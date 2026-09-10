@@ -16,6 +16,11 @@ def compile_mujoco(design: DesignSpec, task: TaskSpec, output_path: Path) -> Too
     Sections and tendon fields are reserved; this MVP builds one passive chain.
     The robot base is the world origin; task targets use this same frame.
     """
+    if design.robot_family != "tendon_driven_continuum":
+        return ToolResult(
+            status="fail", tool="compile_mujoco",
+            failure_code="UNSUPPORTED_ROBOT_FAMILY",
+        )
     segment_length = design.total_length_m / design.segments
     root = ET.Element("mujoco", model="segmented_arm")
     ET.SubElement(root, "option", gravity="0 0 -9.81", timestep="0.002")

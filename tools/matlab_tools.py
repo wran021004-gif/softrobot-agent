@@ -18,6 +18,11 @@ class MatlabTools:
             raise
 
     def analyze_workspace(self, design: DesignSpec, task: TaskSpec) -> ToolResult:
+        if design.robot_family != "tendon_driven_continuum":
+            return ToolResult(
+                status="fail", tool="analyze_workspace",
+                failure_code="UNSUPPORTED_ROBOT_FAMILY",
+            )
         reachable, distance, max_reach, margin = self.eng.analyze_workspace(
             design.total_length_m,
             task.target_m[0],

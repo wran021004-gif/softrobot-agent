@@ -31,10 +31,11 @@ def main() -> int:
         print("PASS")
         print("[4] MATLAB workspace analysis...", flush=True)
         workspace = matlab_tools.analyze_workspace(design, task)
-        print("Target reachable:", workspace.metrics["target_reachable"])
-        print("Target distance:", workspace.metrics["target_distance_m"])
-        print("Max reach:", workspace.metrics["max_reach_m"])
-        print("Reach margin:", workspace.metrics["reach_margin_m"])
+        if workspace.metrics:
+            print("Target reachable:", workspace.metrics["target_reachable"])
+            print("Target distance:", workspace.metrics["target_distance_m"])
+            print("Max reach:", workspace.metrics["max_reach_m"])
+            print("Reach margin:", workspace.metrics["reach_margin_m"])
         if workspace.status != "pass":
             print("FAIL:", workspace.failure_code)
             return 1

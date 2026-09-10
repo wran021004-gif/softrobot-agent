@@ -1,0 +1,101 @@
+bundle_name: mujoco
+implementation_status: partial
+tools:
+  compile_mujoco:
+    implementation:
+      module: tools.mujoco_tools
+      callable: compile_mujoco
+    supported_robot_families: [tendon_driven_continuum]
+    family_support: partial
+    inputs:
+      design: DesignSpec
+      task: TaskSpec
+      output_path: pathlib.Path
+    output: ToolResult
+    design_fields_used: [robot_family, segments, total_length_m, body_radius_m]
+    discriminator_field: robot_family
+    numerical_design_fields_used: [segments, total_length_m, body_radius_m]
+    currently_ignored_design_fields:
+      - sections
+      - tendon_count
+      - tendon_routing_radius_m
+    task_fields_used: [target_m]
+    currently_ignored_task_fields: [task_id, task_type, position_error_max_m]
+    fidelity:
+      level: low
+      model: segmented_passive_hinge_chain_approximation
+    contract:
+      robot_base_m: [0.0, 0.0, 0.0]
+      segment_length: total_length_m / segments
+      segment_direction: local +x
+      joint_axis: local +y
+      floor_z: -body_radius_m
+      tip_site: Last segment at local [segment_length, 0, 0].
+      target_site: World site at task.target_m; no collision or actuation.
+      pass_condition: MJCF written; loading and task success are checked separately.
+      metrics: {}
+      artifacts:
+        mjcf_path: Absolute path to generated XML.
+    limitations:
+      - No tendon actuation and no active controller.
+      - Planar hinge chain; not a physical continuum model.
+      - Single passive chain regardless of sections.
+      - Fixed density, damping, gravity, and timestep.
+      - Arm-floor contact only; arm self-contact disabled.
+      - Invalid design arithmetic and file-write exceptions propagate without a ToolResult.
+    failure_codes:
+      UNSUPPORTED_ROBOT_FAMILY: Only tendon_driven_continuum is accepted.
+    cost:
+      compute: low
+  validate_task:
+    implementation:
+      module: tools.mujoco_tools
+      callable: validate_task
+    supported_robot_families: [tendon_driven_continuum]
+    family_support: partial
+    family_check: No DesignSpec input or runtime family check; intended for this bundle's compiled MJCF.
+    inputs:
+      xml_path: str | pathlib.Path
+      task: TaskSpec
+    output: ToolResult
+    design_fields_used: []
+    currently_ignored_design_fields: []
+    design_input_note: No DesignSpec argument; geometry and dynamics are read from MJCF.
+    task_fields_used: [target_m, position_error_max_m]
+    currently_ignored_task_fields: [task_id, task_type]
+    fidelity:
+      level: low
+      model: final_position_gate_on_passive_segmented_simulation
+    contract:
+      steps: 100
+      finite_checks: [qpos_each_step, qvel_each_step, final_tip_position]
+      tip_position_source: data.site_xpos at tip_site after final mj_forward
+      target_source: task.target_m; target_site is not read
+      coordinate_frame: MuJoCo world, equal to compiled robot base frame
+      position_error_m: Euclidean distance between final tip position and task.target_m
+      task_success: position_error_m <= task.position_error_max_m
+      pass_condition: Simulation checks pass and task_success is true.
+      metrics_on_completed_simulation:
+        steps: int
+        nq: int
+        nv: int
+        tip_position_m: list[float]
+        target_position_m: list[float]
+        position_error_m: float
+        position_error_max_m: float
+        task_success: bool
+      artifacts: []
+    limitations:
+      - Checks final position only; no tracking, orientation, or sustained reach validation.
+      - No controller or control inputs are added.
+      - Requires a named tip_site in the input XML.
+      - Does not dispatch on task_type; only the positional reach gate is implemented.
+      - Finite-state checks are a minimal sanity check, not a robustness guarantee.
+      - Physics and nonfinite failures return empty metrics; TASK_FAILED retains task metrics.
+    failure_codes:
+      TASK_FAILED: Simulation completed but final position error exceeds the allowed error.
+      PHYSICS_ERROR: Exception during model loading, site lookup, simulation, or evaluation.
+      NONFINITE_STATE: A checked state or final tip position contains NaN or Inf.
+    cost:
+      compute: low
+      note: Fixed 100 steps; actual cost depends on the input XML.
