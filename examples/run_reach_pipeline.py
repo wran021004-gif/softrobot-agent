@@ -11,7 +11,7 @@ import yaml
 from schemas.design_spec import DesignSpec
 from schemas.task_spec import TaskSpec
 from tools.matlab_tools import MatlabTools
-from tools.mujoco_tools import compile_mujoco, validate_physics
+from tools.mujoco_tools import compile_mujoco, validate_task
 
 
 def main() -> int:
@@ -41,20 +41,28 @@ def main() -> int:
 
         print("[5] Compiling MuJoCo model...", flush=True)
         compiled = compile_mujoco(
-            design, PROJECT_ROOT / "mujoco/generated" / f"{task.task_id}.xml",
+            design, task, PROJECT_ROOT / "mujoco/generated" / f"{task.task_id}.xml",
         )
         if compiled.status != "pass":
             print("FAIL:", compiled.failure_code, compiled.message)
             return 1
         print("Generated:", compiled.artifacts["mjcf_path"])
 
-        print("[6] Validating MuJoCo physics...", flush=True)
-        physics = validate_physics(compiled.artifacts["mjcf_path"])
-        if physics.status != "pass":
-            print("FAIL:", physics.failure_code, physics.message)
+        print("[6] Running MuJoCo task validation...", flush=True)
+        validation = validate_task(compiled.artifacts["mjcf_path"], task)
+        if "task_success" in validation.metrics:
+            print("Steps:", validation.metrics["steps"])
+            print("Tip position:", validation.metrics["tip_position_m"])
+            print("Target position:", validation.metrics["target_position_m"])
+            print("Position error:", validation.metrics["position_error_m"], "m")
+            print("Allowed error:", validation.metrics["position_error_max_m"], "m")
+            print("Task success:", validation.metrics["task_success"])
+        if validation.status != "pass":
+            print("FAIL:", validation.failure_code)
+            if validation.message:
+                print(validation.message)
             return 1
         print("PASS")
-        print("Steps:", physics.metrics["steps"])
     finally:
         matlab_tools.close()
 

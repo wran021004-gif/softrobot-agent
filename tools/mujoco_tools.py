@@ -5,14 +5,16 @@ import xml.etree.ElementTree as ET
 import mujoco
 
 from schemas.design_spec import DesignSpec
+from schemas.task_spec import TaskSpec
 from schemas.tool_result import ToolResult
 
 
-def compile_mujoco(design: DesignSpec, output_path: Path) -> ToolResult:
+def compile_mujoco(design: DesignSpec, task: TaskSpec, output_path: Path) -> ToolResult:
     """MVP segmented approximation.
 
     TODO: add physical tendon routing and actuation.
     Sections and tendon fields are reserved; this MVP builds one passive chain.
+    The robot base is the world origin; task targets use this same frame.
     """
     segment_length = design.total_length_m / design.segments
     root = ET.Element("mujoco", model="segmented_arm")
@@ -24,14 +26,15 @@ def compile_mujoco(design: DesignSpec, output_path: Path) -> ToolResult:
     world = ET.SubElement(root, "worldbody")
     ET.SubElement(
         world, "geom", name="floor", type="plane", size="2 2 0.1",
-        contype="0", conaffinity="1",
+        pos=f"0 0 {-design.body_radius_m}", contype="0", conaffinity="1",
+    )
+    ET.SubElement(
+        world, "site", name="target_site", type="sphere", size="0.008",
+        pos=" ".join(str(value) for value in task.target_m), rgba="1 0 0 1",
     )
     parent = world
     for index in range(design.segments):
-        position = (
-            f"0 0 {design.total_length_m + design.body_radius_m}"
-            if index == 0 else f"{segment_length} 0 0"
-        )
+        position = "0 0 0" if index == 0 else f"{segment_length} 0 0"
         body = ET.SubElement(parent, "body", name=f"segment_{index}", pos=position)
         ET.SubElement(body, "joint", name=f"joint_{index}")
         ET.SubElement(
@@ -39,6 +42,11 @@ def compile_mujoco(design: DesignSpec, output_path: Path) -> ToolResult:
             fromto=f"0 0 0 {segment_length} 0 0", size=str(design.body_radius_m),
         )
         parent = body
+
+    ET.SubElement(
+        parent, "site", name="tip_site", type="sphere", size="0.005",
+        pos=f"{segment_length} 0 0", rgba="0 1 0 1",
+    )
 
     output_path = Path(output_path).resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -51,10 +59,12 @@ def compile_mujoco(design: DesignSpec, output_path: Path) -> ToolResult:
     )
 
 
-def validate_physics(xml_path: str | Path) -> ToolResult:
+def validate_task(xml_path: str | Path, task: TaskSpec) -> ToolResult:
+    """Check finite simulation state and the final tip-to-target distance."""
     try:
         model = mujoco.MjModel.from_xml_path(str(xml_path))
         data = mujoco.MjData(model)
+        tip_site_id = model.site("tip_site").id
         for _ in range(100):
             mujoco.mj_step(model, data)
             if not (
@@ -62,16 +72,36 @@ def validate_physics(xml_path: str | Path) -> ToolResult:
                 and all(math.isfinite(value) for value in data.qvel)
             ):
                 return ToolResult(
-                    status="fail", tool="validate_physics",
+                    status="fail", tool="validate_task",
                     failure_code="NONFINITE_STATE",
                     message="qpos or qvel contains a non-finite value.",
                 )
+        # Refresh site positions from qpos after the final integration step.
+        mujoco.mj_forward(model, data)
+        tip_position = [float(value) for value in data.site_xpos[tip_site_id]]
+        if not all(math.isfinite(value) for value in tip_position):
+            return ToolResult(
+                status="fail", tool="validate_task",
+                failure_code="NONFINITE_STATE",
+                message="tip_site position contains a non-finite value.",
+            )
+        target_position = [float(value) for value in task.target_m]
+        position_error = math.dist(tip_position, target_position)
+        task_success = position_error <= task.position_error_max_m
         return ToolResult(
-            status="pass", tool="validate_physics",
-            metrics={"steps": 100, "nq": model.nq, "nv": model.nv},
+            status="pass" if task_success else "fail", tool="validate_task",
+            failure_code=None if task_success else "TASK_FAILED",
+            metrics={
+                "steps": 100, "nq": model.nq, "nv": model.nv,
+                "tip_position_m": tip_position,
+                "target_position_m": target_position,
+                "position_error_m": position_error,
+                "position_error_max_m": task.position_error_max_m,
+                "task_success": task_success,
+            },
         )
     except Exception as exc:
         return ToolResult(
-            status="fail", tool="validate_physics",
+            status="fail", tool="validate_task",
             failure_code="PHYSICS_ERROR", message=str(exc),
         )
