@@ -180,8 +180,8 @@ tools:
         error.
       PHYSICS_ERROR: Exception during model loading, site lookup, simulation, or evaluation.
       NONFINITE_STATE: A checked state or final tip position contains NaN or Inf.
-      INVALID_TENDON_COMMAND: Invalid length count/values or model transmissions/order;
-        empty metrics.
+      INVALID_TENDON_COMMAND: Invalid length count/values or model transmission/order;
+        retains available execution evidence.
       CAPABILITY_MISSING: No implemented route/evaluator for requested task.
     cost:
       compute: low
@@ -214,7 +214,8 @@ tools:
       controller: Controller protocol or None
       run_settings: RunSettings
     outputs:
-    - ToolResult with actual metrics and final state
+    - ToolResult with canonical actual metrics, compact execution_evidence, resolved
+      engine parameter provenance and final state
     fields_consumed:
     - MJCF
     - TaskSpec.task_type
@@ -229,6 +230,9 @@ tools:
     - Only reach evaluator exists.
     - Finite state is not validated physical fidelity.
     - No automatic tuning or retry.
+    - Step force/length samples are solver-stage values; qpos/qvel are post-integration.
+      No extra forward calls in integration loop. An upper zero-bound hit does not prove
+      active clipping or maximum-pull saturation.
     failure_codes:
     - TASK_FAILED
     - PHYSICS_ERROR

@@ -123,7 +123,7 @@ Implemented: spec validation/IR compiler; M0 geometric screening and M1 PCC;
 C0 passive and C1 fixed length execution; deterministic MuJoCo compilation,
 finite-state checks and final reach evaluation; artifacts and deterministic resolver.
 Planned manifests contain no callable: extended mechanics/dynamics, optimization,
-feedback/model-based control, diagnostics, general metrics and learning. Future
+feedback/model-based control, advanced diagnostics, general metrics and learning. Future
 reach_window/catch_drop/catch_ramp/stabilize_tip have no executable task package.
 
 Resolver states are SUPPORTED, PARAMETRICALLY_SUPPORTED, IMPLEMENTATION_REQUIRED,
@@ -135,3 +135,37 @@ Legal segmentation/tendon-count variation is executable, not scientifically vali
 Human decisions still needed: material/EI to equivalent hinge stiffness, damping
 source, tendon elasticity/slack/friction, validated actuator dynamics and calibration,
 and multi-section physics/coupling. No scientific law is supplied to fill these gaps.
+
+## Round 1: provenance and failure evidence
+
+The unchanged reach_free command now produces diagnostic_summary.json and four
+deterministic diagnostic ToolResults: compare_model_sim, check_actuator_limits,
+check_tendon_tracking and inspect_numerics. They report whether M1 already predicts
+tolerance failure, model-to-simulation tip discrepancy, final tendon tracking,
+maximum-pull saturation versus the zero-force no-push bound, finite state, warnings and state
+peaks. TASK_FAILED does not establish MODEL_MISMATCH or CONTROL_FAILURE. Without
+approved causal/mismatch criteria, attribution remains UNKNOWN. See
+[diagnostic tool documentation](capabilities/tools/diagnostics/TOOL.md).
+
+provenance.json contains per-parameter values, units, category, source and
+scientific status from executed inputs. Stiffness=0.1 N m/rad, damping=0.1 N m s/rad,
+density=1000 kg/m^3, tendon servo gain=1000 N/m and force limit=20 N are explicitly
+legacy_v1_surrogate and unvalidated. Segment lengths/routing are approved geometric
+derivations; MuJoCo derives capsule mass/inertia from geometry and surrogate density.
+Neither is a validated continuum material law. Resolved contact and numerical
+engine defaults are also recorded with version. Task/environment facts, controller
+commands, simulator settings and run duration stay separate categories.
+
+Optimization approval lives in the existing family grammar. There are currently
+**no approved optimization variables or bounds**. Human defines the allowed set,
+bounds/units/constraints, provenance and objective authority. Engineer selects
+approved names; a future optimizer supplies bounded values. Selection/candidate
+validators reject unauthorized fields/changes, and Coding permissions protect
+policy/objective/tolerance/benchmark. optimize_design and run_parameter_sensitivity
+remain PLANNED; no optimizer or retuning is implemented.
+
+Coding permissions are an application-level contract, not OS/process isolation.
+Before autonomous Coding LLM writes, add an isolated worktree, permission-enforcing
+executor, post-run diff allowlist and Human review. See
+[authority and isolation](agents/contracts/README.md) and
+[open scientific decisions](proposals/engineer/round1_physics_questions.md).

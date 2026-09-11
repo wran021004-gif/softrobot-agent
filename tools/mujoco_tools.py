@@ -15,6 +15,7 @@ from tools.spec_tools import load_environment, load_simulator, load_run_settings
 from controllers.base import Controller
 from controllers.open_loop_length import OpenLoopLength
 from metrics.reach import evaluate_reach
+from tools.mujoco_evidence import ExecutionEvidence
 
 
 def compile_mujoco(design: DesignSpec | RobotIR, task: TaskSpec, output_path: Path,
@@ -127,6 +128,9 @@ def run_task(
     run_settings: RunSettings | None = None,
 ) -> ToolResult:
     """Check finite simulation state and the final tip-to-target distance."""
+    evidence = None
+    def observed():
+        return {"execution_evidence": evidence.summary(model, data), "steps_completed": evidence.steps} if evidence else {}
     try:
         settings = run_settings or load_run_settings()
         if task.task_type != "reach":
@@ -134,6 +138,12 @@ def run_task(
         model = mujoco.MjModel.from_xml_path(str(xml_path))
         data = mujoco.MjData(model)
         tip_site_id = model.site("tip_site").id
+        # Kinematics on a separate data object cannot alter the executed state or
+        # solver warm start. No extra forward/step calls enter the baseline loop.
+        initial_data = mujoco.MjData(model)
+        mujoco.mj_kinematics(model, initial_data)
+        initial_tip = initial_data.site_xpos[tip_site_id].tolist()
+        evidence = ExecutionEvidence(model, data, settings.steps, initial_tip, controller)
         commands = None
         for step in range(settings.steps):
             try:
@@ -142,7 +152,7 @@ def run_task(
             except Exception as exc:
                 return ToolResult(
                     status="fail", tool="run_task", failure_code="CONTROL_FAILURE",
-                    metrics={"steps_completed": step}, message=str(exc),
+                    metrics=observed(), message=str(exc),
                 )
             if commands is not None and (
                 len(commands) != model.nu or model.nu != model.ntendon
@@ -152,6 +162,7 @@ def run_task(
             ):
                 return ToolResult(
                     status="fail", tool="run_task", failure_code="INVALID_TENDON_COMMAND",
+                    metrics=observed(),
                     message="Expected one positive length per tendon actuator in tendon order.",
                 )
             if commands is not None:
@@ -161,6 +172,7 @@ def run_task(
                 # Zero ctrl means zero length; disable forces for passive execution.
                 model.opt.disableflags |= int(mujoco.mjtDisableBit.mjDSBL_ACTUATION)
             mujoco.mj_step(model, data)
+            evidence.observe_step(model, data, commands)
             if not (
                 all(math.isfinite(value) for value in data.qpos)
                 and all(math.isfinite(value) for value in data.qvel)
@@ -168,7 +180,7 @@ def run_task(
                 return ToolResult(
                     status="fail", tool="run_task",
                     failure_code="NONFINITE_STATE",
-                    metrics={"steps_completed": step + 1},
+                    metrics=observed(),
                     message="qpos or qvel contains a non-finite value.",
                 )
         # Refresh site positions from qpos after the final integration step.
@@ -178,9 +190,11 @@ def run_task(
             return ToolResult(
                 status="fail", tool="run_task",
                 failure_code="NONFINITE_STATE",
+                metrics=observed(),
                 message="tip_site position contains a non-finite value.",
             )
         metrics = {
+            **observed(),
             "steps": settings.steps, "nq": model.nq, "nv": model.nv,
             **evaluate_reach(tip_position, task),
         }
@@ -200,7 +214,7 @@ def run_task(
     except Exception as exc:
         return ToolResult(
             status="fail", tool="run_task",
-            failure_code="PHYSICS_ERROR", message=str(exc),
+            failure_code="PHYSICS_ERROR", metrics=observed(), message=str(exc),
         )
 
 

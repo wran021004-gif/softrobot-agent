@@ -1,5 +1,5 @@
 from typing import Literal
-from pydantic import Field
+from pydantic import Field, model_validator
 from schemas.common import Contract
 from schemas.design_spec import DesignSpec
 from schemas.failure_taxonomy import FailureCategory
@@ -13,6 +13,15 @@ class EngineerOutput(Contract):
     requested_tools: tuple[str, ...] = ()
     optimization_variables: tuple[str, ...] = ()
     decision: Literal["execute", "stop", "escalate"]
+
+    @model_validator(mode="after")
+    def authorized_variables(self):
+        if self.optimization_variables:
+            from agents.contracts.optimization import validate_optimization_variables
+            if self.design_hypothesis is None:
+                raise ValueError("Optimization selection requires a design hypothesis")
+            validate_optimization_variables(self.design_hypothesis.robot_family, self.optimization_variables)
+        return self
 
 
 class CodingOutput(Contract):

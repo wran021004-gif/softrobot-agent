@@ -1,82 +1,140 @@
 bundle_name: diagnostics
-version: '1'
+version: '2'
 tools:
   compare_model_sim:
-    implementation_status: PLANNED
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.diagnostic_tools
+      callable: compare_model_sim
     inputs:
-    - run artifacts
-    - ToolResults
-    - approved contracts
+    - 'model_result: ToolResult'
+    - 'simulation_result: ToolResult'
+    - 'task: TaskSpec'
+    - 'evidence_paths: optional caller-supplied references'
     outputs:
-    - model/simulation discrepancy evidence
-    supported_robot_families: &id001
+    - ToolResult; evidence_status available/unavailable; failure_attribution UNKNOWN;
+      measured evidence
+    supported_robot_families:
     - tendon_driven_continuum
-    fidelity: unimplemented; no numerical claims
+    fidelity: Deterministic evidence arithmetic on recorded V1 observations; no validated
+      physical or causal inference.
     assumptions:
-    - Requires Human-approved scientific semantics before implementation.
-    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    - Trusted Harness same-run artifacts; callers must verify recorded artifact hashes
+      before reading persisted evidence.
+    - No approved model mismatch, tracking acceptance, or large-qvel thresholds.
+    applicable_when: V1 structured execution evidence is available; task failure does
+      not prevent diagnostics.
     limitations:
-    - No callable and no fabricated results.
+    - Missing/malformed evidence returns unavailable and UNKNOWN.
+    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force;
+      neither establishes cable slack.
+    - No canonical gate changes, optimizer, physical stability certificate, or causal
+      attribution.
     failure_codes:
-    - CAPABILITY_MISSING
-    - PHYSICS_ASSUMPTION_REQUIRED
+    - UNKNOWN
     cost:
-      compute: unknown until implemented
-    fields_consumed: []
-    artifacts: []
-    physics_contract_dependencies: []
-    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
-      require approval before promotion
+      compute: low
+      note: O(tendon/actuator/state summary size), no simulator or MATLAB launch.
+    fields_consumed:
+    - model_result.metrics.predicted_tip_m / predicted_position_error_m / model_task_success
+      / target_position_m / tendon_target_lengths_m
+    - simulation_result.metrics.tip_position_m / position_error_m / task_success /
+      position_error_max_m / target_position_m / tendon_target_lengths_m
+    - both metrics.comparison_context (Harness run/input hashes and coordinate frame)
+    - TaskSpec.target_m / position_error_max_m
+    - execution_evidence.actuators command extrema and active sample counts
+    artifacts:
+    - compare_model_sim.json (Harness artifact service)
+    - diagnostic_summary.json (Harness aggregate)
+    physics_contract_dependencies:
+    - coordinate_frames.md
+    - actuator_model_v1.md
+    - tendon_length_mapping_v1.md
   check_actuator_limits:
-    implementation_status: PLANNED
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.diagnostic_tools
+      callable: check_actuator_limits
     inputs:
-    - run artifacts
-    - ToolResults
-    - approved contracts
+    - 'simulation_result: ToolResult'
+    - 'evidence_paths: optional caller-supplied references'
     outputs:
-    - saturation evidence
-    supported_robot_families: *id001
-    fidelity: unimplemented; no numerical claims
+    - ToolResult; evidence_status available/unavailable; failure_attribution UNKNOWN;
+      measured evidence
+    supported_robot_families:
+    - tendon_driven_continuum
+    fidelity: Deterministic evidence arithmetic on recorded V1 observations; no validated
+      physical or causal inference.
     assumptions:
-    - Requires Human-approved scientific semantics before implementation.
-    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    - Trusted Harness same-run artifacts; callers must verify recorded artifact hashes
+      before reading persisted evidence.
+    - No approved model mismatch, tracking acceptance, or large-qvel thresholds.
+    applicable_when: V1 structured execution evidence is available; task failure does
+      not prevent diagnostics.
     limitations:
-    - No callable and no fabricated results.
+    - Missing/malformed evidence returns unavailable and UNKNOWN.
+    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force;
+      neither establishes cable slack.
+    - No canonical gate changes, optimizer, physical stability certificate, or causal
+      attribution.
     failure_codes:
-    - CAPABILITY_MISSING
-    - PHYSICS_ASSUMPTION_REQUIRED
+    - UNKNOWN
     cost:
-      compute: unknown until implemented
-    fields_consumed: []
-    artifacts: []
-    physics_contract_dependencies: []
-    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
-      require approval before promotion
+      compute: low
+      note: O(tendon/actuator/state summary size), no simulator or MATLAB launch.
+    fields_consumed:
+    - execution_evidence.actuators identity / force range / extrema / active and limit
+      sample counts
+    - execution_evidence.steps_completed / timestep_s / numerics.actuator_force_all_finite
+    artifacts:
+    - check_actuator_limits.json (Harness artifact service)
+    - diagnostic_summary.json (Harness aggregate)
+    physics_contract_dependencies:
+    - coordinate_frames.md
+    - actuator_model_v1.md
+    - tendon_length_mapping_v1.md
   check_tendon_tracking:
-    implementation_status: PLANNED
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.diagnostic_tools
+      callable: check_tendon_tracking
     inputs:
-    - run artifacts
-    - ToolResults
-    - approved contracts
+    - 'simulation_result: ToolResult'
+    - 'evidence_paths: optional caller-supplied references'
     outputs:
-    - tracking error evidence
-    supported_robot_families: *id001
-    fidelity: unimplemented; no numerical claims
+    - ToolResult; evidence_status available/unavailable; failure_attribution UNKNOWN;
+      measured evidence
+    supported_robot_families:
+    - tendon_driven_continuum
+    fidelity: Deterministic evidence arithmetic on recorded V1 observations; no validated
+      physical or causal inference.
     assumptions:
-    - Requires Human-approved scientific semantics before implementation.
-    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    - Trusted Harness same-run artifacts; callers must verify recorded artifact hashes
+      before reading persisted evidence.
+    - No approved model mismatch, tracking acceptance, or large-qvel thresholds.
+    applicable_when: V1 structured execution evidence is available; task failure does
+      not prevent diagnostics.
     limitations:
-    - No callable and no fabricated results.
+    - Missing/malformed evidence returns unavailable and UNKNOWN.
+    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force;
+      neither establishes cable slack.
+    - No canonical gate changes, optimizer, physical stability certificate, or causal
+      attribution.
     failure_codes:
-    - CAPABILITY_MISSING
-    - PHYSICS_ASSUMPTION_REQUIRED
+    - UNKNOWN
     cost:
-      compute: unknown until implemented
-    fields_consumed: []
-    artifacts: []
-    physics_contract_dependencies: []
-    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
-      require approval before promotion
+      compute: low
+      note: O(tendon/actuator/state summary size), no simulator or MATLAB launch.
+    fields_consumed:
+    - simulation_result.metrics.tendon_target_lengths_m / final_tendon_lengths_m /
+      actuator_controls
+    artifacts:
+    - check_tendon_tracking.json (Harness artifact service)
+    - diagnostic_summary.json (Harness aggregate)
+    physics_contract_dependencies:
+    - coordinate_frames.md
+    - actuator_model_v1.md
+    - tendon_length_mapping_v1.md
   check_tendon_slack:
     implementation_status: PLANNED
     inputs:
@@ -85,7 +143,8 @@ tools:
     - approved contracts
     outputs:
     - slack evidence (requires approved slack model)
-    supported_robot_families: *id001
+    supported_robot_families: &id001
+    - tendon_driven_continuum
     fidelity: unimplemented; no numerical claims
     assumptions:
     - Requires Human-approved scientific semantics before implementation.
@@ -128,30 +187,48 @@ tools:
     contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
       require approval before promotion
   inspect_numerics:
-    implementation_status: PLANNED
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.diagnostic_tools
+      callable: inspect_numerics
     inputs:
-    - run artifacts
-    - ToolResults
-    - approved contracts
+    - 'simulation_result: ToolResult'
+    - 'evidence_paths: optional caller-supplied references'
     outputs:
-    - numerical diagnostics
-    supported_robot_families: *id001
-    fidelity: unimplemented; no numerical claims
+    - ToolResult; evidence_status available/unavailable; failure_attribution UNKNOWN;
+      measured evidence
+    supported_robot_families:
+    - tendon_driven_continuum
+    fidelity: Deterministic evidence arithmetic on recorded V1 observations; no validated
+      physical or causal inference.
     assumptions:
-    - Requires Human-approved scientific semantics before implementation.
-    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    - Trusted Harness same-run artifacts; callers must verify recorded artifact hashes
+      before reading persisted evidence.
+    - No approved model mismatch, tracking acceptance, or large-qvel thresholds.
+    applicable_when: V1 structured execution evidence is available; task failure does
+      not prevent diagnostics.
     limitations:
-    - No callable and no fabricated results.
+    - Missing/malformed evidence returns unavailable and UNKNOWN.
+    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force;
+      neither establishes cable slack.
+    - No canonical gate changes, optimizer, physical stability certificate, or causal
+      attribution.
     failure_codes:
-    - CAPABILITY_MISSING
-    - PHYSICS_ASSUMPTION_REQUIRED
+    - UNKNOWN
     cost:
-      compute: unknown until implemented
-    fields_consumed: []
-    artifacts: []
-    physics_contract_dependencies: []
-    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
-      require approval before promotion
+      compute: low
+      note: O(tendon/actuator/state summary size), no simulator or MATLAB launch.
+    fields_consumed:
+    - execution_evidence.numerics finite flags / state peaks / warnings / time advancement
+    - execution_evidence.steps_completed / steps_requested
+    - simulation_result.failure_code
+    artifacts:
+    - inspect_numerics.json (Harness artifact service)
+    - diagnostic_summary.json (Harness aggregate)
+    physics_contract_dependencies:
+    - coordinate_frames.md
+    - actuator_model_v1.md
+    - tendon_length_mapping_v1.md
   run_parameter_sensitivity:
     implementation_status: PLANNED
     inputs:
@@ -167,6 +244,8 @@ tools:
     applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
     limitations:
     - No callable and no fabricated results.
+    - 'PHYSICS_ASSUMPTION_REQUIRED: no Human-approved sensitivity variable/bounds
+      policy exists; no perturbations run.'
     failure_codes:
     - CAPABILITY_MISSING
     - PHYSICS_ASSUMPTION_REQUIRED

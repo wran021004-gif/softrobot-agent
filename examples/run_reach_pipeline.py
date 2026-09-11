@@ -14,7 +14,7 @@ def main() -> int:
     print("Run:", run.path)
     print("Final status:", run.record.final_status)
     print("Failure code:", run.record.failure_code)
-    print("Evidence: model_result.json, mujoco_result.json, metrics.json, trace.json, run.json")
+    print("Evidence: model_result.json, mujoco_result.json, diagnostic_summary.json, provenance.json, trace.json, run.json (when produced)")
     return 0 if run.record.final_status == "PASS" else 1
 
 

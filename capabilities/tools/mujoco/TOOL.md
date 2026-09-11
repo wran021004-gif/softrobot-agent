@@ -30,3 +30,12 @@ This is a low-fidelity segmented tendon-driven surrogate. It is not Cosserat,
 FEM, a calibrated actuator or a validated material model. No hidden tuning, trajectory
 optimization or success override occurs. Finite-state checks do not prove physical
 fidelity, convergence, stability or steady state.
+
+Round 1 adds compact execution_evidence: initial tip, per-step finite flags and
+qpos/qvel peaks, warnings, requested/completed steps, dt/time, ordered command
+extrema and per-actuator force extrema and lower/upper bound hit counts. Resolved
+contact, mass/inertia and engine numerical defaults have explicit provenance here
+and in Harness provenance.json. Final metrics retain the same final refresh and
+canonical evaluator. No physics constant, command, schedule or task gate changes.
+No giant raw stdout or time-series arrays enter ToolResult. See the diagnostic
+TOOL.md for sample timing, force-bound semantics and evidence limitations.

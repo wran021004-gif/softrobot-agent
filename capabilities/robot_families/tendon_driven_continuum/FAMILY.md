@@ -57,3 +57,9 @@ supported choices. Agent role/output/permission contracts are present; no LLM ru
 DesignSpec is compiled once into shared RobotIR; both MATLAB and MuJoCo consume
 its physical structure. See ../../../physics_contracts/ for approved mappings
 and ../../../README.md for artifact recovery and authority boundaries.
+
+Optimization metadata lives alongside each field in grammar.yaml. All current
+fields are optimizable=false: executable type/positivity checks and example values
+do not approve scientific search bounds. Human defines bounds and objective
+authority; Engineer may only select approved names. See agents/contracts/optimization.py
+for deterministic selection/candidate checks. optimize_design remains PLANNED.

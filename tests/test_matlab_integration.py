@@ -66,7 +66,24 @@ class FullPipelineTests(unittest.TestCase):
             simulation = json.loads((run.path / "mujoco_result.json").read_text())
             self.assertFalse(model["metrics"]["model_task_success"])
             self.assertEqual(model["status"], "pass")
+            self.assertAlmostEqual(model["metrics"]["predicted_position_error_m"], BASELINE["predicted_position_error_m"], places=12)
             self.assertAlmostEqual(simulation["metrics"]["position_error_m"], BASELINE["position_error_m"], places=12)
+            summary = json.loads((run.path / "diagnostic_summary.json").read_text())
+            self.assertEqual(summary['task_gate'], 'FAIL')
+            self.assertEqual(summary['failure_attribution'], 'UNKNOWN')
+            diagnostics = summary['diagnostics']
+            for result in diagnostics.values():
+                self.assertEqual(result['metrics']['evidence_status'], 'available', result)
+                self.assertTrue((run.path / (result['tool'] + '.json')).is_file())
+                for evidence_path in result['artifacts']['evidence_paths']:
+                    self.assertTrue((run.path / evidence_path).is_file())
+            comparison = diagnostics['compare_model_sim']['metrics']
+            self.assertAlmostEqual(comparison['tip_discrepancy_m'], math.dist(model['metrics']['predicted_tip_m'], simulation['metrics']['tip_position_m']))
+            self.assertTrue(comparison['model_predicts_tolerance_failure'])
+            self.assertIsNone(comparison['mismatch_criterion'])
+            provenance = json.loads((run.path / 'provenance.json').read_text())
+            self.assertEqual(provenance['parameters']['tendon_target_lengths_m']['value'], model['metrics']['tendon_target_lengths_m'])
+            self.assertIn('body_mass', provenance['compiled_engine_parameters'])
             for name, expected in run.record.artifact_hashes.items():
                 self.assertEqual(file_hash(run.path / name), expected)
             with zipfile.ZipFile(run.path / "source_snapshot.zip") as archive:

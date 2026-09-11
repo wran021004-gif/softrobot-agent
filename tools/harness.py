@@ -6,6 +6,7 @@ from tools.artifact_tools import create_run, save_tool_result, finalize_run, fil
 from tools.capability_resolver import resolve_capability, CapabilityState
 from tools.design_compiler import build_robot_ir
 from tools.spec_tools import ROOT, load_yaml, load_task_package, validate_design, load_simulator, load_run_settings
+from tools.provenance import parameter_provenance
 
 
 def _snapshot_sources(run):
@@ -60,7 +61,7 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         run.save("design_final.yaml", design)
         run.update(robot_ir_hash=file_hash(run.path / "robot_ir.yaml"))
         run.event(stage, "pass")
-        run.save("provenance.json", {
+        provenance = {
             "task": "task.yaml (frozen package)", "environment": "environment.yaml (sole semantic source)",
             "design": "design_input.yaml; design_final.yaml is identical validated design, no optimization",
             "robot": "robot_ir.yaml derived by tools/design_compiler.py",
@@ -71,7 +72,9 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             "compiler_representation_constants": "tools/mujoco_tools.py in source_snapshot.zip: unit gear, hinge axes, contact masks, marker sizes/colors",
             "model_algorithm": "matlab/plan_pcc_reach.m in source_snapshot.zip: fminbnd defaults, theta in [0,pi], straight threshold 1e-8",
             "metrics": "metrics/reach.py in source_snapshot.zip; final Euclidean distance <= frozen task tolerance",
-        })
+        }
+        provenance["parameters"] = parameter_provenance(design, robot_ir, task, environment, simulator, settings)
+        run.save("provenance.json", provenance)
         stage = "model"
         if matlab_factory is None:
             from tools.matlab_tools import MatlabTools
@@ -84,6 +87,12 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             final_status = failure_code = workspace.failure_code or "UNKNOWN"
             return run
         plan = matlab.plan_pcc_reach(robot_ir, task, environment)
+        comparison_context = {
+            "run_id": run.record.run_id, "task_hash": run.record.task_hash,
+            "environment_hash": run.record.environment_hash, "robot_ir_hash": run.record.robot_ir_hash,
+            "coordinate_frame": robot_ir.coordinate_frame,
+        }
+        plan = plan.model_copy(update={"metrics": {**plan.metrics, "comparison_context": comparison_context}})
         save_tool_result(run, "model_result.json", plan)
         if plan.status != "pass":
             final_status = failure_code = plan.failure_code or "UNKNOWN"
@@ -92,6 +101,8 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         controller = OpenLoopLength(plan.metrics["tendon_target_lengths_m"])
         run.save("tendon_command.json", controller.target)
         run.save("controller.json", controller.result())
+        provenance["parameters"] = parameter_provenance(design, robot_ir, task, environment, simulator, settings, controller.target)
+        run.save("provenance.json", provenance)
         stage = "compilation"
         from tools.mujoco_tools import compile_mujoco, run_task
         compiled = compile_mujoco(robot_ir, task, run.path / "robot.xml", environment, simulator)
@@ -101,7 +112,11 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             return run
         stage = "physics_sanity_gate"
         result = run_task(compiled.artifacts["mjcf_path"], task, controller, settings)
+        result = result.model_copy(update={"metrics": {**result.metrics, "comparison_context": comparison_context}})
         save_tool_result(run, "mujoco_result.json", result)
+        if "execution_evidence" in result.metrics:
+            provenance["compiled_engine_parameters"] = result.metrics["execution_evidence"]["compiled_parameter_evidence"]
+            run.save("provenance.json", provenance)
         run.save("metrics.json", {"model": plan.metrics, "mujoco": result.metrics})
         if "final_state" in result.artifacts:
             run.save("simulation_state.json", result.artifacts["final_state"])
@@ -110,6 +125,12 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         run.event("task_metric_gate", result.status if completed else "not_run", artifact="mujoco_result.json")
         failure_code = result.failure_code
         final_status = "PASS" if result.status == "pass" else (failure_code or "UNKNOWN")
+        # Diagnostics cannot change the canonical task/physics gate decision.
+        try:
+            from tools.diagnostic_tools import save_diagnostic_summary
+            save_diagnostic_summary(run, plan, result, task)
+        except Exception as exc:
+            run.event("diagnostics", "fail", failure_code="UNKNOWN", message=str(exc))
         return run
     except Exception as exc:
         code = str(exc).split(":", 1)[0]
