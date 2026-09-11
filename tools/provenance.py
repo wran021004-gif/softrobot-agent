@@ -37,4 +37,8 @@ def parameter_provenance(design, ir, task, environment, simulator, settings, com
     add('tendon_target_lengths_m', list(command.tendon_target_lengths_m) if command else None, 'm', 'CONTROLLER',
         'tendon_command.json <- model_result.json; ordered tendon_length_mapping_v1.md',
         'M1 kinematic command; open-loop hold' if command else 'unavailable: model command not yet produced')
+    if environment.truth_status == 'NON_CANONICAL_DEVELOPMENT_ONLY':
+        for key in ('gravity_m_s2', 'environment_objects', 'target_m', 'position_error_max_m'):
+            rows[key]['scientific_status'] = environment.truth_status
+            rows[key]['source'] = 'environment.yaml' if rows[key]['category'] == 'ENVIRONMENT' else 'task.yaml'
     return rows

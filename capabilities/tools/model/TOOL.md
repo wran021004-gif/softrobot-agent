@@ -18,5 +18,18 @@ segment count, body radius and environment gravity/objects are intentionally unu
 by these kinematic models. Engine errors propagate and the Harness records them.
 Spec/IR validation may raise before a numerical call; no unsupported physics is guessed.
 
-Future clearance, actuation, stiffness, equilibrium and dynamics analyses exist
+analyze_clearance consumes the completed PCC plan and the same RobotIR, TaskSpec
+and EnvironmentSpec. Python derives four box bars through window_boxes and passes
+their centres and half sizes to matlab/analyze_clearance.m. MATLAB samples the
+entire PCC arc (spacing <= min(1 mm, body radius/4, thickness/4)), computes signed
+box distance minus body radius, and subtracts half the arc spacing for a conservative
+continuous-shape clearance bound. Sampled intersection and uncertain negative bound
+are distinct. Closest location/segment/bar and sampled centreline are retained.
+The aperture check clips every centreline segment against both slab faces and
+erodes the opening by radius plus sampling bound. It rejects routes around the frame.
+This is low/geometric PCC analysis, not a dynamic collision certificate; floor and
+gravity are excluded. Tool pass denotes completed analysis. Screening never prevents
+the Harness from collecting physical execution evidence.
+
+Future actuation, stiffness, equilibrium and dynamics analyses exist
 only as PLANNED manifests, with no fake numerical functions.

@@ -72,7 +72,7 @@ def compare_model_sim(model_result: ToolResult, simulation_result: ToolResult, t
             if not math.isclose(_number(recorded, nonnegative=True), measured, abs_tol=1e-12, rel_tol=1e-10):
                 raise ValueError('Recorded error contradicts tip/target evidence')
         if (_boolean(m['model_task_success']) != (pe <= task.position_error_max_m)
-                or _boolean(s['task_success']) != (se <= task.position_error_max_m)
+                or _boolean(s.get('target_reached', s['task_success'])) != (se <= task.position_error_max_m)
                 or s['position_error_max_m'] != task.position_error_max_m):
             raise ValueError('Recorded task decision contradicts canonical metric')
         metrics = {'predicted_tip_m': list(predicted), 'predicted_position_error_m': pe,
@@ -186,7 +186,42 @@ def inspect_numerics(simulation_result: ToolResult, *, evidence_paths=()) -> Too
         return _result('inspect_numerics', evidence_paths, error=exc)
 
 
-def save_diagnostic_summary(run, model_result, simulation_result, task):
+def check_collision(clearance_result: ToolResult, simulation_result: ToolResult, *, evidence_paths=()) -> ToolResult:
+    """Separate geometric prediction, observed contact and disagreement evidence."""
+    try:
+        p, s = clearance_result.metrics, simulation_result.metrics
+        if not p.get('comparison_context') or p['comparison_context'] != s['comparison_context']:
+            raise ValueError('Matching model/simulation run identities required')
+        if clearance_result.status != 'pass' or 'task_success' not in s:
+            raise ValueError('Completed prediction and execution required; inspect_numerics handles termination')
+        e = s['window_evidence']
+        contact = _boolean(e['obstacle_contact_occurred'])
+        violation = _boolean(p['predicted_clearance_violation'])
+        intersection = _boolean(p['predicted_intersection'])
+        predicted_aperture = _boolean(p['aperture_constraint_satisfied'])
+        observation = ('predicted_geometric_intersection' if intersection else
+                       'predicted_clearance_not_certified' if violation else
+                       'prediction_simulation_collision_disagreement' if contact else
+                       'predicted_aperture_constraint_violation' if not predicted_aperture else
+                       'no_window_contact_observed')
+        return _result('check_collision', evidence_paths, {
+            'observation': observation, 'predicted_clearance_violation': violation,
+            'predicted_intersection': intersection,
+            'predicted_aperture_constraint_satisfied': predicted_aperture,
+            'predicted_minimum_clearance_m': _number(p['predicted_minimum_clearance_m']),
+            'minimum_observed_robot_obstacle_clearance_m': _number(e['minimum_observed_robot_obstacle_clearance_m']),
+            'obstacle_contact_occurred': contact, 'contact_count': _count(e['contact_count']),
+            'contact_pairs': e['contact_pairs'],
+            'model_simulation_disagreement_observed': not violation and contact,
+            'aperture_constraint_satisfied': _boolean(e['aperture_constraint_satisfied']),
+            'reach_diagnostics_applicable': not contact and not s['target_reached'],
+            'comparison_context': p['comparison_context'],
+            'limitation': 'Same-command PCC shape versus sampled surrogate execution; observation is not causal attribution. Negative conservative bound alone is not proof of intersection.'})
+    except (KeyError, TypeError, ValueError, AttributeError) as exc:
+        return _result('check_collision', evidence_paths, error=exc)
+
+
+def save_diagnostic_summary(run, model_result, simulation_result, task, clearance_result=None):
     """Harness-only persistence through its existing artifact service."""
     paths = ('mujoco_result.json', 'robot.xml', 'run_settings.yaml')
     comparison_paths = ('model_result.json', 'mujoco_result.json', 'task.yaml', 'robot_ir.yaml')
@@ -196,6 +231,11 @@ def save_diagnostic_summary(run, model_result, simulation_result, task):
     for tool in (check_actuator_limits, check_tendon_tracking, inspect_numerics):
         results.append(run.invoke_tool(tool.__name__, tool.__name__ + '.json',
                        lambda: tool(simulation_result, evidence_paths=paths), input_paths=paths, diagnostic=True))
+    if clearance_result is not None:
+        clearance_paths = ('clearance_result.json', 'mujoco_result.json', 'environment.yaml', 'robot_ir.yaml')
+        results.append(run.invoke_tool('check_collision', 'check_collision.json',
+            lambda: check_collision(clearance_result, simulation_result, evidence_paths=clearance_paths),
+            input_paths=clearance_paths, diagnostic=True))
     summary = {
         'task_gate': 'PASS' if simulation_result.metrics.get('task_success') is True else
                      ('FAIL' if simulation_result.metrics.get('task_success') is False else 'not_run'),

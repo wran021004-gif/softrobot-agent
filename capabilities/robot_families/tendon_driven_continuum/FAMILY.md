@@ -41,11 +41,17 @@ hinges and fixed surrogate restoring stiffness/damping. There is no axial or
 torsional DOF. Force-limited tendons pull only. This is not Cosserat continuum,
 FEM, or a validated material model. Self-contact is disabled.
 
-The task environment source is tasks/reach_free/environment.yaml, selected using TaskSpec.environment_id;
+The task environment source is its package's environment.yaml, matched using TaskSpec.environment_id;
 a future LLM supplying DesignSpec cannot modify it. The task gate holds the PCC
 commands for 1000 steps and compares actual final tip position to the TaskSpec
 target/tolerance. No command disables actuation. PCC error and physical error are
 reported separately; TASK_FAILED must not trigger hidden retuning.
+
+reach_window development fixtures add MATLAB full-PCC swept-radius clearance and
+MuJoCo window contact/aperture evidence. A shared EnvironmentSpec parser derives
+both sets of geometry. Clearance is low/geometric and does not alter M1 commands;
+body_radius_m now also controls the predicted occupied shape. Only fixed rectangular
+y-z apertures are implemented, and no frozen window benchmark is approved yet.
 
 ## Unsupported extensions
 

@@ -191,31 +191,35 @@ tools:
     exception_policy: Schema/IR/contract validation exceptions propagate; Harness
       records stage and message.
   analyze_clearance:
-    implementation_status: PLANNED
-    inputs:
-    - RobotIR
-    - EnvironmentSpec
-    - pose/trajectory
-    outputs:
-    - clearance evidence
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.matlab_tools
+      callable: MatlabTools.analyze_clearance
+      backend: matlab/analyze_clearance.m
+    inputs: [RobotIR, TaskSpec, EnvironmentSpec, PCC ToolResult]
+    outputs: [ToolResult with conservative minimum clearance, intersection, closest sample/segment/bar, aperture crossing and centreline]
     supported_robot_families: &id001
     - tendon_driven_continuum
-    fidelity: unimplemented; no numerical claims
+    fidelity: {level: low, model: geometric_PCC_swept_radius}
     assumptions:
-    - Requires Human-approved scientific semantics before implementation.
-    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    - Single-section PCC, fixed world origin, exactly one y-z window normal to +x.
+    - Window box centres/half sizes are passed from the shared EnvironmentSpec parser.
+    applicable_when: Completed M1 plan for reach_window, including NON_CANONICAL development fixtures.
     limitations:
-    - No callable and no fabricated results.
-    failure_codes:
-    - CAPABILITY_MISSING
-    - PHYSICS_ASSUMPTION_REQUIRED
-    cost:
-      compute: unknown until implemented
-    fields_consumed: []
-    artifacts: []
-    physics_contract_dependencies: []
-    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
-      require approval before promotion
+    - PCC shape approximation; no gravity, dynamics, floor, actuation feasibility or validated physical collision prediction.
+    - Minimum is a conservative lower bound using half the arc sample spacing; a negative bound alone is not proof of intersection.
+    - Closest sample/segment identifies the sampled minimum, not an exact continuous minimizer.
+    - Tool pass means analysis completed, not clearance or task success.
+    failure_codes: [CAPABILITY_MISSING, PHYSICS_ASSUMPTION_REQUIRED]
+    exception_policy: Input or MATLAB failures propagate to the existing Harness.
+    cost: {compute: low, note: Linear in PCC sample count and four window bars; MATLAB session reused.}
+    fields_consumed:
+    - RobotIR.section.length_m / body_radius_m / segments / coordinate_frame
+    - TaskSpec.task_type / target_m / environment_id
+    - EnvironmentSpec.window dimensions, position and plane
+    - model_result theta_rad / phi_rad / comparison_context
+    artifacts: [clearance_result.json]
+    physics_contract_dependencies: [coordinate_frames.md, tendon_driven_pcc_v1.md]
   analyze_actuation:
     implementation_status: PLANNED
     inputs:

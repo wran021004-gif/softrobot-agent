@@ -4,7 +4,7 @@ import warnings
 import xml.etree.ElementTree as ET
 import yaml
 from schemas.design_spec import DesignSpec
-from schemas.environment_spec import EnvironmentSpec, Plane
+from schemas.environment_spec import EnvironmentSpec, Plane, Window
 from schemas.settings import PhysicsSpec, SimulatorSpec, RunSettings
 from schemas.task_spec import TaskSpec
 
@@ -64,6 +64,12 @@ def environment_xml(environment: EnvironmentSpec) -> ET.Element:
     ET.SubElement(root, "option", gravity=vector(environment.gravity_m_s2))
     world = ET.SubElement(root, "worldbody")
     for obj in environment.objects:
+        if isinstance(obj, Window):
+            from tools.window_geometry import window_boxes
+            for name, position, size in window_boxes(obj):
+                ET.SubElement(world, "geom", name=name, type="box", size=vector(size),
+                              pos=vector(position), contype=str(obj.contype), conaffinity=str(obj.conaffinity))
+            continue
         if not isinstance(obj, Plane):
             raise ValueError(f"IMPLEMENTATION_REQUIRED: environment component {obj.kind}")
         ET.SubElement(world, "geom", name=obj.name, type="plane", size=vector(obj.half_size_m),

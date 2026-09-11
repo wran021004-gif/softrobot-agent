@@ -125,7 +125,8 @@ C0 passive and C1 fixed length execution; deterministic MuJoCo compilation,
 finite-state checks and final reach evaluation; artifacts and deterministic resolver.
 Planned manifests contain no callable: extended mechanics/dynamics, optimization,
 feedback/model-based control, advanced diagnostics, general metrics and learning. Future
-reach_window/catch_drop/catch_ramp/stabilize_tip have no executable task package.
+catch_drop/catch_ramp/stabilize_tip have no executable task package. reach_window
+has an executable NON_CANONICAL development fixture; benchmark geometry awaits Human approval.
 
 Resolver states are SUPPORTED, PARAMETRICALLY_SUPPORTED, IMPLEMENTATION_REQUIRED,
 OUT_OF_GRAMMAR and PHYSICS_ASSUMPTION_REQUIRED. Current sections=2 is outside the
@@ -192,3 +193,22 @@ automatic Skill generator/curator or autonomous agent has been introduced.
 
 See [trace architecture](docs/trace_skill_architecture.md),
 [Skill Library](skills/README.md) and [Round 1.5 results](docs/round1_5_result.md).
+
+## Round 2: constrained reach
+
+Run `python examples/run_reach_pipeline.py --task-package tests/fixtures/reach_window_dev`
+for the explicitly NON_CANONICAL / DEVELOPMENT_ONLY window fixture. It reuses M0,
+M1, C1, RobotIR and the unchanged legacy surrogate. MATLAB analyze_clearance checks
+the full PCC shape using four frame bars derived from the same EnvironmentSpec
+that generates MuJoCo geometry. MuJoCo records compact window distance/contact
+evidence; check_collision distinguishes geometric predictions and observed collisions
+without claiming a cause. The existing Finding extractor includes these exact
+metrics when explicitly invoked; no Skill is generated.
+
+The development evaluator requires final target tolerance, full-slab aperture crossing
+and no sampled window contact. The initial arm may already extend through the window;
+this does not demonstrate insertion from a retracted state. Frozen reach_window
+geometry and acceptance semantics remain Human decisions. See the
+[fixture contract](tests/fixtures/reach_window_dev/README.md) and
+[Round 2 results](docs/round2_result.md). Seven focused tests in test_reach_window.py
+include four opt-in real MATLAB tests; use SOFTROBOT_TEST_MATLAB=1 to include them.

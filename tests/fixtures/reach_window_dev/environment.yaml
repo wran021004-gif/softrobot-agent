@@ -1,0 +1,28 @@
+# NON_CANONICAL / DEVELOPMENT_ONLY. Geometry chosen solely to exercise tooling.
+schema_version: '1'
+environment_id: reach_window_dev
+truth_status: NON_CANONICAL_DEVELOPMENT_ONLY
+units: SI
+coordinate_frame: world_base_x_forward_yz_cross_section
+gravity_m_s2: [0.0, 0.0, -9.81]
+gravity_source: Development fixture reuses reach_free gravity; not a frozen benchmark
+objects:
+  - kind: plane
+    name: floor
+    position_m: [0.0, 0.0, -0.02]
+    half_size_m: [2.0, 2.0, 0.1]
+    contype: 0
+    conaffinity: 1
+  - kind: window
+    name: aperture
+    position_m: [0.18, 0.0, 0.06]
+    plane: yz_normal_positive_x
+    width_m: 0.12
+    height_m: 0.18
+    thickness_m: 0.02
+    frame_width_m: 0.15
+    contype: 0
+    conaffinity: 1
+lights:
+  - position_m: [0.0, 0.0, 2.0]
+    direction: [0.0, 0.0, -1.0]

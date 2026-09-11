@@ -39,3 +39,23 @@ and in Harness provenance.json. Final metrics retain the same final refresh and
 canonical evaluator. No physics constant, command, schedule or task gate changes.
 No giant raw stdout or time-series arrays enter ToolResult. See the diagnostic
 TOOL.md for sample timing, force-bound semantics and evidence limitations.
+
+reach_window additionally requires its EnvironmentSpec when calling run_task.
+The shared environment renderer emits four fixed box bars; execution verifies their
+placement, size, orientation and contact masks against that spec. WindowEvidence
+queries capsule-to-bar signed distances via MuJoCo mj_geomDistance and records
+nonpositive-distance contacts, bounded pair counts, closest pair/time, and initial
+and final aperture state. Contacts are sampled from the executed collision arrays;
+distance/geometry samples after mj_step describe the pre-integration pose. The final
+forward refresh contributes one final observation. Counts mean sampled contact
+points, not unique impacts. No added forward/step enters the integration loop.
+
+The window evaluator requires target tolerance AND final full-slab aperture crossing
+with body-radius clearance AND no observed window contact. Floor is excluded from
+the window evidence and contact gate. Only single fixed axis-aligned windows are
+supported; absent continuous collision detection or validated continuum mechanics,
+these are sampled surrogate facts. Development fixture acceptance semantics remain
+NON_CANONICAL until Human approves a benchmark.
+
+MuJoCo documents signed geom distance and the limitations of legacy collision
+algorithms in its [geom distance reference](https://mujoco.readthedocs.io/en/latest/computation/#geom-distance).

@@ -126,14 +126,19 @@ def run_task(
     xml_path: str | Path, task: TaskSpec,
     controller: Controller | None = None,
     run_settings: RunSettings | None = None,
+    environment: EnvironmentSpec | None = None,
 ) -> ToolResult:
     """Check finite simulation state and the final tip-to-target distance."""
     evidence = None
+    window_evidence = None
     def observed():
-        return {"execution_evidence": evidence.summary(model, data), "steps_completed": evidence.steps} if evidence else {}
+        result = {"execution_evidence": evidence.summary(model, data), "steps_completed": evidence.steps} if evidence else {}
+        if window_evidence:
+            result["window_evidence"] = window_evidence.summary()
+        return result
     try:
         settings = run_settings or load_run_settings()
-        if task.task_type != "reach":
+        if task.task_type not in ("reach", "reach_window"):
             return ToolResult(status="fail", tool="run_task", failure_code="CAPABILITY_MISSING")
         model = mujoco.MjModel.from_xml_path(str(xml_path))
         data = mujoco.MjData(model)
@@ -144,6 +149,12 @@ def run_task(
         mujoco.mj_kinematics(model, initial_data)
         initial_tip = initial_data.site_xpos[tip_site_id].tolist()
         evidence = ExecutionEvidence(model, data, settings.steps, initial_tip, controller)
+        if task.task_type == "reach_window":
+            from tools.window_geometry import constrained_window
+            from tools.window_evidence import WindowEvidence
+            if environment is None:
+                raise ValueError("reach_window execution requires its EnvironmentSpec")
+            window_evidence = WindowEvidence(model, constrained_window(environment, task))
         commands = None
         for step in range(settings.steps):
             try:
@@ -183,8 +194,13 @@ def run_task(
                     metrics=observed(),
                     message="qpos or qvel contains a non-finite value.",
                 )
+            if window_evidence:
+                # mj_step's geom/contact arrays describe the pre-integration pose.
+                window_evidence.observe(model, data, data.time - model.opt.timestep)
         # Refresh site positions from qpos after the final integration step.
         mujoco.mj_forward(model, data)
+        if window_evidence:
+            window_evidence.observe(model, data, data.time)
         tip_position = [float(value) for value in data.site_xpos[tip_site_id]]
         if not all(math.isfinite(value) for value in tip_position):
             return ToolResult(
@@ -196,7 +212,7 @@ def run_task(
         metrics = {
             **observed(),
             "steps": settings.steps, "nq": model.nq, "nv": model.nv,
-            **evaluate_reach(tip_position, task),
+            **evaluate_reach(tip_position, task, window_evidence.summary() if window_evidence else None),
         }
         if commands is not None:
             metrics.update({

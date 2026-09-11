@@ -162,30 +162,23 @@ tools:
     contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
       require approval before promotion
   check_collision:
-    implementation_status: PLANNED
-    inputs:
-    - run artifacts
-    - ToolResults
-    - approved contracts
-    outputs:
-    - contact evidence
+    implementation_status: IMPLEMENTED
+    implementation: {module: tools.diagnostic_tools, callable: check_collision}
+    inputs: [clearance ToolResult, simulation ToolResult, optional evidence_paths]
+    outputs: [ToolResult with geometric prediction, actual contact, disagreement evidence and UNKNOWN causal attribution]
     supported_robot_families: *id001
-    fidelity: unimplemented; no numerical claims
-    assumptions:
-    - Requires Human-approved scientific semantics before implementation.
-    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    fidelity: Deterministic arithmetic over low/geometric PCC and sampled MuJoCo surrogate evidence.
+    assumptions: [Matching Harness comparison_context and completed execution]
+    applicable_when: Constrained reach execution with clearance and window evidence.
     limitations:
-    - No callable and no fabricated results.
-    failure_codes:
-    - CAPABILITY_MISSING
-    - PHYSICS_ASSUMPTION_REQUIRED
-    cost:
-      compute: unknown until implemented
-    fields_consumed: []
-    artifacts: []
-    physics_contract_dependencies: []
-    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
-      require approval before promotion
+    - Missing evidence yields unavailable and UNKNOWN; numerical termination uses existing inspect_numerics.
+    - Prediction disagreement and contact are observations, not causal proof or validated physics.
+    - No contact in discrete samples does not guarantee continuous collision avoidance.
+    failure_codes: [UNKNOWN]
+    cost: {compute: low}
+    fields_consumed: [clearance_result.metrics, simulation_result.metrics.window_evidence, comparison_context, target_reached]
+    artifacts: [check_collision.json, diagnostic_summary.json]
+    physics_contract_dependencies: [coordinate_frames.md, segmented_mujoco_mapping_v1.md]
   inspect_numerics:
     implementation_status: IMPLEMENTED
     implementation:

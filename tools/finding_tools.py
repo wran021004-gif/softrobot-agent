@@ -38,6 +38,13 @@ def extract_diagnostic_finding(run_id, run_root):
         ("check_tendon_tracking", "max_absolute_error_m", "Maximum final tendon length error in metres"),
         ("inspect_numerics", "anomaly_indicators", "Recorded numerical anomaly indicators"),
     )
+    if "check_collision.json" in store.run(run_id).artifact_hashes:
+        fields += (
+            ("check_collision", "predicted_minimum_clearance_m", "Conservative PCC window clearance bound in metres"),
+            ("check_collision", "minimum_observed_robot_obstacle_clearance_m", "Minimum sampled MuJoCo capsule-to-window clearance in metres"),
+            ("check_collision", "obstacle_contact_occurred", "Window contact observed in sampled execution"),
+            ("check_collision", "model_simulation_disagreement_observed", "Clear PCC prediction versus observed window contact; no causal inference"),
+        )
     observations = []
     try:
         for tool, metric, description in fields:

@@ -14,9 +14,23 @@ class Plane(Contract):
     conaffinity: int = Field(ge=0)
 
 
+class Window(Contract):
+    """Finite rectangular frame; aperture in the world y-z plane, normal +x."""
+    kind: Literal["window"] = "window"
+    name: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_]*$")
+    position_m: Vec3
+    plane: Literal["yz_normal_positive_x"]
+    width_m: float = Field(gt=0)
+    height_m: float = Field(gt=0)
+    thickness_m: float = Field(gt=0)
+    frame_width_m: float = Field(gt=0)
+    contype: Literal[0] = 0
+    conaffinity: Literal[1] = 1
+
+
 class ReservedComponent(Contract):
     """Serializable extension proposals; no execution support in V1."""
-    kind: Literal["window", "ball", "ramp", "platform_disturbance"]
+    kind: Literal["ball", "ramp", "platform_disturbance"]
     name: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_]*$")
     position_m: Vec3
     status: Literal["PLANNED"] = "PLANNED"
@@ -34,7 +48,8 @@ class EnvironmentSpec(Contract):
     coordinate_frame: Literal["world_base_x_forward_yz_cross_section"]
     gravity_m_s2: Vec3
     gravity_source: str = Field(min_length=1)
-    objects: tuple[Annotated[Plane | ReservedComponent, Field(discriminator="kind")], ...]
+    truth_status: Literal["HUMAN_OWNED", "NON_CANONICAL_DEVELOPMENT_ONLY"] = "HUMAN_OWNED"
+    objects: tuple[Annotated[Plane | Window | ReservedComponent, Field(discriminator="kind")], ...]
     lights: tuple[Light, ...] = ()
 
     @model_validator(mode="after")

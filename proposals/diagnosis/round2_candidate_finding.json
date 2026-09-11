@@ -1,0 +1,190 @@
+{
+  "finding_id": "diagnostic_observation_20260911T083602_356646Z_25a425fc",
+  "title": "Recorded model, actuator, tracking and numerical observations",
+  "category": "MODEL_SIM_COMPARISON",
+  "observation": [
+    {
+      "evidence": {
+        "run_id": "20260911T083602_356646Z_25a425fc",
+        "path": "compare_model_sim.json",
+        "sha256": "7f4bd09ee7eb326959f1f0db7ba39dde5fe5310acee7d5395e1234ff36ca8074",
+        "pointer": "/metrics/model_predicts_tolerance_failure"
+      },
+      "value": true,
+      "description": "M1 predicted tolerance failure"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T083602_356646Z_25a425fc",
+        "path": "compare_model_sim.json",
+        "sha256": "7f4bd09ee7eb326959f1f0db7ba39dde5fe5310acee7d5395e1234ff36ca8074",
+        "pointer": "/metrics/tip_discrepancy_m"
+      },
+      "value": 0.1841045610291436,
+      "description": "Observed endpoint discrepancy in metres; no mismatch criterion"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T083602_356646Z_25a425fc",
+        "path": "check_actuator_limits.json",
+        "sha256": "0c4959870a0e8095b9903de2d6ea716cd86a1255da77c613ed3d64368a6c5efe",
+        "pointer": "/metrics/max_pull_limit_observed"
+      },
+      "value": false,
+      "description": "Maximum-pull limit reached in sampled execution"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T083602_356646Z_25a425fc",
+        "path": "check_tendon_tracking.json",
+        "sha256": "2c1891bde27c6e1c06414cd08ff0d6cbdc64b16f8994f1981b92a8a3acb13ac3",
+        "pointer": "/metrics/max_absolute_error_m"
+      },
+      "value": 0.006847228877633504,
+      "description": "Maximum final tendon length error in metres"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T083602_356646Z_25a425fc",
+        "path": "inspect_numerics.json",
+        "sha256": "78923d2c34fb07f8c47587d53312bd6e7cf267c56086f637bb7c8900bd3fafd8",
+        "pointer": "/metrics/anomaly_indicators"
+      },
+      "value": [],
+      "description": "Recorded numerical anomaly indicators"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T083602_356646Z_25a425fc",
+        "path": "check_collision.json",
+        "sha256": "f0d5c0b91a5015c0013065bd55f6c2ed818468e9cce49b5853c4b37fda4df876",
+        "pointer": "/metrics/predicted_minimum_clearance_m"
+      },
+      "value": 0.03950000000000001,
+      "description": "Conservative PCC window clearance bound in metres"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T083602_356646Z_25a425fc",
+        "path": "check_collision.json",
+        "sha256": "f0d5c0b91a5015c0013065bd55f6c2ed818468e9cce49b5853c4b37fda4df876",
+        "pointer": "/metrics/minimum_observed_robot_obstacle_clearance_m"
+      },
+      "value": 0.009769850850218975,
+      "description": "Minimum sampled MuJoCo capsule-to-window clearance in metres"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T083602_356646Z_25a425fc",
+        "path": "check_collision.json",
+        "sha256": "f0d5c0b91a5015c0013065bd55f6c2ed818468e9cce49b5853c4b37fda4df876",
+        "pointer": "/metrics/obstacle_contact_occurred"
+      },
+      "value": false,
+      "description": "Window contact observed in sampled execution"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T083602_356646Z_25a425fc",
+        "path": "check_collision.json",
+        "sha256": "f0d5c0b91a5015c0013065bd55f6c2ed818468e9cce49b5853c4b37fda4df876",
+        "pointer": "/metrics/model_simulation_disagreement_observed"
+      },
+      "value": false,
+      "description": "Clear PCC prediction versus observed window contact; no causal inference"
+    }
+  ],
+  "conditions": {
+    "scope": "This run and sampled execution only"
+  },
+  "evidence_refs": [
+    {
+      "run_id": "20260911T083602_356646Z_25a425fc",
+      "path": "compare_model_sim.json",
+      "sha256": "7f4bd09ee7eb326959f1f0db7ba39dde5fe5310acee7d5395e1234ff36ca8074",
+      "pointer": "/metrics/model_predicts_tolerance_failure"
+    },
+    {
+      "run_id": "20260911T083602_356646Z_25a425fc",
+      "path": "compare_model_sim.json",
+      "sha256": "7f4bd09ee7eb326959f1f0db7ba39dde5fe5310acee7d5395e1234ff36ca8074",
+      "pointer": "/metrics/tip_discrepancy_m"
+    },
+    {
+      "run_id": "20260911T083602_356646Z_25a425fc",
+      "path": "check_actuator_limits.json",
+      "sha256": "0c4959870a0e8095b9903de2d6ea716cd86a1255da77c613ed3d64368a6c5efe",
+      "pointer": "/metrics/max_pull_limit_observed"
+    },
+    {
+      "run_id": "20260911T083602_356646Z_25a425fc",
+      "path": "check_tendon_tracking.json",
+      "sha256": "2c1891bde27c6e1c06414cd08ff0d6cbdc64b16f8994f1981b92a8a3acb13ac3",
+      "pointer": "/metrics/max_absolute_error_m"
+    },
+    {
+      "run_id": "20260911T083602_356646Z_25a425fc",
+      "path": "inspect_numerics.json",
+      "sha256": "78923d2c34fb07f8c47587d53312bd6e7cf267c56086f637bb7c8900bd3fafd8",
+      "pointer": "/metrics/anomaly_indicators"
+    },
+    {
+      "run_id": "20260911T083602_356646Z_25a425fc",
+      "path": "check_collision.json",
+      "sha256": "f0d5c0b91a5015c0013065bd55f6c2ed818468e9cce49b5853c4b37fda4df876",
+      "pointer": "/metrics/predicted_minimum_clearance_m"
+    },
+    {
+      "run_id": "20260911T083602_356646Z_25a425fc",
+      "path": "check_collision.json",
+      "sha256": "f0d5c0b91a5015c0013065bd55f6c2ed818468e9cce49b5853c4b37fda4df876",
+      "pointer": "/metrics/minimum_observed_robot_obstacle_clearance_m"
+    },
+    {
+      "run_id": "20260911T083602_356646Z_25a425fc",
+      "path": "check_collision.json",
+      "sha256": "f0d5c0b91a5015c0013065bd55f6c2ed818468e9cce49b5853c4b37fda4df876",
+      "pointer": "/metrics/obstacle_contact_occurred"
+    },
+    {
+      "run_id": "20260911T083602_356646Z_25a425fc",
+      "path": "check_collision.json",
+      "sha256": "f0d5c0b91a5015c0013065bd55f6c2ed818468e9cce49b5853c4b37fda4df876",
+      "pointer": "/metrics/model_simulation_disagreement_observed"
+    }
+  ],
+  "source_runs": [
+    "20260911T083602_356646Z_25a425fc"
+  ],
+  "ruled_out": [
+    {
+      "evidence": {
+        "run_id": "20260911T083602_356646Z_25a425fc",
+        "path": "check_actuator_limits.json",
+        "sha256": "0c4959870a0e8095b9903de2d6ea716cd86a1255da77c613ed3d64368a6c5efe",
+        "pointer": "/metrics/max_pull_limit_observed"
+      },
+      "value": false,
+      "description": "Maximum-pull limit reached in sampled execution"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T083602_356646Z_25a425fc",
+        "path": "inspect_numerics.json",
+        "sha256": "78923d2c34fb07f8c47587d53312bd6e7cf267c56086f637bb7c8900bd3fafd8",
+        "pointer": "/metrics/anomaly_indicators"
+      },
+      "value": [],
+      "description": "Recorded numerical anomaly indicators"
+    }
+  ],
+  "unresolved": [
+    "Causal attribution UNKNOWN; no validated repair",
+    "No approved mismatch/tracking thresholds",
+    "Absent saturation does not establish actuator correctness; finite states do not establish stability"
+  ],
+  "causal_attribution": "UNKNOWN",
+  "status": "observed",
+  "confidence": "observation_only",
+  "created_by": "harness"
+}

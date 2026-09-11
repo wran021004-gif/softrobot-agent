@@ -120,6 +120,40 @@ class MatlabTools:
             },
         )
 
+    def analyze_clearance(self, robot_ir: RobotIR, task: TaskSpec,
+                          environment: EnvironmentSpec, model_result: ToolResult) -> ToolResult:
+        """Conservative full PCC shape check against the shared window frame."""
+        from tools.window_geometry import constrained_window, window_boxes, aperture_crossing
+        import matlab
+        self._check_environment(robot_ir, task, environment)
+        window = constrained_window(environment, task)
+        if robot_ir.sections != 1 or model_result.status != "pass":
+            raise ValueError("CAPABILITY_MISSING: clearance requires a completed single-section PCC plan")
+        boxes = window_boxes(window)
+        # Numerical resolution, not a physical tolerance or optimization bound.
+        max_spacing = min(0.001, robot_ir.body_radius_m / 4, window.thickness_m / 4)
+        points, lower, sampled, index, box, spacing = self.eng.analyze_clearance(
+            robot_ir.total_length_m, model_result.metrics["theta_rad"], model_result.metrics["phi_rad"],
+            robot_ir.body_radius_m, matlab.double([centre + size for _, centre, size in boxes]),
+            max_spacing, nargout=6)
+        points = [list(map(float, row)) for row in points]
+        i, j = int(index) - 1, int(box) - 1
+        crossing = aperture_crossing(points, robot_ir.body_radius_m + float(spacing) / 2, window)
+        return ToolResult(tool="analyze_clearance", status="pass", metrics={
+            "predicted_minimum_clearance_m": float(lower),
+            "sampled_minimum_clearance_m": float(sampled),
+            "predicted_intersection": bool(sampled < 0),
+            "predicted_clearance_violation": bool(lower < 0),
+            "closest_location_m": points[i], "closest_sample_index": i,
+            "closest_segment_index": min(robot_ir.segments - 1, int(i / (len(points) - 1) * robot_ir.segments)),
+            "closest_obstacle": boxes[j][0], "sample_spacing_m": float(spacing),
+            "sampling_bound_m": float(spacing) / 2, "body_radius_m": robot_ir.body_radius_m,
+            "sample_count": len(points), **crossing,
+            "window": window.model_dump(mode="json"),
+            "comparison_context": model_result.metrics.get("comparison_context"),
+            "fidelity": "low/geometric", "limitation": "PCC shape approximation; window only, no gravity, dynamics or floor analysis; negative lower bound alone is not proof of intersection",
+        }, artifacts={"predicted_centerline_m": points})
+
     @staticmethod
     def _check_environment(robot_ir, task, environment):
         environment = environment or load_environment()

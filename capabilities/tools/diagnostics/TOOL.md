@@ -50,6 +50,11 @@ Diagnostics cannot override the canonical actual-tip gate; their own processing
 failure is recorded separately.
 
 run_parameter_sensitivity remains PLANNED: no diagnostic variable/bounds policy
-is approved. check_tendon_slack awaits physical semantics; check_collision awaits
-an implemented contact evidence contract. No optimizer, retuner or Diagnosis LLM
+is approved. check_tendon_slack awaits physical semantics. check_collision compares
+same-run clearance_result with window_evidence: sampled predicted intersection,
+uncertified conservative clearance, clear prediction with actual contact, or no
+observed window contact. Initial configuration is recorded separately; disagreement
+does not establish why a shape/controller failed. inspect_numerics still handles
+simulation termination, and existing reach/tracking/actuation diagnostics remain
+available. Missing evidence returns unavailable and UNKNOWN. No optimizer, retuner or Diagnosis LLM
 exists. Manifest specifies input fields, limitations and costs.

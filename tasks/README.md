@@ -1,10 +1,11 @@
 # Task packages
 
-Implemented: reach_free. Planned identifiers: reach_window, catch_drop,
-catch_ramp, stabilize_tip. No executable package or evaluator is provided for
-these future tasks. EnvironmentSpec reserves typed component names; all parameters
-and laws beyond the existing plane environment require Human-approved contracts
-before implementation. Reserved components are rejected by environment compilation.
+Frozen benchmark: reach_free. reach_window tooling is executable using
+tests/fixtures/reach_window_dev, explicitly NON_CANONICAL / DEVELOPMENT_ONLY;
+no approved window geometry exists and no benchmark has been registered.
+Window geometry uses a fixed rectangular y-z aperture derived from EnvironmentSpec.
+catch_drop, catch_ramp and stabilize_tip remain planned with no executable package
+or evaluator. Their reserved components are rejected by environment compilation.
 
 Each implemented package owns task.yaml, environment.yaml and a validated
 MuJoCo representation. MATLAB receives shared semantic inputs through Python,

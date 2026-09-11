@@ -213,6 +213,7 @@ tools:
       task: TaskSpec
       controller: Controller protocol or None
       run_settings: RunSettings
+      environment: EnvironmentSpec required for reach_window; optional for legacy reach
     outputs:
     - ToolResult with canonical actual metrics, compact execution_evidence, resolved
       engine parameter provenance and final state
@@ -223,11 +224,14 @@ tools:
     - TaskSpec.position_error_max_m
     - ControlCommand.tendon_target_lengths_m
     - RunSettings.steps
+    - EnvironmentSpec window geometry and frame (reach_window)
     fidelity:
       level: low
       model: segmented surrogate + canonical reach evaluator
     limitations:
-    - Only reach evaluator exists.
+    - Reach and single axis-aligned reach_window evaluators only; window development fixture is not a frozen benchmark.
+    - Window evidence records sampled capsule-to-frame distances, contact points/counts, initial configuration and final aperture crossing; floor excluded.
+    - reach_window success requires target tolerance AND final aperture crossing AND no sampled window contact; no continuous collision guarantee.
     - Finite state is not validated physical fidelity.
     - No automatic tuning or retry.
     - Step force/length samples are solver-stage values; qpos/qvel are post-integration.

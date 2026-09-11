@@ -19,9 +19,14 @@ PHYSICS_ASSUMPTION_REQUIRED. Missing tools or unimplemented model/control levels
 produce IMPLEMENTATION_REQUIRED. Grammar bounds are not expanded by this migration.
 
 Shared source semantics, migration commands, authority and run recovery are in
-../README.md. tasks/reach_free/environment.yaml owns environment semantics;
+../README.md. Each selected package's environment.yaml owns environment semantics;
 validated XML is a representation. Runs provide artifacts and fine-grained traces.
 Memory has a future index contract only. Skill schema, admission and deterministic
 metadata retrieval are implemented with an initially empty library. The catalog's
 skill_registry points to ../skills/index.yaml; get_skill_registry() resolves it.
 No LLM runtime exists. See ../skills/README.md and ../docs/trace_skill_architecture.md.
+
+Round 2 promotes analyze_clearance (MATLAB, full PCC swept radius, low/geometric)
+and check_collision (deterministic recorded evidence) in the existing model and
+diagnostics bundles. The explicit reach_window route uses a NON_CANONICAL fixture
+until Human approves benchmark geometry. Optimization and learning remain PLANNED.
