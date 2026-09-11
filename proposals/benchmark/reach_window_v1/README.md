@@ -1,5 +1,12 @@
 # reach_window_v1 — PROPOSED_NOT_APPROVED
 
+`contract.yaml` is the read-only TaskContract entry for these candidate sources.
+Resolution preserves all proposal markers and unresolved initial-state decisions;
+it does not manufacture executable TaskSpec/EnvironmentSpec or start MATLAB/MuJoCo.
+Any future promotion also needs an explicitly Human-approved FROZEN contract
+version referencing the approved sources and registered evaluator. Runtime results
+cannot perform this step.
+
 Status: BLOCKED_FOR_HUMAN_APPROVAL. The three candidate YAML files contain
 suggestions copied from Round 2 development geometry, with a proposed before_window
 initial condition. They are not executable task packages and are not registered

@@ -1,5 +1,11 @@
 # Diagnosis Agent contract (no LLM adapter)
 
+Task input: TaskContract plus artifacts, trace and diagnostic results. Start from
+task_contract.yaml/task_contract_resolved.json in the run to identify the exact
+source hashes, task status, evaluator and Gate policy. Distinguish unapproved
+proposal/development observations from formal benchmark results. Do not reinterpret
+acceptance or overwrite canonical success; the contract supplies references to truth.
+
 Inputs: run artifacts, ToolResults, model-versus-MuJoCo evidence and canonical
 metrics. Output schema: agents.contracts.outputs.DiagnosisOutput. Each failure
 hypothesis must reference evidence; output also lists diagnostic tests, attribution

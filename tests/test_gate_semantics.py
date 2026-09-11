@@ -62,6 +62,8 @@ class GateSemanticsTests(unittest.TestCase):
     def test_hard_necessary_bound_stops_but_respects_task_tolerance(self):
         package = self.root / 'task_package'
         shutil.copytree(ROOT / 'tasks/reach_free', package)
+        # This modified local test is deliberately not the registered frozen task.
+        (package / 'contract.yaml').unlink()
         original = load_yaml(package / 'task.yaml')
         for target_x, should_stop in ((.42, True), (.405, False)):
             (package / 'task.yaml').write_text(yaml.safe_dump({**original, 'target_m': [target_x, 0., 0.]}))

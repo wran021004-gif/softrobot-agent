@@ -1,12 +1,14 @@
 """Export the authoritative Pydantic contracts as reviewable JSON Schema files."""
 import json
 from schemas.trace import TraceEvent, DecisionRecord
+from schemas.task_contract import TaskContract
 from schemas.finding import CandidateFinding
 from schemas.memory import MemoryRecord
 from schemas.skill import Skill, SkillValidationRecord, SkillValidationEvidence
 from tools.spec_tools import ROOT
 
 CONTRACTS = {
+    "schemas/json/task_contract.schema.json": TaskContract,
     "schemas/json/trace_event.schema.json": TraceEvent,
     "schemas/json/decision_record.schema.json": DecisionRecord,
     "schemas/json/candidate_finding.schema.json": CandidateFinding,

@@ -1,0 +1,25 @@
+schema_version: '1'
+design_grammar_source: capabilities/robot_families/tendon_driven_continuum/grammar.yaml
+evaluator: metrics.reach.evaluate_reach
+run_settings_source: configs/run.yaml
+simulator_settings_source: configs/simulator.yaml
+evaluation_protocol_source: tools/harness.py
+gate_policy_source: schemas/gate.py
+gate_mapping_source: tools/harness.py
+physics_contract_sources:
+- physics_contracts/coordinate_frames.md
+- physics_contracts/tendon_driven_pcc_v1.md
+- physics_contracts/tendon_length_mapping_v1.md
+- physics_contracts/segmented_mujoco_mapping_v1.md
+- physics_contracts/actuator_model_v1.md
+- physics_contracts/legacy_v1_surrogate.yaml
+contract_id: reach_window_v1_proposal
+task_type: reach_window
+status: PROPOSED_NOT_APPROVED
+task_source: ./candidate_task.yaml
+environment_source: ./candidate_environment.yaml
+initial_condition_source: ./candidate_acceptance.yaml
+acceptance_source: ./candidate_acceptance.yaml
+benchmark_id: null
+notes: Read-only proposal resolution. Initial configuration and acceptance await Human
+  approval; this contract cannot be executed or promoted by the Harness.

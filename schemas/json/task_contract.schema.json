@@ -1,0 +1,155 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "contract_id": {
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "title": "Contract Id",
+      "type": "string"
+    },
+    "task_type": {
+      "title": "Task Type",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "FROZEN",
+        "PROPOSED_NOT_APPROVED",
+        "DEVELOPMENT_ONLY"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "task_source": {
+      "title": "Task Source",
+      "type": "string"
+    },
+    "environment_source": {
+      "title": "Environment Source",
+      "type": "string"
+    },
+    "environment_representation_source": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Environment Representation Source"
+    },
+    "design_grammar_source": {
+      "title": "Design Grammar Source",
+      "type": "string"
+    },
+    "evaluator": {
+      "title": "Evaluator",
+      "type": "string"
+    },
+    "initial_condition_source": {
+      "title": "Initial Condition Source",
+      "type": "string"
+    },
+    "acceptance_source": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Acceptance Source"
+    },
+    "run_settings_source": {
+      "title": "Run Settings Source",
+      "type": "string"
+    },
+    "simulator_settings_source": {
+      "title": "Simulator Settings Source",
+      "type": "string"
+    },
+    "evaluation_protocol_source": {
+      "title": "Evaluation Protocol Source",
+      "type": "string"
+    },
+    "gate_policy_source": {
+      "title": "Gate Policy Source",
+      "type": "string"
+    },
+    "gate_mapping_source": {
+      "title": "Gate Mapping Source",
+      "type": "string"
+    },
+    "physics_contract_sources": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Physics Contract Sources",
+      "type": "array"
+    },
+    "benchmark_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Benchmark Id"
+    },
+    "benchmark_source": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Benchmark Source"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "maxLength": 1000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "contract_id",
+    "task_type",
+    "status",
+    "task_source",
+    "environment_source",
+    "design_grammar_source",
+    "evaluator",
+    "initial_condition_source",
+    "run_settings_source",
+    "simulator_settings_source",
+    "evaluation_protocol_source",
+    "gate_policy_source",
+    "gate_mapping_source",
+    "physics_contract_sources"
+  ],
+  "title": "TaskContract",
+  "type": "object"
+}

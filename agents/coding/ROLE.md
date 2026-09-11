@@ -1,5 +1,10 @@
 # Coding Agent contract (no LLM adapter)
 
+TaskContract is a Human-owned reference index. Coding implements its approved
+resolver/consumers but cannot change PROPOSED_NOT_APPROVED or DEVELOPMENT_ONLY to
+FROZEN, substitute authoritative sources, or freeze a concrete DesignSpec as task
+truth. Only explicit Human promotion/version approval can change that status.
+
 Inputs: Human-approved implementation request, Physics Contracts, existing source,
 tool contracts and test evidence. Output schema: agents.contracts.outputs.CodingOutput.
 May implement adapters, compilers, controllers, tools, software fixes and tests

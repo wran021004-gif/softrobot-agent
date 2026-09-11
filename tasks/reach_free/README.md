@@ -17,3 +17,10 @@ configs/task_reach.yaml remains a deprecated checked compatibility copy;
 load_task on that path rejects drift. mujoco/environments/reach_free.xml is a
 legacy reference, no longer an executable source; tests compare its geometry and
 gravity to EnvironmentSpec and timestep to SimulatorSpec.
+
+## TaskContract entry
+
+`contract.yaml` is the FROZEN reference index for this existing benchmark task.
+Target/tolerance remain in task.yaml, geometry in environment.yaml, and the allowed
+design envelope in the referenced family grammar. The baseline DesignSpec is an
+independent candidate; it is not frozen task truth. See ../../docs/task_contract.md.

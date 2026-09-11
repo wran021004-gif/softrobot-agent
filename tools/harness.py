@@ -1,6 +1,7 @@
 """Deterministic orchestration. Numerical predictions never override task truth."""
 from pathlib import Path
 import math
+import hashlib
 import shutil
 import zipfile
 from tools.artifact_tools import create_run, finalize_run, file_hash
@@ -31,6 +32,7 @@ def _save_gate_summary(run, final_status, failure_code, stage, environment):
         "policy_authority": "Human-owned schemas/gate.py; Agents cannot override type, threshold or decision",
         "final_status": final_status, "failure_code": failure_code,
         "task_truth_status": environment.truth_status if environment is not None else None,
+        "task_contract_id": run.record.task_contract_id, "task_contract_status": run.record.task_contract_status,
         "termination": "HARD_FAIL" if hard else "CANONICAL_RESULT" if canonical else "EXECUTION_ERROR",
         "stopped_by": hard, "last_stage": stage,
         "screening_failures": [g["operation"] for g in gates if g["gate_type"] == "SCREENING" and g["decision"] == "FAIL"],
@@ -40,18 +42,20 @@ def _save_gate_summary(run, final_status, failure_code, stage, environment):
     })
 
 
-def _snapshot_sources(run):
+def _snapshot_sources(run, extra_paths=()):
     paths = []
     for folder in ("schemas", "tools", "controllers", "metrics", "matlab", "capabilities", "physics_contracts", "tasks", "benchmarks", "agents", "configs", "skills", "memory"):
         paths.extend(p for p in (ROOT / folder).rglob("*") if p.is_file() and p.suffix in (".py", ".m", ".yaml", ".md", ".xml", ".json"))
     paths.extend((ROOT / name) for name in ("requirements.txt", "examples/run_reach_pipeline.py"))
     paths.extend(p for p in (ROOT / "tests/fixtures/reach_window_dev").rglob("*") if p.is_file())
+    paths.extend(extra_paths)
     hashes = {}
     with zipfile.ZipFile(run.path / "source_snapshot.zip", "w", zipfile.ZIP_DEFLATED) as archive:
-        for path in sorted(paths):
+        for path in sorted(set(paths)):
             relative = path.relative_to(ROOT).as_posix()
-            archive.write(path, relative)
-            hashes[relative] = file_hash(path)
+            data = path.read_bytes()
+            archive.writestr(relative, data)
+            hashes[relative] = hashlib.sha256(data).hexdigest()
     run.update(source_hashes=hashes)
     run.events.emit("ARTIFACT_CREATED", "source_snapshot", evidence_refs=run.events.refs("source_snapshot.zip"))
 
@@ -62,14 +66,50 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
     matlab = None
     environment = None
     clearance = None
+    resolved_contract = None
     final_status, failure_code = "ERROR", "UNKNOWN"
     stage = "spec_gate"
     try:
-        _snapshot_sources(run)
         package = Path(task_package)
-        for source, name in ((package / "task.yaml", "task.yaml"), (package / "environment.yaml", "environment.yaml"),
-                             (Path(design_path), "design_input.yaml"), (package / "mujoco.xml", "environment.xml")):
-            shutil.copyfile(source, run.path / name)
+        if (package / "contract.yaml").is_file():
+            from tools.task_contract_tools import resolve_task_contract
+            resolved_contract = resolve_task_contract(package)
+        extra = (resolved_contract.manifest_path, *resolved_contract.source_paths.values()) if resolved_contract else ()
+        _snapshot_sources(run, extra)
+        if resolved_contract:
+            resolved = resolved_contract
+            with zipfile.ZipFile(run.path / "source_snapshot.zip") as archive:
+                def source_bytes(path, expected_hash):
+                    data = archive.read(path.relative_to(ROOT).as_posix())
+                    if hashlib.sha256(data).hexdigest() != expected_hash:
+                        raise ValueError("TaskContract source changed during resolution; rerun against stable inputs")
+                    return data
+                manifest = source_bytes(resolved.manifest_path, resolved.manifest_hash)
+                for key, path in resolved.source_paths.items():
+                    source_bytes(path, resolved.source_hashes[key])
+                (run.path / "task_contract.yaml").write_bytes(manifest)
+                run.update(task_contract_id=resolved.contract.contract_id,
+                           task_contract_status=resolved.contract.status, task_contract_hash=file_hash(run.path / "task_contract.yaml"))
+                run.events.emit("ARTIFACT_CREATED", "task_contract_snapshot", evidence_refs=run.events.refs("task_contract.yaml"))
+                run.save("task_contract_resolved.json", resolved.reference_view())
+                run.events.emit("SPEC_VALIDATED", "task_contract_resolved", status="pass",
+                    summary={"contract_id": resolved.contract.contract_id, "contract_status": resolved.contract.status},
+                    evidence_refs=run.events.refs("task_contract.yaml", "task_contract_resolved.json"))
+                if resolved.contract.status == "PROPOSED_NOT_APPROVED":
+                    raise ValueError("CAPABILITY_MISSING: proposal contract is resolvable for discussion, not executable or approved")
+                for key, name in (("task_source", "task.yaml"), ("environment_source", "environment.yaml"),
+                                  ("environment_representation_source", "environment.xml")):
+                    (run.path / name).write_bytes(source_bytes(resolved.source_paths[key], resolved.source_hashes[key]))
+        else:
+            # Existing local tests and legacy packages remain an explicit,
+            # non-benchmark compatibility route, with no invented contract ID.
+            run.update(task_contract_status="DEVELOPMENT_ONLY")
+            run.events.emit("SPEC_VALIDATED", "task_contract_compatibility", status="pass",
+                            summary={"mode": "legacy_no_contract", "contract_status": "DEVELOPMENT_ONLY"})
+            for source, name in ((package / "task.yaml", "task.yaml"), (package / "environment.yaml", "environment.yaml"),
+                                 (package / "mujoco.xml", "environment.xml")):
+                shutil.copyfile(source, run.path / name)
+        shutil.copyfile(Path(design_path), run.path / "design_input.yaml")
         run.update(task_hash=file_hash(run.path / "task.yaml"), environment_hash=file_hash(run.path / "environment.yaml"),
                    design_hash=file_hash(run.path / "design_input.yaml"))
         # Execute the exact copied bytes whose hashes are recorded, so source edits
@@ -90,7 +130,12 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             })
         design = validate_design(load_yaml(run.path / "design_input.yaml"))
         run.events.emit("SPEC_VALIDATED", "design_loaded", status="pass", evidence_refs=run.events.refs("design_input.yaml"))
-        simulator, settings = load_simulator(), load_run_settings()
+        if resolved_contract:
+            simulator, settings = resolved_contract.simulator_settings, resolved_contract.run_settings
+            if design.robot_family != resolved_contract.grammar["family_name"]:
+                raise ValueError("CAPABILITY_MISSING: candidate family differs from TaskContract design envelope")
+        else:
+            simulator, settings = load_simulator(), load_run_settings()
         run.save("simulator.yaml", simulator)
         run.save("run_settings.yaml", settings)
         run.update(random_seed=settings.random_seed)
@@ -103,7 +148,8 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         requested = ("analyze_workspace", "plan_pcc_reach", "compile_mujoco", "run_task")
         if constrained:
             requested += ("analyze_clearance", "check_collision")
-        resolution = resolve_capability(design, requested)
+        resolution = resolve_capability(design, requested,
+            **({"grammar": resolved_contract.grammar} if resolved_contract else {}))
         run.save("capability_resolution.json", resolution)
         run.events.emit("CAPABILITY_RESOLVED", "resolve_capability", summary={"state": resolution.state.value},
                         evidence_refs=run.events.refs("capability_resolution.json", "design_input.yaml"))
@@ -138,10 +184,21 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         }
         provenance["parameters"] = parameter_provenance(design, robot_ir, task, environment, simulator, settings)
         provenance["truth_status"] = environment.truth_status
+        provenance["task_contract"] = {
+            "contract_id": run.record.task_contract_id, "status": run.record.task_contract_status,
+            "manifest_hash": run.record.task_contract_hash,
+            "source": "task_contract_resolved.json" if resolved_contract else "legacy_no_contract compatibility; not a formal benchmark run",
+        }
+        if resolved_contract:
+            provenance["simulator"] = "simulator.yaml <- " + resolved_contract.contract.simulator_settings_source
+            provenance["run"] = "run_settings.yaml <- " + resolved_contract.contract.run_settings_source
+            provenance["metrics"] = resolved_contract.contract.evaluator + " from task_contract.yaml"
         if constrained:
             provenance["task"] = "task.yaml; " + environment.truth_status
             provenance["environment_representation"] = "environment.xml and robot.xml <- tools.spec_tools.environment_xml <- environment.yaml; window bars shared with MATLAB via tools.window_geometry.window_boxes"
             provenance["metrics"] = "metrics/reach.py: target tolerance AND required initial side AND final full-slab aperture crossing AND no forbidden sampled window contact; " + environment.truth_status
+        if resolved_contract:
+            provenance["metrics"] = resolved_contract.contract.evaluator + " <- task_contract.yaml; exact evaluator source in source_snapshot.zip"
         run.save("provenance.json", provenance)
         stage = "model"
         if matlab_factory is None:
@@ -236,7 +293,8 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             stage = "physics_sanity_gate"
             def simulation_call():
                 result = run_task(compiled.artifacts["mjcf_path"], task, controller, settings,
-                                  **({"environment": environment} if constrained else {}))
+                                  **({"environment": environment} if constrained else {}),
+                                  **({"evaluator": resolved_contract.evaluator} if resolved_contract else {}))
                 return result.model_copy(update={"metrics": {**result.metrics, "comparison_context": comparison_context}})
             result = run.invoke_tool("run_task", "mujoco_result.json", simulation_call,
                 input_paths=("robot.xml", "task.yaml", "controller.json", "run_settings.yaml") + (("environment.yaml",) if constrained else ()))
@@ -267,7 +325,7 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             gate=dict(gate="target_reached" if constrained else "task_success", gate_type="CANONICAL", input_metric="position_error_m", value=result.metrics.get("position_error_m"),
                       threshold=task.position_error_max_m, comparison="<=",
                       decision=("PASS" if tip_passed else "FAIL") if completed else "NOT_RUN",
-                      authority=("TaskSpec: task.yaml; metrics/reach.py; " + environment.truth_status) if constrained else "frozen TaskSpec: task.yaml; metrics/reach.py"),
+                      authority=("TaskSpec: task.yaml; contract status " + run.record.task_contract_status) if run.record.task_contract_status != "FROZEN" else "frozen TaskSpec: task.yaml; metrics/reach.py"),
             evidence_refs=run.events.refs("task.yaml", "mujoco_result.json"))
         if constrained:
             for metric, expected in (("initial_required_side_satisfied", True), ("aperture_constraint_satisfied", True), ("obstacle_contact_occurred", False), ("task_success", True)):

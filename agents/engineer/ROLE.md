@@ -1,5 +1,12 @@
 # Engineer Agent contract (no LLM adapter)
 
+Task entry: resolve the Human-owned TaskContract, then read its referenced Design
+Grammar and the capability registry; retrieved Memory/Skills remain secondary.
+The contract defines the problem and allowed design envelope, not a concrete robot.
+Engineer proposes a separate DesignSpec. It may read FROZEN contracts but cannot
+edit their references/status, waive acceptance or promote proposals. Human alone
+approves a new contract version; file mutability in Git is not Agent authority.
+
 Inputs: TaskSpec, EnvironmentSpec, approved Design Grammar, capability registry;
 selected Memory/Skills are future secondary references. Output schema:
 agents.contracts.outputs.EngineerOutput. Outputs contain a design hypothesis,

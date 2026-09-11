@@ -15,6 +15,9 @@ class RunRecord(Contract):
     environment_hash: str | None = None
     design_hash: str | None = None
     robot_ir_hash: str | None = None
+    task_contract_id: str | None = None
+    task_contract_status: str | None = None
+    task_contract_hash: str | None = None
     capability_version: str = "harness_v1"
     tool_version: str = "harness_v1"
     model_level: str = "M1"

@@ -1,0 +1,27 @@
+schema_version: '1'
+design_grammar_source: capabilities/robot_families/tendon_driven_continuum/grammar.yaml
+evaluator: metrics.reach.evaluate_reach
+run_settings_source: configs/run.yaml
+simulator_settings_source: configs/simulator.yaml
+evaluation_protocol_source: tools/harness.py
+gate_policy_source: schemas/gate.py
+gate_mapping_source: tools/harness.py
+physics_contract_sources:
+- physics_contracts/coordinate_frames.md
+- physics_contracts/tendon_driven_pcc_v1.md
+- physics_contracts/tendon_length_mapping_v1.md
+- physics_contracts/segmented_mujoco_mapping_v1.md
+- physics_contracts/actuator_model_v1.md
+- physics_contracts/legacy_v1_surrogate.yaml
+contract_id: reach_window_dev_v1
+task_type: reach_window
+status: DEVELOPMENT_ONLY
+task_source: ./task.yaml
+environment_source: ./environment.yaml
+environment_representation_source: ./mujoco.xml
+initial_condition_source: tools/mujoco_tools.py
+acceptance_source: schemas/task_spec.py
+benchmark_id: null
+notes: Software fixture only. WindowAcceptance defaults are owned by schemas/task_spec.py;
+  initial geometry follows the existing run_task implementation. This is not an insertion
+  benchmark.

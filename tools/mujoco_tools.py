@@ -127,6 +127,7 @@ def run_task(
     controller: Controller | None = None,
     run_settings: RunSettings | None = None,
     environment: EnvironmentSpec | None = None,
+    evaluator=None,
 ) -> ToolResult:
     """Check finite simulation state and the final tip-to-target distance."""
     evidence = None
@@ -212,7 +213,7 @@ def run_task(
         metrics = {
             **observed(),
             "steps": settings.steps, "nq": model.nq, "nv": model.nv,
-            **evaluate_reach(tip_position, task, window_evidence.summary() if window_evidence else None),
+            **(evaluator or evaluate_reach)(tip_position, task, window_evidence.summary() if window_evidence else None),
         }
         if commands is not None:
             metrics.update({

@@ -28,3 +28,7 @@ def evaluate_reach(tip_position_m, task: TaskSpec, window_evidence=None) -> dict
         result["task_success"] = bool(result["target_reached"] and result["aperture_constraint_satisfied"]
                                       and result["initial_required_side_satisfied"] and result["no_forbidden_window_contact"])
     return result
+
+
+# Evaluator capability metadata; no duplicated metric values or thresholds.
+evaluate_reach.supported_task_types = ("reach", "reach_window")

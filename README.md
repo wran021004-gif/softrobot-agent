@@ -229,3 +229,19 @@ The [proposal and Human promotion workflow](proposals/benchmark/reach_window_v1/
 remains PROPOSED_NOT_APPROVED. The [Human decision fields](docs/reach_window_human_decision.md)
 include the unresolved exact initial configuration. No Agent may change gate authority.
 See [Round 2.5 results](docs/round2_5_result.md).
+
+## TaskContract entry point
+
+`tasks/reach_free/contract.yaml` binds the frozen task's authoritative sources by
+reference. The existing example command and `--task-package` option now resolve
+that contract before loading executable inputs. The proposal and development window
+packages have separate PROPOSED_NOT_APPROVED and DEVELOPMENT_ONLY contracts.
+
+TaskContract defines the problem; it contains no target/tolerance/geometry/physics
+values or concrete DesignSpec. `configs/design_tendon_arm.yaml` remains a baseline
+candidate, not the benchmark's sole permitted robot. Grammar references define
+the allowed design envelope. A run stores task_contract.yaml, a compact resolved
+source/hash index, and contract identity in run.json/provenance.json. FROZEN means
+Agents cannot silently change task truth; Human can approve an explicit new version.
+See [TaskContract and source map](docs/task_contract.md) and
+[Round 3 Stage 0 results](docs/round3_stage0_result.md).
