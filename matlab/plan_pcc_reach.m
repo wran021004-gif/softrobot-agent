@@ -1,5 +1,5 @@
 function [theta, phi, tip, position_error, model_task_success, lengths, deltas] = ...
-    plan_pcc_reach(L, N, r_t, tx, ty, tz, tolerance)
+    plan_pcc_reach(L, N, r_t, tx, ty, tz, tolerance, alpha)
     % M1: single-section PCC kinematics, base at origin, straight along +x.
     % Search the simple non-looping branch 0 <= theta <= pi (radians).
     % No dynamics, gravity, stiffness/load, or contact model is included.
@@ -15,7 +15,10 @@ function [theta, phi, tip, position_error, model_task_success, lengths, deltas] 
     tip = pcc_tip(L, theta, phi);
     position_error = norm(tip - target);
     model_task_success = position_error <= tolerance;
-    alpha = 2 * pi * (0:N-1) / N;
+    % Python supplies RobotIR tendon order; seven-argument callers remain valid.
+    if nargin < 8
+        alpha = 2 * pi * (0:N-1) / N;
+    end
     lengths = L - r_t * theta * cos(alpha - phi);
     deltas = lengths - L;
 end

@@ -1,0 +1,179 @@
+bundle_name: diagnostics
+version: '1'
+tools:
+  compare_model_sim:
+    implementation_status: PLANNED
+    inputs:
+    - run artifacts
+    - ToolResults
+    - approved contracts
+    outputs:
+    - model/simulation discrepancy evidence
+    supported_robot_families: &id001
+    - tendon_driven_continuum
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  check_actuator_limits:
+    implementation_status: PLANNED
+    inputs:
+    - run artifacts
+    - ToolResults
+    - approved contracts
+    outputs:
+    - saturation evidence
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  check_tendon_tracking:
+    implementation_status: PLANNED
+    inputs:
+    - run artifacts
+    - ToolResults
+    - approved contracts
+    outputs:
+    - tracking error evidence
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  check_tendon_slack:
+    implementation_status: PLANNED
+    inputs:
+    - run artifacts
+    - ToolResults
+    - approved contracts
+    outputs:
+    - slack evidence (requires approved slack model)
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  check_collision:
+    implementation_status: PLANNED
+    inputs:
+    - run artifacts
+    - ToolResults
+    - approved contracts
+    outputs:
+    - contact evidence
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  inspect_numerics:
+    implementation_status: PLANNED
+    inputs:
+    - run artifacts
+    - ToolResults
+    - approved contracts
+    outputs:
+    - numerical diagnostics
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  run_parameter_sensitivity:
+    implementation_status: PLANNED
+    inputs:
+    - run artifacts
+    - ToolResults
+    - approved contracts
+    outputs:
+    - sensitivity report within approved bounds
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion

@@ -5,15 +5,18 @@ from pathlib import Path
 # can otherwise shadow Conda's library when the compiler later parses MJCF.
 import xml.parsers.expat
 
-import matlab.engine
-
 from schemas.design_spec import DesignSpec
+from schemas.robot_ir import RobotIR
+from schemas.environment_spec import EnvironmentSpec
 from schemas.task_spec import TaskSpec
 from schemas.tool_result import ToolResult
+from tools.design_compiler import ensure_robot_ir
+from tools.spec_tools import load_environment
 
 
 class MatlabTools:
     def __init__(self):
+        import matlab.engine
         project_root = Path(__file__).resolve().parents[1]
         self.eng = matlab.engine.start_matlab()
         try:
@@ -22,12 +25,14 @@ class MatlabTools:
             self.close()
             raise
 
-    def analyze_workspace(self, design: DesignSpec, task: TaskSpec) -> ToolResult:
+    def analyze_workspace(self, design: DesignSpec | RobotIR, task: TaskSpec, environment: EnvironmentSpec | None = None) -> ToolResult:
         if design.robot_family != "tendon_driven_continuum":
             return ToolResult(
                 status="fail", tool="analyze_workspace",
                 failure_code="UNSUPPORTED_ROBOT_FAMILY",
             )
+        design = ensure_robot_ir(design)
+        self._check_environment(design, task, environment)
         reachable, distance, max_reach, margin = self.eng.analyze_workspace(
             design.total_length_m,
             task.target_m[0],
@@ -48,7 +53,7 @@ class MatlabTools:
             },
         )
 
-    def plan_pcc_reach(self, design: DesignSpec, task: TaskSpec) -> ToolResult:
+    def plan_pcc_reach(self, design: DesignSpec | RobotIR, task: TaskSpec, environment: EnvironmentSpec | None = None) -> ToolResult:
         """Return best-effort PCC tendon targets, even when model tolerance fails."""
         if design.robot_family != "tendon_driven_continuum":
             return ToolResult(
@@ -74,9 +79,13 @@ class MatlabTools:
                 status="fail", tool="plan_pcc_reach", failure_code="PCC_INVALID_COMMAND",
                 message="PCC requires positive dimensions/count and finite target/tolerance.",
             )
+        design = ensure_robot_ir(design)
+        self._check_environment(design, task, environment)
+        import matlab
         theta, phi, tip, error, success, lengths, deltas = self.eng.plan_pcc_reach(
             design.total_length_m, float(design.tendon_count), design.tendon_routing_radius_m,
-            *task.target_m, task.position_error_max_m, nargout=7,
+            *task.target_m, task.position_error_max_m,
+            matlab.double([[route.angle_rad for route in design.tendon_routes]]), nargout=7,
         )
         # MATLAB returns row vectors; expose only ordinary Python float lists.
         tip = [float(value) for value in tip[0]]
@@ -110,6 +119,17 @@ class MatlabTools:
                 "tendon_routing_radius_m": design.tendon_routing_radius_m,
             },
         )
+
+    @staticmethod
+    def _check_environment(robot_ir, task, environment):
+        environment = environment or load_environment()
+        if environment.environment_id != task.environment_id or environment.coordinate_frame != robot_ir.coordinate_frame:
+            raise ValueError("Environment identity/frame mismatch")
+        # M0/M1 are kinematic. Gravity and objects are intentionally not used;
+        # no separate MATLAB environment file or implicit transform exists.
+
+    def version(self):
+        return str(self.eng.version(nargout=1))
 
     def close(self):
         self.eng.quit()

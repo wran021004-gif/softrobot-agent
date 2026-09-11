@@ -9,7 +9,7 @@ contract. grammar.yaml documents fields; tools enforce their execution limits.
 Use robot_family=tendon_driven_continuum and sections=1. Family identity is an
 acceptance check, not a physical parameter. sections remains reserved for future
 multi-section support; M1 and compilation explicitly reject sections != 1 with
-UNSUPPORTED_DESIGN_CONFIGURATION. M0 still ignores sections.
+UNSUPPORTED_DESIGN_CONFIGURATION. The shared RobotIR compiler now enforces this boundary before numerical calls.
 
 Active numerical fields:
 
@@ -41,7 +41,7 @@ hinges and fixed surrogate restoring stiffness/damping. There is no axial or
 torsional DOF. Force-limited tendons pull only. This is not Cosserat continuum,
 FEM, or a validated material model. Self-contact is disabled.
 
-The task environment is manually defined and selected using TaskSpec.environment_id;
+The task environment source is tasks/reach_free/environment.yaml, selected using TaskSpec.environment_id;
 a future LLM supplying DesignSpec cannot modify it. The task gate holds the PCC
 commands for 1000 steps and compares actual final tip position to the TaskSpec
 target/tolerance. No command disables actuation. PCC error and physical error are
@@ -52,4 +52,8 @@ reported separately; TASK_FAILED must not trigger hidden retuning.
 Multi-section physics, tapered radius, variable/material-derived stiffness,
 Cosserat/FEM models, and interchangeable end-effectors remain unsupported.
 They require implementation and matching metadata before being exposed as
-supported choices. No Agent, RL, or design optimizer is part of this version.
+supported choices. Agent role/output/permission contracts are present; no LLM runtime, RL or design optimizer is implemented.
+
+DesignSpec is compiled once into shared RobotIR; both MATLAB and MuJoCo consume
+its physical structure. See ../../../physics_contracts/ for approved mappings
+and ../../../README.md for artifact recovery and authority boundaries.

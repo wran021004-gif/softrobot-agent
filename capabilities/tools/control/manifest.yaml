@@ -1,0 +1,107 @@
+bundle_name: control
+version: '1'
+tools:
+  plan_open_loop:
+    implementation:
+      module: controllers.open_loop_length
+      callable: plan_open_loop
+    inputs:
+    - positive finite tendon lengths
+    outputs:
+    - ControllerResult
+    fields_consumed:
+    - tendon_target_lengths_m
+    failure_codes:
+    - INVALID_TENDON_COMMAND
+    fidelity: C1 open loop
+    assumptions:
+    - Human-owned input semantics are authoritative.
+    applicable_when: Deterministic V1 harness; schema validation alone does not imply
+      route support.
+    limitations:
+    - No physical success claim; validation exceptions propagate to the harness.
+    physics_contract_dependencies: []
+    artifacts:
+    - controller.json
+    - tendon_command.json
+    implementation_status: IMPLEMENTED
+    supported_robot_families: &id001
+    - tendon_driven_continuum
+    cost:
+      compute: low
+      note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+  synthesize_feedback:
+    implementation_status: PLANNED
+    inputs:
+    - RobotIR
+    - task
+    - observations
+    outputs:
+    - ControlSpec
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  synthesize_model_controller:
+    implementation_status: PLANNED
+    inputs:
+    - approved dynamic model
+    - task
+    outputs:
+    - ControlSpec
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  optimize_controller:
+    implementation_status: PLANNED
+    inputs:
+    - ControlSpec
+    - objective
+    - approved bounds
+    outputs:
+    - ControlSpec
+    - evidence
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion

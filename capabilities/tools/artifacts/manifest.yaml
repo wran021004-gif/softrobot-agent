@@ -1,0 +1,99 @@
+bundle_name: artifacts
+version: '1'
+tools:
+  create_run:
+    implementation:
+      module: tools.artifact_tools
+      callable: create_run
+    inputs:
+    - run root
+    outputs:
+    - RunArtifacts
+    fields_consumed:
+    - git revision
+    - runtime versions
+    - UTC clock
+    failure_codes:
+    - OSError
+    fidelity: factual persistence
+    assumptions:
+    - Human-owned input semantics are authoritative.
+    applicable_when: Deterministic V1 harness; schema validation alone does not imply
+      route support.
+    limitations:
+    - No physical success claim; validation exceptions propagate to the harness.
+    physics_contract_dependencies: []
+    artifacts:
+    - run.json
+    - trace.json
+    - named tool result
+    implementation_status: IMPLEMENTED
+    supported_robot_families: &id001
+    - tendon_driven_continuum
+    cost:
+      compute: low
+      note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+  save_tool_result:
+    implementation:
+      module: tools.artifact_tools
+      callable: save_tool_result
+    inputs:
+    - RunArtifacts
+    - artifact name
+    - ToolResult
+    outputs:
+    - persisted ToolResult
+    fields_consumed:
+    - ToolResult.*
+    failure_codes:
+    - OSError
+    - ValueError
+    fidelity: factual persistence
+    assumptions:
+    - Human-owned input semantics are authoritative.
+    applicable_when: Deterministic V1 harness; schema validation alone does not imply
+      route support.
+    limitations:
+    - No physical success claim; validation exceptions propagate to the harness.
+    physics_contract_dependencies: []
+    artifacts:
+    - run.json
+    - trace.json
+    - named tool result
+    implementation_status: IMPLEMENTED
+    supported_robot_families: *id001
+    cost:
+      compute: low
+      note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+  finalize_run:
+    implementation:
+      module: tools.artifact_tools
+      callable: finalize_run
+    inputs:
+    - RunArtifacts
+    - status
+    - failure code
+    outputs:
+    - RunRecord
+    fields_consumed:
+    - artifact bytes
+    - final status
+    failure_codes:
+    - OSError
+    fidelity: factual persistence
+    assumptions:
+    - Human-owned input semantics are authoritative.
+    applicable_when: Deterministic V1 harness; schema validation alone does not imply
+      route support.
+    limitations:
+    - No physical success claim; validation exceptions propagate to the harness.
+    physics_contract_dependencies: []
+    artifacts:
+    - run.json
+    - trace.json
+    - named tool result
+    implementation_status: IMPLEMENTED
+    supported_robot_families: *id001
+    cost:
+      compute: low
+      note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.

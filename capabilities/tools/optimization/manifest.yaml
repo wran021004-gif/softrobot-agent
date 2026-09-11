@@ -1,0 +1,57 @@
+bundle_name: optimization
+version: '1'
+tools:
+  optimize_design:
+    implementation_status: PLANNED
+    inputs:
+    - frozen task
+    - grammar
+    - objective
+    - design variables
+    outputs:
+    - design candidate
+    - evidence
+    supported_robot_families: &id001
+    - tendon_driven_continuum
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  fit_model_parameters:
+    implementation_status: PLANNED
+    inputs:
+    - approved model
+    - measurement data
+    - parameter bounds
+    outputs:
+    - fit
+    - uncertainty
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion

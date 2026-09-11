@@ -1,78 +1,125 @@
 bundle_name: mujoco
-implementation_status: partial
+version: '1'
 tools:
   compile_mujoco:
     implementation:
       module: tools.mujoco_tools
       callable: compile_mujoco
-    supported_robot_families: [tendon_driven_continuum]
+    supported_robot_families:
+    - tendon_driven_continuum
     family_support: partial
     inputs:
-      design: DesignSpec
+      robot_ir: RobotIR (DesignSpec compatibility accepted)
       task: TaskSpec
-      output_path: pathlib.Path
+      output_path: Path
+      environment: EnvironmentSpec
+      simulator: SimulatorSpec
     output: ToolResult
-    design_fields_used: [robot_family, sections, segments, total_length_m, body_radius_m, tendon_count, tendon_routing_radius_m]
+    design_fields_used:
+    - robot_family
+    - sections
+    - segments
+    - total_length_m
+    - body_radius_m
+    - tendon_count
+    - tendon_routing_radius_m
     discriminator_field: robot_family
     configuration_constraints:
       sections: 1
-    numerical_design_fields_used: [segments, total_length_m, body_radius_m, tendon_count, tendon_routing_radius_m]
+    numerical_design_fields_used:
+    - segments
+    - total_length_m
+    - body_radius_m
+    - tendon_count
+    - tendon_routing_radius_m
     currently_ignored_design_fields: []
-    task_fields_used: [environment_id, target_m]
-    currently_ignored_task_fields: [task_id, task_type, position_error_max_m]
+    task_fields_used:
+    - environment_id
+    - target_m
+    currently_ignored_task_fields:
+    - task_id
+    - task_type
+    - position_error_max_m
     fidelity:
       level: low
       model: single_section_tendon_actuated_segmented_approximation
     contract:
-      robot_base_m: [0.0, 0.0, 0.0]
+      robot_base_m:
+      - 0.0
+      - 0.0
+      - 0.0
       segment_length: total_length_m / segments
       segment_direction: local +x
-      joint_axes: [local +y, local +z]
-      environment_source: mujoco/environments/<environment_id>.xml
+      joint_axes:
+      - local +y
+      - local +z
+      environment_source: tasks/<environment_id>/environment.yaml; validated tasks/<environment_id>/mujoco.xml
+        representation
       floor_z: Fixed by environment; reach_free uses -0.02 m independent of design.
       tendon_routing: N spatial paths through base and each segment distal end.
       routing_offset_yz: r_t * [cos(2*pi*i/N), sin(2*pi*i/N)]
       physical_spatial_tendon_routing: implemented
       tendon_transmission_actuator: implemented
-      actuator_control: Target tendon length in meters, unit gear, ordered tendon_0 through tendon_N-1.
+      actuator_control: Target tendon length in meters, unit gear, ordered tendon_0
+        through tendon_N-1.
       tip_site: Last segment at local [segment_length, 0, 0].
       target_site: World site at task.target_m; no collision or actuation.
       pass_condition: MJCF written; loading and task success are checked separately.
       metrics: {}
       artifacts:
         mjcf_path: Absolute path to generated XML.
-    fixed_simulator_parameters:
-      source: tools/mujoco_tools.py module constants; not DesignSpec fields.
-      joint_stiffness_nm_per_rad: 0.1
-      joint_damping_nm_s_per_rad: 0.1
-      body_density_kg_m3: 1000.0
-      tendon_servo_kp_n_per_m: 1000.0
-      tendon_force_range_n: [-20.0, 0.0]
-      environment_source: mujoco/environments/reach_free.xml
-      timestep_s: 0.002
-      gravity_m_s2: [0.0, 0.0, -9.81]
     limitations:
-      - Two bending DOF per segment, no axial extension or torsional DOF.
-      - Single-section only; not Cosserat, FEM, or a validated material model.
-      - Fixed segmented surrogate stiffness, to be replaced by EI/material parameters in future.
-      - Position servos pull only; length targets are not guaranteed to be reached.
-      - Fixed density, stiffness, damping, actuator gains/force limits, gravity, and timestep.
-      - Arm-floor contact only; arm self-contact disabled.
-      - File-write exceptions propagate without a ToolResult.
+    - Single-section low fidelity segmented surrogate; not Cosserat/FEM or validated
+      material physics.
+    - Arm self-contact disabled; no extension/torsion.
+    - File-write exceptions propagate; harness records errors.
+    - Reserved environment components are not executable.
     failure_codes:
       UNSUPPORTED_ROBOT_FAMILY: Only tendon_driven_continuum is accepted.
       UNSUPPORTED_DESIGN_CONFIGURATION: Only sections=1 is accepted.
       INVALID_DESIGN: Counts and dimensions must be positive and finite.
-      INVALID_ENVIRONMENT: Invalid ID, missing/unreadable XML, malformed XML, or missing mujoco/worldbody.
+      INVALID_ENVIRONMENT: Invalid ID, missing/unreadable XML, malformed XML, or missing
+        mujoco/worldbody.
+      PHYSICS_ASSUMPTION_REQUIRED: Unapproved/missing IR physics contract (raised
+        ValueError).
     cost:
       compute: low
+    fields_consumed:
+    - RobotIR.section
+    - RobotIR.tendon_routes
+    - RobotIR.mechanics
+    - EnvironmentSpec.objects
+    - EnvironmentSpec.lights
+    - EnvironmentSpec.gravity_m_s2
+    - SimulatorSpec.timestep_s
+    - TaskSpec.target_m
+    artifacts:
+    - robot.xml
+    - compile_result.json
+    physics_contract_dependencies: &id001
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - segmented_mujoco_mapping_v1.md
+    - actuator_model_v1.md
+    assumptions:
+    - Approved legacy_v1_surrogate mechanics; target/tolerance owned by task.
+    applicable_when: V1 reach task and supported environment; final task decision
+      uses actual MuJoCo tip.
+    implementation_status: IMPLEMENTED
+    outputs:
+    - ToolResult
+    exception_policy: Schema/IR/contract validation exceptions propagate; Harness
+      records stage and message.
   validate_task:
     implementation:
       module: tools.mujoco_tools
       callable: validate_task
-    supported_robot_families: [tendon_driven_continuum]
+    supported_robot_families:
+    - tendon_driven_continuum
     family_support: partial
-    family_check: No DesignSpec input or runtime family check; intended for this bundle's compiled MJCF.
+    family_check: No DesignSpec input or runtime family check; intended for this bundle's
+      compiled MJCF.
     inputs:
       xml_path: str | pathlib.Path
       task: TaskSpec
@@ -80,19 +127,30 @@ tools:
     output: ToolResult
     design_fields_used: []
     currently_ignored_design_fields: []
-    design_input_note: No DesignSpec argument; geometry and dynamics are read from MJCF.
-    task_fields_used: [target_m, position_error_max_m]
-    currently_ignored_task_fields: [task_id, task_type, environment_id]
+    design_input_note: No DesignSpec argument; geometry and dynamics are read from
+      MJCF.
+    task_fields_used:
+    - target_m
+    - position_error_max_m
+    currently_ignored_task_fields:
+    - task_id
+    - task_type
+    - environment_id
     fidelity:
       level: low
       model: final_position_gate_on_tendon_actuated_segmented_simulation
     contract:
       steps: 1000
-      steps_source: tools/mujoco_tools.py MUJOCO_TASK_STEPS
-      control: Positive finite targets assigned to data.ctrl once and held for all steps.
-      command_validation: Length count equals model.nu and model.ntendon; ordered tendon transmissions required.
-      no_command: Disable actuation explicitly for unactuated simulation; zero ctrl would request zero length.
-      finite_checks: [qpos_each_step, qvel_each_step, final_tip_position]
+      steps_source: configs/run.yaml
+      control: Compatibility wrapper builds open_loop_length and delegates to run_task.
+      command_validation: Length count equals model.nu and model.ntendon; ordered
+        tendon transmissions required.
+      no_command: Disable actuation explicitly for unactuated simulation; zero ctrl
+        would request zero length.
+      finite_checks:
+      - qpos_each_step
+      - qvel_each_step
+      - final_tip_position
       tip_position_source: data.site_xpos at tip_site after final mj_forward
       target_source: task.target_m; target_site is not read
       coordinate_frame: MuJoCo world, equal to compiled robot base frame
@@ -115,17 +173,132 @@ tools:
         actuator_force: list[float]
       artifacts: []
     limitations:
-      - Checks final position only; no tracking, orientation, or sustained reach validation.
-      - Holds the supplied command; no trajectory, feedback policy, or parameter search.
-      - Requires a named tip_site in the input XML.
-      - Does not dispatch on task_type; only the positional reach gate is implemented.
-      - Finite-state checks are a minimal sanity check, not a robustness guarantee.
-      - Physics and nonfinite failures return empty metrics; TASK_FAILED retains task metrics.
+    - Final position only; minimal finite-state sanity, no robustness guarantee.
+    - Legacy wrapper; unknown task types are rejected.
     failure_codes:
-      TASK_FAILED: Simulation completed but final position error exceeds the allowed error.
+      TASK_FAILED: Simulation completed but final position error exceeds the allowed
+        error.
       PHYSICS_ERROR: Exception during model loading, site lookup, simulation, or evaluation.
       NONFINITE_STATE: A checked state or final tip position contains NaN or Inf.
-      INVALID_TENDON_COMMAND: Invalid length count/values or model transmissions/order; empty metrics.
+      INVALID_TENDON_COMMAND: Invalid length count/values or model transmissions/order;
+        empty metrics.
+      CAPABILITY_MISSING: No implemented route/evaluator for requested task.
     cost:
       compute: low
       note: Fixed 1000 steps; actual cost depends on the input XML.
+    fields_consumed:
+    - MJCF
+    - TaskSpec.target_m
+    - TaskSpec.position_error_max_m
+    - tendon_target_lengths_m
+    - RunSettings.steps
+    artifacts:
+    - ToolResult (caller persists)
+    physics_contract_dependencies: *id001
+    assumptions:
+    - Approved legacy_v1_surrogate mechanics; target/tolerance owned by task.
+    applicable_when: V1 reach task and supported environment; final task decision
+      uses actual MuJoCo tip.
+    implementation_status: IMPLEMENTED
+    outputs:
+    - ToolResult
+    exception_policy: Schema/IR/contract validation exceptions propagate; Harness
+      records stage and message.
+  run_task:
+    implementation:
+      module: tools.mujoco_tools
+      callable: run_task
+    inputs:
+      xml_path: Path
+      task: TaskSpec
+      controller: Controller protocol or None
+      run_settings: RunSettings
+    outputs:
+    - ToolResult with actual metrics and final state
+    fields_consumed:
+    - MJCF
+    - TaskSpec.task_type
+    - TaskSpec.target_m
+    - TaskSpec.position_error_max_m
+    - ControlCommand.tendon_target_lengths_m
+    - RunSettings.steps
+    fidelity:
+      level: low
+      model: segmented surrogate + canonical reach evaluator
+    limitations:
+    - Only reach evaluator exists.
+    - Finite state is not validated physical fidelity.
+    - No automatic tuning or retry.
+    failure_codes:
+    - TASK_FAILED
+    - PHYSICS_ERROR
+    - NONFINITE_STATE
+    - INVALID_TENDON_COMMAND
+    - CONTROL_FAILURE
+    - CAPABILITY_MISSING
+    artifacts:
+    - mujoco_result.json
+    - metrics.json
+    - simulation_state.json
+    physics_contract_dependencies: *id001
+    assumptions:
+    - Approved legacy_v1_surrogate mechanics; target/tolerance owned by task.
+    applicable_when: V1 reach task and supported environment; final task decision
+      uses actual MuJoCo tip.
+    implementation_status: IMPLEMENTED
+    supported_robot_families: &id002
+    - tendon_driven_continuum
+    cost:
+      compute: low
+      note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+    exception_policy: Schema/IR/contract validation exceptions propagate; Harness
+      records stage and message.
+  validate_physics:
+    implementation_status: PLANNED
+    inputs:
+    - RobotIR
+    - MJCF
+    - approved reference evidence
+    outputs:
+    - physics validation report
+    supported_robot_families: *id002
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  evaluate_metrics:
+    implementation_status: PLANNED
+    inputs:
+    - task metric definitions
+    - trajectory
+    outputs:
+    - extended canonical metrics
+    supported_robot_families: *id002
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion

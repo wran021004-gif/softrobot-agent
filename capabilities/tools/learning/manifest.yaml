@@ -1,0 +1,78 @@
+bundle_name: learning
+version: '1'
+tools:
+  build_mdp:
+    implementation_status: PLANNED
+    inputs:
+    - frozen task
+    - RobotIR
+    - approved observation/action/reward semantics
+    outputs:
+    - MDP definition
+    supported_robot_families: &id001
+    - tendon_driven_continuum
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  train_policy:
+    implementation_status: PLANNED
+    inputs:
+    - approved MDP
+    - training settings
+    outputs:
+    - policy
+    - training evidence
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  evaluate_policy:
+    implementation_status: PLANNED
+    inputs:
+    - policy
+    - frozen benchmark
+    outputs:
+    - canonical evaluation evidence
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion

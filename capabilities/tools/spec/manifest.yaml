@@ -1,0 +1,143 @@
+bundle_name: spec
+version: '1'
+tools:
+  load_task:
+    implementation:
+      module: tools.spec_tools
+      callable: load_task
+    inputs:
+    - task package path
+    outputs:
+    - TaskSpec
+    fields_consumed:
+    - task.yaml
+    failure_codes:
+    - INVALID_SPEC
+    fidelity: structural
+    assumptions:
+    - Human-owned input semantics are authoritative.
+    applicable_when: Deterministic V1 harness; schema validation alone does not imply
+      route support.
+    limitations:
+    - No physical success claim; validation exceptions propagate to the harness.
+    physics_contract_dependencies: []
+    artifacts: []
+    implementation_status: IMPLEMENTED
+    supported_robot_families: &id001
+    - tendon_driven_continuum
+    cost:
+      compute: low
+      note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+  validate_task_spec:
+    implementation:
+      module: tools.spec_tools
+      callable: validate_task_spec
+    inputs:
+    - task mapping
+    outputs:
+    - TaskSpec
+    fields_consumed:
+    - TaskSpec.*
+    failure_codes:
+    - INVALID_SPEC
+    fidelity: structural
+    assumptions:
+    - Human-owned input semantics are authoritative.
+    applicable_when: Deterministic V1 harness; schema validation alone does not imply
+      route support.
+    limitations:
+    - No physical success claim; validation exceptions propagate to the harness.
+    physics_contract_dependencies: []
+    artifacts: []
+    implementation_status: IMPLEMENTED
+    supported_robot_families: *id001
+    cost:
+      compute: low
+      note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+  validate_environment:
+    implementation:
+      module: tools.spec_tools
+      callable: validate_environment
+    inputs:
+    - environment mapping
+    outputs:
+    - EnvironmentSpec
+    fields_consumed:
+    - EnvironmentSpec.*
+    failure_codes:
+    - INVALID_ENVIRONMENT
+    fidelity: structural
+    assumptions:
+    - Human-owned input semantics are authoritative.
+    applicable_when: Deterministic V1 harness; schema validation alone does not imply
+      route support.
+    limitations:
+    - No physical success claim; validation exceptions propagate to the harness.
+    physics_contract_dependencies: []
+    artifacts: []
+    implementation_status: IMPLEMENTED
+    supported_robot_families: *id001
+    cost:
+      compute: low
+      note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+  validate_design:
+    implementation:
+      module: tools.spec_tools
+      callable: validate_design
+    inputs:
+    - design mapping
+    outputs:
+    - DesignSpec
+    fields_consumed:
+    - DesignSpec.*
+    failure_codes:
+    - INVALID_DESIGN
+    fidelity: structural
+    assumptions:
+    - Human-owned input semantics are authoritative.
+    applicable_when: Deterministic V1 harness; schema validation alone does not imply
+      route support.
+    limitations:
+    - No physical success claim; validation exceptions propagate to the harness.
+    physics_contract_dependencies: []
+    artifacts: []
+    implementation_status: IMPLEMENTED
+    supported_robot_families: *id001
+    cost:
+      compute: low
+      note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+  build_robot_ir:
+    implementation:
+      module: tools.design_compiler
+      callable: build_robot_ir
+    inputs:
+    - DesignSpec
+    outputs:
+    - RobotIR
+    fields_consumed:
+    - DesignSpec.*
+    - PhysicsSpec.*
+    failure_codes:
+    - OUT_OF_GRAMMAR
+    - IMPLEMENTATION_REQUIRED
+    - PHYSICS_ASSUMPTION_REQUIRED
+    fidelity: structural
+    assumptions:
+    - Human-owned input semantics are authoritative.
+    applicable_when: Deterministic V1 harness; schema validation alone does not imply
+      route support.
+    limitations:
+    - No physical success claim; validation exceptions propagate to the harness.
+    physics_contract_dependencies:
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - segmented_mujoco_mapping_v1.md
+    - actuator_model_v1.md
+    artifacts:
+    - robot_ir.yaml
+    implementation_status: IMPLEMENTED
+    supported_robot_families: *id001
+    cost:
+      compute: low
+      note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.

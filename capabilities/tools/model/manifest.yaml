@@ -1,0 +1,341 @@
+bundle_name: model
+version: '1'
+tools:
+  analyze_workspace:
+    implementation:
+      module: tools.matlab_tools
+      callable: MatlabTools.analyze_workspace
+      backend: matlab/analyze_workspace.m
+    supported_robot_families:
+    - tendon_driven_continuum
+    family_support: partial
+    inputs:
+      robot_ir: RobotIR (DesignSpec compatibility accepted)
+      task: TaskSpec
+      environment: EnvironmentSpec
+    output: ToolResult
+    design_fields_used:
+    - robot_family
+    - total_length_m
+    discriminator_field: robot_family
+    numerical_design_fields_used:
+    - total_length_m
+    currently_ignored_design_fields:
+    - sections
+    - segments
+    - body_radius_m
+    - tendon_count
+    - tendon_routing_radius_m
+    task_fields_used:
+    - target_m
+    currently_ignored_task_fields:
+    - task_id
+    - task_type
+    - environment_id
+    - position_error_max_m
+    fidelity:
+      level: M0
+      model: geometric_reachability
+    contract:
+      coordinate_frame: robot base at world origin
+      target_reachable: norm(target_m) <= total_length_m
+      pass_condition: supported family and target_reachable
+      metrics:
+        target_reachable: bool
+        target_distance_m: float
+        max_reach_m: float
+        reach_margin_m: float
+      artifacts: []
+    limitations:
+    - Not PCC, PCS, or Cosserat.
+    - Does not consider tendon count or tendon routing.
+    - Does not consider stiffness, obstacles, or dynamics.
+    - Does not consider actuation feasibility.
+    - Reachable does not imply MuJoCo task success.
+    - Engine startup and execution exceptions propagate without a ToolResult.
+    - RobotIR mechanics, segment discretization and environment gravity/objects are
+      not part of this kinematic calculation.
+    failure_codes:
+      DESIGN_INFEASIBLE: Target distance exceeds total length.
+      UNSUPPORTED_ROBOT_FAMILY: Only tendon_driven_continuum is accepted; metrics
+        are empty.
+      PHYSICS_ASSUMPTION_REQUIRED: Unapproved/missing IR physics contract (raised
+        ValueError).
+    cost:
+      compute: low
+      note: MATLAB Engine startup has separate overhead.
+    fields_consumed:
+    - RobotIR.section.length_m
+    - EnvironmentSpec.coordinate_frame
+    - EnvironmentSpec.environment_id
+    - TaskSpec.target_m
+    physics_contract_dependencies:
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    assumptions:
+    - Origin fixed at world base; straight +x; no dynamics or contact.
+    applicable_when: V1 reach model route; a model pass never certifies task success.
+    artifacts:
+    - workspace_result.json
+    implementation_status: IMPLEMENTED
+    outputs:
+    - ToolResult
+    exception_policy: Schema/IR/contract validation exceptions propagate; Harness
+      records stage and message.
+  plan_pcc_reach:
+    implementation:
+      module: tools.matlab_tools
+      callable: MatlabTools.plan_pcc_reach
+      backend: matlab/plan_pcc_reach.m
+    supported_robot_families:
+    - tendon_driven_continuum
+    family_support: partial
+    inputs:
+      robot_ir: RobotIR (DesignSpec compatibility accepted)
+      task: TaskSpec
+      environment: EnvironmentSpec
+    output: ToolResult
+    design_fields_used:
+    - robot_family
+    - sections
+    - total_length_m
+    - tendon_count
+    - tendon_routing_radius_m
+    discriminator_field: robot_family
+    configuration_constraints:
+      sections: 1
+    numerical_design_fields_used:
+    - total_length_m
+    - tendon_count
+    - tendon_routing_radius_m
+    currently_ignored_design_fields:
+    - segments
+    - body_radius_m
+    task_fields_used:
+    - target_m
+    - position_error_max_m
+    currently_ignored_task_fields:
+    - task_id
+    - task_type
+    - environment_id
+    fidelity:
+      level: M1
+      model: single_section_PCC_kinematics
+    contract:
+      robot_base_m:
+      - 0.0
+      - 0.0
+      - 0.0
+      straight_direction: local +x
+      cross_section: y-z plane
+      phi_rad: atan2(target_z, target_y)
+      theta_bounds_rad:
+      - 0.0
+      - 3.141592653589793
+      search: MATLAB fminbnd on squared tip error, with both endpoints compared.
+      tendon_target_formula: L - r_t * theta * cos(2*pi*i/N - phi)
+      tendon_order: tendon_0 through tendon_N-1
+      pass_condition: Finite prediction and positive finite commands; model_task_success
+        may be false.
+      metrics:
+        theta_rad: float
+        phi_rad: float
+        predicted_tip_m: list[float]
+        target_position_m: list[float]
+        predicted_position_error_m: float
+        model_task_success: bool
+        tendon_target_lengths_m: list[float]
+        tendon_delta_lengths_m: list[float]
+        tendon_count: int
+        tendon_routing_radius_m: float
+      artifacts: []
+    limitations:
+    - Best effort on the non-looping branch; does not guarantee task tolerance.
+    - No dynamics, gravity, stiffness/load, or contact.
+    - No multi-section, PCS, or Cosserat model.
+    - Continuous PCC tendon geometry differs from segmented spatial paths.
+    - MATLAB Engine startup and execution exceptions propagate.
+    - RobotIR mechanics, segment discretization and environment gravity/objects are
+      not part of this kinematic calculation.
+    failure_codes:
+      UNSUPPORTED_ROBOT_FAMILY: Only tendon_driven_continuum is accepted.
+      UNSUPPORTED_DESIGN_CONFIGURATION: Only sections=1 is accepted.
+      PCC_INVALID_COMMAND: Invalid input dimensions/count/target/tolerance or nonfinite/nonpositive
+        output commands.
+      PHYSICS_ASSUMPTION_REQUIRED: Unapproved/missing IR physics contract (raised
+        ValueError).
+    cost:
+      compute: low
+      note: One bounded scalar search; base MATLAB only, no Optimization Toolbox.
+    fields_consumed:
+    - RobotIR.section.length_m
+    - EnvironmentSpec.coordinate_frame
+    - EnvironmentSpec.environment_id
+    - TaskSpec.target_m
+    - RobotIR.tendon_routes.angle_rad
+    - RobotIR.tendon_routing_radius_m
+    - TaskSpec.position_error_max_m
+    physics_contract_dependencies:
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    assumptions:
+    - Origin fixed at world base; straight +x; no dynamics or contact.
+    applicable_when: V1 reach model route; a model pass never certifies task success.
+    artifacts:
+    - model_result.json
+    implementation_status: IMPLEMENTED
+    outputs:
+    - ToolResult
+    exception_policy: Schema/IR/contract validation exceptions propagate; Harness
+      records stage and message.
+  analyze_clearance:
+    implementation_status: PLANNED
+    inputs:
+    - RobotIR
+    - EnvironmentSpec
+    - pose/trajectory
+    outputs:
+    - clearance evidence
+    supported_robot_families: &id001
+    - tendon_driven_continuum
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  analyze_actuation:
+    implementation_status: PLANNED
+    inputs:
+    - RobotIR
+    - load case
+    outputs:
+    - required actuation
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  analyze_stiffness:
+    implementation_status: PLANNED
+    inputs:
+    - RobotIR
+    - approved stiffness law
+    outputs:
+    - stiffness estimate
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  solve_equilibrium:
+    implementation_status: PLANNED
+    inputs:
+    - RobotIR
+    - EnvironmentSpec
+    - ControlCommand
+    outputs:
+    - equilibrium state
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  analyze_dynamics:
+    implementation_status: PLANNED
+    inputs:
+    - RobotIR
+    - EnvironmentSpec
+    - initial state
+    outputs:
+    - dynamic model
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
+  simulate_reduced_dynamics:
+    implementation_status: PLANNED
+    inputs:
+    - reduced model
+    - ControlSpec
+    - initial state
+    outputs:
+    - reduced trajectory
+    supported_robot_families: *id001
+    fidelity: unimplemented; no numerical claims
+    assumptions:
+    - Requires Human-approved scientific semantics before implementation.
+    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    limitations:
+    - No callable and no fabricated results.
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    cost:
+      compute: unknown until implemented
+    fields_consumed: []
+    artifacts: []
+    physics_contract_dependencies: []
+    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
+      require approval before promotion
