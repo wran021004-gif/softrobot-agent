@@ -41,8 +41,27 @@ XML instead of DesignSpec and therefore consumes no DesignSpec fields directly.
 The grammar records field meanings and `active`/`reserved` status. `active`
 means a field is used by at least one current tool, not every tool. `reserved`
 fields have no implemented numerical effect. Bundle/family support is `partial`:
-the current approximations are executable, but full continuum/tendon physics
-is `unsupported`. This metadata does not enforce new schema constraints.
+the current approximations are executable with spatial tendon routing and tendon
+actuation, but Cosserat, FEM, and validated material physics are unsupported.
+The reserved sections field is explicitly restricted to 1 by M1 and compilation.
+This metadata does not enforce new schema constraints.
+
+## Current reach execution chain
+
+TaskSpec + DesignSpec -> M0 geometric screening -> M1 single-section PCC planning
+-> tendon length targets -> deterministic MuJoCo compilation -> command execution
+-> final tip-position task gate. M1 uses total_length_m, tendon_count, and
+tendon_routing_radius_m. Both tendon fields are active in MuJoCo as well.
+M1 returns best-effort commands even when its predicted error exceeds tolerance;
+only the final physics gate decides task success. TASK_FAILED is a valid result.
+
+`mujoco/environments/reach_free.xml` is a fixed task environment selected by
+TaskSpec.environment_id. Its floor, gravity, and timestep do not depend on
+DesignSpec. Environments such as future reach_window.xml and insertion.xml must
+be manually authored and version controlled. A future LLM designing a robot
+has no authority to modify the task environment. Target and tolerance remain
+TaskSpec facts, and morphology remains a DesignSpec fact. Generated XML in
+`mujoco/generated/` is only environment + robot + task marker runtime output.
 
 Only `tendon_driven_continuum` is registered. To add a family later, supply its
 grammar and FAMILY.md, implement the corresponding MATLAB analysis and MuJoCo

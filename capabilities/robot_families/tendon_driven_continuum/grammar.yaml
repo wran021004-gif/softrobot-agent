@@ -12,13 +12,14 @@ design_fields:
     example_value: tendon_driven_continuum
   sections:
     type: int
-    meaning: Intended number of continuum sections; currently ignored by execution tools.
+    meaning: Section count; M1 and compiler reject values other than 1. Multi-section geometry is reserved.
     role: morphology
     implementation_status: reserved
+    supported_values: [1]
     example_value: 1
   segments:
     type: int
-    meaning: Number of equal capsule bodies in the passive MuJoCo chain.
+    meaning: Number of equal capsule bodies, paired bending hinges, and distal routing stations in MuJoCo.
     role: discretization
     implementation_status: active
     example_value: 8
@@ -31,35 +32,36 @@ design_fields:
     example_value: 0.40
   body_radius_m:
     type: float
-    meaning: Uniform capsule radius; also determines the floor offset.
+    meaning: Uniform capsule radius affecting geometry, mass/inertia, and contact; floor is fixed independently.
     unit: m
     role: morphology
     implementation_status: active
     example_value: 0.02
   tendon_count:
     type: int
-    meaning: Intended tendon count; no tendons are currently generated.
+    meaning: Number of PCC length commands and MuJoCo spatial tendons/actuators.
     role: actuation_description
-    implementation_status: reserved
+    implementation_status: active
     example_value: 4
   tendon_routing_radius_m:
     type: float
-    meaning: Intended tendon routing radius; currently has no physical effect.
+    meaning: Circumferential routing radius in the y-z plane, used in PCC lengths and MuJoCo routing geometry.
     unit: m
     role: actuation_description
-    implementation_status: reserved
+    implementation_status: active
     example_value: 0.015
 generation_guidance:
   - Emit the existing flat DesignSpec fields only.
-  - Keep reserved fields at their example values until corresponding tools support them.
-  - Segments must be positive; length and radius must be positive for meaningful model generation.
-  - These requirements are guidance; DesignSpec currently provides type checks, not physical range validation.
+  - Keep sections=1; multi-section designs return UNSUPPORTED_DESIGN_CONFIGURATION in M1/compiler.
+  - Segments and tendon count must be positive; lengths and radii must be finite and positive.
+  - DesignSpec provides type checks; execution tools also check their consumed counts/dimensions.
   - Example values are from configs/design_tendon_arm.yaml, not validated scientific operating ranges.
 tool_coverage_source: Tool manifests declare consumed and ignored fields; no duplicate coverage matrix is maintained here.
 unsupported_capabilities:
   - multi_section_physics
   - tapered_radius
   - variable_stiffness
-  - physical_tendon_routing
-  - tendon_actuation
+  - Cosserat_continuum
+  - FEM
+  - validated_material_model
   - interchangeable_end_effector

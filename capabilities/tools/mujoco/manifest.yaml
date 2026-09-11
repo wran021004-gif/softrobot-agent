@@ -12,39 +12,58 @@ tools:
       task: TaskSpec
       output_path: pathlib.Path
     output: ToolResult
-    design_fields_used: [robot_family, segments, total_length_m, body_radius_m]
+    design_fields_used: [robot_family, sections, segments, total_length_m, body_radius_m, tendon_count, tendon_routing_radius_m]
     discriminator_field: robot_family
-    numerical_design_fields_used: [segments, total_length_m, body_radius_m]
-    currently_ignored_design_fields:
-      - sections
-      - tendon_count
-      - tendon_routing_radius_m
-    task_fields_used: [target_m]
+    configuration_constraints:
+      sections: 1
+    numerical_design_fields_used: [segments, total_length_m, body_radius_m, tendon_count, tendon_routing_radius_m]
+    currently_ignored_design_fields: []
+    task_fields_used: [environment_id, target_m]
     currently_ignored_task_fields: [task_id, task_type, position_error_max_m]
     fidelity:
       level: low
-      model: segmented_passive_hinge_chain_approximation
+      model: single_section_tendon_actuated_segmented_approximation
     contract:
       robot_base_m: [0.0, 0.0, 0.0]
       segment_length: total_length_m / segments
       segment_direction: local +x
-      joint_axis: local +y
-      floor_z: -body_radius_m
+      joint_axes: [local +y, local +z]
+      environment_source: mujoco/environments/<environment_id>.xml
+      floor_z: Fixed by environment; reach_free uses -0.02 m independent of design.
+      tendon_routing: N spatial paths through base and each segment distal end.
+      routing_offset_yz: r_t * [cos(2*pi*i/N), sin(2*pi*i/N)]
+      physical_spatial_tendon_routing: implemented
+      tendon_transmission_actuator: implemented
+      actuator_control: Target tendon length in meters, unit gear, ordered tendon_0 through tendon_N-1.
       tip_site: Last segment at local [segment_length, 0, 0].
       target_site: World site at task.target_m; no collision or actuation.
       pass_condition: MJCF written; loading and task success are checked separately.
       metrics: {}
       artifacts:
         mjcf_path: Absolute path to generated XML.
+    fixed_simulator_parameters:
+      source: tools/mujoco_tools.py module constants; not DesignSpec fields.
+      joint_stiffness_nm_per_rad: 0.1
+      joint_damping_nm_s_per_rad: 0.1
+      body_density_kg_m3: 1000.0
+      tendon_servo_kp_n_per_m: 1000.0
+      tendon_force_range_n: [-20.0, 0.0]
+      environment_source: mujoco/environments/reach_free.xml
+      timestep_s: 0.002
+      gravity_m_s2: [0.0, 0.0, -9.81]
     limitations:
-      - No tendon actuation and no active controller.
-      - Planar hinge chain; not a physical continuum model.
-      - Single passive chain regardless of sections.
-      - Fixed density, damping, gravity, and timestep.
+      - Two bending DOF per segment, no axial extension or torsional DOF.
+      - Single-section only; not Cosserat, FEM, or a validated material model.
+      - Fixed segmented surrogate stiffness, to be replaced by EI/material parameters in future.
+      - Position servos pull only; length targets are not guaranteed to be reached.
+      - Fixed density, stiffness, damping, actuator gains/force limits, gravity, and timestep.
       - Arm-floor contact only; arm self-contact disabled.
-      - Invalid design arithmetic and file-write exceptions propagate without a ToolResult.
+      - File-write exceptions propagate without a ToolResult.
     failure_codes:
       UNSUPPORTED_ROBOT_FAMILY: Only tendon_driven_continuum is accepted.
+      UNSUPPORTED_DESIGN_CONFIGURATION: Only sections=1 is accepted.
+      INVALID_DESIGN: Counts and dimensions must be positive and finite.
+      INVALID_ENVIRONMENT: Invalid ID, missing/unreadable XML, malformed XML, or missing mujoco/worldbody.
     cost:
       compute: low
   validate_task:
@@ -57,17 +76,22 @@ tools:
     inputs:
       xml_path: str | pathlib.Path
       task: TaskSpec
+      tendon_target_lengths_m: Optional list[float], default None.
     output: ToolResult
     design_fields_used: []
     currently_ignored_design_fields: []
     design_input_note: No DesignSpec argument; geometry and dynamics are read from MJCF.
     task_fields_used: [target_m, position_error_max_m]
-    currently_ignored_task_fields: [task_id, task_type]
+    currently_ignored_task_fields: [task_id, task_type, environment_id]
     fidelity:
       level: low
-      model: final_position_gate_on_passive_segmented_simulation
+      model: final_position_gate_on_tendon_actuated_segmented_simulation
     contract:
-      steps: 100
+      steps: 1000
+      steps_source: tools/mujoco_tools.py MUJOCO_TASK_STEPS
+      control: Positive finite targets assigned to data.ctrl once and held for all steps.
+      command_validation: Length count equals model.nu and model.ntendon; ordered tendon transmissions required.
+      no_command: Disable actuation explicitly for unactuated simulation; zero ctrl would request zero length.
       finite_checks: [qpos_each_step, qvel_each_step, final_tip_position]
       tip_position_source: data.site_xpos at tip_site after final mj_forward
       target_source: task.target_m; target_site is not read
@@ -84,10 +108,15 @@ tools:
         position_error_m: float
         position_error_max_m: float
         task_success: bool
+      additional_metrics_with_command:
+        tendon_target_lengths_m: list[float]
+        final_tendon_lengths_m: list[float]
+        actuator_controls: list[float]
+        actuator_force: list[float]
       artifacts: []
     limitations:
       - Checks final position only; no tracking, orientation, or sustained reach validation.
-      - No controller or control inputs are added.
+      - Holds the supplied command; no trajectory, feedback policy, or parameter search.
       - Requires a named tip_site in the input XML.
       - Does not dispatch on task_type; only the positional reach gate is implemented.
       - Finite-state checks are a minimal sanity check, not a robustness guarantee.
@@ -96,6 +125,7 @@ tools:
       TASK_FAILED: Simulation completed but final position error exceeds the allowed error.
       PHYSICS_ERROR: Exception during model loading, site lookup, simulation, or evaluation.
       NONFINITE_STATE: A checked state or final tip position contains NaN or Inf.
+      INVALID_TENDON_COMMAND: Invalid length count/values or model transmissions/order; empty metrics.
     cost:
       compute: low
-      note: Fixed 100 steps; actual cost depends on the input XML.
+      note: Fixed 1000 steps; actual cost depends on the input XML.

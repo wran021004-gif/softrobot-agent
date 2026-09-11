@@ -29,7 +29,7 @@ def main() -> int:
     matlab_tools = MatlabTools()
     try:
         print("PASS")
-        print("[4] MATLAB workspace analysis...", flush=True)
+        print("[4] M0 geometric workspace analysis...", flush=True)
         workspace = matlab_tools.analyze_workspace(design, task)
         if workspace.metrics:
             print("Target reachable:", workspace.metrics["target_reachable"])
@@ -40,7 +40,19 @@ def main() -> int:
             print("FAIL:", workspace.failure_code)
             return 1
 
-        print("[5] Compiling MuJoCo model...", flush=True)
+        print("[5] M1 PCC reach planning...", flush=True)
+        plan = matlab_tools.plan_pcc_reach(design, task)
+        if plan.status != "pass":
+            print("FAIL:", plan.failure_code, plan.message)
+            return 1
+        print("Theta:", plan.metrics["theta_rad"], "rad")
+        print("Phi:", plan.metrics["phi_rad"], "rad")
+        print("PCC predicted tip:", plan.metrics["predicted_tip_m"])
+        print("PCC predicted error:", plan.metrics["predicted_position_error_m"], "m")
+        print("PCC model task success:", plan.metrics["model_task_success"])
+        print("Tendon target lengths:", plan.metrics["tendon_target_lengths_m"])
+
+        print("[6] Compiling tendon-driven MuJoCo model...", flush=True)
         compiled = compile_mujoco(
             design, task, PROJECT_ROOT / "mujoco/generated" / f"{task.task_id}.xml",
         )
@@ -49,8 +61,11 @@ def main() -> int:
             return 1
         print("Generated:", compiled.artifacts["mjcf_path"])
 
-        print("[6] Running MuJoCo task validation...", flush=True)
-        validation = validate_task(compiled.artifacts["mjcf_path"], task)
+        print("[7] Running MuJoCo tendon task validation...", flush=True)
+        validation = validate_task(
+            compiled.artifacts["mjcf_path"], task,
+            tendon_target_lengths_m=plan.metrics["tendon_target_lengths_m"],
+        )
         if "task_success" in validation.metrics:
             print("Steps:", validation.metrics["steps"])
             print("Tip position:", validation.metrics["tip_position_m"])
@@ -58,6 +73,10 @@ def main() -> int:
             print("Position error:", validation.metrics["position_error_m"], "m")
             print("Allowed error:", validation.metrics["position_error_max_m"], "m")
             print("Task success:", validation.metrics["task_success"])
+            print("Final tendon lengths:", validation.metrics["final_tendon_lengths_m"])
+            print("Actuator controls:", validation.metrics["actuator_controls"])
+            print("Actuator force:", validation.metrics["actuator_force"])
+        print("Failure code:", validation.failure_code)
         if validation.status != "pass":
             print("FAIL:", validation.failure_code)
             if validation.message:

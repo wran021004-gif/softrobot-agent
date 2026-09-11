@@ -1,40 +1,55 @@
 # Tendon-driven continuum family
 
-This family describes the intended tendon-driven continuum arm design space.
-Current support is partial: the executable model is a passive segmented chain.
-The existing flat `schemas.design_spec.DesignSpec` is the design contract;
-grammar.yaml documents its fields without adding schema validation.
+Current support is single-section tendon-driven continuum V1: a low-fidelity
+tendon-actuated segmented approximation. The flat DesignSpec remains the design
+contract. grammar.yaml documents fields; tools enforce their execution limits.
 
 ## Current design choices
 
-Use `robot_family: tendon_driven_continuum`. Both the MATLAB adapter and MuJoCo
-compiler check this discriminator. Proposals can vary `total_length_m` and
-`body_radius_m` as morphology parameters and `segments` as discretization.
-Use positive values; current examples are illustrative, not validated physical
-operating ranges.
+Use robot_family=tendon_driven_continuum and sections=1. Family identity is an
+acceptance check, not a physical parameter. sections remains reserved for future
+multi-section support; M1 and compilation explicitly reject sections != 1 with
+UNSUPPORTED_DESIGN_CONFIGURATION. M0 still ignores sections.
 
-These three numerical fields affect MuJoCo geometry. Only total_length_m enters
-MATLAB's numerical check. Tool manifests are the authoritative per-tool field
-coverage; robot_family is an acceptance check, not a physical parameter.
+Active numerical fields:
 
-`sections`, `tendon_count`, and `tendon_routing_radius_m` remain required schema
-fields but are reserved in the implementation. Keep their example values for
-current proposals; changing them does not change the analysis or simulation.
+- total_length_m: M0 reach bound, M1 PCC arc length, MuJoCo centerline length.
+- segments: MuJoCo discretization, paired y/z hinges, and distal routing stations.
+- body_radius_m: capsule geometry and resulting mass/inertia/contact.
+- tendon_count: number and angular spacing of PCC commands and MuJoCo tendons/actuators.
+- tendon_routing_radius_m: PCC length changes and MuJoCo circumferential routing offsets.
 
-## Current tool support and limitations
+The two tendon fields have moved from reserved to active. Positive finite
+lengths/radii and positive counts are required by consuming tools. Examples are
+illustrative, not validated scientific operating ranges. The environment floor
+is fixed and does not follow body_radius_m. Tool manifests provide exact coverage.
 
-MATLAB performs only a very-low-fidelity geometric length-bound check. It does
-not model PCC, PCS, Cosserat mechanics, stiffness, obstacles, or actuation.
+## Current tools and coordinates
 
-MuJoCo compiles a uniform capsule chain with passive hinges in a plane. It has
-no tendon routing, actuation, or controller. Its task gate compares the final
-tip world position with the target after 100 simulation steps. A geometric
-reachability pass can therefore coexist with TASK_FAILED.
+M0 is a geometric length-bound screen. M1 uses base MATLAB fminbnd to find a
+best-fit single-section PCC bend on theta in [0,pi] and produces length commands.
+PCC ignores dynamics, gravity, stiffness/load, and contact. It can pass as a tool
+while model_task_success=false, allowing the pipeline to continue.
 
-## Future Extensions
+Both M1 and MuJoCo place the base at [0,0,0], straight centerline along +x, and
+cross-section in y-z. Routing i uses alpha_i=2*pi*i/N, y=r_t*cos(alpha_i),
+z=r_t*sin(alpha_i); phi is measured from +y toward +z.
 
-Possible future work includes multi-section models, tapered radius, variable
-stiffness, physical tendon routing, different tendon counts, and different
-end-effectors. These capabilities are unsupported today and require matching
-analysis/compiler implementations and updated manifests before being exposed
-as supported design choices.
+MuJoCo compiles actual spatial tendons through the base and distal routing
+sites, with tendon-transmission length servos. Every segment has y/z bending
+hinges and fixed surrogate restoring stiffness/damping. There is no axial or
+torsional DOF. Force-limited tendons pull only. This is not Cosserat continuum,
+FEM, or a validated material model. Self-contact is disabled.
+
+The task environment is manually defined and selected using TaskSpec.environment_id;
+a future LLM supplying DesignSpec cannot modify it. The task gate holds the PCC
+commands for 1000 steps and compares actual final tip position to the TaskSpec
+target/tolerance. No command disables actuation. PCC error and physical error are
+reported separately; TASK_FAILED must not trigger hidden retuning.
+
+## Unsupported extensions
+
+Multi-section physics, tapered radius, variable/material-derived stiffness,
+Cosserat/FEM models, and interchangeable end-effectors remain unsupported.
+They require implementation and matching metadata before being exposed as
+supported choices. No Agent, RL, or design optimizer is part of this version.
