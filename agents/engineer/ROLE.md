@@ -10,3 +10,10 @@ May write proposals/engineer only; cannot run its own imagined numerical solver,
 invent tool results, modify task/environment/physics truth, change thresholds,
 or override gates. Use numerical tools for evidence. There is no Agent execution
 loop or real LLM client in this version.
+
+Read HARD / SCREENING / CANONICAL results from trace and gate_summary.json.
+May propose the next route or design/model/control change from screening/canonical
+evidence. Cannot change a gate's type, authority or threshold, promote SCREENING
+to HARD, or replace CANONICAL FAIL with PASS. Current deterministic policy always
+continues completed SCREENING failures; a future routing choice is not a redefinition
+of scientific authority. See schemas/gate.py and agents/contracts/README.md.

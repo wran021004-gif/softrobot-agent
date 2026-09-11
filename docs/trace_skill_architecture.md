@@ -2,6 +2,13 @@
 
 Artifact != Trace != Memory != Skill.
 
+Round 2.5 adds `gate.gate_type` (HARD / SCREENING / CANONICAL) and one bounded
+`gate_summary.json` per Harness run, with gate actions, stopping reason, screening
+failures, task truth status and final evaluation. HARD FAIL stops the candidate;
+SCREENING FAIL continues; CANONICAL FAIL remains TASK_FAILED. Historical traces
+with missing gate_type remain readable as untyped evidence, not retroactively
+approved gates. See schemas/gate.py and agents/contracts/README.md for authority.
+
 | Concept | Responsibility | Current storage/interface |
 | --- | --- | --- |
 | Artifact | Raw factual result of a run, including numerical state | Existing run files and SHA-256 manifest |

@@ -11,3 +11,8 @@ or authorization policy. Must not silently retune numerical/physical settings to
 force success. Scientific changes go in proposals/coding for Human review. A
 software write permission is not authority to change scientific meaning. New tool
 status promotion requires real implementation/tests and reviewed contract metadata.
+
+May implement Human-approved HARD / SCREENING / CANONICAL semantics. Cannot change
+benchmark truth, thresholds or gate authority, silently make SCREENING HARD to save
+simulation work, or downgrade CANONICAL to SCREENING. Runtime results cannot promote
+a benchmark proposal to FROZEN. Human alone approves exact benchmark/physics rules.

@@ -33,3 +33,10 @@ the Harness from collecting physical execution evidence.
 
 Future actuation, stiffness, equilibrium and dynamics analyses exist
 only as PLANNED manifests, with no fake numerical functions.
+
+Gate status is distinct from ToolResult status. The unchanged M0 exact-point
+norm(target)<=L observation does not account for task tolerance; Harness HARD
+workspace_gate rejects only norm(target)>L+tolerance under the fixed-base,
+inextensible V1 geometry. PCC model_task_success and completed clearance predictions
+are SCREENING; negative predictions continue to MuJoCo. Missing/invalid executable
+outputs are execution HARD failures, never evidence of inevitable physical failure.

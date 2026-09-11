@@ -1,0 +1,24 @@
+truth_status: PROPOSED_NOT_APPROVED
+acceptance:
+  initial_robot_region: before_window
+  final_aperture_required: true
+  window_contact_policy: forbid
+  final_robot_region: unrestricted
+  randomization: none
+initial_configuration:
+  representation: null
+  values: null
+  status: HUMAN_DECISION_REQUIRED
+  note: Round 2 zero-qpos straight arm already straddles the window and cannot meet proposed before_window. No new initializer is implemented in Round 2.5.
+success_terms:
+  - target_reached
+  - initial_required_side_satisfied
+  - final_aperture_constraint_satisfied
+  - no_forbidden_window_contact
+definitions:
+  initial_region: Entire capsule body including radius must lie strictly before the near wall face, not merely the tip.
+  aperture: Final entire centreline clipped to the full wall slab lies within the radius-eroded opening, and the connected arm spans both slab faces. This is not a temporal swept-path certificate.
+  contact: Forbid any sampled robot-capsule to window-frame contact with signed distance <= 0, including initial pose. Floor excluded as in Round 2; Human must confirm scope.
+  allowed_contact_threshold: null
+  final_region: No additional whole-body region requirement beyond the connected-arm aperture condition; fixed base remains at world origin.
+  evidence: Sampled physical evidence, not a continuous mathematical collision certificate.

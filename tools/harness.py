@@ -1,5 +1,6 @@
 """Deterministic orchestration. Numerical predictions never override task truth."""
 from pathlib import Path
+import math
 import shutil
 import zipfile
 from tools.artifact_tools import create_run, finalize_run, file_hash
@@ -7,6 +8,36 @@ from tools.capability_resolver import resolve_capability, CapabilityState
 from tools.design_compiler import build_robot_ir
 from tools.spec_tools import ROOT, load_yaml, load_task_package, validate_design, load_simulator, load_run_settings
 from tools.provenance import parameter_provenance
+from schemas.gate import GateType, gate_action
+
+
+def _record_check(run, name, gate_type, passed, metric, value, threshold, authority, paths, comparison="=="):
+    decision = "PASS" if passed else "FAIL"
+    run.events.emit("GATE_EVALUATED", name, actor="gate", status="pass" if passed else "fail",
+        gate=dict(gate=name, gate_type=gate_type, input_metric=metric, value=value, threshold=threshold,
+                  comparison=comparison, decision=decision, authority=authority),
+        evidence_refs=run.events.refs(*paths))
+    return gate_action(gate_type, decision)
+
+
+def _save_gate_summary(run, final_status, failure_code, stage, environment):
+    gates = [{"operation": e.operation, **e.gate.model_dump(mode="json"),
+              "action": gate_action(e.gate.gate_type, e.gate.decision),
+              "evidence_refs": [ref.model_dump(mode="json") for ref in e.evidence_refs]}
+             for e in run.events.events if e.gate is not None]
+    hard = [g["operation"] for g in gates if g["action"] == "STOP"]
+    canonical = [g for g in gates if g["gate_type"] == "CANONICAL" and g["decision"] != "NOT_RUN"]
+    run.save("gate_summary.json", {
+        "policy_authority": "Human-owned schemas/gate.py; Agents cannot override type, threshold or decision",
+        "final_status": final_status, "failure_code": failure_code,
+        "task_truth_status": environment.truth_status if environment is not None else None,
+        "termination": "HARD_FAIL" if hard else "CANONICAL_RESULT" if canonical else "EXECUTION_ERROR",
+        "stopped_by": hard, "last_stage": stage,
+        "screening_failures": [g["operation"] for g in gates if g["gate_type"] == "SCREENING" and g["decision"] == "FAIL"],
+        "canonical_result": ("FAIL" if any(g["decision"] == "FAIL" for g in canonical) else "PASS") if canonical else "NOT_RUN",
+        "benchmark_approval": "Gate type is not promotion; consult task/environment authority and benchmark registry",
+        "gates": gates,
+    })
 
 
 def _snapshot_sources(run):
@@ -29,6 +60,7 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
               run_root=ROOT / "runs", *, matlab_factory=None, previous_run_id=None, relationship=None):
     run = create_run(run_root, previous_run_id=previous_run_id, relationship=relationship)
     matlab = None
+    environment = None
     clearance = None
     final_status, failure_code = "ERROR", "UNKNOWN"
     stage = "spec_gate"
@@ -51,6 +83,11 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         if constrained:
             from tools.window_geometry import constrained_window
             constrained_window(environment, task)
+            run.save("acceptance.json", {
+                "truth_status": environment.truth_status,
+                "source": "task.yaml acceptance" if task.acceptance else "Round 2 development default in schemas/task_spec.py; not approved benchmark truth",
+                **task.window_acceptance().model_dump(mode="json"),
+            })
         design = validate_design(load_yaml(run.path / "design_input.yaml"))
         run.events.emit("SPEC_VALIDATED", "design_loaded", status="pass", evidence_refs=run.events.refs("design_input.yaml"))
         simulator, settings = load_simulator(), load_run_settings()
@@ -59,7 +96,7 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         run.update(random_seed=settings.random_seed)
         run.event(stage, "pass")
         run.events.emit("GATE_EVALUATED", stage, actor="gate", status="pass",
-            gate=dict(gate=stage, input_metric="specs_valid", value=True, threshold=True, comparison="==",
+            gate=dict(gate=stage, gate_type="HARD", input_metric="specs_valid", value=True, threshold=True, comparison="==",
                       decision="PASS", authority="Task/Environment/Design contracts and frozen package"),
             evidence_refs=run.events.refs("task.yaml", "environment.yaml", "design_input.yaml"))
         stage = "design_grammar_gate"
@@ -72,10 +109,10 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                         evidence_refs=run.events.refs("capability_resolution.json", "design_input.yaml"))
         supported = resolution.state in (CapabilityState.SUPPORTED, CapabilityState.PARAMETRICALLY_SUPPORTED)
         run.events.emit("GATE_EVALUATED", stage, actor="gate", status="pass" if supported else "fail",
-            gate=dict(gate=stage, input_metric="capability_supported", value=supported, threshold=True, comparison="==",
+            gate=dict(gate=stage, gate_type="HARD", input_metric="capability_supported", value=supported, threshold=True, comparison="==",
                       decision="PASS" if supported else "FAIL", authority="Human-owned family grammar and capability manifests"),
             evidence_refs=run.events.refs("capability_resolution.json"))
-        if resolution.state not in (CapabilityState.SUPPORTED, CapabilityState.PARAMETRICALLY_SUPPORTED):
+        if gate_action(GateType.HARD, "PASS" if supported else "FAIL") == "STOP":
             final_status = failure_code = resolution.state.value
             run.event(stage, "fail", failure_code=failure_code, reason=resolution.reason)
             return run
@@ -104,7 +141,7 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         if constrained:
             provenance["task"] = "task.yaml; " + environment.truth_status
             provenance["environment_representation"] = "environment.xml and robot.xml <- tools.spec_tools.environment_xml <- environment.yaml; window bars shared with MATLAB via tools.window_geometry.window_boxes"
-            provenance["metrics"] = "metrics/reach.py: target tolerance AND final full-slab aperture crossing AND no sampled window contact; " + environment.truth_status
+            provenance["metrics"] = "metrics/reach.py: target tolerance AND required initial side AND final full-slab aperture crossing AND no forbidden sampled window contact; " + environment.truth_status
         run.save("provenance.json", provenance)
         stage = "model"
         if matlab_factory is None:
@@ -122,8 +159,23 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             workspace = run.invoke_tool("analyze_workspace", "workspace_result.json",
                 lambda: matlab.analyze_workspace(robot_ir, task, environment),
                 input_paths=("robot_ir.yaml", "task.yaml", "environment.yaml"))
-            if workspace.status != "pass":
+            workspace_completed = workspace.status == "pass" or (workspace.failure_code == "DESIGN_INFEASIBLE" and workspace.metrics.get("target_reachable") is False)
+            if _record_check(run, "workspace_execution_gate", "HARD", workspace_completed,
+                    "workspace_analysis_completed", workspace_completed, True,
+                    "Executable M0 result required; a completed geometric rejection is not a tool runtime failure",
+                    ("workspace_result.json",)) == "STOP":
                 final_status = failure_code = workspace.failure_code or "UNKNOWN"
+                model_stage.update(status="fail", failure_code=failure_code)
+                return run
+            # M0's exact-point test ignores tolerance. The task necessary bound is
+            # norm(target) <= fixed inextensible arm length + frozen tolerance.
+            distance = math.dist(robot_ir.base_position_m, task.target_m)
+            bound = robot_ir.total_length_m + task.position_error_max_m
+            if _record_check(run, "workspace_gate", "HARD", distance <= bound,
+                    "target_distance_m", distance, bound,
+                    "Fixed-base inextensible RobotIR; segmented_mujoco_mapping_v1.md plus TaskSpec tolerance (triangle inequality); not sufficient for reach",
+                    ("workspace_result.json", "robot_ir.yaml", "task.yaml"), comparison="<=") == "STOP":
+                final_status = failure_code = "DESIGN_INFEASIBLE"
                 model_stage.update(status="fail", failure_code=failure_code)
                 return run
             def plan_call():
@@ -131,21 +183,31 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                 return result.model_copy(update={"metrics": {**result.metrics, "comparison_context": comparison_context}})
             plan = run.invoke_tool("plan_pcc_reach", "model_result.json", plan_call,
                                    input_paths=("robot_ir.yaml", "task.yaml", "environment.yaml"))
-            if plan.status != "pass":
+            if _record_check(run, "model_execution_gate", "HARD", plan.status == "pass",
+                    "valid_PCC_commands_available", plan.status == "pass", True,
+                    "PCC executable-command contract; tool completion is separate from predicted task success",
+                    ("model_result.json",)) == "STOP":
                 final_status = failure_code = plan.failure_code or "UNKNOWN"
                 model_stage.update(status="fail", failure_code=failure_code)
                 return run
+            _record_check(run, "model_prediction_gate", "SCREENING", plan.metrics["model_task_success"],
+                "predicted_position_error_m", plan.metrics["predicted_position_error_m"], task.position_error_max_m,
+                "tendon_driven_pcc_v1.md low-fidelity prediction; TaskSpec tolerance; failure continues to MuJoCo",
+                ("model_result.json", "task.yaml"), comparison="<=")
             if constrained:
                 clearance = run.invoke_tool("analyze_clearance", "clearance_result.json",
                     lambda: matlab.analyze_clearance(robot_ir, task, environment, plan),
                     input_paths=("robot_ir.yaml", "task.yaml", "environment.yaml", "model_result.json"))
-                if clearance.status != "pass":
+                if _record_check(run, "clearance_execution_gate", "HARD", clearance.status == "pass",
+                        "clearance_analysis_completed", clearance.status == "pass", True,
+                        "Executable clearance result required; not a geometric feasibility criterion",
+                        ("clearance_result.json",)) == "STOP":
                     final_status = failure_code = clearance.failure_code or "UNKNOWN"
                     model_stage.update(status="fail", failure_code=failure_code)
                     return run
                 feasible = not clearance.metrics["predicted_clearance_violation"]
                 run.events.emit("GATE_EVALUATED", "model_clearance_gate", actor="gate", status="pass" if feasible else "fail",
-                    gate=dict(gate="model_clearance", input_metric="predicted_clearance_violation",
+                    gate=dict(gate="model_clearance", gate_type="SCREENING", input_metric="predicted_clearance_violation",
                               value=not feasible, threshold=False, comparison="==",
                               decision="PASS" if feasible else "FAIL", authority="Geometric screening only; continue simulation for evidence, no canonical override"),
                     evidence_refs=run.events.refs("clearance_result.json", "environment.yaml"))
@@ -163,7 +225,10 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             compiled = run.invoke_tool("compile_mujoco", "compile_result.json",
                 lambda: compile_mujoco(robot_ir, task, run.path / "robot.xml", environment, simulator),
                 input_paths=("robot_ir.yaml", "task.yaml", "environment.yaml", "simulator.yaml"))
-            if compiled.status != "pass":
+            if _record_check(run, "compilation_gate", "HARD", compiled.status == "pass",
+                    "model_compiled", compiled.status == "pass", True,
+                    "RobotIR/environment compilation contract; execution legality only",
+                    ("compile_result.json",)) == "STOP":
                 final_status = failure_code = compiled.failure_code or "UNKNOWN"
                 sim_stage.update(status="fail", failure_code=failure_code)
                 return run
@@ -192,29 +257,33 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         run.event("task_metric_gate", result.status if completed else "not_run", artifact="mujoco_result.json")
         run.events.emit("GATE_EVALUATED", "physics_sanity_gate", actor="gate", status="pass" if completed else "fail",
             failure_code=None if completed else result.failure_code,
-            gate=dict(gate="physics_sanity", input_metric="task_success_available", value=completed, threshold=True,
+            gate=dict(gate="physics_sanity", gate_type="HARD", input_metric="task_success_available", value=completed, threshold=True,
                       comparison="available", decision="PASS" if completed else "FAIL", authority="run_task finite-state execution checks"),
             evidence_refs=run.events.refs("mujoco_result.json"))
         tip_passed = result.metrics.get("target_reached", result.metrics.get("task_success"))
         run.events.emit("GATE_EVALUATED", "target_metric_gate" if constrained else "task_metric_gate", actor="gate",
             status=("pass" if tip_passed else "fail") if completed else "not_run",
             failure_code=None if tip_passed else result.failure_code,
-            gate=dict(gate="target_reached" if constrained else "task_success", input_metric="position_error_m", value=result.metrics.get("position_error_m"),
+            gate=dict(gate="target_reached" if constrained else "task_success", gate_type="CANONICAL", input_metric="position_error_m", value=result.metrics.get("position_error_m"),
                       threshold=task.position_error_max_m, comparison="<=",
                       decision=("PASS" if tip_passed else "FAIL") if completed else "NOT_RUN",
                       authority=("TaskSpec: task.yaml; metrics/reach.py; " + environment.truth_status) if constrained else "frozen TaskSpec: task.yaml; metrics/reach.py"),
             evidence_refs=run.events.refs("task.yaml", "mujoco_result.json"))
         if constrained:
-            for metric, expected in (("aperture_constraint_satisfied", True), ("obstacle_contact_occurred", False), ("task_success", True)):
+            for metric, expected in (("initial_required_side_satisfied", True), ("aperture_constraint_satisfied", True), ("obstacle_contact_occurred", False), ("task_success", True)):
                 passed = result.metrics.get(metric) == expected if completed else False
                 run.events.emit("GATE_EVALUATED", metric + "_gate", actor="gate",
                     status=("pass" if passed else "fail") if completed else "not_run",
-                    gate=dict(gate=metric, input_metric=metric, value=result.metrics.get(metric), threshold=expected,
+                    gate=dict(gate=metric, gate_type="CANONICAL", input_metric=metric, value=result.metrics.get(metric), threshold=expected,
                               comparison="==", decision=("PASS" if passed else "FAIL") if completed else "NOT_RUN",
                               authority="metrics/reach.py constrained evaluation; " + environment.truth_status),
                     evidence_refs=run.events.refs("task.yaml", "environment.yaml", "mujoco_result.json"))
         failure_code = result.failure_code
-        final_status = "PASS" if result.status == "pass" else (failure_code or "UNKNOWN")
+        if completed:
+            final_status = "PASS" if result.metrics["task_success"] else gate_action(GateType.CANONICAL, "FAIL")
+            failure_code = None if final_status == "PASS" else "TASK_FAILED"
+        else:
+            final_status = failure_code or "UNKNOWN"
         # Diagnostics cannot change the canonical task/physics gate decision.
         try:
             from tools.diagnostic_tools import save_diagnostic_summary
@@ -232,9 +301,13 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         run.save("error.json", {"stage": stage, "exception_type": type(exc).__name__, "message": str(exc)})
         if stage == "spec_gate":
             run.events.emit("GATE_EVALUATED", stage, actor="gate", status="fail", failure_code=failure_code,
-                gate=dict(gate=stage, input_metric="specs_valid", value=False, threshold=True, comparison="==",
+                gate=dict(gate=stage, gate_type="HARD", input_metric="specs_valid", value=False, threshold=True, comparison="==",
                           decision="FAIL", authority="Task/Environment/Design contracts and frozen package"),
                 evidence_refs=run.events.refs("error.json"))
+        else:
+            _record_check(run, "execution_gate", "HARD", False, "stage_executable", False, True,
+                "Harness executable input/tool contract; runtime failure is not scientific design infeasibility",
+                ("error.json",))
         return run
     finally:
         if matlab is not None:
@@ -243,4 +316,5 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                     matlab.close()
             except Exception as exc:
                 run.event("matlab_cleanup", "fail", exception_type=type(exc).__name__, message=str(exc))
+        _save_gate_summary(run, final_status, failure_code, stage, environment)
         finalize_run(run, final_status, failure_code)

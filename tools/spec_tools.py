@@ -100,5 +100,8 @@ def load_task_package(path=ROOT / "tasks/reach_free", *, representation="mujoco.
     task, environment = load_task(path), load_environment(path / "environment.yaml")
     if task.environment_id != environment.environment_id:
         raise ValueError("Task/environment identity mismatch")
+    if task.task_type == "reach_window" and environment.truth_status != "NON_CANONICAL_DEVELOPMENT_ONLY":
+        if environment.truth_status != "HUMAN_APPROVED" or task.acceptance is None:
+            raise ValueError("Formal reach_window requires HUMAN_APPROVED environment and explicit task acceptance")
     validate_frozen_environment(environment, path / representation)
     return task, environment

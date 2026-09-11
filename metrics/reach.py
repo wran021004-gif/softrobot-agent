@@ -18,6 +18,13 @@ def evaluate_reach(tip_position_m, task: TaskSpec, window_evidence=None) -> dict
         result.update(target_reached=result["task_success"],
                       aperture_constraint_satisfied=window_evidence["aperture_constraint_satisfied"],
                       obstacle_contact_occurred=window_evidence["obstacle_contact_occurred"])
+        acceptance = task.window_acceptance()
+        if acceptance.initial_robot_region == "before_window" and window_evidence.get("initial_side_of_wall") is None:
+            raise ValueError("before_window acceptance requires initial whole-body side evidence")
+        result.update(initial_required_side_satisfied=(acceptance.initial_robot_region == "unrestricted" or
+                      window_evidence.get("initial_side_of_wall") == "before_window"),
+                      no_forbidden_window_contact=not result["obstacle_contact_occurred"],
+                      acceptance=acceptance.model_dump(mode="json"))
         result["task_success"] = bool(result["target_reached"] and result["aperture_constraint_satisfied"]
-                                      and not result["obstacle_contact_occurred"])
+                                      and result["initial_required_side_satisfied"] and result["no_forbidden_window_contact"])
     return result

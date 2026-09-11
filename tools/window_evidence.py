@@ -25,6 +25,7 @@ class WindowEvidence:
         self.crossing = None
         self.ever_satisfied = False
         self.initial = None
+        self.side = None
         # Larger than any distance between the fixed frame and this rooted arm.
         self.distance_cutoff = 2 * sum(float(model.geom_size[i, 1]) for i in self.robot) + math.dist(window.position_m, [0, 0, 0]) + window.width_m + window.height_m + 2 * window.frame_width_m + window.thickness_m + 1
 
@@ -54,9 +55,17 @@ class WindowEvidence:
                 points.append((centre - offset).tolist())
             points.append((centre + offset).tolist())
         self.crossing = aperture_crossing(points, float(model.geom_size[self.robot[0], 0]), self.window)
+        radius = float(model.geom_size[self.robot[0], 0])
+        minimum_x = min(p[0] for p in points) - radius
+        maximum_x = max(p[0] for p in points) + radius
+        near = self.window.position_m[0] - self.window.thickness_m / 2
+        far = self.window.position_m[0] + self.window.thickness_m / 2
+        self.side = ("before_window" if maximum_x < near else "after_window" if minimum_x > far else
+                     "straddles_window" if minimum_x < near and maximum_x > far else "intersects_window_slab")
         self.ever_satisfied |= self.crossing["aperture_constraint_satisfied"]
         if self.initial is None:
             self.initial = {"minimum_clearance_m": self.minimum, "obstacle_contact_occurred": bool(self.contacts),
+                            "side_of_wall": self.side, "body_x_bounds_m": [float(minimum_x), float(maximum_x)],
                             **self.crossing}
 
     def summary(self):
@@ -68,5 +77,9 @@ class WindowEvidence:
                                   for (a, b), count in sorted(self.contacts.items())],
                 "observation_samples": self.samples, "ever_aperture_satisfied": self.ever_satisfied,
                 "initial_configuration": self.initial,
+                "initial_aperture_state": ({key: self.initial[key] for key in
+                    ("crosses_window_slab", "aperture_constraint_satisfied", "aperture_margin_m")} if self.initial else None),
+                "initial_side_of_wall": self.initial["side_of_wall"] if self.initial else None,
+                "final_side_of_wall": self.side,
                 **(self.crossing or {}),
                 "limitation": "Discrete initial/pre-integration and final samples; contact_count counts contact points across samples, not unique impacts; no continuous collision guarantee"}

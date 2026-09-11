@@ -212,3 +212,20 @@ geometry and acceptance semantics remain Human decisions. See the
 [fixture contract](tests/fixtures/reach_window_dev/README.md) and
 [Round 2 results](docs/round2_result.md). Seven focused tests in test_reach_window.py
 include four opt-in real MATLAB tests; use SOFTROBOT_TEST_MATLAB=1 to include them.
+
+## Round 2.5: gate and benchmark semantics
+
+Gate types are explicit in trace.jsonl and gate_summary.json: HARD failures stop
+invalid/infeasible execution under the stated contract, SCREENING predictions
+continue to MuJoCo, and CANONICAL task failures remain TASK_FAILED. Tool runtime
+failure is separate from a negative model prediction. The M0 exact-point observation
+is unchanged; its HARD task bound includes the existing target tolerance.
+
+WindowAcceptance now distinguishes unrestricted and before_window initial regions
+using the entire capsule body, not just its tip. Existing development parameters
+and unrestricted behavior remain unchanged. A final evaluator result on that fixture
+does not establish formal benchmark approval or an insertion from before the wall.
+The [proposal and Human promotion workflow](proposals/benchmark/reach_window_v1/README.md)
+remains PROPOSED_NOT_APPROVED. The [Human decision fields](docs/reach_window_human_decision.md)
+include the unresolved exact initial configuration. No Agent may change gate authority.
+See [Round 2.5 results](docs/round2_5_result.md).

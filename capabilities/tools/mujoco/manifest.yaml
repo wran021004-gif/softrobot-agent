@@ -214,6 +214,7 @@ tools:
       controller: Controller protocol or None
       run_settings: RunSettings
       environment: EnvironmentSpec required for reach_window; optional for legacy reach
+    gate_semantics: Executable finite-state evidence is HARD; actual task acceptance is CANONICAL for the selected task, without promoting development fixtures to frozen benchmarks.
     outputs:
     - ToolResult with canonical actual metrics, compact execution_evidence, resolved
       engine parameter provenance and final state
@@ -231,7 +232,8 @@ tools:
     limitations:
     - Reach and single axis-aligned reach_window evaluators only; window development fixture is not a frozen benchmark.
     - Window evidence records sampled capsule-to-frame distances, contact points/counts, initial configuration and final aperture crossing; floor excluded.
-    - reach_window success requires target tolerance AND final aperture crossing AND no sampled window contact; no continuous collision guarantee.
+    - reach_window success requires target tolerance AND required initial whole-body side AND final aperture crossing AND no forbidden sampled window contact; no continuous collision guarantee.
+    - TaskSpec.acceptance supports before_window or unrestricted initial region; legacy development default unrestricted is not formal approval. No new initial-state generator.
     - Finite state is not validated physical fidelity.
     - No automatic tuning or retry.
     - Step force/length samples are solver-stage values; qpos/qvel are post-integration.

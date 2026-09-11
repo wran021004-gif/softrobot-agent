@@ -66,3 +66,38 @@ CODING_SIMULATION strategies. All recommendations still pass through existing
 role permission checks before execution. Skill Curator is a role contract only
 (../skill_curator/ROLE.md) and receives no write scope. Human remains the final
 Skill approval authority. No existing agent permissions are expanded.
+
+## Gate scientific authority (Round 2.5)
+
+Human alone defines benchmark truth, Gate scientific authority and Physics Contract
+approval. schemas/gate.py encodes the three meanings and their fixed actions:
+HARD FAIL stops the current candidate, SCREENING FAIL continues physical validation,
+CANONICAL FAIL remains TASK_FAILED. Diagnostic work may continue after a final failure
+but never changes it. Tool execution status is distinct from a Gate decision.
+
+Spec legality and grammar/capability support are HARD input/execution conditions.
+The workspace HARD rule is norm(target-base) <= L + task tolerance, because the
+fixed-base, inextensible V1 endpoint norm cannot exceed L (triangle inequality).
+This is necessary, not sufficient; a target just beyond L can still satisfy tolerance.
+M0's unchanged exact-target observation norm(target)<=L alone is not the task gate.
+Only that length-bound rejection implies geometric infeasibility under this specific
+representation; missing software or invalid input is not proof about real robots.
+
+Valid model outputs/commands, compilation and finite-state execution are HARD
+execution conditions. Physics sanity proves executable finite evidence only, not
+task success, convergence or physical fidelity. PCC task and full-shape clearance
+predictions are SCREENING irrespective of their MATLAB backend. Tool runtime failure
+is an execution HARD failure, not a negative scientific prediction.
+
+The actual TaskSpec evaluator is CANONICAL: target tolerance for reach_free;
+target AND approved initial side AND final aperture AND no forbidden contact for
+reach_window. CANONICAL labels the final evaluation role, not benchmark membership.
+A NON_CANONICAL development fixture remains development-only even when that
+evaluator passes. Only an explicit Human-approved frozen package/registry entry is
+a formal benchmark. Historical traces missing gate_type remain untyped; no type
+or authority is inferred from a tool name.
+
+Engineer can propose next routes, Diagnosis can explain observations, and Coding
+can implement approved rules. None can change the type/threshold, waive a HARD
+condition or override CANONICAL. A future Engineer route policy may choose among
+screened candidates only under separate Human-owned policy; none is introduced here.

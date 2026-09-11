@@ -156,6 +156,18 @@
           "title": "Gate",
           "type": "string"
         },
+        "gate_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GateType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "None only for historical untyped traces; never infer scientific authority"
+        },
         "input_metric": {
           "maxLength": 128,
           "minLength": 1,
@@ -226,6 +238,15 @@
       ],
       "title": "GateEvidence",
       "type": "object"
+    },
+    "GateType": {
+      "enum": [
+        "HARD",
+        "SCREENING",
+        "CANONICAL"
+      ],
+      "title": "GateType",
+      "type": "string"
     },
     "JsonValue": {}
   },

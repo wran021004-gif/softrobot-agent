@@ -59,3 +59,16 @@ NON_CANONICAL until Human approves a benchmark.
 
 MuJoCo documents signed geom distance and the limitations of legacy collision
 algorithms in its [geom distance reference](https://mujoco.readthedocs.io/en/latest/computation/#geom-distance).
+
+Round 2.5 adds initial_aperture_state, initial_side_of_wall and final_side_of_wall
+to that bounded evidence. Side classification uses complete capsule x extents
+including radius, relative to near/far wall faces. TaskSpec.acceptance can require
+before_window or unrestricted initial region. The unchanged development fixture
+defaults to unrestricted; explicit before_window fails if the initial arm already
+straddles the wall, even when target and final aperture predicates pass. No initial
+configuration generator or continuous passage certificate is supplied.
+
+Finite execution is HARD legality evidence; the selected task evaluator is the
+CANONICAL final decision role. This role does not confer benchmark approval on a
+development fixture. Formal reach_window needs Human-approved values/acceptance;
+the pending proposal is outside executable task packages and benchmark membership.

@@ -52,6 +52,7 @@ tools:
     - Does not consider stiffness, obstacles, or dynamics.
     - Does not consider actuation feasibility.
     - Reachable does not imply MuJoCo task success.
+    - M0 retains the exact-point norm(target)<=L observation. Harness workspace_gate uses L plus TaskSpec tolerance as the HARD necessary task bound; M0 status alone is not that gate.
     - Engine startup and execution exceptions propagate without a ToolResult.
     - RobotIR mechanics, segment discretization and environment gravity/objects are
       not part of this kinematic calculation.
@@ -138,6 +139,7 @@ tools:
       tendon_order: tendon_0 through tendon_N-1
       pass_condition: Finite prediction and positive finite commands; model_task_success
         may be false.
+      gate_semantics: Tool execution is HARD; model_task_success is SCREENING and failure continues to MuJoCo.
       metrics:
         theta_rad: float
         phi_rad: float
@@ -192,6 +194,7 @@ tools:
       records stage and message.
   analyze_clearance:
     implementation_status: IMPLEMENTED
+    gate_semantics: Completed geometric prediction is SCREENING; a tool execution failure is distinct and HARD.
     implementation:
       module: tools.matlab_tools
       callable: MatlabTools.analyze_clearance

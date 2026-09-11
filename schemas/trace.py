@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import AwareDatetime, Field, JsonValue, model_validator
 from schemas.common import Contract
 from schemas.evidence import ArtifactReference, Identifier
+from schemas.gate import GateType
 
 
 class Actor(str, Enum):
@@ -53,6 +54,7 @@ class DecisionRecord(Contract):
 
 class GateEvidence(Contract):
     gate: Identifier
+    gate_type: GateType | None = Field(default=None, description="None only for historical untyped traces; never infer scientific authority")
     input_metric: str = Field(min_length=1, max_length=128)
     value: float | bool | None
     threshold: float | bool | None

@@ -48,7 +48,7 @@ class EnvironmentSpec(Contract):
     coordinate_frame: Literal["world_base_x_forward_yz_cross_section"]
     gravity_m_s2: Vec3
     gravity_source: str = Field(min_length=1)
-    truth_status: Literal["HUMAN_OWNED", "NON_CANONICAL_DEVELOPMENT_ONLY"] = "HUMAN_OWNED"
+    truth_status: Literal["HUMAN_OWNED", "HUMAN_APPROVED", "NON_CANONICAL_DEVELOPMENT_ONLY"] = "HUMAN_OWNED"
     objects: tuple[Annotated[Plane | Window | ReservedComponent, Field(discriminator="kind")], ...]
     lights: tuple[Light, ...] = ()
 
