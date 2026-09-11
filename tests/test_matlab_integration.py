@@ -94,6 +94,8 @@ class FullPipelineTests(unittest.TestCase):
             gates = {event["gate"]: event["status"] for event in trace}
             self.assertEqual(gates["physics_sanity_gate"], "pass")
             self.assertEqual(gates["task_metric_gate"], "fail")
+            from tests.test_trace import assert_canonical_trace
+            assert_canonical_trace(self, run)
 
 
 if __name__ == "__main__":

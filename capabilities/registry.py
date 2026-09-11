@@ -30,3 +30,14 @@ def list_robot_families() -> list[str]:
 
 def get_robot_family_grammar(family_name: str) -> dict:
     return _load_yaml(load_catalog()["robot_families"][family_name])
+
+
+def get_skill_registry():
+    """Resolve the real library from catalog metadata, without numerical imports."""
+    from skills.registry import SkillRegistry
+    index_path = (CAPABILITIES_ROOT / load_catalog()["skill_registry"]).resolve()
+    with index_path.open(encoding="utf-8") as stream:
+        index = yaml.safe_load(stream)
+    if index.get("schema_version") != 1 or index.get("default_status") != "approved":
+        raise ValueError("Unsupported skill registry index")
+    return SkillRegistry(index_path.parent)

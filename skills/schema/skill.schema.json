@@ -1,0 +1,671 @@
+{
+  "$defs": {
+    "Actor": {
+      "enum": [
+        "human",
+        "harness",
+        "tool",
+        "gate",
+        "engineer_agent",
+        "coding_agent",
+        "diagnosis_agent",
+        "skill_system"
+      ],
+      "title": "Actor",
+      "type": "string"
+    },
+    "Applicability": {
+      "additionalProperties": false,
+      "properties": {
+        "robot_families": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Robot Families",
+          "type": "array"
+        },
+        "task_types": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Task Types",
+          "type": "array"
+        },
+        "model_levels": {
+          "items": {
+            "enum": [
+              "M0",
+              "M1",
+              "M2",
+              "M3"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Model Levels",
+          "type": "array"
+        },
+        "control_levels": {
+          "items": {
+            "enum": [
+              "C0",
+              "C1",
+              "C2",
+              "C3"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Control Levels",
+          "type": "array"
+        }
+      },
+      "required": [
+        "robot_families",
+        "task_types",
+        "model_levels",
+        "control_levels"
+      ],
+      "title": "Applicability",
+      "type": "object"
+    },
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "pointer": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "pattern": "^/",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pointer"
+        }
+      },
+      "required": [
+        "run_id",
+        "path"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    },
+    "FailureCategory": {
+      "enum": [
+        "DESIGN_INFEASIBLE",
+        "COLLISION_INFEASIBLE",
+        "ACTUATION_INSUFFICIENT",
+        "MODEL_MISMATCH",
+        "CONTROL_FAILURE",
+        "ACTUATOR_LIMIT",
+        "SIMULATION_ERROR",
+        "NUMERICAL_FAILURE",
+        "CAPABILITY_MISSING",
+        "PHYSICS_ASSUMPTION_REQUIRED",
+        "TASK_FAILED",
+        "UNKNOWN"
+      ],
+      "title": "FailureCategory",
+      "type": "string"
+    },
+    "HumanApproval": {
+      "additionalProperties": false,
+      "properties": {
+        "actor": {
+          "const": "human",
+          "title": "Actor",
+          "type": "string"
+        },
+        "approved_by": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Approved By",
+          "type": "string"
+        },
+        "approved_at": {
+          "format": "date-time",
+          "title": "Approved At",
+          "type": "string"
+        },
+        "content_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Content Sha256",
+          "type": "string"
+        },
+        "rationale": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "actor",
+        "approved_by",
+        "approved_at",
+        "content_sha256",
+        "rationale"
+      ],
+      "title": "HumanApproval",
+      "type": "object"
+    },
+    "MetricPredicate": {
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Tool",
+          "type": "string"
+        },
+        "metric": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Metric",
+          "type": "string"
+        },
+        "operator": {
+          "enum": [
+            "eq",
+            "gt",
+            "ge",
+            "lt",
+            "le"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Value"
+        },
+        "evidence": {
+          "$ref": "#/$defs/ArtifactReference"
+        }
+      },
+      "required": [
+        "tool",
+        "metric",
+        "operator",
+        "value",
+        "evidence"
+      ],
+      "title": "MetricPredicate",
+      "type": "object"
+    },
+    "SkillCategory": {
+      "enum": [
+        "DESIGN",
+        "MODEL_SELECTION",
+        "CONTROL",
+        "DIAGNOSIS",
+        "CODING_SIMULATION"
+      ],
+      "title": "SkillCategory",
+      "type": "string"
+    },
+    "SkillProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "source_runs": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Runs",
+          "type": "array"
+        },
+        "source_findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ArtifactReference"
+          },
+          "title": "Source Findings",
+          "type": "array"
+        },
+        "supporting_evidence": {
+          "items": {
+            "$ref": "#/$defs/ArtifactReference"
+          },
+          "minItems": 1,
+          "title": "Supporting Evidence",
+          "type": "array"
+        },
+        "created_by": {
+          "$ref": "#/$defs/Actor"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "last_validated_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Validated At"
+        }
+      },
+      "required": [
+        "source_runs",
+        "supporting_evidence",
+        "created_by",
+        "created_at"
+      ],
+      "title": "SkillProvenance",
+      "type": "object"
+    },
+    "SkillStatus": {
+      "enum": [
+        "candidate",
+        "validated",
+        "approved",
+        "deprecated",
+        "rejected"
+      ],
+      "title": "SkillStatus",
+      "type": "string"
+    },
+    "SkillValidationRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "validation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Validation Id",
+          "type": "string"
+        },
+        "skill_ref": {
+          "pattern": "^[A-Za-z0-9_.-]+@[1-9][0-9]*$",
+          "title": "Skill Ref",
+          "type": "string"
+        },
+        "strategy_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Strategy Sha256",
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "deterministic",
+            "cross_run",
+            "human_review"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "passed",
+            "failed",
+            "contradicted"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "validated_runs": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "title": "Validated Runs",
+          "type": "array"
+        },
+        "failed_validation_runs": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "title": "Failed Validation Runs",
+          "type": "array"
+        },
+        "task_coverage": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "title": "Task Coverage",
+          "type": "array"
+        },
+        "robot_coverage": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "title": "Robot Coverage",
+          "type": "array"
+        },
+        "seed_coverage": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Seed Coverage",
+          "type": "array"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/ArtifactReference"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "validated_by": {
+          "$ref": "#/$defs/Actor"
+        },
+        "validated_at": {
+          "format": "date-time",
+          "title": "Validated At",
+          "type": "string"
+        },
+        "summary": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "validation_id",
+        "skill_ref",
+        "strategy_sha256",
+        "method",
+        "outcome",
+        "evidence_refs",
+        "validated_by",
+        "validated_at",
+        "summary"
+      ],
+      "title": "SkillValidationRecord",
+      "type": "object"
+    },
+    "StrategyStep": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "invoke_tool",
+            "inspect_evidence",
+            "request_human_review"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "tool": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tool"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ArtifactReference"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "instruction": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Instruction",
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "instruction"
+      ],
+      "title": "StrategyStep",
+      "type": "object"
+    },
+    "TriggerSignature": {
+      "additionalProperties": false,
+      "properties": {
+        "failure_categories": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/FailureCategory"
+          },
+          "title": "Failure Categories",
+          "type": "array"
+        },
+        "metrics": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MetricPredicate"
+          },
+          "title": "Metrics",
+          "type": "array"
+        }
+      },
+      "title": "TriggerSignature",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "skill_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+      "title": "Skill Id",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 256,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "version": {
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "status": {
+      "$ref": "#/$defs/SkillStatus"
+    },
+    "category": {
+      "$ref": "#/$defs/SkillCategory"
+    },
+    "description": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "trigger_signature": {
+      "$ref": "#/$defs/TriggerSignature"
+    },
+    "when_to_apply": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "When To Apply",
+      "type": "array"
+    },
+    "when_not_to_apply": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "When Not To Apply",
+      "type": "array"
+    },
+    "applicability": {
+      "$ref": "#/$defs/Applicability"
+    },
+    "required_tools": {
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Required Tools",
+      "type": "array"
+    },
+    "strategy": {
+      "items": {
+        "$ref": "#/$defs/StrategyStep"
+      },
+      "minItems": 1,
+      "title": "Strategy",
+      "type": "array"
+    },
+    "negative_constraints": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Negative Constraints",
+      "type": "array"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/ArtifactReference"
+      },
+      "minItems": 1,
+      "title": "Evidence",
+      "type": "array"
+    },
+    "validation": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SkillValidationRecord"
+      },
+      "title": "Validation",
+      "type": "array"
+    },
+    "provenance": {
+      "$ref": "#/$defs/SkillProvenance"
+    },
+    "human_approval": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/HumanApproval"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "requires_new_physics": {
+      "default": false,
+      "title": "Requires New Physics",
+      "type": "boolean"
+    },
+    "causal_claim": {
+      "const": "none",
+      "default": "none",
+      "title": "Causal Claim",
+      "type": "string"
+    },
+    "authority": {
+      "const": "recommendation_only",
+      "default": "recommendation_only",
+      "title": "Authority",
+      "type": "string"
+    },
+    "supersedes": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9_.-]+@[1-9][0-9]*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersedes"
+    },
+    "deprecated_by": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9_.-]+@[1-9][0-9]*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Deprecated By"
+    }
+  },
+  "required": [
+    "skill_id",
+    "name",
+    "version",
+    "status",
+    "category",
+    "description",
+    "trigger_signature",
+    "when_to_apply",
+    "when_not_to_apply",
+    "applicability",
+    "required_tools",
+    "strategy",
+    "negative_constraints",
+    "evidence",
+    "provenance"
+  ],
+  "title": "Skill",
+  "type": "object"
+}

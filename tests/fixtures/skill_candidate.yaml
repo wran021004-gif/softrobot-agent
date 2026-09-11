@@ -1,0 +1,38 @@
+skill_id: fixture_tracking_inspection
+name: Fixture only tracking inspection
+version: 1
+status: candidate
+category: DIAGNOSIS
+description: Synthetic admission and retrieval test; no engineering validation claim.
+trigger_signature:
+  failure_categories: [TASK_FAILED]
+  metrics: []
+when_to_apply: [Inspect the fixture condition]
+when_not_to_apply: [Evidence unavailable]
+applicability:
+  robot_families: [tendon_driven_continuum]
+  task_types: [reach]
+  model_levels: [M1]
+  control_levels: [C1]
+required_tools: [check_tendon_tracking]
+strategy:
+  - action: invoke_tool
+    tool: check_tendon_tracking
+    instruction: Inspect final tendon tracking using recorded evidence.
+negative_constraints:
+  - do_not_modify_task_tolerance
+  - do_not_override_task_gate
+  - do_not_assume_model_mismatch_from_task_failure
+  - do_not_retune_surrogate_without_provenance
+  - do_not_bypass_agent_permissions
+evidence: []
+validation: []
+provenance:
+  source_runs: []
+  source_findings: []
+  supporting_evidence: []
+  created_by: human
+  created_at: '2026-09-11T00:00:00Z'
+  last_validated_at: null
+# Tests bind real temporary finalized run IDs and file hashes before validation.
+# Never copy this incomplete template to the production library.

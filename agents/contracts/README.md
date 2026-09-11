@@ -52,3 +52,17 @@ paths, alternate data streams, reserved names and trailing-dot/space aliases.
 Windows case/separators are normalized; existing links are resolved. These checks
 are not OS isolation. A future executor must also prevent link/race changes and
 arbitrary code effects; a software allowlist alone cannot enforce scientific truth.
+
+## Trace and Skill integration contracts
+
+Round 1.5 adds schemas.trace.DecisionRecord: actor, structured decision, a short
+public rationale, requested tools, evidence links, selected versioned skills and
+next action. It has no private chain-of-thought fields. Current traces contain
+actual Harness/tool/gate actors only, not fictional agent activity.
+
+Future Engineer can retrieve DESIGN/MODEL_SELECTION/CONTROL strategies; Diagnosis
+can inspect the trace and retrieve DIAGNOSIS strategies; Coding can retrieve
+CODING_SIMULATION strategies. All recommendations still pass through existing
+role permission checks before execution. Skill Curator is a role contract only
+(../skill_curator/ROLE.md) and receives no write scope. Human remains the final
+Skill approval authority. No existing agent permissions are expanded.

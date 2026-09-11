@@ -1,0 +1,126 @@
+{
+  "finding_id": "diagnostic_observation_20260911T071524_339902Z_141b473c",
+  "title": "Recorded model, actuator, tracking and numerical observations",
+  "category": "MODEL_SIM_COMPARISON",
+  "observation": [
+    {
+      "evidence": {
+        "run_id": "20260911T071524_339902Z_141b473c",
+        "path": "compare_model_sim.json",
+        "sha256": "a47e7410ce3756703aeed8358965661d01233dda9e04b65bc891c59cd1a718f9",
+        "pointer": "/metrics/model_predicts_tolerance_failure"
+      },
+      "value": true,
+      "description": "M1 predicted tolerance failure"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T071524_339902Z_141b473c",
+        "path": "compare_model_sim.json",
+        "sha256": "a47e7410ce3756703aeed8358965661d01233dda9e04b65bc891c59cd1a718f9",
+        "pointer": "/metrics/tip_discrepancy_m"
+      },
+      "value": 0.1841045610291436,
+      "description": "Observed endpoint discrepancy in metres; no mismatch criterion"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T071524_339902Z_141b473c",
+        "path": "check_actuator_limits.json",
+        "sha256": "0c4959870a0e8095b9903de2d6ea716cd86a1255da77c613ed3d64368a6c5efe",
+        "pointer": "/metrics/max_pull_limit_observed"
+      },
+      "value": false,
+      "description": "Maximum-pull limit reached in sampled execution"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T071524_339902Z_141b473c",
+        "path": "check_tendon_tracking.json",
+        "sha256": "2c1891bde27c6e1c06414cd08ff0d6cbdc64b16f8994f1981b92a8a3acb13ac3",
+        "pointer": "/metrics/max_absolute_error_m"
+      },
+      "value": 0.006847228877633504,
+      "description": "Maximum final tendon length error in metres"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T071524_339902Z_141b473c",
+        "path": "inspect_numerics.json",
+        "sha256": "78923d2c34fb07f8c47587d53312bd6e7cf267c56086f637bb7c8900bd3fafd8",
+        "pointer": "/metrics/anomaly_indicators"
+      },
+      "value": [],
+      "description": "Recorded numerical anomaly indicators"
+    }
+  ],
+  "conditions": {
+    "scope": "This run and sampled execution only"
+  },
+  "evidence_refs": [
+    {
+      "run_id": "20260911T071524_339902Z_141b473c",
+      "path": "compare_model_sim.json",
+      "sha256": "a47e7410ce3756703aeed8358965661d01233dda9e04b65bc891c59cd1a718f9",
+      "pointer": "/metrics/model_predicts_tolerance_failure"
+    },
+    {
+      "run_id": "20260911T071524_339902Z_141b473c",
+      "path": "compare_model_sim.json",
+      "sha256": "a47e7410ce3756703aeed8358965661d01233dda9e04b65bc891c59cd1a718f9",
+      "pointer": "/metrics/tip_discrepancy_m"
+    },
+    {
+      "run_id": "20260911T071524_339902Z_141b473c",
+      "path": "check_actuator_limits.json",
+      "sha256": "0c4959870a0e8095b9903de2d6ea716cd86a1255da77c613ed3d64368a6c5efe",
+      "pointer": "/metrics/max_pull_limit_observed"
+    },
+    {
+      "run_id": "20260911T071524_339902Z_141b473c",
+      "path": "check_tendon_tracking.json",
+      "sha256": "2c1891bde27c6e1c06414cd08ff0d6cbdc64b16f8994f1981b92a8a3acb13ac3",
+      "pointer": "/metrics/max_absolute_error_m"
+    },
+    {
+      "run_id": "20260911T071524_339902Z_141b473c",
+      "path": "inspect_numerics.json",
+      "sha256": "78923d2c34fb07f8c47587d53312bd6e7cf267c56086f637bb7c8900bd3fafd8",
+      "pointer": "/metrics/anomaly_indicators"
+    }
+  ],
+  "source_runs": [
+    "20260911T071524_339902Z_141b473c"
+  ],
+  "ruled_out": [
+    {
+      "evidence": {
+        "run_id": "20260911T071524_339902Z_141b473c",
+        "path": "check_actuator_limits.json",
+        "sha256": "0c4959870a0e8095b9903de2d6ea716cd86a1255da77c613ed3d64368a6c5efe",
+        "pointer": "/metrics/max_pull_limit_observed"
+      },
+      "value": false,
+      "description": "Maximum-pull limit reached in sampled execution"
+    },
+    {
+      "evidence": {
+        "run_id": "20260911T071524_339902Z_141b473c",
+        "path": "inspect_numerics.json",
+        "sha256": "78923d2c34fb07f8c47587d53312bd6e7cf267c56086f637bb7c8900bd3fafd8",
+        "pointer": "/metrics/anomaly_indicators"
+      },
+      "value": [],
+      "description": "Recorded numerical anomaly indicators"
+    }
+  ],
+  "unresolved": [
+    "Causal attribution UNKNOWN; no validated repair",
+    "No approved mismatch/tracking thresholds",
+    "Absent saturation does not establish actuator correctness; finite states do not establish stability"
+  ],
+  "causal_attribution": "UNKNOWN",
+  "status": "observed",
+  "confidence": "observation_only",
+  "created_by": "harness"
+}

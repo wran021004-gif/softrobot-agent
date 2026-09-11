@@ -20,5 +20,8 @@ produce IMPLEMENTATION_REQUIRED. Grammar bounds are not expanded by this migrati
 
 Shared source semantics, migration commands, authority and run recovery are in
 ../README.md. tasks/reach_free/environment.yaml owns environment semantics;
-validated XML is a representation. Runs are evidence; Memory/Skill are planned
-secondary layers. No LLM runtime exists.
+validated XML is a representation. Runs provide artifacts and fine-grained traces.
+Memory has a future index contract only. Skill schema, admission and deterministic
+metadata retrieval are implemented with an initially empty library. The catalog's
+skill_registry points to ../skills/index.yaml; get_skill_registry() resolves it.
+No LLM runtime exists. See ../skills/README.md and ../docs/trace_skill_architecture.md.

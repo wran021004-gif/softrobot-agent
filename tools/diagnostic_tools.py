@@ -188,14 +188,14 @@ def inspect_numerics(simulation_result: ToolResult, *, evidence_paths=()) -> Too
 
 def save_diagnostic_summary(run, model_result, simulation_result, task):
     """Harness-only persistence through its existing artifact service."""
-    from tools.artifact_tools import save_tool_result
     paths = ('mujoco_result.json', 'robot.xml', 'run_settings.yaml')
-    results = [compare_model_sim(model_result, simulation_result, task,
-                                 evidence_paths=('model_result.json', 'mujoco_result.json', 'task.yaml', 'robot_ir.yaml'))]
+    comparison_paths = ('model_result.json', 'mujoco_result.json', 'task.yaml', 'robot_ir.yaml')
+    results = [run.invoke_tool('compare_model_sim', 'compare_model_sim.json',
+                lambda: compare_model_sim(model_result, simulation_result, task, evidence_paths=comparison_paths),
+                input_paths=comparison_paths, diagnostic=True)]
     for tool in (check_actuator_limits, check_tendon_tracking, inspect_numerics):
-        results.append(tool(simulation_result, evidence_paths=paths))
-    for result in results:
-        save_tool_result(run, result.tool + '.json', result)
+        results.append(run.invoke_tool(tool.__name__, tool.__name__ + '.json',
+                       lambda: tool(simulation_result, evidence_paths=paths), input_paths=paths, diagnostic=True))
     summary = {
         'task_gate': 'PASS' if simulation_result.metrics.get('task_success') is True else
                      ('FAIL' if simulation_result.metrics.get('task_success') is False else 'not_run'),

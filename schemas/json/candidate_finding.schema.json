@@ -1,0 +1,203 @@
+{
+  "$defs": {
+    "Actor": {
+      "enum": [
+        "human",
+        "harness",
+        "tool",
+        "gate",
+        "engineer_agent",
+        "coding_agent",
+        "diagnosis_agent",
+        "skill_system"
+      ],
+      "title": "Actor",
+      "type": "string"
+    },
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "pointer": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "pattern": "^/",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pointer"
+        }
+      },
+      "required": [
+        "run_id",
+        "path"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "Observation": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "$ref": "#/$defs/ArtifactReference"
+        },
+        "value": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "description": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence",
+        "value",
+        "description"
+      ],
+      "title": "Observation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "finding_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+      "title": "Finding Id",
+      "type": "string"
+    },
+    "title": {
+      "maxLength": 256,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "category": {
+      "enum": [
+        "MODEL_SIM_COMPARISON",
+        "ACTUATION",
+        "NUMERICS",
+        "SOFTWARE",
+        "TASK_OUTCOME"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "observation": {
+      "items": {
+        "$ref": "#/$defs/Observation"
+      },
+      "maxItems": 32,
+      "minItems": 1,
+      "title": "Observation",
+      "type": "array"
+    },
+    "conditions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Conditions",
+      "type": "object"
+    },
+    "evidence_refs": {
+      "items": {
+        "$ref": "#/$defs/ArtifactReference"
+      },
+      "minItems": 1,
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "source_runs": {
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Runs",
+      "type": "array"
+    },
+    "ruled_out": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Observation"
+      },
+      "title": "Ruled Out",
+      "type": "array"
+    },
+    "unresolved": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Unresolved",
+      "type": "array"
+    },
+    "causal_attribution": {
+      "const": "UNKNOWN",
+      "default": "UNKNOWN",
+      "title": "Causal Attribution",
+      "type": "string"
+    },
+    "status": {
+      "default": "observed",
+      "enum": [
+        "observed",
+        "under_review",
+        "rejected"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "confidence": {
+      "const": "observation_only",
+      "default": "observation_only",
+      "title": "Confidence",
+      "type": "string"
+    },
+    "created_by": {
+      "$ref": "#/$defs/Actor"
+    }
+  },
+  "required": [
+    "finding_id",
+    "title",
+    "category",
+    "observation",
+    "conditions",
+    "evidence_refs",
+    "source_runs",
+    "unresolved",
+    "created_by"
+  ],
+  "title": "CandidateFinding",
+  "type": "object"
+}

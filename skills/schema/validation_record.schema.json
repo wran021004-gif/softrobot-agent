@@ -1,0 +1,181 @@
+{
+  "$defs": {
+    "Actor": {
+      "enum": [
+        "human",
+        "harness",
+        "tool",
+        "gate",
+        "engineer_agent",
+        "coding_agent",
+        "diagnosis_agent",
+        "skill_system"
+      ],
+      "title": "Actor",
+      "type": "string"
+    },
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "pointer": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "pattern": "^/",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pointer"
+        }
+      },
+      "required": [
+        "run_id",
+        "path"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "validation_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+      "title": "Validation Id",
+      "type": "string"
+    },
+    "skill_ref": {
+      "pattern": "^[A-Za-z0-9_.-]+@[1-9][0-9]*$",
+      "title": "Skill Ref",
+      "type": "string"
+    },
+    "strategy_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Strategy Sha256",
+      "type": "string"
+    },
+    "method": {
+      "enum": [
+        "deterministic",
+        "cross_run",
+        "human_review"
+      ],
+      "title": "Method",
+      "type": "string"
+    },
+    "outcome": {
+      "enum": [
+        "passed",
+        "failed",
+        "contradicted"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "validated_runs": {
+      "default": [],
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "type": "string"
+      },
+      "title": "Validated Runs",
+      "type": "array"
+    },
+    "failed_validation_runs": {
+      "default": [],
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "type": "string"
+      },
+      "title": "Failed Validation Runs",
+      "type": "array"
+    },
+    "task_coverage": {
+      "default": [],
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "type": "string"
+      },
+      "title": "Task Coverage",
+      "type": "array"
+    },
+    "robot_coverage": {
+      "default": [],
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "type": "string"
+      },
+      "title": "Robot Coverage",
+      "type": "array"
+    },
+    "seed_coverage": {
+      "default": [],
+      "items": {
+        "type": "integer"
+      },
+      "title": "Seed Coverage",
+      "type": "array"
+    },
+    "evidence_refs": {
+      "items": {
+        "$ref": "#/$defs/ArtifactReference"
+      },
+      "minItems": 1,
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "validated_by": {
+      "$ref": "#/$defs/Actor"
+    },
+    "validated_at": {
+      "format": "date-time",
+      "title": "Validated At",
+      "type": "string"
+    },
+    "summary": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    }
+  },
+  "required": [
+    "validation_id",
+    "skill_ref",
+    "strategy_sha256",
+    "method",
+    "outcome",
+    "evidence_refs",
+    "validated_by",
+    "validated_at",
+    "summary"
+  ],
+  "title": "SkillValidationRecord",
+  "type": "object"
+}

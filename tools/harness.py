@@ -2,7 +2,7 @@
 from pathlib import Path
 import shutil
 import zipfile
-from tools.artifact_tools import create_run, save_tool_result, finalize_run, file_hash
+from tools.artifact_tools import create_run, finalize_run, file_hash
 from tools.capability_resolver import resolve_capability, CapabilityState
 from tools.design_compiler import build_robot_ir
 from tools.spec_tools import ROOT, load_yaml, load_task_package, validate_design, load_simulator, load_run_settings
@@ -11,8 +11,8 @@ from tools.provenance import parameter_provenance
 
 def _snapshot_sources(run):
     paths = []
-    for folder in ("schemas", "tools", "controllers", "metrics", "matlab", "capabilities", "physics_contracts", "tasks", "benchmarks", "agents", "configs"):
-        paths.extend(p for p in (ROOT / folder).rglob("*") if p.is_file() and p.suffix in (".py", ".m", ".yaml", ".md", ".xml"))
+    for folder in ("schemas", "tools", "controllers", "metrics", "matlab", "capabilities", "physics_contracts", "tasks", "benchmarks", "agents", "configs", "skills", "memory"):
+        paths.extend(p for p in (ROOT / folder).rglob("*") if p.is_file() and p.suffix in (".py", ".m", ".yaml", ".md", ".xml", ".json"))
     paths.extend((ROOT / name) for name in ("requirements.txt", "examples/run_reach_pipeline.py"))
     hashes = {}
     with zipfile.ZipFile(run.path / "source_snapshot.zip", "w", zipfile.ZIP_DEFLATED) as archive:
@@ -21,11 +21,12 @@ def _snapshot_sources(run):
             archive.write(path, relative)
             hashes[relative] = file_hash(path)
     run.update(source_hashes=hashes)
+    run.events.emit("ARTIFACT_CREATED", "source_snapshot", evidence_refs=run.events.refs("source_snapshot.zip"))
 
 
 def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "configs/design_tendon_arm.yaml",
-              run_root=ROOT / "runs", *, matlab_factory=None):
-    run = create_run(run_root)
+              run_root=ROOT / "runs", *, matlab_factory=None, previous_run_id=None, relationship=None):
+    run = create_run(run_root, previous_run_id=previous_run_id, relationship=relationship)
     matlab = None
     final_status, failure_code = "ERROR", "UNKNOWN"
     stage = "spec_gate"
@@ -40,17 +41,31 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         # Execute the exact copied bytes whose hashes are recorded, so source edits
         # during a run cannot silently change its task/environment/design inputs.
         task, environment = load_task_package(run.path, representation="environment.xml")
+        for operation, artifact in (("task_loaded", "task.yaml"), ("environment_validated", "environment.yaml")):
+            run.events.emit("SPEC_VALIDATED", operation, status="pass", evidence_refs=run.events.refs(artifact))
         if task.task_type != "reach":
             raise ValueError("CAPABILITY_MISSING: no canonical evaluator for task type")
         design = validate_design(load_yaml(run.path / "design_input.yaml"))
+        run.events.emit("SPEC_VALIDATED", "design_loaded", status="pass", evidence_refs=run.events.refs("design_input.yaml"))
         simulator, settings = load_simulator(), load_run_settings()
         run.save("simulator.yaml", simulator)
         run.save("run_settings.yaml", settings)
         run.update(random_seed=settings.random_seed)
         run.event(stage, "pass")
+        run.events.emit("GATE_EVALUATED", stage, actor="gate", status="pass",
+            gate=dict(gate=stage, input_metric="specs_valid", value=True, threshold=True, comparison="==",
+                      decision="PASS", authority="Task/Environment/Design contracts and frozen package"),
+            evidence_refs=run.events.refs("task.yaml", "environment.yaml", "design_input.yaml"))
         stage = "design_grammar_gate"
         resolution = resolve_capability(design, ("analyze_workspace", "plan_pcc_reach", "compile_mujoco", "run_task"))
         run.save("capability_resolution.json", resolution)
+        run.events.emit("CAPABILITY_RESOLVED", "resolve_capability", summary={"state": resolution.state.value},
+                        evidence_refs=run.events.refs("capability_resolution.json", "design_input.yaml"))
+        supported = resolution.state in (CapabilityState.SUPPORTED, CapabilityState.PARAMETRICALLY_SUPPORTED)
+        run.events.emit("GATE_EVALUATED", stage, actor="gate", status="pass" if supported else "fail",
+            gate=dict(gate=stage, input_metric="capability_supported", value=supported, threshold=True, comparison="==",
+                      decision="PASS" if supported else "FAIL", authority="Human-owned family grammar and capability manifests"),
+            evidence_refs=run.events.refs("capability_resolution.json"))
         if resolution.state not in (CapabilityState.SUPPORTED, CapabilityState.PARAMETRICALLY_SUPPORTED):
             final_status = failure_code = resolution.state.value
             run.event(stage, "fail", failure_code=failure_code, reason=resolution.reason)
@@ -60,6 +75,8 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         run.save("physics.yaml", robot_ir.mechanics)
         run.save("design_final.yaml", design)
         run.update(robot_ir_hash=file_hash(run.path / "robot_ir.yaml"))
+        run.events.emit("SPEC_VALIDATED", "robot_ir_built", status="pass",
+                        evidence_refs=run.events.refs("robot_ir.yaml", "physics.yaml", "design_input.yaml"))
         run.event(stage, "pass")
         provenance = {
             "task": "task.yaml (frozen package)", "environment": "environment.yaml (sole semantic source)",
@@ -79,41 +96,61 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         if matlab_factory is None:
             from tools.matlab_tools import MatlabTools
             matlab_factory = MatlabTools
-        matlab = matlab_factory()
-        run.update(matlab_version=matlab.version())
-        workspace = matlab.analyze_workspace(robot_ir, task, environment)
-        save_tool_result(run, "workspace_result.json", workspace)
-        if workspace.status != "pass":
-            final_status = failure_code = workspace.failure_code or "UNKNOWN"
-            return run
-        plan = matlab.plan_pcc_reach(robot_ir, task, environment)
         comparison_context = {
             "run_id": run.record.run_id, "task_hash": run.record.task_hash,
             "environment_hash": run.record.environment_hash, "robot_ir_hash": run.record.robot_ir_hash,
             "coordinate_frame": robot_ir.coordinate_frame,
         }
-        plan = plan.model_copy(update={"metrics": {**plan.metrics, "comparison_context": comparison_context}})
-        save_tool_result(run, "model_result.json", plan)
-        if plan.status != "pass":
-            final_status = failure_code = plan.failure_code or "UNKNOWN"
-            return run
+        with run.events.span("model") as model_stage:
+            with run.events.span("matlab_session", kind="TOOL", actor="tool"):
+                matlab = matlab_factory()
+                run.update(matlab_version=matlab.version())
+            workspace = run.invoke_tool("analyze_workspace", "workspace_result.json",
+                lambda: matlab.analyze_workspace(robot_ir, task, environment),
+                input_paths=("robot_ir.yaml", "task.yaml", "environment.yaml"))
+            if workspace.status != "pass":
+                final_status = failure_code = workspace.failure_code or "UNKNOWN"
+                model_stage.update(status="fail", failure_code=failure_code)
+                return run
+            def plan_call():
+                result = matlab.plan_pcc_reach(robot_ir, task, environment)
+                return result.model_copy(update={"metrics": {**result.metrics, "comparison_context": comparison_context}})
+            plan = run.invoke_tool("plan_pcc_reach", "model_result.json", plan_call,
+                                   input_paths=("robot_ir.yaml", "task.yaml", "environment.yaml"))
+            if plan.status != "pass":
+                final_status = failure_code = plan.failure_code or "UNKNOWN"
+                model_stage.update(status="fail", failure_code=failure_code)
+                return run
         from controllers.open_loop_length import OpenLoopLength
         controller = OpenLoopLength(plan.metrics["tendon_target_lengths_m"])
         run.save("tendon_command.json", controller.target)
         run.save("controller.json", controller.result())
+        run.events.emit("CONTROL_SELECTED", "open_loop_length", status="pass", summary={"control_level": "C1"},
+                        evidence_refs=run.events.refs("model_result.json", "controller.json", "tendon_command.json"))
         provenance["parameters"] = parameter_provenance(design, robot_ir, task, environment, simulator, settings, controller.target)
         run.save("provenance.json", provenance)
         stage = "compilation"
         from tools.mujoco_tools import compile_mujoco, run_task
-        compiled = compile_mujoco(robot_ir, task, run.path / "robot.xml", environment, simulator)
-        save_tool_result(run, "compile_result.json", compiled)
-        if compiled.status != "pass":
-            final_status = failure_code = compiled.failure_code or "UNKNOWN"
-            return run
-        stage = "physics_sanity_gate"
-        result = run_task(compiled.artifacts["mjcf_path"], task, controller, settings)
-        result = result.model_copy(update={"metrics": {**result.metrics, "comparison_context": comparison_context}})
-        save_tool_result(run, "mujoco_result.json", result)
+        with run.events.span("mujoco") as sim_stage:
+            compiled = run.invoke_tool("compile_mujoco", "compile_result.json",
+                lambda: compile_mujoco(robot_ir, task, run.path / "robot.xml", environment, simulator),
+                input_paths=("robot_ir.yaml", "task.yaml", "environment.yaml", "simulator.yaml"))
+            if compiled.status != "pass":
+                final_status = failure_code = compiled.failure_code or "UNKNOWN"
+                sim_stage.update(status="fail", failure_code=failure_code)
+                return run
+            run.events.emit("ARTIFACT_CREATED", "compile_mujoco_artifact", evidence_refs=run.events.refs("robot.xml"))
+            stage = "physics_sanity_gate"
+            def simulation_call():
+                result = run_task(compiled.artifacts["mjcf_path"], task, controller, settings)
+                return result.model_copy(update={"metrics": {**result.metrics, "comparison_context": comparison_context}})
+            result = run.invoke_tool("run_task", "mujoco_result.json", simulation_call,
+                input_paths=("robot.xml", "task.yaml", "controller.json", "run_settings.yaml"))
+            # A failed task can still be a completed simulation stage.
+            sim_stage.update(status="pass" if "task_success" in result.metrics else "fail")
+            if "actuator_controls" in result.metrics:
+                run.events.emit("CONTROL_APPLIED", "open_loop_length", status="pass",
+                                evidence_refs=run.events.refs("controller.json", "mujoco_result.json"))
         if "execution_evidence" in result.metrics:
             provenance["compiled_engine_parameters"] = result.metrics["execution_evidence"]["compiled_parameter_evidence"]
             run.save("provenance.json", provenance)
@@ -123,12 +160,25 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         completed = "task_success" in result.metrics
         run.event(stage, "pass" if completed else "fail", failure_code=None if completed else result.failure_code)
         run.event("task_metric_gate", result.status if completed else "not_run", artifact="mujoco_result.json")
+        run.events.emit("GATE_EVALUATED", "physics_sanity_gate", actor="gate", status="pass" if completed else "fail",
+            failure_code=None if completed else result.failure_code,
+            gate=dict(gate="physics_sanity", input_metric="task_success_available", value=completed, threshold=True,
+                      comparison="available", decision="PASS" if completed else "FAIL", authority="run_task finite-state execution checks"),
+            evidence_refs=run.events.refs("mujoco_result.json"))
+        run.events.emit("GATE_EVALUATED", "task_metric_gate", actor="gate",
+            status=result.status if completed else "not_run", failure_code=result.failure_code,
+            gate=dict(gate="task_success", input_metric="position_error_m", value=result.metrics.get("position_error_m"),
+                      threshold=task.position_error_max_m, comparison="<=",
+                      decision=("PASS" if result.metrics["task_success"] else "FAIL") if completed else "NOT_RUN",
+                      authority="frozen TaskSpec: task.yaml; metrics/reach.py"),
+            evidence_refs=run.events.refs("task.yaml", "mujoco_result.json"))
         failure_code = result.failure_code
         final_status = "PASS" if result.status == "pass" else (failure_code or "UNKNOWN")
         # Diagnostics cannot change the canonical task/physics gate decision.
         try:
             from tools.diagnostic_tools import save_diagnostic_summary
-            save_diagnostic_summary(run, plan, result, task)
+            with run.events.span("diagnostics"):
+                save_diagnostic_summary(run, plan, result, task)
         except Exception as exc:
             run.event("diagnostics", "fail", failure_code="UNKNOWN", message=str(exc))
         return run
@@ -139,11 +189,17 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             final_status = code
         run.event(stage, "fail", exception_type=type(exc).__name__, message=str(exc), failure_code=failure_code)
         run.save("error.json", {"stage": stage, "exception_type": type(exc).__name__, "message": str(exc)})
+        if stage == "spec_gate":
+            run.events.emit("GATE_EVALUATED", stage, actor="gate", status="fail", failure_code=failure_code,
+                gate=dict(gate=stage, input_metric="specs_valid", value=False, threshold=True, comparison="==",
+                          decision="FAIL", authority="Task/Environment/Design contracts and frozen package"),
+                evidence_refs=run.events.refs("error.json"))
         return run
     finally:
         if matlab is not None:
             try:
-                matlab.close()
+                with run.events.span("matlab_cleanup", kind="TOOL", actor="tool"):
+                    matlab.close()
             except Exception as exc:
                 run.event("matlab_cleanup", "fail", exception_type=type(exc).__name__, message=str(exc))
         finalize_run(run, final_status, failure_code)

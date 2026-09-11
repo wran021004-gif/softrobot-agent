@@ -26,7 +26,7 @@ Python's Expat is still loaded before MATLAB DLLs on Windows.
 
 The example prints a unique runs/<id>/ directory. Exit 0 means task PASS; exit 1
 means recorded task/model/capability failure or runtime error. Read run.json and
-trace.json first. Missing downstream data is omitted, never fabricated. The
+trace.json first; trace.jsonl provides the detailed execution timeline. Missing downstream data is omitted, never fabricated. The
 baseline target remains [0.25,0,0.15] m with tolerance 0.01 m. Baseline PCC error
 is 0.08714456960728613 m and actual MuJoCo error is 0.17116166894090315 m, hence
 TASK_FAILED. The migration reproduces these values (MuJoCo 3.13.0).
@@ -49,7 +49,8 @@ TASK_FAILED. The migration reproduces these values (MuJoCo 3.13.0).
 | Tool implementation / roadmap | capabilities/tools/*/manifest.yaml |
 | Agent permissions and outputs | agents/contracts/; agents/*/ROLE.md |
 | Factual evidence | runs/<id>/ snapshots, results, state, trace, hashes and versions |
-| Memory and Skill | Future secondary summaries/strategies; never primary truth |
+| Memory | Future historical index; schemas/memory.py contract only |
+| Skill | skills/ versioned strategies, evidence and Human admission; initially empty |
 
 ```mermaid
 flowchart TD
@@ -169,3 +170,25 @@ Before autonomous Coding LLM writes, add an isolated worktree, permission-enforc
 executor, post-run diff allowlist and Human review. See
 [authority and isolation](agents/contracts/README.md) and
 [open scientific decisions](proposals/engineer/round1_physics_questions.md).
+
+## Round 1.5: trace and skill infrastructure
+
+Every Harness run now keeps the compatible `trace.json` and a bounded, hierarchical
+`trace.jsonl`: actual stage/tool calls, capability/controller choices, diagnostics,
+and structured canonical gate evidence. Both traces are finalized, validated and
+hashed in `run.json`; raw simulation data remains in factual artifacts.
+
+Artifact != Trace != Memory != Skill. `CandidateFinding` records exact observations
+with evidence links and UNKNOWN causal attribution. The optional explicit post-run
+extractor creates no Skill. Machine-readable Skill contracts, deterministic
+admission, immutable revisions, negative validation history and approved-only
+metadata retrieval are implemented. Production candidates/approved/deprecated
+collections start empty; the reach pipeline is independent of retrieval.
+
+Human approval follows validation and binds the exact skill content. A Skill
+cannot grant permissions, override task truth or invent physics. MemoryRecord and
+Skill Curator role contracts describe future integration only. No LLM, Memory DB,
+automatic Skill generator/curator or autonomous agent has been introduced.
+
+See [trace architecture](docs/trace_skill_architecture.md),
+[Skill Library](skills/README.md) and [Round 1.5 results](docs/round1_5_result.md).

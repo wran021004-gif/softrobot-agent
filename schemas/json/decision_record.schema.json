@@ -1,0 +1,124 @@
+{
+  "$defs": {
+    "Actor": {
+      "enum": [
+        "human",
+        "harness",
+        "tool",
+        "gate",
+        "engineer_agent",
+        "coding_agent",
+        "diagnosis_agent",
+        "skill_system"
+      ],
+      "title": "Actor",
+      "type": "string"
+    },
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "pointer": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "pattern": "^/",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pointer"
+        }
+      },
+      "required": [
+        "run_id",
+        "path"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "$ref": "#/$defs/Actor"
+    },
+    "decision": {
+      "maxLength": 256,
+      "minLength": 1,
+      "title": "Decision",
+      "type": "string"
+    },
+    "rationale": {
+      "description": "Public rationale, never private chain-of-thought",
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Rationale",
+      "type": "string"
+    },
+    "requested_tools": {
+      "default": [],
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "type": "string"
+      },
+      "title": "Requested Tools",
+      "type": "array"
+    },
+    "evidence_refs": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ArtifactReference"
+      },
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "selected_skill_refs": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Selected Skill Refs",
+      "type": "array"
+    },
+    "next_action": {
+      "maxLength": 256,
+      "minLength": 1,
+      "title": "Next Action",
+      "type": "string"
+    }
+  },
+  "required": [
+    "actor",
+    "decision",
+    "rationale",
+    "next_action"
+  ],
+  "title": "DecisionRecord",
+  "type": "object"
+}
