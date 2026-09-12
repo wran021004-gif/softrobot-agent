@@ -7,6 +7,8 @@ from pathlib import Path
 import shutil
 import tempfile
 import zipfile
+import tarfile
+import io
 from tools.closeout_state import read, verify_run, digest, atomic_json
 from tools.artifact_tools import file_hash
 
@@ -20,14 +22,16 @@ def audit(root,parent_id):
     assert summary['workflow_status']=='COMPLETED' and manifest['final_status']=='PASS'
     attempts=state['attempts']; assert len(attempts)<=48
     assert len({a['attempt_id'] for a in attempts})==len(attempts)
-    actual=[]; calls={}
+    actual=[]; calls={}; auxiliary=set()
     for stage,budgets in plan['stage_budgets'].items():
         for fidelity,cap in budgets.items():
             assert sum(a['stage']==stage and a['fidelity']==fidelity for a in attempts)<=cap, 'Stage budget'
     for a in attempts:
-        assert a['status'] not in ('pending','running','interrupted'), 'Unresolved attempt'
+        assert a['status'] not in ('pending','running'), 'Unresolved attempt'
+        if a['status']=='interrupted':
+            assert any(r['retry_of']==a['attempt_id'] and r['key']==a['key'] and r['status']=='completed' for r in attempts), 'Unrecovered interruption'
         if 'run_id' not in a:
-            assert a['status']=='failed'; continue
+            assert a['status'] in ('failed','interrupted'); continue
         child=root/a['run_id']; record=verify_run(child,a['run_manifest_hash'])
         context=read(child/'experiment_context.json')
         assert context['parent_experiment_id']==parent_id and context['candidate_id']==a['attempt_id'], 'Child identity'
@@ -38,11 +42,20 @@ def audit(root,parent_id):
             initial_command='deterministic frozen MATLAB PCC plan',initial_state=plan['initial_state'],
             timing='feedback begins at step 0, before mj_step; every 20 steps')), 'Execution key'
         for name,h in plan['execution']['sources'].items():
-            assert record['source_hashes'].get(name)==h, 'Mixed source revision: '+name
+            if name in record['source_hashes']:
+                assert record['source_hashes'][name]==h, 'Mixed source revision: '+name
+            else:
+                # These historical hello examples were over-included by plan discovery,
+                # and are not imported by the executed closeout entry point. Preserve
+                # their exact planned bytes as auxiliary sources, not child execution.
+                assert name in ('examples/mujoco_hello/pendulum.xml','examples/mujoco_hello/test_matlab_engine.py','examples/mujoco_hello/test_mujoco.py'), 'Missing execution source: '+name
+                assert file_hash(root/'plan_sources'/name)==h, 'Missing/damaged auxiliary planned source: '+name
+                auxiliary.add(name)
         for name,count in a.get('backend_calls',{}).items(): calls[name]=calls.get(name,0)+count
         if a.get('canonical_error_m') is None: continue
         r=read(child/'mujoco_result.json'); m=r['metrics']; task=yaml.safe_load((child/'task.yaml').read_text())
-        error=math.dist(m['tip_position_m'],m['target_position_m'])
+        assert m['target_position_m']==task['target_m'] and m['position_error_max_m']==task['position_error_max_m'], 'Metric/task truth mismatch'
+        error=math.dist(m['tip_position_m'],task['target_m'])
         assert math.isclose(error,a['canonical_error_m'],abs_tol=1e-12) and error==m['position_error_m'], 'Canonical error'
         assert (error<=m['position_error_max_m'])==m['task_success'], 'Canonical gate'
         assert read(child/'gate_summary.json')['canonical_result']==('PASS' if m['task_success'] else 'FAIL')
@@ -61,6 +74,9 @@ def audit(root,parent_id):
     best=min(actual,key=lambda a:(a['canonical_error_m'],a['attempt_id']))
     assert summary['best']['attempt_id']==best['attempt_id']==state['incumbents']['global']['attempt_id'], 'Incumbent'
     assert summary['backend_calls']==calls and summary['attempts']==len(attempts), 'Backend accounting'
+    for route in ('C1','C2'):
+        route_best=min((a for a in actual if a['controller']==route),key=lambda a:(a['canonical_error_m'],a['attempt_id']))
+        assert state['incumbents'][route]['attempt_id']==route_best['attempt_id'], 'Route incumbent'
     assert summary['canonical_task_status']==best['canonical_task_status']
     assert summary['improvement_observed']==(best['canonical_error_m']<summary['historical_best_current_revision']['canonical_error_m'])
     by_id={a['attempt_id']:a for a in attempts}
@@ -88,7 +104,8 @@ def audit(root,parent_id):
         if row['evidence_status']=='VERIFIED_LOCAL_RAW': verify_run(root/row['run_id'],row['run_manifest_hash'])
     return dict(passed=True,parent_id=parent_id,verified_children=sum('run_id' in a for a in attempts),
         canonical_metrics_recomputed=len(actual),control_pairs=len(pair_rows),decisions=len(state['decisions']),
-        no_backend_started=True,limits='Hashes detect content inconsistency, not malicious replacement of all evidence.')
+        auxiliary_planned_sources=sorted(auxiliary),no_backend_started=True,
+        limits='Hashes detect content inconsistency, not malicious replacement of all evidence.')
 
 
 def bundle(parent,output):
@@ -102,17 +119,43 @@ def bundle(parent,output):
         for identity in sorted(set(identities)):
             for path in sorted((parent.parent/identity).rglob('*')):
                 if path.is_file(): archive.write(path,path.relative_to(parent.parent).as_posix())
+        for name in result['auxiliary_planned_sources']:
+            archive.write(parent.parent/'plan_sources'/name,'plan_sources/'+name)
     return dict(path=str(output),bytes=output.stat().st_size,sha256=file_hash(output),audit=result)
 
 
 def audit_bundle(path):
     with tempfile.TemporaryDirectory() as tmp:
-        with zipfile.ZipFile(path) as z:
-            for name in z.namelist():
-                assert (Path(tmp)/name).resolve().is_relative_to(Path(tmp).resolve()), 'Unsafe ZIP path'
-            z.extractall(tmp)
+        if zipfile.is_zipfile(path):
+            with zipfile.ZipFile(path) as z:
+                for name in z.namelist():
+                    assert (Path(tmp)/name).resolve().is_relative_to(Path(tmp).resolve()), 'Unsafe ZIP path'
+                z.extractall(tmp)
+        else:
+            with tarfile.open(path,'r:xz') as archive:
+                for member in archive:
+                    target=(Path(tmp)/member.name).resolve()
+                    assert member.isfile() and target.is_relative_to(Path(tmp).resolve()), 'Unsafe TAR member'
+                    target.parent.mkdir(parents=True,exist_ok=True)
+                    target.write_bytes(archive.extractfile(member).read())
         index=read(Path(tmp)/'bundle_index.json')
-        return audit(tmp,index['parent_id'])
+        result=audit(tmp,index['parent_id'])
+        validation=Path(tmp)/'validation_index.json'
+        if validation.exists():
+            v=read(validation)
+            for identity,h in v['runs'].items():verify_run(Path(tmp)/identity,h)
+            for name,h in v['files'].items():assert file_hash(Path(tmp)/name)==h, 'Validation supplement hash: '+name
+            result['verified_validation_runs']=len(v['runs'])
+        return result
+
+
+def compress_bundle(zip_path,output):
+    """Solid xz deduplicates repeated snapshots while preserving every hashed byte."""
+    with zipfile.ZipFile(zip_path) as source,tarfile.open(output,'w:xz',preset=6) as dest:
+        for name in source.namelist():
+            data=source.read(name);info=tarfile.TarInfo(name);info.size=len(data);info.mtime=0
+            dest.addfile(info,io.BytesIO(data))
+    return dict(path=str(output),bytes=Path(output).stat().st_size,sha256=file_hash(output))
 
 
 def export_report(parent,output):
@@ -150,8 +193,8 @@ def export_report(parent,output):
         d=read(parent/name); lines.append(f"- `{name}`: `{d['rule_id']}` read {len(d['evidence'])} persisted evidence files before the next action; hashes, observations and remaining budgets are in the bundle.")
     lines += ['', '## Evidence and budgets','',
         f"{s['attempts']} candidate attempts: {s['model_attempts']} M1 routes and {s['mujoco_route_attempts']} MuJoCo routes; {s['retries']} retries, {s['cache_reads']} exact cache reads. Backend calls: `{json.dumps(s['backend_calls'])}`.",
-        '', 'The compressed [portable evidence bundle](evidence/round3_closeout_evidence.zip) contains all referenced numerical artifacts, source snapshots, manifests, trajectories, frozen plan, decisions and historical raw sources. '
-        'Run `python examples/run_round3_closeout.py audit docs/evidence/round3_closeout_evidence.zip` without MATLAB/MuJoCo execution.',
+        '', 'The compressed [portable evidence bundle](evidence/round3_closeout_evidence.tar.xz) contains all referenced numerical artifacts, source snapshots, manifests, trajectories, frozen plan, decisions and historical raw sources. '
+        'Run `python examples/run_round3_closeout.py audit docs/evidence/round3_closeout_evidence.tar.xz` without MATLAB/MuJoCo execution.',
         '', 'Numerical reproduction checks full saved trajectory plus final state, tip, lengths and forces at atol=rtol=1e-9; these are reproduction tolerances, not task tolerances.',
         '', 'See [capability and parameter matrix](round3_closeout_tools.md) and [validation record](round3_closeout_validation.md) for the independent mechanics tests, recovery demonstration, damaged-copy audit and backend accounting.',
         '', '## Limitations / next phase','',

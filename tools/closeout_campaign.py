@@ -81,6 +81,12 @@ def execute_attempt(state,stage,design,fidelity,controller='C1',*,force=False,re
     if not force:
         cached=state.cached(key)
         if cached: return cached
+    interrupted=[row for row in state.data['attempts'] if row['key']==key and row['status']=='interrupted']
+    if interrupted and retry_of is None:
+        retry_of=interrupted[-1]['attempt_id']
+        # Recovery never charges the exhausted original MuJoCo stage again.
+        # M1 has no E allocation and must fit its remaining original stage cap.
+        if fidelity=='MUJOCO':stage='E'
     a=state.reserve(stage,design,fidelity,controller,retry_of)
     request=dict(design=design,fidelity=fidelity,controller=controller,parent_id=state.run.path.name,
         attempt_id=a['attempt_id'],run_root=str(state.run.path.parent),policy=str(ROOT/POLICY))

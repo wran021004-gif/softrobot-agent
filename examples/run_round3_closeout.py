@@ -14,7 +14,7 @@ def main():
     from tools.spec_tools import ROOT
     if args.mode=='audit':
         from tools.closeout_audit import audit,audit_bundle
-        path=Path(args.path); result=audit_bundle(path) if path.suffix=='.zip' else audit(path.parent,path.name)
+        path=Path(args.path); result=audit_bundle(path) if path.is_file() else audit(path.parent,path.name)
         print(json.dumps(result,indent=2)); return
     if args.mode=='report':
         from tools.closeout_audit import export_report

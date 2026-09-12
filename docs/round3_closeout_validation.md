@@ -22,3 +22,50 @@ This file records development and regression separately from the formal campaign
 Full regression ran exactly once: 139 tests, zero skipped, 167.812 s, PASS, with real MATLAB enabled. Instrumentation counted 54 run_task invocations (the raw counter is named mujoco_rollouts; it includes rejection/error-path tests), plus 8 analyze_workspace, 15 plan_pcc_reach and 8 analyze_clearance calls. They are regression calls, not formal candidates or additional development experiments.
 
 Formal campaign audit, final analysis counts and portable evidence references are appended after actual execution. Historical 133-test results are not counted as validation of this change.
+
+Formal campaign: `20260912T081952_082199Z_ce91267e`, execution commit
+`65b8d2acd05a4df72897362764fec0cabdbd9d1d`. 41 attempts = 25 screening + 16 MuJoCo
+routes. Two verified current-revision model cache reads; zero retries. MATLAB
+top-level calls: 41 workspace + 41 PCC planner + 41 centerline; compile/run_task
+each 16. Historical raw evidence was verified but not used as a current-code cache.
+
+One numerical reproduction compared all 1000 samples and final states: every maximum
+absolute difference was zero (predeclared atol/rtol=1e-9). The single parent campaign
+stopped after the two frozen improvement rounds.
+
+Independent post-campaign analysis: `20260912T082624_505318Z_6c8bf663`. Six additional
+mechanics solves bring the persistent total to **21 / 200**: 18 passed, 3 failed.
+Three constant-final-tension statics found interior equilibria. All three observed-force
+dynamic replays exceeded the one-mode domain and returned structured failures; no
+valid trajectory/accuracy claim is made. These conditional force-input analyses are
+not C1 length-servo predictions. Main trajectories contain nonzero sampled contacts;
+the independent rod excludes contact. Boundary conditions therefore differ, and no
+static-versus-transient accuracy or causal diagnosis is inferred.
+
+Development total outside regression: **4 / 12** real MuJoCo rollouts. Exactly one
+full regression was used. After the campaign, two narrowly targeted non-numerical
+tests passed (4.636 s): automatic E-budget routing for interrupted MuJoCo and
+cross-process recovery. No formal result was rerun or ranked under new source code.
+
+Post-execution review changes affect the offline auditor and interrupted-attempt
+recovery only. The initial auditor rejected three historical hello-example files
+that plan discovery indexed but execution snapshots omitted. Their exact original
+bytes matched all frozen hashes and are bundled under `plan_sources/`, explicitly
+auxiliary rather than executed child sources. Numerical/controller/task sources
+were present throughout. The auditor additionally checks TaskSpec target/tolerance
+and each controller's incumbent. Sealed artifacts/manifests were not rewritten.
+All formal results retain the single 65b8d2a execution revision; audit/recovery fixes
+belong to the later delivery revision.
+
+The [portable package](evidence/round3_closeout_evidence.tar.xz) is 9,141,564 bytes.
+Solid xz compression preserves every original hashed byte while reducing repeated
+snapshot overhead (the intermediate ZIP was 22,114,603 bytes). The final
+[offline audit and corruption test](evidence/round3_closeout_audit.json) passed with
+MATLAB and MuJoCo imports explicitly blocked. It verifies 41 formal children plus
+5 development/analysis runs. Changing the best run's copied tip x by 0.01 m was
+rejected with `Artifact hash mismatch: mujoco_result.json`; the original archive
+hash was unchanged. Reproduce this non-numerical check with:
+
+```powershell
+python examples/audit_closeout_corruption.py docs/evidence/round3_closeout_evidence.tar.xz --output runs/closeout_corruption_check.json
+```

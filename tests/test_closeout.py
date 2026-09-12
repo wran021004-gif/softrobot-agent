@@ -59,6 +59,18 @@ print(r.path,flush=True);os._exit(9)
             self.assertNotEqual(retry['attempt_id'],old['attempt_id'])
             self.assertEqual(state.used('A','MUJOCO'),1);self.assertEqual(state.used('E','MUJOCO'),1)
 
+    def test_resume_routes_interrupted_mujoco_to_reserved_recovery(self):
+        from tools.closeout_campaign import execute_attempt
+        with tempfile.TemporaryDirectory(dir=ROOT/'runs') as tmp:
+            run=create_run(tmp);state=CampaignState(run,make_plan());design=state.plan['reference_designs'][0]
+            for _ in range(4):state.reserve('A',design,'MUJOCO','C1')
+            state.data['attempts'][-1]['status']='interrupted'
+            with patch.object(state,'reserve',side_effect=RuntimeError('stop before backend')) as reserve:
+                with self.assertRaisesRegex(RuntimeError,'stop before backend'):
+                    execute_attempt(state,'A',design,'MUJOCO','C1')
+            self.assertEqual(reserve.call_args.args[0],'E')
+            self.assertEqual(reserve.call_args.args[-1],'attempt_003')
+
     def test_offline_corruption_rejected(self):
         with tempfile.TemporaryDirectory(dir=ROOT/'runs') as tmp:
             run=create_run(tmp);_snapshot_sources(run);run.save('numerical.json',{'tip_m':[.1,0,.1]});finalize_run(run,'PASS')

@@ -69,7 +69,7 @@ python examples/run_round3_closeout.py execute configs/experiments/round3_closeo
 python examples/run_round3_closeout.py resume runs/<parent_id>
 python examples/run_round3_closeout.py inspect runs/<parent_id>
 python examples/run_round3_closeout.py report runs/<parent_id> --output docs/round3_deterministic_closeout_result.md
-python examples/run_round3_closeout.py audit docs/evidence/round3_closeout_evidence.zip
+python examples/run_round3_closeout.py audit docs/evidence/round3_closeout_evidence.tar.xz
 python examples/run_round3_closeout.py replay runs/<child_id> --output runs/replayed_tip.csv
 # The following are validation commands, not formal experiment candidates.
 python examples/validate_closeout.py real
