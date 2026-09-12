@@ -272,29 +272,49 @@ tools:
       - half arc spacing; shared window_boxes and aperture_crossing; see matlab/analyze_clearance.m
       and tools/window_geometry.py.
   analyze_actuation:
-    implementation_status: PLANNED
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.actuation_tools
+      callable: analyze_actuation
     inputs:
     - RobotIR
-    - load case
+    - completed M1 PCC ToolResult
     outputs:
-    - required actuation
+    - ToolResult; GEOMETRIC_ACTUATION_ONLY; strokes and geometric tendon Jacobian
     supported_robot_families: *id001
-    fidelity: unimplemented; no numerical claims
+    fidelity: M1 geometric tendon mapping only
     assumptions:
-    - Requires Human-approved scientific semantics before implementation.
-    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    - Existing L-r*theta*cos(alpha-phi) mapping and b=(theta*cos(phi),theta*sin(phi)).
+    applicable_when: Completed single-section PCC plan and matching RobotIR.
     limitations:
-    - No callable and no fabricated results.
+    - No required tendon force, motor torque, physical feasibility or real mechanical advantage.
     failure_codes:
     - CAPABILITY_MISSING
     - PHYSICS_ASSUMPTION_REQUIRED
     cost:
-      compute: unknown until implemented
-    fields_consumed: []
-    artifacts: []
-    physics_contract_dependencies: []
-    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
-      require approval before promotion
+      compute: O(tendon_count); tiny two-column SVD, no external runtime
+    fields_consumed: [RobotIR.section.length_m, RobotIR.tendon_routes, RobotIR.tendon_routing_radius_m, model_result.metrics]
+    artifacts: [actuation_result.json]
+    physics_contract_dependencies: [tendon_length_mapping_v1.md, tendon_driven_pcc_v1.md]
+    gate_semantics: Geometric evidence only; no canonical or mechanical-feasibility gate.
+  pcc_centerline:
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.matlab_tools
+      callable: MatlabTools.pcc_centerline
+      backend: matlab/pcc_centerline.m
+    inputs: [RobotIR, completed PCC ToolResult]
+    outputs: [ToolResult; normal model centerline and normalized arc coordinates]
+    supported_robot_families: [tendon_driven_continuum]
+    fidelity: M1 geometric
+    assumptions: [Existing single-section PCC geometry]
+    applicable_when: Envelope-authorized study with M1 plan.
+    limitations: [No gravity or mechanics; shape evidence is not task success]
+    failure_codes: [UNKNOWN]
+    cost: {compute: low}
+    fields_consumed: [RobotIR.section.length_m, model_result.metrics.theta_rad, model_result.metrics.phi_rad]
+    artifacts: [model_shape.json]
+    physics_contract_dependencies: [tendon_driven_pcc_v1.md, coordinate_frames.md]
   analyze_stiffness:
     implementation_status: PLANNED
     inputs:

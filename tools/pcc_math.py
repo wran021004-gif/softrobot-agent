@@ -2,6 +2,19 @@
 import math
 
 
+def analytic_target_matching_length(target):
+    """Invert the approved origin/+x PCC tip on theta in [0, pi]."""
+    x, y, z = target
+    rho = math.hypot(y, z)
+    if not all(math.isfinite(v) for v in target) or x < 0 or (x == 0 and rho == 0):
+        raise ValueError('No positive-length target match on the approved PCC branch')
+    theta = 2*math.atan2(rho, x)
+    if rho == 0:
+        return {'total_length_m': x, 'theta_rad': 0., 'phi_rad': 0.}
+    return {'total_length_m': theta*(x*x+rho*rho)/(2*rho),
+            'theta_rad': theta, 'phi_rad': math.atan2(z, y)}
+
+
 def tip_and_jacobian(length, bend):
     """b=(theta*cos(phi),theta*sin(phi)); J=d(tip)/db, meters/radian.
 

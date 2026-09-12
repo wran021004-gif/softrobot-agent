@@ -1,6 +1,24 @@
 bundle_name: diagnostics
 version: '2'
 tools:
+  compare_shape_model_sim:
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.shape_tools
+      callable: compare_shape_model_sim
+    inputs: [normal model_shape ToolResult, normal simulation ToolResult]
+    outputs: [ToolResult; tip/RMS/max discrepancies and 65 compact sample differences]
+    supported_robot_families: [tendon_driven_continuum]
+    fidelity: Geometric comparison of recorded PCC and segmented surrogate shapes
+    assumptions: [Matching run and input hashes, constant matching C1 commands, normalized arc-length correspondence]
+    applicable_when: Completed M1 shape and final MuJoCo centerline.
+    limitations: [No debug inputs, no approved mismatch threshold, failure_attribution remains UNKNOWN]
+    failure_codes: [UNKNOWN]
+    cost: {compute: low; no MATLAB or MuJoCo launch}
+    fields_consumed: [model_shape.artifacts.centerline_m, simulation_result.artifacts.final_centerline_m, comparison_context, command evidence]
+    artifacts: [shape_comparison.json]
+    physics_contract_dependencies: [coordinate_frames.md, tendon_driven_pcc_v1.md, segmented_mujoco_mapping_v1.md]
+    gate_semantics: Evidence only; never automatic MODEL_MISMATCH or canonical override.
   compare_model_sim:
     implementation_status: IMPLEMENTED
     implementation:

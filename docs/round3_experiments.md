@@ -1,5 +1,12 @@
 # Deterministic Round 3 experiments
 
+Round 3 FINAL: [SURROGATE_EXPLORATION_ENVELOPE_V1](design_envelope.md) now provides
+reusable authorization for length, routing radius and tendon count. New
+`ENVELOPE_SUBSET` policies need no additional per-subrange scientific approval.
+Segments remain numerical-sensitivity-only; body-radius optimization remains
+blocked. The historical Round 3.1 policy remains valid at its original narrower
+bounds. See [the final study report](round3_final_result.md).
+
 Round 3.1 update: the Human-approved policy at
 `configs/experiments/round3_1_reach_free.yaml` has a file-specific grammar entry
 for total_length_m only. The generic optimization metadata remains deny-by-default;

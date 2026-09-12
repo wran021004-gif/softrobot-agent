@@ -90,6 +90,30 @@
   },
   "additionalProperties": false,
   "properties": {
+    "authorization_mode": {
+      "default": "HUMAN_POLICY",
+      "enum": [
+        "HUMAN_POLICY",
+        "ENVELOPE_SUBSET"
+      ],
+      "title": "Authorization Mode",
+      "type": "string"
+    },
+    "purpose": {
+      "default": "DESIGN_SEARCH",
+      "enum": [
+        "DESIGN_SEARCH",
+        "NUMERICAL_SENSITIVITY"
+      ],
+      "title": "Purpose",
+      "type": "string"
+    },
+    "physics_profile": {
+      "const": "legacy_v1_surrogate",
+      "default": "legacy_v1_surrogate",
+      "title": "Physics Profile",
+      "type": "string"
+    },
     "policy_id": {
       "minLength": 1,
       "title": "Policy Id",

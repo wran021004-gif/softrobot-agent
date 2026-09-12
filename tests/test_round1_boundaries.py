@@ -14,7 +14,7 @@ class OptimizationTests(unittest.TestCase):
     def test_deny_defaults_and_protected_variables(self):
         names = ['unknown', 'target_m', 'position_error_max_m', 'metrics.position_error_m',
                  'gravity_m_s2', 'timestep_s', 'steps', 'joint_stiffness_nm_per_rad',
-                 *design().model_dump()]
+                 *(n for n in design().model_dump() if n not in ('total_length_m','tendon_routing_radius_m','tendon_count'))]
         for name in names:
             with self.subTest(name=name), self.assertRaises(ValueError):
                 validate_optimization_variables(design().robot_family, (name,))
@@ -24,11 +24,12 @@ class OptimizationTests(unittest.TestCase):
     def test_engineer_output_rejects_unapproved_selection(self):
         with self.assertRaises(ValidationError):
             EngineerOutput(design_hypothesis=design(), rationale='test', requested_model_level='M1',
-                           requested_control_level='C1', optimization_variables=('total_length_m',), decision='execute')
+                           requested_control_level='C1', optimization_variables=('body_radius_m',), decision='execute')
 
     def test_approved_mechanism_and_candidate_boundary(self):
         # Synthetic Human policy fixture only; these numbers never enter the grammar.
         grammar = copy.deepcopy(get_robot_family_grammar(design().robot_family))
+        grammar.pop('exploration_envelope_source', None)  # Isolate the historical grammar fixture.
         policy = grammar['design_fields']['total_length_m']['optimization']
         policy.update(optimizable=True, lower_bound=0.3, upper_bound=0.5,
                       scientific_status='human_approved', provenance='synthetic unit test approval')
@@ -49,7 +50,7 @@ class OptimizationTests(unittest.TestCase):
                 policy.update(old)
         # Authorization is re-read; a prior approved selection is not a capability token.
         with self.assertRaises(ValueError):
-            validate_optimization_candidate(design(), design(total_length_m=0.5), ('total_length_m',))
+            validate_optimization_candidate(design(), design(total_length_m=0.81), ('total_length_m',))
 
 
 class PermissionTests(unittest.TestCase):

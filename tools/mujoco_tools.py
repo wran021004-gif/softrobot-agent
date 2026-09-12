@@ -128,7 +128,7 @@ def run_task(
     run_settings: RunSettings | None = None,
     environment: EnvironmentSpec | None = None,
     evaluator=None,
-    *, observability=None,
+    *, observability=None, record_shape=False,
 ) -> ToolResult:
     """Check finite simulation state and the final tip-to-target distance."""
     evidence = None
@@ -237,11 +237,16 @@ def run_task(
                 "actuator_controls": [float(value) for value in data.ctrl],
                 "actuator_force": [float(value) for value in data.actuator_force],
             })
+        shape_artifacts = {}
+        if record_shape:
+            from tools.shape_tools import final_centerline
+            shape_artifacts['final_centerline_m'] = final_centerline(model, data)
         return ToolResult(
             status="pass" if metrics["task_success"] else "fail", tool="run_task",
             failure_code=None if metrics["task_success"] else "TASK_FAILED",
             metrics=metrics,
-            artifacts={"final_state": {"time_s": float(data.time), "qpos": data.qpos.tolist(), "qvel": data.qvel.tolist()}},
+            artifacts={"final_state": {"time_s": float(data.time), "qpos": data.qpos.tolist(), "qvel": data.qvel.tolist()},
+                       **shape_artifacts},
         )
     except Exception as exc:
         return ToolResult(

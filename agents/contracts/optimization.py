@@ -42,6 +42,12 @@ def _variables_from_grammar(grammar, names, *, experiment_source=None):
     policies = []
     for name in names:
         field = grammar["design_fields"].get(name, {})
+        scoped = field.get('experiment_optimization', {}).get(experiment_source)
+        if grammar.get('exploration_envelope_source') and scoped is None:
+            from tools.design_envelope import load_envelope, envelope_variables
+            envelope, _ = load_envelope(grammar)
+            policies.extend(envelope_variables(envelope, (name,)))
+            continue
         # Only actual numeric DesignSpec fields may enter this morphology boundary.
         if name not in DesignSpec.model_fields or field.get("type") not in ("int", "float"):
             raise ValueError(f"Optimization variable denied: {name}")
@@ -71,6 +77,11 @@ def validate_optimization_candidate(original: DesignSpec, candidate: DesignSpec,
 
 
 def _candidate_with_policies(original, candidate, policies, *, grammar=None):
+    effective_grammar = grammar or get_robot_family_grammar(original.robot_family)
+    if effective_grammar.get('exploration_envelope_source'):
+        from tools.design_envelope import load_envelope, validate_envelope_design
+        envelope, _ = load_envelope(effective_grammar)
+        validate_envelope_design(candidate, envelope)
     names = tuple(policy.name for policy in policies)
     for name in DesignSpec.model_fields:
         if name not in names and getattr(original, name) != getattr(candidate, name):

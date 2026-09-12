@@ -184,6 +184,8 @@ def _metric(result, canonical=False):
 
 def _optimize(session):
     policy = session.experiment.policy
+    if policy.purpose != 'DESIGN_SEARCH':
+        raise ValueError('NUMERICAL_SENSITIVITY_ONLY: no design ranking of segments')
     if not policy.variables:
         raise ValueError("No approved design optimization variables selected")
     if "M1" not in policy.allowed_model_levels or "C1" not in policy.allowed_controller_levels:

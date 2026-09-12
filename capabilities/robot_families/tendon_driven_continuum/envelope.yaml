@@ -1,0 +1,53 @@
+envelope_id: SURROGATE_EXPLORATION_ENVELOPE_V1
+owner: Human
+scientific_status: HUMAN_APPROVED_SURROGATE_EXPLORATION_ONLY
+approval_source: configs/experiments/round3_final_human_authorization.md
+robot_family: tendon_driven_continuum
+physics_profile: legacy_v1_surrogate
+allowed_model_levels: [M0, M1]
+allowed_controller_levels: [C1]
+fields:
+  sections:
+    supported_values: [1]
+    optimization_status: UNSUPPORTED
+    unit: '1'
+  total_length_m:
+    lower_bound: 0.05
+    upper_bound: 0.80
+    unit: m
+    constraints: [positive]
+    optimization_status: AUTHORIZED
+  tendon_routing_radius_m:
+    lower_bound: 0.002
+    upper_bound: 0.018
+    unit: m
+    constraints: [positive]
+    optimization_status: AUTHORIZED
+  tendon_count:
+    lower_bound: 3
+    upper_bound: 8
+    unit: '1'
+    constraints: [positive, integer]
+    optimization_status: AUTHORIZED_DISCRETE
+  body_radius_m:
+    lower_bound: 0.01
+    upper_bound: 0.05
+    unit: m
+    constraints: [positive]
+    representation_status: AUTHORIZED
+    optimization_status: BLOCKED_BY_MECHANICS_COUPLING
+  segments:
+    lower_bound: 4
+    upper_bound: 24
+    unit: '1'
+    constraints: [positive, integer]
+    representation_status: AUTHORIZED
+    optimization_status: NUMERICAL_SENSITIVITY_ONLY
+relational_constraints:
+- left: tendon_routing_radius_m
+  operator: lt
+  right: body_radius_m
+limitations:
+- Simulation exploration, not manufacturing certification or real-robot validation.
+- Per-joint stiffness/damping remain unscaled with segment length.
+- No body-radius optimization, new mechanics, C2 tuning or multi-section support.

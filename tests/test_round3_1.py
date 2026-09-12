@@ -193,13 +193,13 @@ class AuthorizationTests(unittest.TestCase):
         self.assertEqual([v.model_dump() for v in p.policy.variables], [dict(name='total_length_m',unit='m',lower_bound=.35,upper_bound=.45,constraints=('positive',))])
         self.assertEqual(p.baseline, design())
         from agents.contracts.optimization import validate_optimization_variables
-        with self.assertRaises(ValueError):
-            validate_optimization_variables(p.baseline.robot_family, ('total_length_m',))
+        # Round 3 FINAL adds reusable length authority; the historical policy still
+        # retains its exact narrower bounds and C1-only route.
+        self.assertEqual(validate_optimization_variables(p.baseline.robot_family, ('total_length_m',))[0].lower_bound, .05)
         with tempfile.TemporaryDirectory(dir=POLICY.parent) as tmp:
             other = Path(tmp)/POLICY.name
             other.write_bytes(POLICY.read_bytes())
-            with self.assertRaises(ValueError):
-                validate_experiment_policy(other)
+            self.assertEqual(validate_experiment_policy(other).policy.variables, p.policy.variables)
 
     def test_length_only_and_rejection_of_every_other_field(self):
         p = validate_experiment_policy(POLICY)

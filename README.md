@@ -1,5 +1,10 @@
 # Softrobot deterministic research harness
 
+Round 3 FINAL establishes the reusable [V1 surrogate design envelope](docs/design_envelope.md),
+geometric actuation analysis and normal-artifact shape comparison. Its staged
+study uses `python examples/run_round3_final.py`; see [results](docs/round3_final_result.md).
+Historical approval blockers below are superseded only within this envelope.
+
 Round 3.1 adds optional `--debug` and `--visualize` observability and a Human-approved,
 file-scoped total-length experiment for reach_free. See [debug usage](docs/debug_visualization.md)
 and [Round 3.1 results](docs/round3_1_result.md). The Round 3 authorization status

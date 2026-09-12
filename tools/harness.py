@@ -71,6 +71,7 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
     resolved_contract = None
     experiment = None
     controller = None
+    research_evidence = False
     observability = None
     if debug or visualize:
         from tools.debug_tools import DebugObservability
@@ -88,6 +89,7 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         if experiment_path is not None:
             from tools.experiment_policy_tools import validate_experiment_policy
             experiment = validate_experiment_policy(experiment_path)
+            research_evidence = experiment.policy.authorization_mode == 'ENVELOPE_SUBSET'
             if not resolved_contract or resolved_contract.manifest_hash != experiment.resolved.manifest_hash:
                 raise ValueError("Experiment TaskContract mismatch")
             model_level = "M0" if fidelity == "M0" else "M1"
@@ -313,6 +315,12 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                               value=not feasible, threshold=False, comparison="==",
                               decision="PASS" if feasible else "FAIL", authority="Geometric screening only; continue simulation for evidence, no canonical override"),
                     evidence_refs=run.events.refs("clearance_result.json", "environment.yaml"))
+        if research_evidence:
+            from tools.actuation_tools import analyze_actuation
+            run.invoke_tool('analyze_actuation', 'actuation_result.json',
+                lambda: analyze_actuation(robot_ir, plan), input_paths=('robot_ir.yaml','model_result.json'))
+            run.invoke_tool('pcc_centerline', 'model_shape.json',
+                lambda: matlab.pcc_centerline(robot_ir, plan), input_paths=('robot_ir.yaml','model_result.json'))
         if observability is not None:
             observability.plot_matlab(matlab, run.path, visible=visualize)
         if fidelity == "M1":
@@ -354,7 +362,8 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                 result = run_task(compiled.artifacts["mjcf_path"], task, controller, settings,
                                   **({"environment": environment} if constrained else {}),
                                   **({"evaluator": resolved_contract.evaluator} if resolved_contract else {}),
-                                  **({"observability": observability} if observability else {}))
+                                  **({"observability": observability} if observability else {}),
+                                  **({'record_shape': True} if research_evidence else {}))
                 return result.model_copy(update={"metrics": {**result.metrics, "comparison_context": comparison_context}})
             result = run.invoke_tool("run_task", "mujoco_result.json", simulation_call,
                 input_paths=("robot.xml", "task.yaml", "controller.json", "run_settings.yaml") + (("environment.yaml",) if constrained else ()))
@@ -407,6 +416,12 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             from tools.diagnostic_tools import save_diagnostic_summary
             with run.events.span("diagnostics"):
                 save_diagnostic_summary(run, plan, result, task, clearance)
+                if research_evidence:
+                    from tools.shape_tools import compare_shape_model_sim
+                    from schemas.tool_result import ToolResult
+                    run.invoke_tool('compare_shape_model_sim', 'shape_comparison.json',
+                        lambda: compare_shape_model_sim(ToolResult.model_validate_json((run.path/'model_shape.json').read_text(encoding='utf-8')), result),
+                        input_paths=('model_shape.json','mujoco_result.json'), diagnostic=True)
         except Exception as exc:
             run.event("diagnostics", "fail", failure_code="UNKNOWN", message=str(exc))
         return run

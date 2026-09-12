@@ -7,7 +7,7 @@ tools:
       module: tools.experiment_tools
       callable: optimize_design
     inputs:
-    - Human-owned ExperimentPolicy path
+    - Human-owned ExperimentPolicy or validated ENVELOPE_SUBSET policy path
     outputs:
     - RunArtifacts; optimization_summary.json
     fields_consumed:
@@ -32,8 +32,8 @@ tools:
     - Single-section approved PCC geometry only; no new mechanical law or tuned defaults.
     - Numerical experiments require file-owned policy and approved grammar; TEST_ONLY
       cannot execute frozen tasks.
-    applicable_when: Explicit supported route and numerical authorization; real experiments
-      currently blocked pending Human approval.
+    applicable_when: Explicit supported route and validated Human policy or subset of
+      SURROGATE_EXPLORATION_ENVELOPE_V1; numerical sensitivity is not design ranking.
     limitations:
     - No real robot validation, convergence guarantee or causal attribution.
     - No canonical success from model predictions; no TaskContract or Skill mutation.

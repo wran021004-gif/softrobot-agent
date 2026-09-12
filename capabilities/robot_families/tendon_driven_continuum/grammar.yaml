@@ -1,4 +1,5 @@
 family_name: tendon_driven_continuum
+exploration_envelope_source: capabilities/robot_families/tendon_driven_continuum/envelope.yaml
 schema: DesignSpec
 schema_module: schemas.design_spec
 implementation_status: partial
@@ -139,4 +140,4 @@ optimization_policy:
   owner: Human
   objective_source: benchmarks/tendon_v1.yaml tasks[].metric and evaluator; task tolerance remains frozen
   default: deny
-  note: General optimization remains denied. The file-scoped Round 3.1 authorization permits total_length_m only for its named ExperimentPolicy.
+  note: exploration_envelope_source is the reusable Human authority for new subsets. Legacy per-field metadata and the Round 3.1 file override are retained for historical compatibility.

@@ -162,6 +162,16 @@ class MatlabTools:
         # M0/M1 are kinematic. Gravity and objects are intentionally not used;
         # no separate MATLAB environment file or implicit transform exists.
 
+    def pcc_centerline(self, robot_ir, model_result, samples=65):
+        m = model_result.metrics
+        points = self.eng.pcc_centerline(robot_ir.total_length_m, m['theta_rad'], m['phi_rad'],
+                                         float(samples), nargout=1)
+        return ToolResult(tool='pcc_centerline', status='pass', metrics={
+            'scope': 'MODEL_SHAPE_EVIDENCE', 'comparison_context': m.get('comparison_context'),
+            'normalized_arc_length': [i/(samples-1) for i in range(samples)],
+            'tendon_target_lengths_m': list(m['tendon_target_lengths_m'])},
+            artifacts={'centerline_m': [list(map(float, row)) for row in points]})
+
     def plot_saved_results(self, run_path, output_path, *, visible=False):
         """Plot saved copies only. Caller isolates failures from all ToolResults."""
         import json
