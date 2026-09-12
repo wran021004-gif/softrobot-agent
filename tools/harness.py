@@ -47,6 +47,7 @@ def _snapshot_sources(run, extra_paths=()):
     for folder in ("schemas", "tools", "controllers", "metrics", "matlab", "capabilities", "physics_contracts", "tasks", "benchmarks", "agents", "configs", "skills", "memory"):
         paths.extend(p for p in (ROOT / folder).rglob("*") if p.is_file() and p.suffix in (".py", ".m", ".yaml", ".md", ".xml", ".json"))
     paths.extend((ROOT / name) for name in ("requirements.txt", "examples/run_reach_pipeline.py", "examples/run_experiment.py"))
+    paths.extend((ROOT/'examples').glob('*.py'))
     paths.extend(p for p in (ROOT / "tests/fixtures/reach_window_dev").rglob("*") if p.is_file())
     paths.extend(extra_paths)
     hashes = {}
@@ -89,7 +90,7 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         if experiment_path is not None:
             from tools.experiment_policy_tools import validate_experiment_policy
             experiment = validate_experiment_policy(experiment_path)
-            research_evidence = experiment.policy.authorization_mode == 'ENVELOPE_SUBSET'
+            research_evidence = experiment.policy.authorization_mode in ('ENVELOPE_SUBSET', 'CLOSEOUT_SCOPED')
             if not resolved_contract or resolved_contract.manifest_hash != experiment.resolved.manifest_hash:
                 raise ValueError("Experiment TaskContract mismatch")
             model_level = "M0" if fidelity == "M0" else "M1"
@@ -363,7 +364,14 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                                   **({"environment": environment} if constrained else {}),
                                   **({"evaluator": resolved_contract.evaluator} if resolved_contract else {}),
                                   **({"observability": observability} if observability else {}),
-                                  **({'record_shape': True} if research_evidence else {}))
+                                  **({'record_shape': True} if research_evidence else {}),
+                                  **({'record_trajectory':True} if experiment and experiment.policy.authorization_mode == 'CLOSEOUT_SCOPED' else {}))
+                if 'trajectory' in result.artifacts:
+                    import gzip, json
+                    rows = result.artifacts['trajectory']
+                    (run.path/'trajectory.json.gz').write_bytes(gzip.compress(json.dumps(rows, allow_nan=False).encode(), mtime=0))
+                    run.events.emit('ARTIFACT_CREATED', 'normal_trajectory', evidence_refs=run.events.refs('trajectory.json.gz'))
+                    result = result.model_copy(update={'artifacts':{k:v for k,v in result.artifacts.items() if k != 'trajectory'}})
                 return result.model_copy(update={"metrics": {**result.metrics, "comparison_context": comparison_context}})
             result = run.invoke_tool("run_task", "mujoco_result.json", simulation_call,
                 input_paths=("robot.xml", "task.yaml", "controller.json", "run_settings.yaml") + (("environment.yaml",) if constrained else ()))

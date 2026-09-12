@@ -42,7 +42,7 @@ class FeedbackParameters(Contract):
 
 
 class ExperimentPolicy(Contract):
-    authorization_mode: Literal['HUMAN_POLICY', 'ENVELOPE_SUBSET'] = 'HUMAN_POLICY'
+    authorization_mode: Literal['HUMAN_POLICY', 'ENVELOPE_SUBSET', 'CLOSEOUT_SCOPED'] = 'HUMAN_POLICY'
     purpose: Literal['DESIGN_SEARCH', 'NUMERICAL_SENSITIVITY'] = 'DESIGN_SEARCH'
     physics_profile: Literal['legacy_v1_surrogate'] = 'legacy_v1_surrogate'
     policy_id: str = Field(min_length=1)

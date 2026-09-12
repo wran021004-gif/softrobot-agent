@@ -1,0 +1,65 @@
+scope: ROUND3_DETERMINISTIC_CLOSEOUT
+source: User instruction supplied in this Codex session on 2026-09-12; no human signature
+  fabricated
+parent_approval_source: configs/experiments/round3_final_human_authorization.md
+instruction_source: configs/experiments/round3_closeout_instruction.md
+instruction_sha256: 420540e41ad5dc9d59943f8e4102d9e8758c8f8833ae28f5b945b300ca1e9567
+frozen_hashes:
+  tasks/reach_free/task.yaml: 3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88
+  tasks/reach_free/environment.yaml: 932ee625481d643c6bb225393fd94be4cc31fd87ec0c07faee03e845f9997e56
+  tasks/reach_free/mujoco.xml: ec2c48779dcc95ada4f8caebba04bec16116d816b52b4b3adfaae0bb151ab32e
+  tasks/reach_free/contract.yaml: 93633233ade80cfae7d6b4a535ab94fc7d655021c7826a2266c4375ace31497c
+  benchmarks/tendon_v1.yaml: 92927311c16c1b69d92f0099dcb1f2f244073ebb5d8002da7f945c211d7ebc6a
+  metrics/reach.py: 4ff39ebd56fa8db1367329ce7f29e33b80939d4deb66c0903ad9e60ef8997f96
+  schemas/gate.py: b44a9e516f5e3088ed057b4ece275ef68e60dc24fa5b2423b33b1817957b1870
+  configs/run.yaml: 8fdad79d48c1b6181d56a7602f99944c41c2f27ccf7f8884191ee080d95f5841
+  configs/simulator.yaml: 6f1a1f6bc8f5348999b180ff8ab8bac22200afbc5f253030b7c9715dd24ce608
+  configs/design_tendon_arm.yaml: cc0b861a43690d1e824b29deb688e9877b4e315c15ae61a1ae3974ce7cfa007d
+  capabilities/robot_families/tendon_driven_continuum/envelope.yaml: 5a794785b259ac5c3ddecc31e5cdbbffb55056c7cd72592c288fdc7d555bfe47
+  configs/experiments/round3_final_human_authorization.md: a2f3ffa2ea37f00e7e77271462c39c1535d61dd933a1095e1547a7ce678b32e3
+  physics_contracts/actuator_model_v1.md: 30cd82657724f0546c1f95f87f13a6a327b3d5d5286de5be0a332c93a98d87b7
+  physics_contracts/coordinate_frames.md: d4c064b34b7ea2aa13b1efb037c53bf89c694e99119df81b24e42bc520cc2650
+  physics_contracts/legacy_v1_surrogate.yaml: 6fa007dedb5a49b39c4396930ca96aab01fd55c0a3bfaf5d36b6d74be845642b
+  physics_contracts/segmented_mujoco_mapping_v1.md: ea4a905898b457ce92af58e4115aa3a2e43c719c671b81673ba2a37db22b20a6
+  physics_contracts/tendon_driven_pcc_v1.md: cddb5b5bdb15525919bf864032af39f66f0644d39bf8e3a97832acfbb3c88b2b
+  physics_contracts/tendon_length_mapping_v1.md: 85a01c6ed77952b7b7559796703f3fc750d0d63ba5344b27447dc83067cb7362
+feedback_parameters:
+  gain_rad2_per_m2: 0.3
+  update_every_steps: 20
+  max_bend_update_rad: 0.01
+  max_command_update_m: 0.0001
+  min_tendon_length_m: 0.001
+  max_tendon_length_m: 1.0
+stage_budgets:
+  A:
+    M1: 4
+    MUJOCO: 4
+  B:
+    M1: 16
+    MUJOCO: 4
+  C:
+    M1: 0
+    MUJOCO: 4
+  D:
+    M1: 8
+    MUJOCO: 4
+  E:
+    M1: 0
+    MUJOCO: 4
+independent_analysis_operations:
+- static
+- dynamic
+- fit
+- disturbance
+- replay
+restrictions:
+- simulation only
+- no main physics writeback
+- no hardware
+- no benchmark promotion
+- no Skill admission
+development_limits:
+  mujoco_rollouts: 12
+  mechanics_top_level_solves: 200
+  full_regressions: 1
+  formal_campaigns: 1

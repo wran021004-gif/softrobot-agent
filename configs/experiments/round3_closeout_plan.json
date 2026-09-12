@@ -1,0 +1,404 @@
+{
+  "schema_version": 1,
+  "policy_source": "configs/experiments/round3_closeout.yaml",
+  "authorization_source": "configs/experiments/round3_closeout_authorization.yaml",
+  "seed": 17,
+  "stage_budgets": {
+    "A": {
+      "M1": 4,
+      "MUJOCO": 4
+    },
+    "B": {
+      "M1": 16,
+      "MUJOCO": 4
+    },
+    "C": {
+      "M1": 0,
+      "MUJOCO": 4
+    },
+    "D": {
+      "M1": 8,
+      "MUJOCO": 4
+    },
+    "E": {
+      "M1": 0,
+      "MUJOCO": 4
+    }
+  },
+  "evaluation_budget": 48,
+  "feedback_parameters": {
+    "gain_rad2_per_m2": 0.3,
+    "update_every_steps": 20,
+    "max_bend_update_rad": 0.01,
+    "max_command_update_m": 0.0001,
+    "min_tendon_length_m": 0.001,
+    "max_tendon_length_m": 1.0
+  },
+  "reference_designs": [
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.4,
+      "body_radius_m": 0.02,
+      "tendon_count": 4,
+      "tendon_routing_radius_m": 0.015
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.29,
+      "body_radius_m": 0.02,
+      "tendon_count": 8,
+      "tendon_routing_radius_m": 0.018
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.3062377168199977,
+      "body_radius_m": 0.02,
+      "tendon_count": 4,
+      "tendon_routing_radius_m": 0.015
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.29,
+      "body_radius_m": 0.02,
+      "tendon_count": 4,
+      "tendon_routing_radius_m": 0.018
+    }
+  ],
+  "search_candidates": [
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.282,
+      "body_radius_m": 0.02,
+      "tendon_count": 8,
+      "tendon_routing_radius_m": 0.018
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.286,
+      "body_radius_m": 0.02,
+      "tendon_count": 8,
+      "tendon_routing_radius_m": 0.018
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.294,
+      "body_radius_m": 0.02,
+      "tendon_count": 8,
+      "tendon_routing_radius_m": 0.018
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.3,
+      "body_radius_m": 0.02,
+      "tendon_count": 8,
+      "tendon_routing_radius_m": 0.018
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.3062377168199977,
+      "body_radius_m": 0.02,
+      "tendon_count": 8,
+      "tendon_routing_radius_m": 0.018
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.32,
+      "body_radius_m": 0.02,
+      "tendon_count": 8,
+      "tendon_routing_radius_m": 0.018
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.29,
+      "body_radius_m": 0.02,
+      "tendon_count": 8,
+      "tendon_routing_radius_m": 0.006
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.29,
+      "body_radius_m": 0.02,
+      "tendon_count": 8,
+      "tendon_routing_radius_m": 0.012
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.29,
+      "body_radius_m": 0.02,
+      "tendon_count": 3,
+      "tendon_routing_radius_m": 0.018
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.29,
+      "body_radius_m": 0.02,
+      "tendon_count": 5,
+      "tendon_routing_radius_m": 0.018
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.29,
+      "body_radius_m": 0.02,
+      "tendon_count": 6,
+      "tendon_routing_radius_m": 0.015
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.29,
+      "body_radius_m": 0.02,
+      "tendon_count": 7,
+      "tendon_routing_radius_m": 0.015
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.301835389,
+      "body_radius_m": 0.02,
+      "tendon_count": 5,
+      "tendon_routing_radius_m": 0.016066908
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.293005764,
+      "body_radius_m": 0.02,
+      "tendon_count": 8,
+      "tendon_routing_radius_m": 0.015661074
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.302527045,
+      "body_radius_m": 0.02,
+      "tendon_count": 3,
+      "tendon_routing_radius_m": 0.010782765
+    },
+    {
+      "robot_family": "tendon_driven_continuum",
+      "sections": 1,
+      "segments": 8,
+      "total_length_m": 0.291458318,
+      "body_radius_m": 0.02,
+      "tendon_count": 6,
+      "tendon_routing_radius_m": 0.016151861
+    }
+  ],
+  "execution": {
+    "sources": {
+      "tools/actuation_tools.py": "5a92afbb2befee37137134e26913227555431437466cc5e5c604a91e3f8577b3",
+      "tools/artifact_tools.py": "dc4919ec913c686d3b158376eb8d5d3e1ba26dffaaacaacce299bff868a99e57",
+      "tools/capability_resolver.py": "dda0bb4592b19b93acafb109267b3bcc9a4c8a6e9a918d5e319363100c003266",
+      "tools/closeout_audit.py": "8e661d96c22d0cdd13418fafa5eb8df281514619632dbc5f2ffba4547a7720aa",
+      "tools/closeout_authority.py": "6fe3f11025e6108f3d0dce14971203e013ab64c969db350a9001b763f16f7ed6",
+      "tools/closeout_campaign.py": "20c75c3f489375a9f9788d8eea878bd4277863a632949a7b337281f7f7f9a210",
+      "tools/closeout_state.py": "b1af134abb86e004cce9cafeec323cc47bf688139df776135b7e2680c7aeb62a",
+      "tools/closeout_validation.py": "94f4d6151e9fb40c28753687770ff173c110e8150cee78236de36e22caa131a0",
+      "tools/debug_tools.py": "788c9505646b29a05fc373e38433142180974cfc567f7e389306820acccd50df",
+      "tools/design_compiler.py": "79a5a09353d822cad0a2dbb5483b53372487e52bc33b6371cde787ff99497203",
+      "tools/design_envelope.py": "e211a687041ebc560a8e5339b6535d7a349564174f72b5aeed0153a60b9c54a0",
+      "tools/diagnostic_tools.py": "6a9021f225cb327db8facbb548e44a1e3112d208404003106692a7b72b44dc16",
+      "tools/evidence.py": "c584062d6d78d0f9eaaad5400dd3969fca0ab3ac76723825ddc50e5cbafc6680",
+      "tools/experiment_policy_tools.py": "0668e18e25b2fb4f4f567338231c31946da45c107fbe5a3083a4e3e16b327508",
+      "tools/experiment_tools.py": "69b3b55b624e73726acd3604fa12625b4a2ef4521cb5fb9e73e0a7a2fcf8d55a",
+      "tools/export_contract_schemas.py": "1ff8d62cd3055a246044c2c1c48a214afeea3c44969a1ea700a4398dbf4efba1",
+      "tools/finding_tools.py": "eeb89633f2c0c6f678aad3eda085a6a6feada74f18dedefc15578b3a6a568b63",
+      "tools/harness.py": "2b77e3909e0459d16e30ed15ae6c2de7f04fdabf6a3efdc05a3eaba39532c159",
+      "tools/matlab_tools.py": "4e99d9454cad51d57293d9c5dc18133ad235195cffac6d0b9ea273974f8567f6",
+      "tools/mechanics_tools.py": "62dd70ae3c42e0d83114ebe9f8f513dead463cf5da5a5f6c638529e78b6b1191",
+      "tools/mujoco_evidence.py": "a968ab16f1ba7767c5de6f438b75aaf2ae239b3ce810ebfd85e7d8702e685688",
+      "tools/mujoco_tools.py": "fc32908cee9c7929f6fdacf3846db7d3b7d8e311f40879b4c89bab06d378ea4d",
+      "tools/pcc_math.py": "b2d9a741a29c44548e9fd6d97d3ae1f120429d096b96a632f9b3454ce66ede3f",
+      "tools/provenance.py": "847201473b9de8653303808c5a7af06ee7bb44ff028fe4b3d4a70bc9eef0ab7a",
+      "tools/round3_studies.py": "2153434816940628331660cbcb1f106407fa46534ce582f43253e528802e9a9a",
+      "tools/shape_tools.py": "7d4a6713443be08292ddeb1862a7f1a4f1c7fd4b5383be0c91c07cc8d000ec77",
+      "tools/skill_policy.py": "27c84129a44a43e2ce88f20eabf297ab14869d4bbdc10e781066628599695f31",
+      "tools/spec_tools.py": "b7c6e2fca5d972de0eed2188f1ab4868e953e66a4526dba5c42670a596742f03",
+      "tools/task_contract_tools.py": "f55942886aac0011892aa247187b124cf96dfb31515ada5e5886eea66fbbd62d",
+      "tools/trace_tools.py": "fbc871ee3a5347e236c0a32646898695ecbf1ae7529454e7a4185a6b8876f1af",
+      "tools/window_evidence.py": "d957cacaa5cb2ea23c6d2e588942d6b5664140ebde75cfe1963bd530da868a52",
+      "tools/window_geometry.py": "5fe9321df18c9904691a21a728b72f6f56b198056de98469f829bc4b838f8e3f",
+      "tools/__init__.py": "06d827cc19a6120b55e2c2a9b41630739ca63f0857c1d7cb51b8814fb325be36",
+      "controllers/base.py": "ca31aa780268409a63f0de685b8fedeba983298ffaae9d968ce874eef9dfea46",
+      "controllers/open_loop_length.py": "734bbd1387dcd5291ad154fe569f79130fc5b5183c3bcfd97c03efb4dc2f3bc6",
+      "controllers/pcc_tip_feedback.py": "0725febea07af735d12a88f7e5af25da6c692f3e2b1bc3df833a5089827c604e",
+      "controllers/__init__.py": "54395e2332e2c30a39d392ae52f59c1d0442738eb22a89c5c79eb95494939d39",
+      "schemas/analysis_spec.py": "11bf05a699a34a35a12a1422685beb553d7404705686cd6473b996d486bed541",
+      "schemas/candidate_evaluation.py": "a9db41c956bb75e80c8fa1b0a9f472980bcdf7d1b2ff3cd0b2b1dc3d04026075",
+      "schemas/common.py": "95600d6bfdac7e46b024c7b8ae53aac8fc11eb51e92b2b93763d3e5b6fa19eae",
+      "schemas/control_spec.py": "c2c09aefeef3febf69c2de71bdabbb26dc7bad435ea7f458148b160fd70f8353",
+      "schemas/debug_artifact.py": "7d997bc821bec33f1791852e9d26f37914d53ec3fb9d8e3a06697492ef82ae5f",
+      "schemas/design_spec.py": "16c4deaa308fd3bb880a51071724fd1c33f5b230a508328af8aa1eb91bfe3d5c",
+      "schemas/environment_spec.py": "ea69f868cf2e67ecf36ba80018074cc9ebcccb87a9b879477531a17fdced019a",
+      "schemas/evidence.py": "49cd6b3309a6afa69dc6308b2581966c6326fc187c1e045472b454a15b4132fd",
+      "schemas/experiment_policy.py": "60692303ea89d737e2c3b9ff9e0c9c0961b1aee889cad7e94ed0059765ecacc9",
+      "schemas/failure_taxonomy.py": "1aa1c527eb0c563a3dbc1d958189376aa09b1a13496e5aad082c93dbd34045db",
+      "schemas/feedback.py": "f3d3355158555e1cfc3701beb6a73380bf180a5c5c087fe467e3f9bb253bb46e",
+      "schemas/finding.py": "2e72bba50775852aba2d5ddf08d858756c71f7647b45e5cb3093ae7baeaeab8c",
+      "schemas/gate.py": "b44a9e516f5e3088ed057b4ece275ef68e60dc24fa5b2423b33b1817957b1870",
+      "schemas/memory.py": "d869c74167c622f3309594ec6c15a2e9f4dc9a362064f43f1b4ce9c33aeb9f45",
+      "schemas/robot_ir.py": "87ef6d44cac832f6f962e6cde58acdeb7ce0355a4d82c94611cae755f759a8a4",
+      "schemas/run_record.py": "2dd85d18a195e6795d1a9d05a8651ee670467c1ee9dd3c2a2dbd9fa9c03c2153",
+      "schemas/settings.py": "7e2512e160232834553962da2db8466b7223d7422a29d078cf24624e507053f5",
+      "schemas/skill.py": "c6d7e3cc0c08f62e34b57069c2903ccfe37d296d7ebde1b8331cfe9deb377952",
+      "schemas/task_contract.py": "1a73626d5b1550b4a9671c5fec60c15dea9dea8008d77775049d4db46531ed31",
+      "schemas/task_spec.py": "7d9ab297a87f025388c89c45cd279e935a19f4f4a3bcc277714095f586748ffa",
+      "schemas/tool_result.py": "c63a5ed800bd5590a8411fcc6b8c81ef5d6a761665246956a9dd86b0e45b9b7c",
+      "schemas/trace.py": "18eeebbaf7c9a7bd16df832d48b87a66a01b9bb9330c71fe8ea8747ef340901c",
+      "schemas/__init__.py": "c44809e9c7aaef53b778cc1302e46e063f8b7891db264ccd6d1d14859de46bef",
+      "metrics/reach.py": "4ff39ebd56fa8db1367329ce7f29e33b80939d4deb66c0903ad9e60ef8997f96",
+      "metrics/__init__.py": "7197298baf0cbc68ab5ec71ce2d42fa35e73bdfcdb9ad544a5b9a21701a097d1",
+      "matlab/analyze_clearance.m": "745ade31ae4e148231195ba1147e79d0528153d50748283b3c9df83c283643c4",
+      "matlab/analyze_workspace.m": "8e60ff616566ab129f861ddd9aca7917a9f77caa6df67d33613d13237f4c583c",
+      "matlab/closeout_mechanics.m": "d65d361d4661fc2226d11620fcf502a8221ef812e4625b50d5a4324b8af7d724",
+      "matlab/hello_matlab.m": "52bdc8a70698070fbd7af31edf664d9bf81bf53848867fec1e0566ee91127808",
+      "matlab/pcc_centerline.m": "a384ee7826e6ed490c98e7324a0f03328d64342d1a0dd459a0bb72bc0d70a4af",
+      "matlab/plan_pcc_reach.m": "ab36666f1239ec920ab694136386e817218b6c437fbd0f68f6c3e93d46446d1d",
+      "matlab/plot_saved_pcc.m": "d35e44cf85856c4a9a920db09a11c8ff6755d505f720af0a903eeab45d534a13",
+      "physics_contracts/actuator_model_v1.md": "30cd82657724f0546c1f95f87f13a6a327b3d5d5286de5be0a332c93a98d87b7",
+      "physics_contracts/closeout_analysis_v1.md": "1b20f82bf94d35b4b15456da3b93aaac10668936e8cc87c8d228f01f91461025",
+      "physics_contracts/coordinate_frames.md": "d4c064b34b7ea2aa13b1efb037c53bf89c694e99119df81b24e42bc520cc2650",
+      "physics_contracts/legacy_v1_surrogate.yaml": "6fa007dedb5a49b39c4396930ca96aab01fd55c0a3bfaf5d36b6d74be845642b",
+      "physics_contracts/segmented_mujoco_mapping_v1.md": "ea4a905898b457ce92af58e4115aa3a2e43c719c671b81673ba2a37db22b20a6",
+      "physics_contracts/tendon_driven_pcc_v1.md": "cddb5b5bdb15525919bf864032af39f66f0644d39bf8e3a97832acfbb3c88b2b",
+      "physics_contracts/tendon_length_mapping_v1.md": "85a01c6ed77952b7b7559796703f3fc750d0d63ba5344b27447dc83067cb7362",
+      "capabilities/catalog.yaml": "b959915ccedff4c33853c89acfdfdf742a5c63cb253b2ccba3bb34df36fafb0a",
+      "capabilities/README.md": "fd3367037725411c80c96bf17c549067e0839ed24a8066a13f2957c203d35e33",
+      "capabilities/registry.py": "13c519c68d36d67f70db019df70ad85691a7081c2af2be0bb6731557af46b683",
+      "capabilities/__init__.py": "ddbd1f0c1e30202bef7f2c396da649e0565b07ec6b26422446a55a15c4d70760",
+      "capabilities/robot_families/tendon_driven_continuum/envelope.yaml": "5a794785b259ac5c3ddecc31e5cdbbffb55056c7cd72592c288fdc7d555bfe47",
+      "capabilities/robot_families/tendon_driven_continuum/FAMILY.md": "3cff4960af28fb61aeaa53d96c41c127ec69ab7ec858c39d4102b9ec1c99451d",
+      "capabilities/robot_families/tendon_driven_continuum/grammar.yaml": "bbc2951bd231e6ca28cb58dbc8f9f8bbf70ede60dd4881ec7b0031f77e1fd727",
+      "capabilities/tools/artifacts/manifest.yaml": "7a21b7d53ea97e6d5ce628ee5a3608895c48bc45e35b731ed8dc15d91b4f41a5",
+      "capabilities/tools/closeout_analysis/manifest.yaml": "a41e968d1bc769829972aa92e41f4863fa00c11b04d4392537c100a862c9b9ed",
+      "capabilities/tools/control/manifest.yaml": "355cdbdd53013a304033c36b8028e349d166787a34e8a15efa6bea4142276212",
+      "capabilities/tools/diagnostics/manifest.yaml": "9ed9c1326c199a81eb6ccd1cc170902a61d55203aa09a5dd51f35b79c9609bc0",
+      "capabilities/tools/diagnostics/TOOL.md": "036c73e18b23ec728ec5c5b88e3306299974cc09eb8890e65e07d4e6c774d1b5",
+      "capabilities/tools/learning/manifest.yaml": "1e78a3422fcac59e9cb1c7ed54ec996f55e1e483fc8989932f4739679dd2dc3b",
+      "capabilities/tools/matlab_analysis/manifest.yaml": "6c311819e555041029015f6a87cf38a9a2bd38a0a7ebc185369c516781c142b5",
+      "capabilities/tools/matlab_analysis/TOOL.md": "95c1672abef024a596ef673ef321b4ef32b0305d90ff0b5d65c8b0ded5ac8d24",
+      "capabilities/tools/model/manifest.yaml": "59d797b89f03f0840e7cd08a37655e034e148de1b579bd1f34246bf6b9f4dd63",
+      "capabilities/tools/model/TOOL.md": "caf7c9fb8a9de567106bd737aa407579205d170dd17c637c505ef9ac0697dbb6",
+      "capabilities/tools/mujoco/manifest.yaml": "0a8c608d79703abbeeb16e32b91512ebc0bae43c6e43f352ff8891fddcf7c60a",
+      "capabilities/tools/mujoco/TOOL.md": "4f4b02285718873df0a0a35336e03d92e9ade15014bf2a56d0d4270749f2d3b2",
+      "capabilities/tools/optimization/manifest.yaml": "46e40d10052a9586c112840ebbad80fa44040a6c14e7203b3ab26ef39cfbc7b9",
+      "capabilities/tools/spec/manifest.yaml": "a80091c771db0c0b17814c8d2634fb48235a2d56f74aa1b4c5160a40c82ba75d",
+      "tasks/README.md": "57c9f3430f9df76518ead55b950394057adc25aefb96975e8ca609a0c0f7af4c",
+      "tasks/reach_free/contract.yaml": "93633233ade80cfae7d6b4a535ab94fc7d655021c7826a2266c4375ace31497c",
+      "tasks/reach_free/environment.yaml": "932ee625481d643c6bb225393fd94be4cc31fd87ec0c07faee03e845f9997e56",
+      "tasks/reach_free/mujoco.xml": "ec2c48779dcc95ada4f8caebba04bec16116d816b52b4b3adfaae0bb151ab32e",
+      "tasks/reach_free/README.md": "4e1c89e9f60d24b4bc462992fbcbd5f86286851129aa10b7514dfd432442ed35",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88",
+      "configs/design_tendon_arm.yaml": "cc0b861a43690d1e824b29deb688e9877b4e315c15ae61a1ae3974ce7cfa007d",
+      "configs/run.yaml": "8fdad79d48c1b6181d56a7602f99944c41c2f27ccf7f8884191ee080d95f5841",
+      "configs/simulator.yaml": "6f1a1f6bc8f5348999b180ff8ab8bac22200afbc5f253030b7c9715dd24ce608",
+      "configs/task_reach.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88",
+      "configs/experiments/round3_1_human_authorization.md": "f5a2f5d8b528f83387102e1d3a61e0b4a18ca5e853ee7c795013534f078c813d",
+      "configs/experiments/round3_1_reach_free.yaml": "affa39dcee689e798a79522b5821efe63c0bba07d2b5e9c598585ef7e2557b13",
+      "configs/experiments/round3_closeout.yaml": "8f4f3a5a5e27ab64111c9c8b1daec8870e8424d143c920ffb48d07e3770ca6cf",
+      "configs/experiments/round3_closeout_authorization.yaml": "317edea0c760f81a8061085989d6515cfa13d380ff73644912976e5b71b3051a",
+      "configs/experiments/round3_closeout_instruction.md": "420540e41ad5dc9d59943f8e4102d9e8758c8f8833ae28f5b945b300ca1e9567",
+      "configs/experiments/round3_final_human_authorization.md": "a2f3ffa2ea37f00e7e77271462c39c1535d61dd933a1095e1547a7ce678b32e3",
+      "benchmarks/tendon_v1.yaml": "92927311c16c1b69d92f0099dcb1f2f244073ebb5d8002da7f945c211d7ebc6a",
+      "examples/run_experiment.py": "a44e010fdc82094863a46cd599ddf7240d29ef9d341b31f3112cbf7193a242db",
+      "examples/run_reach_pipeline.py": "f7f03e6b99c0db92cc180d7d20ea140a4be126bfd20bcc011f376300c4bd0791",
+      "examples/run_round3_closeout.py": "a952df9b06f4e41612c5c1774e61b8cc8af92ea38d6274d6fe7fb18dfe4c2a2b",
+      "examples/run_round3_final.py": "6a79f3169ca2d09cd3d8f7d8cd9e133313bedbf91584450191dc4b4aade7791a",
+      "examples/validate_closeout.py": "43538db024b28975043f9ce204c75c9f76bf12b44abbad70e09f8218ab72fe00",
+      "examples/validate_round3.py": "33d1b6a23f75570704c1d209c5a3474b00b3e4a36dba91ac564c289d8bd2b49d",
+      "examples/validate_round3_1.py": "7bc75b58cdbf5bdcee2c63fcfccc9522cf569396ab8f69d415268131558b416e",
+      "examples/mujoco_hello/pendulum.xml": "1b1a0155a50f711e128b9178da307b21cdc181b264b0fcf983abfea16d8ac957",
+      "examples/mujoco_hello/test_matlab_engine.py": "5b36fdba91ae4e4d9677cbfd8aaf3438384eda3168b59bd57884cf5216dced79",
+      "examples/mujoco_hello/test_mujoco.py": "7bec7b4516a5f6004f34d0d33b762aedf546344de3c665960946695853d016fe"
+    },
+    "versions": {
+      "numpy": "2.4.6",
+      "mujoco": "3.13.0",
+      "matlabengine": "24.1",
+      "pydantic": "2.13.5",
+      "PyYAML": "6.0.3"
+    },
+    "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+    "policy_hash": "8f4f3a5a5e27ab64111c9c8b1daec8870e8424d143c920ffb48d07e3770ca6cf"
+  },
+  "execution_fingerprint": "b93f8bb13eb1ec92dda2b2b233a322ea9f7a07cc989986c592a3b91402b4e272",
+  "initial_state": "Frozen MjData defaults, zero hinge qpos/qvel, no warm-start mutation; run seed remains configs/run.yaml",
+  "generation": "A: baseline/history best/analytic/representative. B: 12 explicit representatives + 4 Random(17) samples, exact DesignSpec digest dedup.",
+  "ranking": "Finite canonical Euclidean error ascending, then stable attempt_id. Model ranked separately; never rank runtime failures.",
+  "B_selection": "Best M1, minimum radius, minimum tendon count, then best remaining M1; dedup before taking four. SCREENING failure eligible.",
+  "C_selection": "Baseline and best C1 after B required; then historical best and analytic, exact design dedup, <=4 C2.",
+  "D_rules": {
+    "HARD": "Exclude explicitly HARD-rejected candidates; next legal fixed neighbor",
+    "TOOL_FAILURE": "Keep failed attempt, retry once under E with retry_of, never use as design score",
+    "TASK_FAILED": "Read canonical incumbents, C1/C2 pairs and saved diagnostics; center the neighborhood on the best actual design/controller, then select model-best eligible neighbor and evaluate both C1 and C2",
+    "neighbors": [
+      [
+        "total_length_m",
+        -0.004
+      ],
+      [
+        "total_length_m",
+        0.004
+      ],
+      [
+        "tendon_routing_radius_m",
+        -0.002
+      ],
+      [
+        "tendon_count",
+        -1
+      ]
+    ],
+    "clipping": "Clip into policy bounds, round length/radius to 12 decimal places; exact DesignSpec dedup against prior MuJoCo designs and prior D screening. Previously B-screened models may be reused, without expanding the fixed four-neighbor list",
+    "stop": "After required C pairs: canonical success, no new legal neighbors, or 2 rounds; no extra search for unused budget"
+  },
+  "E_reproduction": {
+    "selection": "global best observed after D",
+    "atol": 1e-09,
+    "rtol": 1e-09,
+    "fields": [
+      "tip_position_m",
+      "final_tendon_lengths_m",
+      "actuator_force",
+      "qpos",
+      "qvel",
+      "trajectory"
+    ]
+  },
+  "scientific_status": "SIM_TO_SIM / UNCALIBRATED_LEGACY_SURROGATE",
+  "failure_attribution": "UNKNOWN"
+}

@@ -1,4 +1,5 @@
 import math
+import time
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -128,11 +129,13 @@ def run_task(
     run_settings: RunSettings | None = None,
     environment: EnvironmentSpec | None = None,
     evaluator=None,
-    *, observability=None, record_shape=False,
+    *, observability=None, record_shape=False, record_trajectory=False, disturbances=None, timeout_s=120.,
 ) -> ToolResult:
     """Check finite simulation state and the final tip-to-target distance."""
     evidence = None
     window_evidence = None
+    trajectory = []
+    started = time.monotonic()
     def observed():
         result = {"execution_evidence": evidence.summary(model, data), "steps_completed": evidence.steps} if evidence else {}
         if window_evidence:
@@ -144,6 +147,14 @@ def run_task(
             return ToolResult(status="fail", tool="run_task", failure_code="CAPABILITY_MISSING")
         model = mujoco.MjModel.from_xml_path(str(xml_path))
         data = mujoco.MjData(model)
+        if disturbances:
+            from tools.closeout_authority import analysis_permission
+            analysis_permission('disturbance')
+            for item in disturbances:
+                if (item['coordinate_frame'] != 'world' or not 0 <= item['start_s'] < item['end_s'] <= settings.steps*model.opt.timestep
+                    or len(item['force_n']) != 3 or not all(math.isfinite(x) and abs(x) <= 5 for x in item['force_n'])):
+                    raise ValueError('Invalid bounded development disturbance')
+                model.body(item['body'])
         if observability is not None:
             observability.attempt("simulation_debug_start", lambda: observability.start(model, data, task))
         tip_site_id = model.site("tip_site").id
@@ -163,7 +174,16 @@ def run_task(
         # Enabled feedback observes current qpos on a separate kinematics buffer.
         # It never calls mj_forward or changes warm starts on the executed data.
         observation_data = mujoco.MjData(model) if getattr(controller, "requires_tip_observation", False) else None
+        trajectory_data = mujoco.MjData(model) if record_trajectory else None
         for step in range(settings.steps):
+            if time.monotonic() - started > timeout_s:
+                return ToolResult(status='fail', tool='run_task', failure_code='PHYSICS_ERROR',
+                    metrics=observed(), message='TIMEOUT: bounded execution stopped', artifacts={'partial_trajectory':trajectory})
+            if disturbances:
+                data.xfrc_applied[:] = 0
+                for item in disturbances:
+                    if item['start_s'] <= data.time < item['end_s']:
+                        data.xfrc_applied[model.body(item['body']).id, :3] += item['force_n']
             try:
                 observation = {"qpos": data.qpos.tolist(), "qvel": data.qvel.tolist()}
                 if observation_data is not None:
@@ -200,6 +220,14 @@ def run_task(
             if observability is not None:
                 observability.attempt("simulation_debug_step", lambda: observability.observe(model, data, commands))
             evidence.observe_step(model, data, commands)
+            if record_trajectory:
+                trajectory_data.qpos[:] = data.qpos
+                mujoco.mj_kinematics(model, trajectory_data)
+                trajectory.append({'time_s':float(data.time), 'solver_time_s':float(data.time-model.opt.timestep),
+                    'tip_m':trajectory_data.site_xpos[tip_site_id].tolist(),
+                    'qpos_rad':data.qpos.tolist(), 'qvel_rad_s':data.qvel.tolist(),
+                    'command_m':commands, 'solver_tendon_length_m':data.ten_length.tolist(),
+                    'solver_actuator_force_n':data.actuator_force.tolist(), 'solver_contact_count':int(data.ncon)})
             if not (
                 all(math.isfinite(value) for value in data.qpos)
                 and all(math.isfinite(value) for value in data.qvel)
@@ -246,6 +274,7 @@ def run_task(
             failure_code=None if metrics["task_success"] else "TASK_FAILED",
             metrics=metrics,
             artifacts={"final_state": {"time_s": float(data.time), "qpos": data.qpos.tolist(), "qvel": data.qvel.tolist()},
+                       **({'trajectory':trajectory, 'disturbances':disturbances or []} if record_trajectory else {}),
                        **shape_artifacts},
         )
     except Exception as exc:

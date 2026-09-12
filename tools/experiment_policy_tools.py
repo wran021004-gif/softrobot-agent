@@ -64,7 +64,8 @@ def validate_experiment_policy(path) -> ValidatedExperiment:
         raise ApprovalRequired("BLOCKED_FOR_HUMAN_APPROVAL: approve variables, bounds, routes, controller parameters and budgets")
     # File location is the existing Human-owned repository boundary, not authentication.
     owner_root = ROOT / ("tests/fixtures" if policy.scientific_status == "TEST_ONLY" else "configs/experiments")
-    subset = policy.authorization_mode == 'ENVELOPE_SUBSET'
+    closeout = policy.authorization_mode == 'CLOSEOUT_SCOPED'
+    subset = policy.authorization_mode == 'ENVELOPE_SUBSET' or closeout
     policy_roots = (ROOT/'configs/experiments', ROOT/'proposals/engineer', ROOT/'runs') if subset else (owner_root,)
     if not any(path.is_relative_to(root.resolve()) for root in policy_roots):
         raise ValueError("Experiment policy must reside in its owned source directory")
@@ -88,12 +89,15 @@ def validate_experiment_policy(path) -> ValidatedExperiment:
         from tools.design_envelope import load_envelope, envelope_variables, validate_envelope_design
         envelope, envelope_path = load_envelope(resolved.grammar)
         extra_inputs.append(envelope_path)
-        if policy.scientific_status != 'HUMAN_APPROVED' or approval != repository_path(envelope['approval_source']):
+        if closeout:
+            from tools.closeout_authority import validate_closeout_authority
+            extra_inputs.extend(validate_closeout_authority(policy, path, envelope))
+        if policy.scientific_status != 'HUMAN_APPROVED' or (not closeout and approval != repository_path(envelope['approval_source'])):
             raise ValueError('ENVELOPE_REQUIRED: reference the existing Human envelope approval')
         if (not set(policy.allowed_model_levels) <= set(envelope['allowed_model_levels']) or
-                not set(policy.allowed_controller_levels) <= set(envelope['allowed_controller_levels'])):
+                not set(policy.allowed_controller_levels) <= set(['C1', 'C2'] if closeout else envelope['allowed_controller_levels'])):
             raise ValueError('CAPABILITY_NOT_AUTHORIZED: envelope model/controller route')
-        if policy.physics_profile != envelope['physics_profile'] or policy.feedback_parameters is not None:
+        if policy.physics_profile != envelope['physics_profile'] or (not closeout and policy.feedback_parameters is not None):
             raise ValueError('PHYSICS_ASSUMPTION_REQUIRED: new physics/controller')
         if policy.repair_iteration_budget or policy.repair_actions:
             raise ValueError('REPAIR_NOT_AUTHORIZED: envelope exploration has no repair route')

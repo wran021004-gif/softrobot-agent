@@ -182,7 +182,7 @@ def _metric(result, canonical=False):
     return value if type(value) in (int, float) and math.isfinite(value) else math.inf
 
 
-def _optimize(session):
+def _optimize(session, *, reserve_evaluations=0, reserve_mujoco=0):
     policy = session.experiment.policy
     if policy.purpose != 'DESIGN_SEARCH':
         raise ValueError('NUMERICAL_SENSITIVITY_ONLY: no design ranking of segments')
@@ -194,7 +194,11 @@ def _optimize(session):
         raise ValueError("Model ranking objective is not authorized")
     if session.remaining_mujoco and "mujoco.position_error_m" not in policy.objective_metric_refs:
         raise ValueError("Canonical comparison objective is not authorized")
-    model_budget = session.remaining - min(session.remaining_mujoco, max(0, session.remaining - 1))
+    available = max(0, session.remaining - reserve_evaluations)
+    actual_budget = max(0, session.remaining_mujoco - reserve_mujoco)
+    model_budget = available - min(actual_budget, max(0, available - 1))
+    if not model_budget:
+        return {'status': 'RESERVED_BUDGET', 'best_canonical_candidate': None}
     models = []
     stream = _candidate_stream(session.experiment)
     for _ in range(model_budget):
@@ -205,7 +209,7 @@ def _optimize(session):
     # remains eligible; only HARD/runtime failures lack a ranking model result.
     selected = [models[0]] + [r for r in ranked if r.candidate_id != models[0].candidate_id and _metric(r) != math.inf]
     for model in selected:
-        if session.remaining <= 0 or session.remaining_mujoco <= 0:
+        if session.remaining <= reserve_evaluations or session.remaining_mujoco <= reserve_mujoco:
             break
         session.decision("validate_candidate", [model.candidate_id + "_evaluation.json"],
             "Policy model objective ranks candidates; baseline first, then ascending model error; actual MuJoCo decides acceptance.")
@@ -230,7 +234,9 @@ def _optimize(session):
         candidate = session.designs[model.candidate_id]
         candidate = candidate.model_dump() if hasattr(candidate, 'model_dump') else candidate
         candidate_table.append({"candidate_id": model.candidate_id,
-            "total_length_m": candidate['total_length_m'], "robot_ir_hash": model.robot_ir_hash,
+            **candidate, "controller_level": model.controller_level,
+            "physics_profile": policy.physics_profile, "evidence_level": "SIM_TO_SIM",
+            "robot_ir_hash": model.robot_ir_hash,
             "m1_predicted_error_m": model.model_metrics.get('predicted_position_error_m'),
             "entered_mujoco": bool(validations), "parent_experiment_id": session.run.record.run_id,
             "model_run_id": model.run_id, "model_status": model.status,
@@ -294,6 +300,7 @@ def _repair(session):
     policy = session.experiment.policy
     baseline = session.evaluate(session.experiment.baseline, "MUJOCO")
     current = baseline
+    incumbent = baseline
     decisions = []
     stream = _candidate_stream(session.experiment)
     next(stream)
@@ -319,17 +326,22 @@ def _repair(session):
             elif action == "synthesize_feedback":
                 current = session.evaluate(session.designs[current.candidate_id], "MUJOCO", "C2")
             elif action == "optimize_design":
-                session.run.save(f"repair_{iteration:04d}_optimization.json", _optimize(session))
+                reserve = len(policy.repair_actions[:policy.repair_iteration_budget]) - iteration - 1
+                session.run.save(f"repair_{iteration:04d}_optimization.json", _optimize(session,
+                    reserve_evaluations=reserve, reserve_mujoco=reserve))
             else:
                 session.run.save(f"repair_{iteration:04d}_sensitivity.json", _sensitivity(session))
             canonical = [r for r in session.results[before:] if r.canonical_task_status != "NOT_RUN"]
             if canonical:
                 current = min(canonical, key=lambda r: (r.canonical_task_status != "PASS", _metric(r, True)))
+                incumbent = min([incumbent, *canonical], key=lambda r: (_metric(r, True), r.candidate_id))
+                current = incumbent
             decisions.append({"iteration": iteration, "action": action, "authority": f"optimization_policy.yaml#repair_actions/{iteration}",
                               "evidence_read": evidence, "evaluations": len(session.results)-before, "causal_attribution": "UNKNOWN"})
             session.run.save("repair_decisions.json", decisions)
     return {"iterations": len(decisions), "iteration_budget": policy.repair_iteration_budget,
             "decisions": decisions, "last_canonical_task_status": current.canonical_task_status,
+            "best_canonical_candidate": incumbent.candidate_id,
             "causal_attribution": "UNKNOWN"}
 
 

@@ -1,0 +1,115 @@
+tools:
+  closeout_mechanics_solve:
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.mechanics_tools
+      callable: MechanicsTools.solve
+    inputs:
+    - AnalysisSpec
+    - live MatlabTools
+    - persistent solve ledger
+    outputs:
+    - actual equilibrium/dynamic/fit result or structured failure
+    supported_robot_families:
+    - tendon_driven_continuum
+    fidelity: independent planar one-mode surrogate analysis
+    assumptions:
+    - compiled V1 parameters; no calibration
+    - given nonnegative tension; no implicit length-to-tension mapping
+    applicable_when: Exact closeout authorization, valid planar AnalysisSpec and MATLAB
+      backend
+    limitations:
+    - No contact, catch task, out-of-plane mechanics or true-robot claim
+    - No main experiment physics writeback
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    - UNKNOWN
+    cost:
+      compute: static <=160 objective evaluations; dynamics <=4 seconds horizon and
+        30 seconds wall time
+    fields_consumed:
+    - AnalysisSpec SI fields
+    - RobotIR
+    - compiled mass/inertial frame/stiffness/damping
+    artifacts:
+    - caller saved parameter/result JSON
+    - persistent mechanics solve ledger
+    physics_contract_dependencies:
+    - closeout_analysis_v1.md
+    authorization_source: configs/experiments/round3_closeout_authorization.yaml
+  export_compiled_analysis_parameters:
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.mechanics_tools
+      callable: export_parameters
+    inputs:
+    - compiled XML
+    - RobotIR
+    outputs:
+    - SI parameter dictionary with XML hash and engine version
+    supported_robot_families:
+    - tendon_driven_continuum
+    fidelity: independent planar one-mode surrogate analysis
+    assumptions:
+    - compiled V1 parameters; no calibration
+    - given nonnegative tension; no implicit length-to-tension mapping
+    applicable_when: Exact closeout authorization, valid planar AnalysisSpec and MATLAB
+      backend
+    limitations:
+    - No contact, catch task, out-of-plane mechanics or true-robot claim
+    - No main experiment physics writeback
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    - UNKNOWN
+    cost:
+      compute: static <=160 objective evaluations; dynamics <=4 seconds horizon and
+        30 seconds wall time
+    fields_consumed:
+    - AnalysisSpec SI fields
+    - RobotIR
+    - compiled mass/inertial frame/stiffness/damping
+    artifacts:
+    - caller saved parameter/result JSON
+    - persistent mechanics solve ledger
+    physics_contract_dependencies:
+    - closeout_analysis_v1.md
+    authorization_source: configs/experiments/round3_closeout_authorization.yaml
+  resolve_closeout_analysis:
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.mechanics_tools
+      callable: resolve_analysis_capability
+    inputs:
+    - AnalysisSpec
+    outputs:
+    - authority/dependency/input resolution; no silent fallback
+    supported_robot_families:
+    - tendon_driven_continuum
+    fidelity: independent planar one-mode surrogate analysis
+    assumptions:
+    - compiled V1 parameters; no calibration
+    - given nonnegative tension; no implicit length-to-tension mapping
+    applicable_when: Exact closeout authorization, valid planar AnalysisSpec and MATLAB
+      backend
+    limitations:
+    - No contact, catch task, out-of-plane mechanics or true-robot claim
+    - No main experiment physics writeback
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
+    - UNKNOWN
+    cost:
+      compute: static <=160 objective evaluations; dynamics <=4 seconds horizon and
+        30 seconds wall time
+    fields_consumed:
+    - AnalysisSpec SI fields
+    - RobotIR
+    - compiled mass/inertial frame/stiffness/damping
+    artifacts:
+    - caller saved parameter/result JSON
+    - persistent mechanics solve ledger
+    physics_contract_dependencies:
+    - closeout_analysis_v1.md
+    authorization_source: configs/experiments/round3_closeout_authorization.yaml

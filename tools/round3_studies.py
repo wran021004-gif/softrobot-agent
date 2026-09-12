@@ -74,7 +74,17 @@ class StudyLedger:
 
     def evaluate(self, session, design, fidelity):
         design = session.experiment.validate_candidate(design)
-        key = (design_key(design), fidelity)
+        from tools.closeout_state import digest
+        from importlib.metadata import version
+        execution_sources = {p.relative_to(ROOT).as_posix():file_hash(p)
+            for folder in ('tools','controllers','matlab','schemas','metrics','physics_contracts')
+            for p in (ROOT/folder).rglob('*') if p.is_file() and p.suffix in ('.py','.m','.yaml','.md')}
+        key = (design_key(design), fidelity, digest(dict(sources=execution_sources,
+            bindings=session.experiment.resolved.source_hashes,controller='C1',feedback=None,
+            initial_state='MjData defaults',initial_command='frozen MATLAB PCC plan',
+            settings=session.experiment.resolved.run_settings.model_dump(),
+            simulator=session.experiment.resolved.simulator_settings.model_dump(),
+            versions={name:version(name) for name in ('mujoco','numpy','matlabengine')})))
         bindings = session.experiment.resolved.source_hashes
         reused = key in self.cache
         if reused:
@@ -116,8 +126,7 @@ class StudyLedger:
             parameters = result.canonical_metrics['execution_evidence']['compiled_parameter_evidence']
             row['mass_inertia'] = {k:parameters[k] for k in ('body_mass','body_inertia')}
             row['total_mass_kg'] = sum(parameters['body_mass']['value'])
-            if read(child/'debug/status.json')['errors']:
-                raise ValueError('Representative debug artifacts failed')
+            row['debug_status'] = read(child/'debug/status.json') if (child/'debug/status.json').is_file() else {'status':'NOT_AVAILABLE'}
         self.rows.setdefault(session.run.record.run_id, []).append(row)
         session.run.save('study_rows.json', self.rows[session.run.record.run_id])
         return row

@@ -1,0 +1,332 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "operation": {
+      "enum": [
+        "static",
+        "dynamic",
+        "fit"
+      ],
+      "title": "Operation",
+      "type": "string"
+    },
+    "n": {
+      "maximum": 24,
+      "minimum": 4,
+      "title": "N",
+      "type": "integer"
+    },
+    "length_m": {
+      "exclusiveMinimum": 0,
+      "maximum": 0.8,
+      "title": "Length M",
+      "type": "number"
+    },
+    "offset_yz_m": {
+      "items": {
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "title": "Offset Yz M",
+      "type": "array"
+    },
+    "mass_kg": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Mass Kg",
+      "type": "array"
+    },
+    "inertia_y_kg_m2": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Inertia Y Kg M2",
+      "type": "array"
+    },
+    "stiffness_nm_rad": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Stiffness Nm Rad",
+      "type": "array"
+    },
+    "damping_nm_s_rad": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Damping Nm S Rad",
+      "type": "array"
+    },
+    "gravity_m_s2": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Gravity M S2",
+      "type": "array"
+    },
+    "tension_n": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Tension N",
+      "type": "array"
+    },
+    "tip_force_n": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Tip Force N",
+      "type": "array"
+    },
+    "stiffness_scale": {
+      "maximum": 2,
+      "minimum": 0.5,
+      "title": "Stiffness Scale",
+      "type": "number"
+    },
+    "damping_scale": {
+      "maximum": 2,
+      "minimum": 0.5,
+      "title": "Damping Scale",
+      "type": "number"
+    },
+    "source": {
+      "additionalProperties": true,
+      "title": "Source",
+      "type": "object"
+    },
+    "duration_s": {
+      "default": 2,
+      "exclusiveMinimum": 0,
+      "maximum": 4,
+      "title": "Duration S",
+      "type": "number"
+    },
+    "sample_dt_s": {
+      "default": 0.01,
+      "maximum": 0.1,
+      "minimum": 0.001,
+      "title": "Sample Dt S",
+      "type": "number"
+    },
+    "initial_q_rad": {
+      "default": 0,
+      "maximum": 2.8,
+      "minimum": -2.8,
+      "title": "Initial Q Rad",
+      "type": "number"
+    },
+    "initial_velocity_rad_s": {
+      "default": 0,
+      "maximum": 10,
+      "minimum": -10,
+      "title": "Initial Velocity Rad S",
+      "type": "number"
+    },
+    "pulse_start_s": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pulse Start S"
+    },
+    "pulse_end_s": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pulse End S"
+    },
+    "pulse_force_n": {
+      "anyOf": [
+        {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pulse Force N"
+    },
+    "pulse_tension_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pulse Tension N"
+    },
+    "input_time_s": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Input Time S"
+    },
+    "input_tension_n": {
+      "anyOf": [
+        {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Input Tension N"
+    },
+    "train_q_rad": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Train Q Rad"
+    },
+    "train_force_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Train Force N"
+    },
+    "validation_q_rad": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Validation Q Rad"
+    },
+    "validation_force_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Validation Force N"
+    }
+  },
+  "required": [
+    "operation",
+    "n",
+    "length_m",
+    "offset_yz_m",
+    "mass_kg",
+    "inertia_y_kg_m2",
+    "stiffness_nm_rad",
+    "damping_nm_s_rad",
+    "gravity_m_s2",
+    "tension_n",
+    "tip_force_n",
+    "stiffness_scale",
+    "damping_scale",
+    "source"
+  ],
+  "title": "AnalysisSpec",
+  "type": "object"
+}

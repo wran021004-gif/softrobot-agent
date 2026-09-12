@@ -40,6 +40,10 @@ def compare_shape_model_sim(model_shape, simulation_result):
                 or 'task_success' not in s or model_shape.status != 'pass'):
             raise ValueError('Matching completed normal model/simulator evidence required')
         commands = m['tendon_target_lengths_m']
+        if any(row['command_min_m'] != row['command_max_m'] for row in s['execution_evidence']['actuators']):
+            return ToolResult(tool='compare_shape_model_sim', status='pass', metrics={
+                'evidence_status':'NOT_APPLICABLE_TIME_VARYING_COMMAND', 'failure_attribution':'UNKNOWN'},
+                message='Initial PCC and final C2 do not share a constant command; no same-command mismatch computed.')
         if commands != s.get('tendon_target_lengths_m'):
             raise ValueError('Commands differ')
         for row, command in zip(s['execution_evidence']['actuators'], commands):

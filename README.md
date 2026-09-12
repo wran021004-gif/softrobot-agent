@@ -1,19 +1,24 @@
 # Softrobot deterministic research harness
 
-Round 3 FINAL establishes the reusable [V1 surrogate design envelope](docs/design_envelope.md),
-geometric actuation analysis and normal-artifact shape comparison. Its staged
-study uses `python examples/run_round3_final.py`; see [results](docs/round3_final_result.md).
-Historical approval blockers below are superseded only within this envelope.
+Current closeout implements a persistent bounded campaign with fixed C1/C2 pairs,
+normal trajectories, independent MATLAB reduced mechanics and offline evidence audit.
+See [closeout entry and capability matrix](docs/round3_closeout_tools.md),
+[validation](docs/round3_closeout_validation.md) and [research result](docs/round3_deterministic_closeout_result.md).
+The [V1 design envelope](docs/design_envelope.md) remains authoritative; the
+[closeout authorization](configs/experiments/round3_closeout_authorization.yaml) adds
+only this session's fixed C2 and independent surrogate analysis permissions.
+The [Round 3 FINAL report](docs/round3_final_result.md) and its artifacts are historical,
+immutable evidence. Do not rerun its five studies to validate the closeout.
 
 Round 3.1 adds optional `--debug` and `--visualize` observability and a Human-approved,
 file-scoped total-length experiment for reach_free. See [debug usage](docs/debug_visualization.md)
 and [Round 3.1 results](docs/round3_1_result.md). The Round 3 authorization status
-below is historical; general optimization and C2 remain unapproved.
+below is historical; permissions outside the envelope/closeout scope remain restricted.
 
 Round 3 adds policy-authorized deterministic multi-fidelity candidate evaluation,
 bounded design search, PCC tip feedback, sensitivity evidence and a bounded repair
-loop. Real numerical experiments remain pending Human approval; production grammar
-authorization and frozen benchmark truth are unchanged. See [execution/authority contracts](docs/round3_experiments.md)
+loop. These capabilities are implemented; executable experiment authority is checked
+against each policy and its scoped approval. Frozen benchmark truth is unchanged. See [execution/authority contracts](docs/round3_experiments.md)
 and [required Human decisions](proposals/engineer/round3_human_decisions.md).
 
 This repository runs a tendon-driven continuum V1 research pipeline without any
@@ -30,13 +35,13 @@ In the current Windows setup:
 ```powershell
 conda activate softagent
 python examples/run_reach_pipeline.py
-python -m unittest discover -s tests -v
 $env:SOFTROBOT_TEST_MATLAB = "1"
 python -m unittest discover -s tests -v
 ```
 
-The first test command skips the three real MATLAB tests unless enabled. The
-second includes them. Temporary test runs live under runs/ and are cleaned up.
+Enable real MATLAB before the single full regression. For this closeout use
+`python examples/validate_closeout.py full-suite`, which records and enforces the
+one-full-suite allowance. Temporary test runs live under runs/ and are cleaned up.
 MATLAB requires a working licensed local installation and process-launch access.
 Python's Expat is still loaded before MATLAB DLLs on Windows.
 
@@ -137,10 +142,10 @@ Memory may summarize these facts later but must retain evidence links.
 ## Capability boundaries and open science
 
 Implemented: spec validation/IR compiler; M0 geometric screening and M1 PCC;
-C0 passive and C1 fixed length execution; deterministic MuJoCo compilation,
+C0 passive, C1 fixed length and scoped C2 feedback execution; deterministic MuJoCo compilation,
 finite-state checks and final reach evaluation; artifacts and deterministic resolver.
-Planned manifests contain no callable: extended mechanics/dynamics, optimization,
-feedback/model-based control, advanced diagnostics, general metrics and learning. Future
+Bounded optimization, diagnostics and independent one-mode MATLAB mechanics have callable
+implementations; general continuum mechanics, model-based control and learning remain planned. Future
 catch_drop/catch_ramp/stabilize_tip have no executable task package. reach_window
 has an executable NON_CANONICAL development fixture; benchmark geometry awaits Human approval.
 
@@ -174,13 +179,12 @@ Neither is a validated continuum material law. Resolved contact and numerical
 engine defaults are also recorded with version. Task/environment facts, controller
 commands, simulator settings and run duration stay separate categories.
 
-Optimization approval lives in the existing family grammar. There are currently
-**no approved optimization variables or bounds**. Human defines the allowed set,
-bounds/units/constraints, provenance and objective authority. Engineer selects
-approved names; a future optimizer supplies bounded values. Selection/candidate
-validators reject unauthorized fields/changes, and Coding permissions protect
-policy/objective/tolerance/benchmark. optimize_design and run_parameter_sensitivity
-remain PLANNED; no optimizer or retuning is implemented.
+Optimization approval now includes the referenced V1 surrogate envelope for length,
+tendon routing radius and tendon count. Earlier Round 1 reports retain their historical
+unapproved status. Selection/candidate validators reject unauthorized fields/changes;
+`optimize_design` and `run_parameter_sensitivity` are implemented. The closeout parent
+reserves stage budgets independently and preserves the global and per-controller best.
+No automatic physical retuning is implemented.
 
 Coding permissions are an application-level contract, not OS/process isolation.
 Before autonomous Coding LLM writes, add an isolated worktree, permission-enforcing
