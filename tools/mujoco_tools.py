@@ -157,9 +157,17 @@ def run_task(
                 raise ValueError("reach_window execution requires its EnvironmentSpec")
             window_evidence = WindowEvidence(model, constrained_window(environment, task))
         commands = None
+        # Enabled feedback observes current qpos on a separate kinematics buffer.
+        # It never calls mj_forward or changes warm starts on the executed data.
+        observation_data = mujoco.MjData(model) if getattr(controller, "requires_tip_observation", False) else None
         for step in range(settings.steps):
             try:
-                command = controller.command(float(data.time), {"qpos": data.qpos.tolist(), "qvel": data.qvel.tolist()}) if controller else None
+                observation = {"qpos": data.qpos.tolist(), "qvel": data.qvel.tolist()}
+                if observation_data is not None:
+                    observation_data.qpos[:] = data.qpos
+                    mujoco.mj_kinematics(model, observation_data)
+                    observation.update(step=step, tip_position_m=observation_data.site_xpos[tip_site_id].tolist())
+                command = controller.command(float(data.time), observation) if controller else None
                 commands = list(command.tendon_target_lengths_m) if command is not None else None
             except Exception as exc:
                 return ToolResult(
@@ -171,6 +179,8 @@ def run_task(
                 or not all(math.isfinite(value) and value > 0 for value in commands)
                 or any(value != mujoco.mjtTrn.mjTRN_TENDON for value in model.actuator_trntype)
                 or any(int(model.actuator_trnid[i, 0]) != i for i in range(model.nu))
+                or any(model.actuator_ctrllimited[i] and not model.actuator_ctrlrange[i, 0] <= commands[i] <= model.actuator_ctrlrange[i, 1]
+                       for i in range(model.nu))
             ):
                 return ToolResult(
                     status="fail", tool="run_task", failure_code="INVALID_TENDON_COMMAND",

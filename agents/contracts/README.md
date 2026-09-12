@@ -1,5 +1,11 @@
 # Authority boundary
 
+Round 3 adds ExperimentPolicy and deterministic candidate/search/feedback/sensitivity/
+repair consumers; see ../../docs/round3_experiments.md. Historical notes below describe
+earlier stages. optimize_design, synthesize_feedback and run_parameter_sensitivity
+now have callable implementations and artifact contracts; production experiments
+remain BLOCKED_FOR_HUMAN_APPROVAL. No role write scope or scientific authority expands.
+
 Human defines scientific semantics and approves immutable truth. Engineer proposes
 routes/designs, Coding implements approved rules, Diagnosis attributes failures
 from evidence. Numerical tools compute; canonical gates decide outcomes.

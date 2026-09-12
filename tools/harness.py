@@ -33,7 +33,7 @@ def _save_gate_summary(run, final_status, failure_code, stage, environment):
         "final_status": final_status, "failure_code": failure_code,
         "task_truth_status": environment.truth_status if environment is not None else None,
         "task_contract_id": run.record.task_contract_id, "task_contract_status": run.record.task_contract_status,
-        "termination": "HARD_FAIL" if hard else "CANONICAL_RESULT" if canonical else "EXECUTION_ERROR",
+        "termination": "HARD_FAIL" if hard else "CANONICAL_RESULT" if canonical else "MODEL_ONLY" if final_status == "MODEL_ONLY" else "EXECUTION_ERROR",
         "stopped_by": hard, "last_stage": stage,
         "screening_failures": [g["operation"] for g in gates if g["gate_type"] == "SCREENING" and g["decision"] == "FAIL"],
         "canonical_result": ("FAIL" if any(g["decision"] == "FAIL" for g in canonical) else "PASS") if canonical else "NOT_RUN",
@@ -46,7 +46,7 @@ def _snapshot_sources(run, extra_paths=()):
     paths = []
     for folder in ("schemas", "tools", "controllers", "metrics", "matlab", "capabilities", "physics_contracts", "tasks", "benchmarks", "agents", "configs", "skills", "memory"):
         paths.extend(p for p in (ROOT / folder).rglob("*") if p.is_file() and p.suffix in (".py", ".m", ".yaml", ".md", ".xml", ".json"))
-    paths.extend((ROOT / name) for name in ("requirements.txt", "examples/run_reach_pipeline.py"))
+    paths.extend((ROOT / name) for name in ("requirements.txt", "examples/run_reach_pipeline.py", "examples/run_experiment.py"))
     paths.extend(p for p in (ROOT / "tests/fixtures/reach_window_dev").rglob("*") if p.is_file())
     paths.extend(extra_paths)
     hashes = {}
@@ -61,12 +61,15 @@ def _snapshot_sources(run, extra_paths=()):
 
 
 def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "configs/design_tendon_arm.yaml",
-              run_root=ROOT / "runs", *, matlab_factory=None, previous_run_id=None, relationship=None):
+              run_root=ROOT / "runs", *, matlab_factory=None, previous_run_id=None, relationship=None,
+              fidelity="MUJOCO", experiment_path=None, controller_level="C1", experiment_context=None):
     run = create_run(run_root, previous_run_id=previous_run_id, relationship=relationship)
     matlab = None
     environment = None
     clearance = None
     resolved_contract = None
+    experiment = None
+    controller = None
     final_status, failure_code = "ERROR", "UNKNOWN"
     stage = "spec_gate"
     try:
@@ -74,7 +77,26 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
         if (package / "contract.yaml").is_file():
             from tools.task_contract_tools import resolve_task_contract
             resolved_contract = resolve_task_contract(package)
+        if fidelity not in ("M0", "M1", "MUJOCO") or controller_level not in ("C1", "C2"):
+            raise ValueError("CAPABILITY_MISSING: unsupported evaluation route")
+        if experiment_path is not None:
+            from tools.experiment_policy_tools import validate_experiment_policy
+            experiment = validate_experiment_policy(experiment_path)
+            if not resolved_contract or resolved_contract.manifest_hash != experiment.resolved.manifest_hash:
+                raise ValueError("Experiment TaskContract mismatch")
+            model_level = "M0" if fidelity == "M0" else "M1"
+            if model_level not in experiment.policy.allowed_model_levels or controller_level not in experiment.policy.allowed_controller_levels:
+                raise ValueError("Evaluation route is not authorized by policy")
+            if fidelity == "MUJOCO" and experiment.policy.mujoco_validation_budget == 0:
+                raise ValueError("No authorized MuJoCo validation budget")
+            (run.path / "optimization_policy.yaml").write_bytes(experiment.path.read_bytes())
+            run.save("experiment_context.json", {"policy_hash": experiment.policy_hash,
+                "scope": experiment.policy.scientific_status, **(experiment_context or {})})
+        elif fidelity != "MUJOCO" or controller_level != "C1":
+            raise ValueError("BLOCKED_FOR_HUMAN_APPROVAL: optional routes require ExperimentPolicy")
         extra = (resolved_contract.manifest_path, *resolved_contract.source_paths.values()) if resolved_contract else ()
+        if experiment:
+            extra += tuple(experiment.input_hashes)
         _snapshot_sources(run, extra)
         if resolved_contract:
             resolved = resolved_contract
@@ -129,6 +151,8 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                 **task.window_acceptance().model_dump(mode="json"),
             })
         design = validate_design(load_yaml(run.path / "design_input.yaml"))
+        if experiment:
+            experiment.validate_candidate(design)
         run.events.emit("SPEC_VALIDATED", "design_loaded", status="pass", evidence_refs=run.events.refs("design_input.yaml"))
         if resolved_contract:
             simulator, settings = resolved_contract.simulator_settings, resolved_contract.run_settings
@@ -146,6 +170,12 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             evidence_refs=run.events.refs("task.yaml", "environment.yaml", "design_input.yaml"))
         stage = "design_grammar_gate"
         requested = ("analyze_workspace", "plan_pcc_reach", "compile_mujoco", "run_task")
+        if fidelity == "M0":
+            requested = ("analyze_workspace",)
+        elif fidelity == "M1":
+            requested = ("analyze_workspace", "plan_pcc_reach")
+        if controller_level == "C2":
+            requested += ("synthesize_feedback",)
         if constrained:
             requested += ("analyze_clearance", "check_collision")
         resolution = resolve_capability(design, requested,
@@ -199,6 +229,10 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             provenance["metrics"] = "metrics/reach.py: target tolerance AND required initial side AND final full-slab aperture crossing AND no forbidden sampled window contact; " + environment.truth_status
         if resolved_contract:
             provenance["metrics"] = resolved_contract.contract.evaluator + " <- task_contract.yaml; exact evaluator source in source_snapshot.zip"
+        if experiment:
+            provenance["experiment"] = {"policy_hash": experiment.policy_hash,
+                "policy_source": "optimization_policy.yaml", "context_source": "experiment_context.json",
+                "scope": experiment.policy.scientific_status, "requested_fidelity": fidelity}
         run.save("provenance.json", provenance)
         stage = "model"
         if matlab_factory is None:
@@ -235,6 +269,11 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                 final_status = failure_code = "DESIGN_INFEASIBLE"
                 model_stage.update(status="fail", failure_code=failure_code)
                 return run
+            if fidelity == "M0":
+                run.save("metrics.json", {"model": workspace.metrics, "mujoco": {}})
+                run.update(model_level="M0", control_level="C0")
+                final_status, failure_code = "MODEL_ONLY", None
+                return run
             def plan_call():
                 result = matlab.plan_pcc_reach(robot_ir, task, environment)
                 return result.model_copy(update={"metrics": {**result.metrics, "comparison_context": comparison_context}})
@@ -268,11 +307,23 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                               value=not feasible, threshold=False, comparison="==",
                               decision="PASS" if feasible else "FAIL", authority="Geometric screening only; continue simulation for evidence, no canonical override"),
                     evidence_refs=run.events.refs("clearance_result.json", "environment.yaml"))
+        if fidelity == "M1":
+            run.save("metrics.json", {"model": plan.metrics, "mujoco": {},
+                                      **({"clearance": clearance.metrics} if clearance else {})})
+            run.update(control_level="C0")
+            final_status, failure_code = "MODEL_ONLY", None
+            return run
         from controllers.open_loop_length import OpenLoopLength
         controller = OpenLoopLength(plan.metrics["tendon_target_lengths_m"])
+        if controller_level == "C2":
+            from controllers.pcc_tip_feedback import synthesize_feedback
+            controller = synthesize_feedback(robot_ir, task, plan, experiment)
+            run.save("feedback_controller.json", controller.artifact)
+            run.update(control_level="C2")
+            provenance["controller"] = "feedback_controller.json; actual MuJoCo tip feedback; parameters from optimization_policy.yaml"
         run.save("tendon_command.json", controller.target)
         run.save("controller.json", controller.result())
-        run.events.emit("CONTROL_SELECTED", "open_loop_length", status="pass", summary={"control_level": "C1"},
+        run.events.emit("CONTROL_SELECTED", controller.spec.controller, status="pass", summary={"control_level": controller.spec.level},
                         evidence_refs=run.events.refs("model_result.json", "controller.json", "tendon_command.json"))
         provenance["parameters"] = parameter_provenance(design, robot_ir, task, environment, simulator, settings, controller.target)
         run.save("provenance.json", provenance)
@@ -301,7 +352,7 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             # A failed task can still be a completed simulation stage.
             sim_stage.update(status="pass" if "task_success" in result.metrics else "fail")
             if "actuator_controls" in result.metrics:
-                run.events.emit("CONTROL_APPLIED", "open_loop_length", status="pass",
+                run.events.emit("CONTROL_APPLIED", controller.spec.controller, status="pass",
                                 evidence_refs=run.events.refs("controller.json", "mujoco_result.json"))
         if "execution_evidence" in result.metrics:
             provenance["compiled_engine_parameters"] = result.metrics["execution_evidence"]["compiled_parameter_evidence"]
@@ -368,6 +419,11 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                 ("error.json",))
         return run
     finally:
+        if controller is not None and hasattr(controller, "updates"):
+            run.save("feedback_updates.json", controller.updates)
+            run.events.emit("CONTROL_APPLIED", "feedback_update_summary", status="recorded",
+                summary={"updates": len(controller.updates)},
+                evidence_refs=run.events.refs("feedback_controller.json", "feedback_updates.json"))
         if matlab is not None:
             try:
                 with run.events.span("matlab_cleanup", kind="TOOL", actor="tool"):

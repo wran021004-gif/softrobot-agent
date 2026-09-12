@@ -132,7 +132,7 @@ class CapabilityTests(unittest.TestCase):
         self.assertEqual(resolve_capability(design(segments=6, tendon_count=3)).state, "PARAMETRICALLY_SUPPORTED")
         self.assertEqual(resolve_capability(design(robot_family="other")).state, "OUT_OF_GRAMMAR")
         self.assertEqual(resolve_capability(design(sections=2)).state, "OUT_OF_GRAMMAR")
-        self.assertEqual(resolve_capability(design(), ["optimize_design"]).state, "IMPLEMENTATION_REQUIRED")
+        self.assertEqual(resolve_capability(design(), ["fit_model_parameters"]).state, "IMPLEMENTATION_REQUIRED")
         self.assertEqual(resolve_capability(design(), ["missing_tool"]).state, "IMPLEMENTATION_REQUIRED")
         self.assertEqual(resolve_capability(design(), physics_profile="new_stiffness_law").state, "PHYSICS_ASSUMPTION_REQUIRED")
         self.assertEqual(resolve_capability(design(), model_level="M2").state, "IMPLEMENTATION_REQUIRED")

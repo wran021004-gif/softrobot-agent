@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "JsonValue": {}
+  },
+  "additionalProperties": false,
+  "properties": {
+    "candidate_id": {
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "parent_experiment_id": {
+      "title": "Parent Experiment Id",
+      "type": "string"
+    },
+    "policy_id": {
+      "title": "Policy Id",
+      "type": "string"
+    },
+    "policy_hash": {
+      "title": "Policy Hash",
+      "type": "string"
+    },
+    "task_contract_id": {
+      "title": "Task Contract Id",
+      "type": "string"
+    },
+    "scope": {
+      "enum": [
+        "HUMAN_APPROVED",
+        "TEST_ONLY"
+      ],
+      "title": "Scope",
+      "type": "string"
+    },
+    "fidelity": {
+      "enum": [
+        "M0",
+        "M1",
+        "MUJOCO"
+      ],
+      "title": "Fidelity",
+      "type": "string"
+    },
+    "controller_level": {
+      "enum": [
+        "C1",
+        "C2"
+      ],
+      "title": "Controller Level",
+      "type": "string"
+    },
+    "design_hash": {
+      "title": "Design Hash",
+      "type": "string"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    },
+    "run_manifest_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Manifest Hash"
+    },
+    "robot_ir_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Robot Ir Hash"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    },
+    "model_metrics": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Model Metrics",
+      "type": "object"
+    },
+    "canonical_metrics": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Canonical Metrics",
+      "type": "object"
+    },
+    "canonical_task_status": {
+      "default": "NOT_RUN",
+      "enum": [
+        "PASS",
+        "TASK_FAILED",
+        "NOT_RUN"
+      ],
+      "title": "Canonical Task Status",
+      "type": "string"
+    },
+    "failure_message": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Failure Message"
+    }
+  },
+  "required": [
+    "candidate_id",
+    "parent_experiment_id",
+    "policy_id",
+    "policy_hash",
+    "task_contract_id",
+    "scope",
+    "fidelity",
+    "controller_level",
+    "design_hash",
+    "status"
+  ],
+  "title": "CandidateEvaluation",
+  "type": "object"
+}

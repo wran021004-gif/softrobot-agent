@@ -28,10 +28,10 @@ tools:
     - tendon_routing_radius_m
     task_fields_used:
     - target_m
+    - environment_id
     currently_ignored_task_fields:
     - task_id
     - task_type
-    - environment_id
     - position_error_max_m
     fidelity:
       level: M0
@@ -52,7 +52,9 @@ tools:
     - Does not consider stiffness, obstacles, or dynamics.
     - Does not consider actuation feasibility.
     - Reachable does not imply MuJoCo task success.
-    - M0 retains the exact-point norm(target)<=L observation. Harness workspace_gate uses L plus TaskSpec tolerance as the HARD necessary task bound; M0 status alone is not that gate.
+    - M0 retains the exact-point norm(target)<=L observation. Harness workspace_gate
+      uses L plus TaskSpec tolerance as the HARD necessary task bound; M0 status alone
+      is not that gate.
     - Engine startup and execution exceptions propagate without a ToolResult.
     - RobotIR mechanics, segment discretization and environment gravity/objects are
       not part of this kinematic calculation.
@@ -70,6 +72,7 @@ tools:
     - EnvironmentSpec.coordinate_frame
     - EnvironmentSpec.environment_id
     - TaskSpec.target_m
+    - TaskSpec.environment_id
     physics_contract_dependencies:
     - coordinate_frames.md
     - tendon_driven_pcc_v1.md
@@ -84,6 +87,15 @@ tools:
     - ToolResult
     exception_policy: Schema/IR/contract validation exceptions propagate; Harness
       records stage and message.
+    environment_fields_used:
+    - environment_id
+    - coordinate_frame
+    environment_fields_omitted_from_equations:
+    - gravity_m_s2
+    - objects
+    - lights
+    gate_semantics: M0 exact-point observation is not canonical; Harness HARD necessity
+      uses norm(target-base)<=L+TaskSpec tolerance; runtime completion is HARD.
   plan_pcc_reach:
     implementation:
       module: tools.matlab_tools
@@ -116,10 +128,10 @@ tools:
     task_fields_used:
     - target_m
     - position_error_max_m
+    - environment_id
     currently_ignored_task_fields:
     - task_id
     - task_type
-    - environment_id
     fidelity:
       level: M1
       model: single_section_PCC_kinematics
@@ -139,7 +151,8 @@ tools:
       tendon_order: tendon_0 through tendon_N-1
       pass_condition: Finite prediction and positive finite commands; model_task_success
         may be false.
-      gate_semantics: Tool execution is HARD; model_task_success is SCREENING and failure continues to MuJoCo.
+      gate_semantics: Tool execution is HARD; model_task_success is SCREENING and
+        failure continues to MuJoCo.
       metrics:
         theta_rad: float
         phi_rad: float
@@ -178,6 +191,7 @@ tools:
     - RobotIR.tendon_routes.angle_rad
     - RobotIR.tendon_routing_radius_m
     - TaskSpec.position_error_max_m
+    - TaskSpec.environment_id
     physics_contract_dependencies:
     - coordinate_frames.md
     - tendon_driven_pcc_v1.md
@@ -192,37 +206,71 @@ tools:
     - ToolResult
     exception_policy: Schema/IR/contract validation exceptions propagate; Harness
       records stage and message.
+    environment_fields_used:
+    - environment_id
+    - coordinate_frame
+    environment_fields_omitted_from_equations:
+    - gravity_m_s2
+    - objects
+    - lights
+    gate_semantics: Execution/finite positive commands HARD; model prediction SCREENING;
+      no canonical acceptance.
   analyze_clearance:
     implementation_status: IMPLEMENTED
-    gate_semantics: Completed geometric prediction is SCREENING; a tool execution failure is distinct and HARD.
+    gate_semantics: Completed geometric prediction is SCREENING; a tool execution
+      failure is distinct and HARD.
     implementation:
       module: tools.matlab_tools
       callable: MatlabTools.analyze_clearance
       backend: matlab/analyze_clearance.m
-    inputs: [RobotIR, TaskSpec, EnvironmentSpec, PCC ToolResult]
-    outputs: [ToolResult with conservative minimum clearance, intersection, closest sample/segment/bar, aperture crossing and centreline]
+    inputs:
+    - RobotIR
+    - TaskSpec
+    - EnvironmentSpec
+    - PCC ToolResult
+    outputs:
+    - ToolResult with conservative minimum clearance
+    - intersection
+    - closest sample/segment/bar
+    - aperture crossing and centreline
     supported_robot_families: &id001
     - tendon_driven_continuum
-    fidelity: {level: low, model: geometric_PCC_swept_radius}
+    fidelity:
+      level: low
+      model: geometric_PCC_swept_radius
     assumptions:
     - Single-section PCC, fixed world origin, exactly one y-z window normal to +x.
     - Window box centres/half sizes are passed from the shared EnvironmentSpec parser.
-    applicable_when: Completed M1 plan for reach_window, including NON_CANONICAL development fixtures.
+    applicable_when: Completed M1 plan for reach_window, including NON_CANONICAL development
+      fixtures.
     limitations:
-    - PCC shape approximation; no gravity, dynamics, floor, actuation feasibility or validated physical collision prediction.
-    - Minimum is a conservative lower bound using half the arc sample spacing; a negative bound alone is not proof of intersection.
-    - Closest sample/segment identifies the sampled minimum, not an exact continuous minimizer.
+    - PCC shape approximation; no gravity, dynamics, floor, actuation feasibility
+      or validated physical collision prediction.
+    - Minimum is a conservative lower bound using half the arc sample spacing; a negative
+      bound alone is not proof of intersection.
+    - Closest sample/segment identifies the sampled minimum, not an exact continuous
+      minimizer.
     - Tool pass means analysis completed, not clearance or task success.
-    failure_codes: [CAPABILITY_MISSING, PHYSICS_ASSUMPTION_REQUIRED]
+    failure_codes:
+    - CAPABILITY_MISSING
+    - PHYSICS_ASSUMPTION_REQUIRED
     exception_policy: Input or MATLAB failures propagate to the existing Harness.
-    cost: {compute: low, note: Linear in PCC sample count and four window bars; MATLAB session reused.}
+    cost:
+      compute: low
+      note: Linear in PCC sample count and four window bars; MATLAB session reused.
     fields_consumed:
     - RobotIR.section.length_m / body_radius_m / segments / coordinate_frame
     - TaskSpec.task_type / target_m / environment_id
     - EnvironmentSpec.window dimensions, position and plane
     - model_result theta_rad / phi_rad / comparison_context
-    artifacts: [clearance_result.json]
-    physics_contract_dependencies: [coordinate_frames.md, tendon_driven_pcc_v1.md]
+    artifacts:
+    - clearance_result.json
+    physics_contract_dependencies:
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    equations: Sample PCC centreline; min signed point-box distance - body radius
+      - half arc spacing; shared window_boxes and aperture_crossing; see matlab/analyze_clearance.m
+      and tools/window_geometry.py.
   analyze_actuation:
     implementation_status: PLANNED
     inputs:
@@ -346,3 +394,42 @@ tools:
     physics_contract_dependencies: []
     contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
       require approval before promotion
+  pcc_sensitivity:
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.pcc_math
+      callable: pcc_sensitivity
+    inputs:
+    - RobotIR
+    - theta_rad
+    - phi_rad
+    outputs:
+    - ToolResult
+    fields_consumed:
+    - RobotIR.section.length_m
+    - RobotIR.tendon_routes.angle_rad
+    - RobotIR.tendon_routing_radius_m
+    artifacts:
+    - pcc_sensitivity.json (caller persists)
+    fidelity: M1 geometric differential
+    supported_robot_families:
+    - tendon_driven_continuum
+    physics_contract_dependencies:
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - coordinate_frames.md
+    assumptions:
+    - Direct mathematical derivative of approved single-section PCC and tendon equations;
+      analytic straight limit.
+    applicable_when: Valid RobotIR and bend on approved PCC branch; no design perturbation
+      or gain selection.
+    limitations:
+    - No real robot validation, convergence guarantee or causal attribution.
+    - No canonical success from model predictions; no TaskContract or Skill mutation.
+    failure_codes:
+    - PHYSICS_ASSUMPTION_REQUIRED
+    - CAPABILITY_MISSING
+    - UNKNOWN
+    cost:
+      compute: O(tendon_count); no MATLAB startup or simulation
+    gate_semantics: MODEL/SCREENING derivative evidence only; no task success decision.

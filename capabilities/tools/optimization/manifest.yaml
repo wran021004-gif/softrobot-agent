@@ -2,33 +2,49 @@ bundle_name: optimization
 version: '1'
 tools:
   optimize_design:
-    implementation_status: PLANNED
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.experiment_tools
+      callable: optimize_design
     inputs:
-    - frozen task
-    - grammar
-    - objective
-    - design variables
+    - Human-owned ExperimentPolicy path
     outputs:
-    - design candidate
-    - evidence
-    supported_robot_families: &id001
+    - RunArtifacts; optimization_summary.json
+    fields_consumed:
+    - ExperimentPolicy.*
+    - DesignSpec.*
+    - TaskContract references
+    artifacts:
+    - optimization_policy.yaml
+    - optimization_history.jsonl
+    - optimization_summary.json
+    - candidate_*_design.yaml
+    - candidate_*_evaluation.json
+    - candidate_*_run_reference.json
+    fidelity: M1 ranking / MUJOCO canonical
+    supported_robot_families:
     - tendon_driven_continuum
-    fidelity: unimplemented; no numerical claims
+    physics_contract_dependencies:
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - coordinate_frames.md
     assumptions:
-    - Requires Human-approved scientific semantics before implementation.
-    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    - Single-section approved PCC geometry only; no new mechanical law or tuned defaults.
+    - Numerical experiments require file-owned policy and approved grammar; TEST_ONLY
+      cannot execute frozen tasks.
+    applicable_when: Explicit supported route and numerical authorization; real experiments
+      currently blocked pending Human approval.
     limitations:
-    - No callable and no fabricated results.
+    - No real robot validation, convergence guarantee or causal attribution.
+    - No canonical success from model predictions; no TaskContract or Skill mutation.
     failure_codes:
-    - CAPABILITY_MISSING
     - PHYSICS_ASSUMPTION_REQUIRED
+    - CAPABILITY_MISSING
+    - UNKNOWN
     cost:
-      compute: unknown until implemented
-    fields_consumed: []
-    artifacts: []
-    physics_contract_dependencies: []
-    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
-      require approval before promotion
+      compute: bounded by explicit policy budgets
+    gate_semantics: HARD input/execution legality; SCREENING model evidence; existing
+      MUJOCO evaluator alone is CANONICAL
   fit_model_parameters:
     implementation_status: PLANNED
     inputs:
@@ -38,7 +54,8 @@ tools:
     outputs:
     - fit
     - uncertainty
-    supported_robot_families: *id001
+    supported_robot_families:
+    - tendon_driven_continuum
     fidelity: unimplemented; no numerical claims
     assumptions:
     - Requires Human-approved scientific semantics before implementation.

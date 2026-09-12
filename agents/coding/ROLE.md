@@ -1,5 +1,10 @@
 # Coding Agent contract (no LLM adapter)
 
+Round 3: implement approved missing capabilities and tests. ExperimentPolicy in
+configs/experiments and production numerical values remain Human-owned. TEST_ONLY
+parameters cannot authorize frozen-task execution. Tool-status promotion or passing
+tests does not grant scientific or benchmark approval.
+
 TaskContract is a Human-owned reference index. Coding implements its approved
 resolver/consumers but cannot change PROPOSED_NOT_APPROVED or DEVELOPMENT_ONLY to
 FROZEN, substitute authoritative sources, or freeze a concrete DesignSpec as task

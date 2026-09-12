@@ -35,7 +35,7 @@ def resolve_capability(design, requested_tools=(), physics_profile="legacy_v1_su
             return Resolution(state=CapabilityState.OUT_OF_GRAMMAR, reason=f"{name} outside approved grammar")
     if physics_profile != "legacy_v1_surrogate":
         return Resolution(state=CapabilityState.PHYSICS_ASSUMPTION_REQUIRED, reason="Requested physics profile has no approved contract")
-    if model_level not in ("M0", "M1") or control_level not in ("C0", "C1"):
+    if model_level not in ("M0", "M1") or control_level not in ("C0", "C1", "C2"):
         return Resolution(state=CapabilityState.IMPLEMENTATION_REQUIRED, reason="Requested model/control level is not implemented")
     if design.sections != 1:
         return Resolution(state=CapabilityState.IMPLEMENTATION_REQUIRED, reason="Grammar permits design but V1 compiler implements sections=1 only")

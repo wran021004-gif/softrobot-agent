@@ -58,7 +58,9 @@ y-z apertures are implemented, and no frozen window benchmark is approved yet.
 Multi-section physics, tapered radius, variable/material-derived stiffness,
 Cosserat/FEM models, and interchangeable end-effectors remain unsupported.
 They require implementation and matching metadata before being exposed as
-supported choices. Agent role/output/permission contracts are present; no LLM runtime, RL or design optimizer is implemented.
+supported choices. Agent contracts have no LLM runtime or RL. Round 3 implements
+bounded design search and C2 feedback infrastructure behind ExperimentPolicy;
+real numerical experiments still require Human approval.
 
 DesignSpec is compiled once into shared RobotIR; both MATLAB and MuJoCo consume
 its physical structure. See ../../../physics_contracts/ for approved mappings
@@ -68,4 +70,7 @@ Optimization metadata lives alongside each field in grammar.yaml. All current
 fields are optimizable=false: executable type/positivity checks and example values
 do not approve scientific search bounds. Human defines bounds and objective
 authority; Engineer may only select approved names. See agents/contracts/optimization.py
-for deterministic selection/candidate checks. optimize_design remains PLANNED.
+for deterministic selection/candidate checks. optimize_design is IMPLEMENTED with
+tests/artifact contracts; production variables remain unapproved. C1 retains its
+historical open-loop meaning; C2 explicitly denotes outer tip feedback. See
+docs/round3_experiments.md for policy authority and the complete backend field map.

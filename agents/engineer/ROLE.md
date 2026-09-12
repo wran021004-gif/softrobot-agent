@@ -1,5 +1,11 @@
 # Engineer Agent contract (no LLM adapter)
 
+Round 3: read the Human-owned ExperimentPolicy and select only authorized routes
+and variable names. Request evaluate_candidate/optimize_design through the Harness.
+Engineer does not choose numerical optimum values; the optimizer does. C1 remains
+legacy open-loop; C2 is PCC tip feedback with policy-sourced parameters. IMPLEMENTED
+does not grant numerical experiment approval. See docs/round3_experiments.md.
+
 Task entry: resolve the Human-owned TaskContract, then read its referenced Design
 Grammar and the capability registry; retrieved Memory/Skills remain secondary.
 The contract defines the problem and allowed design envelope, not a concrete robot.

@@ -1,0 +1,293 @@
+{
+  "$defs": {
+    "FeedbackParameters": {
+      "additionalProperties": false,
+      "description": "No numerical defaults: all experimental numbers require a policy source.",
+      "properties": {
+        "gain_rad2_per_m2": {
+          "exclusiveMinimum": 0,
+          "title": "Gain Rad2 Per M2",
+          "type": "number"
+        },
+        "update_every_steps": {
+          "exclusiveMinimum": 0,
+          "title": "Update Every Steps",
+          "type": "integer"
+        },
+        "max_bend_update_rad": {
+          "exclusiveMinimum": 0,
+          "title": "Max Bend Update Rad",
+          "type": "number"
+        },
+        "max_command_update_m": {
+          "exclusiveMinimum": 0,
+          "title": "Max Command Update M",
+          "type": "number"
+        },
+        "min_tendon_length_m": {
+          "exclusiveMinimum": 0,
+          "title": "Min Tendon Length M",
+          "type": "number"
+        },
+        "max_tendon_length_m": {
+          "exclusiveMinimum": 0,
+          "title": "Max Tendon Length M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "gain_rad2_per_m2",
+        "update_every_steps",
+        "max_bend_update_rad",
+        "max_command_update_m",
+        "min_tendon_length_m",
+        "max_tendon_length_m"
+      ],
+      "title": "FeedbackParameters",
+      "type": "object"
+    },
+    "SearchVariable": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "lower_bound": {
+          "title": "Lower Bound",
+          "type": "number"
+        },
+        "upper_bound": {
+          "title": "Upper Bound",
+          "type": "number"
+        },
+        "constraints": {
+          "default": [],
+          "items": {
+            "enum": [
+              "positive",
+              "integer"
+            ],
+            "type": "string"
+          },
+          "title": "Constraints",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "unit",
+        "lower_bound",
+        "upper_bound"
+      ],
+      "title": "SearchVariable",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "policy_id": {
+      "minLength": 1,
+      "title": "Policy Id",
+      "type": "string"
+    },
+    "task_contract_id": {
+      "title": "Task Contract Id",
+      "type": "string"
+    },
+    "task_contract_source": {
+      "title": "Task Contract Source",
+      "type": "string"
+    },
+    "baseline_design": {
+      "title": "Baseline Design",
+      "type": "string"
+    },
+    "scientific_status": {
+      "enum": [
+        "PROPOSED",
+        "HUMAN_APPROVED",
+        "TEST_ONLY"
+      ],
+      "title": "Scientific Status",
+      "type": "string"
+    },
+    "approval_status": {
+      "enum": [
+        "HUMAN_APPROVAL_REQUIRED",
+        "HUMAN_APPROVED",
+        "TEST_ONLY"
+      ],
+      "title": "Approval Status",
+      "type": "string"
+    },
+    "approval_source": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approval Source"
+    },
+    "variables": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SearchVariable"
+      },
+      "title": "Variables",
+      "type": "array"
+    },
+    "objective_metric_refs": {
+      "default": [],
+      "items": {
+        "enum": [
+          "model.predicted_position_error_m",
+          "mujoco.position_error_m"
+        ],
+        "type": "string"
+      },
+      "title": "Objective Metric Refs",
+      "type": "array"
+    },
+    "evaluation_budget": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Evaluation Budget"
+    },
+    "seed": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seed"
+    },
+    "allowed_model_levels": {
+      "default": [],
+      "items": {
+        "enum": [
+          "M0",
+          "M1"
+        ],
+        "type": "string"
+      },
+      "title": "Allowed Model Levels",
+      "type": "array"
+    },
+    "allowed_controller_levels": {
+      "default": [],
+      "items": {
+        "enum": [
+          "C1",
+          "C2"
+        ],
+        "type": "string"
+      },
+      "title": "Allowed Controller Levels",
+      "type": "array"
+    },
+    "feedback_parameters": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FeedbackParameters"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "controller_parameter_bounds": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SearchVariable"
+      },
+      "title": "Controller Parameter Bounds",
+      "type": "array"
+    },
+    "mujoco_validation_budget": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Mujoco Validation Budget"
+    },
+    "repair_iteration_budget": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Repair Iteration Budget"
+    },
+    "repair_actions": {
+      "default": [],
+      "items": {
+        "enum": [
+          "next_candidate",
+          "optimize_design",
+          "synthesize_feedback",
+          "run_parameter_sensitivity"
+        ],
+        "type": "string"
+      },
+      "title": "Repair Actions",
+      "type": "array"
+    },
+    "stop_conditions": {
+      "default": [],
+      "items": {
+        "enum": [
+          "budget_exhausted",
+          "canonical_success",
+          "actions_exhausted"
+        ],
+        "type": "string"
+      },
+      "title": "Stop Conditions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "policy_id",
+    "task_contract_id",
+    "task_contract_source",
+    "baseline_design",
+    "scientific_status",
+    "approval_status"
+  ],
+  "title": "ExperimentPolicy",
+  "type": "object"
+}

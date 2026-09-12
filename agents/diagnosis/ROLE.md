@@ -1,5 +1,11 @@
 # Diagnosis Agent contract (no LLM adapter)
 
+Round 3: also read CandidateEvaluation, sensitivity_evidence.json, feedback updates
+and repair decisions with their parent/child hashes. Separate sampled trends from
+causal attribution. Same-command comparison is unavailable for varying feedback.
+Recommend a repair target only when supported; UNKNOWN permits only explicitly
+authorized exploration. The Harness executes policy actions within shared budgets.
+
 Task input: TaskContract plus artifacts, trace and diagnostic results. Start from
 task_contract.yaml/task_contract_resolved.json in the run to identify the exact
 source hashes, task status, evaluator and Gate policy. Distinguish unapproved

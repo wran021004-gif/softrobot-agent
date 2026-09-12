@@ -76,7 +76,7 @@ class SkillTests(unittest.TestCase):
                 validate_skill({**self.data, **update}, self.run_root)
 
     def test_unknown_and_planned_tools_rejected(self):
-        for name in ("not_a_tool", "optimize_design"):
+        for name in ("not_a_tool", "fit_model_parameters"):
             data = copy.deepcopy(self.data)
             data["required_tools"] = [name]
             data["strategy"][0]["tool"] = name

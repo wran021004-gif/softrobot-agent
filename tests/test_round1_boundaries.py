@@ -19,7 +19,7 @@ class OptimizationTests(unittest.TestCase):
             with self.subTest(name=name), self.assertRaises(ValueError):
                 validate_optimization_variables(design().robot_family, (name,))
         self.assertEqual(validate_optimization_variables(design().robot_family, ()), ())
-        self.assertEqual(get_tool_manifest('optimization')['tools']['optimize_design']['implementation_status'], 'PLANNED')
+        self.assertEqual(get_tool_manifest('optimization')['tools']['optimize_design']['implementation_status'], 'IMPLEMENTED')
 
     def test_engineer_output_rejects_unapproved_selection(self):
         with self.assertRaises(ValidationError):

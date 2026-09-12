@@ -194,6 +194,9 @@ def check_collision(clearance_result: ToolResult, simulation_result: ToolResult,
             raise ValueError('Matching model/simulation run identities required')
         if clearance_result.status != 'pass' or 'task_success' not in s:
             raise ValueError('Completed prediction and execution required; inspect_numerics handles termination')
+        execution = s.get('execution_evidence', {})
+        if any(row['command_min_m'] != row['command_max_m'] for row in execution.get('actuators', ())):
+            raise ValueError('Same-command clearance comparison unavailable for varying feedback commands; actual collision evidence remains in MuJoCo result')
         e = s['window_evidence']
         contact = _boolean(e['obstacle_contact_occurred'])
         violation = _boolean(p['predicted_clearance_violation'])

@@ -1,0 +1,117 @@
+{
+  "$defs": {
+    "ControlCommand": {
+      "additionalProperties": false,
+      "properties": {
+        "tendon_target_lengths_m": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Tendon Target Lengths M",
+          "type": "array"
+        }
+      },
+      "required": [
+        "tendon_target_lengths_m"
+      ],
+      "title": "ControlCommand",
+      "type": "object"
+    },
+    "FeedbackParameters": {
+      "additionalProperties": false,
+      "description": "No numerical defaults: all experimental numbers require a policy source.",
+      "properties": {
+        "gain_rad2_per_m2": {
+          "exclusiveMinimum": 0,
+          "title": "Gain Rad2 Per M2",
+          "type": "number"
+        },
+        "update_every_steps": {
+          "exclusiveMinimum": 0,
+          "title": "Update Every Steps",
+          "type": "integer"
+        },
+        "max_bend_update_rad": {
+          "exclusiveMinimum": 0,
+          "title": "Max Bend Update Rad",
+          "type": "number"
+        },
+        "max_command_update_m": {
+          "exclusiveMinimum": 0,
+          "title": "Max Command Update M",
+          "type": "number"
+        },
+        "min_tendon_length_m": {
+          "exclusiveMinimum": 0,
+          "title": "Min Tendon Length M",
+          "type": "number"
+        },
+        "max_tendon_length_m": {
+          "exclusiveMinimum": 0,
+          "title": "Max Tendon Length M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "gain_rad2_per_m2",
+        "update_every_steps",
+        "max_bend_update_rad",
+        "max_command_update_m",
+        "min_tendon_length_m",
+        "max_tendon_length_m"
+      ],
+      "title": "FeedbackParameters",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "controller": {
+      "const": "pcc_tip_feedback",
+      "default": "pcc_tip_feedback",
+      "title": "Controller",
+      "type": "string"
+    },
+    "level": {
+      "const": "C2",
+      "default": "C2",
+      "title": "Level",
+      "type": "string"
+    },
+    "policy_id": {
+      "title": "Policy Id",
+      "type": "string"
+    },
+    "policy_hash": {
+      "title": "Policy Hash",
+      "type": "string"
+    },
+    "parameter_source": {
+      "title": "Parameter Source",
+      "type": "string"
+    },
+    "parameters": {
+      "$ref": "#/$defs/FeedbackParameters"
+    },
+    "initial_command": {
+      "$ref": "#/$defs/ControlCommand"
+    },
+    "mapping_source": {
+      "const": "tools/pcc_math.py; approved PCC and tendon mapping derivatives",
+      "default": "tools/pcc_math.py; approved PCC and tendon mapping derivatives",
+      "title": "Mapping Source",
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy_id",
+    "policy_hash",
+    "parameter_source",
+    "parameters",
+    "initial_command"
+  ],
+  "title": "FeedbackArtifact",
+  "type": "object"
+}

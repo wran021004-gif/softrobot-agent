@@ -1,5 +1,11 @@
 # Softrobot deterministic research harness
 
+Round 3 adds policy-authorized deterministic multi-fidelity candidate evaluation,
+bounded design search, PCC tip feedback, sensitivity evidence and a bounded repair
+loop. Real numerical experiments remain pending Human approval; production grammar
+authorization and frozen benchmark truth are unchanged. See [execution/authority contracts](docs/round3_experiments.md)
+and [required Human decisions](proposals/engineer/round3_human_decisions.md).
+
 This repository runs a tendon-driven continuum V1 research pipeline without any
 LLM API. It preserves the main@245a785 kinematic and low-fidelity segmented
 MuJoCo surrogate behavior. TASK_FAILED is a valid, recorded scientific outcome.

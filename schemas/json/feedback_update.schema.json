@@ -1,0 +1,108 @@
+{
+  "$defs": {
+    "ControlCommand": {
+      "additionalProperties": false,
+      "properties": {
+        "tendon_target_lengths_m": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Tendon Target Lengths M",
+          "type": "array"
+        }
+      },
+      "required": [
+        "tendon_target_lengths_m"
+      ],
+      "title": "ControlCommand",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "step": {
+      "minimum": 0,
+      "title": "Step",
+      "type": "integer"
+    },
+    "time_s": {
+      "minimum": 0,
+      "title": "Time S",
+      "type": "number"
+    },
+    "observed_tip_m": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Observed Tip M",
+      "type": "array"
+    },
+    "error_m": {
+      "maxItems": 3,
+      "minItems": 3,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Error M",
+      "type": "array"
+    },
+    "bend_rad": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Bend Rad",
+      "type": "array"
+    },
+    "command": {
+      "$ref": "#/$defs/ControlCommand"
+    },
+    "max_command_delta_m": {
+      "minimum": 0,
+      "title": "Max Command Delta M",
+      "type": "number"
+    },
+    "command_clipped": {
+      "title": "Command Clipped",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "step",
+    "time_s",
+    "observed_tip_m",
+    "error_m",
+    "bend_rad",
+    "command",
+    "max_command_delta_m",
+    "command_clipped"
+  ],
+  "title": "FeedbackUpdate",
+  "type": "object"
+}

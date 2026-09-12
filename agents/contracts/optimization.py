@@ -29,9 +29,13 @@ class VariablePolicy(Contract):
 
 def validate_optimization_variables(family: str, names: tuple[str, ...]) -> tuple[VariablePolicy, ...]:
     """Reload the authoritative grammar on every check; examples grant no permission."""
+    return _variables_from_grammar(get_robot_family_grammar(family), names)
+
+
+def _variables_from_grammar(grammar, names):
+    """Shared arithmetic; only trusted file resolvers provide grammar objects."""
     if len(set(names)) != len(names):
         raise ValueError("Duplicate optimization variables")
-    grammar = get_robot_family_grammar(family)
     if names and (grammar.get("optimization_policy", {}).get("owner") != "Human"
                   or not grammar["optimization_policy"].get("objective_source")):
         raise ValueError("PHYSICS_ASSUMPTION_REQUIRED: Human objective authority required")
@@ -60,6 +64,11 @@ def validate_optimization_candidate(original: DesignSpec, candidate: DesignSpec,
     original = DesignSpec.model_validate(original.model_dump())
     candidate = DesignSpec.model_validate(candidate.model_dump())
     policies = validate_optimization_variables(original.robot_family, names)
+    _candidate_with_policies(original, candidate, policies)
+
+
+def _candidate_with_policies(original, candidate, policies, *, grammar=None):
+    names = tuple(policy.name for policy in policies)
     for name in DesignSpec.model_fields:
         if name not in names and getattr(original, name) != getattr(candidate, name):
             raise ValueError(f"Unselected design field changed: {name}")
@@ -72,5 +81,5 @@ def validate_optimization_candidate(original: DesignSpec, candidate: DesignSpec,
         if "integer" in policy.constraints and int(value) != value:
             raise ValueError(f"Integer constraint violated: {policy.name}")
     from tools.capability_resolver import resolve_capability, CapabilityState
-    if resolve_capability(candidate).state not in (CapabilityState.SUPPORTED, CapabilityState.PARAMETRICALLY_SUPPORTED):
+    if resolve_capability(candidate, grammar=grammar).state not in (CapabilityState.SUPPORTED, CapabilityState.PARAMETRICALLY_SUPPORTED):
         raise ValueError("Candidate is outside executable grammar")

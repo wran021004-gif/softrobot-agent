@@ -1,0 +1,157 @@
+family_name: tendon_driven_continuum
+schema: DesignSpec
+schema_module: schemas.design_spec
+implementation_status: partial
+design_fields:
+  robot_family:
+    unit: '1'
+    optimization:
+      category: ROBOT_DESIGN
+      optimizable: false
+      lower_bound: null
+      upper_bound: null
+      constraints: []
+      provenance: Existing grammar type/positivity only; example is not an approved
+        bound.
+      scientific_status: human_approval_required
+    type: str
+    meaning: Robot family identifier accepted by the current analysis and compiler.
+    role: discriminator
+    implementation_status: active
+    allowed_values:
+    - tendon_driven_continuum
+    example_value: tendon_driven_continuum
+  sections:
+    unit: '1'
+    optimization:
+      category: ROBOT_DESIGN
+      optimizable: false
+      lower_bound: null
+      upper_bound: null
+      constraints:
+      - positive
+      - integer
+      provenance: Existing grammar type/positivity only; example is not an approved
+        bound.
+      scientific_status: human_approval_required
+    type: int
+    meaning: Section count; M1 and compiler reject values other than 1. Multi-section
+      geometry is reserved.
+    role: morphology
+    implementation_status: reserved
+    supported_values:
+    - 1
+    example_value: 1
+  segments:
+    unit: '1'
+    optimization:
+      category: ROBOT_DESIGN
+      optimizable: false
+      lower_bound: null
+      upper_bound: null
+      constraints:
+      - positive
+      - integer
+      provenance: Existing grammar type/positivity only; example is not an approved
+        bound.
+      scientific_status: human_approval_required
+    type: int
+    meaning: Number of equal capsule bodies, paired bending hinges, and distal routing
+      stations in MuJoCo.
+    role: discretization
+    implementation_status: active
+    example_value: 8
+  total_length_m:
+    optimization:
+      category: ROBOT_DESIGN
+      optimizable: true
+      lower_bound: 0.35
+      upper_bound: 0.45
+      constraints:
+      - positive
+      provenance: TEST_ONLY synthetic bounds; never scientific approval
+      scientific_status: human_approved
+    type: float
+    meaning: Geometric reach bound and sum of segment centerline lengths.
+    unit: m
+    role: morphology
+    implementation_status: active
+    example_value: 0.4
+  body_radius_m:
+    optimization:
+      category: ROBOT_DESIGN
+      optimizable: false
+      lower_bound: null
+      upper_bound: null
+      constraints:
+      - positive
+      provenance: Existing grammar type/positivity only; example is not an approved
+        bound.
+      scientific_status: human_approval_required
+    type: float
+    meaning: Uniform capsule radius affecting geometry, mass/inertia, and contact;
+      floor is fixed independently.
+    unit: m
+    role: morphology
+    implementation_status: active
+    example_value: 0.02
+  tendon_count:
+    unit: '1'
+    optimization:
+      category: ROBOT_DESIGN
+      optimizable: false
+      lower_bound: null
+      upper_bound: null
+      constraints:
+      - positive
+      - integer
+      provenance: Existing grammar type/positivity only; example is not an approved
+        bound.
+      scientific_status: human_approval_required
+    type: int
+    meaning: Number of PCC length commands and MuJoCo spatial tendons/actuators.
+    role: actuation_description
+    implementation_status: active
+    example_value: 4
+  tendon_routing_radius_m:
+    optimization:
+      category: ROBOT_DESIGN
+      optimizable: false
+      lower_bound: null
+      upper_bound: null
+      constraints:
+      - positive
+      provenance: Existing grammar type/positivity only; example is not an approved
+        bound.
+      scientific_status: human_approval_required
+    type: float
+    meaning: Circumferential routing radius in the y-z plane, used in PCC lengths
+      and MuJoCo routing geometry.
+    unit: m
+    role: actuation_description
+    implementation_status: active
+    example_value: 0.015
+generation_guidance:
+- Emit the existing flat DesignSpec fields only.
+- Keep sections=1; multi-section designs return UNSUPPORTED_DESIGN_CONFIGURATION in
+  M1/compiler.
+- Segments and tendon count must be positive; lengths and radii must be finite and
+  positive.
+- DesignSpec provides type checks; execution tools also check their consumed counts/dimensions.
+- Example values are from configs/design_tendon_arm.yaml, not validated scientific
+  operating ranges.
+tool_coverage_source: Tool manifests declare consumed and ignored fields; no duplicate
+  coverage matrix is maintained here.
+unsupported_capabilities:
+- multi_section_physics
+- tapered_radius
+- variable_stiffness
+- Cosserat_continuum
+- FEM
+- validated_material_model
+- interchangeable_end_effector
+optimization_policy:
+  owner: Human
+  objective_source: tests/fixtures/round3/README.md
+  default: deny
+  note: TEST_ONLY synthetic algorithm fixture; never production grammar

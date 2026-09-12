@@ -26,8 +26,8 @@ tools:
       not prevent diagnostics.
     limitations:
     - Missing/malformed evidence returns unavailable and UNKNOWN.
-    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force;
-      neither establishes cable slack.
+    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling
+      force; neither establishes cable slack.
     - No canonical gate changes, optimizer, physical stability certificate, or causal
       attribution.
     failure_codes:
@@ -73,8 +73,8 @@ tools:
       not prevent diagnostics.
     limitations:
     - Missing/malformed evidence returns unavailable and UNKNOWN.
-    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force;
-      neither establishes cable slack.
+    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling
+      force; neither establishes cable slack.
     - No canonical gate changes, optimizer, physical stability certificate, or causal
       attribution.
     failure_codes:
@@ -116,8 +116,8 @@ tools:
       not prevent diagnostics.
     limitations:
     - Missing/malformed evidence returns unavailable and UNKNOWN.
-    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force;
-      neither establishes cable slack.
+    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling
+      force; neither establishes cable slack.
     - No canonical gate changes, optimizer, physical stability certificate, or causal
       attribution.
     failure_codes:
@@ -163,22 +163,44 @@ tools:
       require approval before promotion
   check_collision:
     implementation_status: IMPLEMENTED
-    implementation: {module: tools.diagnostic_tools, callable: check_collision}
-    inputs: [clearance ToolResult, simulation ToolResult, optional evidence_paths]
-    outputs: [ToolResult with geometric prediction, actual contact, disagreement evidence and UNKNOWN causal attribution]
+    implementation:
+      module: tools.diagnostic_tools
+      callable: check_collision
+    inputs:
+    - clearance ToolResult
+    - simulation ToolResult
+    - optional evidence_paths
+    outputs:
+    - ToolResult with geometric prediction
+    - actual contact
+    - disagreement evidence and UNKNOWN causal attribution
     supported_robot_families: *id001
-    fidelity: Deterministic arithmetic over low/geometric PCC and sampled MuJoCo surrogate evidence.
-    assumptions: [Matching Harness comparison_context and completed execution]
+    fidelity: Deterministic arithmetic over low/geometric PCC and sampled MuJoCo surrogate
+      evidence.
+    assumptions:
+    - Matching Harness comparison_context and completed execution
     applicable_when: Constrained reach execution with clearance and window evidence.
     limitations:
-    - Missing evidence yields unavailable and UNKNOWN; numerical termination uses existing inspect_numerics.
-    - Prediction disagreement and contact are observations, not causal proof or validated physics.
+    - Missing evidence yields unavailable and UNKNOWN; numerical termination uses
+      existing inspect_numerics.
+    - Prediction disagreement and contact are observations, not causal proof or validated
+      physics.
     - No contact in discrete samples does not guarantee continuous collision avoidance.
-    failure_codes: [UNKNOWN]
-    cost: {compute: low}
-    fields_consumed: [clearance_result.metrics, simulation_result.metrics.window_evidence, comparison_context, target_reached]
-    artifacts: [check_collision.json, diagnostic_summary.json]
-    physics_contract_dependencies: [coordinate_frames.md, segmented_mujoco_mapping_v1.md]
+    failure_codes:
+    - UNKNOWN
+    cost:
+      compute: low
+    fields_consumed:
+    - clearance_result.metrics
+    - simulation_result.metrics.window_evidence
+    - comparison_context
+    - target_reached
+    artifacts:
+    - check_collision.json
+    - diagnostic_summary.json
+    physics_contract_dependencies:
+    - coordinate_frames.md
+    - segmented_mujoco_mapping_v1.md
   inspect_numerics:
     implementation_status: IMPLEMENTED
     implementation:
@@ -202,8 +224,8 @@ tools:
       not prevent diagnostics.
     limitations:
     - Missing/malformed evidence returns unavailable and UNKNOWN.
-    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force;
-      neither establishes cable slack.
+    - Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling
+      force; neither establishes cable slack.
     - No canonical gate changes, optimizer, physical stability certificate, or causal
       attribution.
     failure_codes:
@@ -223,29 +245,45 @@ tools:
     - actuator_model_v1.md
     - tendon_length_mapping_v1.md
   run_parameter_sensitivity:
-    implementation_status: PLANNED
+    implementation_status: IMPLEMENTED
+    implementation:
+      module: tools.experiment_tools
+      callable: run_parameter_sensitivity
     inputs:
-    - run artifacts
-    - ToolResults
-    - approved contracts
+    - Human-owned ExperimentPolicy path
+    - requested fidelity
     outputs:
-    - sensitivity report within approved bounds
-    supported_robot_families: *id001
-    fidelity: unimplemented; no numerical claims
+    - RunArtifacts; sensitivity_evidence.json
+    fields_consumed:
+    - ExperimentPolicy.variables
+    - DesignSpec.*
+    - TaskContract references
+    artifacts:
+    - optimization_policy.yaml
+    - optimization_history.jsonl
+    - sensitivity_evidence.json
+    - candidate_*_evaluation.json
+    fidelity: M0/M1 model or MUJOCO; evidence only
+    supported_robot_families:
+    - tendon_driven_continuum
+    physics_contract_dependencies:
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - coordinate_frames.md
     assumptions:
-    - Requires Human-approved scientific semantics before implementation.
-    applicable_when: Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.
+    - Single-section approved PCC geometry only; no new mechanical law or tuned defaults.
+    - Numerical experiments require file-owned policy and approved grammar; TEST_ONLY
+      cannot execute frozen tasks.
+    applicable_when: Explicit supported route and numerical authorization; real experiments
+      currently blocked pending Human approval.
     limitations:
-    - No callable and no fabricated results.
-    - 'PHYSICS_ASSUMPTION_REQUIRED: no Human-approved sensitivity variable/bounds
-      policy exists; no perturbations run.'
+    - No real robot validation, convergence guarantee or causal attribution.
+    - No canonical success from model predictions; no TaskContract or Skill mutation.
     failure_codes:
-    - CAPABILITY_MISSING
     - PHYSICS_ASSUMPTION_REQUIRED
+    - CAPABILITY_MISSING
+    - UNKNOWN
     cost:
-      compute: unknown until implemented
-    fields_consumed: []
-    artifacts: []
-    physics_contract_dependencies: []
-    contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
-      require approval before promotion
+      compute: bounded by explicit policy budgets
+    gate_semantics: HARD input/execution legality; SCREENING model evidence; existing
+      MUJOCO evaluator alone is CANONICAL

@@ -1,0 +1,41 @@
+policy_id: round3_synthetic_only
+task_contract_id: round3_synthetic_dev_v1
+task_contract_source: tests/fixtures/round3/contract.yaml
+baseline_design: configs/design_tendon_arm.yaml
+scientific_status: TEST_ONLY
+approval_status: TEST_ONLY
+approval_source: tests/fixtures/round3/README.md
+variables:
+- name: total_length_m
+  unit: m
+  lower_bound: 0.35
+  upper_bound: 0.45
+  constraints:
+  - positive
+objective_metric_refs:
+- model.predicted_position_error_m
+- mujoco.position_error_m
+evaluation_budget: 6
+seed: 17
+allowed_model_levels:
+- M0
+- M1
+allowed_controller_levels:
+- C1
+- C2
+feedback_parameters:
+  gain_rad2_per_m2: 0.3
+  update_every_steps: 20
+  max_bend_update_rad: 0.01
+  max_command_update_m: 0.0001
+  min_tendon_length_m: 0.2
+  max_tendon_length_m: 0.6
+controller_parameter_bounds: []
+mujoco_validation_budget: 2
+repair_iteration_budget: 1
+repair_actions:
+- synthesize_feedback
+stop_conditions:
+- budget_exhausted
+- actions_exhausted
+- canonical_success
