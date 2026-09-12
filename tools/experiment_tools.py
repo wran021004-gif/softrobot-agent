@@ -20,9 +20,10 @@ def _read(path):
 
 
 class ExperimentSession:
-    def __init__(self, run, experiment, matlab_factory=None):
+    def __init__(self, run, experiment, matlab_factory=None, *, debug=False):
         self.run, self.experiment, self.matlab_factory = run, experiment, matlab_factory
         self.results = []
+        self.debug = debug
         self.designs = {}
         self.mujoco_attempts = 0
         self.history = run.path / "optimization_history.jsonl"
@@ -60,7 +61,7 @@ class ExperimentSession:
                     raise ValueError("Route not authorized by policy")
                 child = run_reach(self.experiment.resolved.manifest_path.parent, snapshot, self.run.path.parent,
                     matlab_factory=self.matlab_factory, fidelity=fidelity, experiment_path=self.experiment.path,
-                    controller_level=controller_level,
+                    controller_level=controller_level, **({"debug": True} if self.debug else {}),
                     experiment_context={"parent_experiment_id": self.run.record.run_id, "candidate_id": candidate_id})
                 # Preserve the completed child even if a subsequent integrity check
                 # detects an input change; never orphan an attempted evaluation.
@@ -104,7 +105,7 @@ class ExperimentSession:
             "requested_tools": (), "evidence_refs": refs, "next_action": action}, evidence_refs=refs)
 
 
-def _execute(policy_path, operation, callback, *, run_root=ROOT / "runs", matlab_factory=None):
+def _execute(policy_path, operation, callback, *, run_root=ROOT / "runs", matlab_factory=None, debug=False):
     run = create_run(run_root)
     status, code = "ERROR", "UNKNOWN"
     session = None
@@ -118,7 +119,7 @@ def _execute(policy_path, operation, callback, *, run_root=ROOT / "runs", matlab
             "task_contract_id": experiment.policy.task_contract_id,
             "input_hashes": {p.relative_to(ROOT).as_posix(): h for p, h in experiment.input_hashes.items()},
             "artifact_role": "experimental evidence; canonical results live in referenced candidate runs"})
-        session = ExperimentSession(run, experiment, matlab_factory)
+        session = ExperimentSession(run, experiment, matlab_factory, debug=debug)
         with run.events.span(operation):
             summary = callback(session)
         experiment.check_unchanged()
@@ -213,7 +214,33 @@ def _optimize(session):
     best_actual = min(actual, key=lambda r: (r.canonical_task_status != "PASS", _metric(r, True), r.candidate_id)) if actual else None
     best_model = next((r for r in ranked if _metric(r) != math.inf), None)
     baseline_actual = canonical[0] if canonical and _metric(canonical[0], True) != math.inf else None
+    def boundary(result):
+        if result is None:
+            return []
+        candidate = session.designs[result.candidate_id]
+        candidate = candidate.model_dump() if hasattr(candidate, 'model_dump') else candidate
+        return [v.name for v in policy.variables if candidate[v.name] in (v.lower_bound, v.upper_bound)]
+    actual_boundary, model_boundary = boundary(best_actual), boundary(best_model)
+    # Link repeated design evaluations explicitly; no inference from rounded lengths.
+    candidate_table = []
+    for model in models:
+        validations = [r for r in canonical if r.design_hash == model.design_hash]
+        candidate = session.designs[model.candidate_id]
+        candidate = candidate.model_dump() if hasattr(candidate, 'model_dump') else candidate
+        candidate_table.append({"candidate_id": model.candidate_id,
+            "total_length_m": candidate['total_length_m'], "robot_ir_hash": model.robot_ir_hash,
+            "m1_predicted_error_m": model.model_metrics.get('predicted_position_error_m'),
+            "entered_mujoco": bool(validations), "parent_experiment_id": session.run.record.run_id,
+            "model_run_id": model.run_id, "model_status": model.status,
+            "canonical_task_status": validations[0].canonical_task_status if validations else "NOT_RUN",
+            "mujoco_validations": [{"candidate_id": r.candidate_id, "run_id": r.run_id,
+                "robot_ir_hash": r.robot_ir_hash, "actual_error_m": r.canonical_metrics.get('position_error_m'),
+                "canonical_task_status": r.canonical_task_status} for r in validations]})
+    session.run.save("candidate_comparison.json", candidate_table)
     return {"algorithm": "baseline_coordinate_endpoints_seeded_bounded_search", "seed": policy.seed,
+        "boundary_result": "BOUNDARY_OPTIMUM_OBSERVED" if actual_boundary else "NO_CANONICAL_BOUNDARY_OPTIMUM_OBSERVED",
+        "canonical_boundary_variables": actual_boundary, "model_boundary_variables": model_boundary,
+        "bounds_expanded": False, "next_range_authority": "Human",
         "variables": [v.model_dump() for v in policy.variables], "bounds_source": "optimization_policy.yaml intersected with approved grammar",
         "best_model_candidate": best_model.candidate_id if best_model else None,
         "best_canonical_candidate": best_actual.candidate_id if best_actual else None,
@@ -224,8 +251,8 @@ def _optimize(session):
         "scope": policy.scientific_status, "physical_validity": "MuJoCo surrogate evidence only; not real robot validation"}
 
 
-def optimize_design(policy_path, *, run_root=ROOT / "runs", matlab_factory=None):
-    return _execute(policy_path, "optimization", _optimize, run_root=run_root, matlab_factory=matlab_factory)
+def optimize_design(policy_path, *, run_root=ROOT / "runs", matlab_factory=None, debug=False):
+    return _execute(policy_path, "optimization", _optimize, run_root=run_root, matlab_factory=matlab_factory, debug=debug)
 
 
 def _sensitivity(session, fidelity="M1"):

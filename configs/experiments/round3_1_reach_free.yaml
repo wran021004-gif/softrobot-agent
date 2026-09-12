@@ -1,0 +1,26 @@
+policy_id: round3_1_reach_free_length
+task_contract_id: reach_free_v1
+task_contract_source: tasks/reach_free/contract.yaml
+baseline_design: configs/design_tendon_arm.yaml
+scientific_status: HUMAN_APPROVED
+approval_status: HUMAN_APPROVED
+approval_source: configs/experiments/round3_1_human_authorization.md
+variables:
+- name: total_length_m
+  unit: m
+  lower_bound: 0.35
+  upper_bound: 0.45
+  constraints: [positive]
+objective_metric_refs:
+- model.predicted_position_error_m
+- mujoco.position_error_m
+evaluation_budget: 12
+seed: 17
+allowed_model_levels: [M1]
+allowed_controller_levels: [C1]
+feedback_parameters: null
+controller_parameter_bounds: []
+mujoco_validation_budget: 5
+repair_iteration_budget: 0
+repair_actions: []
+stop_conditions: [budget_exhausted, actions_exhausted]

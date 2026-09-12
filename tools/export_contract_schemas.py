@@ -5,12 +5,14 @@ from schemas.task_contract import TaskContract
 from schemas.experiment_policy import ExperimentPolicy
 from schemas.candidate_evaluation import CandidateEvaluation
 from schemas.feedback import FeedbackArtifact, FeedbackUpdate
+from schemas.debug_artifact import DebugTrajectory
 from schemas.finding import CandidateFinding
 from schemas.memory import MemoryRecord
 from schemas.skill import Skill, SkillValidationRecord, SkillValidationEvidence
 from tools.spec_tools import ROOT
 
 CONTRACTS = {
+    "schemas/json/debug_trajectory.schema.json": DebugTrajectory,
     "schemas/json/experiment_policy.schema.json": ExperimentPolicy,
     "schemas/json/candidate_evaluation.schema.json": CandidateEvaluation,
     "schemas/json/feedback_controller.schema.json": FeedbackArtifact,

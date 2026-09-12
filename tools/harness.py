@@ -62,7 +62,8 @@ def _snapshot_sources(run, extra_paths=()):
 
 def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "configs/design_tendon_arm.yaml",
               run_root=ROOT / "runs", *, matlab_factory=None, previous_run_id=None, relationship=None,
-              fidelity="MUJOCO", experiment_path=None, controller_level="C1", experiment_context=None):
+              fidelity="MUJOCO", experiment_path=None, controller_level="C1", experiment_context=None,
+              debug=False, visualize=False, viewer_launcher=None):
     run = create_run(run_root, previous_run_id=previous_run_id, relationship=relationship)
     matlab = None
     environment = None
@@ -70,6 +71,11 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
     resolved_contract = None
     experiment = None
     controller = None
+    observability = None
+    if debug or visualize:
+        from tools.debug_tools import DebugObservability
+        observability = DebugObservability(run.path / "debug", debug=debug, visualize=visualize,
+                                           viewer_launcher=viewer_launcher)
     final_status, failure_code = "ERROR", "UNKNOWN"
     stage = "spec_gate"
     try:
@@ -307,6 +313,8 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                               value=not feasible, threshold=False, comparison="==",
                               decision="PASS" if feasible else "FAIL", authority="Geometric screening only; continue simulation for evidence, no canonical override"),
                     evidence_refs=run.events.refs("clearance_result.json", "environment.yaml"))
+        if observability is not None:
+            observability.plot_matlab(matlab, run.path, visible=visualize)
         if fidelity == "M1":
             run.save("metrics.json", {"model": plan.metrics, "mujoco": {},
                                       **({"clearance": clearance.metrics} if clearance else {})})
@@ -345,7 +353,8 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
             def simulation_call():
                 result = run_task(compiled.artifacts["mjcf_path"], task, controller, settings,
                                   **({"environment": environment} if constrained else {}),
-                                  **({"evaluator": resolved_contract.evaluator} if resolved_contract else {}))
+                                  **({"evaluator": resolved_contract.evaluator} if resolved_contract else {}),
+                                  **({"observability": observability} if observability else {}))
                 return result.model_copy(update={"metrics": {**result.metrics, "comparison_context": comparison_context}})
             result = run.invoke_tool("run_task", "mujoco_result.json", simulation_call,
                 input_paths=("robot.xml", "task.yaml", "controller.json", "run_settings.yaml") + (("environment.yaml",) if constrained else ()))
@@ -419,6 +428,8 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                 ("error.json",))
         return run
     finally:
+        if observability is not None:
+            observability.attempt("debug_finalize", observability.finish)
         if controller is not None and hasattr(controller, "updates"):
             run.save("feedback_updates.json", controller.updates)
             run.events.emit("CONTROL_APPLIED", "feedback_update_summary", status="recorded",

@@ -31,6 +31,8 @@ class EvidenceStore:
 
     def resolve(self, reference, *, require_hash=True):
         ref = ArtifactReference.model_validate(reference)
+        if ref.path.casefold().startswith("debug/"):
+            raise ValueError("DEBUG_ONLY / NON_CANONICAL artifacts cannot enter evidence admission")
         record = self.run(ref.run_id)
         expected = record.artifact_hashes.get(ref.path)
         if not expected or (require_hash and ref.sha256 is None) or (ref.sha256 and ref.sha256 != expected):

@@ -51,6 +51,15 @@ design_fields:
     implementation_status: active
     example_value: 8
   total_length_m:
+    experiment_optimization:
+      configs/experiments/round3_1_reach_free.yaml:
+        category: ROBOT_DESIGN
+        optimizable: true
+        lower_bound: 0.35
+        upper_bound: 0.45
+        constraints: [positive]
+        provenance: configs/experiments/round3_1_human_authorization.md; Round 3.1 only; finite values enforced by contracts
+        scientific_status: human_approved
     optimization:
       category: ROBOT_DESIGN
       optimizable: false
@@ -130,4 +139,4 @@ optimization_policy:
   owner: Human
   objective_source: benchmarks/tendon_v1.yaml tasks[].metric and evaluator; task tolerance remains frozen
   default: deny
-  note: No variables currently have approved bounds. optimize_design is implemented but real search remains blocked pending Human approval.
+  note: General optimization remains denied. The file-scoped Round 3.1 authorization permits total_length_m only for its named ExperimentPolicy.

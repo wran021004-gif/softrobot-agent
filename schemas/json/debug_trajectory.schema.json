@@ -1,0 +1,171 @@
+{
+  "$defs": {
+    "DebugSample": {
+      "additionalProperties": false,
+      "properties": {
+        "time_s": {
+          "title": "Time S",
+          "type": "number"
+        },
+        "tip_position_m": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Tip Position M",
+          "type": "array"
+        },
+        "position_error_m": {
+          "title": "Position Error M",
+          "type": "number"
+        },
+        "tendon_target_lengths_m": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tendon Target Lengths M"
+        },
+        "tendon_actual_lengths_m": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Tendon Actual Lengths M",
+          "type": "array"
+        },
+        "actuator_force_n": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Actuator Force N",
+          "type": "array"
+        },
+        "qpos": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Qpos",
+          "type": "array"
+        },
+        "qvel": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Qvel",
+          "type": "array"
+        }
+      },
+      "required": [
+        "time_s",
+        "tip_position_m",
+        "position_error_m",
+        "tendon_target_lengths_m",
+        "tendon_actual_lengths_m",
+        "actuator_force_n",
+        "qpos",
+        "qvel"
+      ],
+      "title": "DebugSample",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "labels": {
+      "default": [
+        "DEBUG_ONLY",
+        "NON_CANONICAL"
+      ],
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "const": "DEBUG_ONLY",
+          "type": "string"
+        },
+        {
+          "const": "NON_CANONICAL",
+          "type": "string"
+        }
+      ],
+      "title": "Labels",
+      "type": "array"
+    },
+    "prohibited_uses": {
+      "default": [
+        "canonical_gate",
+        "optimizer_ranking",
+        "skill_admission",
+        "causal_attribution"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "title": "Prohibited Uses",
+      "type": "array"
+    },
+    "sampling": {
+      "default": "After each existing mj_step: time/qpos/qvel and independently computed current tip; tendon lengths and actuator forces are untouched mj_step work arrays from the last dynamics evaluation, not recomputed at post-integration qpos. Commands are those used for that step.",
+      "title": "Sampling",
+      "type": "string"
+    },
+    "nq": {
+      "minimum": 0,
+      "title": "Nq",
+      "type": "integer"
+    },
+    "nv": {
+      "minimum": 0,
+      "title": "Nv",
+      "type": "integer"
+    },
+    "ntendon": {
+      "minimum": 0,
+      "title": "Ntendon",
+      "type": "integer"
+    },
+    "nu": {
+      "minimum": 0,
+      "title": "Nu",
+      "type": "integer"
+    },
+    "samples": {
+      "items": {
+        "$ref": "#/$defs/DebugSample"
+      },
+      "title": "Samples",
+      "type": "array"
+    }
+  },
+  "required": [
+    "nq",
+    "nv",
+    "ntendon",
+    "nu",
+    "samples"
+  ],
+  "title": "DebugTrajectory",
+  "type": "object"
+}

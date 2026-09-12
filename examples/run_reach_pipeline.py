@@ -12,9 +12,11 @@ from tools.harness import run_reach
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--task-package", type=Path, default=PROJECT_ROOT / "tasks/reach_free")
+    parser.add_argument("--visualize", action="store_true", help="Display DEBUG_ONLY MATLAB figures and passive MuJoCo viewer")
+    parser.add_argument("--debug", action="store_true", help="Save NON_CANONICAL model figures, trajectory and plots without a desktop")
     args = parser.parse_args()
     print("Running deterministic MATLAB M0/M1 -> MuJoCo reach harness...", flush=True)
-    run = run_reach(task_package=args.task_package)
+    run = run_reach(task_package=args.task_package, debug=args.debug, visualize=args.visualize)
     print("Run:", run.path)
     print("Final status:", run.record.final_status)
     print("Failure code:", run.record.failure_code)

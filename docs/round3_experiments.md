@@ -1,5 +1,12 @@
 # Deterministic Round 3 experiments
 
+Round 3.1 update: the Human-approved policy at
+`configs/experiments/round3_1_reach_free.yaml` has a file-specific grammar entry
+for total_length_m only. The generic optimization metadata remains deny-by-default;
+moving or copying this policy to another file does not carry its permission. No
+TaskContract or general grammar capability envelope changed. Historical absence of
+authorization described below applies to Round 3. See [Round 3.1](round3_1_result.md).
+
 TaskContract locates the problem; ExperimentPolicy authorizes a search procedure.
 DesignSpec is the candidate. None stores an optimization result, controller tuning
 result, diagnosis, Memory or Skill. Production numerical authorization is absent;

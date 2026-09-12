@@ -113,6 +113,7 @@ def save_tool_result(run: RunArtifacts, name: str, result):
 
 def finalize_run(run: RunArtifacts, status, failure_code=None):
     run.events.close(status, failure_code)
-    hashes = {p.name: file_hash(p) for p in sorted(run.path.iterdir()) if p.is_file() and p.name != "run.json"}
+    hashes = {p.relative_to(run.path).as_posix(): file_hash(p) for p in sorted(run.path.rglob("*"))
+              if p.is_file() and p != run.path / "run.json"}
     run.update(final_status=status, failure_code=failure_code, failure_category=failure_category(failure_code), artifact_hashes=hashes)
     return run.record

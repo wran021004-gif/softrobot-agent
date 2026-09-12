@@ -162,6 +162,34 @@ class MatlabTools:
         # M0/M1 are kinematic. Gravity and objects are intentionally not used;
         # no separate MATLAB environment file or implicit transform exists.
 
+    def plot_saved_results(self, run_path, output_path, *, visible=False):
+        """Plot saved copies only. Caller isolates failures from all ToolResults."""
+        import json
+        from tools.spec_tools import load_yaml
+        from tools.debug_tools import _write
+        from schemas.environment_spec import Window
+        from tools.window_geometry import window_boxes
+        run_path, output_path = Path(run_path), Path(output_path)
+        ir = RobotIR.model_validate(load_yaml(run_path / "robot_ir.yaml"))
+        task = TaskSpec.model_validate(load_yaml(run_path / "task.yaml"))
+        model = json.loads((run_path / "model_result.json").read_text(encoding="utf-8"))["metrics"]
+        value = dict(labels=["DEBUG_ONLY", "NON_CANONICAL"], total_length_m=ir.total_length_m,
+                     base_position_m=list(ir.base_position_m), target_m=list(task.target_m),
+                     position_tolerance_m=task.position_error_max_m, model=model)
+        clearance_path = run_path / "clearance_result.json"
+        if clearance_path.is_file():
+            clearance = json.loads(clearance_path.read_text(encoding="utf-8"))
+            window = Window.model_validate(clearance["metrics"]["window"])
+            x, y, z = window.position_m
+            w, h = window.width_m / 2, window.height_m / 2
+            value.update(clearance=clearance["metrics"], centerline_m=clearance["artifacts"]["predicted_centerline_m"],
+                window_boxes=[centre + size for _, centre, size in window_boxes(window)],
+                aperture_m=[[x,y-w,z-h], [x,y+w,z-h], [x,y+w,z+h], [x,y-w,z+h], [x,y-w,z-h]])
+        _write(output_path / "matlab_inputs.json", value)
+        # MATLAB receives paths as Engine arguments, never interpolated eval code.
+        self.eng.plot_saved_pcc(str(Path(run_path).resolve()), str(Path(output_path).resolve()),
+                                bool(visible), nargout=0)
+
     def version(self):
         return str(self.eng.version(nargout=1))
 

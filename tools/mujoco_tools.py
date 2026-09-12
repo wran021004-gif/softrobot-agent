@@ -128,6 +128,7 @@ def run_task(
     run_settings: RunSettings | None = None,
     environment: EnvironmentSpec | None = None,
     evaluator=None,
+    *, observability=None,
 ) -> ToolResult:
     """Check finite simulation state and the final tip-to-target distance."""
     evidence = None
@@ -143,6 +144,8 @@ def run_task(
             return ToolResult(status="fail", tool="run_task", failure_code="CAPABILITY_MISSING")
         model = mujoco.MjModel.from_xml_path(str(xml_path))
         data = mujoco.MjData(model)
+        if observability is not None:
+            observability.attempt("simulation_debug_start", lambda: observability.start(model, data, task))
         tip_site_id = model.site("tip_site").id
         # Kinematics on a separate data object cannot alter the executed state or
         # solver warm start. No extra forward/step calls enter the baseline loop.
@@ -194,6 +197,8 @@ def run_task(
                 # Zero ctrl means zero length; disable forces for passive execution.
                 model.opt.disableflags |= int(mujoco.mjtDisableBit.mjDSBL_ACTUATION)
             mujoco.mj_step(model, data)
+            if observability is not None:
+                observability.attempt("simulation_debug_step", lambda: observability.observe(model, data, commands))
             evidence.observe_step(model, data, commands)
             if not (
                 all(math.isfinite(value) for value in data.qpos)

@@ -1,5 +1,10 @@
 # Softrobot deterministic research harness
 
+Round 3.1 adds optional `--debug` and `--visualize` observability and a Human-approved,
+file-scoped total-length experiment for reach_free. See [debug usage](docs/debug_visualization.md)
+and [Round 3.1 results](docs/round3_1_result.md). The Round 3 authorization status
+below is historical; general optimization and C2 remain unapproved.
+
 Round 3 adds policy-authorized deterministic multi-fidelity candidate evaluation,
 bounded design search, PCC tip feedback, sensitivity evidence and a bounded repair
 loop. Real numerical experiments remain pending Human approval; production grammar

@@ -38,7 +38,8 @@ class ValidatedExperiment:
         self.check_unchanged()
         candidate = DesignSpec.model_validate(candidate.model_dump() if isinstance(candidate, DesignSpec) else candidate)
         names = tuple(v.name for v in self.policy.variables)
-        approved = _variables_from_grammar(self.resolved.grammar, names)
+        approved = _variables_from_grammar(self.resolved.grammar, names,
+            experiment_source=self.path.relative_to(ROOT).as_posix())
         _candidate_with_policies(self.baseline, candidate, approved, grammar=self.resolved.grammar)
         for v in self.policy.variables:
             if not v.lower_bound <= getattr(candidate, v.name) <= v.upper_bound:
@@ -74,7 +75,8 @@ def validate_experiment_policy(path) -> ValidatedExperiment:
         raise ValueError("Approval source must share the Human/test-owned boundary")
     baseline_path = repository_path(policy.baseline_design)
     baseline = validate_design(load_yaml(baseline_path))
-    approved = _variables_from_grammar(resolved.grammar, tuple(v.name for v in policy.variables))
+    approved = _variables_from_grammar(resolved.grammar, tuple(v.name for v in policy.variables),
+        experiment_source=path.relative_to(ROOT).as_posix())
     for selected, authority in zip(policy.variables, approved):
         if selected.unit != authority.unit:
             raise ValueError(f"Variable unit mismatch: {selected.name}")

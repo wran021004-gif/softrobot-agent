@@ -32,7 +32,7 @@ def validate_optimization_variables(family: str, names: tuple[str, ...]) -> tupl
     return _variables_from_grammar(get_robot_family_grammar(family), names)
 
 
-def _variables_from_grammar(grammar, names):
+def _variables_from_grammar(grammar, names, *, experiment_source=None):
     """Shared arithmetic; only trusted file resolvers provide grammar objects."""
     if len(set(names)) != len(names):
         raise ValueError("Duplicate optimization variables")
@@ -46,6 +46,9 @@ def _variables_from_grammar(grammar, names):
         if name not in DesignSpec.model_fields or field.get("type") not in ("int", "float"):
             raise ValueError(f"Optimization variable denied: {name}")
         metadata = field.get("optimization")
+        # A file-specific Human authorization does not grant general optimization.
+        if experiment_source is not None:
+            metadata = field.get("experiment_optimization", {}).get(experiment_source, metadata)
         if metadata is None:
             raise ValueError(f"PHYSICS_ASSUMPTION_REQUIRED: no policy for {name}")
         policy = VariablePolicy(name=name, unit=field.get("unit", ""), **metadata)
