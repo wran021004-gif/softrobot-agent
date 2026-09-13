@@ -30,6 +30,11 @@ class EvaluationArguments(Contract):
 
 class EvidenceArguments(Contract):
     evidence_id: str = Field(min_length=1)
+    pointer: str = Field(default='', description='JSON Pointer，如 /data/diagnostics 或 /metrics；空串选择根')
+    offset: int = Field(default=0, ge=0, description='对象条目或数组元素的起始位置')
+    limit: int = Field(default=10, ge=1, le=50)
+    byte_offset: int = Field(default=0, ge=0, description='超大字段的 UTF-8 分片起点，使用上次返回的 next_byte_offset')
+    max_bytes: int = Field(default=3000, ge=256, le=6000, description='本次内容字节上限，完整文件仍保存在磁盘')
 
 
 class CandidateArguments(Contract):
@@ -48,7 +53,8 @@ class CompareCandidatesArguments(Contract):
 class DeepSeekConfig(Contract):
     model: str = Field(pattern=r'^deepseek-[a-z0-9.-]+$')
     base_url: str
-    thinking: Literal['disabled'] = 'disabled'
+    thinking: Literal['disabled', 'enabled'] = 'disabled'
+    context_turns: int = Field(default=2, ge=1, le=6, description='一个协议会话片段保留的完整工具往返数；之后从状态摘要新开片段')
     temperature: float = Field(default=0.2, ge=0, le=2)
     max_tokens: int = Field(default=2048, ge=256, le=8192)
     max_input_bytes: int = Field(default=60000, ge=4000, le=200000)

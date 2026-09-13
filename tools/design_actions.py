@@ -69,6 +69,9 @@ def execute(name, arguments, root, folder, state):
                       failure_code=run.record.failure_code, message=str(error or run.record.final_status))
     if name == 'observe_candidate':
         ev = evaluation(state, c['candidate_id'])['result']['data']
+        if not ev.get('trajectory_available'):
+            return output(dict(candidate_id=c['candidate_id'], backend_solves=0), status='capability_missing',
+                          failure_code='NO_TRAJECTORY', message='没有可用轨迹；计算与任务成绩请查看评价证据')
         from tools.workbench_actions import render_observation
         return output(dict(candidate_id=c['candidate_id'], backend_solves=0), render_observation(root / ev['run'], folder))
     raise ValueError('Unknown design tool')

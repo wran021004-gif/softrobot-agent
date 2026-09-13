@@ -52,13 +52,40 @@ def request_completion(config, payload, key):
         raise RuntimeError('DEEPSEEK_NETWORK_ERROR') from None
 
 
-def payload_for(book):
+def encoded_size(value):
+    return len(json.dumps(value, ensure_ascii=False).encode('utf-8'))
+
+
+def input_metrics(payload):
+    parts = dict(system=0, context=0, assistant=0, tool_feedback=0, reasoning=0,
+                 tools=encoded_size(payload['tools']))
+    for message in payload['messages']:
+        key = {'system': 'system', 'user': 'context', 'assistant': 'assistant', 'tool': 'tool_feedback'}[message['role']]
+        parts[key] += encoded_size(message)
+        if 'reasoning_content' in message:
+            parts['reasoning'] += encoded_size(message['reasoning_content'])
+    context_parts = {}
+    for message in payload['messages']:
+        if message['role'] == 'user' and message['content'].startswith('最新权威上下文与状态：\n'):
+            context_parts = {k: encoded_size(v) for k, v in json.loads(message['content'].split('\n', 1)[1]).items()}
+    return dict(total_bytes=encoded_size(payload), components=parts, context_sections=context_parts,
+                note='UTF-8 请求 JSON；reasoning 是 assistant 的子项，不能再次相加')
+
+
+def payload_for(book, *, fresh=False):
     config = book.state['request']['design_session']
+    state = book.state
+    start = state.get('context_start', 0)
+    active = [r for r in state['model_calls'][start:] if r.get('status') == 'completed']
+    if fresh or len(active) >= config.get('context_turns', 2):
+        # Start a NEW conversation from saved facts, never trim reasoning inside
+        # a replayed assistant/tool exchange. Completed records remain immutable.
+        start = len(state['model_calls'])
+        active = []
+    state['context_start'] = start
     messages = [{'role': 'system', 'content': (book.root / 'inputs/system_prompt.md').read_text(encoding='utf-8')},
-                {'role': 'user', 'content': '开始一次有预算限制的机器人设计任务，使用本次真实计算反馈修改设计。'}]
-    for row in book.state['model_calls']:
-        if row.get('status') != 'completed':
-            continue
+                {'role': 'user', 'content': '继续有限设计任务；本会话片段以最新保存状态为事实依据。'}]
+    for row in active:
         messages.append(row['message'])
         feedback = json.dumps(row['feedback'], ensure_ascii=False)
         calls = row['message'].get('tool_calls', [])
@@ -66,9 +93,24 @@ def payload_for(book):
             messages.extend({'role': 'tool', 'tool_call_id': c['id'], 'content': feedback} for c in calls)
         else:
             messages.append({'role': 'user', 'content': feedback})
-    messages.append({'role': 'user', 'content': '最新权威上下文与状态：\n' + json.dumps(book.context(), ensure_ascii=False)})
-    return dict(model=config['model'], messages=messages, tools=native_tools(), tool_choice='required',
-                thinking={'type': config['thinking']}, temperature=config['temperature'], max_tokens=config['max_tokens'], stream=False)
+    context = book.context()
+    if not active:
+        last = next((r for r in reversed(state['model_calls']) if r.get('status') == 'completed'), None)
+        if last:
+            context['latest_feedback'] = compact_feedback(last['feedback'])
+    messages.append({'role': 'user', 'content': '最新权威上下文与状态：\n' + json.dumps(context, ensure_ascii=False)})
+    payload = dict(model=config['model'], messages=messages, tools=native_tools(), tool_choice='required',
+                   thinking={'type': config['thinking']}, max_tokens=config['max_tokens'], stream=False)
+    if config['thinking'] == 'disabled':
+        payload['temperature'] = config['temperature']
+    return payload
+
+
+def compact_feedback(feedback):
+    decision = feedback['decision']
+    return dict(decision={k: decision[k] for k in ('sequence', 'status', 'failure_code') if k in decision},
+                result=compact_result(feedback['result']) if feedback.get('result') else None,
+                result_ref=feedback.get('result_ref'), cite_as=feedback.get('cite_as'))
 
 
 def parse_decision(row):
@@ -99,8 +141,11 @@ def apply_response(book, row):
     attempt = next((a for a in book.state['attempts'] if a['decision'] == sequence), None)
     ref = attempt.get('result_ref') if attempt else decision.get('result_ref')
     result = read(book.root / ref) if ref else None
-    row.update(status='completed', feedback=dict(decision=decision, result=compact_result(result) if result else None,
-                                                result_ref=ref, remaining=book.remaining()))
+    feedback = dict(decision=decision, result=result, result_ref=ref,
+                    cite_as=book.state['evidence'].get(ref, {}).get('evaluation_id') or ref)
+    row.update(status='completed', feedback=compact_feedback(feedback))
+    atomic_json(book.root / row['folder'] / 'feedback.json', row['feedback'])
+    book.register(book.root / row['folder'] / 'feedback.json')
     book.save()
 
 
@@ -138,20 +183,26 @@ def run_model(book, *, steps=None, transport=None):
             return stop(book, 'MODEL_FAILURE_RETRY_EXHAUSTED')
         if book.remaining()['model_calls'] <= 0 or book.remaining()['decisions'] <= 0:
             return stop(book, 'MODEL_OR_DECISION_BUDGET_EXHAUSTED')
+        payload = payload_for(book)
+        if encoded_size(payload) > config['max_input_bytes']:
+            payload = payload_for(book, fresh=True)
+        state['last_input_metrics'] = input_metrics(payload)
+        if encoded_size(payload) > config['max_input_bytes']:
+            atomic_json(book.root / 'blocked_request.json', payload)
+            book.register(book.root / 'blocked_request.json')
+            return stop(book, 'MODEL_INPUT_BUDGET_EXHAUSTED; evidence remains saved')
         key = os.environ.get('DEEPSEEK_API_KEY', '')
         if not key:
             state.update(status='WAITING_FOR_KEY', stop_reason='填写 DEEPSEEK_API_KEY 后 resume；未发送模型请求、未消耗模型预算')
             book.save()
             break
-        payload = payload_for(book)
-        if len(json.dumps(payload, ensure_ascii=False).encode('utf-8')) > config['max_input_bytes']:
-            return stop(book, 'MODEL_INPUT_BUDGET_EXHAUSTED; evidence remains saved')
         folder = book.root / 'model_calls' / f'{len(state["model_calls"]):03d}'
         folder.mkdir(parents=True)
         atomic_json(folder / 'request.json', redact(payload, key))
         book.register(folder / 'request.json')
         row = dict(index=len(state['model_calls']), status='reserved', folder=folder.relative_to(book.root).as_posix(),
                    decision_sequence=len(state['decisions']), model=config['model'],
+                   context_start=state['context_start'], input_metrics=state['last_input_metrics'],
                    transport='injected_test' if transport else 'official_deepseek')
         state['model_calls'].append(row)
         state.update(status='MODEL_CALL', stop_reason=None)
@@ -160,7 +211,7 @@ def run_model(book, *, steps=None, transport=None):
             response = redact(send(config, payload, key), key)
             choice = response['choices'][0]
             message = choice['message']
-            saved = dict(message={k: message[k] for k in ('role', 'content', 'tool_calls') if k in message},
+            saved = dict(message={k: message[k] for k in ('role', 'content', 'reasoning_content', 'tool_calls') if k in message},
                          finish_reason=choice.get('finish_reason'), usage=response.get('usage', {}),
                          response_model=response.get('model'))
             atomic_json(folder / 'response.json', saved)

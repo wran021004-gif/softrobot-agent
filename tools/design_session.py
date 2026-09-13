@@ -62,8 +62,10 @@ def preconditions(book, decision, arguments):
         if parent is None or parent != state['candidates'][-1]:
             raise ValueError('PARENT_REQUIRED: use the latest candidate')
         previous = evaluation(state, parent['candidate_id'])
-        if not previous or previous['result_ref'] not in decision.evidence:
-            raise ValueError('FEEDBACK_REQUIRED: cite the parent evaluation result before changing design')
+        if not previous or previous['result']['data'].get('canonical_task_status') not in ('PASS', 'FAIL'):
+            raise ValueError('FEEDBACK_REQUIRED: completed parent evaluation required')
+        if not any(ref == previous['result_ref'] or book.state['evidence'][ref].get('evaluation_id') == 'eval:' + parent['candidate_id'] for ref in decision.evidence):
+            raise ValueError('FEEDBACK_REQUIRED: cite eval:' + parent['candidate_id'])
         task_context = read(book.root / 'inputs/task_context.json')
         if not set(arguments['changes']) <= set(task_context['allowed_changes']):
             raise ValueError('PARAMETER_NOT_AUTHORIZED')
@@ -73,7 +75,10 @@ def preconditions(book, decision, arguments):
             raise ValueError('DUPLICATE_DESIGN: changes must produce a new candidate')
         return dict(parent=parent['design_hash'], feedback=state['evidence'][previous['result_ref']]['sha256'])
     if tool == 'read_evidence':
-        return {}
+        ref = state['evidence'].get(arguments['evidence_id'])
+        if ref is None:
+            raise ValueError('UNKNOWN_EVIDENCE')
+        return dict(evidence=ref['sha256'])
     ids = arguments.get('candidate_ids', [arguments.get('candidate_id')])
     binding = {}
     for cid in ids:
@@ -112,8 +117,15 @@ def finish_candidate(state, attempt):
 
 def compact_result(result):
     data = result.get('data', {})
-    return dict(status=result['status'], failure_code=result.get('failure_code'), message=result.get('message'), data=data,
-                artifacts=result.get('artifacts', []))
+    if result.get('tool') == 'read_evidence' and 'content_bytes' in data:
+        selected = data
+    else:
+        fields = ('candidate_id', 'candidate', 'canonical_task_status', 'position_error_m',
+                  'predicted_position_error_m', 'actual_tip_m', 'model_tip_m', 'trajectory_available',
+                  'failure_attribution', 'capability', 'best_candidate_id', 'ranked', 'backend_solves')
+        selected = {k: data[k] for k in fields if k in data}
+    return dict(tool=result.get('tool'), status=result['status'], failure_code=result.get('failure_code'),
+                message=str(result.get('message') or '')[:400], data=selected)
 
 
 def model_context(book):
@@ -122,12 +134,18 @@ def model_context(book):
     candidates = []
     for c in state['candidates']:
         ev = evaluation(state, c['candidate_id'])
-        candidates.append({**c, 'evaluation': compact_result(ev['result']) if ev else {'status': 'NOT_RUN'}})
-    return dict(task={k: v for k, v in task.items() if k not in ('envelope', 'task_authority')},
-                authority=task['task_authority']['source_paths'], candidates=candidates,
+        candidates.append({**{k: v for k, v in c.items() if k not in ('reason', 'evidence', 'design_hash', 'path')},
+                           'evaluation_id': 'eval:' + c['candidate_id'] if ev else None,
+                           'evaluation': compact_result(ev['result']) if ev else {'status': 'NOT_RUN'}})
+    return dict(task={k: v for k, v in task.items() if k in ('task', 'allowed_changes', 'fixed_parameters', 'relational_constraints', 'control', 'physics')},
+                environment={k: task['environment'][k] for k in ('coordinate_frame', 'gravity_m_s2', 'objects')}, candidates=candidates,
                 remaining=book.remaining(), computation_retries=state['request']['design_session']['computation_retries'],
-                decisions=state['decisions'][-4:],
-                evidence={k: v for k, v in state['evidence'].items() if k == 'request' or k.endswith(('result.json', 'task_context.json')) or k.startswith('history:')},
+                recent_actions=[dict(sequence=d['sequence'], tool=d['proposal'].get('tool') or d['proposal'].get('action'),
+                                     status=d.get('status'), reason=d['proposal'].get('reason', '')[:240],
+                                     rejection=d.get('failure_code')) for d in state['decisions'][-3:]],
+                evidence={k: {f: v[f] for f in ('path', 'candidate_id', 'evaluation_id') if f in v} for k, v in state['evidence'].items()
+                          if k in ('request', 'inputs/task_context.json') or k.startswith(('catalog:', 'eval:'))},
+                read_help='eval:cNNN 可直接引用；catalog:cNNN 用 pointer=/entries 分页发现该候选全部证据。read_evidence 用 JSON Pointer 选择字段，按 next_offset / next_byte_offset 继续。',
                 current_phase=state['status'], frozen_truth='task and scoring are read-only; no new physics')
 
 
@@ -147,7 +165,12 @@ def summary(state):
     modified = [c['candidate_id'] for c in state.get('candidates', []) if c.get('parent_id') and c.get('decision') in live_decisions]
     verified = any((ev := evaluation(state, cid)) and ev['result']['data'].get('evidence_role') == 'new_computation'
                    and ev['result']['data'].get('canonical_task_status') in ('PASS', 'FAIL') for cid in modified)
+    inherited = state['request'].get('continuation', {}).get('used', {})
     return dict(status=state['status'], stop_reason=state.get('stop_reason'), candidates=rows, best_candidate=best,
+                workflow_completed=state['status'] == 'STOPPED' and any(d.get('status') == 'accepted' and d['proposal'].get('action') == 'stop' for d in state['decisions']),
+                inherited_usage=inherited,
+                new_model_requests=len(state.get('model_calls', [])) - inherited.get('model_calls', 0),
+                new_simulation_reservations=sum(a['cost'].get('simulations', 0) for a in state['attempts']) - inherited.get('simulations', 0),
                 task_achieved=bool(best and best['canonical_task_status'] == 'PASS'),
                 live_model_feedback_modifications=modified, live_model_feedback_loop_verified=verified,
-                evidence_role='new_computation', evaluator_authority='metrics.reach.evaluate_reach; original Harness gates')
+                evidence_role='compatible_continuation' if inherited else 'new_computation', evaluator_authority='metrics.reach.evaluate_reach; original Harness gates')

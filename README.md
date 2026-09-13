@@ -1,9 +1,11 @@
 # Softrobot deterministic research harness
 
-第六轮已接通单模型 DeepSeek 候选设计循环，见[中文使用说明](docs/round6_deepseek.md)和[验证结果](docs/round6_result.md)。
-`python examples/workbench.py run --deepseek` 启动；缺少 `DEEPSEEK_API_KEY` 时保存等待状态，填好后 `resume`。
-`python examples/workbench.py observe runs/round6_compute` 可查看本轮真实计算及轨迹。
-默认最多三个候选、三次仿真；真实计算已恢复，真实模型反馈循环因缺少密钥尚未联调。
+第七轮已完善有限上下文、按需证据读取、思考协议和兼容续接，见[中文操作说明](docs/round7_continuation.md)和[实际结果](docs/round7_result.md)。
+当前 `runs/round7_ready` 继承第六轮七次真实模型请求、两个已评价候选和两次仿真；已有比较、动画和曲线。本轮进程无密钥，新增真实模型请求与仿真均为零。
+设置 `DEEPSEEK_API_KEY` 后运行 `python examples/workbench.py resume runs/round7_ready`；剩余最多一个候选、一次仿真和十一次模型请求。
+`python examples/workbench.py observe runs/round7_ready` 打开中文观察页。机器人尚未达到一厘米精度，模型续接收尾等待密钥。
+
+第六轮接入说明和当时交付记录保留在[使用说明](docs/round6_deepseek.md)和[历史结果](docs/round6_result.md)；本轮以随后实际运行的 `runs/round6_ready` 为准。
 
 第五轮统一入口见[中文工作台说明](docs/round5_workbench.md)及[验证结果](docs/round5_result.md)。
 `python examples/workbench.py run` 创建最多一次新仿真的固定规则闭环；

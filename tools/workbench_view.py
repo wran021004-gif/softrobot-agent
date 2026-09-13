@@ -1,6 +1,7 @@
 """Chinese saved-state dashboard; the existing viewer supplies motion and curves."""
 from html import escape
 from pathlib import Path
+import json
 from urllib.parse import quote, unquote, urlsplit
 from tools.state_io import read
 from tools.workbench_catalog import TOOLS
@@ -70,19 +71,49 @@ def render(root, state):
             ev = evaluation(state, c['candidate_id'])
             links = [link(c['path'], '设计')]
             links += [link(c[k], label) for k, label in (('check_candidate_ref', '检查'), ('evaluate_candidate_ref', '评价'), ('observe_candidate_ref', '动画入口')) if k in c]
-            status = ev['result']['status'] if ev else '未执行'
+            status = ('计算完成但任务未达标' if result['canonical_task_status'] == 'FAIL' else
+                      '计算完成且任务达标' if result['canonical_task_status'] == 'PASS' else '尚无完成的任务评价')
+            available = ev and ev['result']['data'].get('trajectory_available')
+            observation = next((a for a in reversed(state['attempts']) if a['tool'] == 'observe_candidate' and a['arguments'].get('candidate_id') == c['candidate_id']), None)
+            animation = bool(observation and any(p.endswith('.gif') for p in observation.get('result', {}).get('artifacts', [])))
+            status += '；' + ('动画已生成' if animation else '轨迹已保存，尚未生成动画' if available else '没有可用轨迹')
             candidate_rows.append(f'<tr><td>{text(c["candidate_id"])} ← {text(c["parent_id"] or "初始")}</td><td>{text(c["design"])}</td><td>{text(c.get("changes", {}))}<br>{text(c.get("reason", ""))}</td><td>{text(status)} / {text(result["canonical_task_status"])}<br>实际误差：{text(result["position_error_m"])} m<br>{text(result["failure_code"] or "")}</td><td>{" · ".join(links)}</td></tr>')
-        calls = ''.join(f'<li>#{m["index"]} {text(m["model"])} · {text(m["status"])} {text(m.get("error", ""))} · {link(m["folder"] + "/request.json", "请求与工具说明")}</li>' for m in state['model_calls'])
-        design_section = f'<section><h2>模型与候选设计</h2><p>单决策模型：{text(state["request"]["design_session"]["model"])}；固定指令 C1；所有下表成绩为本轮新计算，NOT_RUN 为尚无实际成绩。</p><table><tr><th>编号 / 上一版</th><th>参数</th><th>修改与依据</th><th>计算 / 任务成绩</th><th>证据</th></tr>{"".join(candidate_rows)}</table><p>{link("design_report.json", "有证据支持的最终结果")}；真实模型反馈修改：{text(summary_data["live_model_feedback_modifications"])}</p><details><summary>模型调用及错误</summary><ol>{calls}</ol></details></section>'
+        calls = []
+        inherited = state['request'].get('continuation', {}).get('used', {}).get('model_calls', 0)
+        for m in state['model_calls']:
+            from tools.deepseek_adapter import input_metrics
+            request_path = m['folder'] + '/request.json'
+            sizes = m.get('input_metrics') or input_metrics(read(root / request_path))
+            labels = {'system': '系统指令', 'context': '任务与当前状态', 'assistant': '历史回复', 'tool_feedback': '历史工具反馈', 'reasoning': '其中思考字段', 'tools': '工具定义'}
+            components = '；'.join(labels[k] + '：' + str(v) + ' B' for k, v in sizes['components'].items())
+            if sizes.get('context_sections'):
+                components += '；状态内部各项 (B)：' + text(sizes['context_sections'])
+            response_path = m['folder'] + '/response.json'
+            response_link = link(response_path, '完整回复（含协议字段）') if (root / response_path).exists() else '没有收到完整回复'
+            d = next((d for d in state['decisions'] if d['sequence'] == m['decision_sequence']), None)
+            attempt = next((a for a in state['attempts'] if a['decision'] == m['decision_sequence']), None)
+            proposal = d['proposal'] if d else {}
+            outcome = ''
+            if d:
+                outcome = '<p>决策：' + text(d.get('status')) + '；拒绝原因：' + text(d.get('failure_code') or '无') + '</p>'
+                outcome += '<pre>' + text(json.dumps(proposal, ensure_ascii=False, indent=2)) + '</pre>'
+            if attempt:
+                outcome += '<p>工具结果：' + text(attempt.get('result', {}).get('status', attempt['status'])) + ' · ' + link(attempt['result_ref'], '完整工具结果') + '</p>' if attempt.get('result_ref') else '<p>工具执行中</p>'
+            if m.get('feedback'):
+                outcome += '<details><summary>回传模型的工具反馈</summary><pre>' + text(json.dumps(m['feedback'], ensure_ascii=False, indent=2)) + '</pre></details>'
+            calls.append(f'<details><summary>#{m["index"]} {"继承请求" if m["index"] < inherited else "本运行请求"} · {text(m["status"])} · {sizes["total_bytes"]:,} B</summary><p>{components}</p><p>会话片段起点：{text(m.get("context_start", "旧版完整历史"))}；{link(request_path, "完整请求")} · {response_link}</p><p>{text(m.get("error", ""))}</p>{outcome}</details>')
+        preview = state.get('last_input_metrics', {})
+        design_section = f'<section><h2>模型与候选设计</h2><p>单决策模型：{text(state["request"]["design_session"]["model"])}；思考模式：{text(state["request"]["design_session"]["thinking"])}；固定指令 C1。成绩来自本次或兼容续接继承的真实评价，NOT_RUN 表示尚无实际成绩。</p><table><tr><th>编号 / 上一版</th><th>参数</th><th>修改与依据</th><th>计算 / 任务成绩</th><th>证据</th></tr>{"".join(candidate_rows)}</table><p>{link("design_report.json", "有证据支持的最终结果")}；流程完成：{text(summary_data["workflow_completed"])}；机器人达标：{text(summary_data["task_achieved"])}</p><p>本运行新增模型请求：{summary_data["new_model_requests"]}；新增仿真预留：{summary_data["new_simulation_reservations"]}</p></section><section><h2>模型请求 → 回复 → 工具反馈（时间顺序）</h2>{"".join(calls)}<p>最新请求或待发送预览：{text(preview)}</p><p>停止原因：{text(state.get("stop_reason"))}</p></section>'
     return f'''<!doctype html><html lang="zh-CN"><meta charset="utf-8">
-<meta http-equiv="refresh" content="5"><title>机器人设计工作台</title>
+<title>机器人设计工作台</title>
+<script>setInterval(()=>{{if(!document.querySelector('details[open]'))location.reload()}},5000)</script>
 <style>body{{font:16px/1.6 system-ui,sans-serif;max-width:1200px;margin:32px auto;padding:0 24px;background:#f5f7fb;color:#172b45}}section{{background:white;padding:20px;margin:18px 0;border-radius:12px}}table{{width:100%;border-collapse:collapse}}td,th{{border-bottom:1px solid #ddd;padding:10px;text-align:left}}a{{color:#165caa;overflow-wrap:anywhere}}img{{width:100%;max-width:1008px}}pre{{white-space:pre-wrap}}li{{margin:14px 0}}</style>
 <h1>机器人自动设计工作台</h1><p>读取任务 → 检查设计 → 数学分析 → 控制生成 → 编译 → 仿真 → 评价诊断 → 下一步决策 → 停止</p>
 <section><h2>当前状态：{text(state['status'])}</h2><p>{text(state.get('stop_reason', '按固定规则执行；每 5 秒刷新保存状态'))}</p><p>{budget}</p><p>冻结任务：reach_free_v1；控制器：C1；物理：legacy_v1_surrogate（未标定）</p><details><summary>使用的设计</summary><pre>{text(design)}</pre></details><p>{link('request.json', '任务、预算与代码版本')} · {link('state.json', '完整状态与证据哈希')} · {link('source_snapshot.zip', '执行源代码快照')}</p>{' · '.join(history)}</section>
 {design_section}<section><h2>工具执行</h2><table><tr><th>阶段</th><th>状态</th><th>错误</th><th>证据</th></tr>{''.join(rows)}</table><p>缓存复用：{len(state['reuse'])} 次。预算按尝试预扣，中断不返还。</p></section>
 <section><h2>为什么选择下一步</h2><ol>{''.join(decisions)}</ol></section>
 <section><h2>实验细节与失败证据</h2>{''.join(execution)}</section>
-<section><h2>动画与曲线</h2><p>由现有观察器读取保存轨迹生成；观看不启动仿真。</p>{''.join(media) or '暂无完整轨迹；请查看上方门控或错误证据。'}</section></html>'''
+<section><h2>动画与曲线</h2><p>由现有观察器读取保存轨迹生成；观看不启动仿真。</p>{''.join(media) or ('轨迹已保存，尚未生成动画。' if any(a.get('result', {}).get('data', {}).get('trajectory_available') for a in state['attempts']) else '没有可用轨迹；请查看评价与错误证据。')}</section></html>'''
 
 
 def write_dashboard(root, state):

@@ -16,8 +16,8 @@ def execute(name, arguments, root, folder, state):
                                artifacts=[str(Path(p).relative_to(root).as_posix()) for p in artifacts])
 
     if name == 'read_evidence':
-        ref = state['evidence'][arguments['evidence_id']]
-        return completed({'evidence_id': arguments['evidence_id'], 'content': read(root / ref['path'])})
+        from tools.design_evidence import read_slice
+        return completed(read_slice(root, state, arguments))
 
     if name in ('inspect_task', 'analyze_design'):
         from tools.task_contract_tools import resolve_task_contract

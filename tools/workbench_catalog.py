@@ -15,8 +15,8 @@ TOOLS = {
                      cost={}, purpose='读取原评价和诊断证据；因果归因保持 UNKNOWN'),
     'observe': dict(label='生成动画与曲线', schema=NoArguments, requires=['evaluate_design'], permission='derived_artifacts',
                     cost={}, purpose='复用 ObservationViewer；保存数据回放，零动力学调用'),
-    'read_evidence': dict(label='读取历史证据', schema=EvidenceArguments, requires=[], permission='read_evidence',
-                          cost={}, purpose='只能按已登记证据 ID 读取 JSON；禁止任意文件路径'),
+    'read_evidence': dict(label='按需读取证据', schema=EvidenceArguments, requires=[], permission='read_evidence',
+                          cost={}, purpose='按 evidence_id 和 JSON Pointer 读取字段或有限片段；catalog:cNNN 的 /entries 为候选文件目录；返回 cite_as 可直接引用'),
 }
 DESIGN_TOOLS = {
     'create_candidate': dict(label='根据评价修改候选', schema=CreateCandidateArguments, requires=[], permission='candidate_design',

@@ -22,6 +22,11 @@ def main():
     resume.add_argument('root')
     resume.add_argument('--steps', type=int)
     resume.add_argument('--decision', help='提交一个符合 Decision schema 的 JSON 文件')
+    continuation = sub.add_parser('continue', help='计算条件兼容时复制旧运行，继承候选、证据和全部已用预算')
+    continuation.add_argument('source')
+    continuation.add_argument('--root', required=True, help='不存在的新运行目录')
+    continuation.add_argument('--model-config', default='configs/deepseek.yaml')
+    continuation.add_argument('--steps', type=int)
     observe = sub.add_parser('observe', help='本地只读中文页面，动态读取内部阶段')
     observe.add_argument('root')
     observe.add_argument('--port', type=int, default=8765)
@@ -52,6 +57,9 @@ def main():
     if args.command == 'run':
         book.create(design=args.design, history=args.history, simulations=args.simulations, replay_run=args.replay_run,
                     deepseek_config=args.model_config if args.deepseek else None)
+    elif args.command == 'continue':
+        from tools.design_continuation import continue_design
+        continue_design(book, args.source, args.model_config)
     state = book.run(steps=args.steps, decision=read(args.decision) if getattr(args, 'decision', None) else None)
     print(f'工作台状态：{state["status"]}；页面：{book.root / "index.html"}')
     # Scientific failure is a valid completed workflow, independent of CLI success.

@@ -183,6 +183,8 @@ class Workbench:
 
     def save(self):
         if self.state.get('candidates'):
+            from tools.design_evidence import refresh_index
+            refresh_index(self)
             from tools.design_session import summary
             atomic_json(self.root / 'design_report.json', summary(self.state))
         atomic_json(self.root / 'state.json', self.state)
@@ -289,6 +291,16 @@ class Workbench:
                 ref = self.state['evidence'].get(arguments['evidence_id'])
                 if ref is None or not ref['path'].endswith('.json'):
                     raise ValueError('INVALID_INPUT: registered JSON evidence required')
+            # A continuation changes the request hash, but completed candidate
+            # evaluations remain valid under the verified computation identity.
+            if design_mode and decision.tool == 'evaluate_candidate':
+                from tools.design_session import evaluation
+                previous = evaluation(self.state, arguments['candidate_id'])
+                if previous and previous['result']['data'].get('canonical_task_status') in ('PASS', 'FAIL'):
+                    row.update(status='reused', result_ref=previous['result_ref'])
+                    self.state['reuse'].append(dict(decision=row['sequence'], result_ref=previous['result_ref']))
+                    self.save()
+                    return
             key = digest(dict(request=self.state['evidence']['request']['sha256'], design=self.state['evidence']['inputs/design.yaml']['sha256'],
                               tool=decision.tool, arguments=arguments, candidate_binding=binding,
                               dependencies={n: self.state['evidence'][completed[n]['result_ref']]['sha256'] for n in info['requires']}))
