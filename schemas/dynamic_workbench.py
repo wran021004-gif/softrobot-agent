@@ -54,7 +54,7 @@ TOOLS={
  'create_candidate':(Create,'candidate_design','Branch any registered candidate, changing design, equivalent physics or control; cite recorded evidence.'),
  'simulate_candidate':(Simulate,'simulate','Run only the selected backend. MATLAB screening does not set canonical reach success. One rollout charged even on failure.'),
  'evaluate_candidate':(Candidate,'simulate','Compatibility: evaluate candidate in MuJoCo with its own controller, no bundled MATLAB calls.'),
- 'optimize_matlab':(Optimize,'analysis','MATLAB bounded local coordinate search, checkpoint every trial, one dynamic budget unit per actual rollout. Resume identical search_id. Pick 4-6 evidence-based variables initially.'),
+ 'optimize_matlab':(Optimize,'analysis','MATLAB bounded local coordinate search, checkpoint every trial, one dynamic budget unit per actual rollout. Resume identical search_id. Choose a small evidence-based variable subset and a bounded batch.'),
  'diagnose_trajectory':(Diagnose,'read_evidence','Query exact entity and time from saved trajectory. Force and state have distinct time phases. Returns sampled facts, events and evidence refs.'),
  'compare_candidates':(Compare,'read_evidence','Paged design/control/physics/backend comparison. Unevaluated backends remain NOT_RUN.'),
  'observe_candidate':(Observe,'derived_artifacts','Render saved MATLAB or MuJoCo coordinates, curves and event list; zero backend solves.'),

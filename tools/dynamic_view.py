@@ -64,6 +64,28 @@ def render_workbench(book):
     page+=f'<h1>Round 9 · reach_free</h1><p>流程完成：{state["status"]=="STOPPED"}；会话状态：{esc(state["status"])}；停止原因：{esc(state.get("stop_reason"))}</p>'
     page+='<p>固定任务：目标 [0.25,0,0.15]m，t=2s，容差 0.01m。MATLAB 为未标定平面动态筛选；任务真值使用原 MuJoCo 评价器。</p>'
     page+='<p><a href="history/audit.json">历史核对</a> · <a href="inputs/grant.json">冻结授权与范围</a> · <a href="budget.json">预算账本</a> · <a href="candidate_table.json">完整候选表</a> · <a href="working_memory.json">工作记忆</a></p>'
+    if state.get('tool_call_corrections'):
+        page+='<h2>工具调用数量纠正（每个被拒绝决策最多一次）</h2>'
+        for r in state['tool_call_corrections'].values():
+            index=r['correction_request_index']
+            link=(f'<a href="model_calls/{index:03d}/request.json">{index:03d} request</a>' if index is not None else 'pending / 尚未发送')
+            response=(f'<a href="{esc(r["correction_response_ref"])}">correction response</a>' if r.get('correction_response_ref') else '')
+            page+=f'<p>Rejected {r["rejected_request_index"]:03d}: count={r["observed_count"]}; <a href="{esc(r["original_response_ref"])}">original response</a>; correction={link} {response}; outcome={esc(r["outcome"])}</p>'
+            page+='<pre>'+esc(r.get('original_error',r.get('error')))+'\n'+esc(r.get('error') or '')+'</pre>'
+            if r.get('correction_observed_count') is not None:page+=f'<p>Correction rejected count: {r["correction_observed_count"]}</p>'
+    if state.get('experiment'):
+        summary=book.experiment_summary();eid=summary['experiment_id'];baseline=summary['baseline_id']
+        page+=f'<h2>实验 {esc(eid)} · {esc(summary["status"])}</h2><p>基线 {baseline}；只计新实验后代与新数值回执。历史 c057/c065/c066 成功不属于本实验。</p>'
+        page+=f'<p><a href="experiments/{eid}/experiment.json">实验额度与起点</a> · <a href="experiments/{eid}/summary.json">实验结论</a>'
+        for cid,label in ((baseline,'baseline'),(summary['best_id'],'best new verified')):
+            if cid:
+                for backend in ('matlab','mujoco'):
+                    ref=f'observations/{cid}_{backend}.html'
+                    if (root/ref).exists():page+=f' · <a href="{ref}">{label} {cid} {backend} playback</a>'
+        page+='</p><pre>'+esc(json.dumps(summary,ensure_ascii=False,indent=2))+'</pre>'
+    errors=[{k:r[k] for k in ('index','status','error','correction_for','observed_tool_call_count') if k in r}
+            for r in state['model_calls'][-3:] if r.get('error')]
+    if errors:page+='<h2>最近模型错误</h2><pre>'+esc(json.dumps(errors,ensure_ascii=False,indent=2))+'</pre>'
     page+='<table><tr>'+''.join('<th>'+x+'</th>' for x in headers)+'</tr>'+''.join(rows)+'</table>'
     page+='<h2>实际预算消耗</h2><pre>'+esc(json.dumps(book.ledger['used'],indent=2))+'</pre><h2>已核对的 LLM 诊断</h2><pre>'+esc(json.dumps(state['verified_diagnoses'],ensure_ascii=False,indent=2))+'</pre>'
     atomic_json(root/'candidate_table.json',state['candidates']);(root/'index.html').write_text(page,encoding='utf8')

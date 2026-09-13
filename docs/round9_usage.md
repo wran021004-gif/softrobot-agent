@@ -1,5 +1,8 @@
 # Round 9 本地使用
 
+新增的单次工具数量纠正、英文运行时提示与 `llm_reach_v1` 实验入口见
+[运行时实验说明](round9_llm_experiment.md)。原有上下文修复与历史数值结果保留。
+
 ## 上下文读取修复与聚焦验证
 
 实际发送和只读检查共用 `DynamicCampaign.build_model_request()`，按 transport 的完整 UTF-8 JSON 编码计量（包含 system、user、tools 和转义），目标 50000 bytes，硬上限仍为 60000。候选默认包含参数变化、后端状态/核心指标和原文件引用；旧的大工具结果只在构建请求时转换，不覆盖原文件。超过目标依次压缩历史/最近决策、候选详情、非读页工具预览；当前证据页、任务、权限、工具 schema 和工作记忆保留。必要内容仍超过硬上限时保存 `context_pause.json`，状态改为 PAUSED，不预约模型预算。

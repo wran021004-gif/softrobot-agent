@@ -9,9 +9,10 @@ from tools.workbench import owner
 
 def main(argv=None):
     p=argparse.ArgumentParser(description='reach_free MATLAB/MuJoCo dynamic workbench')
-    p.add_argument('command',choices=['new','resume','tool','observe','context'])
+    p.add_argument('command',choices=['new','resume','tool','observe','context','experiment-start','experiment-resume'])
     p.add_argument('--root',default='runs/round9_reach');p.add_argument('--source',default='runs/round8_ready')
     p.add_argument('--steps',type=int,default=12);p.add_argument('--name');p.add_argument('--arguments',default='{}')
+    p.add_argument('--experiment-id',default='llm_reach_v1')
     p.add_argument('--arguments-file');p.add_argument('--reason',default='User-authorized reach development operation')
     p.add_argument('--evidence',action='append');a=p.parse_args(argv)
     if a.steps<0:p.error('steps must be nonnegative')
@@ -22,6 +23,11 @@ def main(argv=None):
         with owner(book.root):
             if a.command!='new':book.load()
             if a.command=='resume':book.run_model(a.steps)
+            elif a.command in ('experiment-start','experiment-resume'):
+                if a.command=='experiment-start':book.start_experiment(a.experiment_id)
+                elif not book.experiment() or book.experiment()['experiment_id']!=a.experiment_id:
+                    p.error('No matching saved experiment; use experiment-start once')
+                book.run_model(a.steps);book.render_experiment()
             elif a.command=='tool':
                 args=json.loads(Path(a.arguments_file).read_text(encoding='utf8') if a.arguments_file else a.arguments)
                 result,ref=book.submit(a.name,args,a.reason,a.evidence or ['history/audit.json']);print(json.dumps(dict(result=result,result_ref=ref),ensure_ascii=True))

@@ -23,13 +23,15 @@ from tools.design_compiler import build_robot_ir
 from tools.reach_dynamics import DynamicsBackends,MODEL_ID,SOLVER
 from tools.trajectory_diagnosis import historical_audit,diagnose,metadata_from_shared
 from tools.dynamic_context import (evidence_page, encoded_size, prompt_with_version,
-    PAGE_VERSION, TARGET_BYTES, MAX_REQUEST_BYTES, RequestTooLarge)
+    PAGE_VERSION, TARGET_BYTES, MAX_REQUEST_BYTES, RequestTooLarge, request_progress)
+from tools.dynamic_experiment import ExperimentSupport
+from tools.dynamic_recovery import ToolCountRecovery
 
 GRANT=ROOT/'configs/experiments/round9_grant.json'
 LEDGER=ROOT/'runs/round9_budget.json'
 
 
-class DynamicCampaign(Workbench):
+class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
     def __init__(self,root):
         super().__init__(root);self.backends=DynamicsBackends();self.tick=time.monotonic();self.state=None
         self.loaded_numerical_sources=self.numerical_sources()
@@ -100,7 +102,10 @@ class DynamicCampaign(Workbench):
             cid=folder.parents[1].name;c=self.candidate(cid);backend=out['backend']
             if identity['design']!=c['design_hash'] or identity['control']!=c['control_hash']:return
             completed_wall=max(0,result_path.stat().st_mtime-receipt.get('started_at_epoch_s',result_path.stat().st_mtime))
-            self.ledger['used']['active_wall_s']+=min(receipt.get('reserved_wall_s',completed_wall),completed_wall)
+            recovered_wall=min(receipt.get('reserved_wall_s',completed_wall),completed_wall)
+            self.ledger['used']['active_wall_s']+=recovered_wall
+            if self.experiment() and receipt.get('experiment_id')==self.experiment()['experiment_id']:
+                self.experiment()['used']['active_wall_s']+=recovered_wall
             out.update(candidate_id=cid,control_hash=c['control_hash'],physics_version=c['physics_version'],
                 result_ref=result_path.relative_to(self.root).as_posix(),recovered_completed_artifact=True)
             atomic_json(result_path,out)
@@ -112,7 +117,11 @@ class DynamicCampaign(Workbench):
         self.state['evidence'][ref]=dict(sha256=__import__('hashlib').sha256(path.read_bytes()).hexdigest())
         return ref
     def save(self):
-        now=time.monotonic();self.ledger['used']['active_wall_s']+=now-self.tick;self.tick=now
+        now=time.monotonic();elapsed=now-self.tick;self.ledger['used']['active_wall_s']+=elapsed;self.tick=now
+        exp=self.experiment()
+        if exp:
+            if exp['status']=='RUNNING':exp['used']['active_wall_s']+=elapsed
+            atomic_json(self.root/f"experiments/{exp['experiment_id']}/experiment.json",exp)
         atomic_json(LEDGER,self.ledger);atomic_json(self.root/'budget.json',self.ledger)
         atomic_json(self.root/'state.json',self.state);atomic_json(self.root/'working_memory.json',self.state['working_memory'])
     def remaining(self):
@@ -122,14 +131,22 @@ class DynamicCampaign(Workbench):
     def reserve(self,resource,key,purpose='validation'):
         old=next((r for r in self.ledger['entries'] if r['resource']==resource and r['key']==key),None)
         if old:return old,False
-        rem=self.remaining()
-        if rem[resource]<1 or rem['active_wall_s']<=0:raise ValueError('BUDGET_EXHAUSTED: '+resource)
+        rem=self.check_resource(resource)
         if resource=='mujoco' and purpose=='validation' and rem[resource]<=6:raise ValueError('MuJoCo reserve is for diagnostic/baseline/sensitivity')
         self.ledger['used'][resource]+=1
         cap={'matlab_dynamic':120,'mujoco':180,'model_calls':90}.get(resource,0)
         row=dict(resource=resource,key=key,status='running',purpose=purpose,index=len(self.ledger['entries']),
-            reserved_wall_s=min(cap,rem['active_wall_s']),started_at_epoch_s=time.time())
+            reserved_wall_s=min(cap,rem['active_wall_s']),started_at_epoch_s=time.time(),**self.action_provenance())
+        if self.experiment():
+            row['reserved_wall_s']=min(row['reserved_wall_s'],self.experiment_remaining()['active_wall_s'])
+            if resource in self.experiment()['used']:self.experiment()['used'][resource]+=1
         self.ledger['entries'].append(row);self.save();return row,True
+    def check_resource(self,resource):
+        rem=self.remaining()
+        if rem[resource]<1 or rem['active_wall_s']<=0:raise ValueError('BUDGET_EXHAUSTED: '+resource)
+        er=self.experiment_remaining()
+        if er and (er.get(resource,1)<1 or er['active_wall_s']<=0):raise ValueError('EXPERIMENT_BUDGET_EXHAUSTED: '+resource)
+        return rem
     def finish(self,row,status='completed',**kw):
         row.update(status=status,unsettled_wall_s=0,**kw);self.save()
     def candidate(self,cid):
@@ -147,6 +164,7 @@ class DynamicCampaign(Workbench):
         c=dict(candidate_id=cid,parent_id=parent,design=design,control=control,design_hash=dh,control_hash=ch,
             physics_hash=digest(ir.mechanics.model_dump()),physics_version=ir.mechanics.profile,identity_hash=ih,changes=changes,
             evidence=evidence,reason=reason,path=f'candidates/{cid}/candidate.json',results={})
+        if self.experiment():c['provenance']=self.action_provenance()
         atomic_json(self.root/c['path'],identity);atomic_json(self.root/f'candidates/{cid}/robot_ir.json',ir.model_dump(mode='json'))
         self.state['candidates'].append(c);self.register(self.root/c['path']);self.finish(receipt);return c
     def create_candidate(self,parent_id,changes,evidence,reason):
@@ -185,12 +203,15 @@ class DynamicCampaign(Workbench):
             for p in folder.iterdir():
                 if p.is_file() and p.suffix in ('.json','.xml','.gz'):self.check_evidence(p.relative_to(self.root).as_posix())
             out=read(result_path);out['cache_hit']=True;return out
+        resource='matlab_dynamic' if backend=='matlab' else 'mujoco'
+        self.check_resource(resource)
         if backend=='matlab':
             # Environment startup is campaign activity, preceding the bounded
             # rollout reservation; one Engine is reused for all subsequent trials.
             self.backends.engine();self.save()
-        resource='matlab_dynamic' if backend=='matlab' else 'mujoco';receipt,new=self.reserve(resource,key,purpose)
+        receipt,new=self.reserve(resource,key,purpose)
         if not new:raise ValueError('Interrupted/failed rollout already charged; create an explicit new hypothesis or resume completed evidence')
+        receipt.update(candidate_id=cid,backend=backend);self.save()
         folder.mkdir(parents=True,exist_ok=True);atomic_json(folder/'identity.json',identity)
         snapshot=self.root/f'sources/{digest(sources)}.zip'
         if not snapshot.exists():
@@ -205,6 +226,7 @@ class DynamicCampaign(Workbench):
         except Exception as exc:
             out=dict(computation_status='failed',complete=False,reason=str(exc),backend=backend,model_id=expected,position_error_m=None)
         out.update(candidate_id=cid,control_hash=c['control_hash'],physics_version=c['physics_version'],result_ref=result_path.relative_to(self.root).as_posix())
+        if self.experiment():out['provenance']=self.action_provenance()
         atomic_json(result_path,out)
         for p in folder.iterdir():
             if p.is_file():self.register(p)
@@ -233,14 +255,22 @@ class DynamicCampaign(Workbench):
         else:
             s=dict(args=args,best=encode(parent),best_id=parent['candidate_id'],best_score=None,iteration=0,step=args['initial_step'],
                 trials=[],actual_evaluations=0,active_wall_s=0,cycle_improved=False,stopping_reason=None,algorithm='MATLAB bounded coordinate pattern local search')
+            if self.experiment():s['provenance']=self.action_provenance()
             atomic_json(path,s)
         # Recover the true charged rollout count even if the process died after
         # a backend receipt was written but before the search checkpoint.
         s['actual_evaluations']=sum(r['resource']=='matlab_dynamic' and r['purpose']=='search:'+sid for r in self.ledger['entries'])
         start=time.monotonic()
         self.optimization_deadline=start+min(1800-s['active_wall_s'],self.remaining()['active_wall_s'])
+        if self.experiment():self.optimization_deadline=min(self.optimization_deadline,start+self.experiment_remaining()['active_wall_s'])
         while s['actual_evaluations']<args['max_evaluations'] and s['iteration']<args['max_evaluations']*3:
             if s['active_wall_s']+time.monotonic()-start>=1800 or self.remaining()['active_wall_s']<=0:s['stopping_reason']='WALL_CAP';break
+            if self.experiment() and (self.experiment_remaining()['matlab_dynamic']<=0 or self.experiment_remaining()['active_wall_s']<=0):
+                s['stopping_reason']='EXPERIMENT_CAP';break
+            if self.remaining()['model_calls']<=self.state['request']['grant']['reserved']['model_calls'] or self.remaining()['tool_calls']<=self.state['request']['grant']['reserved']['tool_calls']:
+                s['stopping_reason']='CAMPAIGN_CLOSEOUT_RESERVE';break
+            self.search_provenance=dict(type='matlab_coordinate_search',search_id=sid,trial_index=s['iteration'],
+                                        originating_decision=s.get('provenance'))
             if self.remaining()['matlab_dynamic']<=0 or self.remaining()['candidates']<=0:s['stopping_reason']='RESOURCE_CAP';break
             if not s['trials']:x=s['best'];proposal='parent baseline'
             else:
@@ -251,6 +281,7 @@ class DynamicCampaign(Workbench):
                 if not proposal:raise ValueError('Interrupted numerical search proposal; evidence retained')
                 x=proposal['x']
             trial=dict(index=s['iteration'],parameters=decode(x),status='started',evidence=evidence)
+            if self.experiment():trial['provenance']=self.action_provenance()
             s['pending_trial']=trial;atomic_json(path,s)
             # Deterministic ID/identity plus per-rollout receipts make re-entry idempotent.
             try:
@@ -272,6 +303,7 @@ class DynamicCampaign(Workbench):
             atomic_json(path,s);self.register(path);self.save()
         s['active_wall_s']+=time.monotonic()-start;s['stopping_reason']=s['stopping_reason'] or 'EVALUATION_CAP'
         self.optimization_deadline=float('inf')
+        self.search_provenance=None
         atomic_json(path,s);self.register(path)
         return dict(best_candidate_id=s['best_id'],best_error_m=s['best_score'],actual_evaluations=s['actual_evaluations'],
             stopping_reason=s['stopping_reason'],search_ref=path.relative_to(self.root).as_posix(),
@@ -314,9 +346,14 @@ class DynamicCampaign(Workbench):
                 raise ValueError('Diagnostic entity/time mismatch')
             if args['field'] not in r['values'] or not math.isclose(r['values'][args['field']],args['value'],rel_tol=1e-6,abs_tol=1e-9):raise ValueError('Diagnostic numeric mismatch')
             claim={**args,'origin':getattr(self,'decision_origin','codex_development'),
+                'candidate_id':r.get('candidate_id'),'provenance':self.action_provenance(),
                 'verification':'NUMERIC_ENTITY_TIME_MATCH','semantic_text_verification':'not inferred; structured fields authoritative'}
             self.state['verified_diagnoses'].append(claim);atomic_json(self.root/'verified_diagnoses.json',self.state['verified_diagnoses']);return claim
-        if name=='stop_design':self.state.update(status='STOPPED',stop_reason=reason);return dict(status='STOPPED',reason=reason)
+        if name=='stop_design':
+            self.state.update(status='STOPPED',stop_reason=reason)
+            if self.experiment():
+                self.experiment()['stop_decision_sequence']=len(self.state['decisions'])-1
+            return dict(status='STOPPED',reason=reason,experiment=self.experiment_summary())
         raise ValueError('Tool is not executable')
     def check_evidence(self,ref):
         if ref not in self.state['evidence']:raise ValueError('Unregistered evidence: '+ref)
@@ -326,6 +363,7 @@ class DynamicCampaign(Workbench):
         seq=len(self.state['decisions']);receipt,new=self.reserve('decisions',str(seq));self.finish(receipt)
         decision=dict(sequence=seq,tool=name,arguments=args,reason=reason,evidence=evidence,status='pending',
             origin=getattr(self,'decision_origin','codex_development'),
+            provenance=self.action_provenance(),
             evidence_hashes={ref:self.state['evidence'].get(ref,{}).get('sha256') for ref in evidence})
         self.state['decisions'].append(decision);self.save()
         tool_receipt=None
@@ -339,15 +377,17 @@ class DynamicCampaign(Workbench):
                     raise ValueError('RESEARCH_BUDGET_RESERVED_FOR_COMPARISON_DIAGNOSIS_AND_CLOSEOUT')
             if not evidence:raise ValueError('Evidence is required')
             for ref in evidence:self.check_evidence(ref)
-            parsed=schema.model_validate(args).model_dump();receipt,new=self.reserve('tool_calls',str(seq));tool_receipt=receipt
+            parsed=schema.model_validate(args).model_dump();self.guard_experiment_action(name,parsed)
+            receipt,new=self.reserve('tool_calls',str(seq));tool_receipt=receipt
             data=self.dispatch(name,parsed,evidence,reason);result=WorkbenchResult(tool=name,status='completed',data=data)
             self.finish(receipt);decision['status']='accepted'
         except Exception as exc:
             if tool_receipt:self.finish(tool_receipt,'failed',reason=str(exc))
             result=WorkbenchResult(tool=name,status='failed',failure_code='TOOL_ERROR',message=str(exc));decision['status']='failed'
-        if name=='optimize_matlab':self.optimization_deadline=float('inf')
+        if name=='optimize_matlab':self.optimization_deadline=float('inf');self.search_provenance=None
         ref=f'attempts/{seq:03d}_{name}/result.json';atomic_json(self.root/ref,result.model_dump(mode='json'));self.register(self.root/ref)
-        decision['result_ref']=ref;self.state['attempts'].append(dict(tool=name,arguments=args,result_ref=ref))
+        decision['result_ref']=ref;self.state['attempts'].append(dict(tool=name,arguments=args,result_ref=ref,
+            decision_sequence=seq,provenance=decision['provenance']))
         if memory:self.state['working_memory']={k:([str(x)[:300] for x in v[:4]] if isinstance(v,list) else str(v)[:300]) for k,v in memory.items() if k in ('findings','unresolved','next_action')}
         self.save();return result.model_dump(mode='json'),ref
     def latest_preview(self,max_bytes=4000):
@@ -374,6 +414,14 @@ class DynamicCampaign(Workbench):
         model_ranked=sorted([c for c in self.state['candidates'] if c['results'].get('matlab',{}).get('complete')],
             key=lambda c:c['results']['matlab']['position_error_m'])[:2]
         selected={c['candidate_id']:c for c in [self.state['candidates'][0],*ranked,*model_ranked,*recent]}
+        if self.experiment():
+            experimental=self.experiment_candidates()
+            best=[]
+            for backend in ('matlab','mujoco'):
+                best+=sorted([c for c in experimental if c['results'].get(backend,{}).get('complete')],
+                             key=lambda c:c['results'][backend]['position_error_m'])[:2]
+            baseline=next(c for c in self.state['candidates'] if c['candidate_id']==self.experiment()['baseline_id'])
+            selected={c['candidate_id']:c for c in [baseline,*best,*experimental[-2:]]}
         candidates=[]
         metric_keys=('complete','computation_status','model_id','position_error_m','model_task_success','canonical_task_success',
                      'tip_m','last_valid_time_s','residual_qvel_norm_rad_s','result_ref','diagnosis_ref')
@@ -390,6 +438,7 @@ class DynamicCampaign(Workbench):
             recent_decisions=[{**{k:d[k] for k in ('sequence','tool','status','result_ref') if k in d},'reason':d.get('reason','')[:160]}
                               for d in self.state['decisions'][-3:]],
             latest_tool_result=self.latest_preview(),verified_diagnoses=copy.deepcopy(self.state['verified_diagnoses'][-2:]),
+            progress=request_progress(self),experiment=self.experiment_summary(),tool_call_correction=self.correction_context(),
             evidence_help='history/c002_diagnosis.json; inputs/grant.json; use returned result/diagnosis refs. compare_candidates pages the full table.')
     def build_model_request(self):
         """Pure request builder shared by resume and read-only size inspection."""
@@ -426,19 +475,28 @@ class DynamicCampaign(Workbench):
     def run_model(self,steps=12):
         from tools.deepseek_adapter import request_completion,redact
         config=self.state['request']['design_session'];key=os.environ.get('DEEPSEEK_API_KEY','')
-        if not key:self.state.update(status='WAITING_FOR_KEY',stop_reason='DEEPSEEK_API_KEY missing; no model request sent');self.save();return
+        self.recover_model_responses()
+        correction=self.correction_for_decision()
+        if correction and correction['outcome']!='pending':
+            self.state.update(status='PAUSED',stop_reason=f"Correction for request {correction['rejected_request_index']:03d} is {correction['outcome']}; its single allowance is consumed. {correction.get('error')}")
+            if self.experiment() and self.experiment()['status']=='RUNNING':self.experiment()['status']='PAUSED'
+            self.save();return
+        if self.experiment() and self.experiment()['stop_decision_sequence'] is not None:return
+        if not key:
+            self.state.update(status='WAITING_FOR_KEY',stop_reason='DEEPSEEK_API_KEY missing; no model request sent'+('; tool-count correction remains pending' if correction else ''))
+            if self.experiment() and self.experiment()['status']=='RUNNING':self.experiment()['status']='PAUSED'
+            self.save();return
         self.state.update(status='RUNNING',stop_reason=None)
-        # Persisted responses are applied once, even after a process interruption.
-        for row in self.state['model_calls']:
-            if row['status'] not in ('reserved','responded'):continue
-            response_path=self.root/f"model_calls/{row['index']:03d}/response.json"
-            if response_path.exists():self.apply_model_response(row,read(response_path))
-            else:row.update(status='failed',error='Interrupted request remains charged; no response recorded')
+        if self.experiment():self.experiment()['status']='RUNNING'
         self.save()
         for _ in range(steps):
-            if self.state['status']=='STOPPED':break
-            if any(self.remaining()[k]<=0 for k in ('model_calls','decisions','tool_calls','active_wall_s')):
-                self.state.update(status='STOPPED',stop_reason='MODEL_TOOL_DECISION_OR_WALL_BUDGET_EXHAUSTED');break
+            if self.state['status']!='RUNNING':break
+            correction=self.correction_for_decision()
+            try:
+                for resource in ('model_calls','decisions','tool_calls'):self.check_resource(resource)
+            except ValueError as exc:
+                self.state.update(status='PAUSED',stop_reason=str(exc)+('; correction remains pending' if correction else ''))
+                break
             index=len(self.state['model_calls'])
             try:
                 payload,metrics=self.build_model_request()
@@ -450,20 +508,43 @@ class DynamicCampaign(Workbench):
             version=metrics['prompt_version']
             version_path=self.root/f"inputs/prompt_versions/{version['effective_sha256']}.json"
             if not version_path.exists():atomic_json(version_path,version)
-            receipt,new=self.reserve('model_calls',str(index))
             folder=self.root/f'model_calls/{index:03d}';atomic_json(folder/'request.json',payload)
             row=dict(index=index,status='reserved',decision_sequence=len(self.state['decisions']),request_ref=f'model_calls/{index:03d}/request.json',
-                     input_metrics=metrics,prompt_version_ref=version_path.relative_to(self.root).as_posix());self.state['model_calls'].append(row);self.save()
+                     input_metrics=metrics,prompt_version_ref=version_path.relative_to(self.root).as_posix())
+            if self.experiment():row['experiment_id']=self.experiment()['experiment_id']
+            if correction:
+                row['correction_for']=correction['rejected_request_index']
+                correction.update(correction_request_index=index,outcome='reserved')
+            self.state['model_calls'].append(row)
+            self.current_model_row=row;self.decision_origin='deepseek_api'
+            try:
+                # reserve saves row + correction link + the charge together
+                # before HTTP I/O; recovery cannot grant another correction.
+                receipt,new=self.reserve('model_calls',str(index))
+            except ValueError as exc:
+                self.state['model_calls'].pop()
+                if correction:correction.update(correction_request_index=None,outcome='pending')
+                self.state.update(status='PAUSED',stop_reason=str(exc));break
+            finally:
+                self.current_model_row=None;self.decision_origin='codex_development'
+            if not new:
+                row.update(status='failed',error='Existing interrupted request reservation; no API resent')
+                self.settle_correction(row);self.state.update(status='PAUSED',stop_reason=row['error']);break
             try:
                 bounded_config={**config,'timeout_s':min(config['timeout_s'],receipt['reserved_wall_s'])}
                 response=redact(request_completion(bounded_config,payload,key),key);atomic_json(folder/'response.json',response)
                 row['status']='responded';self.save();self.apply_model_response(row,response)
-                self.finish(receipt)
+                self.settle_correction(row)
+                self.finish(receipt,'completed' if row['status']=='completed' else 'failed')
             except Exception as exc:
-                row.update(status='failed',error=str(exc));self.finish(receipt,'failed');self.state['status']='MODEL_RETRY_REQUIRED';break
+                row.update(status='failed',error=redact(str(exc),key));self.finish(receipt,'failed')
+                self.state.update(status='MODEL_RETRY_REQUIRED',stop_reason=row['error']);self.settle_correction(row);break
             self.save();self.render()
         if self.state['status']=='RUNNING':self.state['status']='PAUSED'
         self.save()
+        if self.experiment():
+            self.experiment()['status']='STOPPED' if self.state['status']=='STOPPED' else 'PAUSED'
+            self.save();self.render_experiment()
     def apply_model_response(self,row,response):
         sequence=row['decision_sequence']
         if len(self.state['decisions'])>sequence:
@@ -472,15 +553,17 @@ class DynamicCampaign(Workbench):
                 error=None if d.get('result_ref') else 'Decision interrupted; do not dispatch twice, inspect saved receipts')
             return
         choice=response['choices'][0]
+        calls=choice['message'].get('tool_calls') or []
+        row['usage']=response.get('usage')
+        if len(calls)!=1:
+            self.reject_tool_count(row,calls);return
         if choice.get('finish_reason')=='length':raise ValueError('MODEL_OUTPUT_TRUNCATED')
-        calls=choice['message'].get('tool_calls',[])
-        if len(calls)!=1:raise ValueError('One tool call per decision required')
         f=calls[0]['function'];args=json.loads(f['arguments']);reason=args.pop('reason');evidence=args.pop('evidence');memory=args.pop('working_memory')
-        self.decision_origin='deepseek_api'
+        self.decision_origin='deepseek_api';self.current_model_row=row
         try:
             result,ref=self.submit(f['name'],args,reason,evidence,memory)
             row.update(status='completed',feedback_ref=ref,usage=response.get('usage'),tool=f['name'])
-        finally:self.decision_origin='codex_development'
+        finally:self.decision_origin='codex_development';self.current_model_row=None
     def render(self):
         from tools.dynamic_view import render_workbench
         render_workbench(self)
