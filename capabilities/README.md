@@ -24,7 +24,9 @@ validated XML is a representation. Runs provide artifacts and fine-grained trace
 Memory has a future index contract only. Skill schema, admission and deterministic
 metadata retrieval are implemented with an initially empty library. The catalog's
 skill_registry points to ../skills/index.yaml; get_skill_registry() resolves it.
-No LLM runtime exists. See ../skills/README.md and ../docs/trace_skill_architecture.md.
+The optional single-model DeepSeek runtime uses the bounded workbench; it cannot
+run code or call historical campaign entry points. See ../docs/round6_deepseek.md.
+Skill admission remains separate; see ../skills/README.md and ../docs/trace_skill_architecture.md.
 
 Round 2 promotes analyze_clearance (MATLAB, full PCC swept radius, low/geometric)
 and check_collision (deterministic recorded evidence) in the existing model and
@@ -38,3 +40,9 @@ It includes strict JSON input schemas, preconditions, permissions, costs and a
 uniform WorkbenchResult output. Legacy manifests remain descriptive library
 metadata and cannot dynamically register executable tools. See
 [the Chinese workbench guide](../docs/round5_workbench.md).
+
+Round 6 adds create_candidate, check_candidate, evaluate_candidate,
+compare_candidates and observe_candidate in the same allowlist. These require
+a design session created with `--deepseek`, validate the existing Human-owned
+exploration envelope, and bind checks and evaluation caches to each candidate.
+The decision model may change only length, routing radius and tendon count.

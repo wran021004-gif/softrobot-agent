@@ -1,10 +1,15 @@
 # Softrobot deterministic research harness
 
+第六轮已接通单模型 DeepSeek 候选设计循环，见[中文使用说明](docs/round6_deepseek.md)和[验证结果](docs/round6_result.md)。
+`python examples/workbench.py run --deepseek` 启动；缺少 `DEEPSEEK_API_KEY` 时保存等待状态，填好后 `resume`。
+`python examples/workbench.py observe runs/round6_compute` 可查看本轮真实计算及轨迹。
+默认最多三个候选、三次仿真；真实计算已恢复，真实模型反馈循环因缺少密钥尚未联调。
+
 第五轮统一入口见[中文工作台说明](docs/round5_workbench.md)及[验证结果](docs/round5_result.md)。
 `python examples/workbench.py run` 创建最多一次新仿真的固定规则闭环；
 `python examples/workbench.py observe runs/workbench_demo` 打开中文观察服务。
-本机已完成的零仿真历史闭环使用 `python examples/workbench.py observe runs/round5_replay_complete`；
-新增实时评价在 MATLAB 启动时失败，完整限制和次数见第五轮验证结果。
+第五轮的零仿真历史闭环使用 `python examples/workbench.py observe runs/round5_replay_complete`；
+该轮 MATLAB 启动失败记录保持不变，第六轮已另行恢复真实计算。
 已有实验使用 `resume` 继续或直接观察，不能通过重复 `run` 覆盖。
 本轮只运行 `python -m unittest tests.test_workbench -v` 等改动相关检查；
 下方第三、第四轮全量测试与实验命令仅是历史说明，不适用于第五轮验证。
@@ -36,10 +41,11 @@ loop. These capabilities are implemented; executable experiment authority is che
 against each policy and its scoped approval. Frozen benchmark truth is unchanged. See [execution/authority contracts](docs/round3_experiments.md)
 and [required Human decisions](proposals/engineer/round3_human_decisions.md).
 
-This repository runs a tendon-driven continuum V1 research pipeline without any
-LLM API. It preserves the main@245a785 kinematic and low-fidelity segmented
+The deterministic entry runs the tendon-driven continuum V1 research pipeline;
+Round 6 adds an optional single-model DeepSeek decision loop. Both preserve the
+main@245a785 kinematic and low-fidelity segmented
 MuJoCo surrogate behavior. TASK_FAILED is a valid, recorded scientific outcome.
-There is no automatic retuning, RL, Cosserat, FEM or validated material model.
+There is no physical calibration, RL, Cosserat, FEM or validated material model.
 
 ## Run and test
 

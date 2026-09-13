@@ -1,0 +1,108 @@
+{
+  "result": {
+    "status": "completed",
+    "tool": "evaluate_candidate",
+    "failure_code": "TASK_FAILED",
+    "message": "TASK_FAILED",
+    "data": {
+      "candidate_id": "c000",
+      "design_hash": "db3efe748f3fe006c3f64bc9d1b969dd3291dce685769041237e2546fdfc6906",
+      "run": "attempts/001_evaluate_candidate/execution/20260913T073615_314850Z_58ad7fb4",
+      "evidence_role": "new_computation",
+      "canonical_task_status": "FAIL",
+      "position_error_m": 0.17116166894090315,
+      "predicted_position_error_m": 0.08714456960728613,
+      "actual_tip_m": [
+        0.3844450937959572,
+        1.9864386249836533e-17,
+        0.04407156345517224
+      ],
+      "model_tip_m": [
+        0.31053385572145686,
+        1.3023404911554016e-17,
+        0.2126883428041688
+      ],
+      "final_status": "TASK_FAILED",
+      "failure_code": "TASK_FAILED",
+      "stopped_by": [],
+      "error": null,
+      "diagnostics": {
+        "compare_model_sim": {
+          "status": "pass",
+          "failure_code": null,
+          "metrics": {
+            "evidence_status": "available",
+            "failure_attribution": "UNKNOWN",
+            "predicted_position_error_m": 0.08714456960728613,
+            "actual_position_error_m": 0.17116166894090315,
+            "tip_discrepancy_m": 0.1841045610291436,
+            "model_predicts_tolerance_failure": true,
+            "mismatch_criterion": null,
+            "unresolved": "PHYSICS_ASSUMPTION_REQUIRED: Human-approved mismatch criterion absent; discrepancy alone does not establish MODEL_MISMATCH."
+          }
+        },
+        "check_actuator_limits": {
+          "status": "pass",
+          "failure_code": null,
+          "metrics": {
+            "evidence_status": "available",
+            "failure_attribution": "UNKNOWN",
+            "max_pull_limit_observed": false,
+            "supported_evidence_category": null,
+            "limitation": "Counts concern sampled active steps; reaching the 0 N no-push bound does not prove active clipping, cable slack or maximum-pull saturation. No causal attribution."
+          }
+        },
+        "check_tendon_tracking": {
+          "status": "pass",
+          "failure_code": null,
+          "metrics": {
+            "evidence_status": "available",
+            "failure_attribution": "UNKNOWN",
+            "max_absolute_error_m": 0.006847228877633504,
+            "tracking_acceptance_threshold": null,
+            "limitation": "Final length differences only; no approved tracking tolerance or causal controller/actuator verdict."
+          }
+        },
+        "inspect_numerics": {
+          "status": "pass",
+          "failure_code": null,
+          "metrics": {
+            "evidence_status": "available",
+            "failure_attribution": "UNKNOWN",
+            "qpos_all_finite": true,
+            "qvel_all_finite": true,
+            "actuator_force_all_finite": true,
+            "tendon_length_all_finite": true,
+            "max_abs_qpos_rad": 0.6140460194010043,
+            "max_abs_qvel_rad_s": 2.2575461555606604,
+            "steps_completed": 1000,
+            "steps_requested": 1000,
+            "termination_code": "TASK_FAILED",
+            "observation_complete": true,
+            "qvel_threshold_status": "unavailable: no approved anomaly threshold",
+            "stability_validated": false,
+            "limitation": "Sanity observations only; finite states and absent warnings do not establish stability, convergence, or physical validity."
+          }
+        }
+      },
+      "failure_attribution": "UNKNOWN",
+      "trajectory_available": true
+    },
+    "artifacts": [
+      "attempts/001_evaluate_candidate/execution/20260913T073615_314850Z_58ad7fb4/run.json",
+      "attempts/001_evaluate_candidate/execution/20260913T073615_314850Z_58ad7fb4/gate_summary.json",
+      "attempts/001_evaluate_candidate/execution/20260913T073615_314850Z_58ad7fb4/mujoco_result.json",
+      "attempts/001_evaluate_candidate/execution/20260913T073615_314850Z_58ad7fb4/diagnostic_summary.json"
+    ]
+  },
+  "remaining": {
+    "tool_calls": 20,
+    "decisions": 19,
+    "simulations": 0,
+    "candidates": 2,
+    "model_calls": 18,
+    "matlab_calls": 0
+  },
+  "live_model_calls": 0,
+  "computation_attempts": 1
+}

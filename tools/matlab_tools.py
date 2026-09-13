@@ -18,7 +18,15 @@ class MatlabTools:
     def __init__(self):
         import matlab.engine
         project_root = Path(__file__).resolve().parents[1]
-        self.eng = matlab.engine.start_matlab()
+        try:
+            self.eng = matlab.engine.start_matlab()
+        except UnicodeDecodeError as exc:
+            # R2024a's native launcher can return a Windows ANSI error while
+            # Python Engine assumes UTF-8. Preserve the real launch failure.
+            import os
+            encoding = 'mbcs' if os.name == 'nt' else 'utf-8'
+            detail = exc.object.decode(encoding, errors='replace')
+            raise RuntimeError('MATLAB_STARTUP_FAILED: ' + detail) from exc
         try:
             self.eng.addpath(str(project_root / "matlab"), nargout=0)
         except Exception:

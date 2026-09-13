@@ -1,5 +1,6 @@
 """Executable allowlist. Descriptive legacy manifests never grant execution."""
 from schemas.workbench import Decision, WorkbenchResult, NoArguments, EvaluationArguments, EvidenceArguments
+from schemas.workbench import CandidateArguments, CreateCandidateArguments, CompareCandidatesArguments
 
 TOOLS = {
     'inspect_task': dict(label='读取任务与检查设计', schema=NoArguments, requires=[], permission='read_inputs',
@@ -17,6 +18,20 @@ TOOLS = {
     'read_evidence': dict(label='读取历史证据', schema=EvidenceArguments, requires=[], permission='read_evidence',
                           cost={}, purpose='只能按已登记证据 ID 读取 JSON；禁止任意文件路径'),
 }
+DESIGN_TOOLS = {
+    'create_candidate': dict(label='根据评价修改候选', schema=CreateCandidateArguments, requires=[], permission='candidate_design',
+                            cost={'candidates': 1}, purpose='只修改权威 envelope 允许的参数；必须引用 parent_id 的本轮评价证据，不能提前生成序列'),
+    'check_candidate': dict(label='独立检查候选', schema=CandidateArguments, requires=[], permission='analysis',
+                           cost={}, purpose='检查指定候选的语法、范围与关系约束，生成独立 IR 和 PCC 局部分析'),
+    'evaluate_candidate': dict(label='真实评价候选', schema=CandidateArguments, requires=['check_candidate'], permission='simulate',
+                              cost={'simulations': 1, 'matlab_calls': 3}, purpose='指定候选经原 Harness 的 MATLAB M0/M1/形状、C1、编译、MuJoCo 和冻结评价；成功与失败均返回真实数据'),
+    'compare_candidates': dict(label='比较候选真实成绩', schema=CompareCandidatesArguments, requires=[], permission='read_evidence',
+                              cost={}, purpose='仅比较指定候选已有的本轮评价；任务状态与误差来自既有评价程序'),
+    'observe_candidate': dict(label='观察候选轨迹', schema=CandidateArguments, requires=['evaluate_candidate'], permission='derived_artifacts',
+                             cost={}, purpose='用原观察器从指定候选保存数据生成动画和曲线，不重新仿真'),
+}
+LEGACY_TOOLS = set(TOOLS)
+TOOLS.update(DESIGN_TOOLS)
 PERMISSIONS = sorted({v['permission'] for v in TOOLS.values()})
 LIMITS = dict(tool_calls=10, decisions=14, simulations=1, matlab_calls=2)
 
@@ -28,7 +43,7 @@ def executable_catalog():
                    'cost_note': 'evaluate_design 在 request.replay 模式为零后端；模型不能修改 request 或切换模式',
                    'failure_codes': ['INVALID_INPUT', 'TOOL_ERROR', 'TIMEOUT', 'CAPABILITY_MISSING',
                                      'PERMISSION_DENIED', 'BUDGET_EXHAUSTED', 'EVIDENCE_CHANGED', 'INTERRUPTED'],
-                   'limitations': '冻结 reach_free、语法内设计、C1；无搜索、标定、写代码、硬件或网络权限'}
+                   'limitations': '冻结 reach_free、C1；设计模式仅允许 envelope 范围内最多三个候选；无标定、编程或硬件权限'}
             for name, info in TOOLS.items()}
 
 
@@ -39,5 +54,5 @@ def catalog():
                 library=[{**v, 'executable_via_workbench': False,
                           'execution_note': '库工具或历史实验入口；不在执行白名单，不能由决策直接调用'}
                          for v in query_tools()],
-                missing=['LLM adapter', 'hardware execution', 'calibrated physics', 'C3/RL',
+                missing=['hardware execution', 'calibrated physics', 'C3/RL',
                          'design/control proposals beyond frozen C1 route'])

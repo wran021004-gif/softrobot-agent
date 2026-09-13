@@ -6,6 +6,10 @@ from tools.state_io import read
 
 
 def execute(name, arguments, root, folder, state):
+    from tools.workbench_catalog import DESIGN_TOOLS
+    if name in DESIGN_TOOLS:
+        from tools.design_actions import execute as design_execute
+        return design_execute(name, arguments, root, folder, state)
     request = state['request']
     def completed(data, artifacts=()):
         return WorkbenchResult(status='completed', tool=name, data=data,
@@ -69,16 +73,20 @@ def execute(name, arguments, root, folder, state):
         if not evaluation['trajectory_available']:
             return WorkbenchResult(status='capability_missing', tool=name, failure_code='CAPABILITY_MISSING',
                                    message='没有完整保存轨迹；参见 gate_summary.json 和 error.json')
-        import matplotlib
-        matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
-        from tools.observation_viewer import ObservationViewer
-        viewer = ObservationViewer([run])
-        try:
-            viewer.seek(viewer.times[-1])
-            png = viewer.snapshot(path=folder / 'curves.png')
-            gif = viewer.export(path=folder / 'motion.gif')
-        finally:
-            plt.close(viewer.figure)
-        return completed(dict(backend_solves=0, observer='tools.observation_viewer.ObservationViewer'), [png, gif])
+        return completed(dict(backend_solves=0, observer='tools.observation_viewer.ObservationViewer'), render_observation(run, folder))
     raise ValueError('Unknown adapter')
+
+
+def render_observation(run, folder):
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    from tools.observation_viewer import ObservationViewer
+    viewer = ObservationViewer([run])
+    try:
+        viewer.seek(viewer.times[-1])
+        png = viewer.snapshot(path=folder / 'curves.png')
+        gif = viewer.export(path=folder / 'motion.gif')
+    finally:
+        plt.close(viewer.figure)
+    return [png, gif]

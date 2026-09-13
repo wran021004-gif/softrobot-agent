@@ -86,7 +86,14 @@ class Workbench:
             raise ValueError('Workbench output must be a child of runs/')
         self.launcher = launcher
 
-    def create(self, *, design=ROOT / 'configs/design_tendon_arm.yaml', history=(), simulations=1, replay_run=None):
+    def create(self, *, design=ROOT / 'configs/design_tendon_arm.yaml', history=(), simulations=1, replay_run=None, deepseek_config=None):
+        config = None
+        if deepseek_config:
+            from schemas.workbench import DeepSeekConfig
+            from tools.spec_tools import load_yaml
+            config = DeepSeekConfig.model_validate(load_yaml(deepseek_config)).model_dump(mode='json')
+            if replay_run:
+                raise ValueError('Model design sessions require new computation, not replay')
         if simulations not in (0, 1):
             raise ValueError('Simulation budget must be 0 or 1')
         self.root.mkdir(parents=True, exist_ok=False)
@@ -137,6 +144,11 @@ class Workbench:
                            git_commit=git('rev-parse', 'HEAD'), git_dirty=bool(git('status', '--porcelain')),
                            sources=hashes, runtime=runtime(),
                            scope='framework validation; no search, calibration or canonical override')
+            if config:
+                request.update(design_session=config, scope='bounded model-directed design within approved envelope',
+                               timeout_s=config['tool_timeout_s'],
+                               limits={k: config[k] for k in ('tool_calls', 'decisions', 'simulations', 'candidates', 'model_calls')})
+                request['limits']['matlab_calls'] = config['simulations'] * 3
             atomic_json(self.root / 'request.json', request)
             self.state = dict(version=1, status='READY', request=request, attempts=[], decisions=[], reuse=[], evidence={})
             for name in ('request.json', 'source_snapshot.zip', 'inputs/design.yaml'):
@@ -156,6 +168,9 @@ class Workbench:
                 self.register(target, f'history:{index}')
                 self.state['evidence'][f'history:{index}']['origin'] = source.relative_to(ROOT).as_posix()
                 self.state['evidence'][f'history:{index}']['role'] = 'historical_context_only'
+            if config:
+                from tools.design_session import initialize
+                initialize(self)
             self.save()
         return self.state
 
@@ -167,6 +182,9 @@ class Workbench:
         return evidence_id
 
     def save(self):
+        if self.state.get('candidates'):
+            from tools.design_session import summary
+            atomic_json(self.root / 'design_report.json', summary(self.state))
         atomic_json(self.root / 'state.json', self.state)
         from tools.workbench_view import write_dashboard
         write_dashboard(self.root, self.state)
@@ -198,14 +216,20 @@ class Workbench:
         return self.state
 
     def remaining(self):
-        used = {name: 0 for name in LIMITS}
+        used = {name: 0 for name in self.state['request']['limits']}
         used['decisions'] = len(self.state['decisions'])
+        if 'candidates' in used:
+            used['candidates'] = 1
+            used['model_calls'] = len(self.state.get('model_calls', []))
         for attempt in self.state['attempts']:
             for name, count in attempt['cost'].items():
                 used[name] += count
         return {name: cap - used[name] for name, cap in self.state['request']['limits'].items()}
 
     def context(self):
+        if self.state.get('candidates'):
+            from tools.design_session import model_context
+            return model_context(self)
         return dict(request=self.state['request'], attempts=self.state['attempts'],
                     evidence=self.state['evidence'], remaining=self.remaining(), tools=executable_catalog(),
                     decision_schema=Decision.model_json_schema(), result_schema=WorkbenchResult.model_json_schema())
@@ -218,6 +242,9 @@ class Workbench:
                 self.register(path)
         attempt.update(status='completed', result=result.model_dump(mode='json'),
                        result_ref=(folder / 'result.json').relative_to(self.root).as_posix())
+        if self.state.get('candidates'):
+            from tools.design_session import finish_candidate
+            finish_candidate(self.state, attempt)
         self.state['status'] = 'PAUSED' if result.status == 'interrupted' else 'RUNNING'
         self.save()
 
@@ -241,11 +268,21 @@ class Workbench:
                 return
             if decision.tool not in TOOLS:
                 raise ValueError('CAPABILITY_MISSING: tool is not executable')
+            from tools.workbench_catalog import DESIGN_TOOLS, LEGACY_TOOLS
+            design_mode = bool(self.state['request'].get('design_session'))
+            allowed = set(DESIGN_TOOLS) | {'read_evidence'} if design_mode else LEGACY_TOOLS
+            if decision.tool not in allowed:
+                raise ValueError('PERMISSION_DENIED: tool is not enabled in this session')
             info = TOOLS[decision.tool]
             arguments = info['schema'].model_validate(decision.arguments).model_dump(mode='json')
             if info['permission'] not in self.state['request']['permissions']:
                 raise ValueError('PERMISSION_DENIED')
-            completed = {a['tool']: a for a in self.state['attempts'] if a.get('result', {}).get('status') == 'completed'}
+            binding = {}
+            if design_mode:
+                from tools.design_session import preconditions
+                binding = preconditions(self, decision, arguments)
+            completed = {a['tool']: a for a in self.state['attempts'] if a.get('result', {}).get('status') == 'completed'
+                         and (not design_mode or a['arguments'].get('candidate_id') == arguments.get('candidate_id'))}
             if any(name not in completed for name in info['requires']):
                 raise ValueError('PRECONDITION_FAILED')
             if decision.tool == 'read_evidence':
@@ -253,7 +290,7 @@ class Workbench:
                 if ref is None or not ref['path'].endswith('.json'):
                     raise ValueError('INVALID_INPUT: registered JSON evidence required')
             key = digest(dict(request=self.state['evidence']['request']['sha256'], design=self.state['evidence']['inputs/design.yaml']['sha256'],
-                              tool=decision.tool, arguments=arguments,
+                              tool=decision.tool, arguments=arguments, candidate_binding=binding,
                               dependencies={n: self.state['evidence'][completed[n]['result_ref']]['sha256'] for n in info['requires']}))
             cached = next((a for a in self.state['attempts'] if a['key'] == key and a.get('result', {}).get('status') == 'completed'), None)
             if cached:
@@ -291,9 +328,12 @@ class Workbench:
 
     def run(self, *, steps=None, decision=None, policy=None):
         from tools.workbench_policy import decide
-        policy = policy or decide
         with owner(self.root):
             self.load()
+            if self.state['request'].get('design_session') and policy is None and decision is None:
+                from tools.deepseek_adapter import run_model
+                return run_model(self, steps=steps)
+            policy = policy or decide
             count = 0
             while self.state['status'] not in ('STOPPED', 'CAPABILITY_MISSING'):
                 if steps is not None and count >= steps:

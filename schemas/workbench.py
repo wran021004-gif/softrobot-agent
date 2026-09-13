@@ -32,6 +32,48 @@ class EvidenceArguments(Contract):
     evidence_id: str = Field(min_length=1)
 
 
+class CandidateArguments(Contract):
+    candidate_id: str = Field(pattern=r'^c\d{3}$')
+
+
+class CreateCandidateArguments(Contract):
+    parent_id: str = Field(pattern=r'^c\d{3}$')
+    changes: dict = Field(min_length=1)
+
+
+class CompareCandidatesArguments(Contract):
+    candidate_ids: list[str] = Field(min_length=1, max_length=3)
+
+
+class DeepSeekConfig(Contract):
+    model: str = Field(pattern=r'^deepseek-[a-z0-9.-]+$')
+    base_url: str
+    thinking: Literal['disabled'] = 'disabled'
+    temperature: float = Field(default=0.2, ge=0, le=2)
+    max_tokens: int = Field(default=2048, ge=256, le=8192)
+    max_input_bytes: int = Field(default=60000, ge=4000, le=200000)
+    timeout_s: int = Field(default=90, ge=1, le=180)
+    model_calls: int = Field(default=18, ge=1, le=40)
+    model_failure_retries: int = Field(default=1, ge=0, le=2)
+    candidates: int = Field(default=3, ge=1, le=3)
+    simulations: int = Field(default=3, ge=0, le=3)
+    computation_retries: int = Field(default=0, ge=0, le=1)
+    tool_calls: int = Field(default=24, ge=1, le=40)
+    decisions: int = Field(default=24, ge=1, le=40)
+    tool_timeout_s: int = Field(default=180, ge=1, le=300)
+
+    @model_validator(mode='after')
+    def official_endpoint(self):
+        from urllib.parse import urlsplit
+        url = urlsplit(self.base_url)
+        if (url.scheme != 'https' or url.netloc != 'api.deepseek.com'
+                or url.path.rstrip('/') not in ('', '/v1') or url.query or url.fragment):
+            raise ValueError('Use the official https://api.deepseek.com or /v1 endpoint')
+        if self.simulations > self.candidates:
+            raise ValueError('Simulation limit must not exceed candidate limit')
+        return self
+
+
 class WorkbenchResult(Contract):
     status: Literal['completed', 'failed', 'capability_missing', 'rejected', 'interrupted']
     tool: str
