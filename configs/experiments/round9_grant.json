@@ -1,0 +1,21 @@
+{
+  "version": "campaign_grant_v2",
+  "authorization_id": "round9-user-grant",
+  "task": "tasks/reach_free",
+  "limits": {"model_calls":120,"tool_calls":240,"decisions":260,"candidates":320,"matlab_dynamic":240,"matlab_other":600,"mujoco":24,"active_wall_s":14400},
+  "reserved": {"mujoco":6,"model_calls":12,"tool_calls":24},
+  "timeouts_s": {"matlab_dynamic":120,"mujoco":180,"optimize_matlab":1800},
+  "objective": {"id":"reach_final_error_v1","time_s":2.0,"metric":"position_error_m","auxiliary_weights":{},"invalid_score":"ineligible"},
+  "bounds": {
+    "total_length_m":[0.05,0.80],"body_radius_m":[0.005,0.05],"tendon_routing_radius_m":[0.002,0.045],
+    "line_density_kg_m":[0.02,3.0],"root_ei_nm2":[0.0001,1.0],"tip_ei_ratio":[0.1,3.0],
+    "bending_viscosity_nm2_s":[0.000001,0.05],"natural_total_angle_rad":[-3.141592653589793,3.141592653589793],
+    "tendon_servo_kp_n_per_m":[100,20000],"tendon_force_limit_n":[5,80],"bias_fraction":[-0.02,0.05],
+    "bend_y_rad":[-3.141592653589793,3.141592653589793],"bend_z_rad":[-3.141592653589793,3.141592653589793],
+    "gain_rad2_per_m2":[0,100],"rate_limit_ref_per_s":[0.001,2]
+  },
+  "units_and_assumptions":"physics_contracts/equivalent_rod_v2.md; schemas/exploration.py",
+  "unavailable_parameters":["elastic_tendon_stiffness"],
+  "fixed":"task/environment/initial qpos/initial qvel/duration/evaluator/solver precision/eight-segment grid",
+  "stop_rules":["target plus necessary validation","no executable new hypothesis","three unimproved batches after diagnosis","model inapplicable","resource limit"]
+}

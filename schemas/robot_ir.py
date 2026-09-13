@@ -1,9 +1,10 @@
 """Resolved single-section structure shared by numerical adapters."""
 import math
 from typing import Literal
-from pydantic import Field, model_validator
+from pydantic import Field, model_validator, model_serializer
 from schemas.common import Contract
 from schemas.settings import PhysicsSpec
+from schemas.exploration import ExplorationPhysics, ResolvedRod
 
 
 class SectionIR(Contract):
@@ -30,9 +31,16 @@ class RobotIR(Contract):
     section: SectionIR
     tendon_routing_radius_m: float = Field(gt=0)
     tendon_routes: tuple[TendonRoute, ...] = Field(min_length=1)
-    mechanics: PhysicsSpec
+    mechanics: PhysicsSpec | ExplorationPhysics
+    resolved_rod: ResolvedRod | None = None
     physics_contracts: tuple[str, ...]
     compiler_version: Literal["design_to_ir_v1"] = "design_to_ir_v1"
+
+    @model_serializer(mode='wrap')
+    def legacy_bytes(self,handler):
+        data=handler(self)
+        if self.resolved_rod is None:data.pop('resolved_rod',None)
+        return data
 
     @model_validator(mode="after")
     def structural_consistency(self):

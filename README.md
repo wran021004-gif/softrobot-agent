@@ -1,9 +1,13 @@
 # Softrobot deterministic research harness
 
+第九轮已运行独立 MATLAB 多关节动力学、逐次计费的连续参数搜索、MuJoCo 验证与 C2 对照。当前 `runs/round9_reach` 的最佳 c066 在原 reach_free 任务中误差 **0.0001043346913 m（0.1043 mm）**，最大拉力仍为 20 N。
+真实数值运行：MATLAB 动态 69 次（含 1 次超时）、其他 MATLAB 数学调用 76 次、MuJoCo 6 次；**本轮 DeepSeek API 调用为 0，当前进程及 Windows 环境均未配置密钥，外部 LLM 闭环验收尚未完成**。详见[结果与限制](docs/round9_result.md)、[实际操作命令](docs/round9_usage.md)。
+查看工作台：`runs/round9_reach/index.html`；继续单模型会话：`python examples/workbench.py dynamics resume --root runs/round9_reach`。该命令不会增加授权额度。第九轮仅使用聚焦检查，不运行下文历史 full-suite 命令。
+
 第八轮已增加持续工作记忆、完整诊断入口、默认开启思考模式、独立新增预算和 MuJoCo 原生场景回放，见[操作与实际结果](docs/round8_design.md)。
-`runs/round8_ready` 保留旧 18 次请求和两个真实候选，另有本轮 12 次模型请求、1 个候选、1 次仿真预算；当前等待环境变量密钥。
+第九轮审计实际文件确认：`runs/round8_ready` 已停止于预算约束，累计 28 次真实模型请求，Round 8 新增 10/12；已有 c000/c001/c002 三个真实评价，最佳误差 0.1164444630 m。
 `python examples/workbench.py resume runs/round8_ready` 继续模型；`python examples/native_replay.py runs/round8_ready` 打开原生保存轨迹窗口。
-本轮原生窗口与 GIF 已验证，真实思考 API 因本进程无密钥尚未联调；没有新增仿真。
+旧文档中的 WAITING_FOR_KEY 是打包时记录，不代表之后实际运行的状态；历史文件与 Round 8 账本保留不变。
 
 第七轮已完善有限上下文、按需证据读取、思考协议和兼容续接，见[中文操作说明](docs/round7_continuation.md)和[实际结果](docs/round7_result.md)。
 当前 `runs/round7_ready` 继承第六轮七次真实模型请求、两个已评价候选和两次仿真；已有比较、动画和曲线。本轮进程无密钥，新增真实模型请求与仿真均为零。

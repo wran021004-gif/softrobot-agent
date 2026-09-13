@@ -74,16 +74,21 @@ def compile_mujoco(design: DesignSpec | RobotIR, task: TaskSpec, output_path: Pa
     for index in range(design.segments):
         position = "0 0 0" if index == 0 else f"{segment_length} 0 0"
         body = ET.SubElement(parent, "body", name=f"segment_{index}", pos=position)
+        rod = design.resolved_rod
+        if rod is not None:
+            ET.SubElement(body, 'inertial', pos=f'{segment_length/2} 0 0', mass=str(rod.mass_kg[index]),
+                          diaginertia=' '.join(map(str, rod.inertia_diagonal_kg_m2[index])))
         for axis_name, axis in (("y", "0 1 0"), ("z", "0 0 1")):
             ET.SubElement(
                 body, "joint", name=f"joint_{index}_{axis_name}", type="hinge", axis=axis,
-                stiffness=str(design.mechanics.joint_stiffness_nm_per_rad),
-                damping=str(design.mechanics.joint_damping_nm_s_per_rad),
+                stiffness=str(rod.stiffness_nm_rad[index] if rod else design.mechanics.joint_stiffness_nm_per_rad),
+                damping=str(rod.damping_nm_s_rad[index] if rod else design.mechanics.joint_damping_nm_s_per_rad),
+                **({'springref': str(math.degrees(rod.natural_y_rad[index]) if axis_name == 'y' else 0)} if rod else {}),
             )
         ET.SubElement(
             body, "geom", name=f"capsule_{index}", type="capsule",
             fromto=f"0 0 0 {segment_length} 0 0", size=str(design.body_radius_m),
-            density=str(design.mechanics.body_density_kg_m3), contype="1", conaffinity="0",
+            density=str(1000 if rod else design.mechanics.body_density_kg_m3), contype="1", conaffinity="0",
         )
         for i, (y, z) in enumerate(routing_offsets):
             ET.SubElement(
@@ -216,18 +221,37 @@ def run_task(
             else:
                 # Zero ctrl means zero length; disable forces for passive execution.
                 model.opt.disableflags |= int(mujoco.mjtDisableBit.mjDSBL_ACTUATION)
+            pre_qpos = data.qpos.copy() if record_trajectory else None
+            pre_qvel = data.qvel.copy() if record_trajectory else None
             mujoco.mj_step(model, data)
             if observability is not None:
                 observability.attempt("simulation_debug_step", lambda: observability.observe(model, data, commands))
             evidence.observe_step(model, data, commands)
             if record_trajectory:
+                import numpy as np
                 trajectory_data.qpos[:] = data.qpos
                 mujoco.mj_kinematics(model, trajectory_data)
+                contacts=[]
+                for ci in range(data.ncon):
+                    ct=data.contact[ci]; cf=np.zeros(6); mujoco.mj_contactForce(model,data,ci,cf)
+                    contacts.append(dict(geom1=model.geom(int(ct.geom1)).name,geom2=model.geom(int(ct.geom2)).name,
+                        position_m=ct.pos.tolist(),gap_m=float(ct.dist),normal_force_n=float(cf[0]),
+                        tangent_force_n=cf[1:3].tolist(),force_frame='contact local frame',time_s=float(data.time-model.opt.timestep)))
                 trajectory.append({'time_s':float(data.time), 'solver_time_s':float(data.time-model.opt.timestep),
                     'tip_m':trajectory_data.site_xpos[tip_site_id].tolist(),
                     'qpos_rad':data.qpos.tolist(), 'qvel_rad_s':data.qvel.tolist(),
                     'command_m':commands, 'solver_tendon_length_m':data.ten_length.tolist(),
-                    'solver_actuator_force_n':data.actuator_force.tolist(), 'solver_contact_count':int(data.ncon)})
+                    'solver_actuator_force_n':data.actuator_force.tolist(), 'solver_contact_count':int(data.ncon),
+                    'solver_qpos_rad':pre_qpos.tolist(),'solver_qvel_rad_s':pre_qvel.tolist(),
+                    'solver_qfrc_actuator_nm':data.qfrc_actuator.tolist(),
+                    'solver_qfrc_passive_nm':data.qfrc_passive.tolist(),
+                    'solver_qfrc_constraint_nm':data.qfrc_constraint.tolist(),
+                    'contacts':contacts,
+                    'tendon_routes_m':[[trajectory_data.site_xpos[model.site(f'tendon_{j}_base').id].tolist()]+[
+                        trajectory_data.site_xpos[model.site(f'tendon_{j}_seg_{i}').id].tolist() for i in range(model.nq//2)] for j in range(model.ntendon)]})
+                # Body origins plus final tip are centerline nodes, not tendon sites.
+                trajectory[-1]['centerline_m']=[trajectory_data.xpos[model.body(f'segment_{i}').id].tolist()
+                    for i in range(model.nq//2)]+[trajectory_data.site_xpos[tip_site_id].tolist()]
             if not (
                 all(math.isfinite(value) for value in data.qpos)
                 and all(math.isfinite(value) for value in data.qvel)

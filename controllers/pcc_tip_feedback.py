@@ -51,9 +51,13 @@ class PCCTipFeedback:
         norm = math.hypot(*bend)
         if norm > math.pi:
             bend = [x * math.pi / norm for x in bend]
-        raw = [self.robot_ir.total_length_m - self.robot_ir.tendon_routing_radius_m *
+        raw = [self.robot_ir.total_length_m + getattr(self, 'length_bias_m', 0.) - self.robot_ir.tendon_routing_radius_m *
                (bend[0] * math.cos(route.angle_rad) + bend[1] * math.sin(route.angle_rad))
                for route in self.robot_ir.tendon_routes]
+        if getattr(self,'active_fraction_limit',None) is not None:
+            base=self.robot_ir.total_length_m+getattr(self,'length_bias_m',0.)
+            cap=self.active_fraction_limit*self.robot_ir.total_length_m
+            raw=[base+min(cap,max(-cap,value-base)) for value in raw]
         previous = self.target.tendon_target_lengths_m
         cap = self.parameters.max_command_update_m
         bounded = [min(self.parameters.max_tendon_length_m, old + cap,

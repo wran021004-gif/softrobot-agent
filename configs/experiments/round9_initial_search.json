@@ -1,0 +1,10 @@
+{
+  "decision_origin":"Codex development decision from saved numerical evidence; not a DeepSeek API result",
+  "api_status":"No DEEPSEEK_API_KEY available at plan creation; real external LLM acceptance remains pending",
+  "hypothesis":"Historical root motion is small while terminal bending concentrates; unilateral length servo never reaches the 19.8N near-limit rule. Lower distributed gravity load and/or upward spring reference with adjusted length demand may distribute bending without increasing actuator rating.",
+  "evidence":["history/c002_diagnosis.json","candidates/c000/matlab/5046a6ec9bf0/result.json","candidates/c001/matlab/bc4720117150/result.json","candidates/c001/mujoco/9e5bb3dc3c81/result.json"],
+  "arguments": {"parent_id":"c001","variables":["bend_z_rad","line_density_kg_m","root_ei_nm2","natural_total_angle_rad","bias_fraction"],"bounds_ref":"round9_grant","objective_ref":"reach_final_error_v1","max_evaluations":40,"search_id":"initial_physical_control","initial_step":0.1},
+  "fixed":"L=.3m, body radius=.02m, tendon radius=.018m, 4 tendons, 8 segments, actuator max pull=20N; frozen reach task, solver tolerances and duration",
+  "objective":"only final valid t=2s Euclidean tip error; all auxiliary weights zero; local optimizer, not global optimum",
+  "validation":"Compare best and one representative in MuJoCo; diagnose discrepancies before choosing a feedback modification"
+}

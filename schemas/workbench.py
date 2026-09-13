@@ -61,7 +61,7 @@ class CreateCandidateArguments(Contract):
 
 
 class CompareCandidatesArguments(Contract):
-    candidate_ids: list[str] = Field(min_length=1, max_length=3)
+    candidate_ids: list[str] = Field(min_length=1, max_length=320)
 
 
 class DeepSeekConfig(Contract):
@@ -74,13 +74,13 @@ class DeepSeekConfig(Contract):
     max_tokens: int = Field(default=2048, ge=256, le=8192)
     max_input_bytes: int = Field(default=60000, ge=4000, le=200000)
     timeout_s: int = Field(default=90, ge=1, le=180)
-    model_calls: int = Field(default=18, ge=1, le=40)
+    model_calls: int = Field(default=18, ge=1, le=120)
     model_failure_retries: int = Field(default=1, ge=0, le=2)
-    candidates: int = Field(default=3, ge=1, le=3)
-    simulations: int = Field(default=3, ge=0, le=3)
+    candidates: int = Field(default=3, ge=1, le=320)
+    simulations: int = Field(default=3, ge=0, le=24)
     computation_retries: int = Field(default=0, ge=0, le=1)
-    tool_calls: int = Field(default=24, ge=1, le=40)
-    decisions: int = Field(default=24, ge=1, le=40)
+    tool_calls: int = Field(default=24, ge=1, le=240)
+    decisions: int = Field(default=24, ge=1, le=260)
     tool_timeout_s: int = Field(default=180, ge=1, le=300)
 
     @model_validator(mode='after')

@@ -7,6 +7,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 def main():
+    if len(sys.argv)>1 and sys.argv[1]=='dynamics':
+        from examples.reach_dynamics import main as dynamic_main
+        return dynamic_main(sys.argv[2:])
     parser = argparse.ArgumentParser(description='机器人设计工作台：固定规则、受限工具、持久证据与中文观察')
     sub = parser.add_subparsers(dest='command', required=True)
     start = sub.add_parser('run', help='新建有限闭环；默认最多一次仿真')

@@ -49,7 +49,11 @@ def executable_catalog():
 
 def catalog():
     from capabilities.registry import query_tools
+    from schemas.dynamic_workbench import native_tools as dynamic_tools
     return dict(executable=executable_catalog(), limits=LIMITS,
+                dynamics_v2=dict(entrypoint='python examples/workbench.py dynamics',
+                    executable=dynamic_tools(),grant='configs/experiments/round9_grant.json',
+                    implementation='tools/dynamic_campaign.py',scope='New reach_free campaign; original V1 continuation remains strict'),
                 decision_schema=Decision.model_json_schema(), result_schema=WorkbenchResult.model_json_schema(),
                 library=[{**v, 'executable_via_workbench': False,
                           'execution_note': '库工具或历史实验入口；不在执行白名单，不能由决策直接调用'}
