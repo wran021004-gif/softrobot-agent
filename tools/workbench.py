@@ -197,6 +197,8 @@ class Workbench:
 
     def _load_idle(self):
         self.state = read(self.root / 'state.json')
+        from tools.design_continuation import verify_round_owner
+        verify_round_owner(self)
         for ref in self.state['evidence'].values():
             path = (self.root / ref['path']).resolve()
             if not path.is_relative_to(self.root) or file_hash(path) != ref['sha256']:
@@ -226,7 +228,8 @@ class Workbench:
         for attempt in self.state['attempts']:
             for name, count in attempt['cost'].items():
                 used[name] += count
-        return {name: cap - used[name] for name, cap in self.state['request']['limits'].items()}
+        baseline = self.state['request'].get('round_budget', {}).get('baseline', {})
+        return {name: cap - (used[name] - baseline.get(name, 0)) for name, cap in self.state['request']['limits'].items()}
 
     def context(self):
         if self.state.get('candidates'):
@@ -252,6 +255,8 @@ class Workbench:
 
     def submit(self, value):
         """Caller holds owner lock and has loaded state. Untrusted JSON is validated before dispatch."""
+        from tools.design_continuation import verify_round_owner
+        verify_round_owner(self)
         if self.remaining()['decisions'] <= 0:
             self.state.update(status='STOPPED', stop_reason='DECISION_BUDGET_EXHAUSTED')
             self.save()
@@ -262,6 +267,8 @@ class Workbench:
             decision = Decision.model_validate(row['proposal'])
             if any(ref not in self.state['evidence'] for ref in decision.evidence):
                 raise ValueError('UNKNOWN_EVIDENCE')
+            if decision.working_memory and any(ref not in self.state['evidence'] for ref in decision.working_memory.evidence):
+                raise ValueError('UNKNOWN_MEMORY_EVIDENCE')
             row['evidence_hashes'] = {ref: self.state['evidence'][ref]['sha256'] for ref in decision.evidence}
             if decision.action != 'continue':
                 row['status'] = 'accepted'

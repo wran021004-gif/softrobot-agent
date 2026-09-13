@@ -123,12 +123,15 @@ def compact_result(result):
         fields = ('candidate_id', 'candidate', 'canonical_task_status', 'position_error_m',
                   'predicted_position_error_m', 'actual_tip_m', 'model_tip_m', 'trajectory_available',
                   'failure_attribution', 'capability', 'best_candidate_id', 'ranked', 'backend_solves')
+        fields += ('native_scene', 'native_command')
         selected = {k: data[k] for k in fields if k in data}
     return dict(tool=result.get('tool'), status=result['status'], failure_code=result.get('failure_code'),
                 message=str(result.get('message') or '')[:400], data=selected)
 
 
 def model_context(book):
+    from tools.design_evidence import diagnostic_entries
+    from tools.design_memory import memory_context
     state = book.state
     task = read(book.root / 'inputs/task_context.json')
     candidates = []
@@ -136,10 +139,12 @@ def model_context(book):
         ev = evaluation(state, c['candidate_id'])
         candidates.append({**{k: v for k, v in c.items() if k not in ('reason', 'evidence', 'design_hash', 'path')},
                            'evaluation_id': 'eval:' + c['candidate_id'] if ev else None,
+                           'diagnostic_entries': diagnostic_entries(ev['result']['data'], 'eval:' + c['candidate_id']) if ev else {},
                            'evaluation': compact_result(ev['result']) if ev else {'status': 'NOT_RUN'}})
     return dict(task={k: v for k, v in task.items() if k in ('task', 'allowed_changes', 'fixed_parameters', 'relational_constraints', 'control', 'physics')},
                 environment={k: task['environment'][k] for k in ('coordinate_frame', 'gravity_m_s2', 'objects')}, candidates=candidates,
-                remaining=book.remaining(), computation_retries=state['request']['design_session']['computation_retries'],
+                remaining=book.remaining(), working_memory=memory_context(state),
+                computation_retries=state['request']['design_session']['computation_retries'],
                 recent_actions=[dict(sequence=d['sequence'], tool=d['proposal'].get('tool') or d['proposal'].get('action'),
                                      status=d.get('status'), reason=d['proposal'].get('reason', '')[:240],
                                      rejection=d.get('failure_code')) for d in state['decisions'][-3:]],
@@ -169,6 +174,7 @@ def summary(state):
     return dict(status=state['status'], stop_reason=state.get('stop_reason'), candidates=rows, best_candidate=best,
                 workflow_completed=state['status'] == 'STOPPED' and any(d.get('status') == 'accepted' and d['proposal'].get('action') == 'stop' for d in state['decisions']),
                 inherited_usage=inherited,
+                round_budget=state['request'].get('round_budget'),
                 new_model_requests=len(state.get('model_calls', [])) - inherited.get('model_calls', 0),
                 new_simulation_reservations=sum(a['cost'].get('simulations', 0) for a in state['attempts']) - inherited.get('simulations', 0),
                 task_achieved=bool(best and best['canonical_task_status'] == 'PASS'),

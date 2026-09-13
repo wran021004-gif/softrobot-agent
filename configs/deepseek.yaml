@@ -1,15 +1,15 @@
 # No credentials here. Read DEEPSEEK_API_KEY from the process environment only.
 model: deepseek-flash
 base_url: https://api.deepseek.com
-thinking: disabled
+thinking: enabled
 # enabled preserves reasoning_content in complete tool exchanges; temperature is omitted.
-# Start a fresh conversation from saved facts after this many complete exchanges.
-context_turns: 2
+# Compact only when the serialized request reaches this fraction of the byte cap.
+context_compact_ratio: 0.85
 temperature: 0.2
-max_tokens: 2048
+max_tokens: 8192
 max_input_bytes: 60000
 timeout_s: 90
-model_calls: 18
+model_calls: 12
 model_failure_retries: 1
 candidates: 3
 simulations: 3

@@ -14,6 +14,9 @@ def render(root, state):
     def link(path, label=None):
         return f'<a href="{quote(path, safe="/")}">{text(label or path)}</a>'
     rows, media = [], []
+    for cid, paths in state.get('native_replays', {}).items():
+        media.append('<p>原生场景回放：' + text(cid) + ' · ' + ' · '.join(link(p) for p in paths) + '</p>')
+        media.extend(f'<img src="{quote(p, safe="/")}" alt="MuJoCo 原生机器人、腱线与目标场景">' for p in paths if p.endswith('.gif'))
     for attempt in state['attempts']:
         result = attempt.get('result', {})
         refs = [link(p) for p in result.get('artifacts', [])]
@@ -53,13 +56,19 @@ def render(root, state):
             execution.append('<p>' + label + text(data.get('mujoco', {}).get('task_success', 'NOT_RUN')) +
                              '；末端误差 (m)：' + text(data.get('mujoco', {}).get('position_error_m', '无')) + '</p>')
         execution.append('<p>交互观察命令：<code>python examples/observe.py ' + text(run.relative_to(ROOT).as_posix()) + '</code></p>')
+        execution.append('<p>MuJoCo 原生场景窗口：<code>python examples/native_replay.py ' + text(run.relative_to(ROOT).as_posix()) + '</code>；空格暂停/继续，左右逐帧，R 重播，鼠标调视角。导出加 <code>--export runs/native_export_new</code>（新目录）。</p>')
     limits = state['request']['limits']
     used = {k: sum(a['cost'].get(k, 0) for a in state['attempts']) for k in limits}
     used['decisions'] = len(state['decisions'])
     if 'candidates' in used:
         used['candidates'] += 1
         used['model_calls'] = len(state.get('model_calls', []))
+    historical = state['request'].get('round_budget', {}).get('baseline', {})
+    total_used = dict(used)
+    used = {k: v - historical.get(k, 0) for k, v in used.items()}
     budget = '；'.join(f'{text(k)}：{used[k]}/{limits[k]}' for k in limits)
+    if historical:
+        budget = '本轮新增用量：' + budget + '<br>历史消耗（保留）：' + text(historical) + '<br>累计消耗：' + text(total_used)
     design = (root / 'inputs/design.yaml').read_text(encoding='utf-8')
     history = [link(v['path'], k + '（历史上下文）') for k, v in state['evidence'].items() if k.startswith('history:')]
     design_section = ''
@@ -83,7 +92,8 @@ def render(root, state):
         for m in state['model_calls']:
             from tools.deepseek_adapter import input_metrics
             request_path = m['folder'] + '/request.json'
-            sizes = m.get('input_metrics') or input_metrics(read(root / request_path))
+            wire = read(root / request_path)
+            sizes = m.get('input_metrics') or input_metrics(wire)
             labels = {'system': '系统指令', 'context': '任务与当前状态', 'assistant': '历史回复', 'tool_feedback': '历史工具反馈', 'reasoning': '其中思考字段', 'tools': '工具定义'}
             components = '；'.join(labels[k] + '：' + str(v) + ' B' for k, v in sizes['components'].items())
             if sizes.get('context_sections'):
@@ -97,12 +107,16 @@ def render(root, state):
             if d:
                 outcome = '<p>决策：' + text(d.get('status')) + '；拒绝原因：' + text(d.get('failure_code') or '无') + '</p>'
                 outcome += '<pre>' + text(json.dumps(proposal, ensure_ascii=False, indent=2)) + '</pre>'
+            outcome += '<p>请求模型：' + text(wire.get('model')) + '；响应模型：' + text(m.get('response_model') or '尚无响应') + '；实际请求思考模式：' + text(wire.get('thinking', {}).get('type', '未记录')) + '；生成上限：' + text(wire.get('max_tokens')) + '；实际 token 用量：' + text(m.get('usage', {})) + '</p>'
+            if m.get('thinking') == 'enabled':
+                outcome += '<p>思考字段已保存：' + text('reasoning_content' in m.get('message', {})) + '（完整字段保留在响应文件，页面只展示简短行动依据）</p>'
             if attempt:
                 outcome += '<p>工具结果：' + text(attempt.get('result', {}).get('status', attempt['status'])) + ' · ' + link(attempt['result_ref'], '完整工具结果') + '</p>' if attempt.get('result_ref') else '<p>工具执行中</p>'
             if m.get('feedback'):
                 outcome += '<details><summary>回传模型的工具反馈</summary><pre>' + text(json.dumps(m['feedback'], ensure_ascii=False, indent=2)) + '</pre></details>'
             calls.append(f'<details><summary>#{m["index"]} {"继承请求" if m["index"] < inherited else "本运行请求"} · {text(m["status"])} · {sizes["total_bytes"]:,} B</summary><p>{components}</p><p>会话片段起点：{text(m.get("context_start", "旧版完整历史"))}；{link(request_path, "完整请求")} · {response_link}</p><p>{text(m.get("error", ""))}</p>{outcome}</details>')
         preview = state.get('last_input_metrics', {})
+        memory_view = '<details><summary>持续工作记忆：已读内容、发现与下一步</summary><pre>' + text(json.dumps(state.get('working_memory', {}), ensure_ascii=False, indent=2)) + '</pre></details>'
         design_section = f'<section><h2>模型与候选设计</h2><p>单决策模型：{text(state["request"]["design_session"]["model"])}；思考模式：{text(state["request"]["design_session"]["thinking"])}；固定指令 C1。成绩来自本次或兼容续接继承的真实评价，NOT_RUN 表示尚无实际成绩。</p><table><tr><th>编号 / 上一版</th><th>参数</th><th>修改与依据</th><th>计算 / 任务成绩</th><th>证据</th></tr>{"".join(candidate_rows)}</table><p>{link("design_report.json", "有证据支持的最终结果")}；流程完成：{text(summary_data["workflow_completed"])}；机器人达标：{text(summary_data["task_achieved"])}</p><p>本运行新增模型请求：{summary_data["new_model_requests"]}；新增仿真预留：{summary_data["new_simulation_reservations"]}</p></section><section><h2>模型请求 → 回复 → 工具反馈（时间顺序）</h2>{"".join(calls)}<p>最新请求或待发送预览：{text(preview)}</p><p>停止原因：{text(state.get("stop_reason"))}</p></section>'
     return f'''<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 <title>机器人设计工作台</title>
@@ -111,9 +125,9 @@ def render(root, state):
 <h1>机器人自动设计工作台</h1><p>读取任务 → 检查设计 → 数学分析 → 控制生成 → 编译 → 仿真 → 评价诊断 → 下一步决策 → 停止</p>
 <section><h2>当前状态：{text(state['status'])}</h2><p>{text(state.get('stop_reason', '按固定规则执行；每 5 秒刷新保存状态'))}</p><p>{budget}</p><p>冻结任务：reach_free_v1；控制器：C1；物理：legacy_v1_surrogate（未标定）</p><details><summary>使用的设计</summary><pre>{text(design)}</pre></details><p>{link('request.json', '任务、预算与代码版本')} · {link('state.json', '完整状态与证据哈希')} · {link('source_snapshot.zip', '执行源代码快照')}</p>{' · '.join(history)}</section>
 {design_section}<section><h2>工具执行</h2><table><tr><th>阶段</th><th>状态</th><th>错误</th><th>证据</th></tr>{''.join(rows)}</table><p>缓存复用：{len(state['reuse'])} 次。预算按尝试预扣，中断不返还。</p></section>
-<section><h2>为什么选择下一步</h2><ol>{''.join(decisions)}</ol></section>
+<section><h2>为什么选择下一步</h2>{memory_view if state.get('candidates') else ''}<ol>{''.join(decisions)}</ol></section>
 <section><h2>实验细节与失败证据</h2>{''.join(execution)}</section>
-<section><h2>动画与曲线</h2><p>由现有观察器读取保存轨迹生成；观看不启动仿真。</p>{''.join(media) or ('轨迹已保存，尚未生成动画。' if any(a.get('result', {}).get('data', {}).get('trajectory_available') for a in state['attempts']) else '没有可用轨迹；请查看评价与错误证据。')}</section></html>'''
+<section><h2>原生场景、动画与诊断曲线</h2><p>直接打开最佳候选原生窗口：<code>python examples/native_replay.py {text(root.relative_to(ROOT).as_posix())}</code>。空格暂停/继续，左右逐帧，R 重播；鼠标拖动和滚轮调整视角。回放读取保存状态和时间，不推进实验、不重新评分。</p>{''.join(media) or ('轨迹已保存，尚未生成动画。' if any(a.get('result', {}).get('data', {}).get('trajectory_available') for a in state['attempts']) else '没有可用轨迹；请查看评价与错误证据。')}</section></html>'''
 
 
 def write_dashboard(root, state):

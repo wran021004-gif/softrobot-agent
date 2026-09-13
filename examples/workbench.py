@@ -27,6 +27,11 @@ def main():
     continuation.add_argument('--root', required=True, help='不存在的新运行目录')
     continuation.add_argument('--model-config', default='configs/deepseek.yaml')
     continuation.add_argument('--steps', type=int)
+    round_start = sub.add_parser('round', help='使用本次明确授权的新预算导入两个旧候选；一次性登记，后续只能 resume')
+    round_start.add_argument('source')
+    round_start.add_argument('--root', required=True)
+    round_start.add_argument('--model-config', default='configs/deepseek.yaml')
+    round_start.add_argument('--steps', type=int)
     observe = sub.add_parser('observe', help='本地只读中文页面，动态读取内部阶段')
     observe.add_argument('root')
     observe.add_argument('--port', type=int, default=8765)
@@ -60,6 +65,9 @@ def main():
     elif args.command == 'continue':
         from tools.design_continuation import continue_design
         continue_design(book, args.source, args.model_config)
+    elif args.command == 'round':
+        from tools.design_continuation import start_round
+        start_round(book, args.source, args.model_config)
     state = book.run(steps=args.steps, decision=read(args.decision) if getattr(args, 'decision', None) else None)
     print(f'工作台状态：{state["status"]}；页面：{book.root / "index.html"}')
     # Scientific failure is a valid completed workflow, independent of CLI success.

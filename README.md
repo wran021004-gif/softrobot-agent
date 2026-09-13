@@ -1,5 +1,10 @@
 # Softrobot deterministic research harness
 
+第八轮已增加持续工作记忆、完整诊断入口、默认开启思考模式、独立新增预算和 MuJoCo 原生场景回放，见[操作与实际结果](docs/round8_design.md)。
+`runs/round8_ready` 保留旧 18 次请求和两个真实候选，另有本轮 12 次模型请求、1 个候选、1 次仿真预算；当前等待环境变量密钥。
+`python examples/workbench.py resume runs/round8_ready` 继续模型；`python examples/native_replay.py runs/round8_ready` 打开原生保存轨迹窗口。
+本轮原生窗口与 GIF 已验证，真实思考 API 因本进程无密钥尚未联调；没有新增仿真。
+
 第七轮已完善有限上下文、按需证据读取、思考协议和兼容续接，见[中文操作说明](docs/round7_continuation.md)和[实际结果](docs/round7_result.md)。
 当前 `runs/round7_ready` 继承第六轮七次真实模型请求、两个已评价候选和两次仿真；已有比较、动画和曲线。本轮进程无密钥，新增真实模型请求与仿真均为零。
 设置 `DEEPSEEK_API_KEY` 后运行 `python examples/workbench.py resume runs/round7_ready`；剩余最多一个候选、一次仿真和十一次模型请求。

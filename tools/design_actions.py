@@ -73,5 +73,13 @@ def execute(name, arguments, root, folder, state):
             return output(dict(candidate_id=c['candidate_id'], backend_solves=0), status='capability_missing',
                           failure_code='NO_TRAJECTORY', message='没有可用轨迹；计算与任务成绩请查看评价证据')
         from tools.workbench_actions import render_observation
-        return output(dict(candidate_id=c['candidate_id'], backend_solves=0), render_observation(root / ev['run'], folder))
+        artifacts = render_observation(root / ev['run'], folder)
+        from tools.native_replay import NativeReplay
+        try:
+            artifacts += NativeReplay(root / ev['run']).export(folder)
+            native_status = 'completed'
+        except (RuntimeError, ValueError, OSError) as exc:
+            native_status = 'unavailable: ' + str(exc)
+        return output(dict(candidate_id=c['candidate_id'], backend_solves=0, native_scene=native_status,
+                           native_command=f'python examples/native_replay.py {root.relative_to(ROOT).as_posix()} --candidate {c["candidate_id"]}'), artifacts)
     raise ValueError('Unknown design tool')

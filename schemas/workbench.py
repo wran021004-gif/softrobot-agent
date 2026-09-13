@@ -4,12 +4,26 @@ from pydantic import Field, model_validator
 from schemas.common import Contract
 
 
+class WorkingMemory(Contract):
+    findings: list[str] = Field(default_factory=list, max_length=4)
+    unresolved: list[str] = Field(default_factory=list, max_length=4)
+    next_action: str = Field(max_length=300)
+    evidence: list[str] = Field(min_length=1, max_length=8)
+
+    @model_validator(mode='after')
+    def concise(self):
+        if any(len(s) > 300 for s in self.findings + self.unresolved):
+            raise ValueError('Memory notes must be brief observations, at most 300 characters each')
+        return self
+
+
 class Decision(Contract):
     action: Literal['continue', 'stop', 'capability_missing']
     tool: str | None = None
     arguments: dict = Field(default_factory=dict)
     evidence: list[str] = Field(min_length=1)
     reason: str = Field(min_length=1, max_length=4000)
+    working_memory: WorkingMemory | None = None
 
     @model_validator(mode='after')
     def consistent(self):
@@ -54,7 +68,8 @@ class DeepSeekConfig(Contract):
     model: str = Field(pattern=r'^deepseek-[a-z0-9.-]+$')
     base_url: str
     thinking: Literal['disabled', 'enabled'] = 'disabled'
-    context_turns: int = Field(default=2, ge=1, le=6, description='一个协议会话片段保留的完整工具往返数；之后从状态摘要新开片段')
+    context_turns: int | None = Field(default=None, description='旧配置兼容字段；不再按往返数重建会话')
+    context_compact_ratio: float = Field(default=0.85, ge=0.5, le=1)
     temperature: float = Field(default=0.2, ge=0, le=2)
     max_tokens: int = Field(default=2048, ge=256, le=8192)
     max_input_bytes: int = Field(default=60000, ge=4000, le=200000)

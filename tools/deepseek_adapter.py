@@ -3,7 +3,7 @@ import json
 import os
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, build_opener, HTTPRedirectHandler
-from schemas.workbench import Decision
+from schemas.workbench import Decision, WorkingMemory
 from tools.state_io import atomic_json, read
 from tools.workbench_catalog import TOOLS, DESIGN_TOOLS
 from tools.design_session import compact_result
@@ -26,7 +26,8 @@ def native_tools():
         schema = info['schema'].model_json_schema() if info else {'type': 'object', 'properties': {}, 'required': []}
         schema['properties'].update(reason={'type': 'string', 'description': '简要依据；引用真实观测，不输出长推理'},
                                     evidence={'type': 'array', 'items': {'type': 'string'}, 'minItems': 1})
-        schema['required'] = schema.get('required', []) + ['reason', 'evidence']
+        schema['properties']['working_memory'] = {**WorkingMemory.model_json_schema(), 'description': '更新简短工作笔记：已得发现、待解决问题、下一步；不写长推理。证据必须已登记。'}
+        schema['required'] = schema.get('required', []) + ['reason', 'evidence', 'working_memory']
         schema['additionalProperties'] = False
         description = (info['purpose'] + '；成本：' + json.dumps(info['cost']) + '；前置检查：' + str(info['requires'])) if info else '引用证据结束本次设计，说明停止或能力不足的原因'
         tools.append(dict(type='function', function=dict(name=name, description=description, parameters=schema)))
@@ -77,7 +78,7 @@ def payload_for(book, *, fresh=False):
     state = book.state
     start = state.get('context_start', 0)
     active = [r for r in state['model_calls'][start:] if r.get('status') == 'completed']
-    if fresh or len(active) >= config.get('context_turns', 2):
+    if fresh:
         # Start a NEW conversation from saved facts, never trim reasoning inside
         # a replayed assistant/tool exchange. Completed records remain immutable.
         start = len(state['model_calls'])
@@ -86,7 +87,7 @@ def payload_for(book, *, fresh=False):
     messages = [{'role': 'system', 'content': (book.root / 'inputs/system_prompt.md').read_text(encoding='utf-8')},
                 {'role': 'user', 'content': '继续有限设计任务；本会话片段以最新保存状态为事实依据。'}]
     for row in active:
-        messages.append(row['message'])
+        messages.append({**row['message'], 'content': row['message'].get('content') or ''})
         feedback = json.dumps(row['feedback'], ensure_ascii=False)
         calls = row['message'].get('tool_calls', [])
         if calls:
@@ -99,10 +100,11 @@ def payload_for(book, *, fresh=False):
         if last:
             context['latest_feedback'] = compact_feedback(last['feedback'])
     messages.append({'role': 'user', 'content': '最新权威上下文与状态：\n' + json.dumps(context, ensure_ascii=False)})
-    payload = dict(model=config['model'], messages=messages, tools=native_tools(), tool_choice='required',
+    payload = dict(model=config['model'], messages=messages, tools=native_tools(),
                    thinking={'type': config['thinking']}, max_tokens=config['max_tokens'], stream=False)
     if config['thinking'] == 'disabled':
         payload['temperature'] = config['temperature']
+        payload['tool_choice'] = 'required'
     return payload
 
 
@@ -110,7 +112,7 @@ def compact_feedback(feedback):
     decision = feedback['decision']
     return dict(decision={k: decision[k] for k in ('sequence', 'status', 'failure_code') if k in decision},
                 result=compact_result(feedback['result']) if feedback.get('result') else None,
-                result_ref=feedback.get('result_ref'), cite_as=feedback.get('cite_as'))
+                result_ref=feedback.get('result_ref'), cite_as=feedback.get('cite_as'), read_notice=feedback.get('read_notice'))
 
 
 def parse_decision(row):
@@ -123,10 +125,11 @@ def parse_decision(row):
         call = calls[0]['function']
         args = json.loads(call['arguments'])
         reason, evidence = args.pop('reason'), args.pop('evidence')
+        memory = args.pop('working_memory', None)
         if call['name'] in ('stop_design', 'capability_missing'):
             return Decision(action='stop' if call['name'] == 'stop_design' else 'capability_missing',
-                            arguments=args, reason=reason, evidence=evidence)
-        return Decision(action='continue', tool=call['name'], arguments=args, reason=reason, evidence=evidence)
+                            arguments=args, reason=reason, evidence=evidence, working_memory=memory)
+        return Decision(action='continue', tool=call['name'], arguments=args, reason=reason, evidence=evidence, working_memory=memory)
     except (ValueError, TypeError, KeyError, AttributeError) as exc:
         return dict(action='continue', tool='INVALID_MODEL_OUTPUT', arguments={}, evidence=['request'], reason=str(exc))
 
@@ -144,6 +147,11 @@ def apply_response(book, row):
     feedback = dict(decision=decision, result=result, result_ref=ref,
                     cite_as=book.state['evidence'].get(ref, {}).get('evaluation_id') or ref)
     row.update(status='completed', feedback=compact_feedback(feedback))
+    from tools.design_memory import remember, save_memory
+    notice = remember(book, decision, result)
+    if notice:
+        row['feedback']['read_notice'] = notice
+    save_memory(book)
     atomic_json(book.root / row['folder'] / 'feedback.json', row['feedback'])
     book.register(book.root / row['folder'] / 'feedback.json')
     book.save()
@@ -178,14 +186,18 @@ def run_model(book, *, steps=None, transport=None):
             apply_response(book, pending)
             count += 1
             continue
-        failures = sum(m['status'] == 'failed' for m in state['model_calls'])
+        baseline = state['request'].get('round_budget', {}).get('baseline', {}).get('model_calls', 0)
+        failures = sum(m['status'] == 'failed' for m in state['model_calls'][baseline:])
         if failures > config['model_failure_retries']:
             return stop(book, 'MODEL_FAILURE_RETRY_EXHAUSTED')
         if book.remaining()['model_calls'] <= 0 or book.remaining()['decisions'] <= 0:
             return stop(book, 'MODEL_OR_DECISION_BUDGET_EXHAUSTED')
         payload = payload_for(book)
-        if encoded_size(payload) > config['max_input_bytes']:
+        if encoded_size(payload) > config['max_input_bytes'] * config.get('context_compact_ratio', .85) and state['context_start'] < len(state['model_calls']):
+            before = encoded_size(payload)
             payload = payload_for(book, fresh=True)
+            state.setdefault('context_compactions', []).append(dict(at_model_call=len(state['model_calls']), before_bytes=before,
+                                                                    after_bytes=encoded_size(payload), reason='input_size', memory_ref='working_memory.json'))
         state['last_input_metrics'] = input_metrics(payload)
         if encoded_size(payload) > config['max_input_bytes']:
             atomic_json(book.root / 'blocked_request.json', payload)
@@ -203,6 +215,7 @@ def run_model(book, *, steps=None, transport=None):
         row = dict(index=len(state['model_calls']), status='reserved', folder=folder.relative_to(book.root).as_posix(),
                    decision_sequence=len(state['decisions']), model=config['model'],
                    context_start=state['context_start'], input_metrics=state['last_input_metrics'],
+                   thinking=config['thinking'], max_tokens=config['max_tokens'],
                    transport='injected_test' if transport else 'official_deepseek')
         state['model_calls'].append(row)
         state.update(status='MODEL_CALL', stop_reason=None)
@@ -214,6 +227,8 @@ def run_model(book, *, steps=None, transport=None):
             saved = dict(message={k: message[k] for k in ('role', 'content', 'reasoning_content', 'tool_calls') if k in message},
                          finish_reason=choice.get('finish_reason'), usage=response.get('usage', {}),
                          response_model=response.get('model'))
+            # Persist the provider response exactly, including nullable content.
+            # Normalize content only on the outbound wire if tools require it.
             atomic_json(folder / 'response.json', saved)
             book.register(folder / 'response.json')
             absorb_response(book, row, saved)
