@@ -1,5 +1,39 @@
 # Round 9 本地使用
 
+## 上下文读取修复与聚焦验证
+
+实际发送和只读检查共用 `DynamicCampaign.build_model_request()`，按 transport 的完整 UTF-8 JSON 编码计量（包含 system、user、tools 和转义），目标 50000 bytes，硬上限仍为 60000。候选默认包含参数变化、后端状态/核心指标和原文件引用；旧的大工具结果只在构建请求时转换，不覆盖原文件。超过目标依次压缩历史/最近决策、候选详情、非读页工具预览；当前证据页、任务、权限、工具 schema 和工作记忆保留。必要内容仍超过硬上限时保存 `context_pause.json`，状态改为 PAUSED，不预约模型预算。
+
+已有 run 的 `inputs/system_prompt.md` 保持原样；构建请求时追加 `dynamic_evidence_reading_v1` 指引。真实发送时将原提示文本哈希、有效提示哈希和追加指引保存至 `inputs/prompt_versions/`，并在模型回执中关联版本；`request.json` 保存实际有效提示。
+
+只读检查（不会调用 `load/save`、API 或求解器）：
+
+```powershell
+python examples/check_dynamic_context.py --root runs/round9_reach
+```
+
+本次当前磁盘状态的完整请求为 **61795 → 26016 bytes**；最新结果为 `attempts/025_compare_candidates/result.json`，选中 c000/c066/c057/c065 四个候选。修复前数值由原有未提交的 `round9_context_check.py` 在修改前测得，并非先前另一状态的 84572 bytes。原有未提交脚本未修改。
+
+仅执行一个聚焦回归：`python -m unittest tests.test_dynamic_context -v`。244801 bytes 嵌套工具结果可逐层续读，5000 个原始样本数值保持一致，数组原索引通过 `record_verified_diagnosis` 核验；下一轮完整请求 26122 bytes。该场景也覆盖旧结果转换、转义 pointer/UTF-8 字符串、保留当前页、超限暂停且不扣模型预算。测试使用独立的 `runs/round9_context_tests/` 小型夹具，不改变当前 Round9 状态和预算。
+
+进程、用户和系统环境均无 `DEEPSEEK_API_KEY`，真实模型闭环验证跳过。本次实际 API/MATLAB/MuJoCo 调用均为 0；未重新优化 c066。
+
+`read_evidence` 保留原参数，新增 `max_bytes`（默认 4000，范围 1000–8000，包含整页元数据）。可直接使用以下真实参数读取 c066 的已有证据：
+
+```json
+{"evidence_ref":"candidates/c066/mujoco/bcd6ffa57302/diagnosis.json","pointer":"/queries","offset":0,"limit":2,"max_bytes":4000}
+```
+
+返回原文件 queries[0:2]（tendon_0、tendon_1），`returned_range={"start":0,"end_exclusive":2}`、`next_offset=2`、`has_more=true`。续读直接采用返回的 `next_read` 参数（此例 offset=2）。引用诊断时 `record_index=offset+content中的下标`。单个嵌套条目超限时，`mode=directory` 返回子 pointer，`returned_count=0`，应先沿 `next_read` 下钻，再用 `resume_container` 读取其余同级项；字符串页的 offset 是原字符串字符位置。不得把空数据目录页当作完整证据，也不得重新以页内下标引用原文件。
+
+恢复命令：
+
+```powershell
+python examples/workbench.py dynamics resume --root runs/round9_reach --steps 120
+```
+
+`--steps 120` 表示本次最多推进 120 次模型请求，仍受剩余预算和停止条件约束，不新增 120 次预算；本次未执行该恢复命令。
+
 在 `D:\softrobot-agent` 使用已有 `softagent` 环境，不安装新框架或升级依赖：
 
 ```powershell

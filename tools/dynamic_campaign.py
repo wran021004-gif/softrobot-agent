@@ -22,6 +22,8 @@ from tools.workbench import Workbench,owner,source_hashes,runtime
 from tools.design_compiler import build_robot_ir
 from tools.reach_dynamics import DynamicsBackends,MODEL_ID,SOLVER
 from tools.trajectory_diagnosis import historical_audit,diagnose,metadata_from_shared
+from tools.dynamic_context import (evidence_page, encoded_size, prompt_with_version,
+    PAGE_VERSION, TARGET_BYTES, MAX_REQUEST_BYTES, RequestTooLarge)
 
 GRANT=ROOT/'configs/experiments/round9_grant.json'
 LEDGER=ROOT/'runs/round9_budget.json'
@@ -304,11 +306,8 @@ class DynamicCampaign(Workbench):
             return {**{k:v for k,v in d.items() if k!='raw_fields'},'raw_fields_ref':path.relative_to(self.root).as_posix()}
         if name=='read_evidence':
             ref=args['evidence_ref'];self.check_evidence(ref);value=read(self.root/ref)
-            for part in args['pointer'].strip('/').split('/') if args['pointer'] else []:
-                part=part.replace('~1','/').replace('~0','~');value=value[int(part)] if isinstance(value,list) else value[part]
-            if isinstance(value,list):value=value[args['offset']:args['offset']+args['limit']]
-            elif isinstance(value,dict):value=dict(list(value.items())[args['offset']:args['offset']+args['limit']])
-            return dict(content=value,cite_as=ref)
+            return evidence_page(value,ref,args.get('pointer',''),args.get('offset',0),
+                                 args.get('limit',10),args.get('max_bytes',4000))
         if name=='record_verified_diagnosis':
             self.check_evidence(args['evidence_ref']);d=read(self.root/args['evidence_ref']);r=d[args['record_type']][args['record_index']]
             if r['entity_name']!=args['entity_name'] or abs(r['t_start_s']-args['t_start_s'])>1e-9 or abs(r['t_end_s']-args['t_end_s'])>1e-9:
@@ -351,22 +350,79 @@ class DynamicCampaign(Workbench):
         decision['result_ref']=ref;self.state['attempts'].append(dict(tool=name,arguments=args,result_ref=ref))
         if memory:self.state['working_memory']={k:([str(x)[:300] for x in v[:4]] if isinstance(v,list) else str(v)[:300]) for k,v in memory.items() if k in ('findings','unresolved','next_action')}
         self.save();return result.model_dump(mode='json'),ref
+    def latest_preview(self,max_bytes=4000):
+        if not self.state['attempts']:return None
+        a=self.state['attempts'][-1];ref=a['result_ref'];result=read(self.root/ref)
+        summary={k:result[k] for k in ('tool','status','failure_code') if k in result}
+        summary.update(cite_as=ref,evidence_ref=ref)
+        if result.get('message'):summary['message']=result['message'][:240]
+        if a['tool']=='read_evidence' and result.get('status')=='completed':
+            data=result.get('data',{})
+            if isinstance(data,dict) and data.get('page_version')==PAGE_VERSION and encoded_size(data)<=8000:
+                summary['data']=data  # Keep the exact page the model requested.
+            else:
+                # Upgrade legacy feedback from its original source/offset, not
+                # the sliced result (which has already lost original indices).
+                summary['data']=self.dispatch('read_evidence',a['arguments'],[], '')
+            return summary
+        summary['data']=evidence_page(result,ref,'/data' if 'data' in result else '',
+                                      max_bytes=max_bytes)
+        return summary
     def context(self):
         recent=self.state['candidates'][-2:];ranked=sorted([c for c in self.state['candidates'] if c['results'].get('mujoco',{}).get('complete')],
             key=lambda c:c['results']['mujoco']['position_error_m'])[:2]
         model_ranked=sorted([c for c in self.state['candidates'] if c['results'].get('matlab',{}).get('complete')],
             key=lambda c:c['results']['matlab']['position_error_m'])[:2]
         selected={c['candidate_id']:c for c in [self.state['candidates'][0],*ranked,*model_ranked,*recent]}
-        latest=None
-        if self.state['attempts']:
-            a=self.state['attempts'][-1];latest=read(self.root/a['result_ref']);latest['cite_as']=a['result_ref']
-            # Keep complete entity summaries for a narrow query, paginate all-entity evidence.
-            for k in ('events','queries','rows'):
-                if isinstance(latest.get('data',{}).get(k),list):latest['data'][k]=latest['data'][k][:8]
+        candidates=[]
+        metric_keys=('complete','computation_status','model_id','position_error_m','model_task_success','canonical_task_success',
+                     'tip_m','last_valid_time_s','residual_qvel_norm_rad_s','result_ref','diagnosis_ref')
+        for c in selected.values():
+            candidates.append(dict(candidate_id=c['candidate_id'],parent_id=c['parent_id'],changes=c['changes'],
+                physics_version=c['physics_version'],evidence_ref=c['path'],evidence=c['evidence'],
+                results={backend:{k:r[k] for k in metric_keys if k in r} if r else {'computation_status':'NOT_RUN'}
+                         for backend in ('matlab','mujoco') for r in [c['results'].get(backend)]}))
+        history=self.state['request']['history']
         return dict(task=self.state['request']['task'],environment=self.state['request']['environment'],grant=self.state['request']['grant'],
-            history=self.state['request']['history'],candidates=list(selected.values()),remaining=self.remaining(),memory=self.state['working_memory'],
-            recent_decisions=self.state['decisions'][-3:],latest_tool_result=latest,verified_diagnoses=self.state['verified_diagnoses'][-2:],
+            permissions=self.state['request']['permissions'],
+            history=dict(status=history.get('status'),interpretation=str(history.get('interpretation',''))[:300],evidence_ref='history/audit.json'),
+            candidates=candidates,remaining=self.remaining(),memory=copy.deepcopy(self.state['working_memory']),
+            recent_decisions=[{**{k:d[k] for k in ('sequence','tool','status','result_ref') if k in d},'reason':d.get('reason','')[:160]}
+                              for d in self.state['decisions'][-3:]],
+            latest_tool_result=self.latest_preview(),verified_diagnoses=copy.deepcopy(self.state['verified_diagnoses'][-2:]),
             evidence_help='history/c002_diagnosis.json; inputs/grant.json; use returned result/diagnosis refs. compare_candidates pages the full table.')
+    def build_model_request(self):
+        """Pure request builder shared by resume and read-only size inspection."""
+        config=self.state['request']['design_session']
+        prompt,version=prompt_with_version((self.root/'inputs/system_prompt.md').read_text(encoding='utf8'))
+        context=self.context()
+        payload=dict(model=config['model'],thinking={'type':'enabled'},max_tokens=8192,stream=False,tools=native_tools(),
+                     messages=[dict(role='system',content=prompt),dict(role='user',content='')])
+        def measure():
+            payload['messages'][1]['content']=json.dumps(context,ensure_ascii=False)
+            return encoded_size(payload)
+        metrics=dict(initial_bytes=measure(),target_bytes=TARGET_BYTES,limit_bytes=MAX_REQUEST_BYTES,
+                     compactions=[],prompt_version=version)
+        # Fixed priorities. Never trim task, permissions, schema, memory or the
+        # current evidence page. Every removed preview retains a readable ref.
+        if measure()>TARGET_BYTES:
+            context['history']={'evidence_ref':'history/audit.json'}
+            context['recent_decisions']=[{k:v for k,v in d.items() if k!='reason'} for d in context['recent_decisions'][-1:]]
+            metrics['compactions'].append('history_and_decisions')
+        if measure()>TARGET_BYTES:
+            for c in context['candidates']:
+                c.pop('changes',None);c.pop('evidence',None)
+                for r in c['results'].values():r.pop('tip_m',None);r.pop('residual_qvel_norm_rad_s',None)
+            metrics['compactions'].append('candidate_details')
+        if measure()>TARGET_BYTES and context['latest_tool_result'] and context['latest_tool_result'].get('tool')!='read_evidence':
+            context['latest_tool_result']=self.latest_preview(max_bytes=1800)
+            metrics['compactions'].append('tool_preview')
+        metrics.update(total_bytes=measure(),components=dict(system=encoded_size(payload['messages'][0]),
+                       user=encoded_size(payload['messages'][1]),tools=encoded_size(payload['tools'])))
+        if metrics['total_bytes']>MAX_REQUEST_BYTES:
+            metrics['reason']='Task, permissions, tool schemas, current read page and working memory must remain intact'
+            raise RequestTooLarge(metrics)
+        return payload,metrics
     def run_model(self,steps=12):
         from tools.deepseek_adapter import request_completion,redact
         config=self.state['request']['design_session'];key=os.environ.get('DEEPSEEK_API_KEY','')
@@ -384,13 +440,20 @@ class DynamicCampaign(Workbench):
             if any(self.remaining()[k]<=0 for k in ('model_calls','decisions','tool_calls','active_wall_s')):
                 self.state.update(status='STOPPED',stop_reason='MODEL_TOOL_DECISION_OR_WALL_BUDGET_EXHAUSTED');break
             index=len(self.state['model_calls'])
-            prompt=(self.root/'inputs/system_prompt.md').read_text(encoding='utf8')
-            context=self.context();payload=dict(model=config['model'],thinking={'type':'enabled'},max_tokens=8192,stream=False,tools=native_tools(),
-                messages=[dict(role='system',content=prompt),dict(role='user',content=json.dumps(context,ensure_ascii=False))])
-            if len(json.dumps(payload,ensure_ascii=False).encode())>60000:raise ValueError('Bounded model context exceeded 60000 bytes')
+            try:
+                payload,metrics=self.build_model_request()
+            except RequestTooLarge as exc:
+                self.state.update(status='PAUSED',stop_reason=str(exc),last_input_metrics=exc.metrics)
+                atomic_json(self.root/'context_pause.json',dict(error=str(exc),**exc.metrics))
+                self.save();self.render();break
+            self.state['last_input_metrics']=metrics
+            version=metrics['prompt_version']
+            version_path=self.root/f"inputs/prompt_versions/{version['effective_sha256']}.json"
+            if not version_path.exists():atomic_json(version_path,version)
             receipt,new=self.reserve('model_calls',str(index))
             folder=self.root/f'model_calls/{index:03d}';atomic_json(folder/'request.json',payload)
-            row=dict(index=index,status='reserved',decision_sequence=len(self.state['decisions']),request_ref=f'model_calls/{index:03d}/request.json');self.state['model_calls'].append(row);self.save()
+            row=dict(index=index,status='reserved',decision_sequence=len(self.state['decisions']),request_ref=f'model_calls/{index:03d}/request.json',
+                     input_metrics=metrics,prompt_version_ref=version_path.relative_to(self.root).as_posix());self.state['model_calls'].append(row);self.save()
             try:
                 bounded_config={**config,'timeout_s':min(config['timeout_s'],receipt['reserved_wall_s'])}
                 response=redact(request_completion(bounded_config,payload,key),key);atomic_json(folder/'response.json',response)

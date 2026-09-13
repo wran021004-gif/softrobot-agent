@@ -36,6 +36,7 @@ class Read(Contract):
     pointer: str=''
     offset: int=Field(default=0,ge=0)
     limit: int=Field(default=10,ge=1,le=50)
+    max_bytes: int=Field(default=4000,ge=1000,le=8000)
 class Claim(Contract):
     evidence_ref: str
     record_type: Literal['events','queries']='queries'
@@ -57,7 +58,7 @@ TOOLS={
  'diagnose_trajectory':(Diagnose,'read_evidence','Query exact entity and time from saved trajectory. Force and state have distinct time phases. Returns sampled facts, events and evidence refs.'),
  'compare_candidates':(Compare,'read_evidence','Paged design/control/physics/backend comparison. Unevaluated backends remain NOT_RUN.'),
  'observe_candidate':(Observe,'derived_artifacts','Render saved MATLAB or MuJoCo coordinates, curves and event list; zero backend solves.'),
- 'read_evidence':(Read,'read_evidence','Read registered JSON via pointer and pagination; never directory crawling.'),
+ 'read_evidence':(Read,'read_evidence','Read registered JSON with pointer, offset, limit and max_bytes. Follow next_read; oversized items return child pointers and resume_container. Array offsets are original source indices.'),
  'record_verified_diagnosis':(Claim,'read_evidence','Record your concrete diagnostic statement with exact machine-checkable entity, time interval, numeric field and value from a diagnosis record.'),
  'stop_design':(Stop,'read_evidence','Stop with cited results and limitations; distinguish workflow, numerical completion, MATLAB prediction and canonical MuJoCo success.')}
 
