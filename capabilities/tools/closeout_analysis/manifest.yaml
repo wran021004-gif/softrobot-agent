@@ -4,7 +4,7 @@ tools:
     implementation:
       module: tools.mechanics_tools
       callable: MechanicsTools.solve
-    inputs:
+    inputs: &id001
     - AnalysisSpec
     - live MatlabTools
     - persistent solve ledger
@@ -38,12 +38,41 @@ tools:
     physics_contract_dependencies:
     - closeout_analysis_v1.md
     authorization_source: configs/experiments/round3_closeout_authorization.yaml
+    category: mathematical_analysis
+    purpose: closeout mechanics solve; independent planar one-mode surrogate analysis
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - closeout_analysis_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id001
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   export_compiled_analysis_parameters:
     implementation_status: IMPLEMENTED
     implementation:
       module: tools.mechanics_tools
       callable: export_parameters
-    inputs:
+    inputs: &id002
     - compiled XML
     - RobotIR
     outputs:
@@ -76,12 +105,42 @@ tools:
     physics_contract_dependencies:
     - closeout_analysis_v1.md
     authorization_source: configs/experiments/round3_closeout_authorization.yaml
+    category: mathematical_analysis
+    purpose: export compiled analysis parameters; independent planar one-mode surrogate
+      analysis
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - closeout_analysis_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id002
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   resolve_closeout_analysis:
     implementation_status: IMPLEMENTED
     implementation:
       module: tools.mechanics_tools
       callable: resolve_analysis_capability
-    inputs:
+    inputs: &id003
     - AnalysisSpec
     outputs:
     - authority/dependency/input resolution; no silent fallback
@@ -113,3 +172,32 @@ tools:
     physics_contract_dependencies:
     - closeout_analysis_v1.md
     authorization_source: configs/experiments/round3_closeout_authorization.yaml
+    category: capability_management
+    purpose: resolve closeout analysis; independent planar one-mode surrogate analysis
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - closeout_analysis_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id003
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md

@@ -1,0 +1,1113 @@
+{
+  "limits": {
+    "length_screen": 24,
+    "length_mujoco": 28,
+    "development_mujoco": 12,
+    "mechanics": 24
+  },
+  "attempts": [
+    {
+      "id": 0,
+      "kind": "mechanics",
+      "key": "historical_recheck",
+      "context": {
+        "operation": "dynamic",
+        "entry": "round4_mechanics"
+      },
+      "stage": "development",
+      "status": "completed",
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\validation\\historical_recheck.json",
+      "sha256": "d1acd55ad93f52556561fab4b955c6c646f241cfd91dbc842a974864584ca149"
+    },
+    {
+      "id": 1,
+      "kind": "development_mujoco",
+      "key": "oscillator",
+      "context": {
+        "version": "one_hinge_torque_v1",
+        "input": {
+          "inertia": 0.002,
+          "stiffness": 0.1,
+          "damping": 0.01,
+          "torque_nm": 0.003,
+          "q0": 0.1,
+          "dt_s": 0.002,
+          "duration_s": 2.0,
+          "length_m": 0.2
+        },
+        "frame": "world_base_x_forward_yz_cross_section",
+        "mapping": "one rotational DOF q about -Y; J=Iyy+m*cx^2; no gravity/contact/tendons; constant world generalized torque",
+        "interpretation": "same continuous equation; MuJoCo discretization error measured, not real material calibration"
+      },
+      "stage": "development",
+      "status": "completed",
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\validation\\oscillator\\mujoco.json",
+      "sha256": "cf2175851cfbba01b938ad6f4980aaee617d118b57e44640ebc4c87f757f4120"
+    },
+    {
+      "id": 2,
+      "kind": "mechanics",
+      "key": "oscillator",
+      "context": {
+        "version": "one_hinge_torque_v1",
+        "input": {
+          "inertia": 0.002,
+          "stiffness": 0.1,
+          "damping": 0.01,
+          "torque_nm": 0.003,
+          "q0": 0.1,
+          "dt_s": 0.002,
+          "duration_s": 2.0,
+          "length_m": 0.2
+        },
+        "frame": "world_base_x_forward_yz_cross_section",
+        "mapping": "one rotational DOF q about -Y; J=Iyy+m*cx^2; no gravity/contact/tendons; constant world generalized torque",
+        "interpretation": "same continuous equation; MuJoCo discretization error measured, not real material calibration"
+      },
+      "stage": "development",
+      "status": "completed",
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\validation\\oscillator\\matlab.json",
+      "sha256": "e13de70c7bc3a1d6e516bfe04fb3d79f7abcd943b648c9762a816a669de97302"
+    },
+    {
+      "id": 3,
+      "kind": "mechanics",
+      "key": "task_plan_reach_free",
+      "context": {
+        "operation": "plan_pcc_reach"
+      },
+      "stage": "development",
+      "status": "completed",
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\tasks\\reach_free\\plan.json",
+      "sha256": "c2b44488ee652b2d2f6efaa9bda92dd96de7c20d5911661027cdebbe9812a4c8"
+    },
+    {
+      "id": 4,
+      "kind": "development_mujoco",
+      "key": "task_reach_free",
+      "context": {
+        "version": "round4_development_v1",
+        "family": "reach_free",
+        "split": "development",
+        "seed": 17,
+        "target_frame": "world",
+        "target_m": [
+          0.25,
+          0.0,
+          0.15043967819424986
+        ],
+        "package": "tasks/reach_free",
+        "initial_state": "zero_joint_position_and_velocity",
+        "duration_s": 2.0,
+        "evaluation_start_s": 0.0,
+        "tolerance_m": 0.01,
+        "disturbance": null,
+        "authority": "DEVELOPMENT_ONLY_NOT_BENCHMARK_APPROVAL"
+      },
+      "stage": "development",
+      "status": "completed",
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\tasks\\reach_free\\result.json",
+      "sha256": "0094350c714b9bd900b65777ea2e6b8c61acb75cec2912215572a275913b8288"
+    },
+    {
+      "id": 5,
+      "kind": "mechanics",
+      "key": "task_plan_reach_obstacle",
+      "context": {
+        "operation": "plan_pcc_reach"
+      },
+      "stage": "development",
+      "status": "completed",
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\tasks\\reach_obstacle\\plan.json",
+      "sha256": "c2b44488ee652b2d2f6efaa9bda92dd96de7c20d5911661027cdebbe9812a4c8"
+    },
+    {
+      "id": 6,
+      "kind": "development_mujoco",
+      "key": "task_reach_obstacle",
+      "context": {
+        "version": "round4_development_v1",
+        "family": "reach_obstacle",
+        "split": "development",
+        "seed": 17,
+        "target_frame": "world",
+        "target_m": [
+          0.25,
+          0.0,
+          0.15043967819424986
+        ],
+        "package": "tests/fixtures/reach_window_dev",
+        "initial_state": "zero_joint_position_and_velocity",
+        "duration_s": 2.0,
+        "evaluation_start_s": 0.0,
+        "tolerance_m": 0.01,
+        "disturbance": null,
+        "authority": "DEVELOPMENT_ONLY_NOT_BENCHMARK_APPROVAL"
+      },
+      "stage": "development",
+      "status": "completed",
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\tasks\\reach_obstacle\\result.json",
+      "sha256": "4039ae892da59c64b95ed12592c7b1bac26153aa24b50bc565854ce98e9059ee"
+    },
+    {
+      "id": 7,
+      "kind": "mechanics",
+      "key": "task_plan_tip_stability_external_force",
+      "context": {
+        "operation": "plan_pcc_reach"
+      },
+      "stage": "development",
+      "status": "completed",
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\tasks\\tip_stability_external_force\\plan.json",
+      "sha256": "c2b44488ee652b2d2f6efaa9bda92dd96de7c20d5911661027cdebbe9812a4c8"
+    },
+    {
+      "id": 8,
+      "kind": "development_mujoco",
+      "key": "task_tip_stability_external_force",
+      "context": {
+        "version": "round4_development_v1",
+        "family": "tip_stability_external_force",
+        "split": "development",
+        "seed": 17,
+        "target_frame": "world",
+        "target_m": [
+          0.25,
+          0.0,
+          0.15043967819424986
+        ],
+        "package": "tasks/reach_free",
+        "initial_state": "zero_joint_position_and_velocity",
+        "duration_s": 2.0,
+        "evaluation_start_s": 0.8,
+        "tolerance_m": 0.01,
+        "disturbance": {
+          "body": "segment_7",
+          "coordinate_frame": "world",
+          "start_s": 0.5,
+          "end_s": 0.7,
+          "force_n": [
+            0.0,
+            0.0,
+            0.11226763108474716
+          ]
+        },
+        "authority": "DEVELOPMENT_ONLY_NOT_BENCHMARK_APPROVAL"
+      },
+      "stage": "development",
+      "status": "completed",
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\tasks\\tip_stability_external_force\\result.json",
+      "sha256": "4c97ec3ad5ee66012b330ed3f6361c8bfdf74f1c44a02c297bddf2fe898ca570"
+    },
+    {
+      "id": 9,
+      "kind": "length_screen",
+      "key": "0.282547595",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.282547595,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.282547595\\screen.json",
+      "sha256": "c67b68021c2265e3b1df696f37c175ea0fd638fc87fdbc132230332624786c4f"
+    },
+    {
+      "id": 10,
+      "kind": "length_mujoco",
+      "key": "0.282547595C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.282547595,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "c67b68021c2265e3b1df696f37c175ea0fd638fc87fdbc132230332624786c4f"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.282547595\\C1\\result.json",
+      "sha256": "265520e84f80a56efa0b5bc5aa6aaa34ab35f160f8814eeccc9b8a90ded95c8d"
+    },
+    {
+      "id": 11,
+      "kind": "length_mujoco",
+      "key": "0.282547595C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.282547595,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "c67b68021c2265e3b1df696f37c175ea0fd638fc87fdbc132230332624786c4f"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.282547595\\C2\\result.json",
+      "sha256": "89af5be8880f6031b38935483e2ee0b914761fe80a760be4ccd8fc3dd9c1480b"
+    },
+    {
+      "id": 12,
+      "kind": "length_screen",
+      "key": "0.29",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.29,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.29\\screen.json",
+      "sha256": "0dbedb7776e691eb1f9a460d85643f4560f98a6cffe2644a7ea0d9b7d47469ac"
+    },
+    {
+      "id": 13,
+      "kind": "length_mujoco",
+      "key": "0.29C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.29,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "0dbedb7776e691eb1f9a460d85643f4560f98a6cffe2644a7ea0d9b7d47469ac"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.29\\C1\\result.json",
+      "sha256": "462088f6d9d13c1a535096f1a4df6644926c1f00729255037704d62d60e4d4bd"
+    },
+    {
+      "id": 14,
+      "kind": "length_mujoco",
+      "key": "0.29C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.29,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "0dbedb7776e691eb1f9a460d85643f4560f98a6cffe2644a7ea0d9b7d47469ac"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.29\\C2\\result.json",
+      "sha256": "bcf9339cbdfb93851e9e508d609607f36e16fcccf64fb410baea93cd3612ec1a"
+    },
+    {
+      "id": 15,
+      "kind": "length_screen",
+      "key": "0.298",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.298,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.298\\screen.json",
+      "sha256": "5444715cee9008ddee982dfad212e33bace6ecaddbbd6ec76df8281ff9534b5b"
+    },
+    {
+      "id": 16,
+      "kind": "length_mujoco",
+      "key": "0.298C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.298,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "5444715cee9008ddee982dfad212e33bace6ecaddbbd6ec76df8281ff9534b5b"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.298\\C1\\result.json",
+      "sha256": "61947f755a59a1c49024b0a54b3731723884c08122e7f5cbd1d2355257eec0a5"
+    },
+    {
+      "id": 17,
+      "kind": "length_mujoco",
+      "key": "0.298C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.298,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "5444715cee9008ddee982dfad212e33bace6ecaddbbd6ec76df8281ff9534b5b"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.298\\C2\\result.json",
+      "sha256": "f729accf1991052bb8fde553435195e08572080c93aabcc969d6772f67acc61f"
+    },
+    {
+      "id": 18,
+      "kind": "length_screen",
+      "key": "0.30623771682",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.3062377168199977,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.30623771682\\screen.json",
+      "sha256": "455d0a3ed1a7890880e68f8fccc9b417e8d85a0bb5afec4ffc392538f47e39ea"
+    },
+    {
+      "id": 19,
+      "kind": "length_mujoco",
+      "key": "0.30623771682C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.3062377168199977,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "455d0a3ed1a7890880e68f8fccc9b417e8d85a0bb5afec4ffc392538f47e39ea"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.30623771682\\C1\\result.json",
+      "sha256": "dfd948559ee511812352638efe60309df5f1819020544749181aad0a24a05e54"
+    },
+    {
+      "id": 20,
+      "kind": "length_mujoco",
+      "key": "0.30623771682C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.3062377168199977,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "455d0a3ed1a7890880e68f8fccc9b417e8d85a0bb5afec4ffc392538f47e39ea"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.30623771682\\C2\\result.json",
+      "sha256": "e52153669b59c8158bcb75c8025025561af26f84ae6cdbb6cc495fd31a6d5577"
+    },
+    {
+      "id": 21,
+      "kind": "length_screen",
+      "key": "0.4",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.4,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.4\\screen.json",
+      "sha256": "0b7ef6fc7b9442cd27c6968896eb833e68719a4623d195e34380fd00fad65ff3"
+    },
+    {
+      "id": 22,
+      "kind": "length_mujoco",
+      "key": "0.4C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.4,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "0b7ef6fc7b9442cd27c6968896eb833e68719a4623d195e34380fd00fad65ff3"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.4\\C1\\result.json",
+      "sha256": "b5f10c44f52810720bc1f047ca92b79917456f9214d521c09c8c81744ac3af0f"
+    },
+    {
+      "id": 23,
+      "kind": "length_mujoco",
+      "key": "0.4C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.4,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "0b7ef6fc7b9442cd27c6968896eb833e68719a4623d195e34380fd00fad65ff3"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.4\\C2\\result.json",
+      "sha256": "629cbcc4d0323267db57d4c53701b264a0543282b00e77a9cdbee1652e21bfa1"
+    },
+    {
+      "id": 24,
+      "kind": "length_screen",
+      "key": "0.5",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.5,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.5\\screen.json",
+      "sha256": "005b09b9e15d7f034a05ea1aa3613fbea7e5e3481f8561261b0705102d3831f4"
+    },
+    {
+      "id": 25,
+      "kind": "length_mujoco",
+      "key": "0.5C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.5,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "005b09b9e15d7f034a05ea1aa3613fbea7e5e3481f8561261b0705102d3831f4"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.5\\C1\\result.json",
+      "sha256": "b66b4de76f7f348300e6412d32f07517e31ad134bbf46f45ff3d9a530cc2a604"
+    },
+    {
+      "id": 26,
+      "kind": "length_mujoco",
+      "key": "0.5C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.5,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "005b09b9e15d7f034a05ea1aa3613fbea7e5e3481f8561261b0705102d3831f4"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.5\\C2\\result.json",
+      "sha256": "219de814228d1092ac4393ac21d5144d222b83ed1fb99981b25b95de3e780898"
+    },
+    {
+      "id": 27,
+      "kind": "length_screen",
+      "key": "0.6",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.6,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.6\\screen.json",
+      "sha256": "af5709f992f70f4b9a181adba058077ce64c937aaf94b59119af52cf62c46ff4"
+    },
+    {
+      "id": 28,
+      "kind": "length_mujoco",
+      "key": "0.6C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.6,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "af5709f992f70f4b9a181adba058077ce64c937aaf94b59119af52cf62c46ff4"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.6\\C1\\result.json",
+      "sha256": "d1348b812d25b76fa91fbf44db7286e9582ff52ddbbe2bfcb866fa4b2a6d1c78"
+    },
+    {
+      "id": 29,
+      "kind": "length_mujoco",
+      "key": "0.6C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.6,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "af5709f992f70f4b9a181adba058077ce64c937aaf94b59119af52cf62c46ff4"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.6\\C2\\result.json",
+      "sha256": "c745fe1e0e46f8d73528f8507321b7b6c96c32644471368d6e3c2c12faaa8ac5"
+    },
+    {
+      "id": 30,
+      "kind": "length_screen",
+      "key": "0.7",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.7,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.7\\screen.json",
+      "sha256": "d63f7f68cdf5b6772a22629e0694fc369113a16f0d5ac8577c1f10ae22d2d81c"
+    },
+    {
+      "id": 31,
+      "kind": "length_mujoco",
+      "key": "0.7C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.7,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "d63f7f68cdf5b6772a22629e0694fc369113a16f0d5ac8577c1f10ae22d2d81c"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.7\\C1\\result.json",
+      "sha256": "8d72bef0a2107d73d42bd59934830b036b8419902cb6621db3f54fe929cc3104"
+    },
+    {
+      "id": 32,
+      "kind": "length_mujoco",
+      "key": "0.7C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.7,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "d63f7f68cdf5b6772a22629e0694fc369113a16f0d5ac8577c1f10ae22d2d81c"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.7\\C2\\result.json",
+      "sha256": "a303c04419a0f4c1f0e9f54ca8933db19897e01c34cc2a73b868537a57ea53aa"
+    },
+    {
+      "id": 33,
+      "kind": "length_screen",
+      "key": "0.8",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.8,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.8\\screen.json",
+      "sha256": "c6f75db65498c57a80c0c8731a6ac0e9f7b67a8a9f06098da9c5c1e2fed4afba"
+    },
+    {
+      "id": 34,
+      "kind": "length_mujoco",
+      "key": "0.8C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.8,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "c6f75db65498c57a80c0c8731a6ac0e9f7b67a8a9f06098da9c5c1e2fed4afba"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.8\\C1\\result.json",
+      "sha256": "bc078daf0ac2c61daed48b9e32b997b6e1cbe0cc17d4899cf2f260ba6e5e7679"
+    },
+    {
+      "id": 35,
+      "kind": "length_mujoco",
+      "key": "0.8C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.8,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "c6f75db65498c57a80c0c8731a6ac0e9f7b67a8a9f06098da9c5c1e2fed4afba"
+      },
+      "stage": "coarse",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.8\\C2\\result.json",
+      "sha256": "8fa859e96d06ed5ec314ed715008c4e6642f8647f9bc3133ff777730c5b31d87"
+    },
+    {
+      "id": 36,
+      "kind": "length_screen",
+      "key": "0.286273797",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.286273797,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.286273797\\screen.json",
+      "sha256": "51b18d2b4866cdd8527f3217bcb4642bbc6fa376eca1027d41ab27eaf12bf84f"
+    },
+    {
+      "id": 37,
+      "kind": "length_mujoco",
+      "key": "0.286273797C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.286273797,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "51b18d2b4866cdd8527f3217bcb4642bbc6fa376eca1027d41ab27eaf12bf84f"
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.286273797\\C1\\result.json",
+      "sha256": "9f359a1d5631286b2e92999f4739a32c35ac3bf14e2706ef2f7d3788ff11b38c"
+    },
+    {
+      "id": 38,
+      "kind": "length_mujoco",
+      "key": "0.286273797C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.286273797,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "51b18d2b4866cdd8527f3217bcb4642bbc6fa376eca1027d41ab27eaf12bf84f"
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.286273797\\C2\\result.json",
+      "sha256": "2bb750e220b8cf218d16581721484d7adf9c328ca33f562981d8daeccf3bbacb"
+    },
+    {
+      "id": 39,
+      "kind": "length_screen",
+      "key": "0.294",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.294,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.294\\screen.json",
+      "sha256": "d9ba9821d7589c171db09bcccbdddeaa5c29a65dd14680618599f6def42c43b9"
+    },
+    {
+      "id": 40,
+      "kind": "length_mujoco",
+      "key": "0.294C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.294,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "d9ba9821d7589c171db09bcccbdddeaa5c29a65dd14680618599f6def42c43b9"
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.294\\C1\\result.json",
+      "sha256": "4bd53d73e1ed9c07b0a7992e2ac5acd003e08234d19c2b432463f55c1ee04c0e"
+    },
+    {
+      "id": 41,
+      "kind": "length_mujoco",
+      "key": "0.294C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.294,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "d9ba9821d7589c171db09bcccbdddeaa5c29a65dd14680618599f6def42c43b9"
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.294\\C2\\result.json",
+      "sha256": "ba085409d8ee391830c878606a66c8e41b33b3c50855c594404e87289fd3e042"
+    },
+    {
+      "id": 42,
+      "kind": "length_screen",
+      "key": "0.302118858",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.302118858,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.302118858\\screen.json",
+      "sha256": "6a722c9dda822fd5051f97469dad3aa6b139cee85286d5486f66dce302e0c399"
+    },
+    {
+      "id": 43,
+      "kind": "length_mujoco",
+      "key": "0.302118858C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.302118858,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "6a722c9dda822fd5051f97469dad3aa6b139cee85286d5486f66dce302e0c399"
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.302118858\\C1\\result.json",
+      "sha256": "b137f687ae31cf05d345c9a9f2390ea6fdd587136bfb79e72380cabc8e5921a4"
+    },
+    {
+      "id": 44,
+      "kind": "length_mujoco",
+      "key": "0.302118858C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.302118858,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "6a722c9dda822fd5051f97469dad3aa6b139cee85286d5486f66dce302e0c399"
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.302118858\\C2\\result.json",
+      "sha256": "4478c8b036cc54d5a9fe28a473674bbf77aa43ae0290f6039e86fbbaffc900de"
+    },
+    {
+      "id": 45,
+      "kind": "length_screen",
+      "key": "0.353118858",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.353118858,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "calls": [
+          "plan_pcc_reach"
+        ]
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.353118858\\screen.json",
+      "sha256": "cd5502d5986a7a0db880d425867f394c6fa43a22753027ec8ba8a44c6b8885d7"
+    },
+    {
+      "id": 46,
+      "kind": "length_mujoco",
+      "key": "0.353118858C1",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.353118858,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C1",
+        "plan_sha256": "cd5502d5986a7a0db880d425867f394c6fa43a22753027ec8ba8a44c6b8885d7"
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.353118858\\C1\\result.json",
+      "sha256": "e9e4d6c0dd8b80793deb1207685a04d61838dc8e4b7a5d562fe887cd0050bd70"
+    },
+    {
+      "id": 47,
+      "kind": "length_mujoco",
+      "key": "0.353118858C2",
+      "context": {
+        "design": {
+          "robot_family": "tendon_driven_continuum",
+          "sections": 1,
+          "segments": 8,
+          "total_length_m": 0.353118858,
+          "body_radius_m": 0.02,
+          "tendon_count": 8,
+          "tendon_routing_radius_m": 0.018
+        },
+        "controller": "C2",
+        "plan_sha256": "cd5502d5986a7a0db880d425867f394c6fa43a22753027ec8ba8a44c6b8885d7"
+      },
+      "stage": "fine",
+      "status": "completed",
+      "retry_of": null,
+      "artifact": "D:\\softrobot-agent\\runs\\round4\\length\\0.353118858\\C2\\result.json",
+      "sha256": "52b62f39163aadd2a0d36a20a8825246613a95980532c0f62174d9a7901863d9"
+    }
+  ]
+}

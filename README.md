@@ -1,5 +1,11 @@
 # Softrobot deterministic research harness
 
+第四轮现提供[动态观察入口与中文说明](docs/round4_observation.md)、
+[六类能力和任务接口](docs/round4_workbench.md)、[模型限制来源表](docs/round4_model_limits.md)
+及[本轮结果与预算](docs/round4_result.md)。打开保存运行：
+`python examples/observe.py runs/round4/length/0.30623771682/C1 runs/round4/length/0.30623771682/C2`。
+观看与导出动画不启动新仿真；本轮长度对照已结束，不要为查看结果重新运行实验。
+
 Current closeout implements a persistent bounded campaign with fixed C1/C2 pairs,
 normal trajectories, independent MATLAB reduced mechanics and offline evidence audit.
 See [closeout entry and capability matrix](docs/round3_closeout_tools.md),

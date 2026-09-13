@@ -6,25 +6,77 @@ tools:
     implementation:
       module: tools.shape_tools
       callable: compare_shape_model_sim
-    inputs: [normal model_shape ToolResult, normal simulation ToolResult]
-    outputs: [ToolResult; tip/RMS/max discrepancies and 65 compact sample differences]
-    supported_robot_families: [tendon_driven_continuum]
+    inputs: &id001
+    - normal model_shape ToolResult
+    - normal simulation ToolResult
+    outputs:
+    - ToolResult; tip/RMS/max discrepancies and 65 compact sample differences
+    supported_robot_families:
+    - tendon_driven_continuum
     fidelity: Geometric comparison of recorded PCC and segmented surrogate shapes
-    assumptions: [Matching run and input hashes, constant matching C1 commands, normalized arc-length correspondence]
+    assumptions:
+    - Matching run and input hashes
+    - constant matching C1 commands
+    - normalized arc-length correspondence
     applicable_when: Completed M1 shape and final MuJoCo centerline.
-    limitations: [No debug inputs, no approved mismatch threshold, failure_attribution remains UNKNOWN]
-    failure_codes: [UNKNOWN]
-    cost: {compute: low; no MATLAB or MuJoCo launch}
-    fields_consumed: [model_shape.artifacts.centerline_m, simulation_result.artifacts.final_centerline_m, comparison_context, command evidence]
-    artifacts: [shape_comparison.json]
-    physics_contract_dependencies: [coordinate_frames.md, tendon_driven_pcc_v1.md, segmented_mujoco_mapping_v1.md]
+    limitations:
+    - No debug inputs
+    - no approved mismatch threshold
+    - failure_attribution remains UNKNOWN
+    failure_codes:
+    - UNKNOWN
+    cost:
+      compute: low; no MATLAB or MuJoCo launch
+    fields_consumed:
+    - model_shape.artifacts.centerline_m
+    - simulation_result.artifacts.final_centerline_m
+    - comparison_context
+    - command evidence
+    artifacts:
+    - shape_comparison.json
+    physics_contract_dependencies:
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    - segmented_mujoco_mapping_v1.md
     gate_semantics: Evidence only; never automatic MODEL_MISMATCH or canonical override.
+    category: evaluation_observation
+    purpose: compare shape model sim; Geometric comparison of recorded PCC and segmented
+      surrogate shapes
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    - segmented_mujoco_mapping_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id001
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   compare_model_sim:
     implementation_status: IMPLEMENTED
     implementation:
       module: tools.diagnostic_tools
       callable: compare_model_sim
-    inputs:
+    inputs: &id002
     - 'model_result: ToolResult'
     - 'simulation_result: ToolResult'
     - 'task: TaskSpec'
@@ -68,12 +120,44 @@ tools:
     - coordinate_frames.md
     - actuator_model_v1.md
     - tendon_length_mapping_v1.md
+    category: evaluation_observation
+    purpose: compare model sim; Deterministic evidence arithmetic on recorded V1 observations;
+      no validated physical or causal inference.
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - coordinate_frames.md
+    - actuator_model_v1.md
+    - tendon_length_mapping_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id002
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   check_actuator_limits:
     implementation_status: IMPLEMENTED
     implementation:
       module: tools.diagnostic_tools
       callable: check_actuator_limits
-    inputs:
+    inputs: &id003
     - 'simulation_result: ToolResult'
     - 'evidence_paths: optional caller-supplied references'
     outputs:
@@ -111,12 +195,44 @@ tools:
     - coordinate_frames.md
     - actuator_model_v1.md
     - tendon_length_mapping_v1.md
+    category: evaluation_observation
+    purpose: check actuator limits; Deterministic evidence arithmetic on recorded
+      V1 observations; no validated physical or causal inference.
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - coordinate_frames.md
+    - actuator_model_v1.md
+    - tendon_length_mapping_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id003
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   check_tendon_tracking:
     implementation_status: IMPLEMENTED
     implementation:
       module: tools.diagnostic_tools
       callable: check_tendon_tracking
-    inputs:
+    inputs: &id004
     - 'simulation_result: ToolResult'
     - 'evidence_paths: optional caller-supplied references'
     outputs:
@@ -153,6 +269,38 @@ tools:
     - coordinate_frames.md
     - actuator_model_v1.md
     - tendon_length_mapping_v1.md
+    category: evaluation_observation
+    purpose: check tendon tracking; Deterministic evidence arithmetic on recorded
+      V1 observations; no validated physical or causal inference.
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - coordinate_frames.md
+    - actuator_model_v1.md
+    - tendon_length_mapping_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id004
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   check_tendon_slack:
     implementation_status: PLANNED
     inputs:
@@ -161,7 +309,7 @@ tools:
     - approved contracts
     outputs:
     - slack evidence (requires approved slack model)
-    supported_robot_families: &id001
+    supported_robot_families: &id005
     - tendon_driven_continuum
     fidelity: unimplemented; no numerical claims
     assumptions:
@@ -179,12 +327,37 @@ tools:
     physics_contract_dependencies: []
     contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
       require approval before promotion
+    category: evaluation_observation
+    purpose: check tendon slack; unimplemented; no numerical claims
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: false
+      verified: NOT_IMPLEMENTED
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - Python
+    input_example:
+      status: NOT_IMPLEMENTED
+      legal_executable_input: null
+    evidence_refs: []
   check_collision:
     implementation_status: IMPLEMENTED
     implementation:
       module: tools.diagnostic_tools
       callable: check_collision
-    inputs:
+    inputs: &id006
     - clearance ToolResult
     - simulation ToolResult
     - optional evidence_paths
@@ -192,7 +365,7 @@ tools:
     - ToolResult with geometric prediction
     - actual contact
     - disagreement evidence and UNKNOWN causal attribution
-    supported_robot_families: *id001
+    supported_robot_families: *id005
     fidelity: Deterministic arithmetic over low/geometric PCC and sampled MuJoCo surrogate
       evidence.
     assumptions:
@@ -219,12 +392,43 @@ tools:
     physics_contract_dependencies:
     - coordinate_frames.md
     - segmented_mujoco_mapping_v1.md
+    category: evaluation_observation
+    purpose: check collision; Deterministic arithmetic over low/geometric PCC and
+      sampled MuJoCo surrogate evidence.
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - coordinate_frames.md
+    - segmented_mujoco_mapping_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id006
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   inspect_numerics:
     implementation_status: IMPLEMENTED
     implementation:
       module: tools.diagnostic_tools
       callable: inspect_numerics
-    inputs:
+    inputs: &id007
     - 'simulation_result: ToolResult'
     - 'evidence_paths: optional caller-supplied references'
     outputs:
@@ -262,12 +466,44 @@ tools:
     - coordinate_frames.md
     - actuator_model_v1.md
     - tendon_length_mapping_v1.md
+    category: evaluation_observation
+    purpose: inspect numerics; Deterministic evidence arithmetic on recorded V1 observations;
+      no validated physical or causal inference.
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - coordinate_frames.md
+    - actuator_model_v1.md
+    - tendon_length_mapping_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id007
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   run_parameter_sensitivity:
     implementation_status: IMPLEMENTED
     implementation:
       module: tools.experiment_tools
       callable: run_parameter_sensitivity
-    inputs:
+    inputs: &id008
     - Human-owned ExperimentPolicy path
     - requested fidelity
     outputs:
@@ -305,3 +541,34 @@ tools:
       compute: bounded by explicit policy budgets
     gate_semantics: HARD input/execution legality; SCREENING model evidence; existing
       MUJOCO evaluator alone is CANONICAL
+    category: evaluation_observation
+    purpose: run parameter sensitivity; M0/M1 model or MUJOCO; evidence only
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - coordinate_frames.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id008
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md

@@ -9,7 +9,21 @@ tool_bundles:
   learning: tools/learning/manifest.yaml
   matlab_analysis: tools/model/manifest.yaml
   closeout_analysis: tools/closeout_analysis/manifest.yaml
+  workbench: tools/workbench/manifest.yaml
 robot_families:
   tendon_driven_continuum: robot_families/tendon_driven_continuum/grammar.yaml
 skills: []
 skill_registry: ../skills/index.yaml
+functional_categories:
+  design_compile: 设计表达与编译
+  mathematical_analysis: 数学建模与分析
+  design_control_generation: 设计与控制生成
+  execution: 仿真与实验执行
+  evaluation_observation: 评价、诊断与观察
+  capability_management: 代码与能力管理
+shared_services:
+- tools.round4_budget.Budget
+- tools.experiment_policy_tools.validate_experiment_policy
+- tools.artifact_tools
+- tools.closeout_state
+- tools.trace_tools

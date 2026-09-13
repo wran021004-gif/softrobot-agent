@@ -64,7 +64,8 @@ def validate_experiment_policy(path) -> ValidatedExperiment:
         raise ApprovalRequired("BLOCKED_FOR_HUMAN_APPROVAL: approve variables, bounds, routes, controller parameters and budgets")
     # File location is the existing Human-owned repository boundary, not authentication.
     owner_root = ROOT / ("tests/fixtures" if policy.scientific_status == "TEST_ONLY" else "configs/experiments")
-    closeout = policy.authorization_mode == 'CLOSEOUT_SCOPED'
+    round4 = policy.authorization_mode == 'ROUND4_SCOPED'
+    closeout = policy.authorization_mode in ('CLOSEOUT_SCOPED', 'ROUND4_SCOPED')
     subset = policy.authorization_mode == 'ENVELOPE_SUBSET' or closeout
     policy_roots = (ROOT/'configs/experiments', ROOT/'proposals/engineer', ROOT/'runs') if subset else (owner_root,)
     if not any(path.is_relative_to(root.resolve()) for root in policy_roots):
@@ -89,7 +90,10 @@ def validate_experiment_policy(path) -> ValidatedExperiment:
         from tools.design_envelope import load_envelope, envelope_variables, validate_envelope_design
         envelope, envelope_path = load_envelope(resolved.grammar)
         extra_inputs.append(envelope_path)
-        if closeout:
+        if round4:
+            from tools.round4_authority import validate_round4_authority
+            extra_inputs.extend(validate_round4_authority(policy, path, envelope))
+        elif closeout:
             from tools.closeout_authority import validate_closeout_authority
             extra_inputs.extend(validate_closeout_authority(policy, path, envelope))
         if policy.scientific_status != 'HUMAN_APPROVED' or (not closeout and approval != repository_path(envelope['approval_source'])):

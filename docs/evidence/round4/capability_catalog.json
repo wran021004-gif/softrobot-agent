@@ -1,0 +1,4280 @@
+[
+  {
+    "name": "load_task",
+    "bundle": "spec",
+    "implementation": {
+      "module": "tools.spec_tools",
+      "callable": "load_task"
+    },
+    "inputs": [
+      "task package path"
+    ],
+    "outputs": [
+      "TaskSpec"
+    ],
+    "fields_consumed": [
+      "task.yaml"
+    ],
+    "failure_codes": [
+      "INVALID_SPEC"
+    ],
+    "fidelity": "structural",
+    "assumptions": [
+      "Human-owned input semantics are authoritative."
+    ],
+    "applicable_when": "Deterministic V1 harness; schema validation alone does not imply route support.",
+    "limitations": [
+      "No physical success claim; validation exceptions propagate to the harness."
+    ],
+    "physics_contract_dependencies": [],
+    "artifacts": [],
+    "implementation_status": "IMPLEMENTED",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "MATLAB startup separate; MuJoCo cost scales with discretization and steps."
+    },
+    "category": "design_compile",
+    "purpose": "load task; structural",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "task package path"
+      ],
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "validate_task_spec",
+    "bundle": "spec",
+    "implementation": {
+      "module": "tools.spec_tools",
+      "callable": "validate_task_spec"
+    },
+    "inputs": [
+      "task mapping"
+    ],
+    "outputs": [
+      "TaskSpec"
+    ],
+    "fields_consumed": [
+      "TaskSpec.*"
+    ],
+    "failure_codes": [
+      "INVALID_SPEC"
+    ],
+    "fidelity": "structural",
+    "assumptions": [
+      "Human-owned input semantics are authoritative."
+    ],
+    "applicable_when": "Deterministic V1 harness; schema validation alone does not imply route support.",
+    "limitations": [
+      "No physical success claim; validation exceptions propagate to the harness."
+    ],
+    "physics_contract_dependencies": [],
+    "artifacts": [],
+    "implementation_status": "IMPLEMENTED",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "MATLAB startup separate; MuJoCo cost scales with discretization and steps."
+    },
+    "category": "design_compile",
+    "purpose": "validate task spec; structural",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "task mapping"
+      ],
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "validate_environment",
+    "bundle": "spec",
+    "implementation": {
+      "module": "tools.spec_tools",
+      "callable": "validate_environment"
+    },
+    "inputs": [
+      "environment mapping"
+    ],
+    "outputs": [
+      "EnvironmentSpec"
+    ],
+    "fields_consumed": [
+      "EnvironmentSpec.*"
+    ],
+    "failure_codes": [
+      "INVALID_ENVIRONMENT"
+    ],
+    "fidelity": "structural",
+    "assumptions": [
+      "Human-owned input semantics are authoritative."
+    ],
+    "applicable_when": "Deterministic V1 harness; schema validation alone does not imply route support.",
+    "limitations": [
+      "No physical success claim; validation exceptions propagate to the harness."
+    ],
+    "physics_contract_dependencies": [],
+    "artifacts": [],
+    "implementation_status": "IMPLEMENTED",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "MATLAB startup separate; MuJoCo cost scales with discretization and steps."
+    },
+    "category": "design_compile",
+    "purpose": "validate environment; structural",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "environment mapping"
+      ],
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "validate_design",
+    "bundle": "spec",
+    "implementation": {
+      "module": "tools.spec_tools",
+      "callable": "validate_design"
+    },
+    "inputs": [
+      "design mapping"
+    ],
+    "outputs": [
+      "DesignSpec"
+    ],
+    "fields_consumed": [
+      "DesignSpec.*"
+    ],
+    "failure_codes": [
+      "INVALID_DESIGN"
+    ],
+    "fidelity": "structural",
+    "assumptions": [
+      "Human-owned input semantics are authoritative."
+    ],
+    "applicable_when": "Deterministic V1 harness; schema validation alone does not imply route support.",
+    "limitations": [
+      "No physical success claim; validation exceptions propagate to the harness."
+    ],
+    "physics_contract_dependencies": [],
+    "artifacts": [],
+    "implementation_status": "IMPLEMENTED",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "MATLAB startup separate; MuJoCo cost scales with discretization and steps."
+    },
+    "category": "design_compile",
+    "purpose": "validate design; structural",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "design mapping"
+      ],
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "build_robot_ir",
+    "bundle": "spec",
+    "implementation": {
+      "module": "tools.design_compiler",
+      "callable": "build_robot_ir"
+    },
+    "inputs": [
+      "DesignSpec"
+    ],
+    "outputs": [
+      "RobotIR"
+    ],
+    "fields_consumed": [
+      "DesignSpec.*",
+      "PhysicsSpec.*"
+    ],
+    "failure_codes": [
+      "OUT_OF_GRAMMAR",
+      "IMPLEMENTATION_REQUIRED",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "fidelity": "structural",
+    "assumptions": [
+      "Human-owned input semantics are authoritative."
+    ],
+    "applicable_when": "Deterministic V1 harness; schema validation alone does not imply route support.",
+    "limitations": [
+      "No physical success claim; validation exceptions propagate to the harness."
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "segmented_mujoco_mapping_v1.md",
+      "actuator_model_v1.md"
+    ],
+    "artifacts": [
+      "robot_ir.yaml"
+    ],
+    "implementation_status": "IMPLEMENTED",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "MATLAB startup separate; MuJoCo cost scales with discretization and steps."
+    },
+    "category": "design_compile",
+    "purpose": "build robot ir; structural",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "segmented_mujoco_mapping_v1.md",
+      "actuator_model_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "DesignSpec"
+      ],
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "analyze_workspace",
+    "bundle": "model",
+    "implementation": {
+      "module": "tools.matlab_tools",
+      "callable": "MatlabTools.analyze_workspace",
+      "backend": "matlab/analyze_workspace.m"
+    },
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "family_support": "partial",
+    "inputs": {
+      "robot_ir": "RobotIR (DesignSpec compatibility accepted)",
+      "task": "TaskSpec",
+      "environment": "EnvironmentSpec"
+    },
+    "output": "ToolResult",
+    "design_fields_used": [
+      "robot_family",
+      "total_length_m"
+    ],
+    "discriminator_field": "robot_family",
+    "numerical_design_fields_used": [
+      "total_length_m"
+    ],
+    "currently_ignored_design_fields": [
+      "sections",
+      "segments",
+      "body_radius_m",
+      "tendon_count",
+      "tendon_routing_radius_m"
+    ],
+    "task_fields_used": [
+      "target_m",
+      "environment_id"
+    ],
+    "currently_ignored_task_fields": [
+      "task_id",
+      "task_type",
+      "position_error_max_m"
+    ],
+    "fidelity": {
+      "level": "M0",
+      "model": "geometric_reachability"
+    },
+    "contract": {
+      "coordinate_frame": "robot base at world origin",
+      "target_reachable": "norm(target_m) <= total_length_m",
+      "pass_condition": "supported family and target_reachable",
+      "metrics": {
+        "target_reachable": "bool",
+        "target_distance_m": "float",
+        "max_reach_m": "float",
+        "reach_margin_m": "float"
+      },
+      "artifacts": []
+    },
+    "limitations": [
+      "Not PCC, PCS, or Cosserat.",
+      "Does not consider tendon count or tendon routing.",
+      "Does not consider stiffness, obstacles, or dynamics.",
+      "Does not consider actuation feasibility.",
+      "Reachable does not imply MuJoCo task success.",
+      "M0 retains the exact-point norm(target)<=L observation. Harness workspace_gate uses L plus TaskSpec tolerance as the HARD necessary task bound; M0 status alone is not that gate.",
+      "Engine startup and execution exceptions propagate without a ToolResult.",
+      "RobotIR mechanics, segment discretization and environment gravity/objects are not part of this kinematic calculation."
+    ],
+    "failure_codes": {
+      "DESIGN_INFEASIBLE": "Target distance exceeds total length.",
+      "UNSUPPORTED_ROBOT_FAMILY": "Only tendon_driven_continuum is accepted; metrics are empty.",
+      "PHYSICS_ASSUMPTION_REQUIRED": "Unapproved/missing IR physics contract (raised ValueError)."
+    },
+    "cost": {
+      "compute": "low",
+      "note": "MATLAB Engine startup has separate overhead."
+    },
+    "fields_consumed": [
+      "RobotIR.section.length_m",
+      "EnvironmentSpec.coordinate_frame",
+      "EnvironmentSpec.environment_id",
+      "TaskSpec.target_m",
+      "TaskSpec.environment_id"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md"
+    ],
+    "assumptions": [
+      "Origin fixed at world base; straight +x; no dynamics or contact."
+    ],
+    "applicable_when": "V1 reach model route; a model pass never certifies task success.",
+    "artifacts": [
+      "workspace_result.json"
+    ],
+    "implementation_status": "IMPLEMENTED",
+    "outputs": [
+      "ToolResult"
+    ],
+    "exception_policy": "Schema/IR/contract validation exceptions propagate; Harness records stage and message.",
+    "environment_fields_used": [
+      "environment_id",
+      "coordinate_frame"
+    ],
+    "environment_fields_omitted_from_equations": [
+      "gravity_m_s2",
+      "objects",
+      "lights"
+    ],
+    "gate_semantics": "M0 exact-point observation is not canonical; Harness HARD necessity uses norm(target-base)<=L+TaskSpec tolerance; runtime completion is HARD.",
+    "category": "mathematical_analysis",
+    "purpose": "analyze workspace; {'level': 'M0', 'model': 'geometric_reachability'}",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "MATLAB Engine"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": {
+        "robot_ir": "RobotIR (DesignSpec compatibility accepted)",
+        "task": "TaskSpec",
+        "environment": "EnvironmentSpec"
+      },
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "plan_pcc_reach",
+    "bundle": "model",
+    "implementation": {
+      "module": "tools.matlab_tools",
+      "callable": "MatlabTools.plan_pcc_reach",
+      "backend": "matlab/plan_pcc_reach.m"
+    },
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "family_support": "partial",
+    "inputs": {
+      "robot_ir": "RobotIR (DesignSpec compatibility accepted)",
+      "task": "TaskSpec",
+      "environment": "EnvironmentSpec"
+    },
+    "output": "ToolResult",
+    "design_fields_used": [
+      "robot_family",
+      "sections",
+      "total_length_m",
+      "tendon_count",
+      "tendon_routing_radius_m"
+    ],
+    "discriminator_field": "robot_family",
+    "configuration_constraints": {
+      "sections": 1
+    },
+    "numerical_design_fields_used": [
+      "total_length_m",
+      "tendon_count",
+      "tendon_routing_radius_m"
+    ],
+    "currently_ignored_design_fields": [
+      "segments",
+      "body_radius_m"
+    ],
+    "task_fields_used": [
+      "target_m",
+      "position_error_max_m",
+      "environment_id"
+    ],
+    "currently_ignored_task_fields": [
+      "task_id",
+      "task_type"
+    ],
+    "fidelity": {
+      "level": "M1",
+      "model": "single_section_PCC_kinematics"
+    },
+    "contract": {
+      "robot_base_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "straight_direction": "local +x",
+      "cross_section": "y-z plane",
+      "phi_rad": "atan2(target_z, target_y)",
+      "theta_bounds_rad": [
+        0.0,
+        3.141592653589793
+      ],
+      "search": "MATLAB fminbnd on squared tip error, with both endpoints compared.",
+      "tendon_target_formula": "L - r_t * theta * cos(2*pi*i/N - phi)",
+      "tendon_order": "tendon_0 through tendon_N-1",
+      "pass_condition": "Finite prediction and positive finite commands; model_task_success may be false.",
+      "gate_semantics": "Tool execution is HARD; model_task_success is SCREENING and failure continues to MuJoCo.",
+      "metrics": {
+        "theta_rad": "float",
+        "phi_rad": "float",
+        "predicted_tip_m": "list[float]",
+        "target_position_m": "list[float]",
+        "predicted_position_error_m": "float",
+        "model_task_success": "bool",
+        "tendon_target_lengths_m": "list[float]",
+        "tendon_delta_lengths_m": "list[float]",
+        "tendon_count": "int",
+        "tendon_routing_radius_m": "float"
+      },
+      "artifacts": []
+    },
+    "limitations": [
+      "Best effort on the non-looping branch; does not guarantee task tolerance.",
+      "No dynamics, gravity, stiffness/load, or contact.",
+      "No multi-section, PCS, or Cosserat model.",
+      "Continuous PCC tendon geometry differs from segmented spatial paths.",
+      "MATLAB Engine startup and execution exceptions propagate.",
+      "RobotIR mechanics, segment discretization and environment gravity/objects are not part of this kinematic calculation."
+    ],
+    "failure_codes": {
+      "UNSUPPORTED_ROBOT_FAMILY": "Only tendon_driven_continuum is accepted.",
+      "UNSUPPORTED_DESIGN_CONFIGURATION": "Only sections=1 is accepted.",
+      "PCC_INVALID_COMMAND": "Invalid input dimensions/count/target/tolerance or nonfinite/nonpositive output commands.",
+      "PHYSICS_ASSUMPTION_REQUIRED": "Unapproved/missing IR physics contract (raised ValueError)."
+    },
+    "cost": {
+      "compute": "low",
+      "note": "One bounded scalar search; base MATLAB only, no Optimization Toolbox."
+    },
+    "fields_consumed": [
+      "RobotIR.section.length_m",
+      "EnvironmentSpec.coordinate_frame",
+      "EnvironmentSpec.environment_id",
+      "TaskSpec.target_m",
+      "RobotIR.tendon_routes.angle_rad",
+      "RobotIR.tendon_routing_radius_m",
+      "TaskSpec.position_error_max_m",
+      "TaskSpec.environment_id"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md"
+    ],
+    "assumptions": [
+      "Origin fixed at world base; straight +x; no dynamics or contact."
+    ],
+    "applicable_when": "V1 reach model route; a model pass never certifies task success.",
+    "artifacts": [
+      "model_result.json"
+    ],
+    "implementation_status": "IMPLEMENTED",
+    "outputs": [
+      "ToolResult"
+    ],
+    "exception_policy": "Schema/IR/contract validation exceptions propagate; Harness records stage and message.",
+    "environment_fields_used": [
+      "environment_id",
+      "coordinate_frame"
+    ],
+    "environment_fields_omitted_from_equations": [
+      "gravity_m_s2",
+      "objects",
+      "lights"
+    ],
+    "gate_semantics": "Execution/finite positive commands HARD; model prediction SCREENING; no canonical acceptance.",
+    "category": "design_control_generation",
+    "purpose": "plan pcc reach; {'level': 'M1', 'model': 'single_section_PCC_kinematics'}",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "MATLAB Engine"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": {
+        "robot_ir": "RobotIR (DesignSpec compatibility accepted)",
+        "task": "TaskSpec",
+        "environment": "EnvironmentSpec"
+      },
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "analyze_clearance",
+    "bundle": "model",
+    "implementation_status": "IMPLEMENTED",
+    "gate_semantics": "Completed geometric prediction is SCREENING; a tool execution failure is distinct and HARD.",
+    "implementation": {
+      "module": "tools.matlab_tools",
+      "callable": "MatlabTools.analyze_clearance",
+      "backend": "matlab/analyze_clearance.m"
+    },
+    "inputs": [
+      "RobotIR",
+      "TaskSpec",
+      "EnvironmentSpec",
+      "PCC ToolResult"
+    ],
+    "outputs": [
+      "ToolResult with conservative minimum clearance",
+      "intersection",
+      "closest sample/segment/bar",
+      "aperture crossing and centreline"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": {
+      "level": "low",
+      "model": "geometric_PCC_swept_radius"
+    },
+    "assumptions": [
+      "Single-section PCC, fixed world origin, exactly one y-z window normal to +x.",
+      "Window box centres/half sizes are passed from the shared EnvironmentSpec parser."
+    ],
+    "applicable_when": "Completed M1 plan for reach_window, including NON_CANONICAL development fixtures.",
+    "limitations": [
+      "PCC shape approximation; no gravity, dynamics, floor, actuation feasibility or validated physical collision prediction.",
+      "Minimum is a conservative lower bound using half the arc sample spacing; a negative bound alone is not proof of intersection.",
+      "Closest sample/segment identifies the sampled minimum, not an exact continuous minimizer.",
+      "Tool pass means analysis completed, not clearance or task success."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "exception_policy": "Input or MATLAB failures propagate to the existing Harness.",
+    "cost": {
+      "compute": "low",
+      "note": "Linear in PCC sample count and four window bars; MATLAB session reused."
+    },
+    "fields_consumed": [
+      "RobotIR.section.length_m / body_radius_m / segments / coordinate_frame",
+      "TaskSpec.task_type / target_m / environment_id",
+      "EnvironmentSpec.window dimensions, position and plane",
+      "model_result theta_rad / phi_rad / comparison_context"
+    ],
+    "artifacts": [
+      "clearance_result.json"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md"
+    ],
+    "equations": "Sample PCC centreline; min signed point-box distance - body radius - half arc spacing; shared window_boxes and aperture_crossing; see matlab/analyze_clearance.m and tools/window_geometry.py.",
+    "category": "mathematical_analysis",
+    "purpose": "analyze clearance; {'level': 'low', 'model': 'geometric_PCC_swept_radius'}",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "MATLAB Engine"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "RobotIR",
+        "TaskSpec",
+        "EnvironmentSpec",
+        "PCC ToolResult"
+      ],
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "analyze_actuation",
+    "bundle": "model",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.actuation_tools",
+      "callable": "analyze_actuation"
+    },
+    "inputs": [
+      "RobotIR",
+      "completed M1 PCC ToolResult"
+    ],
+    "outputs": [
+      "ToolResult; GEOMETRIC_ACTUATION_ONLY; strokes and geometric tendon Jacobian"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "M1 geometric tendon mapping only",
+    "assumptions": [
+      "Existing L-r*theta*cos(alpha-phi) mapping and b=(theta*cos(phi),theta*sin(phi))."
+    ],
+    "applicable_when": "Completed single-section PCC plan and matching RobotIR.",
+    "limitations": [
+      "No required tendon force, motor torque, physical feasibility or real mechanical advantage."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "O(tendon_count); tiny two-column SVD, no external runtime"
+    },
+    "fields_consumed": [
+      "RobotIR.section.length_m",
+      "RobotIR.tendon_routes",
+      "RobotIR.tendon_routing_radius_m",
+      "model_result.metrics"
+    ],
+    "artifacts": [
+      "actuation_result.json"
+    ],
+    "physics_contract_dependencies": [
+      "tendon_length_mapping_v1.md",
+      "tendon_driven_pcc_v1.md"
+    ],
+    "gate_semantics": "Geometric evidence only; no canonical or mechanical-feasibility gate.",
+    "category": "mathematical_analysis",
+    "purpose": "analyze actuation; M1 geometric tendon mapping only",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "tendon_length_mapping_v1.md",
+      "tendon_driven_pcc_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "RobotIR",
+        "completed M1 PCC ToolResult"
+      ],
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "pcc_centerline",
+    "bundle": "model",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.matlab_tools",
+      "callable": "MatlabTools.pcc_centerline",
+      "backend": "matlab/pcc_centerline.m"
+    },
+    "inputs": [
+      "RobotIR",
+      "completed PCC ToolResult"
+    ],
+    "outputs": [
+      "ToolResult; normal model centerline and normalized arc coordinates"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "M1 geometric",
+    "assumptions": [
+      "Existing single-section PCC geometry"
+    ],
+    "applicable_when": "Envelope-authorized study with M1 plan.",
+    "limitations": [
+      "No gravity or mechanics; shape evidence is not task success"
+    ],
+    "failure_codes": [
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "low"
+    },
+    "fields_consumed": [
+      "RobotIR.section.length_m",
+      "model_result.metrics.theta_rad",
+      "model_result.metrics.phi_rad"
+    ],
+    "artifacts": [
+      "model_shape.json"
+    ],
+    "physics_contract_dependencies": [
+      "tendon_driven_pcc_v1.md",
+      "coordinate_frames.md"
+    ],
+    "category": "mathematical_analysis",
+    "purpose": "pcc centerline; M1 geometric",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "tendon_driven_pcc_v1.md",
+      "coordinate_frames.md",
+      "MATLAB Engine"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "RobotIR",
+        "completed PCC ToolResult"
+      ],
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "analyze_stiffness",
+    "bundle": "model",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "RobotIR",
+      "approved stiffness law"
+    ],
+    "outputs": [
+      "stiffness estimate"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "mathematical_analysis",
+    "purpose": "analyze stiffness; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "solve_equilibrium",
+    "bundle": "model",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "RobotIR",
+      "EnvironmentSpec",
+      "ControlCommand"
+    ],
+    "outputs": [
+      "equilibrium state"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "mathematical_analysis",
+    "purpose": "solve equilibrium; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "analyze_dynamics",
+    "bundle": "model",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "RobotIR",
+      "EnvironmentSpec",
+      "initial state"
+    ],
+    "outputs": [
+      "dynamic model"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "mathematical_analysis",
+    "purpose": "analyze dynamics; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "simulate_reduced_dynamics",
+    "bundle": "model",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "reduced model",
+      "ControlSpec",
+      "initial state"
+    ],
+    "outputs": [
+      "reduced trajectory"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "mathematical_analysis",
+    "purpose": "simulate reduced dynamics; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "pcc_sensitivity",
+    "bundle": "model",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.pcc_math",
+      "callable": "pcc_sensitivity"
+    },
+    "inputs": [
+      "RobotIR",
+      "theta_rad",
+      "phi_rad"
+    ],
+    "outputs": [
+      "ToolResult"
+    ],
+    "fields_consumed": [
+      "RobotIR.section.length_m",
+      "RobotIR.tendon_routes.angle_rad",
+      "RobotIR.tendon_routing_radius_m"
+    ],
+    "artifacts": [
+      "pcc_sensitivity.json (caller persists)"
+    ],
+    "fidelity": "M1 geometric differential",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "physics_contract_dependencies": [
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "coordinate_frames.md"
+    ],
+    "assumptions": [
+      "Direct mathematical derivative of approved single-section PCC and tendon equations; analytic straight limit."
+    ],
+    "applicable_when": "Valid RobotIR and bend on approved PCC branch; no design perturbation or gain selection.",
+    "limitations": [
+      "No real robot validation, convergence guarantee or causal attribution.",
+      "No canonical success from model predictions; no TaskContract or Skill mutation."
+    ],
+    "failure_codes": [
+      "PHYSICS_ASSUMPTION_REQUIRED",
+      "CAPABILITY_MISSING",
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "O(tendon_count); no MATLAB startup or simulation"
+    },
+    "gate_semantics": "MODEL/SCREENING derivative evidence only; no task success decision.",
+    "category": "mathematical_analysis",
+    "purpose": "pcc sensitivity; M1 geometric differential",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "coordinate_frames.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "RobotIR",
+        "theta_rad",
+        "phi_rad"
+      ],
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "optimize_design",
+    "bundle": "optimization",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.experiment_tools",
+      "callable": "optimize_design"
+    },
+    "inputs": [
+      "Human-owned ExperimentPolicy or validated ENVELOPE_SUBSET policy path"
+    ],
+    "outputs": [
+      "RunArtifacts; optimization_summary.json"
+    ],
+    "fields_consumed": [
+      "ExperimentPolicy.*",
+      "DesignSpec.*",
+      "TaskContract references"
+    ],
+    "artifacts": [
+      "optimization_policy.yaml",
+      "optimization_history.jsonl",
+      "optimization_summary.json",
+      "candidate_*_design.yaml",
+      "candidate_*_evaluation.json",
+      "candidate_*_run_reference.json"
+    ],
+    "fidelity": "M1 ranking / MUJOCO canonical",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "physics_contract_dependencies": [
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "coordinate_frames.md"
+    ],
+    "assumptions": [
+      "Single-section approved PCC geometry only; no new mechanical law or tuned defaults.",
+      "Numerical experiments require file-owned policy and approved grammar; TEST_ONLY cannot execute frozen tasks."
+    ],
+    "applicable_when": "Explicit supported route and validated Human policy or subset of SURROGATE_EXPLORATION_ENVELOPE_V1; numerical sensitivity is not design ranking.",
+    "limitations": [
+      "No real robot validation, convergence guarantee or causal attribution.",
+      "No canonical success from model predictions; no TaskContract or Skill mutation."
+    ],
+    "failure_codes": [
+      "PHYSICS_ASSUMPTION_REQUIRED",
+      "CAPABILITY_MISSING",
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "bounded by explicit policy budgets"
+    },
+    "gate_semantics": "HARD input/execution legality; SCREENING model evidence; existing MUJOCO evaluator alone is CANONICAL",
+    "category": "design_control_generation",
+    "purpose": "optimize design; M1 ranking / MUJOCO canonical",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "coordinate_frames.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "Human-owned ExperimentPolicy or validated ENVELOPE_SUBSET policy path"
+      ],
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "fit_model_parameters",
+    "bundle": "optimization",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "approved model",
+      "measurement data",
+      "parameter bounds"
+    ],
+    "outputs": [
+      "fit",
+      "uncertainty"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "design_control_generation",
+    "purpose": "fit model parameters; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "plan_open_loop",
+    "bundle": "control",
+    "implementation": {
+      "module": "controllers.open_loop_length",
+      "callable": "plan_open_loop"
+    },
+    "inputs": [
+      "positive finite tendon lengths"
+    ],
+    "outputs": [
+      "ControllerResult"
+    ],
+    "fields_consumed": [
+      "tendon_target_lengths_m"
+    ],
+    "failure_codes": [
+      "INVALID_TENDON_COMMAND"
+    ],
+    "fidelity": "C1 open loop",
+    "assumptions": [
+      "Human-owned input semantics are authoritative."
+    ],
+    "applicable_when": "Deterministic V1 harness; schema validation alone does not imply route support.",
+    "limitations": [
+      "No physical success claim; validation exceptions propagate to the harness."
+    ],
+    "physics_contract_dependencies": [],
+    "artifacts": [
+      "controller.json",
+      "tendon_command.json"
+    ],
+    "implementation_status": "IMPLEMENTED",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "MATLAB startup separate; MuJoCo cost scales with discretization and steps."
+    },
+    "category": "design_control_generation",
+    "purpose": "plan open loop; C1 open loop",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "positive finite tendon lengths"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "synthesize_feedback",
+    "bundle": "control",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "controllers.pcc_tip_feedback",
+      "callable": "synthesize_feedback"
+    },
+    "inputs": [
+      "RobotIR",
+      "TaskSpec",
+      "M1 ToolResult",
+      "ValidatedExperiment"
+    ],
+    "outputs": [
+      "PCCTipFeedback Controller"
+    ],
+    "fields_consumed": [
+      "RobotIR.section.length_m",
+      "RobotIR.tendon_routes.angle_rad",
+      "RobotIR.tendon_routing_radius_m",
+      "TaskSpec.target_m",
+      "ExperimentPolicy.feedback_parameters",
+      "MuJoCo observed tip_position_m and integer step"
+    ],
+    "artifacts": [
+      "feedback_controller.json",
+      "feedback_updates.json",
+      "controller.json"
+    ],
+    "fidelity": "C2 actual tip feedback; legacy C1 open loop unchanged",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "physics_contract_dependencies": [
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "coordinate_frames.md"
+    ],
+    "assumptions": [
+      "Single-section approved PCC geometry only; no new mechanical law or tuned defaults.",
+      "Numerical experiments require file-owned policy and approved grammar; TEST_ONLY cannot execute frozen tasks."
+    ],
+    "applicable_when": "Explicit supported route and numerical authorization; real experiments currently blocked pending Human approval.",
+    "limitations": [
+      "No real robot validation, convergence guarantee or causal attribution.",
+      "No canonical success from model predictions; no TaskContract or Skill mutation."
+    ],
+    "failure_codes": [
+      "PHYSICS_ASSUMPTION_REQUIRED",
+      "CAPABILITY_MISSING",
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "bounded by explicit policy budgets"
+    },
+    "gate_semantics": "HARD input/execution legality; SCREENING model evidence; existing MUJOCO evaluator alone is CANONICAL",
+    "category": "design_control_generation",
+    "purpose": "synthesize feedback; C2 actual tip feedback; legacy C1 open loop unchanged",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "coordinate_frames.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "RobotIR",
+        "TaskSpec",
+        "M1 ToolResult",
+        "ValidatedExperiment"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "synthesize_model_controller",
+    "bundle": "control",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "approved dynamic model",
+      "task"
+    ],
+    "outputs": [
+      "ControlSpec"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "design_control_generation",
+    "purpose": "synthesize model controller; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "optimize_controller",
+    "bundle": "control",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "ControlSpec",
+      "objective",
+      "approved bounds"
+    ],
+    "outputs": [
+      "ControlSpec",
+      "evidence"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "design_control_generation",
+    "purpose": "optimize controller; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "compile_mujoco",
+    "bundle": "mujoco",
+    "implementation": {
+      "module": "tools.mujoco_tools",
+      "callable": "compile_mujoco"
+    },
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "family_support": "partial",
+    "inputs": {
+      "robot_ir": "RobotIR (DesignSpec compatibility accepted)",
+      "task": "TaskSpec",
+      "output_path": "Path",
+      "environment": "EnvironmentSpec",
+      "simulator": "SimulatorSpec"
+    },
+    "output": "ToolResult",
+    "design_fields_used": [
+      "robot_family",
+      "sections",
+      "segments",
+      "total_length_m",
+      "body_radius_m",
+      "tendon_count",
+      "tendon_routing_radius_m"
+    ],
+    "discriminator_field": "robot_family",
+    "configuration_constraints": {
+      "sections": 1
+    },
+    "numerical_design_fields_used": [
+      "segments",
+      "total_length_m",
+      "body_radius_m",
+      "tendon_count",
+      "tendon_routing_radius_m"
+    ],
+    "currently_ignored_design_fields": [],
+    "task_fields_used": [
+      "environment_id",
+      "target_m"
+    ],
+    "currently_ignored_task_fields": [
+      "task_id",
+      "task_type",
+      "position_error_max_m"
+    ],
+    "fidelity": {
+      "level": "low",
+      "model": "single_section_tendon_actuated_segmented_approximation"
+    },
+    "contract": {
+      "robot_base_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "segment_length": "total_length_m / segments",
+      "segment_direction": "local +x",
+      "joint_axes": [
+        "local +y",
+        "local +z"
+      ],
+      "environment_source": "tasks/<environment_id>/environment.yaml; validated tasks/<environment_id>/mujoco.xml representation",
+      "floor_z": "Fixed by environment; reach_free uses -0.02 m independent of design.",
+      "tendon_routing": "N spatial paths through base and each segment distal end.",
+      "routing_offset_yz": "r_t * [cos(2*pi*i/N), sin(2*pi*i/N)]",
+      "physical_spatial_tendon_routing": "implemented",
+      "tendon_transmission_actuator": "implemented",
+      "actuator_control": "Target tendon length in meters, unit gear, ordered tendon_0 through tendon_N-1.",
+      "tip_site": "Last segment at local [segment_length, 0, 0].",
+      "target_site": "World site at task.target_m; no collision or actuation.",
+      "pass_condition": "MJCF written; loading and task success are checked separately.",
+      "metrics": {},
+      "artifacts": {
+        "mjcf_path": "Absolute path to generated XML."
+      }
+    },
+    "limitations": [
+      "Single-section low fidelity segmented surrogate; not Cosserat/FEM or validated material physics.",
+      "Arm self-contact disabled; no extension/torsion.",
+      "File-write exceptions propagate; harness records errors.",
+      "Reserved environment components are not executable."
+    ],
+    "failure_codes": {
+      "UNSUPPORTED_ROBOT_FAMILY": "Only tendon_driven_continuum is accepted.",
+      "UNSUPPORTED_DESIGN_CONFIGURATION": "Only sections=1 is accepted.",
+      "INVALID_DESIGN": "Counts and dimensions must be positive and finite.",
+      "INVALID_ENVIRONMENT": "Invalid ID, missing/unreadable XML, malformed XML, or missing mujoco/worldbody.",
+      "PHYSICS_ASSUMPTION_REQUIRED": "Unapproved/missing IR physics contract (raised ValueError)."
+    },
+    "cost": {
+      "compute": "low"
+    },
+    "fields_consumed": [
+      "RobotIR.section",
+      "RobotIR.tendon_routes",
+      "RobotIR.mechanics",
+      "EnvironmentSpec.objects",
+      "EnvironmentSpec.lights",
+      "EnvironmentSpec.gravity_m_s2",
+      "SimulatorSpec.timestep_s",
+      "TaskSpec.target_m"
+    ],
+    "artifacts": [
+      "robot.xml",
+      "compile_result.json"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "segmented_mujoco_mapping_v1.md",
+      "actuator_model_v1.md"
+    ],
+    "assumptions": [
+      "Approved legacy_v1_surrogate mechanics; target/tolerance owned by task."
+    ],
+    "applicable_when": "V1 reach task and supported environment; final task decision uses actual MuJoCo tip.",
+    "implementation_status": "IMPLEMENTED",
+    "outputs": [
+      "ToolResult"
+    ],
+    "exception_policy": "Schema/IR/contract validation exceptions propagate; Harness records stage and message.",
+    "category": "design_compile",
+    "purpose": "compile mujoco; {'level': 'low', 'model': 'single_section_tendon_actuated_segmented_approximation'}",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "segmented_mujoco_mapping_v1.md",
+      "actuator_model_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": {
+        "robot_ir": "RobotIR (DesignSpec compatibility accepted)",
+        "task": "TaskSpec",
+        "output_path": "Path",
+        "environment": "EnvironmentSpec",
+        "simulator": "SimulatorSpec"
+      },
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "validate_task",
+    "bundle": "mujoco",
+    "implementation": {
+      "module": "tools.mujoco_tools",
+      "callable": "validate_task"
+    },
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "family_support": "partial",
+    "family_check": "No DesignSpec input or runtime family check; intended for this bundle's compiled MJCF.",
+    "inputs": {
+      "xml_path": "str | pathlib.Path",
+      "task": "TaskSpec",
+      "tendon_target_lengths_m": "Optional list[float], default None."
+    },
+    "output": "ToolResult",
+    "design_fields_used": [],
+    "currently_ignored_design_fields": [],
+    "design_input_note": "No DesignSpec argument; geometry and dynamics are read from MJCF.",
+    "task_fields_used": [
+      "target_m",
+      "position_error_max_m"
+    ],
+    "currently_ignored_task_fields": [
+      "task_id",
+      "task_type",
+      "environment_id"
+    ],
+    "fidelity": {
+      "level": "low",
+      "model": "final_position_gate_on_tendon_actuated_segmented_simulation"
+    },
+    "contract": {
+      "steps": 1000,
+      "steps_source": "configs/run.yaml",
+      "control": "Compatibility wrapper builds open_loop_length and delegates to run_task.",
+      "command_validation": "Length count equals model.nu and model.ntendon; ordered tendon transmissions required.",
+      "no_command": "Disable actuation explicitly for unactuated simulation; zero ctrl would request zero length.",
+      "finite_checks": [
+        "qpos_each_step",
+        "qvel_each_step",
+        "final_tip_position"
+      ],
+      "tip_position_source": "data.site_xpos at tip_site after final mj_forward",
+      "target_source": "task.target_m; target_site is not read",
+      "coordinate_frame": "MuJoCo world, equal to compiled robot base frame",
+      "position_error_m": "Euclidean distance between final tip position and task.target_m",
+      "task_success": "position_error_m <= task.position_error_max_m",
+      "pass_condition": "Simulation checks pass and task_success is true.",
+      "metrics_on_completed_simulation": {
+        "steps": "int",
+        "nq": "int",
+        "nv": "int",
+        "tip_position_m": "list[float]",
+        "target_position_m": "list[float]",
+        "position_error_m": "float",
+        "position_error_max_m": "float",
+        "task_success": "bool"
+      },
+      "additional_metrics_with_command": {
+        "tendon_target_lengths_m": "list[float]",
+        "final_tendon_lengths_m": "list[float]",
+        "actuator_controls": "list[float]",
+        "actuator_force": "list[float]"
+      },
+      "artifacts": []
+    },
+    "limitations": [
+      "Final position only; minimal finite-state sanity, no robustness guarantee.",
+      "Legacy wrapper; unknown task types are rejected."
+    ],
+    "failure_codes": {
+      "TASK_FAILED": "Simulation completed but final position error exceeds the allowed error.",
+      "PHYSICS_ERROR": "Exception during model loading, site lookup, simulation, or evaluation.",
+      "NONFINITE_STATE": "A checked state or final tip position contains NaN or Inf.",
+      "INVALID_TENDON_COMMAND": "Invalid length count/values or model transmission/order; retains available execution evidence.",
+      "CAPABILITY_MISSING": "No implemented route/evaluator for requested task."
+    },
+    "cost": {
+      "compute": "low",
+      "note": "Fixed 1000 steps; actual cost depends on the input XML."
+    },
+    "fields_consumed": [
+      "MJCF",
+      "TaskSpec.target_m",
+      "TaskSpec.position_error_max_m",
+      "tendon_target_lengths_m",
+      "RunSettings.steps"
+    ],
+    "artifacts": [
+      "ToolResult (caller persists)"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "segmented_mujoco_mapping_v1.md",
+      "actuator_model_v1.md"
+    ],
+    "assumptions": [
+      "Approved legacy_v1_surrogate mechanics; target/tolerance owned by task."
+    ],
+    "applicable_when": "V1 reach task and supported environment; final task decision uses actual MuJoCo tip.",
+    "implementation_status": "IMPLEMENTED",
+    "outputs": [
+      "ToolResult"
+    ],
+    "exception_policy": "Schema/IR/contract validation exceptions propagate; Harness records stage and message.",
+    "category": "execution",
+    "purpose": "validate task; {'level': 'low', 'model': 'final_position_gate_on_tendon_actuated_segmented_simulation'}",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "segmented_mujoco_mapping_v1.md",
+      "actuator_model_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": {
+        "xml_path": "str | pathlib.Path",
+        "task": "TaskSpec",
+        "tendon_target_lengths_m": "Optional list[float], default None."
+      },
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "run_task",
+    "bundle": "mujoco",
+    "implementation": {
+      "module": "tools.mujoco_tools",
+      "callable": "run_task"
+    },
+    "inputs": {
+      "xml_path": "Path",
+      "task": "TaskSpec",
+      "controller": "Controller protocol or None",
+      "run_settings": "RunSettings",
+      "environment": "EnvironmentSpec required for reach_window; optional for legacy reach",
+      "evaluator": "Optional resolved TaskContract evaluator callable; legacy default evaluate_reach"
+    },
+    "gate_semantics": "Executable finite-state evidence is HARD; actual task acceptance is CANONICAL for the selected task, without promoting development fixtures to frozen benchmarks.",
+    "outputs": [
+      "ToolResult with canonical actual metrics, compact execution_evidence, resolved engine parameter provenance and final state"
+    ],
+    "fields_consumed": [
+      "MJCF",
+      "TaskSpec.task_type",
+      "TaskSpec.target_m",
+      "TaskSpec.position_error_max_m",
+      "ControlCommand.tendon_target_lengths_m",
+      "RunSettings.steps",
+      "EnvironmentSpec window geometry and frame (reach_window)"
+    ],
+    "fidelity": {
+      "level": "low",
+      "model": "segmented surrogate + canonical reach evaluator"
+    },
+    "limitations": [
+      "Reach and single axis-aligned reach_window evaluators only; window development fixture is not a frozen benchmark.",
+      "Window evidence records sampled capsule-to-frame distances, contact points/counts, initial configuration and final aperture crossing; floor excluded.",
+      "reach_window success requires target tolerance AND required initial whole-body side AND final aperture crossing AND no forbidden sampled window contact; no continuous collision guarantee.",
+      "TaskSpec.acceptance supports before_window or unrestricted initial region; legacy development default unrestricted is not formal approval. No new initial-state generator.",
+      "Finite state is not validated physical fidelity.",
+      "No automatic tuning or retry.",
+      "Step force/length samples are solver-stage values; qpos/qvel are post-integration. No extra forward calls in integration loop. An upper zero-bound hit does not prove active clipping or maximum-pull saturation."
+    ],
+    "failure_codes": [
+      "TASK_FAILED",
+      "PHYSICS_ERROR",
+      "NONFINITE_STATE",
+      "INVALID_TENDON_COMMAND",
+      "CONTROL_FAILURE",
+      "CAPABILITY_MISSING"
+    ],
+    "artifacts": [
+      "mujoco_result.json",
+      "metrics.json",
+      "simulation_state.json"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "segmented_mujoco_mapping_v1.md",
+      "actuator_model_v1.md"
+    ],
+    "assumptions": [
+      "Approved legacy_v1_surrogate mechanics; target/tolerance owned by task."
+    ],
+    "applicable_when": "V1 reach task and supported environment; final task decision uses actual MuJoCo tip.",
+    "implementation_status": "IMPLEMENTED",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "MATLAB startup separate; MuJoCo cost scales with discretization and steps."
+    },
+    "exception_policy": "Schema/IR/contract validation exceptions propagate; Harness records stage and message.",
+    "category": "execution",
+    "purpose": "run task; {'level': 'low', 'model': 'segmented surrogate + canonical reach evaluator'}",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "segmented_mujoco_mapping_v1.md",
+      "actuator_model_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": {
+        "xml_path": "Path",
+        "task": "TaskSpec",
+        "controller": "Controller protocol or None",
+        "run_settings": "RunSettings",
+        "environment": "EnvironmentSpec required for reach_window; optional for legacy reach",
+        "evaluator": "Optional resolved TaskContract evaluator callable; legacy default evaluate_reach"
+      },
+      "note": "Typed object construction shown in referenced executable examples"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "validate_physics",
+    "bundle": "mujoco",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "RobotIR",
+      "MJCF",
+      "approved reference evidence"
+    ],
+    "outputs": [
+      "physics validation report"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "execution",
+    "purpose": "validate physics; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "evaluate_metrics",
+    "bundle": "mujoco",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "task metric definitions",
+      "trajectory"
+    ],
+    "outputs": [
+      "extended canonical metrics"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "execution",
+    "purpose": "evaluate metrics; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "compare_shape_model_sim",
+    "bundle": "diagnostics",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.shape_tools",
+      "callable": "compare_shape_model_sim"
+    },
+    "inputs": [
+      "normal model_shape ToolResult",
+      "normal simulation ToolResult"
+    ],
+    "outputs": [
+      "ToolResult; tip/RMS/max discrepancies and 65 compact sample differences"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "Geometric comparison of recorded PCC and segmented surrogate shapes",
+    "assumptions": [
+      "Matching run and input hashes",
+      "constant matching C1 commands",
+      "normalized arc-length correspondence"
+    ],
+    "applicable_when": "Completed M1 shape and final MuJoCo centerline.",
+    "limitations": [
+      "No debug inputs",
+      "no approved mismatch threshold",
+      "failure_attribution remains UNKNOWN"
+    ],
+    "failure_codes": [
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "low; no MATLAB or MuJoCo launch"
+    },
+    "fields_consumed": [
+      "model_shape.artifacts.centerline_m",
+      "simulation_result.artifacts.final_centerline_m",
+      "comparison_context",
+      "command evidence"
+    ],
+    "artifacts": [
+      "shape_comparison.json"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "segmented_mujoco_mapping_v1.md"
+    ],
+    "gate_semantics": "Evidence only; never automatic MODEL_MISMATCH or canonical override.",
+    "category": "evaluation_observation",
+    "purpose": "compare shape model sim; Geometric comparison of recorded PCC and segmented surrogate shapes",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "tendon_driven_pcc_v1.md",
+      "segmented_mujoco_mapping_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "normal model_shape ToolResult",
+        "normal simulation ToolResult"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "compare_model_sim",
+    "bundle": "diagnostics",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.diagnostic_tools",
+      "callable": "compare_model_sim"
+    },
+    "inputs": [
+      "model_result: ToolResult",
+      "simulation_result: ToolResult",
+      "task: TaskSpec",
+      "evidence_paths: optional caller-supplied references"
+    ],
+    "outputs": [
+      "ToolResult; evidence_status available/unavailable; failure_attribution UNKNOWN; measured evidence"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "Deterministic evidence arithmetic on recorded V1 observations; no validated physical or causal inference.",
+    "assumptions": [
+      "Trusted Harness same-run artifacts; callers must verify recorded artifact hashes before reading persisted evidence.",
+      "No approved model mismatch, tracking acceptance, or large-qvel thresholds."
+    ],
+    "applicable_when": "V1 structured execution evidence is available; task failure does not prevent diagnostics.",
+    "limitations": [
+      "Missing/malformed evidence returns unavailable and UNKNOWN.",
+      "Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force; neither establishes cable slack.",
+      "No canonical gate changes, optimizer, physical stability certificate, or causal attribution."
+    ],
+    "failure_codes": [
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "O(tendon/actuator/state summary size), no simulator or MATLAB launch."
+    },
+    "fields_consumed": [
+      "model_result.metrics.predicted_tip_m / predicted_position_error_m / model_task_success / target_position_m / tendon_target_lengths_m",
+      "simulation_result.metrics.tip_position_m / position_error_m / task_success / position_error_max_m / target_position_m / tendon_target_lengths_m",
+      "both metrics.comparison_context (Harness run/input hashes and coordinate frame)",
+      "TaskSpec.target_m / position_error_max_m",
+      "execution_evidence.actuators command extrema and active sample counts"
+    ],
+    "artifacts": [
+      "compare_model_sim.json (Harness artifact service)",
+      "diagnostic_summary.json (Harness aggregate)"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "actuator_model_v1.md",
+      "tendon_length_mapping_v1.md"
+    ],
+    "category": "evaluation_observation",
+    "purpose": "compare model sim; Deterministic evidence arithmetic on recorded V1 observations; no validated physical or causal inference.",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "actuator_model_v1.md",
+      "tendon_length_mapping_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "model_result: ToolResult",
+        "simulation_result: ToolResult",
+        "task: TaskSpec",
+        "evidence_paths: optional caller-supplied references"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "check_actuator_limits",
+    "bundle": "diagnostics",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.diagnostic_tools",
+      "callable": "check_actuator_limits"
+    },
+    "inputs": [
+      "simulation_result: ToolResult",
+      "evidence_paths: optional caller-supplied references"
+    ],
+    "outputs": [
+      "ToolResult; evidence_status available/unavailable; failure_attribution UNKNOWN; measured evidence"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "Deterministic evidence arithmetic on recorded V1 observations; no validated physical or causal inference.",
+    "assumptions": [
+      "Trusted Harness same-run artifacts; callers must verify recorded artifact hashes before reading persisted evidence.",
+      "No approved model mismatch, tracking acceptance, or large-qvel thresholds."
+    ],
+    "applicable_when": "V1 structured execution evidence is available; task failure does not prevent diagnostics.",
+    "limitations": [
+      "Missing/malformed evidence returns unavailable and UNKNOWN.",
+      "Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force; neither establishes cable slack.",
+      "No canonical gate changes, optimizer, physical stability certificate, or causal attribution."
+    ],
+    "failure_codes": [
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "O(tendon/actuator/state summary size), no simulator or MATLAB launch."
+    },
+    "fields_consumed": [
+      "execution_evidence.actuators identity / force range / extrema / active and limit sample counts",
+      "execution_evidence.steps_completed / timestep_s / numerics.actuator_force_all_finite"
+    ],
+    "artifacts": [
+      "check_actuator_limits.json (Harness artifact service)",
+      "diagnostic_summary.json (Harness aggregate)"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "actuator_model_v1.md",
+      "tendon_length_mapping_v1.md"
+    ],
+    "category": "evaluation_observation",
+    "purpose": "check actuator limits; Deterministic evidence arithmetic on recorded V1 observations; no validated physical or causal inference.",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "actuator_model_v1.md",
+      "tendon_length_mapping_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "simulation_result: ToolResult",
+        "evidence_paths: optional caller-supplied references"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "check_tendon_tracking",
+    "bundle": "diagnostics",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.diagnostic_tools",
+      "callable": "check_tendon_tracking"
+    },
+    "inputs": [
+      "simulation_result: ToolResult",
+      "evidence_paths: optional caller-supplied references"
+    ],
+    "outputs": [
+      "ToolResult; evidence_status available/unavailable; failure_attribution UNKNOWN; measured evidence"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "Deterministic evidence arithmetic on recorded V1 observations; no validated physical or causal inference.",
+    "assumptions": [
+      "Trusted Harness same-run artifacts; callers must verify recorded artifact hashes before reading persisted evidence.",
+      "No approved model mismatch, tracking acceptance, or large-qvel thresholds."
+    ],
+    "applicable_when": "V1 structured execution evidence is available; task failure does not prevent diagnostics.",
+    "limitations": [
+      "Missing/malformed evidence returns unavailable and UNKNOWN.",
+      "Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force; neither establishes cable slack.",
+      "No canonical gate changes, optimizer, physical stability certificate, or causal attribution."
+    ],
+    "failure_codes": [
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "O(tendon/actuator/state summary size), no simulator or MATLAB launch."
+    },
+    "fields_consumed": [
+      "simulation_result.metrics.tendon_target_lengths_m / final_tendon_lengths_m / actuator_controls"
+    ],
+    "artifacts": [
+      "check_tendon_tracking.json (Harness artifact service)",
+      "diagnostic_summary.json (Harness aggregate)"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "actuator_model_v1.md",
+      "tendon_length_mapping_v1.md"
+    ],
+    "category": "evaluation_observation",
+    "purpose": "check tendon tracking; Deterministic evidence arithmetic on recorded V1 observations; no validated physical or causal inference.",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "actuator_model_v1.md",
+      "tendon_length_mapping_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "simulation_result: ToolResult",
+        "evidence_paths: optional caller-supplied references"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "check_tendon_slack",
+    "bundle": "diagnostics",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "run artifacts",
+      "ToolResults",
+      "approved contracts"
+    ],
+    "outputs": [
+      "slack evidence (requires approved slack model)"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "evaluation_observation",
+    "purpose": "check tendon slack; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "check_collision",
+    "bundle": "diagnostics",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.diagnostic_tools",
+      "callable": "check_collision"
+    },
+    "inputs": [
+      "clearance ToolResult",
+      "simulation ToolResult",
+      "optional evidence_paths"
+    ],
+    "outputs": [
+      "ToolResult with geometric prediction",
+      "actual contact",
+      "disagreement evidence and UNKNOWN causal attribution"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "Deterministic arithmetic over low/geometric PCC and sampled MuJoCo surrogate evidence.",
+    "assumptions": [
+      "Matching Harness comparison_context and completed execution"
+    ],
+    "applicable_when": "Constrained reach execution with clearance and window evidence.",
+    "limitations": [
+      "Missing evidence yields unavailable and UNKNOWN; numerical termination uses existing inspect_numerics.",
+      "Prediction disagreement and contact are observations, not causal proof or validated physics.",
+      "No contact in discrete samples does not guarantee continuous collision avoidance."
+    ],
+    "failure_codes": [
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "low"
+    },
+    "fields_consumed": [
+      "clearance_result.metrics",
+      "simulation_result.metrics.window_evidence",
+      "comparison_context",
+      "target_reached"
+    ],
+    "artifacts": [
+      "check_collision.json",
+      "diagnostic_summary.json"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "segmented_mujoco_mapping_v1.md"
+    ],
+    "category": "evaluation_observation",
+    "purpose": "check collision; Deterministic arithmetic over low/geometric PCC and sampled MuJoCo surrogate evidence.",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "segmented_mujoco_mapping_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "clearance ToolResult",
+        "simulation ToolResult",
+        "optional evidence_paths"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "inspect_numerics",
+    "bundle": "diagnostics",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.diagnostic_tools",
+      "callable": "inspect_numerics"
+    },
+    "inputs": [
+      "simulation_result: ToolResult",
+      "evidence_paths: optional caller-supplied references"
+    ],
+    "outputs": [
+      "ToolResult; evidence_status available/unavailable; failure_attribution UNKNOWN; measured evidence"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "Deterministic evidence arithmetic on recorded V1 observations; no validated physical or causal inference.",
+    "assumptions": [
+      "Trusted Harness same-run artifacts; callers must verify recorded artifact hashes before reading persisted evidence.",
+      "No approved model mismatch, tracking acceptance, or large-qvel thresholds."
+    ],
+    "applicable_when": "V1 structured execution evidence is available; task failure does not prevent diagnostics.",
+    "limitations": [
+      "Missing/malformed evidence returns unavailable and UNKNOWN.",
+      "Reaching the upper 0 N no-push bound is distinct from lower-bound maximum pulling force; neither establishes cable slack.",
+      "No canonical gate changes, optimizer, physical stability certificate, or causal attribution."
+    ],
+    "failure_codes": [
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "O(tendon/actuator/state summary size), no simulator or MATLAB launch."
+    },
+    "fields_consumed": [
+      "execution_evidence.numerics finite flags / state peaks / warnings / time advancement",
+      "execution_evidence.steps_completed / steps_requested",
+      "simulation_result.failure_code"
+    ],
+    "artifacts": [
+      "inspect_numerics.json (Harness artifact service)",
+      "diagnostic_summary.json (Harness aggregate)"
+    ],
+    "physics_contract_dependencies": [
+      "coordinate_frames.md",
+      "actuator_model_v1.md",
+      "tendon_length_mapping_v1.md"
+    ],
+    "category": "evaluation_observation",
+    "purpose": "inspect numerics; Deterministic evidence arithmetic on recorded V1 observations; no validated physical or causal inference.",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "coordinate_frames.md",
+      "actuator_model_v1.md",
+      "tendon_length_mapping_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "simulation_result: ToolResult",
+        "evidence_paths: optional caller-supplied references"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "run_parameter_sensitivity",
+    "bundle": "diagnostics",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.experiment_tools",
+      "callable": "run_parameter_sensitivity"
+    },
+    "inputs": [
+      "Human-owned ExperimentPolicy path",
+      "requested fidelity"
+    ],
+    "outputs": [
+      "RunArtifacts; sensitivity_evidence.json"
+    ],
+    "fields_consumed": [
+      "ExperimentPolicy.variables",
+      "DesignSpec.*",
+      "TaskContract references"
+    ],
+    "artifacts": [
+      "optimization_policy.yaml",
+      "optimization_history.jsonl",
+      "sensitivity_evidence.json",
+      "candidate_*_evaluation.json"
+    ],
+    "fidelity": "M0/M1 model or MUJOCO; evidence only",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "physics_contract_dependencies": [
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "coordinate_frames.md"
+    ],
+    "assumptions": [
+      "Single-section approved PCC geometry only; no new mechanical law or tuned defaults.",
+      "Numerical experiments require file-owned policy and approved grammar; TEST_ONLY cannot execute frozen tasks."
+    ],
+    "applicable_when": "Explicit supported route and numerical authorization; real experiments currently blocked pending Human approval.",
+    "limitations": [
+      "No real robot validation, convergence guarantee or causal attribution.",
+      "No canonical success from model predictions; no TaskContract or Skill mutation."
+    ],
+    "failure_codes": [
+      "PHYSICS_ASSUMPTION_REQUIRED",
+      "CAPABILITY_MISSING",
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "bounded by explicit policy budgets"
+    },
+    "gate_semantics": "HARD input/execution legality; SCREENING model evidence; existing MUJOCO evaluator alone is CANONICAL",
+    "category": "evaluation_observation",
+    "purpose": "run parameter sensitivity; M0/M1 model or MUJOCO; evidence only",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "tendon_driven_pcc_v1.md",
+      "tendon_length_mapping_v1.md",
+      "coordinate_frames.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "Human-owned ExperimentPolicy path",
+        "requested fidelity"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "create_run",
+    "bundle": "artifacts",
+    "implementation": {
+      "module": "tools.artifact_tools",
+      "callable": "create_run"
+    },
+    "inputs": [
+      "run root"
+    ],
+    "outputs": [
+      "RunArtifacts"
+    ],
+    "fields_consumed": [
+      "git revision",
+      "runtime versions",
+      "UTC clock"
+    ],
+    "failure_codes": [
+      "OSError"
+    ],
+    "fidelity": "factual persistence",
+    "assumptions": [
+      "Human-owned input semantics are authoritative."
+    ],
+    "applicable_when": "Deterministic V1 harness; schema validation alone does not imply route support.",
+    "limitations": [
+      "No physical success claim; validation exceptions propagate to the harness."
+    ],
+    "physics_contract_dependencies": [],
+    "artifacts": [
+      "run.json",
+      "trace.json",
+      "named tool result"
+    ],
+    "implementation_status": "IMPLEMENTED",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "MATLAB startup separate; MuJoCo cost scales with discretization and steps."
+    },
+    "category": "capability_management",
+    "purpose": "create run; factual persistence",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "run root"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "save_tool_result",
+    "bundle": "artifacts",
+    "implementation": {
+      "module": "tools.artifact_tools",
+      "callable": "save_tool_result"
+    },
+    "inputs": [
+      "RunArtifacts",
+      "artifact name",
+      "ToolResult"
+    ],
+    "outputs": [
+      "persisted ToolResult"
+    ],
+    "fields_consumed": [
+      "ToolResult.*"
+    ],
+    "failure_codes": [
+      "OSError",
+      "ValueError"
+    ],
+    "fidelity": "factual persistence",
+    "assumptions": [
+      "Human-owned input semantics are authoritative."
+    ],
+    "applicable_when": "Deterministic V1 harness; schema validation alone does not imply route support.",
+    "limitations": [
+      "No physical success claim; validation exceptions propagate to the harness."
+    ],
+    "physics_contract_dependencies": [],
+    "artifacts": [
+      "run.json",
+      "trace.json",
+      "named tool result"
+    ],
+    "implementation_status": "IMPLEMENTED",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "MATLAB startup separate; MuJoCo cost scales with discretization and steps."
+    },
+    "category": "capability_management",
+    "purpose": "save tool result; factual persistence",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "RunArtifacts",
+        "artifact name",
+        "ToolResult"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "finalize_run",
+    "bundle": "artifacts",
+    "implementation": {
+      "module": "tools.artifact_tools",
+      "callable": "finalize_run"
+    },
+    "inputs": [
+      "RunArtifacts",
+      "status",
+      "failure code"
+    ],
+    "outputs": [
+      "RunRecord"
+    ],
+    "fields_consumed": [
+      "artifact bytes",
+      "final status"
+    ],
+    "failure_codes": [
+      "OSError"
+    ],
+    "fidelity": "factual persistence",
+    "assumptions": [
+      "Human-owned input semantics are authoritative."
+    ],
+    "applicable_when": "Deterministic V1 harness; schema validation alone does not imply route support.",
+    "limitations": [
+      "No physical success claim; validation exceptions propagate to the harness."
+    ],
+    "physics_contract_dependencies": [],
+    "artifacts": [
+      "run.json",
+      "trace.json",
+      "named tool result"
+    ],
+    "implementation_status": "IMPLEMENTED",
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "cost": {
+      "compute": "low",
+      "note": "MATLAB startup separate; MuJoCo cost scales with discretization and steps."
+    },
+    "category": "capability_management",
+    "purpose": "finalize run; factual persistence",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "RunArtifacts",
+        "status",
+        "failure code"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "build_mdp",
+    "bundle": "learning",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "frozen task",
+      "RobotIR",
+      "approved observation/action/reward semantics"
+    ],
+    "outputs": [
+      "MDP definition"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "design_control_generation",
+    "purpose": "build mdp; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "train_policy",
+    "bundle": "learning",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "approved MDP",
+      "training settings"
+    ],
+    "outputs": [
+      "policy",
+      "training evidence"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "design_control_generation",
+    "purpose": "train policy; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "evaluate_policy",
+    "bundle": "learning",
+    "implementation_status": "PLANNED",
+    "inputs": [
+      "policy",
+      "frozen benchmark"
+    ],
+    "outputs": [
+      "canonical evaluation evidence"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "unimplemented; no numerical claims",
+    "assumptions": [
+      "Requires Human-approved scientific semantics before implementation."
+    ],
+    "applicable_when": "Roadmap only; resolver returns IMPLEMENTATION_REQUIRED.",
+    "limitations": [
+      "No callable and no fabricated results."
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED"
+    ],
+    "cost": {
+      "compute": "unknown until implemented"
+    },
+    "fields_consumed": [],
+    "artifacts": [],
+    "physics_contract_dependencies": [],
+    "contract_status": "PLANNED; consumed fields, artifact formats and physics dependencies require approval before promotion",
+    "category": "design_control_generation",
+    "purpose": "evaluate policy; unimplemented; no numerical claims",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": false,
+      "verified": "NOT_IMPLEMENTED",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "Python"
+    ],
+    "input_example": {
+      "status": "NOT_IMPLEMENTED",
+      "legal_executable_input": null
+    },
+    "evidence_refs": []
+  },
+  {
+    "name": "closeout_mechanics_solve",
+    "bundle": "closeout_analysis",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.mechanics_tools",
+      "callable": "MechanicsTools.solve"
+    },
+    "inputs": [
+      "AnalysisSpec",
+      "live MatlabTools",
+      "persistent solve ledger"
+    ],
+    "outputs": [
+      "actual equilibrium/dynamic/fit result or structured failure"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "independent planar one-mode surrogate analysis",
+    "assumptions": [
+      "compiled V1 parameters; no calibration",
+      "given nonnegative tension; no implicit length-to-tension mapping"
+    ],
+    "applicable_when": "Exact closeout authorization, valid planar AnalysisSpec and MATLAB backend",
+    "limitations": [
+      "No contact, catch task, out-of-plane mechanics or true-robot claim",
+      "No main experiment physics writeback"
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED",
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "static <=160 objective evaluations; dynamics <=4 seconds horizon and 30 seconds wall time"
+    },
+    "fields_consumed": [
+      "AnalysisSpec SI fields",
+      "RobotIR",
+      "compiled mass/inertial frame/stiffness/damping"
+    ],
+    "artifacts": [
+      "caller saved parameter/result JSON",
+      "persistent mechanics solve ledger"
+    ],
+    "physics_contract_dependencies": [
+      "closeout_analysis_v1.md"
+    ],
+    "authorization_source": "configs/experiments/round3_closeout_authorization.yaml",
+    "category": "mathematical_analysis",
+    "purpose": "closeout mechanics solve; independent planar one-mode surrogate analysis",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "closeout_analysis_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "AnalysisSpec",
+        "live MatlabTools",
+        "persistent solve ledger"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "export_compiled_analysis_parameters",
+    "bundle": "closeout_analysis",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.mechanics_tools",
+      "callable": "export_parameters"
+    },
+    "inputs": [
+      "compiled XML",
+      "RobotIR"
+    ],
+    "outputs": [
+      "SI parameter dictionary with XML hash and engine version"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "independent planar one-mode surrogate analysis",
+    "assumptions": [
+      "compiled V1 parameters; no calibration",
+      "given nonnegative tension; no implicit length-to-tension mapping"
+    ],
+    "applicable_when": "Exact closeout authorization, valid planar AnalysisSpec and MATLAB backend",
+    "limitations": [
+      "No contact, catch task, out-of-plane mechanics or true-robot claim",
+      "No main experiment physics writeback"
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED",
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "static <=160 objective evaluations; dynamics <=4 seconds horizon and 30 seconds wall time"
+    },
+    "fields_consumed": [
+      "AnalysisSpec SI fields",
+      "RobotIR",
+      "compiled mass/inertial frame/stiffness/damping"
+    ],
+    "artifacts": [
+      "caller saved parameter/result JSON",
+      "persistent mechanics solve ledger"
+    ],
+    "physics_contract_dependencies": [
+      "closeout_analysis_v1.md"
+    ],
+    "authorization_source": "configs/experiments/round3_closeout_authorization.yaml",
+    "category": "mathematical_analysis",
+    "purpose": "export compiled analysis parameters; independent planar one-mode surrogate analysis",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "closeout_analysis_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "compiled XML",
+        "RobotIR"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "resolve_closeout_analysis",
+    "bundle": "closeout_analysis",
+    "implementation_status": "IMPLEMENTED",
+    "implementation": {
+      "module": "tools.mechanics_tools",
+      "callable": "resolve_analysis_capability"
+    },
+    "inputs": [
+      "AnalysisSpec"
+    ],
+    "outputs": [
+      "authority/dependency/input resolution; no silent fallback"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "fidelity": "independent planar one-mode surrogate analysis",
+    "assumptions": [
+      "compiled V1 parameters; no calibration",
+      "given nonnegative tension; no implicit length-to-tension mapping"
+    ],
+    "applicable_when": "Exact closeout authorization, valid planar AnalysisSpec and MATLAB backend",
+    "limitations": [
+      "No contact, catch task, out-of-plane mechanics or true-robot claim",
+      "No main experiment physics writeback"
+    ],
+    "failure_codes": [
+      "CAPABILITY_MISSING",
+      "PHYSICS_ASSUMPTION_REQUIRED",
+      "UNKNOWN"
+    ],
+    "cost": {
+      "compute": "static <=160 objective evaluations; dynamics <=4 seconds horizon and 30 seconds wall time"
+    },
+    "fields_consumed": [
+      "AnalysisSpec SI fields",
+      "RobotIR",
+      "compiled mass/inertial frame/stiffness/damping"
+    ],
+    "artifacts": [
+      "caller saved parameter/result JSON",
+      "persistent mechanics solve ledger"
+    ],
+    "physics_contract_dependencies": [
+      "closeout_analysis_v1.md"
+    ],
+    "authorization_source": "configs/experiments/round3_closeout_authorization.yaml",
+    "category": "capability_management",
+    "purpose": "resolve closeout analysis; independent planar one-mode surrogate analysis",
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "REFERENCED_HISTORICAL_EVIDENCE",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometric data; not applicable to registry/artifact operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; see observation sampling metadata",
+    "dependencies": [
+      "closeout_analysis_v1.md",
+      "Python"
+    ],
+    "input_example": {
+      "reference": "examples/run_reach_pipeline.py / tests/test_architecture.py",
+      "inputs": [
+        "AnalysisSpec"
+      ],
+      "note": "Use typed inputs listed above; planned operations have no executable input"
+    },
+    "evidence_refs": [
+      "docs/round3_deterministic_closeout_result.md",
+      "docs/round3_closeout_validation.md"
+    ]
+  },
+  {
+    "name": "query_tools",
+    "bundle": "workbench",
+    "implementation_status": "IMPLEMENTED",
+    "category": "capability_management",
+    "implementation": {
+      "module": "capabilities.registry",
+      "callable": "query_tools"
+    },
+    "purpose": "Query executable and missing tools without numerical imports",
+    "inputs": [
+      "category"
+    ],
+    "outputs": [
+      "structured result or observation object; exceptions for invalid contracts"
+    ],
+    "input_example": {
+      "category": "mathematical_analysis"
+    },
+    "assumptions": [
+      "saved-data provenance or valid scoped inputs required"
+    ],
+    "limitations": [
+      "No hardware, LLM, calibration or operating-system isolation"
+    ],
+    "applicable_when": "Valid inputs and dependencies; task failure is not missing capability",
+    "failure_codes": [
+      "INVALID_INPUT",
+      "EVIDENCE_INCOMPLETE",
+      "IMPLEMENTATION_REQUIRED"
+    ],
+    "dependencies": [
+      "Python"
+    ],
+    "cost": {
+      "backend_calls": 0
+    },
+    "artifacts": [
+      "docs/evidence/round4"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "evidence_refs": [
+      "docs/round4_result.md",
+      "docs/evidence/round4/test_record.json",
+      "docs/evidence/round4/audit.json"
+    ],
+    "fidelity": "saved-data observation or scoped independent development; see purpose",
+    "fields_consumed": [
+      "category"
+    ],
+    "physics_contract_dependencies": []
+  },
+  {
+    "name": "load_observation",
+    "bundle": "workbench",
+    "implementation_status": "IMPLEMENTED",
+    "category": "evaluation_observation",
+    "implementation": {
+      "module": "tools.observation_tools",
+      "callable": "load_observation"
+    },
+    "purpose": "Load saved motion with explicit data-stage and missing-field semantics",
+    "inputs": [
+      "source"
+    ],
+    "outputs": [
+      "structured result or observation object; exceptions for invalid contracts"
+    ],
+    "input_example": {
+      "source": "runs/20260912T082519_263560Z_eb328077"
+    },
+    "assumptions": [
+      "saved-data provenance or valid scoped inputs required"
+    ],
+    "limitations": [
+      "No hardware, LLM, calibration or operating-system isolation"
+    ],
+    "applicable_when": "Valid inputs and dependencies; task failure is not missing capability",
+    "failure_codes": [
+      "INVALID_INPUT",
+      "EVIDENCE_INCOMPLETE",
+      "IMPLEMENTATION_REQUIRED"
+    ],
+    "dependencies": [
+      "Python"
+    ],
+    "cost": {
+      "backend_calls": 0
+    },
+    "artifacts": [
+      "docs/evidence/round4"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "evidence_refs": [
+      "docs/round4_result.md",
+      "docs/evidence/round4/test_record.json",
+      "docs/evidence/round4/audit.json"
+    ],
+    "fidelity": "saved-data observation or scoped independent development; see purpose",
+    "fields_consumed": [
+      "source"
+    ],
+    "physics_contract_dependencies": []
+  },
+  {
+    "name": "compare_dynamic_observations",
+    "bundle": "workbench",
+    "implementation_status": "IMPLEMENTED",
+    "category": "evaluation_observation",
+    "implementation": {
+      "module": "tools.observation_tools",
+      "callable": "comparison_eligibility"
+    },
+    "purpose": "Compare completed dynamics only with a shared explicit physical/time mapping",
+    "inputs": [
+      "a",
+      "b"
+    ],
+    "outputs": [
+      "structured result or observation object; exceptions for invalid contracts"
+    ],
+    "input_example": {
+      "a": "load_observation(saved A)",
+      "b": "load_observation(saved B)"
+    },
+    "assumptions": [
+      "saved-data provenance or valid scoped inputs required"
+    ],
+    "limitations": [
+      "No hardware, LLM, calibration or operating-system isolation"
+    ],
+    "applicable_when": "Valid inputs and dependencies; task failure is not missing capability",
+    "failure_codes": [
+      "INVALID_INPUT",
+      "EVIDENCE_INCOMPLETE",
+      "IMPLEMENTATION_REQUIRED"
+    ],
+    "dependencies": [
+      "Python"
+    ],
+    "cost": {
+      "backend_calls": 0
+    },
+    "artifacts": [
+      "docs/evidence/round4"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "evidence_refs": [
+      "docs/round4_result.md",
+      "docs/evidence/round4/test_record.json",
+      "docs/evidence/round4/audit.json"
+    ],
+    "fidelity": "saved-data observation or scoped independent development; see purpose",
+    "fields_consumed": [
+      "a",
+      "b"
+    ],
+    "physics_contract_dependencies": []
+  },
+  {
+    "name": "generate_task_instance",
+    "bundle": "workbench",
+    "implementation_status": "IMPLEMENTED",
+    "category": "design_control_generation",
+    "implementation": {
+      "module": "tools.task_family_tools",
+      "callable": "generate_task_instance"
+    },
+    "purpose": "Generate reproducible development or independent evaluation instances",
+    "inputs": [
+      "family",
+      "seed",
+      "split"
+    ],
+    "outputs": [
+      "structured result or observation object; exceptions for invalid contracts"
+    ],
+    "input_example": {
+      "family": "reach_free",
+      "seed": 17,
+      "split": "development"
+    },
+    "assumptions": [
+      "saved-data provenance or valid scoped inputs required"
+    ],
+    "limitations": [
+      "No hardware, LLM, calibration or operating-system isolation"
+    ],
+    "applicable_when": "Valid inputs and dependencies; task failure is not missing capability",
+    "failure_codes": [
+      "INVALID_INPUT",
+      "EVIDENCE_INCOMPLETE",
+      "IMPLEMENTATION_REQUIRED"
+    ],
+    "dependencies": [
+      "Python"
+    ],
+    "cost": {
+      "backend_calls": 0
+    },
+    "artifacts": [
+      "docs/evidence/round4"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "evidence_refs": [
+      "docs/round4_result.md",
+      "docs/evidence/round4/test_record.json",
+      "docs/evidence/round4/audit.json"
+    ],
+    "fidelity": "saved-data observation or scoped independent development; see purpose",
+    "fields_consumed": [
+      "family",
+      "seed",
+      "split"
+    ],
+    "physics_contract_dependencies": []
+  },
+  {
+    "name": "evaluate_task_instance",
+    "bundle": "workbench",
+    "implementation_status": "IMPLEMENTED",
+    "category": "evaluation_observation",
+    "implementation": {
+      "module": "tools.task_family_tools",
+      "callable": "evaluate_task_instance"
+    },
+    "purpose": "Evaluate three task families; robot task failure is a valid evaluated result",
+    "inputs": [
+      "instance",
+      "result",
+      "trajectory"
+    ],
+    "outputs": [
+      "structured result or observation object; exceptions for invalid contracts"
+    ],
+    "input_example": {
+      "instance": "TaskInstance",
+      "result": "normal run_task ToolResult",
+      "trajectory": "saved normal trajectory"
+    },
+    "assumptions": [
+      "saved-data provenance or valid scoped inputs required"
+    ],
+    "limitations": [
+      "No hardware, LLM, calibration or operating-system isolation"
+    ],
+    "applicable_when": "Valid inputs and dependencies; task failure is not missing capability",
+    "failure_codes": [
+      "INVALID_INPUT",
+      "EVIDENCE_INCOMPLETE",
+      "IMPLEMENTATION_REQUIRED"
+    ],
+    "dependencies": [
+      "Python"
+    ],
+    "cost": {
+      "backend_calls": 0
+    },
+    "artifacts": [
+      "docs/evidence/round4"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "evidence_refs": [
+      "docs/round4_result.md",
+      "docs/evidence/round4/test_record.json",
+      "docs/evidence/round4/audit.json"
+    ],
+    "fidelity": "saved-data observation or scoped independent development; see purpose",
+    "fields_consumed": [
+      "instance",
+      "result",
+      "trajectory"
+    ],
+    "physics_contract_dependencies": []
+  },
+  {
+    "name": "describe_task_families",
+    "bundle": "workbench",
+    "implementation_status": "IMPLEMENTED",
+    "category": "capability_management",
+    "implementation": {
+      "module": "tools.task_family_tools",
+      "callable": "describe_tasks"
+    },
+    "purpose": "Describe family parameters, acceptance and missing capabilities",
+    "inputs": [],
+    "outputs": [
+      "structured result or observation object; exceptions for invalid contracts"
+    ],
+    "input_example": {},
+    "assumptions": [
+      "saved-data provenance or valid scoped inputs required"
+    ],
+    "limitations": [
+      "No hardware, LLM, calibration or operating-system isolation"
+    ],
+    "applicable_when": "Valid inputs and dependencies; task failure is not missing capability",
+    "failure_codes": [
+      "INVALID_INPUT",
+      "EVIDENCE_INCOMPLETE",
+      "IMPLEMENTATION_REQUIRED"
+    ],
+    "dependencies": [
+      "Python"
+    ],
+    "cost": {
+      "backend_calls": 0
+    },
+    "artifacts": [
+      "docs/evidence/round4"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "evidence_refs": [
+      "docs/round4_result.md",
+      "docs/evidence/round4/test_record.json",
+      "docs/evidence/round4/audit.json"
+    ],
+    "fidelity": "saved-data observation or scoped independent development; see purpose",
+    "fields_consumed": [],
+    "physics_contract_dependencies": []
+  },
+  {
+    "name": "observe_saved_motion",
+    "bundle": "workbench",
+    "implementation_status": "IMPLEMENTED",
+    "category": "evaluation_observation",
+    "implementation": {
+      "module": "tools.observation_viewer",
+      "callable": "ObservationViewer"
+    },
+    "purpose": "Interactive 3D motion and synchronized curves with PNG/GIF export",
+    "inputs": [
+      "sources"
+    ],
+    "outputs": [
+      "structured result or observation object; exceptions for invalid contracts"
+    ],
+    "input_example": {
+      "sources": [
+        "runs/20260912T082519_263560Z_eb328077"
+      ]
+    },
+    "assumptions": [
+      "saved-data provenance or valid scoped inputs required"
+    ],
+    "limitations": [
+      "No hardware, LLM, calibration or operating-system isolation"
+    ],
+    "applicable_when": "Valid inputs and dependencies; task failure is not missing capability",
+    "failure_codes": [
+      "INVALID_INPUT",
+      "EVIDENCE_INCOMPLETE",
+      "IMPLEMENTATION_REQUIRED"
+    ],
+    "dependencies": [
+      "numpy",
+      "matplotlib",
+      "Pillow"
+    ],
+    "cost": {
+      "backend_calls": 0
+    },
+    "artifacts": [
+      "docs/evidence/round4"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "evidence_refs": [
+      "docs/round4_result.md",
+      "docs/evidence/round4/test_record.json",
+      "docs/evidence/round4/audit.json"
+    ],
+    "fidelity": "saved-data observation or scoped independent development; see purpose",
+    "fields_consumed": [
+      "sources"
+    ],
+    "physics_contract_dependencies": []
+  },
+  {
+    "name": "round4_length_campaign",
+    "bundle": "workbench",
+    "implementation_status": "IMPLEMENTED",
+    "category": "execution",
+    "implementation": {
+      "module": "tools.round4_campaign",
+      "callable": "run_campaign"
+    },
+    "purpose": "Execute or resume the one frozen finite length comparison",
+    "inputs": [],
+    "outputs": [
+      "structured result or observation object; exceptions for invalid contracts"
+    ],
+    "input_example": {},
+    "assumptions": [
+      "saved-data provenance or valid scoped inputs required"
+    ],
+    "limitations": [
+      "No hardware, LLM, calibration or operating-system isolation"
+    ],
+    "applicable_when": "Valid inputs and dependencies; task failure is not missing capability",
+    "failure_codes": [
+      "INVALID_INPUT",
+      "EVIDENCE_INCOMPLETE",
+      "IMPLEMENTATION_REQUIRED"
+    ],
+    "dependencies": [
+      "Python"
+    ],
+    "cost": {
+      "backend_calls": "bounded persistent reservations"
+    },
+    "artifacts": [
+      "docs/evidence/round4"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "evidence_refs": [
+      "docs/round4_result.md",
+      "docs/evidence/round4/test_record.json",
+      "docs/evidence/round4/audit.json"
+    ],
+    "fidelity": "saved-data observation or scoped independent development; see purpose",
+    "fields_consumed": [],
+    "physics_contract_dependencies": []
+  },
+  {
+    "name": "round4_diagnostic_solve",
+    "bundle": "workbench",
+    "implementation_status": "IMPLEMENTED",
+    "category": "mathematical_analysis",
+    "implementation": {
+      "module": "tools.round4_validation",
+      "callable": "solve_diagnostic"
+    },
+    "purpose": "Versioned independent reduced mechanics with internal-trial boundary diagnostics",
+    "inputs": [
+      "matlab",
+      "parameters",
+      "budget",
+      "name"
+    ],
+    "outputs": [
+      "structured result or observation object; exceptions for invalid contracts"
+    ],
+    "input_example": {
+      "matlab": "live MatlabTools",
+      "parameters": "AnalysisSpec",
+      "budget": "Budget(runs/round4)",
+      "name": "unique solve identity"
+    },
+    "assumptions": [
+      "saved-data provenance or valid scoped inputs required"
+    ],
+    "limitations": [
+      "No hardware, LLM, calibration or operating-system isolation"
+    ],
+    "applicable_when": "Valid inputs and dependencies; task failure is not missing capability",
+    "failure_codes": [
+      "INVALID_INPUT",
+      "EVIDENCE_INCOMPLETE",
+      "IMPLEMENTATION_REQUIRED"
+    ],
+    "dependencies": [
+      "Python"
+    ],
+    "cost": {
+      "backend_calls": "bounded persistent reservations"
+    },
+    "artifacts": [
+      "docs/evidence/round4"
+    ],
+    "supported_robot_families": [
+      "tendon_driven_continuum"
+    ],
+    "version": "round4_metadata_v1; implementation version remains source-bound",
+    "states": {
+      "implemented": true,
+      "verified": "FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md",
+      "calibrated": false
+    },
+    "units": {
+      "geometry": "m",
+      "time": "s",
+      "angle": "rad",
+      "force": "N",
+      "torque": "N m",
+      "dimensionless": "counts/status"
+    },
+    "coordinate_frame": "world_base_x_forward_yz_cross_section for geometry; N/A for metadata operations",
+    "time_semantics": "Static geometry has no trajectory time; run_task post-integration state differs from last dynamics force/length arrays; consult observation metadata",
+    "evidence_refs": [
+      "docs/round4_result.md",
+      "docs/evidence/round4/test_record.json",
+      "docs/evidence/round4/audit.json"
+    ],
+    "fidelity": "saved-data observation or scoped independent development; see purpose",
+    "fields_consumed": [
+      "matlab",
+      "parameters",
+      "budget",
+      "name"
+    ],
+    "physics_contract_dependencies": []
+  }
+]

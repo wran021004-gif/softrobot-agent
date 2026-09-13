@@ -8,7 +8,7 @@ tools:
     supported_robot_families:
     - tendon_driven_continuum
     family_support: partial
-    inputs:
+    inputs: &id001
       robot_ir: RobotIR (DesignSpec compatibility accepted)
       task: TaskSpec
       output_path: Path
@@ -96,7 +96,7 @@ tools:
     artifacts:
     - robot.xml
     - compile_result.json
-    physics_contract_dependencies: &id001
+    physics_contract_dependencies: &id002
     - coordinate_frames.md
     - tendon_driven_pcc_v1.md
     - tendon_length_mapping_v1.md
@@ -111,6 +111,38 @@ tools:
     - ToolResult
     exception_policy: Schema/IR/contract validation exceptions propagate; Harness
       records stage and message.
+    category: design_compile
+    purpose: 'compile mujoco; {''level'': ''low'', ''model'': ''single_section_tendon_actuated_segmented_approximation''}'
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - segmented_mujoco_mapping_v1.md
+    - actuator_model_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id001
+      note: Typed object construction shown in referenced executable examples
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   validate_task:
     implementation:
       module: tools.mujoco_tools
@@ -120,7 +152,7 @@ tools:
     family_support: partial
     family_check: No DesignSpec input or runtime family check; intended for this bundle's
       compiled MJCF.
-    inputs:
+    inputs: &id003
       xml_path: str | pathlib.Path
       task: TaskSpec
       tendon_target_lengths_m: Optional list[float], default None.
@@ -194,7 +226,7 @@ tools:
     - RunSettings.steps
     artifacts:
     - ToolResult (caller persists)
-    physics_contract_dependencies: *id001
+    physics_contract_dependencies: *id002
     assumptions:
     - Approved legacy_v1_surrogate mechanics; target/tolerance owned by task.
     applicable_when: V1 reach task and supported environment; final task decision
@@ -204,18 +236,54 @@ tools:
     - ToolResult
     exception_policy: Schema/IR/contract validation exceptions propagate; Harness
       records stage and message.
+    category: execution
+    purpose: 'validate task; {''level'': ''low'', ''model'': ''final_position_gate_on_tendon_actuated_segmented_simulation''}'
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - segmented_mujoco_mapping_v1.md
+    - actuator_model_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id003
+      note: Typed object construction shown in referenced executable examples
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   run_task:
     implementation:
       module: tools.mujoco_tools
       callable: run_task
-    inputs:
+    inputs: &id004
       xml_path: Path
       task: TaskSpec
       controller: Controller protocol or None
       run_settings: RunSettings
-      environment: EnvironmentSpec required for reach_window; optional for legacy reach
-      evaluator: Optional resolved TaskContract evaluator callable; legacy default evaluate_reach
-    gate_semantics: Executable finite-state evidence is HARD; actual task acceptance is CANONICAL for the selected task, without promoting development fixtures to frozen benchmarks.
+      environment: EnvironmentSpec required for reach_window; optional for legacy
+        reach
+      evaluator: Optional resolved TaskContract evaluator callable; legacy default
+        evaluate_reach
+    gate_semantics: Executable finite-state evidence is HARD; actual task acceptance
+      is CANONICAL for the selected task, without promoting development fixtures to
+      frozen benchmarks.
     outputs:
     - ToolResult with canonical actual metrics, compact execution_evidence, resolved
       engine parameter provenance and final state
@@ -231,15 +299,21 @@ tools:
       level: low
       model: segmented surrogate + canonical reach evaluator
     limitations:
-    - Reach and single axis-aligned reach_window evaluators only; window development fixture is not a frozen benchmark.
-    - Window evidence records sampled capsule-to-frame distances, contact points/counts, initial configuration and final aperture crossing; floor excluded.
-    - reach_window success requires target tolerance AND required initial whole-body side AND final aperture crossing AND no forbidden sampled window contact; no continuous collision guarantee.
-    - TaskSpec.acceptance supports before_window or unrestricted initial region; legacy development default unrestricted is not formal approval. No new initial-state generator.
+    - Reach and single axis-aligned reach_window evaluators only; window development
+      fixture is not a frozen benchmark.
+    - Window evidence records sampled capsule-to-frame distances, contact points/counts,
+      initial configuration and final aperture crossing; floor excluded.
+    - reach_window success requires target tolerance AND required initial whole-body
+      side AND final aperture crossing AND no forbidden sampled window contact; no
+      continuous collision guarantee.
+    - TaskSpec.acceptance supports before_window or unrestricted initial region; legacy
+      development default unrestricted is not formal approval. No new initial-state
+      generator.
     - Finite state is not validated physical fidelity.
     - No automatic tuning or retry.
     - Step force/length samples are solver-stage values; qpos/qvel are post-integration.
-      No extra forward calls in integration loop. An upper zero-bound hit does not prove
-      active clipping or maximum-pull saturation.
+      No extra forward calls in integration loop. An upper zero-bound hit does not
+      prove active clipping or maximum-pull saturation.
     failure_codes:
     - TASK_FAILED
     - PHYSICS_ERROR
@@ -251,19 +325,52 @@ tools:
     - mujoco_result.json
     - metrics.json
     - simulation_state.json
-    physics_contract_dependencies: *id001
+    physics_contract_dependencies: *id002
     assumptions:
     - Approved legacy_v1_surrogate mechanics; target/tolerance owned by task.
     applicable_when: V1 reach task and supported environment; final task decision
       uses actual MuJoCo tip.
     implementation_status: IMPLEMENTED
-    supported_robot_families: &id002
+    supported_robot_families: &id005
     - tendon_driven_continuum
     cost:
       compute: low
       note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
     exception_policy: Schema/IR/contract validation exceptions propagate; Harness
       records stage and message.
+    category: execution
+    purpose: 'run task; {''level'': ''low'', ''model'': ''segmented surrogate + canonical
+      reach evaluator''}'
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - segmented_mujoco_mapping_v1.md
+    - actuator_model_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id004
+      note: Typed object construction shown in referenced executable examples
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   validate_physics:
     implementation_status: PLANNED
     inputs:
@@ -272,7 +379,7 @@ tools:
     - approved reference evidence
     outputs:
     - physics validation report
-    supported_robot_families: *id002
+    supported_robot_families: *id005
     fidelity: unimplemented; no numerical claims
     assumptions:
     - Requires Human-approved scientific semantics before implementation.
@@ -289,6 +396,30 @@ tools:
     physics_contract_dependencies: []
     contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
       require approval before promotion
+    category: execution
+    purpose: validate physics; unimplemented; no numerical claims
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: false
+      verified: NOT_IMPLEMENTED
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - Python
+    input_example:
+      status: NOT_IMPLEMENTED
+      legal_executable_input: null
+    evidence_refs: []
   evaluate_metrics:
     implementation_status: PLANNED
     inputs:
@@ -296,7 +427,7 @@ tools:
     - trajectory
     outputs:
     - extended canonical metrics
-    supported_robot_families: *id002
+    supported_robot_families: *id005
     fidelity: unimplemented; no numerical claims
     assumptions:
     - Requires Human-approved scientific semantics before implementation.
@@ -313,3 +444,27 @@ tools:
     physics_contract_dependencies: []
     contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
       require approval before promotion
+    category: execution
+    purpose: evaluate metrics; unimplemented; no numerical claims
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: false
+      verified: NOT_IMPLEMENTED
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - Python
+    input_example:
+      status: NOT_IMPLEMENTED
+      legal_executable_input: null
+    evidence_refs: []

@@ -1,0 +1,173 @@
+{
+  "diagnostic": {
+    "status": "fail",
+    "evidence": "validation/historical_recheck.json"
+  },
+  "comparison": {
+    "eligible": true,
+    "reason": "explicit saved comparison contract",
+    "tip_rms_m": 1.5620973798553157e-05,
+    "tip_max_m": 4.125239576068344e-05,
+    "q_max_error_rad": 0.00020626197916905065,
+    "mapping": {
+      "version": "one_hinge_torque_v1",
+      "input": {
+        "inertia": 0.002,
+        "stiffness": 0.1,
+        "damping": 0.01,
+        "torque_nm": 0.003,
+        "q0": 0.1,
+        "dt_s": 0.002,
+        "duration_s": 2.0,
+        "length_m": 0.2
+      },
+      "frame": "world_base_x_forward_yz_cross_section",
+      "mapping": "one rotational DOF q about -Y; J=Iyy+m*cx^2; no gravity/contact/tendons; constant world generalized torque",
+      "interpretation": "same continuous equation; MuJoCo discretization error measured, not real material calibration"
+    }
+  },
+  "task_evaluations": [
+    {
+      "status": "EVALUATED",
+      "task_success": false,
+      "authority": "DEVELOPMENT_ONLY_NOT_BENCHMARK_APPROVAL",
+      "instance": {
+        "version": "round4_development_v1",
+        "family": "reach_free",
+        "split": "development",
+        "seed": 17,
+        "target_frame": "world",
+        "target_m": [
+          0.25,
+          0.0,
+          0.15043967819424986
+        ],
+        "package": "tasks/reach_free",
+        "initial_state": "zero_joint_position_and_velocity",
+        "duration_s": 2.0,
+        "evaluation_start_s": 0.0,
+        "tolerance_m": 0.01,
+        "disturbance": null,
+        "authority": "DEVELOPMENT_ONLY_NOT_BENCHMARK_APPROVAL"
+      },
+      "metrics": {
+        "final_error_m": 0.10961602956089656,
+        "maximum_error_m": 0.1574256999832915,
+        "rms_error_m": 0.10705806674272855,
+        "window_evidence": null
+      },
+      "samples": 1000,
+      "success_rule": "existing reach/window evaluator"
+    },
+    {
+      "status": "EVALUATED",
+      "task_success": false,
+      "authority": "DEVELOPMENT_ONLY_NOT_BENCHMARK_APPROVAL",
+      "instance": {
+        "version": "round4_development_v1",
+        "family": "reach_obstacle",
+        "split": "development",
+        "seed": 17,
+        "target_frame": "world",
+        "target_m": [
+          0.25,
+          0.0,
+          0.15043967819424986
+        ],
+        "package": "tests/fixtures/reach_window_dev",
+        "initial_state": "zero_joint_position_and_velocity",
+        "duration_s": 2.0,
+        "evaluation_start_s": 0.0,
+        "tolerance_m": 0.01,
+        "disturbance": null,
+        "authority": "DEVELOPMENT_ONLY_NOT_BENCHMARK_APPROVAL"
+      },
+      "metrics": {
+        "final_error_m": 0.10961602956089656,
+        "maximum_error_m": 0.1574256999832915,
+        "rms_error_m": 0.10705806674272855,
+        "window_evidence": {
+          "scope": "robot capsules versus EnvironmentSpec window frame; floor excluded",
+          "minimum_observed_robot_obstacle_clearance_m": 0.00950856422269868,
+          "closest_pair": {
+            "robot_geom": "capsule_4",
+            "obstacle_geom": "aperture_bottom",
+            "time_s": 0.01
+          },
+          "obstacle_contact_occurred": false,
+          "contact_count": 0,
+          "contact_pairs": [],
+          "observation_samples": 1001,
+          "ever_aperture_satisfied": true,
+          "initial_configuration": {
+            "minimum_clearance_m": 0.009999999999999998,
+            "obstacle_contact_occurred": false,
+            "side_of_wall": "straddles_window",
+            "body_x_bounds_m": [
+              -0.020000000000000004,
+              0.28075
+            ],
+            "crosses_window_slab": true,
+            "aperture_margin_m": 0.009999999999999998,
+            "aperture_constraint_satisfied": true
+          },
+          "initial_aperture_state": {
+            "crosses_window_slab": true,
+            "aperture_constraint_satisfied": true,
+            "aperture_margin_m": 0.009999999999999998
+          },
+          "initial_side_of_wall": "straddles_window",
+          "final_side_of_wall": "straddles_window",
+          "crosses_window_slab": true,
+          "aperture_margin_m": 0.009838050109753933,
+          "aperture_constraint_satisfied": true,
+          "limitation": "Discrete initial/pre-integration and final samples; contact_count counts contact points across samples, not unique impacts; no continuous collision guarantee"
+        }
+      },
+      "samples": 1000,
+      "success_rule": "existing reach/window evaluator"
+    },
+    {
+      "status": "EVALUATED",
+      "task_success": false,
+      "authority": "DEVELOPMENT_ONLY_NOT_BENCHMARK_APPROVAL",
+      "instance": {
+        "version": "round4_development_v1",
+        "family": "tip_stability_external_force",
+        "split": "development",
+        "seed": 17,
+        "target_frame": "world",
+        "target_m": [
+          0.25,
+          0.0,
+          0.15043967819424986
+        ],
+        "package": "tasks/reach_free",
+        "initial_state": "zero_joint_position_and_velocity",
+        "duration_s": 2.0,
+        "evaluation_start_s": 0.8,
+        "tolerance_m": 0.01,
+        "disturbance": {
+          "body": "segment_7",
+          "coordinate_frame": "world",
+          "start_s": 0.5,
+          "end_s": 0.7,
+          "force_n": [
+            0.0,
+            0.0,
+            0.11226763108474716
+          ]
+        },
+        "authority": "DEVELOPMENT_ONLY_NOT_BENCHMARK_APPROVAL"
+      },
+      "metrics": {
+        "final_error_m": 0.10960114711231254,
+        "maximum_error_m": 0.10970682440974307,
+        "rms_error_m": 0.10922424374519824,
+        "window_evidence": null
+      },
+      "samples": 601,
+      "success_rule": "max error over evaluation interval"
+    }
+  ]
+}

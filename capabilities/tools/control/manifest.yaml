@@ -5,7 +5,7 @@ tools:
     implementation:
       module: controllers.open_loop_length
       callable: plan_open_loop
-    inputs:
+    inputs: &id001
     - positive finite tendon lengths
     outputs:
     - ControllerResult
@@ -25,17 +25,45 @@ tools:
     - controller.json
     - tendon_command.json
     implementation_status: IMPLEMENTED
-    supported_robot_families: &id001
+    supported_robot_families: &id003
     - tendon_driven_continuum
     cost:
       compute: low
       note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+    category: design_control_generation
+    purpose: plan open loop; C1 open loop
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id001
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   synthesize_feedback:
     implementation_status: IMPLEMENTED
     implementation:
       module: controllers.pcc_tip_feedback
       callable: synthesize_feedback
-    inputs:
+    inputs: &id002
     - RobotIR
     - TaskSpec
     - M1 ToolResult
@@ -77,6 +105,37 @@ tools:
       compute: bounded by explicit policy budgets
     gate_semantics: HARD input/execution legality; SCREENING model evidence; existing
       MUJOCO evaluator alone is CANONICAL
+    category: design_control_generation
+    purpose: synthesize feedback; C2 actual tip feedback; legacy C1 open loop unchanged
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - coordinate_frames.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id002
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   synthesize_model_controller:
     implementation_status: PLANNED
     inputs:
@@ -84,7 +143,7 @@ tools:
     - task
     outputs:
     - ControlSpec
-    supported_robot_families: *id001
+    supported_robot_families: *id003
     fidelity: unimplemented; no numerical claims
     assumptions:
     - Requires Human-approved scientific semantics before implementation.
@@ -101,6 +160,31 @@ tools:
     physics_contract_dependencies: []
     contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
       require approval before promotion
+    category: design_control_generation
+    purpose: synthesize model controller; unimplemented; no numerical claims
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: false
+      verified: NOT_IMPLEMENTED
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - Python
+    input_example:
+      status: NOT_IMPLEMENTED
+      legal_executable_input: null
+    evidence_refs: []
   optimize_controller:
     implementation_status: PLANNED
     inputs:
@@ -110,7 +194,7 @@ tools:
     outputs:
     - ControlSpec
     - evidence
-    supported_robot_families: *id001
+    supported_robot_families: *id003
     fidelity: unimplemented; no numerical claims
     assumptions:
     - Requires Human-approved scientific semantics before implementation.
@@ -127,3 +211,28 @@ tools:
     physics_contract_dependencies: []
     contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
       require approval before promotion
+    category: design_control_generation
+    purpose: optimize controller; unimplemented; no numerical claims
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: false
+      verified: NOT_IMPLEMENTED
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - Python
+    input_example:
+      status: NOT_IMPLEMENTED
+      legal_executable_input: null
+    evidence_refs: []

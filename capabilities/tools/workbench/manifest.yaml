@@ -1,0 +1,498 @@
+bundle_name: workbench
+version: '1'
+tools:
+  query_tools:
+    implementation_status: IMPLEMENTED
+    category: capability_management
+    implementation:
+      module: capabilities.registry
+      callable: query_tools
+    purpose: Query executable and missing tools without numerical imports
+    inputs: &id001
+    - category
+    outputs:
+    - structured result or observation object; exceptions for invalid contracts
+    input_example:
+      category: mathematical_analysis
+    assumptions:
+    - saved-data provenance or valid scoped inputs required
+    limitations:
+    - No hardware, LLM, calibration or operating-system isolation
+    applicable_when: Valid inputs and dependencies; task failure is not missing capability
+    failure_codes:
+    - INVALID_INPUT
+    - EVIDENCE_INCOMPLETE
+    - IMPLEMENTATION_REQUIRED
+    dependencies:
+    - Python
+    cost:
+      backend_calls: 0
+    artifacts:
+    - docs/evidence/round4
+    supported_robot_families:
+    - tendon_driven_continuum
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    evidence_refs:
+    - docs/round4_result.md
+    - docs/evidence/round4/test_record.json
+    - docs/evidence/round4/audit.json
+    fidelity: saved-data observation or scoped independent development; see purpose
+    fields_consumed: *id001
+    physics_contract_dependencies: []
+  load_observation:
+    implementation_status: IMPLEMENTED
+    category: evaluation_observation
+    implementation:
+      module: tools.observation_tools
+      callable: load_observation
+    purpose: Load saved motion with explicit data-stage and missing-field semantics
+    inputs: &id002
+    - source
+    outputs:
+    - structured result or observation object; exceptions for invalid contracts
+    input_example:
+      source: runs/20260912T082519_263560Z_eb328077
+    assumptions:
+    - saved-data provenance or valid scoped inputs required
+    limitations:
+    - No hardware, LLM, calibration or operating-system isolation
+    applicable_when: Valid inputs and dependencies; task failure is not missing capability
+    failure_codes:
+    - INVALID_INPUT
+    - EVIDENCE_INCOMPLETE
+    - IMPLEMENTATION_REQUIRED
+    dependencies:
+    - Python
+    cost:
+      backend_calls: 0
+    artifacts:
+    - docs/evidence/round4
+    supported_robot_families:
+    - tendon_driven_continuum
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    evidence_refs:
+    - docs/round4_result.md
+    - docs/evidence/round4/test_record.json
+    - docs/evidence/round4/audit.json
+    fidelity: saved-data observation or scoped independent development; see purpose
+    fields_consumed: *id002
+    physics_contract_dependencies: []
+  compare_dynamic_observations:
+    implementation_status: IMPLEMENTED
+    category: evaluation_observation
+    implementation:
+      module: tools.observation_tools
+      callable: comparison_eligibility
+    purpose: Compare completed dynamics only with a shared explicit physical/time
+      mapping
+    inputs: &id003
+    - a
+    - b
+    outputs:
+    - structured result or observation object; exceptions for invalid contracts
+    input_example:
+      a: load_observation(saved A)
+      b: load_observation(saved B)
+    assumptions:
+    - saved-data provenance or valid scoped inputs required
+    limitations:
+    - No hardware, LLM, calibration or operating-system isolation
+    applicable_when: Valid inputs and dependencies; task failure is not missing capability
+    failure_codes:
+    - INVALID_INPUT
+    - EVIDENCE_INCOMPLETE
+    - IMPLEMENTATION_REQUIRED
+    dependencies:
+    - Python
+    cost:
+      backend_calls: 0
+    artifacts:
+    - docs/evidence/round4
+    supported_robot_families:
+    - tendon_driven_continuum
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    evidence_refs:
+    - docs/round4_result.md
+    - docs/evidence/round4/test_record.json
+    - docs/evidence/round4/audit.json
+    fidelity: saved-data observation or scoped independent development; see purpose
+    fields_consumed: *id003
+    physics_contract_dependencies: []
+  generate_task_instance:
+    implementation_status: IMPLEMENTED
+    category: design_control_generation
+    implementation:
+      module: tools.task_family_tools
+      callable: generate_task_instance
+    purpose: Generate reproducible development or independent evaluation instances
+    inputs: &id004
+    - family
+    - seed
+    - split
+    outputs:
+    - structured result or observation object; exceptions for invalid contracts
+    input_example:
+      family: reach_free
+      seed: 17
+      split: development
+    assumptions:
+    - saved-data provenance or valid scoped inputs required
+    limitations:
+    - No hardware, LLM, calibration or operating-system isolation
+    applicable_when: Valid inputs and dependencies; task failure is not missing capability
+    failure_codes:
+    - INVALID_INPUT
+    - EVIDENCE_INCOMPLETE
+    - IMPLEMENTATION_REQUIRED
+    dependencies:
+    - Python
+    cost:
+      backend_calls: 0
+    artifacts:
+    - docs/evidence/round4
+    supported_robot_families:
+    - tendon_driven_continuum
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    evidence_refs:
+    - docs/round4_result.md
+    - docs/evidence/round4/test_record.json
+    - docs/evidence/round4/audit.json
+    fidelity: saved-data observation or scoped independent development; see purpose
+    fields_consumed: *id004
+    physics_contract_dependencies: []
+  evaluate_task_instance:
+    implementation_status: IMPLEMENTED
+    category: evaluation_observation
+    implementation:
+      module: tools.task_family_tools
+      callable: evaluate_task_instance
+    purpose: Evaluate three task families; robot task failure is a valid evaluated
+      result
+    inputs: &id005
+    - instance
+    - result
+    - trajectory
+    outputs:
+    - structured result or observation object; exceptions for invalid contracts
+    input_example:
+      instance: TaskInstance
+      result: normal run_task ToolResult
+      trajectory: saved normal trajectory
+    assumptions:
+    - saved-data provenance or valid scoped inputs required
+    limitations:
+    - No hardware, LLM, calibration or operating-system isolation
+    applicable_when: Valid inputs and dependencies; task failure is not missing capability
+    failure_codes:
+    - INVALID_INPUT
+    - EVIDENCE_INCOMPLETE
+    - IMPLEMENTATION_REQUIRED
+    dependencies:
+    - Python
+    cost:
+      backend_calls: 0
+    artifacts:
+    - docs/evidence/round4
+    supported_robot_families:
+    - tendon_driven_continuum
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    evidence_refs:
+    - docs/round4_result.md
+    - docs/evidence/round4/test_record.json
+    - docs/evidence/round4/audit.json
+    fidelity: saved-data observation or scoped independent development; see purpose
+    fields_consumed: *id005
+    physics_contract_dependencies: []
+  describe_task_families:
+    implementation_status: IMPLEMENTED
+    category: capability_management
+    implementation:
+      module: tools.task_family_tools
+      callable: describe_tasks
+    purpose: Describe family parameters, acceptance and missing capabilities
+    inputs: &id006 []
+    outputs:
+    - structured result or observation object; exceptions for invalid contracts
+    input_example: {}
+    assumptions:
+    - saved-data provenance or valid scoped inputs required
+    limitations:
+    - No hardware, LLM, calibration or operating-system isolation
+    applicable_when: Valid inputs and dependencies; task failure is not missing capability
+    failure_codes:
+    - INVALID_INPUT
+    - EVIDENCE_INCOMPLETE
+    - IMPLEMENTATION_REQUIRED
+    dependencies:
+    - Python
+    cost:
+      backend_calls: 0
+    artifacts:
+    - docs/evidence/round4
+    supported_robot_families:
+    - tendon_driven_continuum
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    evidence_refs:
+    - docs/round4_result.md
+    - docs/evidence/round4/test_record.json
+    - docs/evidence/round4/audit.json
+    fidelity: saved-data observation or scoped independent development; see purpose
+    fields_consumed: *id006
+    physics_contract_dependencies: []
+  observe_saved_motion:
+    implementation_status: IMPLEMENTED
+    category: evaluation_observation
+    implementation:
+      module: tools.observation_viewer
+      callable: ObservationViewer
+    purpose: Interactive 3D motion and synchronized curves with PNG/GIF export
+    inputs: &id007
+    - sources
+    outputs:
+    - structured result or observation object; exceptions for invalid contracts
+    input_example:
+      sources:
+      - runs/20260912T082519_263560Z_eb328077
+    assumptions:
+    - saved-data provenance or valid scoped inputs required
+    limitations:
+    - No hardware, LLM, calibration or operating-system isolation
+    applicable_when: Valid inputs and dependencies; task failure is not missing capability
+    failure_codes:
+    - INVALID_INPUT
+    - EVIDENCE_INCOMPLETE
+    - IMPLEMENTATION_REQUIRED
+    dependencies:
+    - numpy
+    - matplotlib
+    - Pillow
+    cost:
+      backend_calls: 0
+    artifacts:
+    - docs/evidence/round4
+    supported_robot_families:
+    - tendon_driven_continuum
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    evidence_refs:
+    - docs/round4_result.md
+    - docs/evidence/round4/test_record.json
+    - docs/evidence/round4/audit.json
+    fidelity: saved-data observation or scoped independent development; see purpose
+    fields_consumed: *id007
+    physics_contract_dependencies: []
+  round4_length_campaign:
+    implementation_status: IMPLEMENTED
+    category: execution
+    implementation:
+      module: tools.round4_campaign
+      callable: run_campaign
+    purpose: Execute or resume the one frozen finite length comparison
+    inputs: &id008 []
+    outputs:
+    - structured result or observation object; exceptions for invalid contracts
+    input_example: {}
+    assumptions:
+    - saved-data provenance or valid scoped inputs required
+    limitations:
+    - No hardware, LLM, calibration or operating-system isolation
+    applicable_when: Valid inputs and dependencies; task failure is not missing capability
+    failure_codes:
+    - INVALID_INPUT
+    - EVIDENCE_INCOMPLETE
+    - IMPLEMENTATION_REQUIRED
+    dependencies:
+    - Python
+    cost:
+      backend_calls: bounded persistent reservations
+    artifacts:
+    - docs/evidence/round4
+    supported_robot_families:
+    - tendon_driven_continuum
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    evidence_refs:
+    - docs/round4_result.md
+    - docs/evidence/round4/test_record.json
+    - docs/evidence/round4/audit.json
+    fidelity: saved-data observation or scoped independent development; see purpose
+    fields_consumed: *id008
+    physics_contract_dependencies: []
+  round4_diagnostic_solve:
+    implementation_status: IMPLEMENTED
+    category: mathematical_analysis
+    implementation:
+      module: tools.round4_validation
+      callable: solve_diagnostic
+    purpose: Versioned independent reduced mechanics with internal-trial boundary
+      diagnostics
+    inputs: &id009
+    - matlab
+    - parameters
+    - budget
+    - name
+    outputs:
+    - structured result or observation object; exceptions for invalid contracts
+    input_example:
+      matlab: live MatlabTools
+      parameters: AnalysisSpec
+      budget: Budget(runs/round4)
+      name: unique solve identity
+    assumptions:
+    - saved-data provenance or valid scoped inputs required
+    limitations:
+    - No hardware, LLM, calibration or operating-system isolation
+    applicable_when: Valid inputs and dependencies; task failure is not missing capability
+    failure_codes:
+    - INVALID_INPUT
+    - EVIDENCE_INCOMPLETE
+    - IMPLEMENTATION_REQUIRED
+    dependencies:
+    - Python
+    cost:
+      backend_calls: bounded persistent reservations
+    artifacts:
+    - docs/evidence/round4
+    supported_robot_families:
+    - tendon_driven_continuum
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: FOCUSED_CONTRACT_CHECKS; execution scope and numeric evidence in docs/round4_result.md
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    evidence_refs:
+    - docs/round4_result.md
+    - docs/evidence/round4/test_record.json
+    - docs/evidence/round4/audit.json
+    fidelity: saved-data observation or scoped independent development; see purpose
+    fields_consumed: *id009
+    physics_contract_dependencies: []

@@ -5,7 +5,7 @@ tools:
     implementation:
       module: tools.artifact_tools
       callable: create_run
-    inputs:
+    inputs: &id001
     - run root
     outputs:
     - RunArtifacts
@@ -28,16 +28,44 @@ tools:
     - trace.json
     - named tool result
     implementation_status: IMPLEMENTED
-    supported_robot_families: &id001
+    supported_robot_families: &id002
     - tendon_driven_continuum
     cost:
       compute: low
       note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+    category: capability_management
+    purpose: create run; factual persistence
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id001
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   save_tool_result:
     implementation:
       module: tools.artifact_tools
       callable: save_tool_result
-    inputs:
+    inputs: &id003
     - RunArtifacts
     - artifact name
     - ToolResult
@@ -61,15 +89,43 @@ tools:
     - trace.json
     - named tool result
     implementation_status: IMPLEMENTED
-    supported_robot_families: *id001
+    supported_robot_families: *id002
     cost:
       compute: low
       note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+    category: capability_management
+    purpose: save tool result; factual persistence
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id003
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   finalize_run:
     implementation:
       module: tools.artifact_tools
       callable: finalize_run
-    inputs:
+    inputs: &id004
     - RunArtifacts
     - status
     - failure code
@@ -93,7 +149,35 @@ tools:
     - trace.json
     - named tool result
     implementation_status: IMPLEMENTED
-    supported_robot_families: *id001
+    supported_robot_families: *id002
     cost:
       compute: low
       note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+    category: capability_management
+    purpose: finalize run; factual persistence
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometric data; not
+      applicable to registry/artifact operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; see observation sampling
+      metadata
+    dependencies:
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id004
+      note: Use typed inputs listed above; planned operations have no executable input
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md

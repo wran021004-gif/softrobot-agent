@@ -6,7 +6,7 @@ tools:
     implementation:
       module: tools.experiment_tools
       callable: optimize_design
-    inputs:
+    inputs: &id001
     - Human-owned ExperimentPolicy or validated ENVELOPE_SUBSET policy path
     outputs:
     - RunArtifacts; optimization_summary.json
@@ -32,8 +32,8 @@ tools:
     - Single-section approved PCC geometry only; no new mechanical law or tuned defaults.
     - Numerical experiments require file-owned policy and approved grammar; TEST_ONLY
       cannot execute frozen tasks.
-    applicable_when: Explicit supported route and validated Human policy or subset of
-      SURROGATE_EXPLORATION_ENVELOPE_V1; numerical sensitivity is not design ranking.
+    applicable_when: Explicit supported route and validated Human policy or subset
+      of SURROGATE_EXPLORATION_ENVELOPE_V1; numerical sensitivity is not design ranking.
     limitations:
     - No real robot validation, convergence guarantee or causal attribution.
     - No canonical success from model predictions; no TaskContract or Skill mutation.
@@ -45,6 +45,36 @@ tools:
       compute: bounded by explicit policy budgets
     gate_semantics: HARD input/execution legality; SCREENING model evidence; existing
       MUJOCO evaluator alone is CANONICAL
+    category: design_control_generation
+    purpose: optimize design; M1 ranking / MUJOCO canonical
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - coordinate_frames.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id001
+      note: Typed object construction shown in referenced executable examples
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   fit_model_parameters:
     implementation_status: PLANNED
     inputs:
@@ -72,3 +102,27 @@ tools:
     physics_contract_dependencies: []
     contract_status: PLANNED; consumed fields, artifact formats and physics dependencies
       require approval before promotion
+    category: design_control_generation
+    purpose: fit model parameters; unimplemented; no numerical claims
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: false
+      verified: NOT_IMPLEMENTED
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - Python
+    input_example:
+      status: NOT_IMPLEMENTED
+      legal_executable_input: null
+    evidence_refs: []

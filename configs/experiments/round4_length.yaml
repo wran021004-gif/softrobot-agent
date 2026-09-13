@@ -1,0 +1,41 @@
+policy_id: round4_length_v1
+authorization_mode: ROUND4_SCOPED
+purpose: DESIGN_SEARCH
+physics_profile: legacy_v1_surrogate
+task_contract_id: reach_free_v1
+task_contract_source: tasks/reach_free/contract.yaml
+baseline_design: configs/experiments/round4_baseline.yaml
+scientific_status: HUMAN_APPROVED
+approval_status: HUMAN_APPROVED
+approval_source: configs/experiments/round4_authorization.yaml
+variables:
+- name: total_length_m
+  unit: m
+  lower_bound: 0.05
+  upper_bound: 0.8
+  constraints:
+  - positive
+objective_metric_refs:
+- model.predicted_position_error_m
+- mujoco.position_error_m
+evaluation_budget: 52
+mujoco_validation_budget: 28
+seed: 17
+allowed_model_levels:
+- M0
+- M1
+allowed_controller_levels:
+- C1
+- C2
+repair_iteration_budget: 0
+repair_actions: []
+stop_conditions:
+- budget_exhausted
+- actions_exhausted
+feedback_parameters:
+  gain_rad2_per_m2: 0.3
+  update_every_steps: 20
+  max_bend_update_rad: 0.01
+  max_command_update_m: 0.0001
+  min_tendon_length_m: 0.001
+  max_tendon_length_m: 1.0

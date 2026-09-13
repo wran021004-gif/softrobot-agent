@@ -5,7 +5,7 @@ tools:
     implementation:
       module: tools.spec_tools
       callable: load_task
-    inputs:
+    inputs: &id001
     - task package path
     outputs:
     - TaskSpec
@@ -23,16 +23,43 @@ tools:
     physics_contract_dependencies: []
     artifacts: []
     implementation_status: IMPLEMENTED
-    supported_robot_families: &id001
+    supported_robot_families: &id002
     - tendon_driven_continuum
     cost:
       compute: low
       note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+    category: design_compile
+    purpose: load task; structural
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id001
+      note: Typed object construction shown in referenced executable examples
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   validate_task_spec:
     implementation:
       module: tools.spec_tools
       callable: validate_task_spec
-    inputs:
+    inputs: &id003
     - task mapping
     outputs:
     - TaskSpec
@@ -50,15 +77,42 @@ tools:
     physics_contract_dependencies: []
     artifacts: []
     implementation_status: IMPLEMENTED
-    supported_robot_families: *id001
+    supported_robot_families: *id002
     cost:
       compute: low
       note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+    category: design_compile
+    purpose: validate task spec; structural
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id003
+      note: Typed object construction shown in referenced executable examples
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   validate_environment:
     implementation:
       module: tools.spec_tools
       callable: validate_environment
-    inputs:
+    inputs: &id004
     - environment mapping
     outputs:
     - EnvironmentSpec
@@ -76,15 +130,42 @@ tools:
     physics_contract_dependencies: []
     artifacts: []
     implementation_status: IMPLEMENTED
-    supported_robot_families: *id001
+    supported_robot_families: *id002
     cost:
       compute: low
       note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+    category: design_compile
+    purpose: validate environment; structural
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id004
+      note: Typed object construction shown in referenced executable examples
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   validate_design:
     implementation:
       module: tools.spec_tools
       callable: validate_design
-    inputs:
+    inputs: &id005
     - design mapping
     outputs:
     - DesignSpec
@@ -102,15 +183,42 @@ tools:
     physics_contract_dependencies: []
     artifacts: []
     implementation_status: IMPLEMENTED
-    supported_robot_families: *id001
+    supported_robot_families: *id002
     cost:
       compute: low
       note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+    category: design_compile
+    purpose: validate design; structural
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id005
+      note: Typed object construction shown in referenced executable examples
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md
   build_robot_ir:
     implementation:
       module: tools.design_compiler
       callable: build_robot_ir
-    inputs:
+    inputs: &id006
     - DesignSpec
     outputs:
     - RobotIR
@@ -137,7 +245,39 @@ tools:
     artifacts:
     - robot_ir.yaml
     implementation_status: IMPLEMENTED
-    supported_robot_families: *id001
+    supported_robot_families: *id002
     cost:
       compute: low
       note: MATLAB startup separate; MuJoCo cost scales with discretization and steps.
+    category: design_compile
+    purpose: build robot ir; structural
+    version: round4_metadata_v1; implementation version remains source-bound
+    states:
+      implemented: true
+      verified: REFERENCED_HISTORICAL_EVIDENCE
+      calibrated: false
+    units:
+      geometry: m
+      time: s
+      angle: rad
+      force: N
+      torque: N m
+      dimensionless: counts/status
+    coordinate_frame: world_base_x_forward_yz_cross_section for geometry; N/A for
+      metadata operations
+    time_semantics: Static geometry has no trajectory time; run_task post-integration
+      state differs from last dynamics force/length arrays; consult observation metadata
+    dependencies:
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - segmented_mujoco_mapping_v1.md
+    - actuator_model_v1.md
+    - Python
+    input_example:
+      reference: examples/run_reach_pipeline.py / tests/test_architecture.py
+      inputs: *id006
+      note: Typed object construction shown in referenced executable examples
+    evidence_refs:
+    - docs/round3_deterministic_closeout_result.md
+    - docs/round3_closeout_validation.md

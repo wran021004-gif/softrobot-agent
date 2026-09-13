@@ -24,6 +24,19 @@ def get_tool_manifest(bundle_name: str) -> dict:
     return _load_yaml(load_catalog()["tool_bundles"][bundle_name])
 
 
+def query_tools(category=None, implementation_status=None):
+    """Query the same manifests by six functional categories; no backend imports."""
+    found = {}
+    for bundle in list_tool_bundles():
+        for name, info in get_tool_manifest(bundle)['tools'].items():
+            if category is not None and info.get('category') != category:
+                continue
+            if implementation_status is not None and info['implementation_status'] != implementation_status:
+                continue
+            found.setdefault(name, dict(name=name, bundle=bundle, **info))
+    return list(found.values())
+
+
 def list_robot_families() -> list[str]:
     return list(load_catalog()["robot_families"])
 

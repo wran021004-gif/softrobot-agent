@@ -1,0 +1,69 @@
+{
+  "full_suite_runs": 0,
+  "numerical_calls_in_unit_tests": 0,
+  "tests": [
+    {
+      "group": "tests.test_round4 initial 7",
+      "passed": 5,
+      "errors": 2,
+      "reason": "Windows tempfile ACL"
+    },
+    {
+      "group": "two failed items plus three related legacy metadata/authority tests",
+      "passed": 5,
+      "errors": 0,
+      "repair_round": 1
+    },
+    {
+      "group": "explicit interrupted retry accounting",
+      "passed": 1,
+      "errors": 0,
+      "new_risk": "charged resume path added"
+    },
+    {
+      "group": "task provenance and evaluation, changed cache context, diagnostic applicability and saved trial evidence",
+      "passed": 3,
+      "errors": 0,
+      "reason": "New provenance guards added after numerical execution; no numeric result changed; only task evaluation test repeated due its implementation change"
+    },
+    {
+      "group": "saved MATLAB/MuJoCo accepted-time alignment",
+      "passed": 1,
+      "errors": 0,
+      "reason": "Display clock coalesces only 1e-10 s roundoff; original stamps preserved"
+    }
+  ],
+  "unique_passed": 14,
+  "matlab_startup_attempts": 3,
+  "matlab_startup_failures": 1,
+  "notes": "First MATLAB launch blocked in managed sandbox; no solve began; escalated launch succeeded. No third-round numerical experiment rerun.",
+  "visual_checks": {
+    "window_opened": true,
+    "widget_events_dispatched": true,
+    "gif_formats": 3,
+    "gif_timed_playback": true,
+    "issues_found": [
+      "overlapping title fixed",
+      "same accepted time had binary roundoff causing one-frame offset; viewer only fix"
+    ],
+    "backend_solves": 0
+  },
+  "offline_task_provenance_check": [
+    {
+      "family": "reach_free",
+      "status": "EVALUATED",
+      "unchanged": true
+    },
+    {
+      "family": "reach_obstacle",
+      "status": "EVALUATED",
+      "unchanged": true
+    },
+    {
+      "family": "tip_stability_external_force",
+      "status": "EVALUATED",
+      "unchanged": true
+    }
+  ],
+  "successful_matlab_sessions": 2
+}
