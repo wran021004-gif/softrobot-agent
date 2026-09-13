@@ -82,6 +82,9 @@ output=jsonencode(r);
             selected=t(keep);accepted_t=[accepted_t;selected(:)];accepted_x=[accepted_x;x(:,keep)'];
         end
         stop=toc(timer)>30;
+        if stop && ~isempty(t) && ~isempty(x)
+            capture('wall_timeout',30,t(end),x(:,end),'accepted_output_callback');
+        end
     end
     function dx=rhs(t,x)
         if toc(timer)>30
@@ -104,6 +107,10 @@ output=jsonencode(r);
             'unit','rad','time_s',t,'state_rad',x(1),'velocity_rad_s',x(2),...
             'tension_n',tensions,'tip_force_n',p.tip_force_n,'state_kind',kind,...
             'interpretation','Implementation choice; not a proven physical validity boundary');
+        if strcmp(name,'wall_timeout')
+            trigger.actual_value=toc(timer);trigger.unit='s';
+            trigger.interpretation='Wall-clock resource budget exceeded; not a physical limit';
+        end
     end
     function loss=loss_train(scale)
         assert(toc(timer)<=30,'Fit timeout');
