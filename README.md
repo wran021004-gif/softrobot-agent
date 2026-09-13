@@ -1,12 +1,21 @@
 # Softrobot deterministic research harness
 
+第五轮统一入口见[中文工作台说明](docs/round5_workbench.md)及[验证结果](docs/round5_result.md)。
+`python examples/workbench.py run` 创建最多一次新仿真的固定规则闭环；
+`python examples/workbench.py observe runs/workbench_demo` 打开中文观察服务。
+本机已完成的零仿真历史闭环使用 `python examples/workbench.py observe runs/round5_replay_complete`；
+新增实时评价在 MATLAB 启动时失败，完整限制和次数见第五轮验证结果。
+已有实验使用 `resume` 继续或直接观察，不能通过重复 `run` 覆盖。
+本轮只运行 `python -m unittest tests.test_workbench -v` 等改动相关检查；
+下方第三、第四轮全量测试与实验命令仅是历史说明，不适用于第五轮验证。
+
 第四轮现提供[动态观察入口与中文说明](docs/round4_observation.md)、
 [六类能力和任务接口](docs/round4_workbench.md)、[模型限制来源表](docs/round4_model_limits.md)
 及[本轮结果与预算](docs/round4_result.md)。打开保存运行：
 `python examples/observe.py runs/round4/length/0.30623771682/C1 runs/round4/length/0.30623771682/C2`。
 观看与导出动画不启动新仿真；本轮长度对照已结束，不要为查看结果重新运行实验。
 
-Current closeout implements a persistent bounded campaign with fixed C1/C2 pairs,
+The historical closeout implements a persistent bounded campaign with fixed C1/C2 pairs,
 normal trajectories, independent MATLAB reduced mechanics and offline evidence audit.
 See [closeout entry and capability matrix](docs/round3_closeout_tools.md),
 [validation](docs/round3_closeout_validation.md) and [research result](docs/round3_deterministic_closeout_result.md).

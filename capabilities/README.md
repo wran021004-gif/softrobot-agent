@@ -29,4 +29,12 @@ No LLM runtime exists. See ../skills/README.md and ../docs/trace_skill_architect
 Round 2 promotes analyze_clearance (MATLAB, full PCC swept radius, low/geometric)
 and check_collision (deterministic recorded evidence) in the existing model and
 diagnostics bundles. The explicit reach_window route uses a NON_CANONICAL fixture
-until Human approves benchmark geometry. Optimization and learning remain PLANNED.
+until Human approves benchmark geometry. Policy-scoped optimization and bounded
+repair are implemented; learning/RL remains PLANNED. Historical experiment
+authorization does not grant execution through the new workbench.
+
+Round 5: `python examples/workbench.py catalog` is the executable directory.
+It includes strict JSON input schemas, preconditions, permissions, costs and a
+uniform WorkbenchResult output. Legacy manifests remain descriptive library
+metadata and cannot dynamically register executable tools. See
+[the Chinese workbench guide](../docs/round5_workbench.md).

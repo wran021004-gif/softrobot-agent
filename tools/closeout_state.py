@@ -1,6 +1,5 @@
 """Candidate-boundary recovery using existing RunArtifacts and TraceWriter."""
 import hashlib
-import json
 import math
 from pathlib import Path
 from time import perf_counter
@@ -9,19 +8,7 @@ from tools.trace_tools import TraceWriter, read_trace, validate_trace
 from schemas.run_record import RunRecord
 
 
-def read(path):
-    return json.loads(Path(path).read_text(encoding='utf-8'))
-
-
-def digest(value):
-    return hashlib.sha256(json.dumps(value,sort_keys=True,allow_nan=False,separators=(',',':')).encode()).hexdigest()
-
-
-def atomic_json(path,value):
-    path=Path(path); path.parent.mkdir(parents=True,exist_ok=True)
-    temporary=path.with_suffix(path.suffix+'.tmp')
-    temporary.write_text(json.dumps(value,indent=2,allow_nan=False,ensure_ascii=False)+'\n',encoding='utf-8')
-    temporary.replace(path)
+from tools.state_io import read, digest, atomic_json  # Backward-compatible campaign imports.
 
 
 def verify_run(path, expected=None):

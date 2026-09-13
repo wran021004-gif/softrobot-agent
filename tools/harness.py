@@ -64,7 +64,7 @@ def _snapshot_sources(run, extra_paths=()):
 def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "configs/design_tendon_arm.yaml",
               run_root=ROOT / "runs", *, matlab_factory=None, previous_run_id=None, relationship=None,
               fidelity="MUJOCO", experiment_path=None, controller_level="C1", experiment_context=None,
-              debug=False, visualize=False, viewer_launcher=None):
+              debug=False, visualize=False, viewer_launcher=None, record_trajectory=False):
     run = create_run(run_root, previous_run_id=previous_run_id, relationship=relationship)
     matlab = None
     environment = None
@@ -365,7 +365,7 @@ def run_reach(task_package=ROOT / "tasks/reach_free", design_path=ROOT / "config
                                   **({"evaluator": resolved_contract.evaluator} if resolved_contract else {}),
                                   **({"observability": observability} if observability else {}),
                                   **({'record_shape': True} if research_evidence else {}),
-                                  **({'record_trajectory':True} if experiment and experiment.policy.authorization_mode == 'CLOSEOUT_SCOPED' else {}))
+                                  **({'record_trajectory':True} if record_trajectory or (experiment and experiment.policy.authorization_mode == 'CLOSEOUT_SCOPED') else {}))
                 if 'trajectory' in result.artifacts:
                     import gzip, json
                     rows = result.artifacts['trajectory']
