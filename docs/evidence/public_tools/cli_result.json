@@ -1,0 +1,65 @@
+{
+  "contract_version": "1.0",
+  "tool_id": "analysis.pcc_jacobian",
+  "tool_version": "1.0.0",
+  "call_id": "132895d26bbc4843962e3e0339f19a63",
+  "caller": {
+    "actor_id": "local-human",
+    "origin": "human_cli",
+    "transport": "cli",
+    "model_request_index": null
+  },
+  "execution_status": "completed",
+  "solver_status": "NOT_APPLICABLE",
+  "analysis_status": "LOCAL_GEOMETRY_ONLY",
+  "task_status": "NOT_ASSESSED",
+  "summary": "Local PCC geometry: tip=[1.2087480213744717, 0.2458610121248868, -0.1229305060624434] m; 3x2 Jacobian in m/rad. No task evaluation.",
+  "error": null,
+  "evidence": [
+    {
+      "ref": "service_calls/132895d26bbc4843962e3e0339f19a63/data.json",
+      "sha256": "c2104e01926418142189b1075dea59470fc0f96a0dc293eedcd9489faa2a3e65",
+      "role": "detail"
+    }
+  ],
+  "cost": {
+    "charged": {
+      "tool_calls": 1,
+      "backend_solves": 0,
+      "model_calls": 0
+    },
+    "elapsed_s": 0.0,
+    "cache_hit": false,
+    "billing_owner": "services",
+    "recovery": "Charged before execution; interrupted calls never automatically replayed."
+  },
+  "provenance": {
+    "arguments": {
+      "length_m": 1.25,
+      "bend_rad": [
+        0.4,
+        -0.2
+      ],
+      "frame": "base_origin_x_forward_yz_bending"
+    },
+    "config_hash": "790a9f82eda696826ca991a8e70d2f22a7a4d76dad56cead406f97911669d4bf",
+    "imports": [],
+    "implementation_hashes": {
+      "tools/public_services.py": "e4093aacddc319ef691ade6e4aeb56dfc34900e64883dd36597cd65b8bf11feb",
+      "tools/pcc_math.py": "b2d9a741a29c44548e9fd6d97d3ae1f120429d096b96a632f9b3454ce66ede3f",
+      "tools/public_feedback.py": "d38875e6b4c728db730586ce382427055512443ad34d536d0ed70c58565e7528"
+    },
+    "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+    "raw_failure_code": null,
+    "raw_solver_status": null
+  },
+  "epistemics": {
+    "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+    "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+    "unverified": [
+      "Causal attribution and physical calibration unless separately evidenced."
+    ],
+    "visual_access": "not_applicable"
+  },
+  "details_ref": "service_calls/132895d26bbc4843962e3e0339f19a63/data.json"
+}

@@ -3,10 +3,12 @@ import copy
 import time
 
 from tools.state_io import atomic_json, read
+from tools.spec_tools import ROOT
 
 
-EXPERIMENT_ID = 'llm_reach_v1'
-EXPERIMENT_LIMITS = dict(model_calls=24, matlab_dynamic=40, mujoco=3, active_wall_s=1800)
+EXPERIMENT_PROFILE = read(ROOT/'configs/experiments/round9_llm_reach.json')
+EXPERIMENT_ID = EXPERIMENT_PROFILE['experiment_id']
+EXPERIMENT_LIMITS = EXPERIMENT_PROFILE['limits']
 
 
 class ExperimentSupport:
@@ -21,19 +23,20 @@ class ExperimentSupport:
             if old['experiment_id'] != experiment_id:
                 raise ValueError('Another experiment is already bound')
             return old  # Repeated start never resets counters or positions.
-        baseline = self.candidate('c032')
-        if baseline['physics_version'] != 'equivalent_rod_v2':
+        baseline = self.candidate(EXPERIMENT_PROFILE['baseline_id'])
+        if baseline['physics_version'] != EXPERIMENT_PROFILE['physics_version']:
             raise ValueError('Experiment baseline must be V2')
         for result in baseline['results'].values():
             self.check_evidence(result['result_ref'])
         self.state['experiment'] = dict(
-            experiment_id=experiment_id, baseline_id='c032', status='NOT_RUN',
+            experiment_id=experiment_id, baseline_id=EXPERIMENT_PROFILE['baseline_id'], status='NOT_RUN',
+            profile=copy.deepcopy(EXPERIMENT_PROFILE),
             start_model_index=len(self.state['model_calls']), start_decision_sequence=len(self.state['decisions']),
             existing_candidate_ids=[c['candidate_id'] for c in self.state['candidates']],
             starting_counters=copy.deepcopy(self.ledger['used']), limits=copy.deepcopy(EXPERIMENT_LIMITS),
             used={key: 0 for key in EXPERIMENT_LIMITS}, stop_decision_sequence=None,
-            instruction='Informed local optimization from c032; historical success is not a new experiment.',
-            historical_authorship='Development-time Codex selected the 40/24-trial MATLAB plans; deterministic tools generated proposals. c065/c066 are historical comparisons, not runtime DeepSeek discoveries.')
+            instruction=EXPERIMENT_PROFILE['instruction'],
+            historical_authorship=EXPERIMENT_PROFILE['historical_authorship'])
         self.tick = time.monotonic()
         self.save()
         return self.experiment()
@@ -110,7 +113,7 @@ class ExperimentSupport:
         best = min(validated, key=lambda c: c['results']['mujoco']['position_error_m'], default=None)
         phase = 'baseline_review' if not searches else 'optimization' if not numerical else 'verification' if not validated else 'diagnosis' if not claims else 'closeout'
         return dict(experiment_id=exp['experiment_id'], status=exp['status'], phase=phase,
-                    baseline_id=exp['baseline_id'], objective='Improve c032 using a new model-led MATLAB search, then MuJoCo verification and a checked diagnosis; fixed 20 N, 2 s and 0.01 m threshold.',
+                    baseline_id=exp['baseline_id'], objective=exp.get('profile',EXPERIMENT_PROFILE)['objective_description'],
                     remaining=self.experiment_remaining(), used=copy.deepcopy(exp['used']),
                     candidate_ids=[c['candidate_id'] for c in candidates],
                     fresh_matlab_ids=[c['candidate_id'] for c in numerical],
@@ -126,6 +129,7 @@ class ExperimentSupport:
         exp = self.experiment()
         if not exp:
             return
+        profile=exp.get('profile',EXPERIMENT_PROFILE)
         mutations = ('create_candidate', 'optimize_matlab', 'simulate_candidate', 'evaluate_candidate')
         if name in mutations:
             if getattr(self, 'decision_origin', None) != 'deepseek_api':
@@ -135,11 +139,11 @@ class ExperimentSupport:
             if cid not in eligible:
                 raise ValueError('Experiment mutations require c032 or its new experimental descendants')
             c = self.candidate(cid)
-            if c['design']['exploration_physics']['tendon_force_limit_n'] != 20:
+            if c['design']['exploration_physics']['tendon_force_limit_n'] != profile['fixed_force_limit_n']:
                 raise ValueError('Experiment force limit is fixed at 20 N')
         if name == 'create_candidate':
             for key, value in args['changes'].items():
-                if key == 'tendon_force_limit_n' and value != 20:
+                if key == 'tendon_force_limit_n' and value != profile['fixed_force_limit_n']:
                     raise ValueError('Experiment force limit is fixed at 20 N')
                 if key in ('mode', 'physics_version'):
                     if (key == 'mode' and value in ('C1', 'C2')) or (key == 'physics_version' and value == 'equivalent_rod_v2'):
@@ -155,7 +159,7 @@ class ExperimentSupport:
             path = self.root / f"searches/{args['search_id']}.json"
             if path.exists() and read(path).get('provenance', {}).get('experiment_id') != exp['experiment_id']:
                 raise ValueError('Existing search is not owned by this experiment')
-            if not path.exists() and args['max_evaluations'] > min(24, self.experiment_remaining()['matlab_dynamic']):
+            if not path.exists() and args['max_evaluations'] > min(profile['max_batch_evaluations'], self.experiment_remaining()['matlab_dynamic']):
                 raise ValueError('Each new batch is at most 24 trials and cannot exceed experiment remainder')
         if name == 'stop_design':
             summary = self.experiment_summary()

@@ -1,5 +1,7 @@
 # Softrobot deterministic research harness
 
+公共工具接口 v1 已接入：[统一工具清单](docs/public_tools_catalog.md)、[调用规范与迁移/扩展路线](docs/public_tools.md)、[验证记录](docs/public_tools_validation.md)。使用 `python examples/public_tools.py catalog` 发现带命名空间的工具；旧工作台和动力学命令继续有效。以下逐轮说明保留为历史记录。
+
 第九轮已运行独立 MATLAB 多关节动力学、逐次计费的连续参数搜索、MuJoCo 验证与 C2 对照。当前 `runs/round9_reach` 的最佳 c066 在原 reach_free 任务中误差 **0.0001043346913 m（0.1043 mm）**，最大拉力仍为 20 N。
 真实数值运行：MATLAB 动态 69 次（含 1 次超时）、其他 MATLAB 数学调用 76 次、MuJoCo 6 次；**本轮 DeepSeek API 调用为 0，当前进程及 Windows 环境均未配置密钥，外部 LLM 闭环验收尚未完成**。详见[结果与限制](docs/round9_result.md)、[实际操作命令](docs/round9_usage.md)。
 查看工作台：`runs/round9_reach/index.html`；继续单模型会话：`python examples/workbench.py dynamics resume --root runs/round9_reach`。该命令不会增加授权额度。第九轮仅使用聚焦检查，不运行下文历史 full-suite 命令。

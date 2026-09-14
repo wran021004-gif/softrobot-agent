@@ -241,6 +241,12 @@ class Workbench:
 
     def finish(self, attempt, result):
         folder = self.root / attempt['folder']
+        from tools.public_feedback import runner_feedback
+        ref=(folder/'result.json').relative_to(self.root).as_posix()
+        public=runner_feedback(self,'workbench',attempt['tool'],result.model_dump(mode='json'),ref,decision_index=attempt['decision'])
+        public['cost']['charged']=dict(decisions=1,**attempt['cost'])
+        from schemas.public_tools import PublicResult
+        result=result.model_copy(update={'public':PublicResult.model_validate(public)})
         atomic_json(folder / 'result.json', result.model_dump(mode='json'))
         for path in sorted(folder.rglob('*')):
             if path.is_file():
@@ -262,6 +268,8 @@ class Workbench:
             self.save()
             return
         row = dict(sequence=len(self.state['decisions']), proposal=value.model_dump(mode='json') if isinstance(value, Decision) else value)
+        if getattr(self, 'public_caller', None):
+            row['caller']=self.public_caller
         self.state['decisions'].append(row)
         try:
             decision = Decision.model_validate(row['proposal'])
@@ -323,6 +331,13 @@ class Workbench:
                 raise ValueError('BUDGET_EXHAUSTED')
         except (ValueError, TypeError) as exc:
             row.update(status='rejected', failure_code=str(exc))
+            from tools.public_feedback import normalize
+            proposal=row['proposal'] if isinstance(row['proposal'],dict) else {}
+            row['public']=normalize('workbench.'+str(proposal.get('tool','unknown')),
+                dict(status='rejected',failure_code='INVALID_INPUT',message=str(exc)),
+                call_id='decision:'+str(row['sequence']),
+                caller=row.get('caller') or dict(actor_id='legacy_unknown',origin='legacy_unknown'),
+                cost=dict(charged={'decisions':1},billing_owner='workbench'))
             self.save()
             return
         folder = self.root / 'attempts' / f'{len(self.state["attempts"]):03d}_{decision.tool}'
@@ -344,6 +359,8 @@ class Workbench:
             result = WorkbenchResult(status='failed', tool=decision.tool,
                                      failure_code='TIMEOUT' if isinstance(exc, subprocess.TimeoutExpired) else 'TOOL_ERROR', message=str(exc))
         self.finish(attempt, result)
+        row['result_ref']=attempt['result_ref']
+        self.save()
 
     def run(self, *, steps=None, decision=None, policy=None):
         from tools.workbench_policy import decide

@@ -20,18 +20,8 @@ def redact(value, key):
 
 
 def native_tools():
-    tools = []
-    for name in [*DESIGN_TOOLS, 'read_evidence', 'stop_design', 'capability_missing']:
-        info = TOOLS.get(name)
-        schema = info['schema'].model_json_schema() if info else {'type': 'object', 'properties': {}, 'required': []}
-        schema['properties'].update(reason={'type': 'string', 'description': '简要依据；引用真实观测，不输出长推理'},
-                                    evidence={'type': 'array', 'items': {'type': 'string'}, 'minItems': 1})
-        schema['properties']['working_memory'] = {**WorkingMemory.model_json_schema(), 'description': '更新简短工作笔记：已得发现、待解决问题、下一步；不写长推理。证据必须已登记。'}
-        schema['required'] = schema.get('required', []) + ['reason', 'evidence', 'working_memory']
-        schema['additionalProperties'] = False
-        description = (info['purpose'] + '；成本：' + json.dumps(info['cost']) + '；前置检查：' + str(info['requires'])) if info else '引用证据结束本次设计，说明停止或能力不足的原因'
-        tools.append(dict(type='function', function=dict(name=name, description=description, parameters=schema)))
-    return tools
+    from tools.public_catalog import workbench_native_tools
+    return workbench_native_tools()
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -110,7 +100,7 @@ def payload_for(book, *, fresh=False):
 
 def compact_feedback(feedback):
     decision = feedback['decision']
-    return dict(decision={k: decision[k] for k in ('sequence', 'status', 'failure_code') if k in decision},
+    return dict(decision={k: decision[k] for k in ('sequence', 'status', 'failure_code', 'public') if k in decision},
                 result=compact_result(feedback['result']) if feedback.get('result') else None,
                 result_ref=feedback.get('result_ref'), cite_as=feedback.get('cite_as'), read_notice=feedback.get('read_notice'))
 
@@ -139,7 +129,12 @@ def apply_response(book, row):
     # can therefore attach feedback without executing the same decision twice.
     sequence = row['decision_sequence']
     if len(book.state['decisions']) == sequence:
-        book.submit(parse_decision(row))
+        previous=getattr(book,'public_caller',None)
+        book.public_caller=dict(actor_id='deepseek_api',origin='agent',transport=row.get('transport','legacy_unknown'),model_request_index=row['index'])
+        try:
+            book.submit(parse_decision(row))
+        finally:
+            book.public_caller=previous
     decision = book.state['decisions'][sequence]
     attempt = next((a for a in book.state['attempts'] if a['decision'] == sequence), None)
     ref = attempt.get('result_ref') if attempt else decision.get('result_ref')

@@ -1,5 +1,11 @@
 # Capability library
 
+Current public authority: `tools.public_catalog` projects the real Workbench and
+Dynamics allowlists plus task-independent services. See
+[public contracts and migration](../docs/public_tools.md). Manifests below are
+library declarations, not executable authorization. Native agent schemas and the
+public JSON directory share the same input classes; bare names are runtime-scoped.
+
 catalog.yaml indexes spec, model, optimization, control, mujoco, diagnostics,
 artifacts and learning bundles. matlab_analysis is a deprecated alias of model.
 The registry reads metadata without starting MATLAB or importing numerical engines.

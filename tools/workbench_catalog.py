@@ -43,14 +43,16 @@ def executable_catalog():
                    'cost_note': 'evaluate_design 在 request.replay 模式为零后端；模型不能修改 request 或切换模式',
                    'failure_codes': ['INVALID_INPUT', 'TOOL_ERROR', 'TIMEOUT', 'CAPABILITY_MISSING',
                                      'PERMISSION_DENIED', 'BUDGET_EXHAUSTED', 'EVIDENCE_CHANGED', 'INTERRUPTED'],
-                   'limitations': '冻结 reach_free、C1；设计模式仅允许 envelope 范围内最多三个候选；无标定、编程或硬件权限'}
+                   'tool_id': 'workbench.'+name, 'tool_version': '1.0.0',
+                   'limitations': '冻结 reach_free、C1；设计范围和候选数由保存 session 的 envelope 与预算决定；无标定、编程或硬件权限'}
             for name, info in TOOLS.items()}
 
 
 def catalog():
     from capabilities.registry import query_tools
+    from tools.public_catalog import catalog as public_catalog
     from schemas.dynamic_workbench import native_tools as dynamic_tools
-    return dict(executable=executable_catalog(), limits=LIMITS,
+    return dict(public=public_catalog(), executable=executable_catalog(), limits=LIMITS,
                 dynamics_v2=dict(entrypoint='python examples/workbench.py dynamics',
                     executable=dynamic_tools(),grant='configs/experiments/round9_grant.json',
                     implementation='tools/dynamic_campaign.py',scope='New reach_free campaign; original V1 continuation remains strict'),

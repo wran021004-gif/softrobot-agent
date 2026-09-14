@@ -27,7 +27,9 @@ class DesignLoopTests(unittest.TestCase):
     def create_book(self, **limits):
         folder = ROOT / 'runs/round6_tests' / uuid.uuid4().hex
         folder.mkdir(parents=True)
-        cfg = {**load_yaml(ROOT / 'configs/deepseek.yaml'), **limits}
+        # This fixture tests the original non-thinking, 18-call protocol. The
+        # current development config enables thinking and has a different budget.
+        cfg = {**load_yaml(ROOT / 'configs/deepseek.yaml'), 'thinking':'disabled', 'model_calls':18, **limits}
         (folder / 'config.yaml').write_text(yaml.safe_dump(cfg), encoding='utf-8')
         def worker(root, attempt, timeout):
             job = read(attempt / 'job.json')
@@ -94,6 +96,8 @@ class DesignLoopTests(unittest.TestCase):
         self.assertEqual(book.remaining()['candidates'], 0)
         evaluations = [a for a in state['attempts'] if a['tool'] == 'evaluate_candidate']
         self.assertEqual(len(evaluations), 2)
+        self.assertEqual(evaluations[0]['result']['public']['caller']['origin'],'agent')
+        self.assertEqual(evaluations[0]['result']['public']['caller']['transport'],'injected_test')
         self.assertNotEqual(evaluations[0]['result']['data']['design_hash'], evaluations[1]['result']['data']['design_hash'])
         self.assertEqual(len(state['reuse']), 1)
         created = next(a for a in state['attempts'] if a['tool'] == 'create_candidate')

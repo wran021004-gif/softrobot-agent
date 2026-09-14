@@ -2,6 +2,7 @@
 from typing import Literal
 from pydantic import Field
 from schemas.common import Contract
+from schemas.public_tools import PCCJacobian
 
 class Candidate(Contract):
     candidate_id: str=Field(pattern=r'^c\d{3}$')
@@ -58,6 +59,7 @@ class Stop(Contract):
         description='Your final design choice, or null when no design can be selected. Supply a brief English reason.')
 
 TOOLS={
+ 'analyze_pcc':(PCCJacobian,'analysis','Task-independent analytic PCC tip/Jacobian for explicit length and bend; local geometry only, zero backend solves, no task score.'),
  'create_candidate':(Create,'candidate_design','Branch any registered candidate, changing design, equivalent physics or control; cite recorded evidence.'),
  'simulate_candidate':(Simulate,'simulate','Run only the selected backend. MATLAB screening does not set canonical reach success. One rollout charged even on failure.'),
  'evaluate_candidate':(Candidate,'simulate','Compatibility: evaluate candidate in MuJoCo with its own controller, no bundled MATLAB calls.'),
@@ -71,10 +73,5 @@ TOOLS={
  'stop_design':(Stop,'read_evidence','Stop with cited results and limitations; distinguish workflow, numerical completion, MATLAB prediction and canonical MuJoCo success.')}
 
 def native_tools():
-    out=[]
-    for name,(schema,permission,description) in TOOLS.items():
-        s=schema.model_json_schema();s['properties'].update(reason={'type':'string'},evidence={'type':'array','items':{'type':'string'},'minItems':1},
-          working_memory={'type':'object','properties':{'findings':{'type':'array','items':{'type':'string'}},'unresolved':{'type':'array','items':{'type':'string'}},'next_action':{'type':'string'}},'additionalProperties':False})
-        s['required']=s.get('required',[])+['reason','evidence','working_memory']
-        out.append(dict(type='function',function=dict(name=name,description=description,parameters=s)))
-    return out
+    from tools.public_catalog import native_tools as public_native_tools
+    return public_native_tools('dynamics')

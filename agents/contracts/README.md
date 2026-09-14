@@ -1,5 +1,11 @@
 # Authority boundary
 
+Current public execution and caller/accounting contracts are in
+[public_tools.md](../../docs/public_tools.md). The staged notes below preserve
+historical architecture descriptions; statements such as “no LLM” or “PLANNED”
+must not override the current executable directory. This interface migration is
+authorized by the user's explicit request; scientific authority remains unchanged.
+
 Round 3 adds ExperimentPolicy and deterministic candidate/search/feedback/sensitivity/
 repair consumers; see ../../docs/round3_experiments.md. Historical notes below describe
 earlier stages. optimize_design, synthesize_feedback and run_parameter_sensitivity

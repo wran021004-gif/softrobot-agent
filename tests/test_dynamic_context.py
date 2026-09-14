@@ -113,6 +113,10 @@ class DynamicContextRegression(unittest.TestCase):
         with self.assertRaises(ValueError):Read(evidence_ref=ref, max_bytes=8001)
 
         # Oversized necessary memory must pause before any model reservation.
+        # Historical Round 9 may now be closed. Test context limits independently
+        # of that external experiment's terminal flag and correction receipts.
+        book.state.pop('experiment', None)
+        book.state.pop('tool_call_corrections', None)
         book.state['working_memory'] = {'findings': ['x' * 70000], 'next_action': 'Preserve the current page'}
         charged_before = book.ledger['used']['model_calls']
         calls_before = len(book.state['model_calls'])

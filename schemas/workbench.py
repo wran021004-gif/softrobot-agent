@@ -2,6 +2,7 @@
 from typing import Literal
 from pydantic import Field, model_validator
 from schemas.common import Contract
+from schemas.public_tools import PublicResult
 
 
 class WorkingMemory(Contract):
@@ -102,3 +103,4 @@ class WorkbenchResult(Contract):
     message: str = ''
     data: dict = Field(default_factory=dict)
     artifacts: list[str] = Field(default_factory=list)
+    public: PublicResult | None = None  # Additive v1 contract; absent in historical artifacts.

@@ -21,6 +21,14 @@ SESSION_FILES = {
     'schemas/workbench.py', 'examples/workbench.py', 'configs/deepseek.yaml',
     'configs/prompts/design_system.md',
     'tools/design_memory.py', 'tools/native_replay.py', 'examples/native_replay.py',
+    # Public contracts and orchestration/presentation only; numerical adapters,
+    # evaluators, tasks and physics definitions remain outside this allowlist.
+    'schemas/public_tools.py', 'tools/public_catalog.py', 'tools/public_feedback.py',
+    'tools/public_gateway.py', 'tools/public_services.py', 'examples/public_tools.py',
+    'examples/check_public_tools.py',
+    'schemas/dynamic_workbench.py', 'tools/dynamic_campaign.py',
+    'tools/dynamic_experiment.py', 'tools/dynamic_view.py',
+    'capabilities/README.md', 'agents/contracts/README.md',
 }
 
 ROUND_LEDGER = ROOT / 'runs/round8_budget.json'

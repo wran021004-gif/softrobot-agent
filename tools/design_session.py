@@ -126,7 +126,8 @@ def compact_result(result):
         fields += ('native_scene', 'native_command')
         selected = {k: data[k] for k in fields if k in data}
     return dict(tool=result.get('tool'), status=result['status'], failure_code=result.get('failure_code'),
-                message=str(result.get('message') or '')[:400], data=selected)
+                message=str(result.get('message') or '')[:400], data=selected,
+                public={k:result['public'][k] for k in ('tool_id','execution_status','solver_status','analysis_status','task_status','error','details_ref')} if result.get('public') else None)
 
 
 def model_context(book):

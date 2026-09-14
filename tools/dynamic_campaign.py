@@ -311,14 +311,31 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
     def compare(self,ids=(),offset=0,limit=12):
         from tools.dynamic_comparison import compare_backends
         candidates=[c for c in self.state['candidates'] if not ids or c['candidate_id'] in ids]
+        sources={}
+        for c in candidates[offset:offset+limit]:
+            self.candidate(c['candidate_id'])
+            for backend,r in c['results'].items():
+                if r.get('result_ref'):
+                    self.check_evidence(r['result_ref'])
+                if r.get('complete'):
+                    sources.update(self.saved_sources(r))
         comparisons=[compare_backends(self.root,c) for c in candidates[offset:offset+limit]]
         comparison_path=self.root/f'comparisons/{digest(dict(ids=ids,offset=offset,limit=limit))[:16]}.json'
         atomic_json(comparison_path,comparisons);self.register(comparison_path)
+        metadata=comparison_path.with_suffix('.provenance.json')
+        atomic_json(metadata,dict(source_hashes=sources,parameters=dict(candidate_ids=ids,offset=offset,limit=limit),
+            processor='tools.dynamic_comparison.compare_backends',processor_sha256=__import__('hashlib').sha256((ROOT/'tools/dynamic_comparison.py').read_bytes()).hexdigest(),
+            backend_solves=0,rescoring=False,artifact_hashes={comparison_path.relative_to(self.root).as_posix():self.state['evidence'][comparison_path.relative_to(self.root).as_posix()]['sha256']}))
+        self.register(metadata)
         return dict(total=len(candidates),next_offset=offset+limit if offset+limit<len(candidates) else None,
+            source_hashes=sources,backend_solves=0,rescoring=False,metadata_ref=metadata.relative_to(self.root).as_posix(),
             cross_backend=comparisons,comparison_ref=comparison_path.relative_to(self.root).as_posix(),rows=[
             {k:c[k] for k in ('candidate_id','parent_id','design','control','design_hash','control_hash','physics_version','physics_hash','changes','results')}
             for c in candidates[offset:offset+limit]])
     def dispatch(self,name,args,evidence,reason):
+        if name=='analyze_pcc':
+            from tools.public_services import pcc_jacobian
+            return pcc_jacobian(args)
         if name=='render_simulation_video':
             from tools.simulation_video import render_simulation_video
             return render_simulation_video(self.root,self.state['evidence'],**args)
@@ -330,13 +347,22 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
         if name in ('diagnose_trajectory','observe_candidate'):
             c=self.candidate(args['candidate_id']);r=c['results'].get(args['backend'])
             if not r or not r.get('result_ref'):raise ValueError('Backend NOT_RUN')
+            source_hashes=self.saved_sources(r)
             folder=(self.root/r['result_ref']).parent
             if name=='observe_candidate':
                 from tools.dynamic_view import render_candidate
-                path=render_candidate(self.root,c,args['backend']);return dict(candidate_id=c['candidate_id'],backend_solves=0,html_ref=path.relative_to(self.root).as_posix())
+                path=render_candidate(self.root,c,args['backend']);self.register(path)
+                metadata=path.with_suffix('.provenance.json')
+                atomic_json(metadata,dict(source_hashes=source_hashes,parameters=args,backend_solves=0,rescoring=False,
+                    processor='tools.dynamic_view.render_candidate',processor_sha256=__import__('hashlib').sha256((ROOT/'tools/dynamic_view.py').read_bytes()).hexdigest(),
+                    artifact_hashes={path.relative_to(self.root).as_posix():self.state['evidence'][path.relative_to(self.root).as_posix()]['sha256']}))
+                self.register(metadata)
+                return dict(candidate_id=c['candidate_id'],backend_solves=0,html_ref=path.relative_to(self.root).as_posix(),metadata_ref=metadata.relative_to(self.root).as_posix())
             if args['t_end_s']<args['t_start_s']:raise ValueError('Reversed time window')
             meta=metadata_from_shared(read(folder/'shared_input.json'),c['candidate_id'],args['backend'],self.root.name)
             d=diagnose(folder/'trajectory.json.gz',meta,args['entity'],args['t_start_s'],args['t_end_s'],args['fields'])
+            d.update(source_hashes=source_hashes,parameters=args,backend_solves=0,rescoring=False,
+                processor='tools.trajectory_diagnosis.diagnose',processor_sha256=__import__('hashlib').sha256((ROOT/'tools/trajectory_diagnosis.py').read_bytes()).hexdigest())
             path=self.root/f"diagnostics/{digest(args)[:16]}.json";atomic_json(path,d);self.register(path)
             return {**{k:v for k,v in d.items() if k!='raw_fields'},'raw_fields_ref':path.relative_to(self.root).as_posix()}
         if name=='read_evidence':
@@ -363,11 +389,24 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
                 self.experiment()['stop_decision_sequence']=len(self.state['decisions'])-1
             return dict(status='STOPPED',reason=reason,selected_candidate_id=selected,experiment=self.experiment_summary())
         raise ValueError('Tool is not executable')
+    def saved_sources(self,result):
+        """Registered input hashes, shared by comparison, diagnosis and observation."""
+        ref=result['result_ref'];self.check_evidence(ref)
+        folder=(self.root/ref).parent
+        hashes={}
+        for path in (self.root/ref,folder/'trajectory.json.gz',folder/'shared_input.json'):
+            item=path.relative_to(self.root).as_posix();self.check_evidence(item)
+            hashes[item]=self.state['evidence'][item]['sha256']
+        if (folder/'diagnosis.json').exists():
+            item=(folder/'diagnosis.json').relative_to(self.root).as_posix();self.check_evidence(item)
+            hashes[item]=self.state['evidence'][item]['sha256']
+        return hashes
     def check_evidence(self,ref):
         if ref not in self.state['evidence']:raise ValueError('Unregistered evidence: '+ref)
         p=(self.root/ref).resolve()
         if not p.is_relative_to(self.root) or __import__('hashlib').sha256(p.read_bytes()).hexdigest()!=self.state['evidence'][ref]['sha256']:raise ValueError('Evidence changed')
     def submit(self,name,args,reason,evidence,memory=None):
+        started=time.monotonic();before=copy.deepcopy(self.ledger['used'])
         seq=len(self.state['decisions']);receipt,new=self.reserve('decisions',str(seq));self.finish(receipt)
         decision=dict(sequence=seq,tool=name,arguments=args,reason=reason,evidence=evidence,status='pending',
             origin=getattr(self,'decision_origin','codex_development'),
@@ -393,7 +432,14 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
             if tool_receipt:self.finish(tool_receipt,'failed',reason=str(exc))
             result=WorkbenchResult(tool=name,status='failed',failure_code='TOOL_ERROR',message=str(exc));decision['status']='failed'
         if name=='optimize_matlab':self.optimization_deadline=float('inf');self.search_provenance=None
-        ref=f'attempts/{seq:03d}_{name}/result.json';atomic_json(self.root/ref,result.model_dump(mode='json'));self.register(self.root/ref)
+        # Unknown names are untrusted; never interpolate them into a filesystem path.
+        safe_name=name if name in TOOLS else 'unknown_tool'
+        ref=f'attempts/{seq:03d}_{safe_name}/result.json'
+        from tools.public_feedback import runner_feedback
+        from schemas.public_tools import PublicResult
+        result=result.model_copy(update={'public':PublicResult.model_validate(runner_feedback(self,'dynamics',name,result.model_dump(mode='json'),ref,
+            before=before,elapsed_s=time.monotonic()-started))})
+        atomic_json(self.root/ref,result.model_dump(mode='json'));self.register(self.root/ref)
         decision['result_ref']=ref;self.state['attempts'].append(dict(tool=name,arguments=args,result_ref=ref,
             decision_sequence=seq,provenance=decision['provenance']))
         if memory:self.state['working_memory']={k:([str(x)[:300] for x in v[:4]] if isinstance(v,list) else str(v)[:300]) for k,v in memory.items() if k in ('findings','unresolved','next_action')}
@@ -404,6 +450,8 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
         summary={k:result[k] for k in ('tool','status','failure_code') if k in result}
         summary.update(cite_as=ref,evidence_ref=ref)
         if result.get('message'):summary['message']=result['message'][:240]
+        if result.get('public'):
+            summary['public']={k:result['public'][k] for k in ('tool_id','execution_status','solver_status','analysis_status','task_status','error','cost','details_ref')}
         if a['tool']=='read_evidence' and result.get('status')=='completed':
             data=result.get('data',{})
             if isinstance(data,dict) and data.get('page_version')==PAGE_VERSION and encoded_size(data)<=8000:
