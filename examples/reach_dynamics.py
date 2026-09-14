@@ -43,6 +43,7 @@ def main(argv=None):
                         if r.get('complete'):render_candidate(book.root,c,backend)
             book.save();book.render()
             print('status='+book.state['status']+' html='+str(book.root/'index.html'))
+            book.print_selected_design()
     finally:book.close()
 
 if __name__=='__main__':main()

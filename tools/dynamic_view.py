@@ -61,7 +61,14 @@ def render_workbench(book):
         rows.append('<tr>'+''.join('<td>'+esc(x)+'</td>' for x in cells)+'<td>'+'<br>'.join(links)+'</td></tr>')
     headers=['候选','父候选','物理版本（等效参数未标定）','控制','变更','MATLAB 数值完成','MATLAB 误差 m','MATLAB 用时 s','模型预测通过','MuJoCo 数值完成','MuJoCo 误差 m','MuJoCo 用时 s','MuJoCo 任务通过','观察']
     page='<!doctype html><meta charset="utf-8"><title>Round 9 reach workbench</title><style>body{font:14px system-ui;background:#101a29;color:#e4edf8;padding:24px}table{border-collapse:collapse}td,th{border:1px solid #456;padding:8px}a{color:#9df}pre{white-space:pre-wrap}</style>'
-    page+=f'<h1>Round 9 · reach_free</h1><p>流程完成：{state["status"]=="STOPPED"}；会话状态：{esc(state["status"])}；停止原因：{esc(state.get("stop_reason"))}</p>'
+    page+=f'<h1>Round 9 · reach_free</h1><p>流程完成：{state["status"]=="STOPPED"}；会话状态：{esc(state["status"])}</p>'
+    selection=book.selected_design()
+    if selection:
+        page+='<section style="border:2px solid #9df;padding:16px"><h2>Final design selection</h2>'
+        page+=f'<p><strong>Selected candidate: {esc(selection["selected_candidate_id"] or "None")}</strong></p>'
+        page+=f'<p>Design file: {esc(selection["design_file"] or "None")}</p><p>Reason: {esc(selection["reason"])}</p>'
+        page+=f'<p>Source: {esc(selection["source"])}</p></section>'
+    if state.get('stop_reason'):page+='<details><summary>Full stop reason</summary><pre>'+esc(state['stop_reason'])+'</pre></details>'
     page+='<p>固定任务：目标 [0.25,0,0.15]m，t=2s，容差 0.01m。MATLAB 为未标定平面动态筛选；任务真值使用原 MuJoCo 评价器。</p>'
     page+='<p><a href="history/audit.json">历史核对</a> · <a href="inputs/grant.json">冻结授权与范围</a> · <a href="budget.json">预算账本</a> · <a href="candidate_table.json">完整候选表</a> · <a href="working_memory.json">工作记忆</a></p>'
     if state.get('tool_call_corrections'):
@@ -76,6 +83,7 @@ def render_workbench(book):
     if state.get('experiment'):
         summary=book.experiment_summary();eid=summary['experiment_id'];baseline=summary['baseline_id']
         page+=f'<h2>实验 {esc(eid)} · {esc(summary["status"])}</h2><p>基线 {baseline}；只计新实验后代与新数值回执。历史 c057/c065/c066 成功不属于本实验。</p>'
+        page+='<p>Historical best: c066 (before llm_reach_v1; separate from the final design selection above).</p>'
         page+=f'<p><a href="experiments/{eid}/experiment.json">实验额度与起点</a> · <a href="experiments/{eid}/summary.json">实验结论</a>'
         for cid,label in ((baseline,'baseline'),(summary['best_id'],'best new verified')):
             if cid:

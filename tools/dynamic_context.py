@@ -6,9 +6,9 @@ import json
 TARGET_BYTES = 50000
 MAX_REQUEST_BYTES = 60000
 PAGE_VERSION = 'dynamic_evidence_v1'
-PROMPT_VERSION = 'dynamic_english_question_reading_v2'
+PROMPT_VERSION = 'dynamic_selected_design_v3'
 READING_GUIDANCE = '''
-[dynamic_english_question_reading_v2: overrides historical workflow/language instructions]
+[dynamic_selected_design_v3: overrides historical workflow/language instructions]
 Write ALL newly generated natural language in English: reason, working_memory
 findings/unresolved/next_action, diagnostic statement, and stop reason. Keep exact
 evidence paths, entity IDs, units and numeric values. Historical records may be
@@ -45,6 +45,9 @@ no extra search is required if the first verification succeeds. Record a precise
 checked diagnosis for an experiment candidate and stop_design with evidence.
 Historical success/cache reuse does not count as fresh experiment completion.
 Report workflow completion, fresh numerical completion and MuJoCo success separately.
+At closeout, set stop_design.selected_candidate_id to YOUR final design choice;
+use null only when no design can be selected. Give a brief English reason for
+that choice. Historical best and your final selection are separate facts.
 '''
 
 

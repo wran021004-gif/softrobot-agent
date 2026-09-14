@@ -350,10 +350,15 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
                 'verification':'NUMERIC_ENTITY_TIME_MATCH','semantic_text_verification':'not inferred; structured fields authoritative'}
             self.state['verified_diagnoses'].append(claim);atomic_json(self.root/'verified_diagnoses.json',self.state['verified_diagnoses']);return claim
         if name=='stop_design':
+            selected=args.get('selected_candidate_id')
+            if selected is not None:self.candidate(selected)
+            selection=dict(selected_candidate_id=selected,reason=reason,source='stop_design.selected_candidate_id',
+                           provenance=self.action_provenance())
+            self.state['decisions'][-1]['selection']=selection
             self.state.update(status='STOPPED',stop_reason=reason)
             if self.experiment():
                 self.experiment()['stop_decision_sequence']=len(self.state['decisions'])-1
-            return dict(status='STOPPED',reason=reason,experiment=self.experiment_summary())
+            return dict(status='STOPPED',reason=reason,selected_candidate_id=selected,experiment=self.experiment_summary())
         raise ValueError('Tool is not executable')
     def check_evidence(self,ref):
         if ref not in self.state['evidence']:raise ValueError('Unregistered evidence: '+ref)
@@ -564,6 +569,22 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
             result,ref=self.submit(f['name'],args,reason,evidence,memory)
             row.update(status='completed',feedback_ref=ref,usage=response.get('usage'),tool=f['name'])
         finally:self.decision_origin='codex_development';self.current_model_row=None
+    def selected_design(self):
+        decision=next((d for d in reversed(self.state['decisions']) if d['tool']=='stop_design' and d['status']=='accepted'),None)
+        if not decision or 'selection' not in decision:return None
+        selection=decision['selection'];cid=selection['selected_candidate_id']
+        path=(self.root/self.candidate(cid)['path']).resolve() if cid is not None else None
+        if path is not None and not path.is_relative_to(self.root):raise ValueError('Candidate path outside campaign')
+        return dict(selected_candidate_id=cid,design_file=str(path) if path else None,
+                    reason=selection['reason'],source=selection['source'])
+    def print_selected_design(self):
+        selection=self.selected_design()
+        if selection:
+            print(f"Selected candidate: {selection['selected_candidate_id'] or 'None'}")
+            print(f"Design file: {selection['design_file'] or 'None'}")
+            print(f"Reason: {selection['reason']}")
+            print(f"Source: {selection['source']}")
+            if self.experiment():print('Historical best: c066 (before llm_reach_v1; separate from the final selection).')
     def render(self):
         from tools.dynamic_view import render_workbench
         render_workbench(self)

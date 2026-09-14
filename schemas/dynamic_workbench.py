@@ -48,7 +48,8 @@ class Claim(Contract):
     value: float
     statement: str=Field(min_length=1,max_length=600)
 class Stop(Contract):
-    pass
+    selected_candidate_id: str | None=Field(default=None,pattern=r'^c\d{3}$',
+        description='Your final design choice, or null when no design can be selected. Supply a brief English reason.')
 
 TOOLS={
  'create_candidate':(Create,'candidate_design','Branch any registered candidate, changing design, equivalent physics or control; cite recorded evidence.'),
