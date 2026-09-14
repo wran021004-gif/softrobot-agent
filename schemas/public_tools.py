@@ -8,7 +8,8 @@ from schemas.common import Contract
 class ToolCall(Contract):
     contract_version: Literal['1.0'] = '1.0'
     tool_id: str = Field(min_length=1)
-    tool_version: Literal['1.0.0','1.1.0'] = '1.1.0'
+    tool_version: str | None = Field(default=None,pattern=r'^\d+\.\d+\.\d+$',
+        description='Requested tool contract version; omitted/null selects the bound registration. Compatibility is checked by that tool, not this protocol.')
     arguments: dict = Field(default_factory=dict)
     reason: str = Field(min_length=1, max_length=4000)
     evidence: list[str] = Field(default_factory=list)
@@ -51,7 +52,8 @@ class ToolError(Contract):
 class PublicResult(Contract):
     contract_version: Literal['1.0'] = '1.0'
     tool_id: str
-    tool_version: Literal['1.0.0','1.1.0'] = '1.1.0'
+    tool_version: str | None = Field(default=None,pattern=r'^\d+\.\d+\.\d+$',
+        description='Version of the resolved tool binding; null if no binding could be resolved.')
     call_id: str
     caller: Caller
     execution_status: Literal['completed', 'failed', 'rejected', 'interrupted', 'capability_missing']

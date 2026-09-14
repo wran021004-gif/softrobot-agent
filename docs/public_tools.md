@@ -1,4 +1,4 @@
-> Framework 1.1 supersedes extension-roadmap statements below. See [current contracts and migration](framework_extensions.md). Historical interface notes remain preserved.
+> Current version and timeout rules: [engineering closeout](engineering_closeout.md). Public protocol 1.0 is independent of each registered tool version; requests select the binding or an explicitly accepted compatible version. Framework 1.1 supersedes extension-roadmap statements below; historical interface notes remain preserved.
 
 # 公共工具接口 v1
 

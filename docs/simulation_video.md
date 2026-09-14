@@ -1,5 +1,11 @@
 # On-demand native simulation video
 
+Current timeout semantics: public service 1.2.0 and the CLI/campaign compatibility
+entry use the same bounded worker (180 s plus up to 5 s for worker termination).
+The owned process tree is cleaned up; detached external services and abnormal
+host filesystem/OS waits are outside that guarantee. See
+[engineering closeout](engineering_closeout.md) for scope and targeted evidence.
+
 `render_simulation_video` is registered in the actual dynamics model tool schema
 and dispatch. It uses a registered `result_ref`, independent of a task directory
 or candidate ID. Time bounds are optional (default: saved trajectory); `fps`

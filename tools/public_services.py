@@ -172,8 +172,11 @@ class ServiceSession:
         arguments = {}
         implementation_hashes = {}
         cache_key = None
+        resolved_version = None
+        requested_version = None
         try:
             call = ToolCall.model_validate_json(json.dumps(value, allow_nan=False), strict=True)
+            requested_version=call.tool_version
             tool_id = call.tool_id
             info = entries().get(tool_id)
             if info is None or info['runtime'] != 'services':
@@ -181,7 +184,8 @@ class ServiceSession:
             from tools.tool_registry import service_tools
             from tools.service_execution import identity, execute
             definition=service_tools()[tool_id]
-            if call.tool_version not in (definition.version,*definition.compatible_versions):raise ValueError('TOOL_VERSION_MISMATCH')
+            resolved_version=definition.version
+            if call.tool_version is not None and call.tool_version not in (definition.version,*definition.compatible_versions):raise ValueError('TOOL_VERSION_MISMATCH')
             if not definition.binding:raise ValueError('IMPLEMENTATION_REQUIRED: '+tool_id)
             arguments = info['schema'].model_validate_json(json.dumps(call.arguments, allow_nan=False), strict=True).model_dump(mode='json')
             if info['permission'] not in state['config']['permissions']:
@@ -221,11 +225,12 @@ class ServiceSession:
             if key.endswith('_ref') and isinstance(output, str) and output in state['evidence']:
                 refs.append(dict(ref=output, sha256=state['evidence'][output]['sha256'], role='output'))
         result = normalize(tool_id, legacy, call_id=call_id, caller=caller, evidence=refs, details_ref=detail_ref,
+            tool_version=resolved_version,
             analysis_scope=definition.analysis_scope if charged else None,
             cost=dict(charged={'tool_calls':charged, 'backend_solves':0, 'model_calls':0}, elapsed_s=time.monotonic()-started,
                       cache_hit=bool(legacy['data'].get('cached')), billing_owner='services',
                       recovery='Charged before execution; interrupted calls never automatically replayed.'),
-            provenance=dict(arguments=arguments, config_hash=state['config_hash'], imports=state['imports'],
+            provenance=dict(arguments=arguments,requested_tool_version=requested_version,config_hash=state['config_hash'], imports=state['imports'],
                 implementation_hashes=implementation_hashes,cache_key=cache_key,
                 processing='Analytic computation or saved-data processing; no dynamics or rescoring.'))
         atomic_json(self.root/ref, result)
@@ -244,7 +249,9 @@ class ServiceSession:
             name = function['name']
         except (ValueError,KeyError,TypeError) as exc:
             return self.invoke(dict(tool_id='unknown',arguments={},reason='INVALID_NATIVE_CALL: '+str(exc),evidence=[]),caller=caller)
-        tool_id = next((i['tool_id'] for i in entries().values() if i['runtime']=='services' and i['wire_name']==name), name)
+        entry = next((i for i in entries().values() if i['runtime']=='services' and i['wire_name']==name), None)
+        tool_id = entry['tool_id'] if entry else name
         reason = args.pop('reason', '')
         evidence = args.pop('evidence', [])
-        return self.invoke(dict(tool_id=tool_id, arguments=args, reason=reason, evidence=evidence), caller=caller)
+        return self.invoke(dict(tool_id=tool_id,tool_version=entry['tool_version'] if entry else None,
+            arguments=args, reason=reason, evidence=evidence), caller=caller)

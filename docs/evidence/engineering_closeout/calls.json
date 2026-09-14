@@ -1,0 +1,616 @@
+{
+  "extension": {
+    "root": "D:\\softrobot-agent\\runs\\engineering_closeout\\f6eef5067798477cbffbaddd61380c09",
+    "declaration": {
+      "name": "analysis__pcc_tolerance",
+      "description": "analysis.pcc_tolerance@1.0.0: Propagate independent length/bend standard deviations to first-order tip covariance, principal error directions and ranked tolerance contributions. Geometric approximation, no task assessment. Permission: analysis. Requires: []. Backend solves: 0.",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "length_m": {
+            "description": "Positive arc length in meters; geometry only, no design authorization.",
+            "exclusiveMinimum": 0,
+            "title": "Length M",
+            "type": "number"
+          },
+          "bend_rad": {
+            "description": "[theta*cos(phi), theta*sin(phi)] in radians; norm <= pi.",
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Bend Rad",
+            "type": "array"
+          },
+          "frame": {
+            "const": "base_origin_x_forward_yz_bending",
+            "default": "base_origin_x_forward_yz_bending",
+            "title": "Frame",
+            "type": "string"
+          },
+          "length_std_m": {
+            "minimum": 0,
+            "title": "Length Std M",
+            "type": "number"
+          },
+          "bend_std_rad": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "minimum": 0,
+                "type": "number"
+              }
+            ],
+            "title": "Bend Std Rad",
+            "type": "array"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0
+          }
+        },
+        "required": [
+          "length_m",
+          "bend_rad",
+          "length_std_m",
+          "bend_std_rad",
+          "reason",
+          "evidence"
+        ],
+        "title": "PCCTolerance",
+        "type": "object"
+      }
+    },
+    "result": {
+      "contract_version": "1.0",
+      "tool_id": "analysis.pcc_tolerance",
+      "tool_version": "1.0.0",
+      "call_id": "e6cf5f476e0d436ea048fc04608eb1d3",
+      "caller": {
+        "actor_id": "engineering-closeout",
+        "origin": "development",
+        "transport": "offline_native_fixture",
+        "model_request_index": null
+      },
+      "execution_status": "completed",
+      "solver_status": "NOT_APPLICABLE",
+      "analysis_status": "LOCAL_GEOMETRY_ONLY",
+      "task_status": "NOT_ASSESSED",
+      "summary": "analysis.pcc_tolerance: execution=completed; solver=NOT_APPLICABLE; analysis=LOCAL_GEOMETRY_ONLY; task=NOT_ASSESSED",
+      "error": null,
+      "evidence": [
+        {
+          "ref": "service_calls/e6cf5f476e0d436ea048fc04608eb1d3/data.json",
+          "sha256": "3719ba4e97fa2c1d24572d4793a7e1a0b591a67d426d5d4ae546c01ee78c3571",
+          "role": "detail"
+        }
+      ],
+      "cost": {
+        "charged": {
+          "tool_calls": 1,
+          "backend_solves": 0,
+          "model_calls": 0
+        },
+        "elapsed_s": 0.32800000003771856,
+        "cache_hit": false,
+        "billing_owner": "services",
+        "recovery": "Charged before execution; interrupted calls never automatically replayed."
+      },
+      "provenance": {
+        "arguments": {
+          "length_m": 0.4,
+          "bend_rad": [
+            0.3,
+            -0.2
+          ],
+          "frame": "base_origin_x_forward_yz_bending",
+          "length_std_m": 0.001,
+          "bend_std_rad": [
+            0.01,
+            0.02
+          ]
+        },
+        "requested_tool_version": "1.0.0",
+        "config_hash": "dcd56f1ab00067eb6d9490b546d4710cfa87487faa397f358ffb54c4b236ad40",
+        "imports": [],
+        "implementation_hashes": {
+          "schemas/pcc_tolerance.py": "97a46454b126a706005808e1d7d0c4bf1431af10b1e4070045d6fa34851f0b50",
+          "schemas/public_tools.py": "5938e19ccd4ca637f88399a43eee88a8a80ceedc22c992a99c5474e16d488bc5",
+          "tools/model_provider.py": "533f8af05b788042f8a174f91f67e595fff6134b66aa0ce66254af7ed0dba1e4",
+          "tools/pcc_math.py": "b2d9a741a29c44548e9fd6d97d3ae1f120429d096b96a632f9b3454ce66ede3f",
+          "tools/pcc_tolerance.py": "4554d17dcdee6554b2711e6723f5ccd4be2707df9ed56f45d4007bcf0b2d3799",
+          "tools/public_feedback.py": "08cee904dc73ef364b104d9a8c65b6c46853464bbbc974f4860f81f401053ac0",
+          "tools/public_services.py": "9550a34f6c413e89687f4bf7fc03daeb55f48749f0dcbd44ddc78042240359fb",
+          "tools/service_execution.py": "3cc4f1bcfac6b82544465383a4ccffea72a58a1a35e6ad4ad6635d463fab572d",
+          "tools/service_worker.py": "71f07ef01c75eba46d899f55846b67298051271cf4966c4ad4b0b7fefce74081",
+          "tools/tool_registry.py": "5690d5459e2b18f4fbd4853f2893b380ded920690d32e4df6a5ac298e056e79f"
+        },
+        "cache_key": "f750a6b41de558cbb496151df2e341939c74618b030d567d9822b8fb9c4eccc6",
+        "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+        "feedback_semantics_version": "1.1.0",
+        "raw_failure_code": null,
+        "raw_solver_status": null
+      },
+      "epistemics": {
+        "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+        "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+        "unverified": [
+          "Causal attribution and physical calibration unless separately evidenced."
+        ],
+        "visual_access": "not_applicable"
+      },
+      "details_ref": "service_calls/e6cf5f476e0d436ea048fc04608eb1d3/data.json"
+    },
+    "data": {
+      "nominal_tip_m": [
+        0.39138949261604145,
+        0.05935281013741167,
+        -0.03956854009160779
+      ],
+      "tip_covariance_m2": [
+        [
+          1.3904276709665684e-06,
+          -6.033248700715808e-07,
+          1.964477842985828e-06
+        ],
+        [
+          -6.033248700715808e-07,
+          3.820967227934479e-06,
+          1.7981787005323267e-07
+        ],
+        [
+          1.964477842985828e-06,
+          1.7981787005323267e-07,
+          1.545836146063784e-05
+        ]
+      ],
+      "tip_axis_std_m": [
+        0.0011791639711959353,
+        0.001954729451339617,
+        0.003931712281009108
+      ],
+      "rms_position_deviation_m": 0.004546400373871497,
+      "principal_variances_m2": [
+        1.572831498209561e-05,
+        3.956692124373041e-06,
+        9.84749253070233e-07
+      ],
+      "principal_directions": [
+        [
+          0.13540578000314535,
+          0.008101061656153985,
+          0.9907571082469115
+        ],
+        [
+          -0.21341436396080388,
+          0.9767321461931768,
+          0.02118074238726486
+        ],
+        [
+          0.9675327301941498,
+          0.21430979304015327,
+          -0.13398406103018864
+        ]
+      ],
+      "parameter_contributions": [
+        {
+          "parameter": "bend_v_rad",
+          "variance_contribution_m2": 1.572688615860151e-05,
+          "fraction_of_total": 0.7608646122886547
+        },
+        {
+          "parameter": "bend_u_rad",
+          "variance_contribution_m2": 3.953656698647184e-06,
+          "fraction_of_total": 0.19127737307956272
+        },
+        {
+          "parameter": "length_m",
+          "variance_contribution_m2": 9.892135022901946e-07,
+          "fraction_of_total": 0.04785801463178265
+        }
+      ],
+      "model": {
+        "model_id": "single_section_inextensible_pcc_v1",
+        "quantities": {
+          "tip": "m",
+          "tip_jacobian": "m/rad"
+        },
+        "frame": "base_origin_x_forward_yz_bending",
+        "domain": "geometric_approximation",
+        "calibrated": false,
+        "assumptions": [
+          "single section",
+          "constant curvature",
+          "inextensible",
+          "fixed base"
+        ],
+        "unavailable": [
+          "mass_matrix",
+          "coriolis",
+          "gravity_load",
+          "contact_force",
+          "physical_calibration"
+        ]
+      },
+      "input": {
+        "length_m": 0.4,
+        "bend_rad": [
+          0.3,
+          -0.2
+        ],
+        "frame": "base_origin_x_forward_yz_bending",
+        "length_std_m": 0.001,
+        "bend_std_rad": [
+          0.01,
+          0.02
+        ]
+      },
+      "assumptions": [
+        "Centered independent parameter perturbations; standard deviations are supplied, not calibrated.",
+        "First-order covariance A diag(sigma^2) A^T; no finite-range bound, Gaussian assumption or confidence level.",
+        "Local approximation can be poor for large tolerances or near the PCC branch boundary.",
+        "Equal-fraction tolerance reduction benefits rank by variance contribution; manufacturing cost is not modeled.",
+        "Directions in a repeated-eigenvalue subspace are not unique. Geometry only; no task or dynamics prediction."
+      ],
+      "backend_solves": 0
+    },
+    "read_result": {
+      "contract_version": "1.0",
+      "tool_id": "evidence.read_json",
+      "tool_version": "1.1.0",
+      "call_id": "7bf5eea2508c4b208a5b9c205921d2fa",
+      "caller": {
+        "actor_id": "engineering-closeout",
+        "origin": "development",
+        "transport": "offline_native_fixture",
+        "model_request_index": null
+      },
+      "execution_status": "completed",
+      "solver_status": "NOT_APPLICABLE",
+      "analysis_status": "NOT_ASSESSED",
+      "task_status": "NOT_ASSESSED",
+      "summary": "evidence.read_json: execution=completed; solver=NOT_APPLICABLE; analysis=NOT_ASSESSED; task=NOT_ASSESSED",
+      "error": null,
+      "evidence": [
+        {
+          "ref": "service_calls/e6cf5f476e0d436ea048fc04608eb1d3/data.json",
+          "sha256": "3719ba4e97fa2c1d24572d4793a7e1a0b591a67d426d5d4ae546c01ee78c3571",
+          "role": "input"
+        },
+        {
+          "ref": "service_calls/7bf5eea2508c4b208a5b9c205921d2fa/data.json",
+          "sha256": "9515be2514b6e7be577297adb35d8faa59d2a40d87d8d7933b2bdce7266d1a30",
+          "role": "detail"
+        },
+        {
+          "ref": "service_calls/e6cf5f476e0d436ea048fc04608eb1d3/data.json",
+          "sha256": "3719ba4e97fa2c1d24572d4793a7e1a0b591a67d426d5d4ae546c01ee78c3571",
+          "role": "output"
+        }
+      ],
+      "cost": {
+        "charged": {
+          "tool_calls": 1,
+          "backend_solves": 0,
+          "model_calls": 0
+        },
+        "elapsed_s": 0.01600000000325963,
+        "cache_hit": false,
+        "billing_owner": "services",
+        "recovery": "Charged before execution; interrupted calls never automatically replayed."
+      },
+      "provenance": {
+        "arguments": {
+          "evidence_ref": "service_calls/e6cf5f476e0d436ea048fc04608eb1d3/data.json",
+          "pointer": "/parameter_contributions",
+          "offset": 0,
+          "limit": 10,
+          "max_bytes": 4000
+        },
+        "requested_tool_version": null,
+        "config_hash": "dcd56f1ab00067eb6d9490b546d4710cfa87487faa397f358ffb54c4b236ad40",
+        "imports": [],
+        "implementation_hashes": {
+          "schemas/public_tools.py": "5938e19ccd4ca637f88399a43eee88a8a80ceedc22c992a99c5474e16d488bc5",
+          "tools/dynamic_context.py": "a02adb769b7f1bc123e7500d23dae1d5b3e334efacdd568e791d25f434a61d22",
+          "tools/public_feedback.py": "08cee904dc73ef364b104d9a8c65b6c46853464bbbc974f4860f81f401053ac0",
+          "tools/public_services.py": "9550a34f6c413e89687f4bf7fc03daeb55f48749f0dcbd44ddc78042240359fb",
+          "tools/service_execution.py": "3cc4f1bcfac6b82544465383a4ccffea72a58a1a35e6ad4ad6635d463fab572d",
+          "tools/service_worker.py": "71f07ef01c75eba46d899f55846b67298051271cf4966c4ad4b0b7fefce74081",
+          "tools/tool_registry.py": "5690d5459e2b18f4fbd4853f2893b380ded920690d32e4df6a5ac298e056e79f"
+        },
+        "cache_key": "a008bb07885882196686a2be853ea1c1934eba416c365d1dd06361e026557fee",
+        "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+        "feedback_semantics_version": "1.1.0",
+        "raw_failure_code": null,
+        "raw_solver_status": null
+      },
+      "epistemics": {
+        "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+        "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+        "unverified": [
+          "Causal attribution and physical calibration unless separately evidenced."
+        ],
+        "visual_access": "not_applicable"
+      },
+      "details_ref": "service_calls/7bf5eea2508c4b208a5b9c205921d2fa/data.json"
+    },
+    "validation": "Real isolated mathematics through public native adapter; offline provider response, zero dynamics/API calls"
+  },
+  "video_cache": {
+    "root": "D:\\softrobot-agent\\runs\\engineering_closeout\\36b299310fa64508b1e1a6a7ed6e8477",
+    "result": {
+      "contract_version": "1.0",
+      "tool_id": "visualization.render_simulation_video",
+      "tool_version": "1.2.0",
+      "call_id": "7fe65fb8624d48eeafaa97b5d6d352d8",
+      "caller": {
+        "actor_id": "engineering-closeout",
+        "origin": "development",
+        "transport": "offline_native_fixture",
+        "model_request_index": null
+      },
+      "execution_status": "completed",
+      "solver_status": "NOT_APPLICABLE",
+      "analysis_status": "NOT_ASSESSED",
+      "task_status": "NOT_ASSESSED",
+      "summary": "Saved video: observations/videos/94ab100ca3954b1e0389/video.mp4; 0.20000000000000015\u20130.6000000000000004 s. Zero dynamics solves; reference received, frames not viewed.",
+      "error": null,
+      "evidence": [
+        {
+          "ref": "candidates/c071/mujoco/6020a8bd03ef/result.json",
+          "sha256": "1b13b97273cff005c1b657a45d85def9d29274fa516764dc6e2f83173392d787",
+          "role": "input"
+        },
+        {
+          "ref": "service_calls/7fe65fb8624d48eeafaa97b5d6d352d8/data.json",
+          "sha256": "df7a27d4d9e113f0e566cfe620a1f756c469da3345daa98a360b7f192445f5e4",
+          "role": "detail"
+        },
+        {
+          "ref": "observations/videos/94ab100ca3954b1e0389/video.mp4",
+          "sha256": "6cc5e41afd621ad11ea4ff28ce93c4b227beacf9d9c65cee4252ad2b79135132",
+          "role": "output"
+        },
+        {
+          "ref": "observations/videos/94ab100ca3954b1e0389/preview.png",
+          "sha256": "0d5a086bfbbaea2a3fb4ea24496dd757442587a3f7943012571efdc2998148bb",
+          "role": "output"
+        },
+        {
+          "ref": "observations/videos/94ab100ca3954b1e0389/native_video.json",
+          "sha256": "c956ab297ee7011f809cbaf96a2638480f621daeef2b68c266cda69b4109fe8e",
+          "role": "output"
+        },
+        {
+          "ref": "candidates/c071/mujoco/6020a8bd03ef/result.json",
+          "sha256": "1b13b97273cff005c1b657a45d85def9d29274fa516764dc6e2f83173392d787",
+          "role": "output"
+        }
+      ],
+      "cost": {
+        "charged": {
+          "tool_calls": 1,
+          "backend_solves": 0,
+          "model_calls": 0
+        },
+        "elapsed_s": 0.39000000001396984,
+        "cache_hit": true,
+        "billing_owner": "services",
+        "recovery": "Charged before execution; interrupted calls never automatically replayed."
+      },
+      "provenance": {
+        "arguments": {
+          "result_ref": "candidates/c071/mujoco/6020a8bd03ef/result.json",
+          "backend": "mujoco",
+          "t_start_s": 0.2,
+          "t_end_s": 0.6,
+          "fps": 10
+        },
+        "requested_tool_version": null,
+        "config_hash": "5102c5dae00b9fe7a5a201443d2dfaf1dfb54ba730a1b8a4e0f3f833fae5b4d9",
+        "imports": [
+          {
+            "ref": "candidates/c071/mujoco/6020a8bd03ef/canonical_result.json",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "candidates/c071/mujoco/6020a8bd03ef/canonical_result.json",
+            "sha256": "55acdb3a68e3abbe086cf390ecbe4c39cd6ab0e4bf46eade9dd4401d500d3ef3"
+          },
+          {
+            "ref": "candidates/c071/mujoco/6020a8bd03ef/diagnosis.json",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "candidates/c071/mujoco/6020a8bd03ef/diagnosis.json",
+            "sha256": "32d12ccec2c960f51ae4cd663b1ac2b2588192b41ebcb80e09015553f6de5a1e"
+          },
+          {
+            "ref": "candidates/c071/mujoco/6020a8bd03ef/identity.json",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "candidates/c071/mujoco/6020a8bd03ef/identity.json",
+            "sha256": "4b8095582137332aa4956790d29d599092eec1052165ab72b9f9e2ace4f63c22"
+          },
+          {
+            "ref": "candidates/c071/mujoco/6020a8bd03ef/result.json",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "candidates/c071/mujoco/6020a8bd03ef/result.json",
+            "sha256": "1b13b97273cff005c1b657a45d85def9d29274fa516764dc6e2f83173392d787"
+          },
+          {
+            "ref": "candidates/c071/mujoco/6020a8bd03ef/robot.xml",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "candidates/c071/mujoco/6020a8bd03ef/robot.xml",
+            "sha256": "c4567f0326b1a4ceba26656c33db7f9a61c1a2f675b211cc95a8782d4734dc8c"
+          },
+          {
+            "ref": "candidates/c071/mujoco/6020a8bd03ef/robot_ir.json",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "candidates/c071/mujoco/6020a8bd03ef/robot_ir.json",
+            "sha256": "83c23e54e9ce939c33e296062bcdf7d86e0f1181583eb9b9af1bb9d3239eb83b"
+          },
+          {
+            "ref": "candidates/c071/mujoco/6020a8bd03ef/shared_input.json",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "candidates/c071/mujoco/6020a8bd03ef/shared_input.json",
+            "sha256": "442b8ad1f3ee54c845d51d9d71e32f24a0eb11180077e4abe3c474ccdbb97549"
+          },
+          {
+            "ref": "candidates/c071/mujoco/6020a8bd03ef/trajectory.json.gz",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "candidates/c071/mujoco/6020a8bd03ef/trajectory.json.gz",
+            "sha256": "32f6751cf11d329fd15a25a79d6336c1183a14ab83c7eb8429e06f40c9333f47"
+          },
+          {
+            "ref": "observations/videos/94ab100ca3954b1e0389/video.mp4",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "observations/videos/94ab100ca3954b1e0389/video.mp4",
+            "sha256": "6cc5e41afd621ad11ea4ff28ce93c4b227beacf9d9c65cee4252ad2b79135132"
+          },
+          {
+            "ref": "observations/videos/94ab100ca3954b1e0389/preview.png",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "observations/videos/94ab100ca3954b1e0389/preview.png",
+            "sha256": "0d5a086bfbbaea2a3fb4ea24496dd757442587a3f7943012571efdc2998148bb"
+          },
+          {
+            "ref": "observations/videos/94ab100ca3954b1e0389/native_video.json",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "observations/videos/94ab100ca3954b1e0389/native_video.json",
+            "sha256": "c956ab297ee7011f809cbaf96a2638480f621daeef2b68c266cda69b4109fe8e"
+          }
+        ],
+        "implementation_hashes": {
+          "schemas/public_tools.py": "5938e19ccd4ca637f88399a43eee88a8a80ceedc22c992a99c5474e16d488bc5",
+          "tools/public_feedback.py": "08cee904dc73ef364b104d9a8c65b6c46853464bbbc974f4860f81f401053ac0",
+          "tools/public_services.py": "9550a34f6c413e89687f4bf7fc03daeb55f48749f0dcbd44ddc78042240359fb",
+          "tools/service_execution.py": "3cc4f1bcfac6b82544465383a4ccffea72a58a1a35e6ad4ad6635d463fab572d",
+          "tools/service_worker.py": "71f07ef01c75eba46d899f55846b67298051271cf4966c4ad4b0b7fefce74081",
+          "tools/simulation_video.py": "edfeb7fe7aee531f2bfe8adaff0710c7bd9fcfa559a08a2136a531f62dcf394f",
+          "tools/tool_registry.py": "5690d5459e2b18f4fbd4853f2893b380ded920690d32e4df6a5ac298e056e79f"
+        },
+        "cache_key": "33e3bb908f1a68fc8e870ae60ba5067c7f1ba37c588ef68005c64b139d48f5a3",
+        "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+        "feedback_semantics_version": "1.1.0",
+        "raw_failure_code": null,
+        "raw_solver_status": null
+      },
+      "epistemics": {
+        "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+        "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+        "unverified": [
+          "Causal attribution and physical calibration unless separately evidenced."
+        ],
+        "visual_access": "reference_only"
+      },
+      "details_ref": "service_calls/7fe65fb8624d48eeafaa97b5d6d352d8/data.json"
+    },
+    "validation": "Existing MuJoCo video reused, no frames rendered or encoded"
+  },
+  "timeout": {
+    "root": "D:\\softrobot-agent\\runs\\engineering_closeout\\e7b44d465df743f493ae42d56eb23548",
+    "result": {
+      "contract_version": "1.0",
+      "tool_id": "visualization.render_simulation_video",
+      "tool_version": "1.2.0",
+      "call_id": "f2e5ded0c53a40dfb7ce1b55bc4501bb",
+      "caller": {
+        "actor_id": "engineering-closeout",
+        "origin": "development",
+        "transport": "offline_native_fixture",
+        "model_request_index": null
+      },
+      "execution_status": "failed",
+      "solver_status": "NOT_APPLICABLE",
+      "analysis_status": "NOT_ASSESSED",
+      "task_status": "NOT_ASSESSED",
+      "summary": "TIMEOUT: isolated worker terminated; reservation retained",
+      "error": {
+        "category": "timeout",
+        "code": "TIMEOUT",
+        "message": "TIMEOUT: isolated worker terminated; reservation retained",
+        "retryable": false,
+        "recovery_condition": "Inspect partial artifacts and charged reservation before an explicitly authorized retry.",
+        "next_actions": [
+          "Inspect partial artifacts and charged reservation before an explicitly authorized retry."
+        ]
+      },
+      "evidence": [
+        {
+          "ref": "input.json",
+          "sha256": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f",
+          "role": "input"
+        },
+        {
+          "ref": "service_calls/f2e5ded0c53a40dfb7ce1b55bc4501bb/data.json",
+          "sha256": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f",
+          "role": "detail"
+        }
+      ],
+      "cost": {
+        "charged": {
+          "tool_calls": 1,
+          "backend_solves": 0,
+          "model_calls": 0
+        },
+        "elapsed_s": 2.030999999959022,
+        "cache_hit": false,
+        "billing_owner": "services",
+        "recovery": "Charged before execution; interrupted calls never automatically replayed."
+      },
+      "provenance": {
+        "arguments": {
+          "result_ref": "input.json",
+          "backend": "mujoco",
+          "t_start_s": null,
+          "t_end_s": null,
+          "fps": 25
+        },
+        "requested_tool_version": null,
+        "config_hash": "dcd56f1ab00067eb6d9490b546d4710cfa87487faa397f358ffb54c4b236ad40",
+        "imports": [],
+        "implementation_hashes": {
+          "schemas/public_tools.py": "5938e19ccd4ca637f88399a43eee88a8a80ceedc22c992a99c5474e16d488bc5",
+          "tools/public_feedback.py": "08cee904dc73ef364b104d9a8c65b6c46853464bbbc974f4860f81f401053ac0",
+          "tools/public_services.py": "9550a34f6c413e89687f4bf7fc03daeb55f48749f0dcbd44ddc78042240359fb",
+          "tools/service_execution.py": "3cc4f1bcfac6b82544465383a4ccffea72a58a1a35e6ad4ad6635d463fab572d",
+          "tools/service_worker.py": "71f07ef01c75eba46d899f55846b67298051271cf4966c4ad4b0b7fefce74081",
+          "tools/simulation_video.py": "edfeb7fe7aee531f2bfe8adaff0710c7bd9fcfa559a08a2136a531f62dcf394f",
+          "tools/tool_registry.py": "5690d5459e2b18f4fbd4853f2893b380ded920690d32e4df6a5ac298e056e79f"
+        },
+        "cache_key": "8e16ca0ea0be3b2165cd5a6ac6f6c3c3bff171dad3549d3b8f341eb2bb997b8d",
+        "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+        "feedback_semantics_version": "1.1.0",
+        "raw_failure_code": "TOOL_ERROR",
+        "raw_solver_status": null
+      },
+      "epistemics": {
+        "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+        "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+        "unverified": [
+          "Causal attribution and physical calibration unless separately evidenced."
+        ],
+        "visual_access": "not_applicable"
+      },
+      "details_ref": "service_calls/f2e5ded0c53a40dfb7ce1b55bc4501bb/data.json"
+    },
+    "elapsed_s": 2.030999999959022,
+    "child_pid": 32964,
+    "validation": "Injected stuck binding; actual worker/job termination; no video or engine started"
+  }
+}

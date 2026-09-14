@@ -27,6 +27,7 @@ class ServiceTool:
     output_contract: str = 'saved JSON detail + PublicResult@1.0'
     output_schema: type | None = None
     analysis_scope: str = 'not_assessed'
+    process_tree: bool = False
 
     def __post_init__(self):
         if self.permission not in ('analysis','read_evidence','derived_artifacts'):
@@ -45,6 +46,7 @@ class ServiceTool:
 def service_tools():
     from schemas.dynamic_workbench import Read, RenderVideo
     from schemas.framework import PCCCondition, RuleQuery, PCCConditionResult, SignalRuleResult
+    from schemas.pcc_tolerance import PCCTolerance, PCCToleranceResult
     definitions = [
         ServiceTool('analysis.pcc_jacobian',PCCJacobian,'analysis',
             'Single section inextensible PCC tip/Jacobian, m and m/rad, base +x, yz bending; norm(bend)<=pi. Geometry only.',
@@ -54,7 +56,8 @@ def service_tools():
         ServiceTool('diagnostics.saved_trajectory',SavedDiagnosis,'read_evidence','Legacy reach signal rules; saved physical time, no simulation or scoring.',
             'tools.public_services:saved_diagnosis',input_refs=('result_ref',),sources=('tools/trajectory_diagnosis.py',)),
         ServiceTool('visualization.render_simulation_video',RenderVideo,'derived_artifacts','Render saved trajectory; native cache and bounded encoder, zero solves.',
-            'tools.simulation_video:render_simulation_video',adapter='keywords',input_refs=('result_ref',),timeout_s=180.,isolation='inline',
+            'tools.simulation_video:_render_simulation_video',adapter='keywords',input_refs=('result_ref',),timeout_s=180.,process_tree=True,
+            version='1.2.0',compatible_versions=('1.0.0','1.1.0'),
             sources=('tools/simulation_video.py',)),
         ServiceTool('analysis.pcc_condition',PCCCondition,'analysis','Singular values/rank of the local PCC tip Jacobian; geometric conditioning, no controllability or task claim.',
             'tools.math_extensions:pcc_condition',adapter='arguments',cache=True,isolation='process',
@@ -64,6 +67,11 @@ def service_tools():
             'tools.diagnostic_rules:run_saved_rule',input_refs=('result_ref',),
             compatible_versions=(),output_schema=SignalRuleResult,analysis_scope='sampled_rules',
             sources=('tools/observation_contract.py','tools/rules/contact_presence.py','schemas/framework.py')),
+        ServiceTool('analysis.pcc_tolerance',PCCTolerance,'analysis',
+            'Propagate independent length/bend standard deviations to first-order tip covariance, principal error directions and ranked tolerance contributions. Geometric approximation, no task assessment.',
+            'tools.pcc_tolerance:analyze',adapter='arguments',version='1.0.0',compatible_versions=(),
+            cache=True,output_schema=PCCToleranceResult,analysis_scope='geometry',
+            sources=('schemas/pcc_tolerance.py','tools/model_provider.py','tools/pcc_math.py')),
     ]
     result={d.tool_id:d for d in definitions}
     if len(result)!=len(definitions):raise ValueError('Duplicate tool ID')

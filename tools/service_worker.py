@@ -10,6 +10,9 @@ def main():
     try:
         definition=service_tools()[request['tool_id']]
         if definition.isolation!='process':raise ValueError('INVALID_WORKER_BINDING')
+        if definition.process_tree:
+            from tools.service_execution import contain_worker_children
+            job_handle=contain_worker_children()
         data=execute_binding(definition,Path(request['root']),request['registry'],request['arguments'])
         output=dict(data=data,registry=request['registry'])
     except Exception as exc:output=dict(error=str(exc))

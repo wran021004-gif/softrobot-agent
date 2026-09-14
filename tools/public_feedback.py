@@ -25,7 +25,7 @@ def error_info(message, code='TOOL_ERROR'):
         recovery_condition=action, next_actions=[action])
 
 
-def normalize(tool_id, result, *, call_id, caller, evidence=(), cost=None, details_ref=None, provenance=None,analysis_scope=None):
+def normalize(tool_id, result, *, call_id, caller, evidence=(), cost=None, details_ref=None, provenance=None,analysis_scope=None,tool_version=None):
     data = result.get('data') or {}
     status = result.get('status', 'failed')
     raw_solver = data.get('computation_status')
@@ -67,7 +67,7 @@ def normalize(tool_id, result, *, call_id, caller, evidence=(), cost=None, detai
         summary=f"Saved video: {data['video_ref']}; {data.get('t_start_s')}–{data.get('t_end_s')} s. Zero dynamics solves; reference received, frames not viewed."
     elif analysis=='SAMPLED_DIAGNOSTIC_RULES':
         summary=f"Saved samples: {len(data.get('queries',[]))} entity summaries, {len(data.get('events',[]))} rule events. Read details for phases, thresholds and hypotheses; no task evaluation."
-    return PublicResult(tool_id=tool_id, call_id=call_id, caller=Caller.model_validate(caller),
+    return PublicResult(tool_id=tool_id, tool_version=tool_version,call_id=call_id, caller=Caller.model_validate(caller),
         execution_status=status, solver_status=solver, analysis_status=analysis, task_status=task,
         summary=summary[:1200],
         error=err, evidence=list(evidence), cost=cost or {}, details_ref=details_ref,
@@ -96,7 +96,10 @@ def runner_feedback(book, runtime, name, result, ref, *, before=None, elapsed_s=
             refs.append(dict(ref=value, sha256=registry[value]['sha256'], role='output'))
     used = getattr(book, 'ledger', {}).get('used', {})
     charged = {k: v-before.get(k, 0) for k, v in used.items()} if before is not None else {}
+    from tools.public_catalog import entries
+    entry=entries().get(runtime+'.'+name)
     return normalize(runtime+'.'+name, result, call_id=ref, caller=caller, evidence=refs,
+        tool_version=entry['tool_version'] if entry else None,
         details_ref=ref, cost=dict(charged=charged, elapsed_s=elapsed_s, billing_owner=runtime,
             accounting='Existing reservations are authoritative; no extra backend or model charges from normalization.'),
         provenance=dict(legacy_status=result.get('status'), run_root=str(book.root),

@@ -127,6 +127,18 @@ def valid_video_manifest(root, manifest):
 
 def render_simulation_video(root, evidence_registry, result_ref, backend,
                             t_start_s=None, t_end_s=None, fps=25):
+    """CLI/campaign compatibility entry; same bounded worker as public services."""
+    from uuid import uuid4
+    from tools.tool_registry import service_tools
+    from tools.service_execution import execute
+    root=Path(root).resolve()
+    folder=root/'video_calls'/uuid4().hex;folder.mkdir(parents=True)
+    args=RenderVideo(result_ref=result_ref,backend=backend,t_start_s=t_start_s,t_end_s=t_end_s,fps=fps).model_dump()
+    return execute(service_tools()['visualization.render_simulation_video'],root,evidence_registry,args,folder)
+
+
+def _render_simulation_video(root, evidence_registry, result_ref, backend,
+                            t_start_s=None, t_end_s=None, fps=25):
     """Shared dispatch/CLI implementation. Mutates only derived files and registry."""
     started = time.monotonic(); root = Path(root).resolve()
     params = RenderVideo(result_ref=result_ref,backend=backend,t_start_s=t_start_s,t_end_s=t_end_s,fps=fps).model_dump()
