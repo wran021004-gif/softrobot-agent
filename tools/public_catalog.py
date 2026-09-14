@@ -4,7 +4,7 @@ Legacy wire names are scoped aliases. Library manifests never grant execution.
 """
 from schemas.public_tools import PCCJacobian, PublicResult, ToolCall, SavedDiagnosis
 
-VERSION = '1.0.0'
+VERSION = '1.1.0'
 PCC_DESCRIPTION = ('Analytic single-section, inextensible PCC tip and local Jacobian. '
     'Origin at base, +x straight, bending in yz. No gravity, contact, elasticity, '
     'dynamics, calibration or task scoring; norm(bend_rad)<=pi. Outputs m and m/rad.')
@@ -45,21 +45,28 @@ def entries():
             assumptions=['Frozen V1 task route and session exploration envelope; inspect request.json.'])
     for name, (schema, permission, description) in dynamics.items():
         out['dynamics.'+name] = _entry('dynamics.'+name, 'dynamics', name, schema, permission,
-            description, implementation='tools.dynamic_campaign:DynamicCampaign.dispatch',
+            description, implementation='tools.dynamic_actions:'+name,
             scope='campaign grant and optional subordinate experiment',
             assumptions=['Frozen numerical route; task, duration, bounds and resource limits come from saved request/grant.'])
     for name in ('stop_design', 'capability_missing'):
         out['workbench.'+name] = _entry('workbench.'+name, 'workbench', name, NoArguments,
             'session_control', 'Record a cited terminal decision with reason; no numerical execution.',
             implementation='tools.workbench:Workbench.submit', scope='design_session control', assumptions=['Only changes workflow status; never scientific truth.'])
-    for tool_id, schema, permission, description, implementation in (
-        ('analysis.pcc_jacobian', PCCJacobian, 'analysis', PCC_DESCRIPTION, 'tools.public_services:pcc_jacobian'),
-        ('evidence.read_json', Read, 'read_evidence', 'Hash-verified registered JSON, bounded JSON Pointer pages; never simulate or score.', 'tools.public_services:read_json'),
-        ('diagnostics.saved_trajectory', SavedDiagnosis, 'read_evidence', 'Query registered saved trajectory by entity and physical time. Default interval comes from saved state/solver samples. Existing diagnostic rules remain model-specific; no simulation or scoring.', 'tools.public_services:saved_diagnosis'),
-        ('visualization.render_simulation_video', RenderVideo, 'derived_artifacts', dynamics['render_simulation_video'][2], 'tools.simulation_video:render_simulation_video')):
+    from tools.tool_registry import service_tools
+    for definition in service_tools().values():
+        tool_id,schema,permission,description,implementation=(definition.tool_id,definition.schema,definition.permission,definition.description,definition.binding)
         out[tool_id] = _entry(tool_id, 'services', tool_id.replace('.', '__'), schema, permission,
             description, implementation=implementation, scope='independent configured service session',
             assumptions=[PCC_DESCRIPTION] if permission == 'analysis' else ['Saved evidence only; preserve recorded frame, time phases and model identity.'])
+        out[tool_id].update(tool_version=definition.version,registered=True,implemented=bool(definition.binding),
+            accepted_versions=[definition.version,*definition.compatible_versions],
+            callable=bool(definition.binding),permission_granted=None,
+            execution=dict(adapter=definition.adapter,isolation=definition.isolation,timeout_s=definition.timeout_s,
+                cache=definition.cache,resources=dict(definition.resources),input_refs=list(definition.input_refs)),
+            detail_contract=definition.output_contract)
+        out[tool_id]['analysis_scope']=definition.analysis_scope
+        out[tool_id]['detail_schema']=definition.output_schema.model_json_schema() if definition.output_schema else None
+        out[tool_id]['implementation_status']='IMPLEMENTED' if definition.binding else 'PLANNED'
     return out
 
 
@@ -68,6 +75,7 @@ def _entry(tool_id, runtime, alias, schema, permission, purpose, *, requires=(),
     numerical = alias in ('simulate_candidate', 'evaluate_candidate', 'evaluate_design', 'optimize_matlab')
     video = tool_id.endswith('render_simulation_video')
     return dict(tool_id=tool_id, tool_version=VERSION, contract_version='1.0', runtime=runtime,
+        registered=True,implemented=True,permission_granted=None,accepted_versions=['1.0.0',VERSION],
         wire_name=alias, schema=schema, permission=permission, purpose=purpose,
         requires=list(requires), scope=scope, implementation=implementation,
         implementation_status='IMPLEMENTED', callable=True,
@@ -99,7 +107,7 @@ def catalog(runtime=None):
         else:bundle_paths[path]=name
     return dict(contract_version='1.0', tools=tools, library=library,library_bundle_aliases=aliases,
         unavailable=['Host video/frame inspection: references do not expose pixels to a text-only model.',
-                     'General optimizer/evaluator plugin and model-based controller adapters: roadmap only; existing scoped tools remain explicit.'],
+                     'New task semantics, general dynamics quantities, force/torque actuator channels and multi-agent scheduling need explicit adapters.'],
         call_schema=ToolCall.model_json_schema(), result_schema=PublicResult.model_json_schema(),
         alias_rule='Bare names resolve only within a bound runtime. Cross-runtime public calls require tool_id. No silent fallback.')
 
@@ -108,7 +116,7 @@ def native_tools(runtime):
     """Provider wire schema generated from exactly the same registered inputs."""
     out = []
     for info in entries().values():
-        if info['runtime'] != runtime:
+        if info['runtime'] != runtime or not info['implemented']:
             continue
         s = info['schema'].model_json_schema()
         s['properties'].update(reason={'type':'string','minLength':1},
@@ -161,11 +169,11 @@ def workbench_native_tools():
 def markdown_catalog(directory):
     """Generated documentation is a projection, never another registry."""
     clean=lambda value:str(value).replace('|',' / ').replace('\n',' ')
-    lines=['# 统一工具清单（生成视图）','',
-        '由 `python examples/public_tools.py catalog --markdown --output docs/public_tools_catalog.md` 生成。',
-        '版本 1.0 / 工具版本 1.0.0。输入/输出 schema、依赖和完整约束请读取 JSON catalog；[接口规范](public_tools.md)。',
-        '所有可调用项仍受绑定会话的权限、证据、预算和后端依赖检查。','',
-        '| 公共身份 | 权限 | 用途 | 实现入口 |','| --- | --- | --- | --- |']
+    lines=['# Unified tool directory (generated)', '',
+        'Generated by `python examples/public_tools.py catalog --markdown --output docs/public_tools_catalog.md`.',
+        f'Public contract 1.0 / tool version {VERSION}. Input, detail and result schemas are in the JSON catalog.',
+        'See [framework extensions and migration](framework_extensions.md). Registration and implementation do not grant permission.', '',
+        '| Public identity | Required permission | Purpose | Implementation binding |', '| --- | --- | --- | --- |']
     for tool in directory['tools']:
         lines.append('| '+' | '.join(clean(tool[k]) for k in ('tool_id','permission','purpose','implementation'))+' |')
     lines+=['','## 库能力（不授予公共调用权限）','',
@@ -176,6 +184,6 @@ def markdown_catalog(directory):
         impl=tool['manifest'].get('implementation') or {}
         entry=impl.get('module','')+':'+impl.get('callable','') if impl else '—'
         lines.append('| '+' | '.join(clean(x) for x in (tool['tool_id'],tool['implementation_status'],tool['declaration_check'],entry))+' |')
-    lines+=['','Bundle 别名：`'+str(directory['library_bundle_aliases'])+'`。','',
-        '未实现的公共扩展：通用优化器/评价器插件、模型控制器适配和宿主视觉理解；参见接口规范中的路线。','']
+    lines+=['','Bundle aliases: `'+str(directory['library_bundle_aliases'])+'`.', '',
+        'Service bindings, model quantities, saved-signal rules, task context, evaluator/search and C1/C2 lifecycle are implemented. See framework_extensions.md for supported scope and extension routes. Host visual understanding and new actuator channels remain outside this release.', '']
     return '\n'.join(lines)

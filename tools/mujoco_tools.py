@@ -137,6 +137,7 @@ def run_task(
     *, observability=None, record_shape=False, record_trajectory=False, disturbances=None, timeout_s=120.,
 ) -> ToolResult:
     """Check finite simulation state and the final tip-to-target distance."""
+    from controllers.registry import ControllerRuntime
     evidence = None
     window_evidence = None
     trajectory = []
@@ -152,6 +153,10 @@ def run_task(
             return ToolResult(status="fail", tool="run_task", failure_code="CAPABILITY_MISSING")
         model = mujoco.MjModel.from_xml_path(str(xml_path))
         data = mujoco.MjData(model)
+        from controllers.registry import ControllerRuntime
+        if isinstance(controller,ControllerRuntime):
+            if abs(controller.dt-model.opt.timestep)>1e-12:raise ValueError('CONTROL_PERIOD_MISMATCH')
+            controller.start()
         if disturbances:
             from tools.closeout_authority import analysis_permission
             analysis_permission('disturbance')
@@ -190,7 +195,7 @@ def run_task(
                     if item['start_s'] <= data.time < item['end_s']:
                         data.xfrc_applied[model.body(item['body']).id, :3] += item['force_n']
             try:
-                observation = {"qpos": data.qpos.tolist(), "qvel": data.qvel.tolist()}
+                observation = {"qpos": data.qpos.tolist(), "qvel": data.qvel.tolist(),"step":step}
                 if observation_data is not None:
                     observation_data.qpos[:] = data.qpos
                     mujoco.mj_kinematics(model, observation_data)
@@ -293,6 +298,7 @@ def run_task(
         if record_shape:
             from tools.shape_tools import final_centerline
             shape_artifacts['final_centerline_m'] = final_centerline(model, data)
+        if isinstance(controller,ControllerRuntime):controller.finish()
         return ToolResult(
             status="pass" if metrics["task_success"] else "fail", tool="run_task",
             failure_code=None if metrics["task_success"] else "TASK_FAILED",
@@ -306,6 +312,8 @@ def run_task(
             status="fail", tool="run_task",
             failure_code="PHYSICS_ERROR", metrics=observed(), message=str(exc),
         )
+    finally:
+        if isinstance(controller,ControllerRuntime) and controller.lifecycle=='running':controller.abort()
 
 
 def validate_task(xml_path: str | Path, task: TaskSpec,

@@ -1,0 +1,865 @@
+{
+  "baseline": "1a0081b6822ccf802cfd08ce8d1ecb9c5049a69b",
+  "root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c",
+  "math": {
+    "validation_type": "actual isolated math + offline native provider response",
+    "result": {
+      "contract_version": "1.0",
+      "tool_id": "analysis.pcc_condition",
+      "tool_version": "1.1.0",
+      "call_id": "5d236564d0a547ae87ceffb49c7ea7b8",
+      "caller": {
+        "actor_id": "framework-native-acceptance",
+        "origin": "agent",
+        "transport": "offline_native_fixture",
+        "model_request_index": null
+      },
+      "execution_status": "completed",
+      "solver_status": "NOT_APPLICABLE",
+      "analysis_status": "LOCAL_GEOMETRY_ONLY",
+      "task_status": "NOT_ASSESSED",
+      "summary": "analysis.pcc_condition: execution=completed; solver=NOT_APPLICABLE; analysis=LOCAL_GEOMETRY_ONLY; task=NOT_ASSESSED",
+      "error": null,
+      "evidence": [
+        {
+          "ref": "service_calls/5d236564d0a547ae87ceffb49c7ea7b8/data.json",
+          "sha256": "63e73ba7ec1434c973ec7e413f182d9d06a368734e48d6c7a667f6c88082d031",
+          "role": "detail"
+        }
+      ],
+      "cost": {
+        "charged": {
+          "tool_calls": 1,
+          "backend_solves": 0,
+          "model_calls": 0
+        },
+        "elapsed_s": 0.26600000000325963,
+        "cache_hit": false,
+        "billing_owner": "services",
+        "recovery": "Charged before execution; interrupted calls never automatically replayed."
+      },
+      "provenance": {
+        "arguments": {
+          "length_m": 1.0,
+          "bend_rad": [
+            0.0,
+            0.0
+          ],
+          "frame": "base_origin_x_forward_yz_bending",
+          "relative_rank_tolerance": 1e-10
+        },
+        "config_hash": "9b0845dece3f4001d2dc717939e579dd0e23de9aa1ef367ccdfd08e719486248",
+        "imports": [],
+        "implementation_hashes": {
+          "schemas/framework.py": "739b657eff9fc7cf3ec33d67c65360affc8f5fcc6aadb281cc77e566423e40fb",
+          "schemas/public_tools.py": "4b78ec726be50fc6a6ee710ef173aaf6aca9519b6924c4d1b712152454cac54b",
+          "tools/math_extensions.py": "0c14144b8fe9577f2523bf55b74da89101d54c839892351c0377f78869045933",
+          "tools/model_provider.py": "533f8af05b788042f8a174f91f67e595fff6134b66aa0ce66254af7ed0dba1e4",
+          "tools/pcc_math.py": "b2d9a741a29c44548e9fd6d97d3ae1f120429d096b96a632f9b3454ce66ede3f",
+          "tools/public_feedback.py": "d03f333149822214444c4be0562c059b9161d20d98ed306de049874081d70789",
+          "tools/public_services.py": "1152cba85d33d3baaf43e98f776afac5ea779ac0e8686186e38184cbabc16142",
+          "tools/service_execution.py": "fc906b3b77fef0717658d2cfa575fea156289dace5967f952bc1d6048d0ad61c",
+          "tools/service_worker.py": "27c652d9a1e7ce3be0bddca56b20f9dc7d14f9e91afe9d4e0ffa13126e956d60",
+          "tools/tool_registry.py": "678d9e5f13fced57929e68d44855eca51bb0f3275b080a342902898d7441619d"
+        },
+        "cache_key": "5bccaf4703b89df43df2ca76f00c79297a5e5af9858d77e5ddb5d95f26d07857",
+        "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+        "feedback_semantics_version": "1.1.0",
+        "raw_failure_code": null,
+        "raw_solver_status": null
+      },
+      "epistemics": {
+        "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+        "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+        "unverified": [
+          "Causal attribution and physical calibration unless separately evidenced."
+        ],
+        "visual_access": "not_applicable"
+      },
+      "details_ref": "service_calls/5d236564d0a547ae87ceffb49c7ea7b8/data.json"
+    },
+    "read": {
+      "contract_version": "1.0",
+      "tool_id": "evidence.read_json",
+      "tool_version": "1.1.0",
+      "call_id": "24df28815e0542698755ec72c92b033a",
+      "caller": {
+        "actor_id": "framework-native-acceptance",
+        "origin": "agent",
+        "transport": "offline_native_fixture",
+        "model_request_index": null
+      },
+      "execution_status": "completed",
+      "solver_status": "NOT_APPLICABLE",
+      "analysis_status": "NOT_ASSESSED",
+      "task_status": "NOT_ASSESSED",
+      "summary": "evidence.read_json: execution=completed; solver=NOT_APPLICABLE; analysis=NOT_ASSESSED; task=NOT_ASSESSED",
+      "error": null,
+      "evidence": [
+        {
+          "ref": "service_calls/5d236564d0a547ae87ceffb49c7ea7b8/data.json",
+          "sha256": "63e73ba7ec1434c973ec7e413f182d9d06a368734e48d6c7a667f6c88082d031",
+          "role": "input"
+        },
+        {
+          "ref": "service_calls/24df28815e0542698755ec72c92b033a/data.json",
+          "sha256": "13d8efea8bb3b219e3073bbf1eac7aa95abd35fbcb7244b131c28345485713c5",
+          "role": "detail"
+        },
+        {
+          "ref": "service_calls/5d236564d0a547ae87ceffb49c7ea7b8/data.json",
+          "sha256": "63e73ba7ec1434c973ec7e413f182d9d06a368734e48d6c7a667f6c88082d031",
+          "role": "output"
+        }
+      ],
+      "cost": {
+        "charged": {
+          "tool_calls": 1,
+          "backend_solves": 0,
+          "model_calls": 0
+        },
+        "elapsed_s": 0.015000000013969839,
+        "cache_hit": false,
+        "billing_owner": "services",
+        "recovery": "Charged before execution; interrupted calls never automatically replayed."
+      },
+      "provenance": {
+        "arguments": {
+          "evidence_ref": "service_calls/5d236564d0a547ae87ceffb49c7ea7b8/data.json",
+          "pointer": "/singular_values_m_per_rad",
+          "offset": 0,
+          "limit": 10,
+          "max_bytes": 4000
+        },
+        "config_hash": "9b0845dece3f4001d2dc717939e579dd0e23de9aa1ef367ccdfd08e719486248",
+        "imports": [],
+        "implementation_hashes": {
+          "schemas/public_tools.py": "4b78ec726be50fc6a6ee710ef173aaf6aca9519b6924c4d1b712152454cac54b",
+          "tools/dynamic_context.py": "a02adb769b7f1bc123e7500d23dae1d5b3e334efacdd568e791d25f434a61d22",
+          "tools/public_feedback.py": "d03f333149822214444c4be0562c059b9161d20d98ed306de049874081d70789",
+          "tools/public_services.py": "1152cba85d33d3baaf43e98f776afac5ea779ac0e8686186e38184cbabc16142",
+          "tools/service_execution.py": "fc906b3b77fef0717658d2cfa575fea156289dace5967f952bc1d6048d0ad61c",
+          "tools/service_worker.py": "27c652d9a1e7ce3be0bddca56b20f9dc7d14f9e91afe9d4e0ffa13126e956d60",
+          "tools/tool_registry.py": "678d9e5f13fced57929e68d44855eca51bb0f3275b080a342902898d7441619d"
+        },
+        "cache_key": "b1163c417ad9971599580c0b89091b4864df4e01d6ef64a012089d25b3933bb4",
+        "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+        "feedback_semantics_version": "1.1.0",
+        "raw_failure_code": null,
+        "raw_solver_status": null
+      },
+      "epistemics": {
+        "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+        "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+        "unverified": [
+          "Causal attribution and physical calibration unless separately evidenced."
+        ],
+        "visual_access": "not_applicable"
+      },
+      "details_ref": "service_calls/24df28815e0542698755ec72c92b033a/data.json"
+    },
+    "cache": {
+      "contract_version": "1.0",
+      "tool_id": "analysis.pcc_condition",
+      "tool_version": "1.1.0",
+      "call_id": "e45c682c87594472a03e3ba80ba11fa6",
+      "caller": {
+        "actor_id": "framework-native-acceptance",
+        "origin": "agent",
+        "transport": "offline_native_fixture",
+        "model_request_index": null
+      },
+      "execution_status": "completed",
+      "solver_status": "NOT_APPLICABLE",
+      "analysis_status": "LOCAL_GEOMETRY_ONLY",
+      "task_status": "NOT_ASSESSED",
+      "summary": "analysis.pcc_condition: execution=completed; solver=NOT_APPLICABLE; analysis=LOCAL_GEOMETRY_ONLY; task=NOT_ASSESSED",
+      "error": null,
+      "evidence": [
+        {
+          "ref": "service_calls/e45c682c87594472a03e3ba80ba11fa6/data.json",
+          "sha256": "2164070805d8005c636ca0135f7cb00228687d6d8387a61c0a68cb0948dadd28",
+          "role": "detail"
+        },
+        {
+          "ref": "service_calls/5d236564d0a547ae87ceffb49c7ea7b8/data.json",
+          "sha256": "63e73ba7ec1434c973ec7e413f182d9d06a368734e48d6c7a667f6c88082d031",
+          "role": "output"
+        }
+      ],
+      "cost": {
+        "charged": {
+          "tool_calls": 1,
+          "backend_solves": 0,
+          "model_calls": 0
+        },
+        "elapsed_s": 0.01600000000325963,
+        "cache_hit": true,
+        "billing_owner": "services",
+        "recovery": "Charged before execution; interrupted calls never automatically replayed."
+      },
+      "provenance": {
+        "arguments": {
+          "length_m": 1.0,
+          "bend_rad": [
+            0.0,
+            0.0
+          ],
+          "frame": "base_origin_x_forward_yz_bending",
+          "relative_rank_tolerance": 1e-10
+        },
+        "config_hash": "9b0845dece3f4001d2dc717939e579dd0e23de9aa1ef367ccdfd08e719486248",
+        "imports": [],
+        "implementation_hashes": {
+          "schemas/framework.py": "739b657eff9fc7cf3ec33d67c65360affc8f5fcc6aadb281cc77e566423e40fb",
+          "schemas/public_tools.py": "4b78ec726be50fc6a6ee710ef173aaf6aca9519b6924c4d1b712152454cac54b",
+          "tools/math_extensions.py": "0c14144b8fe9577f2523bf55b74da89101d54c839892351c0377f78869045933",
+          "tools/model_provider.py": "533f8af05b788042f8a174f91f67e595fff6134b66aa0ce66254af7ed0dba1e4",
+          "tools/pcc_math.py": "b2d9a741a29c44548e9fd6d97d3ae1f120429d096b96a632f9b3454ce66ede3f",
+          "tools/public_feedback.py": "d03f333149822214444c4be0562c059b9161d20d98ed306de049874081d70789",
+          "tools/public_services.py": "1152cba85d33d3baaf43e98f776afac5ea779ac0e8686186e38184cbabc16142",
+          "tools/service_execution.py": "fc906b3b77fef0717658d2cfa575fea156289dace5967f952bc1d6048d0ad61c",
+          "tools/service_worker.py": "27c652d9a1e7ce3be0bddca56b20f9dc7d14f9e91afe9d4e0ffa13126e956d60",
+          "tools/tool_registry.py": "678d9e5f13fced57929e68d44855eca51bb0f3275b080a342902898d7441619d"
+        },
+        "cache_key": "5bccaf4703b89df43df2ca76f00c79297a5e5af9858d77e5ddb5d95f26d07857",
+        "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+        "feedback_semantics_version": "1.1.0",
+        "raw_failure_code": null,
+        "raw_solver_status": null
+      },
+      "epistemics": {
+        "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+        "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+        "unverified": [
+          "Causal attribution and physical calibration unless separately evidenced."
+        ],
+        "visual_access": "not_applicable"
+      },
+      "details_ref": "service_calls/e45c682c87594472a03e3ba80ba11fa6/data.json"
+    }
+  },
+  "real_backend": [
+    {
+      "controller": "C1",
+      "validation_type": "real MuJoCo rollout",
+      "outcome": {
+        "status": "VALID",
+        "score": 0.05010972492756694,
+        "task_success": false,
+        "evidence_ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/result.json",
+        "actual_evaluations": 0,
+        "reason": null
+      },
+      "controller_diagnostics": {
+        "version": "1.0",
+        "lifecycle": "finished",
+        "steps": 40,
+        "period_s": 0.002,
+        "required_observations": [],
+        "input_type": "tendon_target_lengths_m",
+        "backend": "mujoco",
+        "reset": "stateless"
+      },
+      "ledger": {
+        "evaluations": 2,
+        "calls": 3,
+        "wall_s": 0.25
+      },
+      "views": {
+        "rule_result": {
+          "contract_version": "1.0",
+          "tool_id": "diagnostics.signal_rule",
+          "tool_version": "1.1.0",
+          "call_id": "8bf6d60dedc7452d93a6a21ba929e051",
+          "caller": {
+            "actor_id": "framework-native-acceptance",
+            "origin": "agent",
+            "transport": "offline_native_fixture",
+            "model_request_index": null
+          },
+          "execution_status": "completed",
+          "solver_status": "NOT_APPLICABLE",
+          "analysis_status": "SAMPLED_DIAGNOSTIC_RULES",
+          "task_status": "NOT_ASSESSED",
+          "summary": "Saved samples: 0 entity summaries, 40 rule events. Read details for phases, thresholds and hypotheses; no task evaluation.",
+          "error": null,
+          "evidence": [
+            {
+              "ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/result.json",
+              "sha256": "6724cff7b0bdacdecf39f2f2767bc50ffc8217543f384b592cd37dab1c437a21",
+              "role": "input"
+            },
+            {
+              "ref": "service_calls/8bf6d60dedc7452d93a6a21ba929e051/data.json",
+              "sha256": "ecbee6e7684d98a4207e3663986fa4c8ab2a3c776de0945ec938389ef8021c4b",
+              "role": "detail"
+            }
+          ],
+          "cost": {
+            "charged": {
+              "tool_calls": 1,
+              "backend_solves": 0,
+              "model_calls": 0
+            },
+            "elapsed_s": 0.34399999998277053,
+            "cache_hit": false,
+            "billing_owner": "services",
+            "recovery": "Charged before execution; interrupted calls never automatically replayed."
+          },
+          "provenance": {
+            "arguments": {
+              "result_ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/result.json",
+              "backend": "mujoco",
+              "rule_id": "contact_presence",
+              "rule_version": "1.0.0",
+              "entity": "contact",
+              "t_start_s": null,
+              "t_end_s": null
+            },
+            "config_hash": "d0e43d4e1e4f82ef3c68a0ba1fe18bdc866a327fa67e4ac463d192ecb8fa65fb",
+            "imports": [
+              {
+                "ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/result.json",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C1",
+                "source_ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/result.json",
+                "sha256": "6724cff7b0bdacdecf39f2f2767bc50ffc8217543f384b592cd37dab1c437a21"
+              },
+              {
+                "ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/shared_input.json",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C1",
+                "source_ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/shared_input.json",
+                "sha256": "8e49438c481522bd65e5431eab81f1a9cbdd6b8ad66bfb16b7491aed939d33f4"
+              },
+              {
+                "ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/trajectory.json.gz",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C1",
+                "source_ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/trajectory.json.gz",
+                "sha256": "a6e28d71db9540a0a1e21e72e44572b0468f6354c0da914fb23bdb6a5cbc929a"
+              }
+            ],
+            "implementation_hashes": {
+              "schemas/framework.py": "739b657eff9fc7cf3ec33d67c65360affc8f5fcc6aadb281cc77e566423e40fb",
+              "schemas/public_tools.py": "4b78ec726be50fc6a6ee710ef173aaf6aca9519b6924c4d1b712152454cac54b",
+              "tools/diagnostic_rules.py": "e070e410ac8926247eb18840253da74f3bb3b85ea7851f5a829a3e9eecf4ed73",
+              "tools/observation_contract.py": "8f2be6175ab41ee8285488c5b8b44c27c7db072854f029e05751179828c5e146",
+              "tools/public_feedback.py": "d03f333149822214444c4be0562c059b9161d20d98ed306de049874081d70789",
+              "tools/public_services.py": "1152cba85d33d3baaf43e98f776afac5ea779ac0e8686186e38184cbabc16142",
+              "tools/rules/contact_presence.py": "0c9b332dd5c9ff3f89f1a9f31d7dfc5d72bbe97d26c1ac357e3bf86e3d2da177",
+              "tools/service_execution.py": "fc906b3b77fef0717658d2cfa575fea156289dace5967f952bc1d6048d0ad61c",
+              "tools/service_worker.py": "27c652d9a1e7ce3be0bddca56b20f9dc7d14f9e91afe9d4e0ffa13126e956d60",
+              "tools/tool_registry.py": "678d9e5f13fced57929e68d44855eca51bb0f3275b080a342902898d7441619d"
+            },
+            "cache_key": "2fff543ae809e4510d7d4df3c4c992fe22faf8301aad67c7a7eed06f6a75fd18",
+            "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+            "feedback_semantics_version": "1.1.0",
+            "raw_failure_code": null,
+            "raw_solver_status": null
+          },
+          "epistemics": {
+            "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+            "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+            "unverified": [
+              "Causal attribution and physical calibration unless separately evidenced."
+            ],
+            "visual_access": "not_applicable"
+          },
+          "details_ref": "service_calls/8bf6d60dedc7452d93a6a21ba929e051/data.json"
+        },
+        "diagnostic_result": {
+          "contract_version": "1.0",
+          "tool_id": "diagnostics.saved_trajectory",
+          "tool_version": "1.1.0",
+          "call_id": "bfd51caf3bac4908b743a6685e7915d6",
+          "caller": {
+            "actor_id": "framework-native-acceptance",
+            "origin": "agent",
+            "transport": "offline_native_fixture",
+            "model_request_index": null
+          },
+          "execution_status": "completed",
+          "solver_status": "NOT_APPLICABLE",
+          "analysis_status": "SAMPLED_DIAGNOSTIC_RULES",
+          "task_status": "NOT_ASSESSED",
+          "summary": "Saved samples: 20 entity summaries, 22 rule events. Read details for phases, thresholds and hypotheses; no task evaluation.",
+          "error": null,
+          "evidence": [
+            {
+              "ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/result.json",
+              "sha256": "6724cff7b0bdacdecf39f2f2767bc50ffc8217543f384b592cd37dab1c437a21",
+              "role": "input"
+            },
+            {
+              "ref": "service_calls/bfd51caf3bac4908b743a6685e7915d6/data.json",
+              "sha256": "2af1b885244d742e93ffe8790ef4cf03f359b175ac02be61fbe7c6bd7c8da432",
+              "role": "detail"
+            }
+          ],
+          "cost": {
+            "charged": {
+              "tool_calls": 1,
+              "backend_solves": 0,
+              "model_calls": 0
+            },
+            "elapsed_s": 0.34299999999348074,
+            "cache_hit": false,
+            "billing_owner": "services",
+            "recovery": "Charged before execution; interrupted calls never automatically replayed."
+          },
+          "provenance": {
+            "arguments": {
+              "result_ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/result.json",
+              "backend": "mujoco",
+              "entity": "all",
+              "t_start_s": null,
+              "t_end_s": null,
+              "fields": []
+            },
+            "config_hash": "d0e43d4e1e4f82ef3c68a0ba1fe18bdc866a327fa67e4ac463d192ecb8fa65fb",
+            "imports": [
+              {
+                "ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/result.json",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C1",
+                "source_ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/result.json",
+                "sha256": "6724cff7b0bdacdecf39f2f2767bc50ffc8217543f384b592cd37dab1c437a21"
+              },
+              {
+                "ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/shared_input.json",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C1",
+                "source_ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/shared_input.json",
+                "sha256": "8e49438c481522bd65e5431eab81f1a9cbdd6b8ad66bfb16b7491aed939d33f4"
+              },
+              {
+                "ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/trajectory.json.gz",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C1",
+                "source_ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/trajectory.json.gz",
+                "sha256": "a6e28d71db9540a0a1e21e72e44572b0468f6354c0da914fb23bdb6a5cbc929a"
+              }
+            ],
+            "implementation_hashes": {
+              "schemas/public_tools.py": "4b78ec726be50fc6a6ee710ef173aaf6aca9519b6924c4d1b712152454cac54b",
+              "tools/public_feedback.py": "d03f333149822214444c4be0562c059b9161d20d98ed306de049874081d70789",
+              "tools/public_services.py": "1152cba85d33d3baaf43e98f776afac5ea779ac0e8686186e38184cbabc16142",
+              "tools/service_execution.py": "fc906b3b77fef0717658d2cfa575fea156289dace5967f952bc1d6048d0ad61c",
+              "tools/service_worker.py": "27c652d9a1e7ce3be0bddca56b20f9dc7d14f9e91afe9d4e0ffa13126e956d60",
+              "tools/tool_registry.py": "678d9e5f13fced57929e68d44855eca51bb0f3275b080a342902898d7441619d",
+              "tools/trajectory_diagnosis.py": "b9f1dc617687b5de2008ceec1290f10bbbe2b7915c9276ac2e493c69f18b7b91"
+            },
+            "cache_key": "6fdcd63ee1bcfce6e29850d7b4f2aa7820b1a95c6d026b271badac6acddefd2d",
+            "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+            "feedback_semantics_version": "1.1.0",
+            "raw_failure_code": null,
+            "raw_solver_status": null
+          },
+          "epistemics": {
+            "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+            "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+            "unverified": [
+              "Causal attribution and physical calibration unless separately evidenced."
+            ],
+            "visual_access": "not_applicable"
+          },
+          "details_ref": "service_calls/bfd51caf3bac4908b743a6685e7915d6/data.json"
+        },
+        "target_m": [
+          0.3,
+          0.0,
+          0.08
+        ],
+        "duration_s": 0.08,
+        "last_time_s": 0.08000000000000006,
+        "html": "views_C1\\observations\\views_C1_mujoco.html",
+        "html_sha256": "8c4c09f62695eabaa0eb915dbba692f56eb059bba4e8ccfd9e471ce1b81a6257"
+      }
+    },
+    {
+      "controller": "C2",
+      "validation_type": "real MuJoCo rollout",
+      "outcome": {
+        "status": "VALID",
+        "score": 0.07349628850587914,
+        "task_success": false,
+        "evidence_ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/result.json",
+        "actual_evaluations": 1,
+        "reason": null
+      },
+      "controller_diagnostics": {
+        "version": "1.0",
+        "lifecycle": "finished",
+        "steps": 60,
+        "period_s": 0.002,
+        "required_observations": [
+          "step",
+          "tip_position_m"
+        ],
+        "input_type": "tendon_target_lengths_m",
+        "backend": "mujoco",
+        "reset": "reset"
+      },
+      "ledger": {
+        "evaluations": 1,
+        "calls": 1,
+        "wall_s": 0.10899999999674037
+      },
+      "views": {
+        "rule_result": {
+          "contract_version": "1.0",
+          "tool_id": "diagnostics.signal_rule",
+          "tool_version": "1.1.0",
+          "call_id": "34719e3efdc14fb2a7e8661c2c46b8c6",
+          "caller": {
+            "actor_id": "framework-native-acceptance",
+            "origin": "agent",
+            "transport": "offline_native_fixture",
+            "model_request_index": null
+          },
+          "execution_status": "completed",
+          "solver_status": "NOT_APPLICABLE",
+          "analysis_status": "SAMPLED_DIAGNOSTIC_RULES",
+          "task_status": "NOT_ASSESSED",
+          "summary": "Saved samples: 0 entity summaries, 60 rule events. Read details for phases, thresholds and hypotheses; no task evaluation.",
+          "error": null,
+          "evidence": [
+            {
+              "ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/result.json",
+              "sha256": "bccdefa8e2d5a5bea6b764a0e88b646169ab990b7924c9b8856783e4a8b71f97",
+              "role": "input"
+            },
+            {
+              "ref": "service_calls/34719e3efdc14fb2a7e8661c2c46b8c6/data.json",
+              "sha256": "603403e1a1cfb5cc21ef9f71d437739ec0d47e1e8a5a2aeba194038e279be27e",
+              "role": "detail"
+            }
+          ],
+          "cost": {
+            "charged": {
+              "tool_calls": 1,
+              "backend_solves": 0,
+              "model_calls": 0
+            },
+            "elapsed_s": 0.3279999999795109,
+            "cache_hit": false,
+            "billing_owner": "services",
+            "recovery": "Charged before execution; interrupted calls never automatically replayed."
+          },
+          "provenance": {
+            "arguments": {
+              "result_ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/result.json",
+              "backend": "mujoco",
+              "rule_id": "contact_presence",
+              "rule_version": "1.0.0",
+              "entity": "contact",
+              "t_start_s": null,
+              "t_end_s": null
+            },
+            "config_hash": "dbc3ec7252d2c5a5edf753dc285b9646a2de5319d3ab7aa9c9f6662e7ecfd532",
+            "imports": [
+              {
+                "ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/result.json",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C2",
+                "source_ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/result.json",
+                "sha256": "bccdefa8e2d5a5bea6b764a0e88b646169ab990b7924c9b8856783e4a8b71f97"
+              },
+              {
+                "ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/shared_input.json",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C2",
+                "source_ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/shared_input.json",
+                "sha256": "8a8a913386f24af270eab21750c8338ceac88faaa5cae6af0092774eb2b18c47"
+              },
+              {
+                "ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/trajectory.json.gz",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C2",
+                "source_ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/trajectory.json.gz",
+                "sha256": "bb967f1da3ee098ed7806f10774d826bd17366b98363f463d48e9f5fe6994b5c"
+              }
+            ],
+            "implementation_hashes": {
+              "schemas/framework.py": "739b657eff9fc7cf3ec33d67c65360affc8f5fcc6aadb281cc77e566423e40fb",
+              "schemas/public_tools.py": "4b78ec726be50fc6a6ee710ef173aaf6aca9519b6924c4d1b712152454cac54b",
+              "tools/diagnostic_rules.py": "e070e410ac8926247eb18840253da74f3bb3b85ea7851f5a829a3e9eecf4ed73",
+              "tools/observation_contract.py": "8f2be6175ab41ee8285488c5b8b44c27c7db072854f029e05751179828c5e146",
+              "tools/public_feedback.py": "d03f333149822214444c4be0562c059b9161d20d98ed306de049874081d70789",
+              "tools/public_services.py": "1152cba85d33d3baaf43e98f776afac5ea779ac0e8686186e38184cbabc16142",
+              "tools/rules/contact_presence.py": "0c9b332dd5c9ff3f89f1a9f31d7dfc5d72bbe97d26c1ac357e3bf86e3d2da177",
+              "tools/service_execution.py": "fc906b3b77fef0717658d2cfa575fea156289dace5967f952bc1d6048d0ad61c",
+              "tools/service_worker.py": "27c652d9a1e7ce3be0bddca56b20f9dc7d14f9e91afe9d4e0ffa13126e956d60",
+              "tools/tool_registry.py": "678d9e5f13fced57929e68d44855eca51bb0f3275b080a342902898d7441619d"
+            },
+            "cache_key": "e8cbc3a079c51df2fcad5d6da35c14c7490b9787d6c7c4729e2e5fcbbdbf657e",
+            "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+            "feedback_semantics_version": "1.1.0",
+            "raw_failure_code": null,
+            "raw_solver_status": null
+          },
+          "epistemics": {
+            "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+            "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+            "unverified": [
+              "Causal attribution and physical calibration unless separately evidenced."
+            ],
+            "visual_access": "not_applicable"
+          },
+          "details_ref": "service_calls/34719e3efdc14fb2a7e8661c2c46b8c6/data.json"
+        },
+        "diagnostic_result": {
+          "contract_version": "1.0",
+          "tool_id": "diagnostics.saved_trajectory",
+          "tool_version": "1.1.0",
+          "call_id": "6584bd80385c44879c4b19b4b5954dbb",
+          "caller": {
+            "actor_id": "framework-native-acceptance",
+            "origin": "agent",
+            "transport": "offline_native_fixture",
+            "model_request_index": null
+          },
+          "execution_status": "completed",
+          "solver_status": "NOT_APPLICABLE",
+          "analysis_status": "SAMPLED_DIAGNOSTIC_RULES",
+          "task_status": "NOT_ASSESSED",
+          "summary": "Saved samples: 20 entity summaries, 22 rule events. Read details for phases, thresholds and hypotheses; no task evaluation.",
+          "error": null,
+          "evidence": [
+            {
+              "ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/result.json",
+              "sha256": "bccdefa8e2d5a5bea6b764a0e88b646169ab990b7924c9b8856783e4a8b71f97",
+              "role": "input"
+            },
+            {
+              "ref": "service_calls/6584bd80385c44879c4b19b4b5954dbb/data.json",
+              "sha256": "9eb5acc20fec6e0fd30fb128689d19b8289e1839ffa7498742f3debfe53a1ff9",
+              "role": "detail"
+            }
+          ],
+          "cost": {
+            "charged": {
+              "tool_calls": 1,
+              "backend_solves": 0,
+              "model_calls": 0
+            },
+            "elapsed_s": 0.3279999999795109,
+            "cache_hit": false,
+            "billing_owner": "services",
+            "recovery": "Charged before execution; interrupted calls never automatically replayed."
+          },
+          "provenance": {
+            "arguments": {
+              "result_ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/result.json",
+              "backend": "mujoco",
+              "entity": "all",
+              "t_start_s": null,
+              "t_end_s": null,
+              "fields": []
+            },
+            "config_hash": "dbc3ec7252d2c5a5edf753dc285b9646a2de5319d3ab7aa9c9f6662e7ecfd532",
+            "imports": [
+              {
+                "ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/result.json",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C2",
+                "source_ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/result.json",
+                "sha256": "bccdefa8e2d5a5bea6b764a0e88b646169ab990b7924c9b8856783e4a8b71f97"
+              },
+              {
+                "ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/shared_input.json",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C2",
+                "source_ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/shared_input.json",
+                "sha256": "8a8a913386f24af270eab21750c8338ceac88faaa5cae6af0092774eb2b18c47"
+              },
+              {
+                "ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/trajectory.json.gz",
+                "source_root": "D:\\softrobot-agent\\runs\\framework_acceptance\\8f8d2b7043dc4b569618ba24db8cbe2c\\C2",
+                "source_ref": "evaluations/398277eb52bcaa97c38b56195f4af699a62bcbe7857224d20cb2c9c5d00a0232/trajectory.json.gz",
+                "sha256": "bb967f1da3ee098ed7806f10774d826bd17366b98363f463d48e9f5fe6994b5c"
+              }
+            ],
+            "implementation_hashes": {
+              "schemas/public_tools.py": "4b78ec726be50fc6a6ee710ef173aaf6aca9519b6924c4d1b712152454cac54b",
+              "tools/public_feedback.py": "d03f333149822214444c4be0562c059b9161d20d98ed306de049874081d70789",
+              "tools/public_services.py": "1152cba85d33d3baaf43e98f776afac5ea779ac0e8686186e38184cbabc16142",
+              "tools/service_execution.py": "fc906b3b77fef0717658d2cfa575fea156289dace5967f952bc1d6048d0ad61c",
+              "tools/service_worker.py": "27c652d9a1e7ce3be0bddca56b20f9dc7d14f9e91afe9d4e0ffa13126e956d60",
+              "tools/tool_registry.py": "678d9e5f13fced57929e68d44855eca51bb0f3275b080a342902898d7441619d",
+              "tools/trajectory_diagnosis.py": "b9f1dc617687b5de2008ceec1290f10bbbe2b7915c9276ac2e493c69f18b7b91"
+            },
+            "cache_key": "7775b7ec0244e161f7710d3f696ae2ae529d36bdb2a73bcc60ac73e56865a03a",
+            "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+            "feedback_semantics_version": "1.1.0",
+            "raw_failure_code": null,
+            "raw_solver_status": null
+          },
+          "epistemics": {
+            "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+            "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+            "unverified": [
+              "Causal attribution and physical calibration unless separately evidenced."
+            ],
+            "visual_access": "not_applicable"
+          },
+          "details_ref": "service_calls/6584bd80385c44879c4b19b4b5954dbb/data.json"
+        },
+        "target_m": [
+          0.28,
+          0.02,
+          0.12
+        ],
+        "duration_s": 0.12,
+        "last_time_s": 0.12000000000000009,
+        "html": "views_C2\\observations\\views_C2_mujoco.html",
+        "html_sha256": "6d49dad660d1d01084ac8dd8b5efa1727dbc90ccfbb5d973761bdad5a9cb0640"
+      }
+    }
+  ],
+  "model_api_calls": 0,
+  "matlab_dynamic_solves": 0,
+  "limitations": [
+    "No live LLM API decision; native adapter uses an explicit provider-response fixture."
+  ],
+  "saved_data_reuse": {
+    "validation_type": "hash-verified saved MATLAB signals; zero new solves",
+    "result": {
+      "contract_version": "1.0",
+      "tool_id": "diagnostics.signal_rule",
+      "tool_version": "1.1.0",
+      "call_id": "e11e1d58d58c446999659267fcd7bf23",
+      "caller": {
+        "actor_id": "framework-native-acceptance",
+        "origin": "agent",
+        "transport": "offline_native_fixture",
+        "model_request_index": null
+      },
+      "execution_status": "completed",
+      "solver_status": "NOT_APPLICABLE",
+      "analysis_status": "SAMPLED_DIAGNOSTIC_RULES",
+      "task_status": "NOT_ASSESSED",
+      "summary": "Saved samples: 0 entity summaries, 1000 rule events. Read details for phases, thresholds and hypotheses; no task evaluation.",
+      "error": null,
+      "evidence": [
+        {
+          "ref": "candidates/c000/matlab/5046a6ec9bf0/result.json",
+          "sha256": "2850c1a79823b53cdbabe957ef6f2ac79746b0c4a3d62a1dcf5c6543a0266d92",
+          "role": "input"
+        },
+        {
+          "ref": "service_calls/e11e1d58d58c446999659267fcd7bf23/data.json",
+          "sha256": "ff5c813ec47177b5e9ee9d04e1ebc49c6aa482873ec6af6a9c5cb218df1bf27e",
+          "role": "detail"
+        }
+      ],
+      "cost": {
+        "charged": {
+          "tool_calls": 1,
+          "backend_solves": 0,
+          "model_calls": 0
+        },
+        "elapsed_s": 0.4850000000442378,
+        "cache_hit": false,
+        "billing_owner": "services",
+        "recovery": "Charged before execution; interrupted calls never automatically replayed."
+      },
+      "provenance": {
+        "arguments": {
+          "result_ref": "candidates/c000/matlab/5046a6ec9bf0/result.json",
+          "backend": "matlab",
+          "rule_id": "contact_presence",
+          "rule_version": "1.0.0",
+          "entity": "contact",
+          "t_start_s": null,
+          "t_end_s": null
+        },
+        "config_hash": "99144b3674399876db14ed5898da53590e6c0aaf130e154344aa8a006b455e9b",
+        "imports": [
+          {
+            "ref": "candidates/c000/matlab/5046a6ec9bf0/result.json",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "candidates/c000/matlab/5046a6ec9bf0/result.json",
+            "sha256": "2850c1a79823b53cdbabe957ef6f2ac79746b0c4a3d62a1dcf5c6543a0266d92"
+          },
+          {
+            "ref": "candidates/c000/matlab/5046a6ec9bf0/shared_input.json",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "candidates/c000/matlab/5046a6ec9bf0/shared_input.json",
+            "sha256": "81cc1c2d9b767632164cda081fae5d75b8af8eea32101b04c0573f6e1e86ef19"
+          },
+          {
+            "ref": "candidates/c000/matlab/5046a6ec9bf0/trajectory.json.gz",
+            "source_root": "D:\\softrobot-agent\\runs\\round9_reach",
+            "source_ref": "candidates/c000/matlab/5046a6ec9bf0/trajectory.json.gz",
+            "sha256": "4f55b406cf500a64d7bb9cf48c495ef6c6f4886144f038f723df0a6b6d7ad236"
+          }
+        ],
+        "implementation_hashes": {
+          "schemas/framework.py": "739b657eff9fc7cf3ec33d67c65360affc8f5fcc6aadb281cc77e566423e40fb",
+          "schemas/public_tools.py": "4b78ec726be50fc6a6ee710ef173aaf6aca9519b6924c4d1b712152454cac54b",
+          "tools/diagnostic_rules.py": "e070e410ac8926247eb18840253da74f3bb3b85ea7851f5a829a3e9eecf4ed73",
+          "tools/observation_contract.py": "8f2be6175ab41ee8285488c5b8b44c27c7db072854f029e05751179828c5e146",
+          "tools/public_feedback.py": "d03f333149822214444c4be0562c059b9161d20d98ed306de049874081d70789",
+          "tools/public_services.py": "1152cba85d33d3baaf43e98f776afac5ea779ac0e8686186e38184cbabc16142",
+          "tools/rules/contact_presence.py": "0c9b332dd5c9ff3f89f1a9f31d7dfc5d72bbe97d26c1ac357e3bf86e3d2da177",
+          "tools/service_execution.py": "fc906b3b77fef0717658d2cfa575fea156289dace5967f952bc1d6048d0ad61c",
+          "tools/service_worker.py": "27c652d9a1e7ce3be0bddca56b20f9dc7d14f9e91afe9d4e0ffa13126e956d60",
+          "tools/tool_registry.py": "678d9e5f13fced57929e68d44855eca51bb0f3275b080a342902898d7441619d"
+        },
+        "cache_key": "1d5720022a4211b3b08c3e36eeba07f585de8481f36234796c1c880d5e882ed4",
+        "processing": "Analytic computation or saved-data processing; no dynamics or rescoring.",
+        "feedback_semantics_version": "1.1.0",
+        "raw_failure_code": null,
+        "raw_solver_status": null
+      },
+      "epistemics": {
+        "observations": "Only hash-linked saved numerical samples or direct analytic computation are facts of this model.",
+        "inference": "Model predictions and diagnostic rule interpretations are not physical validation.",
+        "unverified": [
+          "Causal attribution and physical calibration unless separately evidenced."
+        ],
+        "visual_access": "not_applicable"
+      },
+      "details_ref": "service_calls/e11e1d58d58c446999659267fcd7bf23/data.json"
+    }
+  },
+  "search": {
+    "method": "bounded_coordinate_pattern_local_v1; Python adapter of existing MATLAB proposal formula",
+    "validation_type": "two real MuJoCo evaluations, then cache reuse",
+    "study": {
+      "identity": "bfcb64e61f0c05dbbc9103da0877678b965b921c8f8f3dde33e873b434a21830",
+      "best": [
+        0.8578810067292914
+      ],
+      "best_score": 0.05010972492756694,
+      "iteration": 2,
+      "step": 0.1,
+      "trials": [
+        {
+          "x": [
+            0.8578810067292914
+          ],
+          "parameters": {
+            "control.bend_z_rad": 1.0736430201878742
+          },
+          "index": 0,
+          "status": "VALID",
+          "score": 0.05010972492756694,
+          "task_success": false,
+          "evidence_ref": "evaluations/0be32b1c6bca66bdaabc2ab30b973e2dfed90395b22fd186897071e2444134f1/result.json",
+          "actual_evaluations": 1,
+          "reason": null
+        },
+        {
+          "x": [
+            0.7578810067292914
+          ],
+          "parameters": {
+            "control.bend_z_rad": 0.7736430201878743
+          },
+          "index": 1,
+          "status": "VALID",
+          "score": 0.0625894291452105,
+          "task_success": false,
+          "evidence_ref": "evaluations/885271bfd5bd959bcf28d3518c3efa410f5ad90ab9b8414b87ec8c44f643b565/result.json",
+          "actual_evaluations": 1,
+          "reason": null
+        }
+      ],
+      "actual_evaluations": 2,
+      "cycle_improved": false
+    }
+  }
+}

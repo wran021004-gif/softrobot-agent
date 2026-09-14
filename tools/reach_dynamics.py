@@ -21,30 +21,19 @@ def control_commands(ir, control):
     return [float(np.clip(L+a+control.bias_fraction*L,.73*L,1.30*L)) for a in active]
 
 
-def make_controller(ir,task,control):
-    from controllers.open_loop_length import OpenLoopLength
-    if control.mode=='C1':
-        return OpenLoopLength(control_commands(ir,control))
-    from controllers.pcc_tip_feedback import PCCTipFeedback
-    from schemas.experiment_policy import FeedbackParameters
-    p=FeedbackParameters(gain_rad2_per_m2=control.gain_rad2_per_m2,
-        update_every_steps=control.update_every_steps,max_bend_update_rad=control.max_bend_update_rad,
-        max_command_update_m=control.rate_limit_ref_per_s*ir.total_length_m*control.update_every_steps*load_simulator().timestep_s,
-        min_tendon_length_m=.73*ir.total_length_m,max_tendon_length_m=1.30*ir.total_length_m)
-    experiment=SimpleNamespace(check_unchanged=lambda:None,policy=SimpleNamespace(allowed_controller_levels=['C2'],
-        feedback_parameters=p,policy_id='round9-user-grant'),policy_hash=digest(control.model_dump()),path=ROOT/'configs/experiments/round9_grant.json')
-    plan=SimpleNamespace(metrics=dict(theta_rad=math.hypot(control.bend_y_rad,control.bend_z_rad),
-        phi_rad=math.atan2(control.bend_z_rad,control.bend_y_rad),tendon_target_lengths_m=control_commands(ir,control)))
-    controller=PCCTipFeedback(ir,task,plan,experiment)
-    controller.length_bias_m=control.bias_fraction*ir.total_length_m
-    controller.active_fraction_limit=.25
-    return controller
+def make_controller(ir,task,control,*,authority=None,timestep_s=None,parameter_source=None,controller_id=None):
+    from controllers.registry import generate
+    return generate(ir,task,control,authority=authority,timestep_s=timestep_s,
+        parameter_source=parameter_source,controller_id=controller_id)
 
 
-def export_shared(ir,control,folder):
+def export_shared(ir,control,folder,task_context=None):
     from tools.mujoco_tools import compile_mujoco
     import mujoco
-    task,environment=load_task_package(); dt=load_simulator().timestep_s; duration=load_run_settings().steps*dt
+    from tools.task_context import legacy_context
+    context=task_context or legacy_context()
+    task,environment=context.task,context.environment;dt=context.timestep_s;duration=context.duration_s
+    if dt!=load_simulator().timestep_s:raise ValueError('SIMULATOR_ADAPTER_REQUIRED: timestep differs from compiled source')
     result=compile_mujoco(ir,task,folder/'robot.xml',environment)
     if result.status!='pass': raise ValueError(result.message)
     model=mujoco.MjModel.from_xml_path(str(folder/'robot.xml'))
@@ -65,7 +54,8 @@ def export_shared(ir,control,folder):
         command=control_commands(ir,control),bend=[control.bend_y_rad,control.bend_z_rad],control=control.model_dump(),
         gravity=list(environment.gravity_m_s2),floor_z=environment.objects[0].position_m[2],duration=duration,dt=dt,
         target=list(task.target_m),tolerance=task.position_error_max_m,timeout_s=120,solver=SOLVER,
-        task_hash=digest(task.model_dump(mode='json')),environment_hash=digest(environment.model_dump(mode='json')))
+        task_hash=digest(task.model_dump(mode='json')),environment_hash=digest(environment.model_dump(mode='json')),
+        task_context=context.model_dump(mode='json'),task_context_hash=context.identity)
     if ir.resolved_rod:
         rod=ir.resolved_rod
         if not np.allclose(masses,rod.mass_kg,atol=1e-12) or not np.allclose(inertia,[i[1] for i in rod.inertia_diagonal_kg_m2],atol=1e-12):
@@ -83,10 +73,14 @@ class DynamicsBackends:
         return self.matlab.eng
     def close(self):
         if self.matlab: self.matlab.close(); self.matlab=None
-    def simulate(self,backend,ir,control,folder,timeout_s=None):
+    def simulate(self,backend,ir,control,folder,timeout_s=None,task_context=None,controller_id=None):
+        from tools.task_context import legacy_context
+        from controllers.registry import check_backend
+        context=task_context or legacy_context()
+        check_backend(control.mode,backend,context,controller_id=controller_id)
         setup=time.monotonic();eng=self.engine() if backend=='matlab' else None;engine_setup_s=time.monotonic()-setup
         started=time.monotonic();limit=timeout_s or (120 if backend=='matlab' else 180)
-        folder.mkdir(parents=True,exist_ok=True); p=export_shared(ir,control,folder)
+        folder.mkdir(parents=True,exist_ok=True); p=export_shared(ir,control,folder,context)
         p['timeout_s']=max(.01,limit-(time.monotonic()-started)-.5)
         atomic_json(folder/'shared_input.json',p)
         if backend=='matlab':
@@ -108,17 +102,24 @@ class DynamicsBackends:
                 out['applicability_warnings'].append('Initial capsule at fixed base overlaps floor; rotation cannot remove the base-cap overlap. Do not interpret this contact approximation as validated geometry')
         else:
             from tools.mujoco_tools import run_task
-            task,env=load_task_package(); controller=make_controller(ir,task,control)
+            task,env=context.task,context.environment
+            controller=make_controller(ir,task,control,authority=context.authority,timestep_s=context.timestep_s,
+                parameter_source=folder/'shared_input.json',controller_id=controller_id)
+            from controllers.registry import ControllerRuntime
+            controller=ControllerRuntime(controller,'mujoco',context.timestep_s)
             result=run_task(folder/'robot.xml',task,controller,environment=env,record_trajectory=True,record_shape=True,
-                timeout_s=max(.01,limit-(time.monotonic()-started)))
+                timeout_s=max(.01,limit-(time.monotonic()-started)),run_settings=context.run_settings,evaluator=context.evaluator())
             rows=result.artifacts.pop('trajectory',result.artifacts.pop('partial_trajectory',[]))
+            atomic_json(folder/'controller_contract.json',controller.diagnostics())
+            atomic_json(folder/'controller_updates.json',getattr(controller,'updates',[]))
             atomic_json(folder/'canonical_result.json',result.model_dump(mode='json'))
-            complete=result.metrics.get('steps_completed')==load_run_settings().steps and result.failure_code in (None,'TASK_FAILED')
+            complete=result.metrics.get('steps_completed')==context.run_settings.steps and result.failure_code in (None,'TASK_FAILED')
             out=dict(model_id='mujoco_segmented_v2' if ir.resolved_rod else 'mujoco_legacy_v1',complete=complete,
                 computation_status='completed' if complete else 'failed',reason=result.message,position_error_m=result.metrics.get('position_error_m'),
-                tip_m=result.metrics.get('tip_position_m'),canonical_task_success=complete and result.metrics.get('task_success',False),
+                tip_m=result.metrics.get('tip_position_m'),canonical_task_success=result.metrics.get('task_success',False) if complete else None,
                 elapsed_s=time.monotonic()-started,last_valid_time_s=rows[-1]['time_s'] if rows else 0,
-                successful_internal_steps=result.metrics.get('steps_completed',0),solver='frozen MuJoCo timestep/integrator')
+                successful_internal_steps=result.metrics.get('steps_completed',0),solver='frozen MuJoCo timestep/integrator',
+                controller_diagnostics=controller.diagnostics())
         with gzip.open(folder/'trajectory.json.gz','wt',encoding='utf8') as stream: json.dump(rows,stream,allow_nan=False)
         out.update(backend=backend,shared_input_hash=digest(p),trajectory_ref='trajectory.json.gz',actual_evaluations=1,
             engine_setup_s=engine_setup_s,rollout_wall_limit_s=limit,

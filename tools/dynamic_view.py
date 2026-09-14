@@ -39,6 +39,7 @@ def render_candidate(root,c,backend):
     # Animation downsamples coordinates only; curve data retain all output samples.
     data=dict(candidate_id=c['candidate_id'],backend=backend,result=r,design=c['design'],control=c['control'],rows=rows,
               target_m=shared.get('target'),floor_z=shared.get('floor_z'),
+              declared_duration_s=shared.get('duration'),task_context=shared.get('task_context'),
               time_range_s=[min(rows[0]['time_s'],rows[0].get('solver_time_s',rows[0]['time_s'])),rows[-1]['time_s']],
               model_status=c['results'].get('matlab',{}).get('model_task_success','未运行'),
               canonical_status=c['results'].get('mujoco',{}).get('canonical_task_success','未运行'),

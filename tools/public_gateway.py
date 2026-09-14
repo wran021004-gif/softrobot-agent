@@ -33,6 +33,7 @@ def invoke_bound(book, value, *, caller):
         entry = entries().get(call.tool_id)
         if entry is None or entry['runtime'] != runtime:
             raise ValueError('UNKNOWN_TOOL: use the catalog for this bound runtime')
+        if call.tool_version not in entry['accepted_versions']:raise ValueError('TOOL_VERSION_MISMATCH')
         arguments = entry['schema'].model_validate_json(json.dumps(call.arguments, allow_nan=False), strict=True).model_dump(mode='json')
     except (ValueError, TypeError) as exc:
         return _record(book,normalize(tool_id, dict(status='rejected', failure_code='INVALID_INPUT', message=str(exc)),
@@ -57,7 +58,9 @@ def invoke_bound(book, value, *, caller):
         # Old/reused receipts stay byte-for-byte historical; normalize this view.
         public = result.get('public')
         if public:
-            public = {**public, 'caller':caller}
+            public = normalize(call.tool_id,result,call_id=ref or uuid4().hex,caller=caller,
+                evidence=public.get('evidence',[]),details_ref=public.get('details_ref',ref),cost=public.get('cost',{}),
+                provenance={**public.get('provenance',{}),'historical_feedback_version':public.get('tool_version')})
         else:
             public = normalize(call.tool_id, result, call_id=ref or uuid4().hex, caller=caller, details_ref=ref,
                 cost={'billing_owner':runtime,'accounting':'Inspect original runner decision/reservation; no additional adapter charge.'})

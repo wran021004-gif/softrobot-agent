@@ -11,6 +11,7 @@ def error_info(message, code='TOOL_ERROR'):
         ('evidence', ('EVIDENCE','SOURCE_CHANGED','RESULT_CHANGED','UNREGISTERED','MISSING_SAVED','NOT_RUN','IDENTITY CHANGED'), 'Read the registered source/receipt; restore matching saved bytes or select existing complete evidence.'),
         ('timeout', ('TIMEOUT','TIMED OUT'), 'Inspect partial artifacts and charged reservation before an explicitly authorized retry.'),
         ('interrupted', ('INTERRUPTED',), 'Resume from sealed artifacts; incomplete reservations remain charged.'),
+        ('input', ('BACKEND_UNSUPPORTED','ADAPTER_REQUIRED','MODEL_QUANTITY_UNAVAILABLE','UNIT_MISMATCH'), 'Inspect model/controller capabilities, units and required observations; select a supported adapter or supply an explicit extension.'),
         ('dependency', ('UNAVAILABLE','CAPABILITY_MISSING','NO MODULE','ENCODER'), 'Install/configure the declared dependency or use existing cached evidence.'),
         ('input', ('INVALID','VALIDATION','UNKNOWN','MISMATCH','REVERSED','INTERVAL','REQUIRED','PRECONDITION','PCC BRANCH','NO_SAVED_SAMPLE_OR_ENTITY'), 'Read the input schema and preconditions, correct arguments, and cite valid evidence.')]
     category, action = next(((cat, action) for cat, keys, action in rules if any(k in text for k in keys)),
@@ -24,7 +25,7 @@ def error_info(message, code='TOOL_ERROR'):
         recovery_condition=action, next_actions=[action])
 
 
-def normalize(tool_id, result, *, call_id, caller, evidence=(), cost=None, details_ref=None, provenance=None):
+def normalize(tool_id, result, *, call_id, caller, evidence=(), cost=None, details_ref=None, provenance=None,analysis_scope=None):
     data = result.get('data') or {}
     status = result.get('status', 'failed')
     raw_solver = data.get('computation_status')
@@ -33,23 +34,27 @@ def normalize(tool_id, result, *, call_id, caller, evidence=(), cost=None, detai
         solver = 'UNKNOWN'
     if 'complete' in data and solver == 'NOT_APPLICABLE':
         solver = 'COMPLETED' if data['complete'] else 'INCOMPLETE'
-    if data.get('execution_completed') is True:
+    if data.get('execution_completed') is True and data.get('complete') is not False and solver not in ('FAILED','INCOMPLETE','NOT_RUN'):
         solver = 'COMPLETED'
+    assessable = (status == 'completed' and data.get('complete') is not False
+                  and solver not in ('FAILED','INCOMPLETE','NOT_RUN','UNKNOWN'))
     task = 'NOT_ASSESSED'
     # Historical replay and comparisons are never a new task evaluation.
     if data.get('evidence_role') == 'historical_replay':
         task = 'NOT_RUN'
-    elif data.get('canonical_task_success') is not None:
+    elif assessable and data.get('canonical_task_success') is not None:
         task = 'PASS' if data['canonical_task_success'] else 'FAIL'
-    elif data.get('canonical_task_status') in ('PASS','FAIL','NOT_RUN'):
+    elif assessable and data.get('canonical_task_status') in ('PASS','FAIL','NOT_RUN'):
         task = data['canonical_task_status']
     analysis = 'NOT_ASSESSED'
-    if data.get('model_task_success') is not None:
+    if assessable and data.get('model_task_success') is not None:
         analysis = 'MODEL_PREDICTS_PASS' if data['model_task_success'] else 'MODEL_PREDICTS_FAIL'
-    if tool_id.endswith(('pcc_jacobian', 'analyze_pcc', 'analyze_design')) and status == 'completed':
+    if (analysis_scope=='geometry' or tool_id.endswith(('pcc_jacobian', 'analyze_pcc', 'analyze_design'))) and status == 'completed':
         analysis = 'LOCAL_GEOMETRY_ONLY'
-    if tool_id.endswith(('saved_trajectory','diagnose_trajectory')) and status == 'completed':
+    if (analysis_scope=='sampled_rules' or tool_id.endswith(('saved_trajectory','diagnose_trajectory'))) and status == 'completed':
         analysis = 'SAMPLED_DIAGNOSTIC_RULES'
+        if data.get('status') in ('MISSING_DATA','NOT_APPLICABLE','NO_EVENT'):
+            analysis=data['status']
     message = result.get('message') or ''
     err = error_info(message, result.get('failure_code') or 'TOOL_ERROR') if status != 'completed' else None
     # Dispatch completion and a failed solver are independent states.
@@ -66,7 +71,7 @@ def normalize(tool_id, result, *, call_id, caller, evidence=(), cost=None, detai
         execution_status=status, solver_status=solver, analysis_status=analysis, task_status=task,
         summary=summary[:1200],
         error=err, evidence=list(evidence), cost=cost or {}, details_ref=details_ref,
-        provenance={**(provenance or {}),'raw_failure_code':result.get('failure_code'),'raw_solver_status':raw_solver}, epistemics=dict(
+        provenance={**(provenance or {}),'feedback_semantics_version':'1.1.0','raw_failure_code':result.get('failure_code'),'raw_solver_status':raw_solver}, epistemics=dict(
             observations='Only hash-linked saved numerical samples or direct analytic computation are facts of this model.',
             inference='Model predictions and diagnostic rule interpretations are not physical validation.',
             unverified=['Causal attribution and physical calibration unless separately evidenced.'],
@@ -105,6 +110,7 @@ def _implementation_hashes(runtime,name):
     from tools.artifact_tools import file_hash
     paths=['tools/public_feedback.py','schemas/public_tools.py',
            'tools/dynamic_campaign.py' if runtime=='dynamics' else 'tools/workbench.py']
+    if runtime=='dynamics':paths.append('tools/dynamic_actions.py')
     if name in ('analyze_pcc','analyze_design'):
         paths+=['tools/pcc_math.py','tools/public_services.py']
     return {p:file_hash(ROOT/p) for p in paths}

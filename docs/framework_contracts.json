@@ -1,0 +1,1860 @@
+{
+  "version": "1.1.0",
+  "schemas": {
+    "TaskContext": {
+      "$defs": {
+        "EnvironmentSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "const": "1",
+              "default": "1",
+              "title": "Schema Version",
+              "type": "string"
+            },
+            "environment_id": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Environment Id",
+              "type": "string"
+            },
+            "units": {
+              "const": "SI",
+              "default": "SI",
+              "title": "Units",
+              "type": "string"
+            },
+            "coordinate_frame": {
+              "const": "world_base_x_forward_yz_cross_section",
+              "title": "Coordinate Frame",
+              "type": "string"
+            },
+            "gravity_m_s2": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Gravity M S2",
+              "type": "array"
+            },
+            "gravity_source": {
+              "minLength": 1,
+              "title": "Gravity Source",
+              "type": "string"
+            },
+            "truth_status": {
+              "default": "HUMAN_OWNED",
+              "enum": [
+                "HUMAN_OWNED",
+                "HUMAN_APPROVED",
+                "NON_CANONICAL_DEVELOPMENT_ONLY"
+              ],
+              "title": "Truth Status",
+              "type": "string"
+            },
+            "objects": {
+              "items": {
+                "discriminator": {
+                  "mapping": {
+                    "ball": "#/$defs/ReservedComponent",
+                    "plane": "#/$defs/Plane",
+                    "platform_disturbance": "#/$defs/ReservedComponent",
+                    "ramp": "#/$defs/ReservedComponent",
+                    "window": "#/$defs/Window"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Plane"
+                  },
+                  {
+                    "$ref": "#/$defs/Window"
+                  },
+                  {
+                    "$ref": "#/$defs/ReservedComponent"
+                  }
+                ]
+              },
+              "title": "Objects",
+              "type": "array"
+            },
+            "lights": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/Light"
+              },
+              "title": "Lights",
+              "type": "array"
+            }
+          },
+          "required": [
+            "environment_id",
+            "coordinate_frame",
+            "gravity_m_s2",
+            "gravity_source",
+            "objects"
+          ],
+          "title": "EnvironmentSpec",
+          "type": "object"
+        },
+        "Light": {
+          "additionalProperties": false,
+          "properties": {
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "direction": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Direction",
+              "type": "array"
+            }
+          },
+          "required": [
+            "position_m",
+            "direction"
+          ],
+          "title": "Light",
+          "type": "object"
+        },
+        "Plane": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "plane",
+              "default": "plane",
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "half_size_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              ],
+              "title": "Half Size M",
+              "type": "array"
+            },
+            "contype": {
+              "minimum": 0,
+              "title": "Contype",
+              "type": "integer"
+            },
+            "conaffinity": {
+              "minimum": 0,
+              "title": "Conaffinity",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "name",
+            "position_m",
+            "half_size_m",
+            "contype",
+            "conaffinity"
+          ],
+          "title": "Plane",
+          "type": "object"
+        },
+        "ReservedComponent": {
+          "additionalProperties": false,
+          "description": "Serializable extension proposals; no execution support in V1.",
+          "properties": {
+            "kind": {
+              "enum": [
+                "ball",
+                "ramp",
+                "platform_disturbance"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "status": {
+              "const": "PLANNED",
+              "default": "PLANNED",
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "name",
+            "position_m"
+          ],
+          "title": "ReservedComponent",
+          "type": "object"
+        },
+        "RunSettings": {
+          "additionalProperties": false,
+          "properties": {
+            "steps": {
+              "exclusiveMinimum": 0,
+              "title": "Steps",
+              "type": "integer"
+            },
+            "random_seed": {
+              "minimum": 0,
+              "title": "Random Seed",
+              "type": "integer"
+            },
+            "provenance": {
+              "title": "Provenance",
+              "type": "string"
+            }
+          },
+          "required": [
+            "steps",
+            "random_seed",
+            "provenance"
+          ],
+          "title": "RunSettings",
+          "type": "object"
+        },
+        "TaskSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "task_id": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "task_type": {
+              "title": "Task Type",
+              "type": "string"
+            },
+            "environment_id": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Environment Id",
+              "type": "string"
+            },
+            "target_m": {
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 3,
+              "minItems": 3,
+              "title": "Target M",
+              "type": "array"
+            },
+            "position_error_max_m": {
+              "minimum": 0,
+              "title": "Position Error Max M",
+              "type": "number"
+            },
+            "acceptance": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/WindowAcceptance"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            }
+          },
+          "required": [
+            "task_id",
+            "task_type",
+            "environment_id",
+            "target_m",
+            "position_error_max_m"
+          ],
+          "title": "TaskSpec",
+          "type": "object"
+        },
+        "Window": {
+          "additionalProperties": false,
+          "description": "Finite rectangular frame; aperture in the world y-z plane, normal +x.",
+          "properties": {
+            "kind": {
+              "const": "window",
+              "default": "window",
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "plane": {
+              "const": "yz_normal_positive_x",
+              "title": "Plane",
+              "type": "string"
+            },
+            "width_m": {
+              "exclusiveMinimum": 0,
+              "title": "Width M",
+              "type": "number"
+            },
+            "height_m": {
+              "exclusiveMinimum": 0,
+              "title": "Height M",
+              "type": "number"
+            },
+            "thickness_m": {
+              "exclusiveMinimum": 0,
+              "title": "Thickness M",
+              "type": "number"
+            },
+            "frame_width_m": {
+              "exclusiveMinimum": 0,
+              "title": "Frame Width M",
+              "type": "number"
+            },
+            "contype": {
+              "const": 0,
+              "default": 0,
+              "title": "Contype",
+              "type": "integer"
+            },
+            "conaffinity": {
+              "const": 1,
+              "default": 1,
+              "title": "Conaffinity",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "name",
+            "position_m",
+            "plane",
+            "width_m",
+            "height_m",
+            "thickness_m",
+            "frame_width_m"
+          ],
+          "title": "Window",
+          "type": "object"
+        },
+        "WindowAcceptance": {
+          "additionalProperties": false,
+          "description": "Minimal executable acceptance; defaults preserve Round 2 development only.\n\nbefore_window means every robot capsule, including radius, is strictly before\nthe near wall face at the initial sampled pose. No initializer is implied.",
+          "properties": {
+            "initial_robot_region": {
+              "default": "unrestricted",
+              "enum": [
+                "before_window",
+                "unrestricted"
+              ],
+              "title": "Initial Robot Region",
+              "type": "string"
+            },
+            "final_aperture_required": {
+              "const": true,
+              "default": true,
+              "title": "Final Aperture Required",
+              "type": "boolean"
+            },
+            "window_contact_policy": {
+              "const": "forbid",
+              "default": "forbid",
+              "title": "Window Contact Policy",
+              "type": "string"
+            },
+            "final_robot_region": {
+              "const": "unrestricted",
+              "default": "unrestricted",
+              "title": "Final Robot Region",
+              "type": "string"
+            },
+            "randomization": {
+              "const": "none",
+              "default": "none",
+              "title": "Randomization",
+              "type": "string"
+            }
+          },
+          "title": "WindowAcceptance",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskSpec"
+        },
+        "environment": {
+          "$ref": "#/$defs/EnvironmentSpec"
+        },
+        "run_settings": {
+          "$ref": "#/$defs/RunSettings"
+        },
+        "timestep_s": {
+          "exclusiveMinimum": 0,
+          "title": "Timestep S",
+          "type": "number"
+        },
+        "initial_state": {
+          "const": "compiled_default_qpos_zero_qvel",
+          "default": "compiled_default_qpos_zero_qvel",
+          "title": "Initial State",
+          "type": "string"
+        },
+        "evaluator_id": {
+          "const": "reach_v1",
+          "default": "reach_v1",
+          "title": "Evaluator Id",
+          "type": "string"
+        },
+        "authority": {
+          "minLength": 1,
+          "title": "Authority",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task",
+        "environment",
+        "run_settings",
+        "timestep_s",
+        "authority"
+      ],
+      "title": "TaskContext",
+      "type": "object"
+    },
+    "EvaluationConfig": {
+      "$defs": {
+        "DesignSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "robot_family": {
+              "title": "Robot Family",
+              "type": "string"
+            },
+            "sections": {
+              "exclusiveMinimum": 0,
+              "title": "Sections",
+              "type": "integer"
+            },
+            "segments": {
+              "exclusiveMinimum": 0,
+              "title": "Segments",
+              "type": "integer"
+            },
+            "total_length_m": {
+              "exclusiveMinimum": 0,
+              "title": "Total Length M",
+              "type": "number"
+            },
+            "body_radius_m": {
+              "exclusiveMinimum": 0,
+              "title": "Body Radius M",
+              "type": "number"
+            },
+            "tendon_count": {
+              "exclusiveMinimum": 0,
+              "title": "Tendon Count",
+              "type": "integer"
+            },
+            "tendon_routing_radius_m": {
+              "exclusiveMinimum": 0,
+              "title": "Tendon Routing Radius M",
+              "type": "number"
+            },
+            "exploration_physics": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ExplorationPhysics"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            }
+          },
+          "required": [
+            "robot_family",
+            "sections",
+            "segments",
+            "total_length_m",
+            "body_radius_m",
+            "tendon_count",
+            "tendon_routing_radius_m"
+          ],
+          "title": "DesignSpec",
+          "type": "object"
+        },
+        "EnvironmentSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "const": "1",
+              "default": "1",
+              "title": "Schema Version",
+              "type": "string"
+            },
+            "environment_id": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Environment Id",
+              "type": "string"
+            },
+            "units": {
+              "const": "SI",
+              "default": "SI",
+              "title": "Units",
+              "type": "string"
+            },
+            "coordinate_frame": {
+              "const": "world_base_x_forward_yz_cross_section",
+              "title": "Coordinate Frame",
+              "type": "string"
+            },
+            "gravity_m_s2": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Gravity M S2",
+              "type": "array"
+            },
+            "gravity_source": {
+              "minLength": 1,
+              "title": "Gravity Source",
+              "type": "string"
+            },
+            "truth_status": {
+              "default": "HUMAN_OWNED",
+              "enum": [
+                "HUMAN_OWNED",
+                "HUMAN_APPROVED",
+                "NON_CANONICAL_DEVELOPMENT_ONLY"
+              ],
+              "title": "Truth Status",
+              "type": "string"
+            },
+            "objects": {
+              "items": {
+                "discriminator": {
+                  "mapping": {
+                    "ball": "#/$defs/ReservedComponent",
+                    "plane": "#/$defs/Plane",
+                    "platform_disturbance": "#/$defs/ReservedComponent",
+                    "ramp": "#/$defs/ReservedComponent",
+                    "window": "#/$defs/Window"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Plane"
+                  },
+                  {
+                    "$ref": "#/$defs/Window"
+                  },
+                  {
+                    "$ref": "#/$defs/ReservedComponent"
+                  }
+                ]
+              },
+              "title": "Objects",
+              "type": "array"
+            },
+            "lights": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/Light"
+              },
+              "title": "Lights",
+              "type": "array"
+            }
+          },
+          "required": [
+            "environment_id",
+            "coordinate_frame",
+            "gravity_m_s2",
+            "gravity_source",
+            "objects"
+          ],
+          "title": "EnvironmentSpec",
+          "type": "object"
+        },
+        "ExplorationControl": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "length_control_v2",
+              "default": "length_control_v2",
+              "title": "Version",
+              "type": "string"
+            },
+            "mode": {
+              "default": "C1",
+              "enum": [
+                "C1",
+                "C2"
+              ],
+              "title": "Mode",
+              "type": "string"
+            },
+            "bend_y_rad": {
+              "default": 0,
+              "maximum": 3.141592653589793,
+              "minimum": -3.141592653589793,
+              "title": "Bend Y Rad",
+              "type": "number"
+            },
+            "bend_z_rad": {
+              "default": 1.073643020187874,
+              "maximum": 3.141592653589793,
+              "minimum": -3.141592653589793,
+              "title": "Bend Z Rad",
+              "type": "number"
+            },
+            "bias_fraction": {
+              "default": 0,
+              "maximum": 0.05,
+              "minimum": -0.02,
+              "title": "Bias Fraction",
+              "type": "number"
+            },
+            "gain_rad2_per_m2": {
+              "default": 5,
+              "maximum": 100,
+              "minimum": 0,
+              "title": "Gain Rad2 Per M2",
+              "type": "number"
+            },
+            "update_every_steps": {
+              "default": 10,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Update Every Steps",
+              "type": "integer"
+            },
+            "max_bend_update_rad": {
+              "default": 0.05,
+              "exclusiveMinimum": 0,
+              "maximum": 0.2,
+              "title": "Max Bend Update Rad",
+              "type": "number"
+            },
+            "rate_limit_ref_per_s": {
+              "default": 0.5,
+              "exclusiveMinimum": 0,
+              "maximum": 2,
+              "title": "Rate Limit Ref Per S",
+              "type": "number"
+            }
+          },
+          "title": "ExplorationControl",
+          "type": "object"
+        },
+        "ExplorationPhysics": {
+          "additionalProperties": false,
+          "properties": {
+            "profile": {
+              "const": "equivalent_rod_v2",
+              "default": "equivalent_rod_v2",
+              "title": "Profile",
+              "type": "string"
+            },
+            "validated": {
+              "const": false,
+              "default": false,
+              "title": "Validated",
+              "type": "boolean"
+            },
+            "mass_mode": {
+              "const": "uniform_equivalent_cylinder",
+              "default": "uniform_equivalent_cylinder",
+              "title": "Mass Mode",
+              "type": "string"
+            },
+            "line_density_kg_m": {
+              "default": 1.2566370614359172,
+              "maximum": 3,
+              "minimum": 0.02,
+              "title": "Line Density Kg M",
+              "type": "number"
+            },
+            "root_ei_nm2": {
+              "default": 0.00375,
+              "maximum": 1,
+              "minimum": 0.0001,
+              "title": "Root Ei Nm2",
+              "type": "number"
+            },
+            "tip_ei_ratio": {
+              "default": 1,
+              "maximum": 3,
+              "minimum": 0.1,
+              "title": "Tip Ei Ratio",
+              "type": "number"
+            },
+            "bending_viscosity_nm2_s": {
+              "default": 0.00375,
+              "maximum": 0.05,
+              "minimum": 1e-06,
+              "title": "Bending Viscosity Nm2 S",
+              "type": "number"
+            },
+            "natural_total_angle_rad": {
+              "default": 0,
+              "maximum": 3.141592653589793,
+              "minimum": -3.141592653589793,
+              "title": "Natural Total Angle Rad",
+              "type": "number"
+            },
+            "tendon_servo_kp_n_per_m": {
+              "default": 1000,
+              "maximum": 20000,
+              "minimum": 100,
+              "title": "Tendon Servo Kp N Per M",
+              "type": "number"
+            },
+            "tendon_force_limit_n": {
+              "default": 20,
+              "maximum": 80,
+              "minimum": 5,
+              "title": "Tendon Force Limit N",
+              "type": "number"
+            }
+          },
+          "title": "ExplorationPhysics",
+          "type": "object"
+        },
+        "Light": {
+          "additionalProperties": false,
+          "properties": {
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "direction": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Direction",
+              "type": "array"
+            }
+          },
+          "required": [
+            "position_m",
+            "direction"
+          ],
+          "title": "Light",
+          "type": "object"
+        },
+        "Plane": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "plane",
+              "default": "plane",
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "half_size_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              ],
+              "title": "Half Size M",
+              "type": "array"
+            },
+            "contype": {
+              "minimum": 0,
+              "title": "Contype",
+              "type": "integer"
+            },
+            "conaffinity": {
+              "minimum": 0,
+              "title": "Conaffinity",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "name",
+            "position_m",
+            "half_size_m",
+            "contype",
+            "conaffinity"
+          ],
+          "title": "Plane",
+          "type": "object"
+        },
+        "ReservedComponent": {
+          "additionalProperties": false,
+          "description": "Serializable extension proposals; no execution support in V1.",
+          "properties": {
+            "kind": {
+              "enum": [
+                "ball",
+                "ramp",
+                "platform_disturbance"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "status": {
+              "const": "PLANNED",
+              "default": "PLANNED",
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "name",
+            "position_m"
+          ],
+          "title": "ReservedComponent",
+          "type": "object"
+        },
+        "RunSettings": {
+          "additionalProperties": false,
+          "properties": {
+            "steps": {
+              "exclusiveMinimum": 0,
+              "title": "Steps",
+              "type": "integer"
+            },
+            "random_seed": {
+              "minimum": 0,
+              "title": "Random Seed",
+              "type": "integer"
+            },
+            "provenance": {
+              "title": "Provenance",
+              "type": "string"
+            }
+          },
+          "required": [
+            "steps",
+            "random_seed",
+            "provenance"
+          ],
+          "title": "RunSettings",
+          "type": "object"
+        },
+        "TaskContext": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "1.0",
+              "default": "1.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "task": {
+              "$ref": "#/$defs/TaskSpec"
+            },
+            "environment": {
+              "$ref": "#/$defs/EnvironmentSpec"
+            },
+            "run_settings": {
+              "$ref": "#/$defs/RunSettings"
+            },
+            "timestep_s": {
+              "exclusiveMinimum": 0,
+              "title": "Timestep S",
+              "type": "number"
+            },
+            "initial_state": {
+              "const": "compiled_default_qpos_zero_qvel",
+              "default": "compiled_default_qpos_zero_qvel",
+              "title": "Initial State",
+              "type": "string"
+            },
+            "evaluator_id": {
+              "const": "reach_v1",
+              "default": "reach_v1",
+              "title": "Evaluator Id",
+              "type": "string"
+            },
+            "authority": {
+              "minLength": 1,
+              "title": "Authority",
+              "type": "string"
+            }
+          },
+          "required": [
+            "task",
+            "environment",
+            "run_settings",
+            "timestep_s",
+            "authority"
+          ],
+          "title": "TaskContext",
+          "type": "object"
+        },
+        "TaskSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "task_id": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "task_type": {
+              "title": "Task Type",
+              "type": "string"
+            },
+            "environment_id": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Environment Id",
+              "type": "string"
+            },
+            "target_m": {
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 3,
+              "minItems": 3,
+              "title": "Target M",
+              "type": "array"
+            },
+            "position_error_max_m": {
+              "minimum": 0,
+              "title": "Position Error Max M",
+              "type": "number"
+            },
+            "acceptance": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/WindowAcceptance"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            }
+          },
+          "required": [
+            "task_id",
+            "task_type",
+            "environment_id",
+            "target_m",
+            "position_error_max_m"
+          ],
+          "title": "TaskSpec",
+          "type": "object"
+        },
+        "Window": {
+          "additionalProperties": false,
+          "description": "Finite rectangular frame; aperture in the world y-z plane, normal +x.",
+          "properties": {
+            "kind": {
+              "const": "window",
+              "default": "window",
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "plane": {
+              "const": "yz_normal_positive_x",
+              "title": "Plane",
+              "type": "string"
+            },
+            "width_m": {
+              "exclusiveMinimum": 0,
+              "title": "Width M",
+              "type": "number"
+            },
+            "height_m": {
+              "exclusiveMinimum": 0,
+              "title": "Height M",
+              "type": "number"
+            },
+            "thickness_m": {
+              "exclusiveMinimum": 0,
+              "title": "Thickness M",
+              "type": "number"
+            },
+            "frame_width_m": {
+              "exclusiveMinimum": 0,
+              "title": "Frame Width M",
+              "type": "number"
+            },
+            "contype": {
+              "const": 0,
+              "default": 0,
+              "title": "Contype",
+              "type": "integer"
+            },
+            "conaffinity": {
+              "const": 1,
+              "default": 1,
+              "title": "Conaffinity",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "name",
+            "position_m",
+            "plane",
+            "width_m",
+            "height_m",
+            "thickness_m",
+            "frame_width_m"
+          ],
+          "title": "Window",
+          "type": "object"
+        },
+        "WindowAcceptance": {
+          "additionalProperties": false,
+          "description": "Minimal executable acceptance; defaults preserve Round 2 development only.\n\nbefore_window means every robot capsule, including radius, is strictly before\nthe near wall face at the initial sampled pose. No initializer is implied.",
+          "properties": {
+            "initial_robot_region": {
+              "default": "unrestricted",
+              "enum": [
+                "before_window",
+                "unrestricted"
+              ],
+              "title": "Initial Robot Region",
+              "type": "string"
+            },
+            "final_aperture_required": {
+              "const": true,
+              "default": true,
+              "title": "Final Aperture Required",
+              "type": "boolean"
+            },
+            "window_contact_policy": {
+              "const": "forbid",
+              "default": "forbid",
+              "title": "Window Contact Policy",
+              "type": "string"
+            },
+            "final_robot_region": {
+              "const": "unrestricted",
+              "default": "unrestricted",
+              "title": "Final Robot Region",
+              "type": "string"
+            },
+            "randomization": {
+              "const": "none",
+              "default": "none",
+              "title": "Randomization",
+              "type": "string"
+            }
+          },
+          "title": "WindowAcceptance",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "authorization": {
+          "minLength": 1,
+          "title": "Authorization",
+          "type": "string"
+        },
+        "permissions": {
+          "items": {
+            "const": "simulate",
+            "type": "string"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "backends": {
+          "items": {
+            "enum": [
+              "mujoco",
+              "matlab"
+            ],
+            "type": "string"
+          },
+          "title": "Backends",
+          "type": "array"
+        },
+        "controller_modes": {
+          "items": {
+            "enum": [
+              "C1",
+              "C2"
+            ],
+            "type": "string"
+          },
+          "title": "Controller Modes",
+          "type": "array"
+        },
+        "controller_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Controller Id"
+        },
+        "task_context": {
+          "$ref": "#/$defs/TaskContext"
+        },
+        "design": {
+          "$ref": "#/$defs/DesignSpec"
+        },
+        "control": {
+          "$ref": "#/$defs/ExplorationControl"
+        },
+        "bounds": {
+          "additionalProperties": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Bounds",
+          "type": "object"
+        },
+        "max_evaluations": {
+          "minimum": 0,
+          "title": "Max Evaluations",
+          "type": "integer"
+        },
+        "max_calls": {
+          "minimum": 0,
+          "title": "Max Calls",
+          "type": "integer"
+        },
+        "wall_s": {
+          "exclusiveMinimum": 0,
+          "title": "Wall S",
+          "type": "number"
+        },
+        "per_evaluation_timeout_s": {
+          "exclusiveMinimum": 0,
+          "title": "Per Evaluation Timeout S",
+          "type": "number"
+        }
+      },
+      "required": [
+        "authorization",
+        "permissions",
+        "backends",
+        "controller_modes",
+        "task_context",
+        "design",
+        "control",
+        "max_evaluations",
+        "max_calls",
+        "wall_s",
+        "per_evaluation_timeout_s"
+      ],
+      "title": "EvaluationConfig",
+      "type": "object"
+    },
+    "Evaluation": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "VALID",
+            "INCOMPLETE",
+            "INVALID",
+            "REJECTED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        },
+        "task_success": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Success"
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Ref"
+        },
+        "actual_evaluations": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Actual Evaluations",
+          "type": "integer"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "Evaluation",
+      "type": "object"
+    },
+    "PCCCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "length_m": {
+          "description": "Positive arc length in meters; geometry only, no design authorization.",
+          "exclusiveMinimum": 0,
+          "title": "Length M",
+          "type": "number"
+        },
+        "bend_rad": {
+          "description": "[theta*cos(phi), theta*sin(phi)] in radians; norm <= pi.",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Bend Rad",
+          "type": "array"
+        },
+        "frame": {
+          "const": "base_origin_x_forward_yz_bending",
+          "default": "base_origin_x_forward_yz_bending",
+          "title": "Frame",
+          "type": "string"
+        },
+        "relative_rank_tolerance": {
+          "default": 1e-10,
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "title": "Relative Rank Tolerance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "length_m",
+        "bend_rad"
+      ],
+      "title": "PCCCondition",
+      "type": "object"
+    },
+    "PCCConditionResult": {
+      "additionalProperties": false,
+      "properties": {
+        "singular_values_m_per_rad": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Singular Values M Per Rad",
+          "type": "array"
+        },
+        "rank": {
+          "maximum": 2,
+          "minimum": 0,
+          "title": "Rank",
+          "type": "integer"
+        },
+        "condition_number": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Condition Number"
+        },
+        "condition_status": {
+          "enum": [
+            "FINITE",
+            "RANK_DEFICIENT"
+          ],
+          "title": "Condition Status",
+          "type": "string"
+        },
+        "relative_rank_tolerance": {
+          "title": "Relative Rank Tolerance",
+          "type": "number"
+        },
+        "model": {
+          "additionalProperties": true,
+          "title": "Model",
+          "type": "object"
+        },
+        "input": {
+          "additionalProperties": true,
+          "title": "Input",
+          "type": "object"
+        },
+        "analysis_status": {
+          "const": "LOCAL_GEOMETRY_ONLY",
+          "title": "Analysis Status",
+          "type": "string"
+        },
+        "backend_solves": {
+          "const": 0,
+          "title": "Backend Solves",
+          "type": "integer"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "singular_values_m_per_rad",
+        "rank",
+        "condition_number",
+        "condition_status",
+        "relative_rank_tolerance",
+        "model",
+        "input",
+        "analysis_status",
+        "backend_solves",
+        "limitations"
+      ],
+      "title": "PCCConditionResult",
+      "type": "object"
+    },
+    "RuleQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "result_ref": {
+          "title": "Result Ref",
+          "type": "string"
+        },
+        "backend": {
+          "enum": [
+            "matlab",
+            "mujoco"
+          ],
+          "title": "Backend",
+          "type": "string"
+        },
+        "rule_id": {
+          "default": "contact_presence",
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "rule_version": {
+          "default": "1.0.0",
+          "title": "Rule Version",
+          "type": "string"
+        },
+        "entity": {
+          "default": "contact",
+          "title": "Entity",
+          "type": "string"
+        },
+        "t_start_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "T Start S"
+        },
+        "t_end_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "T End S"
+        }
+      },
+      "required": [
+        "result_ref",
+        "backend"
+      ],
+      "title": "RuleQuery",
+      "type": "object"
+    },
+    "SignalRuleResult": {
+      "additionalProperties": false,
+      "properties": {
+        "rule_id": {
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "rule_version": {
+          "title": "Rule Version",
+          "type": "string"
+        },
+        "rule_sha256": {
+          "title": "Rule Sha256",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "EVENTS_FOUND",
+            "NO_EVENT",
+            "MISSING_DATA",
+            "NOT_APPLICABLE",
+            "EXECUTION_FAILED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "events": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "backend_solves": {
+          "const": 0,
+          "title": "Backend Solves",
+          "type": "integer"
+        },
+        "rescoring": {
+          "const": false,
+          "title": "Rescoring",
+          "type": "boolean"
+        },
+        "semantics": {
+          "title": "Semantics",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "source_hashes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Source Hashes",
+          "type": "object"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        }
+      },
+      "required": [
+        "rule_id",
+        "rule_version",
+        "rule_sha256",
+        "status",
+        "events",
+        "backend_solves",
+        "rescoring",
+        "semantics"
+      ],
+      "title": "SignalRuleResult",
+      "type": "object"
+    },
+    "QuantityRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "quantity": {
+          "title": "Quantity",
+          "type": "string"
+        },
+        "frame": {
+          "const": "base_origin_x_forward_yz_bending",
+          "default": "base_origin_x_forward_yz_bending",
+          "title": "Frame",
+          "type": "string"
+        },
+        "units": {
+          "title": "Units",
+          "type": "string"
+        }
+      },
+      "required": [
+        "quantity",
+        "units"
+      ],
+      "title": "QuantityRequest",
+      "type": "object"
+    }
+  },
+  "signals": {
+    "solver_contact_count": {
+      "units": "1",
+      "phase": "solver",
+      "time_field": "solver_time_s",
+      "entity": "contact"
+    },
+    "qpos_rad": {
+      "units": "rad",
+      "phase": "post_step_state",
+      "time_field": "time_s",
+      "entity": "joint"
+    },
+    "qvel_rad_s": {
+      "units": "rad/s",
+      "phase": "post_step_state",
+      "time_field": "time_s",
+      "entity": "joint"
+    },
+    "solver_actuator_force_n": {
+      "units": "N",
+      "phase": "solver",
+      "time_field": "solver_time_s",
+      "entity": "tendon",
+      "tension_sign": -1
+    },
+    "solver_tendon_length_m": {
+      "units": "m",
+      "phase": "solver",
+      "time_field": "solver_time_s",
+      "entity": "tendon"
+    },
+    "command_m": {
+      "units": "m",
+      "phase": "solver",
+      "time_field": "solver_time_s",
+      "entity": "tendon"
+    },
+    "tip_m": {
+      "units": "m",
+      "phase": "post_step_state",
+      "time_field": "time_s",
+      "entity": "tip",
+      "frame": "world"
+    }
+  },
+  "rules": {
+    "contact_presence": {
+      "version": "1.0.0",
+      "signal": "solver_contact_count",
+      "entity": "contact",
+      "backends": [
+        "matlab",
+        "mujoco"
+      ],
+      "binding": "tools.rules.contact_presence:evaluate"
+    }
+  },
+  "controllers": {
+    "open_loop_length": {
+      "version": "1.0",
+      "level": "C1",
+      "backend": "mujoco",
+      "input_type": "tendon_target_lengths_m",
+      "observations": [],
+      "reset": "stateless",
+      "generator": "controllers.factories:length_controller"
+    },
+    "pcc_tip_feedback": {
+      "version": "1.0",
+      "level": "C2",
+      "backend": "mujoco",
+      "input_type": "tendon_target_lengths_m",
+      "observations": [
+        "step",
+        "tip_position_m"
+      ],
+      "reset": "reset",
+      "generator": "controllers.factories:length_controller"
+    }
+  }
+}

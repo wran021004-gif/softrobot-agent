@@ -184,6 +184,8 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
     def numerical_sources(self):
         names=['tools/reach_dynamics.py','tools/mujoco_tools.py','tools/design_compiler.py','matlab/tdcr_planar_dynamic.m',
                'controllers/pcc_tip_feedback.py','tools/pcc_math.py','metrics/reach.py','physics_contracts/equivalent_rod_v2.md',
+               'tools/task_context.py','controllers/registry.py','controllers/factories.py','tools/optimization_interfaces.py',
+               'schemas/framework.py','tools/dynamic_actions.py',
                'schemas/exploration.py','schemas/design_spec.py','schemas/robot_ir.py','schemas/settings.py','tools/spec_tools.py']
         return {n:__import__('hashlib').sha256((ROOT/n).read_bytes()).hexdigest() for n in names}
     def simulate(self,cid,backend,purpose='validation',model_id=None):
@@ -244,11 +246,11 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
         if parent['physics_version']!='equivalent_rod_v2':raise ValueError('Create an explicit V2 parent before continuous physical design optimization')
         flat={**parent['design'],**parent['design']['exploration_physics'],**parent['control']}
         logs={'root_ei_nm2','bending_viscosity_nm2_s','line_density_kg_m','tendon_servo_kp_n_per_m'}
-        bb=[np.log(bounds[v]) if v in logs else np.array(bounds[v]) for v in variables]
-        def encode(c):
-            f={**c['design'],**c['design']['exploration_physics'],**c['control']}
-            return [float(((math.log(f[v]) if v in logs else f[v])-b[0])/(b[1]-b[0])) for v,b in zip(variables,bb)]
-        def decode(x):return {v:float(math.exp(b[0]+z*(b[1]-b[0])) if v in logs else b[0]+z*(b[1]-b[0])) for v,b,z in zip(variables,bb,x)}
+        from tools.optimization_interfaces import ParameterSpace, CampaignEvaluator, MatlabCoordinateProposal
+        space=ParameterSpace(variables,bounds,logs)
+        def encode(c):return space.encode({**c['design'],**c['design']['exploration_physics'],**c['control']})
+        decode=space.decode
+        evaluator=CampaignEvaluator(self,'matlab');search=MatlabCoordinateProposal(self)
         if path.exists():
             s=read(path)
             if s['args']!=args:raise ValueError('Search ID already bound to different arguments')
@@ -274,11 +276,7 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
             if self.remaining()['matlab_dynamic']<=0 or self.remaining()['candidates']<=0:s['stopping_reason']='RESOURCE_CAP';break
             if not s['trials']:x=s['best'];proposal='parent baseline'
             else:
-                key=f'{sid}:{s["iteration"]}';receipt,new=self.reserve('matlab_other',key)
-                if new:
-                    proposal=json.loads(self.backends.engine().tdcr_search_step(json.dumps(s),nargout=1));self.finish(receipt,proposal=proposal)
-                else:proposal=receipt.get('proposal')
-                if not proposal:raise ValueError('Interrupted numerical search proposal; evidence retained')
+                proposal=search.propose(s,sid)
                 x=proposal['x']
             trial=dict(index=s['iteration'],parameters=decode(x),status='started',evidence=evidence)
             if self.experiment():trial['provenance']=self.action_provenance()
@@ -286,12 +284,12 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
             # Deterministic ID/identity plus per-rollout receipts make re-entry idempotent.
             try:
                 c=parent if not s['trials'] else self.create_candidate(args['parent_id'],trial['parameters'],evidence,reason)
-                before=self.ledger['used']['matlab_dynamic'];out=self.simulate(c['candidate_id'],'matlab','search:'+sid)
-                delta=self.ledger['used']['matlab_dynamic']-before;s['actual_evaluations']+=delta
-                trial.update(candidate_id=c['candidate_id'],result_ref=out.get('result_ref'),actual_rollouts=delta,
-                    status=out['computation_status'],score=out.get('position_error_m'),reason=out.get('reason'))
-                score=out.get('position_error_m')
-                if out['complete'] and score is not None and (s['best_score'] is None or score<s['best_score']):
+                outcome=evaluator.evaluate(c,'search:'+sid)
+                delta=outcome.actual_evaluations;s['actual_evaluations']+=delta
+                trial.update(candidate_id=c['candidate_id'],result_ref=outcome.evidence_ref,actual_rollouts=delta,
+                    status=outcome.status,score=outcome.score,reason=outcome.reason)
+                score=outcome.score
+                if outcome.status=='VALID' and (s['best_score'] is None or score<s['best_score']):
                     s.update(best=x,best_score=score,best_id=c['candidate_id'],cycle_improved=True)
             except ValueError as exc:trial.update(status='rejected',reason=str(exc),actual_rollouts=0)
             s['trials'].append(trial);s['iteration']+=1
@@ -333,62 +331,10 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
             {k:c[k] for k in ('candidate_id','parent_id','design','control','design_hash','control_hash','physics_version','physics_hash','changes','results')}
             for c in candidates[offset:offset+limit]])
     def dispatch(self,name,args,evidence,reason):
-        if name=='analyze_pcc':
-            from tools.public_services import pcc_jacobian
-            return pcc_jacobian(args)
-        if name=='render_simulation_video':
-            from tools.simulation_video import render_simulation_video
-            return render_simulation_video(self.root,self.state['evidence'],**args)
-        if name=='create_candidate':return dict(candidate=self.create_candidate(**args,evidence=evidence,reason=reason))
-        if name=='simulate_candidate':return self.simulate(args['candidate_id'],args['backend'],args['purpose'],args['model_id'])
-        if name=='evaluate_candidate':return self.simulate(args['candidate_id'],'mujoco')
-        if name=='optimize_matlab':return self.optimize(args,evidence,reason)
-        if name=='compare_candidates':return self.compare(args['candidate_ids'],args['offset'],args['limit'])
-        if name in ('diagnose_trajectory','observe_candidate'):
-            c=self.candidate(args['candidate_id']);r=c['results'].get(args['backend'])
-            if not r or not r.get('result_ref'):raise ValueError('Backend NOT_RUN')
-            source_hashes=self.saved_sources(r)
-            folder=(self.root/r['result_ref']).parent
-            if name=='observe_candidate':
-                from tools.dynamic_view import render_candidate
-                path=render_candidate(self.root,c,args['backend']);self.register(path)
-                metadata=path.with_suffix('.provenance.json')
-                atomic_json(metadata,dict(source_hashes=source_hashes,parameters=args,backend_solves=0,rescoring=False,
-                    processor='tools.dynamic_view.render_candidate',processor_sha256=__import__('hashlib').sha256((ROOT/'tools/dynamic_view.py').read_bytes()).hexdigest(),
-                    artifact_hashes={path.relative_to(self.root).as_posix():self.state['evidence'][path.relative_to(self.root).as_posix()]['sha256']}))
-                self.register(metadata)
-                return dict(candidate_id=c['candidate_id'],backend_solves=0,html_ref=path.relative_to(self.root).as_posix(),metadata_ref=metadata.relative_to(self.root).as_posix())
-            if args['t_end_s']<args['t_start_s']:raise ValueError('Reversed time window')
-            meta=metadata_from_shared(read(folder/'shared_input.json'),c['candidate_id'],args['backend'],self.root.name)
-            d=diagnose(folder/'trajectory.json.gz',meta,args['entity'],args['t_start_s'],args['t_end_s'],args['fields'])
-            d.update(source_hashes=source_hashes,parameters=args,backend_solves=0,rescoring=False,
-                processor='tools.trajectory_diagnosis.diagnose',processor_sha256=__import__('hashlib').sha256((ROOT/'tools/trajectory_diagnosis.py').read_bytes()).hexdigest())
-            path=self.root/f"diagnostics/{digest(args)[:16]}.json";atomic_json(path,d);self.register(path)
-            return {**{k:v for k,v in d.items() if k!='raw_fields'},'raw_fields_ref':path.relative_to(self.root).as_posix()}
-        if name=='read_evidence':
-            ref=args['evidence_ref'];self.check_evidence(ref);value=read(self.root/ref)
-            return evidence_page(value,ref,args.get('pointer',''),args.get('offset',0),
-                                 args.get('limit',10),args.get('max_bytes',4000))
-        if name=='record_verified_diagnosis':
-            self.check_evidence(args['evidence_ref']);d=read(self.root/args['evidence_ref']);r=d[args['record_type']][args['record_index']]
-            if r['entity_name']!=args['entity_name'] or abs(r['t_start_s']-args['t_start_s'])>1e-9 or abs(r['t_end_s']-args['t_end_s'])>1e-9:
-                raise ValueError('Diagnostic entity/time mismatch')
-            if args['field'] not in r['values'] or not math.isclose(r['values'][args['field']],args['value'],rel_tol=1e-6,abs_tol=1e-9):raise ValueError('Diagnostic numeric mismatch')
-            claim={**args,'origin':getattr(self,'decision_origin','codex_development'),
-                'candidate_id':r.get('candidate_id'),'provenance':self.action_provenance(),
-                'verification':'NUMERIC_ENTITY_TIME_MATCH','semantic_text_verification':'not inferred; structured fields authoritative'}
-            self.state['verified_diagnoses'].append(claim);atomic_json(self.root/'verified_diagnoses.json',self.state['verified_diagnoses']);return claim
-        if name=='stop_design':
-            selected=args.get('selected_candidate_id')
-            if selected is not None:self.candidate(selected)
-            selection=dict(selected_candidate_id=selected,reason=reason,source='stop_design.selected_candidate_id',
-                           provenance=self.action_provenance())
-            self.state['decisions'][-1]['selection']=selection
-            self.state.update(status='STOPPED',stop_reason=reason)
-            if self.experiment():
-                self.experiment()['stop_decision_sequence']=len(self.state['decisions'])-1
-            return dict(status='STOPPED',reason=reason,selected_candidate_id=selected,experiment=self.experiment_summary())
-        raise ValueError('Tool is not executable')
+        from tools.dynamic_actions import BINDINGS
+        if set(BINDINGS)!=set(TOOLS):raise ValueError('REGISTRY_BINDING_MISMATCH')
+        if name not in BINDINGS:raise ValueError('Tool is not executable')
+        return BINDINGS[name](self,args,evidence,reason)
     def saved_sources(self,result):
         """Registered input hashes, shared by comparison, diagnosis and observation."""
         ref=result['result_ref'];self.check_evidence(ref)

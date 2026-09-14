@@ -64,7 +64,7 @@ def saved_diagnosis(root, registry, arguments):
         data=diagnose(paths[-1],meta,arguments['entity'],start,end,arguments['fields'])
     except KeyError as exc:
         raise ValueError('MISSING_SAVED_FIELD: '+str(exc)) from exc
-    if not data.get('queries'):
+    if not data.get('queries') and not data.get('events') and data.get('status') not in ('NO_EVENT','MISSING_DATA'):
         raise ValueError('NO_SAVED_SAMPLE_OR_ENTITY: inspect saved entity names and time range')
     data.update(source_hashes=hashes,backend_solves=0,rescoring=False,
         processor='tools.trajectory_diagnosis.diagnose',processor_sha256=file_hash(ROOT/'tools/trajectory_diagnosis.py'),
@@ -170,50 +170,63 @@ class ServiceSession:
         charged = 0
         refs = []
         arguments = {}
+        implementation_hashes = {}
+        cache_key = None
         try:
             call = ToolCall.model_validate_json(json.dumps(value, allow_nan=False), strict=True)
             tool_id = call.tool_id
             info = entries().get(tool_id)
             if info is None or info['runtime'] != 'services':
                 raise ValueError('UNKNOWN_TOOL: discover the bound services catalog')
+            from tools.tool_registry import service_tools
+            from tools.service_execution import identity, execute
+            definition=service_tools()[tool_id]
+            if call.tool_version not in (definition.version,*definition.compatible_versions):raise ValueError('TOOL_VERSION_MISMATCH')
+            if not definition.binding:raise ValueError('IMPLEMENTATION_REQUIRED: '+tool_id)
             arguments = info['schema'].model_validate_json(json.dumps(call.arguments, allow_nan=False), strict=True).model_dump(mode='json')
             if info['permission'] not in state['config']['permissions']:
                 raise ValueError('PERMISSION_DENIED: '+info['permission'])
-            for evidence_ref in dict.fromkeys(call.evidence + [arguments[k] for k in ('evidence_ref','result_ref') if k in arguments]):
+            for evidence_ref in dict.fromkeys(call.evidence + [arguments[k] for k in definition.input_refs]):
                 path = checked_path(self.root, state['evidence'], evidence_ref)
                 refs.append(dict(ref=evidence_ref, sha256=file_hash(path), role='input'))
+            cache_key,implementation_hashes=identity(definition,arguments,refs)
+            cached=state.get('cache',{}).get(cache_key) if definition.cache else None
+            if cached:checked_path(self.root,state['evidence'],cached)
             if state['used']['tool_calls'] >= state['config']['tool_calls']:
                 raise ValueError('BUDGET_EXHAUSTED: tool_calls')
             atomic_json(folder/'request.json', dict(call=call.model_dump(mode='json'), caller=caller, parsed_arguments=arguments))
             charged = 1
             state['used']['tool_calls'] += charged
             row['status'] = 'reserved'
+            row.update(cache_key=cache_key,implementation_hashes=implementation_hashes,resources=dict(definition.resources))
             atomic_json(self.root/'state.json', state)
-            if tool_id == 'analysis.pcc_jacobian':
-                data = pcc_jacobian(arguments)
-            elif tool_id == 'evidence.read_json':
-                data = read_json(self.root, state['evidence'], arguments)
-            elif tool_id == 'diagnostics.saved_trajectory':
-                data = saved_diagnosis(self.root, state['evidence'], arguments)
+            if cached:
+                data={**read(checked_path(self.root,state['evidence'],cached)), 'cached':True,'cache_source_ref':cached}
             else:
-                from tools.simulation_video import render_simulation_video
-                data = render_simulation_video(self.root, state['evidence'], **arguments)
+                data=execute(definition,self.root,state['evidence'],arguments,folder)
+                if definition.output_schema:
+                    data=definition.output_schema.model_validate_json(json.dumps(data,allow_nan=False),strict=True).model_dump(mode='json')
             legacy = dict(status='completed', data=data)
+            if data.get('status')=='EXECUTION_FAILED':
+                legacy.update(status='failed',failure_code='DIAGNOSTIC_EXECUTION_FAILED',message=data.get('reason','Rule execution failed'))
         except Exception as exc:
             legacy = dict(status='failed' if charged else 'rejected', failure_code='TOOL_ERROR' if charged else 'INVALID_REQUEST', message=str(exc), data={})
         detail_ref = (folder/'data.json').relative_to(self.root).as_posix()
         atomic_json(self.root/detail_ref, legacy['data'])
         state['evidence'][detail_ref] = dict(sha256=file_hash(self.root/detail_ref))
+        if legacy['status']=='completed' and definition.cache:
+            state.setdefault('cache',{})[cache_key]=detail_ref
         refs.append(dict(ref=detail_ref, sha256=state['evidence'][detail_ref]['sha256'], role='detail'))
         for key, output in legacy['data'].items():
             if key.endswith('_ref') and isinstance(output, str) and output in state['evidence']:
                 refs.append(dict(ref=output, sha256=state['evidence'][output]['sha256'], role='output'))
         result = normalize(tool_id, legacy, call_id=call_id, caller=caller, evidence=refs, details_ref=detail_ref,
+            analysis_scope=definition.analysis_scope if charged else None,
             cost=dict(charged={'tool_calls':charged, 'backend_solves':0, 'model_calls':0}, elapsed_s=time.monotonic()-started,
                       cache_hit=bool(legacy['data'].get('cached')), billing_owner='services',
                       recovery='Charged before execution; interrupted calls never automatically replayed.'),
             provenance=dict(arguments=arguments, config_hash=state['config_hash'], imports=state['imports'],
-                implementation_hashes={p:file_hash(ROOT/p) for p in ('tools/public_services.py','tools/pcc_math.py','tools/public_feedback.py')},
+                implementation_hashes=implementation_hashes,cache_key=cache_key,
                 processing='Analytic computation or saved-data processing; no dynamics or rescoring.'))
         atomic_json(self.root/ref, result)
         state['evidence'][ref] = dict(sha256=file_hash(self.root/ref))

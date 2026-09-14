@@ -1,5 +1,9 @@
 # Authority boundary
 
+Framework 1.1 contracts and supported extension routes are documented in
+[framework_extensions.md](../../docs/framework_extensions.md). Native services
+share registration, execution and feedback; caller identity remains host-owned.
+
 Current public execution and caller/accounting contracts are in
 [public_tools.md](../../docs/public_tools.md). The staged notes below preserve
 historical architecture descriptions; statements such as “no LLM” or “PLANNED”

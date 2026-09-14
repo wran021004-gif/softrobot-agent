@@ -43,7 +43,7 @@ def executable_catalog():
                    'cost_note': 'evaluate_design 在 request.replay 模式为零后端；模型不能修改 request 或切换模式',
                    'failure_codes': ['INVALID_INPUT', 'TOOL_ERROR', 'TIMEOUT', 'CAPABILITY_MISSING',
                                      'PERMISSION_DENIED', 'BUDGET_EXHAUSTED', 'EVIDENCE_CHANGED', 'INTERRUPTED'],
-                   'tool_id': 'workbench.'+name, 'tool_version': '1.0.0',
+                   'tool_id': 'workbench.'+name, 'tool_version': '1.1.0',
                    'limitations': '冻结 reach_free、C1；设计范围和候选数由保存 session 的 envelope 与预算决定；无标定、编程或硬件权限'}
             for name, info in TOOLS.items()}
 

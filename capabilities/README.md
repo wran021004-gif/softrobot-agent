@@ -1,5 +1,10 @@
 # Capability library
 
+Framework 1.1: [extension contracts and migration](../docs/framework_extensions.md).
+New services bind declarations directly in `tools/tool_registry.py`; dynamic
+tools bind through `tools/dynamic_actions.py`. Registered, implemented and
+permitted are separate states. Existing library manifests remain descriptive.
+
 Current public authority: `tools.public_catalog` projects the real Workbench and
 Dynamics allowlists plus task-independent services. See
 [public contracts and migration](../docs/public_tools.md). Manifests below are

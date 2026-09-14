@@ -26,8 +26,16 @@ class PCCTipFeedback:
                 for x in self.target.tendon_target_lengths_m):
             raise ValueError("Initial PCC command outside approved feedback bounds")
         self.artifact = FeedbackArtifact(policy_id=p.policy_id, policy_hash=experiment.policy_hash,
-            parameter_source=experiment.path.relative_to(ROOT).as_posix() + '#feedback_parameters',
+            parameter_source=experiment.path.relative_to(ROOT).as_posix() + '#'+getattr(experiment,'parameter_pointer','feedback_parameters'),
             parameters=self.parameters, initial_command=self.target)
+        self.updates = []
+        self.last_step = -1
+        self.initial_bend = self.bend[:]
+        self.initial_target = self.target
+
+    def reset(self):
+        self.bend = self.initial_bend[:]
+        self.target = self.initial_target
         self.updates = []
         self.last_step = -1
 

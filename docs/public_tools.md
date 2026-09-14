@@ -1,3 +1,5 @@
+> Framework 1.1 supersedes extension-roadmap statements below. See [current contracts and migration](framework_extensions.md). Historical interface notes remain preserved.
+
 # 公共工具接口 v1
 
 本次以 `feat/round9-matlab-dynamics-design-loop` 的 `e1051c4` 为基线，把真实执行白名单、公共调用和反馈、保存证据服务接入同一目录。入口是 `tools.public_catalog`；旧 Workbench 与 Dynamics 的调度、授权和账本继续负责执行。没有重跑设计实验，也没有改变物理模型、目标、评价器或已批准预算。

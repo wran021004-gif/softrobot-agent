@@ -21,17 +21,20 @@ def intervals(mask,times):
     return [g for g in groups if times[g[-1]]-times[g[0]]>=RULES['min_duration_s']-1e-10]
 
 
-def diagnose(path,metadata,entity='all',t_start_s=0,t_end_s=2,fields=None):
+def diagnose(path,metadata,entity='all',t_start_s=None,t_end_s=None,fields=None):
     rows=load_rows(path)
     if not rows: return dict(status='NOT_RECORDED',events=[],queries=[])
     state_t=np.array([r['time_s'] for r in rows]); force_t=np.array([r['solver_time_s'] for r in rows])
+    if t_start_s is None: t_start_s=float(min(state_t[0],force_t[0]))
+    if t_end_s is None: t_end_s=float(max(state_t[-1],force_t[-1]))
     fields=fields or []; events=[]; queries=[]; p=metadata
     def record(name,idx,t,ids,kind,values,units,rule,interpretation,observed):
         return dict(run_id=p['run_id'],candidate_id=p['candidate_id'],backend=p['backend'],model_id=p['model_id'],
           entity_name=name,entity_index=idx,t_start_s=float(t[ids[0]]),t_end_s=float(t[ids[-1]]),
           sample_indices=[int(ids[0]),int(ids[-1])],observed_fields=observed,values=values,units=units,
           event_type=kind,detection_rule=rule,evidence_ref=str(path),interpretation=interpretation,
-          confidence_or_status='OBSERVED_SAMPLED',diagnostic_version=RULES['version'])
+          confidence_or_status='OBSERVED_SAMPLED',diagnostic_version=RULES['version'],
+          time_phase='solver' if t is force_t else 'post_step_state')
     lengths=np.array([r['solver_tendon_length_m'] for r in rows]); forces=-np.array([r['solver_actuator_force_n'] for r in rows]);
     commands=np.array([r['command_m'] for r in rows]); limit=p['force_limit_n']; kp=p['kp']
     fm=(force_t>=t_start_s-1e-10)&(force_t<=t_end_s+1e-10)
@@ -47,7 +50,7 @@ def diagnose(path,metadata,entity='all',t_start_s=0,t_end_s=2,fields=None):
           command_end_m=float(commands[ids[-1],j]),path_min_m=float(lengths[ids,j].min()),path_max_m=float(lengths[ids,j].max()),
           reference_length_m=p['reference_length_m'],unclipped_demand_min_n=float(demand[ids].min()),unclipped_demand_max_n=float(demand[ids].max()),
           max_abs_tracking_error_m=float(abs(err[ids]).max()),positive_tension_sign='-raw_actuator_force',
-          initial_route_offset_yz_m=p['offsets'][j],length_rate_sampled_max_abs_m_s=float(np.max(np.abs(np.gradient(lengths[:,j],force_t))[ids])))
+          initial_route_offset_yz_m=p['offsets'][j],length_rate_sampled_max_abs_m_s=float(np.max(np.abs(np.gradient(lengths[:,j],force_t))[ids])) if len(rows)>1 else None)
       queries.append(record(name,j,force_t,ids,'WINDOW_SUMMARY',values,{'length':'m','force':'N','time':'s'},'inclusive saved solver-time interval',
           'Length servo demand and output share solver phase. Zero force is the no-push end; slack is not independently measured.',
           ['solver_tendon_length_m','command_m','solver_actuator_force_n']))
@@ -94,17 +97,18 @@ def diagnose(path,metadata,entity='all',t_start_s=0,t_end_s=2,fields=None):
     raw={}
     for f in fields:
         raw[f]=[dict(sample_index=int(i),time_s=rows[i]['time_s'],solver_time_s=rows[i]['solver_time_s'],value=rows[i].get(f,'NOT_RECORDED')) for i in selected]
-    return dict(status='completed' if queries or events else 'NOT_RECORDED',events=events,queries=queries,raw_fields=raw,
+    return dict(status='completed' if queries or events else 'NO_EVENT' if entity=='contact' and fm.any() else 'NOT_RECORDED',events=events,queries=queries,raw_fields=raw,
         ground_nearest_initial_tendon=f"tendon_{int(np.argmin(np.array(p['offsets'])[:,1]))}",
         ground_mapping_rule='minimum actual initial route z; initial qpos=0; fixed base offsets and segment routes coincide in z',
-        numerical=dict(last_valid_time_s=float(state_t[-1]),remaining_duration_s=max(0,2-float(state_t[-1])),
+        numerical=dict(last_valid_time_s=float(state_t[-1]),remaining_duration_s=max(0,p['duration_s']-float(state_t[-1])) if p.get('duration_s') is not None else None,
+            duration_status='DECLARED' if p.get('duration_s') is not None else 'NOT_RECORDED',
             finite=bool(np.isfinite(q).all() and np.isfinite(v).all())),rules=RULES,
         limitations=['sampled extrema are not continuous-time bounds','old unrecorded fields remain NOT_RECORDED','no causal attribution from counts alone'])
 
 
 def metadata_from_shared(shared,cid,backend,run_id):
     p=shared;n=len(p['mass']); planar=backend=='matlab'
-    return dict(candidate_id=cid,backend=backend,run_id=run_id,model_id=p['model_id'] if planar else 'mujoco_segmented',
+    return dict(candidate_id=cid,backend=backend,run_id=run_id,duration_s=p.get('duration'),model_id=p['model_id'] if planar else 'mujoco_segmented',
         force_limit_n=p['fmax'],kp=p['kp'],reference_length_m=p['length'],offsets=p['offsets'],
         joint_names=[f'joint_{i}_{a}' for i in range(n) for a in (['y'] if planar else ['y','z'])],
         natural=p['natural'] if planar else [v for a in p['natural'] for v in (a,0)],

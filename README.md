@@ -1,5 +1,7 @@
 # Softrobot deterministic research harness
 
+框架扩展机制已落地：[七项边界、迁移与接入路线](docs/framework_extensions.md)、[验证记录](docs/framework_validation.md)。工具版本为 1.1.0；历史说明与证据保留。
+
 公共工具接口 v1 已接入：[统一工具清单](docs/public_tools_catalog.md)、[调用规范与迁移/扩展路线](docs/public_tools.md)、[验证记录](docs/public_tools_validation.md)。使用 `python examples/public_tools.py catalog` 发现带命名空间的工具；旧工作台和动力学命令继续有效。以下逐轮说明保留为历史记录。
 
 第九轮已运行独立 MATLAB 多关节动力学、逐次计费的连续参数搜索、MuJoCo 验证与 C2 对照。当前 `runs/round9_reach` 的最佳 c066 在原 reach_free 任务中误差 **0.0001043346913 m（0.1043 mm）**，最大拉力仍为 20 N。
