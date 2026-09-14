@@ -1,7 +1,9 @@
-function info = tdcr_replay_saved(folder, output_folder, fps)
+function info = tdcr_replay_saved(folder, output_folder, fps, frame_indices, interactive)
 % Native Figure only: saved planar eight-joint poses, no solver or force model.
 if nargin<2, output_folder=''; end
 if nargin<3, fps=25; end
+if nargin<4, frame_indices=[]; end
+if nargin<5, interactive=true; end
 p=jsondecode(fileread(fullfile(folder,'shared_input.json')));
 ir=jsondecode(fileread(fullfile(folder,'robot_ir.json')));
 result=jsondecode(fileread(fullfile(folder,'result.json')));
@@ -28,7 +30,7 @@ xlabel(ax,'world x (m)'); ylabel(ax,'world y (m)'); zlabel(ax,'world z (m)'); vi
 patch(ax,[-.15*L 1.2*L 1.2*L -.15*L],[-.4*L -.4*L .4*L .4*L], ...
     p.floor_z*ones(1,4),[.65 .67 .70],'FaceAlpha',.65,'EdgeColor','none');
 % A fixed-base marker, sized from the saved body radius; it is not a new body.
-base=[-r -r -r;0 -r -r;0 r -r;-r r -r;-r -r r;0 -r r;0 r r;-r r r];
+base=[-r -r -r;0 -r -r;0 r -r;-r r -r;-r -r r;0 -r r;0 r r;-r r r]+ir.base_position_m(:)';
 patch(ax,'Vertices',base,'Faces',[1 2 3 4;5 6 7 8;1 2 6 5;2 3 7 6;3 4 8 7;4 1 5 8], ...
     'FaceColor',[.25 .28 .32],'EdgeColor','none');
 text(ax,-r,0,1.6*r,'fixed base');
@@ -59,12 +61,17 @@ cursor=times(1); clock=tic; last=0; timer_handle=[];
 fig.CloseRequestFcn=@close_figure;
 draw_frame(1); drawnow;
 indices=[]; scheduled=[times(1):1/fps:times(end),times(end)]; scheduled=unique(scheduled,'stable');
+if ~isempty(frame_indices), scheduled=times(frame_indices); end
 if ~isempty(output_folder)
     set(button,'Enable','off'); set(slider,'Enable','off');
     for k=1:numel(scheduled)
         idx=find(times<=scheduled(k)+1e-12,1,'last'); indices(end+1)=idx; %#ok<AGROW>
         draw_frame(idx); drawnow;
         frame=getframe(fig); % Real MATLAB Figure framebuffer, not Python drawing.
+        if ~interactive
+            imwrite(frame.cdata,fullfile(output_folder,sprintf('frame_%06d.png',k-1)));
+            continue;
+        end
         [indexed,map]=rgb2ind(frame.cdata,256);
         delay=1/fps;
         if k<numel(scheduled), delay=scheduled(k+1)-scheduled(k); end
@@ -89,6 +96,10 @@ info=struct('backend','matlab','candidate_id',result.candidate_id,'renderer','MA
     'force_semantics','Only original solver_actuator_force_n at saved solver_time_s');
 if ~isempty(output_folder)
     fid=fopen(fullfile(output_folder,'native_replay.json'),'w'); fwrite(fid,jsonencode(info),'char'); fclose(fid);
+end
+if ~interactive
+    close_figure([],[]); % Automated capture returns; never wait for user input.
+    return;
 end
 timer_handle=timer('ExecutionMode','fixedSpacing','Period',.03,'BusyMode','drop','TimerFcn',@tick);
 last=toc(clock); start(timer_handle);

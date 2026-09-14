@@ -36,9 +36,9 @@ def resolve_run(source, candidate_id=None, backend='mujoco'):
 
 
 class NativeReplay:
-    def __init__(self, source):
+    def __init__(self, source, *, observation=None):
         self.source = Path(source).resolve()
-        self.observation = load_observation(self.source)
+        self.observation = observation if observation is not None else load_observation(self.source)
         if self.observation['backend'].lower() != 'mujoco':
             raise ValueError('Use the MATLAB Figure entry for MATLAB trajectories')
         self.samples = self.observation['samples']
@@ -59,9 +59,7 @@ class NativeReplay:
         self.model.vis.headlight.diffuse[:] = [.7, .7, .7]
         self.camera = mujoco.MjvCamera()
         mujoco.mjv_defaultFreeCamera(self.model, self.camera)
-        length = self.observation['design']['total_length_m']
-        self.camera.lookat[:] = [length * .45, 0, .055]
-        self.camera.distance = max(.6, length * 2.3)
+        # The saved model supplies the scene center/extent, including its objects.
         self.camera.azimuth, self.camera.elevation = 115, -22
         self.option = mujoco.MjvOption()
         self.option.flags[mujoco.mjtVisFlag.mjVIS_TENDON] = True

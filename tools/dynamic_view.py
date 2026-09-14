@@ -17,10 +17,17 @@ def native_panel(root,c,backend):
         ready=Path(info['source']).resolve()==source and info.get('backend')==backend and info.get('candidate_id')==cid
     title=f'{cid} · {"MATLAB Figure" if backend=="matlab" else "MuJoCo Renderer"} · 保存轨迹回放'
     panel=f'<section style="flex:1;min-width:320px"><h3>{esc(title)}</h3>'
-    if ready:
+    from tools.simulation_video import video_receipts
+    videos=video_receipts(root,c['results'][backend]['result_ref'],backend)
+    for video in videos:
+        panel+=f'<video controls preload="metadata" poster="{esc(video["preview_ref"])}" style="width:100%;max-width:960px" src="{esc(video["video_ref"])}"></video>'
+        panel+=f'<p>保存轨迹回放 · {video["t_start_s"]:.3f}–{video["t_end_s"]:.3f} s · {video["fps"]} fps · <a href="{esc(video["result_ref"])}">源仿真记录</a> · <a href="{esc(video["metadata_ref"])}">采样与渲染元数据</a></p>'
+    if ready and not videos:
         ref=(media/'native_scene.gif').relative_to(root).as_posix()
         panel+=f'<img src="{ref}" alt="{esc(title)}" style="width:100%;max-width:960px"><p><a href="{media.relative_to(root).as_posix()}/native_replay.json">原生捕获来源与时间映射</a></p>'
-    else:panel+='<p>尚无此保存轨迹的原生录像；可用下面的命令打开原生窗口。</p>'
+    elif not videos:panel+='<p>尚无此保存轨迹的原生录像；可用下面的命令打开原生窗口。</p>'
+    record=f'python examples/render_simulation_video.py "{root.resolve()}" --result-ref "{c["results"][backend]["result_ref"]}" --backend {backend}'
+    panel+=f'<details><summary>按需生成 MP4（完成后自动返回）</summary><pre>{esc(record)}</pre></details>'
     command=f'python examples/native_replay.py "{root.resolve()}" --backend {backend} --candidate {cid}'
     panel+=f'<p>原生交互窗口（在项目目录终端运行；与录像分开）：</p><pre>{esc(command)}</pre>'
     return panel+'</section>'
@@ -66,7 +73,7 @@ for(const e of (D.diagnostics.events||[])){let b=document.createElement('button'
 $('time').oninput=draw;$('field').onchange=()=>{entities();draw()};$('entity').onchange=draw;$('play').onclick=()=>playing=!playing;
 entities();$('time').value=Math.max(0,Math.min(2,+(new URLSearchParams(location.search).get('t')||0)));
 function tick(now){if(playing){$('time').value=(+$('time').value+(now-last)/1000)%2;draw()}last=now;requestAnimationFrame(tick)}draw();requestAnimationFrame(tick);
-</script>'''.replace('PAYLOAD',payload).replace('NATIVE_PANEL',native_panel(root,c,backend).replace('src="observations/','src="../observations/').replace('href="observations/','href="../observations/'))
+</script>'''.replace('PAYLOAD',payload).replace('NATIVE_PANEL',native_panel(root,c,backend).replace('src="observations/','src="../observations/').replace('poster="observations/','poster="../observations/').replace('href="observations/','href="../observations/').replace('href="candidates/','href="../candidates/'))
     path.write_text(page,encoding='utf8');return path
 
 def render_workbench(book):
@@ -95,6 +102,19 @@ def render_workbench(book):
             page+='<h2>所选设计：原生渲染画面</h2><div style="display:flex;gap:24px;flex-wrap:wrap">'
             page+=''.join(native_panel(root,chosen,b) for b in ('matlab','mujoco') if chosen['results'].get(b,{}).get('result_ref'))+'</div>'
     if state.get('stop_reason'):page+='<details><summary>Full stop reason</summary><pre>'+esc(state['stop_reason'])+'</pre></details>'
+    # Recordings of other requested records must also be visible; never infer a
+    # new design selection from a video request or automatically record a candidate.
+    selected_id=selection.get('selected_candidate_id') if selection else None
+    recorded=set()
+    for ref in state['evidence']:
+        if ref.startswith('observations/videos/') and ref.endswith('/native_video.json'):
+            receipt=read(root/ref).get('receipt',{})
+            recorded.add((receipt.get('result_ref'),receipt.get('backend')))
+    for candidate in state['candidates']:
+        if candidate['candidate_id']==selected_id:continue
+        for backend,result in candidate['results'].items():
+            if (result.get('result_ref'),backend) in recorded:
+                page+=native_panel(root,candidate,backend)
     page+='<p>固定任务：目标 [0.25,0,0.15]m，t=2s，容差 0.01m。MATLAB 为未标定平面动态筛选；任务真值使用原 MuJoCo 评价器。</p>'
     page+='<p><a href="history/audit.json">历史核对</a> · <a href="inputs/grant.json">冻结授权与范围</a> · <a href="budget.json">预算账本</a> · <a href="candidate_table.json">完整候选表</a> · <a href="working_memory.json">工作记忆</a></p>'
     if state.get('tool_call_corrections'):

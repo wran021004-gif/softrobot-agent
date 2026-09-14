@@ -1,5 +1,9 @@
 # Round 9 native saved-trajectory playback
 
+For model-callable MP4 recording that returns automatically, see
+[On-demand native simulation video](simulation_video.md). Interactive windows
+below remain available independently of recording.
+
 From `D:\softrobot-agent`, in the existing `softagent` environment:
 
 ```powershell

@@ -4,6 +4,25 @@ from tools.artifact_tools import file_hash
 from tools.state_io import read, atomic_json
 
 
+def capture_tdcr(engine, source, output, indices, fps):
+    """Model adapter for matlab_tdcr_planar_dynamic_v1; closes its own Figure."""
+    import matlab
+    import xml.etree.ElementTree as ET
+    source = Path(source)
+    ir = read(source/'robot_ir.json')
+    if ir.get('robot_family') != 'tendon_driven_continuum':
+        raise ValueError('UNSUPPORTED_MODEL: expected saved TDCR robot geometry')
+    scene = ET.parse(source/'robot.xml').getroot().find('worldbody')
+    # This planar adapter supports the saved floor/target scene only. Never hide
+    # an unimplemented obstacle or use this drawing for a different model.
+    if scene is None or any(g.get('name')!='floor' or g.get('type')!='plane' for g in scene.findall('geom')):
+        raise ValueError('UNSUPPORTED_SCENE: TDCR Figure adapter supports a plane floor and target')
+    if any(b.get('name')!='segment_0' for b in scene.findall('body')):
+        raise ValueError('UNSUPPORTED_SCENE: additional bodies require a drawing adapter')
+    return engine.tdcr_replay_saved(str(source), str(output), float(fps),
+                                   matlab.double([[i+1 for i in indices]]), False, nargout=1)
+
+
 def show_matlab(source, output=None):
     import matlab.engine
     source = Path(source).resolve()

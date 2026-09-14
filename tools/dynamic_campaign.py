@@ -319,6 +319,9 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
             {k:c[k] for k in ('candidate_id','parent_id','design','control','design_hash','control_hash','physics_version','physics_hash','changes','results')}
             for c in candidates[offset:offset+limit]])
     def dispatch(self,name,args,evidence,reason):
+        if name=='render_simulation_video':
+            from tools.simulation_video import render_simulation_video
+            return render_simulation_video(self.root,self.state['evidence'],**args)
         if name=='create_candidate':return dict(candidate=self.create_candidate(**args,evidence=evidence,reason=reason))
         if name=='simulate_candidate':return self.simulate(args['candidate_id'],args['backend'],args['purpose'],args['model_id'])
         if name=='evaluate_candidate':return self.simulate(args['candidate_id'],'mujoco')

@@ -6,9 +6,9 @@ import json
 TARGET_BYTES = 50000
 MAX_REQUEST_BYTES = 60000
 PAGE_VERSION = 'dynamic_evidence_v1'
-PROMPT_VERSION = 'dynamic_selected_design_v3'
+PROMPT_VERSION = 'dynamic_native_video_v4'
 READING_GUIDANCE = '''
-[dynamic_selected_design_v3: overrides historical workflow/language instructions]
+[dynamic_native_video_v4: overrides historical workflow/language instructions]
 Write ALL newly generated natural language in English: reason, working_memory
 findings/unresolved/next_action, diagnostic statement, and stop reason. Keep exact
 evidence paths, entity IDs, units and numeric values. Historical records may be
@@ -48,6 +48,11 @@ Report workflow completion, fresh numerical completion and MuJoCo success separa
 At closeout, set stop_design.selected_candidate_id to YOUR final design choice;
 use null only when no design can be selected. Give a brief English reason for
 that choice. Historical best and your final selection are separate facts.
+Use render_simulation_video only when a specific visual inspection question
+requires a native recording of an existing result_ref. Select a useful small time
+interval; no new simulation is performed. It returns file references, not frames
+you can see: do not claim visual understanding from a video reference. Use saved
+numeric evidence for diagnoses. Recording is optional, never required at closeout.
 '''
 
 
