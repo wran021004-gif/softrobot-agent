@@ -52,6 +52,25 @@ def load_observation(source):
         rows = read(trajectory)['samples']
     else:
         rows = __import__('json').loads(gzip.decompress(trajectory.read_bytes()))
+    if (source / 'shared_input.json').exists():
+        # Round 9 already records geometry and state independently per backend.
+        # Do not reconstruct evidence or require legacy task/design YAML files.
+        shared, ir, result = (read(source / name) for name in ('shared_input.json', 'robot_ir.json', 'result.json'))
+        samples = [dict(time_s=r['time_s'], state=r['qpos_rad'], centerline_m=r['centerline_m'],
+                        tip_m=r['tip_m'], input_time_s=r.get('solver_time_s'),
+                        tendon_target_m=r.get('command_m'), tendon_actual_m=r.get('solver_tendon_length_m'),
+                        force_n=r.get('solver_actuator_force_n'), contact_count=r.get('solver_contact_count')) for r in rows]
+        _check(samples)
+        diagnosis = read(source / 'diagnosis.json') if (source / 'diagnosis.json').exists() else {}
+        return dict(format='observation_v1', backend=result['backend'], model=result['model_id'],
+                    candidate_id=result['candidate_id'], source=str(source), source_sha256=file_hash(trajectory),
+                    frame=ir['coordinate_frame'], status=result['computation_status'],
+                    design=dict(total_length_m=ir['section']['length_m'], body_radius_m=ir['section']['body_radius_m'],
+                                segments=ir['section']['segments']), control=shared['control'], target_m=shared['target'],
+                    events=diagnosis.get('events', []), diagnostics=diagnosis,
+                    semantics=dict(state='saved qpos; kinematic scene updates only',
+                                   force='saved solver_actuator_force_n at solver_time_s; no recomputed forces',
+                                   evidence='original trajectory and diagnosis; no integration or rescoring'), samples=samples)
     task = load_yaml(source / 'task.yaml')
     design = load_yaml(source / 'design_input.yaml')
     result = read(source / 'mujoco_result.json') if (source / 'mujoco_result.json').exists() else {}

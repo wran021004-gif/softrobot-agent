@@ -5,6 +5,26 @@ from pathlib import Path
 from tools.state_io import read,atomic_json
 from tools.trajectory_diagnosis import load_rows
 
+def native_panel(root,c,backend):
+    """Embed actual saved renderer captures; never render or simulate here."""
+    esc=lambda x:html.escape(str(x));cid=c['candidate_id']
+    media=root/f'observations/native/{cid}/{backend}'
+    manifest=media/'native_replay.json'
+    source=(root/c['results'][backend]['result_ref']).resolve().parent
+    ready=False
+    if manifest.exists() and (media/'native_scene.gif').exists():
+        info=read(manifest)
+        ready=Path(info['source']).resolve()==source and info.get('backend')==backend and info.get('candidate_id')==cid
+    title=f'{cid} · {"MATLAB Figure" if backend=="matlab" else "MuJoCo Renderer"} · 保存轨迹回放'
+    panel=f'<section style="flex:1;min-width:320px"><h3>{esc(title)}</h3>'
+    if ready:
+        ref=(media/'native_scene.gif').relative_to(root).as_posix()
+        panel+=f'<img src="{ref}" alt="{esc(title)}" style="width:100%;max-width:960px"><p><a href="{media.relative_to(root).as_posix()}/native_replay.json">原生捕获来源与时间映射</a></p>'
+    else:panel+='<p>尚无此保存轨迹的原生录像；可用下面的命令打开原生窗口。</p>'
+    command=f'python examples/native_replay.py "{root.resolve()}" --backend {backend} --candidate {cid}'
+    panel+=f'<p>原生交互窗口（在项目目录终端运行；与录像分开）：</p><pre>{esc(command)}</pre>'
+    return panel+'</section>'
+
 def render_candidate(root,c,backend):
     r=c['results'][backend];folder=(root/r['result_ref']).parent;rows=load_rows(folder/'trajectory.json.gz')
     if not rows:raise ValueError('No saved coordinates')
@@ -17,8 +37,10 @@ def render_candidate(root,c,backend):
     payload=json.dumps(data,ensure_ascii=False).replace('</','<\/')
     page='''<!doctype html><meta charset="utf-8"><title>Reach trajectory</title>
 <style>body{font:15px system-ui;background:#101a29;color:#e4edf8;margin:24px}button,select,input{margin:6px;padding:6px}canvas{background:#172438;border:1px solid #456;width:min(100%,900px)}pre{white-space:pre-wrap}a{color:#9df} .note{color:#aabbd0}table{border-collapse:collapse}td,th{padding:6px;border:1px solid #456}</style>
-<h1 id="title"></h1><p id="status"></p><p class="note">保存轨迹回放；零动力学调用。世界 x-z 投影；MuJoCo 的平面外 y 运动保留在原始数据。红点为固定目标。等效设计参数未标定。</p>
+<h1 id="title"></h1><p id="status"></p>NATIVE_PANEL<p class="note">下方线条为辅助轨迹示意；世界 x-z 投影，曲线和诊断使用保存数值。等效设计参数未标定。</p>
+<details><summary>轨迹示意（辅助线条回放）</summary>
 <canvas id="scene" width="900" height="430"></canvas><br><button id="play">播放 / 暂停</button><input id="time" type="range" min="0" max="2" step="0.002" value="0" style="width:60%"><span id="stamp"></span>
+</details>
 <p>曲线 <select id="field"><option value="error">末端误差 m</option><option value="tipx">末端 x m</option><option value="tipz">末端 z m</option><option value="length">腱指令 / 路径长 m</option><option value="force">正张力 N</option><option value="q">关节角 rad</option><option value="v">关节角速度 rad/s</option></select><select id="entity"></select></p>
 <canvas id="plot" width="900" height="260"></canvas><p class="note">极值来自保存数值采样，不是连续时间严格极值。MuJoCo 绳力/路径采用 solver_time_s，状态采用 time_s。MATLAB 输出是 ode15s 解的固定采样插值；内部时间另存。</p>
 <h2>诊断事件（点击定位时间）</h2><div id="events"></div><details><summary>模型、控制、物理配置和指标</summary><pre id="details"></pre></details>
@@ -44,7 +66,7 @@ for(const e of (D.diagnostics.events||[])){let b=document.createElement('button'
 $('time').oninput=draw;$('field').onchange=()=>{entities();draw()};$('entity').onchange=draw;$('play').onclick=()=>playing=!playing;
 entities();$('time').value=Math.max(0,Math.min(2,+(new URLSearchParams(location.search).get('t')||0)));
 function tick(now){if(playing){$('time').value=(+$('time').value+(now-last)/1000)%2;draw()}last=now;requestAnimationFrame(tick)}draw();requestAnimationFrame(tick);
-</script>'''.replace('PAYLOAD',payload)
+</script>'''.replace('PAYLOAD',payload).replace('NATIVE_PANEL',native_panel(root,c,backend).replace('src="observations/','src="../observations/').replace('href="observations/','href="../observations/'))
     path.write_text(page,encoding='utf8');return path
 
 def render_workbench(book):
@@ -53,7 +75,7 @@ def render_workbench(book):
         results=c['results'];links=[]
         for backend in ('matlab','mujoco'):
             p=root/f'observations/{c["candidate_id"]}_{backend}.html'
-            if p.exists():links.append(f'<a href="{p.relative_to(root).as_posix()}">{backend} 动画/曲线/事件</a>')
+            if p.exists():links.append(f'<a href="{p.relative_to(root).as_posix()}">{backend} 轨迹示意 / 曲线 / 诊断</a>')
         cells=[c['candidate_id'],c['parent_id'],c['physics_version'],c['control']['mode'],json.dumps(c['changes'],ensure_ascii=False)]
         for backend in ('matlab','mujoco'):
             r=results.get(backend,{});cells.extend([r.get('complete','NOT_RUN'),r.get('position_error_m','NOT_RUN'),r.get('elapsed_s','NOT_RUN'),
@@ -68,6 +90,10 @@ def render_workbench(book):
         page+=f'<p><strong>Selected candidate: {esc(selection["selected_candidate_id"] or "None")}</strong></p>'
         page+=f'<p>Design file: {esc(selection["design_file"] or "None")}</p><p>Reason: {esc(selection["reason"])}</p>'
         page+=f'<p>Source: {esc(selection["source"])}</p></section>'
+        if selection['selected_candidate_id']:
+            chosen=next(c for c in state['candidates'] if c['candidate_id']==selection['selected_candidate_id'])
+            page+='<h2>所选设计：原生渲染画面</h2><div style="display:flex;gap:24px;flex-wrap:wrap">'
+            page+=''.join(native_panel(root,chosen,b) for b in ('matlab','mujoco') if chosen['results'].get(b,{}).get('result_ref'))+'</div>'
     if state.get('stop_reason'):page+='<details><summary>Full stop reason</summary><pre>'+esc(state['stop_reason'])+'</pre></details>'
     page+='<p>固定任务：目标 [0.25,0,0.15]m，t=2s，容差 0.01m。MATLAB 为未标定平面动态筛选；任务真值使用原 MuJoCo 评价器。</p>'
     page+='<p><a href="history/audit.json">历史核对</a> · <a href="inputs/grant.json">冻结授权与范围</a> · <a href="budget.json">预算账本</a> · <a href="candidate_table.json">完整候选表</a> · <a href="working_memory.json">工作记忆</a></p>'
@@ -89,7 +115,7 @@ def render_workbench(book):
             if cid:
                 for backend in ('matlab','mujoco'):
                     ref=f'observations/{cid}_{backend}.html'
-                    if (root/ref).exists():page+=f' · <a href="{ref}">{label} {cid} {backend} playback</a>'
+                    if (root/ref).exists():page+=f' · <a href="{ref}">{label} {cid} {backend} 轨迹示意/曲线</a>'
         page+='</p><pre>'+esc(json.dumps(summary,ensure_ascii=False,indent=2))+'</pre>'
     errors=[{k:r[k] for k in ('index','status','error','correction_for','observed_tool_call_count') if k in r}
             for r in state['model_calls'][-3:] if r.get('error')]

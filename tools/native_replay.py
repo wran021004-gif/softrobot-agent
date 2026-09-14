@@ -9,11 +9,23 @@ from tools.state_io import read, atomic_json
 from tools.artifact_tools import file_hash
 
 
-def resolve_run(source, candidate_id=None):
+def resolve_run(source, candidate_id=None, backend='mujoco'):
     source = Path(source).resolve()
     if (source / 'state.json').exists():
-        from tools.design_session import evaluation, summary
         state = read(source / 'state.json')
+        if state.get('version') == 'dynamic_workbench_v2':
+            stop = next((d for d in reversed(state['decisions']) if d['tool']=='stop_design' and d['status']=='accepted'), {})
+            cid = candidate_id or stop.get('selection', stop.get('arguments', {})).get('selected_candidate_id')
+            candidate = next((c for c in state['candidates'] if c['candidate_id']==cid), None)
+            if not candidate:
+                raise ValueError('No explicitly selected design; supply --candidate')
+            result = candidate['results'].get(backend, {})
+            if not result.get('result_ref'):
+                raise ValueError('NO_TRAJECTORY: selected candidate backend was not run')
+            folder = (source / result['result_ref']).resolve().parent
+            if not folder.is_relative_to(source):raise ValueError('Result outside campaign')
+            return folder
+        from tools.design_session import evaluation, summary
         best = summary(state)['best_candidate']
         cid = candidate_id or (best['candidate_id'] if best else None)
         ev = evaluation(state, cid)
@@ -27,6 +39,8 @@ class NativeReplay:
     def __init__(self, source):
         self.source = Path(source).resolve()
         self.observation = load_observation(self.source)
+        if self.observation['backend'].lower() != 'mujoco':
+            raise ValueError('Use the MATLAB Figure entry for MATLAB trajectories')
         self.samples = self.observation['samples']
         if not self.samples:
             raise ValueError('NO_TRAJECTORY')
@@ -60,10 +74,14 @@ class NativeReplay:
         sample = self.samples[self.index]
         self.data.qpos[:] = sample['state']
         self.data.time = sample['time_s']
-        mujoco.mj_kinematics(self.model, self.data)
-        mujoco.mj_comPos(self.model, self.data)
-        mujoco.mj_tendon(self.model, self.data)
+        self.kinematics_only(self.model, self.data)
         return self.index
+
+    @staticmethod
+    def kinematics_only(model, data):
+        mujoco.mj_kinematics(model, data)
+        mujoco.mj_comPos(model, data)
+        mujoco.mj_tendon(model, data)
 
     def key(self, code):
         if code == 32:  # Space
@@ -78,9 +96,20 @@ class NativeReplay:
     def show(self, *, seconds=None):
         import mujoco.viewer
         print('MuJoCo 保存轨迹回放：空格暂停/继续，左右键逐帧，R 回到开头；鼠标拖动旋转/平移，滚轮缩放。关闭窗口退出。', flush=True)
+        print('Saved final force_n:', self.samples[-1]['force_n'], '\nSaved diagnosis:', self.source/'diagnosis.json', flush=True)
         self.seek(self.cursor)
-        with mujoco.viewer.launch_passive(self.model, self.data, key_callback=self.key,
-                                         show_left_ui=False, show_right_ui=False) as viewer:
+        # Installed launch_passive initializes with mj_forward. This dedicated
+        # replay process substitutes only that synchronous initialization call;
+        # its passive viewer never starts a physics thread. Restore immediately.
+        forward = mujoco.mj_forward
+        try:
+            mujoco.mj_forward = self.kinematics_only
+            viewer = mujoco.viewer.launch_passive(self.model, self.data, key_callback=self.key,
+                                                 show_left_ui=False, show_right_ui=False)
+        finally:
+            mujoco.mj_forward = forward
+        with viewer:
+            print('MuJoCo native window opened (passive, kinematics only).', flush=True)
             with viewer.lock():
                 viewer.cam.lookat[:] = self.camera.lookat
                 viewer.cam.distance = self.camera.distance
@@ -132,6 +161,11 @@ class NativeReplay:
                                    interpolation=False, backend_solves=0, rescoring=False,
                                    display_only='translucent robot surfaces, tendon colors and headlight; saved model unchanged',
                                    geometry_updates=['mj_kinematics', 'mj_comPos', 'mj_tendon'],
+                                   candidate_id=self.observation.get('candidate_id'), backend='mujoco',
+                                   renderer='mujoco.Renderer', final_saved_tip_m=self.samples[-1]['tip_m'],
+                                   final_rendered_tip_m=self.data.site_xpos[self.model.site('tip_site').id].tolist(),
+                                   length_m=self.observation['design']['total_length_m'],
+                                   target_m=self.observation['target_m'],
                                    target='target_site from saved robot.xml', camera=dict(azimuth=self.camera.azimuth, elevation=self.camera.elevation)))
         return [gif, png, manifest]
 
@@ -140,11 +174,19 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(description='MuJoCo 原生场景保存轨迹回放和 GIF 导出；不启动实验')
     parser.add_argument('source', help='工作台目录或原数值运行目录')
-    parser.add_argument('--candidate', help='如 c001；默认最佳已评价候选')
+    parser.add_argument('--candidate', help='候选编号；Round9 默认 LLM 明确选定的候选')
+    parser.add_argument('--backend', choices=['mujoco','matlab'], default='mujoco')
     parser.add_argument('--export', metavar='NEW_FOLDER', help='导出原生场景 GIF、PNG 和时间映射，使用新目录')
+    parser.add_argument('--show', action='store_true', help='导出后也打开原生交互窗口；MATLAB Figure 始终保持可见直至用户关闭')
+    parser.add_argument('--seconds', type=float, help='MuJoCo 窗口验证时长；默认保持打开直到用户关闭')
     args = parser.parse_args()
-    player = NativeReplay(resolve_run(args.source, args.candidate))
+    folder = resolve_run(args.source, args.candidate, args.backend)
+    if args.backend == 'matlab':
+        from tools.matlab_replay import show_matlab
+        show_matlab(folder, args.export)
+        return
+    player = NativeReplay(folder)
     if args.export:
         print('\n'.join(str(p) for p in player.export(args.export)))
-    else:
-        player.show()
+    if not args.export or args.show:
+        player.cursor=float(player.times[0]);player.show(seconds=args.seconds)

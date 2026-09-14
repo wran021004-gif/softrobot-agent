@@ -1,5 +1,8 @@
 # Round 9 本地使用
 
+默认动画现使用所选候选的 MATLAB Figure / MuJoCo Renderer 实际捕获画面；
+[原生窗口命令与说明](round9_native_replay.md)。Canvas 仅保留为辅助轨迹示意、曲线和诊断入口。
+
 新增的单次工具数量纠正、英文运行时提示与 `llm_reach_v1` 实验入口见
 [运行时实验说明](round9_llm_experiment.md)。原有上下文修复与历史数值结果保留。
 
