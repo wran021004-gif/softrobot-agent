@@ -1,6 +1,6 @@
 # 扩展接口与独立验收
 
-开发者安装的是可信仓库 Python 包。模型和任务配置不能传入 import 路径。发现机制按路径排序读取 `extensions/*/manifest.py`；声明文件只导入轻量契约，不启动可选引擎。相同身份与版本重名直接拒绝。多个版本可以登记，但当前会话允许工具必须唯一确定版本，不能依赖发现顺序覆盖。
+开发者安装的是可信仓库 Python 包。模型和任务配置不能传入 import 路径。发现机制按路径排序读取 `extensions/*/manifest.py`；声明文件只导入轻量契约，不启动可选引擎。相同身份与版本重名直接拒绝。多个版本可以共存，新会话通过 policy.tool_bindings 精确选择；旧 allowed_tools 仅在版本唯一时规范化。
 
 ## 公共调用
 
@@ -26,7 +26,7 @@
 
 ## 后端能力与资源
 
-声明支持的任务族、机器人、执行器、环境、信号及相位、控制器、一次性／分步操作、资源和超时覆盖。`compile_input` 先拒绝不兼容组合；昂贵启动只在 `simulation.run` 已完成预留之后进行。后端始终在 finally 中 close。
+声明 robot_contracts、robots、channels、environments、signal_specs（完整实体、维度、单位、坐标、相位）、生命周期、资源和超时覆盖。一般兼容不枚举算法名称；旧后端通过 conversion 声明保留专属任务编译限制。昂贵启动只在实际候选检查和预留之后进行；后端始终在 finally 中 close。
 
 参考后端为合成信号模型。MuJoCo 保留原单次执行器；MATLAB 保留平面自由度、近似法向接触、缺少摩擦与自碰撞的限制。MATLAB 引擎启动和关闭没有硬超时保证，future.cancel 也不证明外部服务已终止。未知完成状态保留额度，不自动再求解。
 
@@ -52,3 +52,24 @@ python examples/export_platform_contracts.py
 ```
 
 新包应附独立使用示例和小范围测试。只有公共接口变更才由集成者运行相关组合验收，不要求各开发者重跑全仓库或历史实验。
+
+## 本次开放接口与独立入口
+
+公共操作类型在 `schemas/platform_operations.py`。模型观测、适配器、策略、候选使用 1.0；ToolReceipt/EvaluationResult 使用兼容读取的 1.1；通用 WorkerOutput 使用 2.0。适配器 encode→respond→decode，策略 decide→ToolRequest，Host 执行和记账。
+
+| 类型／拥有目录 | 实现入口与声明 | 参考实现／独立验收方法 |
+| --- | --- | --- |
+| 工具：extensions/<包>/ | `(ctx, typed_args)`；kind=tool，input_schema/output_schema，version | value_v1/value_v2；test_04_precise_tool_versions_and_legacy_normalization |
+| 模型／策略：自己的包 | kind=model_adapter/strategy；ModelResponse/ToolRequest；real_requests、text、timeout、cancellation | ObservingAdapter/EvidenceStrategy；test_01_delivered_results_change_actions_and_raw_failures |
+| 工作者：自己的包 | `(order, parameters, raw, client)`；output_contract、result_checker | math_worker/diagnostic_worker；test_06_workers_parallel_common_host_accounting_and_cancel |
+| 候选：自己的包 | `(baseline_copy, parameters, changes)`；kind=candidate_builder，editable | apply_design；test_02_candidate_effective_input_and_noncontrol_parameter |
+| 任务评价：自己的包及配置 | kind=task/evaluator，具体 Payload、SignalSpec、EvaluationResult | terminal_task/terminal_evaluate；test_08_complete_tasks_debug_and_legacy_configuration |
+| 搜索：自己的包 | propose 可更新内部/RNG 状态；save/restore、feedback | StatefulSearch；test_03_stateful_search_resume_pending_and_sealed_calls |
+
+表中实现均在 `extensions/convergence/implementation.py`。完整命令为 `python -m unittest tests.test_platform_convergence.ConvergenceTests.<方法名> -v`。所有行通过同一 manifest 发现，演练阶段只需本包、配置和测试。
+
+`sources` 声明代码，`assets` 声明计算资产，`extension_dependencies` / `contract_dependencies` 使用 `(name, exact_version)`。快照记录实际依赖闭包；新增未用包、修改文档不失效，已用源码变化需要新会话。旧物理适配保守追踪其控制器、求解器和冻结资产，不遍历全仓库。
+
+构造约定：backend 无参；controller 接收参数和周期；search、model_adapter 接收已校验参数；strategy 无参；worker、candidate、evaluator 使用表中函数。检查不启动引擎；Host 预留后拥有 compile→initialize→run→finally close；step/observe/cancel 只按真实能力提供。模型超时由适配器处理，循环在决策边界停止；网络超时未知保留额度。媒体类型已有区分，本版只传文本。
+
+共同搜索目前只有标量实现。仅声明 multiobjective=true 不会放行；未来需提供 feedback_adapter，将完整 EvaluationResult 与目标交给实际支持的算法，本次没有多目标优化器。

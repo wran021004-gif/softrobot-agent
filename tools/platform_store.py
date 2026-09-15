@@ -181,7 +181,15 @@ class Store:
             with self.connect(True) as conn:
                 return self.remaining(run_id, conn)
         limit = self.session(run_id, db)['snapshot']['input']['policy']['budget'] if run_id else self.config(db)['budget']
-        rows = db.execute('SELECT charged FROM calls' + (' WHERE run_id=?' if run_id else ''), (run_id,) if run_id else ())
+        if run_id:
+            scopes = [run_id]
+            for item in db.execute('SELECT run_id,snapshot FROM sessions'):
+                snap = self.artifact(EvidenceRef(artifact_id=item['snapshot']), db=db)
+                if snap.get('parent_run_id') == run_id:
+                    scopes.append(item['run_id'])
+            rows = db.execute('SELECT charged FROM calls WHERE run_id IN (' + ','.join('?' for _ in scopes) + ')', scopes)
+        else:
+            rows = db.execute('SELECT charged FROM calls')
         used = zero()
         for row in rows:
             for key, value in json.loads(row[0]).items():
@@ -199,7 +207,7 @@ class Store:
         row = db.execute('SELECT * FROM calls WHERE run_id=? AND request_id=?', (run_id, request_id)).fetchone()
         return dict(row) if row else None
 
-    def reserve(self, run_id, request_id, request_hash, caller, cost, resources=(), cache_key=None, parent=None, inputs=(), kind='tool'):
+    def reserve(self, run_id, request_id, request_hash, caller, cost, resources=(), cache_key=None, parent=None, inputs=(), kind='tool', version=VERSION):
         Budget.model_validate(cost)
         with self.transaction() as db:
             old = self.lookup(run_id, request_id, db)
@@ -207,7 +215,8 @@ class Store:
                 if old['request_hash'] != request_hash or old['caller'] != caller:
                     raise ValueError('REQUEST_ID_COLLISION')
                 return old, False
-            for scope in (None, run_id):
+            parent_run = self.session(run_id, db)['snapshot'].get('parent_run_id')
+            for scope in ([None, run_id, parent_run] if parent_run else [None, run_id]):
                 remainder = self.remaining(scope, db)['remaining']
                 if any(cost[k] > remainder[k] + 1e-9 for k in cost):
                     raise ValueError('BUDGET_EXHAUSTED: ' + ('project' if scope is None else 'session'))
@@ -218,7 +227,7 @@ class Store:
                     raise ValueError('RESOURCE_BUSY_OR_NOT_GRANTED: ' + resource)
             execution_id = uuid4().hex
             event_id = self.event(db, run_id, kind, 'reserved', parent=parent, request=request_id,
-                                  execution=execution_id, caller=caller, inputs=inputs, cost=cost)
+                                  execution=execution_id, caller=caller, inputs=inputs, cost=cost, version=version)
             db.execute('INSERT INTO calls VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
                        (run_id, request_id, request_hash, execution_id, caller, 'running', encode(cost), encode(cost), encode(list(resources)), cache_key, None, event_id))
             # SQLite column count checked by focused tests, not separate accounting.
@@ -242,7 +251,7 @@ class Store:
                        (parsed.execution_status, encode(charged), encode(parsed), row['run_id'], row['request_id']))
             self.event(db, row['run_id'], kind, parsed.execution_status, parent=current['parent_id'],
                        request=row['request_id'], execution=row['execution_id'], caller=row['caller'],
-                       outputs=[parsed.output] if parsed.output else [], cost=charged)
+                       outputs=[parsed.output] if parsed.output else [], cost=charged, version=parsed.tool_version)
             return plain(parsed)
 
     def cache(self, run_id, key):
@@ -276,11 +285,20 @@ class Store:
         from schemas.platform import MemoryEntry
         result = []
         with self.connect(True) as db:
-            for row in db.execute('SELECT body FROM memories ORDER BY id'):
+            for row in db.execute('SELECT body,run_id FROM memories ORDER BY id'):
                 entry = MemoryEntry.model_validate_json(row[0])
                 if entry.invalidated or (entry.expires_at and entry.expires_at <= now()):
                     continue
-                if any(value is not None and getattr(entry, key) != value for key, value in filters.items() if key != 'tags'):
+                scoped = filters.get('model_scope')
+                entry_scope = entry.model_scope
+                if scoped and entry_scope is None:
+                    source = self.session(row['run_id'], db)['snapshot']['input']
+                    entry_scope = digest(dict(robot=source['robot'], backend=source['policy']['backend']))
+                transferable = scoped is not None and scoped in entry.transferable_scopes
+                if scoped and entry_scope != scoped and not transferable:
+                    continue
+                if any(value is not None and getattr(entry, key) != value for key, value in filters.items()
+                       if key not in ('tags', 'model_scope') and not (key == 'model_id' and transferable)):
                     continue
                 if set(filters.get('tags', [])) - set(entry.tags):
                     continue

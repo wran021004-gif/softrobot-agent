@@ -145,6 +145,14 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/model_provider.py",
+      "tools/pcc_math.py",
+      "schemas/framework.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "saved derivation; no numerical solves"
   },
   {
@@ -218,6 +226,12 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/pcc_math.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "saved derivation; no numerical solves"
   },
   {
@@ -393,6 +407,14 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "schemas/pcc_tolerance.py",
+      "tools/model_provider.py",
+      "tools/pcc_math.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "saved derivation; no numerical solves"
   },
   {
@@ -474,6 +496,124 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "analysis.versioned_value",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Independent offline development example; no physical calibration",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "Value",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "Value",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/convergence/contracts.py",
+      "extensions/convergence/implementation.py",
+      "extensions/convergence/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "analysis.versioned_value",
+    "kind": "tool",
+    "version": "2.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Independent offline development example; no physical calibration",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "Value",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "Value",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/convergence/contracts.py",
+      "extensions/convergence/implementation.py",
+      "extensions/convergence/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "none"
   },
   {
@@ -632,6 +772,11 @@
           "title": "Model Id",
           "type": "string"
         },
+        "backend_version": {
+          "default": "1.0.0",
+          "title": "Backend Version",
+          "type": "string"
+        },
         "signals": {
           "items": {
             "$ref": "#/$defs/Signal"
@@ -674,6 +819,283 @@
     "resources": [],
     "dependencies": [
       "genesis"
+    ],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.empty",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "backend.limited_synthetic",
+    "kind": "backend",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Independent offline development example; no physical calibration",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Signal": {
+          "additionalProperties": false,
+          "properties": {
+            "spec": {
+              "$ref": "#/$defs/SignalSpec"
+            },
+            "times_s": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Times S",
+              "type": "array"
+            },
+            "values": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "spec",
+            "times_s",
+            "values"
+          ],
+          "title": "Signal",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "backend_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Backend Id",
+          "type": "string"
+        },
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "backend_version": {
+          "default": "1.0.0",
+          "title": "Backend Version",
+          "type": "string"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Payload"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/Payload"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "solver_status",
+        "backend_id",
+        "model_id",
+        "signals",
+        "data",
+        "limitations",
+        "initial_state",
+        "seed"
+      ],
+      "title": "BackendResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "reference": true,
+      "robots": [
+        "reference_signal_robot"
+      ],
+      "channels": [
+        "tendon_target_lengths_m"
+      ],
+      "environments": [
+        "reference.environment"
+      ],
+      "signals": [
+        "tendon_length",
+        "contact_count"
+      ],
+      "signal_specs": [
+        {
+          "name": "tendon_length",
+          "entity": "tendon_0",
+          "dimension": 1,
+          "units": "m",
+          "frame": "actuator",
+          "phase": "post_step"
+        },
+        {
+          "name": "contact_count",
+          "entity": "contact",
+          "dimension": 1,
+          "units": "count",
+          "frame": "world",
+          "phase": "post_step"
+        }
+      ],
+      "signal_phases": [
+        "post_step"
+      ],
+      "operations": [
+        "compile",
+        "initialize",
+        "run",
+        "close"
+      ],
+      "timeout": "step loop",
+      "cancellation": "step boundary"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/convergence/contracts.py",
+      "extensions/convergence/implementation.py",
+      "extensions/convergence/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [
+      [
+        "backend.reference",
+        "1.0.0"
+      ]
+    ],
+    "contract_dependencies": [
+      [
+        "convergence.empty",
+        "1.0.0"
+      ]
     ],
     "side_effects": "none"
   },
@@ -831,6 +1253,11 @@
           "title": "Model Id",
           "type": "string"
         },
+        "backend_version": {
+          "default": "1.0.0",
+          "title": "Backend Version",
+          "type": "string"
+        },
         "signals": {
           "items": {
             "$ref": "#/$defs/Signal"
@@ -870,6 +1297,7 @@
       "type": "object"
     },
     "capabilities": {
+      "conversion": "legacy reach/compiler conversion",
       "families": [
         "task.reach"
       ],
@@ -905,7 +1333,20 @@
         "MuJoCo contact solver"
       ],
       "cancellation": "future cancellation request only",
-      "timeout": "RHS/future; engine startup and shutdown not hard bounded"
+      "timeout": "RHS/future; engine startup and shutdown not hard bounded",
+      "robot_contracts": [
+        "legacy.robot_ir"
+      ],
+      "signal_specs": [
+        {
+          "name": "tip_position",
+          "entity": "tip",
+          "dimension": 3,
+          "units": "m",
+          "frame": "world",
+          "phase": "sampled_state"
+        }
+      ]
     },
     "resources": [
       "matlab_engine"
@@ -913,6 +1354,46 @@
     "dependencies": [
       "matlab.engine",
       "mujoco"
+    ],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py",
+      "extensions/reference/legacy.py",
+      "tools/reach_dynamics.py",
+      "tools/mujoco_tools.py",
+      "tools/matlab_tools.py",
+      "tools/task_context.py",
+      "tools/spec_tools.py",
+      "tools/design_compiler.py",
+      "tools/capability_resolver.py",
+      "controllers/registry.py",
+      "controllers/base.py",
+      "controllers/factories.py",
+      "controllers/open_loop_length.py",
+      "controllers/pcc_tip_feedback.py",
+      "schemas/exploration.py",
+      "schemas/robot_ir.py",
+      "schemas/design_spec.py",
+      "schemas/task_spec.py",
+      "schemas/environment_spec.py",
+      "schemas/settings.py"
+    ],
+    "assets": [
+      "tasks/reach_free/task.yaml",
+      "tasks/reach_free/environment.yaml",
+      "tasks/reach_free/mujoco.xml",
+      "configs/simulator.yaml",
+      "configs/run.yaml",
+      "physics_contracts/legacy_v1_surrogate.yaml",
+      "matlab/tdcr_planar_dynamic.m"
+    ],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.empty",
+        "1.0.0"
+      ]
     ],
     "side_effects": "none"
   },
@@ -1070,6 +1551,11 @@
           "title": "Model Id",
           "type": "string"
         },
+        "backend_version": {
+          "default": "1.0.0",
+          "title": "Backend Version",
+          "type": "string"
+        },
         "signals": {
           "items": {
             "$ref": "#/$defs/Signal"
@@ -1109,6 +1595,7 @@
       "type": "object"
     },
     "capabilities": {
+      "conversion": "legacy reach/compiler conversion",
       "families": [
         "task.reach"
       ],
@@ -1138,11 +1625,64 @@
         "close"
       ],
       "cancellation": "unsupported external interactive cancellation",
-      "timeout": "existing rollout cooperative deadline; startup/export/close not hard bounded"
+      "timeout": "existing rollout cooperative deadline; startup/export/close not hard bounded",
+      "robot_contracts": [
+        "legacy.robot_ir"
+      ],
+      "signal_specs": [
+        {
+          "name": "tip_position",
+          "entity": "tip",
+          "dimension": 3,
+          "units": "m",
+          "frame": "world",
+          "phase": "post_step"
+        }
+      ]
     },
     "resources": [],
     "dependencies": [
       "mujoco"
+    ],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py",
+      "extensions/reference/legacy.py",
+      "tools/reach_dynamics.py",
+      "tools/mujoco_tools.py",
+      "tools/matlab_tools.py",
+      "tools/task_context.py",
+      "tools/spec_tools.py",
+      "tools/design_compiler.py",
+      "tools/capability_resolver.py",
+      "controllers/registry.py",
+      "controllers/base.py",
+      "controllers/factories.py",
+      "controllers/open_loop_length.py",
+      "controllers/pcc_tip_feedback.py",
+      "schemas/exploration.py",
+      "schemas/robot_ir.py",
+      "schemas/design_spec.py",
+      "schemas/task_spec.py",
+      "schemas/environment_spec.py",
+      "schemas/settings.py"
+    ],
+    "assets": [
+      "tasks/reach_free/task.yaml",
+      "tasks/reach_free/environment.yaml",
+      "tasks/reach_free/mujoco.xml",
+      "configs/simulator.yaml",
+      "configs/run.yaml",
+      "physics_contracts/legacy_v1_surrogate.yaml",
+      "matlab/tdcr_planar_dynamic.m"
+    ],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.empty",
+        "1.0.0"
+      ]
     ],
     "side_effects": "none"
   },
@@ -1300,6 +1840,11 @@
           "title": "Model Id",
           "type": "string"
         },
+        "backend_version": {
+          "default": "1.0.0",
+          "title": "Backend Version",
+          "type": "string"
+        },
         "signals": {
           "items": {
             "$ref": "#/$defs/Signal"
@@ -1339,6 +1884,24 @@
       "type": "object"
     },
     "capabilities": {
+      "signal_specs": [
+        {
+          "name": "tendon_length",
+          "entity": "tendon_0",
+          "dimension": 1,
+          "units": "m",
+          "frame": "actuator",
+          "phase": "post_step"
+        },
+        {
+          "name": "contact_count",
+          "entity": "contact",
+          "dimension": 1,
+          "units": "count",
+          "frame": "world",
+          "phase": "post_step"
+        }
+      ],
       "reference": true,
       "families": [
         "task.signal_hold"
@@ -1373,10 +1936,1493 @@
         "close"
       ],
       "cancellation": "cooperative step boundary",
-      "timeout": "step loop; no external startup"
+      "timeout": "step loop; no external startup",
+      "robot_contracts": [
+        "reference.robot"
+      ]
     },
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.empty",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "candidate.controller",
+    "kind": "candidate_builder",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Apply existing typed controller parameters",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "Budget": {
+          "additionalProperties": false,
+          "properties": {
+            "tool_calls": {
+              "minimum": 0,
+              "title": "Tool Calls",
+              "type": "integer"
+            },
+            "model_calls": {
+              "minimum": 0,
+              "title": "Model Calls",
+              "type": "integer"
+            },
+            "backend_solves": {
+              "minimum": 0,
+              "title": "Backend Solves",
+              "type": "integer"
+            },
+            "worker_calls": {
+              "minimum": 0,
+              "title": "Worker Calls",
+              "type": "integer"
+            },
+            "wall_s": {
+              "minimum": 0,
+              "title": "Wall S",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tool_calls",
+            "model_calls",
+            "backend_solves",
+            "worker_calls",
+            "wall_s"
+          ],
+          "title": "Budget",
+          "type": "object"
+        },
+        "ExperimentPolicy": {
+          "additionalProperties": false,
+          "properties": {
+            "policy_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Policy Id",
+              "type": "string"
+            },
+            "editable": {
+              "additionalProperties": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Editable",
+              "type": "object"
+            },
+            "backend": {
+              "$ref": "#/$defs/Binding"
+            },
+            "controller": {
+              "$ref": "#/$defs/Binding"
+            },
+            "candidate_builder": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Binding"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "search": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Binding"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "model": {
+              "$ref": "#/$defs/ModelConfig"
+            },
+            "allowed_tools": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Allowed Tools",
+              "type": "array"
+            },
+            "tool_bindings": {
+              "patternProperties": {
+                "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$": {
+                  "type": "string"
+                }
+              },
+              "title": "Tool Bindings",
+              "type": "object"
+            },
+            "budget": {
+              "$ref": "#/$defs/Budget"
+            },
+            "timeout_s": {
+              "exclusiveMinimum": 0,
+              "title": "Timeout S",
+              "type": "number"
+            },
+            "allow_development_skills": {
+              "default": false,
+              "title": "Allow Development Skills",
+              "type": "boolean"
+            },
+            "recovery": {
+              "const": "sealed_or_unknown_no_replay",
+              "default": "sealed_or_unknown_no_replay",
+              "title": "Recovery",
+              "type": "string"
+            }
+          },
+          "required": [
+            "policy_id",
+            "backend",
+            "controller",
+            "budget",
+            "timeout_s"
+          ],
+          "title": "ExperimentPolicy",
+          "type": "object"
+        },
+        "ModelConfig": {
+          "additionalProperties": false,
+          "properties": {
+            "adapter": {
+              "default": "offline",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Adapter",
+              "type": "string"
+            },
+            "adapter_version": {
+              "default": "1.0.0",
+              "title": "Adapter Version",
+              "type": "string"
+            },
+            "parameters": {
+              "additionalProperties": true,
+              "title": "Parameters",
+              "type": "object"
+            },
+            "strategy": {
+              "default": "strategy.tool",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Strategy",
+              "type": "string"
+            },
+            "strategy_version": {
+              "default": "1.0.0",
+              "title": "Strategy Version",
+              "type": "string"
+            },
+            "model": {
+              "default": "offline-contract-fixture",
+              "title": "Model",
+              "type": "string"
+            },
+            "supports_tools": {
+              "const": true,
+              "default": true,
+              "title": "Supports Tools",
+              "type": "boolean"
+            },
+            "supports_text": {
+              "const": true,
+              "default": true,
+              "title": "Supports Text",
+              "type": "boolean"
+            },
+            "supports_images": {
+              "default": false,
+              "title": "Supports Images",
+              "type": "boolean"
+            },
+            "timeout_s": {
+              "default": 30,
+              "exclusiveMinimum": 0,
+              "title": "Timeout S",
+              "type": "number"
+            },
+            "max_turns": {
+              "default": 12,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Max Turns",
+              "type": "integer"
+            },
+            "max_repairs": {
+              "default": 2,
+              "maximum": 10,
+              "minimum": 0,
+              "title": "Max Repairs",
+              "type": "integer"
+            },
+            "max_no_progress": {
+              "default": 3,
+              "maximum": 20,
+              "minimum": 1,
+              "title": "Max No Progress",
+              "type": "integer"
+            },
+            "context_bytes": {
+              "default": 64000,
+              "minimum": 4000,
+              "title": "Context Bytes",
+              "type": "integer"
+            }
+          },
+          "title": "ModelConfig",
+          "type": "object"
+        },
+        "Objective": {
+          "additionalProperties": false,
+          "properties": {
+            "metric": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Metric",
+              "type": "string"
+            },
+            "direction": {
+              "enum": [
+                "minimize",
+                "maximize"
+              ],
+              "title": "Direction",
+              "type": "string"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "weight": {
+              "default": 1,
+              "exclusiveMinimum": 0,
+              "title": "Weight",
+              "type": "number"
+            }
+          },
+          "required": [
+            "metric",
+            "direction",
+            "units"
+          ],
+          "title": "Objective",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "RobotDescription": {
+          "additionalProperties": false,
+          "properties": {
+            "family": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Family",
+              "type": "string"
+            },
+            "structure": {
+              "$ref": "#/$defs/Payload"
+            },
+            "channels": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Channels",
+              "type": "array"
+            },
+            "units": {
+              "const": "SI",
+              "default": "SI",
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "title": "Frame",
+              "type": "string"
+            },
+            "assumptions": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Assumptions",
+              "type": "array"
+            },
+            "sources": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Sources",
+              "type": "array"
+            },
+            "unsupported": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Unsupported",
+              "type": "array"
+            }
+          },
+          "required": [
+            "family",
+            "structure",
+            "channels",
+            "frame",
+            "assumptions",
+            "sources",
+            "unsupported"
+          ],
+          "title": "RobotDescription",
+          "type": "object"
+        },
+        "Sampling": {
+          "additionalProperties": false,
+          "properties": {
+            "split": {
+              "enum": [
+                "development",
+                "evaluation"
+              ],
+              "title": "Split",
+              "type": "string"
+            },
+            "seeds": {
+              "items": {
+                "type": "integer"
+              },
+              "minItems": 1,
+              "title": "Seeds",
+              "type": "array"
+            },
+            "aggregation": {
+              "const": "per_instance",
+              "default": "per_instance",
+              "title": "Aggregation",
+              "type": "string"
+            },
+            "window_s": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Window S",
+              "type": "array"
+            }
+          },
+          "required": [
+            "split",
+            "seeds",
+            "window_s"
+          ],
+          "title": "Sampling",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        },
+        "TaskDefinition": {
+          "additionalProperties": false,
+          "properties": {
+            "contract_version": {
+              "const": "1.0.0",
+              "default": "1.0.0",
+              "title": "Contract Version",
+              "type": "string"
+            },
+            "task_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "task_version": {
+              "minLength": 1,
+              "title": "Task Version",
+              "type": "string"
+            },
+            "name": {
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "draft",
+                "development_valid",
+                "formally_approved"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "source": {
+              "minLength": 1,
+              "title": "Source",
+              "type": "string"
+            },
+            "family": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Family",
+              "type": "string"
+            },
+            "goal": {
+              "$ref": "#/$defs/Payload"
+            },
+            "environment": {
+              "$ref": "#/$defs/Payload"
+            },
+            "robot_families": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Robot Families",
+              "type": "array"
+            },
+            "actuator_channels": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Actuator Channels",
+              "type": "array"
+            },
+            "initializer": {
+              "$ref": "#/$defs/Binding"
+            },
+            "timing": {
+              "$ref": "#/$defs/Timing"
+            },
+            "evaluator": {
+              "$ref": "#/$defs/Binding"
+            },
+            "objectives": {
+              "items": {
+                "$ref": "#/$defs/Objective"
+              },
+              "minItems": 1,
+              "title": "Objectives",
+              "type": "array"
+            },
+            "failure_policy": {
+              "const": "retain_invalid_and_constraint_failures",
+              "title": "Failure Policy",
+              "type": "string"
+            },
+            "observations": {
+              "items": {
+                "$ref": "#/$defs/SignalSpec"
+              },
+              "minItems": 1,
+              "title": "Observations",
+              "type": "array"
+            },
+            "sampling": {
+              "$ref": "#/$defs/Sampling"
+            }
+          },
+          "required": [
+            "task_id",
+            "task_version",
+            "name",
+            "status",
+            "source",
+            "family",
+            "goal",
+            "environment",
+            "robot_families",
+            "actuator_channels",
+            "initializer",
+            "timing",
+            "evaluator",
+            "objectives",
+            "failure_policy",
+            "observations",
+            "sampling"
+          ],
+          "title": "TaskDefinition",
+          "type": "object"
+        },
+        "Timing": {
+          "additionalProperties": false,
+          "properties": {
+            "timestep_s": {
+              "description": "物理积分步长，s",
+              "exclusiveMinimum": 0,
+              "title": "Timestep S",
+              "type": "number"
+            },
+            "control_period_s": {
+              "description": "控制周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Control Period S",
+              "type": "number"
+            },
+            "sample_period_s": {
+              "description": "输出采样周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Sample Period S",
+              "type": "number"
+            },
+            "duration_s": {
+              "description": "物理持续时间，s",
+              "exclusiveMinimum": 0,
+              "title": "Duration S",
+              "type": "number"
+            },
+            "termination": {
+              "items": {
+                "enum": [
+                  "duration",
+                  "numerical_failure",
+                  "cancelled"
+                ],
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Termination",
+              "type": "array"
+            }
+          },
+          "required": [
+            "timestep_s",
+            "control_period_s",
+            "sample_period_s",
+            "duration_s",
+            "termination"
+          ],
+          "title": "Timing",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskDefinition"
+        },
+        "robot": {
+          "$ref": "#/$defs/RobotDescription"
+        },
+        "policy": {
+          "$ref": "#/$defs/ExperimentPolicy"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "run_id",
+        "task",
+        "robot",
+        "policy",
+        "seed"
+      ],
+      "title": "SessionInput",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "candidate.synthetic",
+    "kind": "candidate_builder",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Independent offline development example; no physical calibration",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "Budget": {
+          "additionalProperties": false,
+          "properties": {
+            "tool_calls": {
+              "minimum": 0,
+              "title": "Tool Calls",
+              "type": "integer"
+            },
+            "model_calls": {
+              "minimum": 0,
+              "title": "Model Calls",
+              "type": "integer"
+            },
+            "backend_solves": {
+              "minimum": 0,
+              "title": "Backend Solves",
+              "type": "integer"
+            },
+            "worker_calls": {
+              "minimum": 0,
+              "title": "Worker Calls",
+              "type": "integer"
+            },
+            "wall_s": {
+              "minimum": 0,
+              "title": "Wall S",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tool_calls",
+            "model_calls",
+            "backend_solves",
+            "worker_calls",
+            "wall_s"
+          ],
+          "title": "Budget",
+          "type": "object"
+        },
+        "ExperimentPolicy": {
+          "additionalProperties": false,
+          "properties": {
+            "policy_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Policy Id",
+              "type": "string"
+            },
+            "editable": {
+              "additionalProperties": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Editable",
+              "type": "object"
+            },
+            "backend": {
+              "$ref": "#/$defs/Binding"
+            },
+            "controller": {
+              "$ref": "#/$defs/Binding"
+            },
+            "candidate_builder": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Binding"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "search": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Binding"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "model": {
+              "$ref": "#/$defs/ModelConfig"
+            },
+            "allowed_tools": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Allowed Tools",
+              "type": "array"
+            },
+            "tool_bindings": {
+              "patternProperties": {
+                "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$": {
+                  "type": "string"
+                }
+              },
+              "title": "Tool Bindings",
+              "type": "object"
+            },
+            "budget": {
+              "$ref": "#/$defs/Budget"
+            },
+            "timeout_s": {
+              "exclusiveMinimum": 0,
+              "title": "Timeout S",
+              "type": "number"
+            },
+            "allow_development_skills": {
+              "default": false,
+              "title": "Allow Development Skills",
+              "type": "boolean"
+            },
+            "recovery": {
+              "const": "sealed_or_unknown_no_replay",
+              "default": "sealed_or_unknown_no_replay",
+              "title": "Recovery",
+              "type": "string"
+            }
+          },
+          "required": [
+            "policy_id",
+            "backend",
+            "controller",
+            "budget",
+            "timeout_s"
+          ],
+          "title": "ExperimentPolicy",
+          "type": "object"
+        },
+        "ModelConfig": {
+          "additionalProperties": false,
+          "properties": {
+            "adapter": {
+              "default": "offline",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Adapter",
+              "type": "string"
+            },
+            "adapter_version": {
+              "default": "1.0.0",
+              "title": "Adapter Version",
+              "type": "string"
+            },
+            "parameters": {
+              "additionalProperties": true,
+              "title": "Parameters",
+              "type": "object"
+            },
+            "strategy": {
+              "default": "strategy.tool",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Strategy",
+              "type": "string"
+            },
+            "strategy_version": {
+              "default": "1.0.0",
+              "title": "Strategy Version",
+              "type": "string"
+            },
+            "model": {
+              "default": "offline-contract-fixture",
+              "title": "Model",
+              "type": "string"
+            },
+            "supports_tools": {
+              "const": true,
+              "default": true,
+              "title": "Supports Tools",
+              "type": "boolean"
+            },
+            "supports_text": {
+              "const": true,
+              "default": true,
+              "title": "Supports Text",
+              "type": "boolean"
+            },
+            "supports_images": {
+              "default": false,
+              "title": "Supports Images",
+              "type": "boolean"
+            },
+            "timeout_s": {
+              "default": 30,
+              "exclusiveMinimum": 0,
+              "title": "Timeout S",
+              "type": "number"
+            },
+            "max_turns": {
+              "default": 12,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Max Turns",
+              "type": "integer"
+            },
+            "max_repairs": {
+              "default": 2,
+              "maximum": 10,
+              "minimum": 0,
+              "title": "Max Repairs",
+              "type": "integer"
+            },
+            "max_no_progress": {
+              "default": 3,
+              "maximum": 20,
+              "minimum": 1,
+              "title": "Max No Progress",
+              "type": "integer"
+            },
+            "context_bytes": {
+              "default": 64000,
+              "minimum": 4000,
+              "title": "Context Bytes",
+              "type": "integer"
+            }
+          },
+          "title": "ModelConfig",
+          "type": "object"
+        },
+        "Objective": {
+          "additionalProperties": false,
+          "properties": {
+            "metric": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Metric",
+              "type": "string"
+            },
+            "direction": {
+              "enum": [
+                "minimize",
+                "maximize"
+              ],
+              "title": "Direction",
+              "type": "string"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "weight": {
+              "default": 1,
+              "exclusiveMinimum": 0,
+              "title": "Weight",
+              "type": "number"
+            }
+          },
+          "required": [
+            "metric",
+            "direction",
+            "units"
+          ],
+          "title": "Objective",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "RobotDescription": {
+          "additionalProperties": false,
+          "properties": {
+            "family": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Family",
+              "type": "string"
+            },
+            "structure": {
+              "$ref": "#/$defs/Payload"
+            },
+            "channels": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Channels",
+              "type": "array"
+            },
+            "units": {
+              "const": "SI",
+              "default": "SI",
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "title": "Frame",
+              "type": "string"
+            },
+            "assumptions": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Assumptions",
+              "type": "array"
+            },
+            "sources": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Sources",
+              "type": "array"
+            },
+            "unsupported": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Unsupported",
+              "type": "array"
+            }
+          },
+          "required": [
+            "family",
+            "structure",
+            "channels",
+            "frame",
+            "assumptions",
+            "sources",
+            "unsupported"
+          ],
+          "title": "RobotDescription",
+          "type": "object"
+        },
+        "Sampling": {
+          "additionalProperties": false,
+          "properties": {
+            "split": {
+              "enum": [
+                "development",
+                "evaluation"
+              ],
+              "title": "Split",
+              "type": "string"
+            },
+            "seeds": {
+              "items": {
+                "type": "integer"
+              },
+              "minItems": 1,
+              "title": "Seeds",
+              "type": "array"
+            },
+            "aggregation": {
+              "const": "per_instance",
+              "default": "per_instance",
+              "title": "Aggregation",
+              "type": "string"
+            },
+            "window_s": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Window S",
+              "type": "array"
+            }
+          },
+          "required": [
+            "split",
+            "seeds",
+            "window_s"
+          ],
+          "title": "Sampling",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        },
+        "TaskDefinition": {
+          "additionalProperties": false,
+          "properties": {
+            "contract_version": {
+              "const": "1.0.0",
+              "default": "1.0.0",
+              "title": "Contract Version",
+              "type": "string"
+            },
+            "task_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "task_version": {
+              "minLength": 1,
+              "title": "Task Version",
+              "type": "string"
+            },
+            "name": {
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "draft",
+                "development_valid",
+                "formally_approved"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "source": {
+              "minLength": 1,
+              "title": "Source",
+              "type": "string"
+            },
+            "family": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Family",
+              "type": "string"
+            },
+            "goal": {
+              "$ref": "#/$defs/Payload"
+            },
+            "environment": {
+              "$ref": "#/$defs/Payload"
+            },
+            "robot_families": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Robot Families",
+              "type": "array"
+            },
+            "actuator_channels": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Actuator Channels",
+              "type": "array"
+            },
+            "initializer": {
+              "$ref": "#/$defs/Binding"
+            },
+            "timing": {
+              "$ref": "#/$defs/Timing"
+            },
+            "evaluator": {
+              "$ref": "#/$defs/Binding"
+            },
+            "objectives": {
+              "items": {
+                "$ref": "#/$defs/Objective"
+              },
+              "minItems": 1,
+              "title": "Objectives",
+              "type": "array"
+            },
+            "failure_policy": {
+              "const": "retain_invalid_and_constraint_failures",
+              "title": "Failure Policy",
+              "type": "string"
+            },
+            "observations": {
+              "items": {
+                "$ref": "#/$defs/SignalSpec"
+              },
+              "minItems": 1,
+              "title": "Observations",
+              "type": "array"
+            },
+            "sampling": {
+              "$ref": "#/$defs/Sampling"
+            }
+          },
+          "required": [
+            "task_id",
+            "task_version",
+            "name",
+            "status",
+            "source",
+            "family",
+            "goal",
+            "environment",
+            "robot_families",
+            "actuator_channels",
+            "initializer",
+            "timing",
+            "evaluator",
+            "objectives",
+            "failure_policy",
+            "observations",
+            "sampling"
+          ],
+          "title": "TaskDefinition",
+          "type": "object"
+        },
+        "Timing": {
+          "additionalProperties": false,
+          "properties": {
+            "timestep_s": {
+              "description": "物理积分步长，s",
+              "exclusiveMinimum": 0,
+              "title": "Timestep S",
+              "type": "number"
+            },
+            "control_period_s": {
+              "description": "控制周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Control Period S",
+              "type": "number"
+            },
+            "sample_period_s": {
+              "description": "输出采样周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Sample Period S",
+              "type": "number"
+            },
+            "duration_s": {
+              "description": "物理持续时间，s",
+              "exclusiveMinimum": 0,
+              "title": "Duration S",
+              "type": "number"
+            },
+            "termination": {
+              "items": {
+                "enum": [
+                  "duration",
+                  "numerical_failure",
+                  "cancelled"
+                ],
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Termination",
+              "type": "array"
+            }
+          },
+          "required": [
+            "timestep_s",
+            "control_period_s",
+            "sample_period_s",
+            "duration_s",
+            "termination"
+          ],
+          "title": "Timing",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskDefinition"
+        },
+        "robot": {
+          "$ref": "#/$defs/RobotDescription"
+        },
+        "policy": {
+          "$ref": "#/$defs/ExperimentPolicy"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "run_id",
+        "task",
+        "robot",
+        "policy",
+        "seed"
+      ],
+      "title": "SessionInput",
+      "type": "object"
+    },
+    "capabilities": {
+      "editable": [
+        "controller.command_m",
+        "structure.response_fraction"
+      ]
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/convergence/contracts.py",
+      "extensions/convergence/implementation.py",
+      "extensions/convergence/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "convergence.empty",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -1499,6 +3545,46 @@
     },
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py",
+      "extensions/reference/legacy.py",
+      "tools/reach_dynamics.py",
+      "tools/mujoco_tools.py",
+      "tools/matlab_tools.py",
+      "tools/task_context.py",
+      "tools/spec_tools.py",
+      "tools/design_compiler.py",
+      "tools/capability_resolver.py",
+      "controllers/registry.py",
+      "controllers/base.py",
+      "controllers/factories.py",
+      "controllers/open_loop_length.py",
+      "controllers/pcc_tip_feedback.py",
+      "schemas/exploration.py",
+      "schemas/robot_ir.py",
+      "schemas/design_spec.py",
+      "schemas/task_spec.py",
+      "schemas/environment_spec.py",
+      "schemas/settings.py"
+    ],
+    "assets": [
+      "tasks/reach_free/task.yaml",
+      "tasks/reach_free/environment.yaml",
+      "tasks/reach_free/mujoco.xml",
+      "configs/simulator.yaml",
+      "configs/run.yaml",
+      "physics_contracts/legacy_v1_surrogate.yaml",
+      "matlab/tdcr_planar_dynamic.m"
+    ],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "legacy.control",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -1565,6 +3651,106 @@
     },
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.control",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "deepseek",
+    "kind": "model_adapter",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Existing text/tool model service transport",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "raw": {
+          "title": "Raw"
+        },
+        "usage": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Usage",
+          "type": "object"
+        },
+        "status": {
+          "default": "completed",
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "timeout"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        }
+      },
+      "required": [
+        "raw"
+      ],
+      "title": "ModelResponse",
+      "type": "object"
+    },
+    "capabilities": {
+      "real_requests": true,
+      "text": true,
+      "images": false,
+      "timeout": "network request deadline",
+      "cancellation": "between requests"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "tools/platform_models.py",
+      "tools/deepseek_adapter.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "none"
   },
   {
@@ -1722,6 +3908,17 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "current session/project only"
   },
   {
@@ -1819,6 +4016,12 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/trajectory_diagnosis.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "saved derivation; no numerical solves"
   },
   {
@@ -2009,6 +4212,14 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/observation_contract.py",
+      "tools/rules/contact_presence.py",
+      "schemas/framework.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "saved derivation; no numerical solves"
   },
   {
@@ -2125,6 +4336,15 @@
       },
       "additionalProperties": false,
       "properties": {
+        "contract_version": {
+          "default": "1.1.0",
+          "enum": [
+            "1.0.0",
+            "1.1.0"
+          ],
+          "title": "Contract Version",
+          "type": "string"
+        },
         "validity": {
           "enum": [
             "valid",
@@ -2167,6 +4387,35 @@
           "title": "Evaluator",
           "type": "string"
         },
+        "evaluator_version": {
+          "default": "1.0.0",
+          "title": "Evaluator Version",
+          "type": "string"
+        },
+        "source_execution_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Execution Id"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
         "comparison_identity": {
           "title": "Comparison Identity",
           "type": "string"
@@ -2199,6 +4448,19 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.hold_evaluation",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -2315,6 +4577,15 @@
       },
       "additionalProperties": false,
       "properties": {
+        "contract_version": {
+          "default": "1.1.0",
+          "enum": [
+            "1.0.0",
+            "1.1.0"
+          ],
+          "title": "Contract Version",
+          "type": "string"
+        },
         "validity": {
           "enum": [
             "valid",
@@ -2357,6 +4628,35 @@
           "title": "Evaluator",
           "type": "string"
         },
+        "evaluator_version": {
+          "default": "1.0.0",
+          "title": "Evaluator Version",
+          "type": "string"
+        },
+        "source_execution_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Execution Id"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
         "comparison_identity": {
           "title": "Comparison Identity",
           "type": "string"
@@ -2389,6 +4689,260 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.reach_evaluation",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "evaluate.terminal",
+    "kind": "evaluator",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Independent offline development example; no physical calibration",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "tolerance_m": {
+          "exclusiveMinimum": 0,
+          "title": "Tolerance M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "tolerance_m"
+      ],
+      "title": "TerminalEvaluation",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "ConstraintResult": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "satisfied": {
+              "title": "Satisfied",
+              "type": "boolean"
+            },
+            "observed": {
+              "title": "Observed",
+              "type": "number"
+            },
+            "limit": {
+              "title": "Limit",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "satisfied",
+            "observed",
+            "limit",
+            "units"
+          ],
+          "title": "ConstraintResult",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Metric": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "value",
+            "units"
+          ],
+          "title": "Metric",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "default": "1.1.0",
+          "enum": [
+            "1.0.0",
+            "1.1.0"
+          ],
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "validity": {
+          "enum": [
+            "valid",
+            "invalid",
+            "incomplete",
+            "unsupported"
+          ],
+          "title": "Validity",
+          "type": "string"
+        },
+        "task_success": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Task Success"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/ConstraintResult"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "evaluator": {
+          "title": "Evaluator",
+          "type": "string"
+        },
+        "evaluator_version": {
+          "default": "1.0.0",
+          "title": "Evaluator Version",
+          "type": "string"
+        },
+        "source_execution_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Execution Id"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
+        "comparison_identity": {
+          "title": "Comparison Identity",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "validity",
+        "task_success",
+        "metrics",
+        "constraints",
+        "source",
+        "evaluator",
+        "comparison_identity"
+      ],
+      "title": "EvaluationResult",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/convergence/contracts.py",
+      "extensions/convergence/implementation.py",
+      "extensions/convergence/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "convergence.terminal_evaluation",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -2432,6 +4986,18 @@
       "properties": {
         "result": {
           "$ref": "#/$defs/EvidenceRef"
+        },
+        "execution_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Execution Id"
         }
       },
       "required": [
@@ -2525,6 +5091,15 @@
       },
       "additionalProperties": false,
       "properties": {
+        "contract_version": {
+          "default": "1.1.0",
+          "enum": [
+            "1.0.0",
+            "1.1.0"
+          ],
+          "title": "Contract Version",
+          "type": "string"
+        },
         "validity": {
           "enum": [
             "valid",
@@ -2567,6 +5142,35 @@
           "title": "Evaluator",
           "type": "string"
         },
+        "evaluator_version": {
+          "default": "1.0.0",
+          "title": "Evaluator Version",
+          "type": "string"
+        },
+        "source_execution_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Execution Id"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
         "comparison_identity": {
           "title": "Comparison Identity",
           "type": "string"
@@ -2599,6 +5203,17 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "current session/project only"
   },
   {
@@ -2659,6 +5274,13 @@
           "maximum": 100,
           "minimum": 1,
           "title": "Limit",
+          "type": "integer"
+        },
+        "byte_limit": {
+          "default": 4096,
+          "maximum": 8192,
+          "minimum": 128,
+          "title": "Byte Limit",
           "type": "integer"
         }
       },
@@ -2727,6 +5349,17 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "none"
   },
   {
@@ -2801,6 +5434,12 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/dynamic_context.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "saved derivation; no numerical solves"
   },
   {
@@ -2852,6 +5491,19 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.empty",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -2918,6 +5570,19 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.initialize",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -2995,6 +5660,25 @@
             "model_id": {
               "title": "Model Id",
               "type": "string"
+            },
+            "model_scope": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Model Scope"
+            },
+            "transferable_scopes": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Transferable Scopes",
+              "type": "array"
             },
             "failure_category": {
               "anyOf": [
@@ -3129,6 +5813,25 @@
               "title": "Model Id",
               "type": "string"
             },
+            "model_scope": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Model Scope"
+            },
+            "transferable_scopes": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Transferable Scopes",
+              "type": "array"
+            },
             "failure_category": {
               "anyOf": [
                 {
@@ -3203,6 +5906,17 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "current session/project only"
   },
   {
@@ -3355,6 +6069,25 @@
               "title": "Model Id",
               "type": "string"
             },
+            "model_scope": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Model Scope"
+            },
+            "transferable_scopes": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Transferable Scopes",
+              "type": "array"
+            },
             "failure_category": {
               "anyOf": [
                 {
@@ -3433,6 +6166,210 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "model.observing",
+    "kind": "model_adapter",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Independent offline development example; no physical calibration",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "values_m": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Values M",
+          "type": "array"
+        }
+      },
+      "title": "AdapterParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "raw": {
+          "title": "Raw"
+        },
+        "usage": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Usage",
+          "type": "object"
+        },
+        "status": {
+          "default": "completed",
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "timeout"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        }
+      },
+      "required": [
+        "raw"
+      ],
+      "title": "ModelResponse",
+      "type": "object"
+    },
+    "capabilities": {
+      "real_requests": false,
+      "text": true,
+      "images": false,
+      "timeout": "bounded local code",
+      "cancellation": "between decisions"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/convergence/contracts.py",
+      "extensions/convergence/implementation.py",
+      "extensions/convergence/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [
+      [
+        "offline",
+        "1.0.0"
+      ]
+    ],
+    "contract_dependencies": [
+      [
+        "convergence.adapter",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "offline",
+    "kind": "model_adapter",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Offline scripted compatibility fixture",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "raw": {
+          "title": "Raw"
+        },
+        "usage": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Usage",
+          "type": "object"
+        },
+        "status": {
+          "default": "completed",
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "timeout"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        }
+      },
+      "required": [
+        "raw"
+      ],
+      "title": "ModelResponse",
+      "type": "object"
+    },
+    "capabilities": {
+      "real_requests": false,
+      "text": true,
+      "images": false,
+      "timeout": "synchronous local",
+      "cancellation": "between decisions"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "tools/platform_models.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "none"
   },
   {
@@ -3506,6 +6443,97 @@
     },
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.search",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "search.stateful",
+    "kind": "search",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Independent offline development example; no physical calibration",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "candidates": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Candidates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidates"
+      ],
+      "title": "StatefulParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "contract": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Contract",
+          "type": "string"
+        },
+        "version": {
+          "default": "1.0.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true,
+          "title": "Data",
+          "type": "object"
+        }
+      },
+      "required": [
+        "contract",
+        "data"
+      ],
+      "title": "Payload",
+      "type": "object"
+    },
+    "capabilities": {
+      "multiobjective": false
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/convergence/contracts.py",
+      "extensions/convergence/implementation.py",
+      "extensions/convergence/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "convergence.search",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -3571,6 +6599,17 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "current session/project only"
   },
   {
@@ -3740,6 +6779,11 @@
           "title": "Model Id",
           "type": "string"
         },
+        "backend_version": {
+          "default": "1.0.0",
+          "title": "Backend Version",
+          "type": "string"
+        },
         "signals": {
           "items": {
             "$ref": "#/$defs/Signal"
@@ -3783,6 +6827,17 @@
     },
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "current session/project only"
   },
   {
@@ -4510,6 +7565,17 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "current session/project only"
   },
   {
@@ -4572,6 +7638,17 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "none"
   },
   {
@@ -4814,7 +7891,253 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "current session/project only"
+  },
+  {
+    "extension_id": "strategy.evidence",
+    "kind": "strategy",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Independent offline development example; no physical calibration",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "tool_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Tool Id",
+          "type": "string"
+        },
+        "tool_version": {
+          "default": "1.0.0",
+          "title": "Tool Version",
+          "type": "string"
+        },
+        "arguments": {
+          "additionalProperties": true,
+          "title": "Arguments",
+          "type": "object"
+        },
+        "reason": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "cache": {
+          "default": "reuse",
+          "enum": [
+            "reuse",
+            "new"
+          ],
+          "title": "Cache",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "tool_id",
+        "arguments",
+        "reason"
+      ],
+      "title": "ToolRequest",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/convergence/contracts.py",
+      "extensions/convergence/implementation.py",
+      "extensions/convergence/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "convergence.empty",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "strategy.tool",
+    "kind": "strategy",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "One typed tool request per decision",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "tool_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Tool Id",
+          "type": "string"
+        },
+        "tool_version": {
+          "default": "1.0.0",
+          "title": "Tool Version",
+          "type": "string"
+        },
+        "arguments": {
+          "additionalProperties": true,
+          "title": "Arguments",
+          "type": "object"
+        },
+        "reason": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "cache": {
+          "default": "reuse",
+          "enum": [
+            "reuse",
+            "new"
+          ],
+          "title": "Cache",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "tool_id",
+        "arguments",
+        "reason"
+      ],
+      "title": "ToolRequest",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "tools/platform_models.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
+    "side_effects": "none"
   },
   {
     "extension_id": "task.reach",
@@ -5200,6 +8523,19 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.empty",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -5586,6 +8922,418 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/contracts.py",
+      "extensions/reference/implementation.py",
+      "extensions/reference/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.empty",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "task.terminal",
+    "kind": "task",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Independent offline development example; no physical calibration",
+    "input_schema": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "Objective": {
+          "additionalProperties": false,
+          "properties": {
+            "metric": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Metric",
+              "type": "string"
+            },
+            "direction": {
+              "enum": [
+                "minimize",
+                "maximize"
+              ],
+              "title": "Direction",
+              "type": "string"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "weight": {
+              "default": 1,
+              "exclusiveMinimum": 0,
+              "title": "Weight",
+              "type": "number"
+            }
+          },
+          "required": [
+            "metric",
+            "direction",
+            "units"
+          ],
+          "title": "Objective",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Sampling": {
+          "additionalProperties": false,
+          "properties": {
+            "split": {
+              "enum": [
+                "development",
+                "evaluation"
+              ],
+              "title": "Split",
+              "type": "string"
+            },
+            "seeds": {
+              "items": {
+                "type": "integer"
+              },
+              "minItems": 1,
+              "title": "Seeds",
+              "type": "array"
+            },
+            "aggregation": {
+              "const": "per_instance",
+              "default": "per_instance",
+              "title": "Aggregation",
+              "type": "string"
+            },
+            "window_s": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Window S",
+              "type": "array"
+            }
+          },
+          "required": [
+            "split",
+            "seeds",
+            "window_s"
+          ],
+          "title": "Sampling",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        },
+        "Timing": {
+          "additionalProperties": false,
+          "properties": {
+            "timestep_s": {
+              "description": "物理积分步长，s",
+              "exclusiveMinimum": 0,
+              "title": "Timestep S",
+              "type": "number"
+            },
+            "control_period_s": {
+              "description": "控制周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Control Period S",
+              "type": "number"
+            },
+            "sample_period_s": {
+              "description": "输出采样周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Sample Period S",
+              "type": "number"
+            },
+            "duration_s": {
+              "description": "物理持续时间，s",
+              "exclusiveMinimum": 0,
+              "title": "Duration S",
+              "type": "number"
+            },
+            "termination": {
+              "items": {
+                "enum": [
+                  "duration",
+                  "numerical_failure",
+                  "cancelled"
+                ],
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Termination",
+              "type": "array"
+            }
+          },
+          "required": [
+            "timestep_s",
+            "control_period_s",
+            "sample_period_s",
+            "duration_s",
+            "termination"
+          ],
+          "title": "Timing",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "task_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Task Id",
+          "type": "string"
+        },
+        "task_version": {
+          "minLength": 1,
+          "title": "Task Version",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "development_valid",
+            "formally_approved"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "family": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Family",
+          "type": "string"
+        },
+        "goal": {
+          "$ref": "#/$defs/Payload"
+        },
+        "environment": {
+          "$ref": "#/$defs/Payload"
+        },
+        "robot_families": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Robot Families",
+          "type": "array"
+        },
+        "actuator_channels": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Actuator Channels",
+          "type": "array"
+        },
+        "initializer": {
+          "$ref": "#/$defs/Binding"
+        },
+        "timing": {
+          "$ref": "#/$defs/Timing"
+        },
+        "evaluator": {
+          "$ref": "#/$defs/Binding"
+        },
+        "objectives": {
+          "items": {
+            "$ref": "#/$defs/Objective"
+          },
+          "minItems": 1,
+          "title": "Objectives",
+          "type": "array"
+        },
+        "failure_policy": {
+          "const": "retain_invalid_and_constraint_failures",
+          "title": "Failure Policy",
+          "type": "string"
+        },
+        "observations": {
+          "items": {
+            "$ref": "#/$defs/SignalSpec"
+          },
+          "minItems": 1,
+          "title": "Observations",
+          "type": "array"
+        },
+        "sampling": {
+          "$ref": "#/$defs/Sampling"
+        }
+      },
+      "required": [
+        "task_id",
+        "task_version",
+        "name",
+        "status",
+        "source",
+        "family",
+        "goal",
+        "environment",
+        "robot_families",
+        "actuator_channels",
+        "initializer",
+        "timing",
+        "evaluator",
+        "objectives",
+        "failure_policy",
+        "observations",
+        "sampling"
+      ],
+      "title": "TaskDefinition",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/convergence/contracts.py",
+      "extensions/convergence/implementation.py",
+      "extensions/convergence/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "convergence.empty",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -5677,12 +9425,479 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/simulation_video.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "saved derivation; no numerical solves"
+  },
+  {
+    "extension_id": "worker.inventory",
+    "kind": "worker",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Independent offline development example; no physical calibration",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "delay_s": {
+          "default": 0.5,
+          "maximum": 5,
+          "minimum": 0,
+          "title": "Delay S",
+          "type": "number"
+        },
+        "fail": {
+          "default": false,
+          "title": "Fail",
+          "type": "boolean"
+        }
+      },
+      "title": "WorkerParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Budget": {
+          "additionalProperties": false,
+          "properties": {
+            "tool_calls": {
+              "minimum": 0,
+              "title": "Tool Calls",
+              "type": "integer"
+            },
+            "model_calls": {
+              "minimum": 0,
+              "title": "Model Calls",
+              "type": "integer"
+            },
+            "backend_solves": {
+              "minimum": 0,
+              "title": "Backend Solves",
+              "type": "integer"
+            },
+            "worker_calls": {
+              "minimum": 0,
+              "title": "Worker Calls",
+              "type": "integer"
+            },
+            "wall_s": {
+              "minimum": 0,
+              "title": "Wall S",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tool_calls",
+            "model_calls",
+            "backend_solves",
+            "worker_calls",
+            "wall_s"
+          ],
+          "title": "Budget",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "2.0.0",
+          "default": "2.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "work_id": {
+          "title": "Work Id",
+          "type": "string"
+        },
+        "base_candidate": {
+          "title": "Base Candidate",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "needs_input"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "result": {
+          "$ref": "#/$defs/Payload"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        },
+        "usage": {
+          "$ref": "#/$defs/Budget"
+        },
+        "claim_key": {
+          "title": "Claim Key",
+          "type": "string"
+        },
+        "conclusion": {
+          "title": "Conclusion",
+          "type": "string"
+        },
+        "started_at": {
+          "title": "Started At",
+          "type": "number"
+        },
+        "ended_at": {
+          "title": "Ended At",
+          "type": "number"
+        }
+      },
+      "required": [
+        "work_id",
+        "base_candidate",
+        "source",
+        "status",
+        "result",
+        "usage",
+        "claim_key",
+        "conclusion",
+        "started_at",
+        "ended_at"
+      ],
+      "title": "WorkerOutput",
+      "type": "object"
+    },
+    "capabilities": {
+      "output_contract": "WorkerOutput@2.0.0",
+      "result_checker": "extensions.convergence.implementation:check_diagnostic"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/convergence/contracts.py",
+      "extensions/convergence/implementation.py",
+      "extensions/convergence/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "convergence.worker",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "worker.math",
+    "kind": "worker",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Independent offline development example; no physical calibration",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "delay_s": {
+          "default": 0.5,
+          "maximum": 5,
+          "minimum": 0,
+          "title": "Delay S",
+          "type": "number"
+        },
+        "fail": {
+          "default": false,
+          "title": "Fail",
+          "type": "boolean"
+        }
+      },
+      "title": "WorkerParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Budget": {
+          "additionalProperties": false,
+          "properties": {
+            "tool_calls": {
+              "minimum": 0,
+              "title": "Tool Calls",
+              "type": "integer"
+            },
+            "model_calls": {
+              "minimum": 0,
+              "title": "Model Calls",
+              "type": "integer"
+            },
+            "backend_solves": {
+              "minimum": 0,
+              "title": "Backend Solves",
+              "type": "integer"
+            },
+            "worker_calls": {
+              "minimum": 0,
+              "title": "Worker Calls",
+              "type": "integer"
+            },
+            "wall_s": {
+              "minimum": 0,
+              "title": "Wall S",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tool_calls",
+            "model_calls",
+            "backend_solves",
+            "worker_calls",
+            "wall_s"
+          ],
+          "title": "Budget",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "2.0.0",
+          "default": "2.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "work_id": {
+          "title": "Work Id",
+          "type": "string"
+        },
+        "base_candidate": {
+          "title": "Base Candidate",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "needs_input"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "result": {
+          "$ref": "#/$defs/Payload"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        },
+        "usage": {
+          "$ref": "#/$defs/Budget"
+        },
+        "claim_key": {
+          "title": "Claim Key",
+          "type": "string"
+        },
+        "conclusion": {
+          "title": "Conclusion",
+          "type": "string"
+        },
+        "started_at": {
+          "title": "Started At",
+          "type": "number"
+        },
+        "ended_at": {
+          "title": "Ended At",
+          "type": "number"
+        }
+      },
+      "required": [
+        "work_id",
+        "base_candidate",
+        "source",
+        "status",
+        "result",
+        "usage",
+        "claim_key",
+        "conclusion",
+        "started_at",
+        "ended_at"
+      ],
+      "title": "WorkerOutput",
+      "type": "object"
+    },
+    "capabilities": {
+      "output_contract": "WorkerOutput@2.0.0",
+      "result_checker": "extensions.convergence.implementation:check_math"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/convergence/contracts.py",
+      "extensions/convergence/implementation.py",
+      "extensions/convergence/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [
+      [
+        "analysis.vector_norm",
+        "1.0.0"
+      ]
+    ],
+    "contract_dependencies": [
+      [
+        "convergence.worker",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
   },
   {
     "extension_id": "worker.signal",
     "kind": "worker",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "declared": true,
     "implementation_exists": true,
     "dependencies_available": true,
@@ -5726,6 +9941,45 @@
     },
     "output_schema": {
       "$defs": {
+        "Budget": {
+          "additionalProperties": false,
+          "properties": {
+            "tool_calls": {
+              "minimum": 0,
+              "title": "Tool Calls",
+              "type": "integer"
+            },
+            "model_calls": {
+              "minimum": 0,
+              "title": "Model Calls",
+              "type": "integer"
+            },
+            "backend_solves": {
+              "minimum": 0,
+              "title": "Backend Solves",
+              "type": "integer"
+            },
+            "worker_calls": {
+              "minimum": 0,
+              "title": "Worker Calls",
+              "type": "integer"
+            },
+            "wall_s": {
+              "minimum": 0,
+              "title": "Wall S",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tool_calls",
+            "model_calls",
+            "backend_solves",
+            "worker_calls",
+            "wall_s"
+          ],
+          "title": "Budget",
+          "type": "object"
+        },
         "EvidenceRef": {
           "additionalProperties": false,
           "properties": {
@@ -5745,10 +9999,42 @@
           ],
           "title": "EvidenceRef",
           "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
         }
       },
       "additionalProperties": false,
       "properties": {
+        "contract_version": {
+          "const": "2.0.0",
+          "default": "2.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
         "work_id": {
           "title": "Work Id",
           "type": "string"
@@ -5760,34 +10046,40 @@
         "source": {
           "$ref": "#/$defs/EvidenceRef"
         },
-        "signal": {
-          "title": "Signal",
-          "type": "string"
-        },
         "status": {
           "enum": [
-            "observed",
-            "missing_data"
+            "completed",
+            "failed",
+            "cancelled",
+            "needs_input"
           ],
           "title": "Status",
           "type": "string"
         },
-        "sample_indices": {
+        "result": {
+          "$ref": "#/$defs/Payload"
+        },
+        "evidence": {
           "items": {
-            "type": "integer"
+            "$ref": "#/$defs/EvidenceRef"
           },
-          "title": "Sample Indices",
+          "title": "Evidence",
           "type": "array"
         },
-        "values": {
-          "items": {
-            "items": {
-              "type": "number"
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
             },
-            "type": "array"
-          },
-          "title": "Values",
-          "type": "array"
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        },
+        "usage": {
+          "$ref": "#/$defs/Budget"
         },
         "claim_key": {
           "title": "Claim Key",
@@ -5810,10 +10102,9 @@
         "work_id",
         "base_candidate",
         "source",
-        "signal",
         "status",
-        "sample_indices",
-        "values",
+        "result",
+        "usage",
         "claim_key",
         "conclusion",
         "started_at",
@@ -5826,11 +10117,25 @@
       "allowed_tools": [
         "evidence.read"
       ],
-      "output_contract": "WorkerOutput@1.0.0",
+      "output_contract": "WorkerOutput@2.0.0",
+      "result_checker": "extensions.reference.workers:check_signal",
       "cancellation": "local process terminate"
     },
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "extensions/reference/workers.py",
+      "tools/platform_worker.py",
+      "extensions/reference/contracts.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "reference.worker",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -5928,6 +10233,17 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "current session/project only"
   },
   {
@@ -6025,6 +10341,17 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "current session/project only"
   },
   {
@@ -6122,6 +10449,17 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "none"
   },
   {
@@ -6272,6 +10610,15 @@
               "title": "Base Candidate",
               "type": "string"
             },
+            "tool_bindings": {
+              "patternProperties": {
+                "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$": {
+                  "type": "string"
+                }
+              },
+              "title": "Tool Bindings",
+              "type": "object"
+            },
             "allowed_tools": {
               "items": {
                 "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -6416,6 +10763,17 @@
     "capabilities": {},
     "resources": [],
     "dependencies": [],
+    "sources": [
+      "tools/platform_tools.py",
+      "tools/platform_candidates.py",
+      "schemas/platform_operations.py",
+      "tools/platform_workers.py",
+      "tools/platform_worker.py",
+      "tools/platform_skills.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
     "side_effects": "current session/project only"
   }
 ]

@@ -8,7 +8,7 @@ from schemas.platform import WorkOrder, WorkerOutput, Budget
 from tools.platform_store import plain, encode, zero
 from tools.state_io import digest, atomic_json, read
 from tools.spec_tools import ROOT
-from extensions.reference.contracts import WorkStatus
+from schemas.platform_operations import WorkStatus
 
 # Live handles are an optimization only; durable reservations survive host death.
 PROCESSES = {}
@@ -32,15 +32,20 @@ class Coordinator:
         order = WorkOrder.model_validate(value)
         definition, parameters = self.host.reg.bind(order.worker, 'worker')
         from tools.platform_registry import dependency_identity
-        inp = self.store.session(self.run_id)['snapshot']['input']
+        session_snapshot = self.store.session(self.run_id)['snapshot']
+        if session_snapshot.get('parent_run_id'):
+            raise ValueError('NESTED_WORKER_DISPATCH_UNSUPPORTED')
+        inp = session_snapshot['input']
         if 'workers.submit' not in inp['policy']['allowed_tools']:
             raise ValueError('WORKER_SUBMISSION_NOT_GRANTED')
-        if set(order.allowed_tools) - set(inp['policy']['allowed_tools']) or order.allowed_tools != ['evidence.read']:
+        if set(order.allowed_tools) - set(inp['policy']['tool_bindings']):
             raise ValueError('WORKER_TOOL_SCOPE_UNSUPPORTED')
+        selected = {n: inp['policy']['tool_bindings'][n] for n in order.allowed_tools}
+        if order.tool_bindings and order.tool_bindings != selected:
+            raise ValueError('WORKER_TOOL_VERSION_NOT_GRANTED')
+        order = order.model_copy(update=dict(tool_bindings=selected))
         if order.output_contract != definition.capabilities['output_contract']:
             raise ValueError('WORKER_OUTPUT_CONTRACT_MISMATCH')
-        if order.budget.worker_calls != 1 or order.budget.tool_calls != 1 or order.budget.model_calls or order.budget.backend_solves:
-            raise ValueError('REFERENCE_WORKER_REQUIRES_ONE_READ_AND_ONE_WORKER_SLOT')
         if order.budget.wall_s < order.timeout_s:
             raise ValueError('WORKER_TIMEOUT_EXCEEDS_WALL_GRANT')
         for dependency in order.dependencies:
@@ -50,13 +55,33 @@ class Coordinator:
         for name in order.resources:
             if name not in self.store.config()['exclusive_resources']:
                 raise ValueError('WORKER_RESOURCE_NOT_GRANTED')
+        if set(definition.resources) - set(order.resources):
+            raise ValueError('WORKER_RESOURCE_SCOPE_MISMATCH')
         row, fresh = self.store.reserve(self.run_id, 'worker-' + order.work_id, digest(plain(order)), 'worker:' + order.work_id,
-            plain(order.budget), order.resources, parent=parent, inputs=[order.input_snapshot], kind='worker')
+            {**zero(), 'worker_calls': 1, 'wall_s': order.timeout_s}, definition.resources, parent=parent, inputs=[order.input_snapshot], kind='worker', version=definition.version)
         if not fresh:
             return self.status(order.work_id)
         folder = self._folder(order.work_id)
         folder.mkdir(parents=True, exist_ok=False)
-        atomic_json(folder / 'order.json', dict(order=plain(order), implementation=dependency_identity(definition)))
+        from tools.platform_host import Host
+        from tools.platform_registry import dependency_closure
+        child_run = self.run_id + '-work-' + order.work_id
+        snapshot = dict(self.store.session(self.run_id)['snapshot'])
+        import copy
+        snapshot = copy.deepcopy(snapshot)
+        snapshot['input']['run_id'] = child_run
+        snapshot['input']['policy']['budget'] = plain(order.budget)
+        snapshot['input']['policy']['allowed_tools'] = order.allowed_tools
+        snapshot['input']['policy']['tool_bindings'] = {n: inp['policy']['tool_bindings'][n] for n in order.allowed_tools}
+        snapshot['input_identity'] = digest(snapshot['input'])
+        snapshot['parent_run_id'] = self.run_id
+        snapshot['worker_parent_id'] = row['parent_id']
+        snapshot['worker_order'] = plain(order)
+        snapshot['dependencies'].update(dependency_closure([definition], self.host.reg))
+        (self.store.root / 'sessions' / child_run).mkdir(parents=True, exist_ok=True)
+        self.store.create_session(snapshot)
+        atomic_json(folder / 'order.json', dict(order=plain(order), implementation=dependency_identity(definition),
+            root=str(self.store.root), child_run=child_run))
         atomic_json(folder / 'input.json', raw)
         with self.store.transaction() as db:
             db.execute('INSERT INTO workers VALUES (?,?,?,?,?,?,?)', (self.run_id, order.work_id, encode(order), 'reserved', None, None, None))
@@ -101,20 +126,29 @@ class Coordinator:
                     return self._finish(work_id, 'cancelled', reason='WORKER_TIMEOUT')
                 return self.status(work_id)
         if (folder / 'output.json').is_file():
-            output = WorkerOutput.model_validate(read(folder / 'output.json'))
-            _, parameters = self.host.reg.bind(order.worker, 'worker')
-            if output.work_id != work_id or output.source != order.input_snapshot or output.base_candidate != order.base_candidate or output.signal != parameters.signal:
-                return self._finish(work_id, 'failed', reason='WORKER_OUTPUT_IDENTITY_MISMATCH')
-            source = self.store.artifact(output.source)
-            from schemas.platform import BackendResult
-            raw = BackendResult.model_validate(source)
-            signal = next((s for s in raw.signals if s.spec.name == output.signal), None)
-            if signal:
-                if output.sample_indices != list(range(len(signal.values))) or output.values != signal.values or output.status != 'observed':
-                    return self._finish(work_id, 'failed', reason='WORKER_SAMPLE_EVIDENCE_MISMATCH')
-            elif output.status != 'missing_data' or output.values or output.sample_indices:
-                return self._finish(work_id, 'failed', reason='WORKER_MISSING_DATA_MISMATCH')
-            return self._finish(work_id, 'completed', output=output)
+            try:
+                output = WorkerOutput.model_validate(read(folder / 'output.json'))
+                definition, _ = self.host.reg.bind(order.worker, 'worker')
+                if output.work_id != work_id or output.source != order.input_snapshot or output.base_candidate != order.base_candidate:
+                    raise ValueError('WORKER_OUTPUT_IDENTITY_MISMATCH')
+                self.host.reg.parse(output.result)
+                child_events = self.store.events(self.run_id + '-work-' + work_id)
+                produced = {r['artifact_id'] for event in child_events for r in event['outputs']}
+                for ref in output.evidence:
+                    self.store.artifact(ref)
+                    if ref.artifact_id not in produced:
+                        raise ValueError('WORKER_EVIDENCE_NOT_FROM_CHILD_EXECUTION')
+                source = self.store.artifact(output.source)
+                from importlib import import_module
+                module, name = definition.capabilities['result_checker'].split(':')
+                getattr(import_module(module), name)(order, output, source, self.host.reg,
+                    [self.store.artifact(ref) for ref in output.evidence])
+                actual = self.store.remaining(self.run_id + '-work-' + work_id)['used']
+                if plain(output.usage) != actual:
+                    raise ValueError('WORKER_USAGE_MISMATCH')
+                return self._finish(work_id, output.status, output=output, reason=output.error)
+            except (ValueError, TypeError, KeyError) as exc:
+                return self._finish(work_id, 'failed', reason=str(exc))
         if (folder / 'failure.json').is_file():
             return self._finish(work_id, 'failed', reason=read(folder / 'failure.json')['error'])
         # No process handle and no sealed output: cannot assume cancelled or refund.
@@ -127,8 +161,15 @@ class Coordinator:
         row = self.store.lookup(self.run_id, 'worker-' + work_id)
         handle = PROCESSES.get((str(self.store.root), self.run_id, work_id))
         elapsed = time.monotonic() - handle[1] if handle else json.loads(row['reserved'])['wall_s']
+        order = WorkOrder.model_validate_json(self._row(work_id)['order_json'])
+        child_run = self.run_id + '-work-' + work_id
+        if status in ('cancelled', 'failed'):
+            with self.store.connect(True) as db:
+                unfinished = [r[0] for r in db.execute("SELECT request_id FROM calls WHERE run_id=? AND status='running'", (child_run,))]
+            for request_id in unfinished:
+                self.store.mark_unknown(child_run, request_id)
         receipt = self.store.complete(row, dict(request_id=row['request_id'], execution_id=row['execution_id'], caller=row['caller'],
-            tool_id='worker.signal', execution_status=status, error=reason, charged=zero()), plain(output) if output else None, elapsed, kind='worker')
+            tool_id=order.worker.extension_id, tool_version=order.worker.version, execution_status='completed' if status == 'needs_input' else status, error=reason, charged=zero()), plain(output) if output else None, elapsed, kind='worker')
         with self.store.transaction() as db:
             db.execute('UPDATE workers SET status=?,output=?,reason=? WHERE run_id=? AND work_id=?',
                 (status, encode(receipt['output']) if receipt.get('output') else None, reason, self.run_id, work_id))
@@ -171,5 +212,5 @@ class Coordinator:
             if status == 'accepted':
                 db.execute('INSERT INTO merges VALUES (?,?,?,?,?)', (self.run_id, work_id, output.claim_key, output.conclusion, row['output']))
             db.execute('UPDATE workers SET status=?,reason=? WHERE run_id=? AND work_id=?', (status, reason, self.run_id, work_id))
-            self.store.event(db, self.run_id, 'worker_merge', status, caller='coordinator', inputs=[output.source], outputs=[json.loads(row['output'])])
+            self.store.event(db, self.run_id, 'worker_merge', status, caller='coordinator', inputs=[output.source, *output.evidence], outputs=[json.loads(row['output'])], version='2.0.0')
         return WorkStatus(work_id=work_id, status=status, result=json.loads(row['output']), reason=reason)

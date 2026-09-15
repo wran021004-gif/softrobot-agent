@@ -1,7 +1,7 @@
 # 调试顺序
 
 1. **定义与能力**：`platform check <session.yaml>`。先处理字段／单位／版本，再处理缺失实现、环境／执行器／信号相位不兼容。catalog 的已声明、实现存在、依赖可用、获准和当前可执行各自独立。
-2. **冻结输入**：`platform status <root> <run_id>`，随后读取数据库会话输入快照或 `context`。核对 task_version、实例、seed、时长、评价器和 allowed_tools；不要只查看已修改的模板。
+2. **冻结输入**：`platform status <root> <run_id>`，随后读取数据库会话输入快照或 `context`。核对 task_version、实例、seed、时长、评价器和 tool_bindings；不要只查看已修改的模板。
 3. **模型实际输入**：`platform inputs ...`。它输出 context_delivery 对应的原始传输载荷。context 只是预览；图片／视频路径不会成为 images_submitted。
 4. **请求与回执**：`platform events ...`，按 request_id 和 execution_id 查请求链；`--parent <event_id>` 沿因果链筛选。rejected 表示没有执行，failed 表示执行出错，unknown 表示不能确认完成；completed 不是任务成功。
 5. **资源**：`platform resources ...` 分别查看 limit、used、remaining、occupied。unknown 保留预留。只读查询不结算工作者；明确 collect／accept 才执行验收状态更新。
@@ -14,7 +14,7 @@
 | 提示 | 含义与处理 |
 | --- | --- |
 | CONTRACT_IMPLEMENTATION_REQUIRED | 负载契约或版本未登记；在扩展包补实现，不写动态 import |
-| TOOL_NOT_GRANTED | 已实现但会话未允许；新策略／新会话才能改变冻结权限 |
+| TOOL_VERSION_NOT_GRANTED | 会话没有绑定该精确版本；新策略／新会话才能改变冻结权限 |
 | BACKEND_SIGNAL_PHASE_UNSUPPORTED | 例如 MATLAB 插值采样不能伪装 MuJoCo 步后状态；选匹配契约 |
 | REQUEST_ID_COLLISION | 同一请求身份对应了不同参数或调用者 |
 | RESOURCE_BUSY_OR_NOT_GRANTED | 资源容量不足或没有该资源声明；查看占用与未知预留 |
@@ -26,3 +26,17 @@
 导出页面按指标名称与单位显示，来源身份留在页面详情。旧工作台页面及原生视频／轨迹入口继续保留，不为调试或展示重新求解。
 
 仿真事件还引用 `ExportBundle`，明确映射原始文件名与不可变内容身份。执行 `platform export-bundle <root> <bundle_artifact_id> <新目录>` 可恢复原始文件字节，再交给原有保存轨迹／原生回放入口；导出本身不改变项目数据库或重新求解。
+
+## 本次接口的调试位置
+
+`context_selection` 表示已选中输入，`context_delivery/adapter_submitted` 引用实际交给适配器的请求；`model_raw_response` 保存原始响应，`model_decision` 连接规范决定。解析失败保留响应及错误。最新工具观测正文最多 8192 字节，证据页默认 4096 字节／20 项，页位置保留最近 8 条；原始证据不因压缩删除。
+
+candidate 事件引用 CandidateInput，包含基线、构建器版本、changes、effective 和内容身份。评价参数 execution_id 消除内容多来源歧义，输出携带 source_execution_id 和 candidate_id。工作者子会话名为 `<run>-work-<work_id>`，其 events/resources 可定位实际工具调用，parent_id 连回派发。
+
+```powershell
+python examples/development_platform.py check configs/platform/convergence/terminal.yaml
+python examples/development_platform.py inputs <root> convergence-terminal
+python examples/development_platform.py events <root> convergence-terminal
+python examples/development_platform.py resources <root> convergence-terminal
+python examples/development_platform.py compatibility <root> convergence-terminal
+```

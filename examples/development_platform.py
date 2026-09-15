@@ -85,12 +85,10 @@ def main(argv=None):
                 result = host.invoke(dict(request_id='pause-' + __import__('uuid').uuid4().hex, tool_id='session.control',
                     arguments=dict(status='paused', reason='本地用户暂停'), reason='本地用户暂停'))
             elif args.command == 'run':
-                from tools.platform_models import OfflineAdapter, DeepSeekAdapter
-                config = host.store.session(args.run_id)['snapshot']['input']['policy']['model']
-                if config['adapter'] == 'offline':
-                    decisions = load(args.decisions)['decisions'] if args.decisions else []
-                    adapter = OfflineAdapter(decisions)
-                else: adapter = DeepSeekAdapter()
+                adapter = None
+                if args.decisions:
+                    from tools.platform_models import OfflineAdapter
+                    adapter = OfflineAdapter(load(args.decisions)['decisions'])
                 session = host.run(adapter)
                 result = dict(run_id=session['run_id'], status=session['status'], turns=session['state']['turn'],
                     stop_reason=session['state'].get('stop_reason'), last_receipt=session['state'].get('last_receipt'))

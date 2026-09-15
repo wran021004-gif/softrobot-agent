@@ -12,7 +12,9 @@
 | 搜索算法 | extensions/<search_package>/ | Search 协议、EvaluationResult | 提案／反馈、无效样本、状态恢复、多目标声明 |
 | 后端 | extensions/<backend_package>/ | RobotDescription、任务快照、BackendResult | 无依赖发现、兼容拒绝、参考或独立短执行 |
 | 任务族／评价器 | extensions/<task_package>/、configs/platform/<task>/ | TaskDefinition、具体 Payload | 缺字段、能力检查、成功／优化分离 |
-| 协作工作者 | extensions/<worker_package>/ | WorkOrder、WorkerOutput、Coordinator | 独立输出、来源、失败／取消和过期候选 |
+| 模型适配／策略 | extensions/<model_package>/ | ModelInput/Response 1.0、ToolRequest、Registry | 收到的结果决定后续调用，错误保留来源 |
+| 候选构建 | extensions/<candidate_package>/ | CandidateInput 1.0、SessionInput、editable | 实际预检和执行同一输入，禁止改写任务 |
+| 协作工作者 | extensions/<worker_package>/ | WorkOrder 精确工具绑定、WorkerOutput 2.0、RestrictedClient | 独立输出、来源、失败／取消和过期候选 |
 | 记忆／技能检索 | 本包适配器及测试 | MemoryEntry、原 SkillRegistry | 来源校验、失效筛选、实际上下文投递 |
 
 ## 集成者维护的共享部分
@@ -30,3 +32,7 @@
 5. 需要真实求解时提交明确独立开发策略与短预算；不借用历史研究授权。
 
 本次分支未自动提交、推送或合并。建议审阅新增平台文件、四处兼容改动及验收证据后，在原有效成果上集成；不要因为远程默认分支名为 main 就覆盖当前开发基线。
+
+各工作包填写自己的输入输出、精确契约版本、sources/assets、扩展依赖及独立命令。演练实现与可直接运行的验收入口见 [扩展接口表](platform_extensions.md)。数学、诊断、控制、后端和记忆/技能继续使用表中的原公共契约；ToolReceipt/EvaluationResult 的新增来源信息采用 1.1。
+
+公共核心和接口版本仍由集成者维护。这是后续协作规则，不要求本次公共修复逐文件确认；正常包内扩展直接完成实现和验收，公共语义变化交付具体变更及兼容方案。

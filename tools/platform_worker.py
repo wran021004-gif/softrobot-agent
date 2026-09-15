@@ -7,19 +7,31 @@ from schemas.platform import BackendResult, WorkOrder, WorkerOutput
 from tools.state_io import read, atomic_json
 
 
-def run_signal_worker(order, parameters, raw):
-    started = time.time()
-    result = BackendResult.model_validate(raw)
-    time.sleep(parameters.delay_s)
-    if parameters.inject == 'failure':
-        raise ValueError('INJECTED_WORKER_FAILURE')
-    signal = next((s for s in result.signals if s.spec.name == parameters.signal), None)
-    return WorkerOutput(work_id=order.work_id, base_candidate=order.base_candidate, source=order.input_snapshot,
-        signal=parameters.signal, status='observed' if signal else 'missing_data',
-        sample_indices=list(range(len(signal.values))) if signal else [], values=signal.values if signal else [],
-        claim_key='injected_shared_claim' if parameters.inject == 'conflict' else parameters.signal,
-        conclusion=('conflicting_' + parameters.signal) if parameters.inject == 'conflict' else ('saved_samples_present' if signal else 'missing_data'),
-        started_at=started, ended_at=time.time())
+class RestrictedClient:
+    """Trusted application boundary, not OS isolation. Writes only child session."""
+    def __init__(self, host, order):
+        self._host, self.order = host, order
+
+    def invoke(self, tool_id, arguments, request_id, reason='worker computation'):
+        policy = self._host.store.session(self._host.run_id)['snapshot']['input']['policy']
+        if tool_id not in self.order.allowed_tools:
+            raise ValueError('WORKER_TOOL_NOT_GRANTED')
+        return self._host.invoke(dict(request_id=request_id, tool_id=tool_id,
+            tool_version=policy['tool_bindings'][tool_id], arguments=arguments, reason=reason))
+
+    def read(self, reference, request_id='read-input'):
+        if reference != self.order.input_snapshot:
+            raise ValueError('WORKER_FIXED_INPUT_REQUIRED')
+        receipt = self.invoke('evidence.read', dict(reference=reference.model_dump(mode='json')), request_id)
+        return self.result(receipt)
+
+    def result(self, receipt):
+        if receipt['execution_status'] != 'completed':
+            raise ValueError(receipt.get('error'))
+        return self._host.store.artifact(receipt['output'])
+
+    def usage(self):
+        return self._host.store.remaining(self._host.run_id)['used']
 
 
 def main():
@@ -41,7 +53,9 @@ def main():
         import hashlib
         if hashlib.sha256(encode(raw).encode('utf8')).hexdigest() != order.input_snapshot.artifact_id:
             raise ValueError('WORKER_INPUT_HASH_MISMATCH')
-        output = definition.resolve()(order, parameters, raw)
+        from tools.platform_host import Host
+        client = RestrictedClient(Host(request['root'], request['child_run'], actor='worker:' + order.work_id), order)
+        output = definition.resolve()(order, parameters, raw, client)
         definition.output_schema.model_validate(output)
         atomic_json(path.parent / 'output.json', output.model_dump(mode='json'))
     except Exception as exc:

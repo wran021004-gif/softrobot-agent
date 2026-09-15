@@ -1,6 +1,6 @@
 from tools.tool_registry import service_tools
 from tools.platform_registry import Extension
-from extensions.reference.contracts import ServiceData
+from schemas.platform_operations import ServiceData
 
 CONTRACTS = []
 EXTENSIONS = [Extension(d.tool_id, 'tool', d.version, d.schema, d.output_schema or ServiceData,

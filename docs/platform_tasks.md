@@ -15,8 +15,8 @@
 | 失败与约束 | failure_policy、评价器输出 constraints | 保留失败与无效结果；工具完成、求解完成、计算有效及任务成功互相独立。 |
 | 所需信号 | observations | 名称、实体、维度、单位、坐标和相位；缺少信号拒绝或未评价，不补零。 |
 | 评价实例 | sampling | 开发 seeds 0..999，评价 seeds 10000..10999；本地开发策略拒绝正式评价分区。窗口单位秒；当前逐实例输出，汇总算法需显式扩展。 |
-| 可编辑参数 | policy_file 中 editable | 仅允许控制器声明的可编辑参数及范围；任务、环境、评价器不进入搜索向量。 |
-| 模型、工具、资源 | policy_file / project.yaml | 与任务科学标准分开。相同任务可由不同策略运行。 |
+| 可编辑参数 | policy_file 中 candidate_builder 和 editable | 由注册构建器解释变量与范围；当前支持控制参数和示例响应系数。任务、环境、评价器不进入搜索向量。 |
+| 模型、工具、资源 | policy_file / project.yaml | 与科学标准分开。tool_bindings 精确绑定工具版本；model.adapter/adapter_version、strategy/strategy_version 选择注册实现。 |
 
 具体必填字段、默认值和嵌套类型来自 [生成字段说明](platform_generated/task_fields.json) 与 [JSON Schema](platform_generated/contracts.json)。空白模板见 [task.blank.yaml](templates/platform/task.blank.yaml)；它故意保持草稿与必填空值，不能误当成可执行示例。
 
@@ -33,14 +33,25 @@ python examples/workbench.py platform check configs/platform/signal_hold/session
 
 典型错误：`length_m Field required` 表示缺少以米为单位的目标；`REQUIRED_SIGNAL` 指出缺少的实体／单位／相位；`IMPLEMENTATION_REQUIRED` 指出未登记评价器；`BACKEND_INCOMPATIBLE` 在求解前拒绝无法表示的任务或执行通道。增加未来任务时，先完成 `extensions/<包>/contracts.py + manifest.py + implementation.py`，再提交可执行配置。
 
-## 两类完整示例
+## 两份默认零真实求解的完整示例
+
+1. [convergence/hold.yaml](../configs/platform/convergence/hold.yaml)：长度保持评价，离线适配器根据收到的数学结果改变候选。
+2. [convergence/terminal.yaml](../configs/platform/convergence/terminal.yaml)：独立包的 task.terminal 使用参考后端已有长度信号，评价最终误差；没有修改公共循环，不需要后端专属转换。
+
+两例均为非物理标定的合成模型。运行时不需要 `--decisions`，适配器由注册声明创建。策略填写模板见 [policy.blank.yaml](templates/platform/policy.blank.yaml)。
+
+## 保留的兼容示例
 
 1. [到达开发任务](../configs/platform/reach_shifted/session.yaml)：目标 `[0.30,0,0.08]` m，时长 0.08 s／40 步，原环境和 0.01 m 容差。机器人 IR 使用原 V1 声明物理值；编译质量惯量仍由原后端导出。它是本次独立开发配置，不替换历史 reach_free。
 2. [长度信号保持任务](../configs/platform/signal_hold/session.yaml)：没有末端目标点。参考模型是明确的一阶离散方程 `x[k+1]=x[k]+0.5*(command-x[k])`；评价窗口内最大偏差与 RMS 偏差。它验证不同任务语义、分步后端、控制及搜索接口，不代表真实绳索动力学。
 
-完整文件均能通过真实解析与能力检查。真实 MuJoCo 的短验证和参考信号计算分别计数。后端不支持的摩擦、活动物体、执行通道和观测不得静默省略。
+本次仅检查历史到达配置的解析与能力，不执行真实求解。后端不支持的摩擦、活动物体、执行通道和观测不得静默省略。
 
 ## 修改、冻结与运行
+
+已支持任务的目标和阈值通常只改配置并升任务版本；新成功语义需要评价器；活动对象和新物理效果需要环境契约及后端；新执行通道需要控制器和后端共同适配。不能承诺所有新任务只填配置即可运行。
+
+同一实例固定 seed 与初态，所有候选复用。结构变化需要初态映射时，须增加明确的映射契约；本版不允许通过重新采样改变任务难度。目标、环境标准、评价阈值和采样分区不是设计变量。
 
 修改目标、评价或初始分布时增加 task_version，使用新 run_id。会话创建后修改配置文件不改变已保存输入。跨版本恢复需要显式迁移或新运行，不替换旧快照。
 

@@ -1,0 +1,171 @@
+run_id: convergence-terminal
+seed: 17
+task:
+  task_id: terminal-dev
+  task_version: 1.0.0
+  name: Synthetic final signal error
+  status: development_valid
+  source: 明确工程参考模型：x[k+1]=x[k]+0.5*(command-x[k])，仅验证接口；无物理标定
+  family: task.terminal
+  goal:
+    contract: convergence.terminal_goal
+    version: 1.0.0
+    data:
+      target_m: 0.3
+  environment:
+    contract: reference.environment
+    version: 1.0.0
+    data:
+      environment_id: empty-reference
+      gravity_m_s2:
+      - 0.0
+      - 0.0
+      - 0.0
+      objects: []
+      source: 合成空环境
+  robot_families:
+  - reference_signal_robot
+  actuator_channels:
+  - tendon_target_lengths_m
+  initializer:
+    extension_id: initialize.length
+    version: 1.0.0
+    parameters:
+      contract: reference.initialize
+      version: 1.0.0
+      data:
+        length_m: 0.29
+        jitter_m: 0.001
+  timing:
+    timestep_s: 0.01
+    control_period_s: 0.01
+    sample_period_s: 0.01
+    duration_s: 0.1
+    termination:
+    - duration
+    - numerical_failure
+    - cancelled
+  evaluator:
+    extension_id: evaluate.terminal
+    version: 1.0.0
+    parameters:
+      contract: convergence.terminal_evaluation
+      version: 1.0.0
+      data:
+        tolerance_m: 0.01
+  objectives:
+  - metric: terminal_error
+    direction: minimize
+    units: m
+  failure_policy: retain_invalid_and_constraint_failures
+  observations:
+  - name: tendon_length
+    entity: tendon_0
+    dimension: 1
+    units: m
+    frame: actuator
+    phase: post_step
+  sampling:
+    split: development
+    seeds:
+    - 17
+    window_s:
+    - 0.0
+    - 0.1
+    aggregation: per_instance
+robot:
+  family: reference_signal_robot
+  structure:
+    contract: reference.robot
+    version: 1.0.0
+    data:
+      length_m: 0.3
+      response_fraction: 0.5
+      model_identity: discrete_length_response_fixture
+  channels:
+  - tendon_target_lengths_m
+  units: SI
+  frame: actuator
+  assumptions:
+  - 离散一阶信号模型，仅接口验证
+  sources:
+  - examples/platform_fixtures.py
+  unsupported:
+  - physical_dynamics
+  - gravity
+  - friction
+  - contact
+policy:
+  policy_id: reference-development
+  editable:
+    controller.command_m:
+    - 0.25
+    - 0.35
+    structure.response_fraction:
+    - 0.1
+    - 1.0
+  backend:
+    extension_id: backend.reference
+    version: 1.0.0
+    parameters:
+      contract: reference.empty
+      version: 1.0.0
+      data: {}
+  controller:
+    extension_id: controller.length_reference
+    version: 1.0.0
+    parameters:
+      contract: reference.control
+      version: 1.0.0
+      data:
+        command_m: 0.3
+  search:
+    extension_id: search.scalar_sequence
+    version: 1.0.0
+    parameters:
+      contract: reference.search
+      version: 1.0.0
+      data:
+        parameter: controller.command_m
+        candidates:
+        - 0.3
+        - 0.31
+  model:
+    adapter: model.observing
+    strategy: strategy.evidence
+    parameters:
+      values_m:
+      - 3.0
+      - 4.0
+    max_turns: 8
+  budget:
+    tool_calls: 60
+    model_calls: 0
+    backend_solves: 0
+    worker_calls: 6
+    wall_s: 300.0
+  timeout_s: 10.0
+  allow_development_skills: true
+  tool_bindings:
+    analysis.vector_norm: 1.0.0
+    simulation.run: 1.0.0
+    evaluation.run: 1.0.0
+    evidence.read: 1.0.0
+    diagnostics.sample_exceeds: 1.0.0
+    memory.save: 1.0.0
+    memory.search: 1.0.0
+    skills.search: 1.0.0
+    skills.propose: 1.0.0
+    skills.validate: 1.0.0
+    workers.submit: 1.0.0
+    workers.status: 1.0.0
+    workers.cancel: 1.0.0
+    workers.accept: 1.0.0
+    session.control: 1.0.0
+  candidate_builder:
+    extension_id: candidate.synthetic
+    version: 1.0.0
+    parameters:
+      contract: convergence.empty
+      version: 1.0.0
+      data: {}

@@ -3,6 +3,33 @@ from typing import Protocol
 from schemas.platform import Payload, BackendResult, EvaluationResult, SessionInput, TaskDefinition, EvidenceRef
 
 
+class ModelAdapter(Protocol):
+    """1.0 text transport. Registry declares real_requests, timeout and cancellation."""
+    adapter_id: str
+    def encode(self, model_input, config) -> dict: ...
+    def respond(self, serialized_request: dict, turn: int): ...
+    def decode(self, response, turn: int, tool_bindings: dict): ...
+
+
+class AgentStrategy(Protocol):
+    """1.0 typed action selection; no execution or accounting authority."""
+    def decide(self, decoded, context): ...
+
+
+class CandidateBuilder(Protocol):
+    """1.0 receives a private copy; may modify declared design data only."""
+    def __call__(self, baseline: SessionInput, parameters, changes: dict[str, float]) -> SessionInput: ...
+
+
+class Worker(Protocol):
+    """WorkerOutput 2.0; own child session, common restricted execution client."""
+    def __call__(self, order, parameters, fixed_input, client): ...
+
+
+class WorkerResultChecker(Protocol):
+    def __call__(self, order, output, source, registry, evidence: list): ...
+
+
 class OneShotBackend(Protocol):
     @staticmethod
     def check(inp: SessionInput, parameters, control) -> None: ...

@@ -81,6 +81,7 @@ class PlatformTests(unittest.TestCase):
         self.assertEqual(len(delivered), 3)
         payload = self.store.artifact(delivered[2]['inputs'][0])
         context = json.loads(payload['messages'][-1]['content'])
+        self.assertEqual(context['observation']['content']['content'], 5.0)
         self.assertTrue(context['pagination'])
         self.assertEqual(context['visual_delivery']['images_submitted'], [])
         self.assertEqual(self.store.remaining()['used']['model_calls'], 0)
@@ -220,9 +221,9 @@ class PlatformTests(unittest.TestCase):
         self.assertEqual(self.store.memories(dict(task_family='task.signal_hold')), [])
 
     def order(self, work_id, signal, ref, inject='none', delay=1.2):
-        return WorkOrder(work_id=work_id, goal='读取固定证据中的信号', worker=binding('worker.signal', 'reference.worker', dict(signal=signal, delay_s=delay, inject=inject)),
+        return WorkOrder(work_id=work_id, goal='读取固定证据中的信号', worker={**binding('worker.signal', 'reference.worker', dict(signal=signal, delay_s=delay, inject=inject)), 'version': '2.0.0'},
             input_snapshot=ref, base_candidate='baseline', allowed_tools=['evidence.read'],
-            budget=budget(tool_calls=1, worker_calls=1, wall_s=10.), timeout_s=10., output_contract='WorkerOutput@1.0.0')
+            budget=budget(tool_calls=1, worker_calls=1, wall_s=10.), timeout_s=10., output_contract='WorkerOutput@2.0.0')
 
     def collect_workers(self, coordinator, names):
         end = time.monotonic() + 20
@@ -247,7 +248,7 @@ class PlatformTests(unittest.TestCase):
         for name in ('tendon', 'contact'):
             self.assertEqual(coordinator.accept(name).status, 'accepted')
             self.assertEqual(coordinator.accept(name).status, 'accepted')
-        self.assertNotEqual(outputs[0]['signal'], outputs[1]['signal'])
+        self.assertNotEqual(outputs[0]['result']['data']['signal'], outputs[1]['result']['data']['signal'])
         self.assertEqual(self.store.remaining()['used']['worker_calls'], 2)
         before = self.store.remaining()['used']
         coordinator.submit(self.order('tendon', 'tendon_length', ref))

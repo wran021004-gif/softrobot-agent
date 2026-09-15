@@ -1,5 +1,14 @@
 # 统一开发平台实施记录
 
+## 当前：公共核心修复与接口定版（c677c22）
+
+- 当前分支 `feat/unified-development-platform`，开始时工作区干净；没有回退、清理历史目录、提交或推送。
+- 四项修复及模型/策略、通用工作者、候选构建接口已接入现有主流程；独立包 `extensions/convergence` 和两份合成任务可运行。
+- 分组检查后，仅执行一次受影响组合验收：12 项通过。运行量及子会话目录故障见 [本次验证](platform_validation.md)。
+- 真实模型、MATLAB、MuJoCo、Genesis 均为零。交付入口见 [完成报告](platform_delivery.md)、[接口决策](platform_interface_decisions.md)、[并行任务单](platform_parallel_development.md)。
+
+以下是先前平台建立的历史记录，其真实求解和测试次数不计入本次工作。
+
 ## 基线与保护
 
 - 基线：`feat/round9-matlab-dynamics-design-loop@63ae9b5`；开始时工作区干净。

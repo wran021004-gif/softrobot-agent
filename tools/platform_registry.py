@@ -25,6 +25,9 @@ class Extension:
     description: str
     dependencies: tuple[str, ...] = ()
     sources: tuple[str, ...] = ()
+    assets: tuple[str, ...] = ()
+    extension_dependencies: tuple[tuple[str, str], ...] = ()
+    contract_dependencies: tuple[tuple[str, str], ...] = ()
     resources: tuple[str, ...] = ()
     cache: bool = False
     side_effects: str = 'none'
@@ -106,6 +109,8 @@ class Registry:
         if missing:
             reasons.append('DEPENDENCY_MISSING: ' + ', '.join(missing))
         permitted = allowed is not None and definition.extension_id in allowed
+        if isinstance(allowed, dict):
+            permitted = allowed.get(definition.extension_id) == definition.version
         if not permitted:
             reasons.append('NOT_GRANTED' if allowed is not None else 'NO_SESSION_POLICY')
         return dict(extension_id=definition.extension_id, kind=definition.kind, version=definition.version,
@@ -114,7 +119,8 @@ class Registry:
                     runtime_probe='not_started', reasons=reasons, description=definition.description,
                     input_schema=definition.input_schema.model_json_schema(), output_schema=definition.output_schema.model_json_schema(),
                     capabilities=definition.capabilities, resources=list(definition.resources),
-                    dependencies=list(definition.dependencies), side_effects=definition.side_effects)
+                    dependencies=list(definition.dependencies), sources=list(definition.sources), assets=list(definition.assets),
+                    extension_dependencies=[list(x) for x in definition.extension_dependencies], contract_dependencies=[list(x) for x in definition.contract_dependencies], side_effects=definition.side_effects)
 
     def catalog(self, allowed=None):
         return [self.inspect(d, allowed) for _, d in sorted(self.extensions.items())]
@@ -133,19 +139,15 @@ def registry():
 
 
 def dependency_identity(definition):
-    paths = set(definition.sources)
+    paths = set(definition.sources) | set(definition.assets)
     if definition.binding:
         paths.add(definition.binding.split(':')[0].replace('.', '/') + '.py')
     paths.update(('schemas/platform.py', 'schemas/common.py', 'tools/platform_registry.py', 'tools/platform_host.py', 'tools/platform_store.py'))
     if definition.legacy_service is not None:
         paths.update(('tools/tool_registry.py', 'tools/service_execution.py', 'tools/service_worker.py',
                       'schemas/public_tools.py', 'extensions/services/manifest.py'))
-    # Undeclared transitive sets are conservative, with an explicit reason.
+    # Legacy declarations are bounded to their owning module, never the workspace.
     conservative = not definition.sources
-    if conservative:
-        for folder in ('tools', 'schemas', 'controllers', 'extensions', 'physics_contracts', 'matlab', 'configs'):
-            paths.update(p.relative_to(ROOT).as_posix() for p in (ROOT / folder).rglob('*')
-                         if p.is_file() and p.suffix in ('.py', '.yaml', '.xml', '.m'))
     versions = {}
     for dep in ('pydantic', *definition.dependencies):
         try:
@@ -156,5 +158,40 @@ def dependency_identity(definition):
                 python=sys.version, packages=versions, version=definition.version,
                 input_schema=definition.input_schema.model_json_schema(), output_schema=definition.output_schema.model_json_schema(),
                 declaration=dict(kind=definition.kind, binding=definition.binding, capabilities=definition.capabilities,
-                    resources=list(definition.resources), cache=definition.cache, side_effects=definition.side_effects),
-                conservative_reason='transitive dependencies not bounded; source/config tree invalidates' if conservative else None)
+                    resources=list(definition.resources), cache=definition.cache, side_effects=definition.side_effects,
+                    extension_dependencies=[list(x) for x in definition.extension_dependencies],
+                    contract_dependencies=[list(x) for x in definition.contract_dependencies]),
+                conservative_reason='legacy module-only declaration; expand explicit sources before promising transitive compatibility' if conservative else None)
+
+
+def tool_bindings(policy, reg, location='policy.tool_bindings'):
+    values = dict(policy.tool_bindings)
+    normalized = []
+    for name in policy.allowed_tools:
+        if name in values:
+            continue
+        matches = [d for (key, _), d in reg.extensions.items() if key == name and d.kind == 'tool']
+        if len(matches) != 1:
+            raise ValueError(f'TOOL_VERSION_SELECTION_REQUIRED: {location}.{name}; found {[d.version for d in matches]}')
+        values[name] = matches[0].version
+        normalized.append(name)
+    for name, version in values.items():
+        reg.get(name, version, 'tool')
+    return values, normalized
+
+
+def dependency_closure(definitions, reg):
+    result = {}
+    def visit(d):
+        key = d.extension_id + '@' + d.version
+        if key in result:
+            return
+        identity = dependency_identity(d)
+        identity['contracts'] = {n + '@' + v: reg.contracts[(n, v)].model_json_schema()
+                                 for n, v in d.contract_dependencies}
+        result[key] = identity
+        for name, version in d.extension_dependencies:
+            visit(reg.get(name, version))
+    for definition in definitions:
+        visit(definition)
+    return result

@@ -31,7 +31,7 @@ def run_search(host):
     if binding is None:
         raise ValueError('SEARCH_NOT_CONFIGURED')
     definition, parameters = host.reg.bind(binding, 'search')
-    if len(inp['task']['objectives']) != 1 and not definition.capabilities.get('multiobjective'):
+    if len(inp['task']['objectives']) != 1 and not definition.capabilities.get('feedback_adapter'):
         raise ValueError('MULTIOBJECTIVE_SEARCH_ADAPTER_REQUIRED')
     algorithm = definition.resolve()(parameters)
     saved = host.store.session(host.run_id)['state'].get('search')
@@ -39,22 +39,28 @@ def run_search(host):
         algorithm.restore(host.reg.parse(saved['algorithm']).model_dump(mode='json'))
     else:
         saved = dict(algorithm=plain(algorithm.save()), pending=None, trials=[])
-    while not algorithm.stopped():
+    while saved['pending'] is not None or not algorithm.stopped():
         if saved['pending'] is None:
             saved['pending'] = dict(index=len(saved['trials']), candidate=algorithm.propose())
+            saved['algorithm'] = plain(algorithm.save())
             _save(host, saved)
         pending = saved['pending']
         prefix = 'search-' + str(pending['index'])
-        simulation = host.invoke(dict(request_id=prefix + '-simulation', tool_id='simulation.run',
+        simulation = host.invoke(dict(request_id=prefix + '-simulation', tool_id='simulation.run', tool_version=inp['policy']['tool_bindings']['simulation.run'],
             arguments=dict(candidate_id=prefix, changes=pending['candidate']), reason='搜索候选', cache='reuse'))
         if simulation['execution_status'] != 'completed':
             return dict(status=simulation['execution_status'], pending=pending, trials=saved['trials'])
-        evaluation = host.invoke(dict(request_id=prefix + '-evaluation', tool_id='evaluation.run',
-            arguments=dict(result=simulation['output']), reason='固定任务评价器评价候选'))
+        evaluation = host.invoke(dict(request_id=prefix + '-evaluation', tool_id='evaluation.run', tool_version=inp['policy']['tool_bindings']['evaluation.run'],
+            arguments=dict(result=simulation['output'], execution_id=simulation['execution_id']), reason='固定任务评价器评价候选'))
         if evaluation['execution_status'] != 'completed':
             return dict(status=evaluation['execution_status'], pending=pending, trials=saved['trials'])
         result = EvaluationResult.model_validate(host.store.artifact(evaluation['output']))
-        scalar = score(result, inp['task']['objectives'])
+        if definition.capabilities.get('feedback_adapter'):
+            from importlib import import_module
+            module, name = definition.capabilities['feedback_adapter'].split(':')
+            scalar = getattr(import_module(module), name)(result, inp['task']['objectives'])
+        else:
+            scalar = score(result, inp['task']['objectives'])
         algorithm.feedback(scalar)
         saved['trials'].append(dict(candidate=pending['candidate'], evaluation=evaluation['output'], score=scalar))
         saved.update(algorithm=plain(algorithm.save()), pending=None)

@@ -3,14 +3,14 @@
 - 任务名称／负责人：
 - 独立分支或 worktree：
 - 目标与明确不覆盖的能力：
-- 公共接口基线：platform 1.0.0；使用的具体契约与版本：
+- 公共接口基线：公共信封 1.0、ToolReceipt/EvaluationResult 1.1、WorkerOutput 2.0；使用的具体契约与版本：
 - 输入／输出契约（字段、单位、坐标、状态）：
 - 已有可复用接口：
 - 拥有的文件：`extensions/<package>/`、对应测试和示例
 - 依赖包、按需启动条件、资源：
 - 禁止直接修改：公共 Host／Store／模型循环／原科学标准及预算；确需变更时先提交接口变更说明
 - 副作用／超时／取消与未知恢复：
-- sources 计算依赖闭包，或保守失效理由：
+- sources / assets / extension_dependencies / contract_dependencies 计算依赖闭包，或保守失效理由：
 - 验收命令及正常数学／合成／真实求解／故障注入分类：
 - 交付物：实现、契约、manifest、最小例子、测试结果、限制
 - 接入说明／重名及版本冲突检查：

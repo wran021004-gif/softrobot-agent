@@ -1,0 +1,33 @@
+# 策略模板：填空后附到完整 SessionInput；字段以生成 JSON Schema 为准。
+policy_id: null
+candidate_builder:
+  extension_id: null # candidate.controller 或自己的注册构建器
+  version: '1.0.0'
+  parameters: {contract: null, version: '1.0.0', data: {}}
+editable: {} # 只列构建器声明的设计变量及 [下限, 上限]；不放任务阈值
+backend:
+  extension_id: null
+  version: '1.0.0'
+  parameters: {contract: null, version: '1.0.0', data: {}}
+controller:
+  extension_id: null
+  version: '1.0.0'
+  parameters: {contract: null, version: '1.0.0', data: {}}
+search: null
+model:
+  adapter: model.observing
+  adapter_version: '1.0.0'
+  parameters: {values_m: [3.0, 4.0]}
+  strategy: strategy.evidence
+  strategy_version: '1.0.0'
+  model: offline-development
+  context_bytes: 64000
+  max_turns: 8
+tool_bindings:
+  analysis.vector_norm: '1.0.0'
+  evidence.read: '1.0.0'
+  simulation.run: '1.0.0'
+  evaluation.run: '1.0.0'
+  session.control: '1.0.0'
+budget: {tool_calls: 20, model_calls: 0, backend_solves: 0, worker_calls: 0, wall_s: 60.0}
+timeout_s: 10.0

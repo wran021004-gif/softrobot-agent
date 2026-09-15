@@ -149,7 +149,11 @@ class Budget(Contract):
 
 
 class ModelConfig(Contract):
-    adapter: Literal['offline', 'deepseek'] = 'offline'
+    adapter: Identifier = 'offline'
+    adapter_version: str = '1.0.0'
+    parameters: dict = Field(default_factory=dict)
+    strategy: Identifier = 'strategy.tool'
+    strategy_version: str = '1.0.0'
     model: str = 'offline-contract-fixture'
     supports_tools: Literal[True] = True
     supports_text: Literal[True] = True
@@ -166,9 +170,11 @@ class ExperimentPolicy(Contract):
     editable: dict[str, tuple[float, float]] = Field(default_factory=dict)
     backend: Binding
     controller: Binding
+    candidate_builder: Binding | None = None
     search: Binding | None = None
     model: ModelConfig = Field(default_factory=ModelConfig)
-    allowed_tools: list[Identifier]
+    allowed_tools: list[Identifier] = Field(default_factory=list)
+    tool_bindings: dict[Identifier, str] = Field(default_factory=dict)
     budget: Budget
     timeout_s: float = Field(gt=0)
     allow_development_skills: bool = False
@@ -220,12 +226,16 @@ class ConstraintResult(Contract):
 
 
 class EvaluationResult(Contract):
+    contract_version: Literal['1.0.0', '1.1.0'] = '1.1.0'
     validity: Literal['valid', 'invalid', 'incomplete', 'unsupported']
     task_success: bool | None
     metrics: list[Metric]
     constraints: list[ConstraintResult]
     source: EvidenceRef
     evaluator: str
+    evaluator_version: str = VERSION
+    source_execution_id: str | None = None
+    candidate_id: str | None = None
     comparison_identity: str
     reason: str | None = None
 
@@ -244,6 +254,7 @@ class BackendResult(Contract):
     solver_status: Literal['completed', 'failed', 'cancelled', 'unknown']
     backend_id: Identifier
     model_id: Identifier
+    backend_version: str = VERSION
     signals: list[Signal]
     data: Payload
     limitations: list[str]
@@ -252,11 +263,14 @@ class BackendResult(Contract):
 
 
 class ToolReceipt(Contract):
-    contract_version: Literal['1.0.0'] = VERSION
+    contract_version: Literal['1.0.0', '1.1.0'] = '1.1.0'
     request_id: str
     execution_id: str
     caller: str
     tool_id: str
+    tool_version: str = VERSION
+    result_contract: str | None = None
+    result_version: str = VERSION
     execution_status: Literal['completed', 'rejected', 'failed', 'unknown', 'cancelled']
     solver_status: str = 'not_run'
     analysis_status: str = 'not_assessed'
@@ -295,6 +309,8 @@ class MemoryEntry(Contract):
     task_version: str
     backend: str
     model_id: str
+    model_scope: str | None = None
+    transferable_scopes: list[str] = Field(default_factory=list)
     failure_category: str | None = None
     tags: list[str] = Field(default_factory=list)
     sources: list[EvidenceRef] = Field(min_length=1)
@@ -308,6 +324,7 @@ class WorkOrder(Contract):
     worker: Binding
     input_snapshot: EvidenceRef
     base_candidate: str
+    tool_bindings: dict[Identifier, str] = Field(default_factory=dict)
     allowed_tools: list[Identifier]
     budget: Budget
     timeout_s: float = Field(gt=0, le=3600)
@@ -318,7 +335,7 @@ class WorkOrder(Contract):
     completion_check: Literal['hash_contract_source_base_candidate'] = 'hash_contract_source_base_candidate'
 
 
-class WorkerOutput(Contract):
+class LegacyWorkerOutput(Contract):
     work_id: str
     base_candidate: str
     source: EvidenceRef
@@ -326,6 +343,64 @@ class WorkerOutput(Contract):
     status: Literal['observed', 'missing_data']
     sample_indices: list[int]
     values: list[list[float]]
+    claim_key: str
+    conclusion: str
+    started_at: float
+    ended_at: float
+
+
+class ToolObservation(Contract):
+    contract_version: Literal['1.0.0'] = '1.0.0'
+    receipt: ToolReceipt
+    content: object = None
+    content_bytes: int = 0
+    truncated: bool = False
+    retained: Literal['latest_only'] = 'latest_only'
+
+
+class CandidateInput(Contract):
+    contract_version: Literal['1.0.0'] = '1.0.0'
+    candidate_id: str
+    baseline_identity: str
+    builder: str
+    builder_version: str
+    changes: dict[str, float]
+    allowed: dict[str, tuple[float, float]]
+    effective: SessionInput
+    content_identity: str
+
+
+class ModelContent(Contract):
+    kind: Literal['text', 'image', 'video']
+    text: str | None = None
+    source: EvidenceRef | None = None
+
+
+class ModelInput(Contract):
+    contract_version: Literal['1.0.0'] = '1.0.0'
+    context: dict
+    tools: list[dict]
+    content: list[ModelContent]
+
+
+class ModelResponse(Contract):
+    contract_version: Literal['1.0.0'] = '1.0.0'
+    raw: object
+    usage: dict[str, int] = Field(default_factory=dict)
+    status: Literal['completed', 'failed', 'cancelled', 'timeout'] = 'completed'
+    error: str | None = None
+
+
+class WorkerOutput(Contract):
+    contract_version: Literal['2.0.0'] = '2.0.0'
+    work_id: str
+    base_candidate: str
+    source: EvidenceRef
+    status: Literal['completed', 'failed', 'cancelled', 'needs_input']
+    result: Payload
+    evidence: list[EvidenceRef] = Field(default_factory=list)
+    error: str | None = None
+    usage: Budget
     claim_key: str
     conclusion: str
     started_at: float

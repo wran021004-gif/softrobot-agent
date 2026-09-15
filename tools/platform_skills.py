@@ -59,5 +59,17 @@ def applicable(host, reference):
     inp = host.store.session(host.run_id)['snapshot']['input']
     candidates = library(host).retrieve_skills(robot_family=inp['robot']['family'], task_type=inp['task']['family'],
         include_candidates=inp['policy']['allow_development_skills'])
+    def same_model(skill):
+        # Old skill records have no explicit model-transfer scope. Keep their source
+        # assumptions, never infer portability merely from a shared backend name.
+        current = inp['robot']
+        for run in skill.provenance.source_runs:
+            try:
+                source = host.store.session(run)['snapshot']['input']
+            except ValueError:
+                return False
+            if source['robot'] != current or source['policy']['backend'] != inp['policy']['backend']:
+                return False
+        return True
     return [s.model_dump(mode='json') for s in candidates if (reference is None or s.reference == reference)
-        and not set(s.required_tools) - set(inp['policy']['allowed_tools'])]
+        and not set(s.required_tools) - set(inp['policy']['allowed_tools']) and same_model(s)]

@@ -4,7 +4,7 @@ work_id: tendon-inspection
 goal: 读取固定证据的绳索信号，返回原始采样索引与数值
 worker:
   extension_id: worker.signal
-  version: '1.0.0'
+  version: '2.0.0'
   parameters:
     contract: reference.worker
     version: '1.0.0'
@@ -17,6 +17,7 @@ input_snapshot:
   media_type: application/json
 base_candidate: baseline
 allowed_tools: [evidence.read]
+tool_bindings: {evidence.read: '1.0.0'}
 budget:
   tool_calls: 1
   model_calls: 0
@@ -26,6 +27,6 @@ budget:
 timeout_s: 10.0
 dependencies: []
 resources: []
-output_contract: WorkerOutput@1.0.0
+output_contract: WorkerOutput@2.0.0
 write_scope: own_output_directory
 completion_check: hash_contract_source_base_candidate

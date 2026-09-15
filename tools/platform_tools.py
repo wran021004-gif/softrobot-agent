@@ -3,37 +3,49 @@ import math
 from schemas.platform import SessionInput, BackendResult, Payload, EvaluationResult, MemoryEntry
 from tools.platform_store import plain, zero
 from tools.state_io import digest
-from extensions.reference import contracts as c
+from schemas import platform_operations as c
 
 
 def simulation_preflight(inp, arguments, reg):
-    backend, parameters = reg.bind(inp.policy.backend, 'backend')
-    controller, control = reg.bind(inp.policy.controller, 'controller')
-    _candidate(inp, arguments.changes, reg)
-    backend.resolve().check(inp, parameters, control)
-    # Reference steps are counted separately as synthetic computations, not backend solves.
-    return dict(cost={'backend_solves': int(not backend.capabilities.get('reference', False))}, resources=list(backend.resources))
+    candidate = _candidate(inp, arguments.changes, reg)
+    backend, parameters = reg.bind(candidate.policy.backend, 'backend')
+    _, control = reg.bind(candidate.policy.controller, 'controller')
+    backend.resolve().check(candidate, parameters, control)
+    from schemas.platform import CandidateInput
+    prepared = CandidateInput(candidate_id=arguments.candidate_id, baseline_identity=digest(plain(inp)),
+        builder=inp.policy.candidate_builder.extension_id, builder_version=inp.policy.candidate_builder.version,
+        changes=arguments.changes, allowed=inp.policy.editable, effective=candidate, content_identity=digest(plain(candidate)))
+    return dict(cost={'backend_solves': int(not backend.capabilities.get('reference', False))},
+                resources=list(backend.resources), prepared=prepared)
 
 
 def _candidate(inp, changes, reg):
-    data = inp.model_dump(mode='json')
     for key, value in changes.items():
         if key not in inp.policy.editable:
             raise ValueError('PARAMETER_NOT_AUTHORIZED: ' + key)
         lo, hi = inp.policy.editable[key]
         if not math.isfinite(value) or not lo <= value <= hi:
             raise ValueError('PARAMETER_OUT_OF_BOUNDS: ' + key)
-        group, name = key.split('.', 1)
-        if group != 'controller':
-            raise ValueError('PARAMETER_ADAPTER_REQUIRED')
-        data['policy']['controller']['parameters']['data'][name] = value
-    candidate = SessionInput.model_validate(data)
+    builder, parameters = reg.bind(inp.policy.candidate_builder, 'candidate_builder')
+    candidate = SessionInput.model_validate(builder.resolve()(inp.model_copy(deep=True), parameters, changes))
+    # Builder may alter robot and controller inputs only; scientific definition stays fixed.
+    before, after = plain(inp), plain(candidate)
+    for data in (before, after):
+        data['robot']['structure']['data'] = {}
+        data['policy']['controller']['parameters']['data'] = {}
+    if before != after:
+        raise ValueError('CANDIDATE_CHANGED_FROZEN_TASK_OR_POLICY')
+    reg.parse(candidate.robot.structure)
     reg.bind(candidate.policy.controller, 'controller')
     return candidate
 
 
 def simulate(ctx, args):
-    inp = _candidate(ctx.input, args.changes, ctx.reg)
+    inp = ctx.prepared.effective
+    with ctx.store.transaction() as db:
+        candidate_ref = ctx.store.put(db, ctx.prepared)
+        ctx.store.event(db, ctx.run_id, 'candidate', 'frozen', request=ctx.row['request_id'], execution=ctx.row['execution_id'],
+            parent=ctx.row['parent_id'], outputs=[candidate_ref], candidate=args.candidate_id, version=ctx.prepared.builder_version)
     backend_def, _ = ctx.reg.bind(inp.policy.backend, 'backend')
     controller_def, parameters = ctx.reg.bind(inp.policy.controller, 'controller')
     backend = backend_def.resolve()()
@@ -59,10 +71,11 @@ def simulate(ctx, args):
                 from schemas.platform import ExportBundle
                 refs.append(ctx.store.put(db, ExportBundle(result=ref, files=files, source=backend_def.extension_id)))
             ctx.store.event(db, ctx.run_id, 'simulation', result.solver_status, parent=ctx.row['parent_id'],
-                request=ctx.row['request_id'], execution=ctx.row['execution_id'], outputs=refs, candidate=args.candidate_id)
+                request=ctx.row['request_id'], execution=ctx.row['execution_id'], outputs=refs, candidate=args.candidate_id, version=backend_def.version)
             state = ctx.store.session(ctx.run_id, db)['state']
-            state.setdefault('result_identities', {})[ref.artifact_id] = dict(instance=ctx.snapshot['instance_identity'],
-                backend=inp.policy.backend.extension_id, task=inp.task.model_dump(mode='json'), candidate=args.candidate_id)
+            state.setdefault('result_executions', {})[ctx.row['execution_id']] = dict(artifact_id=ref.artifact_id, instance=ctx.snapshot['instance_identity'],
+                backend=inp.policy.backend.extension_id, task=inp.task.model_dump(mode='json'), candidate=args.candidate_id,
+                candidate_input=plain(candidate_ref), request_id=ctx.row['request_id'])
             ctx.store.update_state(db, ctx.run_id, state)
         return result
     finally:
@@ -71,9 +84,13 @@ def simulate(ctx, args):
 
 def evaluate(ctx, args):
     result = BackendResult.model_validate(ctx.artifact(args.result))
-    identities = ctx.store.session(ctx.run_id)['state'].get('result_identities', {})
-    metadata = identities.get(args.result.artifact_id)
-    if not metadata or metadata['instance'] != ctx.snapshot['instance_identity']:
+    identities = ctx.store.session(ctx.run_id)['state'].get('result_executions', {})
+    matches = [(key, m) for key, m in identities.items() if m['artifact_id'] == args.result.artifact_id
+               and (args.execution_id is None or key == args.execution_id)]
+    if len(matches) != 1:
+        raise ValueError('RESULT_EXECUTION_SELECTION_REQUIRED: arguments.execution_id')
+    source_execution, metadata = matches[0]
+    if metadata['instance'] != ctx.snapshot['instance_identity']:
         raise ValueError('RESULT_INSTANCE_MISMATCH')
     evaluator, parameters = ctx.reg.bind(ctx.input.task.evaluator, 'evaluator')
     identity = digest(dict(instance=ctx.snapshot['instance_identity'], task=ctx.input.task.model_dump(mode='json'),
@@ -81,10 +98,11 @@ def evaluate(ctx, args):
         evaluator_dependencies=ctx.snapshot['dependencies'][evaluator.extension_id + '@' + evaluator.version],
         backend_dependencies=ctx.snapshot['dependencies'][ctx.input.policy.backend.extension_id + '@' + ctx.input.policy.backend.version]))
     outcome = evaluator.resolve()(ctx.input.task, result, args.result, ctx.reg, identity)
+    outcome = outcome.model_copy(update=dict(source_execution_id=source_execution, candidate_id=metadata['candidate'], evaluator_version=evaluator.version))
     with ctx.store.transaction() as db:
         ref = ctx.store.put(db, outcome)
         ctx.store.event(db, ctx.run_id, 'evaluation', outcome.validity, parent=ctx.row['parent_id'], request=ctx.row['request_id'],
-            execution=ctx.row['execution_id'], inputs=[args.result], outputs=[ref], candidate=metadata['candidate'])
+            execution=ctx.row['execution_id'], inputs=[args.result, metadata['candidate_input']], outputs=[ref], candidate=metadata['candidate'], version=evaluator.version)
     return outcome
 
 
@@ -104,11 +122,24 @@ def read_evidence(ctx, args):
         page, next_offset = {k: value[k] for k in keys[args.offset:end]}, end if end < len(keys) else None
     else:
         page, next_offset = value, None
+    from tools.platform_store import encode
+    while len(encode(page).encode('utf8')) > args.byte_limit and isinstance(page, (list, dict)) and len(page) > 1:
+        end = args.offset + max(1, len(page) // 2)
+        page = value[args.offset:end] if isinstance(value, list) else {k: value[k] for k in list(value)[args.offset:end]}
+        next_offset = end
+    if isinstance(value, str):
+        page = value[args.offset:args.offset + args.limit]
+        while len(encode(page).encode('utf8')) > args.byte_limit:
+            page = page[:len(page) // 2]
+        next_offset = args.offset + len(page) if args.offset + len(page) < len(value) else None
+    if len(encode(page).encode('utf8')) > args.byte_limit:
+        raise ValueError('EVIDENCE_PAGE_TOO_LARGE: narrow pointer; original evidence retained')
     result = c.EvidencePage(source=args.reference, pointer=args.pointer, content=page, next_offset=next_offset)
     with ctx.store.transaction() as db:
         state = ctx.store.session(ctx.run_id, db)['state']
         state.setdefault('reads', {})[digest(plain(args))] = dict(source=plain(args.reference), pointer=args.pointer, offset=args.offset,
             next_offset=next_offset, content_hash=digest(page))
+        state['reads'] = dict(list(state['reads'].items())[-8:])
         ctx.store.update_state(db, ctx.run_id, state)
     return result
 

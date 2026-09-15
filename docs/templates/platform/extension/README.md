@@ -4,7 +4,7 @@
 
 ```powershell
 python examples/workbench.py platform catalog
-# 给新会话 allowed_tools 加 analysis.example_square；不要修改已冻结会话。
+# 给新会话 policy.tool_bindings 加 analysis.example_square: '1.0.0'；不要修改已冻结会话。
 # ToolRequest.arguments = {length_m: 2.0, frame: world}
 ```
 

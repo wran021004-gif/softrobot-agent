@@ -1,47 +1,58 @@
-# 统一开发平台交付报告
+# 公共核心修复与扩展接口定版交付
 
-## 1. 当前平台与运行顺序
+基线为 `c677c22`，当前分支 `feat/unified-development-platform`。开始时工作区干净，沿现有实现继续；改动留在工作区，未提交、推送、合并或改变默认分支。
 
-平台是一个可检查、可恢复的本地开发宿主。人工任务／环境／机器人与实验策略分开；Pydantic 校验和能力检查形成输入快照；离线或现有供应方传输产生决定；公共宿主验证、授权、预留、执行、封存；评价／诊断读取保存结果；记忆、技能与工作者输出进入后续上下文或协调验收。架构和权威来源图见 [platform.md](platform.md)。
+## 四项修复
 
-## 2. 复用与新增路径
+| 问题 | 当前行为 |
+| --- | --- |
+| 结果正文没有进入模型请求 | ToolObservation 投递最近一份受限正文，证据页正文直接进入下一请求。选中输入、实际适配器请求、原始响应和规范决定分别留存；解析失败保留响应引用。实算结果 5 与 10 触发不同候选。 |
+| 候选预检与执行不同 | 注册构建器只构建一次，CandidateInput 冻结有效输入，预检与执行共用。示例上限 0.305 拒绝新指令 0.31，后端运行零次；合法输入逐字段一致。 |
+| 搜索丢失提案后状态 | pending 与提案后的算法/RNG 状态一起保存；恢复先处理 pending，即使算法已经停止提案。已封存工具按原请求复用，反馈、试验记录和新状态一起提交。 |
+| 会话没有精确工具版本 | policy.tool_bindings 绑定名称和版本，目录、模型声明、授权、缓存、依赖与事件统一使用。两个版本可共存；旧唯一版本配置明确规范化，歧义定位配置字段。 |
 
-复用 `tools/service_execution.py`、`tool_registry.py`、`public_gateway.py`、`reach_dynamics.py`、`design_compiler.py`、`model_provider.py`、原控制器与诊断、`skills/registry.py` 及 `tools/skill_policy.py`。旧动态／工作台主循环和历史账本保留原权限。
+## 三类可运行接口
 
-新增主要边界：`schemas/platform.py`、`platform_protocols.py`；`tools/platform_registry.py`、`platform_tasks.py`、`platform_host.py`、`platform_store.py`、`platform_models.py`、`platform_tools.py`、`platform_search.py`、`platform_physics.py`、`platform_workers.py`、`platform_worker.py`、`platform_skills.py`、`platform_view.py`、`platform_history.py`、`platform_config.py`；扩展包在 `extensions/reference/` 和 `extensions/services/`。
+- **模型／策略**：ModelInput/Response 1.0，策略输出 ToolRequest。适配器负责 encode/respond/decode；保留 offline 和 DeepSeek，独立 ObservingAdapter/EvidenceStrategy 由 manifest 接入同一循环。只有文本，未传输图片或视频。
+- **工作者**：WorkerOutput 2.0 封装身份、状态、来源、具体 Payload、错误和用量；注册检查器校验领域结果。两个本地进程分别调用数学工具、返回信号清单诊断，经共同 Host 和原 SQLite 账本执行。子会话独立写入，工作单计算额度是子调用上限，父级不重复预扣计算。
+- **候选**：CandidateInput 1.0 与 candidate_builder 注册边界。默认控制参数适配保留，独立示例支持 structure.response_fraction。初态和种子固定，任务、环境与成功标准不可修改；真实机器人继续使用 RobotDescription/RobotIR。
 
-旧文件仅作必要兼容修改：工作台转发平台命令；原技能注册器与策略检查器增加可注入证据适配，默认行为不变；README 与忽略规则更新。任务、物理、原指标、研究预算和历史结果无修改。
+ToolReceipt / EvaluationResult 的可选来源信息采用 1.1；未改变语义的扩展无需统一升级。决策及兼容策略见 [接口决策](platform_interface_decisions.md)。
 
-## 3. 人工新增任务
+## 独立扩展与接入路径
 
-填写身份／版本／状态、目标契约、环境、机器人与执行器范围、初始化、时间、成功评价器、优化指标、失败约束、信号需求和评价实例；在独立策略中填写可编辑参数、工具、模型与预算。
+演练包拥有 `extensions/convergence/contracts.py`、`implementation.py`、`manifest.py`；两份配置位于 `configs/platform/convergence/hold.yaml`、`terminal.yaml`；对应验收在 `tests/test_platform_convergence.py`。新增工具、适配器、策略、工作者、评价器、搜索器和合成构建器都由声明发现，公共循环没有这些名称的路由分支。
+
+本次集成者修改公共契约、宿主、注册、模型、调度、候选、依赖及 CLI。公共操作类型移至 `schemas/platform_operations.py`，信号工作者回到参考包。来源闭包由 sources、assets、extension_dependencies、contract_dependencies 记录；无关包和文档不再成为全局失效开关。
+
+内容摘要与执行身份分开，一份内容可以关联多个执行。评价显式携带候选和源执行。默认经验检索保留模型、机器人与后端假设范围；接收工作者结果不等于验证自然语言科学结论。
+
+## 使用与验证
 
 ```powershell
 conda activate softagent
-python examples/workbench.py platform check configs/platform/signal_hold/session.yaml
-python examples/workbench.py platform project-create runs/my_platform configs/platform/project.yaml
-python examples/workbench.py platform create runs/my_platform configs/platform/signal_hold/session.yaml
-python examples/workbench.py platform run runs/my_platform signal-hold --decisions configs/platform/offline.yaml
+python examples/development_platform.py check configs/platform/convergence/terminal.yaml
+python examples/development_platform.py project-create runs/my_core_dev configs/platform/project.yaml
+python examples/development_platform.py create runs/my_core_dev configs/platform/convergence/terminal.yaml
+python examples/development_platform.py run runs/my_core_dev convergence-terminal
+python examples/development_platform.py inputs runs/my_core_dev convergence-terminal
 ```
 
-详见 [填写指南](platform_tasks.md)、[空白模板](templates/platform/task.blank.yaml)、[到达例子](../configs/platform/reach_shifted/session.yaml)、[不同语义例子](../configs/platform/signal_hold/session.yaml)、[接球清单](templates/platform/gentle_catch.checklist.yaml)。
+项目配置的 grant_id 应使用新的独立开发身份，不能复制已有绑定来增加额度。填写说明见 [任务指南](platform_tasks.md)、[策略模板](templates/platform/policy.blank.yaml)，接入与独立命令见 [扩展指南](platform_extensions.md)，排查见 [调试指南](platform_debugging.md)。
 
-## 4. 开发者新增能力
+一次受影响组合验收 **12 项通过**；随后修正模型服务参数重名，只补了本地解码检查与结果投递组。本次累计（含分组、失败与补测）：54 次离线回复、30 次合成执行、17 次数学工具完成、13 个工作者进程；真实模型、MATLAB、MuJoCo、Genesis 均为零。口径、失败及修复见 [验证记录](platform_validation.md)，不将历史物理实验算作本次成果。
 
-在自己的 `extensions/<package>/` 提供契约、实现、manifest、最小测试和例子；配置引用稳定身份。通过同一个 `Host.invoke` 或 `platform call` 调用。声明 sources、依赖、能力、资源与副作用。新增普通数学工具／规则／已支持通道上的控制和搜索不需要修改模型循环、预算或展示程序。见 [扩展指南](platform_extensions.md) 与 [包模板](templates/platform/extension/README.md)。
+## 仍需升级或实现的边界
 
-## 5. 并行工作与共享所有权
+| 未来工作 | 接入位置和具体缺口 |
+| --- | --- |
+| 新工具、策略、既有信号评价 | 自己包的契约、实现和 manifest，使用现有公共调用路径 |
+| 接球、动态对象、新物理 | 环境／对象／初态契约、成功与冲击评价器、真正支持这些语义的后端 |
+| Genesis、新材料／形态／执行通道 | RobotDescription/RobotIR 转换与物理来源；新通道由控制器和后端共同定义 |
+| 结构变化需要映射初态 | 显式初态映射契约；本版不能重新采样改变任务难度 |
+| 多目标搜索 | 反馈适配和真正支持多目标的算法；仅设置 multiobjective 标志不会放行 |
+| 完整视觉或流式响应 | 媒体编码、实际传输与回执契约；当前仅文本 |
+| 任意代码、远程集群、复杂图调度 | 额外隔离、传输与调度实现；本地应用边界不是恶意代码沙箱 |
+| 自动技能训练 | 复用原技能库，补可验证训练来源与适用范围；自然语言经验不直接成为程序 |
 
-任务／评价器、数学、诊断、控制、搜索、后端和参考工作者可以各包并行开发。公共信封、宿主、SQLite 事务、模型循环、CLI 及原科学定义由集成者维护；改变共享语义须先提交版本与兼容方案。见 [责任表与合并流程](platform_parallel_development.md)、[开发任务单](templates/platform/development_order.md)。运行时协作是独立概念，见 [记忆技能与协作](platform_collaboration.md)。
-
-## 6. 实际验证
-
-29 个不同聚焦用例通过（28 项组合＋1 项后续恢复检查），没有全仓库重放。累计真实模型 0；正常数学工具 20；离线回复 41；合成参考执行 51；真实 MuJoCo 2 次／100 步；真实 MATLAB 1 次／473 个成功内部步，另一次启动失败未求解。累计本地工作者进程 33 个，覆盖正常并发和故障注入；代表性双工作区间重叠 0.7831 s。计数与证据见 [验证文档](platform_validation.md)。
-
-## 7. 并行扩展判断与边界
-
-在已声明本地接口范围内，**具备并行扩展条件**。不声称所有物理、执行器、仿真器或真实模型已验证；Genesis、完整接球、视觉传输、多目标搜索、新执行通道等保持明确缺失。新物理和语义仍需显式接口扩展，不承诺接口永不升级。
-
-## 8. 分支与集成
-
-基线 `63ae9b5`，本地分支 `feat/unified-development-platform`。改动均留在工作区，**未提交、未推送、未合并**。建议先审查公共契约／事务和兼容改动，再审查参考包与证据，最后从当前有效开发成果集成；不要把旧默认主分支当成当然基线。来源与恢复规则见 [platform_recovery.md](platform_recovery.md)，排查顺序见 [platform_debugging.md](platform_debugging.md)。
+当前基线可进入具体扩展包开发；不承诺未来永远无需修改公共接口。
