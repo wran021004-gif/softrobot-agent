@@ -1,0 +1,24 @@
+Command: conda run -n softagent python -m unittest tests.test_platform_public_fixes -v
+Exit code: 0
+
+test_01_result_contract (tests.test_platform_public_fixes.PublicFixTests.test_01_result_contract) ... ok
+test_02_reuse_provenance_evaluation_accounting_and_reopen (tests.test_platform_public_fixes.PublicFixTests.test_02_reuse_provenance_evaluation_accounting_and_reopen) ... ok
+test_03_explicit_recompute_changed_input_and_idempotency (tests.test_platform_public_fixes.PublicFixTests.test_03_explicit_recompute_changed_input_and_idempotency) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 4.082s
+
+OK
+
+Evidence roots (each contains platform.sqlite; all sessions are named fixture):
+Group 1: runs/platform_public_fixes/c11b2fd029eb48d6870f2f10957f893f
+Group 2: runs/platform_public_fixes/34897319cb21426782bc1559fe6633ef
+Group 3: runs/platform_public_fixes/cb762085d8d349258f0a4959895a9023
+
+Read-only ledger summary after the single combined run:
+Group 1: 8 sealed calls; 2 synthetic backend runs; 3 cache hits (1 math, 2 evaluation).
+Group 2: 9 sealed calls; 1 synthetic backend run; 2 simulation cache hits; 6 evaluations (3 after reopen).
+Group 3: 3 sealed calls; 3 synthetic backend runs; 2 idempotent retries add no calls or charges.
+Total: 20 sealed tool calls, 6 synthetic runs charged as backend_solves in test-only declarations.
+Real model API requests: 0. Real MATLAB solves: 0. Real MuJoCo solves: 0.
+No full repository suite, historical acceptance replay, or additional test run.

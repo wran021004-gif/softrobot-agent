@@ -226,7 +226,7 @@ class ConstraintResult(Contract):
 
 
 class EvaluationResult(Contract):
-    contract_version: Literal['1.0.0', '1.1.0'] = '1.1.0'
+    contract_version: Literal['1.0.0', '1.1.0', '1.2.0'] = '1.2.0'
     validity: Literal['valid', 'invalid', 'incomplete', 'unsupported']
     task_success: bool | None
     metrics: list[Metric]
@@ -235,6 +235,7 @@ class EvaluationResult(Contract):
     evaluator: str
     evaluator_version: str = VERSION
     source_execution_id: str | None = None
+    original_execution_id: str | None = None
     candidate_id: str | None = None
     comparison_identity: str
     reason: str | None = None
@@ -263,7 +264,7 @@ class BackendResult(Contract):
 
 
 class ToolReceipt(Contract):
-    contract_version: Literal['1.0.0', '1.1.0'] = '1.1.0'
+    contract_version: Literal['1.0.0', '1.1.0', '1.2.0'] = '1.2.0'
     request_id: str
     execution_id: str
     caller: str
@@ -278,6 +279,7 @@ class ToolReceipt(Contract):
     output: EvidenceRef | None = None
     error: str | None = None
     cache_hit: bool = False
+    original_execution_id: str | None = None
     charged: Budget
 
 

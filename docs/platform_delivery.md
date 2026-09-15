@@ -1,5 +1,29 @@
 # 公共核心修复与扩展接口定版交付
 
+## 本次：公共接口两项修复（基线 6751639）
+
+**两项均已修复，代码、三组聚焦验证与直接相关中文文档已完成。** 起始 HEAD 为 `6751639`、工作区干净；分支仍为 `feat/unified-development-platform`。以下修改留在工作区，未自行提交、推送或合并；既有四项修复和已接入接口保持。
+
+| 修改文件 | 关键入口与交付行为 |
+| --- | --- |
+| `tools/platform_host.py` | `Host._invoke`：正常／缓存统一严格输出验证，按声明契约提取状态；预留前检查复用条件，完成时传递来源 |
+| `tools/platform_registry.py` | `Extension.hook`：解析现有 capabilities 中的可信可选绑定，复用原登记机制 |
+| `schemas/platform.py` | `ToolReceipt` / `EvaluationResult`：兼容读取 1.0／1.1，新输出 1.2，增加可空 original_execution_id |
+| `extensions/reference/manifest.py` | `simulation.run` 开启缓存并声明 preflight/cache_reuse；评价默认仍不缓存 |
+| `tools/platform_tools.py` | `simulation_reuse` 核对原始来源及有效输入；simulate 准备来源，evaluate 同时输出所选调用与原始执行 |
+| `tools/platform_store.py` | `cache` 只返回已完成原始计算，排除失败求解和缓存读取；complete 同事务保存来源、不可变事件、输出、回执及账本 |
+| `tests/test_platform_public_fixes.py` | 三组公共宿主场景，复用原参考后端与配置夹具 |
+| `docs/platform_recovery.md`、`docs/platform_interface_decisions.md` | 复用范围、身份、评价、费用、扩展点与版本兼容行为 |
+| `docs/platform_validation.md`、`docs/platform_delivery.md`、`docs/evidence/platform_public_fixes.log` | 本次真实验证结果、文件入口、运行证据和使用边界，保留历史记录 |
+
+执行 `conda run -n softagent python -m unittest tests.test_platform_public_fixes -v`，一次 **3/3 通过（4.082 s）**；详见 [验证记录](platform_validation.md) 和 [日志](evidence/platform_public_fixes.log)。共 6 次离散后端替身执行（分组 2/1/3），20 条封存调用；真实模型、MATLAB、MuJoCo 调用全部为零。两个仿真缓存请求不占求解资源、不增加求解费用；同请求重试不新增账本或事件。`git diff --check` 通过，未跑全仓库或重复历史验收。
+
+普通新工具作者**无需新增声明或迁就字段名**，继续声明准确 output_schema；特殊有来源的复用操作可使用可选 cache_reuse 钩子。后端经 simulation.run 接入时已自动使用该链路。读取仿真回执 `original_execution_id` 可直接找到产生轨迹的执行；用本次 `execution_id` 发起评价，其结果 `source_execution_id` 保留本次选中调用、`original_execution_id` 给出原始来源。详细有效输入在 `state.result_executions[execution_id].candidate_input`，同样可通过 result_provenance 事件的不可变输出读取。
+
+既定范围内**没有剩余具体扩展开发阻碍**。复用仅承诺同会话、现有精确匹配范围；旧来源缺失不伪造，新契约不自动迁移历史会话。工作区包括上述 10 个已跟踪文件修改及测试／日志两个新增文件；本地验证项目位于被忽略的 `runs/platform_public_fixes/`，不修改历史任务和实验结果。完成本次交付后停止。
+
+## 以下保留上一轮交付
+
 基线为 `c677c22`，当前分支 `feat/unified-development-platform`。开始时工作区干净，沿现有实现继续；改动留在工作区，未提交、推送、合并或改变默认分支。
 
 ## 四项修复

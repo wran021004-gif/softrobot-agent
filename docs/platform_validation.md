@@ -1,6 +1,26 @@
 # 平台验收与完成边界
 
-## 本次：公共核心修复与接口定版（基线 c677c22）
+## 本次：公共接口两项修复（基线 6751639）
+
+实现完成后只运行一次组合命令：
+
+```powershell
+conda run -n softagent python -m unittest tests.test_platform_public_fixes -v
+```
+
+**3 组通过，0 失败、0 错误、0 跳过，用时 4.082 s。** 无补测、全仓库测试或历史验收重跑。实际输出及三个 SQLite 项目路径见 [platform_public_fixes.log](evidence/platform_public_fixes.log)。随后仅只读核对账本和最终差异，`git diff --check` 通过。
+
+| 组别 | 实际断言及结果 | 替身执行 |
+| --- | --- | ---: |
+| 结果契约 | 普通数学返回 validity/solver_status 且没有 task_success，正常／缓存均成功，3.0.0 结果版本保持；真实 EvaluationResult 的成功与失败均正确投递，缓存仍为 1.2.0；旧 1.1 回执／评价读取默认来源为空 | 2 次离散后端、1 次数学函数替身 |
+| 仿真复用链路 | 同计算三请求、独立身份、同一轨迹、直接原始来源，三份结果均为 valid/task_success=false；新 Host 重开后来源保持，三份再评价成功；原始预留占 reference_device，两个命中预留资源为空，各工具计费 1、求解计费 0、实际耗时大于零 | 1 次离散后端 |
+| 重算与幂等 | 初次执行、cache=new、command_m 改为 0.31 共执行三次；重试封存的 new 和 changed 请求，返回原回执，账本、事件和执行计数不变 | 3 次离散后端 |
+
+三组共 **20 条封存工具调用、6 次合成后端执行**。测试复用现有 `ReferenceBackend`，仅在测试注册表中将其计为求解、声明 `reference_device`，以验证共同预算和资源槽；生产参考后端的零物理求解声明保持。6 个 backend_solves 是替身记账，**真实模型请求、MATLAB、MuJoCo 均为 0**；没有模型离线对话或工作者进程。第二组保存一份轨迹文件；缓存读取没有产生新的后端目录。第一组临时开启评价缓存仅验证通用契约路径，生产 `evaluation.run` 仍默认关闭缓存。
+
+修改文件和关键入口见 [本次交付](platform_delivery.md#本次公共接口两项修复基线-6751639)。范围为同一会话和现有缓存键；精确版本、种子、源码／资产与运行环境检查原样保留。旧证据不改写，历史依赖变化继续要求只读或显式迁移。本次没有发现阻碍既定范围内扩展开发的剩余具体问题，不启动下一轮泛化准备任务。
+
+## 上一轮：公共核心修复与接口定版（基线 c677c22）
 
 一次受影响组合验收 **12 项全部通过**。没有运行全仓库或历史实验。原始日志见 [acceptance.log](evidence/platform_convergence/acceptance.log)，会话目录见 [acceptance.json](evidence/platform_convergence/acceptance.json)，按各 SQLite 事件及回执统计的运行量见 [usage.json](evidence/platform_convergence/usage.json)。
 

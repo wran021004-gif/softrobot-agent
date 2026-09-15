@@ -75,8 +75,9 @@ for name, inp, out, function, description in [
 ]:
     EXTENSIONS.append(ext(name, 'tool', inp, out, 'tools.platform_tools:' + function, description,
         sources=('tools/platform_tools.py', 'tools/platform_candidates.py', 'schemas/platform_operations.py', 'tools/platform_workers.py', 'tools/platform_worker.py', 'tools/platform_skills.py'),
-        cache=False,
-        capabilities=dict(preflight='tools.platform_tools:simulation_preflight') if name == 'simulation.run' else {},
+        cache=name == 'simulation.run',
+        capabilities=dict(preflight='tools.platform_tools:simulation_preflight',
+            cache_reuse='tools.platform_tools:simulation_reuse') if name == 'simulation.run' else {},
         side_effects='current session/project only' if name not in ('evidence.read', 'memory.search', 'skills.search', 'workers.status') else 'none'))
 
 from dataclasses import replace

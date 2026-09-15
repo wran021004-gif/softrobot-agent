@@ -34,6 +34,14 @@ class Extension:
     capabilities: dict = field(default_factory=dict)
     legacy_service: object | None = None
 
+    def hook(self, name):
+        """Resolve an optional trusted capability binding (never request input)."""
+        binding = self.capabilities.get(name)
+        if not binding:
+            return None
+        module, function = binding.split(':')
+        return getattr(import_module(module), function)
+
     def resolve(self):
         if not self.binding:
             raise ValueError('IMPLEMENTATION_REQUIRED: ' + self.extension_id)

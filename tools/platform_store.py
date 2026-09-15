@@ -233,7 +233,7 @@ class Store:
             # SQLite column count checked by focused tests, not separate accounting.
             return self.lookup(run_id, request_id, db), True
 
-    def complete(self, row, receipt, output=None, elapsed=0., kind='tool'):
+    def complete(self, row, receipt, output=None, elapsed=0., kind='tool', *, result_execution=None):
         with self.transaction() as db:
             current = self.lookup(row['run_id'], row['request_id'], db)
             if current['receipt']:
@@ -247,6 +247,16 @@ class Store:
             from schemas.platform import ToolReceipt
             parsed = ToolReceipt.model_validate(receipt)
             self.put(db, parsed)
+            if result_execution is not None:
+                metadata = {**result_execution, 'artifact_id': parsed.output.artifact_id, 'request_id': row['request_id']}
+                state = self.session(row['run_id'], db)['state']
+                state.setdefault('result_executions', {})[row['execution_id']] = metadata
+                self.update_state(db, row['run_id'], state)
+                provenance = self.put(db, dict(execution_id=row['execution_id'], **metadata))
+                self.event(db, row['run_id'], 'result_provenance', 'reused' if parsed.cache_hit else 'produced',
+                    parent=current['parent_id'], request=row['request_id'], execution=row['execution_id'],
+                    caller=row['caller'], inputs=[parsed.output, metadata['candidate_input']], outputs=[provenance],
+                    candidate=metadata['candidate'], version=parsed.tool_version)
             db.execute('UPDATE calls SET status=?,charged=?,receipt=? WHERE run_id=? AND request_id=?',
                        (parsed.execution_status, encode(charged), encode(parsed), row['run_id'], row['request_id']))
             self.event(db, row['run_id'], kind, parsed.execution_status, parent=current['parent_id'],
@@ -256,9 +266,13 @@ class Store:
 
     def cache(self, run_id, key):
         with self.connect(True) as db:
-            row = db.execute("SELECT receipt FROM calls WHERE run_id=? AND cache_key=? AND status='completed' ORDER BY rowid DESC LIMIT 1", (run_id, key)).fetchone()
-            if row:
+            rows = db.execute("SELECT receipt FROM calls WHERE run_id=? AND cache_key=? AND status='completed' AND receipt IS NOT NULL ORDER BY rowid DESC", (run_id, key))
+            for row in rows:
                 value = json.loads(row[0])
+                # Reuse always points to a producer, never another cache read.
+                # Solver failure is independent of a successful tool invocation.
+                if value.get('cache_hit') or not value.get('output') or value.get('solver_status', 'not_run') not in ('not_run', 'completed'):
+                    continue
                 self.artifact(value['output'], db=db)
                 return value
         return None

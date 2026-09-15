@@ -15,6 +15,7 @@ from tools.state_io import digest, atomic_json
 class InvocationContext:
     def __init__(self, host, row, request, prepared=None):
         self.prepared = prepared
+        self.result_execution = None
         self.host, self.store, self.reg = host, host.store, host.reg
         self.run_id, self.row, self.request = host.run_id, row, request
         self.snapshot = self.store.session(self.run_id)['snapshot']
@@ -145,13 +146,17 @@ class Host:
             # Each implementation supplies a preflight hook through its declaration;
             # no software/tool-name routing in the loop or accounting core.
             extra = {}
-            preflight = definition.capabilities.get('preflight')
+            preflight = definition.hook('preflight')
             if preflight:
-                from importlib import import_module
-                module, name = preflight.split(':')
-                extra = getattr(import_module(module), name)(inp, arguments, self.reg)
+                extra = preflight(inp, arguments, self.reg)
                 cost.update(extra.get('cost', {}))
                 resources.extend(extra.get('resources', []))
+            result_execution = None
+            reuse = definition.hook('cache_reuse')
+            if cached and reuse:
+                result_execution = reuse(self, arguments, extra.get('prepared'), cached)
+                if result_execution is None:
+                    cached = None
             work_order = snapshot['snapshot'].get('worker_order')
             if work_order and set(resources) - set(work_order['resources']):
                 raise ValueError('WORKER_RESOURCE_NOT_GRANTED')
@@ -170,15 +175,19 @@ class Host:
                     result = self._legacy_service(context, definition, arguments)
                 else:
                     result = definition.resolve()(context, arguments)
-                result = definition.output_schema.model_validate_json(encode(result), strict=True)
+                result_execution = context.result_execution
+            # Both fresh objects and cached dictionaries have the declared type.
+            result = definition.output_schema.model_validate_json(encode(result), strict=True)
             fields = dict(cache_hit=bool(cached), result_contract=definition.output_schema.__name__, result_version=getattr(result, 'contract_version', definition.version))
             data = plain(result)
-            if isinstance(result, BackendResult) or 'solver_status' in data:
+            if issubclass(definition.output_schema, BackendResult):
                 fields['solver_status'] = data['solver_status']
-            if isinstance(result, EvaluationResult) or 'validity' in data:
+            if issubclass(definition.output_schema, EvaluationResult):
                 fields.update(analysis_status=data['validity'], task_success=data['task_success'])
+            if result_execution is not None:
+                fields['original_execution_id'] = result_execution['original_execution_id']
             receipt = self._receipt(request, row, 'completed', **fields)
-            return self.store.complete(row, receipt, data, time.monotonic() - started)
+            return self.store.complete(row, receipt, data, time.monotonic() - started, result_execution=result_execution)
         except Exception as exc:
             if row:
                 if isinstance(exc, TimeoutError) or 'UNCONFIRMED' in str(exc) or 'timeout' in type(exc).__name__.lower():

@@ -1,5 +1,16 @@
 # 公共接口定版决策（开发接口 2.0）
 
+## 公共接口两项修复（审阅基线 6751639）
+
+- 输出统一按 `Extension.output_schema` 严格验证，缓存字典同样恢复为该契约类型。只有声明为 `BackendResult` / `EvaluationResult`（含子类）才提取求解／评价状态；普通工具的 `validity`、`solver_status` 不参与分类。结果自带的 `contract_version` 在正常和缓存回执中一致保留；未定义该属性时继续使用工具精确版本。
+- 普通工具作者无需新增结果类别声明，只需现有输入输出契约。普通纯计算缓存仍使用 `cache=True`。经 `simulation.run` 接入的后端无需自行实现复用登记或账本。
+- 仿真启用 `cache=True`，在现有 `capabilities` 增加可选可信绑定 `cache_reuse`。函数签名为 `(host, arguments, prepared, cached_receipt)`，在预检后、预留前只读检查；返回 `None` 表示不能复用，回到正常执行；返回来源字典则由宿主封存。未声明时保持普通不可变输出复用。绑定源码和传递依赖仍须纳入现有 sources 声明；不得接受请求提供的模块路径。
+- 仿真正常执行将来源放入 `InvocationContext.result_execution`（默认 `None`），复用钩子返回相同结构：`original_execution_id`、`instance`、`backend`、`task`、`candidate`、`candidate_input`。`Store.complete(..., result_execution=None)` 与输出、回执和结算原子保存；Store 以本次封存输出和请求覆盖 `artifact_id`、`request_id`，并记录含不可变来源证据的 `result_provenance` 事件。无需新表或扩展账本。
+- `ToolReceipt`、`EvaluationResult` 新输出默认 **1.2.0**，增量字段 `original_execution_id: str | None = None` 指向产生轨迹的原始仿真。真实执行指向自身，连续复用直接指向原始执行；评价结果的 `source_execution_id` 保持“选中的仿真调用”原义。普通工具回执及缺少来源的旧记录默认为 `None`。继续读取 1.0.0／1.1.0，保留其版本且不写回；旧消费者若严格只接受旧版本，需显式接入 1.2.0。工具版本和 `BackendResult` 结构不变。
+- 新调用仍检查冻结依赖兼容性；旧会话若依赖已变化则按现有规则只读或显式迁移。旧仿真缺必要来源时不命中缓存、不补造来源。范围限同一会话、现有缓存键，不包含跨会话或跨候选名去重。
+
+以下保留上一轮定版决策。
+
 基线：`c677c22`，`feat/unified-development-platform`；开始时工作区干净。历史任务、参数来源及证据不改写。
 
 | 分类 | 决策 |
