@@ -1,0 +1,61 @@
+task_id: reach-shifted
+task_version: 1.0.0
+name: 更换目标与时长的到达开发示例
+status: development_valid
+source: 原 reach_free 环境与 0.01 m 容差；开发目标 [0.30,0,0.08]，40 步；不改变历史科研定义
+family: task.reach
+goal:
+  contract: reference.reach_goal
+  version: 1.0.0
+  data:
+    target_m:
+    - 0.3
+    - 0.0
+    - 0.08
+robot_families:
+- tendon_driven_continuum
+actuator_channels:
+- tendon_target_lengths_m
+initializer:
+  extension_id: initialize.legacy_zero
+  version: 1.0.0
+  parameters:
+    contract: reference.empty
+    version: 1.0.0
+    data: {}
+timing:
+  timestep_s: 0.002
+  control_period_s: 0.002
+  sample_period_s: 0.002
+  duration_s: 0.08
+  termination:
+  - duration
+  - numerical_failure
+evaluator:
+  extension_id: evaluate.reach
+  version: 1.0.0
+  parameters:
+    contract: reference.reach_evaluation
+    version: 1.0.0
+    data:
+      tolerance_m: 0.01
+objectives:
+- metric: position_error
+  direction: minimize
+  units: m
+failure_policy: retain_invalid_and_constraint_failures
+observations:
+- name: tip_position
+  entity: tip
+  dimension: 3
+  units: m
+  frame: world
+  phase: post_step
+sampling:
+  split: development
+  seeds:
+  - 17
+  window_s:
+  - 0.0
+  - 0.08
+environment_file: environment.yaml

@@ -1,0 +1,54 @@
+policy_id: short-reach-development
+editable: {}
+backend:
+  extension_id: backend.mujoco
+  version: 1.0.0
+  parameters:
+    contract: reference.empty
+    version: 1.0.0
+    data: {}
+controller:
+  extension_id: controller.legacy_length
+  version: 1.0.0
+  parameters:
+    contract: legacy.control
+    version: 1.0.0
+    data:
+      version: length_control_v2
+      mode: C1
+      bend_y_rad: 0.0
+      bend_z_rad: 1.073643020187874
+      bias_fraction: 0.0
+      gain_rad2_per_m2: 5.0
+      update_every_steps: 10
+      max_bend_update_rad: 0.05
+      rate_limit_ref_per_s: 0.5
+search: null
+model:
+  adapter: offline
+  model: offline-contract-fixture
+  max_turns: 12
+allowed_tools:
+- analysis.vector_norm
+- simulation.run
+- evaluation.run
+- evidence.read
+- diagnostics.sample_exceeds
+- memory.save
+- memory.search
+- skills.search
+- skills.propose
+- skills.validate
+- workers.submit
+- workers.status
+- workers.cancel
+- workers.accept
+- session.control
+budget:
+  tool_calls: 60
+  model_calls: 0
+  backend_solves: 1
+  worker_calls: 6
+  wall_s: 300.0
+timeout_s: 10.0
+allow_development_skills: true

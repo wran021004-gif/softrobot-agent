@@ -1,0 +1,194 @@
+{
+  "baseline": "63ae9b5",
+  "branch": "feat/unified-development-platform",
+  "contract_version": "1.0.0",
+  "final_checks": {
+    "run": 28,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "final_check_counts": {
+    "real_model_requests": 0,
+    "offline_model_replies": 9,
+    "mathematical_executions": 4,
+    "reference_backend_executions": 11,
+    "mujoco_reservations": 0,
+    "matlab_reservations": 0,
+    "mujoco_completed": 0,
+    "matlab_completed": 0,
+    "workers_completed": 5,
+    "workers_failed": 1,
+    "workers_cancelled": 1,
+    "unknown_reservations": 2
+  },
+  "cumulative_counts": {
+    "real_model_requests": 0,
+    "offline_model_replies": 41,
+    "mathematical_executions": 20,
+    "reference_backend_executions": 51,
+    "mujoco_reservations": 2,
+    "matlab_reservations": 2,
+    "mujoco_completed": 2,
+    "matlab_completed": 1,
+    "workers_completed": 23,
+    "workers_failed": 5,
+    "workers_cancelled": 5,
+    "unknown_reservations": 8,
+    "worker_processes_started": 33,
+    "worker_unsettled_records": 0
+  },
+  "additional_checks": [
+    {
+      "name": "late_sealed_worker_output_reconciles_unknown_without_relaunch",
+      "passed": true,
+      "log": "late_worker_check.log"
+    }
+  ],
+  "distinct_checks_passed": 29,
+  "cumulative_project_count": 104,
+  "representative_workers": {
+    "outputs": [
+      {
+        "base_candidate": "baseline",
+        "claim_key": "tendon_length",
+        "conclusion": "saved_samples_present",
+        "ended_at": 1789447564.4758089,
+        "sample_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "signal": "tendon_length",
+        "source": {
+          "artifact_id": "ea14aad1e3f209e34c6eeb59a49ea0c1083e7da9aef5a0af6e7b10d636df8787",
+          "media_type": "application/json"
+        },
+        "started_at": 1789447563.2746952,
+        "status": "observed",
+        "values": [
+          [
+            0.29502198390971246
+          ],
+          [
+            0.2975109919548562
+          ],
+          [
+            0.2987554959774281
+          ],
+          [
+            0.2993777479887141
+          ],
+          [
+            0.29968887399435706
+          ],
+          [
+            0.29984443699717855
+          ],
+          [
+            0.29992221849858924
+          ],
+          [
+            0.29996110924929464
+          ],
+          [
+            0.29998055462464734
+          ],
+          [
+            0.29999027731232364
+          ]
+        ],
+        "work_id": "tendon"
+      },
+      {
+        "base_candidate": "baseline",
+        "claim_key": "contact_count",
+        "conclusion": "saved_samples_present",
+        "ended_at": 1789447564.8932517,
+        "sample_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "signal": "contact_count",
+        "source": {
+          "artifact_id": "ea14aad1e3f209e34c6eeb59a49ea0c1083e7da9aef5a0af6e7b10d636df8787",
+          "media_type": "application/json"
+        },
+        "started_at": 1789447563.692698,
+        "status": "observed",
+        "values": [
+          [
+            0.0
+          ],
+          [
+            0.0
+          ],
+          [
+            0.0
+          ],
+          [
+            0.0
+          ],
+          [
+            0.0
+          ],
+          [
+            0.0
+          ],
+          [
+            0.0
+          ],
+          [
+            0.0
+          ],
+          [
+            0.0
+          ],
+          [
+            0.0
+          ]
+        ],
+        "work_id": "contact"
+      }
+    ],
+    "overlap_s": 0.7831108570098877,
+    "actual_parallel": true
+  },
+  "real_backend_summary": {
+    "mujoco_solves": 2,
+    "mujoco_steps": 100,
+    "matlab_solves": 1,
+    "matlab_requested_steps": 40,
+    "matlab_sample_times": 41,
+    "matlab_successful_internal_steps": 473,
+    "matlab_startup_failures_before_solve": 1,
+    "historical_budget_used": 0,
+    "real_model_requests": 0
+  },
+  "definitions": {
+    "public_contracts": 29,
+    "payload_contracts": 20,
+    "extensions": 36,
+    "genesis": "declared_not_implemented"
+  },
+  "final_test_source": "runs\\platform_acceptance\\9acf97b51e4c4fa68c8ae98515a6f42a",
+  "numerical_source": "runs\\platform_acceptance\\175b5a0daf9c499a994f65a1a288b130",
+  "matlab_source": "runs\\platform_acceptance\\bfd530156b664a87abf0f9e27bd379ce",
+  "validation_scope": "本地接口、离线决策载荷、真实短求解和确定性工作者；非真实多模型质量或物理标定",
+  "note": "累计计数包含开发失败后的定向复验；保留全部账本，不把失败夹具或合成参考称为真实求解。MATLAB 40 个输出区间是请求采样网格，不是 ode15s 自适应内部步数。"
+}

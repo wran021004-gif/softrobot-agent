@@ -1,0 +1,11 @@
+# 可执行请求示例：作用于已创建且允许 simulation.run 的会话。
+# 相同 request_id 重送不再求解。显式新实验需换 request_id 并设 cache: new。
+request_id: manual-baseline-001
+tool_id: simulation.run
+tool_version: '1.0.0'
+arguments:
+  candidate_id: baseline
+  changes: {}
+reason: 独立开发配置的一次获准执行
+evidence: []
+cache: reuse

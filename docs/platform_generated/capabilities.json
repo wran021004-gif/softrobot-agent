@@ -1,0 +1,6421 @@
+[
+  {
+    "extension_id": "analysis.pcc_condition",
+    "kind": "tool",
+    "version": "1.1.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Singular values/rank of the local PCC tip Jacobian; geometric conditioning, no controllability or task claim.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "length_m": {
+          "description": "Positive arc length in meters; geometry only, no design authorization.",
+          "exclusiveMinimum": 0,
+          "title": "Length M",
+          "type": "number"
+        },
+        "bend_rad": {
+          "description": "[theta*cos(phi), theta*sin(phi)] in radians; norm <= pi.",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Bend Rad",
+          "type": "array"
+        },
+        "frame": {
+          "const": "base_origin_x_forward_yz_bending",
+          "default": "base_origin_x_forward_yz_bending",
+          "title": "Frame",
+          "type": "string"
+        },
+        "relative_rank_tolerance": {
+          "default": 1e-10,
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "title": "Relative Rank Tolerance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "length_m",
+        "bend_rad"
+      ],
+      "title": "PCCCondition",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "singular_values_m_per_rad": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Singular Values M Per Rad",
+          "type": "array"
+        },
+        "rank": {
+          "maximum": 2,
+          "minimum": 0,
+          "title": "Rank",
+          "type": "integer"
+        },
+        "condition_number": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Condition Number"
+        },
+        "condition_status": {
+          "enum": [
+            "FINITE",
+            "RANK_DEFICIENT"
+          ],
+          "title": "Condition Status",
+          "type": "string"
+        },
+        "relative_rank_tolerance": {
+          "title": "Relative Rank Tolerance",
+          "type": "number"
+        },
+        "model": {
+          "additionalProperties": true,
+          "title": "Model",
+          "type": "object"
+        },
+        "input": {
+          "additionalProperties": true,
+          "title": "Input",
+          "type": "object"
+        },
+        "analysis_status": {
+          "const": "LOCAL_GEOMETRY_ONLY",
+          "title": "Analysis Status",
+          "type": "string"
+        },
+        "backend_solves": {
+          "const": 0,
+          "title": "Backend Solves",
+          "type": "integer"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "singular_values_m_per_rad",
+        "rank",
+        "condition_number",
+        "condition_status",
+        "relative_rank_tolerance",
+        "model",
+        "input",
+        "analysis_status",
+        "backend_solves",
+        "limitations"
+      ],
+      "title": "PCCConditionResult",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "saved derivation; no numerical solves"
+  },
+  {
+    "extension_id": "analysis.pcc_jacobian",
+    "kind": "tool",
+    "version": "1.1.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Single section inextensible PCC tip/Jacobian, m and m/rad, base +x, yz bending; norm(bend)<=pi. Geometry only.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "length_m": {
+          "description": "Positive arc length in meters; geometry only, no design authorization.",
+          "exclusiveMinimum": 0,
+          "title": "Length M",
+          "type": "number"
+        },
+        "bend_rad": {
+          "description": "[theta*cos(phi), theta*sin(phi)] in radians; norm <= pi.",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Bend Rad",
+          "type": "array"
+        },
+        "frame": {
+          "const": "base_origin_x_forward_yz_bending",
+          "default": "base_origin_x_forward_yz_bending",
+          "title": "Frame",
+          "type": "string"
+        }
+      },
+      "required": [
+        "length_m",
+        "bend_rad"
+      ],
+      "title": "PCCJacobian",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "description": "Legacy services retain their own registered output validator when present.",
+      "properties": {
+        "detail": {
+          "additionalProperties": true,
+          "title": "Detail",
+          "type": "object"
+        }
+      },
+      "required": [
+        "detail"
+      ],
+      "title": "ServiceData",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "saved derivation; no numerical solves"
+  },
+  {
+    "extension_id": "analysis.pcc_tolerance",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Propagate independent length/bend standard deviations to first-order tip covariance, principal error directions and ranked tolerance contributions. Geometric approximation, no task assessment.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "length_m": {
+          "description": "Positive arc length in meters; geometry only, no design authorization.",
+          "exclusiveMinimum": 0,
+          "title": "Length M",
+          "type": "number"
+        },
+        "bend_rad": {
+          "description": "[theta*cos(phi), theta*sin(phi)] in radians; norm <= pi.",
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Bend Rad",
+          "type": "array"
+        },
+        "frame": {
+          "const": "base_origin_x_forward_yz_bending",
+          "default": "base_origin_x_forward_yz_bending",
+          "title": "Frame",
+          "type": "string"
+        },
+        "length_std_m": {
+          "minimum": 0,
+          "title": "Length Std M",
+          "type": "number"
+        },
+        "bend_std_rad": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "minimum": 0,
+              "type": "number"
+            }
+          ],
+          "title": "Bend Std Rad",
+          "type": "array"
+        }
+      },
+      "required": [
+        "length_m",
+        "bend_rad",
+        "length_std_m",
+        "bend_std_rad"
+      ],
+      "title": "PCCTolerance",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "nominal_tip_m": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Nominal Tip M",
+          "type": "array"
+        },
+        "tip_covariance_m2": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Tip Covariance M2",
+          "type": "array"
+        },
+        "tip_axis_std_m": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Tip Axis Std M",
+          "type": "array"
+        },
+        "rms_position_deviation_m": {
+          "title": "Rms Position Deviation M",
+          "type": "number"
+        },
+        "principal_variances_m2": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Principal Variances M2",
+          "type": "array"
+        },
+        "principal_directions": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Principal Directions",
+          "type": "array"
+        },
+        "parameter_contributions": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Parameter Contributions",
+          "type": "array"
+        },
+        "model": {
+          "additionalProperties": true,
+          "title": "Model",
+          "type": "object"
+        },
+        "input": {
+          "additionalProperties": true,
+          "title": "Input",
+          "type": "object"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "backend_solves": {
+          "const": 0,
+          "title": "Backend Solves",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "nominal_tip_m",
+        "tip_covariance_m2",
+        "tip_axis_std_m",
+        "rms_position_deviation_m",
+        "principal_variances_m2",
+        "principal_directions",
+        "parameter_contributions",
+        "model",
+        "input",
+        "assumptions",
+        "backend_solves"
+      ],
+      "title": "PCCToleranceResult",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "saved derivation; no numerical solves"
+  },
+  {
+    "extension_id": "analysis.vector_norm",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "带单位与坐标的向量范数；接入不改核心循环",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "values_m": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Values M",
+          "type": "array"
+        },
+        "frame": {
+          "const": "world",
+          "default": "world",
+          "title": "Frame",
+          "type": "string"
+        },
+        "model_id": {
+          "const": "euclidean_vector",
+          "default": "euclidean_vector",
+          "title": "Model Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "values_m"
+      ],
+      "title": "MathNorm",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "norm_m": {
+          "title": "Norm M",
+          "type": "number"
+        },
+        "units": {
+          "const": "m",
+          "default": "m",
+          "title": "Units",
+          "type": "string"
+        },
+        "frame": {
+          "const": "world",
+          "default": "world",
+          "title": "Frame",
+          "type": "string"
+        },
+        "scope": {
+          "const": "mathematical_vector_only",
+          "default": "mathematical_vector_only",
+          "title": "Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "norm_m"
+      ],
+      "title": "MathNormResult",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "backend.genesis",
+    "kind": "backend",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": false,
+    "dependencies_available": false,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "IMPLEMENTATION_REQUIRED",
+      "DEPENDENCY_MISSING: genesis",
+      "NO_SESSION_POLICY"
+    ],
+    "description": "待实现：必须检查目标版本并完成模型、信号与执行通道适配",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Signal": {
+          "additionalProperties": false,
+          "properties": {
+            "spec": {
+              "$ref": "#/$defs/SignalSpec"
+            },
+            "times_s": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Times S",
+              "type": "array"
+            },
+            "values": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "spec",
+            "times_s",
+            "values"
+          ],
+          "title": "Signal",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "backend_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Backend Id",
+          "type": "string"
+        },
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Payload"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/Payload"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "solver_status",
+        "backend_id",
+        "model_id",
+        "signals",
+        "data",
+        "limitations",
+        "initial_state",
+        "seed"
+      ],
+      "title": "BackendResult",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [
+      "genesis"
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "backend.matlab",
+    "kind": "backend",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "保留 MATLAB 平面动力学一次性求解适配",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Signal": {
+          "additionalProperties": false,
+          "properties": {
+            "spec": {
+              "$ref": "#/$defs/SignalSpec"
+            },
+            "times_s": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Times S",
+              "type": "array"
+            },
+            "values": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "spec",
+            "times_s",
+            "values"
+          ],
+          "title": "Signal",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "backend_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Backend Id",
+          "type": "string"
+        },
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Payload"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/Payload"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "solver_status",
+        "backend_id",
+        "model_id",
+        "signals",
+        "data",
+        "limitations",
+        "initial_state",
+        "seed"
+      ],
+      "title": "BackendResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "families": [
+        "task.reach"
+      ],
+      "robots": [
+        "tendon_driven_continuum"
+      ],
+      "channels": [
+        "tendon_target_lengths_m"
+      ],
+      "environments": [
+        "legacy.environment"
+      ],
+      "signals": [
+        "tip_position"
+      ],
+      "signal_phases": [
+        "sampled_state"
+      ],
+      "controllers": [
+        "controller.legacy_length"
+      ],
+      "operations": [
+        "compile",
+        "initialize",
+        "run",
+        "export",
+        "close"
+      ],
+      "omissions": [
+        "out_of_plane DOFs",
+        "friction",
+        "self_collision",
+        "MuJoCo contact solver"
+      ],
+      "cancellation": "future cancellation request only",
+      "timeout": "RHS/future; engine startup and shutdown not hard bounded"
+    },
+    "resources": [
+      "matlab_engine"
+    ],
+    "dependencies": [
+      "matlab.engine",
+      "mujoco"
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "backend.mujoco",
+    "kind": "backend",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "保留 MuJoCo 一次性求解适配",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Signal": {
+          "additionalProperties": false,
+          "properties": {
+            "spec": {
+              "$ref": "#/$defs/SignalSpec"
+            },
+            "times_s": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Times S",
+              "type": "array"
+            },
+            "values": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "spec",
+            "times_s",
+            "values"
+          ],
+          "title": "Signal",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "backend_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Backend Id",
+          "type": "string"
+        },
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Payload"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/Payload"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "solver_status",
+        "backend_id",
+        "model_id",
+        "signals",
+        "data",
+        "limitations",
+        "initial_state",
+        "seed"
+      ],
+      "title": "BackendResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "families": [
+        "task.reach"
+      ],
+      "robots": [
+        "tendon_driven_continuum"
+      ],
+      "channels": [
+        "tendon_target_lengths_m"
+      ],
+      "environments": [
+        "legacy.environment"
+      ],
+      "signals": [
+        "tip_position"
+      ],
+      "signal_phases": [
+        "post_step"
+      ],
+      "controllers": [
+        "controller.legacy_length"
+      ],
+      "operations": [
+        "compile",
+        "initialize",
+        "run",
+        "export",
+        "close"
+      ],
+      "cancellation": "unsupported external interactive cancellation",
+      "timeout": "existing rollout cooperative deadline; startup/export/close not hard bounded"
+    },
+    "resources": [],
+    "dependencies": [
+      "mujoco"
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "backend.reference",
+    "kind": "backend",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "廉价确定性参考后端，非真实物理、非 Genesis",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Signal": {
+          "additionalProperties": false,
+          "properties": {
+            "spec": {
+              "$ref": "#/$defs/SignalSpec"
+            },
+            "times_s": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Times S",
+              "type": "array"
+            },
+            "values": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "spec",
+            "times_s",
+            "values"
+          ],
+          "title": "Signal",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "backend_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Backend Id",
+          "type": "string"
+        },
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Payload"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/Payload"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "solver_status",
+        "backend_id",
+        "model_id",
+        "signals",
+        "data",
+        "limitations",
+        "initial_state",
+        "seed"
+      ],
+      "title": "BackendResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "reference": true,
+      "families": [
+        "task.signal_hold"
+      ],
+      "robots": [
+        "reference_signal_robot"
+      ],
+      "channels": [
+        "tendon_target_lengths_m"
+      ],
+      "environments": [
+        "reference.environment"
+      ],
+      "signals": [
+        "tendon_length",
+        "contact_count"
+      ],
+      "signal_phases": [
+        "post_step"
+      ],
+      "controllers": [
+        "controller.length_reference"
+      ],
+      "operations": [
+        "compile",
+        "initialize",
+        "step",
+        "run",
+        "observe",
+        "export",
+        "cancel",
+        "close"
+      ],
+      "cancellation": "cooperative step boundary",
+      "timeout": "step loop; no external startup"
+    },
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "controller.legacy_length",
+    "kind": "controller",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "旧 C1/C2 参数与数值控制适配",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "length_control_v2",
+          "default": "length_control_v2",
+          "title": "Version",
+          "type": "string"
+        },
+        "mode": {
+          "default": "C1",
+          "enum": [
+            "C1",
+            "C2"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "bend_y_rad": {
+          "default": 0,
+          "maximum": 3.141592653589793,
+          "minimum": -3.141592653589793,
+          "title": "Bend Y Rad",
+          "type": "number"
+        },
+        "bend_z_rad": {
+          "default": 1.073643020187874,
+          "maximum": 3.141592653589793,
+          "minimum": -3.141592653589793,
+          "title": "Bend Z Rad",
+          "type": "number"
+        },
+        "bias_fraction": {
+          "default": 0,
+          "maximum": 0.05,
+          "minimum": -0.02,
+          "title": "Bias Fraction",
+          "type": "number"
+        },
+        "gain_rad2_per_m2": {
+          "default": 5,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Gain Rad2 Per M2",
+          "type": "number"
+        },
+        "update_every_steps": {
+          "default": 10,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Update Every Steps",
+          "type": "integer"
+        },
+        "max_bend_update_rad": {
+          "default": 0.05,
+          "exclusiveMinimum": 0,
+          "maximum": 0.2,
+          "title": "Max Bend Update Rad",
+          "type": "number"
+        },
+        "rate_limit_ref_per_s": {
+          "default": 0.5,
+          "exclusiveMinimum": 0,
+          "maximum": 2,
+          "title": "Rate Limit Ref Per S",
+          "type": "number"
+        }
+      },
+      "title": "ExplorationControl",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "channel": {
+          "const": "tendon_target_lengths_m",
+          "title": "Channel",
+          "type": "string"
+        },
+        "values_m": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Values M",
+          "type": "array"
+        }
+      },
+      "required": [
+        "channel",
+        "values_m"
+      ],
+      "title": "ControlOutput",
+      "type": "object"
+    },
+    "capabilities": {
+      "channel": "tendon_target_lengths_m",
+      "observations": [
+        "tip_position"
+      ],
+      "editable": [],
+      "state_contract": "legacy_controller_export",
+      "reset": true,
+      "restore": false
+    },
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "controller.length_reference",
+    "kind": "controller",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "参考长度指令生命周期",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "command_m": {
+          "exclusiveMinimum": 0,
+          "title": "Command M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "command_m"
+      ],
+      "title": "LengthControl",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "channel": {
+          "const": "tendon_target_lengths_m",
+          "title": "Channel",
+          "type": "string"
+        },
+        "values_m": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Values M",
+          "type": "array"
+        }
+      },
+      "required": [
+        "channel",
+        "values_m"
+      ],
+      "title": "ControlOutput",
+      "type": "object"
+    },
+    "capabilities": {
+      "channel": "tendon_target_lengths_m",
+      "observations": [],
+      "editable": [
+        "controller.command_m"
+      ],
+      "state_contract": "reference.control_state",
+      "reset": true,
+      "restore": true
+    },
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "diagnostics.sample_exceeds",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "基于保存信号的带版本阈值诊断",
+    "input_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "signal": {
+          "title": "Signal",
+          "type": "string"
+        },
+        "threshold": {
+          "title": "Threshold",
+          "type": "number"
+        },
+        "units": {
+          "title": "Units",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result",
+        "signal",
+        "threshold",
+        "units"
+      ],
+      "title": "DiagnosticQuery",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "events_found",
+            "no_event",
+            "missing_data",
+            "not_applicable",
+            "execution_failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "signal": {
+          "title": "Signal",
+          "type": "string"
+        },
+        "sample_indices": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Sample Indices",
+          "type": "array"
+        },
+        "observed": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Observed",
+          "type": "array"
+        },
+        "rule": {
+          "const": "sample_exceeds@1.0.0",
+          "default": "sample_exceeds@1.0.0",
+          "title": "Rule",
+          "type": "string"
+        },
+        "causal_hypothesis": {
+          "default": null,
+          "title": "Causal Hypothesis",
+          "type": "null"
+        },
+        "rescoring": {
+          "const": false,
+          "default": false,
+          "title": "Rescoring",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "status",
+        "source",
+        "signal",
+        "sample_indices",
+        "observed"
+      ],
+      "title": "DiagnosticResult",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "current session/project only"
+  },
+  {
+    "extension_id": "diagnostics.saved_trajectory",
+    "kind": "tool",
+    "version": "1.1.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Legacy reach signal rules; saved physical time, no simulation or scoring.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "result_ref": {
+          "title": "Result Ref",
+          "type": "string"
+        },
+        "backend": {
+          "enum": [
+            "matlab",
+            "mujoco"
+          ],
+          "title": "Backend",
+          "type": "string"
+        },
+        "entity": {
+          "default": "all",
+          "title": "Entity",
+          "type": "string"
+        },
+        "t_start_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "T Start S"
+        },
+        "t_end_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "T End S"
+        },
+        "fields": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Fields",
+          "type": "array"
+        }
+      },
+      "required": [
+        "result_ref",
+        "backend"
+      ],
+      "title": "SavedDiagnosis",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "description": "Legacy services retain their own registered output validator when present.",
+      "properties": {
+        "detail": {
+          "additionalProperties": true,
+          "title": "Detail",
+          "type": "object"
+        }
+      },
+      "required": [
+        "detail"
+      ],
+      "title": "ServiceData",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "saved derivation; no numerical solves"
+  },
+  {
+    "extension_id": "diagnostics.signal_rule",
+    "kind": "tool",
+    "version": "1.1.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Run a versioned saved-signal rule; distinguish missing, no event, inapplicable and failure.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "result_ref": {
+          "title": "Result Ref",
+          "type": "string"
+        },
+        "backend": {
+          "enum": [
+            "matlab",
+            "mujoco"
+          ],
+          "title": "Backend",
+          "type": "string"
+        },
+        "rule_id": {
+          "default": "contact_presence",
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "rule_version": {
+          "default": "1.0.0",
+          "title": "Rule Version",
+          "type": "string"
+        },
+        "entity": {
+          "default": "contact",
+          "title": "Entity",
+          "type": "string"
+        },
+        "t_start_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "T Start S"
+        },
+        "t_end_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "T End S"
+        }
+      },
+      "required": [
+        "result_ref",
+        "backend"
+      ],
+      "title": "RuleQuery",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "rule_id": {
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "rule_version": {
+          "title": "Rule Version",
+          "type": "string"
+        },
+        "rule_sha256": {
+          "title": "Rule Sha256",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "EVENTS_FOUND",
+            "NO_EVENT",
+            "MISSING_DATA",
+            "NOT_APPLICABLE",
+            "EXECUTION_FAILED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "events": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "backend_solves": {
+          "const": 0,
+          "title": "Backend Solves",
+          "type": "integer"
+        },
+        "rescoring": {
+          "const": false,
+          "title": "Rescoring",
+          "type": "boolean"
+        },
+        "semantics": {
+          "title": "Semantics",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "source_hashes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Source Hashes",
+          "type": "object"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        }
+      },
+      "required": [
+        "rule_id",
+        "rule_version",
+        "rule_sha256",
+        "status",
+        "events",
+        "backend_solves",
+        "rescoring",
+        "semantics"
+      ],
+      "title": "SignalRuleResult",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "saved derivation; no numerical solves"
+  },
+  {
+    "extension_id": "evaluate.hold",
+    "kind": "evaluator",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "评价窗口内最大与 RMS 偏差",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "max_deviation_m": {
+          "exclusiveMinimum": 0,
+          "title": "Max Deviation M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "max_deviation_m"
+      ],
+      "title": "HoldEvaluation",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "ConstraintResult": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "satisfied": {
+              "title": "Satisfied",
+              "type": "boolean"
+            },
+            "observed": {
+              "title": "Observed",
+              "type": "number"
+            },
+            "limit": {
+              "title": "Limit",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "satisfied",
+            "observed",
+            "limit",
+            "units"
+          ],
+          "title": "ConstraintResult",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Metric": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "value",
+            "units"
+          ],
+          "title": "Metric",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "validity": {
+          "enum": [
+            "valid",
+            "invalid",
+            "incomplete",
+            "unsupported"
+          ],
+          "title": "Validity",
+          "type": "string"
+        },
+        "task_success": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Task Success"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/ConstraintResult"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "evaluator": {
+          "title": "Evaluator",
+          "type": "string"
+        },
+        "comparison_identity": {
+          "title": "Comparison Identity",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "validity",
+        "task_success",
+        "metrics",
+        "constraints",
+        "source",
+        "evaluator",
+        "comparison_identity"
+      ],
+      "title": "EvaluationResult",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "evaluate.reach",
+    "kind": "evaluator",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "末端距离评价，阈值来自任务",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "tolerance_m": {
+          "exclusiveMinimum": 0,
+          "title": "Tolerance M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "tolerance_m"
+      ],
+      "title": "ReachEvaluation",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "ConstraintResult": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "satisfied": {
+              "title": "Satisfied",
+              "type": "boolean"
+            },
+            "observed": {
+              "title": "Observed",
+              "type": "number"
+            },
+            "limit": {
+              "title": "Limit",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "satisfied",
+            "observed",
+            "limit",
+            "units"
+          ],
+          "title": "ConstraintResult",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Metric": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "value",
+            "units"
+          ],
+          "title": "Metric",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "validity": {
+          "enum": [
+            "valid",
+            "invalid",
+            "incomplete",
+            "unsupported"
+          ],
+          "title": "Validity",
+          "type": "string"
+        },
+        "task_success": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Task Success"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/ConstraintResult"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "evaluator": {
+          "title": "Evaluator",
+          "type": "string"
+        },
+        "comparison_identity": {
+          "title": "Comparison Identity",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "validity",
+        "task_success",
+        "metrics",
+        "constraints",
+        "source",
+        "evaluator",
+        "comparison_identity"
+      ],
+      "title": "EvaluationResult",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "evaluation.run",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "显式评价保存结果并产生新身份",
+    "input_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/EvidenceRef"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "Evaluate",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "ConstraintResult": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "satisfied": {
+              "title": "Satisfied",
+              "type": "boolean"
+            },
+            "observed": {
+              "title": "Observed",
+              "type": "number"
+            },
+            "limit": {
+              "title": "Limit",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "satisfied",
+            "observed",
+            "limit",
+            "units"
+          ],
+          "title": "ConstraintResult",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Metric": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "value",
+            "units"
+          ],
+          "title": "Metric",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "validity": {
+          "enum": [
+            "valid",
+            "invalid",
+            "incomplete",
+            "unsupported"
+          ],
+          "title": "Validity",
+          "type": "string"
+        },
+        "task_success": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Task Success"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/ConstraintResult"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "evaluator": {
+          "title": "Evaluator",
+          "type": "string"
+        },
+        "comparison_identity": {
+          "title": "Comparison Identity",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "validity",
+        "task_success",
+        "metrics",
+        "constraints",
+        "source",
+        "evaluator",
+        "comparison_identity"
+      ],
+      "title": "EvaluationResult",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "current session/project only"
+  },
+  {
+    "extension_id": "evidence.read",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "只读不可变证据及分页",
+    "input_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "pointer": {
+          "default": "",
+          "title": "Pointer",
+          "type": "string"
+        },
+        "offset": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "limit": {
+          "default": 20,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Limit",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "reference"
+      ],
+      "title": "ReadEvidence",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "pointer": {
+          "title": "Pointer",
+          "type": "string"
+        },
+        "content": {
+          "title": "Content"
+        },
+        "next_offset": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Next Offset"
+        }
+      },
+      "required": [
+        "source",
+        "pointer",
+        "content",
+        "next_offset"
+      ],
+      "title": "EvidencePage",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "evidence.read_json",
+    "kind": "tool",
+    "version": "1.1.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Read hash-verified saved JSON using bounded JSON Pointer pages.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_ref": {
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "pointer": {
+          "default": "",
+          "title": "Pointer",
+          "type": "string"
+        },
+        "offset": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "limit": {
+          "default": 10,
+          "maximum": 50,
+          "minimum": 1,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "max_bytes": {
+          "default": 4000,
+          "maximum": 8000,
+          "minimum": 1000,
+          "title": "Max Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "evidence_ref"
+      ],
+      "title": "Read",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "description": "Legacy services retain their own registered output validator when present.",
+      "properties": {
+        "detail": {
+          "additionalProperties": true,
+          "title": "Detail",
+          "type": "object"
+        }
+      },
+      "required": [
+        "detail"
+      ],
+      "title": "ServiceData",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "saved derivation; no numerical solves"
+  },
+  {
+    "extension_id": "initialize.legacy_zero",
+    "kind": "initializer",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "原编译初态和零速度",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "contract": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Contract",
+          "type": "string"
+        },
+        "version": {
+          "default": "1.0.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true,
+          "title": "Data",
+          "type": "object"
+        }
+      },
+      "required": [
+        "contract",
+        "data"
+      ],
+      "title": "Payload",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "initialize.length",
+    "kind": "initializer",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "显式种子的长度初始化",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "length_m": {
+          "exclusiveMinimum": 0,
+          "title": "Length M",
+          "type": "number"
+        },
+        "jitter_m": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Jitter M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "length_m"
+      ],
+      "title": "InitialParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "contract": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Contract",
+          "type": "string"
+        },
+        "version": {
+          "default": "1.0.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true,
+          "title": "Data",
+          "type": "object"
+        }
+      },
+      "required": [
+        "contract",
+        "data"
+      ],
+      "title": "Payload",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "memory.save",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "保存有来源的笔记或观测记录",
+    "input_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "MemoryEntry": {
+          "additionalProperties": false,
+          "properties": {
+            "memory_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Memory Id",
+              "type": "string"
+            },
+            "summary": {
+              "maxLength": 1200,
+              "minLength": 1,
+              "title": "Summary",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "model_note",
+                "direct_observation",
+                "verified_record",
+                "hypothesis"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "task_family": {
+              "title": "Task Family",
+              "type": "string"
+            },
+            "task_version": {
+              "title": "Task Version",
+              "type": "string"
+            },
+            "backend": {
+              "title": "Backend",
+              "type": "string"
+            },
+            "model_id": {
+              "title": "Model Id",
+              "type": "string"
+            },
+            "failure_category": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Failure Category"
+            },
+            "tags": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Tags",
+              "type": "array"
+            },
+            "sources": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "minItems": 1,
+              "title": "Sources",
+              "type": "array"
+            },
+            "expires_at": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Expires At"
+            },
+            "invalidated": {
+              "default": false,
+              "title": "Invalidated",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "memory_id",
+            "summary",
+            "kind",
+            "task_family",
+            "task_version",
+            "backend",
+            "model_id",
+            "sources"
+          ],
+          "title": "MemoryEntry",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "entry": {
+          "$ref": "#/$defs/MemoryEntry"
+        }
+      },
+      "required": [
+        "entry"
+      ],
+      "title": "MemorySave",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "MemoryEntry": {
+          "additionalProperties": false,
+          "properties": {
+            "memory_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Memory Id",
+              "type": "string"
+            },
+            "summary": {
+              "maxLength": 1200,
+              "minLength": 1,
+              "title": "Summary",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "model_note",
+                "direct_observation",
+                "verified_record",
+                "hypothesis"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "task_family": {
+              "title": "Task Family",
+              "type": "string"
+            },
+            "task_version": {
+              "title": "Task Version",
+              "type": "string"
+            },
+            "backend": {
+              "title": "Backend",
+              "type": "string"
+            },
+            "model_id": {
+              "title": "Model Id",
+              "type": "string"
+            },
+            "failure_category": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Failure Category"
+            },
+            "tags": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Tags",
+              "type": "array"
+            },
+            "sources": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "minItems": 1,
+              "title": "Sources",
+              "type": "array"
+            },
+            "expires_at": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Expires At"
+            },
+            "invalidated": {
+              "default": false,
+              "title": "Invalidated",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "memory_id",
+            "summary",
+            "kind",
+            "task_family",
+            "task_version",
+            "backend",
+            "model_id",
+            "sources"
+          ],
+          "title": "MemoryEntry",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "entry": {
+          "$ref": "#/$defs/MemoryEntry"
+        }
+      },
+      "required": [
+        "entry"
+      ],
+      "title": "SavedMemory",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "current session/project only"
+  },
+  {
+    "extension_id": "memory.search",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "检索跨运行记录并校验来源",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "task_family": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Family"
+        },
+        "task_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Version"
+        },
+        "backend": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Backend"
+        },
+        "model_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Id"
+        },
+        "failure_category": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Category"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        }
+      },
+      "title": "MemoryQuery",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "MemoryEntry": {
+          "additionalProperties": false,
+          "properties": {
+            "memory_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Memory Id",
+              "type": "string"
+            },
+            "summary": {
+              "maxLength": 1200,
+              "minLength": 1,
+              "title": "Summary",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "model_note",
+                "direct_observation",
+                "verified_record",
+                "hypothesis"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "task_family": {
+              "title": "Task Family",
+              "type": "string"
+            },
+            "task_version": {
+              "title": "Task Version",
+              "type": "string"
+            },
+            "backend": {
+              "title": "Backend",
+              "type": "string"
+            },
+            "model_id": {
+              "title": "Model Id",
+              "type": "string"
+            },
+            "failure_category": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Failure Category"
+            },
+            "tags": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Tags",
+              "type": "array"
+            },
+            "sources": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "minItems": 1,
+              "title": "Sources",
+              "type": "array"
+            },
+            "expires_at": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Expires At"
+            },
+            "invalidated": {
+              "default": false,
+              "title": "Invalidated",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "memory_id",
+            "summary",
+            "kind",
+            "task_family",
+            "task_version",
+            "backend",
+            "model_id",
+            "sources"
+          ],
+          "title": "MemoryEntry",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/MemoryEntry"
+          },
+          "title": "Entries",
+          "type": "array"
+        }
+      },
+      "required": [
+        "entries"
+      ],
+      "title": "MemoryResults",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "search.scalar_sequence",
+    "kind": "search",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "确定性候选序列参考搜索器；算法拥有状态",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "parameter": {
+          "const": "controller.command_m",
+          "default": "controller.command_m",
+          "title": "Parameter",
+          "type": "string"
+        },
+        "candidates": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Candidates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidates"
+      ],
+      "title": "ScalarSearch",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "contract": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Contract",
+          "type": "string"
+        },
+        "version": {
+          "default": "1.0.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true,
+          "title": "Data",
+          "type": "object"
+        }
+      },
+      "required": [
+        "contract",
+        "data"
+      ],
+      "title": "Payload",
+      "type": "object"
+    },
+    "capabilities": {
+      "multiobjective": false,
+      "checkpoint": "reference.search_state",
+      "random_state": "reserved nullable typed integer state"
+    },
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "session.control",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "停止、暂停、缺少信息或能力",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "stopped",
+            "paused",
+            "needs_input",
+            "capability_missing",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "reason"
+      ],
+      "title": "Stop",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "reason"
+      ],
+      "title": "Stopped",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "current session/project only"
+  },
+  {
+    "extension_id": "simulation.run",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "执行当前冻结任务与候选",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "default": "baseline",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "changes": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Changes",
+          "type": "object"
+        }
+      },
+      "title": "Simulate",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Signal": {
+          "additionalProperties": false,
+          "properties": {
+            "spec": {
+              "$ref": "#/$defs/SignalSpec"
+            },
+            "times_s": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Times S",
+              "type": "array"
+            },
+            "values": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "spec",
+            "times_s",
+            "values"
+          ],
+          "title": "Signal",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "backend_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Backend Id",
+          "type": "string"
+        },
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Payload"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/Payload"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "solver_status",
+        "backend_id",
+        "model_id",
+        "signals",
+        "data",
+        "limitations",
+        "initial_state",
+        "seed"
+      ],
+      "title": "BackendResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "preflight": "tools.platform_tools:simulation_preflight"
+    },
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "current session/project only"
+  },
+  {
+    "extension_id": "skills.propose",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "提案进入开发候选库，无人工批准",
+    "input_schema": {
+      "$defs": {
+        "Actor": {
+          "enum": [
+            "human",
+            "harness",
+            "tool",
+            "gate",
+            "engineer_agent",
+            "coding_agent",
+            "diagnosis_agent",
+            "skill_system"
+          ],
+          "title": "Actor",
+          "type": "string"
+        },
+        "Applicability": {
+          "additionalProperties": false,
+          "properties": {
+            "robot_families": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Robot Families",
+              "type": "array"
+            },
+            "task_types": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Task Types",
+              "type": "array"
+            },
+            "model_levels": {
+              "items": {
+                "enum": [
+                  "M0",
+                  "M1",
+                  "M2",
+                  "M3"
+                ],
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Model Levels",
+              "type": "array"
+            },
+            "control_levels": {
+              "items": {
+                "enum": [
+                  "C0",
+                  "C1",
+                  "C2",
+                  "C3"
+                ],
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Control Levels",
+              "type": "array"
+            }
+          },
+          "required": [
+            "robot_families",
+            "task_types",
+            "model_levels",
+            "control_levels"
+          ],
+          "title": "Applicability",
+          "type": "object"
+        },
+        "ArtifactReference": {
+          "additionalProperties": false,
+          "properties": {
+            "run_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Run Id",
+              "type": "string"
+            },
+            "path": {
+              "maxLength": 512,
+              "title": "Path",
+              "type": "string"
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Sha256"
+            },
+            "pointer": {
+              "anyOf": [
+                {
+                  "maxLength": 512,
+                  "pattern": "^/",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Pointer"
+            }
+          },
+          "required": [
+            "run_id",
+            "path"
+          ],
+          "title": "ArtifactReference",
+          "type": "object"
+        },
+        "FailureCategory": {
+          "enum": [
+            "DESIGN_INFEASIBLE",
+            "COLLISION_INFEASIBLE",
+            "ACTUATION_INSUFFICIENT",
+            "MODEL_MISMATCH",
+            "CONTROL_FAILURE",
+            "ACTUATOR_LIMIT",
+            "SIMULATION_ERROR",
+            "NUMERICAL_FAILURE",
+            "CAPABILITY_MISSING",
+            "PHYSICS_ASSUMPTION_REQUIRED",
+            "TASK_FAILED",
+            "UNKNOWN"
+          ],
+          "title": "FailureCategory",
+          "type": "string"
+        },
+        "HumanApproval": {
+          "additionalProperties": false,
+          "properties": {
+            "actor": {
+              "const": "human",
+              "title": "Actor",
+              "type": "string"
+            },
+            "approved_by": {
+              "maxLength": 160,
+              "minLength": 1,
+              "title": "Approved By",
+              "type": "string"
+            },
+            "approved_at": {
+              "format": "date-time",
+              "title": "Approved At",
+              "type": "string"
+            },
+            "content_sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Content Sha256",
+              "type": "string"
+            },
+            "rationale": {
+              "maxLength": 1000,
+              "minLength": 1,
+              "title": "Rationale",
+              "type": "string"
+            }
+          },
+          "required": [
+            "actor",
+            "approved_by",
+            "approved_at",
+            "content_sha256",
+            "rationale"
+          ],
+          "title": "HumanApproval",
+          "type": "object"
+        },
+        "MetricPredicate": {
+          "additionalProperties": false,
+          "properties": {
+            "tool": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Tool",
+              "type": "string"
+            },
+            "metric": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Metric",
+              "type": "string"
+            },
+            "operator": {
+              "enum": [
+                "eq",
+                "gt",
+                "ge",
+                "lt",
+                "le"
+              ],
+              "title": "Operator",
+              "type": "string"
+            },
+            "value": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                }
+              ],
+              "title": "Value"
+            },
+            "evidence": {
+              "$ref": "#/$defs/ArtifactReference"
+            }
+          },
+          "required": [
+            "tool",
+            "metric",
+            "operator",
+            "value",
+            "evidence"
+          ],
+          "title": "MetricPredicate",
+          "type": "object"
+        },
+        "Skill": {
+          "additionalProperties": false,
+          "properties": {
+            "skill_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Skill Id",
+              "type": "string"
+            },
+            "name": {
+              "maxLength": 256,
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            },
+            "version": {
+              "minimum": 1,
+              "title": "Version",
+              "type": "integer"
+            },
+            "status": {
+              "$ref": "#/$defs/SkillStatus"
+            },
+            "category": {
+              "$ref": "#/$defs/SkillCategory"
+            },
+            "description": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Description",
+              "type": "string"
+            },
+            "trigger_signature": {
+              "$ref": "#/$defs/TriggerSignature"
+            },
+            "when_to_apply": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "When To Apply",
+              "type": "array"
+            },
+            "when_not_to_apply": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "When Not To Apply",
+              "type": "array"
+            },
+            "applicability": {
+              "$ref": "#/$defs/Applicability"
+            },
+            "required_tools": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Required Tools",
+              "type": "array"
+            },
+            "strategy": {
+              "items": {
+                "$ref": "#/$defs/StrategyStep"
+              },
+              "minItems": 1,
+              "title": "Strategy",
+              "type": "array"
+            },
+            "negative_constraints": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Negative Constraints",
+              "type": "array"
+            },
+            "evidence": {
+              "items": {
+                "$ref": "#/$defs/ArtifactReference"
+              },
+              "minItems": 1,
+              "title": "Evidence",
+              "type": "array"
+            },
+            "validation": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/SkillValidationRecord"
+              },
+              "title": "Validation",
+              "type": "array"
+            },
+            "provenance": {
+              "$ref": "#/$defs/SkillProvenance"
+            },
+            "human_approval": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/HumanApproval"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "requires_new_physics": {
+              "default": false,
+              "title": "Requires New Physics",
+              "type": "boolean"
+            },
+            "causal_claim": {
+              "const": "none",
+              "default": "none",
+              "title": "Causal Claim",
+              "type": "string"
+            },
+            "authority": {
+              "const": "recommendation_only",
+              "default": "recommendation_only",
+              "title": "Authority",
+              "type": "string"
+            },
+            "supersedes": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z0-9_.-]+@[1-9][0-9]*$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Supersedes"
+            },
+            "deprecated_by": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z0-9_.-]+@[1-9][0-9]*$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Deprecated By"
+            }
+          },
+          "required": [
+            "skill_id",
+            "name",
+            "version",
+            "status",
+            "category",
+            "description",
+            "trigger_signature",
+            "when_to_apply",
+            "when_not_to_apply",
+            "applicability",
+            "required_tools",
+            "strategy",
+            "negative_constraints",
+            "evidence",
+            "provenance"
+          ],
+          "title": "Skill",
+          "type": "object"
+        },
+        "SkillCategory": {
+          "enum": [
+            "DESIGN",
+            "MODEL_SELECTION",
+            "CONTROL",
+            "DIAGNOSIS",
+            "CODING_SIMULATION"
+          ],
+          "title": "SkillCategory",
+          "type": "string"
+        },
+        "SkillProvenance": {
+          "additionalProperties": false,
+          "properties": {
+            "source_runs": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Source Runs",
+              "type": "array"
+            },
+            "source_findings": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/ArtifactReference"
+              },
+              "title": "Source Findings",
+              "type": "array"
+            },
+            "supporting_evidence": {
+              "items": {
+                "$ref": "#/$defs/ArtifactReference"
+              },
+              "minItems": 1,
+              "title": "Supporting Evidence",
+              "type": "array"
+            },
+            "created_by": {
+              "$ref": "#/$defs/Actor"
+            },
+            "created_at": {
+              "format": "date-time",
+              "title": "Created At",
+              "type": "string"
+            },
+            "last_validated_at": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Last Validated At"
+            }
+          },
+          "required": [
+            "source_runs",
+            "supporting_evidence",
+            "created_by",
+            "created_at"
+          ],
+          "title": "SkillProvenance",
+          "type": "object"
+        },
+        "SkillStatus": {
+          "enum": [
+            "candidate",
+            "validated",
+            "approved",
+            "deprecated",
+            "rejected"
+          ],
+          "title": "SkillStatus",
+          "type": "string"
+        },
+        "SkillValidationRecord": {
+          "additionalProperties": false,
+          "properties": {
+            "validation_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Validation Id",
+              "type": "string"
+            },
+            "skill_ref": {
+              "pattern": "^[A-Za-z0-9_.-]+@[1-9][0-9]*$",
+              "title": "Skill Ref",
+              "type": "string"
+            },
+            "strategy_sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Strategy Sha256",
+              "type": "string"
+            },
+            "method": {
+              "enum": [
+                "deterministic",
+                "cross_run",
+                "human_review"
+              ],
+              "title": "Method",
+              "type": "string"
+            },
+            "outcome": {
+              "enum": [
+                "passed",
+                "failed",
+                "contradicted"
+              ],
+              "title": "Outcome",
+              "type": "string"
+            },
+            "validated_runs": {
+              "default": [],
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Validated Runs",
+              "type": "array"
+            },
+            "failed_validation_runs": {
+              "default": [],
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Failed Validation Runs",
+              "type": "array"
+            },
+            "task_coverage": {
+              "default": [],
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Task Coverage",
+              "type": "array"
+            },
+            "robot_coverage": {
+              "default": [],
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Robot Coverage",
+              "type": "array"
+            },
+            "seed_coverage": {
+              "default": [],
+              "items": {
+                "type": "integer"
+              },
+              "title": "Seed Coverage",
+              "type": "array"
+            },
+            "evidence_refs": {
+              "items": {
+                "$ref": "#/$defs/ArtifactReference"
+              },
+              "minItems": 1,
+              "title": "Evidence Refs",
+              "type": "array"
+            },
+            "validated_by": {
+              "$ref": "#/$defs/Actor"
+            },
+            "validated_at": {
+              "format": "date-time",
+              "title": "Validated At",
+              "type": "string"
+            },
+            "summary": {
+              "maxLength": 1000,
+              "minLength": 1,
+              "title": "Summary",
+              "type": "string"
+            }
+          },
+          "required": [
+            "validation_id",
+            "skill_ref",
+            "strategy_sha256",
+            "method",
+            "outcome",
+            "evidence_refs",
+            "validated_by",
+            "validated_at",
+            "summary"
+          ],
+          "title": "SkillValidationRecord",
+          "type": "object"
+        },
+        "StrategyStep": {
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "enum": [
+                "invoke_tool",
+                "inspect_evidence",
+                "request_human_review"
+              ],
+              "title": "Action",
+              "type": "string"
+            },
+            "tool": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Tool"
+            },
+            "evidence_refs": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/ArtifactReference"
+              },
+              "title": "Evidence Refs",
+              "type": "array"
+            },
+            "instruction": {
+              "maxLength": 1000,
+              "minLength": 1,
+              "title": "Instruction",
+              "type": "string"
+            }
+          },
+          "required": [
+            "action",
+            "instruction"
+          ],
+          "title": "StrategyStep",
+          "type": "object"
+        },
+        "TriggerSignature": {
+          "additionalProperties": false,
+          "properties": {
+            "failure_categories": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/FailureCategory"
+              },
+              "title": "Failure Categories",
+              "type": "array"
+            },
+            "metrics": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/MetricPredicate"
+              },
+              "title": "Metrics",
+              "type": "array"
+            }
+          },
+          "title": "TriggerSignature",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "skill": {
+          "$ref": "#/$defs/Skill"
+        }
+      },
+      "required": [
+        "skill"
+      ],
+      "title": "SkillProposal",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "skills": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Skills",
+          "type": "array"
+        },
+        "classification": {
+          "const": "guidance_strategy",
+          "default": "guidance_strategy",
+          "title": "Classification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "skills"
+      ],
+      "title": "SkillRecords",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "current session/project only"
+  },
+  {
+    "extension_id": "skills.search",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "读取现有技能生命周期中的适用策略",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference"
+        }
+      },
+      "title": "SkillQuery",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "skills": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Skills",
+          "type": "array"
+        },
+        "classification": {
+          "const": "guidance_strategy",
+          "default": "guidance_strategy",
+          "title": "Classification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "skills"
+      ],
+      "title": "SkillRecords",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "skills.validate",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "登记与证据相符的验证记录",
+    "input_schema": {
+      "$defs": {
+        "Actor": {
+          "enum": [
+            "human",
+            "harness",
+            "tool",
+            "gate",
+            "engineer_agent",
+            "coding_agent",
+            "diagnosis_agent",
+            "skill_system"
+          ],
+          "title": "Actor",
+          "type": "string"
+        },
+        "ArtifactReference": {
+          "additionalProperties": false,
+          "properties": {
+            "run_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Run Id",
+              "type": "string"
+            },
+            "path": {
+              "maxLength": 512,
+              "title": "Path",
+              "type": "string"
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Sha256"
+            },
+            "pointer": {
+              "anyOf": [
+                {
+                  "maxLength": 512,
+                  "pattern": "^/",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Pointer"
+            }
+          },
+          "required": [
+            "run_id",
+            "path"
+          ],
+          "title": "ArtifactReference",
+          "type": "object"
+        },
+        "SkillValidationRecord": {
+          "additionalProperties": false,
+          "properties": {
+            "validation_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Validation Id",
+              "type": "string"
+            },
+            "skill_ref": {
+              "pattern": "^[A-Za-z0-9_.-]+@[1-9][0-9]*$",
+              "title": "Skill Ref",
+              "type": "string"
+            },
+            "strategy_sha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Strategy Sha256",
+              "type": "string"
+            },
+            "method": {
+              "enum": [
+                "deterministic",
+                "cross_run",
+                "human_review"
+              ],
+              "title": "Method",
+              "type": "string"
+            },
+            "outcome": {
+              "enum": [
+                "passed",
+                "failed",
+                "contradicted"
+              ],
+              "title": "Outcome",
+              "type": "string"
+            },
+            "validated_runs": {
+              "default": [],
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Validated Runs",
+              "type": "array"
+            },
+            "failed_validation_runs": {
+              "default": [],
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Failed Validation Runs",
+              "type": "array"
+            },
+            "task_coverage": {
+              "default": [],
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Task Coverage",
+              "type": "array"
+            },
+            "robot_coverage": {
+              "default": [],
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Robot Coverage",
+              "type": "array"
+            },
+            "seed_coverage": {
+              "default": [],
+              "items": {
+                "type": "integer"
+              },
+              "title": "Seed Coverage",
+              "type": "array"
+            },
+            "evidence_refs": {
+              "items": {
+                "$ref": "#/$defs/ArtifactReference"
+              },
+              "minItems": 1,
+              "title": "Evidence Refs",
+              "type": "array"
+            },
+            "validated_by": {
+              "$ref": "#/$defs/Actor"
+            },
+            "validated_at": {
+              "format": "date-time",
+              "title": "Validated At",
+              "type": "string"
+            },
+            "summary": {
+              "maxLength": 1000,
+              "minLength": 1,
+              "title": "Summary",
+              "type": "string"
+            }
+          },
+          "required": [
+            "validation_id",
+            "skill_ref",
+            "strategy_sha256",
+            "method",
+            "outcome",
+            "evidence_refs",
+            "validated_by",
+            "validated_at",
+            "summary"
+          ],
+          "title": "SkillValidationRecord",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "title": "Reference",
+          "type": "string"
+        },
+        "record": {
+          "$ref": "#/$defs/SkillValidationRecord"
+        }
+      },
+      "required": [
+        "reference",
+        "record"
+      ],
+      "title": "SkillValidation",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "skills": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Skills",
+          "type": "array"
+        },
+        "classification": {
+          "const": "guidance_strategy",
+          "default": "guidance_strategy",
+          "title": "Classification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "skills"
+      ],
+      "title": "SkillRecords",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "current session/project only"
+  },
+  {
+    "extension_id": "task.reach",
+    "kind": "task",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "已有到达语义的开发任务",
+    "input_schema": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "Objective": {
+          "additionalProperties": false,
+          "properties": {
+            "metric": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Metric",
+              "type": "string"
+            },
+            "direction": {
+              "enum": [
+                "minimize",
+                "maximize"
+              ],
+              "title": "Direction",
+              "type": "string"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "weight": {
+              "default": 1,
+              "exclusiveMinimum": 0,
+              "title": "Weight",
+              "type": "number"
+            }
+          },
+          "required": [
+            "metric",
+            "direction",
+            "units"
+          ],
+          "title": "Objective",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Sampling": {
+          "additionalProperties": false,
+          "properties": {
+            "split": {
+              "enum": [
+                "development",
+                "evaluation"
+              ],
+              "title": "Split",
+              "type": "string"
+            },
+            "seeds": {
+              "items": {
+                "type": "integer"
+              },
+              "minItems": 1,
+              "title": "Seeds",
+              "type": "array"
+            },
+            "aggregation": {
+              "const": "per_instance",
+              "default": "per_instance",
+              "title": "Aggregation",
+              "type": "string"
+            },
+            "window_s": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Window S",
+              "type": "array"
+            }
+          },
+          "required": [
+            "split",
+            "seeds",
+            "window_s"
+          ],
+          "title": "Sampling",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        },
+        "Timing": {
+          "additionalProperties": false,
+          "properties": {
+            "timestep_s": {
+              "description": "物理积分步长，s",
+              "exclusiveMinimum": 0,
+              "title": "Timestep S",
+              "type": "number"
+            },
+            "control_period_s": {
+              "description": "控制周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Control Period S",
+              "type": "number"
+            },
+            "sample_period_s": {
+              "description": "输出采样周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Sample Period S",
+              "type": "number"
+            },
+            "duration_s": {
+              "description": "物理持续时间，s",
+              "exclusiveMinimum": 0,
+              "title": "Duration S",
+              "type": "number"
+            },
+            "termination": {
+              "items": {
+                "enum": [
+                  "duration",
+                  "numerical_failure",
+                  "cancelled"
+                ],
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Termination",
+              "type": "array"
+            }
+          },
+          "required": [
+            "timestep_s",
+            "control_period_s",
+            "sample_period_s",
+            "duration_s",
+            "termination"
+          ],
+          "title": "Timing",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "task_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Task Id",
+          "type": "string"
+        },
+        "task_version": {
+          "minLength": 1,
+          "title": "Task Version",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "development_valid",
+            "formally_approved"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "family": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Family",
+          "type": "string"
+        },
+        "goal": {
+          "$ref": "#/$defs/Payload"
+        },
+        "environment": {
+          "$ref": "#/$defs/Payload"
+        },
+        "robot_families": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Robot Families",
+          "type": "array"
+        },
+        "actuator_channels": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Actuator Channels",
+          "type": "array"
+        },
+        "initializer": {
+          "$ref": "#/$defs/Binding"
+        },
+        "timing": {
+          "$ref": "#/$defs/Timing"
+        },
+        "evaluator": {
+          "$ref": "#/$defs/Binding"
+        },
+        "objectives": {
+          "items": {
+            "$ref": "#/$defs/Objective"
+          },
+          "minItems": 1,
+          "title": "Objectives",
+          "type": "array"
+        },
+        "failure_policy": {
+          "const": "retain_invalid_and_constraint_failures",
+          "title": "Failure Policy",
+          "type": "string"
+        },
+        "observations": {
+          "items": {
+            "$ref": "#/$defs/SignalSpec"
+          },
+          "minItems": 1,
+          "title": "Observations",
+          "type": "array"
+        },
+        "sampling": {
+          "$ref": "#/$defs/Sampling"
+        }
+      },
+      "required": [
+        "task_id",
+        "task_version",
+        "name",
+        "status",
+        "source",
+        "family",
+        "goal",
+        "environment",
+        "robot_families",
+        "actuator_channels",
+        "initializer",
+        "timing",
+        "evaluator",
+        "objectives",
+        "failure_policy",
+        "observations",
+        "sampling"
+      ],
+      "title": "TaskDefinition",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "task.signal_hold",
+    "kind": "task",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "离散长度信号保持开发示例；无末端目标点",
+    "input_schema": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "Objective": {
+          "additionalProperties": false,
+          "properties": {
+            "metric": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Metric",
+              "type": "string"
+            },
+            "direction": {
+              "enum": [
+                "minimize",
+                "maximize"
+              ],
+              "title": "Direction",
+              "type": "string"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "weight": {
+              "default": 1,
+              "exclusiveMinimum": 0,
+              "title": "Weight",
+              "type": "number"
+            }
+          },
+          "required": [
+            "metric",
+            "direction",
+            "units"
+          ],
+          "title": "Objective",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Sampling": {
+          "additionalProperties": false,
+          "properties": {
+            "split": {
+              "enum": [
+                "development",
+                "evaluation"
+              ],
+              "title": "Split",
+              "type": "string"
+            },
+            "seeds": {
+              "items": {
+                "type": "integer"
+              },
+              "minItems": 1,
+              "title": "Seeds",
+              "type": "array"
+            },
+            "aggregation": {
+              "const": "per_instance",
+              "default": "per_instance",
+              "title": "Aggregation",
+              "type": "string"
+            },
+            "window_s": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Window S",
+              "type": "array"
+            }
+          },
+          "required": [
+            "split",
+            "seeds",
+            "window_s"
+          ],
+          "title": "Sampling",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        },
+        "Timing": {
+          "additionalProperties": false,
+          "properties": {
+            "timestep_s": {
+              "description": "物理积分步长，s",
+              "exclusiveMinimum": 0,
+              "title": "Timestep S",
+              "type": "number"
+            },
+            "control_period_s": {
+              "description": "控制周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Control Period S",
+              "type": "number"
+            },
+            "sample_period_s": {
+              "description": "输出采样周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Sample Period S",
+              "type": "number"
+            },
+            "duration_s": {
+              "description": "物理持续时间，s",
+              "exclusiveMinimum": 0,
+              "title": "Duration S",
+              "type": "number"
+            },
+            "termination": {
+              "items": {
+                "enum": [
+                  "duration",
+                  "numerical_failure",
+                  "cancelled"
+                ],
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Termination",
+              "type": "array"
+            }
+          },
+          "required": [
+            "timestep_s",
+            "control_period_s",
+            "sample_period_s",
+            "duration_s",
+            "termination"
+          ],
+          "title": "Timing",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "task_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Task Id",
+          "type": "string"
+        },
+        "task_version": {
+          "minLength": 1,
+          "title": "Task Version",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "development_valid",
+            "formally_approved"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "family": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Family",
+          "type": "string"
+        },
+        "goal": {
+          "$ref": "#/$defs/Payload"
+        },
+        "environment": {
+          "$ref": "#/$defs/Payload"
+        },
+        "robot_families": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Robot Families",
+          "type": "array"
+        },
+        "actuator_channels": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Actuator Channels",
+          "type": "array"
+        },
+        "initializer": {
+          "$ref": "#/$defs/Binding"
+        },
+        "timing": {
+          "$ref": "#/$defs/Timing"
+        },
+        "evaluator": {
+          "$ref": "#/$defs/Binding"
+        },
+        "objectives": {
+          "items": {
+            "$ref": "#/$defs/Objective"
+          },
+          "minItems": 1,
+          "title": "Objectives",
+          "type": "array"
+        },
+        "failure_policy": {
+          "const": "retain_invalid_and_constraint_failures",
+          "title": "Failure Policy",
+          "type": "string"
+        },
+        "observations": {
+          "items": {
+            "$ref": "#/$defs/SignalSpec"
+          },
+          "minItems": 1,
+          "title": "Observations",
+          "type": "array"
+        },
+        "sampling": {
+          "$ref": "#/$defs/Sampling"
+        }
+      },
+      "required": [
+        "task_id",
+        "task_version",
+        "name",
+        "status",
+        "source",
+        "family",
+        "goal",
+        "environment",
+        "robot_families",
+        "actuator_channels",
+        "initializer",
+        "timing",
+        "evaluator",
+        "objectives",
+        "failure_policy",
+        "observations",
+        "sampling"
+      ],
+      "title": "TaskDefinition",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "visualization.render_simulation_video",
+    "kind": "tool",
+    "version": "1.2.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Render saved trajectory; native cache and bounded encoder, zero solves.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "result_ref": {
+          "title": "Result Ref",
+          "type": "string"
+        },
+        "backend": {
+          "enum": [
+            "matlab",
+            "mujoco"
+          ],
+          "title": "Backend",
+          "type": "string"
+        },
+        "t_start_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "T Start S"
+        },
+        "t_end_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "T End S"
+        },
+        "fps": {
+          "default": 25,
+          "maximum": 60,
+          "minimum": 1,
+          "title": "Fps",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "result_ref",
+        "backend"
+      ],
+      "title": "RenderVideo",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "description": "Legacy services retain their own registered output validator when present.",
+      "properties": {
+        "detail": {
+          "additionalProperties": true,
+          "title": "Detail",
+          "type": "object"
+        }
+      },
+      "required": [
+        "detail"
+      ],
+      "title": "ServiceData",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "saved derivation; no numerical solves"
+  },
+  {
+    "extension_id": "worker.signal",
+    "kind": "worker",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "读取同一固定证据的确定性本地工作者",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "signal": {
+          "title": "Signal",
+          "type": "string"
+        },
+        "delay_s": {
+          "default": 0.1,
+          "maximum": 5,
+          "minimum": 0,
+          "title": "Delay S",
+          "type": "number"
+        },
+        "inject": {
+          "default": "none",
+          "enum": [
+            "none",
+            "failure",
+            "conflict"
+          ],
+          "title": "Inject",
+          "type": "string"
+        }
+      },
+      "required": [
+        "signal"
+      ],
+      "title": "WorkerParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "title": "Work Id",
+          "type": "string"
+        },
+        "base_candidate": {
+          "title": "Base Candidate",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "signal": {
+          "title": "Signal",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "missing_data"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "sample_indices": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Sample Indices",
+          "type": "array"
+        },
+        "values": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Values",
+          "type": "array"
+        },
+        "claim_key": {
+          "title": "Claim Key",
+          "type": "string"
+        },
+        "conclusion": {
+          "title": "Conclusion",
+          "type": "string"
+        },
+        "started_at": {
+          "title": "Started At",
+          "type": "number"
+        },
+        "ended_at": {
+          "title": "Ended At",
+          "type": "number"
+        }
+      },
+      "required": [
+        "work_id",
+        "base_candidate",
+        "source",
+        "signal",
+        "status",
+        "sample_indices",
+        "values",
+        "claim_key",
+        "conclusion",
+        "started_at",
+        "ended_at"
+      ],
+      "title": "WorkerOutput",
+      "type": "object"
+    },
+    "capabilities": {
+      "allowed_tools": [
+        "evidence.read"
+      ],
+      "output_contract": "WorkerOutput@1.0.0",
+      "cancellation": "local process terminate"
+    },
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "workers.accept",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "协调者检查并接收独立输出",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "title": "Work Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "work_id"
+      ],
+      "title": "WorkQuery",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "title": "Work Id",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "work_id",
+        "status"
+      ],
+      "title": "WorkStatus",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "current session/project only"
+  },
+  {
+    "extension_id": "workers.cancel",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "请求取消本地工作者",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "title": "Work Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "work_id"
+      ],
+      "title": "WorkQuery",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "title": "Work Id",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "work_id",
+        "status"
+      ],
+      "title": "WorkStatus",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "current session/project only"
+  },
+  {
+    "extension_id": "workers.status",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "查询工作者状态",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "title": "Work Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "work_id"
+      ],
+      "title": "WorkQuery",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "title": "Work Id",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "work_id",
+        "status"
+      ],
+      "title": "WorkStatus",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "workers.submit",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "启动有边界的本地工作者",
+    "input_schema": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "Budget": {
+          "additionalProperties": false,
+          "properties": {
+            "tool_calls": {
+              "minimum": 0,
+              "title": "Tool Calls",
+              "type": "integer"
+            },
+            "model_calls": {
+              "minimum": 0,
+              "title": "Model Calls",
+              "type": "integer"
+            },
+            "backend_solves": {
+              "minimum": 0,
+              "title": "Backend Solves",
+              "type": "integer"
+            },
+            "worker_calls": {
+              "minimum": 0,
+              "title": "Worker Calls",
+              "type": "integer"
+            },
+            "wall_s": {
+              "minimum": 0,
+              "title": "Wall S",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tool_calls",
+            "model_calls",
+            "backend_solves",
+            "worker_calls",
+            "wall_s"
+          ],
+          "title": "Budget",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "WorkOrder": {
+          "additionalProperties": false,
+          "properties": {
+            "work_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Work Id",
+              "type": "string"
+            },
+            "goal": {
+              "minLength": 1,
+              "title": "Goal",
+              "type": "string"
+            },
+            "worker": {
+              "$ref": "#/$defs/Binding"
+            },
+            "input_snapshot": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "base_candidate": {
+              "title": "Base Candidate",
+              "type": "string"
+            },
+            "allowed_tools": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Allowed Tools",
+              "type": "array"
+            },
+            "budget": {
+              "$ref": "#/$defs/Budget"
+            },
+            "timeout_s": {
+              "exclusiveMinimum": 0,
+              "maximum": 3600,
+              "title": "Timeout S",
+              "type": "number"
+            },
+            "dependencies": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Dependencies",
+              "type": "array"
+            },
+            "resources": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Resources",
+              "type": "array"
+            },
+            "output_contract": {
+              "title": "Output Contract",
+              "type": "string"
+            },
+            "write_scope": {
+              "const": "own_output_directory",
+              "default": "own_output_directory",
+              "title": "Write Scope",
+              "type": "string"
+            },
+            "completion_check": {
+              "const": "hash_contract_source_base_candidate",
+              "default": "hash_contract_source_base_candidate",
+              "title": "Completion Check",
+              "type": "string"
+            }
+          },
+          "required": [
+            "work_id",
+            "goal",
+            "worker",
+            "input_snapshot",
+            "base_candidate",
+            "allowed_tools",
+            "budget",
+            "timeout_s",
+            "output_contract"
+          ],
+          "title": "WorkOrder",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "order": {
+          "$ref": "#/$defs/WorkOrder"
+        }
+      },
+      "required": [
+        "order"
+      ],
+      "title": "SubmitWork",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "work_id": {
+          "title": "Work Id",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "work_id",
+        "status"
+      ],
+      "title": "WorkStatus",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "side_effects": "current session/project only"
+  }
+]

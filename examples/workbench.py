@@ -7,6 +7,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 def main():
+    if len(sys.argv)>1 and sys.argv[1]=='platform':
+        from examples.development_platform import main as platform_main
+        return platform_main(sys.argv[2:])
     if len(sys.argv)>1 and sys.argv[1]=='dynamics':
         from examples.reach_dynamics import main as dynamic_main
         return dynamic_main(sys.argv[2:])

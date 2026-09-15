@@ -1,0 +1,21 @@
+family: reference_signal_robot
+structure:
+  contract: reference.robot
+  version: 1.0.0
+  data:
+    length_m: 0.3
+    response_fraction: 0.5
+    model_identity: discrete_length_response_fixture
+channels:
+- tendon_target_lengths_m
+units: SI
+frame: actuator
+assumptions:
+- 离散一阶信号模型，仅接口验证
+sources:
+- examples/platform_fixtures.py
+unsupported:
+- physical_dynamics
+- gravity
+- friction
+- contact

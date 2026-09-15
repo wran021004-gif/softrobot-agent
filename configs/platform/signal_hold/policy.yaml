@@ -1,0 +1,59 @@
+policy_id: reference-development
+editable:
+  controller.command_m:
+  - 0.25
+  - 0.35
+backend:
+  extension_id: backend.reference
+  version: 1.0.0
+  parameters:
+    contract: reference.empty
+    version: 1.0.0
+    data: {}
+controller:
+  extension_id: controller.length_reference
+  version: 1.0.0
+  parameters:
+    contract: reference.control
+    version: 1.0.0
+    data:
+      command_m: 0.3
+search:
+  extension_id: search.scalar_sequence
+  version: 1.0.0
+  parameters:
+    contract: reference.search
+    version: 1.0.0
+    data:
+      parameter: controller.command_m
+      candidates:
+      - 0.3
+      - 0.31
+model:
+  adapter: offline
+  model: offline-contract-fixture
+  max_turns: 12
+allowed_tools:
+- analysis.vector_norm
+- simulation.run
+- evaluation.run
+- evidence.read
+- diagnostics.sample_exceeds
+- memory.save
+- memory.search
+- skills.search
+- skills.propose
+- skills.validate
+- workers.submit
+- workers.status
+- workers.cancel
+- workers.accept
+- session.control
+budget:
+  tool_calls: 60
+  model_calls: 0
+  backend_solves: 0
+  worker_calls: 6
+  wall_s: 300.0
+timeout_s: 10.0
+allow_development_skills: true

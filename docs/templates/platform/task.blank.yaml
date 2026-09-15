@@ -1,0 +1,57 @@
+# 空白任务模板；必填空值和 draft 会被检查器拒绝，不是可执行示例。
+# 填写后：python examples/workbench.py platform check <本文件>
+# 完整示例：configs/platform/signal_hold/task.yaml
+# 所有嵌套类型、可选默认值来自 docs/platform_generated/contracts.json。
+contract_version: '1.0.0' # 默认，不随 task_version 任意改变
+task_id: null           # 必填，稳定 ASCII 身份，例如 length-hold
+task_version: null      # 必填，改变目标/评分/初始分布时递增，例如 1.0.0
+name: null              # 必填，中文任务名称
+status: draft           # 必填；填完且通过检查后才使用 development_valid
+source: null            # 必填，科学或工程定义来源及开发用途
+family: null            # 必填，登记任务族，如 task.signal_hold
+goal:
+  contract: null        # 必填，任务族自己的目标契约
+  version: '1.0.0'
+  data: {}              # 必填，具体字段/单位由该契约校验；不猜目标
+environment_file: null  # 必填，独立环境文件的相对路径，例如 environment.yaml
+robot_families: []      # 必填，非空；例如 [reference_signal_robot]
+actuator_channels: []   # 必填，非空；例如 [tendon_target_lengths_m]
+initializer:
+  extension_id: null    # 必填，登记初始化器
+  version: '1.0.0'
+  parameters:
+    contract: null
+    version: '1.0.0'
+    data: {}            # 初态/分布及单位，不自动填科学值
+timing:
+  timestep_s: null      # 必填，s；例如 0.01
+  control_period_s: null # 必填，s，步长整数倍
+  sample_period_s: null # 必填，s，步长整数倍
+  duration_s: null      # 必填，s，步长整数倍
+  termination: [duration, numerical_failure] # 必填；按后端能力选择 cancelled
+evaluator:
+  extension_id: null    # 必填；未登记时报告 IMPLEMENTATION_REQUIRED
+  version: '1.0.0'
+  parameters:
+    contract: null
+    version: '1.0.0'
+    data: {}            # 必填，成功阈值等，不能与优化变量混用
+objectives:
+  - metric: null        # 必填，评价器导出的指标名
+    direction: minimize # 必填，minimize 或 maximize
+    units: null         # 必填，明确单位，如 m
+    weight: 1.0         # 可选，默认 1；当前搜索不接受多目标
+failure_policy: retain_invalid_and_constraint_failures
+observations:
+  - name: null          # 必填，如 tendon_length
+    entity: null        # 必填，如 tendon_0
+    dimension: null     # 必填，正整数；例如 1
+    units: null         # 必填，例如 m
+    frame: null         # 必填，例如 actuator
+    phase: null         # 必填，例如 post_step；不能混用采样相位
+    missing: unsupported # 可选，默认 unsupported；不得补零
+sampling:
+  split: development
+  seeds: []             # 必填；开发 0..999，正式评价 10000..10999
+  aggregation: per_instance # 可选，当前只支持逐实例结果
+  window_s: [null, null] # 必填，秒，0 <= start < end <= duration

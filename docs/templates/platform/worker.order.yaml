@@ -1,0 +1,31 @@
+# 任务单模板；替换真实 artifact_id 后才能通过校验和来源检查。
+# 外层 ToolRequest.arguments = {order: 本对象}，tool_id = workers.submit。
+work_id: tendon-inspection
+goal: 读取固定证据的绳索信号，返回原始采样索引与数值
+worker:
+  extension_id: worker.signal
+  version: '1.0.0'
+  parameters:
+    contract: reference.worker
+    version: '1.0.0'
+    data:
+      signal: tendon_length
+      delay_s: 0.1
+      inject: none
+input_snapshot:
+  artifact_id: REPLACE_WITH_EXISTING_SHA256
+  media_type: application/json
+base_candidate: baseline
+allowed_tools: [evidence.read]
+budget:
+  tool_calls: 1
+  model_calls: 0
+  backend_solves: 0
+  worker_calls: 1
+  wall_s: 10.0
+timeout_s: 10.0
+dependencies: []
+resources: []
+output_contract: WorkerOutput@1.0.0
+write_scope: own_output_directory
+completion_check: hash_contract_source_base_candidate

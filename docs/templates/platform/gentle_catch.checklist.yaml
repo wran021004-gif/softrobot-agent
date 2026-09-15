@@ -1,0 +1,43 @@
+# 待科学定义与实现的清单；不是 TaskDefinition，不可执行。
+status: SCIENTIFIC_DEFINITION_AND_IMPLEMENTATION_REQUIRED
+purpose: 温和接球人工填写清单
+ball:
+  mass_kg: null
+  radius_m: null
+  material_and_contact_assumptions: null
+  initial_position_m_or_distribution: null
+  initial_velocity_m_s_or_distribution: null
+  release_time_s: null
+environment:
+  gravity_m_s2: null
+  floor_and_obstacles: null
+  robot_base_condition: null
+robot:
+  allowed_families: null
+  allowed_actuator_channels: null
+success:
+  caught_definition: null # 接触保持／包络包含／区域与速度条件等
+  continuous_hold_duration_s: null
+  allowed_rebound_and_drop: null
+  termination_conditions: null
+impact:
+  metric: null # 峰值接触力(N)、冲量(N s)、加速度(m/s^2)等需要明确选择
+  success_limits: null
+  objective_direction_and_weight: null
+  measurement_window_s: null
+  sampling_rate_hz: null
+  aggregation: null
+constraints:
+  penetration_tolerance_m: null
+  force_or_tension_limits_n: null
+  numerical_failure_policy: null
+evaluation:
+  development_instances_and_seeds: null
+  formal_instances_and_seeds: null
+  editable_design_and_control_bounds: null
+missing_implementations:
+  - typed moving-ball environment and initializer
+  - backend contact pairs and phase-aware force/impulse observations
+  - registered catch evaluator and impact evaluator
+  - compatible actuator/controller/backend validation
+  - independent development and formal evaluation policies

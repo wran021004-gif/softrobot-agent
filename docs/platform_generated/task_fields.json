@@ -1,0 +1,189 @@
+[
+  {
+    "field": "contract_version",
+    "required": false,
+    "default": "1.0.0",
+    "schema": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    }
+  },
+  {
+    "field": "task_id",
+    "required": true,
+    "default": null,
+    "schema": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+      "title": "Task Id",
+      "type": "string"
+    }
+  },
+  {
+    "field": "task_version",
+    "required": true,
+    "default": null,
+    "schema": {
+      "minLength": 1,
+      "title": "Task Version",
+      "type": "string"
+    }
+  },
+  {
+    "field": "name",
+    "required": true,
+    "default": null,
+    "schema": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    }
+  },
+  {
+    "field": "status",
+    "required": true,
+    "default": null,
+    "schema": {
+      "enum": [
+        "draft",
+        "development_valid",
+        "formally_approved"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  {
+    "field": "source",
+    "required": true,
+    "default": null,
+    "schema": {
+      "minLength": 1,
+      "title": "Source",
+      "type": "string"
+    }
+  },
+  {
+    "field": "family",
+    "required": true,
+    "default": null,
+    "schema": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+      "title": "Family",
+      "type": "string"
+    }
+  },
+  {
+    "field": "goal",
+    "required": true,
+    "default": null,
+    "schema": {
+      "$ref": "#/$defs/Payload"
+    }
+  },
+  {
+    "field": "environment",
+    "required": true,
+    "default": null,
+    "schema": {
+      "$ref": "#/$defs/Payload"
+    }
+  },
+  {
+    "field": "robot_families",
+    "required": true,
+    "default": null,
+    "schema": {
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Robot Families",
+      "type": "array"
+    }
+  },
+  {
+    "field": "actuator_channels",
+    "required": true,
+    "default": null,
+    "schema": {
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Actuator Channels",
+      "type": "array"
+    }
+  },
+  {
+    "field": "initializer",
+    "required": true,
+    "default": null,
+    "schema": {
+      "$ref": "#/$defs/Binding"
+    }
+  },
+  {
+    "field": "timing",
+    "required": true,
+    "default": null,
+    "schema": {
+      "$ref": "#/$defs/Timing"
+    }
+  },
+  {
+    "field": "evaluator",
+    "required": true,
+    "default": null,
+    "schema": {
+      "$ref": "#/$defs/Binding"
+    }
+  },
+  {
+    "field": "objectives",
+    "required": true,
+    "default": null,
+    "schema": {
+      "items": {
+        "$ref": "#/$defs/Objective"
+      },
+      "minItems": 1,
+      "title": "Objectives",
+      "type": "array"
+    }
+  },
+  {
+    "field": "failure_policy",
+    "required": true,
+    "default": null,
+    "schema": {
+      "const": "retain_invalid_and_constraint_failures",
+      "title": "Failure Policy",
+      "type": "string"
+    }
+  },
+  {
+    "field": "observations",
+    "required": true,
+    "default": null,
+    "schema": {
+      "items": {
+        "$ref": "#/$defs/SignalSpec"
+      },
+      "minItems": 1,
+      "title": "Observations",
+      "type": "array"
+    }
+  },
+  {
+    "field": "sampling",
+    "required": true,
+    "default": null,
+    "schema": {
+      "$ref": "#/$defs/Sampling"
+    }
+  }
+]

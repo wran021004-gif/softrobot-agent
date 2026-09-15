@@ -1,0 +1,104 @@
+{
+  "root": "D:\\softrobot-agent\\runs\\platform_acceptance\\bfd530156b664a87abf0f9e27bd379ce",
+  "checks": null,
+  "numerical": [
+    {
+      "case": "matlab-short",
+      "backend": "matlab",
+      "steps_requested": 40,
+      "solve": {
+        "contract_version": "1.0.0",
+        "request_id": "short-solve",
+        "execution_id": "243ba36911ca4fc688e49833d38a8d5a",
+        "caller": "local-human",
+        "tool_id": "simulation.run",
+        "execution_status": "completed",
+        "solver_status": "completed",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "d4bc31c2d4d984d9cb252e4b8db823cd8996d004eb8a5445ac208ef8879574fd",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 15.077999999979511
+        }
+      },
+      "elapsed_s": 15.09299999999348,
+      "evaluation": {
+        "contract_version": "1.0.0",
+        "request_id": "score",
+        "execution_id": "78cba987bf9244ff986a30ccf6198e85",
+        "caller": "local-human",
+        "tool_id": "evaluation.run",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "valid",
+        "task_success": false,
+        "output": {
+          "artifact_id": "b22e7d7ef0e1521733c74e93edffd21958bdf2946a3549cc24e9d917e4f9fe5b",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.5160000000032596
+        }
+      },
+      "result": {
+        "comparison_identity": "8d03faf01dbcf47521b40d86d290a8281ceeb39edc81095ea7d132281e4c4e29",
+        "constraints": [
+          {
+            "limit": 0.01,
+            "name": "task_bound",
+            "observed": 0.048434515474203015,
+            "satisfied": false,
+            "units": "m"
+          }
+        ],
+        "evaluator": "evaluate.reach",
+        "metrics": [
+          {
+            "name": "position_error",
+            "units": "m",
+            "value": 0.048434515474203015
+          }
+        ],
+        "reason": null,
+        "source": {
+          "artifact_id": "d4bc31c2d4d984d9cb252e4b8db823cd8996d004eb8a5445ac208ef8879574fd",
+          "media_type": "application/json"
+        },
+        "task_success": false,
+        "validity": "valid"
+      }
+    }
+  ],
+  "boundaries": [
+    "离线回复不证明自主决策质量",
+    "确定性工作者不等于真实多模型协作",
+    "参考信号模型不代表机器人物理"
+  ],
+  "counts": {
+    "real_model_requests": 0,
+    "offline_model_replies": 0,
+    "mathematical_executions": 0,
+    "reference_backend_executions": 0,
+    "mujoco_reservations": 0,
+    "matlab_reservations": 1,
+    "workers_completed": 0,
+    "workers_failed": 0,
+    "workers_cancelled": 0,
+    "unknown_reservations": 0
+  }
+}

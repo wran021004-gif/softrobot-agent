@@ -1,0 +1,63 @@
+task_id: signal-hold-dev
+task_version: 1.0.0
+name: 离散长度信号保持开发示例
+status: development_valid
+source: 明确工程参考模型：x[k+1]=x[k]+0.5*(command-x[k])，仅验证接口；无物理标定
+family: task.signal_hold
+goal:
+  contract: reference.hold_goal
+  version: 1.0.0
+  data:
+    length_m: 0.3
+robot_families:
+- reference_signal_robot
+actuator_channels:
+- tendon_target_lengths_m
+initializer:
+  extension_id: initialize.length
+  version: 1.0.0
+  parameters:
+    contract: reference.initialize
+    version: 1.0.0
+    data:
+      length_m: 0.29
+      jitter_m: 0.001
+timing:
+  timestep_s: 0.01
+  control_period_s: 0.01
+  sample_period_s: 0.01
+  duration_s: 0.1
+  termination:
+  - duration
+  - numerical_failure
+  - cancelled
+evaluator:
+  extension_id: evaluate.hold
+  version: 1.0.0
+  parameters:
+    contract: reference.hold_evaluation
+    version: 1.0.0
+    data:
+      max_deviation_m: 0.01
+objectives:
+- metric: rms_deviation
+  direction: minimize
+  units: m
+  weight: 1.0
+failure_policy: retain_invalid_and_constraint_failures
+observations:
+- name: tendon_length
+  entity: tendon_0
+  dimension: 1
+  units: m
+  frame: actuator
+  phase: post_step
+sampling:
+  split: development
+  seeds:
+  - 17
+  window_s:
+  - 0.0
+  - 0.1
+  aggregation: per_instance
+environment_file: environment.yaml

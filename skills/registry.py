@@ -36,8 +36,9 @@ def _check_transition(previous, current):
 
 
 class SkillRegistry:
-    def __init__(self, root=ROOT / "skills", run_root=ROOT / "runs"):
+    def __init__(self, root=ROOT / "skills", run_root=ROOT / "runs", *, validator=None):
         self.root, self.run_root = Path(root).resolve(), Path(run_root).resolve()
+        self.validator = validator or validate_skill
 
     def history(self):
         groups = {}
@@ -46,7 +47,7 @@ class SkillRegistry:
                 if not path.resolve().is_relative_to(self.root):
                     raise ValueError("Registry path escapes root")
                 revision = Revision.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
-                skill = validate_skill(revision.skill, self.run_root)
+                skill = self.validator(revision.skill, self.run_root)
                 if directory != DIRECTORY[skill.status] or path.name != f"{skill.reference}.r{revision.revision}.yaml":
                     raise ValueError("Registry path/status/version mismatch")
                 groups.setdefault(skill.reference, []).append(revision)
@@ -68,7 +69,7 @@ class SkillRegistry:
         return self.history()[reference][-1].skill
 
     def _append(self, skill):
-        skill = validate_skill(skill, self.run_root)
+        skill = self.validator(skill, self.run_root)
         history = self.history()
         rows = history.get(skill.reference, [])
         if rows:

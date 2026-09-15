@@ -1,0 +1,74 @@
+family: tendon_driven_continuum
+structure:
+  contract: legacy.robot_ir
+  version: 1.0.0
+  data:
+    schema_version: '1'
+    robot_family: tendon_driven_continuum
+    units: SI
+    coordinate_frame: world_base_x_forward_yz_cross_section
+    base_position_m:
+    - 0.0
+    - 0.0
+    - 0.0
+    section:
+      length_m: 0.3
+      segments: 8
+      segment_length_m: 0.0375
+      body_radius_m: 0.02
+      backbone_radius_m: null
+    tendon_routing_radius_m: 0.018
+    tendon_routes:
+    - index: 0
+      angle_rad: 0.0
+      offset_yz_m:
+      - 0.018
+      - 0.0
+    - index: 1
+      angle_rad: 1.5707963267948966
+      offset_yz_m:
+      - 1.1021821192326178e-18
+      - 0.018
+    - index: 2
+      angle_rad: 3.141592653589793
+      offset_yz_m:
+      - -0.018
+      - 2.2043642384652355e-18
+    - index: 3
+      angle_rad: 4.71238898038469
+      offset_yz_m:
+      - -3.3065463576978533e-18
+      - -0.018
+    mechanics:
+      profile: legacy_v1_surrogate
+      provenance: main@245a785 tools/mujoco_tools.py fixed surrogate constants; not
+        experimentally validated
+      validated: false
+      joint_stiffness_nm_per_rad: 0.1
+      joint_damping_nm_s_per_rad: 0.1
+      body_density_kg_m3: 1000.0
+      tendon_servo_kp_n_per_m: 1000.0
+      tendon_force_limit_n: 20.0
+    physics_contracts:
+    - coordinate_frames.md
+    - tendon_driven_pcc_v1.md
+    - tendon_length_mapping_v1.md
+    - segmented_mujoco_mapping_v1.md
+    - actuator_model_v1.md
+    compiler_version: design_to_ir_v1
+channels:
+- tendon_target_lengths_m
+units: SI
+frame: world_base_x_forward_yz_cross_section
+assumptions:
+- 原未标定分段替代模型，数值保持原来源
+sources:
+- coordinate_frames.md
+- tendon_driven_pcc_v1.md
+- tendon_length_mapping_v1.md
+- segmented_mujoco_mapping_v1.md
+- actuator_model_v1.md
+unsupported:
+- physical_calibration
+- pressure
+- torque_command

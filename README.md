@@ -1,4 +1,6 @@
-# Softrobot deterministic research harness
+# 统一机器人智能设计开发平台
+
+当前本地接口基线与平台使用入口见 [平台架构与操作](docs/platform.md)、[任务填写指南](docs/platform_tasks.md)、[并行扩展规范](docs/platform_parallel_development.md) 和 [验收交付](docs/platform_validation.md)。运行 `python examples/workbench.py platform catalog` 发现能力；新项目使用独立配置、输入快照和资源账本。以下逐轮说明继续保留历史身份。
 
 框架扩展机制已落地：[七项边界、迁移与接入路线](docs/framework_extensions.md)、[验证记录](docs/framework_validation.md)。工具版本为 1.1.0；历史说明与证据保留。
 

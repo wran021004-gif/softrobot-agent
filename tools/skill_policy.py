@@ -32,18 +32,20 @@ def strategy_hash(skill):
     return hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 
-def validate_skill(skill, run_root):
+def validate_skill(skill, run_root, *, evidence_store=None, tool_manifests=None, robot_families=None):
     # Revalidate even model_copy/model_construct objects, which bypass Pydantic checks.
     skill = Skill.model_validate(skill.model_dump(mode="json") if isinstance(skill, Skill) else skill)
     if skill.requires_new_physics:
         raise ValueError("PHYSICS_ASSUMPTION_REQUIRED: proposal requires Human scientific review")
     if not REQUIRED_CONSTRAINTS.issubset(skill.negative_constraints):
         raise ValueError("Missing mandatory negative constraints")
-    if set(skill.applicability.robot_families) - set(list_robot_families()):
+    if set(skill.applicability.robot_families) - set(robot_families if robot_families is not None else list_robot_families()):
         raise ValueError("Unknown robot family")
     manifests = {}
     for bundle in list_tool_bundles():
         manifests.update(get_tool_manifest(bundle)["tools"])
+    if tool_manifests is not None:
+        manifests.update(tool_manifests)
     used_tools = set(skill.required_tools) | {s.tool for s in skill.strategy if s.tool} | {m.tool for m in skill.trigger_signature.metrics}
     if used_tools - set(skill.required_tools):
         raise ValueError("Strategy/trigger tools must be declared in required_tools")
@@ -62,7 +64,7 @@ def validate_skill(skill, run_root):
         if (re.search(r"\b(modify|write|edit|overwrite|delete|set|change)\b.{0,80}\b(tasks/|benchmarks/|physics_contracts/|schemas/|metrics/|capabilities/|configs/|agents/contracts/)", text)
                 or re.search(r"\b(override|bypass|ignore|relax|increase|change|modify|set)\b.{0,40}\b(task gate|task_gate|task_success|task tolerance|task_tolerance|position_error_max_m)\b", text)):
             raise ValueError("Human-owned mutation or task gate override is forbidden")
-    store = EvidenceStore(run_root)
+    store = evidence_store or EvidenceStore(run_root)
     sources = set(skill.provenance.source_runs)
     for run_id in sources:
         store.run(run_id)
