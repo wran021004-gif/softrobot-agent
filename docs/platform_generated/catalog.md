@@ -4,6 +4,7 @@
 
 | 身份 | 类型 | 版本 | 实现存在 | 说明 |
 | --- | --- | --- | --- | --- |
+| analysis.force_peak | tool | 1.0.0 | True | 计算力序列的最大绝对值；输入输出单位为牛顿，不判断机器人任务成功。 |
 | analysis.pcc_condition | tool | 1.1.0 | True | Singular values/rank of the local PCC tip Jacobian; geometric conditioning, no controllability or task claim. |
 | analysis.pcc_jacobian | tool | 1.1.0 | True | Single section inextensible PCC tip/Jacobian, m and m/rad, base +x, yz bending; norm(bend)<=pi. Geometry only. |
 | analysis.pcc_tolerance | tool | 1.0.0 | True | Propagate independent length/bend standard deviations to first-order tip covariance, principal error directions and ranked tolerance contributions. Geometric approximation, no task assessment. |

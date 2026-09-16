@@ -2356,10 +2356,11 @@
     "additionalProperties": false,
     "properties": {
       "contract_version": {
-        "default": "1.1.0",
+        "default": "1.2.0",
         "enum": [
           "1.0.0",
-          "1.1.0"
+          "1.1.0",
+          "1.2.0"
         ],
         "title": "Contract Version",
         "type": "string"
@@ -2422,6 +2423,18 @@
         ],
         "default": null,
         "title": "Source Execution Id"
+      },
+      "original_execution_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Original Execution Id"
       },
       "candidate_id": {
         "anyOf": [
@@ -2706,10 +2719,11 @@
     "additionalProperties": false,
     "properties": {
       "contract_version": {
-        "default": "1.1.0",
+        "default": "1.2.0",
         "enum": [
           "1.0.0",
-          "1.1.0"
+          "1.1.0",
+          "1.2.0"
         ],
         "title": "Contract Version",
         "type": "string"
@@ -2812,6 +2826,18 @@
         "default": false,
         "title": "Cache Hit",
         "type": "boolean"
+      },
+      "original_execution_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Original Execution Id"
       },
       "charged": {
         "$ref": "#/$defs/Budget"
@@ -3524,10 +3550,11 @@
         "additionalProperties": false,
         "properties": {
           "contract_version": {
-            "default": "1.1.0",
+            "default": "1.2.0",
             "enum": [
               "1.0.0",
-              "1.1.0"
+              "1.1.0",
+              "1.2.0"
             ],
             "title": "Contract Version",
             "type": "string"
@@ -3630,6 +3657,18 @@
             "default": false,
             "title": "Cache Hit",
             "type": "boolean"
+          },
+          "original_execution_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Original Execution Id"
           },
           "charged": {
             "$ref": "#/$defs/Budget"

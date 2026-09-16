@@ -1,0 +1,18 @@
+decisions:
+- tool_id: analysis.force_peak
+  arguments:
+    values_n:
+    - 1.0
+    - -4.0
+    - 3.0
+  reason: 调用新工具
+- tool_id: evidence.read
+  arguments:
+    reference: $last_output
+    pointer: /peak_n
+  reason: 读取刚刚保存的峰值
+- tool_id: session.control
+  arguments:
+    status: stopped
+    reason: 练习完成
+  reason: 结束离线演练

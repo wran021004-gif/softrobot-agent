@@ -1,5 +1,70 @@
 [
   {
+    "extension_id": "analysis.force_peak",
+    "kind": "tool",
+    "version": "1.0.0",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "计算力序列的最大绝对值；输入输出单位为牛顿，不判断机器人任务成功。",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "values_n": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Values N",
+          "type": "array"
+        }
+      },
+      "required": [
+        "values_n"
+      ],
+      "title": "PeakInput",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "validity": {
+          "const": "valid",
+          "default": "valid",
+          "title": "Validity",
+          "type": "string"
+        },
+        "peak_n": {
+          "title": "Peak N",
+          "type": "number"
+        }
+      },
+      "required": [
+        "peak_n"
+      ],
+      "title": "PeakOutput",
+      "type": "object"
+    },
+    "capabilities": {},
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/learning_peak/contracts.py",
+      "extensions/learning_peak/implementation.py",
+      "extensions/learning_peak/manifest.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
+    "side_effects": "none"
+  },
+  {
     "extension_id": "analysis.pcc_condition",
     "kind": "tool",
     "version": "1.1.0",
@@ -4337,10 +4402,11 @@
       "additionalProperties": false,
       "properties": {
         "contract_version": {
-          "default": "1.1.0",
+          "default": "1.2.0",
           "enum": [
             "1.0.0",
-            "1.1.0"
+            "1.1.0",
+            "1.2.0"
           ],
           "title": "Contract Version",
           "type": "string"
@@ -4403,6 +4469,18 @@
           ],
           "default": null,
           "title": "Source Execution Id"
+        },
+        "original_execution_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Original Execution Id"
         },
         "candidate_id": {
           "anyOf": [
@@ -4578,10 +4656,11 @@
       "additionalProperties": false,
       "properties": {
         "contract_version": {
-          "default": "1.1.0",
+          "default": "1.2.0",
           "enum": [
             "1.0.0",
-            "1.1.0"
+            "1.1.0",
+            "1.2.0"
           ],
           "title": "Contract Version",
           "type": "string"
@@ -4644,6 +4723,18 @@
           ],
           "default": null,
           "title": "Source Execution Id"
+        },
+        "original_execution_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Original Execution Id"
         },
         "candidate_id": {
           "anyOf": [
@@ -4819,10 +4910,11 @@
       "additionalProperties": false,
       "properties": {
         "contract_version": {
-          "default": "1.1.0",
+          "default": "1.2.0",
           "enum": [
             "1.0.0",
-            "1.1.0"
+            "1.1.0",
+            "1.2.0"
           ],
           "title": "Contract Version",
           "type": "string"
@@ -4885,6 +4977,18 @@
           ],
           "default": null,
           "title": "Source Execution Id"
+        },
+        "original_execution_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Original Execution Id"
         },
         "candidate_id": {
           "anyOf": [
@@ -5092,10 +5196,11 @@
       "additionalProperties": false,
       "properties": {
         "contract_version": {
-          "default": "1.1.0",
+          "default": "1.2.0",
           "enum": [
             "1.0.0",
-            "1.1.0"
+            "1.1.0",
+            "1.2.0"
           ],
           "title": "Contract Version",
           "type": "string"
@@ -5158,6 +5263,18 @@
           ],
           "default": null,
           "title": "Source Execution Id"
+        },
+        "original_execution_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Original Execution Id"
         },
         "candidate_id": {
           "anyOf": [
@@ -6823,7 +6940,8 @@
       "type": "object"
     },
     "capabilities": {
-      "preflight": "tools.platform_tools:simulation_preflight"
+      "preflight": "tools.platform_tools:simulation_preflight",
+      "cache_reuse": "tools.platform_tools:simulation_reuse"
     },
     "resources": [],
     "dependencies": [],

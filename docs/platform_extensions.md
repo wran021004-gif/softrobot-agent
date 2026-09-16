@@ -2,11 +2,24 @@
 
 开发者安装的是可信仓库 Python 包。模型和任务配置不能传入 import 路径。发现机制按路径排序读取 `extensions/*/manifest.py`；声明文件只导入轻量契约，不启动可选引擎。相同身份与版本重名直接拒绝。多个版本可以共存，新会话通过 policy.tool_bindings 精确选择；旧 allowed_tools 仅在版本唯一时规范化。
 
+## 从现有模板开始
+
+推荐命令前缀为 `python examples/workbench.py platform`；它转发到 `examples/development_platform.py` 的同一入口，完整使用见 [平台指南](platform.md)。
+
+1. 从 [最小数学包模板](templates/platform/extension/README.md) 复制其中 contracts.py、implementation.py、manifest.py、__init__.py 到自己的 `extensions/<包>/`，使用不冲突的扩展身份；其他 skeleton 文件仅是待实现骨架。
+2. 在 manifest 的 `EXTENSIONS` 声明 `kind`、`extension_id`、精确 `version`、`input_schema`／`output_schema` 和 `binding='extensions.<包>.implementation:<函数>'`；函数接收 `(ctx, typed_args)`。若使用 Payload，再在 `CONTRACTS` 注册对应名称、精确版本和类型。依赖声明方法见本文末尾；不要修改公共循环来路由工具。
+3. 在**新会话**的 `policy.tool_bindings` 添加名称到精确版本的映射，例如 `analysis.example_square: '1.0.0'`。ToolRequest 的 `tool_version` 必须一致；不修改已有冻结快照。登记工具不等于授予会话调用权限。
+4. 按模板用 `platform catalog` 确认发现，以 `platform check <新会话配置>` 检查配置，再通过 `Host.invoke` 或 `platform call <项目路径> <run_id> <请求文件>` 做一次本包最小调用：模板输入 2 m 应输出 4 m²。检查回执及输出，不只直接调用实现函数；生成接口投影使用 `python examples/export_platform_contracts.py`。无需全仓库测试或物理实验。
+
+包作者负责本包契约、实现、声明、依赖及最小验收；共同核心和接口语义变更由 [核心维护者](platform_parallel_development.md#集成者维护的共享部分) 负责。当前规范以源码及 [生成契约](platform_generated/contracts.json)、[能力 Schema](platform_generated/capabilities.json) 为准，历史报告保留当时版本和结论。
+
 ## 公共调用
 
 任意入口提交 `ToolRequest` 到 `Host.invoke`：命令行、人类、离线／真实模型都使用该边界。调用者来自宿主构造，不接受工具实参中的 caller、管理员身份或其他预算账户。可信 Python 开发者仍能直接调用函数；这不意味着模型获得了相应权限，也不构成 OS 沙箱或远程认证。
 
 扩展自己的输入、输出必须是 `Contract` 子类；复杂负载通过 `Payload(contract, version, data)` 传递，调用 `Registry.parse` 校验。manifest 绑定输入类型、输出类型、版本、依赖、资源、缓存、副作用和能力说明。公共宿主不增加工具名分支。
+
+`Host.invoke` 统一承担请求幂等与冲突检查、会话状态／精确工具授权／依赖核对、输入与证据验证、登记预检、缓存选择、共同预算和资源预留、执行、输出契约验证、回执／来源／费用／事件封存。正常与缓存输出都按声明类型解释，普通工具可使用 validity、solver_status 等字段，无需伪造 task_success。仿真复用及 `original_execution_id` 读取见 [恢复说明](platform_recovery.md#请求重试与结果复用)；特殊复用钩子见 [接口决策](platform_interface_decisions.md)，普通工具不需新增类别声明。
 
 ## 各类实现责任
 
@@ -32,6 +45,8 @@
 
 新实现的能力声明必须真实。分步控制的连续运行、reset 与 restore 含义分别定义；输出单位和执行通道不能靠改字段名转换。当前真实后端只接绳长通道。
 
+目录中的 `IMPLEMENTATION_REQUIRED` 是实现缺失，`DEPENDENCY_MISSING` 是当前环境缺少声明依赖；不能混称“未实现”。`implementation_exists` 只确认绑定符号存在，不证明骨架方法可执行；参考测试通过也不代表真实机器人能力成立。无需为阅读目录安装未使用的后端依赖。
+
 ## Genesis 接入任务
 
 `backend.genesis` 当前只有未实现声明。未来开发者应：
@@ -53,9 +68,9 @@ python examples/export_platform_contracts.py
 
 新包应附独立使用示例和小范围测试。只有公共接口变更才由集成者运行相关组合验收，不要求各开发者重跑全仓库或历史实验。
 
-## 本次开放接口与独立入口
+## 当前开放接口与独立入口
 
-公共操作类型在 `schemas/platform_operations.py`。模型观测、适配器、策略、候选使用 1.0；ToolReceipt/EvaluationResult 使用兼容读取的 1.1；通用 WorkerOutput 使用 2.0。适配器 encode→respond→decode，策略 decide→ToolRequest，Host 执行和记账。
+公共操作类型在 `schemas/platform_operations.py`，开发协议在 `schemas/platform_protocols.py`。模型观测、适配器、策略、候选使用各自 1.0 契约；ToolReceipt/EvaluationResult 默认 1.2.0，兼容读取 1.0.0／1.1.0，新增可空 original_execution_id；通用 WorkerOutput 使用 2.0.0。工具版本与结果契约版本不同，例如 simulation.run 工具仍为 1.0.0，不随回执版本一起升级。适配器 encode→respond→decode，策略 decide→ToolRequest，Host 执行和记账。
 
 | 类型／拥有目录 | 实现入口与声明 | 参考实现／独立验收方法 |
 | --- | --- | --- |
@@ -68,7 +83,7 @@ python examples/export_platform_contracts.py
 
 表中实现均在 `extensions/convergence/implementation.py`。完整命令为 `python -m unittest tests.test_platform_convergence.ConvergenceTests.<方法名> -v`。所有行通过同一 manifest 发现，演练阶段只需本包、配置和测试。
 
-`sources` 声明代码，`assets` 声明计算资产，`extension_dependencies` / `contract_dependencies` 使用 `(name, exact_version)`。快照记录实际依赖闭包；新增未用包、修改文档不失效，已用源码变化需要新会话。旧物理适配保守追踪其控制器、求解器和冻结资产，不遍历全仓库。
+`dependencies` 声明所需外部包，`sources` 声明实现及传递依赖代码，`assets` 声明计算资产，`extension_dependencies` / `contract_dependencies` 使用 `(name, exact_version)`。快照记录实际依赖闭包；新增未用包、修改文档不失效，已用源码变化需要新会话。旧物理适配保守追踪其控制器、求解器和冻结资产，不遍历全仓库。
 
 构造约定：backend 无参；controller 接收参数和周期；search、model_adapter 接收已校验参数；strategy 无参；worker、candidate、evaluator 使用表中函数。检查不启动引擎；Host 预留后拥有 compile→initialize→run→finally close；step/observe/cancel 只按真实能力提供。模型超时由适配器处理，循环在决策边界停止；网络超时未知保留额度。媒体类型已有区分，本版只传文本。
 

@@ -1,4 +1,8 @@
-# 公共接口定版决策（开发接口 2.0）
+# 公共接口版本与定版决策
+
+当前入口与开发步骤见 [平台指南](platform.md) 和 [扩展指南](platform_extensions.md)。本页顶部记录当前结果契约与复用语义，后半部保留上一轮历史决策；历史“开发接口 2.0”不是全部工具或契约的统一版本。
+
+源码是权威：公共信封见 `schemas/platform.py`、操作类型见 `schemas/platform_operations.py`、Python 开发协议见 `schemas/platform_protocols.py`，具体负载和绑定见各扩展包。运行 `python examples/export_platform_contracts.py` 同步 [contracts.json](platform_generated/contracts.json) 和 [capabilities.json](platform_generated/capabilities.json)，不手写第二套接口。ToolReceipt／EvaluationResult 默认 1.2.0、WorkerOutput 2.0.0，各工具的精确 version 和其他契约版本独立保留；新会话通过 policy.tool_bindings 选择工具版本。
 
 ## 公共接口两项修复（审阅基线 6751639）
 
@@ -9,7 +13,9 @@
 - `ToolReceipt`、`EvaluationResult` 新输出默认 **1.2.0**，增量字段 `original_execution_id: str | None = None` 指向产生轨迹的原始仿真。真实执行指向自身，连续复用直接指向原始执行；评价结果的 `source_execution_id` 保持“选中的仿真调用”原义。普通工具回执及缺少来源的旧记录默认为 `None`。继续读取 1.0.0／1.1.0，保留其版本且不写回；旧消费者若严格只接受旧版本，需显式接入 1.2.0。工具版本和 `BackendResult` 结构不变。
 - 新调用仍检查冻结依赖兼容性；旧会话若依赖已变化则按现有规则只读或显式迁移。旧仿真缺必要来源时不命中缓存、不补造来源。范围限同一会话、现有缓存键，不包含跨会话或跨候选名去重。
 
-以下保留上一轮定版决策。
+## 历史：上一轮定版决策（开发接口 2.0）
+
+以下保留当时版本与结论；其中结果契约 1.1 的描述已由上方 1.2.0 增量决策更新，不作为新开发默认版本。
 
 基线：`c677c22`，`feat/unified-development-platform`；开始时工作区干净。历史任务、参数来源及证据不改写。
 

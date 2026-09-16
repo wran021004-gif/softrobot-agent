@@ -1,6 +1,22 @@
 # 统一机器人智能设计开发平台
 
-当前本地接口基线与平台使用入口见 [平台架构与操作](docs/platform.md)、[任务填写指南](docs/platform_tasks.md)、[并行扩展规范](docs/platform_parallel_development.md) 和 [验收交付](docs/platform_validation.md)。运行 `python examples/workbench.py platform catalog` 发现能力；新项目使用独立配置、输入快照和资源账本。以下逐轮说明继续保留历史身份。
+## 当前开发入口
+
+从 [平台架构与操作](docs/platform.md) 开始，推荐命令为 `python examples/workbench.py platform ...`；它转发到 `examples/development_platform.py` 的同一实现。新增扩展先读 [扩展指南与最小模板](docs/platform_extensions.md)，协作分工见 [共同核心与包作者责任](docs/platform_parallel_development.md)，任务配置见 [填写指南](docs/platform_tasks.md)。
+
+```powershell
+conda activate softagent
+python examples/workbench.py platform catalog
+python examples/workbench.py platform check configs/platform/signal_hold/session.yaml
+```
+
+接口以源码及其 [生成契约](docs/platform_generated/contracts.json)、[生成目录](docs/platform_generated/catalog.md) 为准，生成命令为 `python examples/export_platform_contracts.py`。版本独立：ToolReceipt／EvaluationResult 默认 1.2.0（含原始执行来源），WorkerOutput 为 2.0.0；不能当作所有工具的版本，详见 [接口决策](docs/platform_interface_decisions.md)。
+
+`extensions/reference` 和 `extensions/convergence` 提供可执行接口参考，其中合成后端不代表真实机器人能力。模板的 `*_skeleton.py`、`backend.genesis` 等仍待实现；“实现未提供”和“当前环境缺依赖”是不同状态，目录也不代表运行授权或物理验收。现有 MuJoCo／MATLAB 兼容适配的范围见 [后端说明](docs/platform_extensions.md#后端能力与资源)。
+
+## 兼容入口与历史实验记录
+
+以下框架／公共工具旧入口和逐轮实验材料保留原实现、授权边界及当时结论；不是新扩展的当前接口规范。历史版本、环境状态、全测和实验命令只描述对应轮次，不作为本轮开发步骤。当前验收与历史记录的分界见 [验证说明](docs/platform_validation.md)。
 
 框架扩展机制已落地：[七项边界、迁移与接入路线](docs/framework_extensions.md)、[验证记录](docs/framework_validation.md)。工具版本为 1.1.0；历史说明与证据保留。
 
