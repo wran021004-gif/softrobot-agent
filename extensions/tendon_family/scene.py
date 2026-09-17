@@ -45,9 +45,9 @@ def assemble(inp,p):
             initial_state='named model coordinates; unspecified joints are zero',
             timing='control observations and force signals are interval-start/pre-step; saved state signals are interval-end/post-step'))
     scene['identity']=digest(scene)
-    dynamics_model_identity=(digest(dict(extension_id=inp.policy.dynamics_model.extension_id,
-        version=inp.policy.dynamics_model.version,parameters=inp.policy.dynamics_model.parameters.data))
-        if inp.policy.dynamics_model is not None else None)
+    from .execution import resolve_execution
+    from tools.platform_registry import registry
+    dynamics_model_identity=resolve_execution(inp,registry())['dynamics_model_identity']
     scene['experiment_spec']=dict(version='family_experiment_v1',task_identity=task_identity,
         design_identity=p['design_identity'],discretization_identity=p['discretization_identity'],
         physics_identity=p['identity'],scene_identity=scene['identity'],dynamics_model_identity=dynamics_model_identity,

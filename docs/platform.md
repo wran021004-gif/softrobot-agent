@@ -4,6 +4,10 @@
 
 当前真实串联绳驱双后端入口见 [机器人、离散、任务与共同实验装配](tendon_family.md)。原单段独立空间模型见 [公共物理、空间模型与统一场景](platform_spatial.md)，其模型身份和兼容入口继续保留。
 
+步骤 5–6 的公共请求为 `family.optimization_request`：嵌入 `SessionInput`（任务目标、评价器约束、模型、后端、控制和预算），先选完整模板，再经 `candidate.family` 做实体/控制连续搜索。`extensions.tendon_family.optimization.optimize(root, request)` 调用现有 `platform_search.run_search` 和 Host；注册搜索适配 `search.family_coordinate` 复用 `coordinate_proposal`，首个候选是所选结构下的基线。数值离散固定，轨迹优化未支持。结果保留最佳有效候选、完整 `CandidateInput` 引用、评价证据和停止原因；另一后端复核单列，不混排。
+
+`diagnostics.saved_trajectory@2.0.0` 与 `visualization.render_simulation_video@2.0.0` 现接受家族 `BackendResult` 和执行引用。它们复用 `ExportBundle` 的恢复与封存：诊断适配具名信号；视频沿用有超时的原生渲染/编码执行器。两者均不求解或评分。见 [本轮结果](steps_5_6_result.md)。
+
 这是当前开发总入口，用于共同开发任务、分析、仿真、控制、评价、搜索、诊断、记忆、技能及工作者。各工具与契约独立版本化，不存在一个适用于所有接口的统一版本号。历史到达实验仍是具体项目，不是平台的命名或授权来源。
 
 推荐入口是 `python examples/workbench.py platform ...`：`examples/workbench.py` 将 platform 后的参数转交 `examples/development_platform.py` 的 main；直接调用后者使用同一解析器和宿主，不是另一套平台。以下命令从仓库根目录运行，使用 `conda activate softagent`。文件参数相对于调用者工作目录；配置内引用相对于配置文件，执行器源码相对于仓库根目录。新包从 [扩展指南](platform_extensions.md) 和 [责任划分](platform_parallel_development.md) 开始。

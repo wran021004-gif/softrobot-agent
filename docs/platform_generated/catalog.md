@@ -14,12 +14,14 @@
 | analysis.versioned_value | mathematical_models | teaching_example | tool | 1.0.0 | True | extensions.convergence.implementation:value_v1 | Independent offline development example; no physical calibration |
 | analysis.versioned_value | mathematical_models | teaching_example | tool | 2.0.0 | True | extensions.convergence.implementation:value_v2 | Independent offline development example; no physical calibration |
 | backend.family_mujoco | simulation | adapter | backend | 1.0.0 | True | extensions.tendon_family.backends:MujocoBackend | 具名串联多段双轴弯曲与逐根绳路 |
+| backend.family_mujoco | simulation | adapter | backend | 1.1.0 | True | extensions.tendon_family.backends:MujocoBackend | 显式模型兼容关系与后端专用数值设置 |
 | backend.genesis | simulation | unimplemented | backend | 1.0.0 | False | 未实现 | 待实现：必须检查目标版本并完成模型、信号与执行通道适配 |
 | backend.limited_synthetic | simulation | teaching_example | backend | 1.0.0 | True | extensions.convergence.implementation:LimitedBackend | Independent offline development example; no physical calibration |
 | backend.math_planar | mathematical_models | adapter | backend | 1.0.0 | True | extensions.experiment_dynamics.backends:PlanarBackend | 原 MATLAB 平面 v1 算法，直接读取公共物理量，无 MuJoCo |
 | backend.math_spatial | mathematical_models | adapter | backend | 1.0.0 | True | extensions.experiment_dynamics.backends:SpatialBackend | 独立三维 16 自由度耦合动力学；无 MuJoCo 依赖 |
 | backend.matlab | simulation | adapter | backend | 1.0.0 | True | extensions.reference.legacy:MatlabBackend | 保留 MATLAB 平面动力学一次性求解适配 |
 | backend.matlab_spatial | mathematical_models | adapter | backend | 1.0.0 | True | extensions.tendon_family.backends:MatlabBackend | 具名串联多段双轴弯曲与逐根绳路 |
+| backend.matlab_spatial | mathematical_models | adapter | backend | 1.1.0 | True | extensions.tendon_family.backends:MatlabBackend | 显式模型兼容关系与后端专用数值设置 |
 | backend.mujoco | simulation | adapter | backend | 1.0.0 | True | extensions.reference.legacy:MujocoBackend | 保留 MuJoCo 一次性求解适配 |
 | backend.reference | simulation | adapter | backend | 1.0.0 | True | extensions.reference.implementation:ReferenceBackend | 廉价确定性参考后端，非真实物理、非 Genesis |
 | backend.scene_mujoco | simulation | adapter | backend | 1.0.0 | True | extensions.experiment_dynamics.backends:MujocoBackend | 公共物理和统一场景映射到 MuJoCo |
@@ -52,7 +54,9 @@
 | memory.save | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:memory_save | 保存有来源的笔记或观测记录 |
 | memory.search | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:memory_search | 检索跨运行记录并校验来源 |
 | model.observing | platform_services | teaching_example | model_adapter | 1.0.0 | True | extensions.convergence.implementation:ObservingAdapter | Independent offline development example; no physical calibration |
+| model.serial_bending_cells | mathematical_model | definition | dynamics_model | 1.0.0 | True | extensions.tendon_family.execution:model_definition | 串联逐刚体、逐单元双主轴弯曲数学模型 |
 | offline | platform_services | adapter | model_adapter | 1.0.0 | True | tools.platform_models:OfflineAdapter | Offline scripted compatibility fixture |
+| search.family_coordinate | parameter_search | adapter | search | 1.0.0 | True | extensions.tendon_family.optimization:CoordinateSearch | 复用有界坐标搜索；首个候选为基线；设计与控制联合整定 |
 | search.scalar_sequence | parameter_search | adapter | search | 1.0.0 | True | extensions.reference.implementation:ScalarSequenceSearch | 确定性候选序列参考搜索器；算法拥有状态 |
 | search.stateful | parameter_search | teaching_example | search | 1.0.0 | True | extensions.convergence.implementation:StatefulSearch | Independent offline development example; no physical calibration |
 | session.control | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:stop | 停止、暂停、缺少信息或能力 |

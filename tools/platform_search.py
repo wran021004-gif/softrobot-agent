@@ -49,11 +49,20 @@ def run_search(host):
         simulation = host.invoke(dict(request_id=prefix + '-simulation', tool_id='simulation.run', tool_version=inp['policy']['tool_bindings']['simulation.run'],
             arguments=dict(candidate_id=prefix, changes=pending['candidate']), reason='搜索候选', cache='reuse'))
         if simulation['execution_status'] != 'completed':
-            return dict(status=simulation['execution_status'], pending=pending, trials=saved['trials'])
+            error=simulation.get('error','')
+            invalid=simulation['execution_status']=='rejected' and any(s in error for s in (
+                'PHYSICALLY_INVALID','PARAMETER_','CONDITIONAL_','TEMPLATE_','UNSUPPORTED','INITIAL_UNKNOWN','UNKNOWN_FORCE'))
+            if invalid:
+                algorithm.feedback(None)
+                saved['trials'].append(dict(candidate_id=prefix,candidate=pending['candidate'],score=None,
+                    status='unsupported' if 'UNSUPPORTED' in error else 'invalid_candidate',simulation=simulation))
+                saved.update(algorithm=plain(algorithm.save()),pending=None); _save(host,saved)
+                continue
+            return _outcome(saved,simulation['execution_status'],error,pending)
         evaluation = host.invoke(dict(request_id=prefix + '-evaluation', tool_id='evaluation.run', tool_version=inp['policy']['tool_bindings']['evaluation.run'],
             arguments=dict(result=simulation['output'], execution_id=simulation['execution_id']), reason='固定任务评价器评价候选'))
         if evaluation['execution_status'] != 'completed':
-            return dict(status=evaluation['execution_status'], pending=pending, trials=saved['trials'])
+            return _outcome(saved,evaluation['execution_status'],evaluation.get('error',''),pending)
         result = EvaluationResult.model_validate(host.store.artifact(evaluation['output']))
         if definition.capabilities.get('feedback_adapter'):
             from importlib import import_module
@@ -62,10 +71,21 @@ def run_search(host):
         else:
             scalar = score(result, inp['task']['objectives'])
         algorithm.feedback(scalar)
-        saved['trials'].append(dict(candidate=pending['candidate'], evaluation=evaluation['output'], score=scalar))
+        saved['trials'].append(dict(candidate_id=prefix,candidate=pending['candidate'], evaluation=evaluation['output'],
+            simulation=simulation,score=scalar,comparison_identity=result.comparison_identity,
+            status='valid' if result.validity=='valid' else 'solver_failed',task_success=result.task_success))
         saved.update(algorithm=plain(algorithm.save()), pending=None)
         _save(host, saved)
-    return dict(status='completed', trials=saved['trials'], algorithm=saved['algorithm'])
+    return _outcome(saved,'completed','search_trial_limit')
+
+
+def _outcome(saved,status,reason,pending=None):
+    valid=[t for t in saved['trials'] if t.get('score') is not None]
+    if len({t.get('comparison_identity') for t in valid})>1:
+        raise ValueError('INCOMPARABLE_TASK_INSTANCE_BACKEND_OR_MODEL')
+    return dict(status=status,stop_reason=reason,pending=pending,trials=saved['trials'],algorithm=saved['algorithm'],
+        baseline=saved['trials'][0] if saved['trials'] else None,
+        best=min(valid,key=lambda t:t['score']) if valid else None)
 
 
 def _save(host, saved):

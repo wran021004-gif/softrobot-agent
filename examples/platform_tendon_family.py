@@ -156,7 +156,9 @@ def build_candidates(root,candidate=None):
                 physics=built.resolved_physics,scene=scene,sources=prepared['selection']['sources']))
             if backend=='family_mujoco':
                 import mujoco
-                path=root/(name+'.xml'); compile_xml(built.resolved_physics,scene,None,path)
+                from tools.platform_registry import registry
+                config=registry().bind(prepared['effective'].policy.backend,'backend')[1]
+                path=root/(name+'.xml'); compile_xml(built.resolved_physics,scene,config,path)
                 model=mujoco.MjModel.from_xml_path(str(path))
                 result[name]=dict(dofs=model.nv,tendons=model.ntendon,actuators=len(built.candidate.actuators),mass_kg=sum(x['mass_kg'] for x in built.resolved_physics['parts']),
                     selection=prepared['selection'],**rebuild)
@@ -184,7 +186,7 @@ def run(root,backend,label='',candidate=None):
         selected=candidate or 'continuous'
         prepared=prepare_candidate(root,selected,backend)
         save_selection(root,selected,backend,prepared)
-        inp=prepared['input']; selection=prepared['selection']; changes=selection['request']['changes']
+        inp=prepared['effective'].model_dump(mode='json'); selection=prepared['selection']; changes={}
         prefix=selected+'_'+backend
         inp['run_id']+='_'+selected
     store=Store(root)
@@ -232,18 +234,15 @@ def compare(root,candidate=None,label=''):
     import numpy as np
     from tools.state_io import atomic_json
     root=Path(root); records=[read_record(root,b,candidate,label) for b in ('matlab_spatial','family_mujoco')]
-    if records[0].get('selection') or records[1].get('selection'):
-        for key in ('candidate_id','request_identity','design_identity','discretization_identity','physical_inputs_identity',
-                    'experiment_identity','dynamics_model_identity','control_identity'):
-            if records[0]['selection'][key]!=records[1]['selection'][key]: raise ValueError('COMPARISON_CANDIDATE_IDENTITY_MISMATCH: '+key)
-    for key in ('physics_identity','scene_identity'):
-        assert records[0]['result_data'][key]==records[1]['result_data'][key]
+    from extensions.tendon_family.comparison import comparable
+    basis=comparable(root,records)
+    if not basis['comparable']: return dict(status='not_comparable',**basis,extra_backend_solves=0)
     rows=[json.loads((Path(r['saved_folder'])/'replay_trajectory.json').read_text(encoding='utf8')) for r in records]
     np.testing.assert_allclose([r['time_s'] for r in rows[0]],[r['time_s'] for r in rows[1]],rtol=0,atol=1e-12)
     tips=[np.array([r['tip_m'] for r in rs]) for rs in rows]
     lengths=[np.array([r['tendon_length_m'] for r in rs]) for rs in rows]
     tensions=[np.array([r['tension_n'] for r in rs]) for rs in rows]
-    out=dict(candidate_id=candidate or 'continuous',selection=records[0].get('selection'),meaning='Independent backends, shared physical entities and sample clocks; no ground-truth or calibration claim',
+    out=dict(candidate_id=candidate or 'continuous',selection=records[0].get('selection'),comparison_basis=basis,meaning='Independent backends, shared physical entities and sample clocks; no ground-truth or calibration claim',
         tip_final_difference_m=float(np.linalg.norm(tips[0][-1]-tips[1][-1])),tip_rms_difference_m=float(np.sqrt(np.mean(np.sum((tips[0]-tips[1])**2,axis=1)))),
         length_max_difference_m=float(np.max(np.abs(lengths[0]-lengths[1]))),tension_max_difference_n=float(np.max(np.abs(tensions[0]-tensions[1]))),
         records=[dict(backend=r['backend'],timings=r['result_data']['timings_s'],evaluation=r['evaluation'],usage=r['usage']) for r in records],
@@ -252,12 +251,20 @@ def compare(root,candidate=None,label=''):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__); parser.add_argument('action',choices=['prepare','build','run','compare','view'])
+    parser=argparse.ArgumentParser(description=__doc__); parser.add_argument('action',choices=['prepare','build','run','compare','view',
+        'prepare-opt','build-opt','optimize','best','diagnose','video','crosscheck'])
     parser.add_argument('root',type=Path); parser.add_argument('--backend',choices=['single','matlab_spatial','family_mujoco'],default='matlab_spatial')
     parser.add_argument('--label',default='',help='Explicit distinct invocation label after a diagnosed failure; never auto-retry')
     parser.add_argument('--candidate',choices=list(CANDIDATES),help='Explicit request selection; run defaults to continuous, build defaults to both')
+    parser.add_argument('--request',type=Path)
+    parser.add_argument('--t-start-s',type=float); parser.add_argument('--t-end-s',type=float)
+    parser.add_argument('--fps',type=int,default=25)
+    parser.add_argument('--azimuth-deg',type=float,default=135.); parser.add_argument('--elevation-deg',type=float,default=-20.)
     args=parser.parse_args(argv)
-    if args.action=='run': out=run(args.root,args.backend,args.label,args.candidate)
+    if args.action in ('prepare-opt','build-opt','optimize','best','diagnose','video','crosscheck'):
+        from examples.platform_family_optimization import command
+        out=command(args.root,args.action,args.request,args.t_start_s,args.t_end_s,args.fps,args.azimuth_deg,args.elevation_deg)
+    elif args.action=='run': out=run(args.root,args.backend,args.label,args.candidate)
     elif args.action=='build': out=build_candidates(args.root,args.candidate)
     elif args.action=='compare': out=compare(args.root,args.candidate,args.label)
     elif args.action=='view':

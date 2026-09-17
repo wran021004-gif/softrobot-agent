@@ -44,6 +44,8 @@ class RenderVideo(Contract):
     t_start_s: float | None=Field(default=None,ge=0)
     t_end_s: float | None=Field(default=None,ge=0)
     fps: int=Field(default=25,ge=1,le=60)
+    azimuth_deg: float=135.
+    elevation_deg: float=Field(default=-20.,ge=-90,le=90)
 class Claim(Contract):
     evidence_ref: str
     record_type: Literal['events','queries']='queries'

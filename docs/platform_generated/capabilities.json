@@ -960,6 +960,13 @@
       "category": "simulation",
       "role": "adapter",
       "model": "mujoco_serial_bending_v1",
+      "models": {
+        "model.serial_bending_cells": {
+          "implementation_model_id": "mujoco_serial_bending_v1",
+          "implementation": "MuJoCo articulated rigid-body dynamics",
+          "contact_semantics": "MuJoCo convex native contact"
+        }
+      },
       "conversion": "shared serial family physics",
       "families": [
         "task.reach"
@@ -1058,6 +1065,7 @@
       "extensions/tendon_family/legacy.py",
       "extensions/tendon_family/scene.py",
       "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
       "extensions/tendon_family/backends.py",
       "extensions/tendon_family/signals.py",
       "extensions/tendon_family/candidate.py",
@@ -1065,6 +1073,9 @@
       "extensions/tendon_family/mjcf.py",
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -1081,6 +1092,18 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
       [
         "family.design",
         "1.0.0"
@@ -1099,6 +1122,455 @@
       ],
       [
         "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.space",
+        "1.0.0"
+      ],
+      [
+        "family.discretization",
+        "1.0.0"
+      ],
+      [
+        "family.experiment_spec",
+        "1.0.0"
+      ],
+      [
+        "family.build_request",
+        "1.0.0"
+      ],
+      [
+        "family.build_result",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "backend.family_mujoco",
+    "kind": "backend",
+    "version": "1.1.0",
+    "binding": "extensions.tendon_family.backends:MujocoBackend",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "显式模型兼容关系与后端专用数值设置",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "integrator": {
+          "const": "implicitfast",
+          "default": "implicitfast",
+          "title": "Integrator",
+          "type": "string"
+        },
+        "timestep_source": {
+          "const": "task.timing.timestep_s",
+          "default": "task.timing.timestep_s",
+          "title": "Timestep Source",
+          "type": "string"
+        },
+        "contact_model": {
+          "const": "mujoco_convex_native",
+          "default": "mujoco_convex_native",
+          "title": "Contact Model",
+          "type": "string"
+        },
+        "friction": {
+          "default": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Friction",
+          "type": "array"
+        }
+      },
+      "title": "MujocoParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Signal": {
+          "additionalProperties": false,
+          "properties": {
+            "spec": {
+              "$ref": "#/$defs/SignalSpec"
+            },
+            "times_s": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Times S",
+              "type": "array"
+            },
+            "values": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "spec",
+            "times_s",
+            "values"
+          ],
+          "title": "Signal",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "backend_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Backend Id",
+          "type": "string"
+        },
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "backend_version": {
+          "default": "1.0.0",
+          "title": "Backend Version",
+          "type": "string"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Payload"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/Payload"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "solver_status",
+        "backend_id",
+        "model_id",
+        "signals",
+        "data",
+        "limitations",
+        "initial_state",
+        "seed"
+      ],
+      "title": "BackendResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "simulation",
+      "role": "adapter",
+      "model": "mujoco_serial_bending_v1",
+      "models": {
+        "model.serial_bending_cells": {
+          "implementation_model_id": "mujoco_serial_bending_v1",
+          "implementation": "MuJoCo articulated rigid-body dynamics",
+          "contact_semantics": "MuJoCo convex native contact"
+        }
+      },
+      "conversion": "shared serial family physics",
+      "families": [
+        "task.reach"
+      ],
+      "robots": [
+        "tendon_robot_family",
+        "tendon_driven_continuum"
+      ],
+      "inactive_parameters": [],
+      "robot_contracts": [
+        "family.design",
+        "domain.rod_design"
+      ],
+      "channels": [
+        "actuator_commands"
+      ],
+      "environments": [
+        "experiment.assembly"
+      ],
+      "controllers": [
+        "controller.family"
+      ],
+      "signals": [
+        "tip_position",
+        "joint_position",
+        "joint_velocity",
+        "tendon_length",
+        "tendon_tension",
+        "tendon_target_length",
+        "actuator_command",
+        "actuator_torque",
+        "external_torque"
+      ],
+      "signal_specs_resolver": "extensions.tendon_family.signals:observation_specs",
+      "signal_phases": [
+        "post_step",
+        "pre_step_solver"
+      ],
+      "structures": [
+        "serial flexible segments",
+        "fixed rigid connectors",
+        "guides",
+        "payloads"
+      ],
+      "sections": [
+        "circle",
+        "tube",
+        "ellipse",
+        "rectangle",
+        "simple polygon with holes"
+      ],
+      "routing": "ordered body/physical-segment stations, straight frictionless spans, intermediate anchors",
+      "transmission": "independent/shared ideal displacement or drum rotation; winding sign; travel/speed and per-tendon force limits",
+      "descriptive_only": [
+        "discrete flexure",
+        "rigid tendon joint",
+        "branch",
+        "closed chain",
+        "cable parallel"
+      ],
+      "omissions": [
+        "material torsion",
+        "shear",
+        "axial stretch",
+        "rope elasticity",
+        "friction",
+        "self collision",
+        "motor dynamics"
+      ],
+      "operations": [
+        "compile",
+        "initialize",
+        "run",
+        "export",
+        "close"
+      ],
+      "timeout": "internal solve deadline; engine startup/shutdown not hard bounded",
+      "numerical_contract": "family.mujoco_parameters"
+    },
+    "resources": [],
+    "dependencies": [
+      "numpy",
+      "scipy",
+      "mujoco"
+    ],
+    "sources": [
+      "extensions/tendon_family/contracts.py",
+      "extensions/tendon_family/compiler.py",
+      "extensions/tendon_family/sections.py",
+      "extensions/tendon_family/geometry.py",
+      "extensions/tendon_family/legacy.py",
+      "extensions/tendon_family/scene.py",
+      "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
+      "extensions/tendon_family/backends.py",
+      "extensions/tendon_family/signals.py",
+      "extensions/tendon_family/candidate.py",
+      "extensions/tendon_family/preparation.py",
+      "extensions/tendon_family/mjcf.py",
+      "extensions/tendon_family/saved.py",
+      "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
+      "tools/platform_tools.py",
+      "tools/platform_tasks.py",
+      "schemas/platform_operations.py",
+      "tools/design_compiler.py",
+      "tools/matlab_tools.py",
+      "tools/state_io.py",
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/robot_domain/contracts.py",
+      "schemas/environment_spec.py",
+      "schemas/robot_ir.py",
+      "schemas/exploration.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
+      [
+        "family.design",
+        "1.0.0"
+      ],
+      [
+        "family.initial",
+        "1.0.0"
+      ],
+      [
+        "family.control",
+        "1.0.0"
+      ],
+      [
+        "family.parameters",
+        "1.0.0"
+      ],
+      [
+        "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
         "1.0.0"
       ],
       [
@@ -3350,6 +3822,13 @@
       "category": "mathematical_models",
       "role": "adapter",
       "model": "matlab_serial_bending_v1",
+      "models": {
+        "model.serial_bending_cells": {
+          "implementation_model_id": "matlab_serial_bending_v1",
+          "implementation": "MATLAB native spatial serial dynamics",
+          "contact_semantics": "lowest-envelope-vertex penalty contact"
+        }
+      },
       "conversion": "shared serial family physics",
       "families": [
         "task.reach"
@@ -3443,6 +3922,7 @@
       "extensions/tendon_family/legacy.py",
       "extensions/tendon_family/scene.py",
       "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
       "extensions/tendon_family/backends.py",
       "extensions/tendon_family/signals.py",
       "extensions/tendon_family/candidate.py",
@@ -3450,6 +3930,9 @@
       "extensions/tendon_family/mjcf.py",
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -3477,6 +3960,18 @@
     "extension_dependencies": [],
     "contract_dependencies": [
       [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
+      [
         "family.design",
         "1.0.0"
       ],
@@ -3494,6 +3989,468 @@
       ],
       [
         "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.space",
+        "1.0.0"
+      ],
+      [
+        "family.discretization",
+        "1.0.0"
+      ],
+      [
+        "family.experiment_spec",
+        "1.0.0"
+      ],
+      [
+        "family.build_request",
+        "1.0.0"
+      ],
+      [
+        "family.build_result",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "backend.matlab_spatial",
+    "kind": "backend",
+    "version": "1.1.0",
+    "binding": "extensions.tendon_family.backends:MatlabBackend",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "显式模型兼容关系与后端专用数值设置",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "integrator": {
+          "const": "ode15s",
+          "default": "ode15s",
+          "title": "Integrator",
+          "type": "string"
+        },
+        "max_step_s": {
+          "default": 0.001,
+          "exclusiveMinimum": 0,
+          "title": "Max Step S",
+          "type": "number"
+        },
+        "rtol": {
+          "default": 1e-05,
+          "exclusiveMinimum": 0,
+          "title": "Rtol",
+          "type": "number"
+        },
+        "atol": {
+          "default": 1e-07,
+          "exclusiveMinimum": 0,
+          "title": "Atol",
+          "type": "number"
+        },
+        "contact_model": {
+          "const": "lowest_envelope_vertex_penalty",
+          "default": "lowest_envelope_vertex_penalty",
+          "title": "Contact Model",
+          "type": "string"
+        },
+        "contact_stiffness_n_m": {
+          "default": 5000.0,
+          "exclusiveMinimum": 0,
+          "title": "Contact Stiffness N M",
+          "type": "number"
+        },
+        "contact_damping_n_s_m": {
+          "default": 5.0,
+          "minimum": 0,
+          "title": "Contact Damping N S M",
+          "type": "number"
+        }
+      },
+      "title": "MatlabParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Signal": {
+          "additionalProperties": false,
+          "properties": {
+            "spec": {
+              "$ref": "#/$defs/SignalSpec"
+            },
+            "times_s": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Times S",
+              "type": "array"
+            },
+            "values": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "spec",
+            "times_s",
+            "values"
+          ],
+          "title": "Signal",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "backend_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Backend Id",
+          "type": "string"
+        },
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "backend_version": {
+          "default": "1.0.0",
+          "title": "Backend Version",
+          "type": "string"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Payload"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/Payload"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "solver_status",
+        "backend_id",
+        "model_id",
+        "signals",
+        "data",
+        "limitations",
+        "initial_state",
+        "seed"
+      ],
+      "title": "BackendResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "mathematical_models",
+      "role": "adapter",
+      "model": "matlab_serial_bending_v1",
+      "models": {
+        "model.serial_bending_cells": {
+          "implementation_model_id": "matlab_serial_bending_v1",
+          "implementation": "MATLAB native spatial serial dynamics",
+          "contact_semantics": "lowest-envelope-vertex penalty contact"
+        }
+      },
+      "conversion": "shared serial family physics",
+      "families": [
+        "task.reach"
+      ],
+      "robots": [
+        "tendon_robot_family",
+        "tendon_driven_continuum"
+      ],
+      "inactive_parameters": [],
+      "robot_contracts": [
+        "family.design",
+        "domain.rod_design"
+      ],
+      "channels": [
+        "actuator_commands"
+      ],
+      "environments": [
+        "experiment.assembly"
+      ],
+      "controllers": [
+        "controller.family"
+      ],
+      "signals": [
+        "tip_position",
+        "joint_position",
+        "joint_velocity",
+        "tendon_length",
+        "tendon_tension",
+        "tendon_target_length",
+        "actuator_command",
+        "actuator_torque",
+        "external_torque"
+      ],
+      "signal_specs_resolver": "extensions.tendon_family.signals:observation_specs",
+      "signal_phases": [
+        "post_step",
+        "pre_step_solver"
+      ],
+      "structures": [
+        "serial flexible segments",
+        "fixed rigid connectors",
+        "guides",
+        "payloads"
+      ],
+      "sections": [
+        "circle",
+        "tube",
+        "ellipse",
+        "rectangle",
+        "simple polygon with holes"
+      ],
+      "routing": "ordered body/physical-segment stations, straight frictionless spans, intermediate anchors",
+      "transmission": "independent/shared ideal displacement or drum rotation; winding sign; travel/speed and per-tendon force limits",
+      "descriptive_only": [
+        "discrete flexure",
+        "rigid tendon joint",
+        "branch",
+        "closed chain",
+        "cable parallel"
+      ],
+      "omissions": [
+        "material torsion",
+        "shear",
+        "axial stretch",
+        "rope elasticity",
+        "friction",
+        "self collision",
+        "motor dynamics"
+      ],
+      "operations": [
+        "compile",
+        "initialize",
+        "run",
+        "export",
+        "close"
+      ],
+      "timeout": "internal solve deadline; engine startup/shutdown not hard bounded",
+      "numerical_contract": "family.matlab_parameters"
+    },
+    "resources": [
+      "matlab_engine"
+    ],
+    "dependencies": [
+      "numpy",
+      "matlab.engine"
+    ],
+    "sources": [
+      "extensions/tendon_family/contracts.py",
+      "extensions/tendon_family/compiler.py",
+      "extensions/tendon_family/sections.py",
+      "extensions/tendon_family/geometry.py",
+      "extensions/tendon_family/legacy.py",
+      "extensions/tendon_family/scene.py",
+      "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
+      "extensions/tendon_family/backends.py",
+      "extensions/tendon_family/signals.py",
+      "extensions/tendon_family/candidate.py",
+      "extensions/tendon_family/preparation.py",
+      "extensions/tendon_family/mjcf.py",
+      "extensions/tendon_family/saved.py",
+      "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
+      "tools/platform_tools.py",
+      "tools/platform_tasks.py",
+      "schemas/platform_operations.py",
+      "tools/design_compiler.py",
+      "tools/matlab_tools.py",
+      "tools/state_io.py",
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/robot_domain/contracts.py",
+      "schemas/environment_spec.py",
+      "schemas/robot_ir.py",
+      "schemas/exploration.py"
+    ],
+    "assets": [
+      "matlab/tf_geometry.m",
+      "matlab/tf_point.m",
+      "matlab/tf_routes.m",
+      "matlab/tf_terms.m",
+      "matlab/tf_control.m",
+      "matlab/tf_run.m",
+      "matlab/tf_observe.m",
+      "matlab/tf_static.m",
+      "matlab/tf_view.m"
+    ],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
+      [
+        "family.design",
+        "1.0.0"
+      ],
+      [
+        "family.initial",
+        "1.0.0"
+      ],
+      [
+        "family.control",
+        "1.0.0"
+      ],
+      [
+        "family.parameters",
+        "1.0.0"
+      ],
+      [
+        "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
         "1.0.0"
       ],
       [
@@ -4787,6 +5744,17 @@
             "controller": {
               "$ref": "#/$defs/Binding"
             },
+            "dynamics_model": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Binding"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
             "discretization": {
               "anyOf": [
                 {
@@ -5656,6 +6624,44 @@
           "title": "Design",
           "type": "object"
         },
+        "Discretization": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "serial_bending_discretization_v1",
+              "default": "serial_bending_discretization_v1",
+              "title": "Version",
+              "type": "string"
+            },
+            "model": {
+              "const": "serial_bending_cells_v1",
+              "default": "serial_bending_cells_v1",
+              "title": "Model",
+              "type": "string"
+            },
+            "cells": {
+              "minProperties": 1,
+              "patternProperties": {
+                "^[A-Za-z][A-Za-z0-9_]*$": {
+                  "type": "integer"
+                }
+              },
+              "title": "Cells",
+              "type": "object"
+            },
+            "coordinates": {
+              "const": "two_principal_bending_angles_per_cell",
+              "default": "two_principal_bending_angles_per_cell",
+              "title": "Coordinates",
+              "type": "string"
+            }
+          },
+          "required": [
+            "cells"
+          ],
+          "title": "Discretization",
+          "type": "object"
+        },
         "PhysicalInput": {
           "additionalProperties": false,
           "properties": {
@@ -6249,11 +7255,26 @@
           "title": "Parameters",
           "type": "object"
         },
+        "control_parameters": {
+          "additionalProperties": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Control Parameters",
+          "type": "object"
+        },
         "templates": {
           "additionalProperties": {
             "$ref": "#/$defs/Design"
           },
           "title": "Templates",
+          "type": "object"
+        },
+        "template_discretizations": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Discretization"
+          },
+          "title": "Template Discretizations",
           "type": "object"
         },
         "discretization_parameters": {
@@ -6363,6 +7384,17 @@
             },
             "controller": {
               "$ref": "#/$defs/Binding"
+            },
+            "dynamics_model": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Binding"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
             },
             "discretization": {
               "anyOf": [
@@ -6992,6 +8024,7 @@
       "extensions/tendon_family/legacy.py",
       "extensions/tendon_family/scene.py",
       "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
       "extensions/tendon_family/backends.py",
       "extensions/tendon_family/signals.py",
       "extensions/tendon_family/candidate.py",
@@ -6999,6 +8032,9 @@
       "extensions/tendon_family/mjcf.py",
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -7015,6 +8051,18 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
       [
         "family.design",
         "1.0.0"
@@ -7033,6 +8081,18 @@
       ],
       [
         "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
         "1.0.0"
       ],
       [
@@ -7174,6 +8234,17 @@
             },
             "controller": {
               "$ref": "#/$defs/Binding"
+            },
+            "dynamics_model": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Binding"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
             },
             "discretization": {
               "anyOf": [
@@ -7815,6 +8886,9 @@
     "sources": [
       "extensions/robot_domain/contracts.py",
       "extensions/robot_domain/candidate.py",
+      "extensions/tendon_family/diagnostics.py",
+      "extensions/tendon_family/saved.py",
+      "matlab/tf_view.m",
       "extensions/robot_domain/signals.py",
       "extensions/robot_domain/saved.py",
       "extensions/robot_domain/manifest.py",
@@ -7955,6 +9029,17 @@
             },
             "controller": {
               "$ref": "#/$defs/Binding"
+            },
+            "dynamics_model": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Binding"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
             },
             "discretization": {
               "anyOf": [
@@ -8760,6 +9845,51 @@
     ],
     "description": "理想驱动映射、确定性指令或实时末端反馈",
     "input_schema": {
+      "$defs": {
+        "Reference": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "task_goal",
+                "actuator_commands"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "commands": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "title": "Commands",
+              "type": "object"
+            },
+            "units": {
+              "enum": [
+                "m_or_rad_by_actuator",
+                "m"
+              ],
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "enum": [
+                "actuator",
+                "world"
+              ],
+              "title": "Frame",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "units",
+            "frame"
+          ],
+          "title": "Reference",
+          "type": "object"
+        }
+      },
       "additionalProperties": false,
       "properties": {
         "mode": {
@@ -8770,6 +9900,17 @@
           ],
           "title": "Mode",
           "type": "string"
+        },
+        "reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Reference"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "commands": {
           "additionalProperties": {
@@ -8840,7 +9981,21 @@
         "tip_position"
       ],
       "reset": true,
-      "restore": false
+      "restore": false,
+      "algorithms": {
+        "deterministic": "deterministic_actuator_reference_v1",
+        "tip_feedback": "tip_resolved_rate_feedback_v1"
+      },
+      "reference_types": [
+        "actuator_commands",
+        "task_goal"
+      ],
+      "output": "named actuator command -> tendon target length",
+      "sampling": {
+        "control_observation": "interval_start_pre_step",
+        "force": "interval_start_pre_step_solver",
+        "state": "interval_end_post_step"
+      }
     },
     "resources": [],
     "dependencies": [],
@@ -8852,6 +10007,7 @@
       "extensions/tendon_family/legacy.py",
       "extensions/tendon_family/scene.py",
       "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
       "extensions/tendon_family/backends.py",
       "extensions/tendon_family/signals.py",
       "extensions/tendon_family/candidate.py",
@@ -8859,6 +10015,9 @@
       "extensions/tendon_family/mjcf.py",
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -8875,6 +10034,18 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
       [
         "family.design",
         "1.0.0"
@@ -8893,6 +10064,18 @@
       ],
       [
         "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
         "1.0.0"
       ],
       [
@@ -10039,11 +11222,26 @@
               "title": "Parameters",
               "type": "object"
             },
+            "control_parameters": {
+              "additionalProperties": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Control Parameters",
+              "type": "object"
+            },
             "templates": {
               "additionalProperties": {
                 "$ref": "#/$defs/Design"
               },
               "title": "Templates",
+              "type": "object"
+            },
+            "template_discretizations": {
+              "additionalProperties": {
+                "$ref": "#/$defs/Discretization"
+              },
+              "title": "Template Discretizations",
               "type": "object"
             },
             "discretization_parameters": {
@@ -11133,6 +12331,7 @@
       "extensions/tendon_family/legacy.py",
       "extensions/tendon_family/scene.py",
       "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
       "extensions/tendon_family/backends.py",
       "extensions/tendon_family/signals.py",
       "extensions/tendon_family/candidate.py",
@@ -11140,6 +12339,9 @@
       "extensions/tendon_family/mjcf.py",
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -11156,6 +12358,18 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
       [
         "family.design",
         "1.0.0"
@@ -11174,6 +12388,18 @@
       ],
       [
         "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
         "1.0.0"
       ],
       [
@@ -11593,6 +12819,9 @@
     "sources": [
       "extensions/robot_domain/contracts.py",
       "extensions/robot_domain/candidate.py",
+      "extensions/tendon_family/diagnostics.py",
+      "extensions/tendon_family/saved.py",
+      "matlab/tf_view.m",
       "extensions/robot_domain/signals.py",
       "extensions/robot_domain/saved.py",
       "extensions/robot_domain/manifest.py",
@@ -11913,6 +13142,9 @@
     "sources": [
       "extensions/robot_domain/contracts.py",
       "extensions/robot_domain/candidate.py",
+      "extensions/tendon_family/diagnostics.py",
+      "extensions/tendon_family/saved.py",
+      "matlab/tf_view.m",
       "extensions/robot_domain/signals.py",
       "extensions/robot_domain/saved.py",
       "extensions/robot_domain/manifest.py",
@@ -12330,6 +13562,9 @@
     "sources": [
       "extensions/robot_domain/contracts.py",
       "extensions/robot_domain/candidate.py",
+      "extensions/tendon_family/diagnostics.py",
+      "extensions/tendon_family/saved.py",
+      "matlab/tf_view.m",
       "extensions/robot_domain/signals.py",
       "extensions/robot_domain/saved.py",
       "extensions/robot_domain/manifest.py",
@@ -13870,6 +15105,7 @@
       "extensions/tendon_family/legacy.py",
       "extensions/tendon_family/scene.py",
       "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
       "extensions/tendon_family/backends.py",
       "extensions/tendon_family/signals.py",
       "extensions/tendon_family/candidate.py",
@@ -13877,6 +15113,9 @@
       "extensions/tendon_family/mjcf.py",
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -13893,6 +15132,18 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
       [
         "family.design",
         "1.0.0"
@@ -13911,6 +15162,18 @@
       ],
       [
         "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
         "1.0.0"
       ],
       [
@@ -14800,6 +16063,220 @@
     "side_effects": "none"
   },
   {
+    "extension_id": "model.serial_bending_cells",
+    "kind": "dynamics_model",
+    "version": "1.0.0",
+    "binding": "extensions.tendon_family.execution:model_definition",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "串联逐刚体、逐单元双主轴弯曲数学模型",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "const": "serial_bending_cells_v1",
+          "default": "serial_bending_cells_v1",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "coordinates": {
+          "const": "two_principal_bending_angles_per_cell",
+          "default": "two_principal_bending_angles_per_cell",
+          "title": "Coordinates",
+          "type": "string"
+        },
+        "equations": {
+          "const": "serial_rigid_body_dynamics_with_hinge_bending",
+          "default": "serial_rigid_body_dynamics_with_hinge_bending",
+          "title": "Equations",
+          "type": "string"
+        },
+        "tendon_model": {
+          "const": "straight_frictionless_length_servo",
+          "default": "straight_frictionless_length_servo",
+          "title": "Tendon Model",
+          "type": "string"
+        },
+        "included": {
+          "default": [
+            "rigid_body_inertia",
+            "gravity",
+            "hinge_elasticity",
+            "hinge_damping",
+            "external_body_forces"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Included",
+          "type": "array"
+        },
+        "omitted": {
+          "default": [
+            "axial_stretch",
+            "shear",
+            "material_torsion",
+            "tendon_friction",
+            "rope_elasticity",
+            "motor_dynamics",
+            "self_collision"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Omitted",
+          "type": "array"
+        }
+      },
+      "title": "DynamicsModel",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "contract": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Contract",
+          "type": "string"
+        },
+        "version": {
+          "default": "1.0.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true,
+          "title": "Data",
+          "type": "object"
+        }
+      },
+      "required": [
+        "contract",
+        "data"
+      ],
+      "title": "Payload",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "mathematical_model",
+      "role": "definition",
+      "coordinates": "two principal bending angles per cell",
+      "equations": "serial rigid-body dynamics with hinge elasticity/damping and straight frictionless tendon length servos",
+      "physical_input": "family.design",
+      "derived_representation": "family.discretization + resolved_physics"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/tendon_family/contracts.py",
+      "extensions/tendon_family/compiler.py",
+      "extensions/tendon_family/sections.py",
+      "extensions/tendon_family/geometry.py",
+      "extensions/tendon_family/legacy.py",
+      "extensions/tendon_family/scene.py",
+      "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
+      "extensions/tendon_family/backends.py",
+      "extensions/tendon_family/signals.py",
+      "extensions/tendon_family/candidate.py",
+      "extensions/tendon_family/preparation.py",
+      "extensions/tendon_family/mjcf.py",
+      "extensions/tendon_family/saved.py",
+      "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
+      "tools/platform_tools.py",
+      "tools/platform_tasks.py",
+      "schemas/platform_operations.py",
+      "tools/design_compiler.py",
+      "tools/matlab_tools.py",
+      "tools/state_io.py",
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/robot_domain/contracts.py",
+      "schemas/environment_spec.py",
+      "schemas/robot_ir.py",
+      "schemas/exploration.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
+      [
+        "family.design",
+        "1.0.0"
+      ],
+      [
+        "family.initial",
+        "1.0.0"
+      ],
+      [
+        "family.control",
+        "1.0.0"
+      ],
+      [
+        "family.parameters",
+        "1.0.0"
+      ],
+      [
+        "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.space",
+        "1.0.0"
+      ],
+      [
+        "family.discretization",
+        "1.0.0"
+      ],
+      [
+        "family.experiment_spec",
+        "1.0.0"
+      ],
+      [
+        "family.build_request",
+        "1.0.0"
+      ],
+      [
+        "family.build_result",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
     "extension_id": "offline",
     "kind": "model_adapter",
     "version": "1.0.0",
@@ -14886,6 +16363,208 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "search.family_coordinate",
+    "kind": "search",
+    "version": "1.0.0",
+    "binding": "extensions.tendon_family.optimization:CoordinateSearch",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "复用有界坐标搜索；首个候选为基线；设计与控制联合整定",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "initial": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Initial",
+          "type": "object"
+        },
+        "bounds": {
+          "additionalProperties": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Bounds",
+          "type": "object"
+        },
+        "max_trials": {
+          "default": 3,
+          "minimum": 1,
+          "title": "Max Trials",
+          "type": "integer"
+        },
+        "step": {
+          "default": 0.2,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Step",
+          "type": "number"
+        }
+      },
+      "required": [
+        "initial",
+        "bounds"
+      ],
+      "title": "SearchParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "contract": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Contract",
+          "type": "string"
+        },
+        "version": {
+          "default": "1.0.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true,
+          "title": "Data",
+          "type": "object"
+        }
+      },
+      "required": [
+        "contract",
+        "data"
+      ],
+      "title": "Payload",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "parameter_search",
+      "role": "adapter",
+      "checkpoint": "family.search_state",
+      "public_entry": "extensions.tendon_family.optimization:optimize",
+      "request_contract": "family.optimization_request",
+      "numerical_discretization": "fixed",
+      "trajectory_optimization": "unsupported"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/tendon_family/contracts.py",
+      "extensions/tendon_family/compiler.py",
+      "extensions/tendon_family/sections.py",
+      "extensions/tendon_family/geometry.py",
+      "extensions/tendon_family/legacy.py",
+      "extensions/tendon_family/scene.py",
+      "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
+      "extensions/tendon_family/backends.py",
+      "extensions/tendon_family/signals.py",
+      "extensions/tendon_family/candidate.py",
+      "extensions/tendon_family/preparation.py",
+      "extensions/tendon_family/mjcf.py",
+      "extensions/tendon_family/saved.py",
+      "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
+      "tools/platform_tools.py",
+      "tools/platform_tasks.py",
+      "schemas/platform_operations.py",
+      "tools/design_compiler.py",
+      "tools/matlab_tools.py",
+      "tools/state_io.py",
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/robot_domain/contracts.py",
+      "schemas/environment_spec.py",
+      "schemas/robot_ir.py",
+      "schemas/exploration.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
+      [
+        "family.design",
+        "1.0.0"
+      ],
+      [
+        "family.initial",
+        "1.0.0"
+      ],
+      [
+        "family.control",
+        "1.0.0"
+      ],
+      [
+        "family.parameters",
+        "1.0.0"
+      ],
+      [
+        "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.space",
+        "1.0.0"
+      ],
+      [
+        "family.discretization",
+        "1.0.0"
+      ],
+      [
+        "family.experiment_spec",
+        "1.0.0"
+      ],
+      [
+        "family.build_request",
+        "1.0.0"
+      ],
+      [
+        "family.build_result",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -15366,6 +17045,9 @@
     "sources": [
       "extensions/robot_domain/contracts.py",
       "extensions/robot_domain/candidate.py",
+      "extensions/tendon_family/diagnostics.py",
+      "extensions/tendon_family/saved.py",
+      "matlab/tf_view.m",
       "extensions/robot_domain/signals.py",
       "extensions/robot_domain/saved.py",
       "extensions/robot_domain/manifest.py",
@@ -18209,6 +19891,18 @@
           "minimum": 1,
           "title": "Fps",
           "type": "integer"
+        },
+        "azimuth_deg": {
+          "default": 135.0,
+          "title": "Azimuth Deg",
+          "type": "number"
+        },
+        "elevation_deg": {
+          "default": -20.0,
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Elevation Deg",
+          "type": "number"
         }
       },
       "required": [
@@ -18336,6 +20030,18 @@
           "minimum": 1,
           "title": "Fps",
           "type": "integer"
+        },
+        "azimuth_deg": {
+          "default": 135.0,
+          "title": "Azimuth Deg",
+          "type": "number"
+        },
+        "elevation_deg": {
+          "default": -20.0,
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Elevation Deg",
+          "type": "number"
         }
       },
       "required": [
@@ -18432,6 +20138,9 @@
     "sources": [
       "extensions/robot_domain/contracts.py",
       "extensions/robot_domain/candidate.py",
+      "extensions/tendon_family/diagnostics.py",
+      "extensions/tendon_family/saved.py",
+      "matlab/tf_view.m",
       "extensions/robot_domain/signals.py",
       "extensions/robot_domain/saved.py",
       "extensions/robot_domain/manifest.py",
@@ -18605,6 +20314,9 @@
     "sources": [
       "extensions/robot_domain/contracts.py",
       "extensions/robot_domain/candidate.py",
+      "extensions/tendon_family/diagnostics.py",
+      "extensions/tendon_family/saved.py",
+      "matlab/tf_view.m",
       "extensions/robot_domain/signals.py",
       "extensions/robot_domain/saved.py",
       "extensions/robot_domain/manifest.py",

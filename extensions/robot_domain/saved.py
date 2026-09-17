@@ -75,7 +75,10 @@ def seal(ctx, args, source, report):
 def diagnosis(ctx, args):
     from schemas.public_tools import SavedDiagnosis
     from tools.public_services import saved_diagnosis
-    source = restore(ctx, args)
+    source = restore(ctx, args, family_replay=True)
+    if source['backend'] in ('backend.matlab_spatial','backend.family_mujoco'):
+        from extensions.tendon_family.diagnostics import diagnose
+        return seal(ctx,args,source,diagnose(ctx,args,source))
     options = args.model_dump(exclude={'result', 'execution_id'})
     options = plain(SavedDiagnosis(result_ref='result.json', backend=source['backend'], **options))
     report = saved_diagnosis(source['root'], source['registry'], options,
@@ -118,9 +121,10 @@ def replay(ctx, args):
 def video(ctx, args):
     from tools.tool_registry import service_tools
     from tools.service_execution import execute
-    source = restore(ctx, args)
+    source = restore(ctx, args, family_replay=True)
+    backend={'backend.matlab_spatial':'matlab','backend.family_mujoco':'mujoco'}.get(source['backend'],source['backend'])
     definition = service_tools()['visualization.render_simulation_video']
-    options = plain(definition.schema.model_validate(dict(result_ref='result.json', backend=source['backend'],
+    options = plain(definition.schema.model_validate(dict(result_ref='result.json', backend=backend,
         **args.model_dump(exclude={'result', 'execution_id'}))))
     report = execute(definition, source['root'], source['registry'], options, ctx.folder)
     return seal(ctx, args, source, report)

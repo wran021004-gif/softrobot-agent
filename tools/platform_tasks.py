@@ -80,7 +80,7 @@ def compile_input(value, reg=None):
         inp = inp.model_copy(update={'policy': inp.policy.model_copy(update={'candidate_builder': default_builder})})
     builder, builder_params = reg.bind(inp.policy.candidate_builder, 'candidate_builder')
     editable = builder.capabilities.get('editable', controller.capabilities.get('editable', []))
-    declared = set(getattr(builder_params, 'parameters', {})) | set(getattr(builder_params, 'discretization_parameters', {}))
+    declared = set(getattr(builder_params, 'parameters', {})) | set(getattr(builder_params, 'discretization_parameters', {})) | set(getattr(builder_params, 'control_parameters', {}))
     for key, limits in inp.policy.editable.items():
         if key not in editable and not (builder.hook('authorize_changes') and key in declared):
             raise ValueError('PARAMETER_NOT_EDITABLE: ' + key)

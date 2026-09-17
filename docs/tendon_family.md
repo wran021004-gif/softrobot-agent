@@ -2,6 +2,42 @@
 
 推荐入口是 `examples/platform_tendon_family.py`。它仍使用公共 Host、Registry、Store、预算、缓存、回执、评价、信号和 `ExportBundle`，但输入不再复制两份任务。
 
+## 有界优化、保存诊断与按需视频
+
+公共 Python 入口为 `extensions.tendon_family.optimization.optimize(root, request)`；项目使用既有 `Store.create(ProjectConfig)` 授权。`family.optimization_request` 包含 `session`、可选完整 `template`、`variables` 的边界、`method`、`max_trials` 和归一化步长 `step`。目标、单位、方向及成功容差都引用 `session.task`，求解配额来自 `session.policy.budget` 和项目总预算。
+
+`prepare-opt` 生成的 `inputs/optimization.json` 是自包含请求快照；编辑这个文件后再执行 `build-opt`，不要期望之后修改其他输入文件会隐式改写它。`inputs/execution.json` 只供示例的另一后端复核选择后端。模板选择先完成，再冻结为会话基线；原始请求封存在 Store 的 optimization 事件中。每个候选的 `CandidateInput` 保存实际设计、离散、控制、模型和后端配置。恢复要求同一请求、依赖和会话；重复已封存调用返回原回执，不新增求解。
+
+实体路径沿用 `components/<id>/...`、`tendons/<id>/...` 等 `Space.parameters`；控制路径为 `control/feedback_gain`、`control/damping`、`control/max_joint_update_rad`、`control/ramp_s`，边界在 `Space.control_parameters`。只接受有界连续数值变量，并继续检查已有任务窄约束。模板和条件参数接受既有最终候选检查；离散可在实验方案中配置，但不能进入连续实体性能搜索；轨迹变量未实现。外层调用者可分别提供不同模板请求，在相同任务和后端条件下比较，当前不是混合整数优化器。
+
+`search.family_coordinate` 复用已有有界坐标步，基线后按正、负方向逐轴提案。无效候选/不支持能力保留原因，不参与排名；有效但任务未达标的候选仍有真实指标。求解失败不会成为普通低分；预算不足返回已知最佳有效候选及停止原因。设计与控制共同变化时，结论针对完整组合，不归因于单一结构参数。
+
+```powershell
+Set-Location D:\softrobot-agent
+conda activate softagent
+$run = 'runs/my_family_optimization'  # 首次准备使用新目录
+python examples/workbench.py platform tendon-family prepare-opt $run
+# 按需编辑 $run/inputs/optimization.json；默认固定 tube_distal 模板、搜索 near 长度
+python examples/workbench.py platform tendon-family build-opt $run
+python examples/workbench.py platform tendon-family optimize $run
+$best = python examples/workbench.py platform tendon-family best $run | ConvertFrom-Json
+$best.best.candidate_id
+$best.configuration.effective  # 完整实际配置
+python examples/workbench.py platform tendon-family crosscheck $run
+python examples/workbench.py platform tendon-family diagnose $run
+python examples/workbench.py platform tendon-family video $run --t-start-s 0.01 --t-end-s 0.35 --fps 25 --azimuth-deg 135 --elevation-deg -20
+```
+
+默认常规预算是 MuJoCo 3 个候选（含基线）加 MATLAB 1 次复核。示例参数为 near 长度 `[0.14, 0.20] m`，归一化步长 `0.2`；选择模板的基线长度为 `0.16 m`，控制反馈增益固定为 5。请求中已声明控制增益 `[2,8]` 授权范围，需要联合整定时把 `control/feedback_gain` 加入 `variables`；3 次试验通常尚未遍历第二轴，不应据此声称收敛。
+
+诊断使用具名关节、绳索和执行器，保留单位、坐标系及相位；末端误差曲线仅描述保存观测，不再评价任务。近拉力上限、近零张力及最短区间复用 `tools.trajectory_diagnosis.RULES`；执行器行程用 1% 行程带、速度用相邻命令采样差分及已保存速度上限的 99%，这些现象不证明实际裁剪。无数据时列出缺失项。关节只报告已记录运动/速度，当前未配置关节限位。关键发现带结果 EvidenceRef 和信号时间区间，可能原因与建议保持独立。
+
+视频选择输入结果即可确定后端。MuJoCo 从保存 XML 和具名关节状态调用 `mj_forward` 重建画面，**不调用 `mj_step`**；MATLAB 从保存刚体姿态和绳路复用 `tf_view` 原生 Figure。输出 MP4、预览、来源、视角/帧率和零额外求解回执，恢复/封存及超时继续使用现有公共工具。默认不会为优化候选生成视频。旧不兼容格式会明确失败；MATLAB Figure 适配的无积分检查与实际渲染验证范围见本轮记录。
+
+模型默认值在 `resolve_execution` 统一规范化，省略默认值与显式默认值具有同一模型身份；`included/omitted` 必须等于已注册实现，不能作为物理开关。build 的 MJCF 与 run 使用同一后端参数。旧 compare 从不可变 `CandidateInput`、任务、结果和已知旧模型映射恢复依据；材料不足返回 `not_comparable`，不修改历史记录。
+
+实际候选、误差、诊断和视频见 [步骤 5–6 结果](steps_5_6_result.md)。
+
 ## 权威来源
 
 | 内容 | 权威文件或契约 | 派生物 |

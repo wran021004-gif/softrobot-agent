@@ -178,6 +178,13 @@ class DynamicsModel(Contract):
     included: tuple[str, ...] = ('rigid_body_inertia', 'gravity', 'hinge_elasticity', 'hinge_damping', 'external_body_forces')
     omitted: tuple[str, ...] = ('axial_stretch', 'shear', 'material_torsion', 'tendon_friction', 'rope_elasticity', 'motor_dynamics', 'self_collision')
 
+    @model_validator(mode='after')
+    def implemented_effects(self):
+        for name in ('included', 'omitted'):
+            if getattr(self, name) != type(self).model_fields[name].default:
+                raise ValueError('PHYSICS_SWITCH_UNSUPPORTED: '+name+' describes the registered equations')
+        return self
+
 
 class Parameters(Contract):
     model: Literal['matlab_serial_bending_v1', 'mujoco_serial_bending_v1'] = 'matlab_serial_bending_v1'
@@ -233,6 +240,7 @@ class ExperimentSpec(Contract):
 class Space(Contract):
     # Physical design paths or full physical-design options.
     parameters: dict[str, dict] = Field(default_factory=dict)
+    control_parameters: dict[str, dict] = Field(default_factory=dict)
     templates: dict[str, Design] = Field(default_factory=dict)
     # A complete template that changes flexible-segment IDs must declare its
     # complete mesh here. Baseline meshes are never guessed onto new segments.

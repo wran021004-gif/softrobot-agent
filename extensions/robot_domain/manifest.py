@@ -5,6 +5,7 @@ from . import contracts as c
 from .candidate import EDITABLE
 
 SOURCES = ('extensions/robot_domain/contracts.py', 'extensions/robot_domain/candidate.py',
+    'extensions/tendon_family/diagnostics.py','extensions/tendon_family/saved.py','matlab/tf_view.m',
     'extensions/robot_domain/signals.py', 'extensions/robot_domain/saved.py', 'extensions/robot_domain/manifest.py')
 CONTRACTS = [('domain.rod_design', '1.0.0', c.RodDesign), ('domain.empty', '1.0.0', c.Empty)]
 EXTENSIONS = [Extension('candidate.rod_design', 'candidate_builder', '1.0.0', c.Empty, SessionInput,

@@ -5,6 +5,22 @@ from pathlib import Path
 from tools.state_io import atomic_json
 
 
+def capture_matlab(engine,folder,frames,indices,fps,azimuth_deg=135.,elevation_deg=-20.):
+    """Reuse the native Figure viewer, capturing only the requested saved states."""
+    rows=json.loads(gzip.decompress((folder/'trajectory.json.gz').read_bytes()))
+    atomic_json(folder/'replay_trajectory.json',rows)
+    for k,index in enumerate(indices):
+        engine.tf_view(str(folder),float(index+1),nargout=0)
+        figure=engine.gcf()
+        try:
+            engine.set(figure,'Position',__import__('matlab').double([100,100,800,600]),nargout=0)
+            engine.view(float(azimuth_deg),float(elevation_deg),nargout=0)
+            engine.drawnow(nargout=0)
+            frame=engine.getframe(figure)
+            engine.imwrite(frame['cdata'],str(frames/f'frame_{k:06d}.png'),nargout=0)
+        finally: engine.close(figure,nargout=0)
+
+
 def materialize(root,record,destination):
     from tools.platform_store import Store
     store=Store(root); receipt=record['receipts']['simulation']; bundles=[]

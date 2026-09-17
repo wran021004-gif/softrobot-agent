@@ -1268,6 +1268,17 @@
       "controller": {
         "$ref": "#/$defs/Binding"
       },
+      "dynamics_model": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Binding"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
       "discretization": {
         "anyOf": [
           {
@@ -1537,6 +1548,17 @@
           },
           "controller": {
             "$ref": "#/$defs/Binding"
+          },
+          "dynamics_model": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Binding"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           },
           "discretization": {
             "anyOf": [
@@ -3841,6 +3863,17 @@
           },
           "controller": {
             "$ref": "#/$defs/Binding"
+          },
+          "dynamics_model": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Binding"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           },
           "discretization": {
             "anyOf": [
@@ -7198,6 +7231,23 @@
           },
           "title": "Exported Files",
           "type": "array"
+        },
+        "execution_plan": {
+          "additionalProperties": true,
+          "title": "Execution Plan",
+          "type": "object"
+        },
+        "control_identity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Control Identity"
         }
       },
       "required": [
@@ -7976,11 +8026,26 @@
               "title": "Parameters",
               "type": "object"
             },
+            "control_parameters": {
+              "additionalProperties": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Control Parameters",
+              "type": "object"
+            },
             "templates": {
               "additionalProperties": {
                 "$ref": "#/$defs/Design"
               },
               "title": "Templates",
+              "type": "object"
+            },
+            "template_discretizations": {
+              "additionalProperties": {
+                "$ref": "#/$defs/Discretization"
+              },
+              "title": "Template Discretizations",
               "type": "object"
             },
             "discretization_parameters": {
@@ -9057,6 +9122,51 @@
       "type": "object"
     },
     "family.control@1.0.0": {
+      "$defs": {
+        "Reference": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "task_goal",
+                "actuator_commands"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "commands": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "title": "Commands",
+              "type": "object"
+            },
+            "units": {
+              "enum": [
+                "m_or_rad_by_actuator",
+                "m"
+              ],
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "enum": [
+                "actuator",
+                "world"
+              ],
+              "title": "Frame",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "units",
+            "frame"
+          ],
+          "title": "Reference",
+          "type": "object"
+        }
+      },
       "additionalProperties": false,
       "properties": {
         "mode": {
@@ -9067,6 +9177,17 @@
           ],
           "title": "Mode",
           "type": "string"
+        },
+        "reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Reference"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "commands": {
           "additionalProperties": {
@@ -9951,6 +10072,67 @@
       "title": "Discretization",
       "type": "object"
     },
+    "family.dynamics_model@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "const": "serial_bending_cells_v1",
+          "default": "serial_bending_cells_v1",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "coordinates": {
+          "const": "two_principal_bending_angles_per_cell",
+          "default": "two_principal_bending_angles_per_cell",
+          "title": "Coordinates",
+          "type": "string"
+        },
+        "equations": {
+          "const": "serial_rigid_body_dynamics_with_hinge_bending",
+          "default": "serial_rigid_body_dynamics_with_hinge_bending",
+          "title": "Equations",
+          "type": "string"
+        },
+        "tendon_model": {
+          "const": "straight_frictionless_length_servo",
+          "default": "straight_frictionless_length_servo",
+          "title": "Tendon Model",
+          "type": "string"
+        },
+        "included": {
+          "default": [
+            "rigid_body_inertia",
+            "gravity",
+            "hinge_elasticity",
+            "hinge_damping",
+            "external_body_forces"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Included",
+          "type": "array"
+        },
+        "omitted": {
+          "default": [
+            "axial_stretch",
+            "shear",
+            "material_torsion",
+            "tendon_friction",
+            "rope_elasticity",
+            "motor_dynamics",
+            "self_collision"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Omitted",
+          "type": "array"
+        }
+      },
+      "title": "DynamicsModel",
+      "type": "object"
+    },
     "family.experiment_spec@1.0.0": {
       "additionalProperties": false,
       "description": "Immutable composition view; editable values remain in their source objects.",
@@ -9980,6 +10162,30 @@
         "scene_identity": {
           "title": "Scene Identity",
           "type": "string"
+        },
+        "dynamics_model_identity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dynamics Model Identity"
+        },
+        "control_identity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Control Identity"
         },
         "source_roles": {
           "additionalProperties": {
@@ -10025,6 +10231,882 @@
         }
       },
       "title": "Initial",
+      "type": "object"
+    },
+    "family.matlab_parameters@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "integrator": {
+          "const": "ode15s",
+          "default": "ode15s",
+          "title": "Integrator",
+          "type": "string"
+        },
+        "max_step_s": {
+          "default": 0.001,
+          "exclusiveMinimum": 0,
+          "title": "Max Step S",
+          "type": "number"
+        },
+        "rtol": {
+          "default": 1e-05,
+          "exclusiveMinimum": 0,
+          "title": "Rtol",
+          "type": "number"
+        },
+        "atol": {
+          "default": 1e-07,
+          "exclusiveMinimum": 0,
+          "title": "Atol",
+          "type": "number"
+        },
+        "contact_model": {
+          "const": "lowest_envelope_vertex_penalty",
+          "default": "lowest_envelope_vertex_penalty",
+          "title": "Contact Model",
+          "type": "string"
+        },
+        "contact_stiffness_n_m": {
+          "default": 5000.0,
+          "exclusiveMinimum": 0,
+          "title": "Contact Stiffness N M",
+          "type": "number"
+        },
+        "contact_damping_n_s_m": {
+          "default": 5.0,
+          "minimum": 0,
+          "title": "Contact Damping N S M",
+          "type": "number"
+        }
+      },
+      "title": "MatlabParameters",
+      "type": "object"
+    },
+    "family.mujoco_parameters@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "integrator": {
+          "const": "implicitfast",
+          "default": "implicitfast",
+          "title": "Integrator",
+          "type": "string"
+        },
+        "timestep_source": {
+          "const": "task.timing.timestep_s",
+          "default": "task.timing.timestep_s",
+          "title": "Timestep Source",
+          "type": "string"
+        },
+        "contact_model": {
+          "const": "mujoco_convex_native",
+          "default": "mujoco_convex_native",
+          "title": "Contact Model",
+          "type": "string"
+        },
+        "friction": {
+          "default": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Friction",
+          "type": "array"
+        }
+      },
+      "title": "MujocoParameters",
+      "type": "object"
+    },
+    "family.optimization_request@1.0.0": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "Budget": {
+          "additionalProperties": false,
+          "properties": {
+            "tool_calls": {
+              "minimum": 0,
+              "title": "Tool Calls",
+              "type": "integer"
+            },
+            "model_calls": {
+              "minimum": 0,
+              "title": "Model Calls",
+              "type": "integer"
+            },
+            "backend_solves": {
+              "minimum": 0,
+              "title": "Backend Solves",
+              "type": "integer"
+            },
+            "worker_calls": {
+              "minimum": 0,
+              "title": "Worker Calls",
+              "type": "integer"
+            },
+            "wall_s": {
+              "minimum": 0,
+              "title": "Wall S",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tool_calls",
+            "model_calls",
+            "backend_solves",
+            "worker_calls",
+            "wall_s"
+          ],
+          "title": "Budget",
+          "type": "object"
+        },
+        "ExperimentPolicy": {
+          "additionalProperties": false,
+          "properties": {
+            "policy_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Policy Id",
+              "type": "string"
+            },
+            "editable": {
+              "additionalProperties": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Editable",
+              "type": "object"
+            },
+            "backend": {
+              "$ref": "#/$defs/Binding"
+            },
+            "controller": {
+              "$ref": "#/$defs/Binding"
+            },
+            "dynamics_model": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Binding"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "discretization": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "candidate_builder": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Binding"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "search": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Binding"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "model": {
+              "$ref": "#/$defs/ModelConfig"
+            },
+            "allowed_tools": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Allowed Tools",
+              "type": "array"
+            },
+            "tool_bindings": {
+              "patternProperties": {
+                "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$": {
+                  "type": "string"
+                }
+              },
+              "title": "Tool Bindings",
+              "type": "object"
+            },
+            "budget": {
+              "$ref": "#/$defs/Budget"
+            },
+            "timeout_s": {
+              "exclusiveMinimum": 0,
+              "title": "Timeout S",
+              "type": "number"
+            },
+            "allow_development_skills": {
+              "default": false,
+              "title": "Allow Development Skills",
+              "type": "boolean"
+            },
+            "recovery": {
+              "const": "sealed_or_unknown_no_replay",
+              "default": "sealed_or_unknown_no_replay",
+              "title": "Recovery",
+              "type": "string"
+            }
+          },
+          "required": [
+            "policy_id",
+            "backend",
+            "controller",
+            "budget",
+            "timeout_s"
+          ],
+          "title": "ExperimentPolicy",
+          "type": "object"
+        },
+        "ModelConfig": {
+          "additionalProperties": false,
+          "properties": {
+            "adapter": {
+              "default": "offline",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Adapter",
+              "type": "string"
+            },
+            "adapter_version": {
+              "default": "1.0.0",
+              "title": "Adapter Version",
+              "type": "string"
+            },
+            "parameters": {
+              "additionalProperties": true,
+              "title": "Parameters",
+              "type": "object"
+            },
+            "strategy": {
+              "default": "strategy.tool",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Strategy",
+              "type": "string"
+            },
+            "strategy_version": {
+              "default": "1.0.0",
+              "title": "Strategy Version",
+              "type": "string"
+            },
+            "model": {
+              "default": "offline-contract-fixture",
+              "title": "Model",
+              "type": "string"
+            },
+            "supports_tools": {
+              "const": true,
+              "default": true,
+              "title": "Supports Tools",
+              "type": "boolean"
+            },
+            "supports_text": {
+              "const": true,
+              "default": true,
+              "title": "Supports Text",
+              "type": "boolean"
+            },
+            "supports_images": {
+              "default": false,
+              "title": "Supports Images",
+              "type": "boolean"
+            },
+            "timeout_s": {
+              "default": 30,
+              "exclusiveMinimum": 0,
+              "title": "Timeout S",
+              "type": "number"
+            },
+            "max_turns": {
+              "default": 12,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Max Turns",
+              "type": "integer"
+            },
+            "max_repairs": {
+              "default": 2,
+              "maximum": 10,
+              "minimum": 0,
+              "title": "Max Repairs",
+              "type": "integer"
+            },
+            "max_no_progress": {
+              "default": 3,
+              "maximum": 20,
+              "minimum": 1,
+              "title": "Max No Progress",
+              "type": "integer"
+            },
+            "context_bytes": {
+              "default": 64000,
+              "minimum": 4000,
+              "title": "Context Bytes",
+              "type": "integer"
+            }
+          },
+          "title": "ModelConfig",
+          "type": "object"
+        },
+        "Objective": {
+          "additionalProperties": false,
+          "properties": {
+            "metric": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Metric",
+              "type": "string"
+            },
+            "direction": {
+              "enum": [
+                "minimize",
+                "maximize"
+              ],
+              "title": "Direction",
+              "type": "string"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "weight": {
+              "default": 1,
+              "exclusiveMinimum": 0,
+              "title": "Weight",
+              "type": "number"
+            }
+          },
+          "required": [
+            "metric",
+            "direction",
+            "units"
+          ],
+          "title": "Objective",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "RobotDescription": {
+          "additionalProperties": false,
+          "properties": {
+            "family": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Family",
+              "type": "string"
+            },
+            "structure": {
+              "$ref": "#/$defs/Payload"
+            },
+            "channels": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Channels",
+              "type": "array"
+            },
+            "units": {
+              "const": "SI",
+              "default": "SI",
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "title": "Frame",
+              "type": "string"
+            },
+            "assumptions": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Assumptions",
+              "type": "array"
+            },
+            "sources": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Sources",
+              "type": "array"
+            },
+            "unsupported": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Unsupported",
+              "type": "array"
+            }
+          },
+          "required": [
+            "family",
+            "structure",
+            "channels",
+            "frame",
+            "assumptions",
+            "sources",
+            "unsupported"
+          ],
+          "title": "RobotDescription",
+          "type": "object"
+        },
+        "Sampling": {
+          "additionalProperties": false,
+          "properties": {
+            "split": {
+              "enum": [
+                "development",
+                "evaluation"
+              ],
+              "title": "Split",
+              "type": "string"
+            },
+            "seeds": {
+              "items": {
+                "type": "integer"
+              },
+              "minItems": 1,
+              "title": "Seeds",
+              "type": "array"
+            },
+            "aggregation": {
+              "const": "per_instance",
+              "default": "per_instance",
+              "title": "Aggregation",
+              "type": "string"
+            },
+            "window_s": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Window S",
+              "type": "array"
+            }
+          },
+          "required": [
+            "split",
+            "seeds",
+            "window_s"
+          ],
+          "title": "Sampling",
+          "type": "object"
+        },
+        "SessionInput": {
+          "additionalProperties": false,
+          "properties": {
+            "contract_version": {
+              "const": "1.0.0",
+              "default": "1.0.0",
+              "title": "Contract Version",
+              "type": "string"
+            },
+            "run_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Run Id",
+              "type": "string"
+            },
+            "task": {
+              "$ref": "#/$defs/TaskDefinition"
+            },
+            "robot": {
+              "$ref": "#/$defs/RobotDescription"
+            },
+            "policy": {
+              "$ref": "#/$defs/ExperimentPolicy"
+            },
+            "seed": {
+              "title": "Seed",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "run_id",
+            "task",
+            "robot",
+            "policy",
+            "seed"
+          ],
+          "title": "SessionInput",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        },
+        "TaskDefinition": {
+          "additionalProperties": false,
+          "properties": {
+            "contract_version": {
+              "const": "1.0.0",
+              "default": "1.0.0",
+              "title": "Contract Version",
+              "type": "string"
+            },
+            "task_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "task_version": {
+              "minLength": 1,
+              "title": "Task Version",
+              "type": "string"
+            },
+            "name": {
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "draft",
+                "development_valid",
+                "formally_approved"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "source": {
+              "minLength": 1,
+              "title": "Source",
+              "type": "string"
+            },
+            "family": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Family",
+              "type": "string"
+            },
+            "goal": {
+              "$ref": "#/$defs/Payload"
+            },
+            "environment": {
+              "$ref": "#/$defs/Payload"
+            },
+            "robot_families": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Robot Families",
+              "type": "array"
+            },
+            "actuator_channels": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Actuator Channels",
+              "type": "array"
+            },
+            "initializer": {
+              "$ref": "#/$defs/Binding"
+            },
+            "timing": {
+              "$ref": "#/$defs/Timing"
+            },
+            "evaluator": {
+              "$ref": "#/$defs/Binding"
+            },
+            "objectives": {
+              "items": {
+                "$ref": "#/$defs/Objective"
+              },
+              "minItems": 1,
+              "title": "Objectives",
+              "type": "array"
+            },
+            "failure_policy": {
+              "const": "retain_invalid_and_constraint_failures",
+              "title": "Failure Policy",
+              "type": "string"
+            },
+            "observations": {
+              "items": {
+                "$ref": "#/$defs/SignalSpec"
+              },
+              "minItems": 1,
+              "title": "Observations",
+              "type": "array"
+            },
+            "sampling": {
+              "$ref": "#/$defs/Sampling"
+            }
+          },
+          "required": [
+            "task_id",
+            "task_version",
+            "name",
+            "status",
+            "source",
+            "family",
+            "goal",
+            "environment",
+            "robot_families",
+            "actuator_channels",
+            "initializer",
+            "timing",
+            "evaluator",
+            "objectives",
+            "failure_policy",
+            "observations",
+            "sampling"
+          ],
+          "title": "TaskDefinition",
+          "type": "object"
+        },
+        "Timing": {
+          "additionalProperties": false,
+          "properties": {
+            "timestep_s": {
+              "description": "物理积分步长，s",
+              "exclusiveMinimum": 0,
+              "title": "Timestep S",
+              "type": "number"
+            },
+            "control_period_s": {
+              "description": "控制周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Control Period S",
+              "type": "number"
+            },
+            "sample_period_s": {
+              "description": "输出采样周期，s",
+              "exclusiveMinimum": 0,
+              "title": "Sample Period S",
+              "type": "number"
+            },
+            "duration_s": {
+              "description": "物理持续时间，s",
+              "exclusiveMinimum": 0,
+              "title": "Duration S",
+              "type": "number"
+            },
+            "termination": {
+              "items": {
+                "enum": [
+                  "duration",
+                  "numerical_failure",
+                  "cancelled"
+                ],
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Termination",
+              "type": "array"
+            }
+          },
+          "required": [
+            "timestep_s",
+            "control_period_s",
+            "sample_period_s",
+            "duration_s",
+            "termination"
+          ],
+          "title": "Timing",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "session": {
+          "$ref": "#/$defs/SessionInput"
+        },
+        "template": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Template"
+        },
+        "variables": {
+          "additionalProperties": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Variables",
+          "type": "object"
+        },
+        "method": {
+          "const": "bounded_coordinate_pattern_local_v1",
+          "default": "bounded_coordinate_pattern_local_v1",
+          "title": "Method",
+          "type": "string"
+        },
+        "max_trials": {
+          "default": 3,
+          "minimum": 1,
+          "title": "Max Trials",
+          "type": "integer"
+        },
+        "step": {
+          "default": 0.2,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Step",
+          "type": "number"
+        }
+      },
+      "required": [
+        "session",
+        "variables"
+      ],
+      "title": "OptimizationRequest",
       "type": "object"
     },
     "family.parameters@1.0.0": {
@@ -10076,6 +11158,92 @@
         }
       },
       "title": "Parameters",
+      "type": "object"
+    },
+    "family.search@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "initial": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Initial",
+          "type": "object"
+        },
+        "bounds": {
+          "additionalProperties": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Bounds",
+          "type": "object"
+        },
+        "max_trials": {
+          "default": 3,
+          "minimum": 1,
+          "title": "Max Trials",
+          "type": "integer"
+        },
+        "step": {
+          "default": 0.2,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Step",
+          "type": "number"
+        }
+      },
+      "required": [
+        "initial",
+        "bounds"
+      ],
+      "title": "SearchParameters",
+      "type": "object"
+    },
+    "family.search_state@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "proposed": {
+          "default": 0,
+          "title": "Proposed",
+          "type": "integer"
+        },
+        "best": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Best",
+          "type": "array"
+        },
+        "pending": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Pending",
+          "type": "array"
+        },
+        "best_score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Best Score"
+        }
+      },
+      "title": "SearchState",
       "type": "object"
     },
     "family.space@1.0.0": {
@@ -10304,6 +11472,44 @@
             "tip"
           ],
           "title": "Design",
+          "type": "object"
+        },
+        "Discretization": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "serial_bending_discretization_v1",
+              "default": "serial_bending_discretization_v1",
+              "title": "Version",
+              "type": "string"
+            },
+            "model": {
+              "const": "serial_bending_cells_v1",
+              "default": "serial_bending_cells_v1",
+              "title": "Model",
+              "type": "string"
+            },
+            "cells": {
+              "minProperties": 1,
+              "patternProperties": {
+                "^[A-Za-z][A-Za-z0-9_]*$": {
+                  "type": "integer"
+                }
+              },
+              "title": "Cells",
+              "type": "object"
+            },
+            "coordinates": {
+              "const": "two_principal_bending_angles_per_cell",
+              "default": "two_principal_bending_angles_per_cell",
+              "title": "Coordinates",
+              "type": "string"
+            }
+          },
+          "required": [
+            "cells"
+          ],
+          "title": "Discretization",
           "type": "object"
         },
         "PhysicalInput": {
@@ -10899,11 +12105,26 @@
           "title": "Parameters",
           "type": "object"
         },
+        "control_parameters": {
+          "additionalProperties": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Control Parameters",
+          "type": "object"
+        },
         "templates": {
           "additionalProperties": {
             "$ref": "#/$defs/Design"
           },
           "title": "Templates",
+          "type": "object"
+        },
+        "template_discretizations": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Discretization"
+          },
+          "title": "Template Discretizations",
           "type": "object"
         },
         "discretization_parameters": {

@@ -1,6 +1,6 @@
 # 统一机器人智能设计开发平台
 
-> 2026-09-17：串联绳驱家族已完成步骤 3「数学模型与执行后端」和步骤 4「参考、控制与执行器映射」的接口整理。推荐输入、兼容边界、PowerShell 命令和结果文件见 [docs/tendon_family.md](docs/tendon_family.md)，本轮记录见 [docs/steps_3_4_result.md](docs/steps_3_4_result.md)。
+> 串联绳驱家族现已接通步骤 5 的有界优化和步骤 6 的保存轨迹诊断、按需原生视频。使用 `platform tendon-family prepare-opt / build-opt / optimize / best / diagnose / video`；完整命令见 [家族文档](docs/tendon_family.md)，实际预算与结果见 [步骤 5–6 记录](docs/steps_5_6_result.md)。
 
 ## 当前开发入口
 

@@ -59,7 +59,8 @@ def prepare_candidate(root, candidate_id, backend, *, legacy_changes=None):
     if 'discretization' in build_request:
         raw_input['policy']['discretization'] = dict(contract='family.discretization',version='1.0.0',
             data=deepcopy(build_request['discretization']))
-    built = build(build_request,task_bounds=raw_input['policy']['editable'])
+    built = build({**build_request,'changes':{k:v for k,v in build_request['changes'].items() if not k.startswith('control/')}},
+        task_bounds={k:v for k,v in raw_input['policy']['editable'].items() if not k.startswith('control/')})
     if built.status != 'valid':
         raise ValueError(built.status.upper()+': '+str(built.reason))
 
@@ -84,6 +85,7 @@ def prepare_candidate(root, candidate_id, backend, *, legacy_changes=None):
     normalized_request = dict(baseline=build_request['baseline'],space=build_request['space'],
         discretization=build_request.get('discretization'),changes=build_request['changes'])
     selection = dict(candidate_id=candidate_id,request=normalized_request,task_bounds=raw_input['policy']['editable'],sources=sources,
+        original_input=raw_input,modifications=built.summary,
         request_identity=digest(dict(request=normalized_request,task_bounds=raw_input['policy']['editable'])),
         control_identity=scene['control']['identity'],session_identity=digest(raw_input),
         dynamics_model_identity=execution_plan['dynamics_model_identity'],execution_plan_identity=execution_plan['identity'],
