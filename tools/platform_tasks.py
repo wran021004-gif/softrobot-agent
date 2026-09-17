@@ -23,6 +23,8 @@ def compile_input(value, reg=None):
     inp = inp.model_copy(update={'policy': inp.policy.model_copy(update={'tool_bindings': bound, 'allowed_tools': list(bound)})})
     task = check_definition(inp.task, reg)
     reg.parse(inp.robot.structure)
+    if inp.policy.discretization is not None:
+        reg.parse(inp.policy.discretization)
     if task.status != 'development_valid':
         raise ValueError('DEVELOPMENT_HOST_REQUIRES_DEVELOPMENT_VALID: draft 不可运行；正式批准需独立真实审批策略')
     if task.sampling.split != 'development':
@@ -73,8 +75,9 @@ def compile_input(value, reg=None):
         inp = inp.model_copy(update={'policy': inp.policy.model_copy(update={'candidate_builder': default_builder})})
     builder, builder_params = reg.bind(inp.policy.candidate_builder, 'candidate_builder')
     editable = builder.capabilities.get('editable', controller.capabilities.get('editable', []))
+    declared = set(getattr(builder_params, 'parameters', {})) | set(getattr(builder_params, 'discretization_parameters', {}))
     for key, limits in inp.policy.editable.items():
-        if key not in editable and not (builder.hook('authorize_changes') and key in getattr(builder_params, 'parameters', {})):
+        if key not in editable and not (builder.hook('authorize_changes') and key in declared):
             raise ValueError('PARAMETER_NOT_EDITABLE: ' + key)
         if limits[0] >= limits[1]:
             raise ValueError('INVALID_PARAMETER_BOUNDS: ' + key)

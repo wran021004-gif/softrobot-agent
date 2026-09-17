@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from copy import deepcopy
-from examples.platform_tendon_family import example_design, design_space, session, prepare, prepare_candidate, save_selection
+from examples.platform_tendon_family import example_design, example_discretization, design_space, session, prepare, prepare_candidate, save_selection
 from extensions.tendon_family.candidate import build
 from extensions.tendon_family.contracts import BuildRequest, Design
 from schemas.platform import SessionInput
@@ -14,21 +14,30 @@ from tools.platform_tools import _candidate
 
 class CandidateBoundaries(unittest.TestCase):
     def setUp(self):
-        self.design=example_design(); self.space=design_space(self.design)
+        self.design=example_design(); self.discretization=example_discretization(); self.space=design_space(self.design)
+
+    def request(self, **changes):
+        return dict(baseline=self.design,discretization=self.discretization,space=self.space,changes=changes)
 
     def test_integer_and_choice_pass_public_candidate_without_task_change(self):
         inp=SessionInput.model_validate(session('family_mujoco',self.design,self.space))
-        changed=_candidate(inp,{'components/near/cells':4,'components/near/interpolation':'linear'},registry())
+        changed=_candidate(inp,{'discretization/cells/near':4,'components/near/interpolation':'linear'},registry())
         self.assertEqual(changed.task,inp.task)
-        self.assertEqual(changed.robot.structure.data['components'][0]['cells'],4)
-        self.assertIsInstance(changed.robot.structure.data['components'][0]['cells'],int)
+        self.assertNotIn('cells',changed.robot.structure.data['components'][0])
+        self.assertEqual(changed.policy.discretization.data['cells']['near'],4)
+        self.assertIsInstance(changed.policy.discretization.data['cells']['near'],int)
         with self.assertRaisesRegex(ValueError,'INTEGER_REQUIRED'):
-            _candidate(inp,{'components/near/cells':3.5},registry())
+            _candidate(inp,{'discretization/cells/near':3.5},registry())
         with self.assertRaisesRegex(ValueError,'OPTION_NOT_AUTHORIZED'):
             _candidate(inp,{'components/near/interpolation':'arbitrary_code'},registry())
+        bounded=inp.model_copy(update={'policy':inp.policy.model_copy(update={'editable':{'discretization/cells/near':(3,4)}})})
+        from tools.platform_tasks import compile_input
+        compile_input(bounded.model_dump(mode='json'))
+        with self.assertRaisesRegex(ValueError,'TASK_PARAMETER_OUT_OF_BOUNDS'):
+            _candidate(bounded,{'discretization/cells/near':5},registry())
 
     def test_conditional_tube_and_invalid_physics_are_distinct(self):
-        req=dict(baseline=self.design,space=self.space,changes={'template':'tube_distal',
+        req=dict(baseline=self.design,discretization=self.discretization,space=self.space,changes={'template':'tube_distal',
             'components/far/sections/0/section/parameters/inner_radius_m':.005})
         valid=build(req); self.assertEqual(valid.status,'valid')
         bad=deepcopy(self.space.model_dump(mode='json'))
@@ -40,7 +49,7 @@ class CandidateBoundaries(unittest.TestCase):
     def test_reserved_topology_never_compiles_or_becomes_a_performance_score(self):
         data=self.design.model_dump(mode='json')
         data['components'].append(dict(id='future_loop',kind='closed_chain',description='Requires closure constraint solver'))
-        out=build(dict(baseline=Design.model_validate(data),space=self.space,changes={}))
+        out=build(dict(baseline=Design.model_validate(data),discretization=self.discretization,space=self.space,changes={}))
         self.assertEqual(out.status,'backend_unsupported')
         self.assertIsNone(out.resolved_physics)
 
@@ -48,7 +57,7 @@ class CandidateBoundaries(unittest.TestCase):
         path='components/near/length_m'
         baseline=self.design.model_dump(mode='json'); baseline['components'][0]['length_m']=.175
         space=self.space.model_dump(mode='json'); space['parameters'][path]['bounds']=[.17,.18]
-        request=dict(baseline=baseline,space=space,changes={'template':'tube_distal'})
+        request=dict(baseline=baseline,discretization=self.discretization,space=space,changes={'template':'tube_distal'})
         invalid=build(request)
         self.assertEqual(invalid.status,'physically_invalid')
         self.assertIn('PARAMETER_OUT_OF_BOUNDS: '+path,invalid.reason)
@@ -72,11 +81,11 @@ class CandidateBoundaries(unittest.TestCase):
             _candidate(inp,{},registry())
 
     def test_final_conditions_skip_inactive_but_require_active_parameter(self):
-        self.assertEqual(build(dict(baseline=self.design,space=self.space,changes={})).status,'valid')
+        self.assertEqual(build(self.request()).status,'valid')
         space=self.space.model_dump(mode='json')
         path='components/far/sections/0/section/parameters/missing_dimension'
         space['parameters'][path]=dict(type='number',bounds=[0.,1.],when={'components/far/sections/0/section/kind':'tube'})
-        out=build(dict(baseline=self.design,space=space,changes={'template':'tube_distal'}))
+        out=build(dict(baseline=self.design,discretization=self.discretization,space=space,changes={'template':'tube_distal'}))
         self.assertEqual(out.status,'physically_invalid')
         self.assertIn('CONSTRAINED_PARAMETER_MISSING: '+path,out.reason)
 
@@ -92,7 +101,8 @@ class CandidateBoundaries(unittest.TestCase):
             self.assertEqual(continuous['built'].candidate.components[0].length_m,.17)
             self.assertEqual(structural['built'].candidate.components[0].length_m,.16)
             far=next(c for c in structural['built'].candidate.components if c.id=='far')
-            self.assertEqual((far.sections[0].section.kind,far.cells),('tube',3))
+            self.assertEqual(far.sections[0].section.kind,'tube')
+            self.assertEqual(structural['built'].discretization.cells['far'],3)
             self.assertEqual(len(structural['built'].resolved_physics['dofs']),12)
             for key in ('request_identity','design_identity','physics_identity','scene_identity'):
                 self.assertEqual(structural['selection'][key],other['selection'][key])
@@ -116,9 +126,52 @@ class CandidateBoundaries(unittest.TestCase):
             # A standalone design edit is visible to both preparation paths,
             # even though it does not override a complete structural template.
             path=root/'inputs/design.json'; baseline=json.loads(path.read_text(encoding='utf8'))
-            baseline['components'][0]['cells']=4; path.write_text(json.dumps(baseline),encoding='utf8')
+            next(c for c in baseline['components'] if c['id']=='far')['length_m']=.13
+            path.write_text(json.dumps(baseline),encoding='utf8')
             changed=prepare_candidate(root,'continuous','matlab_spatial')
-            self.assertEqual(changed['built'].candidate.components[0].cells,4)
+            far=next(c for c in changed['built'].candidate.components if c.id=='far')
+            self.assertEqual(far.length_m,.13)
+
+    def test_legacy_cells_normalize_and_conflicts_are_explicit(self):
+        legacy=self.design.model_dump(mode='json')
+        for component,cells in zip([c for c in legacy['components'] if c['kind']=='flexible_segment'],(3,2)):
+            component['cells']=cells
+        out=build(dict(baseline=legacy,space=self.space,changes={}))
+        self.assertEqual(out.status,'valid')
+        self.assertEqual(out.discretization.cells,{'near':3,'far':2})
+        self.assertNotIn('cells',out.candidate.model_dump(mode='json')['components'][0])
+        explicit=self.discretization.model_dump(mode='json'); explicit['cells']['near']=4
+        with self.assertRaisesRegex(ValueError,'DISCRETIZATION_CONFLICT_WITH_LEGACY_CELLS'):
+            build(dict(baseline=legacy,discretization=explicit,space=self.space,changes={}))
+        old_space=self.space.model_dump(mode='json')
+        old_space['parameters']['components/near/cells']=old_space['discretization_parameters'].pop('discretization/cells/near')
+        value=session('family_mujoco',self.design,self.space,discretization=self.discretization)
+        value['robot']['structure']['data']=legacy
+        value['policy']['discretization']=None
+        value['policy']['candidate_builder']['parameters']['data']=old_space
+        compatible=_candidate(SessionInput.model_validate(value),{'components/near/cells':4},registry())
+        self.assertNotIn('cells',compatible.robot.structure.data['components'][0])
+        self.assertEqual(compatible.policy.discretization.data['cells']['near'],4)
+
+    def test_target_mount_and_timed_force_assemble_identically_for_both_backends(self):
+        from extensions.tendon_family.backends import physics_for
+        from extensions.tendon_family.scene import assemble
+        scenes=[]
+        for backend in ('matlab_spatial','family_mujoco'):
+            value=session(backend,self.design,self.space,discretization=self.discretization)
+            value['task']['goal']['data']['target_m']=[.27,-.01,.21]
+            assembly=value['task']['environment']['data']
+            assembly['mount']['position_m']=[.01,.02,.14]
+            assembly['external_forces']=[dict(entity='payload',force_n=[.01,0.,-.02],start_s=.10,end_s=.20)]
+            inp=SessionInput.model_validate(value)
+            effective=_candidate(inp,{'template':'tube_distal','discretization/cells/far':3},registry())
+            scenes.append(assemble(effective,physics_for(effective)))
+        for scene in scenes:
+            self.assertEqual(scene['target_world_m'],[.27,-.01,.21])
+            self.assertEqual(scene['mount_position'],[.01,.02,.14])
+            self.assertEqual(scene['forces'][0]['entity'],'payload')
+            self.assertEqual(scene['observation_phase'],'post_step')
+        self.assertEqual(scenes[0],scenes[1])
 
 
 if __name__=='__main__': unittest.main()

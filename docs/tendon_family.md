@@ -1,5 +1,53 @@
 # MATLAB 三维后端与绳驱机器人家族接口
 
+## 当前推荐输入与边界
+
+`prepare` 后的 `inputs/` 是下一次 build/run 的实际可编辑来源：
+
+| 文件或字段 | 内容 | 不包含 |
+|---|---|---|
+| `design.json` | 部件和连接、长度、截面、绳路、锚点、执行器、材料或等效物性 | `cells`、目标、初态、后端求解设置 |
+| `space.json` | 物理设计路径、完整结构模板；另列离散参数范围 | 实际候选、搜索算法 |
+| `discretization.json` | 当前模型、每个柔性段的 `cells`、坐标含义 | 真实段数或机器人拓扑 |
+| `<candidate>_request.json` | 明确引用以上文件并给出本次修改／模板选择 | 仅靠 candidate ID 推断设计 |
+| `matlab_spatial.json` / `family_mujoco.json` | TaskDefinition、环境装配、安装、初态、定时外力、Timing、控制器和后端设置 | 第二份可编辑机器人或设计空间 |
+
+`family.design` 中的 `PhysicalInput` 保持两个唯一来源模式：材料模式只接受密度和 Young 模量，等效模式只接受线密度和两个主轴 EI。截面量、质量、完整惯量、刚度与阻尼由 `compiler.py` 派生；当前逐单元刚体和逐关节数组还依赖 `family.discretization`。绳的 `straight_frictionless`、预紧与材料/几何声明属于机器人物理输入，`length_servo_gain_n_m` 是理想长度伺服参数，两者不互相替代。
+
+旧 `Segment.cells` 仍可读取，规范化后只进入 `family.discretization`，最终 `family.design` 不再保存该字段。新旧来源同时给出且数值不同会返回 `DISCRETIZATION_CONFLICT_WITH_LEGACY_CELLS`。旧 `components/<segment>/cells` 候选路径也只作为兼容别名映射到 `discretization/cells/<segment>`；推荐空间使用后者。真实段数、绳数、部件和连接变化仍通过完整实体设计模板表达。
+
+公共 `extensions/tendon_family/preparation.py` 负责加载、构建、公共候选核对、装配和过期检查。`examples/platform_tendon_family.py` 只生成一组配置并演示 Host 调用。`scene.py` 产出两后端共同的 SI 场景、实体映射、具名当前模型状态、安装、目标、外力和时间语义；其中实验时长、控制周期、采样周期／相位和积分步长分开记录。显式失效部件、关节或外力实体会在求解前给出具体错误。
+
+## 推荐命令
+
+以下命令只对 `run` 标出的两行启动新动力学求解。编辑目标、固定安装或定时外力时，修改两个后端输入文件中的相同来源字段；也可用脚本／配置组合器生成这两个文件，不需改后端源码。
+
+```powershell
+Set-Location D:\softrobot-agent
+conda activate softagent
+$familyRun = 'runs/my_selected_tube'
+python examples/workbench.py platform tendon-family prepare $familyRun
+
+# 编辑 inputs/design.json、space.json、discretization.json、structural_request.json
+# 编辑 inputs/matlab_spatial.json 和 family_mujoco.json 中的 task/environment/initializer/run policy
+python examples/workbench.py platform tendon-family build $familyRun --candidate structural
+Get-Content "$familyRun/structural_matlab_spatial_input.json" -Raw -Encoding UTF8
+
+python examples/workbench.py platform tendon-family run $familyRun --candidate structural --backend matlab_spatial  # 新求解 1
+python examples/workbench.py platform tendon-family run $familyRun --candidate structural --backend family_mujoco # 新求解 2
+python examples/workbench.py platform tendon-family compare $familyRun --candidate structural
+Get-Content "$familyRun/structural_matlab_spatial_record.json" -Raw -Encoding UTF8
+Get-Content "$familyRun/structural_family_mujoco_record.json" -Raw -Encoding UTF8
+python examples/workbench.py platform tendon-family view $familyRun --candidate structural --backend matlab_spatial
+python examples/workbench.py platform tendon-family view $familyRun --candidate structural --backend family_mujoco
+```
+
+当前装配能力只覆盖串联家族、固定安装、一个具名地面和现有世界坐标定时外力。定时外力不是移动平台；自由落球、斜坡、移动平台和复杂接触没有实现，会由现有契约或能力检查拒绝。
+
+本次分层的实现与新双后端短运行记录见 [步骤 0、1、2 基础分层结果](foundations_0_1_2_result.md)。
+
+## 历史实现与验证记录
+
 后续针对最终候选约束及 build/run 选择一致性的修复、明确 `--candidate structural` 的新运行命令与证据，见 [candidate_bounds_and_selection.md](candidate_bounds_and_selection.md)。新 prepare 的设计/空间由候选请求引用，后端配置中的对应载荷在运行前装配；下面原三次求解记录作为历史保留。
 
 本轮基线及当前分支：`feat/independent-spatial-dynamics`，`6b2d9dd6f2c08d6cededbbf1b73b864335806c1d`。开始时工作区干净，未切换旧提交、未覆盖历史任务、未 commit/push/merge。旧 `backend.matlab`、`backend.math_planar`、`backend.math_spatial`、`backend.scene_mujoco` 保留原身份。
@@ -56,7 +104,7 @@ python examples/check_tendon_saved.py runs/tendon_family_20260917
 | 面积、质心、面积矩、合法内孔、截面插值 | `extensions/tendon_family/sections.py` |
 | 串联连接、质量惯量、主轴弯曲、物理位置绑定与实体映射 | `extensions/tendon_family/compiler.py`；公共 `tools/design_compiler.py` 也接受 `Design` |
 | 静态几何、绳长雅可比、虚功接口 | `extensions/tendon_family/geometry.py` |
-| 数值/整数/选项/条件修改、完整模板替换 | `extensions/tendon_family/candidate.py` |
+| 数值/整数/选项/条件修改、完整模板替换 | `extensions/tendon_family/candidate.py`；公共文件加载/装配见 `preparation.py` |
 | 场景、具名初态、执行器控制与实时反馈 | `extensions/tendon_family/{scene,control}.py` |
 | 独立后端生命周期与 MuJoCo 转换 | `extensions/tendon_family/{backends,mjcf}.py` |
 | 信号与能力登记 | `extensions/tendon_family/{signals,manifest}.py` |
@@ -66,9 +114,9 @@ python examples/check_tendon_saved.py runs/tendon_family_20260917
 | 保存轨迹原生查看 | `matlab/tf_view.m`, `extensions/tendon_family/saved.py` |
 | 可继续修改的开发样例 | `examples/platform_tendon_family.py` |
 
-`design.family_build@1.0.0` 接收 `family.build_request`：`baseline`、`space`、`changes`，返回完整候选、修改摘要、派生物理、映射和适用性。真正求解时 `candidate.family` 只使用冻结在会话策略中的 `family.space` 授权范围，不能用工具调用偷偷扩大搜索范围。原连续 `changes` 用法保持；公共操作不再将所有值转成 float。旧搜索器没有被升级成混合整数优化器。
+`design.family_build@1.0.0` 接收 `family.build_request`：`baseline`、`space`、`discretization`、`changes`，返回完整实体候选、明确离散配置、修改摘要、派生物理、映射、来源角色和适用性。真正求解时 `candidate.family` 只使用冻结在会话策略中的 `family.space` 授权范围，不能用工具调用扩大搜索范围。原连续 `changes` 用法保持；公共操作不把结构选择或模板转成 float。旧搜索器没有被升级成混合整数优化器。
 
-例如连续修改为 `{"components/near/length_m":0.17}`；整数修改为 `{"components/near/cells":4}`；结构修改为 `{"template":"tube_distal"}`。模板保存完整新设计，包含连接、路由、锚点、驱动及默认值；可以用完整模板表达添加、删除、替换部件或改变绳数，无任意代码执行。字段路径采用具名部件选择，站位列表内使用明确序号。`type=number/integer/choice`、`bounds/options` 和 `when` 是当前支持的空间语法；任务 `policy.editable` 中额外给出的数值范围继续生效。
+例如连续设计修改为 `{"components/near/length_m":0.17}`；离散修改为 `{"discretization/cells/near":4}`；结构修改为 `{"template":"tube_distal","discretization/cells/far":3}`。模板保存完整实体设计，包含连接、路由、锚点、驱动及默认值；可以用完整模板表达添加、删除、替换部件或改变绳数，无任意代码执行。字段路径采用具名部件选择，站位列表内使用明确序号。`type=number/integer/choice`、`bounds/options` 和 `when` 是当前支持的空间语法；任务 `policy.editable` 中额外给出的数值范围继续生效。
 
 `family.initial` 使用具名关节字典，未指定项明确为零。改变单元数无需重写零初态；显式引用已删除关节会被拒绝。信号实体按实际解析结果展开；`actuator_command` 按执行器分别声明 `m` 或 `rad`，一个共享执行器始终只有一个命令实体。绳索张力按绳索实体展开，与执行器数无关。
 

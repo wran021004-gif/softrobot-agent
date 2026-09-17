@@ -17,8 +17,8 @@ class AgentStrategy(Protocol):
 
 
 class CandidateBuilder(Protocol):
-    """1.0 receives a private copy; may modify declared design data only."""
-    def __call__(self, baseline: SessionInput, parameters, changes: dict[str, float]) -> SessionInput: ...
+    """1.0 receives a private copy; may modify declared design/discretization data only."""
+    def __call__(self, baseline: SessionInput, parameters, changes: dict[str, object]) -> SessionInput: ...
 
 
 class Worker(Protocol):

@@ -5,8 +5,9 @@ from . import contracts as c
 
 CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('design',c.Design),('initial',c.Initial),('control',c.Control),('parameters',c.Parameters),('backend_data',c.Data),
-    ('space',c.Space),('build_request',c.BuildRequest),('build_result',c.BuildResult)]]
-SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','backends','signals','candidate','mjcf','saved','manifest'))+(
+    ('space',c.Space),('discretization',c.Discretization),('experiment_spec',c.ExperimentSpec),
+    ('build_request',c.BuildRequest),('build_result',c.BuildResult)]]
+SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','backends','signals','candidate','preparation','mjcf','saved','manifest'))+(
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
     'extensions/experiment_dynamics/physics.py','extensions/robot_domain/contracts.py',

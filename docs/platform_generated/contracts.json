@@ -1268,6 +1268,17 @@
       "controller": {
         "$ref": "#/$defs/Binding"
       },
+      "discretization": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Payload"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
       "candidate_builder": {
         "anyOf": [
           {
@@ -1526,6 +1537,17 @@
           },
           "controller": {
             "$ref": "#/$defs/Binding"
+          },
+          "discretization": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Payload"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           },
           "candidate_builder": {
             "anyOf": [
@@ -3820,6 +3842,17 @@
           "controller": {
             "$ref": "#/$defs/Binding"
           },
+          "discretization": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Payload"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "candidate_builder": {
             "anyOf": [
               {
@@ -4446,9 +4479,7 @@
         "type": "string"
       },
       "changes": {
-        "additionalProperties": {
-          "type": "number"
-        },
+        "additionalProperties": true,
         "title": "Changes",
         "type": "object"
       },
@@ -4475,6 +4506,13 @@
       "content_identity": {
         "title": "Content Identity",
         "type": "string"
+      },
+      "sources": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Sources",
+        "type": "object"
       }
     },
     "required": [
@@ -5626,7 +5664,7 @@
               "type": "string"
             },
             "entity": {
-              "pattern": "^segment_[0-7]$",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
               "title": "Entity",
               "type": "string"
             },
@@ -6854,7 +6892,7 @@
               "type": "string"
             },
             "entity": {
-              "pattern": "^segment_[0-7]$",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
               "title": "Entity",
               "type": "string"
             },
@@ -7113,6 +7151,3771 @@
         }
       },
       "title": "SpatialParameters",
+      "type": "object"
+    },
+    "family.backend_data@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "physics_identity": {
+          "title": "Physics Identity",
+          "type": "string"
+        },
+        "scene_identity": {
+          "title": "Scene Identity",
+          "type": "string"
+        },
+        "timings_s": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Timings S",
+          "type": "object"
+        },
+        "numerical_steps": {
+          "title": "Numerical Steps",
+          "type": "integer"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "applicability": {
+          "additionalProperties": true,
+          "title": "Applicability",
+          "type": "object"
+        },
+        "exported_files": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Exported Files",
+          "type": "array"
+        }
+      },
+      "required": [
+        "physics_identity",
+        "scene_identity",
+        "timings_s",
+        "numerical_steps",
+        "applicability",
+        "exported_files"
+      ],
+      "title": "Data",
+      "type": "object"
+    },
+    "family.build_request@1.0.0": {
+      "$defs": {
+        "Actuator": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "command_type": {
+              "default": "displacement",
+              "enum": [
+                "displacement",
+                "rotation"
+              ],
+              "title": "Command Type",
+              "type": "string"
+            },
+            "units": {
+              "default": "m",
+              "enum": [
+                "m",
+                "rad"
+              ],
+              "title": "Units",
+              "type": "string"
+            },
+            "drum_radius_m": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Drum Radius M"
+            },
+            "transmission": {
+              "items": {
+                "$ref": "#/$defs/Transmission"
+              },
+              "minItems": 1,
+              "title": "Transmission",
+              "type": "array"
+            },
+            "limits": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Limits",
+              "type": "array"
+            },
+            "velocity_limit": {
+              "exclusiveMinimum": 0,
+              "title": "Velocity Limit",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "transmission",
+            "limits",
+            "velocity_limit"
+          ],
+          "title": "Actuator",
+          "type": "object"
+        },
+        "Attachment": {
+          "additionalProperties": false,
+          "properties": {
+            "part": {
+              "default": "fixed_base",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Part",
+              "type": "string"
+            },
+            "s": {
+              "default": 0.0,
+              "maximum": 1,
+              "minimum": 0,
+              "title": "S",
+              "type": "number"
+            },
+            "position_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "quaternion_wxyz": {
+              "default": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Quaternion Wxyz",
+              "type": "array"
+            }
+          },
+          "title": "Attachment",
+          "type": "object"
+        },
+        "Design": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "tendon_family_v1",
+              "default": "tendon_family_v1",
+              "title": "Version",
+              "type": "string"
+            },
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "components": {
+              "items": {
+                "discriminator": {
+                  "mapping": {
+                    "branch": "#/$defs/Reserved",
+                    "cable_parallel": "#/$defs/Reserved",
+                    "closed_chain": "#/$defs/Reserved",
+                    "discrete_flexure": "#/$defs/Reserved",
+                    "flexible_segment": "#/$defs/Segment",
+                    "guide": "#/$defs/Rigid",
+                    "payload": "#/$defs/Rigid",
+                    "rigid_connector": "#/$defs/Rigid",
+                    "rigid_tendon_joint": "#/$defs/Reserved"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Segment"
+                  },
+                  {
+                    "$ref": "#/$defs/Rigid"
+                  },
+                  {
+                    "$ref": "#/$defs/Reserved"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "title": "Components",
+              "type": "array"
+            },
+            "tendons": {
+              "items": {
+                "$ref": "#/$defs/Tendon"
+              },
+              "minItems": 1,
+              "title": "Tendons",
+              "type": "array"
+            },
+            "actuators": {
+              "items": {
+                "$ref": "#/$defs/Actuator"
+              },
+              "minItems": 1,
+              "title": "Actuators",
+              "type": "array"
+            },
+            "tip": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "metadata": {
+              "additionalProperties": true,
+              "description": "Descriptive only; no hidden physical parameters",
+              "title": "Metadata",
+              "type": "object"
+            }
+          },
+          "required": [
+            "id",
+            "components",
+            "tendons",
+            "actuators",
+            "tip"
+          ],
+          "title": "Design",
+          "type": "object"
+        },
+        "Discretization": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "serial_bending_discretization_v1",
+              "default": "serial_bending_discretization_v1",
+              "title": "Version",
+              "type": "string"
+            },
+            "model": {
+              "const": "serial_bending_cells_v1",
+              "default": "serial_bending_cells_v1",
+              "title": "Model",
+              "type": "string"
+            },
+            "cells": {
+              "minProperties": 1,
+              "patternProperties": {
+                "^[A-Za-z][A-Za-z0-9_]*$": {
+                  "type": "integer"
+                }
+              },
+              "title": "Cells",
+              "type": "object"
+            },
+            "coordinates": {
+              "const": "two_principal_bending_angles_per_cell",
+              "default": "two_principal_bending_angles_per_cell",
+              "title": "Coordinates",
+              "type": "string"
+            }
+          },
+          "required": [
+            "cells"
+          ],
+          "title": "Discretization",
+          "type": "object"
+        },
+        "PhysicalInput": {
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "enum": [
+                "material",
+                "equivalent"
+              ],
+              "title": "Mode",
+              "type": "string"
+            },
+            "density_kg_m3": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Density Kg M3"
+            },
+            "young_pa": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Young Pa"
+            },
+            "line_density_kg_m": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Line Density Kg M"
+            },
+            "bending_ei_nm2": {
+              "anyOf": [
+                {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Bending Ei Nm2"
+            },
+            "bending_viscosity_nm2_s": {
+              "default": [
+                0.0,
+                0.0
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Bending Viscosity Nm2 S",
+              "type": "array"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "title": "PhysicalInput",
+          "type": "object"
+        },
+        "Reserved": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "discrete_flexure",
+                "rigid_tendon_joint",
+                "branch",
+                "closed_chain",
+                "cable_parallel"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "description": {
+              "title": "Description",
+              "type": "string"
+            },
+            "attachments": {
+              "items": {
+                "$ref": "#/$defs/Attachment"
+              },
+              "title": "Attachments",
+              "type": "array"
+            },
+            "status": {
+              "const": "descriptive_only",
+              "default": "descriptive_only",
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "description"
+          ],
+          "title": "Reserved",
+          "type": "object"
+        },
+        "Rigid": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "rigid_connector",
+                "guide",
+                "payload"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "connection": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "mass_kg": {
+              "exclusiveMinimum": 0,
+              "title": "Mass Kg",
+              "type": "number"
+            },
+            "com_local_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Com Local M",
+              "type": "array"
+            },
+            "inertia_com_local_kg_m2": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ],
+              "title": "Inertia Com Local Kg M2",
+              "type": "array"
+            },
+            "envelope_halfsize_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Envelope Halfsize M",
+              "type": "array"
+            },
+            "guide_holes": {
+              "additionalProperties": {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Guide Holes",
+              "type": "object"
+            },
+            "hole_radius_m": {
+              "default": 0.0,
+              "minimum": 0,
+              "title": "Hole Radius M",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "connection",
+            "mass_kg",
+            "inertia_com_local_kg_m2",
+            "envelope_halfsize_m"
+          ],
+          "title": "Rigid",
+          "type": "object"
+        },
+        "RoutePoint": {
+          "additionalProperties": false,
+          "properties": {
+            "attachment": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "hole": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Hole"
+            },
+            "role": {
+              "enum": [
+                "start",
+                "guide",
+                "anchor"
+              ],
+              "title": "Role",
+              "type": "string"
+            }
+          },
+          "required": [
+            "attachment",
+            "role"
+          ],
+          "title": "RoutePoint",
+          "type": "object"
+        },
+        "Section": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "circle",
+                "tube",
+                "ellipse",
+                "rectangle",
+                "polygon"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "parameters": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "title": "Parameters",
+              "type": "object"
+            },
+            "outer_yz_m": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Outer Yz M",
+              "type": "array"
+            },
+            "holes_yz_m": {
+              "items": {
+                "items": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "title": "Holes Yz M",
+              "type": "array"
+            },
+            "angle_rad": {
+              "default": 0.0,
+              "title": "Angle Rad",
+              "type": "number"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "title": "Section",
+          "type": "object"
+        },
+        "Segment": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "const": "flexible_segment",
+              "default": "flexible_segment",
+              "title": "Kind",
+              "type": "string"
+            },
+            "connection": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "length_m": {
+              "exclusiveMinimum": 0,
+              "title": "Length M",
+              "type": "number"
+            },
+            "cells": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Cells"
+            },
+            "sections": {
+              "items": {
+                "$ref": "#/$defs/Station"
+              },
+              "minItems": 1,
+              "title": "Sections",
+              "type": "array"
+            },
+            "interpolation": {
+              "default": "step",
+              "enum": [
+                "linear",
+                "step"
+              ],
+              "title": "Interpolation",
+              "type": "string"
+            },
+            "physics": {
+              "$ref": "#/$defs/PhysicalInput"
+            },
+            "natural_curvature_rad_m": {
+              "default": [
+                0.0,
+                0.0
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Natural Curvature Rad M",
+              "type": "array"
+            }
+          },
+          "required": [
+            "id",
+            "length_m",
+            "sections",
+            "physics"
+          ],
+          "title": "Segment",
+          "type": "object"
+        },
+        "Space": {
+          "additionalProperties": false,
+          "properties": {
+            "parameters": {
+              "additionalProperties": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Parameters",
+              "type": "object"
+            },
+            "templates": {
+              "additionalProperties": {
+                "$ref": "#/$defs/Design"
+              },
+              "title": "Templates",
+              "type": "object"
+            },
+            "discretization_parameters": {
+              "additionalProperties": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Discretization Parameters",
+              "type": "object"
+            }
+          },
+          "title": "Space",
+          "type": "object"
+        },
+        "Station": {
+          "additionalProperties": false,
+          "properties": {
+            "s": {
+              "maximum": 1,
+              "minimum": 0,
+              "title": "S",
+              "type": "number"
+            },
+            "section": {
+              "$ref": "#/$defs/Section"
+            }
+          },
+          "required": [
+            "s",
+            "section"
+          ],
+          "title": "Station",
+          "type": "object"
+        },
+        "Tendon": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "points": {
+              "items": {
+                "$ref": "#/$defs/RoutePoint"
+              },
+              "minItems": 2,
+              "title": "Points",
+              "type": "array"
+            },
+            "diameter_m": {
+              "exclusiveMinimum": 0,
+              "title": "Diameter M",
+              "type": "number"
+            },
+            "model": {
+              "const": "straight_frictionless",
+              "default": "straight_frictionless",
+              "title": "Model",
+              "type": "string"
+            },
+            "length_servo_gain_n_m": {
+              "exclusiveMinimum": 0,
+              "title": "Length Servo Gain N M",
+              "type": "number"
+            },
+            "pretension_n": {
+              "default": 0.0,
+              "minimum": 0,
+              "title": "Pretension N",
+              "type": "number"
+            },
+            "force_limit_n": {
+              "exclusiveMinimum": 0,
+              "title": "Force Limit N",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "points",
+            "diameter_m",
+            "length_servo_gain_n_m",
+            "force_limit_n"
+          ],
+          "title": "Tendon",
+          "type": "object"
+        },
+        "Transmission": {
+          "additionalProperties": false,
+          "properties": {
+            "tendon": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Tendon",
+              "type": "string"
+            },
+            "ratio": {
+              "title": "Ratio",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tendon",
+            "ratio"
+          ],
+          "title": "Transmission",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "baseline": {
+          "$ref": "#/$defs/Design"
+        },
+        "space": {
+          "$ref": "#/$defs/Space"
+        },
+        "discretization": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Discretization"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "changes": {
+          "additionalProperties": true,
+          "title": "Changes",
+          "type": "object"
+        }
+      },
+      "required": [
+        "baseline",
+        "space"
+      ],
+      "title": "BuildRequest",
+      "type": "object"
+    },
+    "family.build_result@1.0.0": {
+      "$defs": {
+        "Actuator": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "command_type": {
+              "default": "displacement",
+              "enum": [
+                "displacement",
+                "rotation"
+              ],
+              "title": "Command Type",
+              "type": "string"
+            },
+            "units": {
+              "default": "m",
+              "enum": [
+                "m",
+                "rad"
+              ],
+              "title": "Units",
+              "type": "string"
+            },
+            "drum_radius_m": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Drum Radius M"
+            },
+            "transmission": {
+              "items": {
+                "$ref": "#/$defs/Transmission"
+              },
+              "minItems": 1,
+              "title": "Transmission",
+              "type": "array"
+            },
+            "limits": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Limits",
+              "type": "array"
+            },
+            "velocity_limit": {
+              "exclusiveMinimum": 0,
+              "title": "Velocity Limit",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "transmission",
+            "limits",
+            "velocity_limit"
+          ],
+          "title": "Actuator",
+          "type": "object"
+        },
+        "Attachment": {
+          "additionalProperties": false,
+          "properties": {
+            "part": {
+              "default": "fixed_base",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Part",
+              "type": "string"
+            },
+            "s": {
+              "default": 0.0,
+              "maximum": 1,
+              "minimum": 0,
+              "title": "S",
+              "type": "number"
+            },
+            "position_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "quaternion_wxyz": {
+              "default": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Quaternion Wxyz",
+              "type": "array"
+            }
+          },
+          "title": "Attachment",
+          "type": "object"
+        },
+        "Design": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "tendon_family_v1",
+              "default": "tendon_family_v1",
+              "title": "Version",
+              "type": "string"
+            },
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "components": {
+              "items": {
+                "discriminator": {
+                  "mapping": {
+                    "branch": "#/$defs/Reserved",
+                    "cable_parallel": "#/$defs/Reserved",
+                    "closed_chain": "#/$defs/Reserved",
+                    "discrete_flexure": "#/$defs/Reserved",
+                    "flexible_segment": "#/$defs/Segment",
+                    "guide": "#/$defs/Rigid",
+                    "payload": "#/$defs/Rigid",
+                    "rigid_connector": "#/$defs/Rigid",
+                    "rigid_tendon_joint": "#/$defs/Reserved"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Segment"
+                  },
+                  {
+                    "$ref": "#/$defs/Rigid"
+                  },
+                  {
+                    "$ref": "#/$defs/Reserved"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "title": "Components",
+              "type": "array"
+            },
+            "tendons": {
+              "items": {
+                "$ref": "#/$defs/Tendon"
+              },
+              "minItems": 1,
+              "title": "Tendons",
+              "type": "array"
+            },
+            "actuators": {
+              "items": {
+                "$ref": "#/$defs/Actuator"
+              },
+              "minItems": 1,
+              "title": "Actuators",
+              "type": "array"
+            },
+            "tip": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "metadata": {
+              "additionalProperties": true,
+              "description": "Descriptive only; no hidden physical parameters",
+              "title": "Metadata",
+              "type": "object"
+            }
+          },
+          "required": [
+            "id",
+            "components",
+            "tendons",
+            "actuators",
+            "tip"
+          ],
+          "title": "Design",
+          "type": "object"
+        },
+        "Discretization": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "serial_bending_discretization_v1",
+              "default": "serial_bending_discretization_v1",
+              "title": "Version",
+              "type": "string"
+            },
+            "model": {
+              "const": "serial_bending_cells_v1",
+              "default": "serial_bending_cells_v1",
+              "title": "Model",
+              "type": "string"
+            },
+            "cells": {
+              "minProperties": 1,
+              "patternProperties": {
+                "^[A-Za-z][A-Za-z0-9_]*$": {
+                  "type": "integer"
+                }
+              },
+              "title": "Cells",
+              "type": "object"
+            },
+            "coordinates": {
+              "const": "two_principal_bending_angles_per_cell",
+              "default": "two_principal_bending_angles_per_cell",
+              "title": "Coordinates",
+              "type": "string"
+            }
+          },
+          "required": [
+            "cells"
+          ],
+          "title": "Discretization",
+          "type": "object"
+        },
+        "PhysicalInput": {
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "enum": [
+                "material",
+                "equivalent"
+              ],
+              "title": "Mode",
+              "type": "string"
+            },
+            "density_kg_m3": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Density Kg M3"
+            },
+            "young_pa": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Young Pa"
+            },
+            "line_density_kg_m": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Line Density Kg M"
+            },
+            "bending_ei_nm2": {
+              "anyOf": [
+                {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Bending Ei Nm2"
+            },
+            "bending_viscosity_nm2_s": {
+              "default": [
+                0.0,
+                0.0
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Bending Viscosity Nm2 S",
+              "type": "array"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "title": "PhysicalInput",
+          "type": "object"
+        },
+        "Reserved": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "discrete_flexure",
+                "rigid_tendon_joint",
+                "branch",
+                "closed_chain",
+                "cable_parallel"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "description": {
+              "title": "Description",
+              "type": "string"
+            },
+            "attachments": {
+              "items": {
+                "$ref": "#/$defs/Attachment"
+              },
+              "title": "Attachments",
+              "type": "array"
+            },
+            "status": {
+              "const": "descriptive_only",
+              "default": "descriptive_only",
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "description"
+          ],
+          "title": "Reserved",
+          "type": "object"
+        },
+        "Rigid": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "rigid_connector",
+                "guide",
+                "payload"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "connection": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "mass_kg": {
+              "exclusiveMinimum": 0,
+              "title": "Mass Kg",
+              "type": "number"
+            },
+            "com_local_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Com Local M",
+              "type": "array"
+            },
+            "inertia_com_local_kg_m2": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ],
+              "title": "Inertia Com Local Kg M2",
+              "type": "array"
+            },
+            "envelope_halfsize_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Envelope Halfsize M",
+              "type": "array"
+            },
+            "guide_holes": {
+              "additionalProperties": {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Guide Holes",
+              "type": "object"
+            },
+            "hole_radius_m": {
+              "default": 0.0,
+              "minimum": 0,
+              "title": "Hole Radius M",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "connection",
+            "mass_kg",
+            "inertia_com_local_kg_m2",
+            "envelope_halfsize_m"
+          ],
+          "title": "Rigid",
+          "type": "object"
+        },
+        "RoutePoint": {
+          "additionalProperties": false,
+          "properties": {
+            "attachment": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "hole": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Hole"
+            },
+            "role": {
+              "enum": [
+                "start",
+                "guide",
+                "anchor"
+              ],
+              "title": "Role",
+              "type": "string"
+            }
+          },
+          "required": [
+            "attachment",
+            "role"
+          ],
+          "title": "RoutePoint",
+          "type": "object"
+        },
+        "Section": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "circle",
+                "tube",
+                "ellipse",
+                "rectangle",
+                "polygon"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "parameters": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "title": "Parameters",
+              "type": "object"
+            },
+            "outer_yz_m": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Outer Yz M",
+              "type": "array"
+            },
+            "holes_yz_m": {
+              "items": {
+                "items": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "title": "Holes Yz M",
+              "type": "array"
+            },
+            "angle_rad": {
+              "default": 0.0,
+              "title": "Angle Rad",
+              "type": "number"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "title": "Section",
+          "type": "object"
+        },
+        "Segment": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "const": "flexible_segment",
+              "default": "flexible_segment",
+              "title": "Kind",
+              "type": "string"
+            },
+            "connection": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "length_m": {
+              "exclusiveMinimum": 0,
+              "title": "Length M",
+              "type": "number"
+            },
+            "cells": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Cells"
+            },
+            "sections": {
+              "items": {
+                "$ref": "#/$defs/Station"
+              },
+              "minItems": 1,
+              "title": "Sections",
+              "type": "array"
+            },
+            "interpolation": {
+              "default": "step",
+              "enum": [
+                "linear",
+                "step"
+              ],
+              "title": "Interpolation",
+              "type": "string"
+            },
+            "physics": {
+              "$ref": "#/$defs/PhysicalInput"
+            },
+            "natural_curvature_rad_m": {
+              "default": [
+                0.0,
+                0.0
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Natural Curvature Rad M",
+              "type": "array"
+            }
+          },
+          "required": [
+            "id",
+            "length_m",
+            "sections",
+            "physics"
+          ],
+          "title": "Segment",
+          "type": "object"
+        },
+        "Station": {
+          "additionalProperties": false,
+          "properties": {
+            "s": {
+              "maximum": 1,
+              "minimum": 0,
+              "title": "S",
+              "type": "number"
+            },
+            "section": {
+              "$ref": "#/$defs/Section"
+            }
+          },
+          "required": [
+            "s",
+            "section"
+          ],
+          "title": "Station",
+          "type": "object"
+        },
+        "Tendon": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "points": {
+              "items": {
+                "$ref": "#/$defs/RoutePoint"
+              },
+              "minItems": 2,
+              "title": "Points",
+              "type": "array"
+            },
+            "diameter_m": {
+              "exclusiveMinimum": 0,
+              "title": "Diameter M",
+              "type": "number"
+            },
+            "model": {
+              "const": "straight_frictionless",
+              "default": "straight_frictionless",
+              "title": "Model",
+              "type": "string"
+            },
+            "length_servo_gain_n_m": {
+              "exclusiveMinimum": 0,
+              "title": "Length Servo Gain N M",
+              "type": "number"
+            },
+            "pretension_n": {
+              "default": 0.0,
+              "minimum": 0,
+              "title": "Pretension N",
+              "type": "number"
+            },
+            "force_limit_n": {
+              "exclusiveMinimum": 0,
+              "title": "Force Limit N",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "points",
+            "diameter_m",
+            "length_servo_gain_n_m",
+            "force_limit_n"
+          ],
+          "title": "Tendon",
+          "type": "object"
+        },
+        "Transmission": {
+          "additionalProperties": false,
+          "properties": {
+            "tendon": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Tendon",
+              "type": "string"
+            },
+            "ratio": {
+              "title": "Ratio",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tendon",
+            "ratio"
+          ],
+          "title": "Transmission",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "valid",
+            "physically_invalid",
+            "backend_unsupported"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "candidate": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Design"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "discretization": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Discretization"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "summary": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Summary",
+          "type": "array"
+        },
+        "resolved_physics": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resolved Physics"
+        },
+        "applicability": {
+          "additionalProperties": true,
+          "title": "Applicability",
+          "type": "object"
+        },
+        "source_roles": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Source Roles",
+          "type": "object"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "BuildResult",
+      "type": "object"
+    },
+    "family.control@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "default": "tip_feedback",
+          "enum": [
+            "deterministic",
+            "tip_feedback"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "commands": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Commands",
+          "type": "object"
+        },
+        "ramp_s": {
+          "default": 0.1,
+          "exclusiveMinimum": 0,
+          "title": "Ramp S",
+          "type": "number"
+        },
+        "feedback_gain": {
+          "default": 1.0,
+          "exclusiveMinimum": 0,
+          "title": "Feedback Gain",
+          "type": "number"
+        },
+        "damping": {
+          "default": 0.01,
+          "exclusiveMinimum": 0,
+          "title": "Damping",
+          "type": "number"
+        },
+        "max_joint_update_rad": {
+          "default": 0.02,
+          "exclusiveMinimum": 0,
+          "title": "Max Joint Update Rad",
+          "type": "number"
+        }
+      },
+      "title": "Control",
+      "type": "object"
+    },
+    "family.design@1.0.0": {
+      "$defs": {
+        "Actuator": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "command_type": {
+              "default": "displacement",
+              "enum": [
+                "displacement",
+                "rotation"
+              ],
+              "title": "Command Type",
+              "type": "string"
+            },
+            "units": {
+              "default": "m",
+              "enum": [
+                "m",
+                "rad"
+              ],
+              "title": "Units",
+              "type": "string"
+            },
+            "drum_radius_m": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Drum Radius M"
+            },
+            "transmission": {
+              "items": {
+                "$ref": "#/$defs/Transmission"
+              },
+              "minItems": 1,
+              "title": "Transmission",
+              "type": "array"
+            },
+            "limits": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Limits",
+              "type": "array"
+            },
+            "velocity_limit": {
+              "exclusiveMinimum": 0,
+              "title": "Velocity Limit",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "transmission",
+            "limits",
+            "velocity_limit"
+          ],
+          "title": "Actuator",
+          "type": "object"
+        },
+        "Attachment": {
+          "additionalProperties": false,
+          "properties": {
+            "part": {
+              "default": "fixed_base",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Part",
+              "type": "string"
+            },
+            "s": {
+              "default": 0.0,
+              "maximum": 1,
+              "minimum": 0,
+              "title": "S",
+              "type": "number"
+            },
+            "position_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "quaternion_wxyz": {
+              "default": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Quaternion Wxyz",
+              "type": "array"
+            }
+          },
+          "title": "Attachment",
+          "type": "object"
+        },
+        "PhysicalInput": {
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "enum": [
+                "material",
+                "equivalent"
+              ],
+              "title": "Mode",
+              "type": "string"
+            },
+            "density_kg_m3": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Density Kg M3"
+            },
+            "young_pa": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Young Pa"
+            },
+            "line_density_kg_m": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Line Density Kg M"
+            },
+            "bending_ei_nm2": {
+              "anyOf": [
+                {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Bending Ei Nm2"
+            },
+            "bending_viscosity_nm2_s": {
+              "default": [
+                0.0,
+                0.0
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Bending Viscosity Nm2 S",
+              "type": "array"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "title": "PhysicalInput",
+          "type": "object"
+        },
+        "Reserved": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "discrete_flexure",
+                "rigid_tendon_joint",
+                "branch",
+                "closed_chain",
+                "cable_parallel"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "description": {
+              "title": "Description",
+              "type": "string"
+            },
+            "attachments": {
+              "items": {
+                "$ref": "#/$defs/Attachment"
+              },
+              "title": "Attachments",
+              "type": "array"
+            },
+            "status": {
+              "const": "descriptive_only",
+              "default": "descriptive_only",
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "description"
+          ],
+          "title": "Reserved",
+          "type": "object"
+        },
+        "Rigid": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "rigid_connector",
+                "guide",
+                "payload"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "connection": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "mass_kg": {
+              "exclusiveMinimum": 0,
+              "title": "Mass Kg",
+              "type": "number"
+            },
+            "com_local_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Com Local M",
+              "type": "array"
+            },
+            "inertia_com_local_kg_m2": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ],
+              "title": "Inertia Com Local Kg M2",
+              "type": "array"
+            },
+            "envelope_halfsize_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Envelope Halfsize M",
+              "type": "array"
+            },
+            "guide_holes": {
+              "additionalProperties": {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Guide Holes",
+              "type": "object"
+            },
+            "hole_radius_m": {
+              "default": 0.0,
+              "minimum": 0,
+              "title": "Hole Radius M",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "connection",
+            "mass_kg",
+            "inertia_com_local_kg_m2",
+            "envelope_halfsize_m"
+          ],
+          "title": "Rigid",
+          "type": "object"
+        },
+        "RoutePoint": {
+          "additionalProperties": false,
+          "properties": {
+            "attachment": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "hole": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Hole"
+            },
+            "role": {
+              "enum": [
+                "start",
+                "guide",
+                "anchor"
+              ],
+              "title": "Role",
+              "type": "string"
+            }
+          },
+          "required": [
+            "attachment",
+            "role"
+          ],
+          "title": "RoutePoint",
+          "type": "object"
+        },
+        "Section": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "circle",
+                "tube",
+                "ellipse",
+                "rectangle",
+                "polygon"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "parameters": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "title": "Parameters",
+              "type": "object"
+            },
+            "outer_yz_m": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Outer Yz M",
+              "type": "array"
+            },
+            "holes_yz_m": {
+              "items": {
+                "items": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "title": "Holes Yz M",
+              "type": "array"
+            },
+            "angle_rad": {
+              "default": 0.0,
+              "title": "Angle Rad",
+              "type": "number"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "title": "Section",
+          "type": "object"
+        },
+        "Segment": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "const": "flexible_segment",
+              "default": "flexible_segment",
+              "title": "Kind",
+              "type": "string"
+            },
+            "connection": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "length_m": {
+              "exclusiveMinimum": 0,
+              "title": "Length M",
+              "type": "number"
+            },
+            "cells": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Cells"
+            },
+            "sections": {
+              "items": {
+                "$ref": "#/$defs/Station"
+              },
+              "minItems": 1,
+              "title": "Sections",
+              "type": "array"
+            },
+            "interpolation": {
+              "default": "step",
+              "enum": [
+                "linear",
+                "step"
+              ],
+              "title": "Interpolation",
+              "type": "string"
+            },
+            "physics": {
+              "$ref": "#/$defs/PhysicalInput"
+            },
+            "natural_curvature_rad_m": {
+              "default": [
+                0.0,
+                0.0
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Natural Curvature Rad M",
+              "type": "array"
+            }
+          },
+          "required": [
+            "id",
+            "length_m",
+            "sections",
+            "physics"
+          ],
+          "title": "Segment",
+          "type": "object"
+        },
+        "Station": {
+          "additionalProperties": false,
+          "properties": {
+            "s": {
+              "maximum": 1,
+              "minimum": 0,
+              "title": "S",
+              "type": "number"
+            },
+            "section": {
+              "$ref": "#/$defs/Section"
+            }
+          },
+          "required": [
+            "s",
+            "section"
+          ],
+          "title": "Station",
+          "type": "object"
+        },
+        "Tendon": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "points": {
+              "items": {
+                "$ref": "#/$defs/RoutePoint"
+              },
+              "minItems": 2,
+              "title": "Points",
+              "type": "array"
+            },
+            "diameter_m": {
+              "exclusiveMinimum": 0,
+              "title": "Diameter M",
+              "type": "number"
+            },
+            "model": {
+              "const": "straight_frictionless",
+              "default": "straight_frictionless",
+              "title": "Model",
+              "type": "string"
+            },
+            "length_servo_gain_n_m": {
+              "exclusiveMinimum": 0,
+              "title": "Length Servo Gain N M",
+              "type": "number"
+            },
+            "pretension_n": {
+              "default": 0.0,
+              "minimum": 0,
+              "title": "Pretension N",
+              "type": "number"
+            },
+            "force_limit_n": {
+              "exclusiveMinimum": 0,
+              "title": "Force Limit N",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "points",
+            "diameter_m",
+            "length_servo_gain_n_m",
+            "force_limit_n"
+          ],
+          "title": "Tendon",
+          "type": "object"
+        },
+        "Transmission": {
+          "additionalProperties": false,
+          "properties": {
+            "tendon": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Tendon",
+              "type": "string"
+            },
+            "ratio": {
+              "title": "Ratio",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tendon",
+            "ratio"
+          ],
+          "title": "Transmission",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "tendon_family_v1",
+          "default": "tendon_family_v1",
+          "title": "Version",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "components": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "branch": "#/$defs/Reserved",
+                "cable_parallel": "#/$defs/Reserved",
+                "closed_chain": "#/$defs/Reserved",
+                "discrete_flexure": "#/$defs/Reserved",
+                "flexible_segment": "#/$defs/Segment",
+                "guide": "#/$defs/Rigid",
+                "payload": "#/$defs/Rigid",
+                "rigid_connector": "#/$defs/Rigid",
+                "rigid_tendon_joint": "#/$defs/Reserved"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Segment"
+              },
+              {
+                "$ref": "#/$defs/Rigid"
+              },
+              {
+                "$ref": "#/$defs/Reserved"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Components",
+          "type": "array"
+        },
+        "tendons": {
+          "items": {
+            "$ref": "#/$defs/Tendon"
+          },
+          "minItems": 1,
+          "title": "Tendons",
+          "type": "array"
+        },
+        "actuators": {
+          "items": {
+            "$ref": "#/$defs/Actuator"
+          },
+          "minItems": 1,
+          "title": "Actuators",
+          "type": "array"
+        },
+        "tip": {
+          "$ref": "#/$defs/Attachment"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Descriptive only; no hidden physical parameters",
+          "title": "Metadata",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "components",
+        "tendons",
+        "actuators",
+        "tip"
+      ],
+      "title": "Design",
+      "type": "object"
+    },
+    "family.discretization@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "serial_bending_discretization_v1",
+          "default": "serial_bending_discretization_v1",
+          "title": "Version",
+          "type": "string"
+        },
+        "model": {
+          "const": "serial_bending_cells_v1",
+          "default": "serial_bending_cells_v1",
+          "title": "Model",
+          "type": "string"
+        },
+        "cells": {
+          "minProperties": 1,
+          "patternProperties": {
+            "^[A-Za-z][A-Za-z0-9_]*$": {
+              "type": "integer"
+            }
+          },
+          "title": "Cells",
+          "type": "object"
+        },
+        "coordinates": {
+          "const": "two_principal_bending_angles_per_cell",
+          "default": "two_principal_bending_angles_per_cell",
+          "title": "Coordinates",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cells"
+      ],
+      "title": "Discretization",
+      "type": "object"
+    },
+    "family.experiment_spec@1.0.0": {
+      "additionalProperties": false,
+      "description": "Immutable composition view; editable values remain in their source objects.",
+      "properties": {
+        "version": {
+          "const": "family_experiment_v1",
+          "default": "family_experiment_v1",
+          "title": "Version",
+          "type": "string"
+        },
+        "task_identity": {
+          "title": "Task Identity",
+          "type": "string"
+        },
+        "design_identity": {
+          "title": "Design Identity",
+          "type": "string"
+        },
+        "discretization_identity": {
+          "title": "Discretization Identity",
+          "type": "string"
+        },
+        "physics_identity": {
+          "title": "Physics Identity",
+          "type": "string"
+        },
+        "scene_identity": {
+          "title": "Scene Identity",
+          "type": "string"
+        },
+        "source_roles": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Source Roles",
+          "type": "object"
+        }
+      },
+      "required": [
+        "task_identity",
+        "design_identity",
+        "discretization_identity",
+        "physics_identity",
+        "scene_identity",
+        "source_roles"
+      ],
+      "title": "ExperimentSpec",
+      "type": "object"
+    },
+    "family.initial@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "qpos_rad": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Qpos Rad",
+          "type": "object"
+        },
+        "qvel_rad_s": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Qvel Rad S",
+          "type": "object"
+        },
+        "unspecified": {
+          "const": "zero",
+          "default": "zero",
+          "title": "Unspecified",
+          "type": "string"
+        }
+      },
+      "title": "Initial",
+      "type": "object"
+    },
+    "family.parameters@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "default": "matlab_serial_bending_v1",
+          "enum": [
+            "matlab_serial_bending_v1",
+            "mujoco_serial_bending_v1"
+          ],
+          "title": "Model",
+          "type": "string"
+        },
+        "max_step_s": {
+          "default": 0.001,
+          "description": "MATLAB only; MuJoCo uses scene timestep_s",
+          "exclusiveMinimum": 0,
+          "title": "Max Step S",
+          "type": "number"
+        },
+        "rtol": {
+          "default": 1e-05,
+          "description": "MATLAB ode15s only",
+          "exclusiveMinimum": 0,
+          "title": "Rtol",
+          "type": "number"
+        },
+        "atol": {
+          "default": 1e-07,
+          "description": "MATLAB ode15s only",
+          "exclusiveMinimum": 0,
+          "title": "Atol",
+          "type": "number"
+        },
+        "contact_stiffness_n_m": {
+          "default": 5000.0,
+          "description": "MATLAB penalty only; MuJoCo contact is recorded in XML",
+          "exclusiveMinimum": 0,
+          "title": "Contact Stiffness N M",
+          "type": "number"
+        },
+        "contact_damping_n_s_m": {
+          "default": 5.0,
+          "description": "MATLAB penalty only",
+          "minimum": 0,
+          "title": "Contact Damping N S M",
+          "type": "number"
+        }
+      },
+      "title": "Parameters",
+      "type": "object"
+    },
+    "family.space@1.0.0": {
+      "$defs": {
+        "Actuator": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "command_type": {
+              "default": "displacement",
+              "enum": [
+                "displacement",
+                "rotation"
+              ],
+              "title": "Command Type",
+              "type": "string"
+            },
+            "units": {
+              "default": "m",
+              "enum": [
+                "m",
+                "rad"
+              ],
+              "title": "Units",
+              "type": "string"
+            },
+            "drum_radius_m": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Drum Radius M"
+            },
+            "transmission": {
+              "items": {
+                "$ref": "#/$defs/Transmission"
+              },
+              "minItems": 1,
+              "title": "Transmission",
+              "type": "array"
+            },
+            "limits": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Limits",
+              "type": "array"
+            },
+            "velocity_limit": {
+              "exclusiveMinimum": 0,
+              "title": "Velocity Limit",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "transmission",
+            "limits",
+            "velocity_limit"
+          ],
+          "title": "Actuator",
+          "type": "object"
+        },
+        "Attachment": {
+          "additionalProperties": false,
+          "properties": {
+            "part": {
+              "default": "fixed_base",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Part",
+              "type": "string"
+            },
+            "s": {
+              "default": 0.0,
+              "maximum": 1,
+              "minimum": 0,
+              "title": "S",
+              "type": "number"
+            },
+            "position_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "quaternion_wxyz": {
+              "default": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Quaternion Wxyz",
+              "type": "array"
+            }
+          },
+          "title": "Attachment",
+          "type": "object"
+        },
+        "Design": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "tendon_family_v1",
+              "default": "tendon_family_v1",
+              "title": "Version",
+              "type": "string"
+            },
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "components": {
+              "items": {
+                "discriminator": {
+                  "mapping": {
+                    "branch": "#/$defs/Reserved",
+                    "cable_parallel": "#/$defs/Reserved",
+                    "closed_chain": "#/$defs/Reserved",
+                    "discrete_flexure": "#/$defs/Reserved",
+                    "flexible_segment": "#/$defs/Segment",
+                    "guide": "#/$defs/Rigid",
+                    "payload": "#/$defs/Rigid",
+                    "rigid_connector": "#/$defs/Rigid",
+                    "rigid_tendon_joint": "#/$defs/Reserved"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Segment"
+                  },
+                  {
+                    "$ref": "#/$defs/Rigid"
+                  },
+                  {
+                    "$ref": "#/$defs/Reserved"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "title": "Components",
+              "type": "array"
+            },
+            "tendons": {
+              "items": {
+                "$ref": "#/$defs/Tendon"
+              },
+              "minItems": 1,
+              "title": "Tendons",
+              "type": "array"
+            },
+            "actuators": {
+              "items": {
+                "$ref": "#/$defs/Actuator"
+              },
+              "minItems": 1,
+              "title": "Actuators",
+              "type": "array"
+            },
+            "tip": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "metadata": {
+              "additionalProperties": true,
+              "description": "Descriptive only; no hidden physical parameters",
+              "title": "Metadata",
+              "type": "object"
+            }
+          },
+          "required": [
+            "id",
+            "components",
+            "tendons",
+            "actuators",
+            "tip"
+          ],
+          "title": "Design",
+          "type": "object"
+        },
+        "PhysicalInput": {
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "enum": [
+                "material",
+                "equivalent"
+              ],
+              "title": "Mode",
+              "type": "string"
+            },
+            "density_kg_m3": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Density Kg M3"
+            },
+            "young_pa": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Young Pa"
+            },
+            "line_density_kg_m": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Line Density Kg M"
+            },
+            "bending_ei_nm2": {
+              "anyOf": [
+                {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Bending Ei Nm2"
+            },
+            "bending_viscosity_nm2_s": {
+              "default": [
+                0.0,
+                0.0
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Bending Viscosity Nm2 S",
+              "type": "array"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "title": "PhysicalInput",
+          "type": "object"
+        },
+        "Reserved": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "discrete_flexure",
+                "rigid_tendon_joint",
+                "branch",
+                "closed_chain",
+                "cable_parallel"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "description": {
+              "title": "Description",
+              "type": "string"
+            },
+            "attachments": {
+              "items": {
+                "$ref": "#/$defs/Attachment"
+              },
+              "title": "Attachments",
+              "type": "array"
+            },
+            "status": {
+              "const": "descriptive_only",
+              "default": "descriptive_only",
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "description"
+          ],
+          "title": "Reserved",
+          "type": "object"
+        },
+        "Rigid": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "rigid_connector",
+                "guide",
+                "payload"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "connection": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "mass_kg": {
+              "exclusiveMinimum": 0,
+              "title": "Mass Kg",
+              "type": "number"
+            },
+            "com_local_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Com Local M",
+              "type": "array"
+            },
+            "inertia_com_local_kg_m2": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ],
+              "title": "Inertia Com Local Kg M2",
+              "type": "array"
+            },
+            "envelope_halfsize_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Envelope Halfsize M",
+              "type": "array"
+            },
+            "guide_holes": {
+              "additionalProperties": {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Guide Holes",
+              "type": "object"
+            },
+            "hole_radius_m": {
+              "default": 0.0,
+              "minimum": 0,
+              "title": "Hole Radius M",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "connection",
+            "mass_kg",
+            "inertia_com_local_kg_m2",
+            "envelope_halfsize_m"
+          ],
+          "title": "Rigid",
+          "type": "object"
+        },
+        "RoutePoint": {
+          "additionalProperties": false,
+          "properties": {
+            "attachment": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "hole": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Hole"
+            },
+            "role": {
+              "enum": [
+                "start",
+                "guide",
+                "anchor"
+              ],
+              "title": "Role",
+              "type": "string"
+            }
+          },
+          "required": [
+            "attachment",
+            "role"
+          ],
+          "title": "RoutePoint",
+          "type": "object"
+        },
+        "Section": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "circle",
+                "tube",
+                "ellipse",
+                "rectangle",
+                "polygon"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "parameters": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "title": "Parameters",
+              "type": "object"
+            },
+            "outer_yz_m": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Outer Yz M",
+              "type": "array"
+            },
+            "holes_yz_m": {
+              "items": {
+                "items": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "title": "Holes Yz M",
+              "type": "array"
+            },
+            "angle_rad": {
+              "default": 0.0,
+              "title": "Angle Rad",
+              "type": "number"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "title": "Section",
+          "type": "object"
+        },
+        "Segment": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "const": "flexible_segment",
+              "default": "flexible_segment",
+              "title": "Kind",
+              "type": "string"
+            },
+            "connection": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "length_m": {
+              "exclusiveMinimum": 0,
+              "title": "Length M",
+              "type": "number"
+            },
+            "cells": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Cells"
+            },
+            "sections": {
+              "items": {
+                "$ref": "#/$defs/Station"
+              },
+              "minItems": 1,
+              "title": "Sections",
+              "type": "array"
+            },
+            "interpolation": {
+              "default": "step",
+              "enum": [
+                "linear",
+                "step"
+              ],
+              "title": "Interpolation",
+              "type": "string"
+            },
+            "physics": {
+              "$ref": "#/$defs/PhysicalInput"
+            },
+            "natural_curvature_rad_m": {
+              "default": [
+                0.0,
+                0.0
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Natural Curvature Rad M",
+              "type": "array"
+            }
+          },
+          "required": [
+            "id",
+            "length_m",
+            "sections",
+            "physics"
+          ],
+          "title": "Segment",
+          "type": "object"
+        },
+        "Station": {
+          "additionalProperties": false,
+          "properties": {
+            "s": {
+              "maximum": 1,
+              "minimum": 0,
+              "title": "S",
+              "type": "number"
+            },
+            "section": {
+              "$ref": "#/$defs/Section"
+            }
+          },
+          "required": [
+            "s",
+            "section"
+          ],
+          "title": "Station",
+          "type": "object"
+        },
+        "Tendon": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "points": {
+              "items": {
+                "$ref": "#/$defs/RoutePoint"
+              },
+              "minItems": 2,
+              "title": "Points",
+              "type": "array"
+            },
+            "diameter_m": {
+              "exclusiveMinimum": 0,
+              "title": "Diameter M",
+              "type": "number"
+            },
+            "model": {
+              "const": "straight_frictionless",
+              "default": "straight_frictionless",
+              "title": "Model",
+              "type": "string"
+            },
+            "length_servo_gain_n_m": {
+              "exclusiveMinimum": 0,
+              "title": "Length Servo Gain N M",
+              "type": "number"
+            },
+            "pretension_n": {
+              "default": 0.0,
+              "minimum": 0,
+              "title": "Pretension N",
+              "type": "number"
+            },
+            "force_limit_n": {
+              "exclusiveMinimum": 0,
+              "title": "Force Limit N",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "points",
+            "diameter_m",
+            "length_servo_gain_n_m",
+            "force_limit_n"
+          ],
+          "title": "Tendon",
+          "type": "object"
+        },
+        "Transmission": {
+          "additionalProperties": false,
+          "properties": {
+            "tendon": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Tendon",
+              "type": "string"
+            },
+            "ratio": {
+              "title": "Ratio",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tendon",
+            "ratio"
+          ],
+          "title": "Transmission",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "parameters": {
+          "additionalProperties": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "templates": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Design"
+          },
+          "title": "Templates",
+          "type": "object"
+        },
+        "discretization_parameters": {
+          "additionalProperties": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Discretization Parameters",
+          "type": "object"
+        }
+      },
+      "title": "Space",
       "type": "object"
     },
     "legacy.backend_data@1.0.0": {

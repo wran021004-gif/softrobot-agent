@@ -2,11 +2,14 @@
 
 ## 当前开发入口
 
-独立数学与物理后端的新开发从 [公共物理、空间动力学与统一场景](docs/platform_spatial.md) 开始。使用 `python examples/workbench.py platform spatial-example ...`，同一候选分别进入无 MuJoCo 依赖的三维数学计算和 MuJoCo；保留独立输入的原平面模型与所有旧入口。
+当前串联绳驱家族开发从 [机器人、离散、任务与共同实验装配](docs/tendon_family.md) 开始。推荐入口是 `python examples/workbench.py platform tendon-family ...`：`prepare` 生成可编辑来源，`build` 构建并检查候选和共同场景，`run` 才启动 MATLAB 或 MuJoCo 求解。候选加载与装配实现位于 `extensions/tendon_family/preparation.py`，example 只提供配置样例和命令入口。
+本轮步骤 0、1、2 的实际改动与两次短求解见 [基础分层结果](docs/foundations_0_1_2_result.md)。
+
+总体平台职责、权威来源与真实调用顺序见 [平台架构与操作](docs/platform.md)。原单段独立数学与物理后端说明保留在 [公共物理、空间动力学与统一场景](docs/platform_spatial.md)，作为兼容入口和历史模型身份说明。
 
 真实机器人链路从 [结构候选、统一信号与保存数据诊断](docs/platform_domain.md) 开始：复用现有等效杆编译、MATLAB／MuJoCo 和原诊断工具；内含可复制命令、开放参数及领域原子／内部库／教学示例分类。
 
-从 [平台架构与操作](docs/platform.md) 开始，推荐命令为 `python examples/workbench.py platform ...`；它转发到 `examples/development_platform.py` 的同一实现。新增扩展先读 [扩展指南与最小模板](docs/platform_extensions.md)，协作分工见 [共同核心与包作者责任](docs/platform_parallel_development.md)，任务配置见 [填写指南](docs/platform_tasks.md)。
+平台通用命令仍为 `python examples/workbench.py platform ...`；它转发到 `examples/development_platform.py` 的同一实现。新增扩展先读 [扩展指南与最小模板](docs/platform_extensions.md)，协作分工见 [共同核心与包作者责任](docs/platform_parallel_development.md)，任务配置见 [填写指南](docs/platform_tasks.md)。
 
 ```powershell
 conda activate softagent

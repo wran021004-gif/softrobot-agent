@@ -1,6 +1,6 @@
 # 统一机器人智能设计开发平台
 
-真实的独立数学／物理双后端开发入口见 [公共物理、空间模型与统一场景](platform_spatial.md)；旧 MATLAB 共享导出路径的 MuJoCo 依赖不适用于新数学后端。
+当前真实串联绳驱双后端入口见 [机器人、离散、任务与共同实验装配](tendon_family.md)。原单段独立空间模型见 [公共物理、空间模型与统一场景](platform_spatial.md)，其模型身份和兼容入口继续保留。
 
 这是当前开发总入口，用于共同开发任务、分析、仿真、控制、评价、搜索、诊断、记忆、技能及工作者。各工具与契约独立版本化，不存在一个适用于所有接口的统一版本号。历史到达实验仍是具体项目，不是平台的命名或授权来源。
 
@@ -9,6 +9,22 @@
 当前 ToolReceipt／EvaluationResult 默认 **1.2.0**，含 `original_execution_id`；WorkerOutput 为 **2.0.0**，其余契约按各自源码版本。工具 `tool_version` 与返回内容的 `result_version` 分开记录。仿真同会话复用保留本次调用身份并指向原始执行，缓存调用不新增求解费用；相同请求重试返回原回执。兼容旧版本、精确匹配及来源读取见 [接口决策](platform_interface_decisions.md) 和 [缓存与恢复](platform_recovery.md)。
 
 ## 分层与运行顺序
+
+当前家族链路的职责和权威来源如下。`ExperimentSpec` 是带身份的组合视图，不复制可编辑目标或物理参数。
+
+| 对象 | 权威来源 | 读取者与派生物 |
+|---|---|---|
+| 实体设计与物理输入 | prepare 后的 `inputs/design.json`；`family.design` | `candidate.py` 构建最终设计；`compiler.py` 解析截面、质量、惯量、刚度、阻尼、绳路与传动 |
+| 设计空间与候选选择 | `inputs/space.json`、`inputs/<candidate>_request.json` | `preparation.py` 和公共 `candidate.family`；生成候选、来源身份及过期检查 |
+| 模型离散 | `inputs/discretization.json`；`ExperimentPolicy.discretization` / `family.discretization` | `compiler.py` 生成当前逐刚体、逐关节表示；`cells` 不属于实体设计 |
+| 任务 | prepare 后的后端输入文件中的 `TaskDefinition.goal/objectives/evaluator` | `platform_tasks.py`、评价器；生成任务身份和评价结果 |
+| 环境与装配 | `TaskDefinition.environment` 的 `experiment.assembly`；initializer | `scene.py`；生成共同场景、具名状态、实体映射、安装和定时外力 |
+| 运行方案 | `ExperimentPolicy.backend/controller/discretization`、`Timing`、后端参数 | Host 与后端适配；生成冻结候选输入、求解配置和回执 |
+| 结果与证据 | `BackendResult`、SQLite Store、`ExportBundle` | 评价、统一信号、比较、保存回放和证据读取 |
+
+真实调用顺序为：输入文件 → `preparation.prepare_candidate` → `candidate.build` 与公共 `_candidate` → `compiler.resolve` → `scene.assemble` → `platform_tasks.compile_input` → `Host.invoke(simulation.run)` → 独立 MATLAB / MuJoCo → `BackendResult` → `evaluation.run` / `signals.read` / ExportBundle。公共平台负责信封、注册、冻结、预算、缓存、回执与证据；领域扩展负责机器人语义、物理派生和场景；后端只消费共同输入并独立计算；examples 只生成示例配置和调用这些公共入口。
+
+当前推荐入口是 tendon-family。`spatial-example`、旧 `single`、领域样例及原 workbench 继续兼容。`docs/round*`、旧 runs 和 evidence 是历史实验材料。manifest 中声明但返回 implementation-required 的能力，以及预留拓扑、PCC/GVS 通用状态转换、复杂接触和移动平台仍只是计划范围。
 
 ```mermaid
 flowchart TD

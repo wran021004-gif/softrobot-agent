@@ -2,7 +2,7 @@
 import math
 import numpy as np
 from tools.state_io import digest
-from .contracts import Design, Segment, Rigid, Reserved
+from .contracts import Design, Discretization, Segment, Rigid, Reserved
 from .sections import properties, at
 
 
@@ -29,8 +29,38 @@ def valid_inertia(m, I):
         raise ValueError('INVALID_MASS_OR_COM_INERTIA')
 
 
-def resolve(design):
-    d = Design.model_validate(design)
+def normalize_inputs(design, discretization=None):
+    """Return a physical Design and explicit model discretization.
+
+    Legacy Segment.cells values are accepted only as a compatibility source.
+    An explicit conflicting value is rejected instead of being selected silently.
+    """
+    parsed = design if isinstance(design, Design) else Design.model_validate(design)
+    legacy = {c.id: c.cells for c in parsed.components if isinstance(c, Segment) and c.cells is not None}
+    explicit = Discretization.model_validate(discretization) if discretization is not None else None
+    segment_ids = {c.id for c in parsed.components if isinstance(c, Segment)}
+    if explicit is not None:
+        unknown = set(explicit.cells) - segment_ids
+        missing = segment_ids - set(explicit.cells)
+        if unknown: raise ValueError('DISCRETIZATION_UNKNOWN_SEGMENT: '+','.join(sorted(unknown)))
+        if missing: raise ValueError('DISCRETIZATION_MISSING_SEGMENT: '+','.join(sorted(missing)))
+        conflicts = {name for name,value in legacy.items() if explicit.cells.get(name) != value}
+        if conflicts: raise ValueError('DISCRETIZATION_CONFLICT_WITH_LEGACY_CELLS: '+','.join(sorted(conflicts)))
+        disc = explicit
+        source = 'explicit_model_configuration'
+    else:
+        missing = segment_ids - set(legacy)
+        if missing: raise ValueError('DISCRETIZATION_REQUIRED_FOR_SEGMENTS: '+','.join(sorted(missing)))
+        disc = Discretization(cells=legacy)
+        source = 'legacy_segment_cells_compatibility'
+    # Segment.cells is excluded from serialization; re-validation yields the
+    # canonical physical design with no model mesh values in its source data.
+    physical = Design.model_validate(parsed.model_dump(mode='json'))
+    return physical, disc, source
+
+
+def resolve(design, discretization=None):
+    d, discretization, discretization_source = normalize_inputs(design, discretization)
     all_ids = [c.id for c in d.components]+[t.id for t in d.tendons]+[a.id for a in d.actuators]+['fixed_base']
     if len(all_ids) != len(set(all_ids)): raise ValueError('DUPLICATE_ENTITY')
     if any(isinstance(c,Reserved) for c in d.components):
@@ -62,9 +92,10 @@ def resolve(design):
                 for station in c.sections:
                     properties(station.section)
                 bodies, joints = [], []
-                ds = c.length_m/c.cells
-                for i in range(c.cells):
-                    section = at(c,(i+.5)/c.cells); prop = properties(section)
+                cells = discretization.cells[c.id]
+                ds = c.length_m/cells
+                for i in range(cells):
+                    section = at(c,(i+.5)/cells); prop = properties(section)
                     B = np.array(prop['bending_area_m4']); eig, V = np.linalg.eigh(B)
                     # Principal y,z axes, proper rotation. Preserve circular input orientation.
                     phi = section.angle_rad if abs(eig[1]-eig[0]) < 1e-12*max(eig) else math.atan2(V[1,0],V[0,0])
@@ -140,7 +171,13 @@ def resolve(design):
             if t.tendon not in ids or t.tendon in owners: raise ValueError('TENDON_NEEDS_EXACTLY_ONE_TRANSMISSION')
             owners.add(t.tendon); B[ids.index(t.tendon),j] = t.ratio*(a.drum_radius_m or 1.)
     if len(owners) != len(routes): raise ValueError('UNDRIVEN_TENDON')
-    result = dict(version='serial_bending_physics_v1',source_identity=digest(d.model_dump(mode='json')),parts=parts,tendons=routes,
+    physical_source = d.model_dump(mode='json')
+    model_source = discretization.model_dump(mode='json')
+    result = dict(version='serial_bending_physics_v1',source_identity=digest(physical_source),
+        design_identity=digest(physical_source),discretization_identity=digest(model_source),
+        source_roles=dict(entity_design='family.design',physical_inputs='component.physics and tendon assumptions',
+            model_discretization='family.discretization',discretization_source=discretization_source),
+        discretization=model_source,parts=parts,tendons=routes,
         actuators=[a.model_dump(mode='json') for a in d.actuators],transmission=B.tolist(),dofs=dofs,entity_map=maps,
         tip=dict(body=tip_body,position_m=tip_pos.tolist()),section_quantities=section_data,
         applicability=dict(compilable=True,backends=['backend.matlab_spatial','backend.family_mujoco'],

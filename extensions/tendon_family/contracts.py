@@ -58,7 +58,9 @@ class Segment(Contract):
     kind: Literal['flexible_segment'] = 'flexible_segment'
     connection: Attachment = Field(default_factory=Attachment)
     length_m: float = Field(gt=0)
-    cells: int = Field(gt=0, strict=True)
+    # Compatibility input only. Recommended inputs put this numerical model
+    # choice in family.discretization. Normalization removes it from Design.
+    cells: int | None = Field(default=None, gt=0, strict=True, exclude=True)
     sections: list[Station] = Field(min_length=1)
     interpolation: Literal['linear', 'step'] = 'step'
     physics: PhysicalInput
@@ -171,22 +173,51 @@ class Data(Contract):
     exported_files: list[str]
 
 
+class ExperimentSpec(Contract):
+    """Immutable composition view; editable values remain in their source objects."""
+    version: Literal['family_experiment_v1'] = 'family_experiment_v1'
+    task_identity: str
+    design_identity: str
+    discretization_identity: str
+    physics_identity: str
+    scene_identity: str
+    source_roles: dict[str, str]
+
+
 class Space(Contract):
-    # Exact paths or full-design options, carried by frozen candidate binding.
+    # Physical design paths or full physical-design options.
     parameters: dict[str, dict] = Field(default_factory=dict)
     templates: dict[str, Design] = Field(default_factory=dict)
+    # Numerical-model edits use "discretization/cells/<segment>" paths.
+    discretization_parameters: dict[str, dict] = Field(default_factory=dict)
+
+
+class Discretization(Contract):
+    version: Literal['serial_bending_discretization_v1'] = 'serial_bending_discretization_v1'
+    model: Literal['serial_bending_cells_v1'] = 'serial_bending_cells_v1'
+    cells: dict[Name, int] = Field(min_length=1)
+    coordinates: Literal['two_principal_bending_angles_per_cell'] = 'two_principal_bending_angles_per_cell'
+
+    @model_validator(mode='after')
+    def positive_cells(self):
+        if any(isinstance(value, bool) or not isinstance(value, int) or value <= 0 for value in self.cells.values()):
+            raise ValueError('DISCRETIZATION_CELLS_MUST_BE_POSITIVE_INTEGERS')
+        return self
 
 
 class BuildRequest(Contract):
     baseline: Design
     space: Space
+    discretization: Discretization | None = None
     changes: dict = Field(default_factory=dict)
 
 
 class BuildResult(Contract):
     status: Literal['valid', 'physically_invalid', 'backend_unsupported']
     candidate: Design | None = None
+    discretization: Discretization | None = None
     summary: list[dict] = Field(default_factory=list)
     resolved_physics: dict | None = None
     applicability: dict = Field(default_factory=dict)
+    source_roles: dict[str, str] = Field(default_factory=dict)
     reason: str | None = None

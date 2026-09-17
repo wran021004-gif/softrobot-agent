@@ -14,7 +14,9 @@ def simulation_preflight(inp, arguments, reg):
     from schemas.platform import CandidateInput
     prepared = CandidateInput(candidate_id=arguments.candidate_id, baseline_identity=digest(plain(inp)),
         builder=inp.policy.candidate_builder.extension_id, builder_version=inp.policy.candidate_builder.version,
-        changes=arguments.changes, allowed=inp.policy.editable, effective=candidate, content_identity=digest(plain(candidate)))
+        changes=arguments.changes, allowed=inp.policy.editable, effective=candidate, content_identity=digest(plain(candidate)),
+        sources=dict(entity_design='effective.robot.structure',model_discretization='effective.policy.discretization',
+            task_environment='effective.task',run_plan='effective.policy'))
     return dict(cost={'backend_solves': int(not backend.capabilities.get('reference', False))},
                 resources=list(backend.resources), prepared=prepared)
 
@@ -33,14 +35,18 @@ def _candidate(inp, changes, reg):
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not lo <= value <= hi:
             raise ValueError('PARAMETER_OUT_OF_BOUNDS: ' + key)
     candidate = SessionInput.model_validate(builder.resolve()(inp.model_copy(deep=True), parameters, changes))
-    # Builder may alter robot and controller inputs only; scientific definition stays fixed.
+    # Builder may alter physical design, declared discretization and controller
+    # inputs only; task/environment and all other policy fields stay fixed.
     before, after = plain(inp), plain(candidate)
     for data in (before, after):
         data['robot']['structure']['data'] = {}
+        data['policy']['discretization'] = None
         data['policy']['controller']['parameters']['data'] = {}
     if before != after:
         raise ValueError('CANDIDATE_CHANGED_FROZEN_TASK_OR_POLICY')
     reg.parse(candidate.robot.structure)
+    if candidate.policy.discretization is not None:
+        reg.parse(candidate.policy.discretization)
     reg.bind(candidate.policy.controller, 'controller')
     return candidate
 

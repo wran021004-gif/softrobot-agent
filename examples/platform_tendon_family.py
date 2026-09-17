@@ -2,7 +2,6 @@
 import argparse
 import json
 import math
-from copy import deepcopy
 from pathlib import Path
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
@@ -12,7 +11,7 @@ def example_design():
     from extensions.tendon_family.contracts import Design
     def attach(part='fixed_base',s=0.,pos=(0.,0.,0.)):
         return dict(part=part,s=s,position_m=list(pos))
-    components=[dict(id='near',kind='flexible_segment',length_m=.16,cells=3,
+    components=[dict(id='near',kind='flexible_segment',length_m=.16,
         sections=[dict(s=0.,section=dict(kind='ellipse',parameters=dict(semi_y_m=.010,semi_z_m=.008),angle_rad=.35))],
         physics=dict(mode='material',density_kg_m3=1100.,young_pa=8e6,bending_viscosity_nm2_s=[.0005,.0007])),
         dict(id='mid_guide',kind='guide',connection=attach('near',1.),mass_kg=.002,com_local_m=[0.,0.,0.],
@@ -20,7 +19,7 @@ def example_design():
             guide_holes={},hole_radius_m=.0015),
         dict(id='connector',kind='rigid_connector',connection=attach('mid_guide',pos=(.002,0.,0.)),mass_kg=.003,
             com_local_m=[.006,0.,0.],inertia_com_local_kg_m2=[[5e-8,0.,0.],[0.,7e-8,0.],[0.,0.,7e-8]],envelope_halfsize_m=[.006,.006,.006]),
-        dict(id='far',kind='flexible_segment',connection=attach('connector',pos=(.012,0.,0.)),length_m=.12,cells=2,
+        dict(id='far',kind='flexible_segment',connection=attach('connector',pos=(.012,0.,0.)),length_m=.12,
             sections=[dict(s=0.,section=dict(kind='rectangle',parameters=dict(width_y_m=.014,height_z_m=.010),angle_rad=-.25)),
                       dict(s=1.,section=dict(kind='rectangle',parameters=dict(width_y_m=.012,height_z_m=.009),angle_rad=.15))],
             interpolation='linear',physics=dict(mode='material',density_kg_m3=1050.,young_pa=6e6,bending_viscosity_nm2_s=[.0003,.0004])),
@@ -41,20 +40,26 @@ def example_design():
     return Design.model_validate(dict(id='two_segment_development',components=components,tendons=tendons,actuators=actuators,tip=attach('payload',pos=(.014,0.,0.))))
 
 
+def example_discretization():
+    from extensions.tendon_family.contracts import Discretization
+    return Discretization(cells={'near':3,'far':2})
+
+
 def design_space(design):
     from extensions.tendon_family.contracts import Space
-    changed=design.model_dump(mode='json'); changed['id']='tube_distal_three_cells'
+    changed=design.model_dump(mode='json'); changed['id']='tube_distal'
     far=next(c for c in changed['components'] if c['id']=='far')
-    far.update(cells=3,sections=[dict(s=0.,section=dict(kind='tube',parameters=dict(outer_radius_m=.008,inner_radius_m=.004),angle_rad=.2))],interpolation='step')
+    far.update(sections=[dict(s=0.,section=dict(kind='tube',parameters=dict(outer_radius_m=.008,inner_radius_m=.004),angle_rad=.2))],interpolation='step')
     return Space.model_validate(dict(parameters={
         'components/near/length_m':dict(type='number',bounds=[.14,.20]),
-        'components/near/cells':dict(type='integer',bounds=[2,6]),
         'components/near/interpolation':dict(type='choice',options=['step','linear']),
         'components/far/sections/0/section/parameters/inner_radius_m':dict(type='number',bounds=[.002,.006],when={'components/far/sections/0/section/kind':'tube'})},
-        templates={'tube_distal':changed}))
+        templates={'tube_distal':changed},discretization_parameters={
+        'discretization/cells/near':dict(type='integer',bounds=[2,6]),
+        'discretization/cells/far':dict(type='integer',bounds=[2,6])}))
 
 
-def session(backend,design,space,legacy=False):
+def session(backend,design,space,legacy=False,discretization=None):
     from examples.platform_spatial_example import session_input
     from examples.platform_fixtures import binding,payload,budget
     value=session_input('math_spatial'); duration=.04 if legacy else .35
@@ -76,6 +81,7 @@ def session(backend,design,space,legacy=False):
     if legacy: control=dict(mode='deterministic',commands={'tendon_0_actuator':-.001,'tendon_1_actuator':-.0006},ramp_s=.04)
     value['policy'].update(editable={},backend=binding('backend.'+backend,'family.parameters',dict(model='matlab_serial_bending_v1' if backend=='matlab_spatial' else 'mujoco_serial_bending_v1')),
         controller=binding('controller.family','family.control',control),
+        discretization=None if legacy else payload('family.discretization',(discretization or example_discretization()).model_dump(mode='json')),
         candidate_builder=binding('candidate.controller','platform.empty') if legacy else binding('candidate.family','family.space',space.model_dump(mode='json')),
         budget=budget(tool_calls=12,backend_solves=1,wall_s=900.),timeout_s=700.)
     value['policy']['tool_bindings'].update({'design.family_build':'1.0.0','visualization.saved_replay':'1.0.0'})
@@ -86,16 +92,19 @@ def prepare(root):
     from examples.platform_fixtures import project,budget
     from tools.state_io import atomic_json
     root=Path(root).resolve(); directory=root/'inputs'; directory.mkdir(parents=True,exist_ok=False)
-    d=example_design(); space=design_space(d)
-    atomic_json(directory/'design.json',d.model_dump(mode='json')); atomic_json(directory/'space.json',space.model_dump(mode='json'))
+    d=example_design(); discretization=example_discretization(); space=design_space(d)
+    atomic_json(directory/'design.json',d.model_dump(mode='json')); atomic_json(directory/'discretization.json',discretization.model_dump(mode='json'))
+    atomic_json(directory/'space.json',space.model_dump(mode='json'))
     for name,changes in CANDIDATES.items():
-        atomic_json(directory/(name+'_request.json'),dict(baseline_file='design.json',space_file='space.json',changes=changes))
+        atomic_json(directory/(name+'_request.json'),dict(design_file='design.json',space_file='space.json',
+            discretization_file='discretization.json',changes=changes))
     for backend in ('matlab_spatial','family_mujoco'):
-        config=session(backend,d,space)
+        config=session(backend,d,space,discretization=discretization)
         # Unsealed session settings only. The selected request supplies these
         # payloads before public compilation; there is no second design authority.
         config['robot']['structure']['data']={}
         config['policy']['candidate_builder']['parameters']['data']={}
+        config['policy']['discretization']['data']={}
         atomic_json(directory/(backend+'.json'),config)
     atomic_json(directory/'single.json',session('matlab_spatial',d,space,True))
     p=project(); p.update(authorization_source='本轮用户授权 MATLAB 空间与绳驱家族贯通；3 次目标求解，最多4次常规求解',budget=budget(tool_calls=50,backend_solves=4,wall_s=3600.))
@@ -103,62 +112,18 @@ def prepare(root):
     return dict(inputs=str(directory),baseline=d.id)
 
 
-CANDIDATES = {'continuous': {'components/near/length_m':.17}, 'structural': {'template':'tube_distal'}}
+CANDIDATES = {'continuous': {'components/near/length_m':.17},
+              'structural': {'template':'tube_distal','discretization/cells/far':3}}
 
 
 def prepare_candidate(root, candidate, backend):
-    """Shared build/run preparation; candidate_id alone never loads a robot."""
-    from extensions.tendon_family.candidate import build
-    from extensions.tendon_family.scene import assemble
-    from schemas.platform import SessionInput
-    from tools.platform_tools import _candidate
-    from tools.platform_registry import registry
-    from tools.state_io import digest
-    root=Path(root).resolve(); directory=root/'inputs'; request_path=directory/(candidate+'_request.json')
-    read=lambda p:json.loads(p.read_text(encoding='utf8'))
-    if request_path.exists():
-        request=read(request_path)
-        source=str(request_path)
-    else:
-        # Older prepared directories used standalone files with these two edits.
-        # Keep them authoritative too; never consume their stale embedded copies.
-        request=dict(baseline_file='design.json',space_file='space.json',changes=CANDIDATES[candidate])
-        source='legacy standalone design/space with explicit '+candidate+' changes'
-    baseline_path=directory/request['baseline_file']; space_path=directory/request['space_file']
-    req=dict(baseline=read(baseline_path),space=read(space_path),changes=request['changes'])
-    inp=read(directory/(backend+'.json'))
-    inp['robot']['structure']['data']=deepcopy(req['baseline'])
-    inp['policy']['candidate_builder']['parameters']['data']=deepcopy(req['space'])
-    built=build(req,task_bounds=inp['policy']['editable'])
-    if built.status!='valid': raise ValueError(built.status.upper()+': '+str(built.reason))
-    # Exercise the same public candidate path that simulation.run will use.
-    effective=_candidate(SessionInput.model_validate(inp),req['changes'],registry())
-    if effective.robot.structure.data!=built.candidate.model_dump(mode='json'):
-        raise ValueError('PUBLIC_CANDIDATE_DESIGN_MISMATCH')
-    scene=assemble(effective,built.resolved_physics)
-    snapshot=dict(candidate_id=candidate,request=req,task_bounds=inp['policy']['editable'],
-        sources=dict(request=source,baseline=str(baseline_path),space=str(space_path)),
-        request_identity=digest(dict(request=req,task_bounds=inp['policy']['editable'])),
-        control_identity=digest(inp['policy']['controller']),
-        session_identity=digest(inp),design_identity=digest(built.candidate.model_dump(mode='json')),
-        physics_identity=built.resolved_physics['identity'],scene_identity=scene['identity'],design_id=built.candidate.id)
-    return dict(input=inp,effective=effective,built=built,scene=scene,selection=snapshot)
+    from extensions.tendon_family.preparation import prepare_candidate as common_prepare
+    return common_prepare(root,candidate,backend,legacy_changes=CANDIDATES[candidate])
 
 
 def save_selection(root,candidate,backend,prepared, *, rebuild=False):
-    """An explicit build may replace unsealed build products; run refuses drift."""
-    from tools.state_io import atomic_json
-    path=Path(root)/(candidate+'_'+backend+'_selection.json')
-    previous=json.loads(path.read_text(encoding='utf8')) if path.exists() else None
-    result_path=Path(root)/(candidate+'_candidate.json')
-    result=prepared['built'].model_dump(mode='json')
-    old_result=json.loads(result_path.read_text(encoding='utf8')) if result_path.exists() else None
-    changed=(previous is not None and previous!=prepared['selection']) or (old_result is not None and old_result!=result)
-    if changed and not rebuild:
-        raise ValueError('CANDIDATE_BUILD_STALE: '+str(path)+'; explicitly build the selected candidate again')
-    atomic_json(path,prepared['selection'])
-    atomic_json(result_path,result)
-    return dict(rebuilt=changed,previous_request_identity=previous['request_identity'] if changed and previous else None)
+    from extensions.tendon_family.preparation import save_selection as common_save
+    return common_save(root,candidate,backend,prepared,rebuild=rebuild)
 
 
 def build_candidates(root,candidate=None):
@@ -174,7 +139,8 @@ def build_candidates(root,candidate=None):
             built,scene=prepared['built'],prepared['scene']
             compile_input(prepared['effective'].model_dump(mode='json'))
             rebuild=save_selection(root,name,backend,prepared,rebuild=True)
-            atomic_json(root/(name+'_'+backend+'_input.json'),dict(physics=built.resolved_physics,scene=scene))
+            atomic_json(root/(name+'_'+backend+'_input.json'),dict(normalized=prepared['normalized'],
+                physics=built.resolved_physics,scene=scene,sources=prepared['selection']['sources']))
             if backend=='family_mujoco':
                 import mujoco
                 path=root/(name+'.xml'); compile_xml(built.resolved_physics,scene,None,path)
@@ -248,7 +214,7 @@ def compare(root,candidate=None,label=''):
     from tools.state_io import atomic_json
     root=Path(root); records=[read_record(root,b,candidate,label) for b in ('matlab_spatial','family_mujoco')]
     if records[0].get('selection') or records[1].get('selection'):
-        for key in ('candidate_id','request_identity','design_identity','control_identity'):
+        for key in ('candidate_id','request_identity','design_identity','discretization_identity','physical_inputs_identity','control_identity'):
             if records[0]['selection'][key]!=records[1]['selection'][key]: raise ValueError('COMPARISON_CANDIDATE_IDENTITY_MISMATCH: '+key)
     for key in ('physics_identity','scene_identity'):
         assert records[0]['result_data'][key]==records[1]['result_data'][key]

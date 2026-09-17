@@ -29,11 +29,24 @@ def assemble(inp,p):
         if f.end_s>t.duration_s or any(abs(x/t.control_period_s-round(x/t.control_period_s))>1e-8 for x in (f.start_s,f.end_s)):
             raise ValueError('FORCE_WINDOW_MUST_BE_ON_CONTROL_GRID')
         forces.append(dict(body=[b['entity'] for b in p['parts']].index(f.entity),**f.model_dump(mode='json')))
+    task_identity=digest(inp.task.model_dump(mode='json'))
     scene=dict(physics_identity=p['identity'],assembly=a,initial=initial.model_dump(mode='json'),
         qpos_rad=[initial.qpos_rad.get(j,0.) for j in p['dofs']],qvel_rad_s=[initial.qvel_rad_s.get(j,0.) for j in p['dofs']],
         mount_rotation=quat(assembly.mount.quaternion_wxyz).tolist(),mount_position=list(assembly.mount.position_m),
         gravity=list(env.gravity_m_s2),floor_z_m=env.objects[0].position_m[2],floor_id=assembly.floor_id,
         forces=forces,target_world_m=inp.task.goal.data['target_m'],duration_s=t.duration_s,
-        timestep_s=t.timestep_s,control_period_s=t.control_period_s,task_identity=digest(inp.task.model_dump(mode='json')))
+        timestep_s=t.timestep_s,control_period_s=t.control_period_s,sample_period_s=t.sample_period_s,
+        observation_phase='post_step',task_identity=task_identity,
+        entity_mapping=dict(parts=p['entity_map'],dofs=list(p['dofs']),tendons=[x['entity'] for x in p['tendons']],
+            actuators=[x['id'] for x in p['actuators']]),
+        semantics=dict(units='SI',world_frame=inp.robot.frame,force_frame='world',
+            initial_state='named model coordinates; unspecified joints are zero',
+            timing='duration is experiment time; control/sample periods are public clocks; timestep is backend integration input'))
     scene['identity']=digest(scene)
+    scene['experiment_spec']=dict(version='family_experiment_v1',task_identity=task_identity,
+        design_identity=p['design_identity'],discretization_identity=p['discretization_identity'],
+        physics_identity=p['identity'],scene_identity=scene['identity'],
+        source_roles=dict(task='SessionInput.task',environment_mount_forces='TaskDefinition.environment',
+            initial_state='TaskDefinition.initializer',run_plan='ExperimentPolicy backend/controller/discretization',
+            resolved_physics='derived from family.design + family.discretization'))
     return scene

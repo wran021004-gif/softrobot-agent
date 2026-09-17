@@ -12,7 +12,9 @@ from .signals import export
 
 
 def physics_for(inp):
-    if inp.robot.structure.contract=='family.design': return resolve(inp.robot.structure.data)
+    if inp.robot.structure.contract=='family.design':
+        discretization = inp.policy.discretization.data if inp.policy.discretization is not None else None
+        return resolve(inp.robot.structure.data,discretization)
     if inp.robot.structure.contract=='domain.rod_design':
         from .legacy import resolve_legacy
         return resolve_legacy(inp.robot.structure.data)
@@ -49,7 +51,8 @@ class MatlabBackend:
     def run(self,folder,timeout_s):
         self.folder=folder; folder.mkdir(parents=True,exist_ok=True)
         for name,value in [('robot_description',self.inp.robot.structure.model_dump(mode='json')),('resolved_physics',self.physics),
-                           ('experiment_scene',self.scene),('solver_configuration',self.config.model_dump(mode='json'))]:
+                           ('model_discretization',self.physics['discretization']),('experiment_scene',self.scene),
+                           ('experiment_spec',self.scene['experiment_spec']),('solver_configuration',self.config.model_dump(mode='json'))]:
             atomic_json(folder/(name+'.json'),value)
         start=time.perf_counter()
         rows,observations,complete,reason,steps=self.solve(timeout_s)

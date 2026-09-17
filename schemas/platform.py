@@ -170,6 +170,9 @@ class ExperimentPolicy(Contract):
     editable: dict[str, tuple[float, float]] = Field(default_factory=dict)
     backend: Binding
     controller: Binding
+    # Model/discretization belongs to the run plan, not the physical robot.
+    # It is optional so existing non-discretized extensions remain unchanged.
+    discretization: Payload | None = None
     candidate_builder: Binding | None = None
     search: Binding | None = None
     model: ModelConfig = Field(default_factory=ModelConfig)
@@ -370,6 +373,7 @@ class CandidateInput(Contract):
     allowed: dict[str, tuple[float, float]]
     effective: SessionInput
     content_identity: str
+    sources: dict[str, str] = Field(default_factory=dict)
 
 
 class ModelContent(Contract):

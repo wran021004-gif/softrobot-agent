@@ -1,5 +1,7 @@
 # 候选最终约束与明确结构选择
 
+> 当前输入分层已进一步整理：新推荐实体设计不含 `cells`，离散配置位于 `inputs/discretization.json` 和 `ExperimentPolicy.discretization`；公共文件加载、候选核对与装配位于 `extensions/tendon_family/preparation.py`。本文其余内容保留 `c04a5f9` 当时的修复与证据，当前命令和新旧关系以 [tendon_family.md](tendon_family.md) 为准。
+
 本次在 `feat/independent-spatial-dynamics` / `64494f5311385f8be1dfa1a2fc2662f49d56edb4` 上修复，开始时工作区干净，未发现适用的 AGENTS.md。没有回退、commit、push 或 merge；没有修改物理模型、控制算法、搜索算法或历史任务。
 
 ## 两处修复

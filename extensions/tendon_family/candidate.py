@@ -1,8 +1,15 @@
 """Bounded typed edits or complete frozen templates; no executable edit strings."""
 from copy import deepcopy
 import math
-from .contracts import Design, BuildRequest, BuildResult
-from .compiler import resolve, Unsupported
+from .contracts import Design, Discretization, BuildRequest, BuildResult
+from .compiler import normalize_inputs, resolve, Unsupported
+
+
+def canonical_path(path):
+    parts = path.split('/')
+    if len(parts) == 3 and parts[0] == 'components' and parts[2] == 'cells':
+        return 'discretization/cells/' + parts[1]
+    return path
 
 
 def authorize(inp, space, changes):
@@ -10,7 +17,9 @@ def authorize(inp, space, changes):
         if key == 'template':
             if not isinstance(value,str) or value not in space.templates: raise ValueError('TEMPLATE_NOT_AUTHORIZED')
             continue
-        spec = space.parameters.get(key)
+        normalized = canonical_path(key)
+        specs = space.discretization_parameters if normalized.startswith('discretization/') else space.parameters
+        spec = specs.get(normalized) or space.parameters.get(key)
         if spec is None: raise ValueError('PARAMETER_NOT_AUTHORIZED: '+key)
         check_value(key, value, spec, inp.policy.editable if inp is not None else {})
 
@@ -47,40 +56,58 @@ def read_parameter(data,path):
         raise ValueError('CONSTRAINED_PARAMETER_MISSING: '+path) from exc
 
 
-def validate_final(data,space,changes,task_bounds):
-    for path in dict.fromkeys([*space.parameters,*task_bounds]):
-        spec = space.parameters.get(path,dict(type='number',bounds=task_bounds.get(path)))
+def validate_final(data,discretization,space,changes,task_bounds):
+    specifications = {canonical_path(k):v for k,v in space.parameters.items()}
+    specifications.update({canonical_path(k):v for k,v in space.discretization_parameters.items()})
+    normalized_task = {canonical_path(k):v for k,v in task_bounds.items()}
+    normalized_changes = {canonical_path(k):v for k,v in changes.items()}
+    for path in dict.fromkeys([*specifications,*normalized_task]):
+        spec = specifications.get(path,dict(type='number',bounds=normalized_task.get(path)))
+        target = discretization if path.startswith('discretization/') else data
+        local_path = path.removeprefix('discretization/')
         active = True
         for dependency,expected in spec.get('when',{}).items():
             try:
-                active = active and read_parameter(data,dependency) == expected
+                dependency_target = discretization if dependency.startswith('discretization/') else data
+                active = active and read_parameter(dependency_target,dependency.removeprefix('discretization/')) == expected
             except ValueError:
                 active = False
         if not active:
-            if path in changes: raise ValueError('CONDITIONAL_PARAMETER_INACTIVE: '+path)
+            if path in normalized_changes: raise ValueError('CONDITIONAL_PARAMETER_INACTIVE: '+path)
             continue
-        check_value(path,read_parameter(data,path),spec,task_bounds)
+        check_value(path,read_parameter(target,local_path),spec,normalized_task)
 
 
 def build(value, *, task_bounds=None):
     req = BuildRequest.model_validate(value)
     authorize(None,req.space,req.changes)
-    design = req.space.templates[req.changes['template']] if 'template' in req.changes else req.baseline
-    data = deepcopy(design.model_dump(mode='json')); summary = []
+    baseline, base_discretization, compatibility = normalize_inputs(req.baseline, req.discretization)
+    design = req.space.templates[req.changes['template']] if 'template' in req.changes else baseline
+    if 'template' in req.changes and req.discretization is None:
+        legacy_cells = [c.cells for c in design.components if hasattr(c,'cells')]
+        if any(value is not None for value in legacy_cells):
+            design, base_discretization, compatibility = normalize_inputs(design)
+    data = deepcopy(design.model_dump(mode='json')); discretization = deepcopy(base_discretization.model_dump(mode='json')); summary = []
     if 'template' in req.changes:
         summary.append(dict(operation='complete_template',template=req.changes['template'],defaults='entire explicit template saved in candidate'))
     try:
         for path,value in req.changes.items():
             if path == 'template': continue
-            obj,key = locate(data,path)
+            path = canonical_path(path)
+            target = discretization if path.startswith('discretization/') else data
+            local_path = path.removeprefix('discretization/')
+            obj,key = locate(target,local_path)
             old = obj[int(key)] if isinstance(obj,list) else obj[key]
             if isinstance(obj,list): obj[int(key)] = value
             else: obj[key] = value
             summary.append(dict(operation='set',path=path,before=old,after=value))
-        validate_final(data,req.space,req.changes,task_bounds or {})
+        validate_final(data,discretization,req.space,req.changes,task_bounds or {})
         candidate = Design.model_validate(data)
-        physics = resolve(candidate)
-        return BuildResult(status='valid',candidate=candidate,summary=summary,resolved_physics=physics,applicability=physics['applicability'])
+        model = Discretization.model_validate(discretization)
+        physics = resolve(candidate,model)
+        return BuildResult(status='valid',candidate=candidate,discretization=model,summary=summary,resolved_physics=physics,
+            applicability=physics['applicability'],source_roles=dict(entity_design='baseline or selected complete template',
+                physical_inputs='candidate component physics and tendon declarations',model_discretization=compatibility))
     except Unsupported as exc:
         return BuildResult(status='backend_unsupported',candidate=Design.model_validate(data),summary=summary,reason=str(exc))
     except (ValueError,KeyError,IndexError,StopIteration) as exc:
@@ -88,10 +115,13 @@ def build(value, *, task_bounds=None):
 
 
 def apply(inp, parameters, changes):
-    result = build(dict(baseline=inp.robot.structure.data,space=parameters,changes=changes),task_bounds=inp.policy.editable)
+    explicit = inp.policy.discretization.data if inp.policy.discretization is not None else None
+    result = build(dict(baseline=inp.robot.structure.data,space=parameters,discretization=explicit,changes=changes),task_bounds=inp.policy.editable)
     if result.status != 'valid': raise ValueError(result.status.upper()+': '+str(result.reason))
     inp.robot.structure.data.clear(); inp.robot.structure.data.update(result.candidate.model_dump(mode='json'))
-    return inp
+    from schemas.platform import Payload
+    model = Payload(contract='family.discretization',data=result.discretization.model_dump(mode='json'))
+    return inp.model_copy(update={'policy':inp.policy.model_copy(update={'discretization':model})})
 
 
 def build_tool(ctx, args):
