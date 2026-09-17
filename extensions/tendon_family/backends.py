@@ -9,6 +9,7 @@ from .compiler import resolve
 from .scene import assemble
 from .contracts import Initial, Data
 from .signals import export
+from .execution import resolve_execution
 
 
 def physics_for(inp):
@@ -27,32 +28,34 @@ class MatlabBackend:
 
     @classmethod
     def check(cls,inp,parameters,control):
-        if parameters.model!=cls.model: raise ValueError('BACKEND_MODEL_IDENTITY_MISMATCH')
-        if cls.model=='mujoco_serial_bending_v1':
+        if getattr(parameters,'model',cls.model)!=cls.model: raise ValueError('BACKEND_MODEL_IDENTITY_MISMATCH')
+        if cls.model=='mujoco_serial_bending_v1' and hasattr(parameters,'max_step_s'):
             from .contracts import Parameters
             defaults=Parameters()
             if any(getattr(parameters,k)!=getattr(defaults,k) for k in ('max_step_s','rtol','atol','contact_stiffness_n_m','contact_damping_n_s_m')):
                 raise ValueError('MATLAB_ONLY_SOLVER_PARAMETERS: MuJoCo uses scene timestep and its recorded XML contact settings')
         if inp.task.initializer.extension_id!='initialize.family': raise ValueError('NAMED_FAMILY_INITIALIZER_REQUIRED')
         if inp.policy.controller.extension_id!='controller.family': raise ValueError('FAMILY_CONTROLLER_REQUIRED')
+        from tools.platform_registry import registry
+        resolve_execution(inp,registry())
         p=physics_for(inp); assemble(inp,p)
-        if set(control.commands)-{a['id'] for a in p['actuators']}: raise ValueError('UNKNOWN_CONTROL_ACTUATOR')
 
     def compile(self,inp,reg):
         start=time.perf_counter(); self.inp=inp
-        self.config=reg.parse(inp.policy.backend.parameters); self.physics=physics_for(inp)
+        self.config=reg.parse(inp.policy.backend.parameters); self.execution=resolve_execution(inp,reg); self.physics=physics_for(inp)
         self.scene=assemble(inp,self.physics); self.timings={'prepare_compile':time.perf_counter()-start}
 
     def initialize(self,initial,controller):
         if Initial.model_validate(initial.data).model_dump(mode='json')!=self.scene['initial']: raise ValueError('INITIAL_STATE_MISMATCH')
         self.initial=initial; self.controller=controller
-        controller.configure(self.physics,self.scene['target_world_m'])
+        controller.configure(self.physics,self.scene['control'])
 
     def run(self,folder,timeout_s):
         self.folder=folder; folder.mkdir(parents=True,exist_ok=True)
         for name,value in [('robot_description',self.inp.robot.structure.model_dump(mode='json')),('resolved_physics',self.physics),
                            ('model_discretization',self.physics['discretization']),('experiment_scene',self.scene),
-                           ('experiment_spec',self.scene['experiment_spec']),('solver_configuration',self.config.model_dump(mode='json'))]:
+                           ('experiment_spec',self.scene['experiment_spec']),('dynamics_execution',self.execution),
+                           ('control_spec',self.scene['control']),('solver_configuration',self.config.model_dump(mode='json'))]:
             atomic_json(folder/(name+'.json'),value)
         start=time.perf_counter()
         rows,observations,complete,reason,steps=self.solve(timeout_s)
@@ -62,17 +65,19 @@ class MatlabBackend:
         atomic_json(folder/'actual_commands.json',[dict(time_s=r['solver_time_s'],actuator_command=r['actuator_command'],target_lengths_m=r['command_m']) for r in rows])
         from schemas.platform import Payload
         data=Data(physics_identity=self.physics['identity'],scene_identity=self.scene['identity'],timings_s=self.timings,
-            numerical_steps=steps,reason=reason,applicability=self.physics['applicability'],exported_files=sorted(p.name for p in folder.iterdir()))
-        self.result=BackendResult(solver_status='completed' if complete else 'failed',backend_id=self.backend_id,model_id=self.model,
+            numerical_steps=steps,reason=reason,applicability=self.physics['applicability'],exported_files=sorted(p.name for p in folder.iterdir()),
+            execution_plan=self.execution,control_identity=self.scene['control']['identity'])
+        self.result=BackendResult(solver_status='completed' if complete else 'failed',backend_id=self.backend_id,model_id=self.execution['implementation_model_id'],
             signals=export(rows,self.physics),data=Payload(contract='family.backend_data',data=data.model_dump(mode='json')),
             limitations=[self.physics['applicability']['collision'],'Ideal length servos, tension only, slack gives zero tension; no motor inertia.',
                 'MATLAB lowest-envelope-vertex penalty and MuJoCo convex contact differ; no contact accuracy claim.'],initial_state=self.initial,seed=self.inp.seed)
         atomic_json(folder/'result.json',self.result.model_dump(mode='json')); return self.result
 
     def shared_input(self,timeout_s):
-        c=self.controller.parameters.model_dump(mode='json')
-        c['target_world_m']=self.scene['target_world_m']
-        c['command_vector']=[c['commands'].get(a['id'],0.) for a in self.physics['actuators']]
+        c=dict(self.scene['control']['effective_parameters'])
+        c['target_world_m']=self.scene['control']['reference'].get('target_world_m')
+        commands=self.scene['control']['reference']['commands']
+        c['command_vector']=[commands.get(a['id'],0.) for a in self.physics['actuators']]
         return dict(physics=self.physics,scene=self.scene,config=self.config.model_dump(mode='json'),control=c,timeout_s=timeout_s)
 
     def solve(self,timeout_s):

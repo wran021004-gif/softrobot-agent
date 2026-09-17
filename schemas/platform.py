@@ -170,6 +170,9 @@ class ExperimentPolicy(Contract):
     editable: dict[str, tuple[float, float]] = Field(default_factory=dict)
     backend: Binding
     controller: Binding
+    # Robot dynamics are distinct from ModelConfig, which configures the LLM.
+    # Optional for old snapshots whose backend binding carried this selection.
+    dynamics_model: Binding | None = None
     # Model/discretization belongs to the run plan, not the physical robot.
     # It is optional so existing non-discretized extensions remain unchanged.
     discretization: Payload | None = None

@@ -8,13 +8,16 @@ from numpy.testing import assert_allclose
 from tools.state_io import atomic_json
 
 
-def check(root):
+def check(root,candidate=None):
     from tools.platform_store import Store
     from extensions.tendon_family.compiler import quat
     from extensions.tendon_family.geometry import geometry
     root=Path(root); store=Store(root); result=dict(extra_backend_solves=0,records={})
-    for name in ('single_permitted','matlab_spatial','family_mujoco'):
+    names=((candidate+'_matlab_spatial',candidate+'_family_mujoco') if candidate else
+           ('single_permitted','matlab_spatial','family_mujoco'))
+    for name in names:
         record=json.loads((root/(name+'_record.json')).read_text(encoding='utf8'))
+        backend_name=record['backend']
         folder=Path(record['saved_folder']); read=lambda n:json.loads((folder/n).read_text(encoding='utf8'))
         rows=read('replay_trajectory.json'); p=read('resolved_physics.json'); scene=read('experiment_scene.json'); obs=read('controller_observations.json')
         backend=store.artifact(record['receipts']['simulation']['output'])
@@ -29,14 +32,14 @@ def check(root):
         q=np.array(rows[-1]['qpos_rad']); delta=q-scene['qpos_rad']
         assert np.linalg.norm(delta[::2])>1e-4 and np.linalg.norm(delta[1::2])>1e-4
         forces=[r['solver_time_s'] for r in rows if np.linalg.norm(r['external_torque_nm'])>1e-12]
-        if name!='single_permitted': assert_allclose(forces,np.arange(12,20)/100,atol=1e-12)
+        if backend_name!='single': assert_allclose(forces,np.arange(12,20)/100,atol=1e-12)
         g=geometry(p,q,scene['assembly']['mount']); assert_allclose(g['tip'],rows[-1]['tip_m'],atol=1e-12)
         for a,b in zip(g['routes'],rows[-1]['tendon_routes_m']): assert_allclose(a,b,atol=1e-12)
         result['records'][name]=dict(samples=len(rows),q_y_change_norm_rad=float(np.linalg.norm(delta[::2])),q_z_change_norm_rad=float(np.linalg.norm(delta[1::2])),
             max_tension_n=float(np.max([r['tension_n'] for r in rows])),active_force_times_s=forces,
             final_tip_m=rows[-1]['tip_m'],initial_target_error_m=float(np.linalg.norm(geometry(p,np.array(scene['qpos_rad']),scene['assembly']['mount'])['tip']-scene['target_world_m'])),
             final_target_error_m=record['evaluation']['metrics'][0]['value'])
-        if name=='single_permitted':
+        if backend_name=='single':
             from types import SimpleNamespace
             from extensions.robot_domain.contracts import RodDesign
             from extensions.experiment_dynamics.physics import resolve_physics
@@ -49,7 +52,7 @@ def check(root):
             for key in ('mass','bias','gravity'): assert_allclose(ms[key],terms[key],rtol=1e-12,atol=1e-13)
             assert_allclose(ms['lengths'],terms['geometry']['lengths'],atol=1e-13)
             result['legacy_python_static_match']=True
-        if name=='family_mujoco':
+        if backend_name=='family_mujoco':
             import mujoco
             mapping=read('compiled_physics.json'); model=mujoco.MjModel.from_xml_path(str(folder/'robot.xml')); data=mujoco.MjData(model)
             data.qpos[mapping['qpos_indices']]=q; data.qvel[mapping['qvel_indices']]=rows[-1]['qvel_rad_s']; mujoco.mj_forward(model,data)
@@ -66,4 +69,4 @@ def check(root):
     atomic_json(root/'saved_checks.json',result); return result
 
 
-if __name__=='__main__': print(json.dumps(check(Path(sys.argv[1])),indent=2))
+if __name__=='__main__': print(json.dumps(check(Path(sys.argv[1]),sys.argv[2] if len(sys.argv)>2 else None),indent=2))

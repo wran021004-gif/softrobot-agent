@@ -1,5 +1,6 @@
 """Reproducible family candidates and three budgeted public-platform solves."""
 import argparse
+from copy import deepcopy
 import json
 import math
 from pathlib import Path
@@ -77,9 +78,18 @@ def session(backend,design,space,legacy=False,discretization=None):
     if not legacy:
         value['robot'].update(family='tendon_robot_family',structure=payload('family.design',design.model_dump(mode='json')),
             assumptions=['Serial double-bending cells, separate structure/discretization, SI'],sources=['examples/platform_tendon_family.py'])
-    control=dict(mode='tip_feedback',feedback_gain=5.,damping=.015,max_joint_update_rad=.025)
+    control=dict(mode='tip_feedback',reference=dict(kind='task_goal',commands={},units='m',frame='world'),
+        feedback_gain=5.,damping=.015,max_joint_update_rad=.025)
     if legacy: control=dict(mode='deterministic',commands={'tendon_0_actuator':-.001,'tendon_1_actuator':-.0006},ramp_s=.04)
-    value['policy'].update(editable={},backend=binding('backend.'+backend,'family.parameters',dict(model='matlab_serial_bending_v1' if backend=='matlab_spatial' else 'mujoco_serial_bending_v1')),
+    if legacy:
+        backend_binding=binding('backend.'+backend,'family.parameters',dict(model='matlab_serial_bending_v1'))
+        dynamics_model=None
+    else:
+        numerical_contract='family.matlab_parameters' if backend=='matlab_spatial' else 'family.mujoco_parameters'
+        backend_binding=binding('backend.'+backend,numerical_contract,{})
+        backend_binding['version']='1.1.0'
+        dynamics_model=binding('model.serial_bending_cells','family.dynamics_model',{})
+    value['policy'].update(editable={},backend=backend_binding,dynamics_model=dynamics_model,
         controller=binding('controller.family','family.control',control),
         discretization=None if legacy else payload('family.discretization',(discretization or example_discretization()).model_dump(mode='json')),
         candidate_builder=binding('candidate.controller','platform.empty') if legacy else binding('candidate.family','family.space',space.model_dump(mode='json')),
@@ -98,14 +108,17 @@ def prepare(root):
     for name,changes in CANDIDATES.items():
         atomic_json(directory/(name+'_request.json'),dict(design_file='design.json',space_file='space.json',
             discretization_file='discretization.json',changes=changes))
-    for backend in ('matlab_spatial','family_mujoco'):
-        config=session(backend,d,space,discretization=discretization)
-        # Unsealed session settings only. The selected request supplies these
-        # payloads before public compilation; there is no second design authority.
-        config['robot']['structure']['data']={}
-        config['policy']['candidate_builder']['parameters']['data']={}
-        config['policy']['discretization']['data']={}
-        atomic_json(directory/(backend+'.json'),config)
+    configs={backend:session(backend,d,space,discretization=discretization) for backend in ('matlab_spatial','family_mujoco')}
+    common=deepcopy(configs['matlab_spatial']); common['run_id_prefix']='family'; del common['run_id']
+    common['robot']['structure']['data']={}
+    common['policy']['candidate_builder']['parameters']['data']={}
+    common['policy']['discretization']['data']={}
+    execution=dict(dynamics_model=common['policy'].pop('dynamics_model'),backends={})
+    control=common['policy'].pop('controller'); common['policy'].pop('backend')
+    for backend,config in configs.items(): execution['backends'][backend]=config['policy']['backend']
+    atomic_json(directory/'experiment.json',common)
+    atomic_json(directory/'execution.json',execution)
+    atomic_json(directory/'control.json',control)
     atomic_json(directory/'single.json',session('matlab_spatial',d,space,True))
     p=project(); p.update(authorization_source='本轮用户授权 MATLAB 空间与绳驱家族贯通；3 次目标求解，最多4次常规求解',budget=budget(tool_calls=50,backend_solves=4,wall_s=3600.))
     atomic_json(directory/'project.json',p)
@@ -148,6 +161,12 @@ def build_candidates(root,candidate=None):
                 result[name]=dict(dofs=model.nv,tendons=model.ntendon,actuators=len(built.candidate.actuators),mass_kg=sum(x['mass_kg'] for x in built.resolved_physics['parts']),
                     selection=prepared['selection'],**rebuild)
     result['prepare_compile_s']=time.perf_counter()-start
+    from tools.platform_registry import registry
+    reg=registry(); wanted={'model.serial_bending_cells','backend.matlab_spatial','backend.family_mujoco','controller.family'}
+    catalog=[dict(extension_id=d.extension_id,version=d.version,kind=d.kind,
+        parameter_contract=d.input_schema.__name__,capabilities=d.capabilities)
+        for _,d in sorted(reg.extensions.items()) if d.extension_id in wanted]
+    atomic_json(root/'capability_catalog.json',dict(source='extensions/tendon_family/manifest.py',entries=catalog))
     atomic_json(root/'candidate_checks.json',result); return result
 
 
@@ -214,7 +233,8 @@ def compare(root,candidate=None,label=''):
     from tools.state_io import atomic_json
     root=Path(root); records=[read_record(root,b,candidate,label) for b in ('matlab_spatial','family_mujoco')]
     if records[0].get('selection') or records[1].get('selection'):
-        for key in ('candidate_id','request_identity','design_identity','discretization_identity','physical_inputs_identity','control_identity'):
+        for key in ('candidate_id','request_identity','design_identity','discretization_identity','physical_inputs_identity',
+                    'experiment_identity','dynamics_model_identity','control_identity'):
             if records[0]['selection'][key]!=records[1]['selection'][key]: raise ValueError('COMPARISON_CANDIDATE_IDENTITY_MISMATCH: '+key)
     for key in ('physics_identity','scene_identity'):
         assert records[0]['result_data'][key]==records[1]['result_data'][key]

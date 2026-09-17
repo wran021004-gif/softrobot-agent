@@ -1,5 +1,7 @@
 # 统一机器人智能设计开发平台
 
+> 2026-09-17：串联绳驱家族已完成步骤 3「数学模型与执行后端」和步骤 4「参考、控制与执行器映射」的接口整理。推荐输入、兼容边界、PowerShell 命令和结果文件见 [docs/tendon_family.md](docs/tendon_family.md)，本轮记录见 [docs/steps_3_4_result.md](docs/steps_3_4_result.md)。
+
 ## 当前开发入口
 
 当前串联绳驱家族开发从 [机器人、离散、任务与共同实验装配](docs/tendon_family.md) 开始。推荐入口是 `python examples/workbench.py platform tendon-family ...`：`prepare` 生成可编辑来源，`build` 构建并检查候选和共同场景，`run` 才启动 MATLAB 或 MuJoCo 求解。候选加载与装配实现位于 `extensions/tendon_family/preparation.py`，example 只提供配置样例和命令入口。

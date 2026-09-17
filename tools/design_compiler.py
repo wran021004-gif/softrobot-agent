@@ -7,11 +7,16 @@ from tools.spec_tools import load_physics, ROOT
 CONTRACTS = ("coordinate_frames.md", "tendon_driven_pcc_v1.md", "tendon_length_mapping_v1.md", "segmented_mujoco_mapping_v1.md", "actuator_model_v1.md")
 
 
-def build_robot_ir(design: DesignSpec) -> RobotIR:
+def build_robot_ir(design: DesignSpec, discretization=None) -> RobotIR:
+    """Compile a robot description.
+
+    Family designs require their independent ``family.discretization`` value;
+    older DesignSpec callers retain the original one-argument form.
+    """
     from extensions.tendon_family.contracts import Design as FamilyDesign
     if isinstance(design, FamilyDesign):
         from extensions.tendon_family.compiler import resolve
-        return resolve(design)
+        return resolve(design,discretization)
     design = DesignSpec.model_validate(design)
     if design.exploration_physics is not None:
         return build_exploration_ir(design)

@@ -23,7 +23,13 @@ def resolve_legacy(data):
         tendons.append(dict(entity=t.entity,points=points,kp_n_m=t.kp_n_m,pretension_n=0.,force_limit_n=t.force_limit_n,diameter_m=.001))
         actuators.append(dict(id=t.actuator,command_type='displacement',units='m',drum_radius_m=None,
             transmission=[dict(tendon=t.entity,ratio=1.)],limits=[-.02,.02],velocity_limit=.05))
-    p=dict(version='serial_bending_physics_v1',source_identity=old.identity,parts=parts,tendons=tendons,actuators=actuators,
+    design_source=RodDesign.model_validate(data).model_dump(mode='json')
+    discretization=dict(version='serial_bending_discretization_v1',model='serial_bending_cells_v1',
+        cells={'legacy_rod':len(parts)},coordinates='two_principal_bending_angles_per_cell')
+    p=dict(version='serial_bending_physics_v1',source_identity=old.identity,
+        design_identity=digest(design_source),discretization_identity=digest(discretization),discretization=discretization,
+        source_roles=dict(entity_design='domain.rod_design',physical_inputs='resolved legacy V2 equivalent rod',
+            model_discretization='RodDesign.segments compatibility derivation'),parts=parts,tendons=tendons,actuators=actuators,
         transmission=np.eye(len(tendons)).tolist(),dofs=dofs,entity_map={'legacy_rod':dict(bodies=list(range(len(parts))),dofs=dofs,kind='flexible_segment')},
         tip=dict(body=len(parts)-1,position_m=[old.parts[-1].length_m,0.,0.]),section_quantities={},
         applicability=dict(compilable=True,backends=['backend.matlab_spatial','backend.family_mujoco'],physics='legacy rod adapted to serial bending',

@@ -35,6 +35,11 @@ def compile_input(value, reg=None):
         raise ValueError('ROBOT_OR_ACTUATOR_INCOMPATIBLE')
     backend, params = reg.bind(inp.policy.backend, 'backend')
     controller, control_params = reg.bind(inp.policy.controller, 'controller')
+    dynamics_model = None
+    if inp.policy.dynamics_model is not None:
+        dynamics_model, _ = reg.bind(inp.policy.dynamics_model,'dynamics_model')
+        if dynamics_model.extension_id not in backend.capabilities.get('models',{}):
+            raise ValueError('DYNAMICS_MODEL_BACKEND_UNSUPPORTED: '+dynamics_model.extension_id+' -> '+backend.extension_id)
     if inp.policy.search:
         search, _ = reg.bind(inp.policy.search, 'search')
         if len(task.objectives) != 1 and not search.capabilities.get('feedback_adapter'):
@@ -86,6 +91,8 @@ def compile_input(value, reg=None):
     initial = init.resolve()(init_params, inp.seed)
     reg.parse(initial)
     definitions = [backend, controller, init, reg.get(task.family), reg.get(task.evaluator.extension_id, task.evaluator.version)]
+    if dynamics_model is not None:
+        definitions.append(dynamics_model)
     if inp.policy.search:
         definitions.append(reg.get(inp.policy.search.extension_id, inp.policy.search.version))
     definitions.append(builder)

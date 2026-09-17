@@ -18,10 +18,12 @@ def compile_xml(physics, scene, config, path):
     p=physics
     root=ET.Element('mujoco',model='serial_tendon_family')
     ET.SubElement(root,'compiler',angle='radian',autolimits='true')
-    ET.SubElement(root,'option',timestep=str(scene['timestep_s']),gravity=fmt(scene['gravity']),integrator='implicitfast')
+    integrator=getattr(config,'integrator','implicitfast') if config is not None else 'implicitfast'
+    friction=getattr(config,'friction',(0.,0.,0.)) if config is not None else (0.,0.,0.)
+    ET.SubElement(root,'option',timestep=str(scene['timestep_s']),gravity=fmt(scene['gravity']),integrator=integrator)
     default=ET.SubElement(root,'default')
     ET.SubElement(default,'joint',limited='false')
-    ET.SubElement(default,'geom',contype='1',conaffinity='2',friction='0 0 0')
+    ET.SubElement(default,'geom',contype='1',conaffinity='2',friction=fmt(friction))
     assets=ET.SubElement(root,'asset'); world=ET.SubElement(root,'worldbody')
     ET.SubElement(world,'light',pos='0 -0.3 1',dir='0 0 -1')
     ET.SubElement(world,'geom',name=scene['floor_id'],type='plane',pos=fmt([0,0,scene['floor_z_m']]),size='1 1 .01',contype='2',conaffinity='1',rgba='.6 .6 .6 1')

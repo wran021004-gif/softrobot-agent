@@ -127,7 +127,7 @@ class PlatformTests(unittest.TestCase):
     def test_backend_incompatibility_before_any_solve(self):
         bad = copy.deepcopy(self.input)
         bad['policy']['backend'] = binding('backend.mujoco')
-        self.assertIn('BACKEND_INCOMPATIBLE', str(report(bad)['errors']))
+        self.assertIn('BACKEND_ROBOT_REPRESENTATION_UNSUPPORTED', str(report(bad)['errors']))
         before = self.store.remaining()['used']
         result = self.call('simulation.run', dict(changes={'task.goal': 1.}))
         self.assertEqual(result['execution_status'], 'rejected')

@@ -41,7 +41,19 @@ def prepare_candidate(root, candidate_id, backend, *, legacy_changes=None):
     if discretization_path is not None:
         build_request['discretization'] = _read(discretization_path)
 
-    raw_input = _read(inputs/(backend+'.json'))
+    experiment_path=inputs/'experiment.json'
+    if experiment_path.exists():
+        raw_input=_read(experiment_path)
+        execution=_read(inputs/'execution.json')
+        raw_input['run_id']=raw_input['run_id_prefix']+'-'+backend
+        del raw_input['run_id_prefix']
+        raw_input['policy']['backend']=deepcopy(execution['backends'][backend])
+        raw_input['policy']['dynamics_model']=deepcopy(execution['dynamics_model'])
+        raw_input['policy']['controller']=_read(inputs/'control.json')
+        task_source=str(experiment_path)
+    else:
+        raw_input = _read(inputs/(backend+'.json'))
+        task_source=str(inputs/(backend+'.json'))
     raw_input['robot']['structure']['data'] = deepcopy(build_request['baseline'])
     raw_input['policy']['candidate_builder']['parameters']['data'] = deepcopy(build_request['space'])
     if 'discretization' in build_request:
@@ -59,23 +71,29 @@ def prepare_candidate(root, candidate_id, backend, *, legacy_changes=None):
     if effective.policy.discretization is None or effective.policy.discretization.data != model_discretization:
         raise ValueError('PUBLIC_CANDIDATE_DISCRETIZATION_MISMATCH')
     scene = assemble(effective,built.resolved_physics)
+    from .execution import resolve_execution
+    execution_plan=resolve_execution(effective,registry())
     physics_inputs = dict(components={c.id:c.physics.model_dump(mode='json') for c in built.candidate.components if hasattr(c,'physics')},
         tendons={t.id:dict(model=t.model,diameter_m=t.diameter_m,length_servo_gain_n_m=t.length_servo_gain_n_m,
             pretension_n=t.pretension_n,force_limit_n=t.force_limit_n) for t in built.candidate.tendons})
     sources = dict(request=request_source,entity_design=str(design_path),design_space=str(space_path),
         model_discretization=str(discretization_path) if discretization_path else 'legacy Segment.cells compatibility normalization',
-        task_environment=str(inputs/(backend+'.json')))
+        task_environment=task_source,
+        dynamics_model=str(inputs/'execution.json') if experiment_path.exists() else 'legacy backend binding',
+        control=str(inputs/'control.json') if experiment_path.exists() else task_source)
     normalized_request = dict(baseline=build_request['baseline'],space=build_request['space'],
         discretization=build_request.get('discretization'),changes=build_request['changes'])
     selection = dict(candidate_id=candidate_id,request=normalized_request,task_bounds=raw_input['policy']['editable'],sources=sources,
         request_identity=digest(dict(request=normalized_request,task_bounds=raw_input['policy']['editable'])),
-        control_identity=digest(raw_input['policy']['controller']),session_identity=digest(raw_input),
+        control_identity=scene['control']['identity'],session_identity=digest(raw_input),
+        dynamics_model_identity=execution_plan['dynamics_model_identity'],execution_plan_identity=execution_plan['identity'],
+        experiment_identity=scene['task_identity'],
         design_identity=digest(physical_design),discretization_identity=digest(model_discretization),
         physical_inputs_identity=digest(physics_inputs),physics_identity=built.resolved_physics['identity'],
         scene_identity=scene['identity'],design_id=built.candidate.id)
     return dict(input=raw_input,effective=effective,built=built,scene=scene,selection=selection,
         normalized=dict(entity_design=physical_design,model_discretization=model_discretization,
-            physical_inputs=physics_inputs,experiment=scene['experiment_spec']))
+            physical_inputs=physics_inputs,experiment=scene['experiment_spec'],execution=execution_plan,control=scene['control']))
 
 
 def save_selection(root,candidate_id,backend,prepared, *, rebuild=False):

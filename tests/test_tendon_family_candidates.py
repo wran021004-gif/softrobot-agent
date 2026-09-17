@@ -66,6 +66,34 @@ class CandidateBoundaries(unittest.TestCase):
         self.assertEqual(valid.candidate.components[0].length_m,.175)
         self.assertEqual(space['templates']['tube_distal']['components'][0]['length_m'],.16)
 
+    def test_structure_template_owns_final_discretization(self):
+        baseline=self.design.model_dump(mode='json')
+        three=deepcopy(baseline); three['id']='three_segment'
+        tail=deepcopy(next(c for c in three['components'] if c['id']=='far'))
+        tail.update(id='tail',connection=dict(part='far',s=1.,position_m=[0.,0.,0.]),length_m=.04)
+        payload=next(c for c in three['components'] if c['id']=='payload'); payload['connection']['part']='tail'
+        three['components'].insert(4,tail)
+        space=self.space.model_dump(mode='json')
+        space['templates']['three_segment']=three
+        space['template_discretizations']={'three_segment':dict(cells={'near':3,'far':2,'tail':1})}
+        space['discretization_parameters']['discretization/cells/tail']=dict(type='integer',bounds=[1,3])
+        added=build(dict(baseline=baseline,discretization=self.discretization,space=space,
+            changes={'template':'three_segment','discretization/cells/tail':2}))
+        self.assertEqual(added.status,'valid')
+        self.assertEqual(added.discretization.cells,{'near':3,'far':2,'tail':2})
+        self.assertEqual(added.source_roles['model_discretization'],'space.template_discretizations.three_segment')
+        # The reverse template removes the stale tail mesh rather than applying
+        # it to an unrelated segment; the selected template mesh is complete.
+        reverse=deepcopy(space); reverse['templates']['two_segment']=baseline
+        reverse['template_discretizations']['two_segment']=self.discretization.model_dump(mode='json')
+        removed=build(dict(baseline=three,discretization=dict(cells={'near':3,'far':2,'tail':2}),space=reverse,
+            changes={'template':'two_segment'}))
+        self.assertEqual(removed.status,'valid')
+        self.assertEqual(removed.discretization.cells,{'near':3,'far':2})
+        no_source=deepcopy(space); no_source['template_discretizations']={}
+        with self.assertRaisesRegex(ValueError,'DISCRETIZATION_MISSING_SEGMENT: tail'):
+            build(dict(baseline=baseline,discretization=self.discretization,space=no_source,changes={'template':'three_segment'}))
+
     def test_public_task_bounds_cover_template_and_baseline(self):
         path='components/near/length_m'
         inp=SessionInput.model_validate(session('family_mujoco',self.design,self.space))
@@ -152,6 +180,65 @@ class CandidateBoundaries(unittest.TestCase):
         compatible=_candidate(SessionInput.model_validate(value),{'components/near/cells':4},registry())
         self.assertNotIn('cells',compatible.robot.structure.data['components'][0])
         self.assertEqual(compatible.policy.discretization.data['cells']['near'],4)
+
+    def test_public_compiler_accepts_independent_family_discretization(self):
+        from tools.design_compiler import build_robot_ir
+        physics=build_robot_ir(self.design,self.discretization)
+        self.assertEqual(physics['discretization']['cells'],{'near':3,'far':2})
+        with self.assertRaisesRegex(ValueError,'DISCRETIZATION_REQUIRED_FOR_SEGMENTS'):
+            build_robot_ir(self.design)
+
+    def test_explicit_model_backend_relation_and_control_plan(self):
+        from dataclasses import replace
+        import numpy as np
+        from extensions.tendon_family.backends import physics_for
+        from extensions.tendon_family.control import Controller
+        from extensions.tendon_family.execution import resolve_execution
+        from extensions.tendon_family.manifest import EXTENSIONS
+        from extensions.tendon_family.geometry import geometry
+        reg=registry(); inp=SessionInput.model_validate(session('family_mujoco',self.design,self.space))
+        plan=resolve_execution(inp,reg)
+        self.assertEqual(plan['dynamics_model_id'],'model.serial_bending_cells')
+        self.assertEqual(plan['implementation_model_id'],'mujoco_serial_bending_v1')
+        model=next(x for x in EXTENSIONS if x.extension_id=='model.serial_bending_cells')
+        reg.add(replace(model,extension_id='model.test_unsupported'))
+        binding=inp.policy.dynamics_model.model_copy(update={'extension_id':'model.test_unsupported'})
+        bad=inp.model_copy(update={'policy':inp.policy.model_copy(update={'dynamics_model':binding})})
+        with self.assertRaisesRegex(ValueError,'DYNAMICS_MODEL_BACKEND_UNSUPPORTED'):
+            resolve_execution(bad,reg)
+        from tools.platform_tasks import compile_input
+        with self.assertRaisesRegex(ValueError,'DYNAMICS_MODEL_BACKEND_UNSUPPORTED'):
+            compile_input(bad.model_dump(mode='json'),reg)
+        p=physics_for(inp); scene=__import__('extensions.tendon_family.scene',fromlist=['assemble']).assemble(inp,p)
+        self.assertEqual(scene['control']['algorithm']['id'],'tip_resolved_rate_feedback_v1')
+        self.assertEqual(scene['control']['timing']['observation'],'interval_start_pre_step')
+        deterministic=session('family_mujoco',self.design,self.space)
+        deterministic['policy']['controller']['parameters']['data']=dict(mode='deterministic',
+            reference=dict(kind='actuator_commands',commands={'near_motor0':1.},units='m_or_rad_by_actuator',frame='actuator'),ramp_s=.001)
+        dinp=SessionInput.model_validate(deterministic); dp=physics_for(dinp)
+        ds=__import__('extensions.tendon_family.scene',fromlist=['assemble']).assemble(dinp,dp)
+        c=Controller(reg.parse(dinp.policy.controller.parameters),dinp.task.timing.control_period_s); c.configure(dp,ds['control'])
+        g=geometry(dp,np.zeros(len(dp['dofs'])),ds['assembly']['mount'])
+        c.command(0.,g,np.zeros(len(dp['dofs'])),np.zeros(len(dp['dofs'])))
+        self.assertAlmostEqual(c.u[0],dp['actuators'][0]['velocity_limit']*dinp.task.timing.control_period_s)
+        self.assertEqual(ds['control']['mapping']['order'][0],'rate_limit_actuator_command')
+
+    def test_common_experiment_is_single_authority_for_both_backends(self):
+        scratch=Path(__file__).resolve().parents[1]/'runs'
+        with TemporaryDirectory(dir=scratch) as folder:
+            root=Path(folder).resolve(); prepare(root)
+            self.assertTrue((root/'inputs/experiment.json').exists())
+            self.assertFalse((root/'inputs/matlab_spatial.json').exists())
+            common=json.loads((root/'inputs/experiment.json').read_text(encoding='utf8'))
+            common['task']['goal']['data']['target_m']=[.28,.02,.20]
+            common['task']['environment']['data']['mount']['position_m']=[.01,0.,.16]
+            (root/'inputs/experiment.json').write_text(json.dumps(common),encoding='utf8')
+            a=prepare_candidate(root,'continuous','matlab_spatial')
+            b=prepare_candidate(root,'continuous','family_mujoco')
+            self.assertEqual(a['scene']['target_world_m'],b['scene']['target_world_m'])
+            self.assertEqual(a['scene']['mount_position'],b['scene']['mount_position'])
+            self.assertEqual(a['selection']['experiment_identity'],b['selection']['experiment_identity'])
+            self.assertEqual(a['normalized']['control'],b['normalized']['control'])
 
     def test_target_mount_and_timed_force_assemble_identically_for_both_backends(self):
         from extensions.tendon_family.backends import physics_for

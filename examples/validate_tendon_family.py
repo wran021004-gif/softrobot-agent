@@ -1,5 +1,6 @@
 """Bounded core-risk checks. Static calculations only, never time integration."""
 import argparse
+from copy import deepcopy
 import json
 from pathlib import Path
 import sys
@@ -69,7 +70,7 @@ def checks(root,matlab=False):
     from extensions.tendon_family.compiler import resolve
     from extensions.tendon_family.geometry import geometry
     from extensions.tendon_family.control import Controller
-    from extensions.tendon_family.contracts import Control,Parameters
+    from extensions.tendon_family.contracts import Control,MatlabParameters
     from extensions.tendon_family.scene import assemble
     from examples.platform_tendon_family import session,design_space
     from schemas.platform import SessionInput
@@ -83,8 +84,10 @@ def checks(root,matlab=False):
         if label=='shared':
             d=shared; p=ps
             # Same frozen environment; remove the payload force absent in this small robot.
-            inp=json.loads((root/'inputs/family_mujoco.json').read_text(encoding='utf8'))
+            from extensions.tendon_family.preparation import prepare_candidate
+            inp=deepcopy(prepare_candidate(root,'continuous','family_mujoco')['input'])
             inp['robot']['structure']['data']=d.model_dump(mode='json'); inp['task']['environment']['data']['external_forces']=[]
+            inp['policy']['discretization']['data']=dict(cells={'arm':2})
             inp['policy']['controller']['parameters']['data']=dict(mode='deterministic',commands={'differential':10.},ramp_s=.001)
             ctrl=Control.model_validate(inp['policy']['controller']['parameters']['data']); s=assemble(SessionInput.model_validate(inp),p)
         else:
@@ -100,7 +103,7 @@ def checks(root,matlab=False):
             near=[i for i,n in enumerate(p['dofs']) if n.startswith('near_')]; far=[i for i,n in enumerate(p['dofs']) if n.startswith('far_')]
             assert np.linalg.norm(g['Jlength'][3:,near])>1e-3
             assert_allclose(g['Jlength'][:3,far],0.,atol=1e-14)
-        control=Controller(ctrl,s['control_period_s']); control.configure(p,s['target_world_m']); target=control.command(0.,g,q,v)
+        control=Controller(ctrl,s['control_period_s']); control.configure(p,s['control']); target=control.command(0.,g,q,v)
         if label=='shared':
             assert_allclose(control.u,[.02]); delta=target-np.array(p['reference_lengths_m'])+.0001
             assert_allclose(delta,[.0002,-.0002],atol=1e-14)
@@ -111,7 +114,7 @@ def checks(root,matlab=False):
             for step in range(30): control.command(step*.01,g,q,v)
             assert_allclose(control.u,[.3])
         out[label]=dict(jacobian_directional_error=float(np.max(np.abs(fd-g['Jlength']@direction))),dofs=len(q),actuators=len(p['actuators']),full_inertia_consumed=True)
-        config=Parameters().model_dump(mode='json'); ss={**s,'qpos_rad':q.tolist(),'qvel_rad_s':v.tolist()}
+        config=MatlabParameters().model_dump(mode='json'); ss={**s,'qpos_rad':q.tolist(),'qvel_rad_s':v.tolist()}
         cc=ctrl.model_dump(mode='json'); cc.update(target_world_m=s['target_world_m'],command_vector=[cc['commands'].get(a['id'],0.) for a in p['actuators']])
         pairs.append((label,dict(physics=p,scene=ss,config=config,control=cc,timeout_s=60.),mj,target))
     # Necessary old public entry compatibility: compile only, no extra solve.

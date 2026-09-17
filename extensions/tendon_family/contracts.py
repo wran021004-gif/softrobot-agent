@@ -147,11 +147,36 @@ class Initial(Contract):
 
 class Control(Contract):
     mode: Literal['deterministic', 'tip_feedback'] = 'tip_feedback'
+    reference: 'Reference | None' = None
     commands: dict[str, float] = Field(default_factory=dict)
     ramp_s: float = Field(default=.1, gt=0)
     feedback_gain: float = Field(default=1., gt=0)
     damping: float = Field(default=.01, gt=0)
     max_joint_update_rad: float = Field(default=.02, gt=0)
+
+
+class Reference(Contract):
+    kind: Literal['task_goal', 'actuator_commands']
+    commands: dict[str, float] = Field(default_factory=dict)
+    units: Literal['m_or_rad_by_actuator', 'm']
+    frame: Literal['actuator', 'world']
+
+    @model_validator(mode='after')
+    def meaning(self):
+        if self.kind == 'task_goal' and (self.commands or self.units != 'm' or self.frame != 'world'):
+            raise ValueError('TASK_GOAL_REFERENCE_REQUIRES_WORLD_METRES')
+        if self.kind == 'actuator_commands' and (self.units != 'm_or_rad_by_actuator' or self.frame != 'actuator'):
+            raise ValueError('ACTUATOR_REFERENCE_REQUIRES_NATIVE_UNITS')
+        return self
+
+
+class DynamicsModel(Contract):
+    model_id: Literal['serial_bending_cells_v1'] = 'serial_bending_cells_v1'
+    coordinates: Literal['two_principal_bending_angles_per_cell'] = 'two_principal_bending_angles_per_cell'
+    equations: Literal['serial_rigid_body_dynamics_with_hinge_bending'] = 'serial_rigid_body_dynamics_with_hinge_bending'
+    tendon_model: Literal['straight_frictionless_length_servo'] = 'straight_frictionless_length_servo'
+    included: tuple[str, ...] = ('rigid_body_inertia', 'gravity', 'hinge_elasticity', 'hinge_damping', 'external_body_forces')
+    omitted: tuple[str, ...] = ('axial_stretch', 'shear', 'material_torsion', 'tendon_friction', 'rope_elasticity', 'motor_dynamics', 'self_collision')
 
 
 class Parameters(Contract):
@@ -163,6 +188,23 @@ class Parameters(Contract):
     contact_damping_n_s_m: float = Field(default=5., ge=0, description='MATLAB penalty only')
 
 
+class MatlabParameters(Contract):
+    integrator: Literal['ode15s'] = 'ode15s'
+    max_step_s: float = Field(default=.001, gt=0)
+    rtol: float = Field(default=1e-5, gt=0)
+    atol: float = Field(default=1e-7, gt=0)
+    contact_model: Literal['lowest_envelope_vertex_penalty'] = 'lowest_envelope_vertex_penalty'
+    contact_stiffness_n_m: float = Field(default=5000., gt=0)
+    contact_damping_n_s_m: float = Field(default=5., ge=0)
+
+
+class MujocoParameters(Contract):
+    integrator: Literal['implicitfast'] = 'implicitfast'
+    timestep_source: Literal['task.timing.timestep_s'] = 'task.timing.timestep_s'
+    contact_model: Literal['mujoco_convex_native'] = 'mujoco_convex_native'
+    friction: tuple[float, float, float] = (0., 0., 0.)
+
+
 class Data(Contract):
     physics_identity: str
     scene_identity: str
@@ -171,6 +213,8 @@ class Data(Contract):
     reason: str | None = None
     applicability: dict
     exported_files: list[str]
+    execution_plan: dict = Field(default_factory=dict)
+    control_identity: str | None = None
 
 
 class ExperimentSpec(Contract):
@@ -181,6 +225,8 @@ class ExperimentSpec(Contract):
     discretization_identity: str
     physics_identity: str
     scene_identity: str
+    dynamics_model_identity: str | None = None
+    control_identity: str | None = None
     source_roles: dict[str, str]
 
 
@@ -188,8 +234,18 @@ class Space(Contract):
     # Physical design paths or full physical-design options.
     parameters: dict[str, dict] = Field(default_factory=dict)
     templates: dict[str, Design] = Field(default_factory=dict)
+    # A complete template that changes flexible-segment IDs must declare its
+    # complete mesh here. Baseline meshes are never guessed onto new segments.
+    template_discretizations: dict[str, 'Discretization'] = Field(default_factory=dict)
     # Numerical-model edits use "discretization/cells/<segment>" paths.
     discretization_parameters: dict[str, dict] = Field(default_factory=dict)
+
+    @model_validator(mode='after')
+    def template_meshes(self):
+        unknown = set(self.template_discretizations) - set(self.templates)
+        if unknown:
+            raise ValueError('DISCRETIZATION_FOR_UNKNOWN_TEMPLATE: '+','.join(sorted(unknown)))
+        return self
 
 
 class Discretization(Contract):

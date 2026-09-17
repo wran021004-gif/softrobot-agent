@@ -65,6 +65,10 @@ def validate_final(data,discretization,space,changes,task_bounds):
         spec = specifications.get(path,dict(type='number',bounds=normalized_task.get(path)))
         target = discretization if path.startswith('discretization/') else data
         local_path = path.removeprefix('discretization/')
+        if local_path.startswith('cells/') and local_path.split('/',1)[1] not in discretization.get('cells',{}):
+            if path in normalized_changes:
+                raise ValueError('DISCRETIZATION_SEGMENT_INACTIVE: '+path)
+            continue
         active = True
         for dependency,expected in spec.get('when',{}).items():
             try:
@@ -81,15 +85,22 @@ def validate_final(data,discretization,space,changes,task_bounds):
 def build(value, *, task_bounds=None):
     req = BuildRequest.model_validate(value)
     authorize(None,req.space,req.changes)
-    baseline, base_discretization, compatibility = normalize_inputs(req.baseline, req.discretization)
-    design = req.space.templates[req.changes['template']] if 'template' in req.changes else baseline
-    if 'template' in req.changes and req.discretization is None:
-        legacy_cells = [c.cells for c in design.components if hasattr(c,'cells')]
-        if any(value is not None for value in legacy_cells):
-            design, base_discretization, compatibility = normalize_inputs(design)
+    template = req.changes.get('template')
+    design = req.space.templates[template] if template else req.baseline
+    # Select the complete entity structure before validating its mesh. A
+    # structure-changing template owns a complete mesh, or the request must
+    # explicitly provide one matching the final segment IDs.
+    selected_discretization = req.space.template_discretizations.get(template) if template else req.discretization
+    if template and selected_discretization is None:
+        selected_discretization = req.discretization
+    design, base_discretization, compatibility = normalize_inputs(design,selected_discretization)
     data = deepcopy(design.model_dump(mode='json')); discretization = deepcopy(base_discretization.model_dump(mode='json')); summary = []
-    if 'template' in req.changes:
-        summary.append(dict(operation='complete_template',template=req.changes['template'],defaults='entire explicit template saved in candidate'))
+    source = compatibility
+    if template:
+        source = 'space.template_discretizations.'+template if template in req.space.template_discretizations else compatibility
+        summary.append(dict(operation='complete_template',template=template,
+            defaults='entire explicit template saved in candidate',discretization_source=source,
+            baseline_discretization_reused=template not in req.space.template_discretizations))
     try:
         for path,value in req.changes.items():
             if path == 'template': continue
@@ -107,7 +118,7 @@ def build(value, *, task_bounds=None):
         physics = resolve(candidate,model)
         return BuildResult(status='valid',candidate=candidate,discretization=model,summary=summary,resolved_physics=physics,
             applicability=physics['applicability'],source_roles=dict(entity_design='baseline or selected complete template',
-                physical_inputs='candidate component physics and tendon declarations',model_discretization=compatibility))
+                physical_inputs='candidate component physics and tendon declarations',model_discretization=source))
     except Unsupported as exc:
         return BuildResult(status='backend_unsupported',candidate=Design.model_validate(data),summary=summary,reason=str(exc))
     except (ValueError,KeyError,IndexError,StopIteration) as exc:
