@@ -2,6 +2,8 @@
 import gzip
 import json
 import unittest
+from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 from uuid import uuid4
 from unittest.mock import patch
@@ -9,13 +11,14 @@ from examples.platform_domain_example import session_input, CHANGES
 from examples.platform_fixtures import reference_input, project
 from extensions.robot_domain.contracts import RodDesign
 from extensions.robot_domain.signals import from_rows, select
-from schemas.platform import BackendResult, Payload, ExportBundle, SessionInput
+from schemas.platform import BackendResult, Payload, ExportBundle, SessionInput, Signal, SignalSpec
 from schemas.robot_ir import RobotIR
 from tools.platform_registry import registry
 from tools.platform_tools import _candidate
 from tools.platform_host import Host
 from tools.platform_store import Store, plain, zero
 from tools.design_compiler import build_robot_ir
+from tools.platform_tasks import compile_input
 from tools.spec_tools import ROOT
 
 
@@ -44,11 +47,110 @@ class DomainTests(unittest.TestCase):
             _candidate(inp, {'design.segments': 10.}, reg)
 
     def archive(self):
-        # Prior real short-run exports; read only, never replay the experiment.
-        path = next(iter(sorted((ROOT / 'runs/platform_acceptance').glob('*/numerical/sessions/reach-a/executions/*/backend/trajectory.json.gz'))), None)
-        if path is None:
-            self.skipTest('Existing short MuJoCo archive unavailable; run the public example for live evidence')
-        return path.parent
+        folder = ROOT / 'tests/fixtures/platform_domain/mujoco'
+        for name in ('trajectory.json.gz', 'robot_ir.json', 'shared_input.json', 'result.json'):
+            self.assertTrue((folder / name).is_file(), 'Required repository fixture missing: ' + name)
+        return folder
+
+    def test_backend_observation_contracts(self):
+        for backend in ('matlab', 'mujoco'):
+            with self.subTest(backend=backend):
+                inp = session_input(backend)
+                phase = 'sampled_state' if backend == 'matlab' else 'pre_step_solver'
+                spec = dict(name='actuator_force', entity='tendon_0', dimension=1,
+                            units='N', frame='actuator', phase=phase)
+                inp['task']['observations'].append(spec)
+                reg = registry()
+                key = ('backend.' + backend, '1.0.0')
+                # Only bypass optional runtime installation discovery. Real semantic,
+                # robot compilation and backend.check paths remain active; no solves.
+                reg.extensions[key] = replace(reg.get(*key), dependencies=())
+                ctrl_key = ('controller.legacy_length', '1.0.0')
+                ctrl = reg.get(*ctrl_key)
+                reg.extensions[ctrl_key] = replace(ctrl, capabilities={**ctrl.capabilities, 'observation_specs': [spec]})
+                snapshot = compile_input(inp, reg)
+                self.assertEqual(snapshot['input']['task']['observations'][-1]['entity'], 'tendon_0')
+                for field, wrong in dict(entity='tendon_4', dimension=2, units='m', frame='world',
+                                         phase='post_step').items():
+                    bad = {**spec, field: wrong}
+                    with self.subTest(field=field):
+                        invalid = deepcopy(inp)
+                        invalid['task']['observations'][-1] = bad
+                        with self.assertRaisesRegex(ValueError, 'BACKEND_SIGNAL_SEMANTICS_MISMATCH'):
+                            compile_input(invalid, reg)
+                        reg.extensions[ctrl_key] = replace(ctrl, capabilities={**ctrl.capabilities, 'observation_specs': [bad]})
+                        with self.assertRaisesRegex(ValueError, 'CONTROL_OBSERVATION_SEMANTICS_UNSUPPORTED'):
+                            compile_input(inp, reg)
+                        reg.extensions[ctrl_key] = replace(ctrl, capabilities={**ctrl.capabilities, 'observation_specs': [spec]})
+                # Joint axes are backend/model-specific, not arbitrary entity strings.
+                joint = dict(name='joint_position', entity='joint_7_z', dimension=1,
+                             units='rad', frame='joint_local', phase='sampled_state' if backend == 'matlab' else 'post_step')
+                inp['task']['observations'].append(joint)
+                if backend == 'matlab':
+                    with self.assertRaisesRegex(ValueError, 'BACKEND_SIGNAL_SEMANTICS_MISMATCH'):
+                        compile_input(inp, reg)
+                else:
+                    compile_input(inp, reg)
+
+    def test_entity_threshold_public_versions(self):
+        root = ROOT / 'runs/platform_domain_checks' / uuid4().hex
+        store = Store(root)
+        store.create(project())
+        hosts = {}
+        for version in ('1.0.0', '1.1.0'):
+            inp = reference_input('threshold-' + version.replace('.', '-'))
+            inp['policy']['allowed_tools'] = []
+            inp['policy']['tool_bindings'] = {'diagnostics.sample_exceeds': version}
+            host = Host(root, inp['run_id'])
+            host.create(inp)
+            hosts[version] = host
+        # Synthetic values isolate strict scalar comparison/entity/phase selection.
+        spec = SignalSpec(name='tendon_tension', entity='tendon_0', dimension=1,
+                          units='N', frame='actuator', phase='pre_step_solver')
+        signals = [Signal(spec=spec, times_s=[0., .1, .2], values=[[-11.], [5.], [12.]]),
+            Signal(spec=spec.model_copy(update={'entity': 'tendon_1'}), times_s=[0., .1, .2], values=[[20.], [0.], [5.]]),
+            Signal(spec=spec.model_copy(update={'phase': 'sampled_state'}), times_s=[0.], values=[[50.]])]
+        result = BackendResult(solver_status='completed', backend_id='backend.mujoco', model_id='synthetic-interface-only',
+            signals=signals, data=Payload(contract='legacy.backend_data', data={}),
+            initial_state=Payload(contract='legacy.initial_state', data={}), seed=17, limitations=['Synthetic; no physical validation'])
+        with store.transaction() as db:
+            ref = store.put(db, result)
+            unique = store.put(db, result.model_copy(update={'signals': signals[:1]}))
+            empty = store.put(db, result.model_copy(update={'signals': [Signal(spec=spec, times_s=[], values=[])]}))
+            vector = store.put(db, result.model_copy(update={'signals': [Signal(
+                spec=spec.model_copy(update={'dimension': 2}), times_s=[0.], values=[[12., 20.]])]}))
+
+        def call(version='1.1.0', host_version=None, **changes):
+            args = dict(result=plain(ref), signal='tendon_tension', threshold=5., units='N')
+            args.update(changes)
+            return hosts[host_version or version].invoke(dict(request_id=uuid4().hex,
+                tool_id='diagnostics.sample_exceeds', tool_version=version, arguments=args, reason='Offline contract check'))
+
+        def output(receipt):
+            self.assertEqual(receipt['execution_status'], 'completed', receipt)
+            self.assertEqual(receipt['charged']['backend_solves'], 0)
+            return store.artifact(receipt['output'])
+
+        with patch('tools.reach_dynamics.DynamicsBackends.simulate', side_effect=AssertionError('No solve')):
+            for entity, index, value in [('tendon_0', 2, 12.), ('tendon_1', 0, 20.)]:
+                data = output(call(entity=entity, phase='pre_step_solver'))
+                self.assertEqual(data['sample_indices'], [index])
+                self.assertEqual(data['observed'], [[value]])
+                self.assertEqual((data['signal'], data['entity'], data['phase']), ('tendon_tension', entity, 'pre_step_solver'))
+                self.assertEqual(data['source'], plain(ref))
+                self.assertEqual(data['rule'], 'sample_exceeds@1.1.0')
+            for args in ({}, {'entity': 'tendon_0'}):
+                self.assertIn('SIGNAL_SELECTION_REQUIRED', call(**args)['error'])
+            self.assertEqual(output(call(entity='tendon_9'))['status'], 'missing_data')
+            self.assertEqual(output(call(result=plain(empty)))['status'], 'missing_data')
+            self.assertEqual(output(call(result=plain(vector)))['status'], 'not_applicable')
+            self.assertEqual(output(call(entity='tendon_1', units='m'))['status'], 'not_applicable')
+            self.assertEqual(output(call(entity='tendon_1', threshold=20.))['status'], 'no_event')
+            self.assertEqual(output(call('1.0.0', result=plain(unique)))['sample_indices'], [2])
+            self.assertIn('diagnostics.sample_exceeds@1.1.0', call('1.0.0')['error'])
+            self.assertEqual(call('1.0.0', host_version='1.1.0')['execution_status'], 'rejected')
+            self.assertEqual(call(entity='tendon_1', threshold='invalid')['execution_status'], 'rejected')
+        self.assertEqual(store.remaining()['used']['backend_solves'], 0)
 
     def test_saved_signal_entities_times_and_missing(self):
         folder = self.archive()

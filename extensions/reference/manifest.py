@@ -116,6 +116,7 @@ EXTENSIONS = [replace(d, capabilities={**d.capabilities,
     'signals': sorted({s['name'] for s in declarations(d.extension_id.split('.')[-1])} | {'tendon_tension'} |
         ({'contact_normal_force', 'contact_tangent_force', 'contact_position', 'contact_gap'} if d.extension_id == 'backend.mujoco' else set())),
     'signal_templates': declarations(d.extension_id.split('.')[-1]),
+    'signal_specs_resolver': 'extensions.robot_domain.signals:observation_specs',
     'signal_phases': ['sampled_state'] if d.extension_id == 'backend.matlab' else ['post_step', 'pre_step_solver'],
     'force_convention': 'actuator_force negative=pull; tendon_tension=-actuator_force; contact normal positive=compression',
     'entity_expansion': 'actual IR joints/tendons/segments; MuJoCo contact_sample_i_point_j is one saved occurrence',

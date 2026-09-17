@@ -17,6 +17,7 @@ EXTENSIONS = [Extension('candidate.rod_design', 'candidate_builder', '1.0.0', c.
         semantics='absolute SI changes relative to frozen session design; candidate_id is a label'))]
 
 for name, version, inp, out, binding, description in [
+    ('diagnostics.sample_exceeds', '1.1.0', c.EntityDiagnosticQuery, c.EntityDiagnosticResult, 'signals:sample_exceeds', '按名称/实体/相位选择保存标量并检查严格大于阈值；无新求解/评分'),
     ('signals.read', '1.0.0', c.SignalQuery, c.SelectedSignal, 'signals:read_signal', '按名称/实体/相位读取保存统一信号，歧义拒绝'),
     ('diagnostics.saved_trajectory', '2.0.0', c.SavedDiagnosis, c.SavedProduct, 'saved:diagnosis', '平台结果引用自动进入旧保存轨迹诊断；无新求解/评分'),
     ('diagnostics.signal_rule', '2.0.0', c.SavedRule, c.SavedProduct, 'saved:rule', '平台结果引用自动进入既有保存信号规则'),
@@ -28,8 +29,8 @@ for name, version, inp, out, binding, description in [
         sources=(*SOURCES, 'tools/public_services.py', 'tools/trajectory_diagnosis.py', 'tools/diagnostic_rules.py',
             'tools/observation_contract.py', 'tools/observation_tools.py', 'tools/rules/contact_presence.py',
             'tools/simulation_video.py', 'tools/native_replay.py', 'tools/matlab_replay.py', 'tools/service_execution.py',
-            'tools/tool_registry.py', 'tools/service_worker.py', 'tools/model_provider.py'),
+            'tools/tool_registry.py', 'tools/service_worker.py', 'tools/model_provider.py', 'schemas/platform_operations.py'),
         capabilities=dict(category='signals_diagnostics', role='public_tool',
-            model='saved MATLAB/MuJoCo exports' if name != 'signals.read' else 'BackendResult signals',
+            model='BackendResult signals' if binding.startswith('signals:') else 'saved MATLAB/MuJoCo exports',
             semantics='saved sample times and units; zero dynamics and no rescoring'),
         side_effects='current invocation materialization and immutable saved products'))

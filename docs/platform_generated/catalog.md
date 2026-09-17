@@ -25,6 +25,7 @@
 | controller.length_reference | control | adapter | controller | 1.0.0 | True | extensions.reference.implementation:LengthController | 参考长度指令生命周期 |
 | deepseek | platform_services | adapter | model_adapter | 1.0.0 | True | tools.platform_models:DeepSeekAdapter | Existing text/tool model service transport |
 | diagnostics.sample_exceeds | signals_diagnostics | public_tool | tool | 1.0.0 | True | tools.platform_tools:diagnose | 基于保存信号的带版本阈值诊断 |
+| diagnostics.sample_exceeds | signals_diagnostics | public_tool | tool | 1.1.0 | True | extensions.robot_domain.signals:sample_exceeds | 按名称/实体/相位选择保存标量并检查严格大于阈值；无新求解/评分 |
 | diagnostics.saved_trajectory | signals_diagnostics | public_tool | tool | 1.1.0 | True | tools.public_services:saved_diagnosis | Legacy reach signal rules; saved physical time, no simulation or scoring. |
 | diagnostics.saved_trajectory | signals_diagnostics | public_tool | tool | 2.0.0 | True | extensions.robot_domain.saved:diagnosis | 平台结果引用自动进入旧保存轨迹诊断；无新求解/评分 |
 | diagnostics.signal_rule | signals_diagnostics | public_tool | tool | 1.1.0 | True | tools.diagnostic_rules:run_saved_rule | Run a versioned saved-signal rule; distinguish missing, no event, inapplicable and failure. |

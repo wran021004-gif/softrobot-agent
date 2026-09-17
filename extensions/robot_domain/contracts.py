@@ -5,6 +5,7 @@ from schemas.common import Contract
 from schemas.design_spec import DesignSpec
 from schemas.exploration import ExplorationPhysics
 from schemas.platform import EvidenceRef, Signal
+from schemas.platform_operations import DiagnosticQuery, DiagnosticResult
 
 
 class RodDesign(DesignSpec):
@@ -38,6 +39,19 @@ class SelectedSignal(Contract):
     source: EvidenceRef
     status: Literal['available', 'missing_data']
     signal: Signal | None = None
+
+
+class EntityDiagnosticQuery(DiagnosticQuery):
+    entity: str | None = None
+    phase: str | None = None
+
+
+class EntityDiagnosticResult(DiagnosticResult):
+    entity: str | None
+    phase: str | None
+    units: str
+    threshold: float
+    rule: Literal['sample_exceeds@1.1.0'] = 'sample_exceeds@1.1.0'
 
 
 class SavedDiagnosis(ResultSource):

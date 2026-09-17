@@ -40,6 +40,7 @@ def reference_input(run_id='signal-hold'):
         robot=dict(family='reference_signal_robot', structure=payload('reference.robot', dict(length_m=0.3, response_fraction=0.5, model_identity='discrete_length_response_fixture')),
             channels=['tendon_target_lengths_m'], units='SI', frame='actuator', assumptions=['离散一阶信号模型，仅接口验证'], sources=['examples/platform_fixtures.py'], unsupported=['physical_dynamics', 'gravity', 'friction', 'contact']),
         policy=dict(policy_id='reference-development', editable={'controller.command_m': [0.25, 0.35]},
+            tool_bindings={'diagnostics.sample_exceeds': '1.0.0'},
             backend=binding('backend.reference'), controller=binding('controller.length_reference', 'reference.control', dict(command_m=0.3)),
             search=binding('search.scalar_sequence', 'reference.search', dict(parameter='controller.command_m', candidates=[0.3, 0.31])),
             model=dict(adapter='offline', model='offline-contract-fixture', max_turns=12),

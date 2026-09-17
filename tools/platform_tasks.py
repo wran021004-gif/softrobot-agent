@@ -40,9 +40,11 @@ def compile_input(value, reg=None):
     caps = backend.capabilities
     if inp.robot.structure.contract not in caps.get('robot_contracts', [inp.robot.structure.contract]):
         raise ValueError('BACKEND_ROBOT_REPRESENTATION_UNSUPPORTED')
+    from schemas.platform import SignalSpec
+    resolver = backend.hook('signal_specs_resolver')
+    available = [SignalSpec.model_validate(s) for s in
+                 (resolver(inp, reg) if resolver else caps.get('signal_specs', []))]
     if controller.capabilities.get('observation_specs'):
-        from schemas.platform import SignalSpec
-        available = [SignalSpec.model_validate(s) for s in caps.get('signal_specs', [])]
         if any(SignalSpec.model_validate(s) not in available for s in controller.capabilities['observation_specs']):
             raise ValueError('CONTROL_OBSERVATION_SEMANTICS_UNSUPPORTED')
     checks = [('robots', [inp.robot.family]),
@@ -56,10 +58,8 @@ def compile_input(value, reg=None):
         for key, required in [('families', task.family), ('controllers', controller.extension_id)]:
             if required not in caps.get(key, []):
                 raise ValueError('BACKEND_CONVERSION_ADAPTER_REQUIRED: ' + required)
-    if caps.get('signal_specs'):
-        from schemas.platform import SignalSpec
-        offered = [SignalSpec.model_validate(s) for s in caps['signal_specs']]
-        if any(s not in offered for s in task.observations):
+    if resolver or caps.get('signal_specs'):
+        if any(s not in available for s in task.observations):
             raise ValueError('BACKEND_SIGNAL_SEMANTICS_MISMATCH')
     if any(s.phase not in caps.get('signal_phases', []) for s in task.observations):
         raise ValueError('BACKEND_SIGNAL_PHASE_UNSUPPORTED')

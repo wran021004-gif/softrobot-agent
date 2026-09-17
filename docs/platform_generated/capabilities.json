@@ -1622,6 +1622,7 @@
           "time_field": "solver_time_s"
         }
       ],
+      "signal_specs_resolver": "extensions.robot_domain.signals:observation_specs",
       "force_convention": "actuator_force negative=pull; tendon_tension=-actuator_force; contact normal positive=compression",
       "entity_expansion": "actual IR joints/tendons/segments; MuJoCo contact_sample_i_point_j is one saved occurrence",
       "missing_signals": "absent, never filled with zeros",
@@ -2042,6 +2043,7 @@
           "time_field": "solver_time_s"
         }
       ],
+      "signal_specs_resolver": "extensions.robot_domain.signals:observation_specs",
       "force_convention": "actuator_force negative=pull; tendon_tension=-actuator_force; contact normal positive=compression",
       "entity_expansion": "actual IR joints/tendons/segments; MuJoCo contact_sample_i_point_j is one saved occurrence",
       "missing_signals": "absent, never filled with zeros",
@@ -5127,6 +5129,251 @@
     "side_effects": "current session/project only"
   },
   {
+    "extension_id": "diagnostics.sample_exceeds",
+    "kind": "tool",
+    "version": "1.1.0",
+    "binding": "extensions.robot_domain.signals:sample_exceeds",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "按名称/实体/相位选择保存标量并检查严格大于阈值；无新求解/评分",
+    "input_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "result": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "signal": {
+          "title": "Signal",
+          "type": "string"
+        },
+        "threshold": {
+          "title": "Threshold",
+          "type": "number"
+        },
+        "units": {
+          "title": "Units",
+          "type": "string"
+        },
+        "entity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entity"
+        },
+        "phase": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Phase"
+        }
+      },
+      "required": [
+        "result",
+        "signal",
+        "threshold",
+        "units"
+      ],
+      "title": "EntityDiagnosticQuery",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "events_found",
+            "no_event",
+            "missing_data",
+            "not_applicable",
+            "execution_failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "signal": {
+          "title": "Signal",
+          "type": "string"
+        },
+        "sample_indices": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Sample Indices",
+          "type": "array"
+        },
+        "observed": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Observed",
+          "type": "array"
+        },
+        "rule": {
+          "const": "sample_exceeds@1.1.0",
+          "default": "sample_exceeds@1.1.0",
+          "title": "Rule",
+          "type": "string"
+        },
+        "causal_hypothesis": {
+          "default": null,
+          "title": "Causal Hypothesis",
+          "type": "null"
+        },
+        "rescoring": {
+          "const": false,
+          "default": false,
+          "title": "Rescoring",
+          "type": "boolean"
+        },
+        "entity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Entity"
+        },
+        "phase": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Phase"
+        },
+        "units": {
+          "title": "Units",
+          "type": "string"
+        },
+        "threshold": {
+          "title": "Threshold",
+          "type": "number"
+        }
+      },
+      "required": [
+        "status",
+        "source",
+        "signal",
+        "sample_indices",
+        "observed",
+        "entity",
+        "phase",
+        "units",
+        "threshold"
+      ],
+      "title": "EntityDiagnosticResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "signals_diagnostics",
+      "role": "public_tool",
+      "model": "BackendResult signals",
+      "semantics": "saved sample times and units; zero dynamics and no rescoring"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/robot_domain/contracts.py",
+      "extensions/robot_domain/candidate.py",
+      "extensions/robot_domain/signals.py",
+      "extensions/robot_domain/saved.py",
+      "extensions/robot_domain/manifest.py",
+      "tools/public_services.py",
+      "tools/trajectory_diagnosis.py",
+      "tools/diagnostic_rules.py",
+      "tools/observation_contract.py",
+      "tools/observation_tools.py",
+      "tools/rules/contact_presence.py",
+      "tools/simulation_video.py",
+      "tools/native_replay.py",
+      "tools/matlab_replay.py",
+      "tools/service_execution.py",
+      "tools/tool_registry.py",
+      "tools/service_worker.py",
+      "tools/model_provider.py",
+      "schemas/platform_operations.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
+    "side_effects": "current invocation materialization and immutable saved products"
+  },
+  {
     "extension_id": "diagnostics.saved_trajectory",
     "kind": "tool",
     "version": "1.1.0",
@@ -5438,7 +5685,8 @@
       "tools/service_execution.py",
       "tools/tool_registry.py",
       "tools/service_worker.py",
-      "tools/model_provider.py"
+      "tools/model_provider.py",
+      "schemas/platform_operations.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -5854,7 +6102,8 @@
       "tools/service_execution.py",
       "tools/tool_registry.py",
       "tools/service_worker.py",
-      "tools/model_provider.py"
+      "tools/model_provider.py",
+      "schemas/platform_operations.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -8603,7 +8852,8 @@
       "tools/service_execution.py",
       "tools/tool_registry.py",
       "tools/service_worker.py",
-      "tools/model_provider.py"
+      "tools/model_provider.py",
+      "schemas/platform_operations.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -11670,7 +11920,8 @@
       "tools/service_execution.py",
       "tools/tool_registry.py",
       "tools/service_worker.py",
-      "tools/model_provider.py"
+      "tools/model_provider.py",
+      "schemas/platform_operations.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -11842,7 +12093,8 @@
       "tools/service_execution.py",
       "tools/tool_registry.py",
       "tools/service_worker.py",
-      "tools/model_provider.py"
+      "tools/model_provider.py",
+      "schemas/platform_operations.py"
     ],
     "assets": [],
     "extension_dependencies": [],

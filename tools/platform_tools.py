@@ -165,7 +165,7 @@ def diagnose(ctx, args):
     result = BackendResult.model_validate(ctx.artifact(args.result))
     matches = [s for s in result.signals if s.spec.name == args.signal]
     if len(matches) > 1:
-        raise ValueError('SIGNAL_SELECTION_REQUIRED: use signals.read with entity and phase')
+        raise ValueError('SIGNAL_SELECTION_REQUIRED: bind diagnostics.sample_exceeds@1.1.0 in policy.tool_bindings; pass the original result with entity and phase')
     signal = matches[0] if matches else None
     if signal is None:
         status, indices = 'missing_data', []

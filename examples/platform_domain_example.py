@@ -33,6 +33,7 @@ def session_input(backend):
     inp['policy']['tool_bindings'] = {name: '1.0.0' for name in
         ('simulation.run', 'evaluation.run', 'signals.read', 'evidence.read', 'visualization.saved_replay')}
     inp['policy']['tool_bindings'].update({'diagnostics.saved_trajectory': '2.0.0', 'diagnostics.signal_rule': '2.0.0'})
+    inp['policy']['tool_bindings']['diagnostics.sample_exceeds'] = '1.1.0'
     inp['policy']['budget'] = budget(tool_calls=20, backend_solves=1, wall_s=300.)
     inp['policy']['timeout_s'] = 60.
     return inp
@@ -88,6 +89,8 @@ def run(root, backend):
     evaluation = call('evaluation', 'evaluation.run', source)
     phase = 'sampled_state' if backend == 'matlab' else 'pre_step_solver'
     call('signal', 'signals.read', dict(result=simulation['output'], name='actuator_force', entity='tendon_0', phase=phase))
+    call('threshold', 'diagnostics.sample_exceeds', dict(result=simulation['output'], signal='tendon_tension',
+        entity='tendon_0', phase=phase, threshold=10., units='N'))
     diagnosis = call('diagnosis', 'diagnostics.saved_trajectory', {**source, 'entity': 'all'})
     call('rule', 'diagnostics.signal_rule', source)
     call('replay', 'visualization.saved_replay', source)

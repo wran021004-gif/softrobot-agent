@@ -1,0 +1,199 @@
+{
+  "model_id": "matlab_tdcr_planar_dynamic_v1",
+  "ir_hash": "681f703a37a6c7681a7abea1d39001b687190b4ecdd4d0e69435c15ff6158d66",
+  "control_hash": "fc6e08479d5b5797659777df35500841a5d0b1e400d02603ebcb957a9793ad68",
+  "length": 0.32,
+  "ds": 0.04,
+  "radius": 0.016,
+  "body_radius": 0.019,
+  "mass": [
+    0.044000000000000004,
+    0.044000000000000004,
+    0.044000000000000004,
+    0.044000000000000004,
+    0.044000000000000004,
+    0.044000000000000004,
+    0.044000000000000004,
+    0.044000000000000004
+  ],
+  "inertia_y": [
+    9.837666666666667e-06,
+    9.837666666666667e-06,
+    9.837666666666667e-06,
+    9.837666666666667e-06,
+    9.837666666666667e-06,
+    9.837666666666667e-06,
+    9.837666666666667e-06,
+    9.837666666666667e-06
+  ],
+  "stiffness": [
+    0.105,
+    0.105,
+    0.105,
+    0.105,
+    0.105,
+    0.105,
+    0.105,
+    0.105
+  ],
+  "damping": [
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1
+  ],
+  "natural": [
+    -0.006250000000000001,
+    -0.006250000000000001,
+    -0.006250000000000001,
+    -0.006250000000000001,
+    -0.006250000000000001,
+    -0.006250000000000001,
+    -0.006250000000000001,
+    -0.006250000000000001
+  ],
+  "kp": 1200.0,
+  "fmax": 22.0,
+  "offsets": [
+    [
+      0.016,
+      0.0
+    ],
+    [
+      9.797174393178825e-19,
+      0.016
+    ],
+    [
+      -0.016,
+      1.959434878635765e-18
+    ],
+    [
+      -2.9391523179536477e-18,
+      -0.016
+    ]
+  ],
+  "angles": [
+    0.0,
+    1.5707963267948966,
+    3.141592653589793,
+    4.71238898038469
+  ],
+  "command": [
+    0.3216,
+    0.3072,
+    0.3216,
+    0.336
+  ],
+  "bend": [
+    0.0,
+    0.9
+  ],
+  "control": {
+    "version": "length_control_v2",
+    "mode": "C1",
+    "bend_y_rad": 0.0,
+    "bend_z_rad": 0.9,
+    "bias_fraction": 0.005,
+    "gain_rad2_per_m2": 5.0,
+    "update_every_steps": 10,
+    "max_bend_update_rad": 0.05,
+    "rate_limit_ref_per_s": 0.5
+  },
+  "gravity": [
+    0.0,
+    0.0,
+    -9.81
+  ],
+  "floor_z": -0.02,
+  "duration": 0.08,
+  "dt": 0.002,
+  "target": [
+    0.3,
+    0.0,
+    0.08
+  ],
+  "tolerance": 0.01,
+  "timeout_s": 59.40599999995902,
+  "solver": {
+    "version": "ode15s_v1",
+    "rtol": 1e-05,
+    "atol": 1e-07,
+    "max_step_s": 0.02
+  },
+  "task_hash": "319fd7172b7ea2ecc6ff745145c8b28522cfec33de790625fe4e17a730a82013",
+  "environment_hash": "52369cb2cfb4332ec9459040383f9d4a6e2936cbc85910a45b3ac1e21e03b925",
+  "task_context": {
+    "version": "1.0",
+    "task": {
+      "task_id": "domain-mujoco",
+      "task_type": "reach",
+      "environment_id": "reach_free",
+      "target_m": [
+        0.3,
+        0.0,
+        0.08
+      ],
+      "position_error_max_m": 0.01,
+      "acceptance": null
+    },
+    "environment": {
+      "schema_version": "1",
+      "environment_id": "reach_free",
+      "units": "SI",
+      "coordinate_frame": "world_base_x_forward_yz_cross_section",
+      "gravity_m_s2": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+      "truth_status": "HUMAN_OWNED",
+      "objects": [
+        {
+          "kind": "plane",
+          "name": "floor",
+          "position_m": [
+            0.0,
+            0.0,
+            -0.02
+          ],
+          "half_size_m": [
+            2.0,
+            2.0,
+            0.1
+          ],
+          "contype": 0,
+          "conaffinity": 1
+        }
+      ],
+      "lights": [
+        {
+          "position_m": [
+            0.0,
+            0.0,
+            2.0
+          ],
+          "direction": [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        }
+      ]
+    },
+    "run_settings": {
+      "steps": 40,
+      "random_seed": 17,
+      "provenance": "原 reach_free 环境与 0.01 m 容差；开发目标 [0.30,0,0.08]，40 步；不改变历史科研定义"
+    },
+    "timestep_s": 0.002,
+    "initial_state": "compiled_default_qpos_zero_qvel",
+    "evaluator_id": "reach_v1",
+    "authority": "原 reach_free 环境与 0.01 m 容差；开发目标 [0.30,0,0.08]，40 步；不改变历史科研定义"
+  },
+  "task_context_hash": "a41c5094dcfd5e31276d5ab765a183209ba0421b492393c00ee38f7b6b1207d6"
+}

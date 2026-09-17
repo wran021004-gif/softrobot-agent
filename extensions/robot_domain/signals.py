@@ -1,6 +1,6 @@
 """Lossless semantic projection of fields already recorded by the two executors."""
 from schemas.platform import Signal, SignalSpec, BackendResult
-from .contracts import SelectedSignal
+from .contracts import SelectedSignal, EntityDiagnosticResult
 
 
 def declarations(backend):
@@ -33,9 +33,35 @@ def declarations(backend):
             for f, n, e, d, u, fr, p, t in items]
 
 
-def from_rows(rows, backend, ir):
-    entities = dict(joint=[f'joint_{i}_{a}' for i in range(ir.segments) for a in (('y',) if backend == 'matlab' else ('y', 'z'))],
+def entity_groups(backend, ir):
+    return dict(joint=[f'joint_{i}_{a}' for i in range(ir.segments) for a in (('y',) if backend == 'matlab' else ('y', 'z'))],
                     tendon=[f'tendon_{r.index}' for r in ir.tendon_routes], segment=[f'segment_{i}' for i in range(ir.segments)])
+
+
+def signal_spec(item, entity):
+    return SignalSpec(name=item['name'], entity=entity, dimension=item['dimension'],
+        units=item['units'], frame=item['frame'], phase=item['phase'])
+
+
+def observation_specs(inp, reg):
+    """Expand stable observations from the same definitions/IR as saved signals."""
+    from tools.design_compiler import ensure_robot_ir
+    ir = ensure_robot_ir(reg.parse(inp.robot.structure))
+    backend = inp.policy.backend.extension_id.split('.')[-1]
+    entities = entity_groups(backend, ir)
+    specs = []
+    for item in declarations(backend):
+        for entity in entities.get(item['entity_group'], [item['entity_group']]):
+            spec = signal_spec(item, entity)
+            specs.append(spec)
+            if spec.name == 'actuator_force':
+                specs.append(spec.model_copy(update={'name': 'tendon_tension'}))
+    # Sparse contact occurrences have no pre-execution stable entity identity.
+    return specs
+
+
+def from_rows(rows, backend, ir):
+    entities = entity_groups(backend, ir)
     signals = []
     for item in declarations(backend):
         field, clock, group = item['field'], item['time_field'], item['entity_group']
@@ -49,8 +75,7 @@ def from_rows(rows, backend, ir):
                 values = [[r[field][i]] for r in rows]
             else:
                 values = [r[field] if item['dimension'] > 1 else [r[field]] for r in rows]
-            spec = SignalSpec(name=item['name'], entity=entity, dimension=item['dimension'],
-                units=item['units'], frame=item['frame'], phase=item['phase'])
+            spec = signal_spec(item, entity)
             signals.append(Signal(spec=spec, times_s=[r[clock] for r in rows], values=values))
             if item['name'] == 'actuator_force':
                 signals.append(Signal(spec=spec.model_copy(update={'name': 'tendon_tension'}),
@@ -85,3 +110,22 @@ def read_signal(ctx, args):
     result = BackendResult.model_validate(ctx.artifact(args.result))
     signal = select(result.signals, args.name, args.entity, args.phase)
     return SelectedSignal(source=args.result, status='available' if signal else 'missing_data', signal=signal)
+
+
+def sample_exceeds(ctx, args):
+    result = BackendResult.model_validate(ctx.artifact(args.result))
+    signal = select(result.signals, args.signal, args.entity, args.phase)
+    indices = []
+    if signal is None or not signal.values:
+        status = 'missing_data'
+    elif signal.spec.units != args.units or signal.spec.dimension != 1:
+        status = 'not_applicable'
+    else:
+        indices = [i for i, row in enumerate(signal.values) if row[0] > args.threshold]
+        status = 'events_found' if indices else 'no_event'
+    output = EntityDiagnosticResult(status=status, source=args.result, signal=args.signal,
+        entity=signal.spec.entity if signal else args.entity, phase=signal.spec.phase if signal else args.phase,
+        units=args.units, threshold=args.threshold, sample_indices=indices,
+        observed=[signal.values[i] for i in indices] if signal else [])
+    ctx.record('diagnosis', status, inputs=[args.result])
+    return output

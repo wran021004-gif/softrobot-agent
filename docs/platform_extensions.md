@@ -41,6 +41,8 @@
 
 声明 robot_contracts、robots、channels、environments、signal_specs（完整实体、维度、单位、坐标、相位）、生命周期、资源和超时覆盖。一般兼容不枚举算法名称；旧后端通过 conversion 声明保留专属任务编译限制。昂贵启动只在实际候选检查和预留之后进行；后端始终在 finally 中 close。
 
+实体随机器人变化时，可通过既有 hook 声明 signal_specs_resolver；任务与控制器使用其展开的同一完整规格检查。签名及静态兼容见 [接口决策](platform_interface_decisions.md)，实际 MATLAB/MuJoCo 映射、指定腱阈值诊断和保存数据示例见 [领域指南](platform_domain.md)。不要另维护一套实体列表或仅按信号名称放行。
+
 参考后端为合成信号模型。MuJoCo 保留原单次执行器；MATLAB 保留平面自由度、近似法向接触、缺少摩擦与自碰撞的限制。MATLAB 引擎启动和关闭没有硬超时保证，future.cancel 也不证明外部服务已终止。未知完成状态保留额度，不自动再求解。
 
 新实现的能力声明必须真实。分步控制的连续运行、reset 与 restore 含义分别定义；输出单位和执行通道不能靠改字段名转换。当前真实后端只接绳长通道。

@@ -1,5 +1,11 @@
 # 公共接口版本与定版决策
 
+## 领域信号断点修复（基线 04bf31e）
+
+复用 Extension.hook，后端可选声明 `capabilities.signal_specs_resolver='可信模块:函数'`，签名 `(SessionInput, Registry) -> list[SignalSpec]`。返回当前机器人可声明的完整稳定实体规格，供任务和控制器共用严格语义检查；未声明时保留静态 signal_specs 行为。resolver 及传递依赖须纳入后端 sources；请求不能提供模块路径。MATLAB/MuJoCo 复用 robot_domain 的实际映射定义与 IR 实体规则，不预声明稀疏接触发生记录。
+
+新增 `diagnostics.sample_exceeds@1.1.0`：原 BackendResult 引用加可选 entity/phase，返回所选身份、来源与严格标量大于阈值的样本；旧 1.0.0 保留。新版本、旧版本分别由 policy.tool_bindings 精确选择，现有旧示例补充 1.0.0 绑定。公共信封与结果契约版本不变。字段、只读调用和随仓库测试样例见 [领域指南](platform_domain.md)。
+
 ## 领域接入增量（基线 a716f32）
 
 公共信封版本不变。`domain.rod_design@1.0.0` 作为会话唯一设计负载，`candidate.rod_design@1.0.0` 重用原等效杆编译；既有后端继续接受 legacy.robot_ir，并新增此设计表示。后端输出增量统一信号，明确实际实体和 state／solver 时间。`signals.read@1.0.0` 提供精确选择，旧单字段诊断遇到歧义明确拒绝。

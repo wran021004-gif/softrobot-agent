@@ -20,7 +20,7 @@ python examples/platform_domain_example.py run runs/my_domain_dev --backend matl
 python examples/workbench.py platform events runs/my_domain_dev domain-mujoco
 ```
 
-`run` 是七次公共 `Host.invoke` 的紧凑演示：仿真 → 评价 → 选择腱执行器力信号 → 保存轨迹诊断 → 接触规则 → 回放数据准备 → 读取有效候选。它与 CLI call 使用同一请求和账本，不直调底层函数完成主链路。上面的 CLI 已封存 `domain-solve` 后，脚本重用同一请求，不重复求解；也可只运行 prepare 和两条 run，由脚本创建项目／会话。不要修改已封存请求的参数后复用其 request_id。
+`run` 是八次公共 `Host.invoke` 的紧凑演示：仿真 → 评价 → 选择腱执行器力信号 → 指定腱张力阈值诊断 → 保存轨迹诊断 → 接触规则 → 回放数据准备 → 读取有效候选。它与 CLI call 使用同一请求和账本，不直调底层函数完成主链路。上面的 CLI 已封存 `domain-solve` 后，脚本重用同一请求，不重复求解；也可只运行 prepare 和两条 run，由脚本创建项目／会话。不要修改已封存请求的参数后复用其 request_id。
 
 输入沿用现有 `task.reach`、reach_shifted 目标 `[0.30, 0, 0.08] m`、0.01 m 容差和原环境，时长 0.08 s；没有新任务或批量优化。输出 `<backend>_record.json` 保存所有回执、有效候选、评价和费用，`platform.sqlite` 保存不可变证据。项目限两次求解，每个后端会话一次；模型预算为零。MATLAB 仍需已有 Engine／许可证，且这一路的共享模型导出需要 MuJoCo。
 
@@ -54,7 +54,7 @@ changes 是相对**冻结会话基线的绝对值覆盖**，不是增量，也�
 
 ## 统一信号与相位
 
-映射源码为 [signals.py](../extensions/robot_domain/signals.py)，数据仍来自原 trajectory.json.gz。常规实体名按实际 IR 展开：`joint_i_y/z`（MATLAB 只有 y）、`tendon_i`、`segment_i`，不固定数组宽度。后端目录的 signal_templates 声明展开规则，signal_specs 保留当前任务所需的 tip 完整规格；扩展新任务观测时仍需补充精确规格。
+映射源码为 [signals.py](../extensions/robot_domain/signals.py)，数据仍来自原 trajectory.json.gz。常规实体名按实际 IR 展开：`joint_i_y/z`（MATLAB 只有 y）、`tendon_i`、`segment_i`，不固定数组宽度。后端的 `signal_specs_resolver` 从当前机器人编译 IR，复用结果映射的 `declarations/entity_groups/signal_spec` 展开完整规格（含派生 tendon_tension）。任务 observations 和控制器 observation_specs 均逐项检查名称、实体、维度、单位、坐标系及相位。无需为新观测另抄静态列表；其他后端未声明 resolver 时仍使用 signal_specs。声明可支持不代表每份旧轨迹都有数据，读取缺项仍为 missing_data。
 
 | 统一名称 | 实体／维度 | 单位／坐标 | 数据和限制 |
 | --- | --- | --- | --- |
@@ -73,7 +73,36 @@ changes 是相对**冻结会话基线的绝对值覆盖**，不是增量，也�
 
 MuJoCo 状态为 `post_step`，使用 time_s；绳长、指令、力、接触及力矩为 `pre_step_solver`，使用 solver_time_s，不能挪到步后时间。MATLAB 状态和力均在同一保存输出时刻求值，标为 `sampled_state`；不是 ode15s 内部步。原始求解器字段、内部步日志和全部导出继续保存。
 
-接触点不能跨帧假定身份稳定，因此 MuJoCo 每个接触记录使用 `contact_sample_i_point_j` 的稀疏单点信号，直接对应原始 rows[i].contacts[j]，几何对名称在该原始记录中。无接触时不产生该点信号；不存在的字段不补零。`signals.read@1.0.0` 接受 result、name、可选 entity/phase；多匹配报 SIGNAL_SELECTION_REQUIRED，缺失返回 missing_data。旧 diagnostics.sample_exceeds 遇到同名多实体也明确拒绝，不再默选第一项。
+接触点不能跨帧假定身份稳定，因此 MuJoCo 每个接触记录使用 `contact_sample_i_point_j` 的稀疏单点信号，直接对应原始 rows[i].contacts[j]，几何对名称在该原始记录中。无接触时不产生该点信号；不存在的字段不补零。这些稀疏发生记录不能预先作为稳定实体观测声明；本轮未改变接触事件含义。`signals.read@1.0.0` 接受 result、name、可选 entity/phase；多匹配报 SIGNAL_SELECTION_REQUIRED，缺失返回 missing_data。
+
+### 指定腱的阈值诊断：仅读取保存结果
+
+`diagnostics.sample_exceeds@1.1.0` 输入仍为原 **BackendResult 的 EvidenceRef**，增加可选 `entity/phase`，与 signals.read 共用 select。省略选择条件仅在唯一匹配时可用；不接受 SelectedSignal 引用。规则仍为逐样本标量 **value > threshold**，不取绝对值、不求范数、不重采样。输出保留 source、signal、所选 entity/phase、sample_indices、observed，以及比较使用的 threshold/units、rule=`sample_exceeds@1.1.0`。空数据／无匹配为 missing_data，单位不符／向量为 not_applicable，选择歧义报错；这些状态均不表示 no_event。
+
+旧 `1.0.0` 保留单一同名信号诊断，歧义错误现在指向新版与参数。新会话须精确绑定 `policy.tool_bindings: {diagnostics.sample_exceeds: '1.1.0'}`；旧示例显式绑定 1.0.0。工具版本独立于公共结果契约版本，本轮未改 ToolReceipt/EvaluationResult 的 1.2.0。冻结的旧会话不能直接改授权／依赖后续跑；请使用当前示例新建的会话，不改历史证据。
+
+以下对**当前示例已保存的 MuJoCo 结果**单独发起诊断，不调用仿真或评价（会话已绑定 1.1.0）。MATLAB 把相位改为 sampled_state，并使用对应的 record/run_id：
+
+```powershell
+conda activate softagent
+$root = 'runs/my_domain_dev'
+$record = Get-Content "$root/mujoco_record.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+$request = @{
+  request_id = 'tendon-threshold-' + [guid]::NewGuid().ToString('N')
+  tool_id = 'diagnostics.sample_exceeds'; tool_version = '1.1.0'
+  arguments = @{
+    result = $record.receipts.simulation.output
+    signal = 'tendon_tension'; entity = 'tendon_0'; phase = 'pre_step_solver'
+    threshold = 10.0; units = 'N'
+  }
+  reason = 'Read saved tendon tension only; no dynamics or scoring'
+}
+$json = $request | ConvertTo-Json -Depth 12
+[IO.File]::WriteAllText("$((Resolve-Path $root).Path)/threshold.json", $json, [Text.UTF8Encoding]::new($false))
+python examples/workbench.py platform call $root domain-mujoco "$root/threshold.json"
+```
+
+回执 output 指向诊断结果，可经 evidence.read 读取；source 仍指向原仿真结果，诊断不产生新的仿真执行身份。
 
 ## 平台引用 → 已有保存数据工具
 
@@ -104,7 +133,7 @@ MuJoCo 状态为 `post_step`，使用 time_s；绳长、指令、力、接触及
 | mathematical_models 已有力学 | tools.mechanics_tools.MechanicsTools.solve、matlab/closeout_mechanics.m：内部独立分析／兼容执行 | AnalysisSpec／已导出参数 → 静态、动态或稳定性分析，按旧契约 SI 和模型范围 | 保留旧分析预算／模型定义；未新包装为平台求解工具，也未在本轮重跑 |
 | control 控制 | controller.legacy_length：参数适配；controllers/registry.py、open_loop_length.py、pcc_tip_feedback.py：内部生命周期 | ExplorationControl+IR+观测 → 每腱长度指令 m；按冻结周期更新 | C1 固定／C2 反馈，原控制实现保留；后端执行时间步，LLM 不充当控制器 |
 | simulation 仿真 | simulation.run：公共完整操作；backend.mujoco／matlab：适配；tools.reach_dynamics.DynamicsBackends：内部执行器 | 候选+任务／控制 → BackendResult、Signal、原始文件包 | 一次 MATLAB 平面或 MuJoCo 分段仿真；旧 dynamics.simulate_candidate 是旧账本固定编排 |
-| signals_diagnostics 信号诊断 | signals.read、两项 diagnostics@2.0、visualization.saved_replay／render_simulation_video：公共保存数据工具 | EvidenceRef+执行身份／实体／窗口 → 选择信号或 SavedProduct | 时间相位见上表；内部 trajectory_diagnosis／diagnostic_rules／native_replay 复用，无新动力学 |
+| signals_diagnostics 信号诊断 | signals.read、diagnostics.sample_exceeds@1.1、两项 diagnostics@2.0、visualization.saved_replay／render_simulation_video：公共保存数据工具 | EvidenceRef+执行身份／实体／窗口 → 选择信号、阈值样本或 SavedProduct | 时间相位见上表；内部 trajectory_diagnosis／diagnostic_rules／native_replay 复用，无新动力学 |
 | evaluation_comparison 评价比较 | evaluation.run：公共工具；evaluate.reach：评价适配；tools.platform_search.rank、dynamic_comparison：内部比较 | 保存结果+固定任务 → EvaluationResult／可比较排序；距离 m | 当前到达距离与原阈值；比较检查任务实例／后端／模型身份。当前 score 按有效单目标指标排序，不承诺通用约束优先策略 |
 | parameter_search 参数搜索 | search.scalar_sequence、search.stateful：可执行参考；tools.platform_search.run_search：公共 CLI 的 ask/tell 编排 | 参数序列+反馈+检查点 → 候选和试验列表；单位继承设计空间 | 两个参考器是序列提案，不是通用优化器；无新算法 |
 | parameter_search 旧优化复用 | tools.optimization_interfaces.ParameterSpace/coordinate_proposal、search_runtime.search：内部库；DynamicCampaign.optimize：旧固定编排 | 有界／可对数参数空间 → 正负坐标试探、无改进缩步、保存状态 | MATLAB tdcr_search_step 是有界坐标模式局部搜索，不是梯度算法／全局最优；旧 optimize_matlab 保留旧授权账本，未整体迁移 |
@@ -114,7 +143,15 @@ MuJoCo 状态为 `post_step`，使用 time_s；绳长、指令、力、接触及
 
 完整编排（旧 campaign／workbench、当前 run_search、此处示例）与可复用原子分别列出，旧入口继续按原授权和账本工作。内部库不因列入目录就自动获得公共调用权限。
 
-## 本轮验证与剩余边界
+## 信号接口修复验证（04bf31e 后续）
+
+`conda run -n softagent python -m unittest tests.test_platform_domain -v`：**5 项通过，0 失败，0 跳过，3.306 s**。一次组合覆盖两种后端的执行器力观测／控制器规格及典型错误、关节实体差异、Host.invoke 新旧阈值版本绑定／参数解析／实体和相位消歧、严格大于（不取绝对值）、缺失／空数据／单位不符／向量，以及原有派生量、信号映射和证据桥接检查。只隔离后端可选运行库的安装发现，保留真实编译和语义检查；通过不代表本轮验证了引擎运行。
+
+信号和桥接测试改用 [随仓库样例](../tests/fixtures/platform_domain/mujoco/README.md)：上一轮 MuJoCo 记录的前三个连续样本（全字段保留），加原模型／输入／结果元数据，共约 15 KB。README 记录原始来源、摘录范围和文件摘要；result.json 仍描述原完整运行。缺文件直接失败，不从本机 runs 查找，也不 skip。MATLAB 形状样本和阈值选择数据是明确的合成接口样本，不作为物理证据。
+
+`conda run -n softagent python examples/export_platform_contracts.py` 一次生成成功：35 个公共契约、33 个负载、59 个扩展。**本轮新增 MATLAB/MuJoCo 求解、真实模型请求、视频编码和 GUI 开窗均为 0**。没有新做物理验证；下方两次真实求解属于上一轮历史记录，保留原意。
+
+## 历史：领域接入验证与剩余边界
 
 执行 `conda run -n softagent python -m unittest tests.test_platform_domain -v`：**3 项通过，1.239 s，0 失败／跳过**。范围仅为派生量重建／冻结范围、保存信号实体和相位、档案证据桥接／来源歧义／旧诊断调用；复用历史短轨迹只读数据，没有重跑历史实验。随后只读核对本轮两次真实编译输出与桥接报告。
 
