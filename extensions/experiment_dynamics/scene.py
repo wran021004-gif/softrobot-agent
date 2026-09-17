@@ -22,6 +22,8 @@ def assemble(inp, physics):
         raise ValueError('SCENE_FLOOR_MUST_COLLIDE_WITH_ROBOT')
     timing = inp.task.timing
     for f in a.external_forces:
+        if f.entity not in {p.entity for p in physics.parts}:
+            raise ValueError('UNKNOWN_FORCE_ENTITY: ' + f.entity)
         if f.end_s > timing.duration_s or any(abs(t/timing.timestep_s-round(t/timing.timestep_s)) > 1e-8 for t in (f.start_s, f.end_s)):
             raise ValueError('FORCE_WINDOW_MUST_BE_ON_TIMESTEP_GRID_WITHIN_DURATION')
     body = dict(physics_identity=physics.identity, assembly=a, initial=initial,

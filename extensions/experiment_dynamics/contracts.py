@@ -64,7 +64,7 @@ class Initial(Contract):
 
 class TimedForce(Contract):
     robot_id: Literal['robot'] = 'robot'
-    entity: str = Field(pattern=r'^segment_[0-7]$')
+    entity: str = Field(pattern=r'^[A-Za-z][A-Za-z0-9_]*$')
     point: Literal['center_of_mass'] = 'center_of_mass'
     frame: Literal['world'] = 'world'
     force_n: Vec3

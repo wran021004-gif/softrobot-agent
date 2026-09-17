@@ -1,0 +1,164 @@
+"""Existing platform lifecycle and evidence envelopes, independent engine execution."""
+import gzip
+import json
+import time
+import numpy as np
+from schemas.platform import BackendResult
+from tools.state_io import atomic_json
+from .compiler import resolve
+from .scene import assemble
+from .contracts import Initial, Data
+from .signals import export
+
+
+def physics_for(inp):
+    if inp.robot.structure.contract=='family.design': return resolve(inp.robot.structure.data)
+    if inp.robot.structure.contract=='domain.rod_design':
+        from .legacy import resolve_legacy
+        return resolve_legacy(inp.robot.structure.data)
+    raise ValueError('UNSUPPORTED_FAMILY_DESIGN_CONTRACT')
+
+
+class MatlabBackend:
+    backend_id='backend.matlab_spatial'
+    model='matlab_serial_bending_v1'
+
+    @classmethod
+    def check(cls,inp,parameters,control):
+        if parameters.model!=cls.model: raise ValueError('BACKEND_MODEL_IDENTITY_MISMATCH')
+        if cls.model=='mujoco_serial_bending_v1':
+            from .contracts import Parameters
+            defaults=Parameters()
+            if any(getattr(parameters,k)!=getattr(defaults,k) for k in ('max_step_s','rtol','atol','contact_stiffness_n_m','contact_damping_n_s_m')):
+                raise ValueError('MATLAB_ONLY_SOLVER_PARAMETERS: MuJoCo uses scene timestep and its recorded XML contact settings')
+        if inp.task.initializer.extension_id!='initialize.family': raise ValueError('NAMED_FAMILY_INITIALIZER_REQUIRED')
+        if inp.policy.controller.extension_id!='controller.family': raise ValueError('FAMILY_CONTROLLER_REQUIRED')
+        p=physics_for(inp); assemble(inp,p)
+        if set(control.commands)-{a['id'] for a in p['actuators']}: raise ValueError('UNKNOWN_CONTROL_ACTUATOR')
+
+    def compile(self,inp,reg):
+        start=time.perf_counter(); self.inp=inp
+        self.config=reg.parse(inp.policy.backend.parameters); self.physics=physics_for(inp)
+        self.scene=assemble(inp,self.physics); self.timings={'prepare_compile':time.perf_counter()-start}
+
+    def initialize(self,initial,controller):
+        if Initial.model_validate(initial.data).model_dump(mode='json')!=self.scene['initial']: raise ValueError('INITIAL_STATE_MISMATCH')
+        self.initial=initial; self.controller=controller
+        controller.configure(self.physics,self.scene['target_world_m'])
+
+    def run(self,folder,timeout_s):
+        self.folder=folder; folder.mkdir(parents=True,exist_ok=True)
+        for name,value in [('robot_description',self.inp.robot.structure.model_dump(mode='json')),('resolved_physics',self.physics),
+                           ('experiment_scene',self.scene),('solver_configuration',self.config.model_dump(mode='json'))]:
+            atomic_json(folder/(name+'.json'),value)
+        start=time.perf_counter()
+        rows,observations,complete,reason,steps=self.solve(timeout_s)
+        self.timings['backend_call']=time.perf_counter()-start
+        with gzip.open(folder/'trajectory.json.gz','wt',encoding='utf8') as stream: json.dump(rows,stream,allow_nan=False)
+        atomic_json(folder/'controller_observations.json',observations)
+        atomic_json(folder/'actual_commands.json',[dict(time_s=r['solver_time_s'],actuator_command=r['actuator_command'],target_lengths_m=r['command_m']) for r in rows])
+        from schemas.platform import Payload
+        data=Data(physics_identity=self.physics['identity'],scene_identity=self.scene['identity'],timings_s=self.timings,
+            numerical_steps=steps,reason=reason,applicability=self.physics['applicability'],exported_files=sorted(p.name for p in folder.iterdir()))
+        self.result=BackendResult(solver_status='completed' if complete else 'failed',backend_id=self.backend_id,model_id=self.model,
+            signals=export(rows,self.physics),data=Payload(contract='family.backend_data',data=data.model_dump(mode='json')),
+            limitations=[self.physics['applicability']['collision'],'Ideal length servos, tension only, slack gives zero tension; no motor inertia.',
+                'MATLAB lowest-envelope-vertex penalty and MuJoCo convex contact differ; no contact accuracy claim.'],initial_state=self.initial,seed=self.inp.seed)
+        atomic_json(folder/'result.json',self.result.model_dump(mode='json')); return self.result
+
+    def shared_input(self,timeout_s):
+        c=self.controller.parameters.model_dump(mode='json')
+        c['target_world_m']=self.scene['target_world_m']
+        c['command_vector']=[c['commands'].get(a['id'],0.) for a in self.physics['actuators']]
+        return dict(physics=self.physics,scene=self.scene,config=self.config.model_dump(mode='json'),control=c,timeout_s=timeout_s)
+
+    def solve(self,timeout_s):
+        from tools.matlab_tools import MatlabTools
+        shared=self.shared_input(timeout_s); atomic_json(self.folder/'matlab_input.json',shared)
+        start=time.perf_counter(); executor=MatlabTools(); self.timings['engine_start']=time.perf_counter()-start
+        try:
+            static=json.loads(executor.eng.tf_static(json.dumps(shared),nargout=1))
+            atomic_json(self.folder/'matlab_static.json',static)
+            raw=self.folder/'matlab_raw.json'
+            future=executor.eng.tf_run(json.dumps(shared),str(raw.resolve()),nargout=0,background=True)
+            try: future.result(timeout=timeout_s+30)
+            except Exception:
+                future.cancel(); raise
+            out=json.loads(raw.read_text(encoding='utf8')); self.timings['solve']=out['solve_s']
+            # MATLAB jsonencode represents a length-one numeric vector as scalar.
+            vector_fields=('qpos_rad','qvel_rad_s','actuator_command','command_m','tendon_length_m','target_lengths_m',
+                'solver_tendon_length_m','tension_n','solver_qfrc_actuator_nm','solver_qfrc_passive_nm','external_torque_nm','contact_normal_approx_n')
+            for row in out['trajectory']+out['observations']:
+                for key in vector_fields:
+                    if key in row and isinstance(row[key],(int,float)): row[key]=[row[key]]
+                if 'body_positions_m' in row and len(self.physics['parts'])==1:
+                    row['body_positions_m']=[row['body_positions_m']]
+                    row['body_rotations']=[row['body_rotations']]
+            return out['trajectory'],out['observations'],out['complete'],out['reason'] or None,out['numerical_steps']
+        finally: executor.close()
+
+    def export(self): return self.result
+
+    def close(self): pass
+
+
+class MujocoBackend(MatlabBackend):
+    backend_id='backend.family_mujoco'
+    model='mujoco_serial_bending_v1'
+
+    def solve(self,timeout_s):
+        import mujoco
+        from .mjcf import compile_xml
+        p,s=self.physics,self.scene
+        start=time.perf_counter(); path=self.folder/'robot.xml'
+        compile_xml(p,s,self.config,path); model=mujoco.MjModel.from_xml_path(str(path))
+        data=mujoco.MjData(model); pose=mujoco.MjData(model)
+        bids=[model.body(b['entity']).id for b in p['parts']]
+        # Tree serialization can reorder siblings; never assume array order.
+        jids=[model.joint(j).id for j in p['dofs']]; qi=model.jnt_qposadr[jids]; vi=model.jnt_dofadr[jids]
+        tids=[model.tendon(t['entity']).id for t in p['tendons']]
+        aids=[model.actuator(t['entity']+'_length_servo').id for t in p['tendons']]
+        data.qpos[qi]=s['qpos_rad']; data.qvel[vi]=s['qvel_rad_s']; mujoco.mj_forward(model,data)
+        atomic_json(self.folder/'compiled_physics.json',dict(physics_identity=p['identity'],body_ids=bids,qpos_indices=qi.tolist(),qvel_indices=vi.tolist(),
+            tendon_ids=tids,servo_ids=aids,actuator_entities=[a['id'] for a in p['actuators']],transmission=p['transmission'],
+            mass_kg=model.body_mass[bids].tolist(),com_local_m=model.body_ipos[bids].tolist(),
+            inertia_principal_kg_m2=model.body_inertia[bids].tolist(),inertia_quaternion_wxyz=model.body_iquat[bids].tolist(),
+            stiffness_nm_rad=model.jnt_stiffness[jids].tolist(),damping_nm_s_rad=model.dof_damping[vi].tolist()))
+        self.timings['engine_compile']=time.perf_counter()-start
+        rows=[]; steps=0; start=time.perf_counter(); dt=s['control_period_s']; substeps=round(dt/s['timestep_s'])
+        def current():
+            mujoco.mj_forward(model,data)
+            J=np.zeros((3,model.nv)); Jr=np.zeros_like(J); mujoco.mj_jacSite(model,data,J,Jr,model.site('tip_site').id)
+            # Dense Jacobian from the engine's current explicit tendon routing.
+            jac=np.zeros((model.ntendon,model.nv))
+            if data.ten_J.size==model.ntendon*model.nv: jac[:]=data.ten_J.reshape(model.ntendon,model.nv)
+            else:
+                for k in range(model.ntendon):
+                    adr=model.ten_J_rowadr[k]; nnz=model.ten_J_rownnz[k]
+                    jac[k,model.ten_J_colind[adr:adr+nnz]]=data.ten_J[adr:adr+nnz]
+            return dict(tip=data.site_xpos[model.site('tip_site').id].copy(),Jtip=J[:,vi],lengths=data.ten_length[tids].copy(),Jlength=jac[tids][:,vi])
+        complete=True; reason=None
+        for step in range(round(s['duration_s']/dt)):
+            if time.perf_counter()-start>timeout_s: complete=False; reason='MUJOCO_SOLVER_TIMEOUT'; break
+            t=step*dt; g=current()
+            target=self.controller.command(t,g,data.qpos[qi].copy(),data.qvel[vi].copy())
+            data.ctrl[aids]=target; data.xfrc_applied[:]=0; external=np.zeros(model.nv)
+            for f in s['forces']:
+                if f['start_s']<=t<f['end_s']:
+                    bid=bids[f['body']]; data.xfrc_applied[bid,:3]+=f['force_n']
+                    J=np.zeros((3,model.nv)); Jr=np.zeros_like(J); mujoco.mj_jacBodyCom(model,data,J,Jr,bid)
+                    external+=J.T@f['force_n']
+            mujoco.mj_forward(model,data)
+            before=dict(solver_tendon_length_m=data.ten_length[tids].tolist(),tension_n=(-data.actuator_force[aids]).tolist(),
+                solver_qfrc_actuator_nm=data.qfrc_actuator[vi].tolist(),solver_qfrc_passive_nm=data.qfrc_passive[vi].tolist(),external_torque_nm=external[vi].tolist())
+            for _ in range(substeps): mujoco.mj_step(model,data); steps+=1
+            if not np.isfinite(data.qpos).all() or data.warning[mujoco.mjtWarning.mjWARN_BADQACC].number:
+                complete=False; reason='MUJOCO_NUMERICAL_FAILURE'; break
+            mujoco.mj_forward(model,data)
+            routes=[[data.site_xpos[model.site(f"{td['entity']}_point_{j}").id].tolist() for j in range(len(td['points']))] for td in p['tendons']]
+            rows.append(dict(time_s=(step+1)*dt,solver_time_s=t,tip_m=data.site_xpos[model.site('tip_site').id].tolist(),
+                qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),actuator_command=self.controller.u.tolist(),command_m=target.tolist(),
+                tendon_length_m=data.ten_length[tids].tolist(),body_positions_m=data.xpos[bids].tolist(),
+                body_rotations=data.xmat[bids].reshape(-1,3,3).tolist(),tendon_routes_m=routes,**before))
+        self.timings['solve']=time.perf_counter()-start
+        return rows,self.controller.observations,complete,reason,steps

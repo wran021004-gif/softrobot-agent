@@ -1,5 +1,7 @@
 # 公共物理、独立数学模型与统一实验场景
 
+后续新增的真正 MATLAB 三维执行、多段家族设计与双后端贯通见 [tendon_family.md](tendon_family.md)。本文保留原单段模型的历史说明和身份。
+
 当前入口仍是 `python examples/workbench.py platform ...`。本轮基于 `fix/domain-signal-contracts` 的 `ca777786817a944e30b401b30b5e2f7889d87a57`，在 `feat/independent-spatial-dynamics` 实现；没有提交、推送或合并。原工作区干净，旧任务、历史数据、学习扩展和模型身份保留。
 
 主链路：`domain.rod_design → candidate.rod_design → RobotIR → ResolvedPhysics + Scene → backend.math_spatial / backend.scene_mujoco → BackendResult → signals.read / evaluation.run / diagnostics.sample_exceeds`。全部通过原 Host、ToolRequest、ToolReceipt、预算、EvidenceRef 和 ExportBundle；没有新增证据库或运行系统。

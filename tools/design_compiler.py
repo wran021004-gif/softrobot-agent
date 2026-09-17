@@ -8,6 +8,10 @@ CONTRACTS = ("coordinate_frames.md", "tendon_driven_pcc_v1.md", "tendon_length_m
 
 
 def build_robot_ir(design: DesignSpec) -> RobotIR:
+    from extensions.tendon_family.contracts import Design as FamilyDesign
+    if isinstance(design, FamilyDesign):
+        from extensions.tendon_family.compiler import resolve
+        return resolve(design)
     design = DesignSpec.model_validate(design)
     if design.exploration_physics is not None:
         return build_exploration_ir(design)

@@ -6,7 +6,7 @@ from schemas.platform import EvidenceRef, MemoryEntry, WorkOrder
 
 class Simulate(Contract):
     candidate_id: str = 'baseline'
-    changes: dict[str, float] = Field(default_factory=dict)
+    changes: dict[str, object] = Field(default_factory=dict)
 
 
 class Evaluate(Contract):

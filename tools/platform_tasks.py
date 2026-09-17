@@ -71,10 +71,10 @@ def compile_input(value, reg=None):
         from schemas.platform import Binding, Payload
         default_builder = Binding(extension_id='candidate.controller', parameters=Payload(contract='platform.empty', data={}))
         inp = inp.model_copy(update={'policy': inp.policy.model_copy(update={'candidate_builder': default_builder})})
-    builder, _ = reg.bind(inp.policy.candidate_builder, 'candidate_builder')
+    builder, builder_params = reg.bind(inp.policy.candidate_builder, 'candidate_builder')
     editable = builder.capabilities.get('editable', controller.capabilities.get('editable', []))
     for key, limits in inp.policy.editable.items():
-        if key not in editable:
+        if key not in editable and not (builder.hook('authorize_changes') and key in getattr(builder_params, 'parameters', {})):
             raise ValueError('PARAMETER_NOT_EDITABLE: ' + key)
         if limits[0] >= limits[1]:
             raise ValueError('INVALID_PARAMETER_BOUNDS: ' + key)

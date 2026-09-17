@@ -323,3 +323,7 @@ source/hash index, and contract identity in run.json/provenance.json. FROZEN mea
 Agents cannot silently change task truth; Human can approve an explicit new version.
 See [TaskContract and source map](docs/task_contract.md) and
 [Round 3 Stage 0 results](docs/round3_stage0_result.md).
+
+## MATLAB 三维与绳驱家族开发入口
+
+新增串联多段、非圆截面、逐根绳路、共享执行器与结构候选，保留旧入口。使用 `python examples/workbench.py platform tendon-family --help`；完整示例、支持范围及实际验证见 [docs/tendon_family.md](docs/tendon_family.md)。

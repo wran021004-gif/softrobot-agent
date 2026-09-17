@@ -20,13 +20,18 @@ def simulation_preflight(inp, arguments, reg):
 
 
 def _candidate(inp, changes, reg):
+    builder, parameters = reg.bind(inp.policy.candidate_builder, 'candidate_builder')
+    authorize = builder.hook('authorize_changes')
+    if authorize:
+        authorize(inp, parameters, changes)
     for key, value in changes.items():
+        if authorize:
+            continue
         if key not in inp.policy.editable:
             raise ValueError('PARAMETER_NOT_AUTHORIZED: ' + key)
         lo, hi = inp.policy.editable[key]
-        if not math.isfinite(value) or not lo <= value <= hi:
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not lo <= value <= hi:
             raise ValueError('PARAMETER_OUT_OF_BOUNDS: ' + key)
-    builder, parameters = reg.bind(inp.policy.candidate_builder, 'candidate_builder')
     candidate = SessionInput.model_validate(builder.resolve()(inp.model_copy(deep=True), parameters, changes))
     # Builder may alter robot and controller inputs only; scientific definition stays fixed.
     before, after = plain(inp), plain(candidate)

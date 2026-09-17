@@ -366,7 +366,7 @@ class CandidateInput(Contract):
     baseline_identity: str
     builder: str
     builder_version: str
-    changes: dict[str, float]
+    changes: dict[str, object]
     allowed: dict[str, tuple[float, float]]
     effective: SessionInput
     content_identity: str

@@ -1,0 +1,192 @@
+"""SI family description. Reserved topology types are descriptive, never executable."""
+from typing import Literal, Annotated
+from pydantic import Field, model_validator
+from schemas.common import Contract
+from schemas.environment_spec import Vec3
+from extensions.experiment_dynamics.contracts import Matrix3, Mount
+
+Name = Annotated[str, Field(pattern=r'^[A-Za-z][A-Za-z0-9_]*$')]
+
+
+class Section(Contract):
+    kind: Literal['circle', 'tube', 'ellipse', 'rectangle', 'polygon']
+    parameters: dict[str, float] = Field(default_factory=dict)
+    outer_yz_m: list[tuple[float, float]] = Field(default_factory=list)
+    holes_yz_m: list[list[tuple[float, float]]] = Field(default_factory=list)
+    angle_rad: float = 0.
+
+
+class Station(Contract):
+    s: float = Field(ge=0, le=1)
+    section: Section
+
+
+class PhysicalInput(Contract):
+    mode: Literal['material', 'equivalent']
+    density_kg_m3: float | None = Field(default=None, gt=0)
+    young_pa: float | None = Field(default=None, gt=0)
+    line_density_kg_m: float | None = Field(default=None, gt=0)
+    bending_ei_nm2: tuple[float, float] | None = None
+    bending_viscosity_nm2_s: tuple[float, float] = (0., 0.)
+
+    @model_validator(mode='after')
+    def authority(self):
+        if self.mode == 'material':
+            if self.density_kg_m3 is None or self.young_pa is None or self.line_density_kg_m is not None or self.bending_ei_nm2 is not None:
+                raise ValueError('MATERIAL_AUTHORITY: density and Young modulus only')
+        elif self.line_density_kg_m is None or self.bending_ei_nm2 is None or self.density_kg_m3 is not None or self.young_pa is not None:
+            raise ValueError('EQUIVALENT_AUTHORITY: line density and principal bending EI only')
+        if any(x < 0 for x in self.bending_viscosity_nm2_s) or (self.bending_ei_nm2 and min(self.bending_ei_nm2) <= 0):
+            raise ValueError('INVALID_BENDING_PARAMETERS')
+        return self
+
+
+class Attachment(Contract):
+    part: Name = 'fixed_base'
+    s: float = Field(default=0., ge=0, le=1)
+    position_m: Vec3 = (0., 0., 0.)
+    quaternion_wxyz: tuple[float, float, float, float] = (1., 0., 0., 0.)
+
+    @model_validator(mode='after')
+    def quaternion(self):
+        Mount(quaternion_wxyz=self.quaternion_wxyz)
+        return self
+
+
+class Segment(Contract):
+    id: Name
+    kind: Literal['flexible_segment'] = 'flexible_segment'
+    connection: Attachment = Field(default_factory=Attachment)
+    length_m: float = Field(gt=0)
+    cells: int = Field(gt=0, strict=True)
+    sections: list[Station] = Field(min_length=1)
+    interpolation: Literal['linear', 'step'] = 'step'
+    physics: PhysicalInput
+    natural_curvature_rad_m: tuple[float, float] = (0., 0.)
+
+
+class Rigid(Contract):
+    id: Name
+    kind: Literal['rigid_connector', 'guide', 'payload']
+    connection: Attachment
+    mass_kg: float = Field(gt=0)
+    com_local_m: Vec3 = (0., 0., 0.)
+    inertia_com_local_kg_m2: Matrix3
+    # A separate physical/visual envelope; guide holes do not alter supplied inertia.
+    envelope_halfsize_m: Vec3
+    guide_holes: dict[str, Vec3] = Field(default_factory=dict)
+    hole_radius_m: float = Field(default=0., ge=0)
+
+
+class Reserved(Contract):
+    id: Name
+    kind: Literal['discrete_flexure', 'rigid_tendon_joint', 'branch', 'closed_chain', 'cable_parallel']
+    description: str
+    attachments: list[Attachment] = Field(default_factory=list)
+    status: Literal['descriptive_only'] = 'descriptive_only'
+
+
+class RoutePoint(Contract):
+    attachment: Attachment
+    hole: str | None = None
+    role: Literal['start', 'guide', 'anchor']
+
+
+class Tendon(Contract):
+    id: Name
+    points: list[RoutePoint] = Field(min_length=2)
+    diameter_m: float = Field(gt=0)
+    model: Literal['straight_frictionless'] = 'straight_frictionless'
+    length_servo_gain_n_m: float = Field(gt=0)
+    pretension_n: float = Field(default=0., ge=0)
+    force_limit_n: float = Field(gt=0)
+
+
+class Transmission(Contract):
+    tendon: Name
+    ratio: float  # metres payout / command unit; sign is winding direction
+
+
+class Actuator(Contract):
+    id: Name
+    command_type: Literal['displacement', 'rotation'] = 'displacement'
+    units: Literal['m', 'rad'] = 'm'
+    drum_radius_m: float | None = Field(default=None, gt=0)
+    transmission: list[Transmission] = Field(min_length=1)
+    limits: tuple[float, float]
+    velocity_limit: float = Field(gt=0)
+
+    @model_validator(mode='after')
+    def consistency(self):
+        if self.limits[0] >= self.limits[1] or not self.limits[0] <= 0 <= self.limits[1]:
+            raise ValueError('ACTUATOR_LIMITS_MUST_CONTAIN_ZERO')
+        if (self.command_type == 'rotation') != (self.units == 'rad') or (self.command_type == 'rotation') != (self.drum_radius_m is not None):
+            raise ValueError('ROTATION_REQUIRES_RAD_AND_DRUM_RADIUS')
+        if any(t.ratio == 0 for t in self.transmission):
+            raise ValueError('ZERO_TRANSMISSION')
+        return self
+
+
+class Design(Contract):
+    version: Literal['tendon_family_v1'] = 'tendon_family_v1'
+    id: Name
+    components: list[Annotated[Segment | Rigid | Reserved, Field(discriminator='kind')]] = Field(min_length=1)
+    tendons: list[Tendon] = Field(min_length=1)
+    actuators: list[Actuator] = Field(min_length=1)
+    tip: Attachment
+    metadata: dict = Field(default_factory=dict, description='Descriptive only; no hidden physical parameters')
+
+
+class Initial(Contract):
+    qpos_rad: dict[str, float] = Field(default_factory=dict)
+    qvel_rad_s: dict[str, float] = Field(default_factory=dict)
+    unspecified: Literal['zero'] = 'zero'
+
+
+class Control(Contract):
+    mode: Literal['deterministic', 'tip_feedback'] = 'tip_feedback'
+    commands: dict[str, float] = Field(default_factory=dict)
+    ramp_s: float = Field(default=.1, gt=0)
+    feedback_gain: float = Field(default=1., gt=0)
+    damping: float = Field(default=.01, gt=0)
+    max_joint_update_rad: float = Field(default=.02, gt=0)
+
+
+class Parameters(Contract):
+    model: Literal['matlab_serial_bending_v1', 'mujoco_serial_bending_v1'] = 'matlab_serial_bending_v1'
+    max_step_s: float = Field(default=.001, gt=0, description='MATLAB only; MuJoCo uses scene timestep_s')
+    rtol: float = Field(default=1e-5, gt=0, description='MATLAB ode15s only')
+    atol: float = Field(default=1e-7, gt=0, description='MATLAB ode15s only')
+    contact_stiffness_n_m: float = Field(default=5000., gt=0, description='MATLAB penalty only; MuJoCo contact is recorded in XML')
+    contact_damping_n_s_m: float = Field(default=5., ge=0, description='MATLAB penalty only')
+
+
+class Data(Contract):
+    physics_identity: str
+    scene_identity: str
+    timings_s: dict[str, float]
+    numerical_steps: int
+    reason: str | None = None
+    applicability: dict
+    exported_files: list[str]
+
+
+class Space(Contract):
+    # Exact paths or full-design options, carried by frozen candidate binding.
+    parameters: dict[str, dict] = Field(default_factory=dict)
+    templates: dict[str, Design] = Field(default_factory=dict)
+
+
+class BuildRequest(Contract):
+    baseline: Design
+    space: Space
+    changes: dict = Field(default_factory=dict)
+
+
+class BuildResult(Contract):
+    status: Literal['valid', 'physically_invalid', 'backend_unsupported']
+    candidate: Design | None = None
+    summary: list[dict] = Field(default_factory=list)
+    resolved_physics: dict | None = None
+    applicability: dict = Field(default_factory=dict)
+    reason: str | None = None

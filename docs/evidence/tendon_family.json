@@ -1,0 +1,857 @@
+{
+  "branch": "feat/independent-spatial-dynamics",
+  "baseline": "6b2d9dd6f2c08d6cededbbf1b73b864335806c1d",
+  "actual_complete_solves": 3,
+  "platform_charged_backend_solves": 4,
+  "startup_failure": {
+    "contract_version": "1.2.0",
+    "request_id": "family-simulation",
+    "execution_id": "91202002feda41c886a5469e5f6f66d7",
+    "caller": "local-human",
+    "tool_id": "simulation.run",
+    "tool_version": "1.0.0",
+    "result_contract": null,
+    "result_version": "1.0.0",
+    "execution_status": "failed",
+    "solver_status": "not_run",
+    "analysis_status": "not_assessed",
+    "task_success": null,
+    "output": null,
+    "error": "MATLAB_STARTUP_FAILED: Unable to launch Simple server: Unable to launch C:\\Program Files\\MATLAB\\R2024a\\bin\\win64\\MATLAB.exe\nbecause: CreateFile failed: 拒绝访问。",
+    "cache_hit": false,
+    "original_execution_id": null,
+    "charged": {
+      "tool_calls": 1,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 0.375
+    }
+  },
+  "runtime_records": {
+    "single_permitted": {
+      "backend": "single",
+      "run_id": "family-single_permitted",
+      "receipts": {
+        "simulation": {
+          "contract_version": "1.2.0",
+          "request_id": "family-simulation",
+          "execution_id": "9990f37e594e40798941e0283330de86",
+          "caller": "local-human",
+          "tool_id": "simulation.run",
+          "tool_version": "1.0.0",
+          "result_contract": "BackendResult",
+          "result_version": "1.0.0",
+          "execution_status": "completed",
+          "solver_status": "completed",
+          "analysis_status": "not_assessed",
+          "task_success": null,
+          "output": {
+            "artifact_id": "04cf5427109dbe65bcbe76002edbf84a94d34d84507b1d08f76e39808373130d",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": "9990f37e594e40798941e0283330de86",
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 1,
+            "worker_calls": 0,
+            "wall_s": 10.40700000000652
+          }
+        },
+        "evaluation": {
+          "contract_version": "1.2.0",
+          "request_id": "family-evaluation",
+          "execution_id": "cfedf4b4eb2945849786c09c71672562",
+          "caller": "local-human",
+          "tool_id": "evaluation.run",
+          "tool_version": "1.0.0",
+          "result_contract": "EvaluationResult",
+          "result_version": "1.2.0",
+          "execution_status": "completed",
+          "solver_status": "not_run",
+          "analysis_status": "valid",
+          "task_success": false,
+          "output": {
+            "artifact_id": "a9c88e49b17b92f36bb61d8483de66a67b9d782b2d3247fe83f4ec58044e14ea",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": null,
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 0.3589999999385327
+          }
+        },
+        "tip": {
+          "contract_version": "1.2.0",
+          "request_id": "family-tip",
+          "execution_id": "73448f9ff30043c79a9cb373e7e78e78",
+          "caller": "local-human",
+          "tool_id": "signals.read",
+          "tool_version": "1.0.0",
+          "result_contract": "SelectedSignal",
+          "result_version": "1.0.0",
+          "execution_status": "completed",
+          "solver_status": "not_run",
+          "analysis_status": "not_assessed",
+          "task_success": null,
+          "output": {
+            "artifact_id": "cdb333bd7c748acafa9e0250f0125737020a532a47aca53d97d1083c9fcb75e5",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": null,
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 0.3119999999180436
+          }
+        },
+        "tension": {
+          "contract_version": "1.2.0",
+          "request_id": "family-tension",
+          "execution_id": "344cbbe5543548afaf56c11d3324d0b9",
+          "caller": "local-human",
+          "tool_id": "signals.read",
+          "tool_version": "1.0.0",
+          "result_contract": "SelectedSignal",
+          "result_version": "1.0.0",
+          "execution_status": "completed",
+          "solver_status": "not_run",
+          "analysis_status": "not_assessed",
+          "task_success": null,
+          "output": {
+            "artifact_id": "30ead8cc71a142f3d9bfd70a5deffc6bd4d3f946577f85985ddc04aa9f3b4a59",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": null,
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 0.2970000000204891
+          }
+        }
+      },
+      "evaluation": {
+        "candidate_id": "legacy-single",
+        "comparison_identity": "2bccc0c5d71989bbfd47d8c57429dfdbf1626cee23b0959d60ba0af5aa2480f2",
+        "constraints": [
+          {
+            "limit": 0.01,
+            "name": "task_bound",
+            "observed": 0.060925032893123975,
+            "satisfied": false,
+            "units": "m"
+          }
+        ],
+        "contract_version": "1.2.0",
+        "evaluator": "evaluate.reach",
+        "evaluator_version": "1.0.0",
+        "metrics": [
+          {
+            "name": "position_error",
+            "units": "m",
+            "value": 0.060925032893123975
+          }
+        ],
+        "original_execution_id": "9990f37e594e40798941e0283330de86",
+        "reason": null,
+        "source": {
+          "artifact_id": "04cf5427109dbe65bcbe76002edbf84a94d34d84507b1d08f76e39808373130d",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "9990f37e594e40798941e0283330de86",
+        "task_success": false,
+        "validity": "valid"
+      },
+      "usage": {
+        "tool_calls": 4,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 11.374999999883585
+      },
+      "result_data": {
+        "applicability": {
+          "backends": [
+            "backend.matlab_spatial",
+            "backend.family_mujoco"
+          ],
+          "collision": "polygonal cylinder approximation",
+          "compilable": true,
+          "omitted": [
+            "axial stretch",
+            "shear",
+            "material torsion",
+            "friction"
+          ],
+          "physics": "legacy rod adapted to serial bending"
+        },
+        "exported_files": [
+          "actual_commands.json",
+          "controller_observations.json",
+          "experiment_scene.json",
+          "matlab_input.json",
+          "matlab_raw.json",
+          "matlab_static.json",
+          "resolved_physics.json",
+          "robot_description.json",
+          "solver_configuration.json",
+          "trajectory.json.gz"
+        ],
+        "numerical_steps": 427,
+        "physics_identity": "557e28a6ad984eb1a7614057f9528e459fdd8c20ba510cb3e1f6b87c3b8163b5",
+        "reason": null,
+        "scene_identity": "61413e51068e1476d9372196319f1068a21fcb521939baf94f5300923ea2eba8",
+        "timings_s": {
+          "backend_call": 10.124724499997683,
+          "engine_start": 9.282191800069995,
+          "prepare_compile": 0.003357900073751807,
+          "solve": 0.6352331
+        }
+      },
+      "saved_folder": "D:\\softrobot-agent\\runs\\tendon_family_20260917\\saved\\single_permitted"
+    },
+    "matlab_spatial": {
+      "backend": "matlab_spatial",
+      "run_id": "family-matlab_spatial",
+      "receipts": {
+        "simulation": {
+          "contract_version": "1.2.0",
+          "request_id": "family-simulation",
+          "execution_id": "ad431a73e2ff405a8208bdb8cd7770e3",
+          "caller": "local-human",
+          "tool_id": "simulation.run",
+          "tool_version": "1.0.0",
+          "result_contract": "BackendResult",
+          "result_version": "1.0.0",
+          "execution_status": "completed",
+          "solver_status": "completed",
+          "analysis_status": "not_assessed",
+          "task_success": null,
+          "output": {
+            "artifact_id": "a9660e8fb1e3c1e57a2270af4897444d0e7e595a73d60089df92d1f81dfb30a5",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": "ad431a73e2ff405a8208bdb8cd7770e3",
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 1,
+            "worker_calls": 0,
+            "wall_s": 9.579000000027008
+          }
+        },
+        "evaluation": {
+          "contract_version": "1.2.0",
+          "request_id": "family-evaluation",
+          "execution_id": "f470eb34d8bb41989cdbb6e5a6ab7a54",
+          "caller": "local-human",
+          "tool_id": "evaluation.run",
+          "tool_version": "1.0.0",
+          "result_contract": "EvaluationResult",
+          "result_version": "1.2.0",
+          "execution_status": "completed",
+          "solver_status": "not_run",
+          "analysis_status": "valid",
+          "task_success": false,
+          "output": {
+            "artifact_id": "8a4cffa020a17ae04ce59a02ddaeb042c4bd17250c9581908355c5f57513b6c1",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": null,
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 0.4220000000204891
+          }
+        },
+        "tip": {
+          "contract_version": "1.2.0",
+          "request_id": "family-tip",
+          "execution_id": "247bb2ffea7d4252b4651095a8258938",
+          "caller": "local-human",
+          "tool_id": "signals.read",
+          "tool_version": "1.0.0",
+          "result_contract": "SelectedSignal",
+          "result_version": "1.0.0",
+          "execution_status": "completed",
+          "solver_status": "not_run",
+          "analysis_status": "not_assessed",
+          "task_success": null,
+          "output": {
+            "artifact_id": "f4e6905abd9d893e1f353e496586bbd29ce16bd9d83a726139735246f47e5ade",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": null,
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 0.3589999999385327
+          }
+        },
+        "tension": {
+          "contract_version": "1.2.0",
+          "request_id": "family-tension",
+          "execution_id": "a79139ac1a9c48dcb5c10b1c445ac8d0",
+          "caller": "local-human",
+          "tool_id": "signals.read",
+          "tool_version": "1.0.0",
+          "result_contract": "SelectedSignal",
+          "result_version": "1.0.0",
+          "execution_status": "completed",
+          "solver_status": "not_run",
+          "analysis_status": "not_assessed",
+          "task_success": null,
+          "output": {
+            "artifact_id": "e84acc8d21da618ec9242d5999fb0cf8f143ea00b063e6fa2f7dd690a8236adc",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": null,
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 0.39099999994505197
+          }
+        }
+      },
+      "evaluation": {
+        "candidate_id": "continuous",
+        "comparison_identity": "e713402ea887c722b86fd00249a50a1a6cc3df6b8f5f22cb31c93223c045ee08",
+        "constraints": [
+          {
+            "limit": 0.01,
+            "name": "task_bound",
+            "observed": 0.03159087026891312,
+            "satisfied": false,
+            "units": "m"
+          }
+        ],
+        "contract_version": "1.2.0",
+        "evaluator": "evaluate.reach",
+        "evaluator_version": "1.0.0",
+        "metrics": [
+          {
+            "name": "position_error",
+            "units": "m",
+            "value": 0.03159087026891312
+          }
+        ],
+        "original_execution_id": "ad431a73e2ff405a8208bdb8cd7770e3",
+        "reason": null,
+        "source": {
+          "artifact_id": "a9660e8fb1e3c1e57a2270af4897444d0e7e595a73d60089df92d1f81dfb30a5",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "ad431a73e2ff405a8208bdb8cd7770e3",
+        "task_success": false,
+        "validity": "valid"
+      },
+      "usage": {
+        "tool_calls": 4,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 10.750999999931082
+      },
+      "result_data": {
+        "applicability": {
+          "backends": [
+            "backend.matlab_spatial",
+            "backend.family_mujoco"
+          ],
+          "collision": "section convex hull extrusions; holes filled for collision only; exact polygon/circular area moments; guide box envelope",
+          "compilable": true,
+          "omitted": [
+            "axial stretch",
+            "shear",
+            "material torsion",
+            "friction",
+            "elastic rope",
+            "motor dynamics",
+            "self collision"
+          ],
+          "physics": "serial rigid cells with two principal bending hinges; fixed rigid attachments; straight frictionless tendons"
+        },
+        "exported_files": [
+          "actual_commands.json",
+          "controller_observations.json",
+          "experiment_scene.json",
+          "matlab_input.json",
+          "matlab_raw.json",
+          "matlab_static.json",
+          "resolved_physics.json",
+          "robot_description.json",
+          "solver_configuration.json",
+          "trajectory.json.gz"
+        ],
+        "numerical_steps": 2788,
+        "physics_identity": "1bd300a94fa7c57be1fa2a3fc097bd29554414805a06a7a29ac2c0a19454f9d1",
+        "reason": null,
+        "scene_identity": "e9f376b31dc84bfe417f971a421b07bf6a6784bd58f0e72d127665f01583cc28",
+        "timings_s": {
+          "backend_call": 9.159563299966976,
+          "engine_start": 6.926682000048459,
+          "prepare_compile": 0.004459799965843558,
+          "solve": 2.0453097
+        }
+      },
+      "saved_folder": "D:\\softrobot-agent\\runs\\tendon_family_20260917\\saved\\matlab_spatial"
+    },
+    "family_mujoco": {
+      "backend": "family_mujoco",
+      "run_id": "family-family_mujoco",
+      "receipts": {
+        "simulation": {
+          "contract_version": "1.2.0",
+          "request_id": "family-simulation",
+          "execution_id": "a747047a78464dcab2328853522ef91d",
+          "caller": "local-human",
+          "tool_id": "simulation.run",
+          "tool_version": "1.0.0",
+          "result_contract": "BackendResult",
+          "result_version": "1.0.0",
+          "execution_status": "completed",
+          "solver_status": "completed",
+          "analysis_status": "not_assessed",
+          "task_success": null,
+          "output": {
+            "artifact_id": "fa22fbe4157ded04b3631e753cef620220bf6bbc8da67319616e7363cbf30d27",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": "a747047a78464dcab2328853522ef91d",
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 1,
+            "worker_calls": 0,
+            "wall_s": 0.6719999999040738
+          }
+        },
+        "evaluation": {
+          "contract_version": "1.2.0",
+          "request_id": "family-evaluation",
+          "execution_id": "ba8d9600fba2483cb1735d67bd21bba2",
+          "caller": "local-human",
+          "tool_id": "evaluation.run",
+          "tool_version": "1.0.0",
+          "result_contract": "EvaluationResult",
+          "result_version": "1.2.0",
+          "execution_status": "completed",
+          "solver_status": "not_run",
+          "analysis_status": "valid",
+          "task_success": false,
+          "output": {
+            "artifact_id": "d5ed0b5fed8ab261f192904beb610e11b01414e8b91ac96b8c2549aef071f193",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": null,
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 0.25
+          }
+        },
+        "tip": {
+          "contract_version": "1.2.0",
+          "request_id": "family-tip",
+          "execution_id": "4c16c3f9e89a427eae39b020081ebaa8",
+          "caller": "local-human",
+          "tool_id": "signals.read",
+          "tool_version": "1.0.0",
+          "result_contract": "SelectedSignal",
+          "result_version": "1.0.0",
+          "execution_status": "completed",
+          "solver_status": "not_run",
+          "analysis_status": "not_assessed",
+          "task_success": null,
+          "output": {
+            "artifact_id": "2be36255b449d62dd933328f04f99e5ebc4e46335cb2c02dcc45a57786a5c0c9",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": null,
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 0.25
+          }
+        },
+        "tension": {
+          "contract_version": "1.2.0",
+          "request_id": "family-tension",
+          "execution_id": "6d136ea84720405bb8c2ac76c2191eeb",
+          "caller": "local-human",
+          "tool_id": "signals.read",
+          "tool_version": "1.0.0",
+          "result_contract": "SelectedSignal",
+          "result_version": "1.0.0",
+          "execution_status": "completed",
+          "solver_status": "not_run",
+          "analysis_status": "not_assessed",
+          "task_success": null,
+          "output": {
+            "artifact_id": "5065de8f4982be7306d4f8303c50583294326b980fcf1d5a3653430116424fee",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": null,
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 0.21799999999348074
+          }
+        }
+      },
+      "evaluation": {
+        "candidate_id": "continuous",
+        "comparison_identity": "06dbf462acd1584d4acbca2c97851b16db1f61888863ce3ad67b9df1398f04dc",
+        "constraints": [
+          {
+            "limit": 0.01,
+            "name": "task_bound",
+            "observed": 0.031546050445039026,
+            "satisfied": false,
+            "units": "m"
+          }
+        ],
+        "contract_version": "1.2.0",
+        "evaluator": "evaluate.reach",
+        "evaluator_version": "1.0.0",
+        "metrics": [
+          {
+            "name": "position_error",
+            "units": "m",
+            "value": 0.031546050445039026
+          }
+        ],
+        "original_execution_id": "a747047a78464dcab2328853522ef91d",
+        "reason": null,
+        "source": {
+          "artifact_id": "fa22fbe4157ded04b3631e753cef620220bf6bbc8da67319616e7363cbf30d27",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "a747047a78464dcab2328853522ef91d",
+        "task_success": false,
+        "validity": "valid"
+      },
+      "usage": {
+        "tool_calls": 4,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 1.3899999998975545
+      },
+      "result_data": {
+        "applicability": {
+          "backends": [
+            "backend.matlab_spatial",
+            "backend.family_mujoco"
+          ],
+          "collision": "section convex hull extrusions; holes filled for collision only; exact polygon/circular area moments; guide box envelope",
+          "compilable": true,
+          "omitted": [
+            "axial stretch",
+            "shear",
+            "material torsion",
+            "friction",
+            "elastic rope",
+            "motor dynamics",
+            "self collision"
+          ],
+          "physics": "serial rigid cells with two principal bending hinges; fixed rigid attachments; straight frictionless tendons"
+        },
+        "exported_files": [
+          "actual_commands.json",
+          "compiled_physics.json",
+          "controller_observations.json",
+          "experiment_scene.json",
+          "resolved_physics.json",
+          "robot.xml",
+          "robot_description.json",
+          "solver_configuration.json",
+          "trajectory.json.gz"
+        ],
+        "numerical_steps": 700,
+        "physics_identity": "1bd300a94fa7c57be1fa2a3fc097bd29554414805a06a7a29ac2c0a19454f9d1",
+        "reason": null,
+        "scene_identity": "e9f376b31dc84bfe417f971a421b07bf6a6784bd58f0e72d127665f01583cc28",
+        "timings_s": {
+          "backend_call": 0.3078368999995291,
+          "engine_compile": 0.020069700083695352,
+          "prepare_compile": 0.004212199943140149,
+          "solve": 0.01182139990851283
+        }
+      },
+      "saved_folder": "D:\\softrobot-agent\\runs\\tendon_family_20260917\\saved\\family_mujoco"
+    }
+  },
+  "candidate_checks": {
+    "continuous": {
+      "dofs": 10,
+      "tendons": 6,
+      "actuators": 6,
+      "mass_kg": 0.07757497609770331
+    },
+    "structural": {
+      "dofs": 12,
+      "tendons": 6,
+      "actuators": 6,
+      "mass_kg": 0.07823397693145537
+    },
+    "prepare_compile_s": 1.1416709000477567
+  },
+  "static_checks": {
+    "sections": {
+      "polygon_with_offset_hole_area_m2": 0.00112,
+      "centroid_yz_m": [
+        -0.00028571428571428574,
+        -0.00014285714285714287
+      ],
+      "rotated_rectangle_axes_swapped": true,
+      "torsion_constant_not_claimed": true
+    },
+    "complete_dynamics_solves": 0,
+    "continuous": {
+      "jacobian_directional_error": 6.755596290708432e-10,
+      "dofs": 10,
+      "actuators": 6,
+      "full_inertia_consumed": true,
+      "matlab_mass_max_error": 1.9394479511963825e-15,
+      "matlab_bias_gravity_max_error": 2.7755575615628914e-17
+    },
+    "structural": {
+      "jacobian_directional_error": 1.6778075283274685e-10,
+      "dofs": 12,
+      "actuators": 6,
+      "full_inertia_consumed": true,
+      "matlab_mass_max_error": 1.0822912661564987e-15,
+      "matlab_bias_gravity_max_error": 4.163336342344337e-17
+    },
+    "shared": {
+      "jacobian_directional_error": 7.227360203365674e-11,
+      "dofs": 4,
+      "actuators": 1,
+      "full_inertia_consumed": true,
+      "matlab_mass_max_error": 1.2197274440461925e-19,
+      "matlab_bias_gravity_max_error": 3.469446951953614e-18
+    },
+    "legacy_entries": "math_spatial and math_planar compile_input passed; no extra solve",
+    "matlab_saved_figure": "native Figure exported from saved states; zero solve"
+  },
+  "saved_checks": {
+    "extra_backend_solves": 0,
+    "records": {
+      "single_permitted": {
+        "samples": 4,
+        "q_y_change_norm_rad": 0.03414883405434718,
+        "q_z_change_norm_rad": 0.005114518496289895,
+        "max_tension_n": 0.8984520524961681,
+        "active_force_times_s": [],
+        "final_tip_m": [
+          0.2998389144907194,
+          0.0006546555099097658,
+          0.14064969395708293
+        ],
+        "initial_target_error_m": 0.05408326913195985,
+        "final_target_error_m": 0.060925032893123975
+      },
+      "matlab_spatial": {
+        "samples": 35,
+        "q_y_change_norm_rad": 0.22578032777437176,
+        "q_z_change_norm_rad": 0.1787874916598155,
+        "max_tension_n": 3.3762014272360004,
+        "active_force_times_s": [
+          0.12,
+          0.13,
+          0.14,
+          0.15,
+          0.16,
+          0.17,
+          0.18,
+          0.19
+        ],
+        "final_tip_m": [
+          0.31174825790982386,
+          0.026905981576161704,
+          0.16856444010552446
+        ],
+        "initial_target_error_m": 0.0600749531835024,
+        "final_target_error_m": 0.03159087026891312
+      },
+      "family_mujoco": {
+        "samples": 35,
+        "q_y_change_norm_rad": 0.22555787010915523,
+        "q_z_change_norm_rad": 0.17905835425276784,
+        "max_tension_n": 3.3783218022252584,
+        "active_force_times_s": [
+          0.12,
+          0.13,
+          0.14,
+          0.15,
+          0.16,
+          0.17,
+          0.18,
+          0.19
+        ],
+        "final_tip_m": [
+          0.3117422250375312,
+          0.026928001436010235,
+          0.1686160857586539
+        ],
+        "initial_target_error_m": 0.0600749531835024,
+        "final_target_error_m": 0.031546050445039026
+      }
+    },
+    "legacy_python_static_match": true,
+    "mujoco_saved_render": "actual saved XML and qpos; mj_forward/render only, no mj_step"
+  },
+  "comparison": {
+    "meaning": "Independent backends, shared physical entities and sample clocks; no ground-truth or calibration claim",
+    "tip_final_difference_m": 5.646718748984997e-05,
+    "tip_rms_difference_m": 7.417064623559847e-05,
+    "length_max_difference_m": 1.3687954414087766e-05,
+    "tension_max_difference_n": 0.009016236192710192,
+    "records": [
+      {
+        "backend": "matlab_spatial",
+        "timings": {
+          "backend_call": 9.159563299966976,
+          "engine_start": 6.926682000048459,
+          "prepare_compile": 0.004459799965843558,
+          "solve": 2.0453097
+        },
+        "evaluation": {
+          "candidate_id": "continuous",
+          "comparison_identity": "e713402ea887c722b86fd00249a50a1a6cc3df6b8f5f22cb31c93223c045ee08",
+          "constraints": [
+            {
+              "limit": 0.01,
+              "name": "task_bound",
+              "observed": 0.03159087026891312,
+              "satisfied": false,
+              "units": "m"
+            }
+          ],
+          "contract_version": "1.2.0",
+          "evaluator": "evaluate.reach",
+          "evaluator_version": "1.0.0",
+          "metrics": [
+            {
+              "name": "position_error",
+              "units": "m",
+              "value": 0.03159087026891312
+            }
+          ],
+          "original_execution_id": "ad431a73e2ff405a8208bdb8cd7770e3",
+          "reason": null,
+          "source": {
+            "artifact_id": "a9660e8fb1e3c1e57a2270af4897444d0e7e595a73d60089df92d1f81dfb30a5",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "ad431a73e2ff405a8208bdb8cd7770e3",
+          "task_success": false,
+          "validity": "valid"
+        },
+        "usage": {
+          "tool_calls": 4,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 10.750999999931082
+        }
+      },
+      {
+        "backend": "family_mujoco",
+        "timings": {
+          "backend_call": 0.3078368999995291,
+          "engine_compile": 0.020069700083695352,
+          "prepare_compile": 0.004212199943140149,
+          "solve": 0.01182139990851283
+        },
+        "evaluation": {
+          "candidate_id": "continuous",
+          "comparison_identity": "06dbf462acd1584d4acbca2c97851b16db1f61888863ce3ad67b9df1398f04dc",
+          "constraints": [
+            {
+              "limit": 0.01,
+              "name": "task_bound",
+              "observed": 0.031546050445039026,
+              "satisfied": false,
+              "units": "m"
+            }
+          ],
+          "contract_version": "1.2.0",
+          "evaluator": "evaluate.reach",
+          "evaluator_version": "1.0.0",
+          "metrics": [
+            {
+              "name": "position_error",
+              "units": "m",
+              "value": 0.031546050445039026
+            }
+          ],
+          "original_execution_id": "a747047a78464dcab2328853522ef91d",
+          "reason": null,
+          "source": {
+            "artifact_id": "fa22fbe4157ded04b3631e753cef620220bf6bbc8da67319616e7363cbf30d27",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "a747047a78464dcab2328853522ef91d",
+          "task_success": false,
+          "validity": "valid"
+        },
+        "usage": {
+          "tool_calls": 4,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 1.3899999998975545
+        }
+      }
+    ],
+    "extra_backend_solves": 0
+  },
+  "targeted_candidate_tests": "3 passed",
+  "commit_push_merge": false
+}

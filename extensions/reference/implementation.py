@@ -29,8 +29,8 @@ def reach_task(task, reg):
         raise ValueError('REQUIRED_SIGNAL: tip_position, tip, dimension=3, m, world, declared state phase')
     if task.environment.contract not in ('legacy.environment', 'experiment.assembly'):
         raise ValueError('REACH_ENVIRONMENT_ADAPTER_REQUIRED')
-    expected_initializer = 'initialize.experiment' if task.environment.contract == 'experiment.assembly' else 'initialize.legacy_zero'
-    if task.initializer.extension_id != expected_initializer:
+    expected_initializers = ('initialize.experiment', 'initialize.family') if task.environment.contract == 'experiment.assembly' else ('initialize.legacy_zero',)
+    if task.initializer.extension_id not in expected_initializers:
         raise ValueError('REACH_INITIALIZER_ADAPTER_REQUIRED')
     if any(o.metric != 'position_error' or o.units != 'm' for o in task.objectives):
         raise ValueError('EVALUATOR_METRIC_OR_UNIT_UNAVAILABLE')
