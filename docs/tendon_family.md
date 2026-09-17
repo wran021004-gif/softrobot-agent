@@ -1,5 +1,7 @@
 # MATLAB 三维后端与绳驱机器人家族接口
 
+后续针对最终候选约束及 build/run 选择一致性的修复、明确 `--candidate structural` 的新运行命令与证据，见 [candidate_bounds_and_selection.md](candidate_bounds_and_selection.md)。新 prepare 的设计/空间由候选请求引用，后端配置中的对应载荷在运行前装配；下面原三次求解记录作为历史保留。
+
 本轮基线及当前分支：`feat/independent-spatial-dynamics`，`6b2d9dd6f2c08d6cededbbf1b73b864335806c1d`。开始时工作区干净，未切换旧提交、未覆盖历史任务、未 commit/push/merge。旧 `backend.matlab`、`backend.math_planar`、`backend.math_spatial`、`backend.scene_mujoco` 保留原身份。
 
 新增 `backend.matlab_spatial / matlab_serial_bending_v1` 和 `backend.family_mujoco / mujoco_serial_bending_v1`。主链路仍是原 Host 的 `simulation.run → candidate → compile/check → initialize → run → BackendResult → evaluation.run / signals.read`，复用预算、控制观测、执行回执和不可变 ExportBundle，没有另建 Harness。

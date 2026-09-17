@@ -1,0 +1,216 @@
+{
+  "actual_integrations": 2,
+  "charged_backend_solves": 2,
+  "complete_solve_retries": 0,
+  "records": [
+    {
+      "backend": "matlab_spatial",
+      "candidate_event_verified": true,
+      "design_identity": "a220fa0933197518aa6507afe6fdffdc3627e297c88372a7d94b3843185f0dcd",
+      "physics_identity": "4679c3149906508d12ebea4f60d2943528964846206dcad03112b3509f669001",
+      "scene_identity": "f4dcc2a9fd6c90fad370ecafc2f4d649bb2f030409c33075135f8ade87472835",
+      "near_length_m": 0.16,
+      "far_section": "tube",
+      "far_cells": 3,
+      "dofs": 12,
+      "duration_s": 0.35,
+      "samples": 35,
+      "final_tip_m": [
+        0.30268840913361333,
+        0.018218514735815775,
+        0.18788140055405236
+      ],
+      "solver_status": "completed",
+      "task_success": false,
+      "evaluation": {
+        "candidate_id": "structural",
+        "comparison_identity": "8f437b216d22055ff08fd4a33552597ee8c0baa3d2352dbb10667627f2d1f41b",
+        "constraints": [
+          {
+            "limit": 0.01,
+            "name": "task_bound",
+            "observed": 0.021144796939823397,
+            "satisfied": false,
+            "units": "m"
+          }
+        ],
+        "contract_version": "1.2.0",
+        "evaluator": "evaluate.reach",
+        "evaluator_version": "1.0.0",
+        "metrics": [
+          {
+            "name": "position_error",
+            "units": "m",
+            "value": 0.021144796939823397
+          }
+        ],
+        "original_execution_id": "61048c756a264987a535009cd6f189fc",
+        "reason": null,
+        "source": {
+          "artifact_id": "5e2bf4a47727ee3e3624d349e6704412ec68a12dcde8b0e6200484098d15b096",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "61048c756a264987a535009cd6f189fc",
+        "task_success": false,
+        "validity": "valid"
+      },
+      "timings": {
+        "backend_call": 12.65513369999826,
+        "engine_start": 7.216989399981685,
+        "prepare_compile": 0.006055200006812811,
+        "solve": 5.0941271
+      },
+      "usage": {
+        "tool_calls": 5,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 15.375
+      },
+      "replay_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "selected-structure-saved-replay",
+        "execution_id": "bbf04d3ad7cb4f7a8ca4675e89a8ce63",
+        "caller": "local-human",
+        "tool_id": "visualization.saved_replay",
+        "tool_version": "1.0.0",
+        "result_contract": "SavedProduct",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "c6d552fd489b5423e43a648e655cb83e97d9fac2524fa3af70155e40bf1198fb",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.4690000000409782
+        }
+      }
+    },
+    {
+      "backend": "family_mujoco",
+      "candidate_event_verified": true,
+      "design_identity": "a220fa0933197518aa6507afe6fdffdc3627e297c88372a7d94b3843185f0dcd",
+      "physics_identity": "4679c3149906508d12ebea4f60d2943528964846206dcad03112b3509f669001",
+      "scene_identity": "f4dcc2a9fd6c90fad370ecafc2f4d649bb2f030409c33075135f8ade87472835",
+      "near_length_m": 0.16,
+      "far_section": "tube",
+      "far_cells": 3,
+      "dofs": 12,
+      "duration_s": 0.35,
+      "samples": 35,
+      "final_tip_m": [
+        0.3026768194023646,
+        0.018187411169078793,
+        0.1879652009794601
+      ],
+      "solver_status": "completed",
+      "task_success": false,
+      "evaluation": {
+        "candidate_id": "structural",
+        "comparison_identity": "d85c512449c8092caca053592d7f0e2d27bf03eda629f5684de84d928ef4f841",
+        "constraints": [
+          {
+            "limit": 0.01,
+            "name": "task_bound",
+            "observed": 0.021154321081324628,
+            "satisfied": false,
+            "units": "m"
+          }
+        ],
+        "contract_version": "1.2.0",
+        "evaluator": "evaluate.reach",
+        "evaluator_version": "1.0.0",
+        "metrics": [
+          {
+            "name": "position_error",
+            "units": "m",
+            "value": 0.021154321081324628
+          }
+        ],
+        "original_execution_id": "48d16333fd1e41d89dbb232931a1bc86",
+        "reason": null,
+        "source": {
+          "artifact_id": "3cd9387552564d705c746c6d1f23ff1ee0b221460aeef9781dcba3dbc7934a3a",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "48d16333fd1e41d89dbb232931a1bc86",
+        "task_success": false,
+        "validity": "valid"
+      },
+      "timings": {
+        "backend_call": 0.3204853000352159,
+        "engine_compile": 0.015782500035129488,
+        "prepare_compile": 0.006643899949267507,
+        "solve": 0.011776200029999018
+      },
+      "usage": {
+        "tool_calls": 5,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 2.0629999998491257
+      },
+      "replay_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "selected-structure-saved-replay",
+        "execution_id": "62a1cc08d7914787974070b4f9a49c9e",
+        "caller": "local-human",
+        "tool_id": "visualization.saved_replay",
+        "tool_version": "1.0.0",
+        "result_contract": "SavedProduct",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "aa75c119759eff3e9bc0303a9c5ae10802e7e4131463efdc5c02d31a135df04f",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.375
+        }
+      }
+    }
+  ],
+  "comparison": {
+    "candidate_id": "structural",
+    "meaning": "Independent backends, shared physical entities and sample clocks; no ground-truth or calibration claim",
+    "tip_final_difference_m": 9.01347049293219e-05,
+    "tip_rms_difference_m": 0.00011098393290537042,
+    "length_max_difference_m": 1.3873507926809303e-05,
+    "tension_max_difference_n": 0.007613795750544772,
+    "extra_backend_solves": 0
+  },
+  "baseline": "64494f5311385f8be1dfa1a2fc2662f49d56edb4",
+  "branch": "feat/independent-spatial-dynamics",
+  "request_changes": {
+    "template": "tube_distal"
+  },
+  "input_sources": {
+    "request": "D:\\softrobot-agent\\runs\\tendon_candidate_selection_20260917\\inputs\\structural_request.json",
+    "baseline": "D:\\softrobot-agent\\runs\\tendon_candidate_selection_20260917\\inputs\\design.json",
+    "space": "D:\\softrobot-agent\\runs\\tendon_candidate_selection_20260917\\inputs\\space.json"
+  },
+  "request_identity": "703a00b5668bb858bf27ee28be958cbc6f1ec94a44eca1737cb4741273fdcdbc",
+  "control_identity": "dba9b78ad994f95f4d9031cb9c1256d8a48ebd279264b0e708ddc41ef7141163",
+  "targeted_tests_passed": 7,
+  "commit_push_merge": false
+}

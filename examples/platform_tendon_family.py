@@ -88,76 +88,168 @@ def prepare(root):
     root=Path(root).resolve(); directory=root/'inputs'; directory.mkdir(parents=True,exist_ok=False)
     d=example_design(); space=design_space(d)
     atomic_json(directory/'design.json',d.model_dump(mode='json')); atomic_json(directory/'space.json',space.model_dump(mode='json'))
+    for name,changes in CANDIDATES.items():
+        atomic_json(directory/(name+'_request.json'),dict(baseline_file='design.json',space_file='space.json',changes=changes))
     for backend in ('matlab_spatial','family_mujoco'):
-        atomic_json(directory/(backend+'.json'),session(backend,d,space))
+        config=session(backend,d,space)
+        # Unsealed session settings only. The selected request supplies these
+        # payloads before public compilation; there is no second design authority.
+        config['robot']['structure']['data']={}
+        config['policy']['candidate_builder']['parameters']['data']={}
+        atomic_json(directory/(backend+'.json'),config)
     atomic_json(directory/'single.json',session('matlab_spatial',d,space,True))
     p=project(); p.update(authorization_source='本轮用户授权 MATLAB 空间与绳驱家族贯通；3 次目标求解，最多4次常规求解',budget=budget(tool_calls=50,backend_solves=4,wall_s=3600.))
     atomic_json(directory/'project.json',p)
     return dict(inputs=str(directory),baseline=d.id)
 
 
-def build_candidates(root):
-    import time
+CANDIDATES = {'continuous': {'components/near/length_m':.17}, 'structural': {'template':'tube_distal'}}
+
+
+def prepare_candidate(root, candidate, backend):
+    """Shared build/run preparation; candidate_id alone never loads a robot."""
     from extensions.tendon_family.candidate import build
-    from extensions.tendon_family.compiler import resolve
-    from extensions.tendon_family.mjcf import compile_xml
     from extensions.tendon_family.scene import assemble
     from schemas.platform import SessionInput
+    from tools.platform_tools import _candidate
+    from tools.platform_registry import registry
+    from tools.state_io import digest
+    root=Path(root).resolve(); directory=root/'inputs'; request_path=directory/(candidate+'_request.json')
+    read=lambda p:json.loads(p.read_text(encoding='utf8'))
+    if request_path.exists():
+        request=read(request_path)
+        source=str(request_path)
+    else:
+        # Older prepared directories used standalone files with these two edits.
+        # Keep them authoritative too; never consume their stale embedded copies.
+        request=dict(baseline_file='design.json',space_file='space.json',changes=CANDIDATES[candidate])
+        source='legacy standalone design/space with explicit '+candidate+' changes'
+    baseline_path=directory/request['baseline_file']; space_path=directory/request['space_file']
+    req=dict(baseline=read(baseline_path),space=read(space_path),changes=request['changes'])
+    inp=read(directory/(backend+'.json'))
+    inp['robot']['structure']['data']=deepcopy(req['baseline'])
+    inp['policy']['candidate_builder']['parameters']['data']=deepcopy(req['space'])
+    built=build(req,task_bounds=inp['policy']['editable'])
+    if built.status!='valid': raise ValueError(built.status.upper()+': '+str(built.reason))
+    # Exercise the same public candidate path that simulation.run will use.
+    effective=_candidate(SessionInput.model_validate(inp),req['changes'],registry())
+    if effective.robot.structure.data!=built.candidate.model_dump(mode='json'):
+        raise ValueError('PUBLIC_CANDIDATE_DESIGN_MISMATCH')
+    scene=assemble(effective,built.resolved_physics)
+    snapshot=dict(candidate_id=candidate,request=req,task_bounds=inp['policy']['editable'],
+        sources=dict(request=source,baseline=str(baseline_path),space=str(space_path)),
+        request_identity=digest(dict(request=req,task_bounds=inp['policy']['editable'])),
+        control_identity=digest(inp['policy']['controller']),
+        session_identity=digest(inp),design_identity=digest(built.candidate.model_dump(mode='json')),
+        physics_identity=built.resolved_physics['identity'],scene_identity=scene['identity'],design_id=built.candidate.id)
+    return dict(input=inp,effective=effective,built=built,scene=scene,selection=snapshot)
+
+
+def save_selection(root,candidate,backend,prepared, *, rebuild=False):
+    """An explicit build may replace unsealed build products; run refuses drift."""
+    from tools.state_io import atomic_json
+    path=Path(root)/(candidate+'_'+backend+'_selection.json')
+    previous=json.loads(path.read_text(encoding='utf8')) if path.exists() else None
+    result_path=Path(root)/(candidate+'_candidate.json')
+    result=prepared['built'].model_dump(mode='json')
+    old_result=json.loads(result_path.read_text(encoding='utf8')) if result_path.exists() else None
+    changed=(previous is not None and previous!=prepared['selection']) or (old_result is not None and old_result!=result)
+    if changed and not rebuild:
+        raise ValueError('CANDIDATE_BUILD_STALE: '+str(path)+'; explicitly build the selected candidate again')
+    atomic_json(path,prepared['selection'])
+    atomic_json(result_path,result)
+    return dict(rebuilt=changed,previous_request_identity=previous['request_identity'] if changed and previous else None)
+
+
+def build_candidates(root,candidate=None):
+    import time
+    from extensions.tendon_family.mjcf import compile_xml
     from tools.platform_tasks import compile_input
     from tools.state_io import atomic_json
-    root=Path(root); read=lambda n:json.loads((root/'inputs'/n).read_text(encoding='utf8'))
+    root=Path(root)
     start=time.perf_counter(); result={}
-    for name,changes in [('continuous',{'components/near/length_m':.17}),('structural',{'template':'tube_distal'})]:
-        built=build(dict(baseline=read('design.json'),space=read('space.json'),changes=changes))
-        if built.status!='valid': raise ValueError(built.reason)
-        atomic_json(root/(name+'_candidate.json'),built.model_dump(mode='json'))
+    for name in ([candidate] if candidate else CANDIDATES):
         for backend in ('matlab_spatial','family_mujoco'):
-            inp=read(backend+'.json'); inp['robot']['structure']['data']=built.candidate.model_dump(mode='json')
-            compile_input(inp)
-            value=SessionInput.model_validate(inp); scene=assemble(value,built.resolved_physics)
+            prepared=prepare_candidate(root,name,backend)
+            built,scene=prepared['built'],prepared['scene']
+            compile_input(prepared['effective'].model_dump(mode='json'))
+            rebuild=save_selection(root,name,backend,prepared,rebuild=True)
             atomic_json(root/(name+'_'+backend+'_input.json'),dict(physics=built.resolved_physics,scene=scene))
             if backend=='family_mujoco':
                 import mujoco
                 path=root/(name+'.xml'); compile_xml(built.resolved_physics,scene,None,path)
                 model=mujoco.MjModel.from_xml_path(str(path))
-                result[name]=dict(dofs=model.nv,tendons=model.ntendon,actuators=len(built.candidate.actuators),mass_kg=sum(x['mass_kg'] for x in built.resolved_physics['parts']))
+                result[name]=dict(dofs=model.nv,tendons=model.ntendon,actuators=len(built.candidate.actuators),mass_kg=sum(x['mass_kg'] for x in built.resolved_physics['parts']),
+                    selection=prepared['selection'],**rebuild)
     result['prepare_compile_s']=time.perf_counter()-start
     atomic_json(root/'candidate_checks.json',result); return result
 
 
-def run(root,backend,label=''):
+def run(root,backend,label='',candidate=None):
     from tools.platform_store import Store
     from tools.platform_host import Host
     from tools.state_io import atomic_json
     from extensions.tendon_family.saved import materialize
+    from tools.state_io import digest
     root=Path(root).resolve(); read=lambda n:json.loads((root/'inputs'/n).read_text(encoding='utf8'))
+    if backend=='single':
+        if candidate is not None: raise ValueError('SINGLE_ENTRY_DOES_NOT_ACCEPT_FAMILY_CANDIDATE')
+        inp=read('single.json'); selection=None; changes={}; selected='legacy-single'; prefix=backend
+    else:
+        selected=candidate or 'continuous'
+        prepared=prepare_candidate(root,selected,backend)
+        save_selection(root,selected,backend,prepared)
+        inp=prepared['input']; selection=prepared['selection']; changes=selection['request']['changes']
+        prefix=selected+'_'+backend
+        inp['run_id']+='_'+selected
     store=Store(root)
     if not store.db.exists(): store.create(read('project.json'))
-    inp=read(backend+'.json')
     suffix='_'+label if label else ''
     inp['run_id']+=suffix
     host=Host(root,inp['run_id']); host.create(inp)
-    record=dict(backend=backend,run_id=inp['run_id'],receipts={})
+    record=dict(backend=backend,run_id=inp['run_id'],candidate_id=selected,selection=selection,receipts={})
     def invoke(name,tool,args):
         r=host.invoke(dict(request_id='family-'+name,tool_id=tool,tool_version=inp['policy']['tool_bindings'][tool],arguments=args,cache='new',reason='本轮授权的真实求解或保存结果读取'))
-        record['receipts'][name]=r; atomic_json(root/(backend+suffix+'_record.json'),record)
+        record['receipts'][name]=r; atomic_json(root/(prefix+suffix+'_record.json'),record)
         if r['execution_status']!='completed': raise RuntimeError(str(r))
         return r
-    sim=invoke('simulation','simulation.run',dict(candidate_id='legacy-single' if backend=='single' else 'continuous',changes={} if backend=='single' else {'components/near/length_m':.17}))
+    sim=invoke('simulation','simulation.run',dict(candidate_id=selected,changes=changes))
     if sim['solver_status']!='completed': raise RuntimeError('Solver failed; partial evidence retained')
     ev=invoke('evaluation','evaluation.run',dict(result=sim['output'],execution_id=sim['execution_id']))
     invoke('tip','signals.read',dict(result=sim['output'],name='tip_position',entity='tip'))
     invoke('tension','signals.read',dict(result=sim['output'],name='tendon_tension',entity='tendon_0' if backend=='single' else 'far_t0'))
     record['evaluation']=store.artifact(ev['output']); record['usage']=store.remaining(host.run_id)['used']
     record['result_data']=store.artifact(sim['output'])['data']['data']
-    record['saved_folder']=str(materialize(root,record,root/'saved'/(backend+suffix)))
-    atomic_json(root/(backend+suffix+'_record.json'),record); return record
+    record['saved_folder']=str(materialize(root,record,root/'saved'/(prefix+suffix)))
+    if selection:
+        folder=Path(record['saved_folder'])
+        actual=json.loads((folder/'robot_description.json').read_text(encoding='utf8'))
+        if digest(actual['data'])!=selection['design_identity'] or any(record['result_data'][key]!=selection[key] for key in ('physics_identity','scene_identity')):
+            raise ValueError('SOLVED_CANDIDATE_IDENTITY_MISMATCH: sealed evidence retained')
+        record['selected_input_verified']=True
+    atomic_json(root/(prefix+suffix+'_record.json'),record); return record
 
 
-def compare(root):
+def read_record(root,backend,candidate=None,label=''):
+    if backend=='single' and candidate is not None: raise ValueError('SINGLE_ENTRY_DOES_NOT_ACCEPT_FAMILY_CANDIDATE')
+    suffix='_'+label if label else ''
+    selected=candidate or 'continuous'
+    path=Path(root)/(('' if backend=='single' else selected+'_')+backend+suffix+'_record.json')
+    if not path.exists() and candidate is None:
+        path=Path(root)/(backend+suffix+'_record.json')
+    record=json.loads(path.read_text(encoding='utf8'))
+    actual=record.get('candidate_id',record.get('evaluation',{}).get('candidate_id'))
+    if backend!='single' and actual!=selected: raise ValueError('SAVED_CANDIDATE_SELECTION_MISMATCH')
+    return record
+
+
+def compare(root,candidate=None,label=''):
     import numpy as np
     from tools.state_io import atomic_json
-    root=Path(root); records=[json.loads((root/(b+'_record.json')).read_text(encoding='utf8')) for b in ('matlab_spatial','family_mujoco')]
+    root=Path(root); records=[read_record(root,b,candidate,label) for b in ('matlab_spatial','family_mujoco')]
+    if records[0].get('selection') or records[1].get('selection'):
+        for key in ('candidate_id','request_identity','design_identity','control_identity'):
+            if records[0]['selection'][key]!=records[1]['selection'][key]: raise ValueError('COMPARISON_CANDIDATE_IDENTITY_MISMATCH: '+key)
     for key in ('physics_identity','scene_identity'):
         assert records[0]['result_data'][key]==records[1]['result_data'][key]
     rows=[json.loads((Path(r['saved_folder'])/'replay_trajectory.json').read_text(encoding='utf8')) for r in records]
@@ -165,24 +257,27 @@ def compare(root):
     tips=[np.array([r['tip_m'] for r in rs]) for rs in rows]
     lengths=[np.array([r['tendon_length_m'] for r in rs]) for rs in rows]
     tensions=[np.array([r['tension_n'] for r in rs]) for rs in rows]
-    out=dict(meaning='Independent backends, shared physical entities and sample clocks; no ground-truth or calibration claim',
+    out=dict(candidate_id=candidate or 'continuous',selection=records[0].get('selection'),meaning='Independent backends, shared physical entities and sample clocks; no ground-truth or calibration claim',
         tip_final_difference_m=float(np.linalg.norm(tips[0][-1]-tips[1][-1])),tip_rms_difference_m=float(np.sqrt(np.mean(np.sum((tips[0]-tips[1])**2,axis=1)))),
         length_max_difference_m=float(np.max(np.abs(lengths[0]-lengths[1]))),tension_max_difference_n=float(np.max(np.abs(tensions[0]-tensions[1]))),
         records=[dict(backend=r['backend'],timings=r['result_data']['timings_s'],evaluation=r['evaluation'],usage=r['usage']) for r in records],
         extra_backend_solves=0)
-    atomic_json(root/'comparison.json',out); return out
+    atomic_json(root/((candidate+'_' if candidate else '')+'comparison.json'),out); return out
 
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__); parser.add_argument('action',choices=['prepare','build','run','compare','view'])
     parser.add_argument('root',type=Path); parser.add_argument('--backend',choices=['single','matlab_spatial','family_mujoco'],default='matlab_spatial')
     parser.add_argument('--label',default='',help='Explicit distinct invocation label after a diagnosed failure; never auto-retry')
+    parser.add_argument('--candidate',choices=list(CANDIDATES),help='Explicit request selection; run defaults to continuous, build defaults to both')
     args=parser.parse_args(argv)
-    if args.action=='run': out=run(args.root,args.backend,args.label)
+    if args.action=='run': out=run(args.root,args.backend,args.label,args.candidate)
+    elif args.action=='build': out=build_candidates(args.root,args.candidate)
+    elif args.action=='compare': out=compare(args.root,args.candidate,args.label)
     elif args.action=='view':
         from extensions.tendon_family.saved import view
-        suffix='_'+args.label if args.label else ''
-        out=view(args.root/'saved'/(args.backend+suffix),'mujoco' if args.backend=='family_mujoco' else 'matlab')
+        record=read_record(args.root,args.backend,args.candidate,args.label)
+        out=view(record['saved_folder'],'mujoco' if args.backend=='family_mujoco' else 'matlab')
     else: out=globals()[{'build':'build_candidates'}.get(args.action,args.action)](args.root)
     print(json.dumps(out,ensure_ascii=False,indent=2))
 
