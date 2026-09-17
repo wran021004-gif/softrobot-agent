@@ -43,6 +43,11 @@ def compile_mujoco(design: DesignSpec | RobotIR, task: TaskSpec, output_path: Pa
             failure_code="INVALID_DESIGN", message="Counts and dimensions must be positive and finite.",
         )
     design = ensure_robot_ir(design)
+    # V2 mechanics come from the same engine-independent resolution as math.
+    physical = None
+    if design.resolved_rod is not None and design.tendon_count == 4:
+        from extensions.experiment_dynamics.physics import resolve_physics
+        physical = resolve_physics(design)
     segment_length = design.section.segment_length_m
     try:
         if environment is None:
@@ -75,14 +80,16 @@ def compile_mujoco(design: DesignSpec | RobotIR, task: TaskSpec, output_path: Pa
         position = "0 0 0" if index == 0 else f"{segment_length} 0 0"
         body = ET.SubElement(parent, "body", name=f"segment_{index}", pos=position)
         rod = design.resolved_rod
+        part = physical.parts[index] if physical else None
         if rod is not None:
-            ET.SubElement(body, 'inertial', pos=f'{segment_length/2} 0 0', mass=str(rod.mass_kg[index]),
-                          diaginertia=' '.join(map(str, rod.inertia_diagonal_kg_m2[index])))
+            ET.SubElement(body, 'inertial', pos=' '.join(map(str,part.com_local_m)) if part else f'{segment_length/2} 0 0',
+                          mass=str(part.mass_kg if part else rod.mass_kg[index]),
+                          diaginertia=' '.join(map(str, [part.inertia_com_local_kg_m2[j][j] for j in range(3)] if part else rod.inertia_diagonal_kg_m2[index])))
         for axis_name, axis in (("y", "0 1 0"), ("z", "0 0 1")):
             ET.SubElement(
                 body, "joint", name=f"joint_{index}_{axis_name}", type="hinge", axis=axis,
-                stiffness=str(rod.stiffness_nm_rad[index] if rod else design.mechanics.joint_stiffness_nm_per_rad),
-                damping=str(rod.damping_nm_s_rad[index] if rod else design.mechanics.joint_damping_nm_s_per_rad),
+                stiffness=str(part.stiffness_nm_rad[0] if part else rod.stiffness_nm_rad[index] if rod else design.mechanics.joint_stiffness_nm_per_rad),
+                damping=str(part.damping_nm_s_rad[0] if part else rod.damping_nm_s_rad[index] if rod else design.mechanics.joint_damping_nm_s_per_rad),
                 **({'springref': str(math.degrees(rod.natural_y_rad[index]) if axis_name == 'y' else 0)} if rod else {}),
             )
         ET.SubElement(
@@ -113,8 +120,8 @@ def compile_mujoco(design: DesignSpec | RobotIR, task: TaskSpec, output_path: Pa
         # pulls the tendon; the upper bound prevents a cable from pushing.
         ET.SubElement(
             actuators, "position", name=f"tendon_{i}_actuator", tendon=f"tendon_{i}",
-            gear="1", kp=str(design.mechanics.tendon_servo_kp_n_per_m), forcelimited="true",
-            forcerange=f"{-design.mechanics.tendon_force_limit_n} 0",
+            gear="1", kp=str(physical.tendons[i].kp_n_m if physical else design.mechanics.tendon_servo_kp_n_per_m), forcelimited="true",
+            forcerange=f"{-(physical.tendons[i].force_limit_n if physical else design.mechanics.tendon_force_limit_n)} 0",
         )
 
     output_path = Path(output_path).resolve()

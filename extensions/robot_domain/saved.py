@@ -8,6 +8,8 @@ from .contracts import SavedProduct
 
 def restore(ctx, args):
     result = BackendResult.model_validate(ctx.artifact(args.result))
+    if result.data.contract == 'experiment.backend_data':
+        raise ValueError('SAVED_LEGACY_MODEL_UNSUPPORTED: assembled spatial/planar exports use signals.read and diagnostics.sample_exceeds@1.1.0; legacy replay/trajectory schemas are not reused')
     records = ctx.store.session(ctx.run_id)['state'].get('result_executions', {})
     matches = [(eid, m) for eid, m in records.items() if m['artifact_id'] == args.result.artifact_id
                and (args.execution_id is None or args.execution_id == eid)]

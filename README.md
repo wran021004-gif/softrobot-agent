@@ -2,6 +2,8 @@
 
 ## 当前开发入口
 
+独立数学与物理后端的新开发从 [公共物理、空间动力学与统一场景](docs/platform_spatial.md) 开始。使用 `python examples/workbench.py platform spatial-example ...`，同一候选分别进入无 MuJoCo 依赖的三维数学计算和 MuJoCo；保留独立输入的原平面模型与所有旧入口。
+
 真实机器人链路从 [结构候选、统一信号与保存数据诊断](docs/platform_domain.md) 开始：复用现有等效杆编译、MATLAB／MuJoCo 和原诊断工具；内含可复制命令、开放参数及领域原子／内部库／教学示例分类。
 
 从 [平台架构与操作](docs/platform.md) 开始，推荐命令为 `python examples/workbench.py platform ...`；它转发到 `examples/development_platform.py` 的同一实现。新增扩展先读 [扩展指南与最小模板](docs/platform_extensions.md)，协作分工见 [共同核心与包作者责任](docs/platform_parallel_development.md)，任务配置见 [填写指南](docs/platform_tasks.md)。

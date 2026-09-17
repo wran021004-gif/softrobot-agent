@@ -1,0 +1,5146 @@
+{
+  "branch": "feat/independent-spatial-dynamics",
+  "baseline": "ca777786817a944e30b401b30b5e2f7889d87a57",
+  "run_directory": "runs/independent_spatial_20260917",
+  "comparison": {
+    "physics_identity": "5bddccfd877d58e1d039390a65b501ffb13f46e74af4c67912a73ab4f942aad1",
+    "scene_identity": "fe91de6bc66eec3608262dd8f5db2b789e263e1bc5e80096ff1977733599ef3b",
+    "tip_difference_m": 0.00015049335669957436,
+    "records": [
+      {
+        "backend": "math_spatial",
+        "final_tip_m": [
+          0.32475505268416227,
+          0.04453913839452979,
+          0.038145459497347226
+        ],
+        "evaluation": {
+          "candidate_id": "spatial-nonbaseline",
+          "comparison_identity": "2f7e33430f7b747f185c8cec518453e2332494bd9056295ec8549655edb68a51",
+          "constraints": [
+            {
+              "limit": 0.01,
+              "name": "task_bound",
+              "observed": 0.048838703621703006,
+              "satisfied": false,
+              "units": "m"
+            }
+          ],
+          "contract_version": "1.2.0",
+          "evaluator": "evaluate.reach",
+          "evaluator_version": "1.0.0",
+          "metrics": [
+            {
+              "name": "position_error",
+              "units": "m",
+              "value": 0.048838703621703006
+            }
+          ],
+          "original_execution_id": "97f83a12ad40457bb782dd4c6bd4b59c",
+          "reason": null,
+          "source": {
+            "artifact_id": "2dfd5be58e4bc9cbaa9441174060315084eeaf1ab119c3cff21133f9d4a1fae4",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "97f83a12ad40457bb782dd4c6bd4b59c",
+          "task_success": false,
+          "validity": "valid"
+        },
+        "usage": {
+          "tool_calls": 6,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 5.046000000322238
+        },
+        "execution": "97f83a12ad40457bb782dd4c6bd4b59c"
+      },
+      {
+        "backend": "scene_mujoco",
+        "final_tip_m": [
+          0.3247193896379669,
+          0.044678816924497926,
+          0.03810225873563271
+        ],
+        "evaluation": {
+          "candidate_id": "spatial-nonbaseline",
+          "comparison_identity": "5f936efd61da585b888e4b0a09e8bc3b80c4851995dd811d14ee9a1e788fd3aa",
+          "constraints": [
+            {
+              "limit": 0.01,
+              "name": "task_bound",
+              "observed": 0.04887085302040943,
+              "satisfied": false,
+              "units": "m"
+            }
+          ],
+          "contract_version": "1.2.0",
+          "evaluator": "evaluate.reach",
+          "evaluator_version": "1.0.0",
+          "metrics": [
+            {
+              "name": "position_error",
+              "units": "m",
+              "value": 0.04887085302040943
+            }
+          ],
+          "original_execution_id": "aeed420c37cb43da91cda37c136b2fcf",
+          "reason": null,
+          "source": {
+            "artifact_id": "bd4c87570f2d3e8e490016a52669b65eea3a21bf831285cbdfb230d245d6e890",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "aeed420c37cb43da91cda37c136b2fcf",
+          "task_success": false,
+          "validity": "valid"
+        },
+        "usage": {
+          "tool_calls": 6,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 0.8440000000409782
+        },
+        "execution": "aeed420c37cb43da91cda37c136b2fcf"
+      }
+    ],
+    "saved_checks": [
+      {
+        "backend": "math_spatial",
+        "bundle_verified": true,
+        "signal_count": 114,
+        "q_y_change_norm_rad": 0.05979798390487751,
+        "q_z_change_norm_rad": 0.0331490033447072,
+        "active_force_sample_times_s": [
+          0.006,
+          0.008,
+          0.01,
+          0.012
+        ],
+        "controller_observations": 10,
+        "physics_identity": "5bddccfd877d58e1d039390a65b501ffb13f46e74af4c67912a73ab4f942aad1",
+        "scene_identity": "fe91de6bc66eec3608262dd8f5db2b789e263e1bc5e80096ff1977733599ef3b",
+        "extra_backend_solves": 0
+      },
+      {
+        "backend": "scene_mujoco",
+        "bundle_verified": true,
+        "signal_count": 98,
+        "q_y_change_norm_rad": 0.060632561444101764,
+        "q_z_change_norm_rad": 0.03352908419856995,
+        "active_force_sample_times_s": [
+          0.006,
+          0.008,
+          0.01,
+          0.012
+        ],
+        "controller_observations": 10,
+        "physics_identity": "5bddccfd877d58e1d039390a65b501ffb13f46e74af4c67912a73ab4f942aad1",
+        "scene_identity": "fe91de6bc66eec3608262dd8f5db2b789e263e1bc5e80096ff1977733599ef3b",
+        "extra_backend_solves": 0
+      }
+    ],
+    "meaning": "不同积分与接触模型的短轨迹差异；不视任一模型为物理真值，不合并不同模型的评价身份"
+  },
+  "numerical_solves": {
+    "math_spatial": 1,
+    "scene_mujoco": 1,
+    "math_planar": 0,
+    "additional_for_reads_evaluation_diagnostics": 0
+  },
+  "independent_child": {
+    "mujoco_import_blocked": true,
+    "engine_xml_mjb_open_blocked": true,
+    "loaded_mujoco_modules": [],
+    "cached_result_used": false
+  },
+  "checks": [
+    "3 targeted offline tests passed",
+    "legacy saved archive bridge and path entry passed",
+    "saved immutable bundles and actual MuJoCo compiled physics verified",
+    "C1/C2 command and observation check repeated after controller lifecycle metadata completion; passed",
+    "git diff --check passed"
+  ],
+  "generated": {
+    "contracts": 35,
+    "payloads": 41,
+    "extensions": 64
+  },
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "mujoco": "3.13.0",
+    "pydantic": "2.13.5"
+  },
+  "not_verified": [
+    "new MATLAB planar numerical adapter (original algorithm unchanged)",
+    "full C1 integration; C1 command path checked offline",
+    "long duration dynamics",
+    "contact accuracy (representative scene remained out of contact)",
+    "physical calibration"
+  ],
+  "post_run_changes": "Only lifecycle/reporting, dependency declarations, removing redundant legacy scene XML validation in physical setup, and documentation/saved-evidence audit changed after the two solves; no spatial equations, shared physical values, controller algorithm or integrator changed. Original snapshots retain exact executed source hashes.",
+  "receipts": {
+    "math_spatial": {
+      "simulation": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-solve",
+        "execution_id": "97f83a12ad40457bb782dd4c6bd4b59c",
+        "caller": "local-human",
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "completed",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "2dfd5be58e4bc9cbaa9441174060315084eeaf1ab119c3cff21133f9d4a1fae4",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": "97f83a12ad40457bb782dd4c6bd4b59c",
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 4.516000000061467
+        }
+      },
+      "evaluation": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-evaluation",
+        "execution_id": "497c100c64da4bb1a2c727092c0f6307",
+        "caller": "local-human",
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "valid",
+        "task_success": false,
+        "output": {
+          "artifact_id": "d6f50c6549dda003f98226d913048f98196a335a5823fbcc36d3c14994530e6a",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.10900000005494803
+        }
+      },
+      "tip": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-tip",
+        "execution_id": "f3b229125622477b8641a7b08694795e",
+        "caller": "local-human",
+        "tool_id": "signals.read",
+        "tool_version": "1.0.0",
+        "result_contract": "SelectedSignal",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "e90d18b330b150d47d30b40a784268ed744f97584ef9ca4aae6eba2c272d9338",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0940000000409782
+        }
+      },
+      "tension": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-tension",
+        "execution_id": "5ba265af318c4c7dad51442bfe5aca37",
+        "caller": "local-human",
+        "tool_id": "signals.read",
+        "tool_version": "1.0.0",
+        "result_contract": "SelectedSignal",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "c752828108627d68d1b08500ada1a4aad3b6bf318575a00e2370eb1fdd164b70",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.10900000005494803
+        }
+      },
+      "diagnostic": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-diagnostic",
+        "execution_id": "816d6e13cb264b2b842a67a5abc51c28",
+        "caller": "local-human",
+        "tool_id": "diagnostics.sample_exceeds",
+        "tool_version": "1.1.0",
+        "result_contract": "EntityDiagnosticResult",
+        "result_version": "1.1.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "7b22acb429916af1c93f7412238be58c2f0fa960b146a8fb3d01986516a35802",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.10900000005494803
+        }
+      },
+      "result": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-result",
+        "execution_id": "71bbccffcc6a4a57866fbbc1204d8947",
+        "caller": "local-human",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0",
+        "result_contract": "EvidencePage",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "694f96f5e7c31cf549e1c14f9a49c8f19014fe2548b29ae9fd5322625d35b081",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.10900000005494803
+        }
+      }
+    },
+    "scene_mujoco": {
+      "simulation": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-solve",
+        "execution_id": "aeed420c37cb43da91cda37c136b2fcf",
+        "caller": "local-human",
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "completed",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "bd4c87570f2d3e8e490016a52669b65eea3a21bf831285cbdfb230d245d6e890",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": "aeed420c37cb43da91cda37c136b2fcf",
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 0.26599999994505197
+        }
+      },
+      "evaluation": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-evaluation",
+        "execution_id": "d324de3e70a14d478a7e93072d9df7ed",
+        "caller": "local-human",
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "valid",
+        "task_success": false,
+        "output": {
+          "artifact_id": "af7bea75bf85c33a8084d69b267d17afa22090a2a0207ee9df60373931ec9b7e",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.14099999994505197
+        }
+      },
+      "tip": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-tip",
+        "execution_id": "bf82c73dbdfb41279d4caf0c086fd9c7",
+        "caller": "local-human",
+        "tool_id": "signals.read",
+        "tool_version": "1.0.0",
+        "result_contract": "SelectedSignal",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "5e227520fa03c423b82eba3091b39b145df51116c7a372e5c429a277bdb4fffe",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0940000000409782
+        }
+      },
+      "tension": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-tension",
+        "execution_id": "7eb503014e434c42a2dec421c2353e02",
+        "caller": "local-human",
+        "tool_id": "signals.read",
+        "tool_version": "1.0.0",
+        "result_contract": "SelectedSignal",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "8563bec4db116935096e78e11078e554258d666f461b450ebd27481124e776cd",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.10900000005494803
+        }
+      },
+      "diagnostic": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-diagnostic",
+        "execution_id": "d70343c9bc9847829472142ff00e624d",
+        "caller": "local-human",
+        "tool_id": "diagnostics.sample_exceeds",
+        "tool_version": "1.1.0",
+        "result_contract": "EntityDiagnosticResult",
+        "result_version": "1.1.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "e480ef6070d1597eb5a564387aa1089fbed6d243d0543a14c5c8ab51cc802231",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.10900000005494803
+        }
+      },
+      "result": {
+        "contract_version": "1.2.0",
+        "request_id": "spatial-result",
+        "execution_id": "98098051a0324697ba1e8f45ebc43e50",
+        "caller": "local-human",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0",
+        "result_contract": "EvidencePage",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "7c2d63a33ddd46d574c9c6b8a5a42c34509ca95c7f59a229509b447cb3d29aec",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.125
+        }
+      }
+    }
+  },
+  "executed_backend_dependencies": {
+    "math_spatial": {
+      "conservative_reason": null,
+      "contracts": {
+        "experiment.assembly@1.0.0": {
+          "$defs": {
+            "EnvironmentSpec": {
+              "additionalProperties": false,
+              "properties": {
+                "coordinate_frame": {
+                  "const": "world_base_x_forward_yz_cross_section",
+                  "title": "Coordinate Frame",
+                  "type": "string"
+                },
+                "environment_id": {
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "title": "Environment Id",
+                  "type": "string"
+                },
+                "gravity_m_s2": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Gravity M S2",
+                  "type": "array"
+                },
+                "gravity_source": {
+                  "minLength": 1,
+                  "title": "Gravity Source",
+                  "type": "string"
+                },
+                "lights": {
+                  "default": [],
+                  "items": {
+                    "$ref": "#/$defs/Light"
+                  },
+                  "title": "Lights",
+                  "type": "array"
+                },
+                "objects": {
+                  "items": {
+                    "discriminator": {
+                      "mapping": {
+                        "ball": "#/$defs/ReservedComponent",
+                        "plane": "#/$defs/Plane",
+                        "platform_disturbance": "#/$defs/ReservedComponent",
+                        "ramp": "#/$defs/ReservedComponent",
+                        "window": "#/$defs/Window"
+                      },
+                      "propertyName": "kind"
+                    },
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/Plane"
+                      },
+                      {
+                        "$ref": "#/$defs/Window"
+                      },
+                      {
+                        "$ref": "#/$defs/ReservedComponent"
+                      }
+                    ]
+                  },
+                  "title": "Objects",
+                  "type": "array"
+                },
+                "schema_version": {
+                  "const": "1",
+                  "default": "1",
+                  "title": "Schema Version",
+                  "type": "string"
+                },
+                "truth_status": {
+                  "default": "HUMAN_OWNED",
+                  "enum": [
+                    "HUMAN_OWNED",
+                    "HUMAN_APPROVED",
+                    "NON_CANONICAL_DEVELOPMENT_ONLY"
+                  ],
+                  "title": "Truth Status",
+                  "type": "string"
+                },
+                "units": {
+                  "const": "SI",
+                  "default": "SI",
+                  "title": "Units",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "environment_id",
+                "coordinate_frame",
+                "gravity_m_s2",
+                "gravity_source",
+                "objects"
+              ],
+              "title": "EnvironmentSpec",
+              "type": "object"
+            },
+            "Light": {
+              "additionalProperties": false,
+              "properties": {
+                "direction": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Direction",
+                  "type": "array"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "position_m",
+                "direction"
+              ],
+              "title": "Light",
+              "type": "object"
+            },
+            "Mount": {
+              "additionalProperties": false,
+              "properties": {
+                "mount_id": {
+                  "const": "fixed_base",
+                  "default": "fixed_base",
+                  "title": "Mount Id",
+                  "type": "string"
+                },
+                "parent_frame": {
+                  "const": "world",
+                  "default": "world",
+                  "title": "Parent Frame",
+                  "type": "string"
+                },
+                "position_m": {
+                  "default": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "quaternion_wxyz": {
+                  "default": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 4,
+                  "minItems": 4,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Quaternion Wxyz",
+                  "type": "array"
+                },
+                "robot_id": {
+                  "const": "robot",
+                  "default": "robot",
+                  "title": "Robot Id",
+                  "type": "string"
+                }
+              },
+              "title": "Mount",
+              "type": "object"
+            },
+            "Plane": {
+              "additionalProperties": false,
+              "properties": {
+                "conaffinity": {
+                  "minimum": 0,
+                  "title": "Conaffinity",
+                  "type": "integer"
+                },
+                "contype": {
+                  "minimum": 0,
+                  "title": "Contype",
+                  "type": "integer"
+                },
+                "half_size_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Half Size M",
+                  "type": "array"
+                },
+                "kind": {
+                  "const": "plane",
+                  "default": "plane",
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "name",
+                "position_m",
+                "half_size_m",
+                "contype",
+                "conaffinity"
+              ],
+              "title": "Plane",
+              "type": "object"
+            },
+            "ReservedComponent": {
+              "additionalProperties": false,
+              "description": "Serializable extension proposals; no execution support in V1.",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "ball",
+                    "ramp",
+                    "platform_disturbance"
+                  ],
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "status": {
+                  "const": "PLANNED",
+                  "default": "PLANNED",
+                  "title": "Status",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "name",
+                "position_m"
+              ],
+              "title": "ReservedComponent",
+              "type": "object"
+            },
+            "TimedForce": {
+              "additionalProperties": false,
+              "properties": {
+                "end_s": {
+                  "exclusiveMinimum": 0,
+                  "title": "End S",
+                  "type": "number"
+                },
+                "entity": {
+                  "pattern": "^segment_[0-7]$",
+                  "title": "Entity",
+                  "type": "string"
+                },
+                "force_n": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Force N",
+                  "type": "array"
+                },
+                "frame": {
+                  "const": "world",
+                  "default": "world",
+                  "title": "Frame",
+                  "type": "string"
+                },
+                "point": {
+                  "const": "center_of_mass",
+                  "default": "center_of_mass",
+                  "title": "Point",
+                  "type": "string"
+                },
+                "robot_id": {
+                  "const": "robot",
+                  "default": "robot",
+                  "title": "Robot Id",
+                  "type": "string"
+                },
+                "start_s": {
+                  "minimum": 0,
+                  "title": "Start S",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "entity",
+                "force_n",
+                "start_s",
+                "end_s"
+              ],
+              "title": "TimedForce",
+              "type": "object"
+            },
+            "Window": {
+              "additionalProperties": false,
+              "description": "Finite rectangular frame; aperture in the world y-z plane, normal +x.",
+              "properties": {
+                "conaffinity": {
+                  "const": 1,
+                  "default": 1,
+                  "title": "Conaffinity",
+                  "type": "integer"
+                },
+                "contype": {
+                  "const": 0,
+                  "default": 0,
+                  "title": "Contype",
+                  "type": "integer"
+                },
+                "frame_width_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Frame Width M",
+                  "type": "number"
+                },
+                "height_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Height M",
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "window",
+                  "default": "window",
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "plane": {
+                  "const": "yz_normal_positive_x",
+                  "title": "Plane",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "thickness_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Thickness M",
+                  "type": "number"
+                },
+                "width_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Width M",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "position_m",
+                "plane",
+                "width_m",
+                "height_m",
+                "thickness_m",
+                "frame_width_m"
+              ],
+              "title": "Window",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "environment": {
+              "$ref": "#/$defs/EnvironmentSpec"
+            },
+            "external_forces": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/TimedForce"
+              },
+              "title": "External Forces",
+              "type": "array"
+            },
+            "floor_id": {
+              "title": "Floor Id",
+              "type": "string"
+            },
+            "mount": {
+              "$ref": "#/$defs/Mount"
+            }
+          },
+          "required": [
+            "environment",
+            "floor_id"
+          ],
+          "title": "Assembly",
+          "type": "object"
+        },
+        "experiment.backend_data@1.0.0": {
+          "$defs": {
+            "MujocoParameters": {
+              "additionalProperties": false,
+              "properties": {
+                "integrator": {
+                  "default": "implicitfast",
+                  "enum": [
+                    "Euler",
+                    "implicitfast"
+                  ],
+                  "title": "Integrator",
+                  "type": "string"
+                },
+                "model": {
+                  "const": "mujoco_assembled_rod_v1",
+                  "default": "mujoco_assembled_rod_v1",
+                  "title": "Model",
+                  "type": "string"
+                }
+              },
+              "title": "MujocoParameters",
+              "type": "object"
+            },
+            "PlanarParameters": {
+              "additionalProperties": false,
+              "properties": {
+                "model": {
+                  "const": "matlab_tdcr_planar_dynamic_v1",
+                  "default": "matlab_tdcr_planar_dynamic_v1",
+                  "title": "Model",
+                  "type": "string"
+                }
+              },
+              "title": "PlanarParameters",
+              "type": "object"
+            },
+            "SpatialParameters": {
+              "additionalProperties": false,
+              "properties": {
+                "atol": {
+                  "default": 1e-08,
+                  "exclusiveMinimum": 0,
+                  "maximum": 1e-05,
+                  "title": "Atol",
+                  "type": "number"
+                },
+                "contact_damping_n_s_m": {
+                  "default": 5.0,
+                  "minimum": 0,
+                  "title": "Contact Damping N S M",
+                  "type": "number"
+                },
+                "contact_stiffness_n_m": {
+                  "default": 5000.0,
+                  "exclusiveMinimum": 0,
+                  "title": "Contact Stiffness N M",
+                  "type": "number"
+                },
+                "contact_taper_m": {
+                  "default": 0.0001,
+                  "exclusiveMinimum": 0,
+                  "title": "Contact Taper M",
+                  "type": "number"
+                },
+                "max_step_s": {
+                  "default": 0.0002,
+                  "exclusiveMinimum": 0,
+                  "title": "Max Step S",
+                  "type": "number"
+                },
+                "model": {
+                  "const": "spatial_rigid_link_v1",
+                  "default": "spatial_rigid_link_v1",
+                  "title": "Model",
+                  "type": "string"
+                },
+                "rtol": {
+                  "default": 1e-06,
+                  "exclusiveMinimum": 0,
+                  "maximum": 0.001,
+                  "title": "Rtol",
+                  "type": "number"
+                },
+                "solver": {
+                  "const": "RK45",
+                  "default": "RK45",
+                  "title": "Solver",
+                  "type": "string"
+                }
+              },
+              "title": "SpatialParameters",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "backend": {
+              "title": "Backend",
+              "type": "string"
+            },
+            "controller_mode": {
+              "enum": [
+                "C1",
+                "C2"
+              ],
+              "title": "Controller Mode",
+              "type": "string"
+            },
+            "controller_updates": {
+              "title": "Controller Updates",
+              "type": "integer"
+            },
+            "exported_files": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Exported Files",
+              "type": "array"
+            },
+            "model_version": {
+              "const": "1.0.0",
+              "default": "1.0.0",
+              "title": "Model Version",
+              "type": "string"
+            },
+            "numerical_steps": {
+              "title": "Numerical Steps",
+              "type": "integer"
+            },
+            "physics_identity": {
+              "title": "Physics Identity",
+              "type": "string"
+            },
+            "reason": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Reason"
+            },
+            "scene_identity": {
+              "title": "Scene Identity",
+              "type": "string"
+            },
+            "solver_configuration": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SpatialParameters"
+                },
+                {
+                  "$ref": "#/$defs/PlanarParameters"
+                },
+                {
+                  "$ref": "#/$defs/MujocoParameters"
+                }
+              ],
+              "title": "Solver Configuration"
+            }
+          },
+          "required": [
+            "backend",
+            "physics_identity",
+            "scene_identity",
+            "solver_configuration",
+            "exported_files",
+            "controller_mode",
+            "controller_updates",
+            "numerical_steps"
+          ],
+          "title": "DynamicsData",
+          "type": "object"
+        },
+        "experiment.initial@1.0.0": {
+          "additionalProperties": false,
+          "properties": {
+            "qpos_rad": {
+              "default": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 16,
+              "minItems": 16,
+              "title": "Qpos Rad",
+              "type": "array"
+            },
+            "qvel_rad_s": {
+              "default": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 16,
+              "minItems": 16,
+              "title": "Qvel Rad S",
+              "type": "array"
+            }
+          },
+          "title": "Initial",
+          "type": "object"
+        },
+        "experiment.mujoco_parameters@1.0.0": {
+          "additionalProperties": false,
+          "properties": {
+            "integrator": {
+              "default": "implicitfast",
+              "enum": [
+                "Euler",
+                "implicitfast"
+              ],
+              "title": "Integrator",
+              "type": "string"
+            },
+            "model": {
+              "const": "mujoco_assembled_rod_v1",
+              "default": "mujoco_assembled_rod_v1",
+              "title": "Model",
+              "type": "string"
+            }
+          },
+          "title": "MujocoParameters",
+          "type": "object"
+        },
+        "experiment.physics@1.0.0": {
+          "$defs": {
+            "Part": {
+              "additionalProperties": false,
+              "properties": {
+                "com_local_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Com Local M",
+                  "type": "array"
+                },
+                "damping_nm_s_rad": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Damping Nm S Rad",
+                  "type": "array"
+                },
+                "entity": {
+                  "title": "Entity",
+                  "type": "string"
+                },
+                "inertia_com_local_kg_m2": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    },
+                    {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    },
+                    {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    }
+                  ],
+                  "title": "Inertia Com Local Kg M2",
+                  "type": "array"
+                },
+                "joint_axes_local": {
+                  "default": [
+                    [
+                      0.0,
+                      1.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    },
+                    {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    }
+                  ],
+                  "title": "Joint Axes Local",
+                  "type": "array"
+                },
+                "length_m": {
+                  "title": "Length M",
+                  "type": "number"
+                },
+                "mass_kg": {
+                  "title": "Mass Kg",
+                  "type": "number"
+                },
+                "natural_rad": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Natural Rad",
+                  "type": "array"
+                },
+                "origin_parent_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Origin Parent M",
+                  "type": "array"
+                },
+                "parent": {
+                  "title": "Parent",
+                  "type": "string"
+                },
+                "radius_m": {
+                  "title": "Radius M",
+                  "type": "number"
+                },
+                "stiffness_nm_rad": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Stiffness Nm Rad",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "entity",
+                "parent",
+                "origin_parent_m",
+                "length_m",
+                "radius_m",
+                "mass_kg",
+                "com_local_m",
+                "inertia_com_local_kg_m2",
+                "stiffness_nm_rad",
+                "damping_nm_s_rad",
+                "natural_rad"
+              ],
+              "title": "Part",
+              "type": "object"
+            },
+            "Tendon": {
+              "additionalProperties": false,
+              "properties": {
+                "actuator": {
+                  "title": "Actuator",
+                  "type": "string"
+                },
+                "entity": {
+                  "title": "Entity",
+                  "type": "string"
+                },
+                "force_limit_n": {
+                  "title": "Force Limit N",
+                  "type": "number"
+                },
+                "kp_n_m": {
+                  "title": "Kp N M",
+                  "type": "number"
+                },
+                "offset_yz_m": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Offset Yz M",
+                  "type": "array"
+                },
+                "route_entities": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Route Entities",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "entity",
+                "actuator",
+                "offset_yz_m",
+                "kp_n_m",
+                "force_limit_n",
+                "route_entities"
+              ],
+              "title": "Tendon",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "derivation": {
+              "title": "Derivation",
+              "type": "string"
+            },
+            "frame": {
+              "const": "body_local_x_forward; inertia_about_com",
+              "default": "body_local_x_forward; inertia_about_com",
+              "title": "Frame",
+              "type": "string"
+            },
+            "identity": {
+              "title": "Identity",
+              "type": "string"
+            },
+            "parts": {
+              "items": {
+                "$ref": "#/$defs/Part"
+              },
+              "title": "Parts",
+              "type": "array"
+            },
+            "source_contracts": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Source Contracts",
+              "type": "array"
+            },
+            "source_ir_identity": {
+              "title": "Source Ir Identity",
+              "type": "string"
+            },
+            "tendons": {
+              "items": {
+                "$ref": "#/$defs/Tendon"
+              },
+              "title": "Tendons",
+              "type": "array"
+            },
+            "version": {
+              "const": "equivalent_rod_physics_v1",
+              "default": "equivalent_rod_physics_v1",
+              "title": "Version",
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_ir_identity",
+            "source_contracts",
+            "identity",
+            "parts",
+            "tendons",
+            "derivation"
+          ],
+          "title": "ResolvedPhysics",
+          "type": "object"
+        },
+        "experiment.planar_parameters@1.0.0": {
+          "additionalProperties": false,
+          "properties": {
+            "model": {
+              "const": "matlab_tdcr_planar_dynamic_v1",
+              "default": "matlab_tdcr_planar_dynamic_v1",
+              "title": "Model",
+              "type": "string"
+            }
+          },
+          "title": "PlanarParameters",
+          "type": "object"
+        },
+        "experiment.scene@1.0.0": {
+          "$defs": {
+            "Assembly": {
+              "additionalProperties": false,
+              "properties": {
+                "environment": {
+                  "$ref": "#/$defs/EnvironmentSpec"
+                },
+                "external_forces": {
+                  "default": [],
+                  "items": {
+                    "$ref": "#/$defs/TimedForce"
+                  },
+                  "title": "External Forces",
+                  "type": "array"
+                },
+                "floor_id": {
+                  "title": "Floor Id",
+                  "type": "string"
+                },
+                "mount": {
+                  "$ref": "#/$defs/Mount"
+                }
+              },
+              "required": [
+                "environment",
+                "floor_id"
+              ],
+              "title": "Assembly",
+              "type": "object"
+            },
+            "EnvironmentSpec": {
+              "additionalProperties": false,
+              "properties": {
+                "coordinate_frame": {
+                  "const": "world_base_x_forward_yz_cross_section",
+                  "title": "Coordinate Frame",
+                  "type": "string"
+                },
+                "environment_id": {
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "title": "Environment Id",
+                  "type": "string"
+                },
+                "gravity_m_s2": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Gravity M S2",
+                  "type": "array"
+                },
+                "gravity_source": {
+                  "minLength": 1,
+                  "title": "Gravity Source",
+                  "type": "string"
+                },
+                "lights": {
+                  "default": [],
+                  "items": {
+                    "$ref": "#/$defs/Light"
+                  },
+                  "title": "Lights",
+                  "type": "array"
+                },
+                "objects": {
+                  "items": {
+                    "discriminator": {
+                      "mapping": {
+                        "ball": "#/$defs/ReservedComponent",
+                        "plane": "#/$defs/Plane",
+                        "platform_disturbance": "#/$defs/ReservedComponent",
+                        "ramp": "#/$defs/ReservedComponent",
+                        "window": "#/$defs/Window"
+                      },
+                      "propertyName": "kind"
+                    },
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/Plane"
+                      },
+                      {
+                        "$ref": "#/$defs/Window"
+                      },
+                      {
+                        "$ref": "#/$defs/ReservedComponent"
+                      }
+                    ]
+                  },
+                  "title": "Objects",
+                  "type": "array"
+                },
+                "schema_version": {
+                  "const": "1",
+                  "default": "1",
+                  "title": "Schema Version",
+                  "type": "string"
+                },
+                "truth_status": {
+                  "default": "HUMAN_OWNED",
+                  "enum": [
+                    "HUMAN_OWNED",
+                    "HUMAN_APPROVED",
+                    "NON_CANONICAL_DEVELOPMENT_ONLY"
+                  ],
+                  "title": "Truth Status",
+                  "type": "string"
+                },
+                "units": {
+                  "const": "SI",
+                  "default": "SI",
+                  "title": "Units",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "environment_id",
+                "coordinate_frame",
+                "gravity_m_s2",
+                "gravity_source",
+                "objects"
+              ],
+              "title": "EnvironmentSpec",
+              "type": "object"
+            },
+            "Initial": {
+              "additionalProperties": false,
+              "properties": {
+                "qpos_rad": {
+                  "default": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 16,
+                  "minItems": 16,
+                  "title": "Qpos Rad",
+                  "type": "array"
+                },
+                "qvel_rad_s": {
+                  "default": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 16,
+                  "minItems": 16,
+                  "title": "Qvel Rad S",
+                  "type": "array"
+                }
+              },
+              "title": "Initial",
+              "type": "object"
+            },
+            "Light": {
+              "additionalProperties": false,
+              "properties": {
+                "direction": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Direction",
+                  "type": "array"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "position_m",
+                "direction"
+              ],
+              "title": "Light",
+              "type": "object"
+            },
+            "Mount": {
+              "additionalProperties": false,
+              "properties": {
+                "mount_id": {
+                  "const": "fixed_base",
+                  "default": "fixed_base",
+                  "title": "Mount Id",
+                  "type": "string"
+                },
+                "parent_frame": {
+                  "const": "world",
+                  "default": "world",
+                  "title": "Parent Frame",
+                  "type": "string"
+                },
+                "position_m": {
+                  "default": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "quaternion_wxyz": {
+                  "default": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 4,
+                  "minItems": 4,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Quaternion Wxyz",
+                  "type": "array"
+                },
+                "robot_id": {
+                  "const": "robot",
+                  "default": "robot",
+                  "title": "Robot Id",
+                  "type": "string"
+                }
+              },
+              "title": "Mount",
+              "type": "object"
+            },
+            "Plane": {
+              "additionalProperties": false,
+              "properties": {
+                "conaffinity": {
+                  "minimum": 0,
+                  "title": "Conaffinity",
+                  "type": "integer"
+                },
+                "contype": {
+                  "minimum": 0,
+                  "title": "Contype",
+                  "type": "integer"
+                },
+                "half_size_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Half Size M",
+                  "type": "array"
+                },
+                "kind": {
+                  "const": "plane",
+                  "default": "plane",
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "name",
+                "position_m",
+                "half_size_m",
+                "contype",
+                "conaffinity"
+              ],
+              "title": "Plane",
+              "type": "object"
+            },
+            "ReservedComponent": {
+              "additionalProperties": false,
+              "description": "Serializable extension proposals; no execution support in V1.",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "ball",
+                    "ramp",
+                    "platform_disturbance"
+                  ],
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "status": {
+                  "const": "PLANNED",
+                  "default": "PLANNED",
+                  "title": "Status",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "name",
+                "position_m"
+              ],
+              "title": "ReservedComponent",
+              "type": "object"
+            },
+            "TimedForce": {
+              "additionalProperties": false,
+              "properties": {
+                "end_s": {
+                  "exclusiveMinimum": 0,
+                  "title": "End S",
+                  "type": "number"
+                },
+                "entity": {
+                  "pattern": "^segment_[0-7]$",
+                  "title": "Entity",
+                  "type": "string"
+                },
+                "force_n": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Force N",
+                  "type": "array"
+                },
+                "frame": {
+                  "const": "world",
+                  "default": "world",
+                  "title": "Frame",
+                  "type": "string"
+                },
+                "point": {
+                  "const": "center_of_mass",
+                  "default": "center_of_mass",
+                  "title": "Point",
+                  "type": "string"
+                },
+                "robot_id": {
+                  "const": "robot",
+                  "default": "robot",
+                  "title": "Robot Id",
+                  "type": "string"
+                },
+                "start_s": {
+                  "minimum": 0,
+                  "title": "Start S",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "entity",
+                "force_n",
+                "start_s",
+                "end_s"
+              ],
+              "title": "TimedForce",
+              "type": "object"
+            },
+            "Window": {
+              "additionalProperties": false,
+              "description": "Finite rectangular frame; aperture in the world y-z plane, normal +x.",
+              "properties": {
+                "conaffinity": {
+                  "const": 1,
+                  "default": 1,
+                  "title": "Conaffinity",
+                  "type": "integer"
+                },
+                "contype": {
+                  "const": 0,
+                  "default": 0,
+                  "title": "Contype",
+                  "type": "integer"
+                },
+                "frame_width_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Frame Width M",
+                  "type": "number"
+                },
+                "height_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Height M",
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "window",
+                  "default": "window",
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "plane": {
+                  "const": "yz_normal_positive_x",
+                  "title": "Plane",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "thickness_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Thickness M",
+                  "type": "number"
+                },
+                "width_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Width M",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "position_m",
+                "plane",
+                "width_m",
+                "height_m",
+                "thickness_m",
+                "frame_width_m"
+              ],
+              "title": "Window",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "assembly": {
+              "$ref": "#/$defs/Assembly"
+            },
+            "duration_s": {
+              "title": "Duration S",
+              "type": "number"
+            },
+            "identity": {
+              "title": "Identity",
+              "type": "string"
+            },
+            "initial": {
+              "$ref": "#/$defs/Initial"
+            },
+            "physics_identity": {
+              "title": "Physics Identity",
+              "type": "string"
+            },
+            "sources": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Sources",
+              "type": "array"
+            },
+            "target_world_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Target World M",
+              "type": "array"
+            },
+            "task_identity": {
+              "title": "Task Identity",
+              "type": "string"
+            },
+            "version": {
+              "const": "rod_experiment_v1",
+              "default": "rod_experiment_v1",
+              "title": "Version",
+              "type": "string"
+            }
+          },
+          "required": [
+            "identity",
+            "physics_identity",
+            "assembly",
+            "initial",
+            "target_world_m",
+            "task_identity",
+            "duration_s",
+            "sources"
+          ],
+          "title": "Scene",
+          "type": "object"
+        },
+        "experiment.spatial_parameters@1.0.0": {
+          "additionalProperties": false,
+          "properties": {
+            "atol": {
+              "default": 1e-08,
+              "exclusiveMinimum": 0,
+              "maximum": 1e-05,
+              "title": "Atol",
+              "type": "number"
+            },
+            "contact_damping_n_s_m": {
+              "default": 5.0,
+              "minimum": 0,
+              "title": "Contact Damping N S M",
+              "type": "number"
+            },
+            "contact_stiffness_n_m": {
+              "default": 5000.0,
+              "exclusiveMinimum": 0,
+              "title": "Contact Stiffness N M",
+              "type": "number"
+            },
+            "contact_taper_m": {
+              "default": 0.0001,
+              "exclusiveMinimum": 0,
+              "title": "Contact Taper M",
+              "type": "number"
+            },
+            "max_step_s": {
+              "default": 0.0002,
+              "exclusiveMinimum": 0,
+              "title": "Max Step S",
+              "type": "number"
+            },
+            "model": {
+              "const": "spatial_rigid_link_v1",
+              "default": "spatial_rigid_link_v1",
+              "title": "Model",
+              "type": "string"
+            },
+            "rtol": {
+              "default": 1e-06,
+              "exclusiveMinimum": 0,
+              "maximum": 0.001,
+              "title": "Rtol",
+              "type": "number"
+            },
+            "solver": {
+              "const": "RK45",
+              "default": "RK45",
+              "title": "Solver",
+              "type": "string"
+            }
+          },
+          "title": "SpatialParameters",
+          "type": "object"
+        }
+      },
+      "declaration": {
+        "binding": "extensions.experiment_dynamics.backends:SpatialBackend",
+        "cache": false,
+        "capabilities": {
+          "applicability": "Spatial bending; fixed mount pose; explicit state; named floor and timed COM forces",
+          "cancellation": "between public calls",
+          "category": "mathematical_models",
+          "channels": [
+            "tendon_target_lengths_m"
+          ],
+          "controllers": [
+            "controller.experiment_length"
+          ],
+          "conversion": "typed assembled equivalent rod",
+          "dofs": "16 ordered y,z axes; eight links",
+          "environments": [
+            "experiment.assembly"
+          ],
+          "families": [
+            "task.reach"
+          ],
+          "force_convention": "actuator negative pulls; tension positive; external world force at named link COM, [start,end)",
+          "model": "spatial_rigid_link_v1",
+          "model_version": "1.0.0",
+          "omissions": [
+            "axial extension",
+            "shear",
+            "material twist",
+            "tendon friction",
+            "self collision"
+          ],
+          "operations": [
+            "compile",
+            "initialize",
+            "run",
+            "export",
+            "close"
+          ],
+          "physics": "equivalent rod compiler; SI; COM body-local full inertia",
+          "required_environment": "one named horizontal floor; fixed mount",
+          "robot_contracts": [
+            "domain.rod_design"
+          ],
+          "robots": [
+            "tendon_driven_continuum"
+          ],
+          "role": "adapter",
+          "signal_phases": [
+            "post_step",
+            "pre_step_solver"
+          ],
+          "signal_specs_resolver": "extensions.experiment_dynamics.signals:observation_specs",
+          "signal_templates": [
+            {
+              "dimension": 3,
+              "entity_group": "tip",
+              "field": "tip_m",
+              "frame": "world",
+              "name": "tip_position",
+              "phase": "post_step",
+              "time_field": "time_s",
+              "units": "m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "joint",
+              "field": "qpos_rad",
+              "frame": "joint_local",
+              "name": "joint_position",
+              "phase": "post_step",
+              "time_field": "time_s",
+              "units": "rad"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "joint",
+              "field": "qvel_rad_s",
+              "frame": "joint_local",
+              "name": "joint_velocity",
+              "phase": "post_step",
+              "time_field": "time_s",
+              "units": "rad/s"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "tendon",
+              "field": "command_m",
+              "frame": "actuator",
+              "name": "tendon_command",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "tendon",
+              "field": "solver_tendon_length_m",
+              "frame": "actuator",
+              "name": "tendon_length",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "tendon",
+              "field": "solver_actuator_force_n",
+              "frame": "actuator",
+              "name": "actuator_force",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "N"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "contact",
+              "field": "solver_contact_count",
+              "frame": "world",
+              "name": "contact_count",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "count"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "joint",
+              "field": "solver_qfrc_actuator_nm",
+              "frame": "joint_local",
+              "name": "actuator_torque",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "N.m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "joint",
+              "field": "solver_qfrc_passive_nm",
+              "frame": "joint_local",
+              "name": "passive_torque",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "N.m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "joint",
+              "field": "external_torque_nm",
+              "frame": "joint_local",
+              "name": "external_torque",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "N.m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "segment",
+              "field": "floor_gap_m",
+              "frame": "world",
+              "name": "floor_gap",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "segment",
+              "field": "normal_contact_approx_n",
+              "frame": "world",
+              "name": "contact_normal_approx",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "N"
+            }
+          ],
+          "signals": [
+            "actuator_force",
+            "actuator_torque",
+            "contact_count",
+            "contact_normal_approx",
+            "external_torque",
+            "floor_gap",
+            "joint_position",
+            "joint_velocity",
+            "passive_torque",
+            "tendon_command",
+            "tendon_length",
+            "tendon_tension",
+            "tip_position"
+          ],
+          "timeout": "numerical loop deadline; startup/close not hard bounded"
+        },
+        "contract_dependencies": [
+          [
+            "experiment.assembly",
+            "1.0.0"
+          ],
+          [
+            "experiment.initial",
+            "1.0.0"
+          ],
+          [
+            "experiment.physics",
+            "1.0.0"
+          ],
+          [
+            "experiment.scene",
+            "1.0.0"
+          ],
+          [
+            "experiment.spatial_parameters",
+            "1.0.0"
+          ],
+          [
+            "experiment.planar_parameters",
+            "1.0.0"
+          ],
+          [
+            "experiment.mujoco_parameters",
+            "1.0.0"
+          ],
+          [
+            "experiment.backend_data",
+            "1.0.0"
+          ]
+        ],
+        "extension_dependencies": [],
+        "kind": "backend",
+        "resources": [],
+        "side_effects": "none"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "atol": {
+            "default": 1e-08,
+            "exclusiveMinimum": 0,
+            "maximum": 1e-05,
+            "title": "Atol",
+            "type": "number"
+          },
+          "contact_damping_n_s_m": {
+            "default": 5.0,
+            "minimum": 0,
+            "title": "Contact Damping N S M",
+            "type": "number"
+          },
+          "contact_stiffness_n_m": {
+            "default": 5000.0,
+            "exclusiveMinimum": 0,
+            "title": "Contact Stiffness N M",
+            "type": "number"
+          },
+          "contact_taper_m": {
+            "default": 0.0001,
+            "exclusiveMinimum": 0,
+            "title": "Contact Taper M",
+            "type": "number"
+          },
+          "max_step_s": {
+            "default": 0.0002,
+            "exclusiveMinimum": 0,
+            "title": "Max Step S",
+            "type": "number"
+          },
+          "model": {
+            "const": "spatial_rigid_link_v1",
+            "default": "spatial_rigid_link_v1",
+            "title": "Model",
+            "type": "string"
+          },
+          "rtol": {
+            "default": 1e-06,
+            "exclusiveMinimum": 0,
+            "maximum": 0.001,
+            "title": "Rtol",
+            "type": "number"
+          },
+          "solver": {
+            "const": "RK45",
+            "default": "RK45",
+            "title": "Solver",
+            "type": "string"
+          }
+        },
+        "title": "SpatialParameters",
+        "type": "object"
+      },
+      "output_schema": {
+        "$defs": {
+          "Payload": {
+            "additionalProperties": false,
+            "properties": {
+              "contract": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "title": "Contract",
+                "type": "string"
+              },
+              "data": {
+                "additionalProperties": true,
+                "title": "Data",
+                "type": "object"
+              },
+              "version": {
+                "default": "1.0.0",
+                "title": "Version",
+                "type": "string"
+              }
+            },
+            "required": [
+              "contract",
+              "data"
+            ],
+            "title": "Payload",
+            "type": "object"
+          },
+          "Signal": {
+            "additionalProperties": false,
+            "properties": {
+              "spec": {
+                "$ref": "#/$defs/SignalSpec"
+              },
+              "times_s": {
+                "items": {
+                  "type": "number"
+                },
+                "title": "Times S",
+                "type": "array"
+              },
+              "values": {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "title": "Values",
+                "type": "array"
+              }
+            },
+            "required": [
+              "spec",
+              "times_s",
+              "values"
+            ],
+            "title": "Signal",
+            "type": "object"
+          },
+          "SignalSpec": {
+            "additionalProperties": false,
+            "properties": {
+              "dimension": {
+                "exclusiveMinimum": 0,
+                "title": "Dimension",
+                "type": "integer"
+              },
+              "entity": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "title": "Entity",
+                "type": "string"
+              },
+              "frame": {
+                "minLength": 1,
+                "title": "Frame",
+                "type": "string"
+              },
+              "missing": {
+                "const": "unsupported",
+                "default": "unsupported",
+                "title": "Missing",
+                "type": "string"
+              },
+              "name": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "title": "Name",
+                "type": "string"
+              },
+              "phase": {
+                "minLength": 1,
+                "title": "Phase",
+                "type": "string"
+              },
+              "units": {
+                "minLength": 1,
+                "title": "Units",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "entity",
+              "dimension",
+              "units",
+              "frame",
+              "phase"
+            ],
+            "title": "SignalSpec",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "backend_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Backend Id",
+            "type": "string"
+          },
+          "backend_version": {
+            "default": "1.0.0",
+            "title": "Backend Version",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/$defs/Payload"
+          },
+          "initial_state": {
+            "$ref": "#/$defs/Payload"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "model_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Model Id",
+            "type": "string"
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer"
+          },
+          "signals": {
+            "items": {
+              "$ref": "#/$defs/Signal"
+            },
+            "title": "Signals",
+            "type": "array"
+          },
+          "solver_status": {
+            "enum": [
+              "completed",
+              "failed",
+              "cancelled",
+              "unknown"
+            ],
+            "title": "Solver Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "solver_status",
+          "backend_id",
+          "model_id",
+          "signals",
+          "data",
+          "limitations",
+          "initial_state",
+          "seed"
+        ],
+        "title": "BackendResult",
+        "type": "object"
+      },
+      "packages": {
+        "numpy": "2.4.6",
+        "pydantic": "2.13.5",
+        "scipy": "1.17.1"
+      },
+      "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+      "sources": {
+        "controllers/factories.py": "18d141b6e3cc7be6de401b89a41707cf13cbc179a711c2589b1e29a333918d44",
+        "controllers/open_loop_length.py": "734bbd1387dcd5291ad154fe569f79130fc5b5183c3bcfd97c03efb4dc2f3bc6",
+        "controllers/pcc_tip_feedback.py": "1966f813f18582cbe1d6fe53b39876c55152b825afa99d14b48686d95162657e",
+        "extensions/experiment_dynamics/backends.py": "8636ab9a4d9018e48122c613e31b80c434117171c473d80167a818cbc4eafedd",
+        "extensions/experiment_dynamics/contracts.py": "c6af788cdcad72144d948120c10801441162c0b4a7528f4e0038efc06260cb64",
+        "extensions/experiment_dynamics/manifest.py": "969f30288e1ec5e8a41f034b640bdbe005a91df557ffe0f00c59da747acc0e0d",
+        "extensions/experiment_dynamics/physics.py": "1fd2e663e53ad04b4a07897c3870258efd6bd684403e73137391b1b9edf53c0a",
+        "extensions/experiment_dynamics/scene.py": "80ab544ac7b5484f9420e02be002214a08677930b2bc6bccbfdb8606dcd40314",
+        "extensions/experiment_dynamics/signals.py": "29924789d6a71f3577a5183569116f01fda6c702b22707d541d7afb778498b6f",
+        "extensions/experiment_dynamics/spatial.py": "89d23ed54c6b15ebe471ef0165c5ba22011d739b645481201d8edc47470f7a60",
+        "extensions/robot_domain/signals.py": "34a8ed06491c3df44baf18abfe68d7abaab81432e53c9577b569ca7ebce20c5c",
+        "physics_contracts/equivalent_rod_v2.md": "49a4ed750a4a8a075c99f86360abb3dfbf1e0016123801e89aa1b3b94c1fd575",
+        "schemas/common.py": "95600d6bfdac7e46b024c7b8ae53aac8fc11eb51e92b2b93763d3e5b6fa19eae",
+        "schemas/exploration.py": "25e6c6eb653d5fd9d2e1dfa49cea8e12e36aa7671005f61b5858c26031d0cf15",
+        "schemas/platform.py": "a7b77801df1f0b8beb5803c08adfb70c122c31774248591234a30f7a8fb3e9af",
+        "schemas/robot_ir.py": "149b5431e8acb6eb0e71d61146360e1e95635a0631f6f1053a19822920244944",
+        "tools/design_compiler.py": "77ee2be29609ffc77d555073d2c9fe060b6f2a23bf2b7ff92f0b21f49a72a14f",
+        "tools/pcc_math.py": "b2d9a741a29c44548e9fd6d97d3ae1f120429d096b96a632f9b3454ce66ede3f",
+        "tools/platform_host.py": "760fae88b51b973af95a3d195002be0b34b358336d65c6a7237c01e68d2cf672",
+        "tools/platform_registry.py": "dc3053f82585136a60c5997b46c1e1dd50e84d0d56ca1cf8445898a823c757b6",
+        "tools/platform_store.py": "2f69cfc3525a201deb98ad99a38a2a3a0537d27c0a1c492b1d15d1c450f34258",
+        "tools/reach_dynamics.py": "dd2d707b3fe849ca328860b239520284238bf393b48267965bf0231f3c41130b"
+      },
+      "version": "1.0.0"
+    },
+    "scene_mujoco": {
+      "conservative_reason": null,
+      "contracts": {
+        "experiment.assembly@1.0.0": {
+          "$defs": {
+            "EnvironmentSpec": {
+              "additionalProperties": false,
+              "properties": {
+                "coordinate_frame": {
+                  "const": "world_base_x_forward_yz_cross_section",
+                  "title": "Coordinate Frame",
+                  "type": "string"
+                },
+                "environment_id": {
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "title": "Environment Id",
+                  "type": "string"
+                },
+                "gravity_m_s2": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Gravity M S2",
+                  "type": "array"
+                },
+                "gravity_source": {
+                  "minLength": 1,
+                  "title": "Gravity Source",
+                  "type": "string"
+                },
+                "lights": {
+                  "default": [],
+                  "items": {
+                    "$ref": "#/$defs/Light"
+                  },
+                  "title": "Lights",
+                  "type": "array"
+                },
+                "objects": {
+                  "items": {
+                    "discriminator": {
+                      "mapping": {
+                        "ball": "#/$defs/ReservedComponent",
+                        "plane": "#/$defs/Plane",
+                        "platform_disturbance": "#/$defs/ReservedComponent",
+                        "ramp": "#/$defs/ReservedComponent",
+                        "window": "#/$defs/Window"
+                      },
+                      "propertyName": "kind"
+                    },
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/Plane"
+                      },
+                      {
+                        "$ref": "#/$defs/Window"
+                      },
+                      {
+                        "$ref": "#/$defs/ReservedComponent"
+                      }
+                    ]
+                  },
+                  "title": "Objects",
+                  "type": "array"
+                },
+                "schema_version": {
+                  "const": "1",
+                  "default": "1",
+                  "title": "Schema Version",
+                  "type": "string"
+                },
+                "truth_status": {
+                  "default": "HUMAN_OWNED",
+                  "enum": [
+                    "HUMAN_OWNED",
+                    "HUMAN_APPROVED",
+                    "NON_CANONICAL_DEVELOPMENT_ONLY"
+                  ],
+                  "title": "Truth Status",
+                  "type": "string"
+                },
+                "units": {
+                  "const": "SI",
+                  "default": "SI",
+                  "title": "Units",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "environment_id",
+                "coordinate_frame",
+                "gravity_m_s2",
+                "gravity_source",
+                "objects"
+              ],
+              "title": "EnvironmentSpec",
+              "type": "object"
+            },
+            "Light": {
+              "additionalProperties": false,
+              "properties": {
+                "direction": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Direction",
+                  "type": "array"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "position_m",
+                "direction"
+              ],
+              "title": "Light",
+              "type": "object"
+            },
+            "Mount": {
+              "additionalProperties": false,
+              "properties": {
+                "mount_id": {
+                  "const": "fixed_base",
+                  "default": "fixed_base",
+                  "title": "Mount Id",
+                  "type": "string"
+                },
+                "parent_frame": {
+                  "const": "world",
+                  "default": "world",
+                  "title": "Parent Frame",
+                  "type": "string"
+                },
+                "position_m": {
+                  "default": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "quaternion_wxyz": {
+                  "default": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 4,
+                  "minItems": 4,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Quaternion Wxyz",
+                  "type": "array"
+                },
+                "robot_id": {
+                  "const": "robot",
+                  "default": "robot",
+                  "title": "Robot Id",
+                  "type": "string"
+                }
+              },
+              "title": "Mount",
+              "type": "object"
+            },
+            "Plane": {
+              "additionalProperties": false,
+              "properties": {
+                "conaffinity": {
+                  "minimum": 0,
+                  "title": "Conaffinity",
+                  "type": "integer"
+                },
+                "contype": {
+                  "minimum": 0,
+                  "title": "Contype",
+                  "type": "integer"
+                },
+                "half_size_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Half Size M",
+                  "type": "array"
+                },
+                "kind": {
+                  "const": "plane",
+                  "default": "plane",
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "name",
+                "position_m",
+                "half_size_m",
+                "contype",
+                "conaffinity"
+              ],
+              "title": "Plane",
+              "type": "object"
+            },
+            "ReservedComponent": {
+              "additionalProperties": false,
+              "description": "Serializable extension proposals; no execution support in V1.",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "ball",
+                    "ramp",
+                    "platform_disturbance"
+                  ],
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "status": {
+                  "const": "PLANNED",
+                  "default": "PLANNED",
+                  "title": "Status",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "name",
+                "position_m"
+              ],
+              "title": "ReservedComponent",
+              "type": "object"
+            },
+            "TimedForce": {
+              "additionalProperties": false,
+              "properties": {
+                "end_s": {
+                  "exclusiveMinimum": 0,
+                  "title": "End S",
+                  "type": "number"
+                },
+                "entity": {
+                  "pattern": "^segment_[0-7]$",
+                  "title": "Entity",
+                  "type": "string"
+                },
+                "force_n": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Force N",
+                  "type": "array"
+                },
+                "frame": {
+                  "const": "world",
+                  "default": "world",
+                  "title": "Frame",
+                  "type": "string"
+                },
+                "point": {
+                  "const": "center_of_mass",
+                  "default": "center_of_mass",
+                  "title": "Point",
+                  "type": "string"
+                },
+                "robot_id": {
+                  "const": "robot",
+                  "default": "robot",
+                  "title": "Robot Id",
+                  "type": "string"
+                },
+                "start_s": {
+                  "minimum": 0,
+                  "title": "Start S",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "entity",
+                "force_n",
+                "start_s",
+                "end_s"
+              ],
+              "title": "TimedForce",
+              "type": "object"
+            },
+            "Window": {
+              "additionalProperties": false,
+              "description": "Finite rectangular frame; aperture in the world y-z plane, normal +x.",
+              "properties": {
+                "conaffinity": {
+                  "const": 1,
+                  "default": 1,
+                  "title": "Conaffinity",
+                  "type": "integer"
+                },
+                "contype": {
+                  "const": 0,
+                  "default": 0,
+                  "title": "Contype",
+                  "type": "integer"
+                },
+                "frame_width_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Frame Width M",
+                  "type": "number"
+                },
+                "height_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Height M",
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "window",
+                  "default": "window",
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "plane": {
+                  "const": "yz_normal_positive_x",
+                  "title": "Plane",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "thickness_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Thickness M",
+                  "type": "number"
+                },
+                "width_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Width M",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "position_m",
+                "plane",
+                "width_m",
+                "height_m",
+                "thickness_m",
+                "frame_width_m"
+              ],
+              "title": "Window",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "environment": {
+              "$ref": "#/$defs/EnvironmentSpec"
+            },
+            "external_forces": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/TimedForce"
+              },
+              "title": "External Forces",
+              "type": "array"
+            },
+            "floor_id": {
+              "title": "Floor Id",
+              "type": "string"
+            },
+            "mount": {
+              "$ref": "#/$defs/Mount"
+            }
+          },
+          "required": [
+            "environment",
+            "floor_id"
+          ],
+          "title": "Assembly",
+          "type": "object"
+        },
+        "experiment.backend_data@1.0.0": {
+          "$defs": {
+            "MujocoParameters": {
+              "additionalProperties": false,
+              "properties": {
+                "integrator": {
+                  "default": "implicitfast",
+                  "enum": [
+                    "Euler",
+                    "implicitfast"
+                  ],
+                  "title": "Integrator",
+                  "type": "string"
+                },
+                "model": {
+                  "const": "mujoco_assembled_rod_v1",
+                  "default": "mujoco_assembled_rod_v1",
+                  "title": "Model",
+                  "type": "string"
+                }
+              },
+              "title": "MujocoParameters",
+              "type": "object"
+            },
+            "PlanarParameters": {
+              "additionalProperties": false,
+              "properties": {
+                "model": {
+                  "const": "matlab_tdcr_planar_dynamic_v1",
+                  "default": "matlab_tdcr_planar_dynamic_v1",
+                  "title": "Model",
+                  "type": "string"
+                }
+              },
+              "title": "PlanarParameters",
+              "type": "object"
+            },
+            "SpatialParameters": {
+              "additionalProperties": false,
+              "properties": {
+                "atol": {
+                  "default": 1e-08,
+                  "exclusiveMinimum": 0,
+                  "maximum": 1e-05,
+                  "title": "Atol",
+                  "type": "number"
+                },
+                "contact_damping_n_s_m": {
+                  "default": 5.0,
+                  "minimum": 0,
+                  "title": "Contact Damping N S M",
+                  "type": "number"
+                },
+                "contact_stiffness_n_m": {
+                  "default": 5000.0,
+                  "exclusiveMinimum": 0,
+                  "title": "Contact Stiffness N M",
+                  "type": "number"
+                },
+                "contact_taper_m": {
+                  "default": 0.0001,
+                  "exclusiveMinimum": 0,
+                  "title": "Contact Taper M",
+                  "type": "number"
+                },
+                "max_step_s": {
+                  "default": 0.0002,
+                  "exclusiveMinimum": 0,
+                  "title": "Max Step S",
+                  "type": "number"
+                },
+                "model": {
+                  "const": "spatial_rigid_link_v1",
+                  "default": "spatial_rigid_link_v1",
+                  "title": "Model",
+                  "type": "string"
+                },
+                "rtol": {
+                  "default": 1e-06,
+                  "exclusiveMinimum": 0,
+                  "maximum": 0.001,
+                  "title": "Rtol",
+                  "type": "number"
+                },
+                "solver": {
+                  "const": "RK45",
+                  "default": "RK45",
+                  "title": "Solver",
+                  "type": "string"
+                }
+              },
+              "title": "SpatialParameters",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "backend": {
+              "title": "Backend",
+              "type": "string"
+            },
+            "controller_mode": {
+              "enum": [
+                "C1",
+                "C2"
+              ],
+              "title": "Controller Mode",
+              "type": "string"
+            },
+            "controller_updates": {
+              "title": "Controller Updates",
+              "type": "integer"
+            },
+            "exported_files": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Exported Files",
+              "type": "array"
+            },
+            "model_version": {
+              "const": "1.0.0",
+              "default": "1.0.0",
+              "title": "Model Version",
+              "type": "string"
+            },
+            "numerical_steps": {
+              "title": "Numerical Steps",
+              "type": "integer"
+            },
+            "physics_identity": {
+              "title": "Physics Identity",
+              "type": "string"
+            },
+            "reason": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Reason"
+            },
+            "scene_identity": {
+              "title": "Scene Identity",
+              "type": "string"
+            },
+            "solver_configuration": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SpatialParameters"
+                },
+                {
+                  "$ref": "#/$defs/PlanarParameters"
+                },
+                {
+                  "$ref": "#/$defs/MujocoParameters"
+                }
+              ],
+              "title": "Solver Configuration"
+            }
+          },
+          "required": [
+            "backend",
+            "physics_identity",
+            "scene_identity",
+            "solver_configuration",
+            "exported_files",
+            "controller_mode",
+            "controller_updates",
+            "numerical_steps"
+          ],
+          "title": "DynamicsData",
+          "type": "object"
+        },
+        "experiment.initial@1.0.0": {
+          "additionalProperties": false,
+          "properties": {
+            "qpos_rad": {
+              "default": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 16,
+              "minItems": 16,
+              "title": "Qpos Rad",
+              "type": "array"
+            },
+            "qvel_rad_s": {
+              "default": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 16,
+              "minItems": 16,
+              "title": "Qvel Rad S",
+              "type": "array"
+            }
+          },
+          "title": "Initial",
+          "type": "object"
+        },
+        "experiment.mujoco_parameters@1.0.0": {
+          "additionalProperties": false,
+          "properties": {
+            "integrator": {
+              "default": "implicitfast",
+              "enum": [
+                "Euler",
+                "implicitfast"
+              ],
+              "title": "Integrator",
+              "type": "string"
+            },
+            "model": {
+              "const": "mujoco_assembled_rod_v1",
+              "default": "mujoco_assembled_rod_v1",
+              "title": "Model",
+              "type": "string"
+            }
+          },
+          "title": "MujocoParameters",
+          "type": "object"
+        },
+        "experiment.physics@1.0.0": {
+          "$defs": {
+            "Part": {
+              "additionalProperties": false,
+              "properties": {
+                "com_local_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Com Local M",
+                  "type": "array"
+                },
+                "damping_nm_s_rad": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Damping Nm S Rad",
+                  "type": "array"
+                },
+                "entity": {
+                  "title": "Entity",
+                  "type": "string"
+                },
+                "inertia_com_local_kg_m2": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    },
+                    {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    },
+                    {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    }
+                  ],
+                  "title": "Inertia Com Local Kg M2",
+                  "type": "array"
+                },
+                "joint_axes_local": {
+                  "default": [
+                    [
+                      0.0,
+                      1.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    },
+                    {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    }
+                  ],
+                  "title": "Joint Axes Local",
+                  "type": "array"
+                },
+                "length_m": {
+                  "title": "Length M",
+                  "type": "number"
+                },
+                "mass_kg": {
+                  "title": "Mass Kg",
+                  "type": "number"
+                },
+                "natural_rad": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Natural Rad",
+                  "type": "array"
+                },
+                "origin_parent_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Origin Parent M",
+                  "type": "array"
+                },
+                "parent": {
+                  "title": "Parent",
+                  "type": "string"
+                },
+                "radius_m": {
+                  "title": "Radius M",
+                  "type": "number"
+                },
+                "stiffness_nm_rad": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Stiffness Nm Rad",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "entity",
+                "parent",
+                "origin_parent_m",
+                "length_m",
+                "radius_m",
+                "mass_kg",
+                "com_local_m",
+                "inertia_com_local_kg_m2",
+                "stiffness_nm_rad",
+                "damping_nm_s_rad",
+                "natural_rad"
+              ],
+              "title": "Part",
+              "type": "object"
+            },
+            "Tendon": {
+              "additionalProperties": false,
+              "properties": {
+                "actuator": {
+                  "title": "Actuator",
+                  "type": "string"
+                },
+                "entity": {
+                  "title": "Entity",
+                  "type": "string"
+                },
+                "force_limit_n": {
+                  "title": "Force Limit N",
+                  "type": "number"
+                },
+                "kp_n_m": {
+                  "title": "Kp N M",
+                  "type": "number"
+                },
+                "offset_yz_m": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Offset Yz M",
+                  "type": "array"
+                },
+                "route_entities": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Route Entities",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "entity",
+                "actuator",
+                "offset_yz_m",
+                "kp_n_m",
+                "force_limit_n",
+                "route_entities"
+              ],
+              "title": "Tendon",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "derivation": {
+              "title": "Derivation",
+              "type": "string"
+            },
+            "frame": {
+              "const": "body_local_x_forward; inertia_about_com",
+              "default": "body_local_x_forward; inertia_about_com",
+              "title": "Frame",
+              "type": "string"
+            },
+            "identity": {
+              "title": "Identity",
+              "type": "string"
+            },
+            "parts": {
+              "items": {
+                "$ref": "#/$defs/Part"
+              },
+              "title": "Parts",
+              "type": "array"
+            },
+            "source_contracts": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Source Contracts",
+              "type": "array"
+            },
+            "source_ir_identity": {
+              "title": "Source Ir Identity",
+              "type": "string"
+            },
+            "tendons": {
+              "items": {
+                "$ref": "#/$defs/Tendon"
+              },
+              "title": "Tendons",
+              "type": "array"
+            },
+            "version": {
+              "const": "equivalent_rod_physics_v1",
+              "default": "equivalent_rod_physics_v1",
+              "title": "Version",
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_ir_identity",
+            "source_contracts",
+            "identity",
+            "parts",
+            "tendons",
+            "derivation"
+          ],
+          "title": "ResolvedPhysics",
+          "type": "object"
+        },
+        "experiment.planar_parameters@1.0.0": {
+          "additionalProperties": false,
+          "properties": {
+            "model": {
+              "const": "matlab_tdcr_planar_dynamic_v1",
+              "default": "matlab_tdcr_planar_dynamic_v1",
+              "title": "Model",
+              "type": "string"
+            }
+          },
+          "title": "PlanarParameters",
+          "type": "object"
+        },
+        "experiment.scene@1.0.0": {
+          "$defs": {
+            "Assembly": {
+              "additionalProperties": false,
+              "properties": {
+                "environment": {
+                  "$ref": "#/$defs/EnvironmentSpec"
+                },
+                "external_forces": {
+                  "default": [],
+                  "items": {
+                    "$ref": "#/$defs/TimedForce"
+                  },
+                  "title": "External Forces",
+                  "type": "array"
+                },
+                "floor_id": {
+                  "title": "Floor Id",
+                  "type": "string"
+                },
+                "mount": {
+                  "$ref": "#/$defs/Mount"
+                }
+              },
+              "required": [
+                "environment",
+                "floor_id"
+              ],
+              "title": "Assembly",
+              "type": "object"
+            },
+            "EnvironmentSpec": {
+              "additionalProperties": false,
+              "properties": {
+                "coordinate_frame": {
+                  "const": "world_base_x_forward_yz_cross_section",
+                  "title": "Coordinate Frame",
+                  "type": "string"
+                },
+                "environment_id": {
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "title": "Environment Id",
+                  "type": "string"
+                },
+                "gravity_m_s2": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Gravity M S2",
+                  "type": "array"
+                },
+                "gravity_source": {
+                  "minLength": 1,
+                  "title": "Gravity Source",
+                  "type": "string"
+                },
+                "lights": {
+                  "default": [],
+                  "items": {
+                    "$ref": "#/$defs/Light"
+                  },
+                  "title": "Lights",
+                  "type": "array"
+                },
+                "objects": {
+                  "items": {
+                    "discriminator": {
+                      "mapping": {
+                        "ball": "#/$defs/ReservedComponent",
+                        "plane": "#/$defs/Plane",
+                        "platform_disturbance": "#/$defs/ReservedComponent",
+                        "ramp": "#/$defs/ReservedComponent",
+                        "window": "#/$defs/Window"
+                      },
+                      "propertyName": "kind"
+                    },
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/Plane"
+                      },
+                      {
+                        "$ref": "#/$defs/Window"
+                      },
+                      {
+                        "$ref": "#/$defs/ReservedComponent"
+                      }
+                    ]
+                  },
+                  "title": "Objects",
+                  "type": "array"
+                },
+                "schema_version": {
+                  "const": "1",
+                  "default": "1",
+                  "title": "Schema Version",
+                  "type": "string"
+                },
+                "truth_status": {
+                  "default": "HUMAN_OWNED",
+                  "enum": [
+                    "HUMAN_OWNED",
+                    "HUMAN_APPROVED",
+                    "NON_CANONICAL_DEVELOPMENT_ONLY"
+                  ],
+                  "title": "Truth Status",
+                  "type": "string"
+                },
+                "units": {
+                  "const": "SI",
+                  "default": "SI",
+                  "title": "Units",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "environment_id",
+                "coordinate_frame",
+                "gravity_m_s2",
+                "gravity_source",
+                "objects"
+              ],
+              "title": "EnvironmentSpec",
+              "type": "object"
+            },
+            "Initial": {
+              "additionalProperties": false,
+              "properties": {
+                "qpos_rad": {
+                  "default": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 16,
+                  "minItems": 16,
+                  "title": "Qpos Rad",
+                  "type": "array"
+                },
+                "qvel_rad_s": {
+                  "default": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 16,
+                  "minItems": 16,
+                  "title": "Qvel Rad S",
+                  "type": "array"
+                }
+              },
+              "title": "Initial",
+              "type": "object"
+            },
+            "Light": {
+              "additionalProperties": false,
+              "properties": {
+                "direction": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Direction",
+                  "type": "array"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "position_m",
+                "direction"
+              ],
+              "title": "Light",
+              "type": "object"
+            },
+            "Mount": {
+              "additionalProperties": false,
+              "properties": {
+                "mount_id": {
+                  "const": "fixed_base",
+                  "default": "fixed_base",
+                  "title": "Mount Id",
+                  "type": "string"
+                },
+                "parent_frame": {
+                  "const": "world",
+                  "default": "world",
+                  "title": "Parent Frame",
+                  "type": "string"
+                },
+                "position_m": {
+                  "default": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "quaternion_wxyz": {
+                  "default": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 4,
+                  "minItems": 4,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Quaternion Wxyz",
+                  "type": "array"
+                },
+                "robot_id": {
+                  "const": "robot",
+                  "default": "robot",
+                  "title": "Robot Id",
+                  "type": "string"
+                }
+              },
+              "title": "Mount",
+              "type": "object"
+            },
+            "Plane": {
+              "additionalProperties": false,
+              "properties": {
+                "conaffinity": {
+                  "minimum": 0,
+                  "title": "Conaffinity",
+                  "type": "integer"
+                },
+                "contype": {
+                  "minimum": 0,
+                  "title": "Contype",
+                  "type": "integer"
+                },
+                "half_size_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Half Size M",
+                  "type": "array"
+                },
+                "kind": {
+                  "const": "plane",
+                  "default": "plane",
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "name",
+                "position_m",
+                "half_size_m",
+                "contype",
+                "conaffinity"
+              ],
+              "title": "Plane",
+              "type": "object"
+            },
+            "ReservedComponent": {
+              "additionalProperties": false,
+              "description": "Serializable extension proposals; no execution support in V1.",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "ball",
+                    "ramp",
+                    "platform_disturbance"
+                  ],
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "status": {
+                  "const": "PLANNED",
+                  "default": "PLANNED",
+                  "title": "Status",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "name",
+                "position_m"
+              ],
+              "title": "ReservedComponent",
+              "type": "object"
+            },
+            "TimedForce": {
+              "additionalProperties": false,
+              "properties": {
+                "end_s": {
+                  "exclusiveMinimum": 0,
+                  "title": "End S",
+                  "type": "number"
+                },
+                "entity": {
+                  "pattern": "^segment_[0-7]$",
+                  "title": "Entity",
+                  "type": "string"
+                },
+                "force_n": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Force N",
+                  "type": "array"
+                },
+                "frame": {
+                  "const": "world",
+                  "default": "world",
+                  "title": "Frame",
+                  "type": "string"
+                },
+                "point": {
+                  "const": "center_of_mass",
+                  "default": "center_of_mass",
+                  "title": "Point",
+                  "type": "string"
+                },
+                "robot_id": {
+                  "const": "robot",
+                  "default": "robot",
+                  "title": "Robot Id",
+                  "type": "string"
+                },
+                "start_s": {
+                  "minimum": 0,
+                  "title": "Start S",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "entity",
+                "force_n",
+                "start_s",
+                "end_s"
+              ],
+              "title": "TimedForce",
+              "type": "object"
+            },
+            "Window": {
+              "additionalProperties": false,
+              "description": "Finite rectangular frame; aperture in the world y-z plane, normal +x.",
+              "properties": {
+                "conaffinity": {
+                  "const": 1,
+                  "default": 1,
+                  "title": "Conaffinity",
+                  "type": "integer"
+                },
+                "contype": {
+                  "const": 0,
+                  "default": 0,
+                  "title": "Contype",
+                  "type": "integer"
+                },
+                "frame_width_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Frame Width M",
+                  "type": "number"
+                },
+                "height_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Height M",
+                  "type": "number"
+                },
+                "kind": {
+                  "const": "window",
+                  "default": "window",
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Name",
+                  "type": "string"
+                },
+                "plane": {
+                  "const": "yz_normal_positive_x",
+                  "title": "Plane",
+                  "type": "string"
+                },
+                "position_m": {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "thickness_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Thickness M",
+                  "type": "number"
+                },
+                "width_m": {
+                  "exclusiveMinimum": 0,
+                  "title": "Width M",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "position_m",
+                "plane",
+                "width_m",
+                "height_m",
+                "thickness_m",
+                "frame_width_m"
+              ],
+              "title": "Window",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "assembly": {
+              "$ref": "#/$defs/Assembly"
+            },
+            "duration_s": {
+              "title": "Duration S",
+              "type": "number"
+            },
+            "identity": {
+              "title": "Identity",
+              "type": "string"
+            },
+            "initial": {
+              "$ref": "#/$defs/Initial"
+            },
+            "physics_identity": {
+              "title": "Physics Identity",
+              "type": "string"
+            },
+            "sources": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Sources",
+              "type": "array"
+            },
+            "target_world_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Target World M",
+              "type": "array"
+            },
+            "task_identity": {
+              "title": "Task Identity",
+              "type": "string"
+            },
+            "version": {
+              "const": "rod_experiment_v1",
+              "default": "rod_experiment_v1",
+              "title": "Version",
+              "type": "string"
+            }
+          },
+          "required": [
+            "identity",
+            "physics_identity",
+            "assembly",
+            "initial",
+            "target_world_m",
+            "task_identity",
+            "duration_s",
+            "sources"
+          ],
+          "title": "Scene",
+          "type": "object"
+        },
+        "experiment.spatial_parameters@1.0.0": {
+          "additionalProperties": false,
+          "properties": {
+            "atol": {
+              "default": 1e-08,
+              "exclusiveMinimum": 0,
+              "maximum": 1e-05,
+              "title": "Atol",
+              "type": "number"
+            },
+            "contact_damping_n_s_m": {
+              "default": 5.0,
+              "minimum": 0,
+              "title": "Contact Damping N S M",
+              "type": "number"
+            },
+            "contact_stiffness_n_m": {
+              "default": 5000.0,
+              "exclusiveMinimum": 0,
+              "title": "Contact Stiffness N M",
+              "type": "number"
+            },
+            "contact_taper_m": {
+              "default": 0.0001,
+              "exclusiveMinimum": 0,
+              "title": "Contact Taper M",
+              "type": "number"
+            },
+            "max_step_s": {
+              "default": 0.0002,
+              "exclusiveMinimum": 0,
+              "title": "Max Step S",
+              "type": "number"
+            },
+            "model": {
+              "const": "spatial_rigid_link_v1",
+              "default": "spatial_rigid_link_v1",
+              "title": "Model",
+              "type": "string"
+            },
+            "rtol": {
+              "default": 1e-06,
+              "exclusiveMinimum": 0,
+              "maximum": 0.001,
+              "title": "Rtol",
+              "type": "number"
+            },
+            "solver": {
+              "const": "RK45",
+              "default": "RK45",
+              "title": "Solver",
+              "type": "string"
+            }
+          },
+          "title": "SpatialParameters",
+          "type": "object"
+        }
+      },
+      "declaration": {
+        "binding": "extensions.experiment_dynamics.backends:MujocoBackend",
+        "cache": false,
+        "capabilities": {
+          "applicability": "Spatial bending; fixed mount pose; explicit state; named floor and timed COM forces",
+          "cancellation": "between public calls",
+          "category": "simulation",
+          "channels": [
+            "tendon_target_lengths_m"
+          ],
+          "controllers": [
+            "controller.experiment_length"
+          ],
+          "conversion": "typed assembled equivalent rod",
+          "dofs": "16 ordered y,z axes; eight links",
+          "environments": [
+            "experiment.assembly"
+          ],
+          "families": [
+            "task.reach"
+          ],
+          "force_convention": "actuator negative pulls; tension positive; external world force at named link COM, [start,end)",
+          "model": "mujoco_assembled_rod_v1",
+          "model_version": "1.0.0",
+          "omissions": [
+            "axial extension",
+            "shear",
+            "material twist",
+            "tendon friction",
+            "self collision"
+          ],
+          "operations": [
+            "compile",
+            "initialize",
+            "run",
+            "export",
+            "close"
+          ],
+          "physics": "equivalent rod compiler; SI; COM body-local full inertia",
+          "required_environment": "one named horizontal floor; fixed mount",
+          "robot_contracts": [
+            "domain.rod_design"
+          ],
+          "robots": [
+            "tendon_driven_continuum"
+          ],
+          "role": "adapter",
+          "signal_phases": [
+            "post_step",
+            "pre_step_solver"
+          ],
+          "signal_specs_resolver": "extensions.experiment_dynamics.signals:observation_specs",
+          "signal_templates": [
+            {
+              "dimension": 3,
+              "entity_group": "tip",
+              "field": "tip_m",
+              "frame": "world",
+              "name": "tip_position",
+              "phase": "post_step",
+              "time_field": "time_s",
+              "units": "m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "joint",
+              "field": "qpos_rad",
+              "frame": "joint_local",
+              "name": "joint_position",
+              "phase": "post_step",
+              "time_field": "time_s",
+              "units": "rad"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "joint",
+              "field": "qvel_rad_s",
+              "frame": "joint_local",
+              "name": "joint_velocity",
+              "phase": "post_step",
+              "time_field": "time_s",
+              "units": "rad/s"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "tendon",
+              "field": "command_m",
+              "frame": "actuator",
+              "name": "tendon_command",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "tendon",
+              "field": "solver_tendon_length_m",
+              "frame": "actuator",
+              "name": "tendon_length",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "tendon",
+              "field": "solver_actuator_force_n",
+              "frame": "actuator",
+              "name": "actuator_force",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "N"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "contact",
+              "field": "solver_contact_count",
+              "frame": "world",
+              "name": "contact_count",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "count"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "joint",
+              "field": "solver_qfrc_actuator_nm",
+              "frame": "joint_local",
+              "name": "actuator_torque",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "N.m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "joint",
+              "field": "solver_qfrc_passive_nm",
+              "frame": "joint_local",
+              "name": "passive_torque",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "N.m"
+            },
+            {
+              "dimension": 1,
+              "entity_group": "joint",
+              "field": "external_torque_nm",
+              "frame": "joint_local",
+              "name": "external_torque",
+              "phase": "pre_step_solver",
+              "time_field": "solver_time_s",
+              "units": "N.m"
+            }
+          ],
+          "signals": [
+            "actuator_force",
+            "actuator_torque",
+            "contact_count",
+            "external_torque",
+            "joint_position",
+            "joint_velocity",
+            "passive_torque",
+            "tendon_command",
+            "tendon_length",
+            "tendon_tension",
+            "tip_position"
+          ],
+          "timeout": "numerical loop deadline; startup/close not hard bounded"
+        },
+        "contract_dependencies": [
+          [
+            "experiment.assembly",
+            "1.0.0"
+          ],
+          [
+            "experiment.initial",
+            "1.0.0"
+          ],
+          [
+            "experiment.physics",
+            "1.0.0"
+          ],
+          [
+            "experiment.scene",
+            "1.0.0"
+          ],
+          [
+            "experiment.spatial_parameters",
+            "1.0.0"
+          ],
+          [
+            "experiment.planar_parameters",
+            "1.0.0"
+          ],
+          [
+            "experiment.mujoco_parameters",
+            "1.0.0"
+          ],
+          [
+            "experiment.backend_data",
+            "1.0.0"
+          ]
+        ],
+        "extension_dependencies": [],
+        "kind": "backend",
+        "resources": [],
+        "side_effects": "none"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "integrator": {
+            "default": "implicitfast",
+            "enum": [
+              "Euler",
+              "implicitfast"
+            ],
+            "title": "Integrator",
+            "type": "string"
+          },
+          "model": {
+            "const": "mujoco_assembled_rod_v1",
+            "default": "mujoco_assembled_rod_v1",
+            "title": "Model",
+            "type": "string"
+          }
+        },
+        "title": "MujocoParameters",
+        "type": "object"
+      },
+      "output_schema": {
+        "$defs": {
+          "Payload": {
+            "additionalProperties": false,
+            "properties": {
+              "contract": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "title": "Contract",
+                "type": "string"
+              },
+              "data": {
+                "additionalProperties": true,
+                "title": "Data",
+                "type": "object"
+              },
+              "version": {
+                "default": "1.0.0",
+                "title": "Version",
+                "type": "string"
+              }
+            },
+            "required": [
+              "contract",
+              "data"
+            ],
+            "title": "Payload",
+            "type": "object"
+          },
+          "Signal": {
+            "additionalProperties": false,
+            "properties": {
+              "spec": {
+                "$ref": "#/$defs/SignalSpec"
+              },
+              "times_s": {
+                "items": {
+                  "type": "number"
+                },
+                "title": "Times S",
+                "type": "array"
+              },
+              "values": {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "title": "Values",
+                "type": "array"
+              }
+            },
+            "required": [
+              "spec",
+              "times_s",
+              "values"
+            ],
+            "title": "Signal",
+            "type": "object"
+          },
+          "SignalSpec": {
+            "additionalProperties": false,
+            "properties": {
+              "dimension": {
+                "exclusiveMinimum": 0,
+                "title": "Dimension",
+                "type": "integer"
+              },
+              "entity": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "title": "Entity",
+                "type": "string"
+              },
+              "frame": {
+                "minLength": 1,
+                "title": "Frame",
+                "type": "string"
+              },
+              "missing": {
+                "const": "unsupported",
+                "default": "unsupported",
+                "title": "Missing",
+                "type": "string"
+              },
+              "name": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "title": "Name",
+                "type": "string"
+              },
+              "phase": {
+                "minLength": 1,
+                "title": "Phase",
+                "type": "string"
+              },
+              "units": {
+                "minLength": 1,
+                "title": "Units",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "entity",
+              "dimension",
+              "units",
+              "frame",
+              "phase"
+            ],
+            "title": "SignalSpec",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "backend_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Backend Id",
+            "type": "string"
+          },
+          "backend_version": {
+            "default": "1.0.0",
+            "title": "Backend Version",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/$defs/Payload"
+          },
+          "initial_state": {
+            "$ref": "#/$defs/Payload"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "model_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Model Id",
+            "type": "string"
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer"
+          },
+          "signals": {
+            "items": {
+              "$ref": "#/$defs/Signal"
+            },
+            "title": "Signals",
+            "type": "array"
+          },
+          "solver_status": {
+            "enum": [
+              "completed",
+              "failed",
+              "cancelled",
+              "unknown"
+            ],
+            "title": "Solver Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "solver_status",
+          "backend_id",
+          "model_id",
+          "signals",
+          "data",
+          "limitations",
+          "initial_state",
+          "seed"
+        ],
+        "title": "BackendResult",
+        "type": "object"
+      },
+      "packages": {
+        "mujoco": "3.13.0",
+        "numpy": "2.4.6",
+        "pydantic": "2.13.5"
+      },
+      "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+      "sources": {
+        "controllers/factories.py": "18d141b6e3cc7be6de401b89a41707cf13cbc179a711c2589b1e29a333918d44",
+        "controllers/open_loop_length.py": "734bbd1387dcd5291ad154fe569f79130fc5b5183c3bcfd97c03efb4dc2f3bc6",
+        "controllers/pcc_tip_feedback.py": "1966f813f18582cbe1d6fe53b39876c55152b825afa99d14b48686d95162657e",
+        "extensions/experiment_dynamics/backends.py": "8636ab9a4d9018e48122c613e31b80c434117171c473d80167a818cbc4eafedd",
+        "extensions/experiment_dynamics/contracts.py": "c6af788cdcad72144d948120c10801441162c0b4a7528f4e0038efc06260cb64",
+        "extensions/experiment_dynamics/manifest.py": "969f30288e1ec5e8a41f034b640bdbe005a91df557ffe0f00c59da747acc0e0d",
+        "extensions/experiment_dynamics/physics.py": "1fd2e663e53ad04b4a07897c3870258efd6bd684403e73137391b1b9edf53c0a",
+        "extensions/experiment_dynamics/scene.py": "80ab544ac7b5484f9420e02be002214a08677930b2bc6bccbfdb8606dcd40314",
+        "extensions/experiment_dynamics/signals.py": "29924789d6a71f3577a5183569116f01fda6c702b22707d541d7afb778498b6f",
+        "extensions/experiment_dynamics/spatial.py": "89d23ed54c6b15ebe471ef0165c5ba22011d739b645481201d8edc47470f7a60",
+        "extensions/robot_domain/signals.py": "34a8ed06491c3df44baf18abfe68d7abaab81432e53c9577b569ca7ebce20c5c",
+        "physics_contracts/equivalent_rod_v2.md": "49a4ed750a4a8a075c99f86360abb3dfbf1e0016123801e89aa1b3b94c1fd575",
+        "schemas/common.py": "95600d6bfdac7e46b024c7b8ae53aac8fc11eb51e92b2b93763d3e5b6fa19eae",
+        "schemas/exploration.py": "25e6c6eb653d5fd9d2e1dfa49cea8e12e36aa7671005f61b5858c26031d0cf15",
+        "schemas/platform.py": "a7b77801df1f0b8beb5803c08adfb70c122c31774248591234a30f7a8fb3e9af",
+        "schemas/robot_ir.py": "149b5431e8acb6eb0e71d61146360e1e95635a0631f6f1053a19822920244944",
+        "tools/design_compiler.py": "77ee2be29609ffc77d555073d2c9fe060b6f2a23bf2b7ff92f0b21f49a72a14f",
+        "tools/mujoco_tools.py": "02f77a07907f254e4c1b40800da0c8444bcccdff562f459843b082ee20d09d5c",
+        "tools/pcc_math.py": "b2d9a741a29c44548e9fd6d97d3ae1f120429d096b96a632f9b3454ce66ede3f",
+        "tools/platform_host.py": "760fae88b51b973af95a3d195002be0b34b358336d65c6a7237c01e68d2cf672",
+        "tools/platform_registry.py": "dc3053f82585136a60c5997b46c1e1dd50e84d0d56ca1cf8445898a823c757b6",
+        "tools/platform_store.py": "2f69cfc3525a201deb98ad99a38a2a3a0537d27c0a1c492b1d15d1c450f34258",
+        "tools/reach_dynamics.py": "dd2d707b3fe849ca328860b239520284238bf393b48267965bf0231f3c41130b",
+        "tools/spec_tools.py": "b7c6e2fca5d972de0eed2188f1ab4868e953e66a4526dba5c42670a596742f03"
+      },
+      "version": "1.0.0"
+    }
+  }
+}

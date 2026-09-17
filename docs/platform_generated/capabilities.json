@@ -1204,6 +1204,1016 @@
     "side_effects": "none"
   },
   {
+    "extension_id": "backend.math_planar",
+    "kind": "backend",
+    "version": "1.0.0",
+    "binding": "extensions.experiment_dynamics.backends:PlanarBackend",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "原 MATLAB 平面 v1 算法，直接读取公共物理量，无 MuJoCo",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "const": "matlab_tdcr_planar_dynamic_v1",
+          "default": "matlab_tdcr_planar_dynamic_v1",
+          "title": "Model",
+          "type": "string"
+        }
+      },
+      "title": "PlanarParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Signal": {
+          "additionalProperties": false,
+          "properties": {
+            "spec": {
+              "$ref": "#/$defs/SignalSpec"
+            },
+            "times_s": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Times S",
+              "type": "array"
+            },
+            "values": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "spec",
+            "times_s",
+            "values"
+          ],
+          "title": "Signal",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "backend_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Backend Id",
+          "type": "string"
+        },
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "backend_version": {
+          "default": "1.0.0",
+          "title": "Backend Version",
+          "type": "string"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Payload"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/Payload"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "solver_status",
+        "backend_id",
+        "model_id",
+        "signals",
+        "data",
+        "limitations",
+        "initial_state",
+        "seed"
+      ],
+      "title": "BackendResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "mathematical_models",
+      "role": "adapter",
+      "conversion": "typed assembled equivalent rod",
+      "families": [
+        "task.reach"
+      ],
+      "robots": [
+        "tendon_driven_continuum"
+      ],
+      "robot_contracts": [
+        "domain.rod_design"
+      ],
+      "channels": [
+        "tendon_target_lengths_m"
+      ],
+      "environments": [
+        "experiment.assembly"
+      ],
+      "controllers": [
+        "controller.experiment_length"
+      ],
+      "signals": [
+        "actuator_force",
+        "actuator_torque",
+        "contact_count",
+        "contact_normal_approx",
+        "contact_torque_approx",
+        "damping_torque",
+        "floor_gap",
+        "joint_position",
+        "joint_velocity",
+        "spring_torque",
+        "tendon_command",
+        "tendon_demand",
+        "tendon_length",
+        "tendon_tension",
+        "tendon_velocity",
+        "tip_position"
+      ],
+      "signal_templates": [
+        {
+          "field": "tip_m",
+          "name": "tip_position",
+          "entity_group": "tip",
+          "dimension": 3,
+          "units": "m",
+          "frame": "world",
+          "phase": "sampled_state",
+          "time_field": "time_s"
+        },
+        {
+          "field": "qpos_rad",
+          "name": "joint_position",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "rad",
+          "frame": "joint_local",
+          "phase": "sampled_state",
+          "time_field": "time_s"
+        },
+        {
+          "field": "qvel_rad_s",
+          "name": "joint_velocity",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "rad/s",
+          "frame": "joint_local",
+          "phase": "sampled_state",
+          "time_field": "time_s"
+        },
+        {
+          "field": "command_m",
+          "name": "tendon_command",
+          "entity_group": "tendon",
+          "dimension": 1,
+          "units": "m",
+          "frame": "actuator",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_tendon_length_m",
+          "name": "tendon_length",
+          "entity_group": "tendon",
+          "dimension": 1,
+          "units": "m",
+          "frame": "actuator",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_actuator_force_n",
+          "name": "actuator_force",
+          "entity_group": "tendon",
+          "dimension": 1,
+          "units": "N",
+          "frame": "actuator",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_contact_count",
+          "name": "contact_count",
+          "entity_group": "contact",
+          "dimension": 1,
+          "units": "count",
+          "frame": "world",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "tendon_demand_n",
+          "name": "tendon_demand",
+          "entity_group": "tendon",
+          "dimension": 1,
+          "units": "N",
+          "frame": "actuator",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "tendon_velocity_m_s",
+          "name": "tendon_velocity",
+          "entity_group": "tendon",
+          "dimension": 1,
+          "units": "m/s",
+          "frame": "actuator",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "floor_gap_m",
+          "name": "floor_gap",
+          "entity_group": "segment",
+          "dimension": 1,
+          "units": "m",
+          "frame": "world",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "normal_contact_approx_n",
+          "name": "contact_normal_approx",
+          "entity_group": "segment",
+          "dimension": 1,
+          "units": "N",
+          "frame": "world_z",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "qfrc_actuator",
+          "name": "actuator_torque",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "N.m",
+          "frame": "joint_local",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "qfrc_spring",
+          "name": "spring_torque",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "N.m",
+          "frame": "joint_local",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "qfrc_damper",
+          "name": "damping_torque",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "N.m",
+          "frame": "joint_local",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "qfrc_contact_approx",
+          "name": "contact_torque_approx",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "N.m",
+          "frame": "joint_local",
+          "phase": "sampled_state",
+          "time_field": "solver_time_s"
+        }
+      ],
+      "signal_specs_resolver": "extensions.experiment_dynamics.signals:observation_specs",
+      "signal_phases": [
+        "sampled_state"
+      ],
+      "model": "matlab_tdcr_planar_dynamic_v1",
+      "model_version": "1.0.0",
+      "realtime_control": "MATLAB internal C1/C2 at its original update times; update log unavailable",
+      "dofs": "8 ordered y axes",
+      "physics": "equivalent rod compiler; SI; COM body-local full inertia",
+      "force_convention": "actuator negative pulls; tension positive; external world force at named link COM, [start,end)",
+      "contact_count_semantics": "positive-normal-force segments in math; detected contact points in MuJoCo; not directly comparable",
+      "required_environment": "one named horizontal floor; fixed mount",
+      "applicability": "Planar: identity mount, zero state, x-z target/control/gravity, no external force",
+      "omissions": [
+        "axial extension",
+        "shear",
+        "material twist",
+        "tendon friction",
+        "self collision"
+      ],
+      "operations": [
+        "compile",
+        "initialize",
+        "run",
+        "export",
+        "close"
+      ],
+      "cancellation": "between public calls",
+      "timeout": "numerical loop deadline; startup/close not hard bounded"
+    },
+    "resources": [
+      "matlab_engine"
+    ],
+    "dependencies": [
+      "numpy",
+      "matlab.engine"
+    ],
+    "sources": [
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/experiment_dynamics/scene.py",
+      "extensions/experiment_dynamics/spatial.py",
+      "extensions/experiment_dynamics/signals.py",
+      "extensions/experiment_dynamics/backends.py",
+      "extensions/experiment_dynamics/manifest.py",
+      "tools/design_compiler.py",
+      "schemas/exploration.py",
+      "schemas/robot_ir.py",
+      "controllers/factories.py",
+      "controllers/open_loop_length.py",
+      "controllers/pcc_tip_feedback.py",
+      "tools/pcc_math.py",
+      "tools/reach_dynamics.py",
+      "extensions/robot_domain/signals.py",
+      "schemas/environment_spec.py",
+      "schemas/design_spec.py",
+      "schemas/control_spec.py",
+      "schemas/feedback.py",
+      "schemas/experiment_policy.py",
+      "tools/state_io.py",
+      "extensions/robot_domain/contracts.py",
+      "tools/matlab_tools.py"
+    ],
+    "assets": [
+      "physics_contracts/equivalent_rod_v2.md",
+      "matlab/tdcr_planar_dynamic.m"
+    ],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "experiment.assembly",
+        "1.0.0"
+      ],
+      [
+        "experiment.initial",
+        "1.0.0"
+      ],
+      [
+        "experiment.physics",
+        "1.0.0"
+      ],
+      [
+        "experiment.scene",
+        "1.0.0"
+      ],
+      [
+        "experiment.spatial_parameters",
+        "1.0.0"
+      ],
+      [
+        "experiment.planar_parameters",
+        "1.0.0"
+      ],
+      [
+        "experiment.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "experiment.backend_data",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "backend.math_spatial",
+    "kind": "backend",
+    "version": "1.0.0",
+    "binding": "extensions.experiment_dynamics.backends:SpatialBackend",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "独立三维 16 自由度耦合动力学；无 MuJoCo 依赖",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "const": "spatial_rigid_link_v1",
+          "default": "spatial_rigid_link_v1",
+          "title": "Model",
+          "type": "string"
+        },
+        "solver": {
+          "const": "RK45",
+          "default": "RK45",
+          "title": "Solver",
+          "type": "string"
+        },
+        "rtol": {
+          "default": 1e-06,
+          "exclusiveMinimum": 0,
+          "maximum": 0.001,
+          "title": "Rtol",
+          "type": "number"
+        },
+        "atol": {
+          "default": 1e-08,
+          "exclusiveMinimum": 0,
+          "maximum": 1e-05,
+          "title": "Atol",
+          "type": "number"
+        },
+        "max_step_s": {
+          "default": 0.0002,
+          "exclusiveMinimum": 0,
+          "title": "Max Step S",
+          "type": "number"
+        },
+        "contact_stiffness_n_m": {
+          "default": 5000.0,
+          "exclusiveMinimum": 0,
+          "title": "Contact Stiffness N M",
+          "type": "number"
+        },
+        "contact_damping_n_s_m": {
+          "default": 5.0,
+          "minimum": 0,
+          "title": "Contact Damping N S M",
+          "type": "number"
+        },
+        "contact_taper_m": {
+          "default": 0.0001,
+          "exclusiveMinimum": 0,
+          "title": "Contact Taper M",
+          "type": "number"
+        }
+      },
+      "title": "SpatialParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Signal": {
+          "additionalProperties": false,
+          "properties": {
+            "spec": {
+              "$ref": "#/$defs/SignalSpec"
+            },
+            "times_s": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Times S",
+              "type": "array"
+            },
+            "values": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "spec",
+            "times_s",
+            "values"
+          ],
+          "title": "Signal",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "backend_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Backend Id",
+          "type": "string"
+        },
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "backend_version": {
+          "default": "1.0.0",
+          "title": "Backend Version",
+          "type": "string"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Payload"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/Payload"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "solver_status",
+        "backend_id",
+        "model_id",
+        "signals",
+        "data",
+        "limitations",
+        "initial_state",
+        "seed"
+      ],
+      "title": "BackendResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "mathematical_models",
+      "role": "adapter",
+      "conversion": "typed assembled equivalent rod",
+      "families": [
+        "task.reach"
+      ],
+      "robots": [
+        "tendon_driven_continuum"
+      ],
+      "robot_contracts": [
+        "domain.rod_design"
+      ],
+      "channels": [
+        "tendon_target_lengths_m"
+      ],
+      "environments": [
+        "experiment.assembly"
+      ],
+      "controllers": [
+        "controller.experiment_length"
+      ],
+      "signals": [
+        "actuator_force",
+        "actuator_torque",
+        "contact_count",
+        "contact_normal_approx",
+        "external_torque",
+        "floor_gap",
+        "joint_position",
+        "joint_velocity",
+        "passive_torque",
+        "tendon_command",
+        "tendon_length",
+        "tendon_tension",
+        "tip_position"
+      ],
+      "signal_templates": [
+        {
+          "field": "tip_m",
+          "name": "tip_position",
+          "entity_group": "tip",
+          "dimension": 3,
+          "units": "m",
+          "frame": "world",
+          "phase": "post_step",
+          "time_field": "time_s"
+        },
+        {
+          "field": "qpos_rad",
+          "name": "joint_position",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "rad",
+          "frame": "joint_local",
+          "phase": "post_step",
+          "time_field": "time_s"
+        },
+        {
+          "field": "qvel_rad_s",
+          "name": "joint_velocity",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "rad/s",
+          "frame": "joint_local",
+          "phase": "post_step",
+          "time_field": "time_s"
+        },
+        {
+          "field": "command_m",
+          "name": "tendon_command",
+          "entity_group": "tendon",
+          "dimension": 1,
+          "units": "m",
+          "frame": "actuator",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_tendon_length_m",
+          "name": "tendon_length",
+          "entity_group": "tendon",
+          "dimension": 1,
+          "units": "m",
+          "frame": "actuator",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_actuator_force_n",
+          "name": "actuator_force",
+          "entity_group": "tendon",
+          "dimension": 1,
+          "units": "N",
+          "frame": "actuator",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_contact_count",
+          "name": "contact_count",
+          "entity_group": "contact",
+          "dimension": 1,
+          "units": "count",
+          "frame": "world",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_qfrc_actuator_nm",
+          "name": "actuator_torque",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "N.m",
+          "frame": "joint_local",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_qfrc_passive_nm",
+          "name": "passive_torque",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "N.m",
+          "frame": "joint_local",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "external_torque_nm",
+          "name": "external_torque",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "N.m",
+          "frame": "joint_local",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "floor_gap_m",
+          "name": "floor_gap",
+          "entity_group": "segment",
+          "dimension": 1,
+          "units": "m",
+          "frame": "world",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "normal_contact_approx_n",
+          "name": "contact_normal_approx",
+          "entity_group": "segment",
+          "dimension": 1,
+          "units": "N",
+          "frame": "world",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        }
+      ],
+      "signal_specs_resolver": "extensions.experiment_dynamics.signals:observation_specs",
+      "signal_phases": [
+        "post_step",
+        "pre_step_solver"
+      ],
+      "model": "spatial_rigid_link_v1",
+      "model_version": "1.0.0",
+      "realtime_control": "C1/C2 adapter consumes actual pre-integration world tip; logs world observations and mount-frame feedback updates",
+      "dofs": "16 ordered y,z axes; eight links",
+      "physics": "equivalent rod compiler; SI; COM body-local full inertia",
+      "force_convention": "actuator negative pulls; tension positive; external world force at named link COM, [start,end)",
+      "contact_count_semantics": "positive-normal-force segments in math; detected contact points in MuJoCo; not directly comparable",
+      "required_environment": "one named horizontal floor; fixed mount",
+      "applicability": "Spatial bending; fixed mount pose; explicit state; named floor and timed COM forces",
+      "omissions": [
+        "axial extension",
+        "shear",
+        "material twist",
+        "tendon friction",
+        "self collision"
+      ],
+      "operations": [
+        "compile",
+        "initialize",
+        "run",
+        "export",
+        "close"
+      ],
+      "cancellation": "between public calls",
+      "timeout": "numerical loop deadline; startup/close not hard bounded"
+    },
+    "resources": [],
+    "dependencies": [
+      "numpy",
+      "scipy"
+    ],
+    "sources": [
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/experiment_dynamics/scene.py",
+      "extensions/experiment_dynamics/spatial.py",
+      "extensions/experiment_dynamics/signals.py",
+      "extensions/experiment_dynamics/backends.py",
+      "extensions/experiment_dynamics/manifest.py",
+      "tools/design_compiler.py",
+      "schemas/exploration.py",
+      "schemas/robot_ir.py",
+      "controllers/factories.py",
+      "controllers/open_loop_length.py",
+      "controllers/pcc_tip_feedback.py",
+      "tools/pcc_math.py",
+      "tools/reach_dynamics.py",
+      "extensions/robot_domain/signals.py",
+      "schemas/environment_spec.py",
+      "schemas/design_spec.py",
+      "schemas/control_spec.py",
+      "schemas/feedback.py",
+      "schemas/experiment_policy.py",
+      "tools/state_io.py",
+      "extensions/robot_domain/contracts.py"
+    ],
+    "assets": [
+      "physics_contracts/equivalent_rod_v2.md"
+    ],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "experiment.assembly",
+        "1.0.0"
+      ],
+      [
+        "experiment.initial",
+        "1.0.0"
+      ],
+      [
+        "experiment.physics",
+        "1.0.0"
+      ],
+      [
+        "experiment.scene",
+        "1.0.0"
+      ],
+      [
+        "experiment.spatial_parameters",
+        "1.0.0"
+      ],
+      [
+        "experiment.planar_parameters",
+        "1.0.0"
+      ],
+      [
+        "experiment.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "experiment.backend_data",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
     "extension_id": "backend.matlab",
     "kind": "backend",
     "version": "1.0.0",
@@ -1660,7 +2670,9 @@
       "schemas/design_spec.py",
       "schemas/task_spec.py",
       "schemas/environment_spec.py",
-      "schemas/settings.py"
+      "schemas/settings.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/experiment_dynamics/contracts.py"
     ],
     "assets": [
       "tasks/reach_free/task.yaml",
@@ -2078,7 +3090,9 @@
       "schemas/design_spec.py",
       "schemas/task_spec.py",
       "schemas/environment_spec.py",
-      "schemas/settings.py"
+      "schemas/settings.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/experiment_dynamics/contracts.py"
     ],
     "assets": [
       "tasks/reach_free/task.yaml",
@@ -2368,6 +3382,462 @@
     "contract_dependencies": [
       [
         "reference.empty",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "backend.scene_mujoco",
+    "kind": "backend",
+    "version": "1.0.0",
+    "binding": "extensions.experiment_dynamics.backends:MujocoBackend",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "公共物理和统一场景映射到 MuJoCo",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "const": "mujoco_assembled_rod_v1",
+          "default": "mujoco_assembled_rod_v1",
+          "title": "Model",
+          "type": "string"
+        },
+        "integrator": {
+          "default": "implicitfast",
+          "enum": [
+            "Euler",
+            "implicitfast"
+          ],
+          "title": "Integrator",
+          "type": "string"
+        }
+      },
+      "title": "MujocoParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Signal": {
+          "additionalProperties": false,
+          "properties": {
+            "spec": {
+              "$ref": "#/$defs/SignalSpec"
+            },
+            "times_s": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Times S",
+              "type": "array"
+            },
+            "values": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "spec",
+            "times_s",
+            "values"
+          ],
+          "title": "Signal",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "backend_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Backend Id",
+          "type": "string"
+        },
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "backend_version": {
+          "default": "1.0.0",
+          "title": "Backend Version",
+          "type": "string"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Payload"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/Payload"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "solver_status",
+        "backend_id",
+        "model_id",
+        "signals",
+        "data",
+        "limitations",
+        "initial_state",
+        "seed"
+      ],
+      "title": "BackendResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "simulation",
+      "role": "adapter",
+      "conversion": "typed assembled equivalent rod",
+      "families": [
+        "task.reach"
+      ],
+      "robots": [
+        "tendon_driven_continuum"
+      ],
+      "robot_contracts": [
+        "domain.rod_design"
+      ],
+      "channels": [
+        "tendon_target_lengths_m"
+      ],
+      "environments": [
+        "experiment.assembly"
+      ],
+      "controllers": [
+        "controller.experiment_length"
+      ],
+      "signals": [
+        "actuator_force",
+        "actuator_torque",
+        "contact_count",
+        "external_torque",
+        "joint_position",
+        "joint_velocity",
+        "passive_torque",
+        "tendon_command",
+        "tendon_length",
+        "tendon_tension",
+        "tip_position"
+      ],
+      "signal_templates": [
+        {
+          "field": "tip_m",
+          "name": "tip_position",
+          "entity_group": "tip",
+          "dimension": 3,
+          "units": "m",
+          "frame": "world",
+          "phase": "post_step",
+          "time_field": "time_s"
+        },
+        {
+          "field": "qpos_rad",
+          "name": "joint_position",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "rad",
+          "frame": "joint_local",
+          "phase": "post_step",
+          "time_field": "time_s"
+        },
+        {
+          "field": "qvel_rad_s",
+          "name": "joint_velocity",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "rad/s",
+          "frame": "joint_local",
+          "phase": "post_step",
+          "time_field": "time_s"
+        },
+        {
+          "field": "command_m",
+          "name": "tendon_command",
+          "entity_group": "tendon",
+          "dimension": 1,
+          "units": "m",
+          "frame": "actuator",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_tendon_length_m",
+          "name": "tendon_length",
+          "entity_group": "tendon",
+          "dimension": 1,
+          "units": "m",
+          "frame": "actuator",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_actuator_force_n",
+          "name": "actuator_force",
+          "entity_group": "tendon",
+          "dimension": 1,
+          "units": "N",
+          "frame": "actuator",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_contact_count",
+          "name": "contact_count",
+          "entity_group": "contact",
+          "dimension": 1,
+          "units": "count",
+          "frame": "world",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_qfrc_actuator_nm",
+          "name": "actuator_torque",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "N.m",
+          "frame": "joint_local",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "solver_qfrc_passive_nm",
+          "name": "passive_torque",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "N.m",
+          "frame": "joint_local",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        },
+        {
+          "field": "external_torque_nm",
+          "name": "external_torque",
+          "entity_group": "joint",
+          "dimension": 1,
+          "units": "N.m",
+          "frame": "joint_local",
+          "phase": "pre_step_solver",
+          "time_field": "solver_time_s"
+        }
+      ],
+      "signal_specs_resolver": "extensions.experiment_dynamics.signals:observation_specs",
+      "signal_phases": [
+        "post_step",
+        "pre_step_solver"
+      ],
+      "model": "mujoco_assembled_rod_v1",
+      "model_version": "1.0.0",
+      "realtime_control": "C1/C2 adapter consumes actual pre-integration world tip; logs world observations and mount-frame feedback updates",
+      "dofs": "16 ordered y,z axes; eight links",
+      "physics": "equivalent rod compiler; SI; COM body-local full inertia",
+      "force_convention": "actuator negative pulls; tension positive; external world force at named link COM, [start,end)",
+      "contact_count_semantics": "positive-normal-force segments in math; detected contact points in MuJoCo; not directly comparable",
+      "required_environment": "one named horizontal floor; fixed mount",
+      "applicability": "Spatial bending; fixed mount pose; explicit state; named floor and timed COM forces",
+      "omissions": [
+        "axial extension",
+        "shear",
+        "material twist",
+        "tendon friction",
+        "self collision"
+      ],
+      "operations": [
+        "compile",
+        "initialize",
+        "run",
+        "export",
+        "close"
+      ],
+      "cancellation": "between public calls",
+      "timeout": "numerical loop deadline; startup/close not hard bounded"
+    },
+    "resources": [],
+    "dependencies": [
+      "numpy",
+      "mujoco"
+    ],
+    "sources": [
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/experiment_dynamics/scene.py",
+      "extensions/experiment_dynamics/spatial.py",
+      "extensions/experiment_dynamics/signals.py",
+      "extensions/experiment_dynamics/backends.py",
+      "extensions/experiment_dynamics/manifest.py",
+      "tools/design_compiler.py",
+      "schemas/exploration.py",
+      "schemas/robot_ir.py",
+      "controllers/factories.py",
+      "controllers/open_loop_length.py",
+      "controllers/pcc_tip_feedback.py",
+      "tools/pcc_math.py",
+      "tools/reach_dynamics.py",
+      "extensions/robot_domain/signals.py",
+      "schemas/environment_spec.py",
+      "schemas/design_spec.py",
+      "schemas/control_spec.py",
+      "schemas/feedback.py",
+      "schemas/experiment_policy.py",
+      "tools/state_io.py",
+      "extensions/robot_domain/contracts.py",
+      "tools/mujoco_tools.py",
+      "tools/spec_tools.py"
+    ],
+    "assets": [
+      "physics_contracts/equivalent_rod_v2.md",
+      "tasks/reach_free/task.yaml",
+      "configs/simulator.yaml"
+    ],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "experiment.assembly",
+        "1.0.0"
+      ],
+      [
+        "experiment.initial",
+        "1.0.0"
+      ],
+      [
+        "experiment.physics",
+        "1.0.0"
+      ],
+      [
+        "experiment.scene",
+        "1.0.0"
+      ],
+      [
+        "experiment.spatial_parameters",
+        "1.0.0"
+      ],
+      [
+        "experiment.planar_parameters",
+        "1.0.0"
+      ],
+      [
+        "experiment.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "experiment.backend_data",
         "1.0.0"
       ]
     ],
@@ -4618,6 +6088,158 @@
     "side_effects": "none"
   },
   {
+    "extension_id": "controller.experiment_length",
+    "kind": "controller",
+    "version": "1.0.0",
+    "binding": "extensions.experiment_dynamics.backends:LengthController",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "复用 C1/C2；世界末端实时观测转换到安装坐标",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "length_control_v2",
+          "default": "length_control_v2",
+          "title": "Version",
+          "type": "string"
+        },
+        "mode": {
+          "default": "C1",
+          "enum": [
+            "C1",
+            "C2"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "bend_y_rad": {
+          "default": 0,
+          "maximum": 3.141592653589793,
+          "minimum": -3.141592653589793,
+          "title": "Bend Y Rad",
+          "type": "number"
+        },
+        "bend_z_rad": {
+          "default": 1.073643020187874,
+          "maximum": 3.141592653589793,
+          "minimum": -3.141592653589793,
+          "title": "Bend Z Rad",
+          "type": "number"
+        },
+        "bias_fraction": {
+          "default": 0,
+          "maximum": 0.05,
+          "minimum": -0.02,
+          "title": "Bias Fraction",
+          "type": "number"
+        },
+        "gain_rad2_per_m2": {
+          "default": 5,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Gain Rad2 Per M2",
+          "type": "number"
+        },
+        "update_every_steps": {
+          "default": 10,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Update Every Steps",
+          "type": "integer"
+        },
+        "max_bend_update_rad": {
+          "default": 0.05,
+          "exclusiveMinimum": 0,
+          "maximum": 0.2,
+          "title": "Max Bend Update Rad",
+          "type": "number"
+        },
+        "rate_limit_ref_per_s": {
+          "default": 0.5,
+          "exclusiveMinimum": 0,
+          "maximum": 2,
+          "title": "Rate Limit Ref Per S",
+          "type": "number"
+        }
+      },
+      "title": "ExplorationControl",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "channel": {
+          "const": "tendon_target_lengths_m",
+          "title": "Channel",
+          "type": "string"
+        },
+        "values_m": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Values M",
+          "type": "array"
+        }
+      },
+      "required": [
+        "channel",
+        "values_m"
+      ],
+      "title": "ControlOutput",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "control",
+      "role": "adapter",
+      "channel": "tendon_target_lengths_m",
+      "observations": [
+        "tip_position"
+      ],
+      "reset": true,
+      "restore": false,
+      "realtime_observations": "actual current tip, joint positions/velocities and tendon lengths before each integration interval; world tip transformed to mount frame for C2"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/experiment_dynamics/scene.py",
+      "extensions/experiment_dynamics/spatial.py",
+      "extensions/experiment_dynamics/signals.py",
+      "extensions/experiment_dynamics/backends.py",
+      "extensions/experiment_dynamics/manifest.py",
+      "tools/design_compiler.py",
+      "schemas/exploration.py",
+      "schemas/robot_ir.py",
+      "controllers/factories.py",
+      "controllers/open_loop_length.py",
+      "controllers/pcc_tip_feedback.py",
+      "tools/pcc_math.py",
+      "tools/reach_dynamics.py",
+      "extensions/robot_domain/signals.py",
+      "schemas/environment_spec.py",
+      "schemas/design_spec.py",
+      "schemas/control_spec.py",
+      "schemas/feedback.py",
+      "schemas/experiment_policy.py",
+      "tools/state_io.py",
+      "extensions/robot_domain/contracts.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
+    "side_effects": "none"
+  },
+  {
     "extension_id": "controller.legacy_length",
     "kind": "controller",
     "version": "1.0.0",
@@ -4764,7 +6386,9 @@
       "schemas/design_spec.py",
       "schemas/task_spec.py",
       "schemas/environment_spec.py",
-      "schemas/settings.py"
+      "schemas/settings.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/experiment_dynamics/contracts.py"
     ],
     "assets": [
       "tasks/reach_free/task.yaml",
@@ -7406,6 +9030,144 @@
     "extension_dependencies": [],
     "contract_dependencies": [],
     "side_effects": "saved derivation; no numerical solves"
+  },
+  {
+    "extension_id": "initialize.experiment",
+    "kind": "initializer",
+    "version": "1.0.0",
+    "binding": "extensions.experiment_dynamics.scene:initialize",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "显式八节 y/z 关节位置和速度；不随机改变初态",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "qpos_rad": {
+          "default": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 16,
+          "minItems": 16,
+          "title": "Qpos Rad",
+          "type": "array"
+        },
+        "qvel_rad_s": {
+          "default": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 16,
+          "minItems": 16,
+          "title": "Qvel Rad S",
+          "type": "array"
+        }
+      },
+      "title": "Initial",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "contract": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Contract",
+          "type": "string"
+        },
+        "version": {
+          "default": "1.0.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true,
+          "title": "Data",
+          "type": "object"
+        }
+      },
+      "required": [
+        "contract",
+        "data"
+      ],
+      "title": "Payload",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "scene_assembly",
+      "role": "adapter"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/experiment_dynamics/scene.py",
+      "extensions/experiment_dynamics/spatial.py",
+      "extensions/experiment_dynamics/signals.py",
+      "extensions/experiment_dynamics/backends.py",
+      "extensions/experiment_dynamics/manifest.py",
+      "tools/design_compiler.py",
+      "schemas/exploration.py",
+      "schemas/robot_ir.py",
+      "controllers/factories.py",
+      "controllers/open_loop_length.py",
+      "controllers/pcc_tip_feedback.py",
+      "tools/pcc_math.py",
+      "tools/reach_dynamics.py",
+      "extensions/robot_domain/signals.py",
+      "schemas/environment_spec.py",
+      "schemas/design_spec.py",
+      "schemas/control_spec.py",
+      "schemas/feedback.py",
+      "schemas/experiment_policy.py",
+      "tools/state_io.py",
+      "extensions/robot_domain/contracts.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [],
+    "side_effects": "none"
   },
   {
     "extension_id": "initialize.legacy_zero",

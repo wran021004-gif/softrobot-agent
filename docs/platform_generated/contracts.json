@@ -5271,6 +5271,1850 @@
       "title": "RodDesign",
       "type": "object"
     },
+    "experiment.assembly@1.0.0": {
+      "$defs": {
+        "EnvironmentSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "const": "1",
+              "default": "1",
+              "title": "Schema Version",
+              "type": "string"
+            },
+            "environment_id": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Environment Id",
+              "type": "string"
+            },
+            "units": {
+              "const": "SI",
+              "default": "SI",
+              "title": "Units",
+              "type": "string"
+            },
+            "coordinate_frame": {
+              "const": "world_base_x_forward_yz_cross_section",
+              "title": "Coordinate Frame",
+              "type": "string"
+            },
+            "gravity_m_s2": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Gravity M S2",
+              "type": "array"
+            },
+            "gravity_source": {
+              "minLength": 1,
+              "title": "Gravity Source",
+              "type": "string"
+            },
+            "truth_status": {
+              "default": "HUMAN_OWNED",
+              "enum": [
+                "HUMAN_OWNED",
+                "HUMAN_APPROVED",
+                "NON_CANONICAL_DEVELOPMENT_ONLY"
+              ],
+              "title": "Truth Status",
+              "type": "string"
+            },
+            "objects": {
+              "items": {
+                "discriminator": {
+                  "mapping": {
+                    "ball": "#/$defs/ReservedComponent",
+                    "plane": "#/$defs/Plane",
+                    "platform_disturbance": "#/$defs/ReservedComponent",
+                    "ramp": "#/$defs/ReservedComponent",
+                    "window": "#/$defs/Window"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Plane"
+                  },
+                  {
+                    "$ref": "#/$defs/Window"
+                  },
+                  {
+                    "$ref": "#/$defs/ReservedComponent"
+                  }
+                ]
+              },
+              "title": "Objects",
+              "type": "array"
+            },
+            "lights": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/Light"
+              },
+              "title": "Lights",
+              "type": "array"
+            }
+          },
+          "required": [
+            "environment_id",
+            "coordinate_frame",
+            "gravity_m_s2",
+            "gravity_source",
+            "objects"
+          ],
+          "title": "EnvironmentSpec",
+          "type": "object"
+        },
+        "Light": {
+          "additionalProperties": false,
+          "properties": {
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "direction": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Direction",
+              "type": "array"
+            }
+          },
+          "required": [
+            "position_m",
+            "direction"
+          ],
+          "title": "Light",
+          "type": "object"
+        },
+        "Mount": {
+          "additionalProperties": false,
+          "properties": {
+            "robot_id": {
+              "const": "robot",
+              "default": "robot",
+              "title": "Robot Id",
+              "type": "string"
+            },
+            "mount_id": {
+              "const": "fixed_base",
+              "default": "fixed_base",
+              "title": "Mount Id",
+              "type": "string"
+            },
+            "parent_frame": {
+              "const": "world",
+              "default": "world",
+              "title": "Parent Frame",
+              "type": "string"
+            },
+            "position_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "quaternion_wxyz": {
+              "default": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Quaternion Wxyz",
+              "type": "array"
+            }
+          },
+          "title": "Mount",
+          "type": "object"
+        },
+        "Plane": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "plane",
+              "default": "plane",
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "half_size_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              ],
+              "title": "Half Size M",
+              "type": "array"
+            },
+            "contype": {
+              "minimum": 0,
+              "title": "Contype",
+              "type": "integer"
+            },
+            "conaffinity": {
+              "minimum": 0,
+              "title": "Conaffinity",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "name",
+            "position_m",
+            "half_size_m",
+            "contype",
+            "conaffinity"
+          ],
+          "title": "Plane",
+          "type": "object"
+        },
+        "ReservedComponent": {
+          "additionalProperties": false,
+          "description": "Serializable extension proposals; no execution support in V1.",
+          "properties": {
+            "kind": {
+              "enum": [
+                "ball",
+                "ramp",
+                "platform_disturbance"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "status": {
+              "const": "PLANNED",
+              "default": "PLANNED",
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "name",
+            "position_m"
+          ],
+          "title": "ReservedComponent",
+          "type": "object"
+        },
+        "TimedForce": {
+          "additionalProperties": false,
+          "properties": {
+            "robot_id": {
+              "const": "robot",
+              "default": "robot",
+              "title": "Robot Id",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^segment_[0-7]$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "point": {
+              "const": "center_of_mass",
+              "default": "center_of_mass",
+              "title": "Point",
+              "type": "string"
+            },
+            "frame": {
+              "const": "world",
+              "default": "world",
+              "title": "Frame",
+              "type": "string"
+            },
+            "force_n": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Force N",
+              "type": "array"
+            },
+            "start_s": {
+              "minimum": 0,
+              "title": "Start S",
+              "type": "number"
+            },
+            "end_s": {
+              "exclusiveMinimum": 0,
+              "title": "End S",
+              "type": "number"
+            }
+          },
+          "required": [
+            "entity",
+            "force_n",
+            "start_s",
+            "end_s"
+          ],
+          "title": "TimedForce",
+          "type": "object"
+        },
+        "Window": {
+          "additionalProperties": false,
+          "description": "Finite rectangular frame; aperture in the world y-z plane, normal +x.",
+          "properties": {
+            "kind": {
+              "const": "window",
+              "default": "window",
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "plane": {
+              "const": "yz_normal_positive_x",
+              "title": "Plane",
+              "type": "string"
+            },
+            "width_m": {
+              "exclusiveMinimum": 0,
+              "title": "Width M",
+              "type": "number"
+            },
+            "height_m": {
+              "exclusiveMinimum": 0,
+              "title": "Height M",
+              "type": "number"
+            },
+            "thickness_m": {
+              "exclusiveMinimum": 0,
+              "title": "Thickness M",
+              "type": "number"
+            },
+            "frame_width_m": {
+              "exclusiveMinimum": 0,
+              "title": "Frame Width M",
+              "type": "number"
+            },
+            "contype": {
+              "const": 0,
+              "default": 0,
+              "title": "Contype",
+              "type": "integer"
+            },
+            "conaffinity": {
+              "const": 1,
+              "default": 1,
+              "title": "Conaffinity",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "name",
+            "position_m",
+            "plane",
+            "width_m",
+            "height_m",
+            "thickness_m",
+            "frame_width_m"
+          ],
+          "title": "Window",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "environment": {
+          "$ref": "#/$defs/EnvironmentSpec"
+        },
+        "floor_id": {
+          "title": "Floor Id",
+          "type": "string"
+        },
+        "mount": {
+          "$ref": "#/$defs/Mount"
+        },
+        "external_forces": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TimedForce"
+          },
+          "title": "External Forces",
+          "type": "array"
+        }
+      },
+      "required": [
+        "environment",
+        "floor_id"
+      ],
+      "title": "Assembly",
+      "type": "object"
+    },
+    "experiment.backend_data@1.0.0": {
+      "$defs": {
+        "MujocoParameters": {
+          "additionalProperties": false,
+          "properties": {
+            "model": {
+              "const": "mujoco_assembled_rod_v1",
+              "default": "mujoco_assembled_rod_v1",
+              "title": "Model",
+              "type": "string"
+            },
+            "integrator": {
+              "default": "implicitfast",
+              "enum": [
+                "Euler",
+                "implicitfast"
+              ],
+              "title": "Integrator",
+              "type": "string"
+            }
+          },
+          "title": "MujocoParameters",
+          "type": "object"
+        },
+        "PlanarParameters": {
+          "additionalProperties": false,
+          "properties": {
+            "model": {
+              "const": "matlab_tdcr_planar_dynamic_v1",
+              "default": "matlab_tdcr_planar_dynamic_v1",
+              "title": "Model",
+              "type": "string"
+            }
+          },
+          "title": "PlanarParameters",
+          "type": "object"
+        },
+        "SpatialParameters": {
+          "additionalProperties": false,
+          "properties": {
+            "model": {
+              "const": "spatial_rigid_link_v1",
+              "default": "spatial_rigid_link_v1",
+              "title": "Model",
+              "type": "string"
+            },
+            "solver": {
+              "const": "RK45",
+              "default": "RK45",
+              "title": "Solver",
+              "type": "string"
+            },
+            "rtol": {
+              "default": 1e-06,
+              "exclusiveMinimum": 0,
+              "maximum": 0.001,
+              "title": "Rtol",
+              "type": "number"
+            },
+            "atol": {
+              "default": 1e-08,
+              "exclusiveMinimum": 0,
+              "maximum": 1e-05,
+              "title": "Atol",
+              "type": "number"
+            },
+            "max_step_s": {
+              "default": 0.0002,
+              "exclusiveMinimum": 0,
+              "title": "Max Step S",
+              "type": "number"
+            },
+            "contact_stiffness_n_m": {
+              "default": 5000.0,
+              "exclusiveMinimum": 0,
+              "title": "Contact Stiffness N M",
+              "type": "number"
+            },
+            "contact_damping_n_s_m": {
+              "default": 5.0,
+              "minimum": 0,
+              "title": "Contact Damping N S M",
+              "type": "number"
+            },
+            "contact_taper_m": {
+              "default": 0.0001,
+              "exclusiveMinimum": 0,
+              "title": "Contact Taper M",
+              "type": "number"
+            }
+          },
+          "title": "SpatialParameters",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "title": "Backend",
+          "type": "string"
+        },
+        "physics_identity": {
+          "title": "Physics Identity",
+          "type": "string"
+        },
+        "scene_identity": {
+          "title": "Scene Identity",
+          "type": "string"
+        },
+        "model_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Model Version",
+          "type": "string"
+        },
+        "solver_configuration": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SpatialParameters"
+            },
+            {
+              "$ref": "#/$defs/PlanarParameters"
+            },
+            {
+              "$ref": "#/$defs/MujocoParameters"
+            }
+          ],
+          "title": "Solver Configuration"
+        },
+        "exported_files": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Exported Files",
+          "type": "array"
+        },
+        "controller_mode": {
+          "enum": [
+            "C1",
+            "C2"
+          ],
+          "title": "Controller Mode",
+          "type": "string"
+        },
+        "controller_updates": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Controller Updates"
+        },
+        "numerical_steps": {
+          "title": "Numerical Steps",
+          "type": "integer"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "backend",
+        "physics_identity",
+        "scene_identity",
+        "solver_configuration",
+        "exported_files",
+        "controller_mode",
+        "controller_updates",
+        "numerical_steps"
+      ],
+      "title": "DynamicsData",
+      "type": "object"
+    },
+    "experiment.initial@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "qpos_rad": {
+          "default": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 16,
+          "minItems": 16,
+          "title": "Qpos Rad",
+          "type": "array"
+        },
+        "qvel_rad_s": {
+          "default": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 16,
+          "minItems": 16,
+          "title": "Qvel Rad S",
+          "type": "array"
+        }
+      },
+      "title": "Initial",
+      "type": "object"
+    },
+    "experiment.mujoco_parameters@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "const": "mujoco_assembled_rod_v1",
+          "default": "mujoco_assembled_rod_v1",
+          "title": "Model",
+          "type": "string"
+        },
+        "integrator": {
+          "default": "implicitfast",
+          "enum": [
+            "Euler",
+            "implicitfast"
+          ],
+          "title": "Integrator",
+          "type": "string"
+        }
+      },
+      "title": "MujocoParameters",
+      "type": "object"
+    },
+    "experiment.physics@1.0.0": {
+      "$defs": {
+        "Part": {
+          "additionalProperties": false,
+          "properties": {
+            "entity": {
+              "title": "Entity",
+              "type": "string"
+            },
+            "parent": {
+              "title": "Parent",
+              "type": "string"
+            },
+            "origin_parent_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Origin Parent M",
+              "type": "array"
+            },
+            "length_m": {
+              "title": "Length M",
+              "type": "number"
+            },
+            "radius_m": {
+              "title": "Radius M",
+              "type": "number"
+            },
+            "mass_kg": {
+              "title": "Mass Kg",
+              "type": "number"
+            },
+            "com_local_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Com Local M",
+              "type": "array"
+            },
+            "inertia_com_local_kg_m2": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ],
+              "title": "Inertia Com Local Kg M2",
+              "type": "array"
+            },
+            "joint_axes_local": {
+              "default": [
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ],
+              "title": "Joint Axes Local",
+              "type": "array"
+            },
+            "stiffness_nm_rad": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Stiffness Nm Rad",
+              "type": "array"
+            },
+            "damping_nm_s_rad": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Damping Nm S Rad",
+              "type": "array"
+            },
+            "natural_rad": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Natural Rad",
+              "type": "array"
+            }
+          },
+          "required": [
+            "entity",
+            "parent",
+            "origin_parent_m",
+            "length_m",
+            "radius_m",
+            "mass_kg",
+            "com_local_m",
+            "inertia_com_local_kg_m2",
+            "stiffness_nm_rad",
+            "damping_nm_s_rad",
+            "natural_rad"
+          ],
+          "title": "Part",
+          "type": "object"
+        },
+        "Tendon": {
+          "additionalProperties": false,
+          "properties": {
+            "entity": {
+              "title": "Entity",
+              "type": "string"
+            },
+            "actuator": {
+              "title": "Actuator",
+              "type": "string"
+            },
+            "offset_yz_m": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Offset Yz M",
+              "type": "array"
+            },
+            "kp_n_m": {
+              "title": "Kp N M",
+              "type": "number"
+            },
+            "force_limit_n": {
+              "title": "Force Limit N",
+              "type": "number"
+            },
+            "route_entities": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Route Entities",
+              "type": "array"
+            }
+          },
+          "required": [
+            "entity",
+            "actuator",
+            "offset_yz_m",
+            "kp_n_m",
+            "force_limit_n",
+            "route_entities"
+          ],
+          "title": "Tendon",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "equivalent_rod_physics_v1",
+          "default": "equivalent_rod_physics_v1",
+          "title": "Version",
+          "type": "string"
+        },
+        "source_ir_identity": {
+          "title": "Source Ir Identity",
+          "type": "string"
+        },
+        "source_contracts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Contracts",
+          "type": "array"
+        },
+        "identity": {
+          "title": "Identity",
+          "type": "string"
+        },
+        "frame": {
+          "const": "body_local_x_forward; inertia_about_com",
+          "default": "body_local_x_forward; inertia_about_com",
+          "title": "Frame",
+          "type": "string"
+        },
+        "parts": {
+          "items": {
+            "$ref": "#/$defs/Part"
+          },
+          "title": "Parts",
+          "type": "array"
+        },
+        "tendons": {
+          "items": {
+            "$ref": "#/$defs/Tendon"
+          },
+          "title": "Tendons",
+          "type": "array"
+        },
+        "derivation": {
+          "title": "Derivation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_ir_identity",
+        "source_contracts",
+        "identity",
+        "parts",
+        "tendons",
+        "derivation"
+      ],
+      "title": "ResolvedPhysics",
+      "type": "object"
+    },
+    "experiment.planar_parameters@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "const": "matlab_tdcr_planar_dynamic_v1",
+          "default": "matlab_tdcr_planar_dynamic_v1",
+          "title": "Model",
+          "type": "string"
+        }
+      },
+      "title": "PlanarParameters",
+      "type": "object"
+    },
+    "experiment.scene@1.0.0": {
+      "$defs": {
+        "Assembly": {
+          "additionalProperties": false,
+          "properties": {
+            "environment": {
+              "$ref": "#/$defs/EnvironmentSpec"
+            },
+            "floor_id": {
+              "title": "Floor Id",
+              "type": "string"
+            },
+            "mount": {
+              "$ref": "#/$defs/Mount"
+            },
+            "external_forces": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/TimedForce"
+              },
+              "title": "External Forces",
+              "type": "array"
+            }
+          },
+          "required": [
+            "environment",
+            "floor_id"
+          ],
+          "title": "Assembly",
+          "type": "object"
+        },
+        "EnvironmentSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "const": "1",
+              "default": "1",
+              "title": "Schema Version",
+              "type": "string"
+            },
+            "environment_id": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Environment Id",
+              "type": "string"
+            },
+            "units": {
+              "const": "SI",
+              "default": "SI",
+              "title": "Units",
+              "type": "string"
+            },
+            "coordinate_frame": {
+              "const": "world_base_x_forward_yz_cross_section",
+              "title": "Coordinate Frame",
+              "type": "string"
+            },
+            "gravity_m_s2": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Gravity M S2",
+              "type": "array"
+            },
+            "gravity_source": {
+              "minLength": 1,
+              "title": "Gravity Source",
+              "type": "string"
+            },
+            "truth_status": {
+              "default": "HUMAN_OWNED",
+              "enum": [
+                "HUMAN_OWNED",
+                "HUMAN_APPROVED",
+                "NON_CANONICAL_DEVELOPMENT_ONLY"
+              ],
+              "title": "Truth Status",
+              "type": "string"
+            },
+            "objects": {
+              "items": {
+                "discriminator": {
+                  "mapping": {
+                    "ball": "#/$defs/ReservedComponent",
+                    "plane": "#/$defs/Plane",
+                    "platform_disturbance": "#/$defs/ReservedComponent",
+                    "ramp": "#/$defs/ReservedComponent",
+                    "window": "#/$defs/Window"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Plane"
+                  },
+                  {
+                    "$ref": "#/$defs/Window"
+                  },
+                  {
+                    "$ref": "#/$defs/ReservedComponent"
+                  }
+                ]
+              },
+              "title": "Objects",
+              "type": "array"
+            },
+            "lights": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/Light"
+              },
+              "title": "Lights",
+              "type": "array"
+            }
+          },
+          "required": [
+            "environment_id",
+            "coordinate_frame",
+            "gravity_m_s2",
+            "gravity_source",
+            "objects"
+          ],
+          "title": "EnvironmentSpec",
+          "type": "object"
+        },
+        "Initial": {
+          "additionalProperties": false,
+          "properties": {
+            "qpos_rad": {
+              "default": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 16,
+              "minItems": 16,
+              "title": "Qpos Rad",
+              "type": "array"
+            },
+            "qvel_rad_s": {
+              "default": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 16,
+              "minItems": 16,
+              "title": "Qvel Rad S",
+              "type": "array"
+            }
+          },
+          "title": "Initial",
+          "type": "object"
+        },
+        "Light": {
+          "additionalProperties": false,
+          "properties": {
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "direction": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Direction",
+              "type": "array"
+            }
+          },
+          "required": [
+            "position_m",
+            "direction"
+          ],
+          "title": "Light",
+          "type": "object"
+        },
+        "Mount": {
+          "additionalProperties": false,
+          "properties": {
+            "robot_id": {
+              "const": "robot",
+              "default": "robot",
+              "title": "Robot Id",
+              "type": "string"
+            },
+            "mount_id": {
+              "const": "fixed_base",
+              "default": "fixed_base",
+              "title": "Mount Id",
+              "type": "string"
+            },
+            "parent_frame": {
+              "const": "world",
+              "default": "world",
+              "title": "Parent Frame",
+              "type": "string"
+            },
+            "position_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "quaternion_wxyz": {
+              "default": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Quaternion Wxyz",
+              "type": "array"
+            }
+          },
+          "title": "Mount",
+          "type": "object"
+        },
+        "Plane": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "plane",
+              "default": "plane",
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "half_size_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              ],
+              "title": "Half Size M",
+              "type": "array"
+            },
+            "contype": {
+              "minimum": 0,
+              "title": "Contype",
+              "type": "integer"
+            },
+            "conaffinity": {
+              "minimum": 0,
+              "title": "Conaffinity",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "name",
+            "position_m",
+            "half_size_m",
+            "contype",
+            "conaffinity"
+          ],
+          "title": "Plane",
+          "type": "object"
+        },
+        "ReservedComponent": {
+          "additionalProperties": false,
+          "description": "Serializable extension proposals; no execution support in V1.",
+          "properties": {
+            "kind": {
+              "enum": [
+                "ball",
+                "ramp",
+                "platform_disturbance"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "status": {
+              "const": "PLANNED",
+              "default": "PLANNED",
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "name",
+            "position_m"
+          ],
+          "title": "ReservedComponent",
+          "type": "object"
+        },
+        "TimedForce": {
+          "additionalProperties": false,
+          "properties": {
+            "robot_id": {
+              "const": "robot",
+              "default": "robot",
+              "title": "Robot Id",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^segment_[0-7]$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "point": {
+              "const": "center_of_mass",
+              "default": "center_of_mass",
+              "title": "Point",
+              "type": "string"
+            },
+            "frame": {
+              "const": "world",
+              "default": "world",
+              "title": "Frame",
+              "type": "string"
+            },
+            "force_n": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Force N",
+              "type": "array"
+            },
+            "start_s": {
+              "minimum": 0,
+              "title": "Start S",
+              "type": "number"
+            },
+            "end_s": {
+              "exclusiveMinimum": 0,
+              "title": "End S",
+              "type": "number"
+            }
+          },
+          "required": [
+            "entity",
+            "force_n",
+            "start_s",
+            "end_s"
+          ],
+          "title": "TimedForce",
+          "type": "object"
+        },
+        "Window": {
+          "additionalProperties": false,
+          "description": "Finite rectangular frame; aperture in the world y-z plane, normal +x.",
+          "properties": {
+            "kind": {
+              "const": "window",
+              "default": "window",
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "plane": {
+              "const": "yz_normal_positive_x",
+              "title": "Plane",
+              "type": "string"
+            },
+            "width_m": {
+              "exclusiveMinimum": 0,
+              "title": "Width M",
+              "type": "number"
+            },
+            "height_m": {
+              "exclusiveMinimum": 0,
+              "title": "Height M",
+              "type": "number"
+            },
+            "thickness_m": {
+              "exclusiveMinimum": 0,
+              "title": "Thickness M",
+              "type": "number"
+            },
+            "frame_width_m": {
+              "exclusiveMinimum": 0,
+              "title": "Frame Width M",
+              "type": "number"
+            },
+            "contype": {
+              "const": 0,
+              "default": 0,
+              "title": "Contype",
+              "type": "integer"
+            },
+            "conaffinity": {
+              "const": 1,
+              "default": 1,
+              "title": "Conaffinity",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "name",
+            "position_m",
+            "plane",
+            "width_m",
+            "height_m",
+            "thickness_m",
+            "frame_width_m"
+          ],
+          "title": "Window",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "rod_experiment_v1",
+          "default": "rod_experiment_v1",
+          "title": "Version",
+          "type": "string"
+        },
+        "identity": {
+          "title": "Identity",
+          "type": "string"
+        },
+        "physics_identity": {
+          "title": "Physics Identity",
+          "type": "string"
+        },
+        "assembly": {
+          "$ref": "#/$defs/Assembly"
+        },
+        "initial": {
+          "$ref": "#/$defs/Initial"
+        },
+        "target_world_m": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Target World M",
+          "type": "array"
+        },
+        "task_identity": {
+          "title": "Task Identity",
+          "type": "string"
+        },
+        "duration_s": {
+          "title": "Duration S",
+          "type": "number"
+        },
+        "sources": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "identity",
+        "physics_identity",
+        "assembly",
+        "initial",
+        "target_world_m",
+        "task_identity",
+        "duration_s",
+        "sources"
+      ],
+      "title": "Scene",
+      "type": "object"
+    },
+    "experiment.spatial_parameters@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "const": "spatial_rigid_link_v1",
+          "default": "spatial_rigid_link_v1",
+          "title": "Model",
+          "type": "string"
+        },
+        "solver": {
+          "const": "RK45",
+          "default": "RK45",
+          "title": "Solver",
+          "type": "string"
+        },
+        "rtol": {
+          "default": 1e-06,
+          "exclusiveMinimum": 0,
+          "maximum": 0.001,
+          "title": "Rtol",
+          "type": "number"
+        },
+        "atol": {
+          "default": 1e-08,
+          "exclusiveMinimum": 0,
+          "maximum": 1e-05,
+          "title": "Atol",
+          "type": "number"
+        },
+        "max_step_s": {
+          "default": 0.0002,
+          "exclusiveMinimum": 0,
+          "title": "Max Step S",
+          "type": "number"
+        },
+        "contact_stiffness_n_m": {
+          "default": 5000.0,
+          "exclusiveMinimum": 0,
+          "title": "Contact Stiffness N M",
+          "type": "number"
+        },
+        "contact_damping_n_s_m": {
+          "default": 5.0,
+          "minimum": 0,
+          "title": "Contact Damping N S M",
+          "type": "number"
+        },
+        "contact_taper_m": {
+          "default": 0.0001,
+          "exclusiveMinimum": 0,
+          "title": "Contact Taper M",
+          "type": "number"
+        }
+      },
+      "title": "SpatialParameters",
+      "type": "object"
+    },
     "legacy.backend_data@1.0.0": {
       "additionalProperties": false,
       "properties": {

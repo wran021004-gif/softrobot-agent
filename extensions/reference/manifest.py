@@ -103,7 +103,8 @@ LEGACY_SOURCES = ('extensions/reference/legacy.py', 'extensions/robot_domain/sig
     'tools/matlab_tools.py', 'tools/task_context.py', 'tools/spec_tools.py', 'tools/design_compiler.py',
     'tools/capability_resolver.py', 'controllers/registry.py', 'controllers/base.py', 'controllers/factories.py',
     'controllers/open_loop_length.py', 'controllers/pcc_tip_feedback.py', 'schemas/exploration.py',
-    'schemas/robot_ir.py', 'schemas/design_spec.py', 'schemas/task_spec.py', 'schemas/environment_spec.py', 'schemas/settings.py')
+    'schemas/robot_ir.py', 'schemas/design_spec.py', 'schemas/task_spec.py', 'schemas/environment_spec.py', 'schemas/settings.py',
+    'extensions/experiment_dynamics/physics.py', 'extensions/experiment_dynamics/contracts.py')
 LEGACY_ASSETS = ('tasks/reach_free/task.yaml', 'tasks/reach_free/environment.yaml', 'tasks/reach_free/mujoco.xml',
     'configs/simulator.yaml', 'configs/run.yaml', 'physics_contracts/legacy_v1_surrogate.yaml', 'matlab/tdcr_planar_dynamic.m')
 EXTENSIONS = [replace(d, sources=tuple(dict.fromkeys((*d.sources, *LEGACY_SOURCES))), assets=LEGACY_ASSETS)

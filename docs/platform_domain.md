@@ -1,5 +1,7 @@
 # 公共平台与机器人领域能力
 
+后续独立数学／统一装配能力见 [当前空间动力学指南](platform_spatial.md)。本文以下 MATLAB 需要 MuJoCo 的说明仅适用于旧 `backend.matlab`／`export_shared` 路径；新 `backend.math_planar` 与 `backend.math_spatial` 均不依赖 MuJoCo。原领域分类和旧保存数据入口仍适用，旧回放不适用新装配结果。
+
 当前入口：`python examples/workbench.py platform ...`。本轮从 `a716f32` 创建 `feat/platform-domain-integration`，接通既有模型和工具，不改变历史任务、评分或实验。通用开发步骤见 [扩展指南](platform_extensions.md)，实际注册项及输入输出 Schema 见 [生成目录](platform_generated/catalog.md)／[capabilities.json](platform_generated/capabilities.json)。
 
 **职责**：人定义目标、评价标准和设计空间；LLM 选择工具及参数；数值优化器提出搜索候选；控制器与后端执行时间步。`simulation.run` 是完整执行操作，不要求 LLM 逐步推进仿真。证据、记忆、技能、工作者和会话管理属于平台公共服务。

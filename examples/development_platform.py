@@ -9,8 +9,13 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 
 def main(argv=None):
+    arguments = sys.argv[1:] if argv is None else argv
+    if arguments and arguments[0] == 'spatial-example':
+        from examples.platform_spatial_example import main as spatial_main
+        return spatial_main(arguments[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
+    sub.add_parser('spatial-example', help='统一场景真实示例：prepare/run/compare；数学运行自动阻断 MuJoCo')
     sub.add_parser('catalog', help='只读列出任务、工具与扩展能力')
     check = sub.add_parser('check', help='只读检查定义、能力和可执行配置')
     check.add_argument('config')

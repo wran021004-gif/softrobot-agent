@@ -1,5 +1,7 @@
 # 扩展接口与独立验收
 
+需要设计／场景／数学模型扩展时，先看 [当前独立动力学接口](platform_spatial.md#接口与职责) 与 `extensions/experiment_dynamics`。同一平台注册三个类型化后端，复用公共物理与装配说明；无需复制 Host 或新建运行注册器。
+
 开发者安装的是可信仓库 Python 包。模型和任务配置不能传入 import 路径。发现机制按路径排序读取 `extensions/*/manifest.py`；声明文件只导入轻量契约，不启动可选引擎。相同身份与版本重名直接拒绝。多个版本可以共存，新会话通过 policy.tool_bindings 精确选择；旧 allowed_tools 仅在版本唯一时规范化。
 
 ## 从现有模板开始
