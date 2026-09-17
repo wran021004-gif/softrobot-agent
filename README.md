@@ -2,6 +2,8 @@
 
 ## 当前开发入口
 
+真实机器人链路从 [结构候选、统一信号与保存数据诊断](docs/platform_domain.md) 开始：复用现有等效杆编译、MATLAB／MuJoCo 和原诊断工具；内含可复制命令、开放参数及领域原子／内部库／教学示例分类。
+
 从 [平台架构与操作](docs/platform.md) 开始，推荐命令为 `python examples/workbench.py platform ...`；它转发到 `examples/development_platform.py` 的同一实现。新增扩展先读 [扩展指南与最小模板](docs/platform_extensions.md)，协作分工见 [共同核心与包作者责任](docs/platform_parallel_development.md)，任务配置见 [填写指南](docs/platform_tasks.md)。
 
 ```powershell

@@ -17,5 +17,7 @@ EXTENSIONS = [
             "extensions/learning_peak/manifest.py",
         ),
         cache=True,
+        capabilities=dict(category='mathematical_models', role='teaching_example',
+            semantics='force sequence N -> maximum absolute force N; no task-success claim'),
     )
 ]

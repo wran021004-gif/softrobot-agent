@@ -5134,6 +5134,143 @@
       "title": "WorkerParameters",
       "type": "object"
     },
+    "domain.empty@1.0.0": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Empty",
+      "type": "object"
+    },
+    "domain.rod_design@1.0.0": {
+      "$defs": {
+        "ExplorationPhysics": {
+          "additionalProperties": false,
+          "properties": {
+            "profile": {
+              "const": "equivalent_rod_v2",
+              "default": "equivalent_rod_v2",
+              "title": "Profile",
+              "type": "string"
+            },
+            "validated": {
+              "const": false,
+              "default": false,
+              "title": "Validated",
+              "type": "boolean"
+            },
+            "mass_mode": {
+              "const": "uniform_equivalent_cylinder",
+              "default": "uniform_equivalent_cylinder",
+              "title": "Mass Mode",
+              "type": "string"
+            },
+            "line_density_kg_m": {
+              "default": 1.2566370614359172,
+              "maximum": 3,
+              "minimum": 0.02,
+              "title": "Line Density Kg M",
+              "type": "number"
+            },
+            "root_ei_nm2": {
+              "default": 0.00375,
+              "maximum": 1,
+              "minimum": 0.0001,
+              "title": "Root Ei Nm2",
+              "type": "number"
+            },
+            "tip_ei_ratio": {
+              "default": 1,
+              "maximum": 3,
+              "minimum": 0.1,
+              "title": "Tip Ei Ratio",
+              "type": "number"
+            },
+            "bending_viscosity_nm2_s": {
+              "default": 0.00375,
+              "maximum": 0.05,
+              "minimum": 1e-06,
+              "title": "Bending Viscosity Nm2 S",
+              "type": "number"
+            },
+            "natural_total_angle_rad": {
+              "default": 0,
+              "maximum": 3.141592653589793,
+              "minimum": -3.141592653589793,
+              "title": "Natural Total Angle Rad",
+              "type": "number"
+            },
+            "tendon_servo_kp_n_per_m": {
+              "default": 1000,
+              "maximum": 20000,
+              "minimum": 100,
+              "title": "Tendon Servo Kp N Per M",
+              "type": "number"
+            },
+            "tendon_force_limit_n": {
+              "default": 20,
+              "maximum": 80,
+              "minimum": 5,
+              "title": "Tendon Force Limit N",
+              "type": "number"
+            }
+          },
+          "title": "ExplorationPhysics",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "robot_family": {
+          "const": "tendon_driven_continuum",
+          "default": "tendon_driven_continuum",
+          "title": "Robot Family",
+          "type": "string"
+        },
+        "sections": {
+          "const": 1,
+          "default": 1,
+          "title": "Sections",
+          "type": "integer"
+        },
+        "segments": {
+          "const": 8,
+          "default": 8,
+          "title": "Segments",
+          "type": "integer"
+        },
+        "total_length_m": {
+          "default": 0.3,
+          "maximum": 0.8,
+          "minimum": 0.05,
+          "title": "Total Length M",
+          "type": "number"
+        },
+        "body_radius_m": {
+          "default": 0.02,
+          "maximum": 0.05,
+          "minimum": 0.005,
+          "title": "Body Radius M",
+          "type": "number"
+        },
+        "tendon_count": {
+          "const": 4,
+          "default": 4,
+          "title": "Tendon Count",
+          "type": "integer"
+        },
+        "tendon_routing_radius_m": {
+          "default": 0.018,
+          "maximum": 0.045,
+          "minimum": 0.002,
+          "title": "Tendon Routing Radius M",
+          "type": "number"
+        },
+        "exploration_physics": {
+          "$ref": "#/$defs/ExplorationPhysics"
+        }
+      },
+      "title": "RodDesign",
+      "type": "object"
+    },
     "legacy.backend_data@1.0.0": {
       "additionalProperties": false,
       "properties": {

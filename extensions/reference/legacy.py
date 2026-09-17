@@ -2,7 +2,7 @@
 from pathlib import Path
 import gzip
 import json
-from schemas.platform import BackendResult, Payload, Signal, SignalSpec
+from schemas.platform import BackendResult, Payload
 from schemas.task_spec import TaskSpec
 from schemas.environment_spec import EnvironmentSpec
 from schemas.settings import RunSettings
@@ -21,6 +21,13 @@ class MujocoBackend:
 
     @staticmethod
     def check(inp, parameters, control):
+        from tools.design_compiler import build_robot_ir, ensure_robot_ir
+        if inp.robot.structure.contract == 'domain.rod_design':
+            from extensions.robot_domain.contracts import RodDesign
+            build_robot_ir(RodDesign.model_validate(inp.robot.structure.data))
+        else:
+            from schemas.robot_ir import RobotIR
+            ensure_robot_ir(RobotIR.model_validate(inp.robot.structure.data))
         from tools.spec_tools import load_simulator, load_task_package
         _, original_env = load_task_package()
         if inp.task.environment.data != original_env.model_dump(mode='json'):
@@ -37,7 +44,8 @@ class MujocoBackend:
 
     def compile(self, inp, reg):
         self.inp, self.reg = inp, reg
-        self.ir = reg.parse(inp.robot.structure)
+        from tools.design_compiler import ensure_robot_ir
+        self.ir = ensure_robot_ir(reg.parse(inp.robot.structure))
 
     def initialize(self, initial, controller):
         self.initial, self.controller = initial, controller
@@ -58,10 +66,8 @@ class MujocoBackend:
         original = self.executor.simulate(self.name, self.ir, self.controller.parameters, folder,
             timeout_s=timeout_s, task_context=context)
         rows = json.loads(gzip.decompress((folder / 'trajectory.json.gz').read_bytes()))
-        signals = []
-        if rows and all('tip_m' in row for row in rows):
-            signals.append(Signal(spec=SignalSpec(name='tip_position', entity='tip', dimension=3, units='m', frame='world', phase=self.phase),
-                times_s=[r['time_s'] for r in rows], values=[r['tip_m'] for r in rows]))
+        from extensions.robot_domain.signals import from_rows
+        signals = from_rows(rows, self.name, self.ir)
         self.result = BackendResult(solver_status='completed' if original['complete'] else 'failed',
             backend_id='backend.' + self.name, model_id=original['model_id'], signals=signals,
             data=Payload(contract='legacy.backend_data', data=LegacyData(backend=self.name, original=original,

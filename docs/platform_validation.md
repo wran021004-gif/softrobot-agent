@@ -1,5 +1,9 @@
 # 平台验收与完成边界
 
+## 本次：领域接入（基线 a716f32）
+
+一次定向组 `conda run -n softagent python -m unittest tests.test_platform_domain -v`，3/3 通过（1.239 s）。一个非基线候选分别通过公共宿主完成 **MuJoCo 1 次、MATLAB 1 次** 0.08 s 求解及保存结果评价／信号／诊断／规则／回放数据准备，合计 14 次工具调用、2 次 backend_solves、0 次模型请求；无全仓库测试、历史实验重跑、视频编码或 GUI。两份评价有效且任务未达标。实际编译量与有效候选一致，后处理未增加求解。范围、可复制命令和未验证部分见 [领域指南](platform_domain.md)，数据摘要见 [platform_domain.json](evidence/platform_domain.json)。以下各轮记录保持原意。
+
 ## 本次：公共接口两项修复（基线 6751639）
 
 实现完成后只运行一次组合命令：

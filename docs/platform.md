@@ -57,6 +57,8 @@ flowchart TD
 
 ## 快速使用
 
+改变真实机器人的结构／物理／控制参数，优先使用 [领域接入示例](platform_domain.md)：唯一 DesignSpec → 原编译器 → simulation.run → 评价、统一信号及平台引用诊断。下列 signal_hold 是合成接口示例，不能替代真实机器人验证。
+
 ```powershell
 conda activate softagent
 python examples/workbench.py platform catalog
@@ -77,6 +79,7 @@ python examples/workbench.py platform export runs/my_platform signal-hold runs/m
 
 ## 文档导航
 
+- [机器人领域能力、参数、信号与真实接入示例](platform_domain.md)
 - [历史基线审计表与阶段记录](platform_progress.md)
 - [当前接口版本与兼容决策](platform_interface_decisions.md)
 - [人工任务填写指南](platform_tasks.md)

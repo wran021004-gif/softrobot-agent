@@ -26,8 +26,9 @@ def export():
         for name, spec in schema['properties'].items()]
     (target / 'task_fields.json').write_text(json.dumps(fields, ensure_ascii=False, indent=2) + '\n', encoding='utf8')
     lines = ['# 公共能力目录（生成）', '', '由 `python examples/export_platform_contracts.py` 生成；不是授权清单。', '',
-        '| 身份 | 类型 | 版本 | 实现存在 | 说明 |', '| --- | --- | --- | --- | --- |']
-    lines += [f"| {r['extension_id']} | {r['kind']} | {r['version']} | {r['implementation_exists']} | {r['description']} |" for r in reg.catalog()]
+        '分类、内部库和兼容入口说明见 [领域能力边界](../platform_domain.md)。存在绑定不代表物理验证。', '',
+        '| 身份 | 分类 | 角色 | 类型 | 版本 | 实现存在 | 绑定入口 | 说明 |', '| --- | --- | --- | --- | --- | --- | --- | --- |']
+    lines += [f"| {r['extension_id']} | {r['capabilities'].get('category', 'platform_services')} | {r['capabilities'].get('role', 'adapter')} | {r['kind']} | {r['version']} | {r['implementation_exists']} | {r['binding'] or '未实现'} | {r['description']} |" for r in reg.catalog()]
     (target / 'catalog.md').write_text('\n'.join(lines) + '\n', encoding='utf8')
     return dict(contracts=len(contracts) - 1, payloads=len(reg.contracts), extensions=len(reg.extensions))
 

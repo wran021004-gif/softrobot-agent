@@ -43,7 +43,7 @@ def read_json(root, registry, arguments):
     return evidence_page(read(checked_path(root, registry, ref)), ref, **args)
 
 
-def saved_diagnosis(root, registry, arguments):
+def saved_diagnosis(root, registry, arguments, *, source_identity=None):
     from tools.trajectory_diagnosis import diagnose, load_rows, metadata_from_shared
     path=checked_path(root,registry,arguments['result_ref'])
     result=read(path)
@@ -60,7 +60,9 @@ def saved_diagnosis(root, registry, arguments):
     start=min(rows[0]['time_s'],rows[0]['solver_time_s']) if arguments['t_start_s'] is None else arguments['t_start_s']
     end=max(rows[-1]['time_s'],rows[-1]['solver_time_s']) if arguments['t_end_s'] is None else arguments['t_end_s']
     try:
-        meta=metadata_from_shared(read(paths[1]),result.get('candidate_id','saved'),arguments['backend'],root.name)
+        identity = source_identity or {}
+        meta=metadata_from_shared(read(paths[1]),identity.get('candidate_id',result.get('candidate_id','saved')),
+            arguments['backend'],identity.get('run_id',root.name))
         data=diagnose(paths[-1],meta,arguments['entity'],start,end,arguments['fields'])
     except KeyError as exc:
         raise ValueError('MISSING_SAVED_FIELD: '+str(exc)) from exc

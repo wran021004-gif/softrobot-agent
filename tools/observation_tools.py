@@ -63,7 +63,7 @@ def load_observation(source):
         _check(samples)
         diagnosis = read(source / 'diagnosis.json') if (source / 'diagnosis.json').exists() else {}
         return dict(format='observation_v1', backend=result['backend'], model=result['model_id'],
-                    candidate_id=result['candidate_id'], source=str(source), source_sha256=file_hash(trajectory),
+                    candidate_id=result.get('candidate_id'), source=str(source), source_sha256=file_hash(trajectory),
                     frame=ir['coordinate_frame'], status=result['computation_status'],
                     design=dict(total_length_m=ir['section']['length_m'], body_radius_m=ir['section']['body_radius_m'],
                                 segments=ir['section']['segments']), control=shared['control'], target_m=shared['target'],

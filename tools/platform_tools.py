@@ -163,7 +163,10 @@ def read_evidence(ctx, args):
 
 def diagnose(ctx, args):
     result = BackendResult.model_validate(ctx.artifact(args.result))
-    signal = next((s for s in result.signals if s.spec.name == args.signal), None)
+    matches = [s for s in result.signals if s.spec.name == args.signal]
+    if len(matches) > 1:
+        raise ValueError('SIGNAL_SELECTION_REQUIRED: use signals.read with entity and phase')
+    signal = matches[0] if matches else None
     if signal is None:
         status, indices = 'missing_data', []
     elif signal.spec.units != args.units or signal.spec.dimension != 1:

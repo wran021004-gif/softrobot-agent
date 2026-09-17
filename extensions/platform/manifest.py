@@ -22,3 +22,8 @@ EXTENSIONS = [
     Extension('strategy.tool', 'strategy', '1.0.0', Empty, ToolRequest,
         'tools.platform_models:ToolStrategy', 'One typed tool request per decision', sources=('tools/platform_models.py',)),
 ]
+
+from dataclasses import replace
+EXTENSIONS = [replace(d, capabilities={**d.capabilities,
+    'category': 'robot_design' if d.kind == 'candidate_builder' else 'platform_services',
+    'role': 'adapter'}) for d in EXTENSIONS]

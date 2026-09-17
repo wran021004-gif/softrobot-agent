@@ -12,6 +12,10 @@ CONTRACTS = [('convergence.' + name, '1.0.0', schema) for name, schema in [
 
 
 def ext(name, kind, inp, out, function, **kw):
+    kw['capabilities'] = {**kw.get('capabilities', {}), 'role': 'teaching_example',
+        'category': {'candidate_builder': 'robot_design', 'backend': 'simulation', 'controller': 'control',
+            'search': 'parameter_search', 'task': 'evaluation_comparison', 'evaluator': 'evaluation_comparison',
+            'tool': 'mathematical_models'}.get(kind, 'platform_services')}
     return Extension(name, kind, '1.0.0', inp, out, 'extensions.convergence.implementation:' + function,
         'Independent offline development example; no physical calibration', sources=SOURCE, **kw)
 

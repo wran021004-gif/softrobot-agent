@@ -70,6 +70,8 @@ python examples/export_platform_contracts.py
 
 ## 当前开放接口与独立入口
 
+本轮新增 `candidate.rod_design`、`signals.read` 及基于平台 EvidenceRef 的诊断／回放适配，见 [领域边界和实际入口](platform_domain.md)。旧路径诊断仍为 1.1.0，平台结果引用形式使用 2.0.0；视频旧路径为 1.2.0、引用形式为 2.0.0。新会话显式绑定工具版本，不能把多个版本混在 allowed_tools 中猜选。声明 `capabilities.category/role` 为目录提供分类，不增加权限或另一套注册机制。
+
 公共操作类型在 `schemas/platform_operations.py`，开发协议在 `schemas/platform_protocols.py`。模型观测、适配器、策略、候选使用各自 1.0 契约；ToolReceipt/EvaluationResult 默认 1.2.0，兼容读取 1.0.0／1.1.0，新增可空 original_execution_id；通用 WorkerOutput 使用 2.0.0。工具版本与结果契约版本不同，例如 simulation.run 工具仍为 1.0.0，不随回执版本一起升级。适配器 encode→respond→decode，策略 decide→ToolRequest，Host 执行和记账。
 
 | 类型／拥有目录 | 实现入口与声明 | 参考实现／独立验收方法 |

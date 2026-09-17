@@ -122,6 +122,7 @@ class Registry:
         if not permitted:
             reasons.append('NOT_GRANTED' if allowed is not None else 'NO_SESSION_POLICY')
         return dict(extension_id=definition.extension_id, kind=definition.kind, version=definition.version,
+                    binding=definition.binding,
                     declared=True, implementation_exists=exists, dependencies_available=not missing,
                     permitted=permitted, executable=exists and not missing and permitted,
                     runtime_probe='not_started', reasons=reasons, description=definition.description,

@@ -20,6 +20,12 @@ CONTRACTS = [('reference.empty', VERSION, c.Empty), ('reference.reach_goal', VER
 
 def ext(name, kind, inp, out, binding, description, **kw):
     kw.setdefault('sources', SOURCE if 'SOURCE' in globals() else ())
+    category = {'task': 'evaluation_comparison', 'evaluator': 'evaluation_comparison', 'initializer': 'scene_assembly',
+        'controller': 'control', 'search': 'parameter_search', 'backend': 'simulation', 'worker': 'platform_services'}.get(kind,
+        {'simulation': 'simulation', 'evaluation': 'evaluation_comparison', 'diagnostics': 'signals_diagnostics',
+         'analysis': 'mathematical_models'}.get(name.split('.')[0], 'platform_services'))
+    kw['capabilities'] = {**kw.get('capabilities', {}), 'category': category,
+        'role': 'unimplemented' if binding is None else 'public_tool' if kind == 'tool' else 'adapter'}
     return Extension(name, kind, VERSION, inp, out, binding, description, **kw)
 
 
@@ -88,12 +94,12 @@ from schemas.platform import LegacyWorkerOutput
 CONTRACTS.append(("reference.signal_report", VERSION, LegacyWorkerOutput))
 
 # Exact representation and signal semantics; legacy conversion remains explicit.
-EXTENSIONS = [replace(d, capabilities={**d.capabilities, 'robot_contracts': ['reference.robot' if d.extension_id == 'backend.reference' else 'legacy.robot_ir'],
+EXTENSIONS = [replace(d, capabilities={**d.capabilities, 'robot_contracts': ['reference.robot'] if d.extension_id == 'backend.reference' else ['legacy.robot_ir', 'domain.rod_design'],
     **({'signal_specs': [dict(name='tip_position', entity='tip', dimension=3, units='m', frame='world',
          phase='sampled_state' if d.extension_id == 'backend.matlab' else 'post_step')]} if d.extension_id in ('backend.matlab', 'backend.mujoco') else {})})
     if d.kind == 'backend' and d.binding else d for d in EXTENSIONS]
 
-LEGACY_SOURCES = ('extensions/reference/legacy.py', 'tools/reach_dynamics.py', 'tools/mujoco_tools.py',
+LEGACY_SOURCES = ('extensions/reference/legacy.py', 'extensions/robot_domain/signals.py', 'extensions/robot_domain/contracts.py', 'tools/reach_dynamics.py', 'tools/mujoco_tools.py',
     'tools/matlab_tools.py', 'tools/task_context.py', 'tools/spec_tools.py', 'tools/design_compiler.py',
     'tools/capability_resolver.py', 'controllers/registry.py', 'controllers/base.py', 'controllers/factories.py',
     'controllers/open_loop_length.py', 'controllers/pcc_tip_feedback.py', 'schemas/exploration.py',
@@ -104,3 +110,16 @@ EXTENSIONS = [replace(d, sources=tuple(dict.fromkeys((*d.sources, *LEGACY_SOURCE
               if d.extension_id in ('backend.mujoco', 'backend.matlab', 'controller.legacy_length') else d for d in EXTENSIONS]
 EXTENSIONS = [replace(d, contract_dependencies=tuple((n, v) for n, v, schema in CONTRACTS
               if schema is d.input_schema or schema is d.output_schema)) for d in EXTENSIONS]
+
+from extensions.robot_domain.signals import declarations
+EXTENSIONS = [replace(d, capabilities={**d.capabilities,
+    'signals': sorted({s['name'] for s in declarations(d.extension_id.split('.')[-1])} | {'tendon_tension'} |
+        ({'contact_normal_force', 'contact_tangent_force', 'contact_position', 'contact_gap'} if d.extension_id == 'backend.mujoco' else set())),
+    'signal_templates': declarations(d.extension_id.split('.')[-1]),
+    'signal_phases': ['sampled_state'] if d.extension_id == 'backend.matlab' else ['post_step', 'pre_step_solver'],
+    'force_convention': 'actuator_force negative=pull; tendon_tension=-actuator_force; contact normal positive=compression',
+    'entity_expansion': 'actual IR joints/tendons/segments; MuJoCo contact_sample_i_point_j is one saved occurrence',
+    'missing_signals': 'absent, never filled with zeros',
+    'model': 'existing uncalibrated single-section legacy_v1 or equivalent_rod_v2',
+    'semantics': 'state time_s; force/command solver_time_s; contact occurrence time_s'})
+    if d.extension_id in ('backend.matlab', 'backend.mujoco') else d for d in EXTENSIONS]

@@ -1,5 +1,11 @@
 # 公共接口版本与定版决策
 
+## 领域接入增量（基线 a716f32）
+
+公共信封版本不变。`domain.rod_design@1.0.0` 作为会话唯一设计负载，`candidate.rod_design@1.0.0` 重用原等效杆编译；既有后端继续接受 legacy.robot_ir，并新增此设计表示。后端输出增量统一信号，明确实际实体和 state／solver 时间。`signals.read@1.0.0` 提供精确选择，旧单字段诊断遇到歧义明确拒绝。
+
+`diagnostics.saved_trajectory`、`diagnostics.signal_rule`、`visualization.render_simulation_video` 新 **2.0.0** 输入 EvidenceRef 和执行身份，原路径版本及字段语义保留。`visualization.saved_replay@1.0.0` 只准备原回放数据。输出 SavedProduct 关联源结果、所选／原始执行、候选、ExportBundle、报告和文件引用；复用原 SQLite 内容库与账本。`capabilities.category/role` 与目录 binding 只是发现元数据。详细字段、兼容映射、范围和验证见 [领域指南](platform_domain.md)。
+
 当前入口与开发步骤见 [平台指南](platform.md) 和 [扩展指南](platform_extensions.md)。本页顶部记录当前结果契约与复用语义，后半部保留上一轮历史决策；历史“开发接口 2.0”不是全部工具或契约的统一版本。
 
 源码是权威：公共信封见 `schemas/platform.py`、操作类型见 `schemas/platform_operations.py`、Python 开发协议见 `schemas/platform_protocols.py`，具体负载和绑定见各扩展包。运行 `python examples/export_platform_contracts.py` 同步 [contracts.json](platform_generated/contracts.json) 和 [capabilities.json](platform_generated/capabilities.json)，不手写第二套接口。ToolReceipt／EvaluationResult 默认 1.2.0、WorkerOutput 2.0.0，各工具的精确 version 和其他契约版本独立保留；新会话通过 policy.tool_bindings 选择工具版本。
