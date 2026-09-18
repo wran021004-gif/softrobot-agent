@@ -1,6 +1,7 @@
 """Application assembly for public default adapters; declaration imports only."""
 from schemas.common import Contract
 from schemas.platform import SessionInput, ModelResponse, ToolRequest
+from schemas import platform_math as math_contracts
 from tools.platform_registry import Extension
 
 
@@ -9,6 +10,14 @@ class Empty(Contract):
 
 
 CONTRACTS = [('platform.empty', '1.0.0', Empty)]
+CONTRACTS += [('platform.' + name, '1.0.0', schema) for name, schema in [
+    ('mathematical_model', math_contracts.MathematicalModel),
+    ('dynamic_system', math_contracts.DynamicSystem),
+    ('linearized_model', math_contracts.LinearizedModel),
+    ('model_requirement', math_contracts.ModelRequirement),
+    ('optimization_problem', math_contracts.OptimizationProblem),
+    ('optimization_result', math_contracts.OptimizationResult),
+]]
 EXTENSIONS = [
     Extension('candidate.controller', 'candidate_builder', '1.0.0', Empty, SessionInput,
         'tools.platform_candidates:apply_control', 'Apply existing typed controller parameters',

@@ -18,8 +18,12 @@ def authorize(inp, space, changes):
             if not isinstance(value,str) or value not in space.templates: raise ValueError('TEMPLATE_NOT_AUTHORIZED')
             continue
         normalized = canonical_path(key)
-        specs = space.control_parameters if normalized.startswith('control/') else space.discretization_parameters if normalized.startswith('discretization/') else space.parameters
-        spec = specs.get(normalized) or space.parameters.get(key)
+        specs = (space.control_parameters if normalized.startswith('control/') else
+                 space.model_parameters if normalized.startswith('model/') else
+                 space.discretization_parameters if normalized.startswith('discretization/') else space.parameters)
+        spec = specs.get(normalized)
+        if spec is None and not normalized.startswith('model/'):
+            spec = space.parameters.get(key)  # Legacy physical/discretization aliases.
         if spec is None: raise ValueError('PARAMETER_NOT_AUTHORIZED: '+key)
         check_value(key, value, spec, inp.policy.editable if inp is not None else {})
 
@@ -85,6 +89,8 @@ def validate_final(data,discretization,space,changes,task_bounds):
 def build(value, *, task_bounds=None):
     req = BuildRequest.model_validate(value)
     authorize(None,req.space,req.changes)
+    if any(path.startswith('model/') for path in req.changes):
+        raise ValueError('MODEL_PARAMETER_REQUIRES_SESSION_CANDIDATE: use candidate.family with dynamics_model binding')
     template = req.changes.get('template')
     design = req.space.templates[template] if template else req.baseline
     # Select the complete entity structure before validating its mesh. A
@@ -127,8 +133,8 @@ def build(value, *, task_bounds=None):
 
 def apply(inp, parameters, changes):
     explicit = inp.policy.discretization.data if inp.policy.discretization is not None else None
-    design_changes={k:v for k,v in changes.items() if not k.startswith('control/')}
-    design_bounds={k:v for k,v in inp.policy.editable.items() if not k.startswith('control/')}
+    design_changes={k:v for k,v in changes.items() if not k.startswith(('control/','model/'))}
+    design_bounds={k:v for k,v in inp.policy.editable.items() if not k.startswith(('control/','model/'))}
     result = build(dict(baseline=inp.robot.structure.data,space=parameters,discretization=explicit,changes=design_changes),task_bounds=design_bounds)
     if result.status != 'valid': raise ValueError(result.status.upper()+': '+str(result.reason))
     from .contracts import Control
@@ -141,6 +147,19 @@ def apply(inp, parameters, changes):
             control[key]=value
     for path,spec in parameters.control_parameters.items():
         check_value(path,read_parameter(control,path.removeprefix('control/')),spec,inp.policy.editable)
+    if parameters.model_parameters:
+        if inp.policy.dynamics_model is None:
+            raise ValueError('MODEL_PARAMETER_REQUIRES_EXPLICIT_MODEL')
+        model_data=deepcopy(inp.policy.dynamics_model.parameters.data)
+        for path,value in changes.items():
+            if path.startswith('model/'):
+                obj,key=locate(model_data,path.removeprefix('model/'))
+                if isinstance(obj,list): obj[int(key)]=value
+                else: obj[key]=value
+        for path,spec in parameters.model_parameters.items():
+            check_value(path,read_parameter(model_data,path.removeprefix('model/')),spec,inp.policy.editable)
+        inp.policy.dynamics_model.parameters.data.clear()
+        inp.policy.dynamics_model.parameters.data.update(model_data)
     inp.policy.controller.parameters.data.clear()
     inp.policy.controller.parameters.data.update(Control.model_validate(control).model_dump(mode='json'))
     inp.robot.structure.data.clear(); inp.robot.structure.data.update(result.candidate.model_dump(mode='json'))

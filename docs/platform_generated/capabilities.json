@@ -809,6 +809,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -841,6 +842,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -892,6 +894,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -1089,7 +1092,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -1257,6 +1261,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -1289,6 +1294,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -1340,6 +1346,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -1532,7 +1539,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -1661,6 +1669,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -1693,6 +1702,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -1744,6 +1754,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -1882,6 +1893,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -1914,6 +1926,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -1965,6 +1978,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -2156,6 +2170,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -2188,6 +2203,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -2239,6 +2255,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -2701,6 +2718,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -2733,6 +2751,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -2784,6 +2803,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -3159,6 +3179,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -3191,6 +3212,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -3242,6 +3264,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -3683,6 +3706,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -3715,6 +3739,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -3766,6 +3791,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -3958,7 +3984,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [
       "matlab/tf_geometry.m",
@@ -4138,6 +4165,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -4170,6 +4198,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -4221,6 +4250,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -4414,7 +4444,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [
       "matlab/tf_geometry.m",
@@ -4551,6 +4582,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -4583,6 +4615,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -4634,6 +4667,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -4971,6 +5005,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -5003,6 +5038,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -5054,6 +5090,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -5262,6 +5299,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -5294,6 +5332,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -5345,6 +5384,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -6167,6 +6207,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -7325,6 +7366,15 @@
           "title": "Control Parameters",
           "type": "object"
         },
+        "model_parameters": {
+          "additionalProperties": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "description": "model/<path> in dynamics_model parameters: model-specific tuning such as regularization. Real material Young modulus stays in physical parameters; basis order belongs to discretization_parameters.",
+          "title": "Model Parameters",
+          "type": "object"
+        },
         "templates": {
           "additionalProperties": {
             "$ref": "#/$defs/Design"
@@ -7846,6 +7896,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -8148,7 +8199,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -8740,6 +8792,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -9573,6 +9626,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -10213,7 +10267,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -11418,6 +11473,15 @@
               "title": "Control Parameters",
               "type": "object"
             },
+            "model_parameters": {
+              "additionalProperties": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "description": "model/<path> in dynamics_model parameters: model-specific tuning such as regularization. Real material Young modulus stays in physical parameters; basis order belongs to discretization_parameters.",
+              "title": "Model Parameters",
+              "type": "object"
+            },
             "templates": {
               "additionalProperties": {
                 "$ref": "#/$defs/Design"
@@ -12543,7 +12607,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -15361,7 +15426,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -16317,6 +16383,7 @@
     "description": "Serial rigid-body model with two principal bending axes per cell",
     "input_schema": {
       "additionalProperties": false,
+      "description": "Compatibility payload for serial bending; public capabilities use MathematicalModel.",
       "properties": {
         "model_id": {
           "const": "serial_bending_cells_v1",
@@ -16406,6 +16473,65 @@
       "category": "mathematical_model",
       "role": "definition",
       "coordinates": "two principal bending angles per cell",
+      "mathematical_model": {
+        "state_definition": [
+          {
+            "name": "joint_position",
+            "dimension": "n_dof",
+            "units": "rad",
+            "frame": "joint_local"
+          },
+          {
+            "name": "joint_velocity",
+            "dimension": "n_dof",
+            "units": "rad/s",
+            "frame": "joint_local"
+          }
+        ],
+        "input_definition": [
+          {
+            "name": "actuator_command",
+            "dimension": "n_actuator",
+            "units": "m_or_rad_by_actuator",
+            "frame": "actuator"
+          }
+        ],
+        "output_definition": [
+          {
+            "name": "tip_position",
+            "dimension": 3,
+            "units": "m",
+            "frame": "world"
+          },
+          {
+            "name": "tendon_length",
+            "dimension": "n_tendon",
+            "units": "m",
+            "frame": "path"
+          },
+          {
+            "name": "tendon_tension",
+            "dimension": "n_tendon",
+            "units": "N",
+            "frame": "path"
+          }
+        ],
+        "required_robot_data": [
+          "family.design.components",
+          "family.design.tendons",
+          "family.design.actuators",
+          "family.design.tip"
+        ],
+        "discretization_contract": "family.discretization",
+        "capabilities": {
+          "kinematics": true,
+          "statics": false,
+          "dynamics": true,
+          "linearization": false,
+          "gradients": false
+        },
+        "representations": []
+      },
       "equations": "serial rigid-body dynamics with hinge elasticity/damping and straight frictionless tendon length servos",
       "physical_input": "family.design",
       "derived_representation": "family.discretization + resolved_physics"
@@ -16444,7 +16570,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -16825,7 +16952,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -16975,7 +17103,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -17183,7 +17312,8 @@
       "extensions/robot_domain/contracts.py",
       "schemas/environment_spec.py",
       "schemas/robot_ir.py",
-      "schemas/exploration.py"
+      "schemas/exploration.py",
+      "schemas/platform_math.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -17612,6 +17742,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -17644,6 +17775,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -17827,6 +17959,7 @@
         },
         "Signal": {
           "additionalProperties": false,
+          "description": "Actual sample timestamps in seconds; spacing may be nonuniform or sparse.",
           "properties": {
             "spec": {
               "$ref": "#/$defs/SignalSpec"
@@ -17859,6 +17992,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -17910,6 +18044,7 @@
         }
       },
       "additionalProperties": false,
+      "description": "Public exit for every execution backend, one-shot or stepping.\n\nNative traces may be retained in data/ExportBundle, but shared evaluators\nand diagnostics consume signals with their full SignalSpec semantics.\nsolver_status is the historical execution status, unrelated to Solver.solve.",
       "properties": {
         "solver_status": {
           "enum": [
@@ -19467,6 +19602,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -19870,6 +20006,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
@@ -20273,6 +20410,7 @@
         },
         "SignalSpec": {
           "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
           "properties": {
             "name": {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",

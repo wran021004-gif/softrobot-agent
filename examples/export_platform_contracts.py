@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from schemas import platform
+from schemas import platform, platform_math
 from schemas.common import Contract
 from tools.platform_registry import registry
 from tools.platform_store import encode
@@ -13,8 +13,8 @@ from tools.spec_tools import ROOT
 def export():
     target = ROOT / 'docs/platform_generated'
     target.mkdir(parents=True, exist_ok=True)
-    contracts = {name: cls.model_json_schema() for name, cls in vars(platform).items()
-        if isinstance(cls, type) and issubclass(cls, Contract) and cls.__module__ == platform.__name__}
+    contracts = {name: cls.model_json_schema() for module in (platform, platform_math) for name, cls in vars(module).items()
+        if isinstance(cls, type) and issubclass(cls, Contract) and cls.__module__ == module.__name__}
     from tools.platform_physics import ModelQuantityRequest, ModelQuantityResult
     contracts.update({cls.__name__: cls.model_json_schema() for cls in (ModelQuantityRequest, ModelQuantityResult)})
     reg = registry()

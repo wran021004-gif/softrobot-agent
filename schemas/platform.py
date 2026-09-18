@@ -39,6 +39,11 @@ class Binding(Contract):
 
 
 class SignalSpec(Contract):
+    """Backend-neutral quantity and entity; dimension is each flattened sample.
+
+    Names are extensible (e.g. contact_force). units/frame/phase are semantic,
+    not backend identifiers; absence denotes unsupported, never invented zero.
+    """
     name: Identifier
     entity: Identifier
     dimension: int = Field(gt=0)
@@ -49,6 +54,7 @@ class SignalSpec(Contract):
 
 
 class Signal(Contract):
+    """Actual sample timestamps in seconds; spacing may be nonuniform or sparse."""
     spec: SignalSpec
     times_s: list[float]
     values: list[list[float]]
@@ -262,6 +268,12 @@ class EvaluationResult(Contract):
 
 
 class BackendResult(Contract):
+    """Public exit for every execution backend, one-shot or stepping.
+
+    Native traces may be retained in data/ExportBundle, but shared evaluators
+    and diagnostics consume signals with their full SignalSpec semantics.
+    solver_status is the historical execution status, unrelated to Solver.solve.
+    """
     solver_status: Literal['completed', 'failed', 'cancelled', 'unknown']
     backend_id: Identifier
     model_id: Identifier

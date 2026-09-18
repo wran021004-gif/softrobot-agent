@@ -101,7 +101,8 @@ def view(host):
     return dict(run_id=host.run_id,status=session['status'],task=plain(inp.task),route=route,counts=counts,
         combinations=combinations,baseline=design_summary(inp.robot.structure.data),space=dict(
             templates={name:design_summary(design) for name,design in space.get('templates',{}).items()},
-            parameters=space.get('parameters',{}),control_parameters=space.get('control_parameters',{})),
+            parameters=space.get('parameters',{}),control_parameters=space.get('control_parameters',{}),
+            model_parameters=space.get('model_parameters',{}),discretization_parameters=space.get('discretization_parameters',{})),
         max_trials=spec.max_trials,guidance=spec.guidance,usage=host.store.remaining(host.run_id),
         project_usage=host.store.remaining(),stop_reason=session['state'].get('stop_reason'),
         limitations=['Best means best valid evaluated candidate within one comparable search; no global optimum.',
@@ -138,7 +139,7 @@ def overview(host):
             controller=c['controller']['extension_id'],executable=c['executable'],reasons=c['reasons']) for name,c in full['combinations'].items()},
         baseline=full['baseline'],space=dict(templates=list(space.get('templates',{})),
             parameters=space.get('parameters',{}),discretization_parameters=space.get('discretization_parameters',{}),
-            control_parameters=space.get('control_parameters',{})),max_trials=full['max_trials'],
+            control_parameters=space.get('control_parameters',{}),model_parameters=space.get('model_parameters',{})),max_trials=full['max_trials'],
         counts=full['counts'],usage=full['usage'],project_usage=full['project_usage'],
         available_actions=dict(build='Authorized combination and optional declared changes; zero solves.',
             run='Completed build source_node; one charged backend attempt plus evaluation, no variables.',

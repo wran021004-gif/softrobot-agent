@@ -44,6 +44,7 @@ def compile_input(value, reg=None):
         search, _ = reg.bind(inp.policy.search, 'search')
         if len(task.objectives) != 1 and not search.capabilities.get('feedback_adapter'):
             raise ValueError('MULTIOBJECTIVE_SEARCH_ADAPTER_REQUIRED')
+    reg.check_controller_model(inp.policy.controller, inp.policy.dynamics_model)
     caps = backend.capabilities
     if inp.robot.structure.contract not in caps.get('robot_contracts', [inp.robot.structure.contract]):
         raise ValueError('BACKEND_ROBOT_REPRESENTATION_UNSUPPORTED')
@@ -80,7 +81,7 @@ def compile_input(value, reg=None):
         inp = inp.model_copy(update={'policy': inp.policy.model_copy(update={'candidate_builder': default_builder})})
     builder, builder_params = reg.bind(inp.policy.candidate_builder, 'candidate_builder')
     editable = builder.capabilities.get('editable', controller.capabilities.get('editable', []))
-    declared = set(getattr(builder_params, 'parameters', {})) | set(getattr(builder_params, 'discretization_parameters', {})) | set(getattr(builder_params, 'control_parameters', {}))
+    declared = set(getattr(builder_params, 'parameters', {})) | set(getattr(builder_params, 'discretization_parameters', {})) | set(getattr(builder_params, 'control_parameters', {})) | set(getattr(builder_params, 'model_parameters', {}))
     for key, limits in inp.policy.editable.items():
         if key not in editable and not (builder.hook('authorize_changes') and key in declared):
             raise ValueError('PARAMETER_NOT_EDITABLE: ' + key)

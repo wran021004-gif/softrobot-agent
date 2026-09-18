@@ -17,7 +17,7 @@ SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compile
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
     'extensions/experiment_dynamics/physics.py','extensions/robot_domain/contracts.py',
-    'schemas/environment_spec.py','schemas/robot_ir.py','schemas/exploration.py')
+    'schemas/environment_spec.py','schemas/robot_ir.py','schemas/exploration.py','schemas/platform_math.py')
 MATLAB=tuple('matlab/'+n+'.m' for n in ('tf_geometry','tf_point','tf_routes','tf_terms','tf_control','tf_run','tf_observe','tf_static','tf_view'))
 COMMON=dict(sources=SOURCES,contract_dependencies=tuple((n,v) for n,v,_ in CONTRACTS))
 EXTENSIONS=[
@@ -51,6 +51,7 @@ EXTENSIONS=[
 EXTENSIONS.append(Extension('model.serial_bending_cells','dynamics_model','1.0.0',c.DynamicsModel,Payload,
     'extensions.tendon_family.execution:model_definition','Serial rigid-body model with two principal bending axes per cell',**COMMON,
     capabilities=dict(category='mathematical_model',role='definition',coordinates='two principal bending angles per cell',
+        mathematical_model=c.DynamicsModel().mathematical_model.model_dump(mode='json'),
         equations='serial rigid-body dynamics with hinge elasticity/damping and straight frictionless tendon length servos',
         physical_input='family.design',derived_representation='family.discretization + resolved_physics')))
 for name,binding,model,deps,resources in [

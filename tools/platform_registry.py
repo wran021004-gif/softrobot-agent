@@ -7,17 +7,26 @@ from importlib import import_module, util, metadata
 from pathlib import Path
 import ast
 import sys
+from typing import Literal
 from schemas.common import Contract
 from schemas.platform import Payload, Binding, VERSION
+from schemas.platform_math import MathematicalModel, ModelRequirement
 from tools.spec_tools import ROOT
 from tools.state_io import digest
 from tools.artifact_tools import file_hash
 
 
+# A single registry and routing namespace: mathematical models retain the
+# historical dynamics_model kind; mathematical solvers are distinct from search.
+ExtensionKind = Literal['task', 'initializer', 'dynamics_model', 'backend',
+    'controller', 'search', 'solver', 'evaluator', 'candidate_builder', 'tool',
+    'worker', 'model_adapter', 'strategy']
+
+
 @dataclass(frozen=True)
 class Extension:
     extension_id: str
-    kind: str
+    kind: ExtensionKind
     version: str
     input_schema: type[Contract]
     output_schema: type[Contract]
@@ -93,6 +102,23 @@ class Registry:
             raise ValueError('BINDING_PARAMETER_CONTRACT_MISMATCH: ' + binding.extension_id)
         return definition, parsed
 
+    def mathematical_model(self, binding: Binding) -> MathematicalModel:
+        """Read declared public capabilities without starting a model/backend."""
+        definition, _ = self.bind(binding, 'dynamics_model')
+        contract = definition.capabilities.get('mathematical_model')
+        if contract is None:
+            raise ValueError('MATHEMATICAL_MODEL_DECLARATION_REQUIRED: ' + definition.extension_id)
+        return MathematicalModel.model_validate(contract)
+
+    def check_controller_model(self, controller: Binding, model: Binding | None) -> None:
+        definition, _ = self.bind(controller, 'controller')
+        required = ModelRequirement.model_validate(definition.capabilities.get('model_requirement', {}))
+        if required.input == 'none':
+            return
+        provided = self.mathematical_model(model) if model is not None else None
+        if not required.accepts(provided):
+            raise ValueError('CONTROLLER_MODEL_REQUIREMENT_UNSUPPORTED: ' + definition.extension_id)
+
     def inspect(self, definition, allowed=None):
         reasons = []
         exists = False
@@ -151,7 +177,7 @@ def dependency_identity(definition):
     paths = set(definition.sources) | set(definition.assets)
     if definition.binding:
         paths.add(definition.binding.split(':')[0].replace('.', '/') + '.py')
-    paths.update(('schemas/platform.py', 'schemas/common.py', 'tools/platform_registry.py', 'tools/platform_host.py', 'tools/platform_store.py'))
+    paths.update(('schemas/platform.py', 'schemas/platform_math.py', 'schemas/common.py', 'tools/platform_registry.py', 'tools/platform_host.py', 'tools/platform_store.py'))
     if definition.legacy_service is not None:
         paths.update(('tools/tool_registry.py', 'tools/service_execution.py', 'tools/service_worker.py',
                       'schemas/public_tools.py', 'extensions/services/manifest.py'))

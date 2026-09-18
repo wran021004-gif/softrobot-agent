@@ -1,6 +1,7 @@
 """Developer protocols; concrete serialized state still uses registry contracts."""
 from typing import Protocol
-from schemas.platform import Payload, BackendResult, EvaluationResult, SessionInput, TaskDefinition, EvidenceRef
+from schemas.platform import Payload, BackendResult, EvaluationResult, SessionInput, TaskDefinition, EvidenceRef, RobotDescription, Signal
+from schemas.platform_math import DynamicSystem, LinearizedModel, MathematicalModel, OptimizationProblem, OptimizationResult
 
 
 class ModelAdapter(Protocol):
@@ -17,7 +18,10 @@ class AgentStrategy(Protocol):
 
 
 class CandidateBuilder(Protocol):
-    """1.0 receives a private copy; may modify declared design/discretization data only."""
+    """Receives a private copy; edits declared design/control/model/discretization data.
+
+    Task and extension bindings (identity, version, parameter contract) stay fixed.
+    """
     def __call__(self, baseline: SessionInput, parameters, changes: dict[str, object]) -> SessionInput: ...
 
 
@@ -31,6 +35,7 @@ class WorkerResultChecker(Protocol):
 
 
 class OneShotBackend(Protocol):
+    """All execution adapters normalize native data to BackendResult + Signal."""
     @staticmethod
     def check(inp: SessionInput, parameters, control) -> None: ...
     def compile(self, inp: SessionInput, registry) -> None: ...
@@ -41,12 +46,17 @@ class OneShotBackend(Protocol):
 
 class SteppingBackend(OneShotBackend, Protocol):
     def step(self) -> None: ...
-    def observe(self) -> list: ...
+    def observe(self) -> list[Signal]: ...
     def export(self) -> BackendResult: ...
     def cancel(self) -> None: ...
 
 
 class Controller(Protocol):
+    """Model dependency is Extension.capabilities['model_requirement'].
+
+    The value is a platform_math.ModelRequirement; omission defaults to 'none'.
+    Existing controller objects need no new attribute or lifecycle method.
+    """
     def reset(self) -> None: ...
     def restore(self, state) -> None: ...
     def command(self, time_s: float, observations): ...
@@ -55,11 +65,33 @@ class Controller(Protocol):
 
 
 class Search(Protocol):
+    """Expensive black-box ask/tell search; evaluations remain Host-owned."""
     def propose(self) -> dict[str, float]: ...
     def feedback(self, score: float | None) -> None: ...
     def stopped(self) -> bool: ...
     def save(self) -> Payload: ...
     def restore(self, state) -> None: ...
+
+
+class Solver(Protocol):
+    """Registered as solver, independently of Search and backend execution."""
+    def solve(self, problem: OptimizationProblem) -> OptimizationResult: ...
+
+
+class DynamicSystemProvider(Protocol):
+    """Optional model export capability; no family-specific inputs in consumers."""
+    def build_system(self, robot: RobotDescription, parameters: Payload,
+                     discretization: Payload | None) -> DynamicSystem: ...
+
+
+class Linearizer(Protocol):
+    """Optional capability; linearize at system.x0/u0 without controller imports."""
+    def linearize(self, system: DynamicSystem) -> LinearizedModel: ...
+
+
+class ModelBasedController(Controller, Protocol):
+    """Optional setup for controllers declaring a public model dependency."""
+    def configure_model(self, model: MathematicalModel | DynamicSystem | LinearizedModel) -> None: ...
 
 
 class Evaluator(Protocol):

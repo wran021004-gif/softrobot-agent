@@ -35,19 +35,23 @@ def _candidate(inp, changes, reg):
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not lo <= value <= hi:
             raise ValueError('PARAMETER_OUT_OF_BOUNDS: ' + key)
     candidate = SessionInput.model_validate(builder.resolve()(inp.model_copy(deep=True), parameters, changes))
-    # Builder may alter physical design, declared discretization and controller
-    # inputs only; task/environment and all other policy fields stay fixed.
+    # Builder may alter physical design, declared discretization and controller/
+    # model parameter payloads. Extension identities and the task stay fixed.
     before, after = plain(inp), plain(candidate)
     for data in (before, after):
         data['robot']['structure']['data'] = {}
         data['policy']['discretization'] = None
         data['policy']['controller']['parameters']['data'] = {}
+        if data['policy']['dynamics_model'] is not None:
+            data['policy']['dynamics_model']['parameters']['data'] = {}
     if before != after:
         raise ValueError('CANDIDATE_CHANGED_FROZEN_TASK_OR_POLICY')
     reg.parse(candidate.robot.structure)
     if candidate.policy.discretization is not None:
         reg.parse(candidate.policy.discretization)
     reg.bind(candidate.policy.controller, 'controller')
+    if candidate.policy.dynamics_model is not None:
+        reg.bind(candidate.policy.dynamics_model, 'dynamics_model')
     return candidate
 
 

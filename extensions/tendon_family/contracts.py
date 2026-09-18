@@ -2,6 +2,7 @@
 from typing import Literal, Annotated
 from pydantic import Field, model_validator
 from schemas.common import Contract
+from schemas.platform_math import MathematicalModel, ModelCapabilities, ModelVariable, ParameterDefinitions
 from schemas.environment_spec import Vec3
 from extensions.experiment_dynamics.contracts import Matrix3, Mount
 
@@ -171,12 +172,31 @@ class Reference(Contract):
 
 
 class DynamicsModel(Contract):
+    """Compatibility payload for serial bending; public capabilities use MathematicalModel."""
     model_id: Literal['serial_bending_cells_v1'] = 'serial_bending_cells_v1'
     coordinates: Literal['two_principal_bending_angles_per_cell'] = 'two_principal_bending_angles_per_cell'
     equations: Literal['serial_rigid_body_dynamics_with_hinge_bending'] = 'serial_rigid_body_dynamics_with_hinge_bending'
     tendon_model: Literal['straight_frictionless_length_servo'] = 'straight_frictionless_length_servo'
     included: tuple[str, ...] = ('rigid_body_inertia', 'gravity', 'hinge_elasticity', 'hinge_damping', 'external_body_forces')
     omitted: tuple[str, ...] = ('axial_stretch', 'shear', 'material_torsion', 'tendon_friction', 'rope_elasticity', 'motor_dynamics', 'self_collision')
+
+    @property
+    def mathematical_model(self) -> MathematicalModel:
+        # Plain property: old JSON, model identity and historical payloads do not
+        # acquire new fields. n_dof/n_actuator resolve from the selected design.
+        return MathematicalModel(
+            state_definition=[
+                ModelVariable(name='joint_position', dimension='n_dof', units='rad', frame='joint_local'),
+                ModelVariable(name='joint_velocity', dimension='n_dof', units='rad/s', frame='joint_local')],
+            input_definition=[ModelVariable(name='actuator_command', dimension='n_actuator',
+                units='m_or_rad_by_actuator', frame='actuator')],
+            output_definition=[ModelVariable(name='tip_position', dimension=3, units='m', frame='world'),
+                ModelVariable(name='tendon_length', dimension='n_tendon', units='m', frame='path'),
+                ModelVariable(name='tendon_tension', dimension='n_tendon', units='N', frame='path')],
+            required_robot_data=['family.design.components', 'family.design.tendons', 'family.design.actuators', 'family.design.tip'],
+            discretization_contract='family.discretization',
+            capabilities=ModelCapabilities(kinematics=True, dynamics=True),
+            representations=[])  # Existing backends execute it; no standard IR exporter yet.
 
     @model_validator(mode='after')
     def implemented_effects(self):
@@ -239,17 +259,22 @@ class ExperimentSpec(Contract):
 
 class Space(Contract):
     # Physical design paths or full physical-design options.
-    parameters: dict[str, dict] = Field(default_factory=dict)
-    control_parameters: dict[str, dict] = Field(default_factory=dict)
+    parameters: ParameterDefinitions = Field(default_factory=dict)
+    control_parameters: ParameterDefinitions = Field(default_factory=dict)
+    model_parameters: ParameterDefinitions = Field(default_factory=dict, description=
+        'model/<path> in dynamics_model parameters: model-specific tuning such as regularization. '
+        'Real material Young modulus stays in physical parameters; basis order belongs to discretization_parameters.')
     templates: dict[str, Design] = Field(default_factory=dict)
     # A complete template that changes flexible-segment IDs must declare its
     # complete mesh here. Baseline meshes are never guessed onto new segments.
     template_discretizations: dict[str, 'Discretization'] = Field(default_factory=dict)
     # Numerical-model edits use "discretization/cells/<segment>" paths.
-    discretization_parameters: dict[str, dict] = Field(default_factory=dict)
+    discretization_parameters: ParameterDefinitions = Field(default_factory=dict)
 
     @model_validator(mode='after')
     def template_meshes(self):
+        if any(not path.startswith('model/') for path in self.model_parameters):
+            raise ValueError('MODEL_PARAMETER_PATH_REQUIRES_MODEL_PREFIX')
         unknown = set(self.template_discretizations) - set(self.templates)
         if unknown:
             raise ValueError('DISCRETIZATION_FOR_UNKNOWN_TEMPLATE: '+','.join(sorted(unknown)))
