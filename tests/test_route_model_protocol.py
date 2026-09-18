@@ -13,12 +13,17 @@ from examples.platform_route import main, prepare
 from extensions.tendon_family.route import create, view
 from schemas.platform import ModelResponse
 from tools.platform_host import Host
-from tools.platform_models import DeepSeekAdapter, provider_name
+from tools.platform_models import DeepSeekAdapter, ToolProtocolError, ToolEnvelope, provider_name
 from tools.platform_store import Store, encode
 from tools.state_io import read
 
 
 FIXTURE = read(Path(__file__).parent / 'fixtures/deepseek_route_two_calls.json')
+MISSING_REASON = read(Path(__file__).parent / 'fixtures/deepseek_route_missing_reason.json')
+
+
+def malformed_reply():
+    return ModelResponse.model_validate(deepcopy(MISSING_REASON['response']))
 
 
 def reply(count):
@@ -59,6 +64,70 @@ class RouteModelProtocol(unittest.TestCase):
         inp['policy']['budget']['model_calls'] = calls
         create(root, inp)
         return root, host
+
+    def test_actual_missing_reason_and_valid_envelope(self):
+        """Actual response replay and synthetic parser variants; no tool execution."""
+        response=malformed_reply()
+        self.assertEqual(hashlib.sha256(encode(MISSING_REASON['response']).encode('utf8')).hexdigest(),
+            MISSING_REASON['source_response']['artifact_id'])
+        schema=MISSING_REASON['provider_tool']['function']['parameters']
+        self.assertIn('reason',schema['required'])
+        function=response.raw['choices'][0]['message']['tool_calls'][0]['function']
+        args=json.loads(function['arguments'])
+        self.assertIn('reason',args['arguments']);self.assertNotIn('reason',args)
+        adapter=DeepSeekAdapter();bindings={'route.advance':'1.0.0'}
+        with self.assertRaises(ToolProtocolError) as caught: adapter.decode(response,0,bindings)
+        path='choices[0].message.tool_calls[0].function.arguments.reason'
+        self.assertEqual(caught.exception.issues[0]['path'],path)
+        self.assertIn('Required outer transport metadata',str(caught.exception))
+        # Supply explicit synthetic metadata, never infer it from nested reason/content.
+        args['reason']='Synthetic parser verification: request a build.'
+        function['arguments']=json.dumps(args)
+        decoded=adapter.decode(response,0,bindings)
+        self.assertEqual(decoded['reason'],args['reason'])
+        self.assertEqual(decoded['arguments'],args['arguments'])
+        self.assertEqual(decoded['tool_id'],'route.advance')
+        self.assertNotEqual(decoded['reason'],decoded['arguments']['reason'])
+        for field,value in [('arguments',[]),('reason',None),('reason',''),('reason','x'*2001),
+                            ('tool_version','9.0.0'),('evidence',{}),('unexpected',True)]:
+            with self.subTest(field=field,value_type=type(value).__name__):
+                invalid=deepcopy(args);invalid[field]=value;function['arguments']=json.dumps(invalid)
+                with self.assertRaises(ToolProtocolError): adapter.decode(response,0,bindings)
+        for missing in ('arguments','tool_version'):
+            invalid=deepcopy(args);del invalid[missing];function['arguments']=json.dumps(invalid)
+            with self.assertRaisesRegex(ToolProtocolError,'function.arguments.'+missing): adapter.decode(response,0,bindings)
+        for invalid_json in ('{', '[]'):
+            function['arguments']=invalid_json
+            with self.assertRaises(ToolProtocolError): adapter.decode(response,0,bindings)
+        self.assertEqual(ToolEnvelope.model_json_schema()['required'],['arguments','reason','tool_version'])
+
+    def test_missing_reason_one_correction_and_repeated_failure(self):
+        for second,expected_tools in ((reply(1),1),(malformed_reply(),0),(reply(2),0)):
+            with self.subTest(expected_tools=expected_tools,second=second.raw['choices'][0]['message']['tool_calls'][0]['function']['name']):
+                _,host=self.setup_route()
+                adapter=Replay(host,[malformed_reply(),second])
+                session=host.run(adapter)
+                self.assertEqual(adapter.turns,[0,1])
+                self.assertIsNone(host.store.lookup(host.run_id,'model-0-tool'))
+                self.assertEqual(host.store.remaining()['used']['tool_calls'],expected_tools)
+                self.assertEqual(host.store.remaining()['used']['model_calls'],2)
+                self.assertEqual(host.store.remaining()['used']['backend_solves'],0)
+                self.assertEqual(view(host)['counts']['evaluations'],0)
+                correction=json.loads(adapter.payloads[1]['messages'][-1]['content'])['protocol_correction']
+                self.assertIn('function.arguments.reason',correction['requirement'])
+                self.assertIn('Outer reason is separate',correction['requirement'])
+                self.assertEqual(host.store.artifact(correction['response']),MISSING_REASON['response'])
+                self.assertNotRegex(encode(adapter.payloads[1]),r'[\u4e00-\u9fff]')
+                schema=next(t['function']['parameters'] for t in adapter.payloads[1]['tools']
+                    if t['function']['name']==provider_name('route.advance'))
+                self.assertEqual(schema['properties']['reason']['maxLength'],2000)
+                self.assertIn('separately',schema['properties']['arguments']['description'])
+                if expected_tools:
+                    self.assertEqual(session['state']['stop_reason'],'MODEL_TURN_LIMIT')
+                else:
+                    self.assertEqual(session['status'],'failed')
+                    self.assertIn('MODEL_PROTOCOL_CORRECTION_FAILED',session['state']['stop_reason'])
+                self.assertEqual(session['state']['protocol_corrections_used'],1)
 
     def test_count_correction_success_and_actual_payload(self):
         raw = FIXTURE['response']['raw']
@@ -113,7 +182,7 @@ class RouteModelProtocol(unittest.TestCase):
         for limits in (dict(turns=1), dict(calls=1), dict(project_calls=1)):
             with self.subTest(limits=limits):
                 _, host = self.setup_route(**limits)
-                adapter = Replay(host, [reply(2)])
+                adapter = Replay(host, [malformed_reply()])
                 session = host.run(adapter)
                 self.assertEqual(adapter.turns, [0])
                 self.assertEqual(session['status'], 'failed')
@@ -126,7 +195,7 @@ class RouteModelProtocol(unittest.TestCase):
         for checkpoint in ('invalid_receipt', 'correction_state', 'corrected_receipt', 'tool_receipt'):
             with self.subTest(checkpoint=checkpoint):
                 root, host = self.setup_route()
-                adapter = Replay(host, [reply(2), reply(1)])
+                adapter = Replay(host, [malformed_reply(), reply(1)])
                 original_complete, original_failure, original_invoke = Store.complete, models._model_failure, Host.invoke
 
                 def complete(store, row, receipt, *args, **kwargs):
@@ -159,6 +228,16 @@ class RouteModelProtocol(unittest.TestCase):
                 self.assertEqual(host.store.remaining()['used']['tool_calls'], 1)
                 self.assertEqual(len([e for e in host.store.events(host.run_id)
                                      if e['kind'] == 'model_protocol_correction']), 1)
+
+    def test_transport_failure_has_no_protocol_retry(self):
+        _,host=self.setup_route()
+        adapter=Replay(host,[ModelResponse(raw={},status='failed',error='SYNTHETIC_TRANSPORT_FAILURE')])
+        session=host.run(adapter)
+        self.assertEqual(adapter.turns,[0])
+        self.assertEqual(session['state']['stop_reason'],'SYNTHETIC_TRANSPORT_FAILURE')
+        self.assertNotIn('protocol_corrections_used',session['state'])
+        self.assertEqual(host.store.remaining()['used']['model_calls'],1)
+        self.assertEqual(host.store.remaining()['used']['tool_calls'],0)
 
     def test_unknown_correction_request_is_not_resent(self):
         root, host = self.setup_route()

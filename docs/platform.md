@@ -22,6 +22,8 @@
 
 真实模型每轮必须恰好调用一个工具，收到结果后再选下一步；`route.inspect` 与 `evidence.read` 分轮执行，正常交付使用 `route.advance` 的 `action="finish"`。零调用或多调用在每个会话内有一次协议纠正机会：原始回复和失败回执保留，下一次实际请求携带调用数量、回复引用和纠正要求，使用新的 `model-N` 身份并占用原有轮数、项目及会话模型预算。纠正待处理时不生成终局；再次解析失败或纠正预算不足会保存明确原因并收尾。恢复读取已有回执和纠正状态；已预留但完成情况未知的请求保持 `needs_input`，不自动重发。已封存路线保持不变。
 
+模型工具调用外层信封与领域参数分开：函数的 JSON 参数必须包含外层 `arguments`（对象）、`reason`（1–2000 字符）和 `tool_version`（声明版本），可选 `evidence`。`route.advance` 的 `arguments.reason` 解释路线动作，不能代替外层工具请求理由。`ToolEnvelope` 同时生成提供商 schema 并校验解码；缺字段、错误类型/版本或多余外层字段产生带精确路径的英文错误，与零/多工具调用**共用同一次**持久纠正机会。无效回复不执行工具，不从嵌套理由或消息正文补值；领域校验、预算和未知执行处理保持不变。确认的缺字段证据、定向验证及一次新运行命令见 [工具信封协议修复](route_tool_envelope.md)。
+
 `route start/resume` 遇到 `failed` 或 `needs_input` 返回 1；明确终止但没有有效评价的交付标为 `delivery_status=incomplete`，返回 2。正常停止的有效交付即使 `final.task_success=false` 仍返回 0。`explicit_delivery` 区分模型 finish 与 Host 终止汇总；历史终局不重写。`counts.solves` 与搜索 `actual_solves` 来自计费账本，包含评分前失败的尝试；`successful_integrations` 单列后端完成次数。当前 DeepSeek 服务、模型和 thinking 设置沿用 `configs/deepseek.yaml`，未新增传输参数。新的定向检查为 `tests.test_route_usability`（其中一个用例执行一次真实 MuJoCo 积分，其余采用明确标注的合成输出）。
 
 在已配置 `DEEPSEEK_API_KEY` 的 `softagent` 环境中，从新目录进行一次真实调试（会消耗模型预算并可能启动已有求解器）：
