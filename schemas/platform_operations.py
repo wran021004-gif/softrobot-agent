@@ -5,21 +5,21 @@ from schemas.common import Contract
 from schemas.platform import EvidenceRef, MemoryEntry, WorkOrder
 
 class Simulate(Contract):
-    candidate_id: str = 'baseline'
-    changes: dict[str, object] = Field(default_factory=dict)
+    candidate_id: str = Field(default='baseline', description='Candidate label bound to the frozen effective configuration and execution receipt.')
+    changes: dict[str, object] = Field(default_factory=dict, description='Authorized edits to this session baseline; empty preserves its configuration. One charged backend attempt; does not evaluate.')
 
 
 class Evaluate(Contract):
-    result: EvidenceRef
-    execution_id: str | None = None
+    result: EvidenceRef = Field(description='Existing saved simulation result reference from this session; no new solve.')
+    execution_id: str | None = Field(default=None, description='Simulation execution identity; required when the saved artifact has multiple executions.')
 
 
 class ReadEvidence(Contract):
-    reference: EvidenceRef
-    pointer: str = ''
+    reference: EvidenceRef = Field(description='Existing immutable evidence reference, not a node_id. A build has no evaluation or trajectory to read.')
+    pointer: str = Field(default='', description='JSON Pointer into original evidence, e.g. /detail or /signals/0/values. Empty reads the root. Oversized nested content returns a labeled overview with valid child pointers; follow those pointers using the same source reference.')
     offset: int = Field(default=0, ge=0)
     limit: int = Field(default=20, ge=1, le=100)
-    byte_limit: int = Field(default=4096, ge=128, le=8192)
+    byte_limit: int = Field(default=4096, ge=128, le=8192, description='Requested content byte cap; response and observation envelopes also count toward the inline limit. Pages may be smaller. Follow next_offset at the same pointer.')
 
 
 class EvidencePage(Contract):
@@ -27,6 +27,11 @@ class EvidencePage(Contract):
     pointer: str
     content: object
     next_offset: int | None
+    kind: Literal['content','overview'] = 'content'
+    offset: int = 0
+    total_items: int = 0
+    returned_items: int = 0
+    presentation: Literal['original','english_projection'] = 'original'
 
 
 class DiagnosticQuery(Contract):

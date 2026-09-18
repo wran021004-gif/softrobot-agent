@@ -2,6 +2,8 @@
 
 第一遍七层整理现已接通持久路线。入口为 `python examples/workbench.py platform route ...`；使用方法、真实调用边界及本轮验证见 [步骤 7 与收尾](step7_result.md)。LLM 编排与 Harness 贯穿各层，不是新增的第八层或第二套 Agent 框架。
 
+真实 LLM 路线的可用性修订见 [最终可用性检查](route_usability.md)：`build → run（仿真并评价）→ evidence/diagnose → finish` 已定向验证；本轮没有模型服务凭据，真实 LLM 验收仍未验证。架构接通、模型自主交付、机器人达到容差是三个独立结论。
+
 | 层 | 当前权威输入 | 输出与公共入口 | 已实现 / 主要缺口 |
 |---|---|---|---|
 | 1 任务与实验 | 冻结 `SessionInput.task`、目标/评价器/环境/初态/Timing | `platform check/create`、`compile_input` → 实例身份、实验装配 | 串联软臂到达开发任务；没有通用物理任务生成 |
@@ -14,9 +16,13 @@
 
 用户在 `inputs/route.json` 冻结任务、设计空间、已实现计算组合和总预算。现有模型适配器 → `ToolRequest(route.advance)` → Host/Registry 校验结构化选择 → 子会话优化或公共复核 → 原仿真/评分/诊断 → Store 节点结果 → 下一轮模型选择或停止。`route.inspect`、上下文摘要及现有工作台 status/export 都能查看路线；输入和结果通过原 Store 保存，节点关联请求、执行、候选、证据与后续理由。项目预算与父路线预算同时限制子会话，外层不再次计求解或等待耗时。
 
+`build` 只构建和校验，明确返回“未仿真、未评价”，没有位置误差或轨迹。`run` 的 `source_node` 必须引用一个完成的 build 节点，以其不可变配置创建/复用子会话，调用原 `simulation.run` 后调用 `evaluation.run`，无需优化变量。`optimize` 可从 build/run/optimize 的保存配置开始；省略来源时仍使用原基线。`variables[path]=[lower_bound,upper_bound]` 表示连续区间，不是两个采样值。诊断、复核、视频、finish 均支持有效的单次 run 或优化结果。
+
+模型上下文与 `route.inspect` 共用紧凑概览，保留已选候选、求解/评价存在性、引用、授权空间、额度及各动作前提。完整任务只在上下文保留一份；设计模板和配置通过冻结快照引用及 JSON Pointer 读取。`evidence.read` 返回 `kind=content/overview`、条目数和 `next_offset`，过大的单个子树返回可跟随的指针；分页预算包含响应信封及 Host observation 余量。英文投影注明 `presentation=english_projection`，字符串分页偏移指向投影文本；Store 原文不改。工具说明以注册声明为权威，生成目录不手改。
+
 真实模型每轮必须恰好调用一个工具，收到结果后再选下一步；`route.inspect` 与 `evidence.read` 分轮执行，正常交付使用 `route.advance` 的 `action="finish"`。零调用或多调用在每个会话内有一次协议纠正机会：原始回复和失败回执保留，下一次实际请求携带调用数量、回复引用和纠正要求，使用新的 `model-N` 身份并占用原有轮数、项目及会话模型预算。纠正待处理时不生成终局；再次解析失败或纠正预算不足会保存明确原因并收尾。恢复读取已有回执和纠正状态；已预留但完成情况未知的请求保持 `needs_input`，不自动重发。已封存路线保持不变。
 
-`route start/resume` 遇到 `failed` 或 `needs_input` 返回非零退出码；正常停止的交付即使 `final.task_success=false` 仍返回 0，机器人未达到容差与程序失败分开判断。当前 DeepSeek 服务、模型和 thinking 设置沿用 `configs/deepseek.yaml`，未新增传输参数。离线定向检查：`python -m unittest tests.test_route_model_protocol -v`，重放 `runs/route_live_20260918_084601` 的双工具回复夹具，不请求模型、不积分。
+`route start/resume` 遇到 `failed` 或 `needs_input` 返回 1；明确终止但没有有效评价的交付标为 `delivery_status=incomplete`，返回 2。正常停止的有效交付即使 `final.task_success=false` 仍返回 0。`explicit_delivery` 区分模型 finish 与 Host 终止汇总；历史终局不重写。`counts.solves` 与搜索 `actual_solves` 来自计费账本，包含评分前失败的尝试；`successful_integrations` 单列后端完成次数。当前 DeepSeek 服务、模型和 thinking 设置沿用 `configs/deepseek.yaml`，未新增传输参数。新的定向检查为 `tests.test_route_usability`（其中一个用例执行一次真实 MuJoCo 积分，其余采用明确标注的合成输出）。
 
 在已配置 `DEEPSEEK_API_KEY` 的 `softagent` 环境中，从新目录进行一次真实调试（会消耗模型预算并可能启动已有求解器）：
 

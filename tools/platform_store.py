@@ -73,7 +73,7 @@ class Store:
             db.execute('BEGIN IMMEDIATE')
             prior = db.execute('SELECT root,config_hash FROM grants WHERE grant_id=?', (config.grant_id,)).fetchone()
             if prior and prior != (str(self.root), digest(plain(config))):
-                raise ValueError('GRANT_ALREADY_BOUND: 复制目录不产生新额度')
+                raise ValueError('GRANT_ALREADY_BOUND: copying a directory does not create a new budget')
             if self.db.exists():
                 raise ValueError('PROJECT_ALREADY_EXISTS')
             self.root.mkdir(parents=True, exist_ok=True)
@@ -100,7 +100,7 @@ class Store:
     def check_root(self, db):
         root = json.loads(db.execute("SELECT value FROM meta WHERE key='root'").fetchone()[0])
         if root != str(self.root):
-            raise ValueError('PROJECT_MOVED_OR_COPIED: 只读导出可用；执行需显式迁移授权绑定')
+            raise ValueError('PROJECT_MOVED_OR_COPIED: read-only export is available; execution requires explicit migration of the authorization binding')
         cfg = json.loads(db.execute("SELECT value FROM meta WHERE key='config'").fetchone()[0])
         anchor = ROOT / 'runs' / '.platform_authorities.sqlite'
         with sqlite3.connect(anchor.as_uri() + '?mode=ro', uri=True) as grants:
@@ -290,7 +290,7 @@ class Store:
                 self.artifact(ref, db=db)
             old = db.execute('SELECT body FROM memories WHERE id=?', (entry.memory_id,)).fetchone()
             if old and old[0] != encode(entry):
-                raise ValueError('MEMORY_IMMUTABLE: 新内容需要新身份')
+                raise ValueError('MEMORY_IMMUTABLE: new content requires a new identity')
             db.execute('INSERT OR IGNORE INTO memories VALUES (?,?,?)', (entry.memory_id, run_id, encode(entry)))
             self.event(db, run_id, 'memory', 'indexed', inputs=entry.sources)
         return entry

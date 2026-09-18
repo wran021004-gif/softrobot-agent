@@ -64,16 +64,16 @@ EXTENSIONS = [
 ]
 
 for name, inp, out, function, description in [
-    ('simulation.run', c.Simulate, BackendResult, 'simulate', '执行当前冻结任务与候选'),
-    ('evaluation.run', c.Evaluate, EvaluationResult, 'evaluate', '显式评价保存结果并产生新身份'),
-    ('evidence.read', c.ReadEvidence, c.EvidencePage, 'read_evidence', '只读不可变证据及分页'),
+    ('simulation.run', c.Simulate, BackendResult, 'simulate', 'Execute the frozen task and selected candidate, charging one backend attempt. Saves results and trajectory; use evaluation.run to score the result.'),
+    ('evaluation.run', c.Evaluate, EvaluationResult, 'evaluate', 'Evaluate an existing saved simulation result with the frozen task evaluator. No solve; returns validity, metrics and task_success separately.'),
+    ('evidence.read', c.ReadEvidence, c.EvidencePage, 'read_evidence', 'Read immutable saved evidence with JSON Pointer and offset paging. An oversized subtree returns a labeled pointer overview, not original content. Follow its pointers using the same source reference and next_offset at the same pointer. No solve or evaluation is performed.'),
     ('diagnostics.sample_exceeds', c.DiagnosticQuery, c.DiagnosticResult, 'diagnose', '基于保存信号的带版本阈值诊断'),
     ('memory.search', c.MemoryQuery, c.MemoryResults, 'memory_search', '检索跨运行记录并校验来源'),
     ('memory.save', c.MemorySave, c.SavedMemory, 'memory_save', '保存有来源的笔记或观测记录'),
     ('skills.search', c.SkillQuery, c.SkillRecords, 'skills_search', '读取现有技能生命周期中的适用策略'),
     ('skills.propose', c.SkillProposal, c.SkillRecords, 'skills_propose', '提案进入开发候选库，无人工批准'),
     ('skills.validate', c.SkillValidation, c.SkillRecords, 'skills_validate', '登记与证据相符的验证记录'),
-    ('session.control', c.Stop, c.Stopped, 'stop', '停止、暂停、缺少信息或能力'),
+    ('session.control', c.Stop, c.Stopped, 'stop', 'Stop or pause for missing information, missing capability or execution failure. For normal evaluated route delivery use route.advance(action="finish") instead.'),
     ('workers.submit', c.SubmitWork, c.WorkStatus, 'worker_submit', '启动有边界的本地工作者'),
     ('workers.status', c.WorkQuery, c.WorkStatus, 'worker_status', '查询工作者状态'),
     ('workers.cancel', c.WorkQuery, c.WorkStatus, 'worker_cancel', '请求取消本地工作者'),

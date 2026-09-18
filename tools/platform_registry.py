@@ -73,7 +73,7 @@ class Registry:
     def get(self, name, version=VERSION, kind=None):
         definition = self.extensions.get((name, version))
         if definition is None:
-            raise ValueError(f'IMPLEMENTATION_REQUIRED: {name}@{version}; 登记实现及输入输出契约到 extensions/<包>/manifest.py')
+            raise ValueError(f'IMPLEMENTATION_REQUIRED: {name}@{version}; register implementation and input/output contracts in extensions/<package>/manifest.py')
         if kind and definition.kind != kind:
             raise ValueError('EXTENSION_KIND_MISMATCH: ' + name)
         return definition

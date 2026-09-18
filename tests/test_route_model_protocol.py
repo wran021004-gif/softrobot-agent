@@ -192,6 +192,7 @@ class RouteModelProtocol(unittest.TestCase):
         with host.store.transaction() as db:
             state = host.store.session(host.run_id, db)['state']
             state['route']['final']['task_success'] = False
+            state['route']['final']['delivery_status'] = 'evaluated'
             state['route']['final']['stop_reason'] = state['stop_reason'] = 'offline delivery'
             host.store.update_state(db, host.run_id, state, 'stopped')
         with redirect_stdout(io.StringIO()):

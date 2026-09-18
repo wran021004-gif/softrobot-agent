@@ -113,6 +113,9 @@ def input_for(host):
             'Call exactly one tool per response. Wait for its result before choosing the next step. '
             'Call route.inspect and evidence.read in separate turns, never together. '
             'For normal route delivery use route.advance with action="finish". '
+            'Use English for every explanation, reason and next_step. The compact route overview is already in context. '
+            'Build only constructs: it produces no task error or trajectory. Use run on a saved build to simulate and evaluate it without optimization. '
+            'An evaluation may be valid even when task_success is false; deliver that fact honestly. '
             'Stop explicitly when information or capability is missing. '
             'If protocol_correction is present, follow its correction requirement in this response.'))])
 
@@ -179,7 +182,7 @@ def run_loop(host, adapter=None):
                     else:
                         payload = payload_for(host, adapter)
                     if config['supports_images'] or getattr(adapter, 'supports_images', False):
-                        raise ValueError('VISUAL_TRANSPORT_ADAPTER_REQUIRED: 本轮适配器仅传文本与工具')
+                        raise ValueError('VISUAL_TRANSPORT_ADAPTER_REQUIRED: this adapter supports only text and tools')
                     expected = definition.extension_id
                     request_id = f'model-{state["turn"]}'
                     cost = {**zero(), 'model_calls': int(definition.capabilities.get('real_requests', False)), 'wall_s': config['timeout_s']}
@@ -191,7 +194,7 @@ def run_loop(host, adapter=None):
                     if not fresh:
                         if not row['receipt']:
                             host.store.mark_unknown(host.run_id, request_id)
-                            return _stop(host, 'needs_input', 'MODEL_REQUEST_UNKNOWN: 不自动重发')
+                            return _stop(host, 'needs_input', 'MODEL_REQUEST_UNKNOWN: no automatic resend')
                         receipt = json.loads(row['receipt'])
                         if receipt['execution_status'] != 'completed':
                             stopped = _model_failure(host, receipt)
@@ -265,6 +268,11 @@ def run_loop(host, adapter=None):
                 state['last_signature'] = signature
                 state['repairs'] = state.get('repairs', 0) + 1 if receipt['execution_status'] in ('failed', 'rejected') else 0
                 state['last_receipt'] = receipt
+                args=pending['decision'].get('arguments',{})
+                state['recent_actions']=(state.get('recent_actions',[])+[dict(
+                    tool_id=pending['decision']['tool_id'],action=args.get('action'),node_id=args.get('node_id'),
+                    reference=args.get('reference'),pointer=args.get('pointer'),offset=args.get('offset'),
+                    status=receipt['execution_status'],output=receipt.get('output'),error=receipt.get('error'))])[-4:]
                 state['turn'] += 1
                 state['pending'] = None
                 state.pop('protocol_correction', None)

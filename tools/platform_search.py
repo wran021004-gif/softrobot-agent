@@ -38,7 +38,7 @@ def run_search(host):
     if saved:
         algorithm.restore(host.reg.parse(saved['algorithm']).model_dump(mode='json'))
         if saved.get('stop_reason'):
-            return _outcome(saved,'completed',saved['stop_reason'])
+            return _outcome(host,saved,'completed',saved['stop_reason'])
     else:
         saved = dict(algorithm=plain(algorithm.save()), pending=None, trials=[])
     saved.setdefault('duplicates', [])
@@ -74,10 +74,10 @@ def run_search(host):
                     for i, d in enumerate(saved['duplicates'][-2 * dimensions:])):
                 saved['stop_reason']='no_new_candidate'
                 _save(host,saved)
-                return _outcome(saved, 'completed', 'no_new_candidate')
+                return _outcome(host,saved, 'completed', 'no_new_candidate')
             continue
         simulation = host.invoke(dict(request_id=prefix + '-simulation', tool_id='simulation.run', tool_version=inp['policy']['tool_bindings']['simulation.run'],
-            arguments=dict(candidate_id=prefix, changes=pending['candidate']), reason='搜索候选', cache='reuse'))
+            arguments=dict(candidate_id=prefix, changes=pending['candidate']), reason='Execute search candidate', cache='reuse'))
         if simulation['execution_status'] != 'completed':
             error=simulation.get('error','')
             invalid=simulation['execution_status']=='rejected' and any(s in error for s in (
@@ -88,11 +88,11 @@ def run_search(host):
                     status='unsupported' if 'UNSUPPORTED' in error else 'invalid_candidate',simulation=simulation))
                 saved.update(algorithm=plain(algorithm.save()),pending=None); _save(host,saved)
                 continue
-            return _outcome(saved,simulation['execution_status'],error,pending)
+            return _outcome(host,saved,simulation['execution_status'],error,pending)
         evaluation = host.invoke(dict(request_id=prefix + '-evaluation', tool_id='evaluation.run', tool_version=inp['policy']['tool_bindings']['evaluation.run'],
-            arguments=dict(result=simulation['output'], execution_id=simulation['execution_id']), reason='固定任务评价器评价候选'))
+            arguments=dict(result=simulation['output'], execution_id=simulation['execution_id']), reason='Evaluate candidate with the frozen task evaluator'))
         if evaluation['execution_status'] != 'completed':
-            return _outcome(saved,evaluation['execution_status'],evaluation.get('error',''),pending)
+            return _outcome(host,saved,evaluation['execution_status'],evaluation.get('error',''),pending)
         result = EvaluationResult.model_validate(host.store.artifact(evaluation['output']))
         if definition.capabilities.get('feedback_adapter'):
             from importlib import import_module
@@ -106,16 +106,17 @@ def run_search(host):
             status='valid' if result.validity=='valid' else 'solver_failed',task_success=result.task_success))
         saved.update(algorithm=plain(algorithm.save()), pending=None)
         _save(host, saved)
-    return _outcome(saved,'completed','search_trial_limit')
+    return _outcome(host,saved,'completed','search_trial_limit')
 
 
-def _outcome(saved,status,reason,pending=None):
+def _outcome(host,saved,status,reason,pending=None):
     valid=[t for t in saved['trials'] if t.get('score') is not None]
     if len({t.get('comparison_identity') for t in valid})>1:
         raise ValueError('INCOMPARABLE_TASK_INSTANCE_BACKEND_OR_MODEL')
     return dict(status=status,stop_reason=reason,pending=pending,trials=saved['trials'],algorithm=saved['algorithm'],
         proposals=saved.get('proposals',len(saved['trials'])), distinct_candidates=len(saved['trials']), duplicates=saved.get('duplicates',[]),
-        actual_solves=sum(t.get('simulation',{}).get('charged',{}).get('backend_solves',0) for t in saved['trials']),
+        actual_solves=host.store.remaining(host.run_id)['used']['backend_solves'],
+        solve_count_meaning='Charged backend attempts from the ledger, including failures before a trial was appended',
         baseline=saved['trials'][0] if saved['trials'] else None,
         best=min(valid,key=lambda t:t['score']) if valid else None)
 

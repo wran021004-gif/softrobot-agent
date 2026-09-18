@@ -63,8 +63,10 @@ def main(argv=None):
             final=view(host)['route']['final']
             if not final or not final.get('candidate_id'): raise ValueError('FINAL_CANDIDATE_REQUIRED')
             child=Host(root,final['run_id'])
-            trial=next(t for t in child.store.session(child.run_id)['state']['search']['trials'] if t['candidate_id']==final['candidate_id'])
-            sim=trial['simulation'];tool='diagnostics.saved_trajectory' if args.action=='diagnose' else 'visualization.render_simulation_video'
+            sim=final.get('simulation')
+            if sim is None:  # Compatibility with historical optimization deliveries.
+                sim=next(t for t in child.store.session(child.run_id)['state']['search']['trials'] if t['candidate_id']==final['candidate_id'])['simulation']
+            tool='diagnostics.saved_trajectory' if args.action=='diagnose' else 'visualization.render_simulation_video'
             receipt=invoke(child,'saved-'+args.action+'-'+final['candidate_id'],tool,dict(result=sim['output'],execution_id=sim['execution_id']))
             product=host.store.artifact(receipt['output'])
             files={}
@@ -85,4 +87,11 @@ def main(argv=None):
     # Robot tolerance (final.task_success) is separate from protocol/execution failure.
     if args.action in ('start','resume') and out['status'] in ('failed','needs_input'):
         return 1
+    if args.action in ('start','resume') and (out['route'].get('final') or {}).get('delivery_status')=='incomplete':
+        return 2
+    if args.action=='call' and out['execution_status']!='completed': return 1
     return 0
+
+
+if __name__=='__main__':
+    raise SystemExit(main())

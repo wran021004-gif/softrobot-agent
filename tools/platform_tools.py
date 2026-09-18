@@ -134,6 +134,17 @@ def evaluate(ctx, args):
     return outcome
 
 
+def evidence_overview(value, pointer, offset, limit):
+    """Pointers always address the original document, including one-key wrappers."""
+    keys=list(value) if isinstance(value,dict) else list(range(len(value))) if isinstance(value,list) else []
+    entries=[]
+    for key in keys[offset:offset+limit]:
+        child=value[key]
+        entries.append(dict(pointer=pointer+'/'+str(key).replace('~','~0').replace('/','~1'),
+            type=type(child).__name__,items=len(child) if isinstance(child,(dict,list,str)) else 1))
+    return entries
+
+
 def read_evidence(ctx, args):
     value = ctx.artifact(args.reference)
     if args.pointer:
@@ -142,31 +153,43 @@ def read_evidence(ctx, args):
         for part in args.pointer[1:].split('/'):
             key = part.replace('~1', '/').replace('~0', '~')
             value = value[int(key)] if isinstance(value, list) else value[key]
-    end = args.offset + args.limit
-    if isinstance(value, list):
-        page, next_offset = value[args.offset:end], end if end < len(value) else None
-    elif isinstance(value, dict):
-        keys = list(value)
-        page, next_offset = {k: value[k] for k in keys[args.offset:end]}, end if end < len(keys) else None
-    else:
-        page, next_offset = value, None
     from tools.platform_store import encode
-    while len(encode(page).encode('utf8')) > args.byte_limit and isinstance(page, (list, dict)) and len(page) > 1:
-        end = args.offset + max(1, len(page) // 2)
-        page = value[args.offset:end] if isinstance(value, list) else {k: value[k] for k in list(value)[args.offset:end]}
-        next_offset = end
-    if isinstance(value, str):
-        page = value[args.offset:args.offset + args.limit]
-        while len(encode(page).encode('utf8')) > args.byte_limit:
-            page = page[:len(page) // 2]
-        next_offset = args.offset + len(page) if args.offset + len(page) < len(value) else None
-    if len(encode(page).encode('utf8')) > args.byte_limit:
-        raise ValueError('EVIDENCE_PAGE_TOO_LARGE: narrow pointer; original evidence retained')
-    result = c.EvidencePage(source=args.reference, pointer=args.pointer, content=page, next_offset=next_offset)
+    presentation='original'
+    if ctx.input.policy.route and isinstance(value,str):
+        from tools.platform_language import english_projection
+        projected=english_projection(value)
+        if projected!=value: presentation='english_projection'
+        value=projected  # String offsets index the explicitly labeled presentation.
+    total=len(value) if isinstance(value,(list,dict,str)) else 1
+    count=min(args.limit,max(0,total-args.offset));kind='content'
+    while True:
+        end=args.offset+count
+        if kind=='overview': page=evidence_overview(value,args.pointer,args.offset,count)
+        elif isinstance(value,dict): page={k:value[k] for k in list(value)[args.offset:end]}
+        elif isinstance(value,(list,str)): page=value[args.offset:end]
+        else: page=value
+        result=c.EvidencePage(source=args.reference,pointer=args.pointer,content=page,
+            next_offset=end if end<total else None,kind=kind,offset=args.offset,total_items=total,returned_items=count,presentation=presentation)
+        # Include the EvidencePage envelope and leave room for Host's receipt and
+        # ToolObservation envelope. The projection can expand legacy prose.
+        measured=plain(result)
+        if ctx.input.policy.route and len(encode(measured).encode('utf8'))<=6000:
+            from tools.platform_language import english_projection
+            measured=english_projection(measured)
+        if len(encode(measured['content']).encode('utf8'))<=args.byte_limit and len(encode(measured).encode('utf8'))<=6000:
+            if measured['content']!=page:
+                result=result.model_copy(update=dict(content=measured['content'],presentation='english_projection'))
+            break
+        if count>1:
+            count=max(1,count//2)
+        elif kind=='content' and isinstance(value,(dict,list)):
+            kind='overview'
+        else:
+            raise ValueError('EVIDENCE_POINTER_OR_BYTE_LIMIT_TOO_SMALL: increase byte_limit for this pointer; original evidence retained')
     with ctx.store.transaction() as db:
         state = ctx.store.session(ctx.run_id, db)['state']
         state.setdefault('reads', {})[digest(plain(args))] = dict(source=plain(args.reference), pointer=args.pointer, offset=args.offset,
-            next_offset=next_offset, content_hash=digest(page))
+            next_offset=result.next_offset, kind=kind,content_hash=digest(result.content))
         state['reads'] = dict(list(state['reads'].items())[-8:])
         ctx.store.update_state(db, ctx.run_id, state)
     return result

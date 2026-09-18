@@ -13,7 +13,7 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('space',c.Space),('discretization',c.Discretization),('experiment_spec',c.ExperimentSpec),
     ('build_request',c.BuildRequest),('build_result',c.BuildResult)]]
 SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
-    'tools/optimization_interfaces.py','tools/platform_search.py',
+    'tools/optimization_interfaces.py','tools/platform_search.py','tools/platform_language.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
     'extensions/experiment_dynamics/physics.py','extensions/robot_domain/contracts.py',
@@ -22,34 +22,34 @@ MATLAB=tuple('matlab/'+n+'.m' for n in ('tf_geometry','tf_point','tf_routes','tf
 COMMON=dict(sources=SOURCES,contract_dependencies=tuple((n,v) for n,v,_ in CONTRACTS))
 EXTENSIONS=[
     Extension('route.advance','tool','1.0.0',route.RouteAction,route.RouteResult,
-        'extensions.tendon_family.route:advance','Choose build/optimize, saved diagnosis, independent crosscheck, optional video or finish. Cite previous node result; source_node selects an optimization, candidate_id defaults to its best. Variables must be nonempty for optimize.',**COMMON,
+        'extensions.tendon_family.route:advance','Advance one evidence-led action. build constructs and validates only: no solve, score or trajectory. run executes a saved build and evaluates its saved result (one charged backend attempt). optimize searches within variables[path]=[lower_bound, upper_bound], executing and evaluating candidates (up to max_trials charged attempts); bounds are not sample values. diagnose analyzes saved results; crosscheck independently executes the same physical/control configuration on an authorized alternative backend (one charged attempt); video renders saved results; finish delivers a valid evaluation, including an unmet task tolerance. Only run, optimize and crosscheck consume solver budget. source_node and changes semantics are specified in the input schema. Cite previous node result evidence after the first action.',**COMMON,
         capabilities=dict(category='orchestration',role='public_tool',delegated_execution=True,
             preflight='extensions.tendon_family.route:preflight')),
     Extension('route.inspect','tool','1.0.0',route.Inspect,route.RouteResult,
-        'extensions.tendon_family.route:inspect','Read authorized combinations, design space, route evidence and shared budget.',**COMMON,
+        'extensions.tendon_family.route:inspect','Read the compact factual route overview: selected candidate, solve/evaluation existence, result references, authorized combinations and bounds, remaining budget and next-action prerequisites. The same overview is already in model context; inspect again only when needed. No solve.',**COMMON,
         capabilities=dict(category='orchestration',role='public_tool')),
     Extension('search.family_coordinate','search','1.0.0',opt.SearchParameters,Payload,
-        'extensions.tendon_family.optimization:CoordinateSearch','复用有界坐标搜索；首个候选为基线；设计与控制联合整定',**COMMON,
+        'extensions.tendon_family.optimization:CoordinateSearch','Bounded coordinate search; first candidate is the starting configuration; jointly tunes design and control',**COMMON,
         capabilities=dict(category='parameter_search',role='adapter',checkpoint='family.search_state',
             public_entry='extensions.tendon_family.optimization:optimize',request_contract='family.optimization_request',
             numerical_discretization='fixed',trajectory_optimization='unsupported')),
     Extension('initialize.family','initializer','1.0.0',c.Initial,Payload,'extensions.tendon_family.scene:initialize',
-        '具名初态；未指定的候选自由度为零',**COMMON,capabilities=dict(category='scene_assembly',role='adapter')),
+        'Named initial state; unspecified candidate degrees of freedom start at zero',**COMMON,capabilities=dict(category='scene_assembly',role='adapter')),
     Extension('controller.family','controller','1.0.0',c.Control,Payload,'extensions.tendon_family.control:Controller',
-        '理想驱动映射、确定性指令或实时末端反馈',**COMMON,capabilities=dict(category='control',role='adapter',
+        'Ideal actuator mapping with deterministic commands or live tip feedback',**COMMON,capabilities=dict(category='control',role='adapter',
             channel='actuator_commands',observations=['tip_position'],reset=True,restore=False,
             algorithms={'deterministic':'deterministic_actuator_reference_v1','tip_feedback':'tip_resolved_rate_feedback_v1'},
             reference_types=['actuator_commands','task_goal'],output='named actuator command -> tendon target length',
             sampling={'control_observation':'interval_start_pre_step','force':'interval_start_pre_step_solver','state':'interval_end_post_step'})),
     Extension('candidate.family','candidate_builder','1.0.0',c.Space,SessionInput,'extensions.tendon_family.candidate:apply',
-        '数值、整数、选项与完整结构模板候选',**COMMON,capabilities=dict(category='robot_design',role='adapter',
+        'Candidate construction from numerical, integer, option and complete structure template choices',**COMMON,capabilities=dict(category='robot_design',role='adapter',
             editable=[],authorize_changes='extensions.tendon_family.candidate:authorize',
             search='External/LLM structural proposals; existing continuous search algorithms are not mixed-integer optimizers')),
     Extension('design.family_build','tool','1.0.0',c.BuildRequest,c.BuildResult,'extensions.tendon_family.candidate:build_tool',
-        '构建完整候选、摘要、派生物理与适用性；不启动求解器',**COMMON,capabilities=dict(category='robot_design',role='public_tool')),
+        'Construct and validate a complete candidate, summary, derived physics and applicability. No dynamics solve, score or trajectory.',**COMMON,capabilities=dict(category='robot_design',role='public_tool')),
 ]
 EXTENSIONS.append(Extension('model.serial_bending_cells','dynamics_model','1.0.0',c.DynamicsModel,Payload,
-    'extensions.tendon_family.execution:model_definition','串联逐刚体、逐单元双主轴弯曲数学模型',**COMMON,
+    'extensions.tendon_family.execution:model_definition','Serial rigid-body model with two principal bending axes per cell',**COMMON,
     capabilities=dict(category='mathematical_model',role='definition',coordinates='two principal bending angles per cell',
         equations='serial rigid-body dynamics with hinge elasticity/damping and straight frictionless tendon length servos',
         physical_input='family.design',derived_representation='family.discretization + resolved_physics')))
@@ -73,13 +73,13 @@ for name,binding,model,deps,resources in [
             omissions=['material torsion','shear','axial stretch','rope elasticity','friction','self collision','motor dynamics'],
             operations=['compile','initialize','run','export','close'],timeout='internal solve deadline; engine startup/shutdown not hard bounded')
     EXTENSIONS.append(Extension('backend.'+name,'backend','1.0.0',c.Parameters,BackendResult,
-        'extensions.tendon_family.backends:'+binding,'具名串联多段双轴弯曲与逐根绳路',**COMMON,
+        'extensions.tendon_family.backends:'+binding,'Named serial multi-segment biaxial bending and individual tendon routes',**COMMON,
         assets=MATLAB if name=='matlab_spatial' else (),dependencies=deps,resources=resources,
         capabilities=shared_capabilities))
     parameters=c.MatlabParameters if name=='matlab_spatial' else c.MujocoParameters
     contract='family.matlab_parameters' if name=='matlab_spatial' else 'family.mujoco_parameters'
     modern={**shared_capabilities,'inactive_parameters':[],'numerical_contract':contract}
     EXTENSIONS.append(Extension('backend.'+name,'backend','1.1.0',parameters,BackendResult,
-        'extensions.tendon_family.backends:'+binding,'显式模型兼容关系与后端专用数值设置',sources=SOURCES,
+        'extensions.tendon_family.backends:'+binding,'Explicit model compatibility and backend-specific numerical settings',sources=SOURCES,
         contract_dependencies=COMMON['contract_dependencies'],assets=MATLAB if name=='matlab_spatial' else (),
         dependencies=deps,resources=resources,capabilities=modern))

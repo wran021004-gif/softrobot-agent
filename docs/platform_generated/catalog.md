@@ -13,57 +13,57 @@
 | analysis.vector_norm | mathematical_models | public_tool | tool | 1.0.0 | True | extensions.reference.implementation:vector_norm | 带单位与坐标的向量范数；接入不改核心循环 |
 | analysis.versioned_value | mathematical_models | teaching_example | tool | 1.0.0 | True | extensions.convergence.implementation:value_v1 | Independent offline development example; no physical calibration |
 | analysis.versioned_value | mathematical_models | teaching_example | tool | 2.0.0 | True | extensions.convergence.implementation:value_v2 | Independent offline development example; no physical calibration |
-| backend.family_mujoco | simulation | adapter | backend | 1.0.0 | True | extensions.tendon_family.backends:MujocoBackend | 具名串联多段双轴弯曲与逐根绳路 |
-| backend.family_mujoco | simulation | adapter | backend | 1.1.0 | True | extensions.tendon_family.backends:MujocoBackend | 显式模型兼容关系与后端专用数值设置 |
+| backend.family_mujoco | simulation | adapter | backend | 1.0.0 | True | extensions.tendon_family.backends:MujocoBackend | Named serial multi-segment biaxial bending and individual tendon routes |
+| backend.family_mujoco | simulation | adapter | backend | 1.1.0 | True | extensions.tendon_family.backends:MujocoBackend | Explicit model compatibility and backend-specific numerical settings |
 | backend.genesis | simulation | unimplemented | backend | 1.0.0 | False | 未实现 | 待实现：必须检查目标版本并完成模型、信号与执行通道适配 |
 | backend.limited_synthetic | simulation | teaching_example | backend | 1.0.0 | True | extensions.convergence.implementation:LimitedBackend | Independent offline development example; no physical calibration |
 | backend.math_planar | mathematical_models | adapter | backend | 1.0.0 | True | extensions.experiment_dynamics.backends:PlanarBackend | 原 MATLAB 平面 v1 算法，直接读取公共物理量，无 MuJoCo |
 | backend.math_spatial | mathematical_models | adapter | backend | 1.0.0 | True | extensions.experiment_dynamics.backends:SpatialBackend | 独立三维 16 自由度耦合动力学；无 MuJoCo 依赖 |
 | backend.matlab | simulation | adapter | backend | 1.0.0 | True | extensions.reference.legacy:MatlabBackend | 保留 MATLAB 平面动力学一次性求解适配 |
-| backend.matlab_spatial | mathematical_models | adapter | backend | 1.0.0 | True | extensions.tendon_family.backends:MatlabBackend | 具名串联多段双轴弯曲与逐根绳路 |
-| backend.matlab_spatial | mathematical_models | adapter | backend | 1.1.0 | True | extensions.tendon_family.backends:MatlabBackend | 显式模型兼容关系与后端专用数值设置 |
+| backend.matlab_spatial | mathematical_models | adapter | backend | 1.0.0 | True | extensions.tendon_family.backends:MatlabBackend | Named serial multi-segment biaxial bending and individual tendon routes |
+| backend.matlab_spatial | mathematical_models | adapter | backend | 1.1.0 | True | extensions.tendon_family.backends:MatlabBackend | Explicit model compatibility and backend-specific numerical settings |
 | backend.mujoco | simulation | adapter | backend | 1.0.0 | True | extensions.reference.legacy:MujocoBackend | 保留 MuJoCo 一次性求解适配 |
 | backend.reference | simulation | adapter | backend | 1.0.0 | True | extensions.reference.implementation:ReferenceBackend | 廉价确定性参考后端，非真实物理、非 Genesis |
 | backend.scene_mujoco | simulation | adapter | backend | 1.0.0 | True | extensions.experiment_dynamics.backends:MujocoBackend | 公共物理和统一场景映射到 MuJoCo |
 | candidate.controller | robot_design | adapter | candidate_builder | 1.0.0 | True | tools.platform_candidates:apply_control | Apply existing typed controller parameters |
-| candidate.family | robot_design | adapter | candidate_builder | 1.0.0 | True | extensions.tendon_family.candidate:apply | 数值、整数、选项与完整结构模板候选 |
+| candidate.family | robot_design | adapter | candidate_builder | 1.0.0 | True | extensions.tendon_family.candidate:apply | Candidate construction from numerical, integer, option and complete structure template choices |
 | candidate.rod_design | robot_design | adapter | candidate_builder | 1.0.0 | True | extensions.robot_domain.candidate:apply_design | 单 section / 八节等效杆：从冻结 DesignSpec 重编译派生量 |
 | candidate.synthetic | robot_design | teaching_example | candidate_builder | 1.0.0 | True | extensions.convergence.implementation:apply_design | Independent offline development example; no physical calibration |
 | controller.experiment_length | control | adapter | controller | 1.0.0 | True | extensions.experiment_dynamics.backends:LengthController | 复用 C1/C2；世界末端实时观测转换到安装坐标 |
-| controller.family | control | adapter | controller | 1.0.0 | True | extensions.tendon_family.control:Controller | 理想驱动映射、确定性指令或实时末端反馈 |
+| controller.family | control | adapter | controller | 1.0.0 | True | extensions.tendon_family.control:Controller | Ideal actuator mapping with deterministic commands or live tip feedback |
 | controller.legacy_length | control | adapter | controller | 1.0.0 | True | extensions.reference.legacy:LegacyController | 旧 C1/C2 参数与数值控制适配 |
 | controller.length_reference | control | adapter | controller | 1.0.0 | True | extensions.reference.implementation:LengthController | 参考长度指令生命周期 |
 | deepseek | platform_services | adapter | model_adapter | 1.0.0 | True | tools.platform_models:DeepSeekAdapter | Existing text/tool model service transport |
-| design.family_build | robot_design | public_tool | tool | 1.0.0 | True | extensions.tendon_family.candidate:build_tool | 构建完整候选、摘要、派生物理与适用性；不启动求解器 |
+| design.family_build | robot_design | public_tool | tool | 1.0.0 | True | extensions.tendon_family.candidate:build_tool | Construct and validate a complete candidate, summary, derived physics and applicability. No dynamics solve, score or trajectory. |
 | diagnostics.sample_exceeds | signals_diagnostics | public_tool | tool | 1.0.0 | True | tools.platform_tools:diagnose | 基于保存信号的带版本阈值诊断 |
 | diagnostics.sample_exceeds | signals_diagnostics | public_tool | tool | 1.1.0 | True | extensions.robot_domain.signals:sample_exceeds | 按名称/实体/相位选择保存标量并检查严格大于阈值；无新求解/评分 |
 | diagnostics.saved_trajectory | signals_diagnostics | public_tool | tool | 1.1.0 | True | tools.public_services:saved_diagnosis | Legacy reach signal rules; saved physical time, no simulation or scoring. |
-| diagnostics.saved_trajectory | signals_diagnostics | public_tool | tool | 2.0.0 | True | extensions.robot_domain.saved:diagnosis | 平台结果引用自动进入旧保存轨迹诊断；无新求解/评分 |
+| diagnostics.saved_trajectory | signals_diagnostics | public_tool | tool | 2.0.0 | True | extensions.robot_domain.saved:diagnosis | Analyze an existing saved trajectory selected by result reference and execution ID. No new dynamics solve or evaluation; observations do not establish causes. |
 | diagnostics.signal_rule | signals_diagnostics | public_tool | tool | 1.1.0 | True | tools.diagnostic_rules:run_saved_rule | Run a versioned saved-signal rule; distinguish missing, no event, inapplicable and failure. |
 | diagnostics.signal_rule | signals_diagnostics | public_tool | tool | 2.0.0 | True | extensions.robot_domain.saved:rule | 平台结果引用自动进入既有保存信号规则 |
 | evaluate.hold | evaluation_comparison | adapter | evaluator | 1.0.0 | True | extensions.reference.implementation:evaluate_hold | 评价窗口内最大与 RMS 偏差 |
 | evaluate.reach | evaluation_comparison | adapter | evaluator | 1.0.0 | True | extensions.reference.implementation:evaluate_reach | 末端距离评价，阈值来自任务 |
 | evaluate.terminal | evaluation_comparison | teaching_example | evaluator | 1.0.0 | True | extensions.convergence.implementation:terminal_evaluate | Independent offline development example; no physical calibration |
-| evaluation.run | evaluation_comparison | public_tool | tool | 1.0.0 | True | tools.platform_tools:evaluate | 显式评价保存结果并产生新身份 |
-| evidence.read | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:read_evidence | 只读不可变证据及分页 |
+| evaluation.run | evaluation_comparison | public_tool | tool | 1.0.0 | True | tools.platform_tools:evaluate | Evaluate an existing saved simulation result with the frozen task evaluator. No solve; returns validity, metrics and task_success separately. |
+| evidence.read | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:read_evidence | Read immutable saved evidence with JSON Pointer and offset paging. An oversized subtree returns a labeled pointer overview, not original content. Follow its pointers using the same source reference and next_offset at the same pointer. No solve or evaluation is performed. |
 | evidence.read_json | platform_services | public_tool | tool | 1.1.0 | True | tools.public_services:read_json | Read hash-verified saved JSON using bounded JSON Pointer pages. |
 | initialize.experiment | scene_assembly | adapter | initializer | 1.0.0 | True | extensions.experiment_dynamics.scene:initialize | 显式八节 y/z 关节位置和速度；不随机改变初态 |
-| initialize.family | scene_assembly | adapter | initializer | 1.0.0 | True | extensions.tendon_family.scene:initialize | 具名初态；未指定的候选自由度为零 |
+| initialize.family | scene_assembly | adapter | initializer | 1.0.0 | True | extensions.tendon_family.scene:initialize | Named initial state; unspecified candidate degrees of freedom start at zero |
 | initialize.legacy_zero | scene_assembly | adapter | initializer | 1.0.0 | True | extensions.reference.implementation:initialize_legacy | 原编译初态和零速度 |
 | initialize.length | scene_assembly | adapter | initializer | 1.0.0 | True | extensions.reference.implementation:initialize | 显式种子的长度初始化 |
 | memory.save | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:memory_save | 保存有来源的笔记或观测记录 |
 | memory.search | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:memory_search | 检索跨运行记录并校验来源 |
 | model.observing | platform_services | teaching_example | model_adapter | 1.0.0 | True | extensions.convergence.implementation:ObservingAdapter | Independent offline development example; no physical calibration |
-| model.serial_bending_cells | mathematical_model | definition | dynamics_model | 1.0.0 | True | extensions.tendon_family.execution:model_definition | 串联逐刚体、逐单元双主轴弯曲数学模型 |
+| model.serial_bending_cells | mathematical_model | definition | dynamics_model | 1.0.0 | True | extensions.tendon_family.execution:model_definition | Serial rigid-body model with two principal bending axes per cell |
 | offline | platform_services | adapter | model_adapter | 1.0.0 | True | tools.platform_models:OfflineAdapter | Offline scripted compatibility fixture |
-| route.advance | orchestration | public_tool | tool | 1.0.0 | True | extensions.tendon_family.route:advance | Choose build/optimize, saved diagnosis, independent crosscheck, optional video or finish. Cite previous node result; source_node selects an optimization, candidate_id defaults to its best. Variables must be nonempty for optimize. |
-| route.inspect | orchestration | public_tool | tool | 1.0.0 | True | extensions.tendon_family.route:inspect | Read authorized combinations, design space, route evidence and shared budget. |
-| search.family_coordinate | parameter_search | adapter | search | 1.0.0 | True | extensions.tendon_family.optimization:CoordinateSearch | 复用有界坐标搜索；首个候选为基线；设计与控制联合整定 |
+| route.advance | orchestration | public_tool | tool | 1.0.0 | True | extensions.tendon_family.route:advance | Advance one evidence-led action. build constructs and validates only: no solve, score or trajectory. run executes a saved build and evaluates its saved result (one charged backend attempt). optimize searches within variables[path]=[lower_bound, upper_bound], executing and evaluating candidates (up to max_trials charged attempts); bounds are not sample values. diagnose analyzes saved results; crosscheck independently executes the same physical/control configuration on an authorized alternative backend (one charged attempt); video renders saved results; finish delivers a valid evaluation, including an unmet task tolerance. Only run, optimize and crosscheck consume solver budget. source_node and changes semantics are specified in the input schema. Cite previous node result evidence after the first action. |
+| route.inspect | orchestration | public_tool | tool | 1.0.0 | True | extensions.tendon_family.route:inspect | Read the compact factual route overview: selected candidate, solve/evaluation existence, result references, authorized combinations and bounds, remaining budget and next-action prerequisites. The same overview is already in model context; inspect again only when needed. No solve. |
+| search.family_coordinate | parameter_search | adapter | search | 1.0.0 | True | extensions.tendon_family.optimization:CoordinateSearch | Bounded coordinate search; first candidate is the starting configuration; jointly tunes design and control |
 | search.scalar_sequence | parameter_search | adapter | search | 1.0.0 | True | extensions.reference.implementation:ScalarSequenceSearch | 确定性候选序列参考搜索器；算法拥有状态 |
 | search.stateful | parameter_search | teaching_example | search | 1.0.0 | True | extensions.convergence.implementation:StatefulSearch | Independent offline development example; no physical calibration |
-| session.control | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:stop | 停止、暂停、缺少信息或能力 |
+| session.control | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:stop | Stop or pause for missing information, missing capability or execution failure. For normal evaluated route delivery use route.advance(action="finish") instead. |
 | signals.read | signals_diagnostics | public_tool | tool | 1.0.0 | True | extensions.robot_domain.signals:read_signal | 按名称/实体/相位读取保存统一信号，歧义拒绝 |
-| simulation.run | simulation | public_tool | tool | 1.0.0 | True | tools.platform_tools:simulate | 执行当前冻结任务与候选 |
+| simulation.run | simulation | public_tool | tool | 1.0.0 | True | tools.platform_tools:simulate | Execute the frozen task and selected candidate, charging one backend attempt. Saves results and trajectory; use evaluation.run to score the result. |
 | skills.propose | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:skills_propose | 提案进入开发候选库，无人工批准 |
 | skills.search | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:skills_search | 读取现有技能生命周期中的适用策略 |
 | skills.validate | platform_services | public_tool | tool | 1.0.0 | True | tools.platform_tools:skills_validate | 登记与证据相符的验证记录 |
@@ -73,7 +73,7 @@
 | task.signal_hold | evaluation_comparison | adapter | task | 1.0.0 | True | extensions.reference.implementation:hold_task | 离散长度信号保持开发示例；无末端目标点 |
 | task.terminal | evaluation_comparison | teaching_example | task | 1.0.0 | True | extensions.convergence.implementation:terminal_task | Independent offline development example; no physical calibration |
 | visualization.render_simulation_video | signals_diagnostics | public_tool | tool | 1.2.0 | True | tools.simulation_video:_render_simulation_video | Render saved trajectory; native cache and bounded encoder, zero solves. |
-| visualization.render_simulation_video | signals_diagnostics | public_tool | tool | 2.0.0 | True | extensions.robot_domain.saved:video | 同一证据桥接调用已有视频执行器；显式派生产物 |
+| visualization.render_simulation_video | signals_diagnostics | public_tool | tool | 2.0.0 | True | extensions.robot_domain.saved:video | Render existing saved simulation results through the evidence bridge. Produces a derived video, no new solve or evaluation; a file reference does not mean the text model viewed it. |
 | visualization.saved_replay | signals_diagnostics | public_tool | tool | 1.0.0 | True | extensions.robot_domain.saved:replay | 恢复原始包并准备已有回放 observation；不开窗口 |
 | worker.inventory | platform_services | teaching_example | worker | 1.0.0 | True | extensions.convergence.implementation:diagnostic_worker | Independent offline development example; no physical calibration |
 | worker.math | platform_services | teaching_example | worker | 1.0.0 | True | extensions.convergence.implementation:math_worker | Independent offline development example; no physical calibration |

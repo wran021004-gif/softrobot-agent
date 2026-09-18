@@ -26,7 +26,7 @@ def compile_input(value, reg=None):
     if inp.policy.discretization is not None:
         reg.parse(inp.policy.discretization)
     if task.status != 'development_valid':
-        raise ValueError('DEVELOPMENT_HOST_REQUIRES_DEVELOPMENT_VALID: draft 不可运行；正式批准需独立真实审批策略')
+        raise ValueError('DEVELOPMENT_HOST_REQUIRES_DEVELOPMENT_VALID: drafts cannot execute; formal approval requires an independent approval policy')
     if task.sampling.split != 'development':
         raise ValueError('DEVELOPMENT_POLICY_CANNOT_PRODUCE_FORMAL_EVALUATION_SCORE')
     if inp.seed not in task.sampling.seeds:

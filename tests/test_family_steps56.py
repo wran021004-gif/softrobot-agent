@@ -90,7 +90,11 @@ class FamilySteps56(unittest.TestCase):
         self.assertEqual(a.propose(),b.propose());self.assertTrue(a.stopped())
         from tools.platform_search import _outcome
         saved=dict(trials=[dict(candidate_id='invalid',score=None),dict(candidate_id='valid',score=.2,comparison_identity='same')],algorithm={})
-        out=_outcome(saved,'rejected','BUDGET_EXHAUSTED')
+        from unittest.mock import Mock
+        host=Mock(run_id='synthetic-accounting')
+        host.store.remaining.return_value={'used':{'backend_solves':3}}
+        out=_outcome(host,saved,'rejected','BUDGET_EXHAUSTED')
+        self.assertEqual(out['actual_solves'],3)
         self.assertEqual(out['best']['candidate_id'],'valid')
         self.assertEqual(out['stop_reason'],'BUDGET_EXHAUSTED')
 

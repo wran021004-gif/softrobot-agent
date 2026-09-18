@@ -727,7 +727,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "具名串联多段双轴弯曲与逐根绳路",
+    "description": "Named serial multi-segment biaxial bending and individual tendon routes",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -1078,6 +1078,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -1179,7 +1180,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "显式模型兼容关系与后端专用数值设置",
+    "description": "Explicit model compatibility and backend-specific numerical settings",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -1521,6 +1522,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -3601,7 +3603,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "具名串联多段双轴弯曲与逐根绳路",
+    "description": "Named serial multi-segment biaxial bending and individual tendon routes",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -3947,6 +3949,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -4058,7 +4061,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "显式模型兼容关系与后端专用数值设置",
+    "description": "Explicit model compatibility and backend-specific numerical settings",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -4403,6 +4406,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -6457,7 +6461,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "数值、整数、选项与完整结构模板候选",
+    "description": "Candidate construction from numerical, integer, option and complete structure template choices",
     "input_schema": {
       "$defs": {
         "Actuator": {
@@ -8137,6 +8141,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -10025,7 +10030,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "理想驱动映射、确定性指令或实时末端反馈",
+    "description": "Ideal actuator mapping with deterministic commands or live tip feedback",
     "input_schema": {
       "$defs": {
         "Reference": {
@@ -10202,6 +10207,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -10623,7 +10629,8 @@
     "dependencies": [],
     "sources": [
       "tools/platform_models.py",
-      "tools/deepseek_adapter.py"
+      "tools/deepseek_adapter.py",
+      "tools/platform_language.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -10644,7 +10651,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "构建完整候选、摘要、派生物理与适用性；不启动求解器",
+    "description": "Construct and validate a complete candidate, summary, derived physics and applicability. No dynamics solve, score or trajectory.",
     "input_schema": {
       "$defs": {
         "Actuator": {
@@ -12532,6 +12539,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -13161,7 +13169,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "平台结果引用自动进入旧保存轨迹诊断；无新求解/评分",
+    "description": "Analyze an existing saved trajectory selected by result reference and execution ID. No new dynamics solve or evaluation; observations do not establish causes.",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {
@@ -14570,7 +14578,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "显式评价保存结果并产生新身份",
+    "description": "Evaluate an existing saved simulation result with the frozen task evaluator. No solve; returns validity, metrics and task_success separately.",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {
@@ -14597,7 +14605,8 @@
       "additionalProperties": false,
       "properties": {
         "result": {
-          "$ref": "#/$defs/EvidenceRef"
+          "$ref": "#/$defs/EvidenceRef",
+          "description": "Existing saved simulation result reference from this session; no new solve."
         },
         "execution_id": {
           "anyOf": [
@@ -14609,6 +14618,7 @@
             }
           ],
           "default": null,
+          "description": "Simulation execution identity; required when the saved artifact has multiple executions.",
           "title": "Execution Id"
         }
       },
@@ -14858,7 +14868,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "只读不可变证据及分页",
+    "description": "Read immutable saved evidence with JSON Pointer and offset paging. An oversized subtree returns a labeled pointer overview, not original content. Follow its pointers using the same source reference and next_offset at the same pointer. No solve or evaluation is performed.",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {
@@ -14885,10 +14895,12 @@
       "additionalProperties": false,
       "properties": {
         "reference": {
-          "$ref": "#/$defs/EvidenceRef"
+          "$ref": "#/$defs/EvidenceRef",
+          "description": "Existing immutable evidence reference, not a node_id. A build has no evaluation or trajectory to read."
         },
         "pointer": {
           "default": "",
+          "description": "JSON Pointer into original evidence, e.g. /detail or /signals/0/values. Empty reads the root. Oversized nested content returns a labeled overview with valid child pointers; follow those pointers using the same source reference.",
           "title": "Pointer",
           "type": "string"
         },
@@ -14907,6 +14919,7 @@
         },
         "byte_limit": {
           "default": 4096,
+          "description": "Requested content byte cap; response and observation envelopes also count toward the inline limit. Pages may be smaller. Follow next_offset at the same pointer.",
           "maximum": 8192,
           "minimum": 128,
           "title": "Byte Limit",
@@ -14964,6 +14977,39 @@
             }
           ],
           "title": "Next Offset"
+        },
+        "kind": {
+          "default": "content",
+          "enum": [
+            "content",
+            "overview"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "offset": {
+          "default": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "total_items": {
+          "default": 0,
+          "title": "Total Items",
+          "type": "integer"
+        },
+        "returned_items": {
+          "default": 0,
+          "title": "Returned Items",
+          "type": "integer"
+        },
+        "presentation": {
+          "default": "original",
+          "enum": [
+            "original",
+            "english_projection"
+          ],
+          "title": "Presentation",
+          "type": "string"
         }
       },
       "required": [
@@ -15231,7 +15277,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "具名初态；未指定的候选自由度为零",
+    "description": "Named initial state; unspecified candidate degrees of freedom start at zero",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -15312,6 +15358,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -16276,7 +16323,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "串联逐刚体、逐单元双主轴弯曲数学模型",
+    "description": "Serial rigid-body model with two principal bending axes per cell",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -16395,6 +16442,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -16564,7 +16612,8 @@
     "resources": [],
     "dependencies": [],
     "sources": [
-      "tools/platform_models.py"
+      "tools/platform_models.py",
+      "tools/platform_language.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -16585,7 +16634,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "Choose build/optimize, saved diagnosis, independent crosscheck, optional video or finish. Cite previous node result; source_node selects an optimization, candidate_id defaults to its best. Variables must be nonempty for optimize.",
+    "description": "Advance one evidence-led action. build constructs and validates only: no solve, score or trajectory. run executes a saved build and evaluates its saved result (one charged backend attempt). optimize searches within variables[path]=[lower_bound, upper_bound], executing and evaluating candidates (up to max_trials charged attempts); bounds are not sample values. diagnose analyzes saved results; crosscheck independently executes the same physical/control configuration on an authorized alternative backend (one charged attempt); video renders saved results; finish delivers a valid evaluation, including an unmet task tolerance. Only run, optimize and crosscheck consume solver budget. source_node and changes semantics are specified in the input schema. Cite previous node result evidence after the first action.",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {
@@ -16612,13 +16661,16 @@
       "additionalProperties": false,
       "properties": {
         "node_id": {
+          "description": "Unique label for this route action; reuse the original request_id to recover a sealed call.",
           "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
           "title": "Node Id",
           "type": "string"
         },
         "action": {
+          "description": "build constructs only; run simulates and evaluates a saved build; optimize searches and evaluates; diagnose analyzes saved results; crosscheck executes independently; video renders saved results; finish delivers an evaluated candidate.",
           "enum": [
             "build",
+            "run",
             "optimize",
             "diagnose",
             "crosscheck",
@@ -16638,10 +16690,12 @@
             }
           ],
           "default": null,
+          "description": "Authorized combination name. Required for build, optimize without source_node, and crosscheck. With an optimization source, omit to preserve its bindings; an explicit choice must match them.",
           "title": "Combination"
         },
         "changes": {
           "additionalProperties": true,
+          "description": "build/optimize only: edits from the declared space, including template, physical paths, discretization paths and control/ paths. Applied to the source configuration, or the frozen baseline when no source is supplied.",
           "title": "Changes",
           "type": "object"
         },
@@ -16659,11 +16713,13 @@
             ],
             "type": "array"
           },
+          "description": "optimize only, required: variables[path] = [lower_bound, upper_bound], a continuous interval, NOT two requested samples. Bounds must be within the authorized space and include the starting value.",
           "title": "Variables",
           "type": "object"
         },
         "max_trials": {
           "default": 1,
+          "description": "Maximum optimizer proposals, bounded by route max_trials; independent of single run, which needs one solve. Duplicate proposals may reuse saved results.",
           "minimum": 1,
           "title": "Max Trials",
           "type": "integer"
@@ -16679,6 +16735,7 @@
             }
           ],
           "default": null,
+          "description": "Completed node_id: run requires build; optimize accepts build/run/optimize; diagnose/crosscheck/video/finish require a valid evaluated run or optimize node. Never an artifact ID.",
           "title": "Source Node"
         },
         "candidate_id": {
@@ -16691,9 +16748,11 @@
             }
           ],
           "default": null,
+          "description": "Optional candidate label on build; selects an optimization trial on later actions, defaulting to its best valid trial. A single run preserves the build candidate label.",
           "title": "Candidate Id"
         },
         "evidence": {
+          "description": "After the first action, cite at least one previous route node result reference here. route overview already supplies these references; a separate read is optional.",
           "items": {
             "$ref": "#/$defs/EvidenceRef"
           },
@@ -16701,11 +16760,13 @@
           "type": "array"
         },
         "reason": {
+          "description": "English explanation grounded in the current overview or cited evidence.",
           "minLength": 1,
           "title": "Reason",
           "type": "string"
         },
         "next_step": {
+          "description": "English statement of the intended next decision or stopping condition.",
           "minLength": 1,
           "title": "Next Step",
           "type": "string"
@@ -16764,6 +16825,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -16865,7 +16927,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "Read authorized combinations, design space, route evidence and shared budget.",
+    "description": "Read the compact factual route overview: selected candidate, solve/evaluation existence, result references, authorized combinations and bounds, remaining budget and next-action prerequisites. The same overview is already in model context; inspect again only when needed. No solve.",
     "input_schema": {
       "additionalProperties": false,
       "properties": {},
@@ -16914,6 +16976,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -17015,7 +17078,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "复用有界坐标搜索；首个候选为基线；设计与控制联合整定",
+    "description": "Bounded coordinate search; first candidate is the starting configuration; jointly tunes design and control",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -17122,6 +17185,7 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
+      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -17393,7 +17457,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "停止、暂停、缺少信息或能力",
+    "description": "Stop or pause for missing information, missing capability or execution failure. For normal evaluated route delivery use route.advance(action=\"finish\") instead.",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -17727,17 +17791,19 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "执行当前冻结任务与候选",
+    "description": "Execute the frozen task and selected candidate, charging one backend attempt. Saves results and trajectory; use evaluation.run to score the result.",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
         "candidate_id": {
           "default": "baseline",
+          "description": "Candidate label bound to the frozen effective configuration and execution receipt.",
           "title": "Candidate Id",
           "type": "string"
         },
         "changes": {
           "additionalProperties": true,
+          "description": "Authorized edits to this session baseline; empty preserves its configuration. One charged backend attempt; does not evaluate.",
           "title": "Changes",
           "type": "object"
         }
@@ -20599,7 +20665,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "同一证据桥接调用已有视频执行器；显式派生产物",
+    "description": "Render existing saved simulation results through the evidence bridge. Produces a derived video, no new solve or evaluation; a file reference does not mean the text model viewed it.",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {

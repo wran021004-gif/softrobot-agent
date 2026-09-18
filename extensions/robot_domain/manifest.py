@@ -20,10 +20,10 @@ EXTENSIONS = [Extension('candidate.rod_design', 'candidate_builder', '1.0.0', c.
 for name, version, inp, out, binding, description in [
     ('diagnostics.sample_exceeds', '1.1.0', c.EntityDiagnosticQuery, c.EntityDiagnosticResult, 'signals:sample_exceeds', '按名称/实体/相位选择保存标量并检查严格大于阈值；无新求解/评分'),
     ('signals.read', '1.0.0', c.SignalQuery, c.SelectedSignal, 'signals:read_signal', '按名称/实体/相位读取保存统一信号，歧义拒绝'),
-    ('diagnostics.saved_trajectory', '2.0.0', c.SavedDiagnosis, c.SavedProduct, 'saved:diagnosis', '平台结果引用自动进入旧保存轨迹诊断；无新求解/评分'),
+    ('diagnostics.saved_trajectory', '2.0.0', c.SavedDiagnosis, c.SavedProduct, 'saved:diagnosis', 'Analyze an existing saved trajectory selected by result reference and execution ID. No new dynamics solve or evaluation; observations do not establish causes.'),
     ('diagnostics.signal_rule', '2.0.0', c.SavedRule, c.SavedProduct, 'saved:rule', '平台结果引用自动进入既有保存信号规则'),
     ('visualization.saved_replay', '1.0.0', c.ResultSource, c.SavedProduct, 'saved:replay', '恢复原始包并准备已有回放 observation；不开窗口'),
-    ('visualization.render_simulation_video', '2.0.0', c.SavedVideo, c.SavedProduct, 'saved:video', '同一证据桥接调用已有视频执行器；显式派生产物'),
+    ('visualization.render_simulation_video', '2.0.0', c.SavedVideo, c.SavedProduct, 'saved:video', 'Render existing saved simulation results through the evidence bridge. Produces a derived video, no new solve or evaluation; a file reference does not mean the text model viewed it.'),
 ]:
     EXTENSIONS.append(Extension(name, 'tool', version, inp, out,
         'extensions.robot_domain.' + binding, description,
