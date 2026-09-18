@@ -1,5 +1,21 @@
 # 统一机器人智能设计开发平台
 
+第一遍七层整理现已接通持久路线。入口为 `python examples/workbench.py platform route ...`；使用方法、真实调用边界及本轮验证见 [步骤 7 与收尾](step7_result.md)。LLM 编排与 Harness 贯穿各层，不是新增的第八层或第二套 Agent 框架。
+
+| 层 | 当前权威输入 | 输出与公共入口 | 已实现 / 主要缺口 |
+|---|---|---|---|
+| 1 任务与实验 | 冻结 `SessionInput.task`、目标/评价器/环境/初态/Timing | `platform check/create`、`compile_input` → 实例身份、实验装配 | 串联软臂到达开发任务；没有通用物理任务生成 |
+| 2 机器人与设计空间 | `family.design`、`family.space`，用户准许的完整模板与参数范围 | `design.family_build`、路线 build、`candidate.family` → 完整候选及物理输入 | 串联柔性段、连接件、导向与载荷；分支、闭链等仍未执行 |
+| 3 数学模型 | `policy.dynamics_model` 与 `discretization` | `model.serial_bending_cells`、`resolve_execution` → 坐标/方程身份及兼容关系 | 逐单元双轴弯曲；通用 PCC/GVS、扭转/剪切/轴向伸长未实现 |
+| 4 规划与控制 | 授权组合中的 `controller.family` 与候选 `control/*` | 实时 Controller、执行计划 → 具名驱动指令 | 确定性参考与末端反馈；通用轨迹规划与新控制算法未增加 |
+| 5 优化 | 固定任务目标、结构选择、连续变量/范围与试验预算 | 路线 optimize → `optimization.optimize` → `run_search` → 最佳有效评价/配置引用 | 有界坐标搜索、重复有效配置跳过、检查点；非全局最优或混合整数求解器 |
+| 6 数值执行与仿真 | 冻结候选、模型/控制、后端专用数值设置 | `Host.invoke(simulation.run)` → `BackendResult` 与 ExportBundle | 独立 MuJoCo/MATLAB 后端；无新动力学/积分算法，接触精度未标定 |
+| 7 评价、诊断与证据 | 固定评价器、保存轨迹、来源执行与候选身份 | `evaluation.run`、`diagnostics.saved_trajectory`、`evidence.read`、按需视频 → 评价/观测/回执 | 摘要、分页、独立后端复核；观测不自动证明因果，文本适配器不看视频 |
+
+用户在 `inputs/route.json` 冻结任务、设计空间、已实现计算组合和总预算。现有模型适配器 → `ToolRequest(route.advance)` → Host/Registry 校验结构化选择 → 子会话优化或公共复核 → 原仿真/评分/诊断 → Store 节点结果 → 下一轮模型选择或停止。`route.inspect`、上下文摘要及现有工作台 status/export 都能查看路线；输入和结果通过原 Store 保存，节点关联请求、执行、候选、证据与后续理由。项目预算与父路线预算同时限制子会话，外层不再次计求解或等待耗时。
+
+“第一遍完成”表示职责清楚、公共工具可调用、路线可保存和恢复；不表示算法成熟、物理能力齐全或任务已达到 10 mm 容差。下一阶段按具体任务逐层打磨。
+
 > 串联绳驱家族的推荐会话现在把公共实验、实体/离散、动力学模型、执行后端数值设置和控制分别表达；模型服务仍使用 `ExperimentPolicy.model`，机器人动力学使用 `ExperimentPolicy.dynamics_model`。详见 [绳驱家族入口](tendon_family.md) 与 [步骤 3–4 结果](steps_3_4_result.md)。
 
 当前真实串联绳驱双后端入口见 [机器人、离散、任务与共同实验装配](tendon_family.md)。原单段独立空间模型见 [公共物理、空间模型与统一场景](platform_spatial.md)，其模型身份和兼容入口继续保留。

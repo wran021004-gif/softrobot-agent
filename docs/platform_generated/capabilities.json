@@ -1074,6 +1074,8 @@
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
       "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
       "tools/platform_tools.py",
@@ -1092,6 +1094,10 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
       [
         "family.optimization_request",
         "1.0.0"
@@ -1511,6 +1517,8 @@
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
       "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
       "tools/platform_tools.py",
@@ -1529,6 +1537,10 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
       [
         "family.optimization_request",
         "1.0.0"
@@ -3931,6 +3943,8 @@
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
       "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
       "tools/platform_tools.py",
@@ -3959,6 +3973,10 @@
     ],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
       [
         "family.optimization_request",
         "1.0.0"
@@ -4381,6 +4399,8 @@
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
       "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
       "tools/platform_tools.py",
@@ -4409,6 +4429,10 @@
     ],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
       [
         "family.optimization_request",
         "1.0.0"
@@ -5788,6 +5812,17 @@
               ],
               "default": null
             },
+            "route": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
             "model": {
               "$ref": "#/$defs/ModelConfig"
             },
@@ -5872,6 +5907,33 @@
               "default": "offline-contract-fixture",
               "title": "Model",
               "type": "string"
+            },
+            "base_url": {
+              "default": "https://api.deepseek.com",
+              "title": "Base Url",
+              "type": "string"
+            },
+            "thinking": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "enabled",
+                    "disabled"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Thinking"
+            },
+            "max_tokens": {
+              "default": 2000,
+              "minimum": 1,
+              "title": "Max Tokens",
+              "type": "integer"
             },
             "supports_tools": {
               "const": true,
@@ -7429,6 +7491,17 @@
               ],
               "default": null
             },
+            "route": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
             "model": {
               "$ref": "#/$defs/ModelConfig"
             },
@@ -7513,6 +7586,33 @@
               "default": "offline-contract-fixture",
               "title": "Model",
               "type": "string"
+            },
+            "base_url": {
+              "default": "https://api.deepseek.com",
+              "title": "Base Url",
+              "type": "string"
+            },
+            "thinking": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "enabled",
+                    "disabled"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Thinking"
+            },
+            "max_tokens": {
+              "default": 2000,
+              "minimum": 1,
+              "title": "Max Tokens",
+              "type": "integer"
             },
             "supports_tools": {
               "const": true,
@@ -8033,6 +8133,8 @@
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
       "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
       "tools/platform_tools.py",
@@ -8051,6 +8153,10 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
       [
         "family.optimization_request",
         "1.0.0"
@@ -8279,6 +8385,17 @@
               ],
               "default": null
             },
+            "route": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
             "model": {
               "$ref": "#/$defs/ModelConfig"
             },
@@ -8363,6 +8480,33 @@
               "default": "offline-contract-fixture",
               "title": "Model",
               "type": "string"
+            },
+            "base_url": {
+              "default": "https://api.deepseek.com",
+              "title": "Base Url",
+              "type": "string"
+            },
+            "thinking": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "enabled",
+                    "disabled"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Thinking"
+            },
+            "max_tokens": {
+              "default": 2000,
+              "minimum": 1,
+              "title": "Max Tokens",
+              "type": "integer"
             },
             "supports_tools": {
               "const": true,
@@ -9074,6 +9218,17 @@
               ],
               "default": null
             },
+            "route": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
             "model": {
               "$ref": "#/$defs/ModelConfig"
             },
@@ -9158,6 +9313,33 @@
               "default": "offline-contract-fixture",
               "title": "Model",
               "type": "string"
+            },
+            "base_url": {
+              "default": "https://api.deepseek.com",
+              "title": "Base Url",
+              "type": "string"
+            },
+            "thinking": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "enabled",
+                    "disabled"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Thinking"
+            },
+            "max_tokens": {
+              "default": 2000,
+              "minimum": 1,
+              "title": "Max Tokens",
+              "type": "integer"
             },
             "supports_tools": {
               "const": true,
@@ -10016,6 +10198,8 @@
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
       "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
       "tools/platform_tools.py",
@@ -10034,6 +10218,10 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
       [
         "family.optimization_request",
         "1.0.0"
@@ -12340,6 +12528,8 @@
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
       "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
       "tools/platform_tools.py",
@@ -12358,6 +12548,10 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
       [
         "family.optimization_request",
         "1.0.0"
@@ -15114,6 +15308,8 @@
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
       "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
       "tools/platform_tools.py",
@@ -15132,6 +15328,10 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
       [
         "family.optimization_request",
         "1.0.0"
@@ -16191,6 +16391,8 @@
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
       "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
       "tools/platform_tools.py",
@@ -16209,6 +16411,10 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
       [
         "family.optimization_request",
         "1.0.0"
@@ -16366,6 +16572,436 @@
     "side_effects": "none"
   },
   {
+    "extension_id": "route.advance",
+    "kind": "tool",
+    "version": "1.0.0",
+    "binding": "extensions.tendon_family.route:advance",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Choose build/optimize, saved diagnosis, independent crosscheck, optional video or finish. Cite previous node result; source_node selects an optimization, candidate_id defaults to its best. Variables must be nonempty for optimize.",
+    "input_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "node_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "action": {
+          "enum": [
+            "build",
+            "optimize",
+            "diagnose",
+            "crosscheck",
+            "video",
+            "finish"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "combination": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Combination"
+        },
+        "changes": {
+          "additionalProperties": true,
+          "title": "Changes",
+          "type": "object"
+        },
+        "variables": {
+          "additionalProperties": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Variables",
+          "type": "object"
+        },
+        "max_trials": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Max Trials",
+          "type": "integer"
+        },
+        "source_node": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Node"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "next_step": {
+          "minLength": 1,
+          "title": "Next Step",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "action",
+        "reason",
+        "next_step"
+      ],
+      "title": "RouteAction",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "detail": {
+          "additionalProperties": true,
+          "title": "Detail",
+          "type": "object"
+        }
+      },
+      "required": [
+        "detail"
+      ],
+      "title": "RouteResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "orchestration",
+      "role": "public_tool",
+      "delegated_execution": true,
+      "preflight": "extensions.tendon_family.route:preflight"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/tendon_family/contracts.py",
+      "extensions/tendon_family/compiler.py",
+      "extensions/tendon_family/sections.py",
+      "extensions/tendon_family/geometry.py",
+      "extensions/tendon_family/legacy.py",
+      "extensions/tendon_family/scene.py",
+      "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
+      "extensions/tendon_family/backends.py",
+      "extensions/tendon_family/signals.py",
+      "extensions/tendon_family/candidate.py",
+      "extensions/tendon_family/preparation.py",
+      "extensions/tendon_family/mjcf.py",
+      "extensions/tendon_family/saved.py",
+      "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
+      "tools/platform_tools.py",
+      "tools/platform_tasks.py",
+      "schemas/platform_operations.py",
+      "tools/design_compiler.py",
+      "tools/matlab_tools.py",
+      "tools/state_io.py",
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/robot_domain/contracts.py",
+      "schemas/environment_spec.py",
+      "schemas/robot_ir.py",
+      "schemas/exploration.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
+      [
+        "family.design",
+        "1.0.0"
+      ],
+      [
+        "family.initial",
+        "1.0.0"
+      ],
+      [
+        "family.control",
+        "1.0.0"
+      ],
+      [
+        "family.parameters",
+        "1.0.0"
+      ],
+      [
+        "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.space",
+        "1.0.0"
+      ],
+      [
+        "family.discretization",
+        "1.0.0"
+      ],
+      [
+        "family.experiment_spec",
+        "1.0.0"
+      ],
+      [
+        "family.build_request",
+        "1.0.0"
+      ],
+      [
+        "family.build_result",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "route.inspect",
+    "kind": "tool",
+    "version": "1.0.0",
+    "binding": "extensions.tendon_family.route:inspect",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Read authorized combinations, design space, route evidence and shared budget.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "Inspect",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "detail": {
+          "additionalProperties": true,
+          "title": "Detail",
+          "type": "object"
+        }
+      },
+      "required": [
+        "detail"
+      ],
+      "title": "RouteResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "orchestration",
+      "role": "public_tool"
+    },
+    "resources": [],
+    "dependencies": [],
+    "sources": [
+      "extensions/tendon_family/contracts.py",
+      "extensions/tendon_family/compiler.py",
+      "extensions/tendon_family/sections.py",
+      "extensions/tendon_family/geometry.py",
+      "extensions/tendon_family/legacy.py",
+      "extensions/tendon_family/scene.py",
+      "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
+      "extensions/tendon_family/backends.py",
+      "extensions/tendon_family/signals.py",
+      "extensions/tendon_family/candidate.py",
+      "extensions/tendon_family/preparation.py",
+      "extensions/tendon_family/mjcf.py",
+      "extensions/tendon_family/saved.py",
+      "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
+      "tools/platform_tools.py",
+      "tools/platform_tasks.py",
+      "schemas/platform_operations.py",
+      "tools/design_compiler.py",
+      "tools/matlab_tools.py",
+      "tools/state_io.py",
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/robot_domain/contracts.py",
+      "schemas/environment_spec.py",
+      "schemas/robot_ir.py",
+      "schemas/exploration.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
+      [
+        "family.design",
+        "1.0.0"
+      ],
+      [
+        "family.initial",
+        "1.0.0"
+      ],
+      [
+        "family.control",
+        "1.0.0"
+      ],
+      [
+        "family.parameters",
+        "1.0.0"
+      ],
+      [
+        "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.space",
+        "1.0.0"
+      ],
+      [
+        "family.discretization",
+        "1.0.0"
+      ],
+      [
+        "family.experiment_spec",
+        "1.0.0"
+      ],
+      [
+        "family.build_request",
+        "1.0.0"
+      ],
+      [
+        "family.build_result",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
     "extension_id": "search.family_coordinate",
     "kind": "search",
     "version": "1.0.0",
@@ -16482,6 +17118,8 @@
       "extensions/tendon_family/saved.py",
       "extensions/tendon_family/manifest.py",
       "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
       "tools/platform_tools.py",
@@ -16500,6 +17138,10 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
       [
         "family.optimization_request",
         "1.0.0"

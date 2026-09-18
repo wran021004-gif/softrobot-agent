@@ -1003,6 +1003,33 @@
         "title": "Model",
         "type": "string"
       },
+      "base_url": {
+        "default": "https://api.deepseek.com",
+        "title": "Base Url",
+        "type": "string"
+      },
+      "thinking": {
+        "anyOf": [
+          {
+            "enum": [
+              "enabled",
+              "disabled"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Thinking"
+      },
+      "max_tokens": {
+        "default": 2000,
+        "minimum": 1,
+        "title": "Max Tokens",
+        "type": "integer"
+      },
       "supports_tools": {
         "const": true,
         "default": true,
@@ -1157,6 +1184,33 @@
             "title": "Model",
             "type": "string"
           },
+          "base_url": {
+            "default": "https://api.deepseek.com",
+            "title": "Base Url",
+            "type": "string"
+          },
+          "thinking": {
+            "anyOf": [
+              {
+                "enum": [
+                  "enabled",
+                  "disabled"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Thinking"
+          },
+          "max_tokens": {
+            "default": 2000,
+            "minimum": 1,
+            "title": "Max Tokens",
+            "type": "integer"
+          },
           "supports_tools": {
             "const": true,
             "default": true,
@@ -1305,6 +1359,17 @@
         "anyOf": [
           {
             "$ref": "#/$defs/Binding"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "route": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Payload"
           },
           {
             "type": "null"
@@ -1593,6 +1658,17 @@
             ],
             "default": null
           },
+          "route": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Payload"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "model": {
             "$ref": "#/$defs/ModelConfig"
           },
@@ -1677,6 +1753,33 @@
             "default": "offline-contract-fixture",
             "title": "Model",
             "type": "string"
+          },
+          "base_url": {
+            "default": "https://api.deepseek.com",
+            "title": "Base Url",
+            "type": "string"
+          },
+          "thinking": {
+            "anyOf": [
+              {
+                "enum": [
+                  "enabled",
+                  "disabled"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Thinking"
+          },
+          "max_tokens": {
+            "default": 2000,
+            "minimum": 1,
+            "title": "Max Tokens",
+            "type": "integer"
           },
           "supports_tools": {
             "const": true,
@@ -3908,6 +4011,17 @@
             ],
             "default": null
           },
+          "route": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Payload"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "model": {
             "$ref": "#/$defs/ModelConfig"
           },
@@ -3992,6 +4106,33 @@
             "default": "offline-contract-fixture",
             "title": "Model",
             "type": "string"
+          },
+          "base_url": {
+            "default": "https://api.deepseek.com",
+            "title": "Base Url",
+            "type": "string"
+          },
+          "thinking": {
+            "anyOf": [
+              {
+                "enum": [
+                  "enabled",
+                  "disabled"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Thinking"
+          },
+          "max_tokens": {
+            "default": 2000,
+            "minimum": 1,
+            "title": "Max Tokens",
+            "type": "integer"
           },
           "supports_tools": {
             "const": true,
@@ -10469,6 +10610,17 @@
               ],
               "default": null
             },
+            "route": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
             "model": {
               "$ref": "#/$defs/ModelConfig"
             },
@@ -10553,6 +10705,33 @@
               "default": "offline-contract-fixture",
               "title": "Model",
               "type": "string"
+            },
+            "base_url": {
+              "default": "https://api.deepseek.com",
+              "title": "Base Url",
+              "type": "string"
+            },
+            "thinking": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "enabled",
+                    "disabled"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Thinking"
+            },
+            "max_tokens": {
+              "default": 2000,
+              "minimum": 1,
+              "title": "Max Tokens",
+              "type": "integer"
             },
             "supports_tools": {
               "const": true,
@@ -11158,6 +11337,113 @@
         }
       },
       "title": "Parameters",
+      "type": "object"
+    },
+    "family.route_policy@1.0.0": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "Combination": {
+          "additionalProperties": false,
+          "properties": {
+            "dynamics_model": {
+              "$ref": "#/$defs/Binding"
+            },
+            "backend": {
+              "$ref": "#/$defs/Binding"
+            },
+            "controller": {
+              "$ref": "#/$defs/Binding"
+            }
+          },
+          "required": [
+            "dynamics_model",
+            "backend",
+            "controller"
+          ],
+          "title": "Combination",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "combinations": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Combination"
+          },
+          "title": "Combinations",
+          "type": "object"
+        },
+        "max_trials": {
+          "default": 3,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Max Trials",
+          "type": "integer"
+        },
+        "guidance": {
+          "default": "Select a legal combination and structure; evaluate, inspect evidence, then continue, adjust or finish. Reserve a solve for independent review when useful.",
+          "title": "Guidance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "combinations"
+      ],
+      "title": "RoutePolicy",
       "type": "object"
     },
     "family.search@1.0.0": {

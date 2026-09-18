@@ -3,14 +3,16 @@ from schemas.platform import BackendResult, Payload, SessionInput
 from tools.platform_registry import Extension
 from . import contracts as c
 from . import optimization as opt
+from . import route
 
 CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
+    ('route_policy',route.RoutePolicy),
     ('optimization_request',opt.OptimizationRequest),('search',opt.SearchParameters),('search_state',opt.SearchState),
     ('design',c.Design),('initial',c.Initial),('control',c.Control),('parameters',c.Parameters),('backend_data',c.Data),
     ('dynamics_model',c.DynamicsModel),('matlab_parameters',c.MatlabParameters),('mujoco_parameters',c.MujocoParameters),
     ('space',c.Space),('discretization',c.Discretization),('experiment_spec',c.ExperimentSpec),
     ('build_request',c.BuildRequest),('build_result',c.BuildResult)]]
-SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization'))+(
+SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
@@ -19,6 +21,13 @@ SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compile
 MATLAB=tuple('matlab/'+n+'.m' for n in ('tf_geometry','tf_point','tf_routes','tf_terms','tf_control','tf_run','tf_observe','tf_static','tf_view'))
 COMMON=dict(sources=SOURCES,contract_dependencies=tuple((n,v) for n,v,_ in CONTRACTS))
 EXTENSIONS=[
+    Extension('route.advance','tool','1.0.0',route.RouteAction,route.RouteResult,
+        'extensions.tendon_family.route:advance','Choose build/optimize, saved diagnosis, independent crosscheck, optional video or finish. Cite previous node result; source_node selects an optimization, candidate_id defaults to its best. Variables must be nonempty for optimize.',**COMMON,
+        capabilities=dict(category='orchestration',role='public_tool',delegated_execution=True,
+            preflight='extensions.tendon_family.route:preflight')),
+    Extension('route.inspect','tool','1.0.0',route.Inspect,route.RouteResult,
+        'extensions.tendon_family.route:inspect','Read authorized combinations, design space, route evidence and shared budget.',**COMMON,
+        capabilities=dict(category='orchestration',role='public_tool')),
     Extension('search.family_coordinate','search','1.0.0',opt.SearchParameters,Payload,
         'extensions.tendon_family.optimization:CoordinateSearch','复用有界坐标搜索；首个候选为基线；设计与控制联合整定',**COMMON,
         capabilities=dict(category='parameter_search',role='adapter',checkpoint='family.search_state',

@@ -72,20 +72,11 @@ def command(root,action,request=None,t_start_s=None,t_end_s=None,fps=25,azimuth_
         output=dict(receipt=receipt,product=product,report=report,files=files)
         atomic_json(root/(action+'.json'),output); return output
     if action=='crosscheck':
-        inp=store.artifact(best['configuration'])['effective']
-        original=inp['policy']['backend']['extension_id']
+        from extensions.tendon_family.crosscheck import crosscheck
+        original=store.artifact(best['configuration'])['effective']['policy']['backend']['extension_id']
         backend='matlab_spatial' if original=='backend.family_mujoco' else 'family_mujoco'
-        inp['run_id']=outcome['run_id']+'-crosscheck'
-        inp['policy']['backend']=read(root/'inputs/execution.json')['backends'][backend]
-        inp['policy']['search']=None
-        inp['policy']['budget'].update(backend_solves=1,tool_calls=4,wall_s=1000.)
-        other=Host(root,inp['run_id'])
-        try:store.session(inp['run_id'])
-        except ValueError:other.create(inp)
-        sim=invoke(other,'crosscheck-simulation','simulation.run',dict(candidate_id=best['candidate_id'],changes={}))
-        ev=invoke(other,'crosscheck-evaluation','evaluation.run',dict(result=sim['output'],execution_id=sim['execution_id']))
-        output=dict(backend=backend,candidate_id=best['candidate_id'],simulation=sim,evaluation=store.artifact(ev['output']),
-            reference_evaluation=best['evaluation_data'],usage=store.remaining(inp['run_id'])['used'],
-            meaning='Independent backend review; excluded from optimization ranking')
+        output=crosscheck(root,outcome['run_id'],best['candidate_id'],best['configuration'],
+            read(root/'inputs/execution.json')['backends'][backend])
+        output['reference_evaluation']=best['evaluation_data']
         atomic_json(root/'crosscheck.json',output);return output
     raise ValueError('UNKNOWN_OPTIMIZATION_ACTION: '+action)

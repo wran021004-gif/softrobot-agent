@@ -56,6 +56,8 @@
 | model.observing | platform_services | teaching_example | model_adapter | 1.0.0 | True | extensions.convergence.implementation:ObservingAdapter | Independent offline development example; no physical calibration |
 | model.serial_bending_cells | mathematical_model | definition | dynamics_model | 1.0.0 | True | extensions.tendon_family.execution:model_definition | 串联逐刚体、逐单元双主轴弯曲数学模型 |
 | offline | platform_services | adapter | model_adapter | 1.0.0 | True | tools.platform_models:OfflineAdapter | Offline scripted compatibility fixture |
+| route.advance | orchestration | public_tool | tool | 1.0.0 | True | extensions.tendon_family.route:advance | Choose build/optimize, saved diagnosis, independent crosscheck, optional video or finish. Cite previous node result; source_node selects an optimization, candidate_id defaults to its best. Variables must be nonempty for optimize. |
+| route.inspect | orchestration | public_tool | tool | 1.0.0 | True | extensions.tendon_family.route:inspect | Read authorized combinations, design space, route evidence and shared budget. |
 | search.family_coordinate | parameter_search | adapter | search | 1.0.0 | True | extensions.tendon_family.optimization:CoordinateSearch | 复用有界坐标搜索；首个候选为基线；设计与控制联合整定 |
 | search.scalar_sequence | parameter_search | adapter | search | 1.0.0 | True | extensions.reference.implementation:ScalarSequenceSearch | 确定性候选序列参考搜索器；算法拥有状态 |
 | search.stateful | parameter_search | teaching_example | search | 1.0.0 | True | extensions.convergence.implementation:StatefulSearch | Independent offline development example; no physical calibration |

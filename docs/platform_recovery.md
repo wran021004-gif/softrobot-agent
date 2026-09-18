@@ -1,5 +1,15 @@
 # 版本、证据、预算与恢复
 
+## 持久路线与独立复核
+
+`family.route_policy` 随 SessionInput 冻结。`state.route` 保存顺序节点、当前节点、下一步、选择理由/证据、结果引用和最终交付；原 Store 的 `route_node` 事件封存每次状态投影。没有单独工作流数据库。`platform route status/result` 只读；`resume` 使用原 Host 的 pending 请求/回执机制。已完成路线再次 resume 不发模型请求；没有封存的执行仍按 unknown 保留预留，不重演。预算/轮数等明确终止时，Host 可汇总最近一个有效搜索的最佳候选，明确标为宿主收尾，不冒充新模型决定。
+
+`route.advance` 的子会话带原有 `parent_run_id`，每次内层求解同时检查项目、子会话、父路线额度。外层只计自己的工具调用，求解/评分/派生产物引用内层回执，不重复收取等待耗时。查看入口报告实际求解、评价、真实模型请求、诊断与视频次数。
+
+公共 `extensions.tendon_family.crosscheck.crosscheck` 从来源 CandidateInput 形成复核快照，替换明确选择的另一后端，保留设计、任务、模型和控制；来源、完整规范输入与父路线决定新身份。相同输入复用会话和请求回执，改变 execution.json 的有效数值设置形成新的 `*-cc-<digest>` 会话。优化与复核共同调用 `ensure_session`，已有同名会话输入不一致时明确拒绝，不覆盖旧结果。
+
+搜索层在请求求解前比较完整有效 SessionInput（包含实际设计、任务、控制、模型和数值条件），不同标签不再让相同配置重复求解。重复提案记录 `original_candidate`，保留原候选和评价归属；`proposals`、`distinct_candidates`、`actual_solves` 分开报告。恢复读取同一检查点；完整坐标巡回没有新配置时以 `no_new_candidate` 封存停止。现有仿真缓存规则保持原样。
+
 ## 存储及费用
 
 每个项目有自己的 `platform.sqlite`，授权路径由 `runs/.platform_authorities.sqlite` 绑定。复制项目目录可以只读查询，但不能在复制位置继续执行；同一 grant 不能重新绑定到另一路径获取额度。二者都是本地可信宿主状态，不能防止有权限的人整体替换数据库，不是身份认证服务。

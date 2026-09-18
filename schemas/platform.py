@@ -155,6 +155,9 @@ class ModelConfig(Contract):
     strategy: Identifier = 'strategy.tool'
     strategy_version: str = '1.0.0'
     model: str = 'offline-contract-fixture'
+    base_url: str = 'https://api.deepseek.com'
+    thinking: Literal['enabled','disabled'] | None = None
+    max_tokens: int = Field(default=2000,ge=1)
     supports_tools: Literal[True] = True
     supports_text: Literal[True] = True
     supports_images: bool = False
@@ -178,6 +181,7 @@ class ExperimentPolicy(Contract):
     discretization: Payload | None = None
     candidate_builder: Binding | None = None
     search: Binding | None = None
+    route: Payload | None = None
     model: ModelConfig = Field(default_factory=ModelConfig)
     allowed_tools: list[Identifier] = Field(default_factory=list)
     tool_bindings: dict[Identifier, str] = Field(default_factory=dict)

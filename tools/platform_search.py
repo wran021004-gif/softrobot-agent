@@ -1,5 +1,5 @@
 """Algorithm-neutral ask/tell driver; Host owns evaluation and request identity."""
-from schemas.platform import EvaluationResult, Objective, Payload
+from schemas.platform import EvaluationResult, Objective, Payload, SessionInput
 from tools.platform_store import plain
 from tools.state_io import digest
 
@@ -37,15 +37,45 @@ def run_search(host):
     saved = host.store.session(host.run_id)['state'].get('search')
     if saved:
         algorithm.restore(host.reg.parse(saved['algorithm']).model_dump(mode='json'))
+        if saved.get('stop_reason'):
+            return _outcome(saved,'completed',saved['stop_reason'])
     else:
         saved = dict(algorithm=plain(algorithm.save()), pending=None, trials=[])
+    saved.setdefault('duplicates', [])
+    saved.setdefault('proposals', len(saved['trials']))
     while saved['pending'] is not None or not algorithm.stopped():
         if saved['pending'] is None:
-            saved['pending'] = dict(index=len(saved['trials']), candidate=algorithm.propose())
+            saved['pending'] = dict(index=saved['proposals'], candidate=algorithm.propose())
+            saved['proposals'] += 1
             saved['algorithm'] = plain(algorithm.save())
             _save(host, saved)
         pending = saved['pending']
         prefix = 'search-' + str(pending['index'])
+        from tools.platform_tools import _candidate
+        try:
+            effective = _candidate(SessionInput.model_validate(inp), pending['candidate'], host.reg)
+            identity = digest(plain(effective))  # task, design, control, model and numerical conditions
+        except ValueError:
+            identity = None  # preserve the existing invalid-candidate receipt path
+        for trial in saved['trials']:
+            if 'effective_identity' not in trial:
+                try: trial['effective_identity'] = digest(plain(_candidate(SessionInput.model_validate(inp), trial['candidate'], host.reg)))
+                except ValueError: trial['effective_identity'] = None
+        previous = next((t for t in saved['trials'] if identity and t.get('effective_identity') == identity), None)
+        if previous:
+            algorithm.feedback(previous.get('score'))
+            saved['duplicates'].append(dict(proposal=prefix, original_candidate=previous['candidate_id'], effective_identity=identity))
+            saved.update(algorithm=plain(algorithm.save()), pending=None)
+            _save(host, saved)
+            # A complete coordinate sweep with no new configuration cannot progress.
+            dimensions = len(getattr(getattr(algorithm, 'space', None), 'variables', [None]))
+            if len(saved['duplicates']) >= 2 * dimensions and all(
+                    d['proposal'] == 'search-' + str(saved['proposals'] - 2 * dimensions + i)
+                    for i, d in enumerate(saved['duplicates'][-2 * dimensions:])):
+                saved['stop_reason']='no_new_candidate'
+                _save(host,saved)
+                return _outcome(saved, 'completed', 'no_new_candidate')
+            continue
         simulation = host.invoke(dict(request_id=prefix + '-simulation', tool_id='simulation.run', tool_version=inp['policy']['tool_bindings']['simulation.run'],
             arguments=dict(candidate_id=prefix, changes=pending['candidate']), reason='搜索候选', cache='reuse'))
         if simulation['execution_status'] != 'completed':
@@ -71,7 +101,7 @@ def run_search(host):
         else:
             scalar = score(result, inp['task']['objectives'])
         algorithm.feedback(scalar)
-        saved['trials'].append(dict(candidate_id=prefix,candidate=pending['candidate'], evaluation=evaluation['output'],
+        saved['trials'].append(dict(candidate_id=prefix,candidate=pending['candidate'], effective_identity=identity, evaluation=evaluation['output'],
             simulation=simulation,score=scalar,comparison_identity=result.comparison_identity,
             status='valid' if result.validity=='valid' else 'solver_failed',task_success=result.task_success))
         saved.update(algorithm=plain(algorithm.save()), pending=None)
@@ -84,6 +114,8 @@ def _outcome(saved,status,reason,pending=None):
     if len({t.get('comparison_identity') for t in valid})>1:
         raise ValueError('INCOMPARABLE_TASK_INSTANCE_BACKEND_OR_MODEL')
     return dict(status=status,stop_reason=reason,pending=pending,trials=saved['trials'],algorithm=saved['algorithm'],
+        proposals=saved.get('proposals',len(saved['trials'])), distinct_candidates=len(saved['trials']), duplicates=saved.get('duplicates',[]),
+        actual_solves=sum(t.get('simulation',{}).get('charged',{}).get('backend_solves',0) for t in saved['trials']),
         baseline=saved['trials'][0] if saved['trials'] else None,
         best=min(valid,key=lambda t:t['score']) if valid else None)
 

@@ -1,0 +1,56 @@
+{
+  "description": "Explicit scripted protocol acceptance fixture. These are NOT real LLM decisions.",
+  "decisions": [
+    {
+      "tool_id": "route.advance",
+      "arguments": {
+        "node_id": "search",
+        "action": "optimize",
+        "combination": "family_mujoco",
+        "changes": {"template": "tube_distal"},
+        "variables": {"components/near/length_m": [0.14, 0.20]},
+        "max_trials": 3,
+        "reason": "Offline fixture: evaluate a bounded coordinate search under the frozen task.",
+        "next_step": "Inspect saved trajectory of the best valid candidate"
+      },
+      "reason": "Offline protocol fixture"
+    },
+    {
+      "tool_id": "route.advance",
+      "arguments": {
+        "node_id": "diagnosis",
+        "action": "diagnose",
+        "source_node": "search",
+        "evidence": ["$last_output"],
+        "reason": "Offline fixture: inspect the saved best result; make no causal claim.",
+        "next_step": "Independent backend review"
+      },
+      "reason": "Offline protocol fixture"
+    },
+    {
+      "tool_id": "route.advance",
+      "arguments": {
+        "node_id": "review",
+        "action": "crosscheck",
+        "combination": "matlab_spatial",
+        "source_node": "search",
+        "evidence": ["$last_output"],
+        "reason": "Offline fixture: review the same candidate on the other authorized backend.",
+        "next_step": "Deliver saved candidate and review"
+      },
+      "reason": "Offline protocol fixture"
+    },
+    {
+      "tool_id": "route.advance",
+      "arguments": {
+        "node_id": "delivery",
+        "action": "finish",
+        "source_node": "search",
+        "evidence": ["$last_output"],
+        "reason": "Bounded offline acceptance complete; four solve budget consumed. No further search.",
+        "next_step": "stopped"
+      },
+      "reason": "Offline protocol fixture"
+    }
+  ]
+}

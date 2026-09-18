@@ -84,24 +84,33 @@ def prepare_optimization(value):
     return request,inp
 
 
-def optimize(root, value):
+def ensure_session(host, inp, *, parent_run_id=None, parent_event_id=None):
+    """One normalized input comparison for optimization and independent review."""
+    from tools.platform_tasks import compile_input
+    normalized=compile_input(plain(inp),host.reg)['input']
+    try: existing=host.store.session(host.run_id)
+    except ValueError: existing=None
+    if existing is None:
+        return host.create(normalized,parent_run_id=parent_run_id,parent_event_id=parent_event_id)
+    previous=compile_input(existing['snapshot']['input'],host.reg)['input']
+    if previous!=normalized or existing['snapshot'].get('parent_run_id')!=parent_run_id:
+        raise ValueError('SESSION_INPUT_CHANGED: use a new session identity')
+    return existing
+
+
+def optimize(root, value, *, parent_run_id=None, parent_event_id=None):
     from tools.platform_host import Host
     from tools.platform_search import run_search
     from tools.state_io import atomic_json, digest
     request,inp=prepare_optimization(value)
     host=Host(root,inp.run_id)
-    try: existing=host.store.session(inp.run_id)
-    except ValueError: existing=None
-    if existing is None:
-        host.create(plain(inp))
-        with host.store.transaction() as db:
-            ref=host.store.put(db,request)
-            host.store.event(db,inp.run_id,'optimization','prepared',outputs=[ref],version='1.0.0')
-    elif existing['snapshot']['input'] != plain(inp):
-        # compile_input normalizes tool grants; compare against its own projection.
-        from tools.platform_tasks import compile_input
-        normalized=compile_input(plain(inp))['input']
-        if existing['snapshot']['input']!=normalized: raise ValueError('OPTIMIZATION_SESSION_INPUT_CHANGED')
+    ensure_session(host,inp,parent_run_id=parent_run_id,parent_event_id=parent_event_id)
+    with host.store.transaction() as db:
+        state=host.store.session(inp.run_id,db)['state']
+        if 'optimization_request' not in state:
+            ref=host.store.put(db,request);state['optimization_request']=plain(ref)
+            host.store.update_state(db,inp.run_id,state)
+            host.store.event(db,inp.run_id,'optimization','prepared',parent=parent_event_id,outputs=[ref])
     atomic_json(Path(root)/(inp.run_id+'_optimization_request.json'),plain(request))
     outcome=run_search(host)
     outcome.update(run_id=inp.run_id,method=request.method,template=request.template,

@@ -17,8 +17,12 @@ def result_view(host):
             seen.add(ref['artifact_id'])
             result = EvaluationResult.model_validate(host.store.artifact(ref))
             evaluations.append(dict(evaluation=ref, candidate_id=event['candidate_id'], result=result.model_dump(mode='json')))
-    return dict(run_id=host.run_id, status=host.store.session(host.run_id)['status'], evaluations=evaluations,
+    result = dict(run_id=host.run_id, status=host.store.session(host.run_id)['status'], evaluations=evaluations,
                 resources=host.store.remaining(host.run_id), event_count=len(events), rescoring=False, backend_solves=0)
+    if host.store.session(host.run_id)['snapshot']['input']['policy'].get('route'):
+        from extensions.tendon_family.route import view
+        result['route'] = view(host)
+    return result
 
 
 def export_html(host, path):
