@@ -81,4 +81,8 @@ def main(argv=None):
             out=view(host)
             if args.action=='result':out=dict(final=out['route']['final'],usage=out['usage'],counts=out['counts'],stop_reason=out['stop_reason'])
         atomic_json(root/'route_status.json',view(host)) if args.action in ('start','resume','call') else None
-    print(json.dumps(out,ensure_ascii=False,indent=2));return 0
+    print(json.dumps(out,ensure_ascii=False,indent=2))
+    # Robot tolerance (final.task_success) is separate from protocol/execution failure.
+    if args.action in ('start','resume') and out['status'] in ('failed','needs_input'):
+        return 1
+    return 0

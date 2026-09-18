@@ -14,6 +14,18 @@
 
 用户在 `inputs/route.json` 冻结任务、设计空间、已实现计算组合和总预算。现有模型适配器 → `ToolRequest(route.advance)` → Host/Registry 校验结构化选择 → 子会话优化或公共复核 → 原仿真/评分/诊断 → Store 节点结果 → 下一轮模型选择或停止。`route.inspect`、上下文摘要及现有工作台 status/export 都能查看路线；输入和结果通过原 Store 保存，节点关联请求、执行、候选、证据与后续理由。项目预算与父路线预算同时限制子会话，外层不再次计求解或等待耗时。
 
+真实模型每轮必须恰好调用一个工具，收到结果后再选下一步；`route.inspect` 与 `evidence.read` 分轮执行，正常交付使用 `route.advance` 的 `action="finish"`。零调用或多调用在每个会话内有一次协议纠正机会：原始回复和失败回执保留，下一次实际请求携带调用数量、回复引用和纠正要求，使用新的 `model-N` 身份并占用原有轮数、项目及会话模型预算。纠正待处理时不生成终局；再次解析失败或纠正预算不足会保存明确原因并收尾。恢复读取已有回执和纠正状态；已预留但完成情况未知的请求保持 `needs_input`，不自动重发。已封存路线保持不变。
+
+`route start/resume` 遇到 `failed` 或 `needs_input` 返回非零退出码；正常停止的交付即使 `final.task_success=false` 仍返回 0，机器人未达到容差与程序失败分开判断。当前 DeepSeek 服务、模型和 thinking 设置沿用 `configs/deepseek.yaml`，未新增传输参数。离线定向检查：`python -m unittest tests.test_route_model_protocol -v`，重放 `runs/route_live_20260918_084601` 的双工具回复夹具，不请求模型、不积分。
+
+在已配置 `DEEPSEEK_API_KEY` 的 `softagent` 环境中，从新目录进行一次真实调试（会消耗模型预算并可能启动已有求解器）：
+
+```powershell
+$routeDebug = "runs/route_protocol_$(Get-Date -Format yyyyMMdd_HHmmss)"
+python examples/workbench.py platform route prepare $routeDebug
+if ($LASTEXITCODE -eq 0) { python examples/workbench.py platform route start $routeDebug }
+```
+
 “第一遍完成”表示职责清楚、公共工具可调用、路线可保存和恢复；不表示算法成熟、物理能力齐全或任务已达到 10 mm 容差。下一阶段按具体任务逐层打磨。
 
 > 串联绳驱家族的推荐会话现在把公共实验、实体/离散、动力学模型、执行后端数值设置和控制分别表达；模型服务仍使用 `ExperimentPolicy.model`，机器人动力学使用 `ExperimentPolicy.dynamics_model`。详见 [绳驱家族入口](tendon_family.md) 与 [步骤 3–4 结果](steps_3_4_result.md)。
