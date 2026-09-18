@@ -1,4 +1,4 @@
-"""轻量平台验收；默认仅检查。--real 最多两次短 MuJoCo，--matlab 一次短 MATLAB。"""
+"""Lightweight platform validation; checks only by default. --real allows at most two short MuJoCo solves; --matlab allows one short MATLAB solve."""
 import argparse
 import json
 from pathlib import Path
@@ -60,7 +60,7 @@ def main():
     args = parser.parse_args()
     root = (args.output or ROOT / 'runs/platform_acceptance' / uuid4().hex).resolve()
     root.mkdir(parents=True, exist_ok=False)
-    report = dict(root=str(root), checks=None, numerical=[], boundaries=['离线回复不证明自主决策质量', '确定性工作者不等于真实多模型协作', '参考信号模型不代表机器人物理'])
+    report = dict(root=str(root), checks=None, numerical=[], boundaries=['Offline responses do not establish autonomous decision quality', 'Deterministic workers do not establish real multi-model collaboration', 'The reference signal model does not represent robot physics'])
     roots = []
     if not args.skip_checks:
         from tests import test_platform
@@ -105,7 +105,7 @@ def main():
             if name == 'reach-b':
                 inp['task']['goal']['data']['target_m'] = [0.28, 0.02, 0.12]
                 inp['task']['task_version'] = '1.0.1'
-                inp['task']['source'] = '独立开发变体：目标 [0.28,0.02,0.12]，60 步；原环境与 0.01 m 容差'
+                inp['task']['source'] = 'Independent development variant: target [0.28,0.02,0.12], 60 steps; original environment and 0.01 m tolerance'
             duration = steps * inp['task']['timing']['timestep_s']
             inp['task']['timing']['duration_s'] = duration
             inp['task']['sampling']['window_s'] = [0., duration]
@@ -115,12 +115,12 @@ def main():
             except ValueError as exc:
                 report['numerical'].append(dict(case=name, status='capability_unavailable', reason=str(exc), solver_started=False))
                 continue
-            print('开始独立短后端验收：' + name, flush=True)
+            print('Starting independent short backend validation: ' + name, flush=True)
             started = time.monotonic()
-            receipt = host.invoke(dict(request_id='short-solve', tool_id='simulation.run', arguments={}, reason='用户授权的独立短接口验证', cache='new'))
+            receipt = host.invoke(dict(request_id='short-solve', tool_id='simulation.run', arguments={}, reason='User-authorized independent short interface validation', cache='new'))
             record = dict(case=name, backend=backend, steps_requested=steps, solve=receipt, elapsed_s=time.monotonic() - started)
             if receipt['execution_status'] == 'completed':
-                evaluation = host.invoke(dict(request_id='score', tool_id='evaluation.run', arguments=dict(result=receipt['output']), reason='固定任务评价'))
+                evaluation = host.invoke(dict(request_id='score', tool_id='evaluation.run', arguments=dict(result=receipt['output']), reason='Fixed task evaluation'))
                 record['evaluation'] = evaluation
                 if evaluation.get('output'):
                     record['result'] = store.artifact(evaluation['output'])

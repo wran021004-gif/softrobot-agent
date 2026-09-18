@@ -5,7 +5,7 @@ task:
   task_version: 1.0.0
   name: Synthetic final signal error
   status: development_valid
-  source: 明确工程参考模型：x[k+1]=x[k]+0.5*(command-x[k])，仅验证接口；无物理标定
+  source: "Explicit engineering reference model: x[k+1]=x[k]+0.5*(command-x[k]); interface validation only, no physical calibration"
   family: task.terminal
   goal:
     contract: convergence.terminal_goal
@@ -22,7 +22,7 @@ task:
       - 0.0
       - 0.0
       objects: []
-      source: 合成空环境
+      source: Synthetic empty environment
   robot_families:
   - reference_signal_robot
   actuator_channels:
@@ -87,7 +87,7 @@ robot:
   units: SI
   frame: actuator
   assumptions:
-  - 离散一阶信号模型，仅接口验证
+  - Discrete first-order signal model; interface validation only
   sources:
   - examples/platform_fixtures.py
   unsupported:

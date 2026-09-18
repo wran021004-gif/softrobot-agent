@@ -13,7 +13,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "计算力序列的最大绝对值；输入输出单位为牛顿，不判断机器人任务成功。",
+    "description": "Compute the maximum absolute value of a force sequence; input and output in newtons; does not judge robot task success.",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -516,7 +516,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "带单位与坐标的向量范数；接入不改核心循环",
+    "description": "Vector norm with units and frame; integration leaves the core loop unchanged",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -1078,7 +1078,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -1522,7 +1521,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -1626,7 +1624,7 @@
       "DEPENDENCY_MISSING: genesis",
       "NO_SESSION_POLICY"
     ],
-    "description": "待实现：必须检查目标版本并完成模型、信号与执行通道适配",
+    "description": "Not implemented: check the target version and implement model, signal and execution channel adapters",
     "input_schema": {
       "additionalProperties": false,
       "properties": {},
@@ -2114,7 +2112,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "原 MATLAB 平面 v1 算法，直接读取公共物理量，无 MuJoCo",
+    "description": "Original MATLAB planar v1 algorithm using shared physical quantities directly; no MuJoCo",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -2615,7 +2613,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "独立三维 16 自由度耦合动力学；无 MuJoCo 依赖",
+    "description": "Independent spatial coupled dynamics with 16 degrees of freedom; no MuJoCo dependency",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -3124,7 +3122,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "保留 MATLAB 平面动力学一次性求解适配",
+    "description": "Preserved MATLAB planar dynamics one-shot solve adapter",
     "input_schema": {
       "additionalProperties": false,
       "properties": {},
@@ -3949,7 +3947,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -4406,7 +4403,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -4518,7 +4514,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "保留 MuJoCo 一次性求解适配",
+    "description": "Preserved MuJoCo one-shot solve adapter",
     "input_schema": {
       "additionalProperties": false,
       "properties": {},
@@ -4938,7 +4934,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "廉价确定性参考后端，非真实物理、非 Genesis",
+    "description": "Low-cost deterministic reference backend; no real physics or Genesis",
     "input_schema": {
       "additionalProperties": false,
       "properties": {},
@@ -5213,7 +5209,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "公共物理和统一场景映射到 MuJoCo",
+    "description": "Map shared physics and unified scenes to MuJoCo",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -6347,25 +6343,25 @@
           "additionalProperties": false,
           "properties": {
             "timestep_s": {
-              "description": "物理积分步长，s",
+              "description": "Physical integration timestep, s",
               "exclusiveMinimum": 0,
               "title": "Timestep S",
               "type": "number"
             },
             "control_period_s": {
-              "description": "控制周期，s",
+              "description": "Control period, s",
               "exclusiveMinimum": 0,
               "title": "Control Period S",
               "type": "number"
             },
             "sample_period_s": {
-              "description": "输出采样周期，s",
+              "description": "Output sampling period, s",
               "exclusiveMinimum": 0,
               "title": "Sample Period S",
               "type": "number"
             },
             "duration_s": {
-              "description": "物理持续时间，s",
+              "description": "Physical duration, s",
               "exclusiveMinimum": 0,
               "title": "Duration S",
               "type": "number"
@@ -8026,25 +8022,25 @@
           "additionalProperties": false,
           "properties": {
             "timestep_s": {
-              "description": "物理积分步长，s",
+              "description": "Physical integration timestep, s",
               "exclusiveMinimum": 0,
               "title": "Timestep S",
               "type": "number"
             },
             "control_period_s": {
-              "description": "控制周期，s",
+              "description": "Control period, s",
               "exclusiveMinimum": 0,
               "title": "Control Period S",
               "type": "number"
             },
             "sample_period_s": {
-              "description": "输出采样周期，s",
+              "description": "Output sampling period, s",
               "exclusiveMinimum": 0,
               "title": "Sample Period S",
               "type": "number"
             },
             "duration_s": {
-              "description": "物理持续时间，s",
+              "description": "Physical duration, s",
               "exclusiveMinimum": 0,
               "title": "Duration S",
               "type": "number"
@@ -8141,7 +8137,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -8243,7 +8238,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "单 section / 八节等效杆：从冻结 DesignSpec 重编译派生量",
+    "description": "Single section / eight-cell equivalent rod: recompile derived quantities from frozen DesignSpec",
     "input_schema": {
       "additionalProperties": false,
       "properties": {},
@@ -8921,25 +8916,25 @@
           "additionalProperties": false,
           "properties": {
             "timestep_s": {
-              "description": "物理积分步长，s",
+              "description": "Physical integration timestep, s",
               "exclusiveMinimum": 0,
               "title": "Timestep S",
               "type": "number"
             },
             "control_period_s": {
-              "description": "控制周期，s",
+              "description": "Control period, s",
               "exclusiveMinimum": 0,
               "title": "Control Period S",
               "type": "number"
             },
             "sample_period_s": {
-              "description": "输出采样周期，s",
+              "description": "Output sampling period, s",
               "exclusiveMinimum": 0,
               "title": "Sample Period S",
               "type": "number"
             },
             "duration_s": {
-              "description": "物理持续时间，s",
+              "description": "Physical duration, s",
               "exclusiveMinimum": 0,
               "title": "Duration S",
               "type": "number"
@@ -9754,25 +9749,25 @@
           "additionalProperties": false,
           "properties": {
             "timestep_s": {
-              "description": "物理积分步长，s",
+              "description": "Physical integration timestep, s",
               "exclusiveMinimum": 0,
               "title": "Timestep S",
               "type": "number"
             },
             "control_period_s": {
-              "description": "控制周期，s",
+              "description": "Control period, s",
               "exclusiveMinimum": 0,
               "title": "Control Period S",
               "type": "number"
             },
             "sample_period_s": {
-              "description": "输出采样周期，s",
+              "description": "Output sampling period, s",
               "exclusiveMinimum": 0,
               "title": "Sample Period S",
               "type": "number"
             },
             "duration_s": {
-              "description": "物理持续时间，s",
+              "description": "Physical duration, s",
               "exclusiveMinimum": 0,
               "title": "Duration S",
               "type": "number"
@@ -9878,7 +9873,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "复用 C1/C2；世界末端实时观测转换到安装坐标",
+    "description": "Reuse C1/C2; transform live world-frame tip observations to the mount frame",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -10207,7 +10202,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -10309,7 +10303,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "旧 C1/C2 参数与数值控制适配",
+    "description": "Legacy C1/C2 parameter and numerical control adapter",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -10478,7 +10472,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "参考长度指令生命周期",
+    "description": "Reference length command lifecycle",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -10629,8 +10623,7 @@
     "dependencies": [],
     "sources": [
       "tools/platform_models.py",
-      "tools/deepseek_adapter.py",
-      "tools/platform_language.py"
+      "tools/model_transports/deepseek.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -12539,7 +12532,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -12641,7 +12633,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "基于保存信号的带版本阈值诊断",
+    "description": "Versioned threshold diagnostics from saved signals",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {
@@ -12813,7 +12805,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "按名称/实体/相位选择保存标量并检查严格大于阈值；无新求解/评分",
+    "description": "Select saved scalars by name/entity/phase and check strict threshold exceedance; no new solves or scoring",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {
@@ -13587,7 +13579,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "平台结果引用自动进入既有保存信号规则",
+    "description": "Automatically resolve platform result references for existing saved-signal rules",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {
@@ -13804,7 +13796,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "评价窗口内最大与 RMS 偏差",
+    "description": "Maximum and RMS deviation within the evaluation window",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -14062,7 +14054,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "末端距离评价，阈值来自任务",
+    "description": "Tip distance evaluation with the threshold from the task",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -15139,7 +15131,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "显式八节 y/z 关节位置和速度；不随机改变初态",
+    "description": "Explicit eight-cell y/z joint positions and velocities; no random initial-state changes",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -15358,7 +15350,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -15460,7 +15451,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "原编译初态和零速度",
+    "description": "Original compiled initial state and zero velocity",
     "input_schema": {
       "additionalProperties": false,
       "properties": {},
@@ -15528,7 +15519,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "显式种子的长度初始化",
+    "description": "Length initialization with an explicit seed",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -15611,7 +15602,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "保存有来源的笔记或观测记录",
+    "description": "Save notes or observations with provenance",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {
@@ -15949,7 +15940,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "检索跨运行记录并校验来源",
+    "description": "Search records across runs and verify provenance",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -16442,7 +16433,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -16612,8 +16602,7 @@
     "resources": [],
     "dependencies": [],
     "sources": [
-      "tools/platform_models.py",
-      "tools/platform_language.py"
+      "tools/platform_models.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -16825,7 +16814,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -16976,7 +16964,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -17185,7 +17172,6 @@
       "extensions/tendon_family/route.py",
       "tools/optimization_interfaces.py",
       "tools/platform_search.py",
-      "tools/platform_language.py",
       "tools/platform_tools.py",
       "tools/platform_tasks.py",
       "schemas/platform_operations.py",
@@ -17287,7 +17273,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "确定性候选序列参考搜索器；算法拥有状态",
+    "description": "Deterministic candidate sequence reference searcher; algorithm owns its state",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -17537,7 +17523,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "按名称/实体/相位读取保存统一信号，歧义拒绝",
+    "description": "Read saved unified signals by name/entity/phase; reject ambiguity",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {
@@ -18023,7 +18009,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "提案进入开发候选库，无人工批准",
+    "description": "Submit proposals to the development candidate library without human approval",
     "input_schema": {
       "$defs": {
         "Actor": {
@@ -18765,7 +18751,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "读取现有技能生命周期中的适用策略",
+    "description": "Read applicable strategies from the existing skill lifecycle",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -18842,7 +18828,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "登记与证据相符的验证记录",
+    "description": "Register validation records consistent with evidence",
     "input_schema": {
       "$defs": {
         "Actor": {
@@ -19342,7 +19328,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "已有到达语义的开发任务",
+    "description": "Development task using existing reach semantics",
     "input_schema": {
       "$defs": {
         "Binding": {
@@ -19534,25 +19520,25 @@
           "additionalProperties": false,
           "properties": {
             "timestep_s": {
-              "description": "物理积分步长，s",
+              "description": "Physical integration timestep, s",
               "exclusiveMinimum": 0,
               "title": "Timestep S",
               "type": "number"
             },
             "control_period_s": {
-              "description": "控制周期，s",
+              "description": "Control period, s",
               "exclusiveMinimum": 0,
               "title": "Control Period S",
               "type": "number"
             },
             "sample_period_s": {
-              "description": "输出采样周期，s",
+              "description": "Output sampling period, s",
               "exclusiveMinimum": 0,
               "title": "Sample Period S",
               "type": "number"
             },
             "duration_s": {
-              "description": "物理持续时间，s",
+              "description": "Physical duration, s",
               "exclusiveMinimum": 0,
               "title": "Duration S",
               "type": "number"
@@ -19745,7 +19731,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "离散长度信号保持开发示例；无末端目标点",
+    "description": "Discrete length signal hold development example; no tip target",
     "input_schema": {
       "$defs": {
         "Binding": {
@@ -19937,25 +19923,25 @@
           "additionalProperties": false,
           "properties": {
             "timestep_s": {
-              "description": "物理积分步长，s",
+              "description": "Physical integration timestep, s",
               "exclusiveMinimum": 0,
               "title": "Timestep S",
               "type": "number"
             },
             "control_period_s": {
-              "description": "控制周期，s",
+              "description": "Control period, s",
               "exclusiveMinimum": 0,
               "title": "Control Period S",
               "type": "number"
             },
             "sample_period_s": {
-              "description": "输出采样周期，s",
+              "description": "Output sampling period, s",
               "exclusiveMinimum": 0,
               "title": "Sample Period S",
               "type": "number"
             },
             "duration_s": {
-              "description": "物理持续时间，s",
+              "description": "Physical duration, s",
               "exclusiveMinimum": 0,
               "title": "Duration S",
               "type": "number"
@@ -20340,25 +20326,25 @@
           "additionalProperties": false,
           "properties": {
             "timestep_s": {
-              "description": "物理积分步长，s",
+              "description": "Physical integration timestep, s",
               "exclusiveMinimum": 0,
               "title": "Timestep S",
               "type": "number"
             },
             "control_period_s": {
-              "description": "控制周期，s",
+              "description": "Control period, s",
               "exclusiveMinimum": 0,
               "title": "Control Period S",
               "type": "number"
             },
             "sample_period_s": {
-              "description": "输出采样周期，s",
+              "description": "Output sampling period, s",
               "exclusiveMinimum": 0,
               "title": "Sample Period S",
               "type": "number"
             },
             "duration_s": {
-              "description": "物理持续时间，s",
+              "description": "Physical duration, s",
               "exclusiveMinimum": 0,
               "title": "Duration S",
               "type": "number"
@@ -20886,7 +20872,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "恢复原始包并准备已有回放 observation；不开窗口",
+    "description": "Restore the original bundle and prepare the existing replay observation; no window opened",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {
@@ -21529,7 +21515,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "读取同一固定证据的确定性本地工作者",
+    "description": "Deterministic local worker reading the same fixed evidence",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -21776,7 +21762,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "协调者检查并接收独立输出",
+    "description": "Coordinator checks and accepts independent output",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -21888,7 +21874,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "请求取消本地工作者",
+    "description": "Request local worker cancellation",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -22000,7 +21986,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "查询工作者状态",
+    "description": "Query worker status",
     "input_schema": {
       "additionalProperties": false,
       "properties": {
@@ -22112,7 +22098,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "启动有边界的本地工作者",
+    "description": "Start a bounded local worker",
     "input_schema": {
       "$defs": {
         "Binding": {

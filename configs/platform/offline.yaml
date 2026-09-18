@@ -4,21 +4,21 @@ decisions:
     values_m:
     - 3.0
     - 4.0
-  reason: 新数学扩展验收
+  reason: Validate the new mathematical extension
 - tool_id: evidence.read
   arguments:
     reference: $last_output
     pointer: /norm_m
-  reason: 读取实际数学输出
+  reason: Read actual mathematical output
 - tool_id: simulation.run
   arguments: {}
-  reason: 执行开发参考任务
+  reason: Execute the development reference task
 - tool_id: evaluation.run
   arguments:
     result: $last_output
-  reason: 使用冻结评价器
+  reason: Use the frozen evaluator
 - tool_id: session.control
   arguments:
     status: stopped
-    reason: 离线接口验收完成
-  reason: 明确停止
+    reason: Offline interface validation complete
+  reason: Explicit stop

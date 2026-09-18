@@ -13,37 +13,37 @@ def main():
     if len(sys.argv)>1 and sys.argv[1]=='dynamics':
         from examples.reach_dynamics import main as dynamic_main
         return dynamic_main(sys.argv[2:])
-    parser = argparse.ArgumentParser(description='机器人设计工作台：固定规则、受限工具、持久证据与中文观察')
+    parser = argparse.ArgumentParser(description='Robot design workbench: fixed rules, bounded tools, persistent evidence and a Chinese observation interface')
     sub = parser.add_subparsers(dest='command', required=True)
-    start = sub.add_parser('run', help='新建有限闭环；默认最多一次仿真')
-    start.add_argument('--root', help='新工作台目录；DeepSeek 默认 runs/deepseek_design')
+    start = sub.add_parser('run', help='Create a bounded loop; at most one simulation by default')
+    start.add_argument('--root', help='New workbench directory; DeepSeek defaults to runs/deepseek_design')
     start.add_argument('--design', default='configs/design_tendon_arm.yaml')
     start.add_argument('--history', action='append', default=[])
-    start.add_argument('--replay-run', help='只读复用已封存 C1 运行；新仿真和 MATLAB 预算均为零')
-    start.add_argument('--deepseek', action='store_true', help='使用单个 DeepSeek 决策模型开展候选设计循环')
-    start.add_argument('--model-config', default='configs/deepseek.yaml', help='模型、接口地址及预算配置；密钥仅从环境读取')
+    start.add_argument('--replay-run', help='Reuse a sealed C1 run read-only; zero new simulation and MATLAB budgets')
+    start.add_argument('--deepseek', action='store_true', help='Run the candidate design loop with a single DeepSeek decision model')
+    start.add_argument('--model-config', default='configs/deepseek.yaml', help='Model, endpoint and budget configuration; keys read only from the environment')
     start.add_argument('--simulations', type=int, choices=(0, 1), default=1)
     start.add_argument('--steps', type=int)
-    resume = sub.add_parser('resume', help='继续保存状态；不增加预算')
+    resume = sub.add_parser('resume', help='Resume saved state without increasing budgets')
     resume.add_argument('root')
     resume.add_argument('--steps', type=int)
-    resume.add_argument('--decision', help='提交一个符合 Decision schema 的 JSON 文件')
-    continuation = sub.add_parser('continue', help='计算条件兼容时复制旧运行，继承候选、证据和全部已用预算')
+    resume.add_argument('--decision', help='Submit a JSON file conforming to the Decision schema')
+    continuation = sub.add_parser('continue', help='Copy a previous run when computational conditions are compatible; retain candidates, evidence and all consumed budgets')
     continuation.add_argument('source')
-    continuation.add_argument('--root', required=True, help='不存在的新运行目录')
+    continuation.add_argument('--root', required=True, help='New run directory that does not exist')
     continuation.add_argument('--model-config', default='configs/deepseek.yaml')
     continuation.add_argument('--steps', type=int)
-    round_start = sub.add_parser('round', help='使用本次明确授权的新预算导入两个旧候选；一次性登记，后续只能 resume')
+    round_start = sub.add_parser('round', help='Import two previous candidates with explicitly authorized new budgets; register once, then use resume')
     round_start.add_argument('source')
     round_start.add_argument('--root', required=True)
     round_start.add_argument('--model-config', default='configs/deepseek.yaml')
     round_start.add_argument('--steps', type=int)
-    observe = sub.add_parser('observe', help='本地只读中文页面，动态读取内部阶段')
+    observe = sub.add_parser('observe', help='Local read-only Chinese page showing current internal stages')
     observe.add_argument('root')
     observe.add_argument('--port', type=int, default=8765)
-    context = sub.add_parser('context', help='读取模型所需上下文，无工具执行')
+    context = sub.add_parser('context', help='Read model context without tool execution')
     context.add_argument('root')
-    sub.add_parser('catalog', help='JSON 工具目录：执行白名单及库工具状态')
+    sub.add_parser('catalog', help='JSON tool catalog: execution allowlist and library tool status')
     args = parser.parse_args()
     if args.command == 'run' and args.root is None:
         args.root = 'runs/deepseek_design' if args.deepseek else 'runs/workbench_demo'
@@ -75,7 +75,7 @@ def main():
         from tools.design_continuation import start_round
         start_round(book, args.source, args.model_config)
     state = book.run(steps=args.steps, decision=read(args.decision) if getattr(args, 'decision', None) else None)
-    print(f'工作台状态：{state["status"]}；页面：{book.root / "index.html"}')
+    print(f'Workbench status: {state["status"]}; page: {book.root / "index.html"}')
     # Scientific failure is a valid completed workflow, independent of CLI success.
     return 3 if state['status'] == 'WAITING_FOR_KEY' else 2 if state['status'] in ('CAPABILITY_MISSING', 'WAITING_MODEL_RETRY') else 0
 
@@ -84,8 +84,8 @@ if __name__ == '__main__':
     try:
         raise SystemExit(main())
     except KeyboardInterrupt:
-        print('已中断；使用 resume 读取保存状态，已消耗预算不会重置。')
+        print('Interrupted; use resume to load saved state; consumed budgets are not reset.')
         raise SystemExit(130)
     except (ValueError, OSError) as exc:
-        print(f'工作台拒绝执行：{exc}', file=sys.stderr)
+        print(f'Workbench execution refused: {exc}', file=sys.stderr)
         raise SystemExit(2)

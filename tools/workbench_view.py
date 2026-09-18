@@ -90,7 +90,7 @@ def render(root, state):
         calls = []
         inherited = state['request'].get('continuation', {}).get('used', {}).get('model_calls', 0)
         for m in state['model_calls']:
-            from tools.deepseek_adapter import input_metrics
+            from tools.legacy.workbench_deepseek import input_metrics
             request_path = m['folder'] + '/request.json'
             wire = read(root / request_path)
             sizes = m.get('input_metrics') or input_metrics(wire)

@@ -109,7 +109,7 @@ def compile_input(value, reg=None):
                 initial=initial.model_dump(mode='json'), dependencies=dependencies,
                 instance_identity=digest(dict(task=task.model_dump(mode='json'), seed=inp.seed, initial=initial.model_dump(mode='json'))),
                 approval=dict(definition_valid=True, capabilities_ready=True, formally_approved=False,
-                              purpose='独立开发接口验证，不是正式科研批准'))
+                              purpose='Independent development interface validation; not formal research approval'))
 
 
 def report(value, reg=None):

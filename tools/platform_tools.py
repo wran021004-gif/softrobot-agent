@@ -155,11 +155,6 @@ def read_evidence(ctx, args):
             value = value[int(key)] if isinstance(value, list) else value[key]
     from tools.platform_store import encode
     presentation='original'
-    if ctx.input.policy.route and isinstance(value,str):
-        from tools.platform_language import english_projection
-        projected=english_projection(value)
-        if projected!=value: presentation='english_projection'
-        value=projected  # String offsets index the explicitly labeled presentation.
     total=len(value) if isinstance(value,(list,dict,str)) else 1
     count=min(args.limit,max(0,total-args.offset));kind='content'
     while True:
@@ -171,14 +166,9 @@ def read_evidence(ctx, args):
         result=c.EvidencePage(source=args.reference,pointer=args.pointer,content=page,
             next_offset=end if end<total else None,kind=kind,offset=args.offset,total_items=total,returned_items=count,presentation=presentation)
         # Include the EvidencePage envelope and leave room for Host's receipt and
-        # ToolObservation envelope. The projection can expand legacy prose.
+        # ToolObservation envelope.
         measured=plain(result)
-        if ctx.input.policy.route and len(encode(measured).encode('utf8'))<=6000:
-            from tools.platform_language import english_projection
-            measured=english_projection(measured)
         if len(encode(measured['content']).encode('utf8'))<=args.byte_limit and len(encode(measured).encode('utf8'))<=6000:
-            if measured['content']!=page:
-                result=result.model_copy(update=dict(content=measured['content'],presentation='english_projection'))
             break
         if count>1:
             count=max(1,count//2)

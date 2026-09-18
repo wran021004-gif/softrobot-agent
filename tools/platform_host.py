@@ -267,10 +267,8 @@ class Host:
             context['policy'] = {k: inp['policy'][k] for k in ('model','budget','tool_bindings','timeout_s')}
             context['pending'] = None  # durable request is resumed by the loop, not re-proposed
             context['task_provenance'] = dict(reference=context['route']['frozen_input']['reference'],
-                pointer='/input/task',presentation='English projection of frozen task; original snapshot retained')
+                pointer='/input/task',presentation='Original frozen task; snapshot retained')
             context['recent_actions'] = state.get('recent_actions', [])[-4:]
-            from tools.platform_language import english_projection
-            context = english_projection(context)
         return context
 
     def model_scope(self):
@@ -289,9 +287,6 @@ class Host:
         if 'request_id' not in receipt:
             return dict(error=receipt.get('error'), execution_status=receipt['execution_status'])
         content = self.store.artifact(receipt['output']) if receipt.get('output') else receipt.get('error')
-        if self.store.session(self.run_id)['snapshot']['input']['policy'].get('route'):
-            from tools.platform_language import english_projection
-            content = english_projection(content)
         size = len(encode(content).encode('utf8'))
         limit = 8192
         observation=ToolObservation(receipt=ToolReceipt.model_validate(receipt),content=content,content_bytes=size,truncated=False)

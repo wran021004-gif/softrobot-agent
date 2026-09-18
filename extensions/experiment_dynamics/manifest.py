@@ -19,18 +19,18 @@ SOURCES = tuple('extensions/experiment_dynamics/'+name+'.py' for name in
     'schemas/experiment_policy.py','tools/state_io.py','extensions/robot_domain/contracts.py')
 EXTENSIONS = [
     Extension('initialize.experiment','initializer','1.0.0',c.Initial,Payload,
-        'extensions.experiment_dynamics.scene:initialize','显式八节 y/z 关节位置和速度；不随机改变初态',
+        'extensions.experiment_dynamics.scene:initialize','Explicit eight-cell y/z joint positions and velocities; no random initial-state changes',
         sources=SOURCES, capabilities=dict(category='scene_assembly',role='adapter')),
     Extension('controller.experiment_length','controller','1.0.0',ExplorationControl,ControlOutput,
-        'extensions.experiment_dynamics.backends:LengthController','复用 C1/C2；世界末端实时观测转换到安装坐标',
+        'extensions.experiment_dynamics.backends:LengthController','Reuse C1/C2; transform live world-frame tip observations to the mount frame',
         sources=SOURCES, capabilities=dict(category='control',role='adapter',channel='tendon_target_lengths_m',
             observations=['tip_position'],reset=True,restore=False,
             realtime_observations='actual current tip, joint positions/velocities and tendon lengths before each integration interval; world tip transformed to mount frame for C2')),
 ]
 for name, schema, model, dependencies, resources, description in [
-    ('math_spatial',c.SpatialParameters,'spatial',('numpy','scipy'),(), '独立三维 16 自由度耦合动力学；无 MuJoCo 依赖'),
-    ('math_planar',c.PlanarParameters,'matlab',('numpy','matlab.engine'),('matlab_engine',), '原 MATLAB 平面 v1 算法，直接读取公共物理量，无 MuJoCo'),
-    ('scene_mujoco',c.MujocoParameters,'mujoco',('numpy','mujoco'),(), '公共物理和统一场景映射到 MuJoCo'),
+    ('math_spatial',c.SpatialParameters,'spatial',('numpy','scipy'),(), 'Independent spatial coupled dynamics with 16 degrees of freedom; no MuJoCo dependency'),
+    ('math_planar',c.PlanarParameters,'matlab',('numpy','matlab.engine'),('matlab_engine',), 'Original MATLAB planar v1 algorithm using shared physical quantities directly; no MuJoCo'),
+    ('scene_mujoco',c.MujocoParameters,'mujoco',('numpy','mujoco'),(), 'Map shared physics and unified scenes to MuJoCo'),
 ]:
     binding = {'math_spatial':'SpatialBackend','math_planar':'PlanarBackend','scene_mujoco':'MujocoBackend'}[name]
     phase = 'sampled_state' if model == 'matlab' else 'post_step'

@@ -13,7 +13,7 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('space',c.Space),('discretization',c.Discretization),('experiment_spec',c.ExperimentSpec),
     ('build_request',c.BuildRequest),('build_result',c.BuildResult)]]
 SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
-    'tools/optimization_interfaces.py','tools/platform_search.py','tools/platform_language.py',
+    'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
     'extensions/experiment_dynamics/physics.py','extensions/robot_domain/contracts.py',

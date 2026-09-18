@@ -167,8 +167,9 @@ class RouteUsability(unittest.TestCase):
         self.assertIn('bounds are not sample values',descriptions)
         self.assertLess(len(encode(overview(host)).encode()),6500)
         original=host.store.session(host.run_id)['snapshot']['input']['task']
-        self.assertRegex(original['name'],r'[\u4e00-\u9fff]')
+        self.assertIsNone(re.search(r'[\u4e00-\u9fff]',encode(original)))
         context=json.loads(payload['messages'][-1]['content'])
+        self.assertEqual(context['task'],original)
         self.assertEqual(context['task']['goal'],original['goal'])
         self.assertEqual(context['task']['evaluator'],original['evaluator'])
         document={'detail':{'a/b~c':[[i]*30 for i in range(500)],'large':'x'*20000}}
@@ -192,12 +193,12 @@ class RouteUsability(unittest.TestCase):
         self.assertEqual(next_page['content'][0],document['detail']['a/b~c'][values['next_offset']])
         self.assertEqual(host.store.artifact(ref),document)
         snapshot=context['route']['frozen_input']['reference']
-        translated=host.invoke(dict(request_id='translated-name',tool_id='evidence.read',arguments=dict(
-            reference=snapshot,pointer='/input/task/name',limit=10),reason='Read an English projection of original task prose'))
-        translated_page=host.observation(translated)['content']
-        self.assertEqual(translated_page['presentation'],'english_projection')
-        self.assertEqual(translated_page['content'],context['task']['name'][:10])
-        self.assertEqual(translated_page['next_offset'],10)
+        task_name=host.invoke(dict(request_id='original-name',tool_id='evidence.read',arguments=dict(
+            reference=snapshot,pointer='/input/task/name',limit=10),reason='Read original English task prose'))
+        task_page=host.observation(task_name)['content']
+        self.assertEqual(task_page['presentation'],'original')
+        self.assertEqual(task_page['content'],original['name'][:10])
+        self.assertEqual(task_page['next_offset'],10)
         with host.store.transaction() as db:
             state=host.store.session(host.run_id,db)['state'];state['stop_reason']='MODEL_TURN_LIMIT'
             host.store.update_state(db,host.run_id,state,'stopped')

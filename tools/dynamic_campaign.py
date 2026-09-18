@@ -475,7 +475,7 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
             raise RequestTooLarge(metrics)
         return payload,metrics
     def run_model(self,steps=12):
-        from tools.deepseek_adapter import request_completion,redact
+        from tools.legacy.workbench_deepseek import request_completion,redact
         config=self.state['request']['design_session'];key=os.environ.get('DEEPSEEK_API_KEY','')
         self.recover_model_responses()
         correction=self.correction_for_decision()

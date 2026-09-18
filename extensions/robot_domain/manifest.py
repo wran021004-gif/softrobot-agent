@@ -9,7 +9,7 @@ SOURCES = ('extensions/robot_domain/contracts.py', 'extensions/robot_domain/cand
     'extensions/robot_domain/signals.py', 'extensions/robot_domain/saved.py', 'extensions/robot_domain/manifest.py')
 CONTRACTS = [('domain.rod_design', '1.0.0', c.RodDesign), ('domain.empty', '1.0.0', c.Empty)]
 EXTENSIONS = [Extension('candidate.rod_design', 'candidate_builder', '1.0.0', c.Empty, SessionInput,
-    'extensions.robot_domain.candidate:apply_design', '单 section / 八节等效杆：从冻结 DesignSpec 重编译派生量',
+    'extensions.robot_domain.candidate:apply_design', 'Single section / eight-cell equivalent rod: recompile derived quantities from frozen DesignSpec',
     sources=(*SOURCES, 'tools/design_compiler.py', 'schemas/design_spec.py', 'schemas/robot_ir.py', 'schemas/exploration.py'),
     assets=('physics_contracts/equivalent_rod_v2.md',),
     contract_dependencies=(('domain.rod_design', '1.0.0'), ('domain.empty', '1.0.0')),
@@ -18,11 +18,11 @@ EXTENSIONS = [Extension('candidate.rod_design', 'candidate_builder', '1.0.0', c.
         semantics='absolute SI changes relative to frozen session design; candidate_id is a label'))]
 
 for name, version, inp, out, binding, description in [
-    ('diagnostics.sample_exceeds', '1.1.0', c.EntityDiagnosticQuery, c.EntityDiagnosticResult, 'signals:sample_exceeds', '按名称/实体/相位选择保存标量并检查严格大于阈值；无新求解/评分'),
-    ('signals.read', '1.0.0', c.SignalQuery, c.SelectedSignal, 'signals:read_signal', '按名称/实体/相位读取保存统一信号，歧义拒绝'),
+    ('diagnostics.sample_exceeds', '1.1.0', c.EntityDiagnosticQuery, c.EntityDiagnosticResult, 'signals:sample_exceeds', 'Select saved scalars by name/entity/phase and check strict threshold exceedance; no new solves or scoring'),
+    ('signals.read', '1.0.0', c.SignalQuery, c.SelectedSignal, 'signals:read_signal', 'Read saved unified signals by name/entity/phase; reject ambiguity'),
     ('diagnostics.saved_trajectory', '2.0.0', c.SavedDiagnosis, c.SavedProduct, 'saved:diagnosis', 'Analyze an existing saved trajectory selected by result reference and execution ID. No new dynamics solve or evaluation; observations do not establish causes.'),
-    ('diagnostics.signal_rule', '2.0.0', c.SavedRule, c.SavedProduct, 'saved:rule', '平台结果引用自动进入既有保存信号规则'),
-    ('visualization.saved_replay', '1.0.0', c.ResultSource, c.SavedProduct, 'saved:replay', '恢复原始包并准备已有回放 observation；不开窗口'),
+    ('diagnostics.signal_rule', '2.0.0', c.SavedRule, c.SavedProduct, 'saved:rule', 'Automatically resolve platform result references for existing saved-signal rules'),
+    ('visualization.saved_replay', '1.0.0', c.ResultSource, c.SavedProduct, 'saved:replay', 'Restore the original bundle and prepare the existing replay observation; no window opened'),
     ('visualization.render_simulation_video', '2.0.0', c.SavedVideo, c.SavedProduct, 'saved:video', 'Render existing saved simulation results through the evidence bridge. Produces a derived video, no new solve or evaluation; a file reference does not mean the text model viewed it.'),
 ]:
     EXTENSIONS.append(Extension(name, 'tool', version, inp, out,

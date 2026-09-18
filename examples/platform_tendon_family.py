@@ -65,8 +65,8 @@ def session(backend,design,space,legacy=False,discretization=None):
     from examples.platform_fixtures import binding,payload,budget
     value=session_input('math_spatial'); duration=.04 if legacy else .35
     value['run_id']='family-'+('single' if legacy else backend)
-    value['task'].update(task_id='family-single-dev' if legacy else 'family-multisegment-dev',name='串联多段软臂独立开发验证',
-        source='本轮开发任务；固定目标、容差与评分；不覆盖历史任务',actuator_channels=['actuator_commands'],
+    value['task'].update(task_id='family-single-dev' if legacy else 'family-multisegment-dev',name='Independent development validation of a serial multi-segment soft arm',
+        source='Development task with fixed target, tolerance and scoring; historical tasks are unchanged',actuator_channels=['actuator_commands'],
         robot_families=['tendon_driven_continuum' if legacy else 'tendon_robot_family'],
         initializer=binding('initialize.family','family.initial',{}),
         goal=payload('reference.reach_goal',dict(target_m=[.29,.035,.19])),
@@ -120,7 +120,7 @@ def prepare(root):
     atomic_json(directory/'execution.json',execution)
     atomic_json(directory/'control.json',control)
     atomic_json(directory/'single.json',session('matlab_spatial',d,space,True))
-    p=project(); p.update(authorization_source='本轮用户授权 MATLAB 空间与绳驱家族贯通；3 次目标求解，最多4次常规求解',budget=budget(tool_calls=50,backend_solves=4,wall_s=3600.))
+    p=project(); p.update(authorization_source='User authorization for MATLAB spatial and tendon-family integration; 3 target solves, at most 4 regular solves',budget=budget(tool_calls=50,backend_solves=4,wall_s=3600.))
     atomic_json(directory/'project.json',p)
     return dict(inputs=str(directory),baseline=d.id)
 
@@ -196,7 +196,7 @@ def run(root,backend,label='',candidate=None):
     host=Host(root,inp['run_id']); host.create(inp)
     record=dict(backend=backend,run_id=inp['run_id'],candidate_id=selected,selection=selection,receipts={})
     def invoke(name,tool,args):
-        r=host.invoke(dict(request_id='family-'+name,tool_id=tool,tool_version=inp['policy']['tool_bindings'][tool],arguments=args,cache='new',reason='本轮授权的真实求解或保存结果读取'))
+        r=host.invoke(dict(request_id='family-'+name,tool_id=tool,tool_version=inp['policy']['tool_bindings'][tool],arguments=args,cache='new',reason='Authorized real solve or reading saved results'))
         record['receipts'][name]=r; atomic_json(root/(prefix+suffix+'_record.json'),record)
         if r['execution_status']!='completed': raise RuntimeError(str(r))
         return r

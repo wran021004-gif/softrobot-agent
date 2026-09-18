@@ -367,7 +367,7 @@ class Workbench:
         with owner(self.root):
             self.load()
             if self.state['request'].get('design_session') and policy is None and decision is None:
-                from tools.deepseek_adapter import run_model
+                from tools.legacy.workbench_deepseek import run_model
                 return run_model(self, steps=steps)
             policy = policy or decide
             count = 0

@@ -31,7 +31,7 @@ class MujocoBackend:
         from tools.spec_tools import load_simulator, load_task_package
         _, original_env = load_task_package()
         if inp.task.environment.data != original_env.model_dump(mode='json'):
-            raise ValueError('LEGACY_ENVIRONMENT_EXTENSION_REQUIRED: 当前适配保留原环境')
+            raise ValueError('LEGACY_ENVIRONMENT_EXTENSION_REQUIRED: The current adapter retains the original environment')
         if inp.task.timing.timestep_s != load_simulator().timestep_s:
             raise ValueError('LEGACY_TIMESTEP_ADAPTER_REQUIRED')
         if inp.task.timing.control_period_s != inp.task.timing.timestep_s or inp.task.timing.sample_period_s != inp.task.timing.timestep_s:
@@ -72,7 +72,7 @@ class MujocoBackend:
             backend_id='backend.' + self.name, model_id=original['model_id'], signals=signals,
             data=Payload(contract='legacy.backend_data', data=LegacyData(backend=self.name, original=original,
                 exported_files=sorted(p.name for p in folder.iterdir() if p.is_file())).model_dump(mode='json')),
-            limitations=original.get('omissions', []) + ['未标定数值模型；原始导出和求解证据保留。'], initial_state=self.initial, seed=inp.seed)
+            limitations=original.get('omissions', []) + ['Uncalibrated numerical model; original exports and solve evidence retained.'], initial_state=self.initial, seed=inp.seed)
         return self.export()
 
     def export(self):
@@ -81,7 +81,7 @@ class MujocoBackend:
         return self.result
 
     def cancel(self):
-        raise ValueError('ONE_SHOT_CANCELLATION_NOT_GUARANTEED: 查看后端时间覆盖声明')
+        raise ValueError('ONE_SHOT_CANCELLATION_NOT_GUARANTEED: See the backend time coverage declaration')
 
     def close(self):
         if self.executor:

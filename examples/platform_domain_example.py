@@ -44,7 +44,7 @@ def prepare(root):
     directory = root / 'inputs'
     directory.mkdir(parents=True, exist_ok=False)
     config = project()
-    config['authorization_source'] = '用户本轮公共平台领域接入授权：一个非基线候选，每个既有后端各一次短求解'
+    config['authorization_source'] = 'User authorization for public platform domain integration: one non-baseline candidate, one short solve per existing backend'
     config['budget'] = budget(tool_calls=50, backend_solves=2, wall_s=700.)
     atomic_json(directory / 'project.json', config)
     for backend in ('mujoco', 'matlab'):

@@ -17,6 +17,8 @@ from tools.workbench import Workbench, owner, source_hashes, runtime
 SESSION_FILES = {
     'tools/workbench.py', 'tools/workbench_view.py', 'tools/workbench_catalog.py',
     'tools/workbench_actions.py', 'tools/design_session.py', 'tools/design_actions.py',
+    'tools/model_transports/__init__.py', 'tools/model_transports/deepseek.py',
+    'tools/legacy/__init__.py', 'tools/legacy/workbench_deepseek.py',
     'tools/deepseek_adapter.py', 'tools/design_evidence.py', 'tools/design_continuation.py',
     'schemas/workbench.py', 'examples/workbench.py', 'configs/deepseek.yaml',
     'configs/prompts/design_system.md',

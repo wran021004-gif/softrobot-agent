@@ -38,10 +38,10 @@ class RobotIRProvider:
         if self.ir.resolved_rod:
             mappings['mass'] = (list(self.ir.resolved_rod.mass_kg), 'kg', 'declared_surrogate_parameters')
         if request.quantity not in mappings:
-            raise ValueError('MODEL_QUANTITY_UNAVAILABLE: 不从几何猜测动力学；V1 编译质量惯量需带来源的历史导出；质量矩阵接口待实现')
+            raise ValueError('MODEL_QUANTITY_UNAVAILABLE: Do not infer dynamics from geometry; V1 compiled mass and inertia require historical exports with provenance; mass matrix interface not implemented')
         values, units, domain = mappings[request.quantity]
         if units != request.units:
             raise ValueError('UNIT_MISMATCH')
         return ModelQuantityResult(quantity=request.quantity, values=values, units=units, frame=request.frame,
             model_identity=self.identity, source_identity=self.identity, domain=domain,
-            assumptions=['复用 RobotIR 已声明值，无新物理公式', '未进行物理标定', *self.ir.physics_contracts])
+            assumptions=['Reuse declared RobotIR values; no new physical formulas', 'No physical calibration performed', *self.ir.physics_contracts])

@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.platform_config import load
 
-# 复用完整的开发任务定义，创建自己的练习配置。
+# Reuse the full development task definition to create exercise configurations.
 folder = ROOT / "configs/platform/learning_peak"
 folder.mkdir(parents=True, exist_ok=True)
 session = load(ROOT / "configs/platform/signal_hold/session.yaml")
@@ -27,21 +27,21 @@ project = dict(
     project_id="learning-force-peak",
     grant_id="learning-force-peak-local-v1",
     purpose="development",
-    authorization_source="用户独立数学工具练习，仅离线计算，不使用历史研究预算",
+    authorization_source="User exercise with an independent mathematical tool; offline computation only, no historical research budget",
     budget=budget.copy(),
     exclusive_resources={},
 )
 request = dict(
     tool_id="analysis.force_peak", tool_version="1.0.0",
     arguments=dict(values_n=[1.0, -4.0, 3.0]),
-    reason="计算给定样本的力峰值", cache="reuse",
+    reason="Compute peak force for the given samples", cache="reuse",
 )
 decisions = [
-    dict(tool_id="analysis.force_peak", arguments=request["arguments"], reason="调用新工具"),
+    dict(tool_id="analysis.force_peak", arguments=request["arguments"], reason="Call the new tool"),
     dict(tool_id="evidence.read", arguments=dict(reference="$last_output", pointer="/peak_n"),
-         reason="读取刚刚保存的峰值"),
-    dict(tool_id="session.control", arguments=dict(status="stopped", reason="练习完成"),
-         reason="结束离线演练"),
+         reason="Read the newly saved peak value"),
+    dict(tool_id="session.control", arguments=dict(status="stopped", reason="Exercise complete"),
+         reason="End the offline exercise"),
 ]
 files = {
     "session.yaml": session,
@@ -52,4 +52,4 @@ files = {
 }
 for name, value in files.items():
     (folder / name).write_text(yaml.safe_dump(value, allow_unicode=True, sort_keys=False), encoding="utf8")
-print("练习配置已生成：configs/platform/learning_peak")
+print("Exercise configurations generated: configs/platform/learning_peak")

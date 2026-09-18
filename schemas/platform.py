@@ -63,10 +63,10 @@ class Signal(Contract):
 
 
 class Timing(Contract):
-    timestep_s: float = Field(gt=0, description='物理积分步长，s')
-    control_period_s: float = Field(gt=0, description='控制周期，s')
-    sample_period_s: float = Field(gt=0, description='输出采样周期，s')
-    duration_s: float = Field(gt=0, description='物理持续时间，s')
+    timestep_s: float = Field(gt=0, description='Physical integration timestep, s')
+    control_period_s: float = Field(gt=0, description='Control period, s')
+    sample_period_s: float = Field(gt=0, description='Output sampling period, s')
+    duration_s: float = Field(gt=0, description='Physical duration, s')
     termination: list[Literal['duration', 'numerical_failure', 'cancelled']] = Field(min_length=1)
 
     @model_validator(mode='after')

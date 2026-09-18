@@ -33,10 +33,10 @@ def export_html(host, path):
         for metric in result['metrics']:
             rows.append('<tr>' + ''.join('<td>' + html.escape(str(v)) + '</td>' for v in
                 (item['candidate_id'], metric['name'], metric['value'], metric['units'], result['validity'], result['task_success'])) + '</tr>')
-    document = '<!doctype html><meta charset="utf-8"><title>统一机器人开发工作台</title><style>body{font:16px sans-serif;max-width:1100px;margin:40px auto}td,th{padding:12px;border-bottom:1px solid #ddd}pre{white-space:pre-wrap}</style>'
-    document += '<h1>统一开发平台 · 保存结果</h1><p>会话：' + html.escape(host.run_id) + '；只读展示，不重新求解或评分。</p>'
-    document += '<table><tr><th>候选</th><th>指标</th><th>值</th><th>单位</th><th>计算有效性</th><th>任务成功</th></tr>' + ''.join(rows) + '</table>'
-    document += '<details><summary>结果身份、来源与资源</summary><pre>' + html.escape(json.dumps(view, ensure_ascii=False, indent=2)) + '</pre></details>'
+    document = '<!doctype html><meta charset="utf-8"><title>Unified robot development workbench</title><style>body{font:16px sans-serif;max-width:1100px;margin:40px auto}td,th{padding:12px;border-bottom:1px solid #ddd}pre{white-space:pre-wrap}</style>'
+    document += '<h1>Unified development platform - Saved results</h1><p>Session: ' + html.escape(host.run_id) + '; read-only display, no new solves or scoring.</p>'
+    document += '<table><tr><th>Candidate</th><th>Metric</th><th>Value</th><th>Units</th><th>Computational validity</th><th>Task success</th></tr>' + ''.join(rows) + '</table>'
+    document += '<details><summary>Result identity, provenance and resources</summary><pre>' + html.escape(json.dumps(view, ensure_ascii=False, indent=2)) + '</pre></details>'
     with path.open('x', encoding='utf8') as stream:
         stream.write(document)
     return dict(path=str(path), evaluations=len(view['evaluations']), new_solves=0)

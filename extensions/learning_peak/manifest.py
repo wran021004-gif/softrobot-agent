@@ -10,7 +10,7 @@ EXTENSIONS = [
         input_schema=PeakInput,
         output_schema=PeakOutput,
         binding="extensions.learning_peak.implementation:calculate",
-        description="计算力序列的最大绝对值；输入输出单位为牛顿，不判断机器人任务成功。",
+        description="Compute the maximum absolute value of a force sequence; input and output in newtons; does not judge robot task success.",
         sources=(
             "extensions/learning_peak/contracts.py",
             "extensions/learning_peak/implementation.py",

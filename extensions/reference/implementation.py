@@ -137,7 +137,7 @@ class ReferenceBackend:
         return BackendResult(solver_status='cancelled' if self.cancelled else 'completed', backend_id='backend.reference',
             model_id='discrete_length_response_fixture', signals=self.observe(),
             data=Payload(contract='reference.backend_data', data=ReferenceData(steps=self.index, controller_state=self.controller.checkpoint()).model_dump(mode='json')),
-            limitations=['合成离散信号模型；无质量、重力、接触或绳索动力学，不代表真实机器人能力。'], initial_state=self.initial, seed=self.inp.seed)
+            limitations=['Synthetic discrete signal model; no mass, gravity, contact or tendon dynamics; does not represent real robot capability.'], initial_state=self.initial, seed=self.inp.seed)
 
     def cancel(self):
         self.cancelled = True

@@ -15,7 +15,7 @@ def load(path):
                 raise ValueError('CONFIG_DUPLICATE_INLINE_AND_FILE: ' + name)
             reference = value.pop(key)
             if not isinstance(reference, str) or not reference.strip():
-                raise ValueError('REQUIRED_CONFIG_FILE: ' + key + ' 必须填写相对于配置文件的路径')
+                raise ValueError('REQUIRED_CONFIG_FILE: ' + key + ' must specify a path relative to the configuration file')
             target = (path.parent / reference).resolve()
             value[name] = load(target)
     return value

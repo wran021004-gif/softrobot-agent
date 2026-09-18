@@ -23,8 +23,8 @@ def session_input(backend, mode='C2'):
         mount=Mount(position_m=(.01, -.01, .03), quaternion_wxyz=(math.cos(.075),0.,0.,math.sin(.075))),
         external_forces=(TimedForce(entity='segment_7', force_n=(0.,.2,.1), start_s=.006, end_s=.014),))
     initial = Initial(qpos_rad=tuple([-.003,.002]*8), qvel_rad_s=tuple([0.,.01]*8))
-    value['task'].update(task_id='assembled-reach-dev',name='统一场景空间到达短验证',family='task.reach',
-        source='本轮授权的独立开发配置；原 reach 容差；短运行不要求达到目标',
+    value['task'].update(task_id='assembled-reach-dev',name='Short spatial reach validation in a unified scene',family='task.reach',
+        source='Authorized independent development configuration; original reach tolerance; short runs need not reach the target',
         goal=payload('reference.reach_goal',dict(target_m=[.30,.04,.08])),
         environment=payload('experiment.assembly',assembly.model_dump(mode='json')),
         robot_families=['tendon_driven_continuum'],initializer=binding('initialize.experiment','experiment.initial',initial.model_dump(mode='json')),
@@ -60,13 +60,13 @@ def prepare(root, mode='C2'):
     root = Path(root).resolve()
     directory = root/'inputs'; directory.mkdir(parents=True,exist_ok=False)
     config = project()
-    config['authorization_source'] = '本轮独立三维数学与同场景物理仿真短验证授权'
+    config['authorization_source'] = 'Authorization for short validation of independent spatial mathematics and physical simulation in the same scene'
     config['budget'] = budget(tool_calls=30,backend_solves=2,wall_s=550.)
     atomic_json(directory/'project.json',config)
     for backend in ('math_spatial','scene_mujoco','math_planar'):
         atomic_json(directory/(backend+'.json'),session_input(backend,mode))
     atomic_json(directory/'simulation.json',dict(request_id='spatial-solve',tool_id='simulation.run',tool_version='1.0.0',
-        arguments=dict(candidate_id='spatial-nonbaseline',changes=CHANGES),cache='new',reason='同一非基线设计和装配场景的独立短运行'))
+        arguments=dict(candidate_id='spatial-nonbaseline',changes=CHANGES),cache='new',reason='Independent short runs with the same non-baseline design and assembled scene'))
     return dict(inputs=str(directory))
 
 
@@ -93,7 +93,7 @@ def run(root, backend, blocked=False):
     if sim['solver_status'] != 'completed': raise RuntimeError('Solver failed; receipt and partial evidence retained')
     def call(name,tool,args):
         return invoke(name,dict(request_id='spatial-'+name,tool_id=tool,tool_version=inp['policy']['tool_bindings'][tool],
-            arguments=args,reason='复用保存结果，无额外动力学求解'))
+            arguments=args,reason='Reuse saved results without additional dynamics solves'))
     ev = call('evaluation','evaluation.run',dict(result=sim['output'],execution_id=sim['execution_id']))
     sig = call('tip','signals.read',dict(result=sim['output'],name='tip_position',entity='tip'))
     call('tension','signals.read',dict(result=sim['output'],name='tendon_tension',entity='tendon_0'))
@@ -134,7 +134,7 @@ def compare(root):
         tip_difference_m=math.dist(x,y),records=[dict(backend=r['backend'],final_tip_m=r['tip']['values'][-1],
         evaluation=r['evaluation'],usage=r['usage'],execution=r['receipts']['simulation']['execution_id']) for r in records],
         saved_checks=[verify_saved(root,r) for r in records],
-        meaning='不同积分与接触模型的短轨迹差异；不视任一模型为物理真值，不合并不同模型的评价身份')
+        meaning='Short trajectory differences between integration and contact models; neither model is physical ground truth; evaluation identities remain separate across models')
     atomic_json(root/'comparison.json',result)
     return result
 

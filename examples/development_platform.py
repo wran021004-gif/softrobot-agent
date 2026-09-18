@@ -1,4 +1,4 @@
-"""统一机器人开发平台：只读检查与创建／运行显式分开。"""
+"""Unified robot development platform: read-only inspection is explicitly separate from creation and execution."""
 import argparse
 import json
 from pathlib import Path
@@ -21,32 +21,32 @@ def main(argv=None):
         return family_main(arguments[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
-    sub.add_parser('route', help='持久 LLM 跨层路线：prepare/start/status/resume/result/call')
-    sub.add_parser('spatial-example', help='统一场景真实示例：prepare/run/compare；数学运行自动阻断 MuJoCo')
-    sub.add_parser('tendon-family', help='串联多段候选与 MATLAB/MuJoCo：prepare/build/run/compare/view')
-    sub.add_parser('catalog', help='只读列出任务、工具与扩展能力')
-    check = sub.add_parser('check', help='只读检查定义、能力和可执行配置')
+    sub.add_parser('route', help='Persistent LLM cross-layer route: prepare/start/status/resume/result/call')
+    sub.add_parser('spatial-example', help='Unified scene example: prepare/run/compare; mathematical runs automatically block MuJoCo')
+    sub.add_parser('tendon-family', help='Serial multi-segment candidates and MATLAB/MuJoCo: prepare/build/run/compare/view')
+    sub.add_parser('catalog', help='List tasks, tools and extension capabilities without changes')
+    check = sub.add_parser('check', help='Inspect definitions, capabilities and executable configurations without changes')
     check.add_argument('config')
-    init = sub.add_parser('project-create', help='显式创建独立开发项目与授权锚点')
+    init = sub.add_parser('project-create', help='Explicitly create an independent development project and authorization anchor')
     init.add_argument('root'); init.add_argument('config')
-    create = sub.add_parser('create', help='创建冻结会话，不执行模型或后端')
+    create = sub.add_parser('create', help='Create a frozen session without running a model or backend')
     create.add_argument('root'); create.add_argument('config')
-    for command, description in [('status', '只读状态与统一结果'), ('resources', '只读剩余额度'), ('events', '只读因果事件链'),
-        ('inputs', '只读模型实际输入'), ('context', '只读下一轮上下文预览'), ('compatibility', '只读恢复／版本迁移检查'),
-        ('run', '执行配置中的离线／现有模型闭环'), ('resume', '显式恢复状态，不增加额度'), ('pause', '显式暂停后续调用'),
-        ('call', '通过公共边界调用获准工具'), ('search', '执行已登记搜索器'), ('memory', '只读跨运行记忆检索'), ('skills', '只读适用技能')]:
+    for command, description in [('status', 'Read status and unified results'), ('resources', 'Read remaining resources'), ('events', 'Read the causal event chain'),
+        ('inputs', 'Read actual model inputs'), ('context', 'Preview the next context without changes'), ('compatibility', 'Check resume and version migration compatibility without changes'),
+        ('run', 'Run the configured offline or existing model loop'), ('resume', 'Explicitly resume saved state without increasing budgets'), ('pause', 'Explicitly pause subsequent calls'),
+        ('call', 'Call authorized tools through the public boundary'), ('search', 'Run a registered searcher'), ('memory', 'Search memory across runs without changes'), ('skills', 'Read applicable skills')]:
         cmd = sub.add_parser(command, help=description)
         cmd.add_argument('root'); cmd.add_argument('run_id')
         if command == 'call': cmd.add_argument('request')
-        if command == 'run': cmd.add_argument('--decisions', help='离线回复 JSON/YAML 文件')
+        if command == 'run': cmd.add_argument('--decisions', help='Offline response JSON/YAML file')
         if command == 'events': cmd.add_argument('--parent')
-    evidence = sub.add_parser('evidence', help='只读内容身份对应的证据')
+    evidence = sub.add_parser('evidence', help='Read evidence by content identity')
     evidence.add_argument('root'); evidence.add_argument('artifact_id')
-    export = sub.add_parser('export', help='显式导出保存结果 HTML，不重新求解')
+    export = sub.add_parser('export', help='Explicitly export saved results as HTML without new solves')
     export.add_argument('root'); export.add_argument('run_id'); export.add_argument('output')
-    history = sub.add_parser('history', help='只读校验历史证据，不补造新字段')
+    history = sub.add_parser('history', help='Verify historical evidence without changes or fabricated fields')
     history.add_argument('root')
-    bundle = sub.add_parser('export-bundle', help='显式导出保存原始文件，不求解或评分')
+    bundle = sub.add_parser('export-bundle', help='Explicitly export saved original files without solving or scoring')
     bundle.add_argument('root'); bundle.add_argument('artifact_id'); bundle.add_argument('output')
     args = parser.parse_args(argv)
     from tools.platform_config import load
@@ -96,7 +96,7 @@ def main(argv=None):
             elif args.command == 'resume': host.resume(); result = dict(status='running')
             elif args.command == 'pause':
                 result = host.invoke(dict(request_id='pause-' + __import__('uuid').uuid4().hex, tool_id='session.control',
-                    arguments=dict(status='paused', reason='本地用户暂停'), reason='本地用户暂停'))
+                    arguments=dict(status='paused', reason='Paused by local user'), reason='Paused by local user'))
             elif args.command == 'run':
                 adapter = None
                 if args.decisions:

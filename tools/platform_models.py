@@ -74,7 +74,7 @@ class DeepSeekAdapter:
         return encode_chat(model_input, config)
 
     def respond(self, payload, turn):
-        from tools.deepseek_adapter import request_completion
+        from tools.model_transports.deepseek import request_completion
         key = os.environ.get('DEEPSEEK_API_KEY')
         if not key:
             raise ValueError('MODEL_KEY_MISSING')
