@@ -39,6 +39,93 @@ class RouteUsability(unittest.TestCase):
         self.assertLess(len(encode(payload).encode()),60000)
         return payload
 
+    def test_evaluated_search_start_reuse_and_changed_input(self):
+        """Synthetic outputs only: preserve proposal order and original evidence ownership."""
+        from tests.test_family_route import synthetic_run
+        from extensions.tendon_family.optimization import optimize
+        root,host=self.setup_route()
+        with patch('extensions.tendon_family.backends.MujocoBackend.run',synthetic_run):
+            self.action(host,'built','build',combination='family_mujoco',candidate_id='search-1')
+            original=self.action(host,'run','run',source_node='built')
+            bounds={'components/near/length_m':[.14,.2]}
+            searched=self.action(host,'search','optimize',source_node='run',variables=bounds,max_trials=2)
+            self.assertEqual((searched['proposals'],searched['reused_evaluations'],searched['actual_solves'],searched['new_evaluations']),(2,1,1,1))
+            self.assertEqual(searched['baseline']['candidate_id'],original['candidate_id'])
+            self.assertEqual(searched['baseline']['owner_run_id'],original['run_id'])
+            for key in ('configuration','simulation','evaluation'):
+                self.assertEqual(searched['baseline'][key],original[key])
+            self.assertEqual(searched['trials'][0]['candidate']['components/near/length_m'],.16)
+            self.assertAlmostEqual(searched['trials'][1]['candidate']['components/near/length_m'],.172)
+            self.assertNotEqual(searched['trials'][0]['candidate_id'],searched['trials'][1]['candidate_id'])
+            before=host.store.remaining()['used']
+            replay=optimize(root,read(root/(searched['run_id']+'_optimization_request.json')),
+                parent_run_id=host.run_id,actor='route-executor')
+            self.assertEqual(replay['trials'],searched['trials'])
+            self.assertEqual(host.store.remaining()['used'],before)
+            chained=self.action(host,'chain','optimize',source_node='search',variables=bounds,max_trials=1)
+            self.assertEqual((chained['reused_evaluations'],chained['actual_solves'],chained['new_evaluations']),(1,0,0))
+            self.assertEqual(chained['best']['owner_run_id'],original['run_id'])
+            changed=self.action(host,'changed','optimize',source_node='run',variables=bounds,max_trials=1,
+                changes={'components/near/length_m':.18})
+            self.assertEqual((changed['reused_evaluations'],changed['actual_solves'],changed['new_evaluations']),(0,1,1))
+            self.assertNotEqual(changed['best']['configuration'],original['configuration'])
+            final=self.action(host,'finish','finish',source_node='chain')
+            self.assertEqual(final['run_id'],original['run_id'])
+            self.assertEqual(final['search_run_id'],chained['run_id'])
+            self.assertEqual(final['simulation'],original['simulation'])
+            self.assertEqual(final['evaluation_ref'],original['evaluation'])
+            self.assertIn('selected search',final['best_scope'])
+            self.assertEqual(view(host)['counts']['solves'],3)  # All synthetic.
+            self.assertEqual(view(host)['counts']['evaluations'],3)
+
+    def test_finish_status_comes_from_saved_evidence_without_new_work(self):
+        from tests.test_family_route import synthetic_run
+        _,host=self.setup_route()
+        with patch('extensions.tendon_family.backends.MujocoBackend.run',synthetic_run):
+            self.action(host,'built','build',combination='family_mujoco')
+            summary=view(host)['route']['nodes'][-1]['summary']
+            self.assertFalse(summary['simulated']);self.assertFalse(summary['evaluated'])
+            self.action(host,'run','run',source_node='built')
+            counts=view(host)['counts']
+            final=self.action(host,'finish','finish',source_node='run')
+            summary=view(host)['route']['nodes'][-1]['summary']
+            self.assertTrue(summary['simulated']);self.assertTrue(summary['evaluated'])
+            self.assertEqual((final['actual_solves'],final['new_evaluations']),(0,0))
+            self.assertEqual(view(host)['counts'],counts)
+
+    def test_route_internal_callers_parent_links_and_manual_caller(self):
+        from tests.test_family_route import synthetic_run
+        root,host=self.setup_route()
+        with patch('extensions.tendon_family.backends.MujocoBackend.run',synthetic_run), \
+             patch('extensions.tendon_family.backends.MatlabBackend.run',synthetic_run):
+            self.action(host,'built','build',combination='family_mujoco')
+            result=self.action(host,'run','run',source_node='built')
+            before=host.store.remaining()['used']
+            repeated=self.action(host,'repeat','run',source_node='built')
+            self.assertEqual(repeated['simulation'],result['simulation'])
+            self.assertEqual(repeated['evaluation'],result['evaluation'])
+            self.assertEqual(host.store.remaining()['used']['backend_solves'],before['backend_solves'])
+            self.action(host,'search','optimize',source_node='built',variables={'components/near/length_m':[.14,.2]})
+            self.action(host,'review','crosscheck',source_node='run',combination='matlab_spatial')
+            with host.store.connect(True) as db:
+                calls=[dict(r) for r in db.execute('SELECT * FROM calls WHERE run_id != ?',(host.run_id,))]
+            route_events={e['event_id']:e for e in host.store.events(host.run_id)}
+            origins=set()
+            self.assertEqual(len(calls),6)
+            for call in calls:
+                self.assertEqual(call['caller'],'route-executor')
+                self.assertEqual(json.loads(call['receipt'])['caller'],'route-executor')
+                reservation=next(e for e in host.store.events(call['run_id']) if e['event_id']==call['parent_id'])
+                origin=route_events[reservation['parent_id']]
+                self.assertEqual(origin['agent_id'],'local-human')
+                origins.add(origin['request_id'])
+                self.assertEqual(host.store.session(call['run_id'])['snapshot']['parent_run_id'],host.run_id)
+            self.assertEqual(origins,{'run','search','review'})
+            manual=Host(root,result['run_id']).invoke(dict(request_id='manual-read',tool_id='evidence.read',
+                arguments=dict(reference=result['evaluation']),reason='Manual inspection of saved evaluation'))
+            self.assertEqual(manual['execution_status'],'completed',manual)
+            self.assertEqual(manual['caller'],'local-human')
+
     def test_exact_built_candidate_run_diagnosis_delivery_and_reuse(self):
         # One real MuJoCo integration, no model API requests.
         root,host=self.setup_route()

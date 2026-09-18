@@ -6,16 +6,16 @@ from tools.state_io import digest
 from .optimization import ensure_session
 
 
-def invoke(host, name, tool, arguments):
+def invoke(host, name, tool, arguments, *, parent=None):
     bindings=host.store.session(host.run_id)['snapshot']['input']['policy']['tool_bindings']
     receipt=host.invoke(dict(request_id=name,tool_id=tool,tool_version=bindings[tool],
-        arguments=arguments,cache='reuse',reason='Public route execution using frozen inputs'))
+        arguments=arguments,cache='reuse',reason='Public route execution using frozen inputs'),parent=parent)
     if receipt['execution_status']=='unknown': raise TimeoutError('UNCONFIRMED: '+str(receipt))
     if receipt['execution_status']!='completed': raise ValueError(str(receipt))
     return receipt
 
 
-def crosscheck(root, source_run, candidate, configuration, backend, *, parent_run_id=None, parent_event_id=None):
+def crosscheck(root, source_run, candidate, configuration, backend, *, parent_run_id=None, parent_event_id=None, actor='local-human'):
     store=Store(root)
     inp=deepcopy(store.artifact(configuration)['effective'])
     if inp['policy']['backend']['extension_id']==backend['extension_id']:
@@ -28,7 +28,7 @@ def crosscheck(root, source_run, candidate, configuration, backend, *, parent_ru
     normalized=compile_input(inp)['input']
     identity=digest(dict(input=normalized,source=configuration,candidate=candidate,parent=parent_run_id))
     inp['run_id']=source_run[:60]+'-cc-'+identity[:20]
-    host=Host(root,inp['run_id'])
+    host=Host(root,inp['run_id'],actor=actor)
     ensure_session(host,inp,parent_run_id=parent_run_id,parent_event_id=parent_event_id)
     with store.transaction() as db:
         state=store.session(host.run_id,db)['state']

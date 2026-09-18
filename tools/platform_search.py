@@ -25,7 +25,35 @@ def rank(evaluations, objectives):
     return [plain(e) for s, e in sorted((r for r in rows if r[0] is not None), key=lambda r: r[0])]
 
 
-def run_search(host):
+def reuse_start(host, effective, trial):
+    """Match one explicit source's frozen conditions; never search a global cache."""
+    source = host.store.session(trial['owner_run_id'])['snapshot']
+    current = host.store.session(host.run_id)['snapshot']
+    original = host.store.artifact(trial['configuration'])['effective']
+    # Session identity, search policy and budget do not change the simulated
+    # candidate. Everything else (including task/control/numerics) must match.
+    original['run_id'] = effective['run_id']
+    for key in ('search', 'budget'):
+        original['policy'][key] = effective['policy'][key]
+    if digest(original) != digest(effective) or source['instance_identity'] != current['instance_identity']:
+        return None
+    if any(current['dependencies'].get(k) != v for k,v in source['dependencies'].items()
+           if not k.startswith('search.')):
+        return None
+    evaluation = EvaluationResult.model_validate(host.store.artifact(trial['evaluation']))
+    simulation = trial['simulation']
+    metadata = host.store.session(trial['owner_run_id'])['state']['result_executions'][simulation['execution_id']]
+    if (evaluation.validity != 'valid' or simulation['solver_status'] != 'completed'
+            or evaluation.source_execution_id != simulation['execution_id']
+            or plain(evaluation.source) != simulation['output']
+            or evaluation.candidate_id != trial['candidate_id']
+            or metadata['candidate_input'] != trial['configuration']):
+        return None
+    return {**trial, 'score':score(evaluation,effective['task']['objectives']),
+        'comparison_identity':evaluation.comparison_identity, 'reused_evaluation':True}
+
+
+def run_search(host, starting_trial=None):
     inp = host.store.session(host.run_id)['snapshot']['input']
     binding = inp['policy']['search']
     if binding is None:
@@ -57,6 +85,14 @@ def run_search(host):
             identity = digest(plain(effective))  # task, design, control, model and numerical conditions
         except ValueError:
             identity = None  # preserve the existing invalid-candidate receipt path
+        if pending['index'] == 0 and starting_trial and identity:
+            reused = reuse_start(host, plain(effective), starting_trial)
+            if reused:
+                algorithm.feedback(reused['score'])
+                saved['trials'].append({**reused,'candidate':pending['candidate'],'effective_identity':identity})
+                saved.update(algorithm=plain(algorithm.save()),pending=None)
+                _save(host,saved)
+                continue
         for trial in saved['trials']:
             if 'effective_identity' not in trial:
                 try: trial['effective_identity'] = digest(plain(_candidate(SessionInput.model_validate(inp), trial['candidate'], host.reg)))
@@ -76,15 +112,18 @@ def run_search(host):
                 _save(host,saved)
                 return _outcome(host,saved, 'completed', 'no_new_candidate')
             continue
+        candidate_id = prefix
+        if any(t['candidate_id'] == candidate_id for t in saved['trials']):
+            candidate_id += '-' + digest(host.run_id)[:12]  # Preserve the reused source's original label.
         simulation = host.invoke(dict(request_id=prefix + '-simulation', tool_id='simulation.run', tool_version=inp['policy']['tool_bindings']['simulation.run'],
-            arguments=dict(candidate_id=prefix, changes=pending['candidate']), reason='Execute search candidate', cache='reuse'))
+            arguments=dict(candidate_id=candidate_id, changes=pending['candidate']), reason='Execute search candidate', cache='reuse'))
         if simulation['execution_status'] != 'completed':
             error=simulation.get('error','')
             invalid=simulation['execution_status']=='rejected' and any(s in error for s in (
                 'PHYSICALLY_INVALID','PARAMETER_','CONDITIONAL_','TEMPLATE_','UNSUPPORTED','INITIAL_UNKNOWN','UNKNOWN_FORCE'))
             if invalid:
                 algorithm.feedback(None)
-                saved['trials'].append(dict(candidate_id=prefix,candidate=pending['candidate'],score=None,
+                saved['trials'].append(dict(candidate_id=candidate_id,owner_run_id=host.run_id,candidate=pending['candidate'],score=None,
                     status='unsupported' if 'UNSUPPORTED' in error else 'invalid_candidate',simulation=simulation))
                 saved.update(algorithm=plain(algorithm.save()),pending=None); _save(host,saved)
                 continue
@@ -101,7 +140,7 @@ def run_search(host):
         else:
             scalar = score(result, inp['task']['objectives'])
         algorithm.feedback(scalar)
-        saved['trials'].append(dict(candidate_id=prefix,candidate=pending['candidate'], effective_identity=identity, evaluation=evaluation['output'],
+        saved['trials'].append(dict(candidate_id=candidate_id,owner_run_id=host.run_id,candidate=pending['candidate'], effective_identity=identity, evaluation=evaluation['output'],
             simulation=simulation,score=scalar,comparison_identity=result.comparison_identity,
             status='valid' if result.validity=='valid' else 'solver_failed',task_success=result.task_success))
         saved.update(algorithm=plain(algorithm.save()), pending=None)
@@ -116,6 +155,8 @@ def _outcome(host,saved,status,reason,pending=None):
     return dict(status=status,stop_reason=reason,pending=pending,trials=saved['trials'],algorithm=saved['algorithm'],
         proposals=saved.get('proposals',len(saved['trials'])), distinct_candidates=len(saved['trials']), duplicates=saved.get('duplicates',[]),
         actual_solves=host.store.remaining(host.run_id)['used']['backend_solves'],
+        reused_evaluations=sum(bool(t.get('reused_evaluation')) for t in saved['trials']),
+        new_evaluations=sum(bool(t.get('evaluation')) and not t.get('reused_evaluation',False) for t in saved['trials']),
         solve_count_meaning='Charged backend attempts from the ledger, including failures before a trial was appended',
         baseline=saved['trials'][0] if saved['trials'] else None,
         best=min(valid,key=lambda t:t['score']) if valid else None)

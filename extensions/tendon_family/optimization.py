@@ -98,21 +98,22 @@ def ensure_session(host, inp, *, parent_run_id=None, parent_event_id=None):
     return existing
 
 
-def optimize(root, value, *, parent_run_id=None, parent_event_id=None):
+def optimize(root, value, *, parent_run_id=None, parent_event_id=None, starting_trial=None, actor='local-human'):
     from tools.platform_host import Host
     from tools.platform_search import run_search
     from tools.state_io import atomic_json, digest
     request,inp=prepare_optimization(value)
-    host=Host(root,inp.run_id)
+    host=Host(root,inp.run_id,actor=actor)
     ensure_session(host,inp,parent_run_id=parent_run_id,parent_event_id=parent_event_id)
     with host.store.transaction() as db:
         state=host.store.session(inp.run_id,db)['state']
         if 'optimization_request' not in state:
             ref=host.store.put(db,request);state['optimization_request']=plain(ref)
+            state['optimization_start']=starting_trial
             host.store.update_state(db,inp.run_id,state)
             host.store.event(db,inp.run_id,'optimization','prepared',parent=parent_event_id,outputs=[ref])
     atomic_json(Path(root)/(inp.run_id+'_optimization_request.json'),plain(request))
-    outcome=run_search(host)
+    outcome=run_search(host,host.store.session(inp.run_id)['state'].get('optimization_start'))
     outcome.update(run_id=inp.run_id,method=request.method,template=request.template,
         variables=plain(request)['variables'],objectives=plain(inp.task)['objectives'],
         constraint_authority=plain(inp.task.evaluator),task_identity=digest(plain(inp.task)),
@@ -122,7 +123,7 @@ def optimize(root, value, *, parent_run_id=None, parent_event_id=None):
         trial=outcome.get(key)
         if trial and trial.get('simulation'):
             eid=trial['simulation']['execution_id']
-            metadata=host.store.session(inp.run_id)['state']['result_executions'][eid]
+            metadata=host.store.session(trial.get('owner_run_id',inp.run_id))['state']['result_executions'][eid]
             trial['configuration']=metadata['candidate_input']
             trial['evaluation_data']=host.store.artifact(trial['evaluation'])
             data=host.store.artifact(trial['simulation']['output'])['data']['data']

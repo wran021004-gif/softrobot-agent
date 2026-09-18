@@ -185,9 +185,10 @@ def source_trial(ctx,args,route):
         trial=next((t for t in result['trials'] if t['candidate_id']==args.candidate_id),None) if args.candidate_id else result.get('best')
     if not trial or trial.get('status')!='valid': raise ValueError('VALID_CANDIDATE_REQUIRED')
     from tools.platform_host import Host
-    child=Host(ctx.store.root,result['run_id'])
+    child=Host(ctx.store.root,trial.get('owner_run_id',result['run_id']),actor='route-executor')
     metadata=ctx.store.session(child.run_id)['state']['result_executions'][trial['simulation']['execution_id']]
-    return child,{**trial,'configuration':metadata['candidate_input'],
+    return child,{**trial,'owner_run_id':child.run_id,'search_run_id':result['run_id'] if node['action']=='optimize' else None,
+        'configuration':metadata['candidate_input'],
         'evaluation_data':ctx.store.artifact(trial['evaluation'])}
 
 
@@ -209,7 +210,7 @@ def run_built(ctx,args,route):
     candidate=built['candidate_id']
     if args.candidate_id and args.candidate_id!=candidate: raise ValueError('CANDIDATE_SELECTION_MISMATCH')
     inp=ctx.store.artifact(built['configuration'])
-    child=Host(ctx.store.root,inp['run_id'])
+    child=Host(ctx.store.root,inp['run_id'],actor='route-executor')
     ensure_session(child,inp,parent_run_id=ctx.run_id,parent_event_id=ctx.row['parent_id'])
     sim=invoke(child,'single-simulation','simulation.run',dict(candidate_id=candidate,changes={}))
     ev=invoke(child,'single-evaluation','evaluation.run',dict(result=sim['output'],execution_id=sim['execution_id']))
@@ -231,11 +232,13 @@ def summarize(out):
         evaluation={k:ev[k] for k in ('validity','metrics','task_success','candidate_id','source_execution_id') if k in ev} if isinstance(ev,dict) else None,
         evaluation_ref=best.get('evaluation') if best else out.get('evaluation_ref',out.get('evaluation')),
         simulation={k:sim[k] for k in ('output','execution_id','solver_status') if k in sim} if sim else None,
-        simulated=out.get('simulated',bool(best)),evaluated=out.get('evaluated',bool(best)),
+        simulated=bool(sim and sim.get('solver_status')=='completed'),
+        evaluated=bool(isinstance(ev,dict) and ev.get('source_execution_id') and ev.get('validity')),
         task_success=best.get('task_success') if best else out.get('task_success'),
         facts=out.get('facts'),
         configuration=best.get('configuration') if best else out.get('configuration'),
         proposals=out.get('proposals'),distinct_candidates=out.get('distinct_candidates'),actual_solves=out.get('actual_solves'),
+        new_evaluations=out.get('new_evaluations'),reused_evaluations=out.get('reused_evaluations'),
         findings=out.get('findings'))
 
 
@@ -285,8 +288,11 @@ def advance(ctx,args):
     _save(ctx,route,'started')
     try:
         if args.action in ('build','optimize'):
+            starting_trial=None
             if args.source_node:
                 inp=SessionInput.model_validate(source_configuration(ctx,args,route))
+                if source_node(ctx,args,route)[0]['action'] in ('run','optimize'):
+                    _,starting_trial=source_trial(ctx,args,route)
                 if args.combination:
                     choice=spec.combinations[args.combination]
                     if any(plain(getattr(inp.policy,k))!=plain(getattr(choice,k)) for k in ('dynamics_model','backend','controller')):
@@ -308,7 +314,7 @@ def advance(ctx,args):
                     actual_solves=0,findings=design_summary(data['robot']['structure']['data']))
             else:
                 out=optimize(ctx.store.root,dict(session=data,variables=args.variables,max_trials=args.max_trials),
-                    parent_run_id=ctx.run_id,parent_event_id=ctx.row['parent_id'])
+                    parent_run_id=ctx.run_id,parent_event_id=ctx.row['parent_id'],starting_trial=starting_trial,actor='route-executor')
                 if out['status']=='unknown': raise TimeoutError('UNCONFIRMED child execution')
                 if out['status'] not in ('completed',): raise ValueError('OPTIMIZATION_EXECUTION_FAILED: '+str(out.get('stop_reason')))
         elif args.action=='run':
@@ -323,11 +329,11 @@ def advance(ctx,args):
                     if effective['policy']['dynamics_model']!=plain(choice.dynamics_model) or effective['policy']['controller']['extension_id']!=choice.controller.extension_id:
                         raise ValueError('CROSSCHECK_MUST_PRESERVE_MODEL_AND_CONTROL')
                 out=crosscheck(ctx.store.root,child.run_id,trial['candidate_id'],trial['configuration'],plain(choice.backend),
-                    parent_run_id=ctx.run_id,parent_event_id=ctx.row['parent_id'])
+                    parent_run_id=ctx.run_id,parent_event_id=ctx.row['parent_id'],actor='route-executor')
             elif args.action in ('diagnose','video'):
                 tool='diagnostics.saved_trajectory' if args.action=='diagnose' else 'visualization.render_simulation_video'
                 sim=trial['simulation']
-                receipt=invoke(child,'route-'+args.node_id,tool,dict(result=sim['output'],execution_id=sim['execution_id']))
+                receipt=invoke(child,'route-'+args.node_id,tool,dict(result=sim['output'],execution_id=sim['execution_id']),parent=ctx.row['parent_id'])
                 product=ctx.store.artifact(receipt['output']); report=ctx.store.artifact(product['report'])
                 out=dict(candidate_id=trial['candidate_id'],configuration=trial['configuration'],receipt=receipt,product=product,
                     findings=diagnosis_summary(report) if args.action=='diagnose' else dict(video_generated=True,viewed_by_model=False))
@@ -366,9 +372,11 @@ def delivery(ctx,route,child,trial,reason):
             data=ctx.store.artifact(n['result'])
             if data.get('source_configuration',data.get('configuration'))==trial['configuration']:
                 (reviews if n['action']=='crosscheck' else diagnoses).append(dict(result=n['result'],summary=n['summary']))
-    search=ctx.store.session(child.run_id)['state'].get('search')
+    search_run=trial.get('search_run_id') or child.run_id
+    search=ctx.store.session(search_run)['state'].get('search')
     best=min((t for t in search['trials'] if t.get('score') is not None),key=lambda t:t['score']) if search else trial
     return dict(delivery_status='evaluated',candidate_id=trial['candidate_id'],run_id=child.run_id,configuration=trial['configuration'],
+        search_run_id=search_run if search else None,actual_solves=0,new_evaluations=0,
         simulation=trial['simulation'],
         dynamics_model=configuration['policy']['dynamics_model'],backend=configuration['policy']['backend'],
         controller=configuration['policy']['controller'],evaluation_ref=trial['evaluation'],evaluation=trial['evaluation_data'],
