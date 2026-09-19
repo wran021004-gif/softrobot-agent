@@ -108,6 +108,17 @@ class OptimizationAssembler(Protocol):
                  specification: OptimizationSpecification, context: SystemContext) -> OptimizationProblem: ...
 
 
+class KinematicsProvider(Protocol):
+    """Forward kinematics provider using a typed model-specific request."""
+
+    def forward(
+        self,
+        robot: RobotDescription,
+        request: Payload,
+        registry,
+    ) -> Payload: ...
+
+
 class DynamicSystemProvider(Protocol):
     """Export using explicit context.x0/u0; resolve scene via its existing contract."""
     def build_system(self, robot: RobotDescription, parameters: Payload,

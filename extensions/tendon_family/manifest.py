@@ -11,13 +11,16 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('design',c.Design),('initial',c.Initial),('control',c.Control),('parameters',c.Parameters),('backend_data',c.Data),
     ('dynamics_model',c.DynamicsModel),('matlab_parameters',c.MatlabParameters),('mujoco_parameters',c.MujocoParameters),
     ('space',c.Space),('discretization',c.Discretization),('experiment_spec',c.ExperimentSpec),
-    ('build_request',c.BuildRequest),('build_result',c.BuildResult)]]
+    ('build_request',c.BuildRequest),('build_result',c.BuildResult),
+    ('pcc_model',c.PCCModelParameters),('pcc_configuration',c.PCCConfiguration),
+    ('pcc_forward_request',c.PCCForwardRequest),('pcc_kinematics_result',c.PCCKinematicsResult),]]
 SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
     'extensions/experiment_dynamics/physics.py','extensions/robot_domain/contracts.py',
     'schemas/environment_spec.py','schemas/robot_ir.py','schemas/exploration.py','schemas/platform_math.py')
+PCC_SOURCES=(*SOURCES,'extensions/tendon_family/pcc.py')
 MATLAB=tuple('matlab/'+n+'.m' for n in ('tf_geometry','tf_point','tf_routes','tf_terms','tf_control','tf_run','tf_observe','tf_static','tf_view'))
 COMMON=dict(sources=SOURCES,contract_dependencies=tuple((n,v) for n,v,_ in CONTRACTS))
 EXTENSIONS=[
@@ -84,3 +87,66 @@ for name,binding,model,deps,resources in [
         'extensions.tendon_family.backends:'+binding,'Explicit model compatibility and backend-specific numerical settings',sources=SOURCES,
         contract_dependencies=COMMON['contract_dependencies'],assets=MATLAB if name=='matlab_spatial' else (),
         dependencies=deps,resources=resources,capabilities=modern))
+
+EXTENSIONS.append(
+    Extension(
+        'model.pcc',
+        'dynamics_model',
+        '1.0.0',
+        c.PCCModelParameters,
+        Payload,
+        'extensions.tendon_family.pcc:PCCModel',
+        'Serial multi-segment constant-curvature PCC forward kinematics',
+        sources=PCC_SOURCES,
+        contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy',),
+        capabilities=dict(
+            category='mathematical_model',
+            role='adapter',
+            mathematical_model=(
+                c.PCCModelParameters()
+                .mathematical_model
+                .model_dump(mode='json')
+            ),
+            physical_input='family.design',
+            configuration='per-flexible-segment constant curvature',
+            coordinates='curvature_y_rad_m + curvature_z_rad_m per flexible segment',
+            assumptions=[
+                'constant curvature per flexible segment',
+                'inextensible centerline',
+                'no shear',
+                'no torsion',
+            ],
+        ),
+    )
+)
+EXTENSIONS.append(
+    Extension(
+        'kinematics.pcc_forward',
+        'tool',
+        '1.0.0',
+        c.PCCForwardRequest,
+        c.PCCKinematicsResult,
+        'extensions.tendon_family.pcc:pcc_forward_tool',
+        (
+            'Compute serial multi-segment PCC forward kinematics for '
+            'the frozen session robot. Provide constant curvature about '
+            'local y/z for every flexible segment. No simulation, '
+            'static equilibrium, tendon-force inference or backend solve.'
+        ),
+        sources=PCC_SOURCES,
+        contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy',),
+        extension_dependencies=(
+            ('model.pcc', '1.0.0'),
+        ),
+        cache=True,
+        side_effects='none',
+        capabilities=dict(
+            category='mathematical_models',
+            role='public_tool',
+            model='model.pcc',
+            backend_solves=0,
+        ),
+    )
+)

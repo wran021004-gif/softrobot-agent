@@ -1,10 +1,11 @@
 """SI family description. Reserved topology types are descriptive, never executable."""
 from typing import Literal, Annotated
-from pydantic import Field, model_validator
+from pydantic import Field, FiniteFloat, model_validator
 from schemas.common import Contract
 from schemas.platform_math import MathematicalModel, ModelCapabilities, ModelVariable, ParameterDefinitions
 from schemas.environment_spec import Vec3
 from extensions.experiment_dynamics.contracts import Matrix3, Mount
+
 
 Name = Annotated[str, Field(pattern=r'^[A-Za-z][A-Za-z0-9_]*$')]
 
@@ -310,3 +311,82 @@ class BuildResult(Contract):
     applicability: dict = Field(default_factory=dict)
     source_roles: dict[str, str] = Field(default_factory=dict)
     reason: str | None = None
+
+
+class PCCModelParameters(Contract):
+    model_id: Literal['pcc_constant_curvature_v1'] = 'pcc_constant_curvature_v1'
+
+    @property
+    def mathematical_model(self) -> MathematicalModel:
+        return MathematicalModel(
+            state_definition=[
+                ModelVariable(
+                    name='segment_curvature',
+                    dimension='2*n_flexible_segments',
+                    units='rad/m',
+                    frame='segment_local',
+                )
+            ],
+            input_definition=[],
+            output_definition=[
+                ModelVariable(
+                    name='tip_position',
+                    dimension=3,
+                    units='m',
+                    frame='robot_base',
+                ),
+                ModelVariable(
+                    name='tip_rotation_matrix',
+                    dimension=9,
+                    units='1',
+                    frame='robot_base',
+                ),
+            ],
+            required_robot_data=[
+                'family.design.components',
+                'family.design.tip',
+            ],
+            discretization_contract=None,
+            capabilities=ModelCapabilities(
+                kinematics=True,
+                statics=False,
+                dynamics=False,
+                linearization=False,
+                gradients=False,
+            ),
+            representations=[],
+        )
+
+
+class PCCSegmentConfiguration(Contract):
+    curvature_y_rad_m: FiniteFloat
+    curvature_z_rad_m: FiniteFloat
+
+
+class PCCConfiguration(Contract):
+    segments: dict[Name, PCCSegmentConfiguration] = Field(min_length=1)
+
+
+class PCCForwardRequest(Contract):
+    configuration: PCCConfiguration
+    samples_per_segment: int = Field(default=51, ge=2, le=1001)
+
+
+class PCCPose(Contract):
+    position_m: Vec3
+    rotation_matrix: Matrix3
+
+
+class PCCSegmentKinematics(Contract):
+    base: PCCPose
+    tip: PCCPose
+    backbone_points_m: list[Vec3] = Field(min_length=2)
+
+
+class PCCKinematicsResult(Contract):
+    model_id: Literal['pcc_constant_curvature_v1'] = 'pcc_constant_curvature_v1'
+    frame: Literal['robot_base'] = 'robot_base'
+    configuration: PCCConfiguration
+    chain: list[Name] = Field(min_length=1)
+    segments: dict[Name, PCCSegmentKinematics]
+    tip: PCCPose
