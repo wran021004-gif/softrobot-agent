@@ -15,6 +15,8 @@ CONTRACTS += [('platform.' + name, '1.0.0', schema) for name, schema in [
     ('dynamic_system', math_contracts.DynamicSystem),
     ('linearized_model', math_contracts.LinearizedModel),
     ('model_requirement', math_contracts.ModelRequirement),
+    ('system_context', math_contracts.SystemContext),
+    ('optimization_specification', math_contracts.OptimizationSpecification),
     ('optimization_problem', math_contracts.OptimizationProblem),
     ('optimization_result', math_contracts.OptimizationResult),
 ]]

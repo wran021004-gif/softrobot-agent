@@ -1,7 +1,8 @@
 """Developer protocols; concrete serialized state still uses registry contracts."""
 from typing import Protocol
 from schemas.platform import Payload, BackendResult, EvaluationResult, SessionInput, TaskDefinition, EvidenceRef, RobotDescription, Signal
-from schemas.platform_math import DynamicSystem, LinearizedModel, MathematicalModel, OptimizationProblem, OptimizationResult
+from schemas.platform_math import (DynamicSystem, LinearizedModel, MathematicalModel,
+    OptimizationProblem, OptimizationResult, OptimizationSpecification, ParameterDefinitions, SystemContext)
 
 
 class ModelAdapter(Protocol):
@@ -78,14 +79,30 @@ class Solver(Protocol):
     def solve(self, problem: OptimizationProblem) -> OptimizationResult: ...
 
 
+class OptimizationAssembler(Protocol):
+    """Trusted deterministic templates, registered as optimization_assembler.
+
+    space is the authorized path/specification projection of existing Space
+    parameter maps, not Agent-supplied bounds. Template IDs are declared in
+    Extension.capabilities['supported_objectives'/'supported_constraints'].
+    Use tools.platform_optimization.assemble_optimization for checked dispatch.
+    """
+    def assemble(self, task: TaskDefinition, robot: RobotDescription,
+                 space: ParameterDefinitions, mathematical_model: MathematicalModel,
+                 specification: OptimizationSpecification, context: SystemContext) -> OptimizationProblem: ...
+
+
 class DynamicSystemProvider(Protocol):
-    """Optional model export capability; no family-specific inputs in consumers."""
+    """Export using explicit context.x0/u0; resolve scene via its existing contract."""
     def build_system(self, robot: RobotDescription, parameters: Payload,
-                     discretization: Payload | None) -> DynamicSystem: ...
+                     discretization: Payload | None, context: SystemContext) -> DynamicSystem: ...
 
 
 class Linearizer(Protocol):
-    """Optional capability; linearize at system.x0/u0 without controller imports."""
+    """Linearize at explicit system.x0/u0 from SystemContext; never infer a point.
+
+    To select another operating point, export a system with that context first.
+    """
     def linearize(self, system: DynamicSystem) -> LinearizedModel: ...
 
 

@@ -5544,6 +5544,95 @@
     "title": "DynamicSystem",
     "type": "object"
   },
+  "SystemContext": {
+    "$defs": {
+      "EvidenceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "media_type": {
+            "default": "application/json",
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id"
+        ],
+        "title": "EvidenceRef",
+        "type": "object"
+      },
+      "Payload": {
+        "additionalProperties": false,
+        "properties": {
+          "contract": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Contract",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "contract",
+          "data"
+        ],
+        "title": "Payload",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Explicit x0/u0 in the provider's declared coordinate order; no zero defaults.\n\nThe caller resolves existing Initial/control data into these vectors. Scene\nmay carry an existing Scene/Assembly payload or its saved evidence reference;\nthis contract does not define another environment or initialization model.",
+    "properties": {
+      "x0": {
+        "items": {
+          "type": "number"
+        },
+        "title": "X0",
+        "type": "array"
+      },
+      "u0": {
+        "items": {
+          "type": "number"
+        },
+        "title": "U0",
+        "type": "array"
+      },
+      "scene": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Payload"
+          },
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Scene"
+      }
+    },
+    "required": [
+      "x0",
+      "u0"
+    ],
+    "title": "SystemContext",
+    "type": "object"
+  },
   "LinearizedModel": {
     "$defs": {
       "SignalSpec": {
@@ -5706,6 +5795,135 @@
       "time_domain"
     ],
     "title": "LinearizedModel",
+    "type": "object"
+  },
+  "ObjectiveSelection": {
+    "additionalProperties": false,
+    "description": "A declared semantic template and its public numeric weight, never code.",
+    "properties": {
+      "template_id": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "title": "Template Id",
+        "type": "string"
+      },
+      "weight": {
+        "default": 1.0,
+        "minimum": 0,
+        "title": "Weight",
+        "type": "number"
+      }
+    },
+    "required": [
+      "template_id"
+    ],
+    "title": "ObjectiveSelection",
+    "type": "object"
+  },
+  "ConstraintSelection": {
+    "additionalProperties": false,
+    "properties": {
+      "template_id": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "title": "Template Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "template_id"
+    ],
+    "title": "ConstraintSelection",
+    "type": "object"
+  },
+  "OptimizationSpecification": {
+    "$defs": {
+      "ConstraintSelection": {
+        "additionalProperties": false,
+        "properties": {
+          "template_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Template Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template_id"
+        ],
+        "title": "ConstraintSelection",
+        "type": "object"
+      },
+      "ObjectiveSelection": {
+        "additionalProperties": false,
+        "description": "A declared semantic template and its public numeric weight, never code.",
+        "properties": {
+          "template_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Template Id",
+            "type": "string"
+          },
+          "weight": {
+            "default": 1.0,
+            "minimum": 0,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "template_id"
+        ],
+        "title": "ObjectiveSelection",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Agent choices only; paths refer to the existing authorized Space.\n\nTemplate IDs must be declared by the selected assembler. No expression,\ngeneric configuration dictionary or executable string slot is accepted.\nTask remains the authority for physical targets and limits.",
+    "properties": {
+      "variables": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Variables",
+        "type": "array"
+      },
+      "objectives": {
+        "items": {
+          "$ref": "#/$defs/ObjectiveSelection"
+        },
+        "title": "Objectives",
+        "type": "array"
+      },
+      "constraints": {
+        "items": {
+          "$ref": "#/$defs/ConstraintSelection"
+        },
+        "title": "Constraints",
+        "type": "array"
+      },
+      "horizon": {
+        "anyOf": [
+          {
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Horizon"
+      },
+      "initial_guess": {
+        "additionalProperties": {
+          "type": "number"
+        },
+        "title": "Initial Guess",
+        "type": "object"
+      }
+    },
+    "required": [
+      "variables",
+      "objectives"
+    ],
+    "title": "OptimizationSpecification",
     "type": "object"
   },
   "OptimizationConstraint": {
@@ -15271,6 +15489,187 @@
         "status"
       ],
       "title": "OptimizationResult",
+      "type": "object"
+    },
+    "platform.optimization_specification@1.0.0": {
+      "$defs": {
+        "ConstraintSelection": {
+          "additionalProperties": false,
+          "properties": {
+            "template_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Template Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "template_id"
+          ],
+          "title": "ConstraintSelection",
+          "type": "object"
+        },
+        "ObjectiveSelection": {
+          "additionalProperties": false,
+          "description": "A declared semantic template and its public numeric weight, never code.",
+          "properties": {
+            "template_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Template Id",
+              "type": "string"
+            },
+            "weight": {
+              "default": 1.0,
+              "minimum": 0,
+              "title": "Weight",
+              "type": "number"
+            }
+          },
+          "required": [
+            "template_id"
+          ],
+          "title": "ObjectiveSelection",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Agent choices only; paths refer to the existing authorized Space.\n\nTemplate IDs must be declared by the selected assembler. No expression,\ngeneric configuration dictionary or executable string slot is accepted.\nTask remains the authority for physical targets and limits.",
+      "properties": {
+        "variables": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Variables",
+          "type": "array"
+        },
+        "objectives": {
+          "items": {
+            "$ref": "#/$defs/ObjectiveSelection"
+          },
+          "title": "Objectives",
+          "type": "array"
+        },
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/ConstraintSelection"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "horizon": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Horizon"
+        },
+        "initial_guess": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Initial Guess",
+          "type": "object"
+        }
+      },
+      "required": [
+        "variables",
+        "objectives"
+      ],
+      "title": "OptimizationSpecification",
+      "type": "object"
+    },
+    "platform.system_context@1.0.0": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Explicit x0/u0 in the provider's declared coordinate order; no zero defaults.\n\nThe caller resolves existing Initial/control data into these vectors. Scene\nmay carry an existing Scene/Assembly payload or its saved evidence reference;\nthis contract does not define another environment or initialization model.",
+      "properties": {
+        "x0": {
+          "items": {
+            "type": "number"
+          },
+          "title": "X0",
+          "type": "array"
+        },
+        "u0": {
+          "items": {
+            "type": "number"
+          },
+          "title": "U0",
+          "type": "array"
+        },
+        "scene": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Payload"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scene"
+        }
+      },
+      "required": [
+        "x0",
+        "u0"
+      ],
+      "title": "SystemContext",
       "type": "object"
     },
     "reference.backend_data@1.0.0": {

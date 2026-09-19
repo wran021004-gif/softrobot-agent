@@ -104,6 +104,18 @@ class DynamicSystem(Contract):
         return self
 
 
+class SystemContext(Contract):
+    """Explicit x0/u0 in the provider's declared coordinate order; no zero defaults.
+
+    The caller resolves existing Initial/control data into these vectors. Scene
+    may carry an existing Scene/Assembly payload or its saved evidence reference;
+    this contract does not define another environment or initialization model.
+    """
+    x0: list[float]
+    u0: list[float]
+    scene: Payload | EvidenceRef | None = None
+
+
 class LinearizedModel(Contract):
     """First-order perturbation model about x0/u0, in declared coordinate order.
 
@@ -137,6 +149,30 @@ class LinearizedModel(Contract):
         return self
 
 
+class ObjectiveSelection(Contract):
+    """A declared semantic template and its public numeric weight, never code."""
+    template_id: Identifier
+    weight: float = Field(default=1., ge=0)
+
+
+class ConstraintSelection(Contract):
+    template_id: Identifier
+
+
+class OptimizationSpecification(Contract):
+    """Agent choices only; paths refer to the existing authorized Space.
+
+    Template IDs must be declared by the selected assembler. No expression,
+    generic configuration dictionary or executable string slot is accepted.
+    Task remains the authority for physical targets and limits.
+    """
+    variables: list[str]
+    objectives: list[ObjectiveSelection]
+    constraints: list[ConstraintSelection] = Field(default_factory=list)
+    horizon: int | None = Field(default=None, gt=0)
+    initial_guess: dict[str, float] = Field(default_factory=dict)
+
+
 class OptimizationConstraint(Contract):
     """Scalar lower <= expression(variables) <= upper; equal bounds mean equality."""
     name: Identifier
@@ -144,6 +180,14 @@ class OptimizationConstraint(Contract):
     units: str
     lower: float | None = None
     upper: float | None = None
+
+    @model_validator(mode='after')
+    def bounds(self):
+        if self.lower is None and self.upper is None:
+            raise ValueError('OPTIMIZATION_CONSTRAINT_BOUND_REQUIRED')
+        if self.lower is not None and self.upper is not None and self.lower > self.upper:
+            raise ValueError('OPTIMIZATION_CONSTRAINT_BOUNDS_REVERSED')
+        return self
 
 
 class OptimizationProblem(Contract):
@@ -160,6 +204,12 @@ class OptimizationProblem(Contract):
     model_reference: Binding | EvidenceRef | None = None
     horizon: int | None = Field(default=None, gt=0, description='Number of stages, when applicable')
     initial_guess: dict[str, float] = Field(default_factory=dict)
+
+    @model_validator(mode='after')
+    def declared_initial_guess(self):
+        if self.initial_guess.keys() - self.variables.keys():
+            raise ValueError('INITIAL_GUESS_VARIABLE_NOT_DECLARED')
+        return self
 
 
 class OptimizationResult(Contract):

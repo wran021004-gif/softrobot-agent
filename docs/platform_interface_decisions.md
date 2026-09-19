@@ -1,5 +1,41 @@
 # 公共接口版本与定版决策
 
+## 确定性优化组装与显式工作点（基线 8e198f5）
+
+`OptimizationSpecification`（`schemas/platform_math.py`，`platform.optimization_specification@1.0.0`）
+是 Agent 的结构化选择：已有 Space 变量路径、目标模板 ID/数值 weight、约束模板 ID、可选 horizon
+及同路径 initial_guess。它不接受 objective_function、MathematicalExpression、代码或任意配置字典。
+当前公开模板参数只有目标 weight；有实际需要时再增加受类型约束的普通数据字段。
+Human 的 TaskDefinition 继续拥有物理目标、限制和评价含义；Agent 可选模型、变量、模板和
+Search/Solver 策略，但不能自行提供数学公式或扩大授权参数范围。
+
+`OptimizationAssembler` 协议位于 `schemas/platform_protocols.py`，在原 Registry 以独立
+`optimization_assembler` kind 登记；参数构造方式与 Solver 相同，输出为 OptimizationProblem。
+manifest 的 `Extension.capabilities` 必须用 `supported_objectives` / `supported_constraints`
+列出支持的模板 ID；不建立全局模板注册表。`tools/platform_optimization.assemble_optimization`
+是最小检查/调用入口：核对变量授权和模板声明后才构造 assembler、调用 assemble。
+space 参数复用现有 `ParameterDefinitions`：由可信调用方从已有 Space 的 parameters、
+control_parameters、model_parameters、discretization_parameters 提取当前适用的授权路径/规格，
+保留原 bounds/options，并处理已有 when 条件；不接受 Agent 重新提供范围，不引入第二套 Space。
+assemble 直接接收现有 TaskDefinition、RobotDescription、MathematicalModel 和 SystemContext。
+具体 assembler 负责读取任务/机器人/模型语义、检查自身适用条件，并以固定模板生成实际表达式。
+它不执行仿真、Search 或求解；OptimizationProblem 是其输出，Solver 仅 solve(problem)。
+OptimizationConstraint 要求至少一侧界且 lower <= upper；Problem.initial_guess 只引用已声明变量。
+
+`SystemContext`（同一 math 模块，`platform.system_context@1.0.0`）只含必填 x0/u0 和可选
+scene（既有 Scene/Assembly 的 Payload 或 EvidenceRef）。调用方将已保存 Initial 和名义输入
+按模型坐标顺序显式解析为向量；仅当已有 Initial 明确指定零值时才可据此填零。
+`DynamicSystemProvider.build_system(..., context)` 必须接收该上下文；现有实验 Scene、Assembly、
+Initial、Mount、TimedForce 均复用，不另建场景模型。Linearizer 继续在 system.x0/u0 线性化；
+选择不同工作点时先用对应 context 导出系统，输出 LinearizedModel 保留该点及 A/B。
+
+现有 Search → Backend → Evaluator → feedback、CoordinateSearch 和 route.optimize 保持原义；
+显式路线独立为 Specification → Assembler → Problem → Solver，本轮未接入 route.advance。
+Combination 仍只含 dynamics_model/backend/controller，Host/Store/Backend 及历史 session 不改写；
+源码依赖变化仍服从原兼容性检查。只增加测试模板 objective.test/constraint.test，无真实算法。
+后续 PCC/GVS 提供模型及 assembler；LQR 消费显式工作点的 LinearizedModel；IPOPT/acados
+注册 Solver 消费组装后的 Problem，必要的专用结构届时再按实际需求增加。
+
 ## 数学模型、控制依赖与求解器公共边界（基线 a6f5f8e）
 
 新代码使用 `schemas/platform_math.py` 的数据契约和 `schemas/platform_protocols.py` 的运行协议。
