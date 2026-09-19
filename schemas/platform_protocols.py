@@ -3,6 +3,7 @@ from typing import Protocol
 from schemas.platform import Payload, BackendResult, EvaluationResult, SessionInput, TaskDefinition, EvidenceRef, RobotDescription, Signal
 from schemas.platform_math import (DynamicSystem, LinearizedModel, MathematicalModel,
     OptimizationProblem, OptimizationResult, OptimizationSpecification, ParameterDefinitions, SystemContext)
+from schemas.platform_learning import RLProblem, RLTrainingSpecification, TrainingJob, TrainingResult
 
 
 class ModelAdapter(Protocol):
@@ -77,6 +78,21 @@ class Search(Protocol):
 class Solver(Protocol):
     """Registered as solver, independently of Search and backend execution."""
     def solve(self, problem: OptimizationProblem) -> OptimizationResult: ...
+
+
+class RLTrainer(Protocol):
+    """Registered as rl_trainer; persistent lifecycle, independent of Search.
+
+    start seals problem/specification in the existing Store before returning a
+    durable job identity. A freshly bound adapter must accept a restored job for
+    status/cancel/collect, using existing Worker facilities or its external handle.
+    Unknown/unconfirmed status stays unknown; collect requires explicit artifacts
+    and gates rather than inferring success from a process exit code.
+    """
+    def start(self, problem: RLProblem, specification: RLTrainingSpecification) -> TrainingJob: ...
+    def status(self, job: TrainingJob) -> TrainingJob: ...
+    def cancel(self, job: TrainingJob) -> TrainingJob: ...
+    def collect(self, job: TrainingJob) -> TrainingResult: ...
 
 
 class OptimizationAssembler(Protocol):

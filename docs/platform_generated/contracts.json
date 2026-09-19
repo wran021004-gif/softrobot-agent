@@ -6379,6 +6379,1710 @@
     "title": "OptimizationResult",
     "type": "object"
   },
+  "RewardDefinition": {
+    "$defs": {
+      "EvidenceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "media_type": {
+            "default": "application/json",
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id"
+        ],
+        "title": "EvidenceRef",
+        "type": "object"
+      },
+      "Payload": {
+        "additionalProperties": false,
+        "properties": {
+          "contract": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Contract",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "contract",
+          "data"
+        ],
+        "title": "Payload",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Stable term names; composition and implementation use a trusted contract.\n\nNo reward DSL, executable string or automatically generated reward is defined.",
+    "properties": {
+      "terms": {
+        "items": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "type": "string"
+        },
+        "minItems": 1,
+        "title": "Terms",
+        "type": "array"
+      },
+      "implementation": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Payload"
+          },
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          }
+        ],
+        "title": "Implementation"
+      }
+    },
+    "required": [
+      "terms",
+      "implementation"
+    ],
+    "title": "RewardDefinition",
+    "type": "object"
+  },
+  "RLProblem": {
+    "$defs": {
+      "Binding": {
+        "additionalProperties": false,
+        "properties": {
+          "extension_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Extension Id",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "parameters": {
+            "$ref": "#/$defs/Payload"
+          }
+        },
+        "required": [
+          "extension_id",
+          "parameters"
+        ],
+        "title": "Binding",
+        "type": "object"
+      },
+      "EvidenceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "media_type": {
+            "default": "application/json",
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id"
+        ],
+        "title": "EvidenceRef",
+        "type": "object"
+      },
+      "Payload": {
+        "additionalProperties": false,
+        "properties": {
+          "contract": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Contract",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "contract",
+          "data"
+        ],
+        "title": "Payload",
+        "type": "object"
+      },
+      "RewardDefinition": {
+        "additionalProperties": false,
+        "description": "Stable term names; composition and implementation use a trusted contract.\n\nNo reward DSL, executable string or automatically generated reward is defined.",
+        "properties": {
+          "terms": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Terms",
+            "type": "array"
+          },
+          "implementation": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Payload"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              }
+            ],
+            "title": "Implementation"
+          }
+        },
+        "required": [
+          "terms",
+          "implementation"
+        ],
+        "title": "RewardDefinition",
+        "type": "object"
+      },
+      "SignalSpec": {
+        "additionalProperties": false,
+        "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
+        "properties": {
+          "name": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Name",
+            "type": "string"
+          },
+          "entity": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Entity",
+            "type": "string"
+          },
+          "dimension": {
+            "exclusiveMinimum": 0,
+            "title": "Dimension",
+            "type": "integer"
+          },
+          "units": {
+            "minLength": 1,
+            "title": "Units",
+            "type": "string"
+          },
+          "frame": {
+            "minLength": 1,
+            "title": "Frame",
+            "type": "string"
+          },
+          "phase": {
+            "minLength": 1,
+            "title": "Phase",
+            "type": "string"
+          },
+          "missing": {
+            "const": "unsupported",
+            "default": "unsupported",
+            "title": "Missing",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "entity",
+          "dimension",
+          "units",
+          "frame",
+          "phase"
+        ],
+        "title": "SignalSpec",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Learning interface referencing authoritative TaskDefinition and SessionInput.\n\nexperiment identifies a frozen SessionInput (robot, backend, environment and\npolicy); task references its TaskDefinition. Adapters check their consistency.\nOrdered SignalSpecs define flattened observation/action semantics. Reset and\ntermination adapt existing initial/episode definitions without changing the\ntask's formal success criterion. Reward is not an Evaluator.",
+    "properties": {
+      "task": {
+        "$ref": "#/$defs/EvidenceRef"
+      },
+      "experiment": {
+        "$ref": "#/$defs/EvidenceRef"
+      },
+      "observations": {
+        "items": {
+          "$ref": "#/$defs/SignalSpec"
+        },
+        "minItems": 1,
+        "title": "Observations",
+        "type": "array"
+      },
+      "actions": {
+        "items": {
+          "$ref": "#/$defs/SignalSpec"
+        },
+        "minItems": 1,
+        "title": "Actions",
+        "type": "array"
+      },
+      "reward": {
+        "$ref": "#/$defs/RewardDefinition"
+      },
+      "termination": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Payload"
+          },
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          }
+        ],
+        "title": "Termination"
+      },
+      "reset": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Binding"
+          },
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          }
+        ],
+        "title": "Reset"
+      }
+    },
+    "required": [
+      "task",
+      "experiment",
+      "observations",
+      "actions",
+      "reward",
+      "termination",
+      "reset"
+    ],
+    "title": "RLProblem",
+    "type": "object"
+  },
+  "TrainingBudget": {
+    "additionalProperties": false,
+    "description": "Total environment transitions across all selected seeds and environments.\n\nThis is a training stop limit, not a new Host resource grant or ledger.",
+    "properties": {
+      "environment_steps": {
+        "exclusiveMinimum": 0,
+        "title": "Environment Steps",
+        "type": "integer"
+      },
+      "wall_s": {
+        "anyOf": [
+          {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Wall S"
+      }
+    },
+    "required": [
+      "environment_steps"
+    ],
+    "title": "TrainingBudget",
+    "type": "object"
+  },
+  "RLTrainingSpecification": {
+    "$defs": {
+      "Payload": {
+        "additionalProperties": false,
+        "properties": {
+          "contract": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Contract",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "contract",
+          "data"
+        ],
+        "title": "Payload",
+        "type": "object"
+      },
+      "TrainingBudget": {
+        "additionalProperties": false,
+        "description": "Total environment transitions across all selected seeds and environments.\n\nThis is a training stop limit, not a new Host resource grant or ledger.",
+        "properties": {
+          "environment_steps": {
+            "exclusiveMinimum": 0,
+            "title": "Environment Steps",
+            "type": "integer"
+          },
+          "wall_s": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Wall S"
+          }
+        },
+        "required": [
+          "environment_steps"
+        ],
+        "title": "TrainingBudget",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Agent-owned choices; trainer metadata declares supported algorithm IDs.\n\nparameters is a registered algorithm configuration, not an arbitrary dict.\nAdapters validate it and enforce the existing Host authorization/budget.\nNo task, evaluator, environment, robot or design-space override is accepted.",
+    "properties": {
+      "algorithm_id": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "title": "Algorithm Id",
+        "type": "string"
+      },
+      "parameters": {
+        "$ref": "#/$defs/Payload"
+      },
+      "budget": {
+        "$ref": "#/$defs/TrainingBudget"
+      },
+      "seeds": {
+        "items": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "minItems": 1,
+        "title": "Seeds",
+        "type": "array"
+      }
+    },
+    "required": [
+      "algorithm_id",
+      "parameters",
+      "budget",
+      "seeds"
+    ],
+    "title": "RLTrainingSpecification",
+    "type": "object"
+  },
+  "TrainingJob": {
+    "$defs": {
+      "Binding": {
+        "additionalProperties": false,
+        "properties": {
+          "extension_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Extension Id",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "parameters": {
+            "$ref": "#/$defs/Payload"
+          }
+        },
+        "required": [
+          "extension_id",
+          "parameters"
+        ],
+        "title": "Binding",
+        "type": "object"
+      },
+      "EvidenceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "media_type": {
+            "default": "application/json",
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id"
+        ],
+        "title": "EvidenceRef",
+        "type": "object"
+      },
+      "Payload": {
+        "additionalProperties": false,
+        "properties": {
+          "contract": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Contract",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "contract",
+          "data"
+        ],
+        "title": "Payload",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Durable identity/status snapshot, never a Python process handle.\n\nRebind trainer and query job_id after restoring this artifact. handle may\nreference existing Worker identity or an adapter's typed external job handle.\nproblem/specification reference frozen inputs; status is an observation, not\nproof of policy quality. No process exit code implies training success.",
+    "properties": {
+      "job_id": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "title": "Job Id",
+        "type": "string"
+      },
+      "trainer": {
+        "$ref": "#/$defs/Binding"
+      },
+      "problem": {
+        "$ref": "#/$defs/EvidenceRef"
+      },
+      "specification": {
+        "$ref": "#/$defs/EvidenceRef"
+      },
+      "status": {
+        "enum": [
+          "queued",
+          "running",
+          "completed",
+          "failed",
+          "cancelled",
+          "unknown"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "handle": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Payload"
+          },
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Handle"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Reason"
+      }
+    },
+    "required": [
+      "job_id",
+      "trainer",
+      "problem",
+      "specification",
+      "status"
+    ],
+    "title": "TrainingJob",
+    "type": "object"
+  },
+  "TrainingMetric": {
+    "additionalProperties": false,
+    "description": "Adapter-normalized sample; step counts environment transitions.\n\nNames include train/return, eval/success_rate, train/loss/policy,\ntrain/loss/value, train/entropy, train/approx_kl, train/clip_fraction,\ntrain/actor_loss, train/critic_loss, train/q_value and\nreward/<term>/episodic_return. No algorithm must emit every metric.\neval/* describes training monitoring, not a formal EvaluationResult.",
+    "properties": {
+      "name": {
+        "maxLength": 160,
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*(/[A-Za-z0-9][A-Za-z0-9_.-]*)*$",
+        "title": "Name",
+        "type": "string"
+      },
+      "step": {
+        "minimum": 0,
+        "title": "Step",
+        "type": "integer"
+      },
+      "value": {
+        "title": "Value",
+        "type": "number"
+      },
+      "units": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Units"
+      },
+      "seed": {
+        "anyOf": [
+          {
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "None for an explicitly aggregated sample",
+        "title": "Seed"
+      }
+    },
+    "required": [
+      "name",
+      "step",
+      "value"
+    ],
+    "title": "TrainingMetric",
+    "type": "object"
+  },
+  "PolicyArtifact": {
+    "$defs": {
+      "EvidenceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "media_type": {
+            "default": "application/json",
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id"
+        ],
+        "title": "EvidenceRef",
+        "type": "object"
+      },
+      "Payload": {
+        "additionalProperties": false,
+        "properties": {
+          "contract": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Contract",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "contract",
+          "data"
+        ],
+        "title": "Payload",
+        "type": "object"
+      },
+      "SignalSpec": {
+        "additionalProperties": false,
+        "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
+        "properties": {
+          "name": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Name",
+            "type": "string"
+          },
+          "entity": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Entity",
+            "type": "string"
+          },
+          "dimension": {
+            "exclusiveMinimum": 0,
+            "title": "Dimension",
+            "type": "integer"
+          },
+          "units": {
+            "minLength": 1,
+            "title": "Units",
+            "type": "string"
+          },
+          "frame": {
+            "minLength": 1,
+            "title": "Frame",
+            "type": "string"
+          },
+          "phase": {
+            "minLength": 1,
+            "title": "Phase",
+            "type": "string"
+          },
+          "missing": {
+            "const": "unsupported",
+            "default": "unsupported",
+            "title": "Missing",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "entity",
+          "dimension",
+          "units",
+          "frame",
+          "phase"
+        ],
+        "title": "SignalSpec",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Loadable policy plus its inference semantics, not just network weights.\n\npreprocessing is required, including an explicit identity declaration when\nunused. It holds/references normalization and other input/output transforms.\nConcrete weight formats/loaders belong to trusted adapters. source_job points\nto a saved TrainingJob; training_configuration points to the exact saved spec.",
+    "properties": {
+      "checkpoint": {
+        "$ref": "#/$defs/EvidenceRef"
+      },
+      "algorithm_id": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "title": "Algorithm Id",
+        "type": "string"
+      },
+      "observations": {
+        "items": {
+          "$ref": "#/$defs/SignalSpec"
+        },
+        "minItems": 1,
+        "title": "Observations",
+        "type": "array"
+      },
+      "actions": {
+        "items": {
+          "$ref": "#/$defs/SignalSpec"
+        },
+        "minItems": 1,
+        "title": "Actions",
+        "type": "array"
+      },
+      "preprocessing": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Payload"
+          },
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          }
+        ],
+        "title": "Preprocessing"
+      },
+      "training_configuration": {
+        "$ref": "#/$defs/EvidenceRef"
+      },
+      "source_job": {
+        "$ref": "#/$defs/EvidenceRef"
+      }
+    },
+    "required": [
+      "checkpoint",
+      "algorithm_id",
+      "observations",
+      "actions",
+      "preprocessing",
+      "training_configuration",
+      "source_job"
+    ],
+    "title": "PolicyArtifact",
+    "type": "object"
+  },
+  "TrainingResult": {
+    "$defs": {
+      "EvidenceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "media_type": {
+            "default": "application/json",
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id"
+        ],
+        "title": "EvidenceRef",
+        "type": "object"
+      },
+      "GateResult": {
+        "additionalProperties": false,
+        "description": "Failed means observed failure; ungradable means insufficient usable evidence.\n\nMissing/nonfinite measurements are never fabricated as numeric zero. A\nregistered observation payload can describe nonfiniteness without JSON NaN.",
+        "properties": {
+          "gate_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Gate Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "failed",
+              "ungradable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "observed": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Metric"
+              },
+              {
+                "$ref": "#/$defs/Payload"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Observed"
+          },
+          "expected": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Metric"
+              },
+              {
+                "$ref": "#/$defs/Payload"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "gate_id",
+          "status"
+        ],
+        "title": "GateResult",
+        "type": "object"
+      },
+      "Metric": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Name",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          },
+          "units": {
+            "title": "Units",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "units"
+        ],
+        "title": "Metric",
+        "type": "object"
+      },
+      "Payload": {
+        "additionalProperties": false,
+        "properties": {
+          "contract": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Contract",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "contract",
+          "data"
+        ],
+        "title": "Payload",
+        "type": "object"
+      },
+      "TrainingMetric": {
+        "additionalProperties": false,
+        "description": "Adapter-normalized sample; step counts environment transitions.\n\nNames include train/return, eval/success_rate, train/loss/policy,\ntrain/loss/value, train/entropy, train/approx_kl, train/clip_fraction,\ntrain/actor_loss, train/critic_loss, train/q_value and\nreward/<term>/episodic_return. No algorithm must emit every metric.\neval/* describes training monitoring, not a formal EvaluationResult.",
+        "properties": {
+          "name": {
+            "maxLength": 160,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*(/[A-Za-z0-9][A-Za-z0-9_.-]*)*$",
+            "title": "Name",
+            "type": "string"
+          },
+          "step": {
+            "minimum": 0,
+            "title": "Step",
+            "type": "integer"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          },
+          "units": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Units"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "None for an explicitly aggregated sample",
+            "title": "Seed"
+          }
+        },
+        "required": [
+          "name",
+          "step",
+          "value"
+        ],
+        "title": "TrainingMetric",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Training outcome, separate from formal task evaluation.\n\nPolicy references resolve to PolicyArtifact, and best may differ from final.\ncompleted requires a policy artifact; its suitability still depends on gates\nand evaluation, never on a high return or process exit code. Failed/cancelled\nruns may retain useful checkpoints. Large metrics/logs stay in evidence.",
+    "properties": {
+      "job": {
+        "$ref": "#/$defs/EvidenceRef"
+      },
+      "status": {
+        "enum": [
+          "completed",
+          "failed",
+          "cancelled",
+          "unknown"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "best_policy": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "final_policy": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "metrics": {
+        "items": {
+          "$ref": "#/$defs/TrainingMetric"
+        },
+        "title": "Metrics",
+        "type": "array"
+      },
+      "metrics_evidence": {
+        "items": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "title": "Metrics Evidence",
+        "type": "array"
+      },
+      "logs": {
+        "items": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "title": "Logs",
+        "type": "array"
+      },
+      "gates": {
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GateResult"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            }
+          ]
+        },
+        "title": "Gates",
+        "type": "array"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Reason"
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Limitations",
+        "type": "array"
+      }
+    },
+    "required": [
+      "job",
+      "status"
+    ],
+    "title": "TrainingResult",
+    "type": "object"
+  },
+  "GateResult": {
+    "$defs": {
+      "EvidenceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "media_type": {
+            "default": "application/json",
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id"
+        ],
+        "title": "EvidenceRef",
+        "type": "object"
+      },
+      "Metric": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Name",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          },
+          "units": {
+            "title": "Units",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "units"
+        ],
+        "title": "Metric",
+        "type": "object"
+      },
+      "Payload": {
+        "additionalProperties": false,
+        "properties": {
+          "contract": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Contract",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "contract",
+          "data"
+        ],
+        "title": "Payload",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Failed means observed failure; ungradable means insufficient usable evidence.\n\nMissing/nonfinite measurements are never fabricated as numeric zero. A\nregistered observation payload can describe nonfiniteness without JSON NaN.",
+    "properties": {
+      "gate_id": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "title": "Gate Id",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "passed",
+          "failed",
+          "ungradable"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "evidence": {
+        "items": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "title": "Evidence",
+        "type": "array"
+      },
+      "observed": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Metric"
+          },
+          {
+            "$ref": "#/$defs/Payload"
+          },
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Observed"
+      },
+      "expected": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Metric"
+          },
+          {
+            "$ref": "#/$defs/Payload"
+          },
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Expected"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Reason"
+      }
+    },
+    "required": [
+      "gate_id",
+      "status"
+    ],
+    "title": "GateResult",
+    "type": "object"
+  },
+  "DiagnosticFact": {
+    "$defs": {
+      "EvidenceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "media_type": {
+            "default": "application/json",
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id"
+        ],
+        "title": "EvidenceRef",
+        "type": "object"
+      },
+      "Metric": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Name",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          },
+          "units": {
+            "title": "Units",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "units"
+        ],
+        "title": "Metric",
+        "type": "object"
+      },
+      "Payload": {
+        "additionalProperties": false,
+        "properties": {
+          "contract": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Contract",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "contract",
+          "data"
+        ],
+        "title": "Payload",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Produced by deterministic tools; statements report observations, not causes.",
+    "properties": {
+      "fact_id": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "title": "Fact Id",
+        "type": "string"
+      },
+      "statement": {
+        "minLength": 1,
+        "title": "Statement",
+        "type": "string"
+      },
+      "evidence": {
+        "items": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "minItems": 1,
+        "title": "Evidence",
+        "type": "array"
+      },
+      "observed": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Metric"
+          },
+          {
+            "$ref": "#/$defs/Payload"
+          },
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Observed"
+      }
+    },
+    "required": [
+      "fact_id",
+      "statement",
+      "evidence"
+    ],
+    "title": "DiagnosticFact",
+    "type": "object"
+  },
+  "DiagnosticAttribution": {
+    "additionalProperties": false,
+    "description": "Reasoning over facts; ruled_out is explicit, not a missing hypothesis.",
+    "properties": {
+      "cause": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "title": "Cause",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "supported",
+          "possible",
+          "insufficient_evidence",
+          "ruled_out"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "fact_ids": {
+        "items": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "type": "string"
+        },
+        "title": "Fact Ids",
+        "type": "array"
+      },
+      "reason": {
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "cause",
+      "status",
+      "reason"
+    ],
+    "title": "DiagnosticAttribution",
+    "type": "object"
+  },
+  "DiagnosticReport": {
+    "$defs": {
+      "DiagnosticAttribution": {
+        "additionalProperties": false,
+        "description": "Reasoning over facts; ruled_out is explicit, not a missing hypothesis.",
+        "properties": {
+          "cause": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Cause",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "supported",
+              "possible",
+              "insufficient_evidence",
+              "ruled_out"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "fact_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "type": "string"
+            },
+            "title": "Fact Ids",
+            "type": "array"
+          },
+          "reason": {
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "cause",
+          "status",
+          "reason"
+        ],
+        "title": "DiagnosticAttribution",
+        "type": "object"
+      },
+      "DiagnosticFact": {
+        "additionalProperties": false,
+        "description": "Produced by deterministic tools; statements report observations, not causes.",
+        "properties": {
+          "fact_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Fact Id",
+            "type": "string"
+          },
+          "statement": {
+            "minLength": 1,
+            "title": "Statement",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          },
+          "observed": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Metric"
+              },
+              {
+                "$ref": "#/$defs/Payload"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Observed"
+          }
+        },
+        "required": [
+          "fact_id",
+          "statement",
+          "evidence"
+        ],
+        "title": "DiagnosticFact",
+        "type": "object"
+      },
+      "EvidenceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "media_type": {
+            "default": "application/json",
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id"
+        ],
+        "title": "EvidenceRef",
+        "type": "object"
+      },
+      "GateResult": {
+        "additionalProperties": false,
+        "description": "Failed means observed failure; ungradable means insufficient usable evidence.\n\nMissing/nonfinite measurements are never fabricated as numeric zero. A\nregistered observation payload can describe nonfiniteness without JSON NaN.",
+        "properties": {
+          "gate_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Gate Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "failed",
+              "ungradable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "observed": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Metric"
+              },
+              {
+                "$ref": "#/$defs/Payload"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Observed"
+          },
+          "expected": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Metric"
+              },
+              {
+                "$ref": "#/$defs/Payload"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "gate_id",
+          "status"
+        ],
+        "title": "GateResult",
+        "type": "object"
+      },
+      "Metric": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Name",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          },
+          "units": {
+            "title": "Units",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "units"
+        ],
+        "title": "Metric",
+        "type": "object"
+      },
+      "Payload": {
+        "additionalProperties": false,
+        "properties": {
+          "contract": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "title": "Contract",
+            "type": "string"
+          },
+          "version": {
+            "default": "1.0.0",
+            "title": "Version",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "contract",
+          "data"
+        ],
+        "title": "Payload",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Persistable handoff; facts remain distinct from LLM/human attribution.\n\nsubject is an extensible category, source identifies the diagnosed artifact.\nRecommendations are advisory text, never executable actions or authorization.",
+    "properties": {
+      "subject": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+        "title": "Subject",
+        "type": "string"
+      },
+      "source": {
+        "$ref": "#/$defs/EvidenceRef"
+      },
+      "facts": {
+        "items": {
+          "$ref": "#/$defs/DiagnosticFact"
+        },
+        "title": "Facts",
+        "type": "array"
+      },
+      "attribution": {
+        "items": {
+          "$ref": "#/$defs/DiagnosticAttribution"
+        },
+        "title": "Attribution",
+        "type": "array"
+      },
+      "gates": {
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GateResult"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            }
+          ]
+        },
+        "title": "Gates",
+        "type": "array"
+      },
+      "recommended_actions": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Recommended Actions",
+        "type": "array"
+      },
+      "limitations": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Limitations",
+        "type": "array"
+      }
+    },
+    "required": [
+      "subject",
+      "source"
+    ],
+    "title": "DiagnosticReport",
+    "type": "object"
+  },
   "ModelQuantityRequest": {
     "additionalProperties": false,
     "properties": {
@@ -14599,6 +16303,312 @@
       "title": "RobotIR",
       "type": "object"
     },
+    "platform.diagnostic_report@1.0.0": {
+      "$defs": {
+        "DiagnosticAttribution": {
+          "additionalProperties": false,
+          "description": "Reasoning over facts; ruled_out is explicit, not a missing hypothesis.",
+          "properties": {
+            "cause": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Cause",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "supported",
+                "possible",
+                "insufficient_evidence",
+                "ruled_out"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "fact_ids": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Fact Ids",
+              "type": "array"
+            },
+            "reason": {
+              "minLength": 1,
+              "title": "Reason",
+              "type": "string"
+            }
+          },
+          "required": [
+            "cause",
+            "status",
+            "reason"
+          ],
+          "title": "DiagnosticAttribution",
+          "type": "object"
+        },
+        "DiagnosticFact": {
+          "additionalProperties": false,
+          "description": "Produced by deterministic tools; statements report observations, not causes.",
+          "properties": {
+            "fact_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Fact Id",
+              "type": "string"
+            },
+            "statement": {
+              "minLength": 1,
+              "title": "Statement",
+              "type": "string"
+            },
+            "evidence": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "minItems": 1,
+              "title": "Evidence",
+              "type": "array"
+            },
+            "observed": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Metric"
+                },
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Observed"
+            }
+          },
+          "required": [
+            "fact_id",
+            "statement",
+            "evidence"
+          ],
+          "title": "DiagnosticFact",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "GateResult": {
+          "additionalProperties": false,
+          "description": "Failed means observed failure; ungradable means insufficient usable evidence.\n\nMissing/nonfinite measurements are never fabricated as numeric zero. A\nregistered observation payload can describe nonfiniteness without JSON NaN.",
+          "properties": {
+            "gate_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Gate Id",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "passed",
+                "failed",
+                "ungradable"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "evidence": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Evidence",
+              "type": "array"
+            },
+            "observed": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Metric"
+                },
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Observed"
+            },
+            "expected": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Metric"
+                },
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Expected"
+            },
+            "reason": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Reason"
+            }
+          },
+          "required": [
+            "gate_id",
+            "status"
+          ],
+          "title": "GateResult",
+          "type": "object"
+        },
+        "Metric": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "value",
+            "units"
+          ],
+          "title": "Metric",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Persistable handoff; facts remain distinct from LLM/human attribution.\n\nsubject is an extensible category, source identifies the diagnosed artifact.\nRecommendations are advisory text, never executable actions or authorization.",
+      "properties": {
+        "subject": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Subject",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "facts": {
+          "items": {
+            "$ref": "#/$defs/DiagnosticFact"
+          },
+          "title": "Facts",
+          "type": "array"
+        },
+        "attribution": {
+          "items": {
+            "$ref": "#/$defs/DiagnosticAttribution"
+          },
+          "title": "Attribution",
+          "type": "array"
+        },
+        "gates": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/GateResult"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              }
+            ]
+          },
+          "title": "Gates",
+          "type": "array"
+        },
+        "recommended_actions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "subject",
+        "source"
+      ],
+      "title": "DiagnosticReport",
+      "type": "object"
+    },
     "platform.dynamic_system@1.0.0": {
       "$defs": {
         "EvidenceRef": {
@@ -14803,6 +16813,160 @@
       "additionalProperties": false,
       "properties": {},
       "title": "Empty",
+      "type": "object"
+    },
+    "platform.gate_result@1.0.0": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Metric": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "value",
+            "units"
+          ],
+          "title": "Metric",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Failed means observed failure; ungradable means insufficient usable evidence.\n\nMissing/nonfinite measurements are never fabricated as numeric zero. A\nregistered observation payload can describe nonfiniteness without JSON NaN.",
+      "properties": {
+        "gate_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Gate Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "ungradable"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "observed": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Metric"
+            },
+            {
+              "$ref": "#/$defs/Payload"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed"
+        },
+        "expected": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Metric"
+            },
+            {
+              "$ref": "#/$defs/Payload"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "gate_id",
+        "status"
+      ],
+      "title": "GateResult",
       "type": "object"
     },
     "platform.linearized_model@1.0.0": {
@@ -15583,6 +17747,555 @@
       "title": "OptimizationSpecification",
       "type": "object"
     },
+    "platform.policy_artifact@1.0.0": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Loadable policy plus its inference semantics, not just network weights.\n\npreprocessing is required, including an explicit identity declaration when\nunused. It holds/references normalization and other input/output transforms.\nConcrete weight formats/loaders belong to trusted adapters. source_job points\nto a saved TrainingJob; training_configuration points to the exact saved spec.",
+      "properties": {
+        "checkpoint": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "algorithm_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Algorithm Id",
+          "type": "string"
+        },
+        "observations": {
+          "items": {
+            "$ref": "#/$defs/SignalSpec"
+          },
+          "minItems": 1,
+          "title": "Observations",
+          "type": "array"
+        },
+        "actions": {
+          "items": {
+            "$ref": "#/$defs/SignalSpec"
+          },
+          "minItems": 1,
+          "title": "Actions",
+          "type": "array"
+        },
+        "preprocessing": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Payload"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            }
+          ],
+          "title": "Preprocessing"
+        },
+        "training_configuration": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "source_job": {
+          "$ref": "#/$defs/EvidenceRef"
+        }
+      },
+      "required": [
+        "checkpoint",
+        "algorithm_id",
+        "observations",
+        "actions",
+        "preprocessing",
+        "training_configuration",
+        "source_job"
+      ],
+      "title": "PolicyArtifact",
+      "type": "object"
+    },
+    "platform.reward_definition@1.0.0": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Stable term names; composition and implementation use a trusted contract.\n\nNo reward DSL, executable string or automatically generated reward is defined.",
+      "properties": {
+        "terms": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Terms",
+          "type": "array"
+        },
+        "implementation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Payload"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            }
+          ],
+          "title": "Implementation"
+        }
+      },
+      "required": [
+        "terms",
+        "implementation"
+      ],
+      "title": "RewardDefinition",
+      "type": "object"
+    },
+    "platform.rl_problem@1.0.0": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "RewardDefinition": {
+          "additionalProperties": false,
+          "description": "Stable term names; composition and implementation use a trusted contract.\n\nNo reward DSL, executable string or automatically generated reward is defined.",
+          "properties": {
+            "terms": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Terms",
+              "type": "array"
+            },
+            "implementation": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                }
+              ],
+              "title": "Implementation"
+            }
+          },
+          "required": [
+            "terms",
+            "implementation"
+          ],
+          "title": "RewardDefinition",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Learning interface referencing authoritative TaskDefinition and SessionInput.\n\nexperiment identifies a frozen SessionInput (robot, backend, environment and\npolicy); task references its TaskDefinition. Adapters check their consistency.\nOrdered SignalSpecs define flattened observation/action semantics. Reset and\ntermination adapt existing initial/episode definitions without changing the\ntask's formal success criterion. Reward is not an Evaluator.",
+      "properties": {
+        "task": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "experiment": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "observations": {
+          "items": {
+            "$ref": "#/$defs/SignalSpec"
+          },
+          "minItems": 1,
+          "title": "Observations",
+          "type": "array"
+        },
+        "actions": {
+          "items": {
+            "$ref": "#/$defs/SignalSpec"
+          },
+          "minItems": 1,
+          "title": "Actions",
+          "type": "array"
+        },
+        "reward": {
+          "$ref": "#/$defs/RewardDefinition"
+        },
+        "termination": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Payload"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            }
+          ],
+          "title": "Termination"
+        },
+        "reset": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Binding"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            }
+          ],
+          "title": "Reset"
+        }
+      },
+      "required": [
+        "task",
+        "experiment",
+        "observations",
+        "actions",
+        "reward",
+        "termination",
+        "reset"
+      ],
+      "title": "RLProblem",
+      "type": "object"
+    },
+    "platform.rl_training_specification@1.0.0": {
+      "$defs": {
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "TrainingBudget": {
+          "additionalProperties": false,
+          "description": "Total environment transitions across all selected seeds and environments.\n\nThis is a training stop limit, not a new Host resource grant or ledger.",
+          "properties": {
+            "environment_steps": {
+              "exclusiveMinimum": 0,
+              "title": "Environment Steps",
+              "type": "integer"
+            },
+            "wall_s": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Wall S"
+            }
+          },
+          "required": [
+            "environment_steps"
+          ],
+          "title": "TrainingBudget",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Agent-owned choices; trainer metadata declares supported algorithm IDs.\n\nparameters is a registered algorithm configuration, not an arbitrary dict.\nAdapters validate it and enforce the existing Host authorization/budget.\nNo task, evaluator, environment, robot or design-space override is accepted.",
+      "properties": {
+        "algorithm_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Algorithm Id",
+          "type": "string"
+        },
+        "parameters": {
+          "$ref": "#/$defs/Payload"
+        },
+        "budget": {
+          "$ref": "#/$defs/TrainingBudget"
+        },
+        "seeds": {
+          "items": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "minItems": 1,
+          "title": "Seeds",
+          "type": "array"
+        }
+      },
+      "required": [
+        "algorithm_id",
+        "parameters",
+        "budget",
+        "seeds"
+      ],
+      "title": "RLTrainingSpecification",
+      "type": "object"
+    },
     "platform.system_context@1.0.0": {
       "$defs": {
         "EvidenceRef": {
@@ -15670,6 +18383,509 @@
         "u0"
       ],
       "title": "SystemContext",
+      "type": "object"
+    },
+    "platform.training_job@1.0.0": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Durable identity/status snapshot, never a Python process handle.\n\nRebind trainer and query job_id after restoring this artifact. handle may\nreference existing Worker identity or an adapter's typed external job handle.\nproblem/specification reference frozen inputs; status is an observation, not\nproof of policy quality. No process exit code implies training success.",
+      "properties": {
+        "job_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+          "title": "Job Id",
+          "type": "string"
+        },
+        "trainer": {
+          "$ref": "#/$defs/Binding"
+        },
+        "problem": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "specification": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "status": {
+          "enum": [
+            "queued",
+            "running",
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "handle": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Payload"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Handle"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "job_id",
+        "trainer",
+        "problem",
+        "specification",
+        "status"
+      ],
+      "title": "TrainingJob",
+      "type": "object"
+    },
+    "platform.training_metric@1.0.0": {
+      "additionalProperties": false,
+      "description": "Adapter-normalized sample; step counts environment transitions.\n\nNames include train/return, eval/success_rate, train/loss/policy,\ntrain/loss/value, train/entropy, train/approx_kl, train/clip_fraction,\ntrain/actor_loss, train/critic_loss, train/q_value and\nreward/<term>/episodic_return. No algorithm must emit every metric.\neval/* describes training monitoring, not a formal EvaluationResult.",
+      "properties": {
+        "name": {
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*(/[A-Za-z0-9][A-Za-z0-9_.-]*)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "step": {
+          "minimum": 0,
+          "title": "Step",
+          "type": "integer"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        },
+        "units": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Units"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "None for an explicitly aggregated sample",
+          "title": "Seed"
+        }
+      },
+      "required": [
+        "name",
+        "step",
+        "value"
+      ],
+      "title": "TrainingMetric",
+      "type": "object"
+    },
+    "platform.training_result@1.0.0": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "GateResult": {
+          "additionalProperties": false,
+          "description": "Failed means observed failure; ungradable means insufficient usable evidence.\n\nMissing/nonfinite measurements are never fabricated as numeric zero. A\nregistered observation payload can describe nonfiniteness without JSON NaN.",
+          "properties": {
+            "gate_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Gate Id",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "passed",
+                "failed",
+                "ungradable"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "evidence": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Evidence",
+              "type": "array"
+            },
+            "observed": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Metric"
+                },
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Observed"
+            },
+            "expected": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Metric"
+                },
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Expected"
+            },
+            "reason": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Reason"
+            }
+          },
+          "required": [
+            "gate_id",
+            "status"
+          ],
+          "title": "GateResult",
+          "type": "object"
+        },
+        "Metric": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "value",
+            "units"
+          ],
+          "title": "Metric",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "TrainingMetric": {
+          "additionalProperties": false,
+          "description": "Adapter-normalized sample; step counts environment transitions.\n\nNames include train/return, eval/success_rate, train/loss/policy,\ntrain/loss/value, train/entropy, train/approx_kl, train/clip_fraction,\ntrain/actor_loss, train/critic_loss, train/q_value and\nreward/<term>/episodic_return. No algorithm must emit every metric.\neval/* describes training monitoring, not a formal EvaluationResult.",
+          "properties": {
+            "name": {
+              "maxLength": 160,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*(/[A-Za-z0-9][A-Za-z0-9_.-]*)*$",
+              "title": "Name",
+              "type": "string"
+            },
+            "step": {
+              "minimum": 0,
+              "title": "Step",
+              "type": "integer"
+            },
+            "value": {
+              "title": "Value",
+              "type": "number"
+            },
+            "units": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Units"
+            },
+            "seed": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "None for an explicitly aggregated sample",
+              "title": "Seed"
+            }
+          },
+          "required": [
+            "name",
+            "step",
+            "value"
+          ],
+          "title": "TrainingMetric",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Training outcome, separate from formal task evaluation.\n\nPolicy references resolve to PolicyArtifact, and best may differ from final.\ncompleted requires a policy artifact; its suitability still depends on gates\nand evaluation, never on a high return or process exit code. Failed/cancelled\nruns may retain useful checkpoints. Large metrics/logs stay in evidence.",
+      "properties": {
+        "job": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "best_policy": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "final_policy": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/TrainingMetric"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "metrics_evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Metrics Evidence",
+          "type": "array"
+        },
+        "logs": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Logs",
+          "type": "array"
+        },
+        "gates": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/GateResult"
+              },
+              {
+                "$ref": "#/$defs/EvidenceRef"
+              }
+            ]
+          },
+          "title": "Gates",
+          "type": "array"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "job",
+        "status"
+      ],
+      "title": "TrainingResult",
       "type": "object"
     },
     "reference.backend_data@1.0.0": {

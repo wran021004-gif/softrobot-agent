@@ -19,7 +19,7 @@ from tools.artifact_tools import file_hash
 # A single registry and routing namespace: mathematical models retain the
 # historical dynamics_model kind; mathematical solvers are distinct from search.
 ExtensionKind = Literal['task', 'initializer', 'dynamics_model', 'backend',
-    'controller', 'search', 'solver', 'optimization_assembler', 'evaluator', 'candidate_builder', 'tool',
+    'controller', 'search', 'solver', 'optimization_assembler', 'rl_trainer', 'evaluator', 'candidate_builder', 'tool',
     'worker', 'model_adapter', 'strategy']
 
 

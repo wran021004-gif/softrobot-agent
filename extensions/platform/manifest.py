@@ -2,6 +2,8 @@
 from schemas.common import Contract
 from schemas.platform import SessionInput, ModelResponse, ToolRequest
 from schemas import platform_math as math_contracts
+from schemas import platform_learning as learning_contracts
+from schemas import platform_diagnostics as diagnostic_contracts
 from tools.platform_registry import Extension
 
 
@@ -19,6 +21,15 @@ CONTRACTS += [('platform.' + name, '1.0.0', schema) for name, schema in [
     ('optimization_specification', math_contracts.OptimizationSpecification),
     ('optimization_problem', math_contracts.OptimizationProblem),
     ('optimization_result', math_contracts.OptimizationResult),
+    ('rl_problem', learning_contracts.RLProblem),
+    ('reward_definition', learning_contracts.RewardDefinition),
+    ('rl_training_specification', learning_contracts.RLTrainingSpecification),
+    ('training_job', learning_contracts.TrainingJob),
+    ('training_metric', learning_contracts.TrainingMetric),
+    ('policy_artifact', learning_contracts.PolicyArtifact),
+    ('training_result', learning_contracts.TrainingResult),
+    ('gate_result', diagnostic_contracts.GateResult),
+    ('diagnostic_report', diagnostic_contracts.DiagnosticReport),
 ]]
 EXTENSIONS = [
     Extension('candidate.controller', 'candidate_builder', '1.0.0', Empty, SessionInput,

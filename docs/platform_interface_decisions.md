@@ -1,5 +1,61 @@
 # 公共接口版本与定版决策
 
+## RL 训练产物与通用诊断边界（基线 f0d3b52）
+
+公共数据契约新增 `schemas/platform_learning.py` 与 `schemas/platform_diagnostics.py`，通过原
+Registry 注册为 `platform.rl_problem`、`reward_definition`、`rl_training_specification`、
+`training_job`、`training_metric`、`policy_artifact`、`training_result`、`gate_result`、
+`diagnostic_report`（均为 platform 前缀、1.0.0）。不新增运行框架、调度器或数据库。
+
+三条路线独立：显式 Specification → Assembler → Problem → Solver → OptimizationResult；
+黑箱 Search → Backend → Evaluator → feedback；RLProblem + RLTrainingSpecification → RLTrainer
+→ TrainingJob → TrainingResult → PolicyArtifact → 普通 Controller。RLTrainer 不是 Search、Solver、
+Backend 或 Controller。HARBOR/SB3 等未来只作为具体 RLTrainer adapter，不接管平台。
+
+RLProblem 用 EvidenceRef 引用权威 TaskDefinition 和冻结的 SessionInput（已有机器人、Backend、
+环境/装配及执行配置），复用有序 SignalSpec 定义 observation/action；reset 复用 Binding/EvidenceRef，
+termination 和 reward 实现使用注册 Payload/EvidenceRef。adapter 负责核对 task 与 experiment 一致性、
+解析嵌套 Payload、检查语义及适用范围。RewardDefinition 只列稳定 term 名及可信实现引用，组合方式由
+该实现契约描述。Reward 引导训练；正式成功只来自原 Evaluator/EvaluationResult，高 return 不等于成功。
+
+RLTrainingSpecification 仅含 algorithm_id、注册参数 Payload、训练预算及 seeds，不含任务、评价器、
+环境或 Design Space 覆盖入口。TrainingBudget.environment_steps 是所有 seed/环境的总转移步数上限，
+不产生新的 Host 资源授权。具体 trainer 在 `Extension.capabilities.supported_algorithms` 声明 ID，
+并检查配置契约；算法不做公共枚举，也不新增算法 Registry。
+
+RLTrainer 协议仍在 `schemas/platform_protocols.py`；以独立 `rl_trainer` kind 登记，用原
+`Registry.bind(binding, 'rl_trainer')` 获取可信实现与参数。start/problem/specification 经既有 Store
+封存后返回 TrainingJob；status/cancel 返回任务状态快照，collect 返回 TrainingResult。
+TrainingJob 的 trainer Binding、job_id、输入 EvidenceRef 和可选 typed handle 是恢复依据；
+重建 adapter 后应能查询/取消/收集，不依赖聊天历史或进程对象。现有 Worker 可承载具体实现的工作，
+长期外部作业句柄由 adapter 负责；本轮不改变 Worker 的时限或生命周期。
+queued/running/completed/failed/cancelled/unknown 不由进程退出码推断；取消未确认须保留 unknown。
+
+TrainingResult 的 best_policy/final_policy 分别引用已保存 PolicyArtifact，可不同；completed 至少
+需要一个策略引用，可用性仍须通过 Gate 与独立评价确认。PolicyArtifact 保存 checkpoint、算法 ID、
+有序 observation/action、必填 preprocessing、训练配置和源 TrainingJob 引用。预处理须保留 normalization
+等全部推理变换；不用预处理也须显式声明 identity。权重格式/加载器由 adapter 决定。未来可把该 artifact
+的 Payload 或其 EvidenceRef 放进普通 controller.rl_policy 的参数契约，由 Controller 校验语义并加载；
+Backend 仍只接收 Controller 命令，不感知策略训练来源。
+
+TrainingMetric 提供 name/step/value/units 与可选 seed，name 在原 Identifier 语法上允许 slash 分段，
+不改变全局 Identifier。采用 train/return、eval/return、eval/success_rate、train/loss/policy 等公共语义，
+reward/<term>/episodic_return 对应稳定 term；adapter 映射库私有日志 key，算法无需填齐所有指标。
+eval/* 仅是训练监测，正式结论仍引用 EvaluationResult。大日志/指标序列留在 EvidenceRef。
+
+GateResult 通用于数学、训练与仿真：passed/failed/ungradable 明确区分，observed/expected 复用
+Metric/Payload/EvidenceRef。NaN 事件用 typed payload 记录非有限状态及步数，不写 JSON NaN；
+缺日志是 ungradable，不伪造零值。DiagnosticReport 的 facts 必须引用证据且来自确定工具；attribution
+另存 supported/possible/insufficient_evidence/ruled_out 及事实引用，recommended_actions 只是建议。
+schema 检查引用，不自动判断事实或归因是否科学成立；局限写入 limitations。
+
+当前仍是同一个 LLM 读取事实后归因、决策。未来 Design/Training/Diagnostic Agent 只需通过原
+Store/Evidence/Worker.result 的 typed artifact 交接，不传完整对话或隐式 Python 状态；本轮无多 Agent
+runtime。Host/Store/Worker/Route/Backend/Search/Solver/Controller/Evaluator 和现有 diagnostics 工具不改，
+历史 evidence/session 不迁移；原依赖兼容检查继续生效。Combination 仍只有 dynamics_model/backend/controller。
+本轮仅内存 TrainerStub 和序列化/持久化测试，不启动训练、GPU 或真实推理；公共边界至此冻结，
+下一阶段再接具体环境 adapter、Trainer、Policy Controller 和确定性训练诊断工具。
+
 ## 确定性优化组装与显式工作点（基线 8e198f5）
 
 `OptimizationSpecification`（`schemas/platform_math.py`，`platform.optimization_specification@1.0.0`）
