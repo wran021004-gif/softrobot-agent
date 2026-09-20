@@ -23,6 +23,7 @@ from extensions.tendon_family.contracts import (
     LinearizedModelArtifactResult,
     LQRCommand,
     LQRDescription,
+    LQRSynthesisDescription,
     LQRGainArtifact,
     LQRParameters,
     LQRSynthesisResult,
@@ -299,6 +300,10 @@ class GVSCasadiFunctions:
             ['A', 'B', 'drift'],
         )
         static_residual = tendon_force + gravity - elastic
+        self.q_symbol = q
+        self.u_symbol = u
+        self.static_residual_expression = static_residual
+        self.tip_position_expression = state.attachment_pose(self.design.tip)[:3, 3]
         self.static_equilibrium = ca.Function(
             'gvs_static_equilibrium',
             [q, u],
@@ -325,6 +330,77 @@ class GVSCasadiFunctions:
             np.asarray(values[name], dtype=float)
             for name in ('residual', 'jacobian')
         )
+
+
+class GVSStaticCasadiExpressions:
+    """Static residual and tip graph without assembling inertial dynamics."""
+
+    def __init__(self, expression: GVSContinuousDynamicsExpression):
+        self.expression = expression
+        self.design = expression.design
+        self.parameters = expression.parameters
+        topology = _topology(self.design)
+        n = len(expression.coordinate_order)
+        q = ca.MX.sym('q', n)
+        u = ca.MX.sym('u', len(expression.tendon_order))
+        state = _SymbolicKinematics(
+            topology, q, self.parameters.integration_steps_per_segment
+        )
+
+        gravity = ca.MX.zeros(n, 1)
+        gravity_vector = _dm(expression.gravity_robot_base_m_s2)
+        for descriptor in _mass_descriptors(
+            topology, self.parameters.quadrature_points_per_segment
+        ):
+            pose = (
+                state.point_pose(descriptor['component'], descriptor['s'])
+                if descriptor['kind'] == 'segment'
+                else state.base_pose(descriptor['component'])
+            )
+            rotation = pose[:3, :3]
+            position = pose[:3, 3] + ca.mtimes(rotation, _dm(descriptor['offset']))
+            gravity += descriptor['mass'] * ca.mtimes(
+                ca.jacobian(position, q).T, gravity_vector
+            )
+
+        elastic = ca.MX.zeros(n, 1)
+        nodes, weights = _quadrature(
+            self.parameters.quadrature_points_per_segment
+        )
+        for segment_index, segment in enumerate(topology[3]):
+            local_q = q[4 * segment_index:4 * segment_index + 4]
+            local_elastic = ca.MX.zeros(4, 1)
+            natural = _dm(segment.natural_curvature_rad_m)
+            for node, weight in zip(nodes, weights):
+                phi1 = 2 * float(node) - 1
+                basis = _dm([[1, phi1, 0, 0], [0, 0, 1, phi1]])
+                stiffness, _ = _stiffness_and_damping(segment, float(node))
+                local_elastic += segment.length_m * float(weight) * ca.mtimes(
+                    [basis.T, _dm(stiffness), ca.mtimes(basis, local_q) - natural]
+                )
+            elastic[4 * segment_index:4 * segment_index + 4] = local_elastic
+
+        lengths = []
+        for tendon in topology[0].tendons:
+            positions = []
+            for route_point in tendon.points:
+                attachment = route_point.attachment
+                override = None
+                if route_point.hole:
+                    guide = topology[1].get(attachment.part)
+                    if not isinstance(guide, Rigid) or route_point.hole not in guide.guide_holes:
+                        raise ValueError('UNKNOWN_GUIDE_HOLE')
+                    override = guide.guide_holes[route_point.hole]
+                positions.append(state.attachment_pose(attachment, override)[:3, 3])
+            lengths.append(sum(
+                (ca.norm_2(b - a) for a, b in zip(positions, positions[1:])),
+                ca.MX(0),
+            ))
+        tendon_force = -ca.mtimes(ca.jacobian(ca.vertcat(*lengths), q).T, u)
+        self.q_symbol = q
+        self.u_symbol = u
+        self.static_residual_expression = tendon_force + gravity - elastic
+        self.tip_position_expression = state.attachment_pose(self.design.tip)[:3, 3]
 
 
 @lru_cache(maxsize=8)
@@ -652,3 +728,7 @@ def lqr_synthesize_tool(ctx, args):
 
 def lqr_describe_tool(ctx, args):
     return LQRDescription()
+
+
+def lqr_describe_tool_v2(ctx, args):
+    return LQRSynthesisDescription()

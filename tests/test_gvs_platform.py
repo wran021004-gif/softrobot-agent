@@ -77,6 +77,7 @@ class GVSPlatformTests(unittest.TestCase):
                 'dynamics.gvs_evaluate',
                 'dynamics.gvs_build_system',
                 'linearization.linearize',
+                'control.lqr_describe',
             } else 1
             self.assertEqual(len(matches), expected)
         model = self.reg.get('model.gvs', '1.0.0', 'dynamics_model')

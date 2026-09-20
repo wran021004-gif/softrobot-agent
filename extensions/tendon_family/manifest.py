@@ -1,8 +1,9 @@
 """Capability catalog: descriptive families and executable serial scope are distinct."""
 from schemas.platform import BackendResult, Payload, SessionInput
-from schemas.platform_math import DynamicSystem, LinearizedModel
+from schemas.platform_math import LinearizedModel, OptimizationProblem
 from tools.platform_registry import Extension
 from . import contracts as c
+from . import legacy_scientific
 from . import optimization as opt
 from . import route
 
@@ -24,7 +25,9 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('gvs_linearize_request',c.GVSLinearizeRequest),
     ('casadi_linearizer',c.CasadiLinearizerParameters),
     ('lqr_parameters',c.LQRParameters),('lqr_command',c.LQRCommand),
-    ('lqr_describe_request',c.LQRDescribeRequest),('lqr_description',c.LQRDescription),]]
+    ('lqr_describe_request',c.LQRDescribeRequest),('lqr_description',c.LQRDescription),
+    ('pcc_reach_assembler_parameters',c.PCCReachAssemblerParameters),
+    ('gvs_inverse_assembler_parameters',c.GVSInverseAssemblerParameters),]]
 CONTRACTS += [
     ('family.pcc_forward_request', '2.0.0', c.PCCForwardRequestV2),
     ('family.pcc_kinematics_result', '2.0.0', c.PCCKinematicsResultV2),
@@ -39,6 +42,7 @@ CONTRACTS += [
     ('family.lqr_synthesize_request', '1.0.0', c.LQRSynthesizeRequest),
     ('family.lqr_gain_artifact', '1.0.0', c.LQRGainArtifact),
     ('family.lqr_synthesis_result', '1.0.0', c.LQRSynthesisResult),
+    ('family.lqr_synthesis_description', '2.0.0', c.LQRSynthesisDescription),
 ]
 SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
@@ -47,7 +51,9 @@ SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compile
     'extensions/experiment_dynamics/physics.py','extensions/robot_domain/contracts.py',
     'schemas/environment_spec.py','schemas/robot_ir.py','schemas/exploration.py','schemas/platform_math.py')
 PCC_SOURCES=(*SOURCES,'extensions/tendon_family/pcc.py')
-GVS_SOURCES=(*SOURCES,'extensions/tendon_family/gvs.py','extensions/tendon_family/gvs_casadi.py','extensions/tendon_family/pcc.py')
+GVS_SOURCES=(*SOURCES,'extensions/tendon_family/gvs.py','extensions/tendon_family/gvs_casadi.py','extensions/tendon_family/pcc.py',
+    'extensions/tendon_family/scientific_optimization.py','extensions/tendon_family/legacy_scientific.py')
+OPT_SOURCES=(*GVS_SOURCES,'extensions/optimization/contracts.py','extensions/optimization/ipopt.py','tools/platform_optimization.py')
 MATLAB=tuple('matlab/'+n+'.m' for n in ('tf_geometry','tf_point','tf_routes','tf_terms','tf_control','tf_run','tf_observe','tf_static','tf_view'))
 COMMON=dict(sources=SOURCES,contract_dependencies=tuple((n,v) for n,v,_ in CONTRACTS))
 EXTENSIONS=[
@@ -178,27 +184,6 @@ EXTENSIONS.append(
 )
 EXTENSIONS.append(
     Extension(
-        'dynamics.gvs_build_system',
-        'tool',
-        '1.0.0',
-        c.GVSBuildSystemRequest,
-        DynamicSystem,
-        'extensions.tendon_family.gvs_casadi:gvs_build_system_tool',
-        'Export the frozen family.design GVS as xdot=f(x,u) at an explicit SystemContext operating point.',
-        sources=GVS_SOURCES,
-        contract_dependencies=COMMON['contract_dependencies'],
-        dependencies=('numpy', 'casadi'),
-        extension_dependencies=(('model.gvs', '1.0.0'),),
-        cache=True,
-        side_effects='none',
-        capabilities=dict(
-            category='mathematical_models', role='public_tool',
-            route_visible=True, model='model.gvs', representation='dynamic_system', backend_solves=0,
-        ),
-    )
-)
-EXTENSIONS.append(
-    Extension(
         'linearizer.casadi',
         'linearizer',
         '1.0.0',
@@ -212,26 +197,6 @@ EXTENSIONS.append(
         capabilities=dict(
             category='linearization', role='adapter',
             input='DynamicSystem', derivatives='casadi_automatic_differentiation',
-        ),
-    )
-)
-EXTENSIONS.append(
-    Extension(
-        'linearization.linearize',
-        'tool',
-        '1.0.0',
-        c.GVSLinearizeRequest,
-        LinearizedModel,
-        'extensions.tendon_family.gvs_casadi:linearize_tool',
-        'Linearize a public continuous DynamicSystem at its explicit x0/u0 using CasADi automatic differentiation.',
-        sources=GVS_SOURCES,
-        contract_dependencies=COMMON['contract_dependencies'],
-        dependencies=('numpy', 'casadi'),
-        extension_dependencies=(('linearizer.casadi', '1.0.0'),),
-        cache=True,
-        side_effects='none',
-        capabilities=dict(
-            category='linearization', role='public_tool', route_visible=True, backend_solves=0,
         ),
     )
 )
@@ -254,24 +219,6 @@ EXTENSIONS.append(
             command_space='model_tendon_tension', backend_executable=False,
             equilibrium_required=True, reset=True, restore=True,
         ),
-    )
-)
-EXTENSIONS.append(
-    Extension(
-        'control.lqr_describe',
-        'tool',
-        '1.0.0',
-        c.LQRDescribeRequest,
-        c.LQRDescription,
-        'extensions.tendon_family.gvs_casadi:lqr_describe_tool',
-        'Describe continuous LQR inputs, equilibrium requirement, equation, and tendon-tension bounds.',
-        sources=GVS_SOURCES,
-        contract_dependencies=COMMON['contract_dependencies'],
-        dependencies=('numpy', 'scipy'),
-        extension_dependencies=(('controller.lqr', '1.0.0'),),
-        cache=True,
-        side_effects='none',
-        capabilities=dict(category='control', role='public_tool', route_visible=True, backend_solves=0),
     )
 )
 EXTENSIONS.append(
@@ -343,68 +290,15 @@ EXTENSIONS.append(
         ),
     )
 )
-EXTENSIONS.append(
-    Extension(
-        'dynamics.gvs_evaluate',
-        'tool',
-        '1.0.0',
-        c.GVSDynamicsRequest,
-        c.GVSDynamicsResult,
-        'extensions.tendon_family.gvs:gvs_evaluate_tool',
-        (
-            'Evaluate real first-order variable-strain continuum bending '
-            'dynamics for the frozen family.design using frozen environment '
-            'gravity and explicit tendon tensions. Returns M, velocity bias, '
-            'physical elastic/damping/gravity/tendon forces, qdd and kinematics; '
-            'no simulator or backend solve.'
-        ),
-        sources=GVS_SOURCES,
-        contract_dependencies=COMMON['contract_dependencies'],
-        dependencies=('numpy',),
-        extension_dependencies=(('model.gvs', '1.0.0'),),
-        cache=True,
-        side_effects='none',
-        capabilities=dict(
-            category='mathematical_models', role='public_tool',
-            route_visible=True, model='model.gvs', backend_solves=0,
-        ),
-    )
-)
-EXTENSIONS.append(
-    Extension(
-        'kinematics.pcc_forward',
-        'tool',
-        '1.0.0',
-        c.PCCForwardRequest,
-        c.PCCKinematicsResult,
-        'extensions.tendon_family.pcc:pcc_forward_tool',
-        (
-            'Compute serial multi-segment PCC forward kinematics for '
-            'the frozen session robot. Provide constant curvature about '
-            'local y/z for every flexible segment. No simulation, '
-            'static equilibrium, tendon-force inference or backend solve. '
-            'Curvatures are actual totals, not natural-curvature increments.'
-        ),
-        sources=PCC_SOURCES,
-        contract_dependencies=COMMON['contract_dependencies'],
-        dependencies=('numpy',),
-        extension_dependencies=(
-            ('model.pcc', '1.0.0'),
-        ),
-        cache=True,
-        side_effects='none',
-        capabilities=dict(
-            category='mathematical_models',
-            role='public_tool',
-            route_visible=True,
-            model='model.pcc',
-            backend_solves=0,
-        ),
-    )
-)
+EXTENSIONS.extend(legacy_scientific.registrations(
+    c,
+    pcc_sources=PCC_SOURCES,
+    gvs_sources=GVS_SOURCES,
+    contract_dependencies=COMMON['contract_dependencies'],
+))
 
-# Compact, evidence-oriented public interfaces. The 1.0.0 variants above remain
-# registered so historical session bindings retain their exact contracts.
+# Compact, evidence-oriented public interfaces. Historical registrations live in
+# legacy_scientific.py and remain available to exact-version session bindings.
 EXTENSIONS.extend([
     Extension(
         'kinematics.pcc_forward', 'tool', '2.0.0',
@@ -472,5 +366,56 @@ EXTENSIONS.extend([
         capabilities=dict(category='control', role='public_tool', route_visible=True,
             evidence_input=True, evidence_output=True, command_space='model_tendon_tension',
             backend_executable=False, backend_solves=0),
+    ),
+    Extension(
+        'control.lqr_describe', 'tool', '2.0.0',
+        c.LQRDescribeRequest, c.LQRSynthesisDescription,
+        'extensions.tendon_family.gvs_casadi:lqr_describe_tool_v2',
+        'Describe the semantic LinearizedModel-to-LQR synthesis workflow and frozen tendon authority.',
+        sources=GVS_SOURCES, contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy', 'scipy'), extension_dependencies=(('controller.lqr', '1.0.0'),),
+        cache=True, side_effects='none',
+        capabilities=dict(category='control', role='public_tool', route_visible=True,
+                          recommended=True, backend_solves=0),
+    ),
+])
+
+EXTENSIONS.extend([
+    Extension(
+        'optimization_assembler.pcc_reach', 'optimization_assembler', '1.0.0',
+        c.PCCReachAssemblerParameters, OptimizationProblem,
+        'extensions.tendon_family.scientific_optimization:PCCReachAssembler',
+        'Build one-variable PCC reach problems from an authorized length and the frozen Task target.',
+        sources=OPT_SOURCES, dependencies=('numpy', 'casadi'),
+        contract_dependencies=COMMON['contract_dependencies'] + (
+            ('platform.optimization_problem', '1.0.0'),
+            ('optimization.casadi_nlp_expression', '1.0.0'),
+            ('optimization.casadi_nlp_selector', '1.0.0'),
+        ),
+        extension_dependencies=(('model.pcc', '1.0.0'),),
+        capabilities=dict(category='optimization', role='adapter', model='model.pcc', model_version='1.0.0',
+            authorization='extensions.tendon_family.scientific_optimization:pcc_authorization',
+            supported_objectives=['tip_position_error_squared'],
+            supported_constraints=['authorized_design_bounds'],
+            target_source='frozen_task.goal.target_m', backend_solves=0),
+    ),
+    Extension(
+        'optimization_assembler.gvs_inverse', 'optimization_assembler', '1.0.0',
+        c.GVSInverseAssemblerParameters, OptimizationProblem,
+        'extensions.tendon_family.scientific_optimization:GVSInverseAssembler',
+        'Build GVS inverse-shape or static inverse-tip problems from frozen robot/task facts.',
+        sources=OPT_SOURCES, dependencies=('numpy', 'casadi'),
+        contract_dependencies=COMMON['contract_dependencies'] + (
+            ('platform.optimization_problem', '1.0.0'),
+            ('optimization.casadi_nlp_expression', '1.0.0'),
+            ('optimization.casadi_nlp_selector', '1.0.0'),
+        ),
+        extension_dependencies=(('model.gvs', '1.0.0'),),
+        capabilities=dict(category='optimization', role='adapter', model='model.gvs', model_version='1.0.0',
+            authorization='extensions.tendon_family.scientific_optimization:gvs_authorization',
+            supported_objectives=['inverse_shape_static', 'tip_position_error_squared', 'tendon_effort'],
+            supported_constraints=['static_equilibrium', 'tendon_force_bounds'],
+            target_source='q_target for inverse_shape; frozen_task.goal.target_m for inverse_tip_static',
+            backend_solves=0),
     ),
 ])

@@ -447,6 +447,11 @@ class PCCDescription(Contract):
     natural_curvature_role: Literal['constitutive_reference_only'] = 'constitutive_reference_only'
 
 
+class PCCReachAssemblerParameters(Contract):
+    """Fixed PCC configuration; the reach target always comes from Task."""
+    configuration: PCCConfiguration
+
+
 class GVSModelParameters(Contract):
     model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
     integration_steps_per_segment: int = Field(default=24, ge=4, le=200)
@@ -628,6 +633,21 @@ class LQRDescription(Contract):
     bound_semantics: Literal['clip_each_tendon_to_[0,force_limit_n]'] = 'clip_each_tendon_to_[0,force_limit_n]'
 
 
+class LQRSynthesisDescription(Contract):
+    workflow: Literal[
+        'LinearizedModel/EvidenceRef + semantic weights -> control.lqr_synthesize -> compact stability result + gain EvidenceRef'
+    ] = 'LinearizedModel/EvidenceRef + semantic weights -> control.lqr_synthesize -> compact stability result + gain EvidenceRef'
+    curvature_weight: Literal['default weight for named curvature states'] = 'default weight for named curvature states'
+    state_rate_weight: Literal['default weight for named state-rate states'] = 'default weight for named state-rate states'
+    tendon_tension_weight: Literal['positive model-space tendon-tension effort weight'] = 'positive model-space tendon-tension effort weight'
+    state_weight_overrides: Literal['optional overrides keyed by LinearizedModel state names'] = 'optional overrides keyed by LinearizedModel state names'
+    equilibrium_requirement: Literal['norm(drift,inf)<=equilibrium_tolerance'] = 'norm(drift,inf)<=equilibrium_tolerance'
+    tendon_order_source: Literal['frozen_robot.family.design'] = 'frozen_robot.family.design'
+    force_limits_source: Literal['frozen_robot.family.design'] = 'frozen_robot.family.design'
+    command_space: Literal['model_tendon_tension'] = 'model_tendon_tension'
+    backend_executable: Literal[False] = False
+
+
 class LQRSynthesizeRequest(Contract):
     model: LinearizedModel | EvidenceRef
     curvature_weight: FiniteFloat = Field(default=1.0, gt=0)
@@ -786,6 +806,19 @@ class GVSEquilibriumResult(Contract):
     converged: bool
     iterations: int = Field(ge=0)
     solver: Literal['casadi_ad_damped_newton'] = 'casadi_ad_damped_newton'
+
+
+class GVSInverseAssemblerParameters(Contract):
+    template: Literal['inverse_shape', 'inverse_tip_static']
+    q_target: list[FiniteFloat] | None = None
+
+    @model_validator(mode='after')
+    def target_authority(self):
+        if self.template == 'inverse_shape' and self.q_target is None:
+            raise ValueError('INVERSE_SHAPE_REQUIRES_Q_TARGET')
+        if self.template == 'inverse_tip_static' and self.q_target is not None:
+            raise ValueError('INVERSE_TIP_TARGET_COMES_FROM_FROZEN_TASK')
+        return self
 
 
 class GVSDescribeRequest(Contract):

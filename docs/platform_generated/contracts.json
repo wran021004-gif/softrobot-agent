@@ -6371,6 +6371,28 @@
         },
         "title": "Evidence",
         "type": "array"
+      },
+      "problem_reference": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "solver_evidence": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
       }
     },
     "required": [
@@ -15510,6 +15532,39 @@
       "title": "GVSEquilibriumResult",
       "type": "object"
     },
+    "family.gvs_inverse_assembler_parameters@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "template": {
+          "enum": [
+            "inverse_shape",
+            "inverse_tip_static"
+          ],
+          "title": "Template",
+          "type": "string"
+        },
+        "q_target": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Q Target"
+        }
+      },
+      "required": [
+        "template"
+      ],
+      "title": "GVSInverseAssemblerParameters",
+      "type": "object"
+    },
     "family.gvs_linearize_request@1.0.0": {
       "$defs": {
         "DynamicSystem": {
@@ -16402,6 +16457,73 @@
         "force_limits_n"
       ],
       "title": "LQRParameters",
+      "type": "object"
+    },
+    "family.lqr_synthesis_description@2.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "workflow": {
+          "const": "LinearizedModel/EvidenceRef + semantic weights -> control.lqr_synthesize -> compact stability result + gain EvidenceRef",
+          "default": "LinearizedModel/EvidenceRef + semantic weights -> control.lqr_synthesize -> compact stability result + gain EvidenceRef",
+          "title": "Workflow",
+          "type": "string"
+        },
+        "curvature_weight": {
+          "const": "default weight for named curvature states",
+          "default": "default weight for named curvature states",
+          "title": "Curvature Weight",
+          "type": "string"
+        },
+        "state_rate_weight": {
+          "const": "default weight for named state-rate states",
+          "default": "default weight for named state-rate states",
+          "title": "State Rate Weight",
+          "type": "string"
+        },
+        "tendon_tension_weight": {
+          "const": "positive model-space tendon-tension effort weight",
+          "default": "positive model-space tendon-tension effort weight",
+          "title": "Tendon Tension Weight",
+          "type": "string"
+        },
+        "state_weight_overrides": {
+          "const": "optional overrides keyed by LinearizedModel state names",
+          "default": "optional overrides keyed by LinearizedModel state names",
+          "title": "State Weight Overrides",
+          "type": "string"
+        },
+        "equilibrium_requirement": {
+          "const": "norm(drift,inf)<=equilibrium_tolerance",
+          "default": "norm(drift,inf)<=equilibrium_tolerance",
+          "title": "Equilibrium Requirement",
+          "type": "string"
+        },
+        "tendon_order_source": {
+          "const": "frozen_robot.family.design",
+          "default": "frozen_robot.family.design",
+          "title": "Tendon Order Source",
+          "type": "string"
+        },
+        "force_limits_source": {
+          "const": "frozen_robot.family.design",
+          "default": "frozen_robot.family.design",
+          "title": "Force Limits Source",
+          "type": "string"
+        },
+        "command_space": {
+          "const": "model_tendon_tension",
+          "default": "model_tendon_tension",
+          "title": "Command Space",
+          "type": "string"
+        },
+        "backend_executable": {
+          "const": false,
+          "default": false,
+          "title": "Backend Executable",
+          "type": "boolean"
+        }
+      },
+      "title": "LQRSynthesisDescription",
       "type": "object"
     },
     "family.lqr_synthesis_result@1.0.0": {
@@ -18413,6 +18535,63 @@
       "title": "PCCModelParameters",
       "type": "object"
     },
+    "family.pcc_reach_assembler_parameters@1.0.0": {
+      "$defs": {
+        "PCCConfiguration": {
+          "additionalProperties": false,
+          "properties": {
+            "segments": {
+              "minProperties": 1,
+              "patternProperties": {
+                "^[A-Za-z][A-Za-z0-9_]*$": {
+                  "$ref": "#/$defs/PCCSegmentConfiguration"
+                }
+              },
+              "title": "Segments",
+              "type": "object"
+            }
+          },
+          "required": [
+            "segments"
+          ],
+          "title": "PCCConfiguration",
+          "type": "object"
+        },
+        "PCCSegmentConfiguration": {
+          "additionalProperties": false,
+          "properties": {
+            "curvature_y_rad_m": {
+              "description": "Actual total geometric curvature about local +y in rad/m; not an increment relative to natural_curvature_rad_m.",
+              "title": "Curvature Y Rad M",
+              "type": "number"
+            },
+            "curvature_z_rad_m": {
+              "description": "Actual total geometric curvature about local +z in rad/m; not an increment relative to natural_curvature_rad_m.",
+              "title": "Curvature Z Rad M",
+              "type": "number"
+            }
+          },
+          "required": [
+            "curvature_y_rad_m",
+            "curvature_z_rad_m"
+          ],
+          "title": "PCCSegmentConfiguration",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Fixed PCC configuration; the reach target always comes from Task.",
+      "properties": {
+        "configuration": {
+          "$ref": "#/$defs/PCCConfiguration"
+        }
+      },
+      "required": [
+        "configuration"
+      ],
+      "title": "PCCReachAssemblerParameters",
+      "type": "object"
+    },
     "family.route_policy@1.0.0": {
       "$defs": {
         "Binding": {
@@ -20374,6 +20553,540 @@
       "title": "RobotIR",
       "type": "object"
     },
+    "optimization.assemble_request@1.0.0": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "ConstraintSelection": {
+          "additionalProperties": false,
+          "properties": {
+            "template_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Template Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "template_id"
+          ],
+          "title": "ConstraintSelection",
+          "type": "object"
+        },
+        "ObjectiveSelection": {
+          "additionalProperties": false,
+          "description": "A declared semantic template and its public numeric weight, never code.",
+          "properties": {
+            "template_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Template Id",
+              "type": "string"
+            },
+            "weight": {
+              "default": 1.0,
+              "minimum": 0,
+              "title": "Weight",
+              "type": "number"
+            }
+          },
+          "required": [
+            "template_id"
+          ],
+          "title": "ObjectiveSelection",
+          "type": "object"
+        },
+        "OptimizationSpecification": {
+          "additionalProperties": false,
+          "description": "Agent choices only; paths refer to the existing authorized Space.\n\nTemplate IDs must be declared by the selected assembler. No expression,\ngeneric configuration dictionary or executable string slot is accepted.\nTask remains the authority for physical targets and limits.",
+          "properties": {
+            "variables": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Variables",
+              "type": "array"
+            },
+            "objectives": {
+              "items": {
+                "$ref": "#/$defs/ObjectiveSelection"
+              },
+              "title": "Objectives",
+              "type": "array"
+            },
+            "constraints": {
+              "items": {
+                "$ref": "#/$defs/ConstraintSelection"
+              },
+              "title": "Constraints",
+              "type": "array"
+            },
+            "horizon": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Horizon"
+            },
+            "initial_guess": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "title": "Initial Guess",
+              "type": "object"
+            }
+          },
+          "required": [
+            "variables",
+            "objectives"
+          ],
+          "title": "OptimizationSpecification",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "assembler": {
+          "$ref": "#/$defs/Binding"
+        },
+        "specification": {
+          "$ref": "#/$defs/OptimizationSpecification"
+        }
+      },
+      "required": [
+        "assembler",
+        "specification"
+      ],
+      "title": "OptimizationAssembleRequest",
+      "type": "object"
+    },
+    "optimization.assembly_result@1.0.0": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "problem": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "assembler_id": {
+          "title": "Assembler Id",
+          "type": "string"
+        },
+        "objective_metric": {
+          "title": "Objective Metric",
+          "type": "string"
+        },
+        "variables": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Variables",
+          "type": "array"
+        },
+        "constraint_count": {
+          "minimum": 0,
+          "title": "Constraint Count",
+          "type": "integer"
+        },
+        "target_source": {
+          "title": "Target Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "problem",
+        "assembler_id",
+        "objective_metric",
+        "variables",
+        "constraint_count",
+        "target_source"
+      ],
+      "title": "OptimizationAssemblyResult",
+      "type": "object"
+    },
+    "optimization.casadi_nlp_expression@1.0.0": {
+      "additionalProperties": false,
+      "description": "Trusted serialized CasADi function with scalar objective and vector constraints.",
+      "properties": {
+        "expression_id": {
+          "const": "casadi_nlp_function_v1",
+          "default": "casadi_nlp_function_v1",
+          "title": "Expression Id",
+          "type": "string"
+        },
+        "symbolic_type": {
+          "const": "MX",
+          "default": "MX",
+          "title": "Symbolic Type",
+          "type": "string"
+        },
+        "variable_order": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Variable Order",
+          "type": "array"
+        },
+        "constraint_order": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraint Order",
+          "type": "array"
+        },
+        "serialized_function": {
+          "minLength": 1,
+          "title": "Serialized Function",
+          "type": "string"
+        },
+        "expression_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Expression Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "variable_order",
+        "serialized_function",
+        "expression_digest"
+      ],
+      "title": "CasadiNLPExpression",
+      "type": "object"
+    },
+    "optimization.casadi_nlp_selector@1.0.0": {
+      "additionalProperties": false,
+      "description": "Scalar constraint selection from the bundle carried by objective_function.",
+      "properties": {
+        "expression_id": {
+          "const": "casadi_nlp_selector_v1",
+          "default": "casadi_nlp_selector_v1",
+          "title": "Expression Id",
+          "type": "string"
+        },
+        "expression_digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Expression Digest",
+          "type": "string"
+        },
+        "constraint_name": {
+          "minLength": 1,
+          "title": "Constraint Name",
+          "type": "string"
+        },
+        "constraint_index": {
+          "minimum": 0,
+          "title": "Constraint Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "expression_digest",
+        "constraint_name",
+        "constraint_index"
+      ],
+      "title": "CasadiNLPSelector",
+      "type": "object"
+    },
+    "optimization.describe_request@1.0.0": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "OptimizationDescribeRequest",
+      "type": "object"
+    },
+    "optimization.description@1.0.0": {
+      "$defs": {
+        "OptimizationTemplateDescription": {
+          "additionalProperties": false,
+          "properties": {
+            "template_id": {
+              "title": "Template Id",
+              "type": "string"
+            },
+            "assembler_id": {
+              "title": "Assembler Id",
+              "type": "string"
+            },
+            "objective_templates": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Objective Templates",
+              "type": "array"
+            },
+            "constraint_templates": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Constraint Templates",
+              "type": "array"
+            },
+            "variables": {
+              "title": "Variables",
+              "type": "string"
+            },
+            "target_source": {
+              "title": "Target Source",
+              "type": "string"
+            },
+            "assembler_parameters": {
+              "title": "Assembler Parameters",
+              "type": "string"
+            }
+          },
+          "required": [
+            "template_id",
+            "assembler_id",
+            "objective_templates",
+            "constraint_templates",
+            "variables",
+            "target_source",
+            "assembler_parameters"
+          ],
+          "title": "OptimizationTemplateDescription",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_id": {
+          "const": "solver.ipopt",
+          "default": "solver.ipopt",
+          "title": "Solver Id",
+          "type": "string"
+        },
+        "pipeline": {
+          "const": "Task + authorized variables -> trusted assembler -> OptimizationProblem EvidenceRef -> IPOPT",
+          "default": "Task + authorized variables -> trusted assembler -> OptimizationProblem EvidenceRef -> IPOPT",
+          "title": "Pipeline",
+          "type": "string"
+        },
+        "templates": {
+          "items": {
+            "$ref": "#/$defs/OptimizationTemplateDescription"
+          },
+          "title": "Templates",
+          "type": "array"
+        },
+        "expression_details_public": {
+          "const": false,
+          "default": false,
+          "title": "Expression Details Public",
+          "type": "boolean"
+        },
+        "backend_solves": {
+          "const": 0,
+          "default": 0,
+          "title": "Backend Solves",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "templates"
+      ],
+      "title": "OptimizationDescription",
+      "type": "object"
+    },
+    "optimization.ipopt_parameters@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "max_iterations": {
+          "default": 300,
+          "maximum": 10000,
+          "minimum": 1,
+          "title": "Max Iterations",
+          "type": "integer"
+        },
+        "tolerance": {
+          "default": 1e-08,
+          "exclusiveMinimum": 0,
+          "title": "Tolerance",
+          "type": "number"
+        },
+        "acceptable_tolerance": {
+          "default": 1e-06,
+          "exclusiveMinimum": 0,
+          "title": "Acceptable Tolerance",
+          "type": "number"
+        },
+        "print_level": {
+          "default": 0,
+          "maximum": 12,
+          "minimum": 0,
+          "title": "Print Level",
+          "type": "integer"
+        },
+        "hessian_approximation": {
+          "default": "limited-memory",
+          "enum": [
+            "limited-memory",
+            "exact"
+          ],
+          "title": "Hessian Approximation",
+          "type": "string"
+        }
+      },
+      "title": "IpoptParameters",
+      "type": "object"
+    },
+    "optimization.solve_request@1.0.0": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "IpoptParameters": {
+          "additionalProperties": false,
+          "properties": {
+            "max_iterations": {
+              "default": 300,
+              "maximum": 10000,
+              "minimum": 1,
+              "title": "Max Iterations",
+              "type": "integer"
+            },
+            "tolerance": {
+              "default": 1e-08,
+              "exclusiveMinimum": 0,
+              "title": "Tolerance",
+              "type": "number"
+            },
+            "acceptable_tolerance": {
+              "default": 1e-06,
+              "exclusiveMinimum": 0,
+              "title": "Acceptable Tolerance",
+              "type": "number"
+            },
+            "print_level": {
+              "default": 0,
+              "maximum": 12,
+              "minimum": 0,
+              "title": "Print Level",
+              "type": "integer"
+            },
+            "hessian_approximation": {
+              "default": "limited-memory",
+              "enum": [
+                "limited-memory",
+                "exact"
+              ],
+              "title": "Hessian Approximation",
+              "type": "string"
+            }
+          },
+          "title": "IpoptParameters",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "problem": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "solver": {
+          "const": "solver.ipopt",
+          "default": "solver.ipopt",
+          "title": "Solver",
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/$defs/IpoptParameters"
+        }
+      },
+      "required": [
+        "problem"
+      ],
+      "title": "OptimizationSolveRequest",
+      "type": "object"
+    },
     "platform.diagnostic_report@1.0.0": {
       "$defs": {
         "DiagnosticAttribution": {
@@ -21718,6 +22431,28 @@
           },
           "title": "Evidence",
           "type": "array"
+        },
+        "problem_reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "solver_evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [

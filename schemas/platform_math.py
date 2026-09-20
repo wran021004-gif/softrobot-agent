@@ -219,3 +219,5 @@ class OptimizationResult(Contract):
     constraint_violation: float | None = Field(default=None, ge=0)
     iterations: int | None = Field(default=None, ge=0)
     evidence: list[EvidenceRef] = Field(default_factory=list)
+    problem_reference: EvidenceRef | None = None
+    solver_evidence: EvidenceRef | None = None

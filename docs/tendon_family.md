@@ -38,6 +38,30 @@ python examples/workbench.py platform tendon-family video $run --t-start-s 0.01 
 
 实际候选、误差、诊断和视频见 [步骤 5–6 结果](steps_5_6_result.md)。
 
+## Explicit scientific optimization
+
+The differentiable optimization path is separate from `search.family_coordinate` and
+never launches a simulation backend. `optimization.describe@1.0.0` advertises three
+trusted templates: one-variable PCC length reach, GVS `inverse_shape`, and GVS
+`inverse_tip_static`. `optimization.assemble@1.0.0` validates the selected variables
+and template IDs, reads physical targets and limits from the frozen Task, Space, and
+`family.design`, then stores an `OptimizationProblem`. `optimization.solve@1.0.0`
+accepts that problem by `EvidenceRef`, invokes `solver.ipopt@1.0.0`, and returns a
+compact `OptimizationResult` plus a diagnostics reference.
+
+The generic solver understands only continuous variable bounds and the registered
+serialized CasADi NLP expression contract. PCC/GVS semantics remain in
+`scientific_optimization.py`. PCC reach currently authorizes one existing flexible
+segment `length_m` path. GVS inverse problems derive tendon order and
+`0 <= tension <= force_limit_n` directly from the frozen robot. The inverse-tip target
+comes only from `TaskDefinition.goal.target_m`; its assembler parameters have no target
+field. `inverse_shape` accepts `q_target` because that desired shape is the question
+being posed. Large symbolic problems and IPOPT diagnostics stay in the Store.
+
+Historical scientific tool versions are declared in `legacy_scientific.py`. They are
+still exact-version loadable but have `route_visible=false`; compact current versions
+and `control.lqr_describe@2.0.0` form the preferred LLM-facing surface.
+
 ## 权威来源
 
 | 内容 | 权威文件或契约 | 派生物 |

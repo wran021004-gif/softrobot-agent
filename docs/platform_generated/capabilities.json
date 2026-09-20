@@ -1243,6 +1243,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -1293,6 +1301,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -1818,6 +1830,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -1868,6 +1888,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -4404,6 +4428,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -4454,6 +4486,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -4993,6 +5029,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -5043,6 +5087,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -8866,6 +8914,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -8916,6 +8972,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -10571,7 +10631,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "Describe continuous LQR inputs, equilibrium requirement, equation, and tendon-tension bounds.",
+    "description": "Historical matrix-level LQR description retained for exact-version compatibility.",
     "input_schema": {
       "additionalProperties": false,
       "properties": {},
@@ -10663,10 +10723,12 @@
       "type": "object"
     },
     "capabilities": {
+      "route_visible": false,
+      "legacy": true,
+      "recommended": false,
+      "backend_solves": 0,
       "category": "control",
-      "role": "public_tool",
-      "route_visible": true,
-      "backend_solves": 0
+      "role": "compatibility_tool"
     },
     "resources": [],
     "dependencies": [
@@ -10709,7 +10771,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [
@@ -10864,6 +10928,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -10914,6 +10986,369 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "control.lqr_describe",
+    "kind": "tool",
+    "version": "2.0.0",
+    "binding": "extensions.tendon_family.gvs_casadi:lqr_describe_tool_v2",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Describe the semantic LinearizedModel-to-LQR synthesis workflow and frozen tendon authority.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "LQRDescribeRequest",
+      "type": "object"
+    },
+    "output_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "workflow": {
+          "const": "LinearizedModel/EvidenceRef + semantic weights -> control.lqr_synthesize -> compact stability result + gain EvidenceRef",
+          "default": "LinearizedModel/EvidenceRef + semantic weights -> control.lqr_synthesize -> compact stability result + gain EvidenceRef",
+          "title": "Workflow",
+          "type": "string"
+        },
+        "curvature_weight": {
+          "const": "default weight for named curvature states",
+          "default": "default weight for named curvature states",
+          "title": "Curvature Weight",
+          "type": "string"
+        },
+        "state_rate_weight": {
+          "const": "default weight for named state-rate states",
+          "default": "default weight for named state-rate states",
+          "title": "State Rate Weight",
+          "type": "string"
+        },
+        "tendon_tension_weight": {
+          "const": "positive model-space tendon-tension effort weight",
+          "default": "positive model-space tendon-tension effort weight",
+          "title": "Tendon Tension Weight",
+          "type": "string"
+        },
+        "state_weight_overrides": {
+          "const": "optional overrides keyed by LinearizedModel state names",
+          "default": "optional overrides keyed by LinearizedModel state names",
+          "title": "State Weight Overrides",
+          "type": "string"
+        },
+        "equilibrium_requirement": {
+          "const": "norm(drift,inf)<=equilibrium_tolerance",
+          "default": "norm(drift,inf)<=equilibrium_tolerance",
+          "title": "Equilibrium Requirement",
+          "type": "string"
+        },
+        "tendon_order_source": {
+          "const": "frozen_robot.family.design",
+          "default": "frozen_robot.family.design",
+          "title": "Tendon Order Source",
+          "type": "string"
+        },
+        "force_limits_source": {
+          "const": "frozen_robot.family.design",
+          "default": "frozen_robot.family.design",
+          "title": "Force Limits Source",
+          "type": "string"
+        },
+        "command_space": {
+          "const": "model_tendon_tension",
+          "default": "model_tendon_tension",
+          "title": "Command Space",
+          "type": "string"
+        },
+        "backend_executable": {
+          "const": false,
+          "default": false,
+          "title": "Backend Executable",
+          "type": "boolean"
+        }
+      },
+      "title": "LQRSynthesisDescription",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "control",
+      "role": "public_tool",
+      "route_visible": true,
+      "recommended": true,
+      "backend_solves": 0
+    },
+    "resources": [],
+    "dependencies": [
+      "numpy",
+      "scipy"
+    ],
+    "sources": [
+      "extensions/tendon_family/contracts.py",
+      "extensions/tendon_family/compiler.py",
+      "extensions/tendon_family/sections.py",
+      "extensions/tendon_family/geometry.py",
+      "extensions/tendon_family/legacy.py",
+      "extensions/tendon_family/scene.py",
+      "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
+      "extensions/tendon_family/backends.py",
+      "extensions/tendon_family/signals.py",
+      "extensions/tendon_family/candidate.py",
+      "extensions/tendon_family/preparation.py",
+      "extensions/tendon_family/mjcf.py",
+      "extensions/tendon_family/saved.py",
+      "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
+      "tools/platform_tools.py",
+      "tools/platform_tasks.py",
+      "schemas/platform_operations.py",
+      "tools/design_compiler.py",
+      "tools/matlab_tools.py",
+      "tools/state_io.py",
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/robot_domain/contracts.py",
+      "schemas/environment_spec.py",
+      "schemas/robot_ir.py",
+      "schemas/exploration.py",
+      "schemas/platform_math.py",
+      "extensions/tendon_family/gvs.py",
+      "extensions/tendon_family/gvs_casadi.py",
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [
+      [
+        "controller.lqr",
+        "1.0.0"
+      ]
+    ],
+    "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
+      [
+        "family.design",
+        "1.0.0"
+      ],
+      [
+        "family.initial",
+        "1.0.0"
+      ],
+      [
+        "family.control",
+        "1.0.0"
+      ],
+      [
+        "family.parameters",
+        "1.0.0"
+      ],
+      [
+        "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.space",
+        "1.0.0"
+      ],
+      [
+        "family.discretization",
+        "1.0.0"
+      ],
+      [
+        "family.experiment_spec",
+        "1.0.0"
+      ],
+      [
+        "family.build_request",
+        "1.0.0"
+      ],
+      [
+        "family.build_result",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_model",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_configuration",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_forward_request",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_kinematics_result",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_describe_request",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_description",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_model",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_dynamics_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_dynamics_result",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_describe_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_description",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_continuous_dynamics",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_build_system_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_linearize_request",
+        "1.0.0"
+      ],
+      [
+        "family.casadi_linearizer",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_command",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_describe_request",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_description",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_forward_request",
+        "2.0.0"
+      ],
+      [
+        "family.pcc_kinematics_result",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_dynamics_request",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_dynamics_result",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_build_system_request",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_system_artifact_result",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_linearize_request",
+        "2.0.0"
+      ],
+      [
+        "family.linearized_model_artifact_result",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_equilibrium_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_equilibrium_result",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_synthesize_request",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_gain_artifact",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_result",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -11331,7 +11766,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [
@@ -11486,6 +11923,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -11536,6 +11981,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "artifact_store"
@@ -12045,6 +12494,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -12095,6 +12552,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -12523,7 +12984,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -12673,6 +13136,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -12723,6 +13194,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -14890,6 +15365,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -14940,6 +15423,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -16121,7 +16608,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "Export the frozen family.design GVS as xdot=f(x,u) at an explicit SystemContext operating point.",
+    "description": "Historical inline DynamicSystem export retained for exact-version compatibility.",
     "input_schema": {
       "$defs": {
         "EvidenceRef": {
@@ -16425,12 +16912,14 @@
       "type": "object"
     },
     "capabilities": {
+      "route_visible": false,
+      "legacy": true,
+      "recommended": false,
+      "backend_solves": 0,
       "category": "mathematical_models",
-      "role": "public_tool",
-      "route_visible": true,
+      "role": "compatibility_tool",
       "model": "model.gvs",
-      "representation": "dynamic_system",
-      "backend_solves": 0
+      "representation": "dynamic_system"
     },
     "resources": [],
     "dependencies": [
@@ -16473,7 +16962,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [
@@ -16628,6 +17119,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -16678,6 +17177,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -16831,7 +17334,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [
@@ -16986,6 +17491,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -17036,6 +17549,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "artifact_store"
@@ -17284,7 +17801,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [
@@ -17439,6 +17958,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -17489,6 +18016,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -17507,7 +18038,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "Evaluate real first-order variable-strain continuum bending dynamics for the frozen family.design using frozen environment gravity and explicit tendon tensions. Returns M, velocity bias, physical elastic/damping/gravity/tendon forces, qdd and kinematics; no simulator or backend solve.",
+    "description": "Historical full GVS result retained for exact-version compatibility.",
     "input_schema": {
       "$defs": {
         "GVSInput": {
@@ -17889,11 +18420,13 @@
       "type": "object"
     },
     "capabilities": {
+      "route_visible": false,
+      "legacy": true,
+      "recommended": false,
+      "backend_solves": 0,
       "category": "mathematical_models",
-      "role": "public_tool",
-      "route_visible": true,
-      "model": "model.gvs",
-      "backend_solves": 0
+      "role": "compatibility_tool",
+      "model": "model.gvs"
     },
     "resources": [],
     "dependencies": [
@@ -17935,7 +18468,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [
@@ -18090,6 +18625,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -18140,6 +18683,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -18643,7 +19190,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [
@@ -18798,6 +19347,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -18848,6 +19405,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -20582,6 +21143,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -20632,6 +21201,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -21087,6 +21660,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -21137,6 +21718,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -21155,7 +21740,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "Compute serial multi-segment PCC forward kinematics for the frozen session robot. Provide constant curvature about local y/z for every flexible segment. No simulation, static equilibrium, tendon-force inference or backend solve. Curvatures are actual totals, not natural-curvature increments.",
+    "description": "Historical full PCC result retained for exact-version compatibility.",
     "input_schema": {
       "$defs": {
         "PCCConfiguration": {
@@ -21435,11 +22020,13 @@
       "type": "object"
     },
     "capabilities": {
+      "route_visible": false,
+      "legacy": true,
+      "recommended": false,
+      "backend_solves": 0,
       "category": "mathematical_models",
-      "role": "public_tool",
-      "route_visible": true,
-      "model": "model.pcc",
-      "backend_solves": 0
+      "role": "compatibility_tool",
+      "model": "model.pcc"
     },
     "resources": [],
     "dependencies": [
@@ -21634,6 +22221,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -21684,6 +22279,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -22181,6 +22780,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -22231,6 +22838,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -22249,7 +22860,7 @@
     "reasons": [
       "NO_SESSION_POLICY"
     ],
-    "description": "Linearize a public continuous DynamicSystem at its explicit x0/u0 using CasADi automatic differentiation.",
+    "description": "Historical inline linearization retained for exact-version compatibility.",
     "input_schema": {
       "$defs": {
         "DynamicSystem": {
@@ -22628,10 +23239,12 @@
       "type": "object"
     },
     "capabilities": {
+      "route_visible": false,
+      "legacy": true,
+      "recommended": false,
+      "backend_solves": 0,
       "category": "linearization",
-      "role": "public_tool",
-      "route_visible": true,
-      "backend_solves": 0
+      "role": "compatibility_tool"
     },
     "resources": [],
     "dependencies": [
@@ -22674,7 +23287,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [
@@ -22829,6 +23444,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -22879,6 +23502,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -23241,7 +23868,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [
@@ -23396,6 +24025,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -23446,6 +24083,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "artifact_store"
@@ -23682,7 +24323,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -23832,6 +24475,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -23882,6 +24533,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -24696,7 +25351,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [],
@@ -24846,6 +25503,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -24896,6 +25561,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -25304,6 +25973,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -25354,6 +26031,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -25713,6 +26394,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -25763,6 +26452,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -25854,6 +26547,2002 @@
     "assets": [],
     "extension_dependencies": [],
     "contract_dependencies": [],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "optimization.assemble",
+    "kind": "tool",
+    "version": "1.0.0",
+    "binding": "extensions.optimization.ipopt:optimization_assemble_tool",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Assemble a trusted template from frozen task/robot facts and save its OptimizationProblem.",
+    "input_schema": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "ConstraintSelection": {
+          "additionalProperties": false,
+          "properties": {
+            "template_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Template Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "template_id"
+          ],
+          "title": "ConstraintSelection",
+          "type": "object"
+        },
+        "ObjectiveSelection": {
+          "additionalProperties": false,
+          "description": "A declared semantic template and its public numeric weight, never code.",
+          "properties": {
+            "template_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Template Id",
+              "type": "string"
+            },
+            "weight": {
+              "default": 1.0,
+              "minimum": 0,
+              "title": "Weight",
+              "type": "number"
+            }
+          },
+          "required": [
+            "template_id"
+          ],
+          "title": "ObjectiveSelection",
+          "type": "object"
+        },
+        "OptimizationSpecification": {
+          "additionalProperties": false,
+          "description": "Agent choices only; paths refer to the existing authorized Space.\n\nTemplate IDs must be declared by the selected assembler. No expression,\ngeneric configuration dictionary or executable string slot is accepted.\nTask remains the authority for physical targets and limits.",
+          "properties": {
+            "variables": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Variables",
+              "type": "array"
+            },
+            "objectives": {
+              "items": {
+                "$ref": "#/$defs/ObjectiveSelection"
+              },
+              "title": "Objectives",
+              "type": "array"
+            },
+            "constraints": {
+              "items": {
+                "$ref": "#/$defs/ConstraintSelection"
+              },
+              "title": "Constraints",
+              "type": "array"
+            },
+            "horizon": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Horizon"
+            },
+            "initial_guess": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "title": "Initial Guess",
+              "type": "object"
+            }
+          },
+          "required": [
+            "variables",
+            "objectives"
+          ],
+          "title": "OptimizationSpecification",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "assembler": {
+          "$ref": "#/$defs/Binding"
+        },
+        "specification": {
+          "$ref": "#/$defs/OptimizationSpecification"
+        }
+      },
+      "required": [
+        "assembler",
+        "specification"
+      ],
+      "title": "OptimizationAssembleRequest",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "problem": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "assembler_id": {
+          "title": "Assembler Id",
+          "type": "string"
+        },
+        "objective_metric": {
+          "title": "Objective Metric",
+          "type": "string"
+        },
+        "variables": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Variables",
+          "type": "array"
+        },
+        "constraint_count": {
+          "minimum": 0,
+          "title": "Constraint Count",
+          "type": "integer"
+        },
+        "target_source": {
+          "title": "Target Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "problem",
+        "assembler_id",
+        "objective_metric",
+        "variables",
+        "constraint_count",
+        "target_source"
+      ],
+      "title": "OptimizationAssemblyResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "optimization",
+      "role": "public_tool",
+      "route_visible": true,
+      "evidence_output": true,
+      "backend_solves": 0
+    },
+    "resources": [],
+    "dependencies": [
+      "casadi"
+    ],
+    "sources": [
+      "extensions/optimization/contracts.py",
+      "extensions/optimization/ipopt.py",
+      "extensions/optimization/manifest.py",
+      "schemas/platform_math.py",
+      "schemas/platform_protocols.py",
+      "tools/platform_optimization.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [
+      [
+        "optimization_assembler.pcc_reach",
+        "1.0.0"
+      ],
+      [
+        "optimization_assembler.gvs_inverse",
+        "1.0.0"
+      ]
+    ],
+    "contract_dependencies": [
+      [
+        "optimization.casadi_nlp_expression",
+        "1.0.0"
+      ],
+      [
+        "optimization.casadi_nlp_selector",
+        "1.0.0"
+      ],
+      [
+        "optimization.ipopt_parameters",
+        "1.0.0"
+      ],
+      [
+        "optimization.describe_request",
+        "1.0.0"
+      ],
+      [
+        "optimization.description",
+        "1.0.0"
+      ],
+      [
+        "optimization.assemble_request",
+        "1.0.0"
+      ],
+      [
+        "optimization.assembly_result",
+        "1.0.0"
+      ],
+      [
+        "optimization.solve_request",
+        "1.0.0"
+      ],
+      [
+        "platform.optimization_problem",
+        "1.0.0"
+      ],
+      [
+        "platform.optimization_result",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "artifact_store"
+  },
+  {
+    "extension_id": "optimization.describe",
+    "kind": "tool",
+    "version": "1.0.0",
+    "binding": "extensions.optimization.ipopt:optimization_describe_tool",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Describe trusted PCC reach and GVS inverse templates plus the IPOPT evidence workflow.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "OptimizationDescribeRequest",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "OptimizationTemplateDescription": {
+          "additionalProperties": false,
+          "properties": {
+            "template_id": {
+              "title": "Template Id",
+              "type": "string"
+            },
+            "assembler_id": {
+              "title": "Assembler Id",
+              "type": "string"
+            },
+            "objective_templates": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Objective Templates",
+              "type": "array"
+            },
+            "constraint_templates": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Constraint Templates",
+              "type": "array"
+            },
+            "variables": {
+              "title": "Variables",
+              "type": "string"
+            },
+            "target_source": {
+              "title": "Target Source",
+              "type": "string"
+            },
+            "assembler_parameters": {
+              "title": "Assembler Parameters",
+              "type": "string"
+            }
+          },
+          "required": [
+            "template_id",
+            "assembler_id",
+            "objective_templates",
+            "constraint_templates",
+            "variables",
+            "target_source",
+            "assembler_parameters"
+          ],
+          "title": "OptimizationTemplateDescription",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "solver_id": {
+          "const": "solver.ipopt",
+          "default": "solver.ipopt",
+          "title": "Solver Id",
+          "type": "string"
+        },
+        "pipeline": {
+          "const": "Task + authorized variables -> trusted assembler -> OptimizationProblem EvidenceRef -> IPOPT",
+          "default": "Task + authorized variables -> trusted assembler -> OptimizationProblem EvidenceRef -> IPOPT",
+          "title": "Pipeline",
+          "type": "string"
+        },
+        "templates": {
+          "items": {
+            "$ref": "#/$defs/OptimizationTemplateDescription"
+          },
+          "title": "Templates",
+          "type": "array"
+        },
+        "expression_details_public": {
+          "const": false,
+          "default": false,
+          "title": "Expression Details Public",
+          "type": "boolean"
+        },
+        "backend_solves": {
+          "const": 0,
+          "default": 0,
+          "title": "Backend Solves",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "templates"
+      ],
+      "title": "OptimizationDescription",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "optimization",
+      "role": "public_tool",
+      "route_visible": true,
+      "backend_solves": 0
+    },
+    "resources": [],
+    "dependencies": [
+      "casadi"
+    ],
+    "sources": [
+      "extensions/optimization/contracts.py",
+      "extensions/optimization/ipopt.py",
+      "extensions/optimization/manifest.py",
+      "schemas/platform_math.py",
+      "schemas/platform_protocols.py",
+      "tools/platform_optimization.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [
+      [
+        "optimization_assembler.pcc_reach",
+        "1.0.0"
+      ],
+      [
+        "optimization_assembler.gvs_inverse",
+        "1.0.0"
+      ]
+    ],
+    "contract_dependencies": [
+      [
+        "optimization.casadi_nlp_expression",
+        "1.0.0"
+      ],
+      [
+        "optimization.casadi_nlp_selector",
+        "1.0.0"
+      ],
+      [
+        "optimization.ipopt_parameters",
+        "1.0.0"
+      ],
+      [
+        "optimization.describe_request",
+        "1.0.0"
+      ],
+      [
+        "optimization.description",
+        "1.0.0"
+      ],
+      [
+        "optimization.assemble_request",
+        "1.0.0"
+      ],
+      [
+        "optimization.assembly_result",
+        "1.0.0"
+      ],
+      [
+        "optimization.solve_request",
+        "1.0.0"
+      ],
+      [
+        "platform.optimization_problem",
+        "1.0.0"
+      ],
+      [
+        "platform.optimization_result",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "optimization.solve",
+    "kind": "tool",
+    "version": "1.0.0",
+    "binding": "extensions.optimization.ipopt:optimization_solve_tool",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Solve an OptimizationProblem by EvidenceRef with IPOPT and save compact diagnostics.",
+    "input_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "IpoptParameters": {
+          "additionalProperties": false,
+          "properties": {
+            "max_iterations": {
+              "default": 300,
+              "maximum": 10000,
+              "minimum": 1,
+              "title": "Max Iterations",
+              "type": "integer"
+            },
+            "tolerance": {
+              "default": 1e-08,
+              "exclusiveMinimum": 0,
+              "title": "Tolerance",
+              "type": "number"
+            },
+            "acceptable_tolerance": {
+              "default": 1e-06,
+              "exclusiveMinimum": 0,
+              "title": "Acceptable Tolerance",
+              "type": "number"
+            },
+            "print_level": {
+              "default": 0,
+              "maximum": 12,
+              "minimum": 0,
+              "title": "Print Level",
+              "type": "integer"
+            },
+            "hessian_approximation": {
+              "default": "limited-memory",
+              "enum": [
+                "limited-memory",
+                "exact"
+              ],
+              "title": "Hessian Approximation",
+              "type": "string"
+            }
+          },
+          "title": "IpoptParameters",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "problem": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "solver": {
+          "const": "solver.ipopt",
+          "default": "solver.ipopt",
+          "title": "Solver",
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/$defs/IpoptParameters"
+        }
+      },
+      "required": [
+        "problem"
+      ],
+      "title": "OptimizationSolveRequest",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "converged",
+            "infeasible",
+            "unbounded",
+            "iteration_limit",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "optimum": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Optimum"
+        },
+        "objective_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Objective Value"
+        },
+        "constraint_violation": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Constraint Violation"
+        },
+        "iterations": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Iterations"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "problem_reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "solver_evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "OptimizationResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "optimization",
+      "role": "public_tool",
+      "route_visible": true,
+      "evidence_input": true,
+      "evidence_output": true,
+      "backend_solves": 0
+    },
+    "resources": [],
+    "dependencies": [
+      "numpy",
+      "casadi"
+    ],
+    "sources": [
+      "extensions/optimization/contracts.py",
+      "extensions/optimization/ipopt.py",
+      "extensions/optimization/manifest.py",
+      "schemas/platform_math.py",
+      "schemas/platform_protocols.py",
+      "tools/platform_optimization.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [
+      [
+        "solver.ipopt",
+        "1.0.0"
+      ]
+    ],
+    "contract_dependencies": [
+      [
+        "optimization.casadi_nlp_expression",
+        "1.0.0"
+      ],
+      [
+        "optimization.casadi_nlp_selector",
+        "1.0.0"
+      ],
+      [
+        "optimization.ipopt_parameters",
+        "1.0.0"
+      ],
+      [
+        "optimization.describe_request",
+        "1.0.0"
+      ],
+      [
+        "optimization.description",
+        "1.0.0"
+      ],
+      [
+        "optimization.assemble_request",
+        "1.0.0"
+      ],
+      [
+        "optimization.assembly_result",
+        "1.0.0"
+      ],
+      [
+        "optimization.solve_request",
+        "1.0.0"
+      ],
+      [
+        "platform.optimization_problem",
+        "1.0.0"
+      ],
+      [
+        "platform.optimization_result",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "artifact_store"
+  },
+  {
+    "extension_id": "optimization_assembler.gvs_inverse",
+    "kind": "optimization_assembler",
+    "version": "1.0.0",
+    "binding": "extensions.tendon_family.scientific_optimization:GVSInverseAssembler",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Build GVS inverse-shape or static inverse-tip problems from frozen robot/task facts.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "template": {
+          "enum": [
+            "inverse_shape",
+            "inverse_tip_static"
+          ],
+          "title": "Template",
+          "type": "string"
+        },
+        "q_target": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Q Target"
+        }
+      },
+      "required": [
+        "template"
+      ],
+      "title": "GVSInverseAssemblerParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Objective": {
+          "additionalProperties": false,
+          "properties": {
+            "metric": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Metric",
+              "type": "string"
+            },
+            "direction": {
+              "enum": [
+                "minimize",
+                "maximize"
+              ],
+              "title": "Direction",
+              "type": "string"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "weight": {
+              "default": 1,
+              "exclusiveMinimum": 0,
+              "title": "Weight",
+              "type": "number"
+            }
+          },
+          "required": [
+            "metric",
+            "direction",
+            "units"
+          ],
+          "title": "Objective",
+          "type": "object"
+        },
+        "OptimizationConstraint": {
+          "additionalProperties": false,
+          "description": "Scalar lower <= expression(variables) <= upper; equal bounds mean equality.",
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "expression": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                }
+              ],
+              "title": "Expression"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            },
+            "lower": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Lower"
+            },
+            "upper": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Upper"
+            }
+          },
+          "required": [
+            "name",
+            "expression",
+            "units"
+          ],
+          "title": "OptimizationConstraint",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One explicit mathematical problem derived from a task, with no solver choice.\n\nobjective_function returns the raw scalar metric; Objective retains the task's\ndirection, weight and units. Constraints are mathematical expressions, not\nobserved ConstraintResults. Adapters validate expression payloads via Registry.",
+      "properties": {
+        "variables": {
+          "additionalProperties": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Variables",
+          "type": "object"
+        },
+        "objective": {
+          "$ref": "#/$defs/Objective"
+        },
+        "objective_function": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Payload"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            }
+          ],
+          "title": "Objective Function"
+        },
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/OptimizationConstraint"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "model_reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Binding"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Reference"
+        },
+        "horizon": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Number of stages, when applicable",
+          "title": "Horizon"
+        },
+        "initial_guess": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Initial Guess",
+          "type": "object"
+        }
+      },
+      "required": [
+        "variables",
+        "objective",
+        "objective_function"
+      ],
+      "title": "OptimizationProblem",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "optimization",
+      "role": "adapter",
+      "model": "model.gvs",
+      "model_version": "1.0.0",
+      "authorization": "extensions.tendon_family.scientific_optimization:gvs_authorization",
+      "supported_objectives": [
+        "inverse_shape_static",
+        "tip_position_error_squared",
+        "tendon_effort"
+      ],
+      "supported_constraints": [
+        "static_equilibrium",
+        "tendon_force_bounds"
+      ],
+      "target_source": "q_target for inverse_shape; frozen_task.goal.target_m for inverse_tip_static",
+      "backend_solves": 0
+    },
+    "resources": [],
+    "dependencies": [
+      "numpy",
+      "casadi"
+    ],
+    "sources": [
+      "extensions/tendon_family/contracts.py",
+      "extensions/tendon_family/compiler.py",
+      "extensions/tendon_family/sections.py",
+      "extensions/tendon_family/geometry.py",
+      "extensions/tendon_family/legacy.py",
+      "extensions/tendon_family/scene.py",
+      "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
+      "extensions/tendon_family/backends.py",
+      "extensions/tendon_family/signals.py",
+      "extensions/tendon_family/candidate.py",
+      "extensions/tendon_family/preparation.py",
+      "extensions/tendon_family/mjcf.py",
+      "extensions/tendon_family/saved.py",
+      "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
+      "tools/platform_tools.py",
+      "tools/platform_tasks.py",
+      "schemas/platform_operations.py",
+      "tools/design_compiler.py",
+      "tools/matlab_tools.py",
+      "tools/state_io.py",
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/robot_domain/contracts.py",
+      "schemas/environment_spec.py",
+      "schemas/robot_ir.py",
+      "schemas/exploration.py",
+      "schemas/platform_math.py",
+      "extensions/tendon_family/gvs.py",
+      "extensions/tendon_family/gvs_casadi.py",
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py",
+      "extensions/optimization/contracts.py",
+      "extensions/optimization/ipopt.py",
+      "tools/platform_optimization.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [
+      [
+        "model.gvs",
+        "1.0.0"
+      ]
+    ],
+    "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
+      [
+        "family.design",
+        "1.0.0"
+      ],
+      [
+        "family.initial",
+        "1.0.0"
+      ],
+      [
+        "family.control",
+        "1.0.0"
+      ],
+      [
+        "family.parameters",
+        "1.0.0"
+      ],
+      [
+        "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.space",
+        "1.0.0"
+      ],
+      [
+        "family.discretization",
+        "1.0.0"
+      ],
+      [
+        "family.experiment_spec",
+        "1.0.0"
+      ],
+      [
+        "family.build_request",
+        "1.0.0"
+      ],
+      [
+        "family.build_result",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_model",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_configuration",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_forward_request",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_kinematics_result",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_describe_request",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_description",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_model",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_dynamics_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_dynamics_result",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_describe_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_description",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_continuous_dynamics",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_build_system_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_linearize_request",
+        "1.0.0"
+      ],
+      [
+        "family.casadi_linearizer",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_command",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_describe_request",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_description",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_forward_request",
+        "2.0.0"
+      ],
+      [
+        "family.pcc_kinematics_result",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_dynamics_request",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_dynamics_result",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_build_system_request",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_system_artifact_result",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_linearize_request",
+        "2.0.0"
+      ],
+      [
+        "family.linearized_model_artifact_result",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_equilibrium_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_equilibrium_result",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_synthesize_request",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_gain_artifact",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_result",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
+      ],
+      [
+        "platform.optimization_problem",
+        "1.0.0"
+      ],
+      [
+        "optimization.casadi_nlp_expression",
+        "1.0.0"
+      ],
+      [
+        "optimization.casadi_nlp_selector",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
+    "extension_id": "optimization_assembler.pcc_reach",
+    "kind": "optimization_assembler",
+    "version": "1.0.0",
+    "binding": "extensions.tendon_family.scientific_optimization:PCCReachAssembler",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Build one-variable PCC reach problems from an authorized length and the frozen Task target.",
+    "input_schema": {
+      "$defs": {
+        "PCCConfiguration": {
+          "additionalProperties": false,
+          "properties": {
+            "segments": {
+              "minProperties": 1,
+              "patternProperties": {
+                "^[A-Za-z][A-Za-z0-9_]*$": {
+                  "$ref": "#/$defs/PCCSegmentConfiguration"
+                }
+              },
+              "title": "Segments",
+              "type": "object"
+            }
+          },
+          "required": [
+            "segments"
+          ],
+          "title": "PCCConfiguration",
+          "type": "object"
+        },
+        "PCCSegmentConfiguration": {
+          "additionalProperties": false,
+          "properties": {
+            "curvature_y_rad_m": {
+              "description": "Actual total geometric curvature about local +y in rad/m; not an increment relative to natural_curvature_rad_m.",
+              "title": "Curvature Y Rad M",
+              "type": "number"
+            },
+            "curvature_z_rad_m": {
+              "description": "Actual total geometric curvature about local +z in rad/m; not an increment relative to natural_curvature_rad_m.",
+              "title": "Curvature Z Rad M",
+              "type": "number"
+            }
+          },
+          "required": [
+            "curvature_y_rad_m",
+            "curvature_z_rad_m"
+          ],
+          "title": "PCCSegmentConfiguration",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Fixed PCC configuration; the reach target always comes from Task.",
+      "properties": {
+        "configuration": {
+          "$ref": "#/$defs/PCCConfiguration"
+        }
+      },
+      "required": [
+        "configuration"
+      ],
+      "title": "PCCReachAssemblerParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "Binding": {
+          "additionalProperties": false,
+          "properties": {
+            "extension_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Extension Id",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "parameters": {
+              "$ref": "#/$defs/Payload"
+            }
+          },
+          "required": [
+            "extension_id",
+            "parameters"
+          ],
+          "title": "Binding",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Objective": {
+          "additionalProperties": false,
+          "properties": {
+            "metric": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Metric",
+              "type": "string"
+            },
+            "direction": {
+              "enum": [
+                "minimize",
+                "maximize"
+              ],
+              "title": "Direction",
+              "type": "string"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "weight": {
+              "default": 1,
+              "exclusiveMinimum": 0,
+              "title": "Weight",
+              "type": "number"
+            }
+          },
+          "required": [
+            "metric",
+            "direction",
+            "units"
+          ],
+          "title": "Objective",
+          "type": "object"
+        },
+        "OptimizationConstraint": {
+          "additionalProperties": false,
+          "description": "Scalar lower <= expression(variables) <= upper; equal bounds mean equality.",
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "expression": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                }
+              ],
+              "title": "Expression"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            },
+            "lower": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Lower"
+            },
+            "upper": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Upper"
+            }
+          },
+          "required": [
+            "name",
+            "expression",
+            "units"
+          ],
+          "title": "OptimizationConstraint",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One explicit mathematical problem derived from a task, with no solver choice.\n\nobjective_function returns the raw scalar metric; Objective retains the task's\ndirection, weight and units. Constraints are mathematical expressions, not\nobserved ConstraintResults. Adapters validate expression payloads via Registry.",
+      "properties": {
+        "variables": {
+          "additionalProperties": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Variables",
+          "type": "object"
+        },
+        "objective": {
+          "$ref": "#/$defs/Objective"
+        },
+        "objective_function": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Payload"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            }
+          ],
+          "title": "Objective Function"
+        },
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/OptimizationConstraint"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "model_reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Binding"
+            },
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Reference"
+        },
+        "horizon": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Number of stages, when applicable",
+          "title": "Horizon"
+        },
+        "initial_guess": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Initial Guess",
+          "type": "object"
+        }
+      },
+      "required": [
+        "variables",
+        "objective",
+        "objective_function"
+      ],
+      "title": "OptimizationProblem",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "optimization",
+      "role": "adapter",
+      "model": "model.pcc",
+      "model_version": "1.0.0",
+      "authorization": "extensions.tendon_family.scientific_optimization:pcc_authorization",
+      "supported_objectives": [
+        "tip_position_error_squared"
+      ],
+      "supported_constraints": [
+        "authorized_design_bounds"
+      ],
+      "target_source": "frozen_task.goal.target_m",
+      "backend_solves": 0
+    },
+    "resources": [],
+    "dependencies": [
+      "numpy",
+      "casadi"
+    ],
+    "sources": [
+      "extensions/tendon_family/contracts.py",
+      "extensions/tendon_family/compiler.py",
+      "extensions/tendon_family/sections.py",
+      "extensions/tendon_family/geometry.py",
+      "extensions/tendon_family/legacy.py",
+      "extensions/tendon_family/scene.py",
+      "extensions/tendon_family/control.py",
+      "extensions/tendon_family/execution.py",
+      "extensions/tendon_family/backends.py",
+      "extensions/tendon_family/signals.py",
+      "extensions/tendon_family/candidate.py",
+      "extensions/tendon_family/preparation.py",
+      "extensions/tendon_family/mjcf.py",
+      "extensions/tendon_family/saved.py",
+      "extensions/tendon_family/manifest.py",
+      "extensions/tendon_family/optimization.py",
+      "extensions/tendon_family/crosscheck.py",
+      "extensions/tendon_family/route.py",
+      "tools/optimization_interfaces.py",
+      "tools/platform_search.py",
+      "tools/platform_tools.py",
+      "tools/platform_tasks.py",
+      "schemas/platform_operations.py",
+      "tools/design_compiler.py",
+      "tools/matlab_tools.py",
+      "tools/state_io.py",
+      "extensions/experiment_dynamics/contracts.py",
+      "extensions/experiment_dynamics/physics.py",
+      "extensions/robot_domain/contracts.py",
+      "schemas/environment_spec.py",
+      "schemas/robot_ir.py",
+      "schemas/exploration.py",
+      "schemas/platform_math.py",
+      "extensions/tendon_family/gvs.py",
+      "extensions/tendon_family/gvs_casadi.py",
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py",
+      "extensions/optimization/contracts.py",
+      "extensions/optimization/ipopt.py",
+      "tools/platform_optimization.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [
+      [
+        "model.pcc",
+        "1.0.0"
+      ]
+    ],
+    "contract_dependencies": [
+      [
+        "family.route_policy",
+        "1.0.0"
+      ],
+      [
+        "family.optimization_request",
+        "1.0.0"
+      ],
+      [
+        "family.search",
+        "1.0.0"
+      ],
+      [
+        "family.search_state",
+        "1.0.0"
+      ],
+      [
+        "family.design",
+        "1.0.0"
+      ],
+      [
+        "family.initial",
+        "1.0.0"
+      ],
+      [
+        "family.control",
+        "1.0.0"
+      ],
+      [
+        "family.parameters",
+        "1.0.0"
+      ],
+      [
+        "family.backend_data",
+        "1.0.0"
+      ],
+      [
+        "family.dynamics_model",
+        "1.0.0"
+      ],
+      [
+        "family.matlab_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.mujoco_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.space",
+        "1.0.0"
+      ],
+      [
+        "family.discretization",
+        "1.0.0"
+      ],
+      [
+        "family.experiment_spec",
+        "1.0.0"
+      ],
+      [
+        "family.build_request",
+        "1.0.0"
+      ],
+      [
+        "family.build_result",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_model",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_configuration",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_forward_request",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_kinematics_result",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_describe_request",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_description",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_model",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_dynamics_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_dynamics_result",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_describe_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_description",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_continuous_dynamics",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_build_system_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_linearize_request",
+        "1.0.0"
+      ],
+      [
+        "family.casadi_linearizer",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_command",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_describe_request",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_description",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.pcc_forward_request",
+        "2.0.0"
+      ],
+      [
+        "family.pcc_kinematics_result",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_dynamics_request",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_dynamics_result",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_build_system_request",
+        "2.0.0"
+      ],
+      [
+        "family.gvs_system_artifact_result",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_linearize_request",
+        "2.0.0"
+      ],
+      [
+        "family.linearized_model_artifact_result",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_equilibrium_request",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_equilibrium_result",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_synthesize_request",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_gain_artifact",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_result",
+        "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
+      ],
+      [
+        "platform.optimization_problem",
+        "1.0.0"
+      ],
+      [
+        "optimization.casadi_nlp_expression",
+        "1.0.0"
+      ],
+      [
+        "optimization.casadi_nlp_selector",
+        "1.0.0"
+      ]
+    ],
     "side_effects": "none"
   },
   {
@@ -26223,6 +28912,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -26273,6 +28970,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -26502,6 +29203,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -26552,6 +29261,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -26839,6 +29552,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -26889,6 +29610,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
@@ -28711,6 +31436,256 @@
     "side_effects": "current session/project only"
   },
   {
+    "extension_id": "solver.ipopt",
+    "kind": "solver",
+    "version": "1.0.0",
+    "binding": "extensions.optimization.ipopt:IpoptSolver",
+    "declared": true,
+    "implementation_exists": true,
+    "dependencies_available": true,
+    "permitted": false,
+    "executable": false,
+    "runtime_probe": "not_started",
+    "reasons": [
+      "NO_SESSION_POLICY"
+    ],
+    "description": "Solve explicit differentiable OptimizationProblem expressions with CasADi IPOPT.",
+    "input_schema": {
+      "additionalProperties": false,
+      "properties": {
+        "max_iterations": {
+          "default": 300,
+          "maximum": 10000,
+          "minimum": 1,
+          "title": "Max Iterations",
+          "type": "integer"
+        },
+        "tolerance": {
+          "default": 1e-08,
+          "exclusiveMinimum": 0,
+          "title": "Tolerance",
+          "type": "number"
+        },
+        "acceptable_tolerance": {
+          "default": 1e-06,
+          "exclusiveMinimum": 0,
+          "title": "Acceptable Tolerance",
+          "type": "number"
+        },
+        "print_level": {
+          "default": 0,
+          "maximum": 12,
+          "minimum": 0,
+          "title": "Print Level",
+          "type": "integer"
+        },
+        "hessian_approximation": {
+          "default": "limited-memory",
+          "enum": [
+            "limited-memory",
+            "exact"
+          ],
+          "title": "Hessian Approximation",
+          "type": "string"
+        }
+      },
+      "title": "IpoptParameters",
+      "type": "object"
+    },
+    "output_schema": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "converged",
+            "infeasible",
+            "unbounded",
+            "iteration_limit",
+            "failed",
+            "cancelled",
+            "unknown"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "optimum": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Optimum"
+        },
+        "objective_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Objective Value"
+        },
+        "constraint_violation": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Constraint Violation"
+        },
+        "iterations": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Iterations"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "problem_reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "solver_evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "OptimizationResult",
+      "type": "object"
+    },
+    "capabilities": {
+      "category": "optimization",
+      "role": "adapter",
+      "expression": "casadi_nlp_function_v1",
+      "backend_solves": 0,
+      "search": false
+    },
+    "resources": [],
+    "dependencies": [
+      "numpy",
+      "casadi"
+    ],
+    "sources": [
+      "extensions/optimization/contracts.py",
+      "extensions/optimization/ipopt.py",
+      "extensions/optimization/manifest.py",
+      "schemas/platform_math.py",
+      "schemas/platform_protocols.py",
+      "tools/platform_optimization.py"
+    ],
+    "assets": [],
+    "extension_dependencies": [],
+    "contract_dependencies": [
+      [
+        "optimization.casadi_nlp_expression",
+        "1.0.0"
+      ],
+      [
+        "optimization.casadi_nlp_selector",
+        "1.0.0"
+      ],
+      [
+        "optimization.ipopt_parameters",
+        "1.0.0"
+      ],
+      [
+        "optimization.describe_request",
+        "1.0.0"
+      ],
+      [
+        "optimization.description",
+        "1.0.0"
+      ],
+      [
+        "optimization.assemble_request",
+        "1.0.0"
+      ],
+      [
+        "optimization.assembly_result",
+        "1.0.0"
+      ],
+      [
+        "optimization.solve_request",
+        "1.0.0"
+      ],
+      [
+        "platform.optimization_problem",
+        "1.0.0"
+      ],
+      [
+        "platform.optimization_result",
+        "1.0.0"
+      ]
+    ],
+    "side_effects": "none"
+  },
+  {
     "extension_id": "statics.gvs_equilibrium",
     "kind": "tool",
     "version": "1.0.0",
@@ -28881,7 +31856,9 @@
       "schemas/platform_math.py",
       "extensions/tendon_family/gvs.py",
       "extensions/tendon_family/gvs_casadi.py",
-      "extensions/tendon_family/pcc.py"
+      "extensions/tendon_family/pcc.py",
+      "extensions/tendon_family/scientific_optimization.py",
+      "extensions/tendon_family/legacy_scientific.py"
     ],
     "assets": [],
     "extension_dependencies": [
@@ -29036,6 +32013,14 @@
         "1.0.0"
       ],
       [
+        "family.pcc_reach_assembler_parameters",
+        "1.0.0"
+      ],
+      [
+        "family.gvs_inverse_assembler_parameters",
+        "1.0.0"
+      ],
+      [
         "family.pcc_forward_request",
         "2.0.0"
       ],
@@ -29086,6 +32071,10 @@
       [
         "family.lqr_synthesis_result",
         "1.0.0"
+      ],
+      [
+        "family.lqr_synthesis_description",
+        "2.0.0"
       ]
     ],
     "side_effects": "none"
