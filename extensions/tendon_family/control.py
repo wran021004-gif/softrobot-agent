@@ -4,6 +4,31 @@ from tools.state_io import digest
 from .contracts import Control
 
 
+def execute_tension_reference(physics, period_s, previous_u, geometry, requested_tensions):
+    """Execute model-space tensions through the one shared ideal-servo bridge."""
+    requested=np.asarray(requested_tensions,dtype=float)
+    force=np.array([x['force_limit_n'] for x in physics['tendons']])
+    desired=np.clip(requested,0.,force)
+    kp=np.array([x['kp_n_m'] for x in physics['tendons']])
+    pretension=np.array([x['pretension_n'] for x in physics['tendons']])
+    B=np.array(physics['transmission'])
+    target_for_tension=geometry['lengths']-desired/kp
+    wanted=np.linalg.pinv(B)@(target_for_tension-np.array(physics['reference_lengths_m'])+pretension/kp)
+    limits=np.array([a['limits'] for a in physics['actuators']])
+    speed=np.array([a['velocity_limit'] for a in physics['actuators']])
+    rate_limited=previous_u+np.clip(wanted-previous_u,-speed*period_s,speed*period_s)
+    command=np.clip(rate_limited,limits[:,0],limits[:,1])
+    target=np.array(physics['reference_lengths_m'])+B@command-pretension/kp
+    predicted=np.clip(kp*(geometry['lengths']-target),0.,force)
+    error=predicted-desired
+    telemetry=dict(requested_tension_n=requested.tolist(),desired_tension_n=desired.tolist(),
+        predicted_tension_n=predicted.tolist(),tension_tracking_error_n=error.tolist(),
+        force_limit_saturated=(requested!=desired).tolist(),
+        actuator_saturated=(np.abs(command-wanted)>1e-12).tolist(),
+        tension_command_unrealizable=(np.abs(error)>1e-9).tolist())
+    return command,target,telemetry
+
+
 def resolve_control(inp, physics):
     """Normalize reference, algorithm and actuator mapping without running it."""
     c=Control.model_validate(inp.policy.controller.parameters.data)
@@ -100,25 +125,17 @@ class Controller:
             dq = np.clip(dq,-c.max_joint_update_rad,c.max_joint_update_rad)
             wanted = self.u+np.linalg.pinv(B)@geometry['Jlength']@dq
         else:
-            kp=np.array([x['kp_n_m'] for x in p['tendons']])
-            pretension=np.array([x['pretension_n'] for x in p['tendons']])
-            target_for_tension=geometry['lengths']-self.desired_tensions/kp
-            wanted=np.linalg.pinv(B)@(target_for_tension-np.array(p['reference_lengths_m'])+pretension/kp)
+            self.u,target,self.last=execute_tension_reference(p,dt,self.u,geometry,self.requested_tensions)
+            observation=dict(time_s=t,phase='current_state_before_integration',tip_position_m=geometry['tip'].tolist(),
+                qpos_rad=q.tolist(),qvel_rad_s=v.tolist(),tendon_length_m=geometry['lengths'].tolist(),actuator_command=self.u.tolist(),target_lengths_m=target.tolist())
+            observation.update(self.last); self.observations.append(observation)
+            return target
         limits = np.array([a['limits'] for a in p['actuators']]); speed = np.array([a['velocity_limit'] for a in p['actuators']])
         previous=self.u.copy()
         rate_limited=previous+np.clip(wanted-previous,-speed*dt,speed*dt)
         self.u = np.clip(rate_limited,limits[:,0],limits[:,1])
         target = np.array(p['reference_lengths_m'])+B@self.u-np.array([t['pretension_n']/t['kp_n_m'] for t in p['tendons']])
         self.last={}
-        if c.mode == 'tension_reference':
-            kp=np.array([x['kp_n_m'] for x in p['tendons']]); force=np.array([x['force_limit_n'] for x in p['tendons']])
-            predicted=np.clip(kp*(geometry['lengths']-target),0.,force)
-            error=predicted-self.desired_tensions
-            self.last=dict(requested_tension_n=self.requested_tensions.tolist(),desired_tension_n=self.desired_tensions.tolist(),
-                predicted_tension_n=predicted.tolist(),tension_tracking_error_n=error.tolist(),
-                force_limit_saturated=list(self.force_limit_saturated),
-                actuator_saturated=(np.abs(self.u-wanted)>1e-12).tolist(),
-                tension_command_unrealizable=(np.abs(error)>1e-9).tolist())
         observation=dict(time_s=t,phase='current_state_before_integration',tip_position_m=geometry['tip'].tolist(),
             qpos_rad=q.tolist(),qvel_rad_s=v.tolist(),tendon_length_m=geometry['lengths'].tolist(),actuator_command=self.u.tolist(),target_lengths_m=target.tolist())
         observation.update(self.last); self.observations.append(observation)

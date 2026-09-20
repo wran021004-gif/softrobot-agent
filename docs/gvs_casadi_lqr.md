@@ -31,9 +31,27 @@ only tensions, an initial `q`, and optional numerical tolerances.
 lazy LQR-only SciPy import and applies `u=u0-K(x-x0)`. It rejects
 non-equilibrium linearizations whose drift exceeds the configured tolerance.
 The unconstrained LQR command is finally clamped per tendon to
-`[0, force_limit_n]`; its output is model-space tendon tension, not a backend
-tendon-length or motor command. Direct backend selection therefore fails with
-`CONTROL_BACKEND_ADAPTER_REQUIRED` until an actuator inner-loop adapter exists.
+`[0, force_limit_n]`; its output remains model-space tendon tension, not a
+backend tendon-length or motor command. Direct backend selection therefore
+continues to fail with `CONTROL_BACKEND_ADAPTER_REQUIRED`.
+
+`controller.gvs_lqr@1.0.0` is the separate backend-executable composition. It
+projects the compiled serial-cell `qpos/qvel` state into the unchanged GVS
+first-order basis, applies the existing continuous LQR law, and sends its
+bounded tendon tensions through the shared `execute_tension_reference` bridge.
+The projector rotates each principal-axis hinge angle into its segment frame,
+divides by the real compiled cell length, then least-squares fits
+`[1, 2*s/L-1]` independently for y/z curvature and rate. At least two cells per
+flexible segment are required. MuJoCo actuator travel/rate and tendon force
+limits remain authoritative. Runtime traces retain projected state, projection
+residual, state error, raw/bounded/measured tension, and saturation flags.
+
+Executable controller parameters contain the verified GVS equilibrium `q0/u0`
+and semantic LQR weights. The composition reconstructs the existing
+`DynamicSystem -> LinearizedModel -> ContinuousLQRController` chain at build
+time; it does not implement another Riccati solver. Time-window external forces
+are omitted only from the nominal GVS equilibrium/linearization because GVS v1
+does not model them, while the frozen backend task continues to apply them.
 
 The compact public chain is:
 

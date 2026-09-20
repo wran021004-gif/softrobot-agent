@@ -43,8 +43,9 @@ CONTRACTS += [
     ('family.lqr_gain_artifact', '1.0.0', c.LQRGainArtifact),
     ('family.lqr_synthesis_result', '1.0.0', c.LQRSynthesisResult),
     ('family.lqr_synthesis_description', '2.0.0', c.LQRSynthesisDescription),
+    ('family.gvs_lqr_control', '1.0.0', c.GVSLQRControl),
 ]
-SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
+SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_projection','gvs_lqr','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
@@ -80,6 +81,13 @@ EXTENSIONS=[
             tension_reference=dict(order_source='frozen family.design tendons',force_limit_semantics='clip each requested tension to [0, force_limit_n]',
                 transmission='minimum-norm pseudoinverse followed by existing actuator velocity and travel limits'),
             sampling={'control_observation':'interval_start_pre_step','force':'interval_start_pre_step_solver','state':'interval_end_post_step'})),
+    Extension('controller.gvs_lqr','controller','1.0.0',c.GVSLQRControl,Payload,'extensions.tendon_family.gvs_lqr:GVSLQRController',
+        'Backend-executable GVS state projection plus existing continuous LQR and tendon-tension bridge',**COMMON,
+        dependencies=('numpy','scipy','casadi'),extension_dependencies=(('controller.lqr','1.0.0'),('model.gvs','1.0.0')),
+        capabilities=dict(category='control',role='adapter',channel='actuator_commands',backend_executable=True,
+            command_space='actuator_commands_via_model_tendon_tension',observations=['joint_position','joint_velocity','tendon_length'],
+            state_projector='backend_discrete_to_gvs_first_order_v1',model_requirement=dict(input='none'),
+            composition=['model.gvs','linearizer.casadi','controller.lqr','tension_reference_bridge'],reset=True,restore=False)),
     Extension('candidate.family','candidate_builder','1.0.0',c.Space,SessionInput,'extensions.tendon_family.candidate:apply',
         'Candidate construction from numerical, integer, option and complete structure template choices',**COMMON,capabilities=dict(category='robot_design',role='adapter',
             editable=[],authorize_changes='extensions.tendon_family.candidate:authorize',
@@ -103,7 +111,7 @@ for name,binding,model,deps,resources in [
             conversion='shared serial family physics',families=['task.reach'],robots=['tendon_robot_family','tendon_driven_continuum'],
             inactive_parameters=[] if name=='matlab_spatial' else ['max_step_s','rtol','atol','contact_stiffness_n_m','contact_damping_n_s_m'],
             robot_contracts=['family.design','domain.rod_design'],channels=['actuator_commands'],environments=['experiment.assembly'],
-            controllers=['controller.family'],signals=['tip_position','joint_position','joint_velocity','tendon_length','tendon_tension','desired_tendon_tension','tendon_target_length','actuator_command','actuator_torque','external_torque'],
+            controllers=['controller.family']+(['controller.gvs_lqr'] if name=='family_mujoco' else []),signals=['tip_position','joint_position','joint_velocity','tendon_length','tendon_tension','desired_tendon_tension','tendon_target_length','actuator_command','actuator_torque','external_torque'],
             signal_specs_resolver='extensions.tendon_family.signals:observation_specs',signal_phases=['post_step','pre_step_solver'],
             structures=['serial flexible segments','fixed rigid connectors','guides','payloads'],
             sections=['circle','tube','ellipse','rectangle','simple polygon with holes'],

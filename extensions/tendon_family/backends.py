@@ -35,7 +35,9 @@ class MatlabBackend:
             if any(getattr(parameters,k)!=getattr(defaults,k) for k in ('max_step_s','rtol','atol','contact_stiffness_n_m','contact_damping_n_s_m')):
                 raise ValueError('MATLAB_ONLY_SOLVER_PARAMETERS: MuJoCo uses scene timestep and its recorded XML contact settings')
         if inp.task.initializer.extension_id!='initialize.family': raise ValueError('NAMED_FAMILY_INITIALIZER_REQUIRED')
-        if inp.policy.controller.extension_id!='controller.family': raise ValueError('FAMILY_CONTROLLER_REQUIRED')
+        controllers=['controller.family']
+        if cls.model=='mujoco_serial_bending_v1': controllers.append('controller.gvs_lqr')
+        if inp.policy.controller.extension_id not in controllers: raise ValueError('FAMILY_CONTROLLER_REQUIRED')
         from tools.platform_registry import registry
         resolve_execution(inp,registry())
         p=physics_for(inp); assemble(inp,p)
@@ -71,7 +73,7 @@ class MatlabBackend:
             numerical_steps=steps,reason=reason,applicability=self.physics['applicability'],exported_files=sorted(p.name for p in folder.iterdir()),
             execution_plan=self.execution,control_identity=self.scene['control']['identity'])
         self.result=BackendResult(solver_status='completed' if complete else 'failed',backend_id=self.backend_id,model_id=self.execution['implementation_model_id'],
-            signals=export(rows,self.physics,self.scene['control']['mode']=='tension_reference'),
+            signals=export(rows,self.physics,self.scene['control']['mode'] in ('tension_reference','gvs_lqr')),
             data=Payload(contract='family.backend_data',data=data.model_dump(mode='json')),
             limitations=[self.physics['applicability']['collision'],'Ideal length servos, tension only, slack gives zero tension; no motor inertia.',
                 'MATLAB lowest-envelope-vertex penalty and MuJoCo convex contact differ; no contact accuracy claim.'],initial_state=self.initial,seed=self.inp.seed)
@@ -80,7 +82,7 @@ class MatlabBackend:
     def shared_input(self,timeout_s):
         c=dict(self.scene['control']['effective_parameters'])
         c['target_world_m']=self.scene['control']['reference'].get('target_world_m')
-        commands=self.scene['control']['reference']['commands']
+        commands=self.scene['control']['reference'].get('commands',{})
         c['command_vector']=[commands.get(a['id'],0.) for a in self.physics['actuators']]
         return dict(physics=self.physics,scene=self.scene,config=self.config.model_dump(mode='json'),control=c,timeout_s=timeout_s)
 

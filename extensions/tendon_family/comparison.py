@@ -22,11 +22,12 @@ def comparison_basis(root,record):
             ('backend.family_mujoco','1.0.0','mujoco_serial_bending_v1')):
             raise ValueError('LEGACY_MODEL_EVIDENCE_INSUFFICIENT')
         execution=resolve_execution(inp,registry())
-    from .contracts import Control
+    from .contracts import Control, GVSLQRControl
     from .compiler import normalize_inputs
     design,mesh,_=normalize_inputs(inp.robot.structure.data,inp.policy.discretization.data if inp.policy.discretization else None)
+    control_type=GVSLQRControl if inp.policy.controller.extension_id=='controller.gvs_lqr' else Control
     return dict(task=digest(plain(inp.task)),seed=inp.seed,design=digest(plain(design)),
-        discretization=digest(plain(mesh)),control=digest(plain(Control.model_validate(inp.policy.controller.parameters.data))),
+        discretization=digest(plain(mesh)),control=digest(plain(control_type.model_validate(inp.policy.controller.parameters.data))),
         model=execution['dynamics_model_identity'])
 
 

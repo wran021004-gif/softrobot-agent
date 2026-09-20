@@ -30,7 +30,8 @@ def expanded(p,tension_reference=False):
 def observation_specs(inp,reg):
     from .backends import physics_for
     from .contracts import Control
-    tension=Control.model_validate(inp.policy.controller.parameters.data).mode=='tension_reference'
+    tension=(inp.policy.controller.extension_id=='controller.gvs_lqr' or
+        Control.model_validate(inp.policy.controller.parameters.data).mode=='tension_reference')
     return [s for _,_,s in expanded(physics_for(inp),tension)]
 
 

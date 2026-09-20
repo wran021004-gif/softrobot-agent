@@ -178,6 +178,17 @@ class Control(Contract):
         return self
 
 
+class GVSLQRControl(Contract):
+    equilibrium_q: list[FiniteFloat] = Field(min_length=1)
+    equilibrium_tensions_n: list[Annotated[FiniteFloat, Field(ge=0)]] = Field(min_length=1)
+    curvature_weight: FiniteFloat = Field(default=1., gt=0)
+    state_rate_weight: FiniteFloat = Field(default=.1, gt=0)
+    tendon_tension_weight: FiniteFloat = Field(default=1., gt=0)
+    state_weight_overrides: dict[str, Annotated[FiniteFloat, Field(ge=0)]] = Field(default_factory=dict)
+    equilibrium_tolerance: FiniteFloat = Field(default=1e-7, gt=0)
+    operating_point_source: Literal['gvs_inverse_tip_static', 'gvs_equilibrium'] = 'gvs_inverse_tip_static'
+
+
 class Reference(Contract):
     kind: Literal['task_goal', 'actuator_commands']
     commands: dict[str, float] = Field(default_factory=dict)

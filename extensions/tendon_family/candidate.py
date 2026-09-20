@@ -137,12 +137,15 @@ def apply(inp, parameters, changes):
     design_bounds={k:v for k,v in inp.policy.editable.items() if not k.startswith(('control/','model/'))}
     result = build(dict(baseline=inp.robot.structure.data,space=parameters,discretization=explicit,changes=design_changes),task_bounds=design_bounds)
     if result.status != 'valid': raise ValueError(result.status.upper()+': '+str(result.reason))
-    from .contracts import Control
-    control=Control.model_validate(inp.policy.controller.parameters.data).model_dump(mode='json')
+    from .contracts import Control, GVSLQRControl
+    control_type=GVSLQRControl if inp.policy.controller.extension_id=='controller.gvs_lqr' else Control
+    control=control_type.model_validate(inp.policy.controller.parameters.data).model_dump(mode='json')
     for path,value in changes.items():
         if path.startswith('control/'):
             key=path.removeprefix('control/')
-            if key not in ('feedback_gain','damping','max_joint_update_rad','ramp_s'):
+            allowed=(('curvature_weight','state_rate_weight','tendon_tension_weight')
+                if control_type is GVSLQRControl else ('feedback_gain','damping','max_joint_update_rad','ramp_s'))
+            if key not in allowed:
                 raise ValueError('CONTROL_PARAMETER_UNSUPPORTED: '+path)
             control[key]=value
     for path,spec in parameters.control_parameters.items():
@@ -161,7 +164,7 @@ def apply(inp, parameters, changes):
         inp.policy.dynamics_model.parameters.data.clear()
         inp.policy.dynamics_model.parameters.data.update(model_data)
     inp.policy.controller.parameters.data.clear()
-    inp.policy.controller.parameters.data.update(Control.model_validate(control).model_dump(mode='json'))
+    inp.policy.controller.parameters.data.update(control_type.model_validate(control).model_dump(mode='json'))
     inp.robot.structure.data.clear(); inp.robot.structure.data.update(result.candidate.model_dump(mode='json'))
     from schemas.platform import Payload
     model = Payload(contract='family.discretization',data=result.discretization.model_dump(mode='json'))

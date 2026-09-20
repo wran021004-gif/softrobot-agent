@@ -1,0 +1,94 @@
+"""Backend-executable composition of GVS projection, existing LQR, and tension execution."""
+import numpy as np
+
+from schemas.platform_math import SystemContext
+from tools.state_io import digest
+from .contracts import GVSModelParameters, GVSLQRControl, LQRParameters
+from .control import execute_tension_reference
+from .gvs import GVSModel, coordinate_order, forward_kinematics
+from .gvs_casadi import CasadiLinearizer, ContinuousLQRController
+from .gvs_projection import PROJECTOR_ID, description as projector_description, project
+from .pcc import quaternion_wxyz_to_rotation
+
+
+def _nominal_environment(environment):
+    value=environment.model_copy(deep=True)
+    value.data['external_forces']=[]
+    return value
+
+
+def resolve_gvs_lqr_control(inp,physics):
+    c=GVSLQRControl.model_validate(inp.policy.controller.parameters.data)
+    design=inp.robot.structure.data
+    order=coordinate_order(design);tendon_order=[t['entity'] for t in physics['tendons']]
+    if len(c.equilibrium_q)!=len(order): raise ValueError('GVS_LQR_Q0_DIMENSION_MISMATCH')
+    if len(c.equilibrium_tensions_n)!=len(tendon_order): raise ValueError('GVS_LQR_U0_DIMENSION_MISMATCH')
+    limits=np.array([t['force_limit_n'] for t in physics['tendons']])
+    u0=np.asarray(c.equilibrium_tensions_n,dtype=float)
+    if np.any(u0>limits): raise ValueError('GVS_LQR_U0_FORCE_LIMIT_EXCEEDED')
+    parameters=GVSModelParameters()
+    x0=[*c.equilibrium_q,*([0.]*len(order))]
+    system=GVSModel(parameters).build_system(inp.robot,parameters,None,SystemContext(
+        x0=x0,u0=u0.tolist(),scene=_nominal_environment(inp.task.environment)))
+    linear=CasadiLinearizer().linearize(system)
+    state_names=[spec.name for spec in linear.state_definition]
+    unknown=set(c.state_weight_overrides)-set(state_names)
+    if unknown: raise ValueError('GVS_LQR_UNKNOWN_STATE_WEIGHT: '+','.join(sorted(unknown)))
+    qdiag=[float(c.state_weight_overrides.get(name,c.state_rate_weight if name.endswith('.rate') else c.curvature_weight))
+        for name in state_names]
+    rdiag=[float(c.tendon_tension_weight)]*len(tendon_order)
+    lqr_parameters=LQRParameters(Q=np.diag(qdiag).tolist(),R=np.diag(rdiag).tolist(),tendon_order=tendon_order,
+        force_limits_n=limits.tolist(),equilibrium_tolerance=c.equilibrium_tolerance)
+    lqr=ContinuousLQRController(lqr_parameters);K=lqr.configure_model(linear)
+    gain_identity=digest(dict(K=K.tolist(),Q_diagonal=qdiag,R_diagonal=rdiag,x0=x0,u0=u0.tolist(),
+        tendon_order=tendon_order,force_limits_n=limits.tolist()))
+    local_tip=forward_kinematics(design,c.equilibrium_q,samples_per_segment=2)['tip_position_m']
+    assembly=inp.task.environment.data
+    rotation=quaternion_wxyz_to_rotation(assembly['mount']['quaternion_wxyz'])
+    world_tip=(rotation@local_tip+np.asarray(assembly['mount']['position_m'])).tolist()
+    projector=projector_description(physics,design)
+    plan=dict(mode='gvs_lqr',reference=dict(kind='gvs_equilibrium',target_world_m=list(inp.task.goal.data['target_m']),
+        equilibrium_q=list(c.equilibrium_q),equilibrium_tensions_n=u0.tolist(),tendon_order=tendon_order,
+        source=c.operating_point_source,nominal_external_forces='omitted_from_GVS_operating_point_but_retained_in_backend_task'),
+        algorithm=dict(id='gvs_lqr_tension_composition_v1',equation='u=clip(u0-K@(project(q,qdot)-x0),0,force_limit)',
+            x0=x0,u0=u0.tolist(),K=K.tolist(),Q_diagonal=qdiag,R_diagonal=rdiag,
+            gain_identity=gain_identity,gain_source='deterministic existing Linearizer + ContinuousLQRController at build time',
+            linearized_drift_norm_inf=float(np.linalg.norm(np.asarray(linear.drift),ord=np.inf)),
+            lqr_implementation='ContinuousLQRController',projector=projector),
+        mapping=dict(id='ideal_tendon_transmission_v1',bridge='execute_tension_reference',transmission=physics['transmission'],
+            actuator_order=[a['id'] for a in physics['actuators']],tendon_order=tendon_order,
+            order=['project_backend_state','continuous_lqr','clip_tendon_force','solve_transmission_minimum_norm',
+                'rate_limit_actuator_command','clip_actuator_travel','apply_length_servo']),
+        timing=dict(period_s=inp.task.timing.control_period_s,observation='interval_start_pre_step'),
+        lifecycle=dict(initialize='zero actuator command; observe actual backend state',reset='zero command and clear observations',restore='not implemented'),
+        effective_parameters=c.model_dump(mode='json'),predicted_equilibrium_tip_world_m=world_tip,
+        projector_id=PROJECTOR_ID)
+    plan['identity']=digest(plan)
+    return plan
+
+
+class GVSLQRController:
+    def __init__(self,parameters,period_s):
+        self.parameters=GVSLQRControl.model_validate(parameters);self.period_s=period_s
+
+    def configure(self,physics,plan):
+        self.physics=physics;self.plan=plan;self.coordinate_order=plan['algorithm']['projector']['coordinate_order']
+        self.K=np.asarray(plan['algorithm']['K']);self.x0=np.asarray(plan['algorithm']['x0']);self.u0=np.asarray(plan['algorithm']['u0'])
+        self.u=np.zeros(len(physics['actuators']));self.observations=[];self.last={}
+
+    def command(self,t,geometry,q,v):
+        projection=project(self.physics,self.coordinate_order,q,v)
+        x=np.r_[projection['q_gvs'],projection['qdot_gvs']];delta=x-self.x0
+        raw=self.u0-self.K@delta
+        self.u,target,bridge=execute_tension_reference(self.physics,self.period_s,self.u,geometry,raw)
+        self.last={**bridge,'raw_desired_tension_n':raw.tolist(),
+            'lqr_tension_saturated':(np.asarray(bridge['desired_tension_n'])!=raw).tolist(),
+            'projected_gvs_q':projection['q_gvs'],'projected_gvs_qdot':projection['qdot_gvs'],
+            'gvs_state_error':delta.tolist(),
+            'gvs_projection_residual_max_rad_m':projection['projection_residual_max_rad_m'],
+            'gvs_rate_projection_residual_max_rad_m_s':projection['rate_projection_residual_max_rad_m_s']}
+        observation=dict(time_s=t,phase='current_state_before_integration',tip_position_m=geometry['tip'].tolist(),
+            qpos_rad=q.tolist(),qvel_rad_s=v.tolist(),tendon_length_m=geometry['lengths'].tolist(),
+            actuator_command=self.u.tolist(),target_lengths_m=target.tolist(),**self.last)
+        self.observations.append(observation)
+        return target
