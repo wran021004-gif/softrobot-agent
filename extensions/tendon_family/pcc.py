@@ -21,6 +21,10 @@ The constant curvature vector is represented by two components:
 
 following the right-hand rule.
 
+These inputs are the actual total geometric curvature.  They are not
+increments relative to ``Segment.natural_curvature_rad_m``; natural curvature
+belongs to constitutive mechanics and is intentionally not added here.
+
 Therefore:
 
 - positive curvature about +y bends the local +x tangent toward -z;
@@ -862,3 +866,25 @@ def pcc_forward_tool(ctx, args):
     )
 
     return ctx.reg.parse(result)
+
+
+def pcc_describe_tool(ctx, args):
+    from extensions.tendon_family.contracts import (
+        Design,
+        PCCDescription,
+        PCCSegmentDescription,
+        Segment,
+    )
+
+    if ctx.input.robot.structure.contract != 'family.design':
+        raise ValueError('PCC_REQUIRES_FAMILY_DESIGN')
+    design = ctx.reg.parse(ctx.input.robot.structure)
+    if not isinstance(design, Design):
+        raise ValueError('PCC_REQUIRES_FAMILY_DESIGN')
+    return PCCDescription(
+        segments=[
+            PCCSegmentDescription(segment=component.id)
+            for component in design.components
+            if isinstance(component, Segment)
+        ]
+    )

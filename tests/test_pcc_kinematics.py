@@ -152,6 +152,114 @@ class PCCSegmentKinematicsTests(unittest.TestCase):
 
 class PCCRobotKinematicsTests(unittest.TestCase):
 
+    def test_rotated_rigid_connection_rotates_downstream_segment(self):
+        from extensions.tendon_family.contracts import Design
+
+        half_angle = math.pi / 4.0
+        design = Design.model_validate({
+            'id': 'rotated_serial_pair',
+            'components': [
+                {
+                    'id': 'first',
+                    'kind': 'flexible_segment',
+                    'length_m': 0.1,
+                    'sections': [{
+                        's': 0.0,
+                        'section': {
+                            'kind': 'circle',
+                            'parameters': {'radius_m': 0.005},
+                        },
+                    }],
+                    'physics': {
+                        'mode': 'material',
+                        'density_kg_m3': 1000.0,
+                        'young_pa': 1e6,
+                    },
+                },
+                {
+                    'id': 'turn',
+                    'kind': 'rigid_connector',
+                    'connection': {
+                        'part': 'first',
+                        's': 1.0,
+                        'quaternion_wxyz': [
+                            math.cos(half_angle),
+                            0.0,
+                            0.0,
+                            math.sin(half_angle),
+                        ],
+                    },
+                    'mass_kg': 0.001,
+                    'inertia_com_local_kg_m2': [
+                        [1e-8, 0.0, 0.0],
+                        [0.0, 1e-8, 0.0],
+                        [0.0, 0.0, 1e-8],
+                    ],
+                    'envelope_halfsize_m': [0.001, 0.001, 0.001],
+                },
+                {
+                    'id': 'second',
+                    'kind': 'flexible_segment',
+                    'connection': {'part': 'turn'},
+                    'length_m': 0.05,
+                    'sections': [{
+                        's': 0.0,
+                        'section': {
+                            'kind': 'circle',
+                            'parameters': {'radius_m': 0.004},
+                        },
+                    }],
+                    'physics': {
+                        'mode': 'material',
+                        'density_kg_m3': 1000.0,
+                        'young_pa': 1e6,
+                    },
+                },
+            ],
+            'tendons': [{
+                'id': 'tendon',
+                'points': [
+                    {'attachment': {}, 'role': 'start'},
+                    {
+                        'attachment': {'part': 'second', 's': 1.0},
+                        'role': 'anchor',
+                    },
+                ],
+                'diameter_m': 0.0005,
+                'length_servo_gain_n_m': 100.0,
+                'force_limit_n': 1.0,
+            }],
+            'actuators': [{
+                'id': 'motor',
+                'transmission': [{'tendon': 'tendon', 'ratio': 1.0}],
+                'limits': [-0.01, 0.01],
+                'velocity_limit': 0.01,
+            }],
+            'tip': {'part': 'second', 's': 1.0},
+        })
+
+        result = forward_kinematics(
+            design,
+            {
+                'first': {
+                    'curvature_y_rad_m': 0.0,
+                    'curvature_z_rad_m': 0.0,
+                },
+                'second': {
+                    'curvature_y_rad_m': 0.0,
+                    'curvature_z_rad_m': 0.0,
+                },
+            },
+            samples_per_segment=3,
+        )
+
+        np.testing.assert_allclose(
+            result['segment_transforms']['second']['tip'][:3, 3],
+            np.array([0.1, 0.05, 0.0]),
+            rtol=0.0,
+            atol=1e-12,
+        )
+
     def test_current_two_segment_design_straight_configuration(self):
         from examples.platform_tendon_family import example_design
 

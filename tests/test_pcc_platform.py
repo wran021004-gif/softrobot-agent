@@ -56,6 +56,7 @@ class PCCPlatformTests(unittest.TestCase):
         self.input['policy']['timeout_s'] = 10.0
         self.input['policy']['model']['max_turns'] = 3
         self.input['policy']['tool_bindings'].update({
+            'kinematics.pcc_describe': '1.0.0',
             'kinematics.pcc_forward': '1.0.0',
             'session.control': '1.0.0',
         })
@@ -67,8 +68,12 @@ class PCCPlatformTests(unittest.TestCase):
         )
         self.host.create(self.input)
 
-    def test_registry_has_one_model_and_one_public_tool(self):
-        for extension_id in ('model.pcc', 'kinematics.pcc_forward'):
+    def test_registry_has_unique_model_and_public_tools(self):
+        for extension_id in (
+            'model.pcc',
+            'kinematics.pcc_describe',
+            'kinematics.pcc_forward',
+        ):
             matches = [
                 definition
                 for definition in self.reg.extensions.values()
@@ -148,7 +153,26 @@ class PCCPlatformTests(unittest.TestCase):
         model_input = input_for(self.host)
         tool_ids = {tool['extension_id'] for tool in model_input.tools}
 
+        self.assertIn('kinematics.pcc_describe', tool_ids)
         self.assertIn('kinematics.pcc_forward', tool_ids)
+
+        receipt = self.host.invoke({
+            'request_id': 'pcc-describe',
+            'tool_id': 'kinematics.pcc_describe',
+            'tool_version': '1.0.0',
+            'arguments': {},
+            'reason': 'Discover the frozen robot PCC coordinates.',
+        })
+        self.assertEqual(receipt['execution_status'], 'completed', receipt)
+        description = self.store.artifact(receipt['output'])
+        self.assertEqual(
+            [item['segment'] for item in description['segments']],
+            ['near', 'far'],
+        )
+        self.assertEqual(
+            description['curvature_semantics'],
+            'actual_total_curvature',
+        )
 
     def test_offline_adapter_completes_two_turn_pcc_loop(self):
         outcome = self.host.run(OfflineAdapter([

@@ -359,8 +359,18 @@ class PCCModelParameters(Contract):
 
 
 class PCCSegmentConfiguration(Contract):
-    curvature_y_rad_m: FiniteFloat
-    curvature_z_rad_m: FiniteFloat
+    curvature_y_rad_m: FiniteFloat = Field(
+        description=(
+            'Actual total geometric curvature about local +y in rad/m; '
+            'not an increment relative to natural_curvature_rad_m.'
+        )
+    )
+    curvature_z_rad_m: FiniteFloat = Field(
+        description=(
+            'Actual total geometric curvature about local +z in rad/m; '
+            'not an increment relative to natural_curvature_rad_m.'
+        )
+    )
 
 
 class PCCConfiguration(Contract):
@@ -390,3 +400,207 @@ class PCCKinematicsResult(Contract):
     chain: list[Name] = Field(min_length=1)
     segments: dict[Name, PCCSegmentKinematics]
     tip: PCCPose
+
+
+class PCCDescribeRequest(Contract):
+    pass
+
+
+class PCCSegmentDescription(Contract):
+    segment: Name
+    coordinates: tuple[
+        Literal['curvature_y_rad_m'],
+        Literal['curvature_z_rad_m'],
+    ] = ('curvature_y_rad_m', 'curvature_z_rad_m')
+
+
+class PCCDescription(Contract):
+    model_id: Literal['pcc_constant_curvature_v1'] = 'pcc_constant_curvature_v1'
+    frame: Literal['robot_base'] = 'robot_base'
+    segments: list[PCCSegmentDescription] = Field(min_length=1)
+    curvature_semantics: Literal['actual_total_curvature'] = 'actual_total_curvature'
+    natural_curvature_role: Literal['constitutive_reference_only'] = 'constitutive_reference_only'
+
+
+class GVSModelParameters(Contract):
+    model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
+    integration_steps_per_segment: int = Field(default=24, ge=4, le=200)
+    quadrature_points_per_segment: int = Field(default=5, ge=2, le=20)
+    finite_difference_step: float = Field(default=1e-6, gt=0, le=1e-3)
+
+    @property
+    def mathematical_model(self) -> MathematicalModel:
+        return MathematicalModel(
+            state_definition=[
+                ModelVariable(
+                    name='strain_coefficients',
+                    dimension='4*n_flexible_segments',
+                    units='rad/m',
+                    frame='segment_local',
+                ),
+                ModelVariable(
+                    name='strain_coefficient_rates',
+                    dimension='4*n_flexible_segments',
+                    units='rad/(m*s)',
+                    frame='segment_local',
+                ),
+            ],
+            input_definition=[
+                ModelVariable(
+                    name='tendon_tension',
+                    dimension='n_tendons',
+                    units='N',
+                    frame='tendon_path',
+                )
+            ],
+            output_definition=[
+                ModelVariable(
+                    name='strain_coefficient_acceleration',
+                    dimension='4*n_flexible_segments',
+                    units='rad/(m*s^2)',
+                    frame='segment_local',
+                ),
+                ModelVariable(
+                    name='tip_position',
+                    dimension=3,
+                    units='m',
+                    frame='robot_base',
+                ),
+            ],
+            required_robot_data=[
+                'family.design.components.length_m',
+                'family.design.components.sections',
+                'family.design.components.physics',
+                'family.design.components.natural_curvature_rad_m',
+                'family.design.components.mass_kg',
+                'family.design.components.com_local_m',
+                'family.design.components.inertia_com_local_kg_m2',
+                'family.design.tendons',
+            ],
+            discretization_contract=None,
+            capabilities=ModelCapabilities(
+                kinematics=True,
+                statics=False,
+                dynamics=True,
+                linearization=False,
+                gradients=False,
+            ),
+            representations=[],
+        )
+
+
+class GVSState(Contract):
+    q: list[FiniteFloat]
+    qdot: list[FiniteFloat]
+
+
+NonNegativeFinite = Annotated[FiniteFloat, Field(ge=0)]
+
+
+class GVSInput(Contract):
+    tendon_tensions_n: dict[Name, NonNegativeFinite] = Field(
+        description=(
+            'Actual total nonnegative tendon tensions in N; values are not '
+            'inferred from actuators and design pretension is not added.'
+        )
+    )
+
+
+class GVSDynamicsRequest(Contract):
+    state: GVSState
+    input: GVSInput
+    samples_per_segment: int = Field(default=21, ge=2, le=201)
+
+
+class GVSPose(Contract):
+    position_m: Vec3
+    rotation_matrix: Matrix3
+
+
+class GVSSegmentKinematics(Contract):
+    base: GVSPose
+    tip: GVSPose
+    backbone_points_m: list[Vec3] = Field(min_length=2)
+
+
+class GVSDynamicsResult(Contract):
+    model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
+    frame: Literal['robot_base'] = 'robot_base'
+    coordinate_order: list[str] = Field(min_length=1)
+    q: list[FiniteFloat]
+    qdot: list[FiniteFloat]
+    qdd: list[FiniteFloat]
+    mass_matrix: list[list[FiniteFloat]]
+    velocity_bias: list[FiniteFloat]
+    elastic_force: list[FiniteFloat]
+    damping_force: list[FiniteFloat]
+    gravity_force: list[FiniteFloat]
+    tendon_generalized_force: list[FiniteFloat]
+    tendon_order: list[Name]
+    tendon_lengths_m: list[FiniteFloat]
+    tendon_length_jacobian: list[list[FiniteFloat]]
+    segments: dict[Name, GVSSegmentKinematics]
+    component_poses: dict[Name, GVSPose]
+    tip: GVSPose
+    dynamics_equation: Literal[
+        'M*qdd+c+elastic+damping=tendon+gravity'
+    ] = 'M*qdd+c+elastic+damping=tendon+gravity'
+    limitations: tuple[str, ...] = (
+        'branches',
+        'closed_chains',
+        'contact',
+        'self_collision',
+        'material_torsion',
+        'shear',
+        'axial_extension',
+        'rope_elasticity',
+        'tendon_friction',
+        'motor_dynamics',
+        'external_applied_forces',
+    )
+
+
+class GVSDescribeRequest(Contract):
+    pass
+
+
+class GVSCoordinateDescription(Contract):
+    name: str
+    segment: Name
+    mode: Literal['constant', 'linear']
+    axis: Literal['y', 'z']
+    units: Literal['rad/m'] = 'rad/m'
+
+
+class GVSTendonInputDescription(Contract):
+    tendon: Name
+    units: Literal['N'] = 'N'
+    constraint: Literal['nonnegative'] = 'nonnegative'
+    force_limit_n: float = Field(gt=0)
+    design_pretension_n: float = Field(ge=0)
+
+
+class GVSDescription(Contract):
+    model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
+    frame: Literal['robot_base'] = 'robot_base'
+    basis: tuple[Literal['phi0(s)=1'], Literal['phi1(s)=2*s/L-1']] = (
+        'phi0(s)=1',
+        'phi1(s)=2*s/L-1',
+    )
+    curvature_semantics: Literal['actual_total_curvature'] = 'actual_total_curvature'
+    natural_curvature_role: Literal['zero_elastic_energy_reference'] = 'zero_elastic_energy_reference'
+    coordinates: list[GVSCoordinateDescription] = Field(min_length=1)
+    tendon_inputs: list[GVSTendonInputDescription] = Field(min_length=1)
+    limitations: tuple[str, ...] = (
+        'branches',
+        'closed_chains',
+        'contact',
+        'self_collision',
+        'material_torsion',
+        'shear',
+        'axial_extension',
+        'rope_elasticity',
+        'tendon_friction',
+        'motor_dynamics',
+        'external_applied_forces',
+    )

@@ -13,7 +13,11 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('space',c.Space),('discretization',c.Discretization),('experiment_spec',c.ExperimentSpec),
     ('build_request',c.BuildRequest),('build_result',c.BuildResult),
     ('pcc_model',c.PCCModelParameters),('pcc_configuration',c.PCCConfiguration),
-    ('pcc_forward_request',c.PCCForwardRequest),('pcc_kinematics_result',c.PCCKinematicsResult),]]
+    ('pcc_forward_request',c.PCCForwardRequest),('pcc_kinematics_result',c.PCCKinematicsResult),
+    ('pcc_describe_request',c.PCCDescribeRequest),('pcc_description',c.PCCDescription),
+    ('gvs_model',c.GVSModelParameters),('gvs_dynamics_request',c.GVSDynamicsRequest),
+    ('gvs_dynamics_result',c.GVSDynamicsResult),('gvs_describe_request',c.GVSDescribeRequest),
+    ('gvs_description',c.GVSDescription),]]
 SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
@@ -21,6 +25,7 @@ SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compile
     'extensions/experiment_dynamics/physics.py','extensions/robot_domain/contracts.py',
     'schemas/environment_spec.py','schemas/robot_ir.py','schemas/exploration.py','schemas/platform_math.py')
 PCC_SOURCES=(*SOURCES,'extensions/tendon_family/pcc.py')
+GVS_SOURCES=(*SOURCES,'extensions/tendon_family/gvs.py','extensions/tendon_family/pcc.py')
 MATLAB=tuple('matlab/'+n+'.m' for n in ('tf_geometry','tf_point','tf_routes','tf_terms','tf_control','tf_run','tf_observe','tf_static','tf_view'))
 COMMON=dict(sources=SOURCES,contract_dependencies=tuple((n,v) for n,v,_ in CONTRACTS))
 EXTENSIONS=[
@@ -111,12 +116,136 @@ EXTENSIONS.append(
             physical_input='family.design',
             configuration='per-flexible-segment constant curvature',
             coordinates='curvature_y_rad_m + curvature_z_rad_m per flexible segment',
+            curvature_semantics='actual total geometric curvature; natural curvature is not added',
             assumptions=[
                 'constant curvature per flexible segment',
                 'inextensible centerline',
                 'no shear',
                 'no torsion',
             ],
+        ),
+    )
+)
+EXTENSIONS.append(
+    Extension(
+        'kinematics.pcc_describe',
+        'tool',
+        '1.0.0',
+        c.PCCDescribeRequest,
+        c.PCCDescription,
+        'extensions.tendon_family.pcc:pcc_describe_tool',
+        (
+            'Describe the frozen family.design PCC flexible-segment names and '
+            'their actual-total-curvature y/z coordinates. Read-only; no '
+            'simulation, mechanics, tendon inference or backend solve.'
+        ),
+        sources=PCC_SOURCES,
+        contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy',),
+        extension_dependencies=(('model.pcc', '1.0.0'),),
+        cache=True,
+        side_effects='none',
+        capabilities=dict(
+            category='mathematical_models',
+            role='public_tool',
+            model='model.pcc',
+            backend_solves=0,
+        ),
+    )
+)
+EXTENSIONS.append(
+    Extension(
+        'model.gvs',
+        'dynamics_model',
+        '1.0.0',
+        c.GVSModelParameters,
+        Payload,
+        'extensions.tendon_family.gvs:GVSModel',
+        'First-order variable-strain continuum bending kinematics and dynamics',
+        sources=GVS_SOURCES,
+        contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy',),
+        capabilities=dict(
+            category='mathematical_model',
+            role='adapter',
+            mathematical_model=(
+                c.GVSModelParameters().mathematical_model.model_dump(mode='json')
+            ),
+            physical_input='family.design',
+            environment_input='experiment.assembly gravity and mount',
+            generalized_coordinates=(
+                'per segment: kappa_y_0, kappa_y_1, kappa_z_0, kappa_z_1'
+            ),
+            strain_basis=['phi0(s)=1', 'phi1(s)=2*s/L-1'],
+            curvature_semantics='actual total geometric curvature',
+            constitutive_reference='Segment.natural_curvature_rad_m',
+            actuation_input=(
+                'actual total nonnegative tendon tensions in N, bounded by '
+                'family.design force limits; pretension is not added'
+            ),
+            assumptions=[
+                'serial variable-strain continuum bending',
+                'inextensible centerline',
+                'no shear or torsion',
+                'straight frictionless tendon spans',
+            ],
+            omissions=[
+                'branches', 'closed chains', 'contact', 'self collision',
+                'material torsion', 'shear', 'axial extension', 'rope elasticity',
+                'tendon friction', 'motor electrical dynamics',
+                'external applied forces',
+            ],
+        ),
+    )
+)
+EXTENSIONS.append(
+    Extension(
+        'dynamics.gvs_describe',
+        'tool',
+        '1.0.0',
+        c.GVSDescribeRequest,
+        c.GVSDescription,
+        'extensions.tendon_family.gvs:gvs_describe_tool',
+        (
+            'Describe the frozen robot GVS coordinate order, fixed first-order '
+            'strain basis and nonnegative tendon-tension inputs. No solve.'
+        ),
+        sources=GVS_SOURCES,
+        contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy',),
+        extension_dependencies=(('model.gvs', '1.0.0'),),
+        cache=True,
+        side_effects='none',
+        capabilities=dict(
+            category='mathematical_models', role='public_tool',
+            model='model.gvs', backend_solves=0,
+        ),
+    )
+)
+EXTENSIONS.append(
+    Extension(
+        'dynamics.gvs_evaluate',
+        'tool',
+        '1.0.0',
+        c.GVSDynamicsRequest,
+        c.GVSDynamicsResult,
+        'extensions.tendon_family.gvs:gvs_evaluate_tool',
+        (
+            'Evaluate real first-order variable-strain continuum bending '
+            'dynamics for the frozen family.design using frozen environment '
+            'gravity and explicit tendon tensions. Returns M, velocity bias, '
+            'physical elastic/damping/gravity/tendon forces, qdd and kinematics; '
+            'no simulator or backend solve.'
+        ),
+        sources=GVS_SOURCES,
+        contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy',),
+        extension_dependencies=(('model.gvs', '1.0.0'),),
+        cache=True,
+        side_effects='none',
+        capabilities=dict(
+            category='mathematical_models', role='public_tool',
+            model='model.gvs', backend_solves=0,
         ),
     )
 )
@@ -132,7 +261,8 @@ EXTENSIONS.append(
             'Compute serial multi-segment PCC forward kinematics for '
             'the frozen session robot. Provide constant curvature about '
             'local y/z for every flexible segment. No simulation, '
-            'static equilibrium, tendon-force inference or backend solve.'
+            'static equilibrium, tendon-force inference or backend solve. '
+            'Curvatures are actual totals, not natural-curvature increments.'
         ),
         sources=PCC_SOURCES,
         contract_dependencies=COMMON['contract_dependencies'],
