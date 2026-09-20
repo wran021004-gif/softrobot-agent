@@ -25,6 +25,7 @@ def physics_for(inp):
 class MatlabBackend:
     backend_id='backend.matlab_spatial'
     model='matlab_serial_bending_v1'
+    tension_execution_modes=('actuator_realistic',)
 
     @classmethod
     def check(cls,inp,parameters,control):
@@ -40,12 +41,19 @@ class MatlabBackend:
         if inp.policy.controller.extension_id not in controllers: raise ValueError('FAMILY_CONTROLLER_REQUIRED')
         from tools.platform_registry import registry
         resolve_execution(inp,registry())
-        p=physics_for(inp); assemble(inp,p)
+        p=physics_for(inp); scene=assemble(inp,p)
+        mode=scene['control'].get('tension_execution_mode','actuator_realistic')
+        if mode not in cls.tension_execution_modes:
+            raise ValueError('TENDON_TENSION_EXECUTION_UNSUPPORTED: '+mode+' by '+cls.backend_id)
 
     def compile(self,inp,reg):
         start=time.perf_counter(); self.inp=inp
         self.config=reg.parse(inp.policy.backend.parameters); self.execution=resolve_execution(inp,reg); self.physics=physics_for(inp)
-        self.scene=assemble(inp,self.physics); self.timings={'prepare_compile':time.perf_counter()-start}
+        self.scene=assemble(inp,self.physics)
+        mode=self.scene['control'].get('tension_execution_mode','actuator_realistic')
+        if mode not in self.tension_execution_modes:
+            raise ValueError('TENDON_TENSION_EXECUTION_UNSUPPORTED: '+mode+' by '+self.backend_id)
+        self.timings={'prepare_compile':time.perf_counter()-start}
 
     def initialize(self,initial,controller):
         if Initial.model_validate(initial.data).model_dump(mode='json')!=self.scene['initial']: raise ValueError('INITIAL_STATE_MISMATCH')
@@ -66,16 +74,23 @@ class MatlabBackend:
         atomic_json(folder/'controller_observations.json',observations)
         command_fields=('requested_tension_n','desired_tension_n','predicted_tension_n','tension_tracking_error_n',
             'force_limit_saturated','actuator_saturated','tension_command_unrealizable')
-        atomic_json(folder/'actual_commands.json',[dict(time_s=r['solver_time_s'],actuator_command=r['actuator_command'],
-            target_lengths_m=r['command_m'],**{key:r[key] for key in command_fields if key in r}) for r in rows])
+        atomic_json(folder/'actual_commands.json',[dict(time_s=r['solver_time_s'],
+            **({'actuator_command':r['actuator_command'],'target_lengths_m':r['command_m']}
+               if 'actuator_command' in r else {}),
+            **{key:r[key] for key in command_fields if key in r}) for r in rows])
         from schemas.platform import Payload
         data=Data(physics_identity=self.physics['identity'],scene_identity=self.scene['identity'],timings_s=self.timings,
             numerical_steps=steps,reason=reason,applicability=self.physics['applicability'],exported_files=sorted(p.name for p in folder.iterdir()),
             execution_plan=self.execution,control_identity=self.scene['control']['identity'])
+        execution_mode=self.scene['control'].get('tension_execution_mode','actuator_realistic')
+        execution_limitation=('Direct bounded MuJoCo tendon force; tendon lengths are measured responses, not a real-robot constitutive law.'
+            if execution_mode=='ideal_tension' else
+            'Ideal length servos, tension only, slack gives zero tension; no motor inertia.')
         self.result=BackendResult(solver_status='completed' if complete else 'failed',backend_id=self.backend_id,model_id=self.execution['implementation_model_id'],
-            signals=export(rows,self.physics,self.scene['control']['mode'] in ('tension_reference','gvs_lqr')),
+            signals=export(rows,self.physics,self.scene['control']['mode'] in ('tension_reference','gvs_lqr'),
+                self.scene['control'].get('tension_execution_mode','actuator_realistic')),
             data=Payload(contract='family.backend_data',data=data.model_dump(mode='json')),
-            limitations=[self.physics['applicability']['collision'],'Ideal length servos, tension only, slack gives zero tension; no motor inertia.',
+            limitations=[self.physics['applicability']['collision'],execution_limitation,
                 'MATLAB lowest-envelope-vertex penalty and MuJoCo convex contact differ; no contact accuracy claim.'],initial_state=self.initial,seed=self.inp.seed)
         atomic_json(folder/'result.json',self.result.model_dump(mode='json')); return self.result
 
@@ -120,6 +135,7 @@ class MatlabBackend:
 class MujocoBackend(MatlabBackend):
     backend_id='backend.family_mujoco'
     model='mujoco_serial_bending_v1'
+    tension_execution_modes=('ideal_tension','actuator_realistic')
 
     def solve(self,timeout_s):
         import mujoco
@@ -132,15 +148,21 @@ class MujocoBackend(MatlabBackend):
         # Tree serialization can reorder siblings; never assume array order.
         jids=[model.joint(j).id for j in p['dofs']]; qi=model.jnt_qposadr[jids]; vi=model.jnt_dofadr[jids]
         tids=[model.tendon(t['entity']).id for t in p['tendons']]
-        aids=[model.actuator(t['entity']+'_length_servo').id for t in p['tendons']]
+        execution_mode=s['control'].get('tension_execution_mode','actuator_realistic')
+        suffix='_direct_tension' if execution_mode=='ideal_tension' else '_length_servo'
+        aids=[model.actuator(t['entity']+suffix).id for t in p['tendons']]
         data.qpos[qi]=s['qpos_rad']; data.qvel[vi]=s['qvel_rad_s']; mujoco.mj_forward(model,data)
+        actuator_ids=({'direct_tension_ids':aids} if execution_mode=='ideal_tension' else {'servo_ids':aids})
         atomic_json(self.folder/'compiled_physics.json',dict(physics_identity=p['identity'],body_ids=bids,qpos_indices=qi.tolist(),qvel_indices=vi.tolist(),
-            tendon_ids=tids,servo_ids=aids,actuator_entities=[a['id'] for a in p['actuators']],transmission=p['transmission'],
+            tendon_ids=tids,**actuator_ids,tension_execution_mode=execution_mode,
+            actuator_entities=[a['id'] for a in p['actuators']] if execution_mode=='actuator_realistic' else [],
+            transmission=p['transmission'] if execution_mode=='actuator_realistic' else None,
             mass_kg=model.body_mass[bids].tolist(),com_local_m=model.body_ipos[bids].tolist(),
             inertia_principal_kg_m2=model.body_inertia[bids].tolist(),inertia_quaternion_wxyz=model.body_iquat[bids].tolist(),
             stiffness_nm_rad=model.jnt_stiffness[jids].tolist(),damping_nm_s_rad=model.dof_damping[vi].tolist()))
         self.timings['engine_compile']=time.perf_counter()-start
         rows=[]; steps=0; start=time.perf_counter(); dt=s['control_period_s']; substeps=round(dt/s['timestep_s'])
+        initial_lengths=data.ten_length[tids].copy(); previous_lengths=initial_lengths.copy()
         def current():
             mujoco.mj_forward(model,data)
             J=np.zeros((3,model.nv)); Jr=np.zeros_like(J); mujoco.mj_jacSite(model,data,J,Jr,model.site('tip_site').id)
@@ -156,24 +178,36 @@ class MujocoBackend(MatlabBackend):
         for step in range(round(s['duration_s']/dt)):
             if time.perf_counter()-start>timeout_s: complete=False; reason='MUJOCO_SOLVER_TIMEOUT'; break
             t=step*dt; g=current()
-            target=self.controller.command(t,g,data.qpos[qi].copy(),data.qvel[vi].copy())
-            data.ctrl[aids]=target; data.xfrc_applied[:]=0; external=np.zeros(model.nv)
+            command=self.controller.command(t,g,data.qpos[qi].copy(),data.qvel[vi].copy())
+            data.ctrl[aids]=command; data.xfrc_applied[:]=0; external=np.zeros(model.nv)
             for f in s['forces']:
                 if f['start_s']<=t<f['end_s']:
                     bid=bids[f['body']]; data.xfrc_applied[bid,:3]+=f['force_n']
                     J=np.zeros((3,model.nv)); Jr=np.zeros_like(J); mujoco.mj_jacBodyCom(model,data,J,Jr,bid)
                     external+=J.T@f['force_n']
             mujoco.mj_forward(model,data)
-            before=dict(solver_tendon_length_m=data.ten_length[tids].tolist(),tension_n=(-data.actuator_force[aids]).tolist(),
+            actual_tension=-data.actuator_force[aids]
+            before=dict(solver_tendon_length_m=data.ten_length[tids].tolist(),tension_n=actual_tension.tolist(),
                 solver_qfrc_actuator_nm=data.qfrc_actuator[vi].tolist(),solver_qfrc_passive_nm=data.qfrc_passive[vi].tolist(),external_torque_nm=external[vi].tolist())
+            if execution_mode=='ideal_tension':
+                tracking=(actual_tension-np.asarray(self.controller.last['desired_tension_n'])).tolist()
+                self.controller.last['tension_tracking_error_n']=tracking
+                self.controller.last['predicted_tension_n']=actual_tension.tolist()
+                self.controller.observations[-1].update(tension_tracking_error_n=tracking,
+                    predicted_tension_n=actual_tension.tolist(),actual_tension_n=actual_tension.tolist())
             for _ in range(substeps): mujoco.mj_step(model,data); steps+=1
             if not np.isfinite(data.qpos).all() or data.warning[mujoco.mjtWarning.mjWARN_BADQACC].number:
                 complete=False; reason='MUJOCO_NUMERICAL_FAILURE'; break
             mujoco.mj_forward(model,data)
             routes=[[data.site_xpos[model.site(f"{td['entity']}_point_{j}").id].tolist() for j in range(len(td['points']))] for td in p['tendons']]
-            rows.append(dict(time_s=(step+1)*dt,solver_time_s=t,tip_m=data.site_xpos[model.site('tip_site').id].tolist(),
-                qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),actuator_command=self.controller.u.tolist(),command_m=target.tolist(),
-                tendon_length_m=data.ten_length[tids].tolist(),body_positions_m=data.xpos[bids].tolist(),
-                body_rotations=data.xmat[bids].reshape(-1,3,3).tolist(),tendon_routes_m=routes,**self.controller.last,**before))
+            lengths=data.ten_length[tids].copy()
+            row=dict(time_s=(step+1)*dt,solver_time_s=t,tip_m=data.site_xpos[model.site('tip_site').id].tolist(),
+                qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),
+                tendon_length_m=lengths.tolist(),tendon_length_change_m=(lengths-initial_lengths).tolist(),
+                tendon_length_rate_m_s=((lengths-previous_lengths)/dt).tolist(),body_positions_m=data.xpos[bids].tolist(),
+                body_rotations=data.xmat[bids].reshape(-1,3,3).tolist(),tendon_routes_m=routes,**self.controller.last,**before)
+            if execution_mode=='actuator_realistic':
+                row.update(actuator_command=self.controller.u.tolist(),command_m=command.tolist())
+            rows.append(row);previous_lengths=lengths
         self.timings['solve']=time.perf_counter()-start
         return rows,self.controller.observations,complete,reason,steps

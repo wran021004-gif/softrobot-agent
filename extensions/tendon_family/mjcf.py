@@ -1,4 +1,4 @@
-"""Named bodies, full COM tensors, explicit tendon sites and ideal length servos."""
+"""Named bodies, full COM tensors, explicit tendon sites and tendon actuators."""
 import xml.etree.ElementTree as ET
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -59,6 +59,7 @@ def compile_xml(physics, scene, config, path):
     tip=p['tip']; parent=base if tip['body']<0 else bodies[tip['body']]
     ET.SubElement(parent,'site',name='tip_site',pos=fmt(tip['position_m']),size='.002',rgba='0 1 0 1')
     tendons=ET.SubElement(root,'tendon'); actuators=ET.SubElement(root,'actuator')
+    execution_mode=scene['control'].get('tension_execution_mode','actuator_realistic')
     for t in p['tendons']:
         route=ET.SubElement(tendons,'spatial',name=t['entity'],width=str(t['diameter_m']/2),rgba='.8 .15 .15 1')
         for j,point in enumerate(t['points']):
@@ -66,10 +67,16 @@ def compile_xml(physics, scene, config, path):
             name=f"{t['entity']}_point_{j}"
             ET.SubElement(parent,'site',name=name,pos=fmt(point['position_m']),size=str(t['diameter_m']/2),rgba='.8 .15 .15 1')
             ET.SubElement(route,'site',site=name)
-        # These are tendon force elements, not independent motor descriptions.
-        # The shared actuator matrix is applied once per control interval.
-        ET.SubElement(actuators,'general',name=t['entity']+'_length_servo',tendon=t['entity'],
-            gainprm=str(t['kp_n_m']),biastype='affine',biasprm=fmt([0,-t['kp_n_m'],0]),
-            forcelimited='true',forcerange=fmt([-t['force_limit_n'],0]))
+        if execution_mode=='ideal_tension':
+            # Positive controller tension maps to MuJoCo's negative tendon force.
+            ET.SubElement(actuators,'general',name=t['entity']+'_direct_tension',tendon=t['entity'],
+                gainprm='-1',ctrllimited='true',ctrlrange=fmt([0,t['force_limit_n']]),
+                forcelimited='true',forcerange=fmt([-t['force_limit_n'],0]))
+        else:
+            # These are tendon force elements, not independent motor descriptions.
+            # The shared actuator matrix is applied once per control interval.
+            ET.SubElement(actuators,'general',name=t['entity']+'_length_servo',tendon=t['entity'],
+                gainprm=str(t['kp_n_m']),biastype='affine',biasprm=fmt([0,-t['kp_n_m'],0]),
+                forcelimited='true',forcerange=fmt([-t['force_limit_n'],0]))
     ET.ElementTree(root).write(path,encoding='utf-8',xml_declaration=True)
     return path

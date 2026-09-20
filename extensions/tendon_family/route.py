@@ -136,7 +136,9 @@ def overview(host):
         route=dict(current=route['current'],next_step=route['next_step'],final=delivery_summary(route['final']),nodes=[
             {k:n[k] for k in ('node_id','action','status','result','error') if k in n} for n in nodes[-8:]]),
         combinations={name:dict(dynamics_model=c['dynamics_model']['extension_id'],backend=c['backend']['extension_id'],
-            controller=c['controller']['extension_id'],executable=c['executable'],reasons=c['reasons']) for name,c in full['combinations'].items()},
+            controller=c['controller']['extension_id'],
+            tension_execution_mode=c['controller']['parameters']['data'].get('tension_execution_mode','actuator_realistic'),
+            executable=c['executable'],reasons=c['reasons']) for name,c in full['combinations'].items()},
         baseline=full['baseline'],space=dict(templates=list(space.get('templates',{})),
             parameters=space.get('parameters',{}),discretization_parameters=space.get('discretization_parameters',{}),
             control_parameters=space.get('control_parameters',{}),model_parameters=space.get('model_parameters',{})),max_trials=full['max_trials'],
@@ -149,7 +151,10 @@ def overview(host):
             video='Valid run/optimize source_node with saved results; zero solves.',
             finish='Valid run/optimize source_node; deliver even when task_success is false; zero solves.'),
         evidence_access='Node result references below are already available for citation. Read details only when needed. evidence.read returns content or a labeled pointer overview.',
-        guidance=full['guidance'],limitations=full['limitations'])
+        guidance=full['guidance'],tendon_tension_execution=dict(
+            ideal_tension='MuJoCo directly realizes bounded desired tendon force, bypassing transmission, actuator travel/velocity limits and length-servo dynamics; use it to isolate model/controller behavior.',
+            actuator_realistic='Desired tendon force is realized through the existing tendon-length servo, transmission, actuator velocity and actuator travel limits; use it for actuator-realistic validation.'),
+        limitations=full['limitations'])
 
 
 def inspect(ctx,args): return RouteResult(detail=overview(ctx.host))

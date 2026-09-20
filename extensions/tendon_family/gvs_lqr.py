@@ -4,7 +4,7 @@ import numpy as np
 from schemas.platform_math import SystemContext
 from tools.state_io import digest
 from .contracts import GVSModelParameters, GVSLQRControl, LQRParameters
-from .control import execute_tension_reference
+from .control import execute_ideal_tension, execute_tension_reference
 from .gvs import GVSModel, coordinate_order, forward_kinematics
 from .gvs_casadi import CasadiLinearizer, ContinuousLQRController
 from .gvs_projection import PROJECTOR_ID, description as projector_description, project
@@ -47,7 +47,20 @@ def resolve_gvs_lqr_control(inp,physics):
     rotation=quaternion_wxyz_to_rotation(assembly['mount']['quaternion_wxyz'])
     world_tip=(rotation@local_tip+np.asarray(assembly['mount']['position_m'])).tolist()
     projector=projector_description(physics,design)
-    plan=dict(mode='gvs_lqr',reference=dict(kind='gvs_equilibrium',target_world_m=list(inp.task.goal.data['target_m']),
+    if c.tension_execution_mode=='ideal_tension':
+        mapping=dict(id='direct_bounded_tendon_tension_v1',bridge='execute_ideal_tension',tendon_order=tendon_order,
+            force_limits_n=limits.tolist(),order=['project_backend_state','continuous_lqr','clip_tendon_force',
+                'apply_direct_backend_tendon_force'],
+            bypassed=['transmission_pseudoinverse','actuator_velocity_limit','actuator_travel_limit','tendon_length_servo'])
+        lifecycle=dict(initialize='observe actual backend state; no actuator state',reset='clear observations',restore='not implemented')
+    else:
+        mapping=dict(id='ideal_tendon_transmission_v1',bridge='execute_tension_reference',transmission=physics['transmission'],
+            actuator_order=[a['id'] for a in physics['actuators']],tendon_order=tendon_order,
+            order=['project_backend_state','continuous_lqr','clip_tendon_force','solve_transmission_minimum_norm',
+                'rate_limit_actuator_command','clip_actuator_travel','apply_length_servo'])
+        lifecycle=dict(initialize='zero actuator command; observe actual backend state',reset='zero command and clear observations',restore='not implemented')
+    plan=dict(mode='gvs_lqr',tension_execution_mode=c.tension_execution_mode,
+        reference=dict(kind='gvs_equilibrium',target_world_m=list(inp.task.goal.data['target_m']),
         equilibrium_q=list(c.equilibrium_q),equilibrium_tensions_n=u0.tolist(),tendon_order=tendon_order,
         source=c.operating_point_source,nominal_external_forces='omitted_from_GVS_operating_point_but_retained_in_backend_task'),
         algorithm=dict(id='gvs_lqr_tension_composition_v1',equation='u=clip(u0-K@(project(q,qdot)-x0),0,force_limit)',
@@ -55,12 +68,9 @@ def resolve_gvs_lqr_control(inp,physics):
             gain_identity=gain_identity,gain_source='deterministic existing Linearizer + ContinuousLQRController at build time',
             linearized_drift_norm_inf=float(np.linalg.norm(np.asarray(linear.drift),ord=np.inf)),
             lqr_implementation='ContinuousLQRController',projector=projector),
-        mapping=dict(id='ideal_tendon_transmission_v1',bridge='execute_tension_reference',transmission=physics['transmission'],
-            actuator_order=[a['id'] for a in physics['actuators']],tendon_order=tendon_order,
-            order=['project_backend_state','continuous_lqr','clip_tendon_force','solve_transmission_minimum_norm',
-                'rate_limit_actuator_command','clip_actuator_travel','apply_length_servo']),
+        mapping=mapping,
         timing=dict(period_s=inp.task.timing.control_period_s,observation='interval_start_pre_step'),
-        lifecycle=dict(initialize='zero actuator command; observe actual backend state',reset='zero command and clear observations',restore='not implemented'),
+        lifecycle=lifecycle,
         effective_parameters=c.model_dump(mode='json'),predicted_equilibrium_tip_world_m=world_tip,
         projector_id=PROJECTOR_ID)
     plan['identity']=digest(plan)
@@ -74,13 +84,18 @@ class GVSLQRController:
     def configure(self,physics,plan):
         self.physics=physics;self.plan=plan;self.coordinate_order=plan['algorithm']['projector']['coordinate_order']
         self.K=np.asarray(plan['algorithm']['K']);self.x0=np.asarray(plan['algorithm']['x0']);self.u0=np.asarray(plan['algorithm']['u0'])
-        self.u=np.zeros(len(physics['actuators']));self.observations=[];self.last={}
+        self.execution_mode=plan.get('tension_execution_mode','actuator_realistic')
+        self.u=None if self.execution_mode=='ideal_tension' else np.zeros(len(physics['actuators']))
+        self.observations=[];self.last={}
 
     def command(self,t,geometry,q,v):
         projection=project(self.physics,self.coordinate_order,q,v)
         x=np.r_[projection['q_gvs'],projection['qdot_gvs']];delta=x-self.x0
         raw=self.u0-self.K@delta
-        self.u,target,bridge=execute_tension_reference(self.physics,self.period_s,self.u,geometry,raw)
+        if self.execution_mode=='ideal_tension':
+            command,bridge=execute_ideal_tension(self.physics,raw)
+        else:
+            self.u,command,bridge=execute_tension_reference(self.physics,self.period_s,self.u,geometry,raw)
         self.last={**bridge,'raw_desired_tension_n':raw.tolist(),
             'lqr_tension_saturated':(np.asarray(bridge['desired_tension_n'])!=raw).tolist(),
             'projected_gvs_q':projection['q_gvs'],'projected_gvs_qdot':projection['qdot_gvs'],
@@ -88,7 +103,8 @@ class GVSLQRController:
             'gvs_projection_residual_max_rad_m':projection['projection_residual_max_rad_m'],
             'gvs_rate_projection_residual_max_rad_m_s':projection['rate_projection_residual_max_rad_m_s']}
         observation=dict(time_s=t,phase='current_state_before_integration',tip_position_m=geometry['tip'].tolist(),
-            qpos_rad=q.tolist(),qvel_rad_s=v.tolist(),tendon_length_m=geometry['lengths'].tolist(),
-            actuator_command=self.u.tolist(),target_lengths_m=target.tolist(),**self.last)
+            qpos_rad=q.tolist(),qvel_rad_s=v.tolist(),tendon_length_m=geometry['lengths'].tolist(),**self.last)
+        if self.execution_mode=='actuator_realistic':
+            observation.update(actuator_command=self.u.tolist(),target_lengths_m=command.tolist())
         self.observations.append(observation)
-        return target
+        return command

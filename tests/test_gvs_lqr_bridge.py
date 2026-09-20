@@ -1,5 +1,6 @@
 """Focused D0-D2 checks for state projection and executable GVS-LQR composition."""
 import unittest
+import json
 from pathlib import Path
 
 import numpy as np
@@ -16,7 +17,7 @@ from tools.platform_registry import registry
 from tools.platform_tasks import compile_input
 
 
-def lqr_input(duration=.03):
+def lqr_input(duration=.03,execution_mode='actuator_realistic'):
     design=example_design();value=session('family_mujoco',design,design_space(design))
     value['task']['environment']['data']['external_forces']=[]
     value['task']['environment']['data']['environment']['gravity_m_s2']=[0.,0.,0.]
@@ -25,7 +26,8 @@ def lqr_input(duration=.03):
     value['policy']['controller']={'extension_id':'controller.gvs_lqr','version':'1.0.0','parameters':{
         'contract':'family.gvs_lqr_control','version':'1.0.0','data':{
             'equilibrium_q':[0.]*8,'equilibrium_tensions_n':[0.]*6,
-            'curvature_weight':1.,'state_rate_weight':.1,'tendon_tension_weight':1.}}}
+            'curvature_weight':1.,'state_rate_weight':.1,'tendon_tension_weight':1.,
+            'tension_execution_mode':execution_mode}}}
     return design,value
 
 
@@ -98,6 +100,31 @@ class GVSProjectorAndController(unittest.TestCase):
             for row in backend.controller.observations))
         self.assertTrue(all('projected_gvs_q' in row and 'desired_tension_n' in row
             and 'actuator_saturated' in row for row in backend.controller.observations))
+
+    def test_short_ideal_tension_mujoco_is_direct_finite_and_observable(self):
+        _,value=lqr_input(execution_mode='ideal_tension')
+        inp=SessionInput.model_validate(compile_input(value)['input'])
+        backend=MujocoBackend();controller=GVSLQRController(
+            inp.policy.controller.parameters.data,inp.task.timing.control_period_s)
+        backend.compile(inp,self.reg);backend.initialize(Payload(contract='family.initial',data={}),controller)
+        directory=Path('runs/gvs_lqr_ideal_smoke_test/backend').resolve()
+        result=backend.run(directory,30.)
+        self.assertEqual(result.solver_status,'completed')
+        self.assertEqual(backend.scene['control']['tension_execution_mode'],'ideal_tension')
+        xml=(directory/'robot.xml').read_text(encoding='utf-8')
+        self.assertIn('_direct_tension',xml);self.assertNotIn('_length_servo',xml)
+        commands=json.loads((directory/'actual_commands.json').read_text(encoding='utf-8'))
+        observations=json.loads((directory/'controller_observations.json').read_text(encoding='utf-8'))
+        self.assertTrue(all('actuator_command' not in row and 'target_lengths_m' not in row for row in commands+observations))
+        names={signal.spec.name for signal in result.signals}
+        self.assertTrue({'desired_tendon_tension','tendon_tension','tendon_length',
+            'tendon_length_change','tendon_length_rate'} <= names)
+        self.assertNotIn('actuator_command',names);self.assertNotIn('tendon_target_length',names)
+        self.assertIsNone(controller.u)
+        self.assertTrue(all(np.isfinite(signal.values).all() for signal in result.signals))
+        desired={s.spec.entity:np.asarray(s.values) for s in result.signals if s.spec.name=='desired_tendon_tension'}
+        actual={s.spec.entity:np.asarray(s.values) for s in result.signals if s.spec.name=='tendon_tension'}
+        for entity in desired: np.testing.assert_allclose(actual[entity],desired[entity],atol=1e-12)
 
 
 if __name__=='__main__': unittest.main()

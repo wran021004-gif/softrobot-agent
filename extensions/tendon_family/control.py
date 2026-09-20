@@ -5,7 +5,7 @@ from .contracts import Control
 
 
 def execute_tension_reference(physics, period_s, previous_u, geometry, requested_tensions):
-    """Execute model-space tensions through the one shared ideal-servo bridge."""
+    """Execute model-space tensions through the actuator-realistic servo bridge."""
     requested=np.asarray(requested_tensions,dtype=float)
     force=np.array([x['force_limit_n'] for x in physics['tendons']])
     desired=np.clip(requested,0.,force)
@@ -27,6 +27,17 @@ def execute_tension_reference(physics, period_s, previous_u, geometry, requested
         actuator_saturated=(np.abs(command-wanted)>1e-12).tolist(),
         tension_command_unrealizable=(np.abs(error)>1e-9).tolist())
     return command,target,telemetry
+
+
+def execute_ideal_tension(physics, requested_tensions):
+    """Clip a model-space tension command without applying actuator kinematics."""
+    requested=np.asarray(requested_tensions,dtype=float)
+    force=np.array([x['force_limit_n'] for x in physics['tendons']])
+    desired=np.clip(requested,0.,force)
+    telemetry=dict(requested_tension_n=requested.tolist(),desired_tension_n=desired.tolist(),
+        predicted_tension_n=desired.tolist(),tension_tracking_error_n=np.zeros_like(desired).tolist(),
+        force_limit_saturated=(requested!=desired).tolist())
+    return desired,telemetry
 
 
 def resolve_control(inp, physics):
@@ -88,10 +99,21 @@ def resolve_control(inp, physics):
         effective.update(desired_tendon_tensions_n=reference['desired_tensions_n'],
             requested_tendon_tensions_n=reference['requested_tensions_n'],
             force_limit_saturated=reference['force_limit_saturated'])
-    plan=dict(mode=c.mode,reference=reference,algorithm=algorithm,mapping=mapping,
+    execution_mode=c.tension_execution_mode if c.mode=='tension_reference' else 'actuator_realistic'
+    if c.mode=='tension_reference' and execution_mode=='ideal_tension':
+        mapping=dict(id='direct_bounded_tendon_tension_v1',input='desired tendon tension N',
+            output='direct backend tendon force',tendon_order=tendon_order,
+            tendon_force_limits_n={t['entity']:t['force_limit_n'] for t in physics['tendons']},
+            order=['clip_tendon_force','apply_direct_backend_tendon_force'],
+            bypassed=['transmission_pseudoinverse','actuator_velocity_limit','actuator_travel_limit','tendon_length_servo'])
+        algorithm={**algorithm,'state':[],'output':'desired_tendon_tension'}
+    lifecycle=(dict(initialize='no actuator state; clear observations',reset='clear observations at run start',restore='not implemented')
+        if execution_mode=='ideal_tension' else
+        dict(initialize='zero actuator command',reset='zero command and clear observations at run start',restore='not implemented'))
+    plan=dict(mode=c.mode,tension_execution_mode=execution_mode,reference=reference,algorithm=algorithm,mapping=mapping,
         timing=dict(period_s=inp.task.timing.control_period_s,observation='interval_start_pre_step',
             force_signals='interval_start_pre_step_solver',state_signals='interval_end_post_step'),
-        lifecycle=dict(initialize='zero actuator command',reset='zero command and clear observations at run start',restore='not implemented'),
+        lifecycle=lifecycle,
         effective_parameters=effective)
     plan['identity']=digest(plan)
     return plan
@@ -110,7 +132,8 @@ class Controller:
         self.desired_tensions = np.array(plan['reference'].get('desired_tensions_n',[]))
         self.requested_tensions = np.array(plan['reference'].get('requested_tensions_n',[]))
         self.force_limit_saturated = plan['reference'].get('force_limit_saturated',[])
-        self.u = np.zeros(len(physics['actuators']))
+        self.execution_mode = plan.get('tension_execution_mode','actuator_realistic')
+        self.u = None if self.execution_mode=='ideal_tension' else np.zeros(len(physics['actuators']))
         self.observations = []
         self.last = {}
 
@@ -125,6 +148,12 @@ class Controller:
             dq = np.clip(dq,-c.max_joint_update_rad,c.max_joint_update_rad)
             wanted = self.u+np.linalg.pinv(B)@geometry['Jlength']@dq
         else:
+            if self.execution_mode == 'ideal_tension':
+                tension,self.last=execute_ideal_tension(p,self.requested_tensions)
+                observation=dict(time_s=t,phase='current_state_before_integration',tip_position_m=geometry['tip'].tolist(),
+                    qpos_rad=q.tolist(),qvel_rad_s=v.tolist(),tendon_length_m=geometry['lengths'].tolist(),**self.last)
+                self.observations.append(observation)
+                return tension
             self.u,target,self.last=execute_tension_reference(p,dt,self.u,geometry,self.requested_tensions)
             observation=dict(time_s=t,phase='current_state_before_integration',tip_position_m=geometry['tip'].tolist(),
                 qpos_rad=q.tolist(),qvel_rad_s=v.tolist(),tendon_length_m=geometry['lengths'].tolist(),actuator_command=self.u.tolist(),target_lengths_m=target.tolist())

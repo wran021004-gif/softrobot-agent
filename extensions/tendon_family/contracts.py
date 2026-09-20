@@ -158,6 +158,7 @@ class Initial(Contract):
 
 class Control(Contract):
     mode: Literal['deterministic', 'tip_feedback', 'tension_reference'] = 'tip_feedback'
+    tension_execution_mode: Literal['ideal_tension', 'actuator_realistic'] = 'actuator_realistic'
     reference: 'Reference | None' = None
     commands: dict[str, float] = Field(default_factory=dict)
     desired_tendon_tensions_n: list[Annotated[FiniteFloat, Field(ge=0)]] = Field(default_factory=list)
@@ -175,6 +176,8 @@ class Control(Contract):
                 raise ValueError('TENSION_REFERENCE_IS_ORDERED_VECTOR_ONLY')
         elif self.desired_tendon_tensions_n:
             raise ValueError('TENSION_REFERENCE_MODE_REQUIRED')
+        if self.mode != 'tension_reference' and self.tension_execution_mode != 'actuator_realistic':
+            raise ValueError('TENSION_EXECUTION_MODE_REQUIRES_TENSION_REFERENCE')
         return self
 
 
@@ -187,6 +190,7 @@ class GVSLQRControl(Contract):
     state_weight_overrides: dict[str, Annotated[FiniteFloat, Field(ge=0)]] = Field(default_factory=dict)
     equilibrium_tolerance: FiniteFloat = Field(default=1e-7, gt=0)
     operating_point_source: Literal['gvs_inverse_tip_static', 'gvs_equilibrium'] = 'gvs_inverse_tip_static'
+    tension_execution_mode: Literal['ideal_tension', 'actuator_realistic'] = 'actuator_realistic'
 
 
 class Reference(Contract):

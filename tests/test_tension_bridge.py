@@ -83,5 +83,24 @@ class TensionBridge(unittest.TestCase):
         self.assertTrue(controller.last['tension_command_unrealizable'][0])
         self.assertFalse(controller.last['tension_command_unrealizable'][1])
 
+    def test_ideal_tension_clips_without_actuator_realization(self):
+        _,inp=self.input([9.,.4,.8,.7,1.1,.3])
+        inp.policy.controller.parameters.data['tension_execution_mode']='ideal_tension'
+        p=physics_for(inp);scene=assemble(inp,p)
+        controller=Controller(Control.model_validate(inp.policy.controller.parameters.data),
+            inp.task.timing.control_period_s)
+        controller.configure(p,scene['control'])
+        g=geometry(p,np.zeros(len(p['dofs'])),scene['assembly']['mount'])
+        command=controller.command(0.,g,np.zeros(len(p['dofs'])),np.zeros(len(p['dofs'])))
+        np.testing.assert_allclose(command,[8.,.4,.8,.7,1.1,.3])
+        self.assertIsNone(controller.u)
+        self.assertNotIn('actuator_command',controller.observations[-1])
+        self.assertNotIn('target_lengths_m',controller.observations[-1])
+        self.assertEqual(scene['control']['mapping']['bypassed'],[
+            'transmission_pseudoinverse','actuator_velocity_limit','actuator_travel_limit','tendon_length_servo'])
+        names={s.name for s in observation_specs(inp,registry())}
+        self.assertIn('tendon_length_rate',names)
+        self.assertNotIn('actuator_command',names)
+
 
 if __name__=='__main__': unittest.main()
