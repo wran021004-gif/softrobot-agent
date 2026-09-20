@@ -21,7 +21,7 @@ import math
 
 import numpy as np
 
-from extensions.experiment_dynamics.contracts import Assembly
+from extensions.experiment_dynamics.contracts import Assembly, Scene
 from extensions.tendon_family.contracts import Design, Reserved, Rigid, Segment
 from extensions.tendon_family.pcc import (
     quaternion_wxyz_to_rotation,
@@ -681,6 +681,110 @@ class GVSModel:
         return Payload(
             contract='family.gvs_dynamics_result',
             data=result.model_dump(mode='json'),
+        )
+
+    def build_system(self, robot, parameters, discretization, context):
+        """Export x=[q,qdot], u=tendon tension as a public continuous system."""
+        from schemas.platform import EvidenceRef, Payload, RobotDescription, SignalSpec
+        from schemas.platform_math import DynamicSystem, SystemContext
+        from extensions.tendon_family.contracts import GVSContinuousDynamicsExpression
+
+        robot = RobotDescription.model_validate(robot)
+        context = SystemContext.model_validate(context)
+        if robot.structure.contract != 'family.design':
+            raise ValueError('GVS_REQUIRES_FAMILY_DESIGN')
+        if discretization is not None:
+            raise ValueError('GVS_DOES_NOT_ACCEPT_DISCRETIZATION')
+        if isinstance(parameters, Payload):
+            if parameters.contract != 'family.gvs_model':
+                raise ValueError('GVS_MODEL_PARAMETERS_REQUIRED')
+            supplied = type(self.parameters).model_validate(parameters.data)
+        else:
+            supplied = type(self.parameters).model_validate(parameters)
+        if supplied != self.parameters:
+            raise ValueError('GVS_BOUND_PARAMETERS_MISMATCH')
+        design = Design.model_validate(robot.structure.data)
+        if context.scene is None:
+            raise ValueError('GVS_SYSTEM_CONTEXT_REQUIRES_SCENE')
+        if isinstance(context.scene, EvidenceRef):
+            raise ValueError('GVS_SYSTEM_CONTEXT_SCENE_EVIDENCE_REQUIRES_RESOLUTION')
+        if context.scene.contract == 'experiment.assembly':
+            assembly = Assembly.model_validate(context.scene.data)
+        elif context.scene.contract == 'experiment.scene':
+            assembly = Scene.model_validate(context.scene.data).assembly
+        else:
+            raise ValueError('GVS_REQUIRES_EXPERIMENT_ASSEMBLY')
+        if assembly.external_forces:
+            raise ValueError('GVS_EXTERNAL_APPLIED_FORCES_UNSUPPORTED')
+
+        coordinates = coordinate_order(design)
+        tendons = list(design.tendons)
+        n = len(coordinates)
+        if len(context.x0) != 2 * n or len(context.u0) != len(tendons):
+            raise ValueError('MODEL_OPERATING_POINT_DIMENSION_MISMATCH')
+        limits = np.asarray([tendon.force_limit_n for tendon in tendons])
+        u0 = np.asarray(context.u0, dtype=float)
+        if np.any(u0 < 0) or np.any(u0 > limits):
+            raise ValueError('GVS_OPERATING_TENSION_OUT_OF_BOUNDS')
+
+        mount_rotation = quaternion_wxyz_to_rotation(
+            assembly.mount.quaternion_wxyz
+        )
+        gravity_robot = mount_rotation.T @ np.asarray(
+            assembly.environment.gravity_m_s2, dtype=float
+        )
+        expression = GVSContinuousDynamicsExpression(
+            design=design,
+            parameters=self.parameters,
+            gravity_robot_base_m_s2=tuple(gravity_robot),
+            coordinate_order=coordinates,
+            tendon_order=[tendon.id for tendon in tendons],
+            tendon_force_limits_n=limits.tolist(),
+        )
+        state_definition = [
+            SignalSpec(
+                name=name,
+                entity=name.split('.', 1)[0],
+                dimension=1,
+                units='rad/m',
+                frame='segment_local',
+                phase='continuous_state',
+            )
+            for name in coordinates
+        ] + [
+            SignalSpec(
+                name=name + '.rate',
+                entity=name.split('.', 1)[0],
+                dimension=1,
+                units='rad/(m*s)',
+                frame='segment_local',
+                phase='continuous_state',
+            )
+            for name in coordinates
+        ]
+        input_definition = [
+            SignalSpec(
+                name='tendon_tension',
+                entity=tendon.id,
+                dimension=1,
+                units='N',
+                frame='tendon_path',
+                phase='continuous_input',
+            )
+            for tendon in tendons
+        ]
+        return DynamicSystem(
+            state_definition=state_definition,
+            input_definition=input_definition,
+            output_definition=[],
+            dynamics=Payload(
+                contract='family.gvs_continuous_dynamics',
+                data=expression.model_dump(mode='json'),
+            ),
+            x0=context.x0,
+            u0=context.u0,
+            time_domain='continuous',
+            timestep=None,
         )
 
 

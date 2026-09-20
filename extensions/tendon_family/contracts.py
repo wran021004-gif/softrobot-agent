@@ -2,7 +2,14 @@
 from typing import Literal, Annotated
 from pydantic import Field, FiniteFloat, model_validator
 from schemas.common import Contract
-from schemas.platform_math import MathematicalModel, ModelCapabilities, ModelVariable, ParameterDefinitions
+from schemas.platform_math import (
+    DynamicSystem,
+    MathematicalModel,
+    ModelCapabilities,
+    ModelVariable,
+    ParameterDefinitions,
+    SystemContext,
+)
 from schemas.environment_spec import Vec3
 from extensions.experiment_dynamics.contracts import Matrix3, Mount
 
@@ -483,18 +490,103 @@ class GVSModelParameters(Contract):
                 statics=False,
                 dynamics=True,
                 linearization=False,
-                gradients=False,
+                gradients=True,
             ),
-            representations=[],
+            representations=['dynamic_system'],
         )
+
+
+NonNegativeFinite = Annotated[FiniteFloat, Field(ge=0)]
+
+
+class GVSContinuousDynamicsExpression(Contract):
+    """Serializable recipe for the trusted CasADi GVS expression adapter."""
+    expression_id: Literal['family.gvs_continuous_dynamics'] = 'family.gvs_continuous_dynamics'
+    model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
+    symbolic_type: Literal['MX'] = 'MX'
+    design: Design
+    parameters: GVSModelParameters
+    gravity_robot_base_m_s2: Vec3
+    coordinate_order: list[str] = Field(min_length=1)
+    tendon_order: list[Name] = Field(min_length=1)
+    tendon_force_limits_n: list[Annotated[FiniteFloat, Field(gt=0)]] = Field(min_length=1)
+
+    @model_validator(mode='after')
+    def dimensions(self):
+        if len(self.coordinate_order) != 4 * sum(
+            isinstance(component, Segment) for component in self.design.components
+        ):
+            raise ValueError('GVS_EXPRESSION_COORDINATE_ORDER_MISMATCH')
+        expected = [tendon.id for tendon in self.design.tendons]
+        if self.tendon_order != expected or len(self.tendon_force_limits_n) != len(expected):
+            raise ValueError('GVS_EXPRESSION_TENDON_ORDER_MISMATCH')
+        if self.tendon_force_limits_n != [tendon.force_limit_n for tendon in self.design.tendons]:
+            raise ValueError('GVS_EXPRESSION_FORCE_LIMIT_MISMATCH')
+        return self
+
+
+class GVSBuildSystemRequest(Contract):
+    context: SystemContext
+
+
+class GVSLinearizeRequest(Contract):
+    system: DynamicSystem
+
+
+class CasadiLinearizerParameters(Contract):
+    pass
+
+
+class LQRParameters(Contract):
+    Q: list[list[FiniteFloat]]
+    R: list[list[FiniteFloat]]
+    tendon_order: list[Name] = Field(min_length=1)
+    force_limits_n: list[float] = Field(min_length=1)
+    equilibrium_tolerance: float = Field(default=1e-7, gt=0)
+
+    @model_validator(mode='after')
+    def matrices_and_limits(self):
+        if len(self.Q) == 0 or any(len(row) != len(self.Q) for row in self.Q):
+            raise ValueError('LQR_Q_MUST_BE_SQUARE')
+        if len(self.R) == 0 or any(len(row) != len(self.R) for row in self.R):
+            raise ValueError('LQR_R_MUST_BE_SQUARE')
+        if len(self.tendon_order) != len(self.force_limits_n) or len(self.R) != len(self.tendon_order):
+            raise ValueError('LQR_INPUT_DIMENSION_MISMATCH')
+        if any(limit <= 0 for limit in self.force_limits_n):
+            raise ValueError('LQR_FORCE_LIMIT_MUST_BE_POSITIVE')
+        return self
+
+
+class LQRCommand(Contract):
+    tendon_order: list[Name]
+    tendon_tensions_n: list[NonNegativeFinite]
+    raw_tendon_tensions_n: list[FiniteFloat]
+    saturated: list[bool]
+
+
+class LQRDescribeRequest(Contract):
+    pass
+
+
+class LQRDescription(Contract):
+    algorithm: Literal['continuous_time_lqr'] = 'continuous_time_lqr'
+    model_input: Literal['LinearizedModel'] = 'LinearizedModel'
+    required_parameters: tuple[
+        Literal['Q'], Literal['R'], Literal['tendon_order'],
+        Literal['force_limits_n'], Literal['equilibrium_tolerance'],
+    ] = ('Q', 'R', 'tendon_order', 'force_limits_n', 'equilibrium_tolerance')
+    state_observation: Literal[
+        'ordered vector matching LinearizedModel.state_definition'
+    ] = 'ordered vector matching LinearizedModel.state_definition'
+    command_output: Literal['bounded_model_space_tendon_tensions_n'] = 'bounded_model_space_tendon_tensions_n'
+    equation: Literal['u=u0-K*(x-x0)'] = 'u=u0-K*(x-x0)'
+    equilibrium_requirement: Literal['norm(drift,inf)<=equilibrium_tolerance'] = 'norm(drift,inf)<=equilibrium_tolerance'
+    bound_semantics: Literal['clip_each_tendon_to_[0,force_limit_n]'] = 'clip_each_tendon_to_[0,force_limit_n]'
 
 
 class GVSState(Contract):
     q: list[FiniteFloat]
     qdot: list[FiniteFloat]
-
-
-NonNegativeFinite = Annotated[FiniteFloat, Field(ge=0)]
 
 
 class GVSInput(Contract):

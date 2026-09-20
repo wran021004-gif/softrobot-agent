@@ -12,6 +12,7 @@ from extensions.tendon_family.contracts import (
     GVSDynamicsRequest,
     GVSDynamicsResult,
 )
+from schemas.platform_math import DynamicSystem
 from tools.platform_host import Host
 from tools.platform_models import OfflineAdapter, input_for
 from tools.platform_registry import registry
@@ -37,6 +38,9 @@ class GVSPlatformTests(unittest.TestCase):
         self.input['policy']['tool_bindings'].update({
             'dynamics.gvs_describe': '1.0.0',
             'dynamics.gvs_evaluate': '1.0.0',
+            'dynamics.gvs_build_system': '1.0.0',
+            'linearization.linearize': '1.0.0',
+            'control.lqr_describe': '1.0.0',
             'session.control': '1.0.0',
         })
         self.host = Host(self.root, self.input['run_id'], reg=self.reg)
@@ -60,6 +64,9 @@ class GVSPlatformTests(unittest.TestCase):
             'model.gvs',
             'dynamics.gvs_describe',
             'dynamics.gvs_evaluate',
+            'dynamics.gvs_build_system',
+            'linearization.linearize',
+            'control.lqr_describe',
         ):
             matches = [
                 definition
@@ -75,12 +82,15 @@ class GVSPlatformTests(unittest.TestCase):
                 'statics': False,
                 'dynamics': True,
                 'linearization': False,
-                'gradients': False,
+                'gradients': True,
             },
         )
         self.assertEqual(
-            model.capabilities['mathematical_model']['representations'], []
+            model.capabilities['mathematical_model']['representations'],
+            ['dynamic_system'],
         )
+        self.reg.get('linearizer.casadi', '1.0.0', 'linearizer')
+        self.reg.get('controller.lqr', '1.0.0', 'controller')
         self.assertIs(
             self.reg.get('dynamics.gvs_describe').output_schema,
             GVSDescription,
@@ -93,6 +103,9 @@ class GVSPlatformTests(unittest.TestCase):
         tools = {tool['extension_id'] for tool in input_for(self.host).tools}
         self.assertIn('dynamics.gvs_describe', tools)
         self.assertIn('dynamics.gvs_evaluate', tools)
+        self.assertIn('dynamics.gvs_build_system', tools)
+        self.assertIn('linearization.linearize', tools)
+        self.assertIn('control.lqr_describe', tools)
 
         receipt = self.host.invoke({
             'request_id': 'gvs-evaluate',
@@ -115,6 +128,27 @@ class GVSPlatformTests(unittest.TestCase):
         )
         self.assertNotIn('mujoco', sys.modules)
         self.assertNotIn('matlab.engine', sys.modules)
+
+    def test_public_system_export_preserves_explicit_context(self):
+        x0 = self.request['state']['q'] + self.request['state']['qdot']
+        u0 = [0.2] * len(self.request['input']['tendon_tensions_n'])
+        receipt = self.host.invoke({
+            'request_id': 'gvs-build-system',
+            'tool_id': 'dynamics.gvs_build_system',
+            'tool_version': '1.0.0',
+            'arguments': {'context': {
+                'x0': x0,
+                'u0': u0,
+                'scene': self.input['task']['environment'],
+            }},
+            'reason': 'Export the explicit GVS continuous operating point.',
+        })
+        self.assertEqual(receipt['execution_status'], 'completed', receipt)
+        system = DynamicSystem.model_validate(self.store.artifact(receipt['output']))
+        self.assertEqual((system.x0, system.u0), (x0, u0))
+        self.assertEqual((len(system.x0), len(system.u0)), (16, 6))
+        self.assertEqual(system.dynamics.contract, 'family.gvs_continuous_dynamics')
+        self.assertEqual(receipt['charged']['backend_solves'], 0)
 
     def test_offline_adapter_observes_gvs_description_then_stops(self):
         outcome = self.host.run(OfflineAdapter([

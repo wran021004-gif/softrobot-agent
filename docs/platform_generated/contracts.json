@@ -12263,6 +12263,12 @@
       "title": "BuildResult",
       "type": "object"
     },
+    "family.casadi_linearizer@1.0.0": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "CasadiLinearizerParameters",
+      "type": "object"
+    },
     "family.control@1.0.0": {
       "$defs": {
         "Reference": {
@@ -13349,6 +13355,1844 @@
       "title": "ExperimentSpec",
       "type": "object"
     },
+    "family.gvs_build_system_request@1.0.0": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "SystemContext": {
+          "additionalProperties": false,
+          "description": "Explicit x0/u0 in the provider's declared coordinate order; no zero defaults.\n\nThe caller resolves existing Initial/control data into these vectors. Scene\nmay carry an existing Scene/Assembly payload or its saved evidence reference;\nthis contract does not define another environment or initialization model.",
+          "properties": {
+            "x0": {
+              "items": {
+                "type": "number"
+              },
+              "title": "X0",
+              "type": "array"
+            },
+            "u0": {
+              "items": {
+                "type": "number"
+              },
+              "title": "U0",
+              "type": "array"
+            },
+            "scene": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Scene"
+            }
+          },
+          "required": [
+            "x0",
+            "u0"
+          ],
+          "title": "SystemContext",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/SystemContext"
+        }
+      },
+      "required": [
+        "context"
+      ],
+      "title": "GVSBuildSystemRequest",
+      "type": "object"
+    },
+    "family.gvs_continuous_dynamics@1.0.0": {
+      "$defs": {
+        "Actuator": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "command_type": {
+              "default": "displacement",
+              "enum": [
+                "displacement",
+                "rotation"
+              ],
+              "title": "Command Type",
+              "type": "string"
+            },
+            "units": {
+              "default": "m",
+              "enum": [
+                "m",
+                "rad"
+              ],
+              "title": "Units",
+              "type": "string"
+            },
+            "drum_radius_m": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Drum Radius M"
+            },
+            "transmission": {
+              "items": {
+                "$ref": "#/$defs/Transmission"
+              },
+              "minItems": 1,
+              "title": "Transmission",
+              "type": "array"
+            },
+            "limits": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Limits",
+              "type": "array"
+            },
+            "velocity_limit": {
+              "exclusiveMinimum": 0,
+              "title": "Velocity Limit",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "transmission",
+            "limits",
+            "velocity_limit"
+          ],
+          "title": "Actuator",
+          "type": "object"
+        },
+        "Attachment": {
+          "additionalProperties": false,
+          "properties": {
+            "part": {
+              "default": "fixed_base",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Part",
+              "type": "string"
+            },
+            "s": {
+              "default": 0.0,
+              "maximum": 1,
+              "minimum": 0,
+              "title": "S",
+              "type": "number"
+            },
+            "position_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "quaternion_wxyz": {
+              "default": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Quaternion Wxyz",
+              "type": "array"
+            }
+          },
+          "title": "Attachment",
+          "type": "object"
+        },
+        "Design": {
+          "additionalProperties": false,
+          "properties": {
+            "version": {
+              "const": "tendon_family_v1",
+              "default": "tendon_family_v1",
+              "title": "Version",
+              "type": "string"
+            },
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "components": {
+              "items": {
+                "discriminator": {
+                  "mapping": {
+                    "branch": "#/$defs/Reserved",
+                    "cable_parallel": "#/$defs/Reserved",
+                    "closed_chain": "#/$defs/Reserved",
+                    "discrete_flexure": "#/$defs/Reserved",
+                    "flexible_segment": "#/$defs/Segment",
+                    "guide": "#/$defs/Rigid",
+                    "payload": "#/$defs/Rigid",
+                    "rigid_connector": "#/$defs/Rigid",
+                    "rigid_tendon_joint": "#/$defs/Reserved"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/Segment"
+                  },
+                  {
+                    "$ref": "#/$defs/Rigid"
+                  },
+                  {
+                    "$ref": "#/$defs/Reserved"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "title": "Components",
+              "type": "array"
+            },
+            "tendons": {
+              "items": {
+                "$ref": "#/$defs/Tendon"
+              },
+              "minItems": 1,
+              "title": "Tendons",
+              "type": "array"
+            },
+            "actuators": {
+              "items": {
+                "$ref": "#/$defs/Actuator"
+              },
+              "minItems": 1,
+              "title": "Actuators",
+              "type": "array"
+            },
+            "tip": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "metadata": {
+              "additionalProperties": true,
+              "description": "Descriptive only; no hidden physical parameters",
+              "title": "Metadata",
+              "type": "object"
+            }
+          },
+          "required": [
+            "id",
+            "components",
+            "tendons",
+            "actuators",
+            "tip"
+          ],
+          "title": "Design",
+          "type": "object"
+        },
+        "GVSModelParameters": {
+          "additionalProperties": false,
+          "properties": {
+            "model_id": {
+              "const": "gvs_variable_strain_bending_v1",
+              "default": "gvs_variable_strain_bending_v1",
+              "title": "Model Id",
+              "type": "string"
+            },
+            "integration_steps_per_segment": {
+              "default": 24,
+              "maximum": 200,
+              "minimum": 4,
+              "title": "Integration Steps Per Segment",
+              "type": "integer"
+            },
+            "quadrature_points_per_segment": {
+              "default": 5,
+              "maximum": 20,
+              "minimum": 2,
+              "title": "Quadrature Points Per Segment",
+              "type": "integer"
+            },
+            "finite_difference_step": {
+              "default": 1e-06,
+              "exclusiveMinimum": 0,
+              "maximum": 0.001,
+              "title": "Finite Difference Step",
+              "type": "number"
+            }
+          },
+          "title": "GVSModelParameters",
+          "type": "object"
+        },
+        "PhysicalInput": {
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "enum": [
+                "material",
+                "equivalent"
+              ],
+              "title": "Mode",
+              "type": "string"
+            },
+            "density_kg_m3": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Density Kg M3"
+            },
+            "young_pa": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Young Pa"
+            },
+            "line_density_kg_m": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Line Density Kg M"
+            },
+            "bending_ei_nm2": {
+              "anyOf": [
+                {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Bending Ei Nm2"
+            },
+            "bending_viscosity_nm2_s": {
+              "default": [
+                0.0,
+                0.0
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Bending Viscosity Nm2 S",
+              "type": "array"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "title": "PhysicalInput",
+          "type": "object"
+        },
+        "Reserved": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "discrete_flexure",
+                "rigid_tendon_joint",
+                "branch",
+                "closed_chain",
+                "cable_parallel"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "description": {
+              "title": "Description",
+              "type": "string"
+            },
+            "attachments": {
+              "items": {
+                "$ref": "#/$defs/Attachment"
+              },
+              "title": "Attachments",
+              "type": "array"
+            },
+            "status": {
+              "const": "descriptive_only",
+              "default": "descriptive_only",
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "description"
+          ],
+          "title": "Reserved",
+          "type": "object"
+        },
+        "Rigid": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "rigid_connector",
+                "guide",
+                "payload"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "connection": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "mass_kg": {
+              "exclusiveMinimum": 0,
+              "title": "Mass Kg",
+              "type": "number"
+            },
+            "com_local_m": {
+              "default": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Com Local M",
+              "type": "array"
+            },
+            "inertia_com_local_kg_m2": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ],
+              "title": "Inertia Com Local Kg M2",
+              "type": "array"
+            },
+            "envelope_halfsize_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Envelope Halfsize M",
+              "type": "array"
+            },
+            "guide_holes": {
+              "additionalProperties": {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Guide Holes",
+              "type": "object"
+            },
+            "hole_radius_m": {
+              "default": 0.0,
+              "minimum": 0,
+              "title": "Hole Radius M",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "connection",
+            "mass_kg",
+            "inertia_com_local_kg_m2",
+            "envelope_halfsize_m"
+          ],
+          "title": "Rigid",
+          "type": "object"
+        },
+        "RoutePoint": {
+          "additionalProperties": false,
+          "properties": {
+            "attachment": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "hole": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Hole"
+            },
+            "role": {
+              "enum": [
+                "start",
+                "guide",
+                "anchor"
+              ],
+              "title": "Role",
+              "type": "string"
+            }
+          },
+          "required": [
+            "attachment",
+            "role"
+          ],
+          "title": "RoutePoint",
+          "type": "object"
+        },
+        "Section": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "circle",
+                "tube",
+                "ellipse",
+                "rectangle",
+                "polygon"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "parameters": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "title": "Parameters",
+              "type": "object"
+            },
+            "outer_yz_m": {
+              "items": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "title": "Outer Yz M",
+              "type": "array"
+            },
+            "holes_yz_m": {
+              "items": {
+                "items": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "title": "Holes Yz M",
+              "type": "array"
+            },
+            "angle_rad": {
+              "default": 0.0,
+              "title": "Angle Rad",
+              "type": "number"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "title": "Section",
+          "type": "object"
+        },
+        "Segment": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "const": "flexible_segment",
+              "default": "flexible_segment",
+              "title": "Kind",
+              "type": "string"
+            },
+            "connection": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "length_m": {
+              "exclusiveMinimum": 0,
+              "title": "Length M",
+              "type": "number"
+            },
+            "cells": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Cells"
+            },
+            "sections": {
+              "items": {
+                "$ref": "#/$defs/Station"
+              },
+              "minItems": 1,
+              "title": "Sections",
+              "type": "array"
+            },
+            "interpolation": {
+              "default": "step",
+              "enum": [
+                "linear",
+                "step"
+              ],
+              "title": "Interpolation",
+              "type": "string"
+            },
+            "physics": {
+              "$ref": "#/$defs/PhysicalInput"
+            },
+            "natural_curvature_rad_m": {
+              "default": [
+                0.0,
+                0.0
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Natural Curvature Rad M",
+              "type": "array"
+            }
+          },
+          "required": [
+            "id",
+            "length_m",
+            "sections",
+            "physics"
+          ],
+          "title": "Segment",
+          "type": "object"
+        },
+        "Station": {
+          "additionalProperties": false,
+          "properties": {
+            "s": {
+              "maximum": 1,
+              "minimum": 0,
+              "title": "S",
+              "type": "number"
+            },
+            "section": {
+              "$ref": "#/$defs/Section"
+            }
+          },
+          "required": [
+            "s",
+            "section"
+          ],
+          "title": "Station",
+          "type": "object"
+        },
+        "Tendon": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Id",
+              "type": "string"
+            },
+            "points": {
+              "items": {
+                "$ref": "#/$defs/RoutePoint"
+              },
+              "minItems": 2,
+              "title": "Points",
+              "type": "array"
+            },
+            "diameter_m": {
+              "exclusiveMinimum": 0,
+              "title": "Diameter M",
+              "type": "number"
+            },
+            "model": {
+              "const": "straight_frictionless",
+              "default": "straight_frictionless",
+              "title": "Model",
+              "type": "string"
+            },
+            "length_servo_gain_n_m": {
+              "exclusiveMinimum": 0,
+              "title": "Length Servo Gain N M",
+              "type": "number"
+            },
+            "pretension_n": {
+              "default": 0.0,
+              "minimum": 0,
+              "title": "Pretension N",
+              "type": "number"
+            },
+            "force_limit_n": {
+              "exclusiveMinimum": 0,
+              "title": "Force Limit N",
+              "type": "number"
+            }
+          },
+          "required": [
+            "id",
+            "points",
+            "diameter_m",
+            "length_servo_gain_n_m",
+            "force_limit_n"
+          ],
+          "title": "Tendon",
+          "type": "object"
+        },
+        "Transmission": {
+          "additionalProperties": false,
+          "properties": {
+            "tendon": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Tendon",
+              "type": "string"
+            },
+            "ratio": {
+              "title": "Ratio",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tendon",
+            "ratio"
+          ],
+          "title": "Transmission",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Serializable recipe for the trusted CasADi GVS expression adapter.",
+      "properties": {
+        "expression_id": {
+          "const": "family.gvs_continuous_dynamics",
+          "default": "family.gvs_continuous_dynamics",
+          "title": "Expression Id",
+          "type": "string"
+        },
+        "model_id": {
+          "const": "gvs_variable_strain_bending_v1",
+          "default": "gvs_variable_strain_bending_v1",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "symbolic_type": {
+          "const": "MX",
+          "default": "MX",
+          "title": "Symbolic Type",
+          "type": "string"
+        },
+        "design": {
+          "$ref": "#/$defs/Design"
+        },
+        "parameters": {
+          "$ref": "#/$defs/GVSModelParameters"
+        },
+        "gravity_robot_base_m_s2": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Gravity Robot Base M S2",
+          "type": "array"
+        },
+        "coordinate_order": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Coordinate Order",
+          "type": "array"
+        },
+        "tendon_order": {
+          "items": {
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Tendon Order",
+          "type": "array"
+        },
+        "tendon_force_limits_n": {
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Tendon Force Limits N",
+          "type": "array"
+        }
+      },
+      "required": [
+        "design",
+        "parameters",
+        "gravity_robot_base_m_s2",
+        "coordinate_order",
+        "tendon_order",
+        "tendon_force_limits_n"
+      ],
+      "title": "GVSContinuousDynamicsExpression",
+      "type": "object"
+    },
+    "family.gvs_describe_request@1.0.0": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "GVSDescribeRequest",
+      "type": "object"
+    },
+    "family.gvs_description@1.0.0": {
+      "$defs": {
+        "GVSCoordinateDescription": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "title": "Name",
+              "type": "string"
+            },
+            "segment": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Segment",
+              "type": "string"
+            },
+            "mode": {
+              "enum": [
+                "constant",
+                "linear"
+              ],
+              "title": "Mode",
+              "type": "string"
+            },
+            "axis": {
+              "enum": [
+                "y",
+                "z"
+              ],
+              "title": "Axis",
+              "type": "string"
+            },
+            "units": {
+              "const": "rad/m",
+              "default": "rad/m",
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "segment",
+            "mode",
+            "axis"
+          ],
+          "title": "GVSCoordinateDescription",
+          "type": "object"
+        },
+        "GVSTendonInputDescription": {
+          "additionalProperties": false,
+          "properties": {
+            "tendon": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Tendon",
+              "type": "string"
+            },
+            "units": {
+              "const": "N",
+              "default": "N",
+              "title": "Units",
+              "type": "string"
+            },
+            "constraint": {
+              "const": "nonnegative",
+              "default": "nonnegative",
+              "title": "Constraint",
+              "type": "string"
+            },
+            "force_limit_n": {
+              "exclusiveMinimum": 0,
+              "title": "Force Limit N",
+              "type": "number"
+            },
+            "design_pretension_n": {
+              "minimum": 0,
+              "title": "Design Pretension N",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tendon",
+            "force_limit_n",
+            "design_pretension_n"
+          ],
+          "title": "GVSTendonInputDescription",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "const": "gvs_variable_strain_bending_v1",
+          "default": "gvs_variable_strain_bending_v1",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "frame": {
+          "const": "robot_base",
+          "default": "robot_base",
+          "title": "Frame",
+          "type": "string"
+        },
+        "basis": {
+          "default": [
+            "phi0(s)=1",
+            "phi1(s)=2*s/L-1"
+          ],
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "const": "phi0(s)=1",
+              "type": "string"
+            },
+            {
+              "const": "phi1(s)=2*s/L-1",
+              "type": "string"
+            }
+          ],
+          "title": "Basis",
+          "type": "array"
+        },
+        "curvature_semantics": {
+          "const": "actual_total_curvature",
+          "default": "actual_total_curvature",
+          "title": "Curvature Semantics",
+          "type": "string"
+        },
+        "natural_curvature_role": {
+          "const": "zero_elastic_energy_reference",
+          "default": "zero_elastic_energy_reference",
+          "title": "Natural Curvature Role",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "$ref": "#/$defs/GVSCoordinateDescription"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "tendon_inputs": {
+          "items": {
+            "$ref": "#/$defs/GVSTendonInputDescription"
+          },
+          "minItems": 1,
+          "title": "Tendon Inputs",
+          "type": "array"
+        },
+        "limitations": {
+          "default": [
+            "branches",
+            "closed_chains",
+            "contact",
+            "self_collision",
+            "material_torsion",
+            "shear",
+            "axial_extension",
+            "rope_elasticity",
+            "tendon_friction",
+            "motor_dynamics",
+            "external_applied_forces"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "coordinates",
+        "tendon_inputs"
+      ],
+      "title": "GVSDescription",
+      "type": "object"
+    },
+    "family.gvs_dynamics_request@1.0.0": {
+      "$defs": {
+        "GVSInput": {
+          "additionalProperties": false,
+          "properties": {
+            "tendon_tensions_n": {
+              "description": "Actual total nonnegative tendon tensions in N; values are not inferred from actuators and design pretension is not added.",
+              "patternProperties": {
+                "^[A-Za-z][A-Za-z0-9_]*$": {
+                  "minimum": 0,
+                  "type": "number"
+                }
+              },
+              "title": "Tendon Tensions N",
+              "type": "object"
+            }
+          },
+          "required": [
+            "tendon_tensions_n"
+          ],
+          "title": "GVSInput",
+          "type": "object"
+        },
+        "GVSState": {
+          "additionalProperties": false,
+          "properties": {
+            "q": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Q",
+              "type": "array"
+            },
+            "qdot": {
+              "items": {
+                "type": "number"
+              },
+              "title": "Qdot",
+              "type": "array"
+            }
+          },
+          "required": [
+            "q",
+            "qdot"
+          ],
+          "title": "GVSState",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "$ref": "#/$defs/GVSState"
+        },
+        "input": {
+          "$ref": "#/$defs/GVSInput"
+        },
+        "samples_per_segment": {
+          "default": 21,
+          "maximum": 201,
+          "minimum": 2,
+          "title": "Samples Per Segment",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "state",
+        "input"
+      ],
+      "title": "GVSDynamicsRequest",
+      "type": "object"
+    },
+    "family.gvs_dynamics_result@1.0.0": {
+      "$defs": {
+        "GVSPose": {
+          "additionalProperties": false,
+          "properties": {
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "rotation_matrix": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ],
+              "title": "Rotation Matrix",
+              "type": "array"
+            }
+          },
+          "required": [
+            "position_m",
+            "rotation_matrix"
+          ],
+          "title": "GVSPose",
+          "type": "object"
+        },
+        "GVSSegmentKinematics": {
+          "additionalProperties": false,
+          "properties": {
+            "base": {
+              "$ref": "#/$defs/GVSPose"
+            },
+            "tip": {
+              "$ref": "#/$defs/GVSPose"
+            },
+            "backbone_points_m": {
+              "items": {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "minItems": 2,
+              "title": "Backbone Points M",
+              "type": "array"
+            }
+          },
+          "required": [
+            "base",
+            "tip",
+            "backbone_points_m"
+          ],
+          "title": "GVSSegmentKinematics",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "const": "gvs_variable_strain_bending_v1",
+          "default": "gvs_variable_strain_bending_v1",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "frame": {
+          "const": "robot_base",
+          "default": "robot_base",
+          "title": "Frame",
+          "type": "string"
+        },
+        "coordinate_order": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Coordinate Order",
+          "type": "array"
+        },
+        "q": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Q",
+          "type": "array"
+        },
+        "qdot": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Qdot",
+          "type": "array"
+        },
+        "qdd": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Qdd",
+          "type": "array"
+        },
+        "mass_matrix": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Mass Matrix",
+          "type": "array"
+        },
+        "velocity_bias": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Velocity Bias",
+          "type": "array"
+        },
+        "elastic_force": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Elastic Force",
+          "type": "array"
+        },
+        "damping_force": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Damping Force",
+          "type": "array"
+        },
+        "gravity_force": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Gravity Force",
+          "type": "array"
+        },
+        "tendon_generalized_force": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Tendon Generalized Force",
+          "type": "array"
+        },
+        "tendon_order": {
+          "items": {
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+            "type": "string"
+          },
+          "title": "Tendon Order",
+          "type": "array"
+        },
+        "tendon_lengths_m": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Tendon Lengths M",
+          "type": "array"
+        },
+        "tendon_length_jacobian": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Tendon Length Jacobian",
+          "type": "array"
+        },
+        "segments": {
+          "patternProperties": {
+            "^[A-Za-z][A-Za-z0-9_]*$": {
+              "$ref": "#/$defs/GVSSegmentKinematics"
+            }
+          },
+          "title": "Segments",
+          "type": "object"
+        },
+        "component_poses": {
+          "patternProperties": {
+            "^[A-Za-z][A-Za-z0-9_]*$": {
+              "$ref": "#/$defs/GVSPose"
+            }
+          },
+          "title": "Component Poses",
+          "type": "object"
+        },
+        "tip": {
+          "$ref": "#/$defs/GVSPose"
+        },
+        "dynamics_equation": {
+          "const": "M*qdd+c+elastic+damping=tendon+gravity",
+          "default": "M*qdd+c+elastic+damping=tendon+gravity",
+          "title": "Dynamics Equation",
+          "type": "string"
+        },
+        "limitations": {
+          "default": [
+            "branches",
+            "closed_chains",
+            "contact",
+            "self_collision",
+            "material_torsion",
+            "shear",
+            "axial_extension",
+            "rope_elasticity",
+            "tendon_friction",
+            "motor_dynamics",
+            "external_applied_forces"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "coordinate_order",
+        "q",
+        "qdot",
+        "qdd",
+        "mass_matrix",
+        "velocity_bias",
+        "elastic_force",
+        "damping_force",
+        "gravity_force",
+        "tendon_generalized_force",
+        "tendon_order",
+        "tendon_lengths_m",
+        "tendon_length_jacobian",
+        "segments",
+        "component_poses",
+        "tip"
+      ],
+      "title": "GVSDynamicsResult",
+      "type": "object"
+    },
+    "family.gvs_linearize_request@1.0.0": {
+      "$defs": {
+        "DynamicSystem": {
+          "additionalProperties": false,
+          "description": "Ordered flattened x/u/y coordinates with concrete SignalSpec dimensions.\n\nContinuous: dynamics is xdot=f(x,u); discrete: x_next=f(x,u).\nOutput, when present, is y=h(x,u); no output map is inferred from names.\ntimes/phase in coordinate specs describe the model's sampling convention.",
+          "properties": {
+            "state_definition": {
+              "items": {
+                "$ref": "#/$defs/SignalSpec"
+              },
+              "title": "State Definition",
+              "type": "array"
+            },
+            "input_definition": {
+              "items": {
+                "$ref": "#/$defs/SignalSpec"
+              },
+              "title": "Input Definition",
+              "type": "array"
+            },
+            "output_definition": {
+              "items": {
+                "$ref": "#/$defs/SignalSpec"
+              },
+              "title": "Output Definition",
+              "type": "array"
+            },
+            "dynamics": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                }
+              ],
+              "title": "Dynamics"
+            },
+            "output": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Output"
+            },
+            "x0": {
+              "items": {
+                "type": "number"
+              },
+              "title": "X0",
+              "type": "array"
+            },
+            "u0": {
+              "items": {
+                "type": "number"
+              },
+              "title": "U0",
+              "type": "array"
+            },
+            "time_domain": {
+              "enum": [
+                "continuous",
+                "discrete"
+              ],
+              "title": "Time Domain",
+              "type": "string"
+            },
+            "timestep": {
+              "anyOf": [
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Seconds; required for discrete time",
+              "title": "Timestep"
+            }
+          },
+          "required": [
+            "state_definition",
+            "input_definition",
+            "output_definition",
+            "dynamics",
+            "x0",
+            "u0",
+            "time_domain"
+          ],
+          "title": "DynamicSystem",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "SignalSpec": {
+          "additionalProperties": false,
+          "description": "Backend-neutral quantity and entity; dimension is each flattened sample.\n\nNames are extensible (e.g. contact_force). units/frame/phase are semantic,\nnot backend identifiers; absence denotes unsupported, never invented zero.",
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "entity": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Entity",
+              "type": "string"
+            },
+            "dimension": {
+              "exclusiveMinimum": 0,
+              "title": "Dimension",
+              "type": "integer"
+            },
+            "units": {
+              "minLength": 1,
+              "title": "Units",
+              "type": "string"
+            },
+            "frame": {
+              "minLength": 1,
+              "title": "Frame",
+              "type": "string"
+            },
+            "phase": {
+              "minLength": 1,
+              "title": "Phase",
+              "type": "string"
+            },
+            "missing": {
+              "const": "unsupported",
+              "default": "unsupported",
+              "title": "Missing",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "entity",
+            "dimension",
+            "units",
+            "frame",
+            "phase"
+          ],
+          "title": "SignalSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "system": {
+          "$ref": "#/$defs/DynamicSystem"
+        }
+      },
+      "required": [
+        "system"
+      ],
+      "title": "GVSLinearizeRequest",
+      "type": "object"
+    },
+    "family.gvs_model@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "const": "gvs_variable_strain_bending_v1",
+          "default": "gvs_variable_strain_bending_v1",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "integration_steps_per_segment": {
+          "default": 24,
+          "maximum": 200,
+          "minimum": 4,
+          "title": "Integration Steps Per Segment",
+          "type": "integer"
+        },
+        "quadrature_points_per_segment": {
+          "default": 5,
+          "maximum": 20,
+          "minimum": 2,
+          "title": "Quadrature Points Per Segment",
+          "type": "integer"
+        },
+        "finite_difference_step": {
+          "default": 1e-06,
+          "exclusiveMinimum": 0,
+          "maximum": 0.001,
+          "title": "Finite Difference Step",
+          "type": "number"
+        }
+      },
+      "title": "GVSModelParameters",
+      "type": "object"
+    },
     "family.initial@1.0.0": {
       "additionalProperties": false,
       "properties": {
@@ -13374,6 +15218,195 @@
         }
       },
       "title": "Initial",
+      "type": "object"
+    },
+    "family.lqr_command@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "tendon_order": {
+          "items": {
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+            "type": "string"
+          },
+          "title": "Tendon Order",
+          "type": "array"
+        },
+        "tendon_tensions_n": {
+          "items": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Tendon Tensions N",
+          "type": "array"
+        },
+        "raw_tendon_tensions_n": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Raw Tendon Tensions N",
+          "type": "array"
+        },
+        "saturated": {
+          "items": {
+            "type": "boolean"
+          },
+          "title": "Saturated",
+          "type": "array"
+        }
+      },
+      "required": [
+        "tendon_order",
+        "tendon_tensions_n",
+        "raw_tendon_tensions_n",
+        "saturated"
+      ],
+      "title": "LQRCommand",
+      "type": "object"
+    },
+    "family.lqr_describe_request@1.0.0": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "LQRDescribeRequest",
+      "type": "object"
+    },
+    "family.lqr_description@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {
+          "const": "continuous_time_lqr",
+          "default": "continuous_time_lqr",
+          "title": "Algorithm",
+          "type": "string"
+        },
+        "model_input": {
+          "const": "LinearizedModel",
+          "default": "LinearizedModel",
+          "title": "Model Input",
+          "type": "string"
+        },
+        "required_parameters": {
+          "default": [
+            "Q",
+            "R",
+            "tendon_order",
+            "force_limits_n",
+            "equilibrium_tolerance"
+          ],
+          "maxItems": 5,
+          "minItems": 5,
+          "prefixItems": [
+            {
+              "const": "Q",
+              "type": "string"
+            },
+            {
+              "const": "R",
+              "type": "string"
+            },
+            {
+              "const": "tendon_order",
+              "type": "string"
+            },
+            {
+              "const": "force_limits_n",
+              "type": "string"
+            },
+            {
+              "const": "equilibrium_tolerance",
+              "type": "string"
+            }
+          ],
+          "title": "Required Parameters",
+          "type": "array"
+        },
+        "state_observation": {
+          "const": "ordered vector matching LinearizedModel.state_definition",
+          "default": "ordered vector matching LinearizedModel.state_definition",
+          "title": "State Observation",
+          "type": "string"
+        },
+        "command_output": {
+          "const": "bounded_model_space_tendon_tensions_n",
+          "default": "bounded_model_space_tendon_tensions_n",
+          "title": "Command Output",
+          "type": "string"
+        },
+        "equation": {
+          "const": "u=u0-K*(x-x0)",
+          "default": "u=u0-K*(x-x0)",
+          "title": "Equation",
+          "type": "string"
+        },
+        "equilibrium_requirement": {
+          "const": "norm(drift,inf)<=equilibrium_tolerance",
+          "default": "norm(drift,inf)<=equilibrium_tolerance",
+          "title": "Equilibrium Requirement",
+          "type": "string"
+        },
+        "bound_semantics": {
+          "const": "clip_each_tendon_to_[0,force_limit_n]",
+          "default": "clip_each_tendon_to_[0,force_limit_n]",
+          "title": "Bound Semantics",
+          "type": "string"
+        }
+      },
+      "title": "LQRDescription",
+      "type": "object"
+    },
+    "family.lqr_parameters@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "Q": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "Q",
+          "type": "array"
+        },
+        "R": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "title": "R",
+          "type": "array"
+        },
+        "tendon_order": {
+          "items": {
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Tendon Order",
+          "type": "array"
+        },
+        "force_limits_n": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Force Limits N",
+          "type": "array"
+        },
+        "equilibrium_tolerance": {
+          "default": 1e-07,
+          "exclusiveMinimum": 0,
+          "title": "Equilibrium Tolerance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "Q",
+        "R",
+        "tendon_order",
+        "force_limits_n"
+      ],
+      "title": "LQRParameters",
       "type": "object"
     },
     "family.matlab_parameters@1.0.0": {
@@ -14340,6 +16373,425 @@
         }
       },
       "title": "Parameters",
+      "type": "object"
+    },
+    "family.pcc_configuration@1.0.0": {
+      "$defs": {
+        "PCCSegmentConfiguration": {
+          "additionalProperties": false,
+          "properties": {
+            "curvature_y_rad_m": {
+              "description": "Actual total geometric curvature about local +y in rad/m; not an increment relative to natural_curvature_rad_m.",
+              "title": "Curvature Y Rad M",
+              "type": "number"
+            },
+            "curvature_z_rad_m": {
+              "description": "Actual total geometric curvature about local +z in rad/m; not an increment relative to natural_curvature_rad_m.",
+              "title": "Curvature Z Rad M",
+              "type": "number"
+            }
+          },
+          "required": [
+            "curvature_y_rad_m",
+            "curvature_z_rad_m"
+          ],
+          "title": "PCCSegmentConfiguration",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "segments": {
+          "minProperties": 1,
+          "patternProperties": {
+            "^[A-Za-z][A-Za-z0-9_]*$": {
+              "$ref": "#/$defs/PCCSegmentConfiguration"
+            }
+          },
+          "title": "Segments",
+          "type": "object"
+        }
+      },
+      "required": [
+        "segments"
+      ],
+      "title": "PCCConfiguration",
+      "type": "object"
+    },
+    "family.pcc_describe_request@1.0.0": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "PCCDescribeRequest",
+      "type": "object"
+    },
+    "family.pcc_description@1.0.0": {
+      "$defs": {
+        "PCCSegmentDescription": {
+          "additionalProperties": false,
+          "properties": {
+            "segment": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+              "title": "Segment",
+              "type": "string"
+            },
+            "coordinates": {
+              "default": [
+                "curvature_y_rad_m",
+                "curvature_z_rad_m"
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "const": "curvature_y_rad_m",
+                  "type": "string"
+                },
+                {
+                  "const": "curvature_z_rad_m",
+                  "type": "string"
+                }
+              ],
+              "title": "Coordinates",
+              "type": "array"
+            }
+          },
+          "required": [
+            "segment"
+          ],
+          "title": "PCCSegmentDescription",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "const": "pcc_constant_curvature_v1",
+          "default": "pcc_constant_curvature_v1",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "frame": {
+          "const": "robot_base",
+          "default": "robot_base",
+          "title": "Frame",
+          "type": "string"
+        },
+        "segments": {
+          "items": {
+            "$ref": "#/$defs/PCCSegmentDescription"
+          },
+          "minItems": 1,
+          "title": "Segments",
+          "type": "array"
+        },
+        "curvature_semantics": {
+          "const": "actual_total_curvature",
+          "default": "actual_total_curvature",
+          "title": "Curvature Semantics",
+          "type": "string"
+        },
+        "natural_curvature_role": {
+          "const": "constitutive_reference_only",
+          "default": "constitutive_reference_only",
+          "title": "Natural Curvature Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "segments"
+      ],
+      "title": "PCCDescription",
+      "type": "object"
+    },
+    "family.pcc_forward_request@1.0.0": {
+      "$defs": {
+        "PCCConfiguration": {
+          "additionalProperties": false,
+          "properties": {
+            "segments": {
+              "minProperties": 1,
+              "patternProperties": {
+                "^[A-Za-z][A-Za-z0-9_]*$": {
+                  "$ref": "#/$defs/PCCSegmentConfiguration"
+                }
+              },
+              "title": "Segments",
+              "type": "object"
+            }
+          },
+          "required": [
+            "segments"
+          ],
+          "title": "PCCConfiguration",
+          "type": "object"
+        },
+        "PCCSegmentConfiguration": {
+          "additionalProperties": false,
+          "properties": {
+            "curvature_y_rad_m": {
+              "description": "Actual total geometric curvature about local +y in rad/m; not an increment relative to natural_curvature_rad_m.",
+              "title": "Curvature Y Rad M",
+              "type": "number"
+            },
+            "curvature_z_rad_m": {
+              "description": "Actual total geometric curvature about local +z in rad/m; not an increment relative to natural_curvature_rad_m.",
+              "title": "Curvature Z Rad M",
+              "type": "number"
+            }
+          },
+          "required": [
+            "curvature_y_rad_m",
+            "curvature_z_rad_m"
+          ],
+          "title": "PCCSegmentConfiguration",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "configuration": {
+          "$ref": "#/$defs/PCCConfiguration"
+        },
+        "samples_per_segment": {
+          "default": 51,
+          "maximum": 1001,
+          "minimum": 2,
+          "title": "Samples Per Segment",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "configuration"
+      ],
+      "title": "PCCForwardRequest",
+      "type": "object"
+    },
+    "family.pcc_kinematics_result@1.0.0": {
+      "$defs": {
+        "PCCConfiguration": {
+          "additionalProperties": false,
+          "properties": {
+            "segments": {
+              "minProperties": 1,
+              "patternProperties": {
+                "^[A-Za-z][A-Za-z0-9_]*$": {
+                  "$ref": "#/$defs/PCCSegmentConfiguration"
+                }
+              },
+              "title": "Segments",
+              "type": "object"
+            }
+          },
+          "required": [
+            "segments"
+          ],
+          "title": "PCCConfiguration",
+          "type": "object"
+        },
+        "PCCPose": {
+          "additionalProperties": false,
+          "properties": {
+            "position_m": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "title": "Position M",
+              "type": "array"
+            },
+            "rotation_matrix": {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ],
+              "title": "Rotation Matrix",
+              "type": "array"
+            }
+          },
+          "required": [
+            "position_m",
+            "rotation_matrix"
+          ],
+          "title": "PCCPose",
+          "type": "object"
+        },
+        "PCCSegmentConfiguration": {
+          "additionalProperties": false,
+          "properties": {
+            "curvature_y_rad_m": {
+              "description": "Actual total geometric curvature about local +y in rad/m; not an increment relative to natural_curvature_rad_m.",
+              "title": "Curvature Y Rad M",
+              "type": "number"
+            },
+            "curvature_z_rad_m": {
+              "description": "Actual total geometric curvature about local +z in rad/m; not an increment relative to natural_curvature_rad_m.",
+              "title": "Curvature Z Rad M",
+              "type": "number"
+            }
+          },
+          "required": [
+            "curvature_y_rad_m",
+            "curvature_z_rad_m"
+          ],
+          "title": "PCCSegmentConfiguration",
+          "type": "object"
+        },
+        "PCCSegmentKinematics": {
+          "additionalProperties": false,
+          "properties": {
+            "base": {
+              "$ref": "#/$defs/PCCPose"
+            },
+            "tip": {
+              "$ref": "#/$defs/PCCPose"
+            },
+            "backbone_points_m": {
+              "items": {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "minItems": 2,
+              "title": "Backbone Points M",
+              "type": "array"
+            }
+          },
+          "required": [
+            "base",
+            "tip",
+            "backbone_points_m"
+          ],
+          "title": "PCCSegmentKinematics",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "const": "pcc_constant_curvature_v1",
+          "default": "pcc_constant_curvature_v1",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "frame": {
+          "const": "robot_base",
+          "default": "robot_base",
+          "title": "Frame",
+          "type": "string"
+        },
+        "configuration": {
+          "$ref": "#/$defs/PCCConfiguration"
+        },
+        "chain": {
+          "items": {
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Chain",
+          "type": "array"
+        },
+        "segments": {
+          "patternProperties": {
+            "^[A-Za-z][A-Za-z0-9_]*$": {
+              "$ref": "#/$defs/PCCSegmentKinematics"
+            }
+          },
+          "title": "Segments",
+          "type": "object"
+        },
+        "tip": {
+          "$ref": "#/$defs/PCCPose"
+        }
+      },
+      "required": [
+        "configuration",
+        "chain",
+        "segments",
+        "tip"
+      ],
+      "title": "PCCKinematicsResult",
+      "type": "object"
+    },
+    "family.pcc_model@1.0.0": {
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "const": "pcc_constant_curvature_v1",
+          "default": "pcc_constant_curvature_v1",
+          "title": "Model Id",
+          "type": "string"
+        }
+      },
+      "title": "PCCModelParameters",
       "type": "object"
     },
     "family.route_policy@1.0.0": {

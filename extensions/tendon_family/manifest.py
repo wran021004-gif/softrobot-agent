@@ -1,5 +1,6 @@
 """Capability catalog: descriptive families and executable serial scope are distinct."""
 from schemas.platform import BackendResult, Payload, SessionInput
+from schemas.platform_math import DynamicSystem, LinearizedModel
 from tools.platform_registry import Extension
 from . import contracts as c
 from . import optimization as opt
@@ -17,7 +18,13 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('pcc_describe_request',c.PCCDescribeRequest),('pcc_description',c.PCCDescription),
     ('gvs_model',c.GVSModelParameters),('gvs_dynamics_request',c.GVSDynamicsRequest),
     ('gvs_dynamics_result',c.GVSDynamicsResult),('gvs_describe_request',c.GVSDescribeRequest),
-    ('gvs_description',c.GVSDescription),]]
+    ('gvs_description',c.GVSDescription),
+    ('gvs_continuous_dynamics',c.GVSContinuousDynamicsExpression),
+    ('gvs_build_system_request',c.GVSBuildSystemRequest),
+    ('gvs_linearize_request',c.GVSLinearizeRequest),
+    ('casadi_linearizer',c.CasadiLinearizerParameters),
+    ('lqr_parameters',c.LQRParameters),('lqr_command',c.LQRCommand),
+    ('lqr_describe_request',c.LQRDescribeRequest),('lqr_description',c.LQRDescription),]]
 SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
@@ -25,7 +32,7 @@ SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compile
     'extensions/experiment_dynamics/physics.py','extensions/robot_domain/contracts.py',
     'schemas/environment_spec.py','schemas/robot_ir.py','schemas/exploration.py','schemas/platform_math.py')
 PCC_SOURCES=(*SOURCES,'extensions/tendon_family/pcc.py')
-GVS_SOURCES=(*SOURCES,'extensions/tendon_family/gvs.py','extensions/tendon_family/pcc.py')
+GVS_SOURCES=(*SOURCES,'extensions/tendon_family/gvs.py','extensions/tendon_family/gvs_casadi.py','extensions/tendon_family/pcc.py')
 MATLAB=tuple('matlab/'+n+'.m' for n in ('tf_geometry','tf_point','tf_routes','tf_terms','tf_control','tf_run','tf_observe','tf_static','tf_view'))
 COMMON=dict(sources=SOURCES,contract_dependencies=tuple((n,v) for n,v,_ in CONTRACTS))
 EXTENSIONS=[
@@ -155,6 +162,103 @@ EXTENSIONS.append(
 )
 EXTENSIONS.append(
     Extension(
+        'dynamics.gvs_build_system',
+        'tool',
+        '1.0.0',
+        c.GVSBuildSystemRequest,
+        DynamicSystem,
+        'extensions.tendon_family.gvs_casadi:gvs_build_system_tool',
+        'Export the frozen family.design GVS as xdot=f(x,u) at an explicit SystemContext operating point.',
+        sources=GVS_SOURCES,
+        contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy', 'casadi'),
+        extension_dependencies=(('model.gvs', '1.0.0'),),
+        cache=True,
+        side_effects='none',
+        capabilities=dict(
+            category='mathematical_models', role='public_tool',
+            model='model.gvs', representation='dynamic_system', backend_solves=0,
+        ),
+    )
+)
+EXTENSIONS.append(
+    Extension(
+        'linearizer.casadi',
+        'linearizer',
+        '1.0.0',
+        c.CasadiLinearizerParameters,
+        LinearizedModel,
+        'extensions.tendon_family.gvs_casadi:CasadiLinearizer',
+        'Automatic-differentiation linearizer for registered typed CasADi expressions.',
+        sources=GVS_SOURCES,
+        contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy', 'casadi'),
+        capabilities=dict(
+            category='linearization', role='adapter',
+            input='DynamicSystem', derivatives='casadi_automatic_differentiation',
+        ),
+    )
+)
+EXTENSIONS.append(
+    Extension(
+        'linearization.linearize',
+        'tool',
+        '1.0.0',
+        c.GVSLinearizeRequest,
+        LinearizedModel,
+        'extensions.tendon_family.gvs_casadi:linearize_tool',
+        'Linearize a public continuous DynamicSystem at its explicit x0/u0 using CasADi automatic differentiation.',
+        sources=GVS_SOURCES,
+        contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy', 'casadi'),
+        extension_dependencies=(('linearizer.casadi', '1.0.0'),),
+        cache=True,
+        side_effects='none',
+        capabilities=dict(
+            category='linearization', role='public_tool', backend_solves=0,
+        ),
+    )
+)
+EXTENSIONS.append(
+    Extension(
+        'controller.lqr',
+        'controller',
+        '1.0.0',
+        c.LQRParameters,
+        c.LQRCommand,
+        'extensions.tendon_family.gvs_casadi:ContinuousLQRController',
+        'Continuous-time LQR around an equilibrium LinearizedModel with physical tendon-tension clamping.',
+        sources=GVS_SOURCES,
+        contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy', 'scipy'),
+        capabilities=dict(
+            category='control', role='adapter',
+            model_requirement=dict(input='linearized_model', capabilities=['linearization']),
+            input='state', output='bounded model-space tendon tensions',
+            equilibrium_required=True, reset=True, restore=True,
+        ),
+    )
+)
+EXTENSIONS.append(
+    Extension(
+        'control.lqr_describe',
+        'tool',
+        '1.0.0',
+        c.LQRDescribeRequest,
+        c.LQRDescription,
+        'extensions.tendon_family.gvs_casadi:lqr_describe_tool',
+        'Describe continuous LQR inputs, equilibrium requirement, equation, and tendon-tension bounds.',
+        sources=GVS_SOURCES,
+        contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy', 'scipy'),
+        extension_dependencies=(('controller.lqr', '1.0.0'),),
+        cache=True,
+        side_effects='none',
+        capabilities=dict(category='control', role='public_tool', backend_solves=0),
+    )
+)
+EXTENSIONS.append(
+    Extension(
         'model.gvs',
         'dynamics_model',
         '1.0.0',
@@ -164,7 +268,7 @@ EXTENSIONS.append(
         'First-order variable-strain continuum bending kinematics and dynamics',
         sources=GVS_SOURCES,
         contract_dependencies=COMMON['contract_dependencies'],
-        dependencies=('numpy',),
+        dependencies=('numpy', 'casadi'),
         capabilities=dict(
             category='mathematical_model',
             role='adapter',
