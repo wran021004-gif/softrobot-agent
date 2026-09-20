@@ -821,3 +821,41 @@ def gvs_evaluate_tool(ctx, args):
         ctx.reg,
     )
     return ctx.reg.parse(result)
+
+
+def gvs_evaluate_tool_v2(ctx, args):
+    """Evaluate once, then expose only the requested public diagnostic layer."""
+    from extensions.tendon_family.contracts import (
+        GVSDynamicsRequest,
+        GVSDynamicsResultV2,
+    )
+
+    full = gvs_evaluate_tool(ctx, GVSDynamicsRequest(
+        state=args.state,
+        input=args.input,
+        samples_per_segment=args.samples_per_segment,
+    ))
+    forces = args.detail in ('forces', 'full')
+    diagnostics = args.detail == 'full'
+    return GVSDynamicsResultV2(
+        detail=args.detail,
+        coordinate_order=full.coordinate_order,
+        q=full.q,
+        qdot=full.qdot,
+        qdd=full.qdd,
+        tip=full.tip,
+        segment_end_poses={name: segment.tip for name, segment in full.segments.items()},
+        velocity_bias=full.velocity_bias if forces else None,
+        elastic_force=full.elastic_force if forces else None,
+        damping_force=full.damping_force if forces else None,
+        gravity_force=full.gravity_force if forces else None,
+        tendon_generalized_force=full.tendon_generalized_force if forces else None,
+        mass_matrix=full.mass_matrix if diagnostics else None,
+        tendon_order=full.tendon_order if diagnostics else None,
+        tendon_lengths_m=full.tendon_lengths_m if diagnostics else None,
+        tendon_length_jacobian=full.tendon_length_jacobian if diagnostics else None,
+        backbone_points_m=(
+            {name: segment.backbone_points_m for name, segment in full.segments.items()}
+            if args.include_backbone else None
+        ),
+    )

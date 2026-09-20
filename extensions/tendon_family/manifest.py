@@ -25,6 +25,21 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('casadi_linearizer',c.CasadiLinearizerParameters),
     ('lqr_parameters',c.LQRParameters),('lqr_command',c.LQRCommand),
     ('lqr_describe_request',c.LQRDescribeRequest),('lqr_description',c.LQRDescription),]]
+CONTRACTS += [
+    ('family.pcc_forward_request', '2.0.0', c.PCCForwardRequestV2),
+    ('family.pcc_kinematics_result', '2.0.0', c.PCCKinematicsResultV2),
+    ('family.gvs_dynamics_request', '2.0.0', c.GVSDynamicsRequestV2),
+    ('family.gvs_dynamics_result', '2.0.0', c.GVSDynamicsResultV2),
+    ('family.gvs_build_system_request', '2.0.0', c.GVSBuildSystemRequestV2),
+    ('family.gvs_system_artifact_result', '1.0.0', c.GVSSystemArtifactResult),
+    ('family.gvs_linearize_request', '2.0.0', c.GVSLinearizeRequestV2),
+    ('family.linearized_model_artifact_result', '1.0.0', c.LinearizedModelArtifactResult),
+    ('family.gvs_equilibrium_request', '1.0.0', c.GVSEquilibriumRequest),
+    ('family.gvs_equilibrium_result', '1.0.0', c.GVSEquilibriumResult),
+    ('family.lqr_synthesize_request', '1.0.0', c.LQRSynthesizeRequest),
+    ('family.lqr_gain_artifact', '1.0.0', c.LQRGainArtifact),
+    ('family.lqr_synthesis_result', '1.0.0', c.LQRSynthesisResult),
+]
 SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
@@ -155,6 +170,7 @@ EXTENSIONS.append(
         capabilities=dict(
             category='mathematical_models',
             role='public_tool',
+            route_visible=True,
             model='model.pcc',
             backend_solves=0,
         ),
@@ -177,7 +193,7 @@ EXTENSIONS.append(
         side_effects='none',
         capabilities=dict(
             category='mathematical_models', role='public_tool',
-            model='model.gvs', representation='dynamic_system', backend_solves=0,
+            route_visible=True, model='model.gvs', representation='dynamic_system', backend_solves=0,
         ),
     )
 )
@@ -215,7 +231,7 @@ EXTENSIONS.append(
         cache=True,
         side_effects='none',
         capabilities=dict(
-            category='linearization', role='public_tool', backend_solves=0,
+            category='linearization', role='public_tool', route_visible=True, backend_solves=0,
         ),
     )
 )
@@ -234,7 +250,8 @@ EXTENSIONS.append(
         capabilities=dict(
             category='control', role='adapter',
             model_requirement=dict(input='linearized_model', capabilities=['linearization']),
-            input='state', output='bounded model-space tendon tensions',
+            input='state', output='bounded model-space tendon tensions', channel='model_tendon_tension',
+            command_space='model_tendon_tension', backend_executable=False,
             equilibrium_required=True, reset=True, restore=True,
         ),
     )
@@ -254,7 +271,7 @@ EXTENSIONS.append(
         extension_dependencies=(('controller.lqr', '1.0.0'),),
         cache=True,
         side_effects='none',
-        capabilities=dict(category='control', role='public_tool', backend_solves=0),
+        capabilities=dict(category='control', role='public_tool', route_visible=True, backend_solves=0),
     )
 )
 EXTENSIONS.append(
@@ -322,7 +339,7 @@ EXTENSIONS.append(
         side_effects='none',
         capabilities=dict(
             category='mathematical_models', role='public_tool',
-            model='model.gvs', backend_solves=0,
+            route_visible=True, model='model.gvs', backend_solves=0,
         ),
     )
 )
@@ -349,7 +366,7 @@ EXTENSIONS.append(
         side_effects='none',
         capabilities=dict(
             category='mathematical_models', role='public_tool',
-            model='model.gvs', backend_solves=0,
+            route_visible=True, model='model.gvs', backend_solves=0,
         ),
     )
 )
@@ -379,8 +396,81 @@ EXTENSIONS.append(
         capabilities=dict(
             category='mathematical_models',
             role='public_tool',
+            route_visible=True,
             model='model.pcc',
             backend_solves=0,
         ),
     )
 )
+
+# Compact, evidence-oriented public interfaces. The 1.0.0 variants above remain
+# registered so historical session bindings retain their exact contracts.
+EXTENSIONS.extend([
+    Extension(
+        'kinematics.pcc_forward', 'tool', '2.0.0',
+        c.PCCForwardRequestV2, c.PCCKinematicsResultV2,
+        'extensions.tendon_family.pcc:pcc_forward_tool_v2',
+        'Compute compact PCC tip and segment-end poses; backbone samples are opt-in.',
+        sources=PCC_SOURCES, contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy',), extension_dependencies=(('model.pcc', '1.0.0'),),
+        cache=True, side_effects='none',
+        capabilities=dict(category='mathematical_models', role='public_tool', route_visible=True,
+            model='model.pcc', output_layering='compact_with_backbone_opt_in', backend_solves=0),
+    ),
+    Extension(
+        'dynamics.gvs_evaluate', 'tool', '2.0.0',
+        c.GVSDynamicsRequestV2, c.GVSDynamicsResultV2,
+        'extensions.tendon_family.gvs:gvs_evaluate_tool_v2',
+        'Evaluate frozen GVS dynamics with summary, force, or full diagnostics; backbone samples are opt-in.',
+        sources=GVS_SOURCES, contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy',), extension_dependencies=(('model.gvs', '1.0.0'),),
+        cache=True, side_effects='none',
+        capabilities=dict(category='mathematical_models', role='public_tool', route_visible=True,
+            model='model.gvs', output_layering=['summary', 'forces', 'full'], backend_solves=0),
+    ),
+    Extension(
+        'dynamics.gvs_build_system', 'tool', '2.0.0',
+        c.GVSBuildSystemRequestV2, c.GVSSystemArtifactResult,
+        'extensions.tendon_family.gvs_casadi:gvs_build_system_tool_v2',
+        'Save a GVS DynamicSystem at x0/u0 using the frozen task environment and return its EvidenceRef.',
+        sources=GVS_SOURCES, contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy', 'casadi'), extension_dependencies=(('model.gvs', '1.0.0'),),
+        cache=True, side_effects='artifact_store',
+        capabilities=dict(category='mathematical_models', role='public_tool', route_visible=True,
+            model='model.gvs', representation='dynamic_system', environment='frozen_task', backend_solves=0),
+    ),
+    Extension(
+        'linearization.linearize', 'tool', '2.0.0',
+        c.GVSLinearizeRequestV2, c.LinearizedModelArtifactResult,
+        'extensions.tendon_family.gvs_casadi:linearize_tool_v2',
+        'Resolve a DynamicSystem inline or by EvidenceRef, save its AD linearization, and return a compact reference.',
+        sources=GVS_SOURCES, contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy', 'casadi'), extension_dependencies=(('linearizer.casadi', '1.0.0'),),
+        cache=True, side_effects='artifact_store',
+        capabilities=dict(category='linearization', role='public_tool', route_visible=True,
+            evidence_input=True, evidence_output=True, backend_solves=0),
+    ),
+    Extension(
+        'statics.gvs_equilibrium', 'tool', '1.0.0',
+        c.GVSEquilibriumRequest, c.GVSEquilibriumResult,
+        'extensions.tendon_family.gvs_casadi:gvs_equilibrium_tool',
+        'Solve frozen-robot static GVS equilibrium for specified tendon tensions from an initial q.',
+        sources=GVS_SOURCES, contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy', 'casadi'), extension_dependencies=(('model.gvs', '1.0.0'),),
+        cache=True, side_effects='none',
+        capabilities=dict(category='statics', role='public_tool', route_visible=True,
+            model='model.gvs', equation='tendon+gravity-elastic=0', backend_solves=0),
+    ),
+    Extension(
+        'control.lqr_synthesize', 'tool', '1.0.0',
+        c.LQRSynthesizeRequest, c.LQRSynthesisResult,
+        'extensions.tendon_family.gvs_casadi:lqr_synthesize_tool',
+        'Synthesize continuous LQR from a LinearizedModel reference using compact semantic weights and frozen actuator facts.',
+        sources=GVS_SOURCES, contract_dependencies=COMMON['contract_dependencies'],
+        dependencies=('numpy', 'scipy'), extension_dependencies=(('controller.lqr', '1.0.0'),),
+        cache=True, side_effects='artifact_store',
+        capabilities=dict(category='control', role='public_tool', route_visible=True,
+            evidence_input=True, evidence_output=True, command_space='model_tendon_tension',
+            backend_executable=False, backend_solves=0),
+    ),
+])

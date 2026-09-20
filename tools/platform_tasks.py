@@ -35,6 +35,13 @@ def compile_input(value, reg=None):
         raise ValueError('ROBOT_OR_ACTUATOR_INCOMPATIBLE')
     backend, params = reg.bind(inp.policy.backend, 'backend')
     controller, control_params = reg.bind(inp.policy.controller, 'controller')
+    if controller.capabilities.get('backend_executable') is False:
+        raise ValueError(
+            'CONTROL_BACKEND_ADAPTER_REQUIRED: '
+            + controller.extension_id
+            + ' emits '
+            + controller.capabilities.get('command_space', 'an unsupported command space')
+        )
     dynamics_model = None
     if inp.policy.dynamics_model is not None:
         dynamics_model, _ = reg.bind(inp.policy.dynamics_model,'dynamics_model')

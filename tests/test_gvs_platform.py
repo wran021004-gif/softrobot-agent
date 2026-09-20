@@ -73,13 +73,18 @@ class GVSPlatformTests(unittest.TestCase):
                 for definition in self.reg.extensions.values()
                 if definition.extension_id == extension_id
             ]
-            self.assertEqual(len(matches), 1)
+            expected = 2 if extension_id in {
+                'dynamics.gvs_evaluate',
+                'dynamics.gvs_build_system',
+                'linearization.linearize',
+            } else 1
+            self.assertEqual(len(matches), expected)
         model = self.reg.get('model.gvs', '1.0.0', 'dynamics_model')
         self.assertEqual(
             model.capabilities['mathematical_model']['capabilities'],
             {
                 'kinematics': True,
-                'statics': False,
+                'statics': True,
                 'dynamics': True,
                 'linearization': False,
                 'gradients': True,

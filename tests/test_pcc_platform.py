@@ -79,7 +79,8 @@ class PCCPlatformTests(unittest.TestCase):
                 for definition in self.reg.extensions.values()
                 if definition.extension_id == extension_id
             ]
-            self.assertEqual(len(matches), 1)
+            expected = 2 if extension_id == 'kinematics.pcc_forward' else 1
+            self.assertEqual(len(matches), expected)
 
         model = self.reg.get('model.pcc', '1.0.0', 'dynamics_model')
         tool = self.reg.get('kinematics.pcc_forward', '1.0.0', 'tool')

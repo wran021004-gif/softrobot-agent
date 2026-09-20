@@ -2,8 +2,10 @@
 from typing import Literal, Annotated
 from pydantic import Field, FiniteFloat, model_validator
 from schemas.common import Contract
+from schemas.platform import EvidenceRef
 from schemas.platform_math import (
     DynamicSystem,
+    LinearizedModel,
     MathematicalModel,
     ModelCapabilities,
     ModelVariable,
@@ -409,6 +411,22 @@ class PCCKinematicsResult(Contract):
     tip: PCCPose
 
 
+class PCCForwardRequestV2(Contract):
+    configuration: PCCConfiguration
+    include_backbone: bool = False
+    samples_per_segment: int = Field(default=51, ge=2, le=1001)
+
+
+class PCCKinematicsResultV2(Contract):
+    model_id: Literal['pcc_constant_curvature_v1'] = 'pcc_constant_curvature_v1'
+    frame: Literal['robot_base'] = 'robot_base'
+    configuration: PCCConfiguration
+    chain: list[Name] = Field(min_length=1)
+    segment_end_poses: dict[Name, PCCPose]
+    tip: PCCPose
+    backbone_points_m: dict[Name, list[Vec3]] | None = None
+
+
 class PCCDescribeRequest(Contract):
     pass
 
@@ -487,7 +505,7 @@ class GVSModelParameters(Contract):
             discretization_contract=None,
             capabilities=ModelCapabilities(
                 kinematics=True,
-                statics=False,
+                statics=True,
                 dynamics=True,
                 linearization=False,
                 gradients=True,
@@ -531,6 +549,32 @@ class GVSBuildSystemRequest(Contract):
 
 class GVSLinearizeRequest(Contract):
     system: DynamicSystem
+
+
+class GVSBuildSystemRequestV2(Contract):
+    x0: list[FiniteFloat]
+    u0: list[FiniteFloat]
+
+
+class GVSSystemArtifactResult(Contract):
+    model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
+    system: EvidenceRef
+    state_dimension: int = Field(gt=0)
+    input_dimension: int = Field(gt=0)
+    environment_source: Literal['frozen_task_environment'] = 'frozen_task_environment'
+
+
+class GVSLinearizeRequestV2(Contract):
+    system: DynamicSystem | EvidenceRef
+
+
+class LinearizedModelArtifactResult(Contract):
+    model: EvidenceRef
+    source_system: EvidenceRef | None = None
+    state_dimension: int = Field(gt=0)
+    input_dimension: int = Field(gt=0)
+    time_domain: Literal['continuous', 'discrete']
+    drift_norm_inf: NonNegativeFinite
 
 
 class CasadiLinearizerParameters(Contract):
@@ -584,6 +628,44 @@ class LQRDescription(Contract):
     bound_semantics: Literal['clip_each_tendon_to_[0,force_limit_n]'] = 'clip_each_tendon_to_[0,force_limit_n]'
 
 
+class LQRSynthesizeRequest(Contract):
+    model: LinearizedModel | EvidenceRef
+    curvature_weight: FiniteFloat = Field(default=1.0, gt=0)
+    state_rate_weight: FiniteFloat = Field(default=0.1, gt=0)
+    tendon_tension_weight: FiniteFloat = Field(default=1.0, gt=0)
+    state_weight_overrides: dict[str, NonNegativeFinite] = Field(default_factory=dict)
+    equilibrium_tolerance: FiniteFloat = Field(
+        default=1e-7, gt=0,
+        description='Maximum infinity norm of LinearizedModel drift in state-derivative units.',
+    )
+
+
+class LQRGainArtifact(Contract):
+    controller_type: Literal['continuous_time_lqr'] = 'continuous_time_lqr'
+    K: list[list[FiniteFloat]]
+    Q_diagonal: list[NonNegativeFinite]
+    R_diagonal: list[FiniteFloat]
+    x0: list[FiniteFloat]
+    u0: list[FiniteFloat]
+    tendon_order: list[Name] = Field(min_length=1)
+    force_limits_n: list[FiniteFloat] = Field(min_length=1)
+
+
+class LQRSynthesisResult(Contract):
+    controller_type: Literal['continuous_time_lqr'] = 'continuous_time_lqr'
+    operating_point: EvidenceRef
+    gain: EvidenceRef
+    gain_shape: tuple[int, int]
+    closed_loop_stable: bool
+    max_real_closed_loop_eigenvalue: FiniteFloat
+    controllability_rank: int = Field(ge=0)
+    stabilizability_issue: bool
+    tendon_order: list[Name] = Field(min_length=1)
+    force_bounds_source: Literal['frozen_robot.family.design'] = 'frozen_robot.family.design'
+    command_space: Literal['model_tendon_tension'] = 'model_tendon_tension'
+    backend_executable: Literal[False] = False
+
+
 class GVSState(Contract):
     q: list[FiniteFloat]
     qdot: list[FiniteFloat]
@@ -601,6 +683,14 @@ class GVSInput(Contract):
 class GVSDynamicsRequest(Contract):
     state: GVSState
     input: GVSInput
+    samples_per_segment: int = Field(default=21, ge=2, le=201)
+
+
+class GVSDynamicsRequestV2(Contract):
+    state: GVSState
+    input: GVSInput
+    detail: Literal['summary', 'forces', 'full'] = 'summary'
+    include_backbone: bool = False
     samples_per_segment: int = Field(default=21, ge=2, le=201)
 
 
@@ -650,6 +740,52 @@ class GVSDynamicsResult(Contract):
         'motor_dynamics',
         'external_applied_forces',
     )
+
+
+class GVSDynamicsResultV2(Contract):
+    model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
+    frame: Literal['robot_base'] = 'robot_base'
+    detail: Literal['summary', 'forces', 'full']
+    coordinate_order: list[str] = Field(min_length=1)
+    q: list[FiniteFloat]
+    qdot: list[FiniteFloat]
+    qdd: list[FiniteFloat]
+    tip: GVSPose
+    segment_end_poses: dict[Name, GVSPose]
+    velocity_bias: list[FiniteFloat] | None = None
+    elastic_force: list[FiniteFloat] | None = None
+    damping_force: list[FiniteFloat] | None = None
+    gravity_force: list[FiniteFloat] | None = None
+    tendon_generalized_force: list[FiniteFloat] | None = None
+    mass_matrix: list[list[FiniteFloat]] | None = None
+    tendon_order: list[Name] | None = None
+    tendon_lengths_m: list[FiniteFloat] | None = None
+    tendon_length_jacobian: list[list[FiniteFloat]] | None = None
+    backbone_points_m: dict[Name, list[Vec3]] | None = None
+    dynamics_equation: Literal[
+        'M*qdd+c+elastic+damping=tendon+gravity'
+    ] = 'M*qdd+c+elastic+damping=tendon+gravity'
+
+
+class GVSEquilibriumRequest(Contract):
+    tendon_tensions_n: dict[Name, NonNegativeFinite]
+    initial_q: list[FiniteFloat]
+    tolerance: FiniteFloat = Field(
+        default=1e-10, gt=0,
+        description='Maximum infinity norm of the static generalized-force residual.',
+    )
+    max_iterations: int = Field(default=50, ge=1, le=500)
+
+
+class GVSEquilibriumResult(Contract):
+    model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
+    coordinate_order: list[str] = Field(min_length=1)
+    tendon_order: list[Name] = Field(min_length=1)
+    q_equilibrium: list[FiniteFloat]
+    residual_norm: NonNegativeFinite
+    converged: bool
+    iterations: int = Field(ge=0)
+    solver: Literal['casadi_ad_damped_newton'] = 'casadi_ad_damped_newton'
 
 
 class GVSDescribeRequest(Contract):

@@ -28,6 +28,17 @@ class InvocationContext:
         # work orders receive an immutable input snapshot, not this context object.
         return self.store.artifact(ref)
 
+    def save_artifact(self, value, kind='scientific_artifact'):
+        """Persist a large scientific value and return its immutable reference."""
+        with self.store.transaction() as db:
+            ref = self.store.put(db, value)
+            self.store.event(
+                db, self.run_id, kind, 'saved', parent=self.row['parent_id'],
+                request=self.row['request_id'], execution=self.row['execution_id'],
+                caller=self.host.actor, outputs=[ref], version=self.request.tool_version,
+            )
+        return ref
+
     def record(self, kind, status, *, inputs=(), outputs=(), candidate=None):
         with self.store.transaction() as db:
             return self.store.event(db, self.run_id, kind, status, parent=self.row['parent_id'],

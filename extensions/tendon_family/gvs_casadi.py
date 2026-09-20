@@ -12,16 +12,20 @@ import json
 
 import casadi as ca
 import numpy as np
-from scipy.linalg import solve_continuous_are
 
 from extensions.tendon_family.contracts import (
     Design,
     GVSContinuousDynamicsExpression,
+    GVSEquilibriumResult,
     GVSLinearizeRequest,
     GVSModelParameters,
+    GVSSystemArtifactResult,
+    LinearizedModelArtifactResult,
     LQRCommand,
     LQRDescription,
+    LQRGainArtifact,
     LQRParameters,
+    LQRSynthesisResult,
     Rigid,
     Segment,
 )
@@ -294,6 +298,14 @@ class GVSCasadiFunctions:
             ['x', 'u'],
             ['A', 'B', 'drift'],
         )
+        static_residual = tendon_force + gravity - elastic
+        self.static_equilibrium = ca.Function(
+            'gvs_static_equilibrium',
+            [q, u],
+            [static_residual, ca.jacobian(static_residual, q)],
+            ['q', 'u'],
+            ['residual', 'jacobian'],
+        )
 
     def evaluate(self, x, u):
         values = self.function(x=np.asarray(x, dtype=float), u=np.asarray(u, dtype=float))
@@ -304,6 +316,15 @@ class GVSCasadiFunctions:
             x=np.asarray(x, dtype=float), u=np.asarray(u, dtype=float)
         )
         return tuple(np.asarray(values[name], dtype=float) for name in ('A', 'B', 'drift'))
+
+    def equilibrium_terms(self, q, u):
+        values = self.static_equilibrium(
+            q=np.asarray(q, dtype=float), u=np.asarray(u, dtype=float)
+        )
+        return tuple(
+            np.asarray(values[name], dtype=float)
+            for name in ('residual', 'jacobian')
+        )
 
 
 @lru_cache(maxsize=8)
@@ -366,6 +387,8 @@ class ContinuousLQRController:
         self.last_command = None
 
     def configure_model(self, model):
+        from scipy.linalg import solve_continuous_are
+
         model = LinearizedModel.model_validate(model)
         if model.time_domain != 'continuous':
             raise ValueError('LQR_REQUIRES_CONTINUOUS_LINEARIZED_MODEL')
@@ -448,8 +471,183 @@ def gvs_build_system_tool(ctx, args):
     )
 
 
+def gvs_build_system_tool_v2(ctx, args):
+    """Export at x0/u0 while taking all physical context from the frozen task."""
+    from schemas.platform_math import SystemContext
+
+    model = _bound_model(ctx)
+    system = model.build_system(
+        ctx.input.robot,
+        model.parameters,
+        None,
+        SystemContext(x0=args.x0, u0=args.u0, scene=ctx.input.task.environment),
+    )
+    reference = ctx.save_artifact(system, 'dynamic_system')
+    return GVSSystemArtifactResult(
+        system=reference,
+        state_dimension=len(system.x0),
+        input_dimension=len(system.u0),
+    )
+
+
 def linearize_tool(ctx, args: GVSLinearizeRequest):
     return CasadiLinearizer().linearize(args.system)
+
+
+def linearize_tool_v2(ctx, args):
+    source = args.system if isinstance(args.system, EvidenceRef) else None
+    system = DynamicSystem.model_validate(
+        ctx.artifact(args.system) if source is not None else args.system
+    )
+    linear = CasadiLinearizer().linearize(system)
+    reference = ctx.save_artifact(linear, 'linearized_model')
+    drift = np.zeros(len(linear.x0)) if linear.drift is None else np.asarray(linear.drift)
+    return LinearizedModelArtifactResult(
+        model=reference,
+        source_system=source,
+        state_dimension=len(linear.x0),
+        input_dimension=len(linear.u0),
+        time_domain=linear.time_domain,
+        drift_norm_inf=float(np.linalg.norm(drift, ord=np.inf)),
+    )
+
+
+def gvs_equilibrium_tool(ctx, args):
+    """Solve tendon + gravity - elastic = 0 with a damped AD Newton method."""
+    from extensions.tendon_family.contracts import Design
+    from schemas.platform_math import SystemContext
+
+    design = Design.model_validate(ctx.input.robot.structure.data)
+    order = [tendon.id for tendon in design.tendons]
+    if set(args.tendon_tensions_n) != set(order):
+        raise ValueError('GVS tendon tensions must cover exactly: ' + ', '.join(order))
+    tensions = np.asarray([args.tendon_tensions_n[name] for name in order], dtype=float)
+    limits = np.asarray([tendon.force_limit_n for tendon in design.tendons], dtype=float)
+    if np.any(tensions > limits):
+        raise ValueError('GVS tendon tension exceeds family.design force limit')
+
+    model = _bound_model(ctx)
+    n = len(coordinate_order(design))
+    q = np.asarray(args.initial_q, dtype=float)
+    if q.shape != (n,):
+        raise ValueError('GVS_EQUILIBRIUM_INITIAL_Q_DIMENSION_MISMATCH')
+    system = model.build_system(
+        ctx.input.robot,
+        model.parameters,
+        None,
+        SystemContext(
+            x0=np.r_[q, np.zeros(n)].tolist(),
+            u0=tensions.tolist(),
+            scene=ctx.input.task.environment,
+        ),
+    )
+    functions = functions_for(expression_from_system(system))
+    iterations = 0
+    converged = False
+    for iteration in range(args.max_iterations + 1):
+        residual, jacobian = functions.equilibrium_terms(q, tensions)
+        residual = residual.reshape(-1)
+        norm = float(np.linalg.norm(residual, ord=np.inf))
+        if norm <= args.tolerance:
+            converged = True
+            iterations = iteration
+            break
+        if iteration == args.max_iterations:
+            iterations = iteration
+            break
+        try:
+            step = np.linalg.solve(jacobian, -residual)
+        except np.linalg.LinAlgError:
+            step = np.linalg.lstsq(jacobian, -residual, rcond=None)[0]
+        alpha = 1.0
+        accepted = False
+        for _ in range(12):
+            candidate = q + alpha * step
+            candidate_residual, _ = functions.equilibrium_terms(candidate, tensions)
+            if np.linalg.norm(candidate_residual, ord=np.inf) < norm:
+                q = candidate
+                accepted = True
+                break
+            alpha *= 0.5
+        if not accepted:
+            q = q + alpha * step
+        iterations = iteration + 1
+    residual, _ = functions.equilibrium_terms(q, tensions)
+    return GVSEquilibriumResult(
+        coordinate_order=coordinate_order(design),
+        tendon_order=order,
+        q_equilibrium=q.tolist(),
+        residual_norm=float(np.linalg.norm(residual, ord=np.inf)),
+        converged=converged,
+        iterations=iterations,
+    )
+
+
+def lqr_synthesize_tool(ctx, args):
+    """Build diagonal weights, derive robot facts, and persist the full gain."""
+    from extensions.tendon_family.contracts import Design
+
+    model_reference = args.model if isinstance(args.model, EvidenceRef) else None
+    model = LinearizedModel.model_validate(
+        ctx.artifact(args.model) if model_reference is not None else args.model
+    )
+    if model_reference is None:
+        model_reference = ctx.save_artifact(model, 'linearized_model')
+    design = Design.model_validate(ctx.input.robot.structure.data)
+    tendon_order = [tendon.id for tendon in design.tendons]
+    force_limits = [tendon.force_limit_n for tendon in design.tendons]
+    if [spec.entity for spec in model.input_definition] != tendon_order:
+        raise ValueError('LQR_FROZEN_ROBOT_TENDON_ORDER_MISMATCH')
+    state_names = [spec.name for spec in model.state_definition]
+    unknown = set(args.state_weight_overrides) - set(state_names)
+    if unknown:
+        raise ValueError('LQR_UNKNOWN_STATE_WEIGHT_OVERRIDE: ' + ', '.join(sorted(unknown)))
+    q_diagonal = [
+        float(args.state_weight_overrides.get(
+            name,
+            args.state_rate_weight if name.endswith('.rate') else args.curvature_weight,
+        ))
+        for name in state_names
+    ]
+    r_diagonal = [float(args.tendon_tension_weight)] * len(tendon_order)
+    parameters = LQRParameters(
+        Q=np.diag(q_diagonal).tolist(),
+        R=np.diag(r_diagonal).tolist(),
+        tendon_order=tendon_order,
+        force_limits_n=force_limits,
+        equilibrium_tolerance=args.equilibrium_tolerance,
+    )
+    gain = ContinuousLQRController(parameters).configure_model(model)
+    A = np.asarray(model.A, dtype=float)
+    B = np.asarray(model.B, dtype=float)
+    closed_loop = np.linalg.eigvals(A - B @ gain)
+    max_real = float(np.max(closed_loop.real))
+    controllability = np.hstack([np.linalg.matrix_power(A, index) @ B for index in range(len(model.x0))])
+    rank = int(np.linalg.matrix_rank(controllability))
+    unstable = [value for value in np.linalg.eigvals(A) if value.real >= -1e-10]
+    stabilizability_issue = any(
+        np.linalg.matrix_rank(np.hstack([value * np.eye(len(model.x0)) - A, B])) < len(model.x0)
+        for value in unstable
+    )
+    gain_reference = ctx.save_artifact(LQRGainArtifact(
+        K=gain.tolist(),
+        Q_diagonal=q_diagonal,
+        R_diagonal=r_diagonal,
+        x0=model.x0,
+        u0=model.u0,
+        tendon_order=tendon_order,
+        force_limits_n=force_limits,
+    ), 'lqr_gain')
+    return LQRSynthesisResult(
+        operating_point=model_reference,
+        gain=gain_reference,
+        gain_shape=gain.shape,
+        closed_loop_stable=max_real < 0.0,
+        max_real_closed_loop_eigenvalue=max_real,
+        controllability_rank=rank,
+        stabilizability_issue=stabilizability_issue,
+        tendon_order=tendon_order,
+    )
 
 
 def lqr_describe_tool(ctx, args):

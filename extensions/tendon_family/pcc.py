@@ -868,6 +868,29 @@ def pcc_forward_tool(ctx, args):
     return ctx.reg.parse(result)
 
 
+def pcc_forward_tool_v2(ctx, args):
+    """Project unchanged PCC mathematics into a compact public result."""
+    from extensions.tendon_family.contracts import (
+        PCCForwardRequest,
+        PCCKinematicsResultV2,
+    )
+
+    full = pcc_forward_tool(ctx, PCCForwardRequest(
+        configuration=args.configuration,
+        samples_per_segment=args.samples_per_segment,
+    ))
+    return PCCKinematicsResultV2(
+        configuration=full.configuration,
+        chain=full.chain,
+        segment_end_poses={name: segment.tip for name, segment in full.segments.items()},
+        tip=full.tip,
+        backbone_points_m=(
+            {name: segment.backbone_points_m for name, segment in full.segments.items()}
+            if args.include_backbone else None
+        ),
+    )
+
+
 def pcc_describe_tool(ctx, args):
     from extensions.tendon_family.contracts import (
         Design,
