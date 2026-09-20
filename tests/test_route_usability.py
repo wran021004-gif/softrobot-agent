@@ -36,7 +36,8 @@ class RouteUsability(unittest.TestCase):
     def check_payload(self,host):
         payload=payload_for(host)
         self.assertIsNone(re.search(r'[\u4e00-\u9fff]',encode(payload)))
-        self.assertLess(len(encode(payload).encode()),60000)
+        limit=host.store.session(host.run_id)['snapshot']['input']['policy']['model']['context_bytes']
+        self.assertLess(len(encode(payload).encode()),limit)
         return payload
 
     def test_evaluated_search_start_reuse_and_changed_input(self):

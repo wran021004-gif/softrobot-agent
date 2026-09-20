@@ -13,7 +13,8 @@ from examples.platform_route import main, prepare
 from extensions.tendon_family.route import create, view
 from schemas.platform import ModelResponse
 from tools.platform_host import Host
-from tools.platform_models import DeepSeekAdapter, ToolProtocolError, ToolEnvelope, provider_name
+from tools.platform_models import (DeepSeekAdapter, ModelLengthTruncationError,
+    ToolProtocolError, ToolEnvelope, payload_for, provider_name)
 from tools.platform_store import Store, encode
 from tools.state_io import read
 
@@ -33,6 +34,14 @@ def reply(count):
     if count == 0:
         response['raw']['choices'][0]['finish_reason'] = 'stop'
     return ModelResponse.model_validate(response)
+
+
+def length_reply():
+    response = reply(1)
+    choice = response.raw['choices'][0]
+    choice['finish_reason'] = 'length'
+    choice['message']['tool_calls'][0]['function']['arguments'] = '{"arguments":{"partial":'
+    return response
 
 
 class Replay(DeepSeekAdapter):
@@ -128,6 +137,64 @@ class RouteModelProtocol(unittest.TestCase):
                     self.assertEqual(session['status'],'failed')
                     self.assertIn('MODEL_PROTOCOL_CORRECTION_FAILED',session['state']['stop_reason'])
                 self.assertEqual(session['state']['protocol_corrections_used'],1)
+
+    def test_length_truncation_has_one_dedicated_retry_and_executes_no_partial_call(self):
+        _,host=self.setup_route()
+        truncated=length_reply()
+        with self.assertRaises(ModelLengthTruncationError):
+            DeepSeekAdapter().decode(truncated,0,{'route.inspect':'1.0.0'})
+        adapter=Replay(host,[truncated,reply(1)])
+        session=host.run(adapter)
+        self.assertEqual(adapter.turns,[0,1])
+        self.assertIsNone(host.store.lookup(host.run_id,'model-0-tool'))
+        self.assertEqual(host.store.lookup(host.run_id,'model-1-tool')['status'],'completed')
+        self.assertEqual(session['state']['length_retries_used'],1)
+        self.assertNotIn('protocol_corrections_used',session['state'])
+        used=host.store.remaining()['used']
+        self.assertEqual((used['model_calls'],used['tool_calls'],used['backend_solves']),(2,1,0))
+        correction=json.loads(adapter.payloads[1]['messages'][-1]['content'])['protocol_correction']
+        self.assertEqual(correction['type'],'length_truncation')
+        self.assertEqual(correction['finish_reason'],'length')
+        self.assertIn('Do not repeat the analysis',correction['requirement'])
+        self.assertIn('exactly one complete tool call',correction['requirement'])
+        self.assertEqual(len([e for e in host.store.events(host.run_id)
+            if e['kind']=='model_length_recovery']),1)
+
+    def test_length_and_ordinary_corrections_are_independent(self):
+        for responses in ([malformed_reply(),length_reply(),reply(1)],
+                          [length_reply(),malformed_reply(),reply(1)]):
+            with self.subTest(first=responses[0].raw['choices'][0]['finish_reason']):
+                _,host=self.setup_route(turns=3,calls=3,project_calls=3)
+                adapter=Replay(host,responses)
+                session=host.run(adapter)
+                self.assertEqual(adapter.turns,[0,1,2])
+                self.assertEqual(session['state']['protocol_corrections_used'],1)
+                self.assertEqual(session['state']['length_retries_used'],1)
+                self.assertEqual(len([e for e in host.store.events(host.run_id)
+                    if e['kind']=='model_protocol_correction']),1)
+                self.assertEqual(len([e for e in host.store.events(host.run_id)
+                    if e['kind']=='model_length_recovery']),1)
+                used=host.store.remaining()['used']
+                self.assertEqual((used['model_calls'],used['tool_calls'],used['backend_solves']),(3,1,0))
+
+    def test_second_length_truncation_fails_without_tool_execution(self):
+        _,host=self.setup_route(turns=4,calls=4,project_calls=4)
+        adapter=Replay(host,[length_reply(),length_reply()])
+        session=host.run(adapter)
+        self.assertEqual(adapter.turns,[0,1])
+        self.assertEqual(session['status'],'failed')
+        self.assertIn('MODEL_LENGTH_RETRY_FAILED',session['state']['stop_reason'])
+        self.assertEqual(session['state']['length_retries_used'],1)
+        self.assertIsNone(host.store.lookup(host.run_id,'model-0-tool'))
+        self.assertIsNone(host.store.lookup(host.run_id,'model-1-tool'))
+        used=host.store.remaining()['used']
+        self.assertEqual((used['model_calls'],used['tool_calls'],used['backend_solves']),(2,0,0))
+
+    def test_route_overview_evidence_guidance_is_present(self):
+        _,host=self.setup_route()
+        instruction=payload_for(host)['messages'][0]['content']
+        self.assertIn('overview contains the current combinations, baseline design',instruction)
+        self.assertIn('use evidence.read only for details omitted from it',instruction)
 
     def test_count_correction_success_and_actual_payload(self):
         raw = FIXTURE['response']['raw']

@@ -19,6 +19,11 @@ try
         after=tf_geometry(p,scene,y(1:n),y(n+1:end));
         count=count+1; observations{count}=obs;
         rows{count}=tf_observe(p,after,y,u,target,t,dt,before);
+        fields={'requested_tension_n','desired_tension_n','predicted_tension_n','tension_tracking_error_n',...
+            'force_limit_saturated','actuator_saturated','tension_command_unrealizable'};
+        for field=fields
+            if isfield(obs,field{1}), rows{count}.(field{1})=obs.(field{1}); end
+        end
     end
 catch exc
     complete=false; reason=[exc.identifier ': ' exc.message];

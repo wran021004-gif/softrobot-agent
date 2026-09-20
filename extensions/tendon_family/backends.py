@@ -62,13 +62,17 @@ class MatlabBackend:
         self.timings['backend_call']=time.perf_counter()-start
         with gzip.open(folder/'trajectory.json.gz','wt',encoding='utf8') as stream: json.dump(rows,stream,allow_nan=False)
         atomic_json(folder/'controller_observations.json',observations)
-        atomic_json(folder/'actual_commands.json',[dict(time_s=r['solver_time_s'],actuator_command=r['actuator_command'],target_lengths_m=r['command_m']) for r in rows])
+        command_fields=('requested_tension_n','desired_tension_n','predicted_tension_n','tension_tracking_error_n',
+            'force_limit_saturated','actuator_saturated','tension_command_unrealizable')
+        atomic_json(folder/'actual_commands.json',[dict(time_s=r['solver_time_s'],actuator_command=r['actuator_command'],
+            target_lengths_m=r['command_m'],**{key:r[key] for key in command_fields if key in r}) for r in rows])
         from schemas.platform import Payload
         data=Data(physics_identity=self.physics['identity'],scene_identity=self.scene['identity'],timings_s=self.timings,
             numerical_steps=steps,reason=reason,applicability=self.physics['applicability'],exported_files=sorted(p.name for p in folder.iterdir()),
             execution_plan=self.execution,control_identity=self.scene['control']['identity'])
         self.result=BackendResult(solver_status='completed' if complete else 'failed',backend_id=self.backend_id,model_id=self.execution['implementation_model_id'],
-            signals=export(rows,self.physics),data=Payload(contract='family.backend_data',data=data.model_dump(mode='json')),
+            signals=export(rows,self.physics,self.scene['control']['mode']=='tension_reference'),
+            data=Payload(contract='family.backend_data',data=data.model_dump(mode='json')),
             limitations=[self.physics['applicability']['collision'],'Ideal length servos, tension only, slack gives zero tension; no motor inertia.',
                 'MATLAB lowest-envelope-vertex penalty and MuJoCo convex contact differ; no contact accuracy claim.'],initial_state=self.initial,seed=self.inp.seed)
         atomic_json(folder/'result.json',self.result.model_dump(mode='json')); return self.result
@@ -95,6 +99,7 @@ class MatlabBackend:
             out=json.loads(raw.read_text(encoding='utf8')); self.timings['solve']=out['solve_s']
             # MATLAB jsonencode represents a length-one numeric vector as scalar.
             vector_fields=('qpos_rad','qvel_rad_s','actuator_command','command_m','tendon_length_m','target_lengths_m',
+                'requested_tension_n','desired_tension_n','predicted_tension_n','tension_tracking_error_n',
                 'solver_tendon_length_m','tension_n','solver_qfrc_actuator_nm','solver_qfrc_passive_nm','external_torque_nm','contact_normal_approx_n')
             for row in out['trajectory']+out['observations']:
                 for key in vector_fields:
@@ -167,6 +172,6 @@ class MujocoBackend(MatlabBackend):
             rows.append(dict(time_s=(step+1)*dt,solver_time_s=t,tip_m=data.site_xpos[model.site('tip_site').id].tolist(),
                 qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),actuator_command=self.controller.u.tolist(),command_m=target.tolist(),
                 tendon_length_m=data.ten_length[tids].tolist(),body_positions_m=data.xpos[bids].tolist(),
-                body_rotations=data.xmat[bids].reshape(-1,3,3).tolist(),tendon_routes_m=routes,**before))
+                body_rotations=data.xmat[bids].reshape(-1,3,3).tolist(),tendon_routes_m=routes,**self.controller.last,**before))
         self.timings['solve']=time.perf_counter()-start
         return rows,self.controller.observations,complete,reason,steps

@@ -157,13 +157,25 @@ class Initial(Contract):
 
 
 class Control(Contract):
-    mode: Literal['deterministic', 'tip_feedback'] = 'tip_feedback'
+    mode: Literal['deterministic', 'tip_feedback', 'tension_reference'] = 'tip_feedback'
     reference: 'Reference | None' = None
     commands: dict[str, float] = Field(default_factory=dict)
+    desired_tendon_tensions_n: list[Annotated[FiniteFloat, Field(ge=0)]] = Field(default_factory=list)
     ramp_s: float = Field(default=.1, gt=0)
     feedback_gain: float = Field(default=1., gt=0)
     damping: float = Field(default=.01, gt=0)
     max_joint_update_rad: float = Field(default=.02, gt=0)
+
+    @model_validator(mode='after')
+    def mode_reference(self):
+        if self.mode == 'tension_reference':
+            if not self.desired_tendon_tensions_n:
+                raise ValueError('TENSION_REFERENCE_REQUIRED')
+            if self.reference is not None or self.commands:
+                raise ValueError('TENSION_REFERENCE_IS_ORDERED_VECTOR_ONLY')
+        elif self.desired_tendon_tensions_n:
+            raise ValueError('TENSION_REFERENCE_MODE_REQUIRED')
+        return self
 
 
 class Reference(Contract):

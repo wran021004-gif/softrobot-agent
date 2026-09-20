@@ -14,19 +14,25 @@ def prepare(root,offline=False):
     config=load('configs/deepseek.yaml')
     value['policy']['model']=dict(adapter='offline' if offline else 'deepseek',model=config['model'],
         base_url=config['base_url'],thinking=config['thinking'],max_tokens=config['max_tokens'],
-        timeout_s=config['timeout_s'],context_bytes=config['max_input_bytes'],max_turns=10)
-    value['policy']['budget'].update(model_calls=10,backend_solves=4,tool_calls=60,wall_s=3600.)
+        timeout_s=config['timeout_s'],context_bytes=config['max_input_bytes'],max_turns=16)
+    value['policy']['budget'].update(model_calls=16,backend_solves=4,tool_calls=60,wall_s=3600.)
     value['policy']['allowed_tools']=[]
     value['policy']['tool_bindings']={
         'route.advance':'1.0.0','route.inspect':'1.0.0','simulation.run':'1.0.0',
         'evaluation.run':'1.0.0','evidence.read':'1.0.0','session.control':'1.0.0',
-        'diagnostics.saved_trajectory':'2.0.0','visualization.render_simulation_video':'2.0.0'}
+        'diagnostics.saved_trajectory':'2.0.0','visualization.render_simulation_video':'2.0.0',
+        'kinematics.pcc_describe':'1.0.0','kinematics.pcc_forward':'2.0.0',
+        'dynamics.gvs_describe':'1.0.0','dynamics.gvs_evaluate':'2.0.0',
+        'dynamics.gvs_build_system':'2.0.0','statics.gvs_equilibrium':'1.0.0',
+        'linearization.linearize':'2.0.0','control.lqr_describe':'2.0.0',
+        'control.lqr_synthesize':'1.0.0','optimization.describe':'1.0.0',
+        'optimization.assemble':'1.0.0','optimization.solve':'1.0.0'}
     value['policy']['route']=dict(contract='family.route_policy',version='1.0.0',data=dict(
         source='User editable route.json assembled from inputs/experiment, design, space, execution, control; route.json becomes authority at start.',
         combinations={name:dict(dynamics_model=execution['dynamics_model'],backend=backend,controller=value['policy']['controller'])
             for name,backend in execution['backends'].items()},max_trials=3))
     atomic_json(root/'inputs/route.json',value)
-    project=read(root/'inputs/project.json');project['budget'].update(model_calls=10,tool_calls=60,backend_solves=4,wall_s=3600.)
+    project=read(root/'inputs/project.json');project['budget'].update(model_calls=16,tool_calls=60,backend_solves=4,wall_s=3600.)
     atomic_json(root/'inputs/project.json',project)
     return dict(input=str(root/'inputs/route.json'),project=str(root/'inputs/project.json'),
         adapter=value['policy']['model']['adapter'],note='Edit route.json before start. Frozen inputs cannot be changed on resume.')

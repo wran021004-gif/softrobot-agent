@@ -32,6 +32,11 @@ class ToolCallCountError(ToolProtocolError):
             expected=f'EXACTLY_ONE_TOOL_CALL_REQUIRED: received {count}')])
 
 
+class ModelLengthTruncationError(ValueError):
+    def __init__(self):
+        super().__init__('MODEL_RESPONSE_LENGTH_TRUNCATED: provider finish_reason="length"')
+
+
 class OfflineAdapter:
     adapter_id = 'offline'
     supports_images = False
@@ -90,6 +95,8 @@ class DeepSeekAdapter:
         if not choices:
             raise ToolProtocolError([dict(path='choices[0]', expected='Expected a choice containing message.tool_calls.')])
         choice = require(choices[0], dict, 'choices[0]', 'Expected a choice object.')
+        if choice.get('finish_reason') == 'length':
+            raise ModelLengthTruncationError()
         message = require(choice.get('message'), dict, 'choices[0].message', 'Expected a message object containing tool_calls.')
         calls = require(message.get('tool_calls') or [], list, 'choices[0].message.tool_calls', 'Expected an array containing exactly one function tool call.')
         if len(calls) != 1:
@@ -165,8 +172,12 @@ def input_for(host):
             'Call route.inspect and evidence.read in separate turns, never together. '
             'For normal route delivery use route.advance with action="finish". '
             'Use English for every explanation, reason and next_step. The compact route overview is already in context. '
+            'The overview contains the current combinations, baseline design, authorized parameter bounds, budgets and route state; '
+            'use evidence.read only for details omitted from it rather than rediscovering those facts. '
             'Build only constructs: it produces no task error or trajectory. Use run on a saved build to simulate and evaluate it without optimization. '
             'An evaluation may be valid even when task_success is false; deliver that fact honestly. '
+            'Prefer zero-backend scientific analysis or explicit optimization when it can reduce expensive simulation trial-and-error. '
+            'Simulation remains the validation authority; mathematical models are approximations and may be skipped when irrelevant. '
             'Stop explicitly when information or capability is missing. '
             'If protocol_correction is present, follow its correction requirement in this response.'))])
 
@@ -219,7 +230,9 @@ def run_loop(host, adapter=None):
                 return session
             if state['turn'] >= config['max_turns']:
                 if state.get('protocol_correction'):
-                    return _stop(host, 'failed', 'MODEL_PROTOCOL_CORRECTION_BUDGET_EXHAUSTED: MODEL_TURN_LIMIT')
+                    reason = ('MODEL_LENGTH_RETRY_BUDGET_EXHAUSTED' if state['protocol_correction'].get('type') == 'length_truncation'
+                              else 'MODEL_PROTOCOL_CORRECTION_BUDGET_EXHAUSTED')
+                    return _stop(host, 'failed', reason + ': MODEL_TURN_LIMIT')
                 return _stop(host, 'stopped', 'MODEL_TURN_LIMIT')
             pending = state.get('pending')
             if pending is None:
@@ -287,6 +300,8 @@ def run_loop(host, adapter=None):
                                 host.store.mark_unknown(host.run_id, request_id)
                                 return _stop(host, 'needs_input', 'MODEL_TRANSPORT_TIMEOUT_UNKNOWN')
                             failure = dict(error=str(exc), response=plain(raw_ref) if raw_ref else None)
+                            if isinstance(exc, ModelLengthTruncationError):
+                                failure.update(length_truncated=True, finish_reason='length')
                             if isinstance(exc, ToolProtocolError):
                                 failure['protocol_errors'] = exc.issues
                             if isinstance(exc, ToolCallCountError):
@@ -305,8 +320,10 @@ def run_loop(host, adapter=None):
                         host.store.update_state(db, host.run_id, state)
                 except (ValueError, TypeError) as exc:
                     if state.get('protocol_correction'):
-                        reason = ('MODEL_PROTOCOL_CORRECTION_BUDGET_EXHAUSTED' if 'BUDGET_EXHAUSTED' in str(exc)
-                                  else 'MODEL_PROTOCOL_CORRECTION_FAILED')
+                        length = state['protocol_correction'].get('type') == 'length_truncation'
+                        reason = (('MODEL_LENGTH_RETRY_BUDGET_EXHAUSTED' if length else 'MODEL_PROTOCOL_CORRECTION_BUDGET_EXHAUSTED')
+                                  if 'BUDGET_EXHAUSTED' in str(exc) else
+                                  ('MODEL_LENGTH_RETRY_FAILED' if length else 'MODEL_PROTOCOL_CORRECTION_FAILED'))
                         return _stop(host, 'failed', reason + ': ' + str(exc))
                     return _stop(host, 'budget_exhausted' if 'BUDGET_EXHAUSTED' in str(exc) else 'needs_input', str(exc))
             # Same request identity on crash recovery. The host supplies model caller.
@@ -341,7 +358,7 @@ def run_loop(host, adapter=None):
 
 
 def _model_failure(host, receipt):
-    """One durable protocol correction per session, also replayable after receipt commit.
+    """Bounded durable corrections, also replayable after receipt commit.
 
     The invalid response is settled once. Advancing the turn atomically with the
     correction gives the next request a new identity and consumes the same limits.
@@ -349,6 +366,23 @@ def _model_failure(host, receipt):
     """
     failure = host.store.artifact(receipt['output']) if receipt.get('output') else {}
     state = host.store.session(host.run_id)['state']
+    truncated = failure.get('length_truncated') and failure.get('finish_reason') == 'length'
+    if truncated and not state.get('length_retries_used', 0):
+        with host.store.transaction() as db:
+            state = host.store.session(host.run_id, db)['state']
+            state['length_retries_used'] = 1
+            state['protocol_correction'] = dict(
+                type='length_truncation', request_id=receipt['request_id'], response=failure['response'],
+                finish_reason='length', errors=[], requirement=(
+                    'Your previous response was truncated before the tool call completed. '
+                    'Do not repeat the analysis. Return exactly one complete tool call now.'))
+            state['turn'] += 1
+            host.store.update_state(db, host.run_id, state)
+            ref = host.store.put(db, state['protocol_correction'])
+            host.store.event(db, host.run_id, 'model_length_recovery', 'scheduled',
+                request=receipt['request_id'], execution=receipt['execution_id'],
+                inputs=[receipt['output']], outputs=[ref])
+        return None
     malformed = 'protocol_errors' in failure or 'tool_call_count' in failure
     if malformed and not state.get('protocol_corrections_used', 0):
         with host.store.transaction() as db:
@@ -375,7 +409,11 @@ def _model_failure(host, receipt):
                 inputs=[receipt['output']], outputs=[ref])
         return None
     reason = receipt.get('error') or 'MODEL_RESPONSE_FAILED'
-    if state.get('protocol_correction') or malformed:
+    if truncated:
+        reason = 'MODEL_LENGTH_RETRY_FAILED: ' + reason
+    elif state.get('protocol_correction', {}).get('type') == 'length_truncation':
+        reason = 'MODEL_LENGTH_RETRY_FAILED: ' + reason
+    elif state.get('protocol_correction') or malformed:
         reason = 'MODEL_PROTOCOL_CORRECTION_FAILED: ' + reason
     return _stop(host, 'failed', reason)
 
