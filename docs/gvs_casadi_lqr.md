@@ -38,20 +38,30 @@ continues to fail with `CONTROL_BACKEND_ADAPTER_REQUIRED`.
 `controller.gvs_lqr@1.0.0` is the separate backend-executable composition. It
 projects the compiled serial-cell `qpos/qvel` state into the unchanged GVS
 first-order basis, applies the existing continuous LQR law, and sends its
-bounded tendon tensions through the shared `execute_tension_reference` bridge.
+bounded tendon tensions to the selected backend. Normal
+`backend.family_mujoco` execution uses `execute_ideal_tension`: each tension is
+clipped to its frozen force limit and applied by a direct tendon-force actuator.
+Transmission inversion, actuator travel/rate limits, and the length servo are
+not part of this normal path. The old length-servo bridge remains available to
+the explicit development comparison, but Route rejects it as a combination.
 The projector rotates each principal-axis hinge angle into its segment frame,
 divides by the real compiled cell length, then least-squares fits
 `[1, 2*s/L-1]` independently for y/z curvature and rate. At least two cells per
-flexible segment are required. MuJoCo actuator travel/rate and tendon force
-limits remain authoritative. Runtime traces retain projected state, projection
-residual, state error, raw/bounded/measured tension, and saturation flags.
+flexible segment are required. Runtime traces retain projected state,
+projection residual, state error, raw/bounded/measured tension, tendon length,
+length change, length rate, and saturation flags.
 
-Executable controller parameters contain the verified GVS equilibrium `q0/u0`
-and semantic LQR weights. The composition reconstructs the existing
-`DynamicSystem -> LinearizedModel -> ContinuousLQRController` chain at build
-time; it does not implement another Riccati solver. Time-window external forces
-are omitted only from the nominal GVS equilibrium/linearization because GVS v1
-does not model them, while the frozen backend task continues to apply them.
+Executable controller parameters are now a candidate-independent recipe:
+semantic LQR weights and the `gvs_inverse_tip_static` operating-point strategy.
+For each physical candidate, scene resolution runs the existing inverse-tip
+IPOPT assembly against the frozen target, refines it with
+`statics.gvs_equilibrium`, then reconstructs the existing
+`GVSModel -> DynamicSystem -> CasadiLinearizer -> ContinuousLQRController`
+chain. Candidate control evidence records operating-point, linearization, gain,
+and final control identities. `q0`, `u0`, and `K` are derived artifacts and are
+not Route/LLM inputs. Time-window external forces are omitted only from the
+nominal GVS equilibrium/linearization because GVS v1 does not model them, while
+the frozen backend task continues to apply them.
 
 The compact public chain is:
 

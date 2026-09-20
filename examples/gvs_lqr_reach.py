@@ -62,16 +62,14 @@ def run(root,tendon_weight=1.):
     from schemas.platform import EvaluationResult
     from tools.platform_host import Host
     from tools.platform_store import Store
-    from tools.state_io import atomic_json
+    from tools.state_io import atomic_json, read
 
     root=Path(root).resolve();root.mkdir(parents=True,exist_ok=False)
     design=example_design();value=session('family_mujoco',design,design_space(design))
     value['run_id']='gvs-lqr-reach'
     value['policy']['budget'].update(model_calls=0,tool_calls=100,backend_solves=6,wall_s=3600.)
-    point=operating_point(value)
     value['policy']['controller']={'extension_id':'controller.gvs_lqr','version':'1.0.0','parameters':{
         'contract':'family.gvs_lqr_control','version':'1.0.0','data':{
-            'equilibrium_q':point['q0'],'equilibrium_tensions_n':point['u0'],
             'curvature_weight':1.,'state_rate_weight':.1,'tendon_tension_weight':tendon_weight,
             'operating_point_source':'gvs_inverse_tip_static'}}}
     value['policy']['tool_bindings'].update({'simulation.run':'1.0.0','evaluation.run':'1.0.0'})
@@ -87,7 +85,8 @@ def run(root,tendon_weight=1.):
         'arguments':{'result':simulation['output'],'execution_id':simulation['execution_id']}})
     if evaluation['execution_status']!='completed': raise ValueError('EVALUATION_FAILED: '+str(evaluation))
     outcome=EvaluationResult.model_validate(host.store.artifact(evaluation['output']))
-    result=dict(operating_point=point,controller=value['policy']['controller'],simulation=simulation,evaluation=evaluation,
+    control_spec=read(root/'sessions'/value['run_id']/'executions'/simulation['execution_id']/'backend'/'control_spec.json')
+    result=dict(operating_point=control_spec['reference']['derivation'],controller=value['policy']['controller'],simulation=simulation,evaluation=evaluation,
         outcome=outcome.model_dump(mode='json'),usage=host.store.remaining(value['run_id']))
     atomic_json(root/'study.json',result);atomic_json(root/'input.json',value)
     print(json.dumps(result,indent=2));return result

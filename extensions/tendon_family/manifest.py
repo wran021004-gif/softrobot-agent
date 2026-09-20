@@ -89,9 +89,8 @@ EXTENSIONS=[
         capabilities=dict(category='control',role='adapter',channel='actuator_commands',backend_executable=True,
             command_space='desired_tendon_tension',observations=['joint_position','joint_velocity','tendon_length'],
             state_projector='backend_discrete_to_gvs_first_order_v1',model_requirement=dict(input='none'),
-            tension_execution_modes=dict(
-                ideal_tension='Direct bounded tendon force in supporting simulation backends; isolates model/controller behavior from actuator dynamics.',
-                actuator_realistic='Existing tendon-length servo, transmission, actuator velocity and travel limits.'),
+            derived_artifacts=['candidate_gvs_equilibrium','candidate_dynamic_system','candidate_linearization','candidate_lqr_gain'],
+            backend_execution='backend.family_mujoco deterministically applies clipped desired tendon force directly',
             composition=['model.gvs','linearizer.casadi','controller.lqr','backend_tension_execution'],reset=True,restore=False)),
     Extension('candidate.family','candidate_builder','1.0.0',c.Space,SessionInput,'extensions.tendon_family.candidate:apply',
         'Candidate construction from numerical, integer, option and complete structure template choices',**COMMON,capabilities=dict(category='robot_design',role='adapter',
@@ -122,7 +121,9 @@ for name,binding,model,deps,resources in [
             sections=['circle','tube','ellipse','rectangle','simple polygon with holes'],
             routing='ordered body/physical-segment stations, straight frictionless spans, intermediate anchors',
             transmission='independent/shared ideal displacement or drum rotation; winding sign; travel/speed and per-tendon force limits',
-            tendon_tension_execution=(['ideal_tension','actuator_realistic'] if name=='family_mujoco' else ['actuator_realistic']),
+            tendon_tension_execution=(dict(controller_gvs_lqr='direct_bounded_tendon_force',
+                controller_family_development=['ideal_tension','actuator_realistic']) if name=='family_mujoco'
+                else dict(controller_family='actuator_realistic')),
             descriptive_only=['discrete flexure','rigid tendon joint','branch','closed chain','cable parallel'],
             omissions=['material torsion','shear','axial stretch','rope elasticity','friction','self collision','motor dynamics'],
             operations=['compile','initialize','run','export','close'],timeout='internal solve deadline; engine startup/shutdown not hard bounded')

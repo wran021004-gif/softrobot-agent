@@ -1,4 +1,4 @@
-"""Prepare and run the bounded DeepSeek reach_free study with two GVS-LQR execution modes."""
+"""Prepare and run the bounded DeepSeek reach_free candidate-owned GVS-LQR study."""
 import argparse
 from copy import deepcopy
 import json
@@ -22,60 +22,55 @@ TOOLS={
     'optimization.assemble':'1.0.0','optimization.solve':'1.0.0'}
 
 
-def controller(point,mode):
+def controller():
     return {'extension_id':'controller.gvs_lqr','version':'1.0.0','parameters':{
         'contract':'family.gvs_lqr_control','version':'1.0.0','data':{
-            'equilibrium_q':point['q0'],'equilibrium_tensions_n':point['u0'],
             'curvature_weight':1.,'state_rate_weight':.1,'tendon_tension_weight':100.,
-            'operating_point_source':'gvs_inverse_tip_static','tension_execution_mode':mode}}}
+            'operating_point_source':'gvs_inverse_tip_static'}}}
 
 
-def prepare(root,base_input,comparison_path):
+def prepare(root,base_input):
     from examples.platform_fixtures import project
     from tools.platform_config import load
     from tools.platform_store import Store
 
     root=Path(root).resolve();inputs=root/'inputs';inputs.mkdir(parents=True,exist_ok=False)
-    value=read(base_input);comparison=read(comparison_path);point=comparison['operating_point']
+    value=read(base_input)
     value['run_id']='reach-free-gvs-lqr-route'
     value['policy']['candidate_builder']['parameters']['data']['control_parameters']={}
     deepseek=load('configs/deepseek.yaml')
     value['policy']['model']=dict(adapter='deepseek',model=deepseek['model'],base_url=deepseek['base_url'],
         thinking=deepseek['thinking'],max_tokens=deepseek['max_tokens'],timeout_s=deepseek['timeout_s'],
-        context_bytes=deepseek['max_input_bytes'],max_turns=32)
-    value['policy']['budget'].update(model_calls=32,tool_calls=120,backend_solves=8,wall_s=3600.)
+        context_bytes=deepseek['max_input_bytes'],max_turns=40)
+    value['policy']['budget'].update(model_calls=40,tool_calls=160,backend_solves=10,wall_s=3600.)
     value['policy']['allowed_tools']=[];value['policy']['tool_bindings']=TOOLS
     dynamics=deepcopy(value['policy']['dynamics_model']);mujoco=deepcopy(value['policy']['backend'])
     old_combinations=value['policy']['route']['data']['combinations']
-    combinations={
-        'gvs_lqr_ideal_tension':dict(dynamics_model=dynamics,backend=mujoco,controller=controller(point,'ideal_tension')),
-        'gvs_lqr_actuator_realistic':dict(dynamics_model=dynamics,backend=mujoco,controller=controller(point,'actuator_realistic'))}
+    combinations={'gvs_lqr_family_mujoco':dict(dynamics_model=dynamics,backend=mujoco,controller=controller())}
     for name in ('family_mujoco','matlab_spatial'):
-        if name in old_combinations: combinations['tip_feedback_'+name]=old_combinations[name]
-    project_value=project();project_value['budget'].update(model_calls=32,tool_calls=120,backend_solves=8,wall_s=3600.)
+        source_name='tip_feedback_'+name if 'tip_feedback_'+name in old_combinations else name
+        if source_name in old_combinations: combinations['tip_feedback_'+name]=old_combinations[source_name]
+    project_value=project();project_value['budget'].update(model_calls=40,tool_calls=160,backend_solves=10,wall_s=3600.)
     store=Store(root);store.create(project_value)
-    with store.transaction() as db: comparison_ref=store.put(db,comparison)
     value['policy']['route']={'contract':'family.route_policy','version':'1.0.0','data':{
-        'source':'Frozen reach_free input plus the completed controlled GVS-LQR execution-mode comparison.',
-        'combinations':combinations,'max_trials':4,
-        'guidance':('Select legal combinations and use scientific evidence autonomously. The controlled comparison is available as '
-            f'EvidenceRef {comparison_ref.model_dump(mode="json")}. It found exact ideal force tracking but does not mandate a mode or sequence. '
-            'Stop immediately after a valid frozen-evaluator task success; otherwise deliver the best valid evaluated candidate.')}}
+        'source':'Frozen reach_free input with candidate-owned GVS equilibrium, linearization, LQR and backend execution.',
+        'combinations':combinations,'max_trials':10,
+        'guidance':('Choose scientific strategy and authorized design changes autonomously. Every changed GVS-LQR robot is rebuilt with its own '
+            'equilibrium, linearization and LQR. Use optimize only for continuous numeric variables; select integer, choice, template and discretization '
+            'values through explicit build changes. Stop immediately after a valid frozen-evaluator task success; otherwise deliver the best valid evaluated candidate.')}}
     atomic_json(inputs/'route.json',value);atomic_json(inputs/'project.json',project_value)
-    atomic_json(inputs/'comparison_ref.json',comparison_ref.model_dump(mode='json'))
-    atomic_json(inputs/'operating_point.json',point)
-    return dict(input=str(inputs/'route.json'),project=str(inputs/'project.json'),comparison_ref=comparison_ref.model_dump(mode='json'),
+    return dict(input=str(inputs/'route.json'),project=str(inputs/'project.json'),
         model=value['policy']['model'],budget=value['policy']['budget'],combinations=list(combinations))
 
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action',choices=['prepare','start','resume','status','result'])
-    parser.add_argument('root');parser.add_argument('--base-input');parser.add_argument('--comparison')
+    parser.add_argument('root');parser.add_argument('--base-input')
     args=parser.parse_args(argv);root=Path(args.root).resolve()
     if args.action=='prepare':
-        if not args.base_input or not args.comparison: raise ValueError('--base-input and --comparison are required')
-        out=prepare(root,args.base_input,args.comparison)
+        if not args.base_input: raise ValueError('--base-input is required')
+        out=prepare(root,args.base_input)
     else:
         from extensions.tendon_family.route import create, view
         from tools.platform_host import Host

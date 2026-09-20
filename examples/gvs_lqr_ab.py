@@ -9,9 +9,6 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 
 import numpy as np
 
-from examples.gvs_lqr_reach import operating_point
-
-
 def signal_final(result,name,entity='tip'):
     signal=next(s for s in result['signals'] if s['spec']['name']==name and s['spec']['entity']==entity)
     return signal['values'][-1]
@@ -33,7 +30,6 @@ def run(root,base_input=None):
         baseline['policy']['candidate_builder']['parameters']['data']['control_parameters']={}
     else:
         baseline=session('family_mujoco',example_design(),design_space(example_design()))
-    point=operating_point(baseline)
     project_value=project();project_value['budget'].update(model_calls=0,tool_calls=12,backend_solves=2,wall_s=3600.)
     store=Store(root);store.create(project_value);runs={}
     for mode in ('ideal_tension','actuator_realistic'):
@@ -41,9 +37,9 @@ def run(root,base_input=None):
         value['policy']['budget'].update(model_calls=0,tool_calls=6,backend_solves=1,wall_s=1800.)
         value['policy']['controller']={'extension_id':'controller.gvs_lqr','version':'1.0.0','parameters':{
             'contract':'family.gvs_lqr_control','version':'1.0.0','data':{
-                'equilibrium_q':point['q0'],'equilibrium_tensions_n':point['u0'],
                 'curvature_weight':1.,'state_rate_weight':.1,'tendon_tension_weight':100.,
-                'operating_point_source':'gvs_inverse_tip_static','tension_execution_mode':mode}}}
+                'operating_point_source':'gvs_inverse_tip_static',
+                **({'development_execution_mode':'actuator_realistic'} if mode=='actuator_realistic' else {})}}}
         value['policy']['tool_bindings'].update({'simulation.run':'1.0.0','evaluation.run':'1.0.0'})
         host=Host(root,value['run_id']);host.create(value)
         simulation=host.invoke({'request_id':'ab-simulation','tool_id':'simulation.run','tool_version':'1.0.0',
@@ -58,6 +54,7 @@ def run(root,base_input=None):
         backend=root/'sessions'/value['run_id']/'executions'/simulation['execution_id']/'backend'
         with gzip.open(backend/'trajectory.json.gz','rt',encoding='utf-8') as stream: rows=json.load(stream)
         control_spec=read(backend/'control_spec.json')
+        point=control_spec['reference']['derivation']
         final_tip=signal_final(result,'tip_position')
         error=next(m['value'] for m in outcome['metrics'] if m['name']=='position_error')
         tracking=np.asarray([r['tension_tracking_error_n'] for r in rows])

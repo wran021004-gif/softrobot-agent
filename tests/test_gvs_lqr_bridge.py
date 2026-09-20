@@ -17,7 +17,7 @@ from tools.platform_registry import registry
 from tools.platform_tasks import compile_input
 
 
-def lqr_input(duration=.03,execution_mode='actuator_realistic'):
+def lqr_input(duration=.03,development_execution_mode=None):
     design=example_design();value=session('family_mujoco',design,design_space(design))
     value['task']['environment']['data']['external_forces']=[]
     value['task']['environment']['data']['environment']['gravity_m_s2']=[0.,0.,0.]
@@ -25,9 +25,8 @@ def lqr_input(duration=.03,execution_mode='actuator_realistic'):
     value['task']['sampling']['window_s']=[0.,duration]
     value['policy']['controller']={'extension_id':'controller.gvs_lqr','version':'1.0.0','parameters':{
         'contract':'family.gvs_lqr_control','version':'1.0.0','data':{
-            'equilibrium_q':[0.]*8,'equilibrium_tensions_n':[0.]*6,
             'curvature_weight':1.,'state_rate_weight':.1,'tendon_tension_weight':1.,
-            'tension_execution_mode':execution_mode}}}
+            **({'development_execution_mode':development_execution_mode} if development_execution_mode else {})}}}
     return design,value
 
 
@@ -68,28 +67,27 @@ class GVSProjectorAndController(unittest.TestCase):
         physics=physics_for(compiled);plan=assemble(compiled,physics)['control']
         controller=GVSLQRController(compiled.policy.controller.parameters.data,compiled.task.timing.control_period_s)
         controller.configure(physics,plan)
-        zero=np.zeros(len(physics['dofs']));zero_geometry=geometry(physics,zero)
-        controller.command(0.,zero_geometry,zero,zero)
+        q0=np.asarray(plan['reference']['equilibrium_q']);q,v=discretize(physics,design,q0,np.zeros(8))
+        controller.command(0.,geometry(physics,q),q,v)
         np.testing.assert_allclose(controller.last['raw_desired_tension_n'],controller.u0,atol=1e-12)
         controller.configure(physics,plan)
         delta=np.array([.01,-.005,.004,0.,-.006,.003,0.,-.002]+[0.]*8)
-        q,v=discretize(physics,design,delta[:8],delta[8:])
+        q,v=discretize(physics,design,q0+delta[:8],delta[8:])
         g=geometry(physics,q)
         controller.command(0.,g,q,v)
         expected=controller.u0-controller.K@delta
         np.testing.assert_allclose(controller.last['raw_desired_tension_n'],expected,atol=1e-10)
         self.assertTrue(np.all(np.asarray(controller.last['desired_tension_n'])>=0.))
         self.assertTrue(np.all(np.asarray(controller.last['desired_tension_n'])<=8.))
-        speed=np.array([a['velocity_limit'] for a in physics['actuators']])
-        self.assertTrue(np.all(np.abs(controller.u)<=speed*controller.period_s+1e-15))
+        self.assertIsNone(controller.u)
         self.assertEqual(len(controller.last['projected_gvs_q']),8)
         self.assertIn('gvs_projection_residual_max_rad_m',controller.last)
-        self.assertEqual(plan['mapping']['bridge'],'execute_tension_reference')
+        self.assertEqual(plan['mapping']['bridge'],'execute_ideal_tension')
         self.assertFalse(self.reg.get('controller.lqr','1.0.0','controller').capabilities['backend_executable'])
         self.assertTrue(self.reg.get('controller.gvs_lqr','1.0.0','controller').capabilities['backend_executable'])
 
-    def test_short_mujoco_closed_loop_is_finite(self):
-        _,value=lqr_input();inp=SessionInput.model_validate(compile_input(value)['input'])
+    def test_historical_development_length_servo_remains_finite(self):
+        _,value=lqr_input(development_execution_mode='actuator_realistic');inp=SessionInput.model_validate(compile_input(value)['input'])
         backend=MujocoBackend();controller=GVSLQRController(inp.policy.controller.parameters.data,inp.task.timing.control_period_s)
         backend.compile(inp,self.reg);backend.initialize(Payload(contract='family.initial',data={}),controller)
         directory=Path('runs/gvs_lqr_smoke_test/backend').resolve()
@@ -98,11 +96,12 @@ class GVSProjectorAndController(unittest.TestCase):
         self.assertEqual(backend.scene['control']['mode'],'gvs_lqr')
         self.assertTrue(all(np.isfinite(row['qpos_rad']).all() and np.isfinite(row['qvel_rad_s']).all()
             for row in backend.controller.observations))
+        self.assertEqual(backend.scene['control']['tension_execution_mode'],'actuator_realistic')
         self.assertTrue(all('projected_gvs_q' in row and 'desired_tension_n' in row
             and 'actuator_saturated' in row for row in backend.controller.observations))
 
     def test_short_ideal_tension_mujoco_is_direct_finite_and_observable(self):
-        _,value=lqr_input(execution_mode='ideal_tension')
+        _,value=lqr_input()
         inp=SessionInput.model_validate(compile_input(value)['input'])
         backend=MujocoBackend();controller=GVSLQRController(
             inp.policy.controller.parameters.data,inp.task.timing.control_period_s)
@@ -125,6 +124,20 @@ class GVSProjectorAndController(unittest.TestCase):
         desired={s.spec.entity:np.asarray(s.values) for s in result.signals if s.spec.name=='desired_tendon_tension'}
         actual={s.spec.entity:np.asarray(s.values) for s in result.signals if s.spec.name=='tendon_tension'}
         for entity in desired: np.testing.assert_allclose(actual[entity],desired[entity],atol=1e-12)
+
+    def test_geometry_change_regenerates_operating_point_linearization_and_gain(self):
+        from tools.platform_tools import _candidate
+        _,value=lqr_input();baseline=SessionInput.model_validate(compile_input(value)['input'])
+        first=assemble(baseline,physics_for(baseline))['control']
+        changed=_candidate(baseline,{'components/near/length_m':.18},self.reg)
+        second=assemble(changed,physics_for(changed))['control']
+        self.assertNotEqual(first['reference']['operating_point_identity'],second['reference']['operating_point_identity'])
+        self.assertNotEqual(first['algorithm']['dynamic_system_identity'],second['algorithm']['dynamic_system_identity'])
+        self.assertNotEqual(first['algorithm']['linearization_identity'],second['algorithm']['linearization_identity'])
+        self.assertNotEqual(first['algorithm']['gain_identity'],second['algorithm']['gain_identity'])
+        self.assertNotEqual(first['identity'],second['identity'])
+        self.assertNotEqual(first['reference']['equilibrium_q'],second['reference']['equilibrium_q'])
+        self.assertNotEqual(first['reference']['equilibrium_tensions_n'],second['reference']['equilibrium_tensions_n'])
 
 
 if __name__=='__main__': unittest.main()

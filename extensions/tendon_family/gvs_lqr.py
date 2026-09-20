@@ -1,9 +1,11 @@
-"""Backend-executable composition of GVS projection, existing LQR, and tension execution."""
+"""Candidate-owned GVS equilibrium/LQR composition and backend tension execution."""
+from copy import deepcopy
 import numpy as np
 
-from schemas.platform_math import SystemContext
+from schemas.platform import Binding, Payload
+from schemas.platform_math import ConstraintSelection, ObjectiveSelection, OptimizationSpecification, SystemContext
 from tools.state_io import digest
-from .contracts import GVSModelParameters, GVSLQRControl, LQRParameters
+from .contracts import GVSInverseAssemblerParameters, GVSModelParameters, GVSLQRControl, GVSEquilibriumRequest, LQRParameters
 from .control import execute_ideal_tension, execute_tension_reference
 from .gvs import GVSModel, coordinate_order, forward_kinematics
 from .gvs_casadi import CasadiLinearizer, ContinuousLQRController
@@ -17,19 +19,78 @@ def _nominal_environment(environment):
     return value
 
 
+_OPERATING_POINTS = {}
+
+
+def _candidate_operating_point(inp):
+    """Compose the existing inverse/static tools for this physical candidate."""
+    from extensions.optimization.ipopt import IpoptSolver
+    from tools.platform_optimization import assemble_optimization
+    from tools.platform_registry import registry
+    from .gvs_casadi import gvs_equilibrium_tool
+    from .scientific_optimization import gvs_authorization
+
+    nominal=inp.model_copy(deep=True)
+    nominal.task.environment.data['external_forces']=[]
+    design=nominal.robot.structure.data
+    coordinates=coordinate_order(design);tendons=[t['id'] for t in design['tendons']]
+    key=digest(dict(design=design,environment=nominal.task.environment.model_dump(mode='json'),
+        target=nominal.task.goal.data['target_m'],source='gvs_inverse_tip_static_v1'))
+    if key in _OPERATING_POINTS:
+        return deepcopy(_OPERATING_POINTS[key])
+    reg=registry();q_paths=['q/'+name for name in coordinates]
+    tension_paths=['tendon_tensions_n/'+name for name in tendons]
+    binding=Binding(extension_id='optimization_assembler.gvs_inverse',parameters=Payload(
+        contract='family.gvs_inverse_assembler_parameters',data=GVSInverseAssemblerParameters(
+            template='inverse_tip_static').model_dump(mode='json')))
+    parameters=reg.bind(binding,'optimization_assembler')[1]
+    space=gvs_authorization(nominal.robot,reg.parse(nominal.policy.candidate_builder.parameters).model_dump(mode='json'),parameters)
+    initial={name:0. for name in q_paths}
+    initial.update({'tendon_tensions_n/'+t['id']:min(float(t['force_limit_n']),max(float(t['pretension_n']),.2))
+        for t in design['tendons']})
+    problem=assemble_optimization(reg,binding,task=nominal.task,robot=nominal.robot,space=space,
+        mathematical_model=reg.mathematical_model(Binding(extension_id='model.gvs',parameters=Payload(
+            contract='family.gvs_model',data={}))),
+        specification=OptimizationSpecification(variables=q_paths+tension_paths,
+            objectives=[ObjectiveSelection(template_id='tip_position_error_squared')],
+            constraints=[ConstraintSelection(template_id='static_equilibrium'),
+                ConstraintSelection(template_id='tendon_force_bounds')],initial_guess=initial),
+        context=SystemContext(x0=[],u0=[],scene=nominal.task.environment))
+    solved=IpoptSolver({'max_iterations':500,'tolerance':1e-9}).solve(problem)
+    if solved.status!='converged' or solved.constraint_violation>1e-7:
+        raise ValueError('GVS_OPERATING_POINT_INVERSE_FAILED: status='+solved.status+
+            ', constraint_violation='+str(solved.constraint_violation))
+    q0=[solved.optimum[name] for name in q_paths]
+    u0=[solved.optimum[name] for name in tension_paths]
+    from types import SimpleNamespace
+    refined=gvs_equilibrium_tool(SimpleNamespace(input=nominal,reg=reg),GVSEquilibriumRequest(
+        tendon_tensions_n=dict(zip(tendons,u0)),initial_q=q0,tolerance=1e-16,max_iterations=20))
+    if not refined.converged:
+        raise ValueError('GVS_OPERATING_POINT_REFINEMENT_FAILED: residual='+str(refined.residual_norm))
+    point=dict(q0=refined.q_equilibrium,u0=u0,coordinate_order=coordinates,tendon_order=tendons,
+        inverse_objective_value=solved.objective_value,inverse_constraint_violation=solved.constraint_violation,
+        inverse_iterations=solved.iterations,refined_equilibrium_residual_norm=refined.residual_norm,
+        refinement_iterations=refined.iterations,source='gvs_inverse_tip_static',candidate_model_identity=key,
+        nominalization='Only time-window external forces omitted; frozen target and backend task are unchanged.')
+    point['identity']=digest(point)
+    _OPERATING_POINTS[key]=deepcopy(point)
+    return point
+
+
 def resolve_gvs_lqr_control(inp,physics):
     c=GVSLQRControl.model_validate(inp.policy.controller.parameters.data)
     design=inp.robot.structure.data
     order=coordinate_order(design);tendon_order=[t['entity'] for t in physics['tendons']]
-    if len(c.equilibrium_q)!=len(order): raise ValueError('GVS_LQR_Q0_DIMENSION_MISMATCH')
-    if len(c.equilibrium_tensions_n)!=len(tendon_order): raise ValueError('GVS_LQR_U0_DIMENSION_MISMATCH')
+    point=_candidate_operating_point(inp);q0=point['q0'];u0=np.asarray(point['u0'],dtype=float)
+    if len(q0)!=len(order): raise ValueError('GVS_LQR_Q0_DIMENSION_MISMATCH')
+    if len(u0)!=len(tendon_order): raise ValueError('GVS_LQR_U0_DIMENSION_MISMATCH')
     limits=np.array([t['force_limit_n'] for t in physics['tendons']])
-    u0=np.asarray(c.equilibrium_tensions_n,dtype=float)
     if np.any(u0>limits): raise ValueError('GVS_LQR_U0_FORCE_LIMIT_EXCEEDED')
     parameters=GVSModelParameters()
-    x0=[*c.equilibrium_q,*([0.]*len(order))]
+    x0=[*q0,*([0.]*len(order))]
     system=GVSModel(parameters).build_system(inp.robot,parameters,None,SystemContext(
         x0=x0,u0=u0.tolist(),scene=_nominal_environment(inp.task.environment)))
+    dynamic_system_identity=digest(system.model_dump(mode='json'))
     linear=CasadiLinearizer().linearize(system)
     state_names=[spec.name for spec in linear.state_definition]
     unknown=set(c.state_weight_overrides)-set(state_names)
@@ -42,12 +103,16 @@ def resolve_gvs_lqr_control(inp,physics):
     lqr=ContinuousLQRController(lqr_parameters);K=lqr.configure_model(linear)
     gain_identity=digest(dict(K=K.tolist(),Q_diagonal=qdiag,R_diagonal=rdiag,x0=x0,u0=u0.tolist(),
         tendon_order=tendon_order,force_limits_n=limits.tolist()))
-    local_tip=forward_kinematics(design,c.equilibrium_q,samples_per_segment=2)['tip_position_m']
+    linearization_identity=digest(linear.model_dump(mode='json'))
+    local_tip=forward_kinematics(design,q0,samples_per_segment=2)['tip_position_m']
     assembly=inp.task.environment.data
     rotation=quaternion_wxyz_to_rotation(assembly['mount']['quaternion_wxyz'])
     world_tip=(rotation@local_tip+np.asarray(assembly['mount']['position_m'])).tolist()
     projector=projector_description(physics,design)
-    if c.tension_execution_mode=='ideal_tension':
+    if inp.policy.backend.extension_id!='backend.family_mujoco':
+        raise ValueError('GVS_LQR_BACKEND_EXECUTION_UNSUPPORTED: '+inp.policy.backend.extension_id)
+    execution_mode=c.development_execution_mode or 'ideal_tension'
+    if execution_mode=='ideal_tension':
         mapping=dict(id='direct_bounded_tendon_tension_v1',bridge='execute_ideal_tension',tendon_order=tendon_order,
             force_limits_n=limits.tolist(),order=['project_backend_state','continuous_lqr','clip_tendon_force',
                 'apply_direct_backend_tendon_force'],
@@ -59,19 +124,24 @@ def resolve_gvs_lqr_control(inp,physics):
             order=['project_backend_state','continuous_lqr','clip_tendon_force','solve_transmission_minimum_norm',
                 'rate_limit_actuator_command','clip_actuator_travel','apply_length_servo'])
         lifecycle=dict(initialize='zero actuator command; observe actual backend state',reset='zero command and clear observations',restore='not implemented')
-    plan=dict(mode='gvs_lqr',tension_execution_mode=c.tension_execution_mode,
+    plan=dict(mode='gvs_lqr',tension_execution_mode=execution_mode,
         reference=dict(kind='gvs_equilibrium',target_world_m=list(inp.task.goal.data['target_m']),
-        equilibrium_q=list(c.equilibrium_q),equilibrium_tensions_n=u0.tolist(),tendon_order=tendon_order,
-        source=c.operating_point_source,nominal_external_forces='omitted_from_GVS_operating_point_but_retained_in_backend_task'),
+        equilibrium_q=list(q0),equilibrium_tensions_n=u0.tolist(),tendon_order=tendon_order,
+        source=c.operating_point_source,operating_point_identity=point['identity'],derivation=point,
+        nominal_external_forces='omitted_from_GVS_operating_point_but_retained_in_backend_task'),
         algorithm=dict(id='gvs_lqr_tension_composition_v1',equation='u=clip(u0-K@(project(q,qdot)-x0),0,force_limit)',
             x0=x0,u0=u0.tolist(),K=K.tolist(),Q_diagonal=qdiag,R_diagonal=rdiag,
-            gain_identity=gain_identity,gain_source='deterministic existing Linearizer + ContinuousLQRController at build time',
+            gain_identity=gain_identity,dynamic_system_identity=dynamic_system_identity,
+            linearization_identity=linearization_identity,
+            gain_source='deterministic existing Linearizer + ContinuousLQRController at candidate build time',
             linearized_drift_norm_inf=float(np.linalg.norm(np.asarray(linear.drift),ord=np.inf)),
             lqr_implementation='ContinuousLQRController',projector=projector),
         mapping=mapping,
         timing=dict(period_s=inp.task.timing.control_period_s,observation='interval_start_pre_step'),
         lifecycle=lifecycle,
-        effective_parameters=c.model_dump(mode='json'),predicted_equilibrium_tip_world_m=world_tip,
+        effective_parameters=c.model_dump(mode='json',exclude_none=True),backend_execution_source=(
+            'development comparison override' if c.development_execution_mode else 'backend.family_mujoco fixed semantics'),
+        predicted_equilibrium_tip_world_m=world_tip,
         projector_id=PROJECTOR_ID)
     plan['identity']=digest(plan)
     return plan

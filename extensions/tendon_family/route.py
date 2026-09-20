@@ -27,7 +27,7 @@ class RouteAction(Contract):
     action: Literal['build','run','optimize','diagnose','crosscheck','video','finish'] = Field(description='build constructs only; run simulates and evaluates a saved build; optimize searches and evaluates; diagnose analyzes saved results; crosscheck executes independently; video renders saved results; finish delivers an evaluated candidate.')
     combination: str | None = Field(default=None, description='Authorized combination name. Required for build, optimize without source_node, and crosscheck. With an optimization source, omit to preserve its bindings; an explicit choice must match them.')
     changes: dict = Field(default_factory=dict, description='build/optimize only: edits from the declared space, including template, physical paths, discretization paths and control/ paths. Applied to the source configuration, or the frozen baseline when no source is supplied.')
-    variables: dict[str, tuple[float,float]] = Field(default_factory=dict, description='optimize only, required: variables[path] = [lower_bound, upper_bound], a continuous interval, NOT two requested samples. Bounds must be within the authorized space and include the starting value.')
+    variables: dict[str, tuple[float,float]] = Field(default_factory=dict, description='optimize only, required: continuous numeric variables[path] = [lower_bound, upper_bound], a continuous interval, NOT two requested samples. Integer, choice, template, and discretization changes belong in explicit changes. Bounds must be within the authorized space and include the starting value.')
     max_trials: int = Field(default=1,ge=1,description='Maximum optimizer proposals, bounded by route max_trials; independent of single run, which needs one solve. Duplicate proposals may reuse saved results.')
     source_node: Identifier | None = Field(default=None, description='Completed node_id: run requires build; optimize accepts build/run/optimize; diagnose/crosscheck/video/finish require a valid evaluated run or optimize node. Never an artifact ID.')
     candidate_id: str | None = Field(default=None, description='Optional candidate label on build; selects an optimization trial on later actions, defaulting to its best valid trial. A single run preserves the build candidate label.')
@@ -52,6 +52,9 @@ def policy(inp):
 def selected(inp, spec, name, reg):
     if name not in spec.combinations: raise ValueError('COMBINATION_NOT_AUTHORIZED')
     choice=spec.combinations[name]
+    if (choice.controller.extension_id=='controller.gvs_lqr' and
+            choice.controller.parameters.data.get('development_execution_mode') is not None):
+        raise ValueError('DEVELOPMENT_TENSION_EXECUTION_NOT_ROUTE_SELECTABLE')
     for kind in ('dynamics_model','backend','controller'):
         definition,_=reg.bind(getattr(choice,kind),kind)
         capability=reg.inspect(definition,{definition.extension_id:definition.version})
@@ -137,7 +140,6 @@ def overview(host):
             {k:n[k] for k in ('node_id','action','status','result','error') if k in n} for n in nodes[-8:]]),
         combinations={name:dict(dynamics_model=c['dynamics_model']['extension_id'],backend=c['backend']['extension_id'],
             controller=c['controller']['extension_id'],
-            tension_execution_mode=c['controller']['parameters']['data'].get('tension_execution_mode','actuator_realistic'),
             executable=c['executable'],reasons=c['reasons']) for name,c in full['combinations'].items()},
         baseline=full['baseline'],space=dict(templates=list(space.get('templates',{})),
             parameters=space.get('parameters',{}),discretization_parameters=space.get('discretization_parameters',{}),
@@ -145,15 +147,13 @@ def overview(host):
         counts=full['counts'],usage=full['usage'],project_usage=full['project_usage'],
         available_actions=dict(build='Authorized combination and optional declared changes; zero solves.',
             run='Completed build source_node; one charged backend attempt plus evaluation, no variables.',
-            optimize='Nonempty numerical bounds; optional build/run/optimize source_node; up to max_trials charged attempts.',
+            optimize='Nonempty continuous numerical bounds only; integer/choice/template/discretization selections use explicit build changes; optional source_node; up to max_trials charged attempts.',
             diagnose='Valid run/optimize source_node; saved trajectory required; zero solves.',
             crosscheck='Valid run/optimize source_node and authorized alternative backend combination; one charged attempt plus evaluation.',
             video='Valid run/optimize source_node with saved results; zero solves.',
             finish='Valid run/optimize source_node; deliver even when task_success is false; zero solves.'),
         evidence_access='Node result references below are already available for citation. Read details only when needed. evidence.read returns content or a labeled pointer overview.',
-        guidance=full['guidance'],tendon_tension_execution=dict(
-            ideal_tension='MuJoCo directly realizes bounded desired tendon force, bypassing transmission, actuator travel/velocity limits and length-servo dynamics; use it to isolate model/controller behavior.',
-            actuator_realistic='Desired tendon force is realized through the existing tendon-length servo, transmission, actuator velocity and actuator travel limits; use it for actuator-realistic validation.'),
+        guidance=full['guidance'],
         limitations=full['limitations'])
 
 

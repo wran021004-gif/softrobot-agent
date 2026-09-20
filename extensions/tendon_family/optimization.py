@@ -58,7 +58,7 @@ def prepare_optimization(value):
     from tools.platform_tools import _candidate
     from tools.platform_tasks import compile_input
     from .candidate import read_parameter
-    from .contracts import Space, Control
+    from .contracts import Space, Control, GVSLQRControl
     request=OptimizationRequest.model_validate(value)
     inp=request.session
     if inp.policy.candidate_builder.extension_id!='candidate.family':
@@ -74,7 +74,8 @@ def prepare_optimization(value):
         lo,hi=bounds
         if not spec['bounds'][0]<=lo<hi<=spec['bounds'][1]:
             raise ValueError('OPTIMIZATION_BOUNDS_OUTSIDE_AUTHORIZED_SPACE: '+path)
-        target=Control.model_validate(inp.policy.controller.parameters.data).model_dump(mode='json') if control else inp.robot.structure.data
+        control_type=GVSLQRControl if inp.policy.controller.extension_id=='controller.gvs_lqr' else Control
+        target=control_type.model_validate(inp.policy.controller.parameters.data).model_dump(mode='json') if control else inp.robot.structure.data
         initial[path]=read_parameter(target,path.removeprefix('control/') if control else path)
     parameters=SearchParameters(initial=initial,bounds=request.variables,max_trials=request.max_trials,step=request.step)
     CoordinateSearch(parameters)  # checks the baseline against the requested bounds

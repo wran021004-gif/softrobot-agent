@@ -39,7 +39,9 @@ def observation_specs(inp,reg):
     tension=(inp.policy.controller.extension_id=='controller.gvs_lqr' or
         Control.model_validate(inp.policy.controller.parameters.data).mode=='tension_reference')
     parameters=inp.policy.controller.parameters.data
-    execution_mode=parameters.get('tension_execution_mode','actuator_realistic')
+    execution_mode=(parameters.get('development_execution_mode') or 'ideal_tension'
+        if inp.policy.controller.extension_id=='controller.gvs_lqr'
+        else parameters.get('tension_execution_mode','actuator_realistic'))
     return [s for _,_,s in expanded(physics_for(inp),tension,execution_mode)]
 
 

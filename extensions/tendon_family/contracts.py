@@ -182,15 +182,16 @@ class Control(Contract):
 
 
 class GVSLQRControl(Contract):
-    equilibrium_q: list[FiniteFloat] = Field(min_length=1)
-    equilibrium_tensions_n: list[Annotated[FiniteFloat, Field(ge=0)]] = Field(min_length=1)
+    """Candidate-independent recipe; the candidate build derives q0, u0 and K."""
     curvature_weight: FiniteFloat = Field(default=1., gt=0)
     state_rate_weight: FiniteFloat = Field(default=.1, gt=0)
     tendon_tension_weight: FiniteFloat = Field(default=1., gt=0)
     state_weight_overrides: dict[str, Annotated[FiniteFloat, Field(ge=0)]] = Field(default_factory=dict)
     equilibrium_tolerance: FiniteFloat = Field(default=1e-7, gt=0)
-    operating_point_source: Literal['gvs_inverse_tip_static', 'gvs_equilibrium'] = 'gvs_inverse_tip_static'
-    tension_execution_mode: Literal['ideal_tension', 'actuator_realistic'] = 'actuator_realistic'
+    operating_point_source: Literal['gvs_inverse_tip_static'] = 'gvs_inverse_tip_static'
+    # Explicitly excluded from Route combinations. This preserves the historical
+    # A/B research path without making backend realization a design decision.
+    development_execution_mode: Literal['actuator_realistic'] | None = None
 
 
 class Reference(Contract):

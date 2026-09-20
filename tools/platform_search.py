@@ -120,7 +120,8 @@ def run_search(host, starting_trial=None):
         if simulation['execution_status'] != 'completed':
             error=simulation.get('error','')
             invalid=simulation['execution_status']=='rejected' and any(s in error for s in (
-                'PHYSICALLY_INVALID','PARAMETER_','CONDITIONAL_','TEMPLATE_','UNSUPPORTED','INITIAL_UNKNOWN','UNKNOWN_FORCE'))
+                 'PHYSICALLY_INVALID','PARAMETER_','CONDITIONAL_','TEMPLATE_','UNSUPPORTED','INITIAL_UNKNOWN','UNKNOWN_FORCE',
+                 'GVS_OPERATING_POINT_','LQR_OPERATING_POINT_','GVS_LQR_'))
             if invalid:
                 algorithm.feedback(None)
                 saved['trials'].append(dict(candidate_id=candidate_id,owner_run_id=host.run_id,candidate=pending['candidate'],score=None,
