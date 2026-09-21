@@ -139,5 +139,15 @@ class GVSProjectorAndController(unittest.TestCase):
         self.assertNotEqual(first['reference']['equilibrium_q'],second['reference']['equilibrium_q'])
         self.assertNotEqual(first['reference']['equilibrium_tensions_n'],second['reference']['equilibrium_tensions_n'])
 
+    def test_tube_template_solver_bound_roundoff_refines_inside_force_limits(self):
+        from tools.platform_tools import _candidate
+        _,value=lqr_input();baseline=SessionInput.model_validate(compile_input(value)['input'])
+        candidate=_candidate(baseline,{'template':'tube_distal',
+            'discretization/cells/near':6,'discretization/cells/far':6},self.reg)
+        physics=physics_for(candidate);plan=assemble(candidate,physics)['control']
+        tensions=plan['reference']['equilibrium_tensions_n']
+        self.assertTrue(all(0.<=u<=t['force_limit_n'] for u,t in zip(tensions,physics['tendons'])))
+        self.assertLess(plan['algorithm']['linearized_drift_norm_inf'],1e-7)
+
 
 if __name__=='__main__': unittest.main()

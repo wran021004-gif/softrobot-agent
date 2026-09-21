@@ -61,7 +61,14 @@ def _candidate_operating_point(inp):
         raise ValueError('GVS_OPERATING_POINT_INVERSE_FAILED: status='+solved.status+
             ', constraint_violation='+str(solved.constraint_violation))
     q0=[solved.optimum[name] for name in q_paths]
-    u0=[solved.optimum[name] for name in tension_paths]
+    inverse_tensions=np.asarray([solved.optimum[name] for name in tension_paths],dtype=float)
+    limits=np.asarray([t['force_limit_n'] for t in design['tendons']],dtype=float)
+    # IPOPT's converged bound can exceed an exact model contract by numerical
+    # tolerance. Only solver-scale overshoot is projected onto the frozen bound;
+    # a materially infeasible inverse result remains an invalid candidate.
+    if np.max(np.maximum(-inverse_tensions,inverse_tensions-limits))>1e-6:
+        raise ValueError('GVS_OPERATING_POINT_FORCE_LIMIT_EXCEEDED')
+    u0=np.clip(inverse_tensions,0.,limits).tolist()
     from types import SimpleNamespace
     refined=gvs_equilibrium_tool(SimpleNamespace(input=nominal,reg=reg),GVSEquilibriumRequest(
         tendon_tensions_n=dict(zip(tendons,u0)),initial_q=q0,tolerance=1e-16,max_iterations=20))
