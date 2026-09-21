@@ -8,7 +8,7 @@ import numpy as np
 from examples.platform_tendon_family import example_design, design_space, session
 from extensions.tendon_family.backends import MatlabBackend, MujocoBackend, physics_for
 from extensions.tendon_family.gvs_lqr import GVSLQRController
-from extensions.tendon_family.gvs_projection import discretize, project
+from extensions.tendon_family.gvs_projection import discretize, discretization_jacobian, project
 from extensions.tendon_family.gvs import forward_kinematics
 from extensions.tendon_family.geometry import geometry
 from extensions.tendon_family.scene import assemble
@@ -53,6 +53,17 @@ class GVSProjectorAndController(unittest.TestCase):
                     backend_tip=geometry(self.physics,backend_q)['tip']
                     gvs_tip=forward_kinematics(self.design,q,samples_per_segment=2)['tip_position_m']
                     np.testing.assert_allclose(backend_tip,gvs_tip,atol=2e-4)
+        mapping=discretization_jacobian(self.physics,self.design)
+        np.testing.assert_allclose(mapping@states[1][0],discretize(self.physics,self.design,*states[1])[0],atol=1e-12)
+        force=np.linspace(-.2,.3,len(self.physics['dofs']))
+        delta=states[1][0]
+        self.assertAlmostEqual(float(force@(mapping@delta)),float((mapping.T@force)@delta),places=12)
+
+    def test_free_reach_development_assembly_has_no_extra_force(self):
+        value=session('family_mujoco',self.design,design_space(self.design))
+        self.assertEqual(value['task']['environment']['data']['external_forces'],[])
+        self.assertEqual(value['task']['environment']['data']['environment']['gravity_m_s2'],[0.,0.,-9.81])
+        self.assertEqual(value['task']['goal']['data']['target_m'],[.29,.035,.19])
 
     def test_matlab_tension_shared_input_defaults_missing_commands(self):
         design=example_design();value=session('matlab_spatial',design,design_space(design))
@@ -101,6 +112,8 @@ class GVSProjectorAndController(unittest.TestCase):
             and 'actuator_saturated' in row for row in backend.controller.observations))
 
     def test_short_ideal_tension_mujoco_is_direct_finite_and_observable(self):
+        from types import SimpleNamespace
+        from extensions.tendon_family.diagnostics import diagnose
         _,value=lqr_input()
         inp=SessionInput.model_validate(compile_input(value)['input'])
         backend=MujocoBackend();controller=GVSLQRController(
@@ -124,6 +137,12 @@ class GVSProjectorAndController(unittest.TestCase):
         desired={s.spec.entity:np.asarray(s.values) for s in result.signals if s.spec.name=='desired_tendon_tension'}
         actual={s.spec.entity:np.asarray(s.values) for s in result.signals if s.spec.name=='tendon_tension'}
         for entity in desired: np.testing.assert_allclose(actual[entity],desired[entity],atol=1e-12)
+        reference=dict(artifact_id='focused-direct-tension-result',media_type='application/json')
+        diagnosis=diagnose(SimpleNamespace(artifact=lambda _:result.model_dump(mode='json')),
+            SimpleNamespace(result=reference,entity='all',t_start_s=None,t_end_s=None,fields=[]),
+            dict(root=directory,metadata=dict(candidate='focused-direct-tension')))
+        self.assertFalse(any(item['signal'].startswith('actuator_command') for item in diagnosis['missing']))
+        self.assertTrue(any(item['observation']=='projected_gvs_state' for item in diagnosis['queries']))
 
     def test_geometry_change_regenerates_operating_point_linearization_and_gain(self):
         from tools.platform_tools import _candidate

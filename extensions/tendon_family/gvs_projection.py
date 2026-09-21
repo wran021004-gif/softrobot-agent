@@ -78,13 +78,16 @@ def discretize(physics,design,q_gvs,qdot_gvs):
     coordinates=coordinate_order(Design.model_validate(design));n=len(coordinates)
     q_gvs=np.asarray(q_gvs,dtype=float);qdot_gvs=np.asarray(qdot_gvs,dtype=float)
     if q_gvs.shape!=(n,) or qdot_gvs.shape!=(n,): raise ValueError('GVS_DISCRETIZATION_STATE_DIMENSION_MISMATCH')
-    qpos=np.zeros(len(physics['dofs']));qvel=np.zeros_like(qpos)
+    mapping=discretization_jacobian(physics,design)
+    return mapping@q_gvs,mapping@qdot_gvs
+
+
+def discretization_jacobian(physics,design):
+    """Exact linear cell-angle Jacobian used by discretize and virtual work."""
+    mapping=np.zeros((len(physics['dofs']),len(coordinate_order(Design.model_validate(design)))))
     for index,(_,samples,_) in enumerate(_segments(physics,design)):
-        q=q_gvs[4*index:4*index+4];v=qdot_gvs[4*index:4*index+4]
         for sample in samples:
-            phi=2*sample['normalized_center']-1.;ds=sample['cell_length_m'];rotation=sample['principal_to_segment']
-            curvature=np.array([q[0]+q[1]*phi,q[2]+q[3]*phi])
-            rate=np.array([v[0]+v[1]*phi,v[2]+v[3]*phi])
-            qpos[sample['dofs']]=rotation.T@curvature*ds
-            qvel[sample['dofs']]=rotation.T@rate*ds
-    return qpos,qvel
+            phi=2*sample['normalized_center']-1.;ds=sample['cell_length_m']
+            basis=np.array([[1.,phi,0.,0.],[0.,0.,1.,phi]])
+            mapping[sample['dofs'],4*index:4*index+4]=ds*sample['principal_to_segment'].T@basis
+    return mapping

@@ -53,7 +53,7 @@ def operating_point(value):
         objective_value=solved.objective_value,constraint_violation=solved.constraint_violation,
         refined_equilibrium_residual_norm=refined.residual_norm,refinement_iterations=refined.iterations,
         iterations=solved.iterations,predicted_tip_world_m=world,
-        nominalization='Only time-window external forces omitted from equilibrium synthesis; final task and MuJoCo retain them.')
+        nominalization='Force-free nominal equilibrium; final task and MuJoCo retain the task-defined forces unchanged.')
 
 
 def run(root,tendon_weight=1.):

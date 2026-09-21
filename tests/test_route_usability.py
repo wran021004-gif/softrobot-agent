@@ -8,7 +8,7 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from examples.platform_route import prepare, main
-from extensions.tendon_family.route import create, overview, view, finalize_stop
+from extensions.tendon_family.route import create, overview, view, finalize_stop, update_incumbent
 from tools.platform_host import Host
 from tools.platform_models import payload_for
 from tools.platform_store import plain, encode
@@ -16,6 +16,19 @@ from tools.state_io import read
 
 
 class RouteUsability(unittest.TestCase):
+    def test_session_incumbent_keeps_better_earlier_evaluation(self):
+        from types import SimpleNamespace
+        evaluation=dict(validity='valid',comparison_identity='same-task')
+        ctx=SimpleNamespace(store=SimpleNamespace(artifact=lambda _:evaluation))
+        route=dict(incumbent=None)
+        baseline=dict(status='valid',score=.04348,candidate_id='baseline',evaluation='baseline-ref')
+        update_incumbent(ctx,route,dict(node_id='run',action='run'),dict(run_id='base-run',**baseline))
+        later=dict(status='valid',score=.04415,candidate_id='search-4',evaluation='later-ref')
+        update_incumbent(ctx,route,dict(node_id='search',action='optimize'),
+            dict(run_id='search-run',trials=[later]))
+        self.assertEqual((route['incumbent']['node_id'],route['incumbent']['candidate_id'],
+            route['incumbent']['evaluation_ref']),('run','baseline','baseline-ref'))
+
     def setup_route(self):
         root=Path('runs/route_usability_checks')/uuid4().hex
         prepare(root,True)
@@ -70,12 +83,16 @@ class RouteUsability(unittest.TestCase):
                 changes={'components/near/length_m':.18})
             self.assertEqual((changed['reused_evaluations'],changed['actual_solves'],changed['new_evaluations']),(0,1,1))
             self.assertNotEqual(changed['best']['configuration'],original['configuration'])
+            incumbent=view(host)['route']['incumbent']
+            scores=[original['score']]+[t['score'] for t in searched['trials']+changed['trials']
+                if t['status']=='valid' and t['score'] is not None]
+            self.assertEqual(incumbent['score'],min(scores))
             final=self.action(host,'finish','finish',source_node='chain')
-            self.assertEqual(final['run_id'],original['run_id'])
-            self.assertEqual(final['search_run_id'],chained['run_id'])
-            self.assertEqual(final['simulation'],original['simulation'])
-            self.assertEqual(final['evaluation_ref'],original['evaluation'])
-            self.assertIn('selected search',final['best_scope'])
+            self.assertEqual(final['candidate_id'],incumbent['candidate_id'])
+            self.assertEqual(final['evaluation_ref'],incumbent['evaluation_ref'])
+            self.assertEqual(final['best_valid_evaluation']['node_id'],incumbent['node_id'])
+            self.assertEqual(final['selection_basis'],'session-wide incumbent')
+            self.assertIn('session-wide',final['best_scope'])
             self.assertEqual(view(host)['counts']['solves'],3)  # All synthetic.
             self.assertEqual(view(host)['counts']['evaluations'],3)
 
@@ -88,7 +105,7 @@ class RouteUsability(unittest.TestCase):
             self.assertFalse(summary['simulated']);self.assertFalse(summary['evaluated'])
             self.action(host,'run','run',source_node='built')
             counts=view(host)['counts']
-            final=self.action(host,'finish','finish',source_node='run')
+            final=self.action(host,'finish','finish')
             summary=view(host)['route']['nodes'][-1]['summary']
             self.assertTrue(summary['simulated']);self.assertTrue(summary['evaluated'])
             self.assertEqual((final['actual_solves'],final['new_evaluations']),(0,0))
@@ -153,7 +170,7 @@ class RouteUsability(unittest.TestCase):
         self.assertEqual(final['evaluation_ref'],run['evaluation'])
         self.assertEqual(final['delivery_status'],'evaluated')
         self.assertTrue(final['explicit_delivery'])
-        self.assertIn('no search ranking',final['best_scope'])
+        self.assertIn('session-wide',final['best_scope'])
         self.assertEqual(view(host)['counts']['solves'],1)
         self.assertEqual(view(host)['counts']['evaluations'],1)
         used=host.store.remaining()['used'];host.run()

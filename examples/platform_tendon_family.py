@@ -73,7 +73,7 @@ def session(backend,design,space,legacy=False,discretization=None):
         timing=dict(timestep_s=.0005,control_period_s=.01,sample_period_s=.01,duration_s=duration,termination=['duration','numerical_failure']),
         sampling=dict(split='development',seeds=[17],window_s=[0.,duration]))
     assembly=value['task']['environment']['data']; assembly['mount']=dict(position_m=[0.,0.,.15],quaternion_wxyz=[1.,0.,0.,0.])
-    assembly['external_forces']=[] if legacy else [dict(entity='payload',force_n=[0.,.03,.02],start_s=.12,end_s=.20)]
+    assembly['external_forces']=[]
     value['robot']['channels']=['actuator_commands']
     if not legacy:
         value['robot'].update(family='tendon_robot_family',structure=payload('family.design',design.model_dump(mode='json')),

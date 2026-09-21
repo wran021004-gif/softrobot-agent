@@ -59,9 +59,10 @@ IPOPT assembly against the frozen target, refines it with
 `GVSModel -> DynamicSystem -> CasadiLinearizer -> ContinuousLQRController`
 chain. Candidate control evidence records operating-point, linearization, gain,
 and final control identities. `q0`, `u0`, and `K` are derived artifacts and are
-not Route/LLM inputs. Time-window external forces are omitted only from the
-nominal GVS equilibrium/linearization because GVS v1 does not model them, while
-the frozen backend task continues to apply them.
+not Route/LLM inputs. Time-window external forces, if present in another
+task, are omitted only from the nominal GVS equilibrium/linearization because
+GVS v1 does not model them. The current free-reach development assembly has
+no such force; the backend always preserves the task-defined forces.
 
 The compact public chain is:
 

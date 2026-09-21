@@ -78,7 +78,7 @@ def _candidate_operating_point(inp):
         inverse_objective_value=solved.objective_value,inverse_constraint_violation=solved.constraint_violation,
         inverse_iterations=solved.iterations,refined_equilibrium_residual_norm=refined.residual_norm,
         refinement_iterations=refined.iterations,source='gvs_inverse_tip_static',candidate_model_identity=key,
-        nominalization='Only time-window external forces omitted; frozen target and backend task are unchanged.')
+        nominalization='Force-free nominal operating point; backend task keeps its declared external forces unchanged.')
     point['identity']=digest(point)
     _OPERATING_POINTS[key]=deepcopy(point)
     return point
@@ -135,7 +135,7 @@ def resolve_gvs_lqr_control(inp,physics):
         reference=dict(kind='gvs_equilibrium',target_world_m=list(inp.task.goal.data['target_m']),
         equilibrium_q=list(q0),equilibrium_tensions_n=u0.tolist(),tendon_order=tendon_order,
         source=c.operating_point_source,operating_point_identity=point['identity'],derivation=point,
-        nominal_external_forces='omitted_from_GVS_operating_point_but_retained_in_backend_task'),
+        nominal_external_forces='omitted_from_GVS_operating_point;backend_task_unchanged'),
         algorithm=dict(id='gvs_lqr_tension_composition_v1',equation='u=clip(u0-K@(project(q,qdot)-x0),0,force_limit)',
             x0=x0,u0=u0.tolist(),K=K.tolist(),Q_diagonal=qdiag,R_diagonal=rdiag,
             gain_identity=gain_identity,dynamic_system_identity=dynamic_system_identity,

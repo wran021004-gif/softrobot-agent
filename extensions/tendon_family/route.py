@@ -29,8 +29,8 @@ class RouteAction(Contract):
     changes: dict = Field(default_factory=dict, description='build/optimize only: edits from the declared space, including template, physical paths, discretization paths and control/ paths. Applied to the source configuration, or the frozen baseline when no source is supplied.')
     variables: dict[str, tuple[float,float]] = Field(default_factory=dict, description='optimize only, required: continuous numeric variables[path] = [lower_bound, upper_bound], a continuous interval, NOT two requested samples. Integer, choice, template, and discretization changes belong in explicit changes. Bounds must be within the authorized space and include the starting value.')
     max_trials: int = Field(default=1,ge=1,description='Maximum optimizer proposals, bounded by route max_trials; independent of single run, which needs one solve. Duplicate proposals may reuse saved results.')
-    source_node: Identifier | None = Field(default=None, description='Completed node_id: run requires build; optimize accepts build/run/optimize; diagnose/crosscheck/video/finish require a valid evaluated run or optimize node. Never an artifact ID.')
-    candidate_id: str | None = Field(default=None, description='Optional candidate label on build; selects an optimization trial on later actions, defaulting to its best valid trial. A single run preserves the build candidate label.')
+    source_node: Identifier | None = Field(default=None, description='Completed node_id: run requires build; optimize accepts build/run/optimize; diagnose/crosscheck/video require an evaluated run or optimize node. Finish defaults to the session incumbent; supply source_node with candidate_id to select another valid candidate. Never an artifact ID.')
+    candidate_id: str | None = Field(default=None, description='Optional candidate label on build; selects an optimization trial on later actions. Finish without candidate_id delivers the session-wide incumbent. A single run preserves the build candidate label.')
     evidence: list[EvidenceRef] = Field(default_factory=list, description='After the first action, cite at least one previous route node result reference here. route overview already supplies these references; a separate read is optional.')
     reason: str = Field(min_length=1,description='English explanation grounded in the current overview or cited evidence.')
     next_step: str = Field(min_length=1,description='English statement of the intended next decision or stopping condition.')
@@ -74,7 +74,7 @@ def create(root, value):
     with host.store.transaction() as db:
         state=host.store.session(host.run_id,db)['state']
         if 'route' not in state:
-            state['route']=dict(source=spec.source,nodes=[],current=None,next_step='Select and evaluate an authorized candidate',final=None)
+            state['route']=dict(source=spec.source,nodes=[],current=None,next_step='Select and evaluate an authorized candidate',incumbent=None,final=None)
             host.store.update_state(db,host.run_id,state)
     return view(host)
 
@@ -108,7 +108,7 @@ def view(host):
             model_parameters=space.get('model_parameters',{}),discretization_parameters=space.get('discretization_parameters',{})),
         max_trials=spec.max_trials,guidance=spec.guidance,usage=host.store.remaining(host.run_id),
         project_usage=host.store.remaining(),stop_reason=session['state'].get('stop_reason'),
-        limitations=['Best means best valid evaluated candidate within one comparable search; no global optimum.',
+        limitations=['Incumbent means lowest score among valid comparable evaluated candidates in this Route session; no global optimum claim.',
             'Diagnosis is observational, not causal. Text adapter has not viewed videos.',
             'Serial bending cells only; no torsion/shear/stretch, friction, motor dynamics or general trajectory optimization.'])
 
@@ -134,6 +134,7 @@ def overview(host):
         selected_candidate=summary.get('candidate_id'),has_solve=full['counts']['solves']>0,
         has_evaluation=full['counts']['evaluations']>0,selected_summary=summary,
         latest_evaluated_node=evaluated['node_id'] if evaluated else None,
+        incumbent=route.get('incumbent'),
         frozen_input=dict(reference=snapshot_ref,task_pointer='/input/task',design_pointer='/input/robot/structure/data',
             space_pointer='/input/policy/candidate_builder/parameters/data',combinations_pointer='/input/policy/route/data/combinations'),
         route=dict(current=route['current'],next_step=route['next_step'],final=delivery_summary(route['final']),nodes=[
@@ -151,7 +152,7 @@ def overview(host):
             diagnose='Valid run/optimize source_node; saved trajectory required; zero solves.',
             crosscheck='Valid run/optimize source_node and authorized alternative backend combination; one charged attempt plus evaluation.',
             video='Valid run/optimize source_node with saved results; zero solves.',
-            finish='Valid run/optimize source_node; deliver even when task_success is false; zero solves.'),
+            finish='Deliver session-wide valid incumbent by default; source_node plus candidate_id explicitly selects another valid candidate; zero solves.'),
         evidence_access='Node result references below are already available for citation. Read details only when needed. evidence.read returns content or a labeled pointer overview.',
         guidance=full['guidance'],
         limitations=full['limitations'])
@@ -169,8 +170,10 @@ def preflight(inp,args,reg):
     if args.action not in ('build','optimize') and (args.changes or args.variables):
         raise ValueError('CHANGES_AND_VARIABLES_ONLY_FOR_BUILD_OR_OPTIMIZE')
     if args.action=='run' and args.combination: raise ValueError('RUN_PRESERVES_BUILD_COMBINATION: omit combination')
-    if args.action in ('run','diagnose','crosscheck','video','finish') and not args.source_node:
+    if args.action in ('run','diagnose','crosscheck','video') and not args.source_node:
         raise ValueError('SOURCE_NODE_REQUIRED')
+    if args.action=='finish' and args.candidate_id and not args.source_node:
+        raise ValueError('EXPLICIT_CANDIDATE_REQUIRES_SOURCE_NODE')
     if args.action=='build' and args.variables: raise ValueError('VARIABLES_ONLY_FOR_OPTIMIZE')
     return dict(cost={'wall_s':0.})
 
@@ -203,6 +206,27 @@ def source_configuration(ctx,args,route):
     if node['action']=='build': return ctx.store.artifact(result['configuration'])
     _,trial=source_trial(ctx,args,route)
     return ctx.store.artifact(trial['configuration'])['effective']
+
+
+def update_incumbent(ctx,route,node,out):
+    """Track session-wide comparable evidence without copying the full trial."""
+    if node['action']=='run': trials=[out]
+    elif node['action']=='optimize': trials=out.get('trials',[])
+    else: return
+    for trial in trials:
+        if trial.get('status')!='valid' or trial.get('score') is None or not trial.get('evaluation'):
+            continue
+        evaluation=ctx.store.artifact(trial['evaluation'])
+        if evaluation.get('validity')!='valid': continue
+        previous=route.get('incumbent')
+        comparison=evaluation.get('comparison_identity')
+        if previous and previous['comparison_identity']!=comparison: continue
+        if previous is None or trial['score']<previous['score']:
+            summary={k:evaluation[k] for k in ('validity','task_success','metrics','source_execution_id') if k in evaluation}
+            route['incumbent']=dict(node_id=node['node_id'],search_run_id=out.get('run_id') if node['action']=='optimize' else None,
+                candidate_id=trial['candidate_id'],owner_run_id=trial.get('owner_run_id',out.get('run_id')),
+                evaluation_ref=trial['evaluation'],evaluation=summary,score=trial['score'],
+                comparison_identity=comparison)
 
 
 def run_built(ctx,args,route):
@@ -326,7 +350,14 @@ def advance(ctx,args):
         elif args.action=='run':
             out=run_built(ctx,args,route)
         elif args.action in ('diagnose','crosscheck','video','finish'):
-            child,trial=source_trial(ctx,args,route)
+            if args.action=='finish' and args.candidate_id is None:
+                incumbent=route.get('incumbent')
+                if incumbent is None: raise ValueError('VALID_SESSION_INCUMBENT_REQUIRED')
+                from types import SimpleNamespace
+                selected_args=SimpleNamespace(source_node=incumbent['node_id'],candidate_id=incumbent['candidate_id'])
+            else:
+                selected_args=args
+            child,trial=source_trial(ctx,selected_args,route)
             if args.action=='crosscheck':
                 choice=spec.combinations[args.combination]
                 effective=ctx.store.artifact(trial['configuration'])['effective']
@@ -345,6 +376,7 @@ def advance(ctx,args):
                     findings=diagnosis_summary(report) if args.action=='diagnose' else dict(video_generated=True,viewed_by_model=False))
             else:
                 out=delivery(ctx,route,child,trial,args.reason)
+                out['selection_basis']='explicit valid candidate' if args.candidate_id else 'session-wide incumbent'
                 out['explicit_delivery']=True
                 route['final']=out
     except Exception as exc:
@@ -354,6 +386,7 @@ def advance(ctx,args):
         raise
     with ctx.store.transaction() as db: ref=ctx.store.put(db,out)
     node.update(status='completed',result=plain(ref),summary=summarize(out))
+    update_incumbent(ctx,route,node,out)
     route['current']=None
     _save(ctx,route,'completed',stop=args.action=='finish')
     return RouteResult(detail=dict(node={k:node[k] for k in ('node_id','action','status')},
@@ -379,16 +412,16 @@ def delivery(ctx,route,child,trial,reason):
             if data.get('source_configuration',data.get('configuration'))==trial['configuration']:
                 (reviews if n['action']=='crosscheck' else diagnoses).append(dict(result=n['result'],summary=n['summary']))
     search_run=trial.get('search_run_id') or child.run_id
-    search=ctx.store.session(search_run)['state'].get('search')
-    best=min((t for t in search['trials'] if t.get('score') is not None),key=lambda t:t['score']) if search else trial
+    best=route.get('incumbent')
     return dict(delivery_status='evaluated',candidate_id=trial['candidate_id'],run_id=child.run_id,configuration=trial['configuration'],
-        search_run_id=search_run if search else None,actual_solves=0,new_evaluations=0,
+        search_run_id=trial.get('search_run_id'),actual_solves=0,new_evaluations=0,
         simulation=trial['simulation'],
         dynamics_model=configuration['policy']['dynamics_model'],backend=configuration['policy']['backend'],
         controller=configuration['policy']['controller'],evaluation_ref=trial['evaluation'],evaluation=trial['evaluation_data'],
         task_success=trial['task_success'],crosschecks=reviews,crosscheck_status='reviewed' if reviews else 'not_reviewed',
-        diagnoses=diagnoses,stop_reason=reason,best_scope='best valid evaluated in selected search; not global optimum' if search else 'one selected evaluated candidate; no search ranking',
-        best_valid_evaluation=dict(candidate_id=best['candidate_id'],evaluation_ref=best['evaluation'],score=best['score']),
+        diagnoses=diagnoses,stop_reason=reason,best_scope='session-wide valid comparable evaluated candidates; no global optimum',
+        best_valid_evaluation=dict(node_id=best['node_id'],search_run_id=best['search_run_id'],candidate_id=best['candidate_id'],
+            evaluation_ref=best['evaluation_ref'],evaluation=best['evaluation'],score=best['score']) if best else None,
         limitations=view(ctx.host)['limitations'])
 
 
@@ -401,11 +434,11 @@ def finalize_stop(host):
     reason=session['state'].get('stop_reason',session['status'])
     ctx=SimpleNamespace(host=host,store=host.store)
     final=dict(delivery_status='incomplete',candidate_id=None,evaluated=False,stop_reason=reason,crosscheck_status='not_reviewed')
-    for node in reversed(route['nodes']):
-        if node['action'] in ('run','optimize') and node.get('result') and (host.store.artifact(node['result']).get('best') or host.store.artifact(node['result']).get('status')=='valid'):
-            child,trial=source_trial(ctx,SimpleNamespace(source_node=node['node_id'],candidate_id=None),route)
-            final=delivery(ctx,route,child,trial,reason);break
-    final['selection_basis']='Host terminal summary of the most recent valid evaluated source; not an explicit model delivery'
+    incumbent=route.get('incumbent')
+    if incumbent:
+        child,trial=source_trial(ctx,SimpleNamespace(source_node=incumbent['node_id'],candidate_id=incumbent['candidate_id']),route)
+        final=delivery(ctx,route,child,trial,reason)
+    final['selection_basis']='Host terminal summary of session-wide incumbent; not an explicit model delivery'
     final['explicit_delivery']=False
     route['final']=final
     with host.store.transaction() as db:

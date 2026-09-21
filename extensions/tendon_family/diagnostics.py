@@ -9,6 +9,7 @@ from tools.platform_store import plain
 def diagnose(ctx,args,source):
     result=BackendResult.model_validate(ctx.artifact(args.result))
     folder=source['root']; p=read(folder/'resolved_physics.json'); scene=read(folder/'experiment_scene.json')
+    direct_tension=scene['control'].get('tension_execution_mode')=='ideal_tension'
     events=[]; queries=[]; missing=[]
     signals={(s.spec.name,s.spec.entity):s for s in result.signals}
     def series(name,entity):
@@ -49,13 +50,16 @@ def diagnose(ctx,args,source):
             'Euclidean distance to saved TaskDefinition goal; descriptive only, no repeated evaluation'))
     for td in p['tendons']:
         limit=td['force_limit_n']; fraction=RULES['near_force_fraction']; zero=RULES['zero_force_n']
+        if direct_tension:
+            for signal in ('desired_tendon_tension','tendon_length','tendon_length_change','tendon_length_rate'):
+                inspect(signal,td['entity'])
         inspect('tendon_tension',td['entity'],[
             (lambda v,limit=limit:v>=fraction*limit,'near_pull_limit',dict(threshold_n=fraction*limit,
                 source='resolved_physics tendon.force_limit_n * tools.trajectory_diagnosis.RULES.near_force_fraction',
                 minimum_duration_s=RULES['min_duration_s'],meaning='near limit does not prove controller clipping')),
             (lambda v:v<=zero,'near_zero_tension',dict(threshold_n=zero,source='tools.trajectory_diagnosis.RULES.zero_force_n',
                 minimum_duration_s=RULES['min_duration_s'],meaning='near-zero positive pull; no independent slack measurement'))])
-    for a in p['actuators']:
+    for a in ([] if direct_tension else p['actuators']):
         name=a['id']; lo,hi=a['limits']; margin=(hi-lo)*(1-RULES['near_force_fraction'])
         inspect('actuator_command',name,[(lambda v,lo=lo,hi=hi,margin=margin:(v<=lo+margin)|(v>=hi-margin),
             'near_travel_limit',dict(limits=[lo,hi],margin=margin,source='saved actuator limits; 1% travel span',
@@ -73,6 +77,21 @@ def diagnose(ctx,args,source):
         else:missing.append(dict(signal='actuator_command_rate',entity=name,reason='requires two command samples'))
     for name in p['dofs']:
         inspect('joint_position',name); inspect('joint_velocity',name)
+    if direct_tension and args.entity in ('all','tip'):
+        observations=read(folder/'controller_observations.json')
+        projected=[row for row in observations if 'projected_gvs_q' in row and
+            (args.t_start_s is None or row['time_s']>=args.t_start_s) and
+            (args.t_end_s is None or row['time_s']<=args.t_end_s)]
+        if projected:
+            queries.append(dict(candidate_id=source['metadata']['candidate'],backend=result.backend_id,
+                observation='projected_gvs_state',entity='tip',signal='controller_observations',
+                time_range_s=[projected[0]['time_s'],projected[-1]['time_s']],
+                values=dict(initial_q=projected[0]['projected_gvs_q'],final_q=projected[-1]['projected_gvs_q'],
+                    initial_qdot=projected[0]['projected_gvs_qdot'],final_qdot=projected[-1]['projected_gvs_qdot'],
+                    maximum_projection_residual_rad_m=max(row['gvs_projection_residual_max_rad_m'] for row in projected),
+                    maximum_rate_projection_residual_rad_m_s=max(row['gvs_rate_projection_residual_max_rad_m_s'] for row in projected)),
+                criterion='saved pre-step controller projection; descriptive only',evidence=dict(result=plain(args.result),
+                    saved_file='controller_observations.json')))
     times=[t for s in result.signals if s.spec.phase=='post_step' for t in s.times_s]
     raw_fields={}
     for name in args.fields:
