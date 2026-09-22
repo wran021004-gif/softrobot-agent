@@ -1,5 +1,8 @@
 # Free-reach GVS/MuJoCo static consistency (E0–E2)
 
+Follow-up F0–F2 measurements and the refined-mesh static result are in
+[gvs_geometry_static_f0_f2.md](gvs_geometry_static_f0_f2.md).
+
 The current development `reach_free` assembly keeps gravity and floor but has
 no timed payload force. Its existing target `[0.25, 0, 0.15]` m, evaluator,
 and 0.01 m position tolerance are unchanged. Route now records a session-wide

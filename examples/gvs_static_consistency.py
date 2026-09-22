@@ -11,7 +11,7 @@ import numpy as np
 from tools.state_io import atomic_json, read
 
 
-def source_input(path):
+def source_input(path,cells=None):
     value=deepcopy(read(path))
     assert value['task']['goal']['data']['target_m']==[.25,0.,.15]
     assert value['task']['evaluator']['parameters']['data']['tolerance_m']==.01
@@ -19,10 +19,12 @@ def source_input(path):
     value['task']['environment']['data']['external_forces']=[]
     value['run_id']='gvs-static-e1'
     value['policy']['route']=None
+    if cells is not None:
+        value['policy']['discretization']['data']['cells']=cells
     return value
 
 
-def static_experiment(root,source):
+def static_experiment(root,source,cells=None):
     from extensions.tendon_family.backends import MujocoBackend, physics_for
     from extensions.tendon_family.contracts import Control
     from extensions.tendon_family.control import Controller
@@ -35,7 +37,7 @@ def static_experiment(root,source):
     from tools.platform_tasks import compile_input
 
     root=Path(root).resolve();root.mkdir(parents=True,exist_ok=False)
-    value=source_input(source)
+    value=source_input(source,cells)
     preliminary=SessionInput.model_validate(value)
     point=_candidate_operating_point(preliminary)
     q0=np.asarray(point['q0']);u0=np.asarray(point['u0'])
@@ -157,9 +159,13 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action',choices=['e1','e2']);parser.add_argument('root')
     parser.add_argument('--source',default='runs/reach_free_gvs_candidate_rebuild_retry_20260921/inputs/route.json')
+    parser.add_argument('--near-cells',type=int)
+    parser.add_argument('--far-cells',type=int)
     args=parser.parse_args()
     import json
-    report=static_experiment(args.root,args.source) if args.action=='e1' else force_attribution(args.root)
+    cells=({'near':args.near_cells,'far':args.far_cells}
+        if args.near_cells is not None and args.far_cells is not None else None)
+    report=static_experiment(args.root,args.source,cells) if args.action=='e1' else force_attribution(args.root)
     print(json.dumps(report,indent=2))
 
 
