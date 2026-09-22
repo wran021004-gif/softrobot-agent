@@ -181,9 +181,14 @@ class Control(Contract):
         return self
 
 
+class GVSBasisSpecification(Contract):
+    strategy: Literal['first_order', 'structural_linear'] = 'first_order'
+
+
 class GVSLQRControl(Contract):
     """Candidate-independent recipe; the candidate build derives q0, u0 and K."""
     curvature_weight: FiniteFloat = Field(default=1., gt=0)
+    basis: GVSBasisSpecification = Field(default_factory=GVSBasisSpecification)
     state_rate_weight: FiniteFloat = Field(default=.1, gt=0)
     tendon_tension_weight: FiniteFloat = Field(default=1., gt=0)
     state_weight_overrides: dict[str, Annotated[FiniteFloat, Field(ge=0)]] = Field(default_factory=dict)
@@ -482,10 +487,34 @@ class PCCReachAssemblerParameters(Contract):
     configuration: PCCConfiguration
 
 
+class GVSStructuralLocation(Contract):
+    s: float = Field(ge=0, le=1)
+    kinds: tuple[str, ...]
+
+
+class GVSSegmentBasis(Contract):
+    segment: Name
+    start: int = Field(ge=0)
+    length_m: float = Field(gt=0)
+    knots: tuple[float, ...]
+    locations: tuple[GVSStructuralLocation, ...]
+
+
+class ResolvedGVSBasis(Contract):
+    representation_id: Literal['gvs_bending_basis_v1'] = 'gvs_bending_basis_v1'
+    specification: GVSBasisSpecification
+    coordinate_order: list[str]
+    segments: list[GVSSegmentBasis]
+    dimension: int = Field(gt=0)
+    axes: tuple[Literal['y'], Literal['z']] = ('y', 'z')
+
+
 class GVSModelParameters(Contract):
     model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
+    basis: GVSBasisSpecification = Field(default_factory=GVSBasisSpecification)
     integration_steps_per_segment: int = Field(default=24, ge=4, le=200)
-    quadrature_points_per_segment: int = Field(default=5, ge=2, le=20)
+    quadrature_points_per_segment: int = Field(default=5, ge=2, le=20,
+        description='Gauss nodes per resolved knot interval; first_order has one interval.')
     finite_difference_step: float = Field(default=1e-6, gt=0, le=1e-3)
 
     @property
@@ -494,13 +523,13 @@ class GVSModelParameters(Contract):
             state_definition=[
                 ModelVariable(
                     name='strain_coefficients',
-                    dimension='4*n_flexible_segments',
+                    dimension='n_gvs_coordinates',
                     units='rad/m',
                     frame='segment_local',
                 ),
                 ModelVariable(
                     name='strain_coefficient_rates',
-                    dimension='4*n_flexible_segments',
+                    dimension='n_gvs_coordinates',
                     units='rad/(m*s)',
                     frame='segment_local',
                 ),
@@ -516,7 +545,7 @@ class GVSModelParameters(Contract):
             output_definition=[
                 ModelVariable(
                     name='strain_coefficient_acceleration',
-                    dimension='4*n_flexible_segments',
+                    dimension='n_gvs_coordinates',
                     units='rad/(m*s^2)',
                     frame='segment_local',
                 ),
@@ -528,6 +557,7 @@ class GVSModelParameters(Contract):
                 ),
             ],
             required_robot_data=[
+                'family.design.components.connection',
                 'family.design.components.length_m',
                 'family.design.components.sections',
                 'family.design.components.physics',
@@ -536,6 +566,7 @@ class GVSModelParameters(Contract):
                 'family.design.components.com_local_m',
                 'family.design.components.inertia_com_local_kg_m2',
                 'family.design.tendons',
+                'family.design.tip',
             ],
             discretization_contract=None,
             capabilities=ModelCapabilities(
@@ -561,15 +592,19 @@ class GVSContinuousDynamicsExpression(Contract):
     parameters: GVSModelParameters
     gravity_robot_base_m_s2: Vec3
     coordinate_order: list[str] = Field(min_length=1)
+    resolved_basis: ResolvedGVSBasis | None = None
     tendon_order: list[Name] = Field(min_length=1)
     tendon_force_limits_n: list[Annotated[FiniteFloat, Field(gt=0)]] = Field(min_length=1)
 
     @model_validator(mode='after')
     def dimensions(self):
-        if len(self.coordinate_order) != 4 * sum(
-            isinstance(component, Segment) for component in self.design.components
+        from .gvs_basis import resolve_basis
+        resolved = resolve_basis(self.design, self.parameters.basis)
+        if self.coordinate_order != resolved.coordinate_order or (
+            self.resolved_basis is not None and self.resolved_basis != resolved
         ):
             raise ValueError('GVS_EXPRESSION_COORDINATE_ORDER_MISMATCH')
+        object.__setattr__(self, 'resolved_basis', resolved)
         expected = [tendon.id for tendon in self.design.tendons]
         if self.tendon_order != expected or len(self.tendon_force_limits_n) != len(expected):
             raise ValueError('GVS_EXPRESSION_TENDON_ORDER_MISMATCH')
@@ -820,6 +855,7 @@ class GVSDynamicsResultV2(Contract):
 class GVSEquilibriumRequest(Contract):
     tendon_tensions_n: dict[Name, NonNegativeFinite]
     initial_q: list[FiniteFloat]
+    basis: GVSBasisSpecification = Field(default_factory=GVSBasisSpecification)
     tolerance: FiniteFloat = Field(
         default=1e-10, gt=0,
         description='Maximum infinity norm of the static generalized-force residual.',
@@ -841,6 +877,7 @@ class GVSEquilibriumResult(Contract):
 class GVSInverseAssemblerParameters(Contract):
     template: Literal['inverse_shape', 'inverse_tip_static']
     q_target: list[FiniteFloat] | None = None
+    basis: GVSBasisSpecification = Field(default_factory=GVSBasisSpecification)
 
     @model_validator(mode='after')
     def target_authority(self):
@@ -858,7 +895,7 @@ class GVSDescribeRequest(Contract):
 class GVSCoordinateDescription(Contract):
     name: str
     segment: Name
-    mode: Literal['constant', 'linear']
+    mode: Literal['constant', 'linear', 'nodal_linear']
     axis: Literal['y', 'z']
     units: Literal['rad/m'] = 'rad/m'
 
@@ -874,10 +911,11 @@ class GVSTendonInputDescription(Contract):
 class GVSDescription(Contract):
     model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
     frame: Literal['robot_base'] = 'robot_base'
-    basis: tuple[Literal['phi0(s)=1'], Literal['phi1(s)=2*s/L-1']] = (
+    basis: tuple[str, ...] = (
         'phi0(s)=1',
         'phi1(s)=2*s/L-1',
     )
+    resolved_basis: ResolvedGVSBasis | None = None
     curvature_semantics: Literal['actual_total_curvature'] = 'actual_total_curvature'
     natural_curvature_role: Literal['zero_elastic_energy_reference'] = 'zero_elastic_energy_reference'
     coordinates: list[GVSCoordinateDescription] = Field(min_length=1)

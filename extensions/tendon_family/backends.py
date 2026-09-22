@@ -180,7 +180,7 @@ class MujocoBackend(MatlabBackend):
             t=step*dt; g=current()
             if s['control']['mode']=='gvs_lqr':
                 from .gvs_projection import project
-                projection=project(p,self.controller.coordinate_order,data.qpos[qi],data.qvel[vi])
+                projection=project(p,self.controller.resolved_basis,data.qpos[qi],data.qvel[vi])
                 g['gvs_projection']=projection
                 command=self.controller.command(t,g,np.asarray(projection['q_gvs']),np.asarray(projection['qdot_gvs']))
             else:

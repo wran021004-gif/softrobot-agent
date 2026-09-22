@@ -162,7 +162,7 @@ def gvs_authorization(robot, space, parameters):
     parameters = GVSInverseAssemblerParameters.model_validate(parameters)
     design = _design(robot)
     result = dict(space)
-    for name in coordinate_order(design):
+    for name in coordinate_order(design, parameters.basis):
         result['q/' + name] = {'type': 'number', 'bounds': [None, None], 'units': 'rad/m'}
     for tendon in design.tendons:
         result['tendon_tensions_n/' + tendon.id] = {
@@ -182,13 +182,13 @@ class GVSInverseAssembler:
         assembly = _assembly(task)
         if assembly.external_forces:
             raise ValueError('GVS_EXTERNAL_APPLIED_FORCES_UNSUPPORTED')
-        coordinates = coordinate_order(design)
+        coordinates = coordinate_order(design, self.parameters.basis)
         tendon_order = [tendon.id for tendon in design.tendons]
         q_paths = ['q/' + name for name in coordinates]
         tension_paths = ['tendon_tensions_n/' + name for name in tendon_order]
         rotation = quaternion_wxyz_to_rotation(assembly.mount.quaternion_wxyz)
         gravity_robot = rotation.T @ np.asarray(assembly.environment.gravity_m_s2, dtype=float)
-        model_parameters = GVSModelParameters()
+        model_parameters = GVSModelParameters(basis=self.parameters.basis)
         functions = GVSStaticCasadiExpressions(GVSContinuousDynamicsExpression(
             design=design,
             parameters=model_parameters,

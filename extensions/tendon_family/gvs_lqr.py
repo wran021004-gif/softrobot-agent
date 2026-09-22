@@ -5,7 +5,7 @@ import numpy as np
 from schemas.platform import Binding, Payload
 from schemas.platform_math import ConstraintSelection, ObjectiveSelection, OptimizationSpecification, SystemContext
 from tools.state_io import digest
-from .contracts import GVSInverseAssemblerParameters, GVSModelParameters, GVSLQRControl, GVSEquilibriumRequest, LQRParameters
+from .contracts import GVSInverseAssemblerParameters, GVSModelParameters, GVSLQRControl, GVSEquilibriumRequest, LQRParameters, ResolvedGVSBasis
 from .control import execute_ideal_tension, execute_tension_reference
 from .gvs import GVSModel, coordinate_order, forward_kinematics
 from .gvs_casadi import CasadiLinearizer, ContinuousLQRController
@@ -33,16 +33,17 @@ def _candidate_operating_point(inp):
     nominal=inp.model_copy(deep=True)
     nominal.task.environment.data['external_forces']=[]
     design=nominal.robot.structure.data
-    coordinates=coordinate_order(design);tendons=[t['id'] for t in design['tendons']]
+    basis=GVSLQRControl.model_validate(nominal.policy.controller.parameters.data).basis
+    coordinates=coordinate_order(design,basis);tendons=[t['id'] for t in design['tendons']]
     key=digest(dict(design=design,environment=nominal.task.environment.model_dump(mode='json'),
-        target=nominal.task.goal.data['target_m'],source='gvs_inverse_tip_static_v1'))
+        target=nominal.task.goal.data['target_m'],basis=basis.model_dump(mode='json'),source='gvs_inverse_tip_static_v1'))
     if key in _OPERATING_POINTS:
         return deepcopy(_OPERATING_POINTS[key])
     reg=registry();q_paths=['q/'+name for name in coordinates]
     tension_paths=['tendon_tensions_n/'+name for name in tendons]
     binding=Binding(extension_id='optimization_assembler.gvs_inverse',parameters=Payload(
         contract='family.gvs_inverse_assembler_parameters',data=GVSInverseAssemblerParameters(
-            template='inverse_tip_static').model_dump(mode='json')))
+            template='inverse_tip_static',basis=basis).model_dump(mode='json')))
     parameters=reg.bind(binding,'optimization_assembler')[1]
     space=gvs_authorization(nominal.robot,reg.parse(nominal.policy.candidate_builder.parameters).model_dump(mode='json'),parameters)
     initial={name:0. for name in q_paths}
@@ -50,7 +51,7 @@ def _candidate_operating_point(inp):
         for t in design['tendons']})
     problem=assemble_optimization(reg,binding,task=nominal.task,robot=nominal.robot,space=space,
         mathematical_model=reg.mathematical_model(Binding(extension_id='model.gvs',parameters=Payload(
-            contract='family.gvs_model',data={}))),
+            contract='family.gvs_model',data=GVSModelParameters(basis=basis).model_dump(mode='json')))),
         specification=OptimizationSpecification(variables=q_paths+tension_paths,
             objectives=[ObjectiveSelection(template_id='tip_position_error_squared')],
             constraints=[ConstraintSelection(template_id='static_equilibrium'),
@@ -71,7 +72,7 @@ def _candidate_operating_point(inp):
     u0=np.clip(inverse_tensions,0.,limits).tolist()
     from types import SimpleNamespace
     refined=gvs_equilibrium_tool(SimpleNamespace(input=nominal,reg=reg),GVSEquilibriumRequest(
-        tendon_tensions_n=dict(zip(tendons,u0)),initial_q=q0,tolerance=1e-16,max_iterations=20))
+        tendon_tensions_n=dict(zip(tendons,u0)),initial_q=q0,basis=basis,tolerance=1e-16,max_iterations=20))
     if not refined.converged:
         raise ValueError('GVS_OPERATING_POINT_REFINEMENT_FAILED: residual='+str(refined.residual_norm))
     point=dict(q0=refined.q_equilibrium,u0=u0,coordinate_order=coordinates,tendon_order=tendons,
@@ -87,13 +88,14 @@ def _candidate_operating_point(inp):
 def resolve_gvs_lqr_control(inp,physics):
     c=GVSLQRControl.model_validate(inp.policy.controller.parameters.data)
     design=inp.robot.structure.data
-    order=coordinate_order(design);tendon_order=[t['entity'] for t in physics['tendons']]
+    basis=c.basis
+    order=coordinate_order(design,basis);tendon_order=[t['entity'] for t in physics['tendons']]
     point=_candidate_operating_point(inp);q0=point['q0'];u0=np.asarray(point['u0'],dtype=float)
     if len(q0)!=len(order): raise ValueError('GVS_LQR_Q0_DIMENSION_MISMATCH')
     if len(u0)!=len(tendon_order): raise ValueError('GVS_LQR_U0_DIMENSION_MISMATCH')
     limits=np.array([t['force_limit_n'] for t in physics['tendons']])
     if np.any(u0>limits): raise ValueError('GVS_LQR_U0_FORCE_LIMIT_EXCEEDED')
-    parameters=GVSModelParameters()
+    parameters=GVSModelParameters(basis=basis)
     x0=[*q0,*([0.]*len(order))]
     system=GVSModel(parameters).build_system(inp.robot,parameters,None,SystemContext(
         x0=x0,u0=u0.tolist(),scene=_nominal_environment(inp.task.environment)))
@@ -111,16 +113,16 @@ def resolve_gvs_lqr_control(inp,physics):
     gain_identity=digest(dict(K=K.tolist(),Q_diagonal=qdiag,R_diagonal=rdiag,x0=x0,u0=u0.tolist(),
         tendon_order=tendon_order,force_limits_n=limits.tolist()))
     linearization_identity=digest(linear.model_dump(mode='json'))
-    local_tip=forward_kinematics(design,q0,samples_per_segment=2)['tip_position_m']
+    local_tip=forward_kinematics(design,q0,samples_per_segment=2,basis=basis)['tip_position_m']
     assembly=inp.task.environment.data
     rotation=quaternion_wxyz_to_rotation(assembly['mount']['quaternion_wxyz'])
     world_tip=(rotation@local_tip+np.asarray(assembly['mount']['position_m'])).tolist()
     def tip_at(q):
-        return rotation@np.asarray(forward_kinematics(design,q.tolist(),samples_per_segment=2)['tip_position_m'])
+        return rotation@np.asarray(forward_kinematics(design,q.tolist(),samples_per_segment=2,basis=basis)['tip_position_m'])
     q0_array=np.asarray(q0)
     tip_jacobian=np.column_stack([(tip_at(q0_array+np.eye(len(q0))[i]*1e-5)
         -tip_at(q0_array-np.eye(len(q0))[i]*1e-5))/(2e-5) for i in range(len(q0))])
-    projector=projector_description(physics,design)
+    projector=projector_description(physics,design,basis)
     if inp.policy.backend.extension_id!='backend.family_mujoco':
         raise ValueError('GVS_LQR_BACKEND_EXECUTION_UNSUPPORTED: '+inp.policy.backend.extension_id)
     execution_mode=c.development_execution_mode or 'ideal_tension'
@@ -169,6 +171,7 @@ class GVSLQRController:
 
     def configure(self,physics,plan):
         self.physics=physics;self.plan=plan;self.coordinate_order=plan['algorithm']['projector']['coordinate_order']
+        self.resolved_basis=ResolvedGVSBasis.model_validate(plan['algorithm']['projector']['resolved_basis'])
         self.K=np.asarray(plan['algorithm']['K']);self.x0=np.asarray(plan['algorithm']['x0']);self.u0=np.asarray(plan['algorithm']['u0'])
         feedback=plan['task_feedback'];self.task_feedback_gain=feedback['gain']
         self.task_feedback_limit=feedback['max_tension_n']

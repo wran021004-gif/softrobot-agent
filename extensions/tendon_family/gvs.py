@@ -1,10 +1,7 @@
-"""First-order variable-strain continuum bending dynamics.
+"""RobotIR-driven variable-strain continuum bending dynamics.
 
-Each flexible segment uses the deterministic coordinate order
-
-    kappa_y_0, kappa_y_1, kappa_z_0, kappa_z_1
-
-with ``phi0(s)=1`` and ``phi1(s)=2*s/L-1``.  The strain is the actual
+The resolved GVS basis determines the coordinate order and curvature field.
+The strain is the actual
 geometric curvature.  Natural curvature is used only as the zero-energy
 reference in the constitutive bending force.
 
@@ -30,15 +27,11 @@ from extensions.tendon_family.pcc import (
 )
 from extensions.tendon_family.sections import at as section_at
 from extensions.tendon_family.sections import properties as section_properties
+from extensions.tendon_family.gvs_basis import (basis_matrix, basis_quadrature,
+    integration_intervals, resolve_basis, segment_basis, segment_slice)
 
 
 MODEL_ID = 'gvs_variable_strain_bending_v1'
-LOCAL_COORDINATES = (
-    ('kappa_y_0', 'y', 'constant'),
-    ('kappa_y_1', 'y', 'linear'),
-    ('kappa_z_0', 'z', 'constant'),
-    ('kappa_z_1', 'z', 'linear'),
-)
 
 
 def _topology(design):
@@ -77,32 +70,26 @@ def _topology(design):
     return parsed, components, chain, segments
 
 
-def coordinate_order(design) -> list[str]:
-    """Resolve the fixed first-order GVS coordinate ordering."""
-    _, _, _, segments = _topology(design)
-    return [
-        f'{segment.id}.{coordinate}'
-        for segment in segments
-        for coordinate, _, _ in LOCAL_COORDINATES
-    ]
+def coordinate_order(design, basis=None) -> list[str]:
+    return resolve_basis(design, basis).coordinate_order
 
 
-def describe(design) -> dict:
-    parsed, _, _, segments = _topology(design)
+def describe(design, basis=None) -> dict:
+    parsed, _, _, _ = _topology(design)
+    resolved = resolve_basis(parsed, basis)
     coordinates = []
-    for segment in segments:
-        for coordinate, axis, mode in LOCAL_COORDINATES:
-            coordinates.append(dict(
-                name=f'{segment.id}.{coordinate}',
-                segment=segment.id,
-                mode=mode,
-                axis=axis,
-                units='rad/m',
-            ))
+    for local in resolved.segments:
+        for axis_index, axis in enumerate(resolved.axes):
+            for index in range(len(local.knots)):
+                name = resolved.coordinate_order[local.start + axis_index * len(local.knots) + index]
+                mode = ('constant' if index == 0 else 'linear') if resolved.specification.strategy == 'first_order' else 'nodal_linear'
+                coordinates.append(dict(name=name, segment=local.segment, mode=mode,
+                                        axis=axis, units='rad/m'))
     return dict(
         model_id=MODEL_ID,
         frame='robot_base',
-        basis=('phi0(s)=1', 'phi1(s)=2*s/L-1'),
+        basis=(('phi0(s)=1', 'phi1(s)=2*s/L-1') if resolved.specification.strategy == 'first_order' else ('piecewise_linear_nodal',)),
+        resolved_basis=resolved.model_dump(mode='json'),
         curvature_semantics='actual_total_curvature',
         natural_curvature_role='zero_elastic_energy_reference',
         coordinates=coordinates,
@@ -119,40 +106,36 @@ def describe(design) -> dict:
     )
 
 
-def _configuration(topology, q):
-    _, _, _, segments = topology
+def _configuration(topology, q, basis=None):
+    resolved = resolve_basis(topology[0], basis)
     values = np.asarray(q, dtype=float)
-    expected = 4 * len(segments)
+    expected = resolved.dimension
     if values.shape != (expected,) or not np.all(np.isfinite(values)):
         raise ValueError(f'GVS q must contain {expected} finite coordinates')
     return values, {
-        segment.id: values[4 * index:4 * index + 4]
-        for index, segment in enumerate(segments)
+        segment.segment: values[segment_slice(segment)]
+        for segment in resolved.segments
     }
 
 
-def _segment_local_pose(segment, coefficients, u, integration_steps):
+def _segment_local_pose(segment, coefficients, u, integration_steps, resolved, local_basis):
     u = float(u)
     if not 0.0 <= u <= 1.0:
         raise ValueError('GVS segment coordinate must be within [0, 1]')
     if u == 0.0:
         return np.eye(4)
-    steps = max(1, math.ceil(integration_steps * u))
-    ds = segment.length_m * u / steps
     transform = np.eye(4)
-    for index in range(steps):
-        normalized_midpoint = (index + 0.5) * u / steps
-        phi1 = 2.0 * normalized_midpoint - 1.0
-        ky = coefficients[0] + coefficients[1] * phi1
-        kz = coefficients[2] + coefficients[3] * phi1
-        transform = transform @ segment_pose_at(ds, ky, kz)
+    for normalized_midpoint, normalized_width in integration_intervals(local_basis, u, integration_steps):
+        ky, kz = basis_matrix(resolved, local_basis, normalized_midpoint) @ coefficients
+        transform = transform @ segment_pose_at(segment.length_m * normalized_width, ky, kz)
     return transform
 
 
 class _Kinematics:
-    def __init__(self, topology, q, integration_steps):
+    def __init__(self, topology, q, integration_steps, basis=None):
         self.design, self.components, self.chain, self.segments = topology
-        self.q, self.coefficients = _configuration(topology, q)
+        self.resolved = resolve_basis(self.design, basis)
+        self.q, self.coefficients = _configuration(topology, q, basis)
         self.integration_steps = integration_steps
         self._base_cache = {}
         self._point_cache = {}
@@ -177,6 +160,8 @@ class _Kinematics:
                     self.coefficients[part],
                     s,
                     self.integration_steps,
+                    self.resolved,
+                    segment_basis(self.resolved, part),
                 )
             elif isinstance(component, Rigid):
                 if abs(float(s)) > 1e-12:
@@ -237,10 +222,10 @@ class _Kinematics:
         )
 
 
-def forward_kinematics(design, q, samples_per_segment=21, integration_steps_per_segment=24):
+def forward_kinematics(design, q, samples_per_segment=21, integration_steps_per_segment=24, basis=None):
     """Integrate the variable-curvature continuum pose in the robot base frame."""
     topology = _topology(design)
-    return _Kinematics(topology, q, integration_steps_per_segment).output(
+    return _Kinematics(topology, q, integration_steps_per_segment, basis).output(
         samples_per_segment
     )
 
@@ -278,48 +263,41 @@ def _stiffness_and_damping(segment, normalized_s):
     return stiffness, damping
 
 
-def _quadrature(count):
-    nodes, weights = np.polynomial.legendre.leggauss(count)
-    return (nodes + 1.0) / 2.0, weights / 2.0
-
-
-def constitutive_forces(design, q, qdot, quadrature_points_per_segment=5):
+def constitutive_forces(design, q, qdot, quadrature_points_per_segment=5, basis=None):
     """Return positive-LHS elastic and viscous generalized forces."""
     topology = _topology(design)
-    values, coefficients = _configuration(topology, q)
+    resolved = resolve_basis(topology[0], basis)
+    values, coefficients = _configuration(topology, q, basis)
     rates = np.asarray(qdot, dtype=float)
     if rates.shape != values.shape or not np.all(np.isfinite(rates)):
         raise ValueError('GVS qdot must match q and contain finite values')
     elastic = np.zeros_like(values)
     damping = np.zeros_like(values)
-    nodes, weights = _quadrature(quadrature_points_per_segment)
-    for segment_index, segment in enumerate(topology[3]):
+    for segment in topology[3]:
+        local = segment_basis(resolved, segment.id)
+        sl = segment_slice(local)
         local_q = coefficients[segment.id]
-        local_qdot = rates[4 * segment_index:4 * segment_index + 4]
-        local_elastic = np.zeros(4)
-        local_damping = np.zeros(4)
+        local_qdot = rates[sl]
+        local_elastic = np.zeros(len(local_q))
+        local_damping = np.zeros(len(local_q))
         natural = np.asarray(segment.natural_curvature_rad_m, dtype=float)
-        for u, weight in zip(nodes, weights):
-            phi1 = 2.0 * u - 1.0
-            basis = np.array([
-                [1.0, phi1, 0.0, 0.0],
-                [0.0, 0.0, 1.0, phi1],
-            ])
+        for u, weight in basis_quadrature(local, quadrature_points_per_segment):
+            matrix = basis_matrix(resolved, local, u)
             stiffness, viscosity = _stiffness_and_damping(segment, float(u))
             scale = segment.length_m * weight
-            local_elastic += scale * basis.T @ stiffness @ (basis @ local_q - natural)
-            local_damping += scale * basis.T @ viscosity @ (basis @ local_qdot)
-        start = 4 * segment_index
-        elastic[start:start + 4] = local_elastic
-        damping[start:start + 4] = local_damping
+            local_elastic += scale * matrix.T @ stiffness @ (matrix @ local_q - natural)
+            local_damping += scale * matrix.T @ viscosity @ (matrix @ local_qdot)
+        elastic[sl] = local_elastic
+        damping[sl] = local_damping
     return elastic, damping
 
 
-def _mass_descriptors(topology, quadrature_points):
-    nodes, weights = _quadrature(quadrature_points)
+def _mass_descriptors(topology, quadrature_points, basis=None):
+    resolved = resolve_basis(topology[0], basis)
     descriptors = []
     for segment in topology[3]:
-        for u, weight in zip(nodes, weights):
+        local = segment_basis(resolved, segment.id)
+        for u, weight in basis_quadrature(local, quadrature_points):
             section = section_at(segment, float(u))
             prop = section_properties(section)
             area = prop['area_m2']
@@ -357,8 +335,8 @@ def _mass_descriptors(topology, quadrature_points):
     return descriptors
 
 
-def _observe_mass(topology, q, integration_steps, descriptors):
-    state = _Kinematics(topology, q, integration_steps)
+def _observe_mass(topology, q, integration_steps, descriptors, basis):
+    state = _Kinematics(topology, q, integration_steps, basis)
     observations = []
     for descriptor in descriptors:
         if descriptor['kind'] == 'segment':
@@ -372,12 +350,12 @@ def _observe_mass(topology, q, integration_steps, descriptors):
 
 
 def _mass_and_gravity(topology, q, gravity, parameters, descriptors=None):
-    q, _ = _configuration(topology, q)
+    q, _ = _configuration(topology, q, parameters.basis)
     descriptors = descriptors or _mass_descriptors(
-        topology, parameters.quadrature_points_per_segment
+        topology, parameters.quadrature_points_per_segment, parameters.basis
     )
     base = _observe_mass(
-        topology, q, parameters.integration_steps_per_segment, descriptors
+        topology, q, parameters.integration_steps_per_segment, descriptors, parameters.basis
     )
     n = len(q)
     jacobian_v = [np.zeros((3, n)) for _ in descriptors]
@@ -387,10 +365,10 @@ def _mass_and_gravity(topology, q, gravity, parameters, descriptors=None):
         delta = np.zeros(n)
         delta[coordinate] = h
         plus = _observe_mass(
-            topology, q + delta, parameters.integration_steps_per_segment, descriptors
+            topology, q + delta, parameters.integration_steps_per_segment, descriptors, parameters.basis
         )
         minus = _observe_mass(
-            topology, q - delta, parameters.integration_steps_per_segment, descriptors
+            topology, q - delta, parameters.integration_steps_per_segment, descriptors, parameters.basis
         )
         for item, ((_, rotation), (p_plus, r_plus), (p_minus, r_minus)) in enumerate(
             zip(base, plus, minus)
@@ -426,8 +404,8 @@ def gravity_force(design, q, gravity_robot_base_m_s2, parameters):
     )[1]
 
 
-def _tendon_lengths(topology, q, integration_steps):
-    state = _Kinematics(topology, q, integration_steps)
+def _tendon_lengths(topology, q, integration_steps, basis=None):
+    state = _Kinematics(topology, q, integration_steps, basis)
     lengths = []
     for tendon in topology[0].tendons:
         positions = []
@@ -450,9 +428,9 @@ def _tendon_lengths(topology, q, integration_steps):
 def tendon_kinematics(design, q, parameters):
     """Return tendon order, lengths and dl/dq for straight frictionless spans."""
     topology = _topology(design)
-    values, _ = _configuration(topology, q)
+    values, _ = _configuration(topology, q, parameters.basis)
     lengths = _tendon_lengths(
-        topology, values, parameters.integration_steps_per_segment
+        topology, values, parameters.integration_steps_per_segment, parameters.basis
     )
     jacobian = np.zeros((len(lengths), len(values)))
     h = parameters.finite_difference_step
@@ -460,10 +438,10 @@ def tendon_kinematics(design, q, parameters):
         delta = np.zeros(len(values))
         delta[coordinate] = h
         plus = _tendon_lengths(
-            topology, values + delta, parameters.integration_steps_per_segment
+            topology, values + delta, parameters.integration_steps_per_segment, parameters.basis
         )
         minus = _tendon_lengths(
-            topology, values - delta, parameters.integration_steps_per_segment
+            topology, values - delta, parameters.integration_steps_per_segment, parameters.basis
         )
         jacobian[:, coordinate] = (plus - minus) / (2.0 * h)
     return [tendon.id for tendon in topology[0].tendons], lengths, jacobian
@@ -472,9 +450,9 @@ def tendon_kinematics(design, q, parameters):
 def tendon_lengths(design, q, parameters):
     """Return straight-frictionless tendon lengths without differentiating."""
     topology = _topology(design)
-    values, _ = _configuration(topology, q)
+    values, _ = _configuration(topology, q, parameters.basis)
     return _tendon_lengths(
-        topology, values, parameters.integration_steps_per_segment
+        topology, values, parameters.integration_steps_per_segment, parameters.basis
     )
 
 
@@ -518,7 +496,7 @@ def evaluate_dynamics(
 ):
     """Assemble and solve M*qdd+c+elastic+damping=tendon+gravity."""
     topology = _topology(design)
-    q, _ = _configuration(topology, q)
+    q, _ = _configuration(topology, q, parameters.basis)
     qdot = np.asarray(qdot, dtype=float)
     if qdot.shape != q.shape or not np.all(np.isfinite(qdot)):
         raise ValueError('GVS qdot must match q and contain finite values')
@@ -534,15 +512,15 @@ def evaluate_dynamics(
     if np.any(tensions > limits):
         raise ValueError('GVS tendon tension exceeds family.design force limit')
 
-    descriptors = _mass_descriptors(topology, parameters.quadrature_points_per_segment)
+    descriptors = _mass_descriptors(topology, parameters.quadrature_points_per_segment, parameters.basis)
     mass, gravity = _mass_and_gravity(
         topology, q, gravity_robot_base_m_s2, parameters, descriptors
     )
     bias = _velocity_bias(topology, q, qdot, parameters, descriptors)
     elastic, damping = constitutive_forces(
-        topology[0], q, qdot, parameters.quadrature_points_per_segment
+        topology[0], q, qdot, parameters.quadrature_points_per_segment, parameters.basis
     )
-    lengths = _tendon_lengths(topology, q, parameters.integration_steps_per_segment)
+    lengths = _tendon_lengths(topology, q, parameters.integration_steps_per_segment, parameters.basis)
     tendon_jacobian = np.zeros((len(lengths), len(q)))
     h = parameters.finite_difference_step
     for coordinate in range(len(q)):
@@ -550,20 +528,20 @@ def evaluate_dynamics(
         delta[coordinate] = h
         tendon_jacobian[:, coordinate] = (
             _tendon_lengths(
-                topology, q + delta, parameters.integration_steps_per_segment
+                topology, q + delta, parameters.integration_steps_per_segment, parameters.basis
             )
             - _tendon_lengths(
-                topology, q - delta, parameters.integration_steps_per_segment
+                topology, q - delta, parameters.integration_steps_per_segment, parameters.basis
             )
         ) / (2.0 * h)
     tendon_force = -tendon_jacobian.T @ tensions
     rhs = tendon_force + gravity - bias - elastic - damping
     qdd = np.linalg.solve(mass, rhs)
     kinematics = _Kinematics(
-        topology, q, parameters.integration_steps_per_segment
+        topology, q, parameters.integration_steps_per_segment, parameters.basis
     ).output(samples_per_segment)
     return dict(
-        coordinate_order=coordinate_order(topology[0]),
+        coordinate_order=coordinate_order(topology[0], parameters.basis),
         q=q,
         qdot=qdot,
         qdd=qdd,
@@ -611,7 +589,7 @@ class GVSModel:
         design = registry.parse(robot.structure)
         if not isinstance(design, Design):
             raise ValueError('GVS_REQUIRES_FAMILY_DESIGN')
-        result = GVSDescription.model_validate(describe(design))
+        result = GVSDescription.model_validate(describe(design, self.parameters.basis))
         return Payload(
             contract='family.gvs_description',
             data=result.model_dump(mode='json'),
@@ -717,7 +695,7 @@ class GVSModel:
         if assembly.external_forces:
             raise ValueError('GVS_EXTERNAL_APPLIED_FORCES_UNSUPPORTED')
 
-        coordinates = coordinate_order(design)
+        coordinates = coordinate_order(design, self.parameters.basis)
         tendons = list(design.tendons)
         n = len(coordinates)
         if len(context.x0) != 2 * n or len(context.u0) != len(tendons):

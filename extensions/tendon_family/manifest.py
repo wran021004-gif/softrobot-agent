@@ -45,7 +45,7 @@ CONTRACTS += [
     ('family.lqr_synthesis_description', '2.0.0', c.LQRSynthesisDescription),
     ('family.gvs_lqr_control', '1.0.0', c.GVSLQRControl),
 ]
-SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_projection','gvs_lqr','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
+SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
@@ -88,7 +88,7 @@ EXTENSIONS=[
         dependencies=('numpy','scipy','casadi'),extension_dependencies=(('controller.lqr','1.0.0'),('model.gvs','1.0.0')),
         capabilities=dict(category='control',role='adapter',channel='actuator_commands',backend_executable=True,
             command_space='desired_tendon_tension',observations=['joint_position','joint_velocity','tendon_length'],
-            state_projector='backend_discrete_to_gvs_first_order_v1',model_requirement=dict(input='none'),
+            state_projector='backend_discrete_to_gvs_resolved_v1',model_requirement=dict(input='none'),
             derived_artifacts=['candidate_gvs_equilibrium','candidate_dynamic_system','candidate_linearization','candidate_lqr_gain'],
             backend_execution='backend.family_mujoco deterministically applies clipped desired tendon force directly',
             composition=['model.gvs','linearizer.casadi','controller.lqr','backend_tension_execution'],reset=True,restore=False)),
@@ -247,7 +247,7 @@ EXTENSIONS.append(
         c.GVSModelParameters,
         Payload,
         'extensions.tendon_family.gvs:GVSModel',
-        'First-order variable-strain continuum bending kinematics and dynamics',
+        'RobotIR-driven variable-strain continuum bending kinematics and dynamics',
         sources=GVS_SOURCES,
         contract_dependencies=COMMON['contract_dependencies'],
         dependencies=('numpy', 'casadi'),
@@ -259,10 +259,8 @@ EXTENSIONS.append(
             ),
             physical_input='family.design',
             environment_input='experiment.assembly gravity and mount',
-            generalized_coordinates=(
-                'per segment: kappa_y_0, kappa_y_1, kappa_z_0, kappa_z_1'
-            ),
-            strain_basis=['phi0(s)=1', 'phi1(s)=2*s/L-1'],
+            generalized_coordinates='resolved from model basis strategy and family.design structural locations',
+            strain_basis=['first_order', 'structural_linear'],
             curvature_semantics='actual total geometric curvature',
             constitutive_reference='Segment.natural_curvature_rad_m',
             actuation_input=(
@@ -293,7 +291,7 @@ EXTENSIONS.append(
         c.GVSDescription,
         'extensions.tendon_family.gvs:gvs_describe_tool',
         (
-            'Describe the frozen robot GVS coordinate order, fixed first-order '
+            'Describe the robot GVS coordinate order, resolved '
             'strain basis and nonnegative tendon-tension inputs. No solve.'
         ),
         sources=GVS_SOURCES,

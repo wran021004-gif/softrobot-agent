@@ -1,4 +1,4 @@
-"""CasADi MX implementation of the frozen first-order bending GVS model.
+"""CasADi MX implementation of the resolved bending GVS model.
 
 MX keeps indexed pose assembly and the resulting expression graph readable and
 is directly usable by later IPOPT/acados adapters.  Public contracts retain only
@@ -32,12 +32,13 @@ from extensions.tendon_family.contracts import (
 )
 from extensions.tendon_family.gvs import (
     _mass_descriptors,
-    _quadrature,
     _stiffness_and_damping,
     _topology,
     _bound_model,
     coordinate_order,
 )
+from extensions.tendon_family.gvs_basis import (basis_matrix, basis_quadrature,
+    integration_intervals, segment_basis, segment_slice)
 from extensions.tendon_family.pcc import quaternion_wxyz_to_rotation, rigid_transform
 from schemas.platform import EvidenceRef, Payload
 from schemas.platform_math import DynamicSystem, LinearizedModel
@@ -88,12 +89,13 @@ def _segment_pose(length, ky, kz):
 
 
 class _SymbolicKinematics:
-    def __init__(self, topology, q, integration_steps):
+    def __init__(self, topology, q, integration_steps, resolved):
         self.design, self.components, self.chain, self.segments = topology
         self.q = q
+        self.resolved = resolved
         self.coefficients = {
-            segment.id: q[4 * index:4 * index + 4]
-            for index, segment in enumerate(self.segments)
+            segment.segment: q[segment_slice(segment)]
+            for segment in resolved.segments
         }
         self.integration_steps = integration_steps
         self._base_cache = {}
@@ -105,15 +107,11 @@ class _SymbolicKinematics:
             raise ValueError('GVS segment coordinate must be within [0, 1]')
         if u == 0:
             return ca.DM.eye(4)
-        steps = max(1, int(np.ceil(self.integration_steps * u)))
-        ds = segment.length_m * u / steps
         transform = ca.MX.eye(4)
-        for index in range(steps):
-            midpoint = (index + 0.5) * u / steps
-            phi1 = 2 * midpoint - 1
-            ky = coefficients[0] + coefficients[1] * phi1
-            kz = coefficients[2] + coefficients[3] * phi1
-            transform = ca.mtimes(transform, _segment_pose(ds, ky, kz))
+        for midpoint, width in integration_intervals(segment_basis(self.resolved, segment.id), u, self.integration_steps):
+            curvature = ca.mtimes(_dm(basis_matrix(self.resolved, segment_basis(self.resolved, segment.id), midpoint)), coefficients)
+            ky, kz = curvature[0], curvature[1]
+            transform = ca.mtimes(transform, _segment_pose(segment.length_m * width, ky, kz))
         return transform
 
     def point_pose(self, part, s):
@@ -182,7 +180,8 @@ class GVSCasadiFunctions:
         self.expression = expression
         self.design = expression.design
         self.parameters = expression.parameters
-        if expression.coordinate_order != coordinate_order(self.design):
+        self.resolved = expression.resolved_basis
+        if expression.coordinate_order != self.resolved.coordinate_order:
             raise ValueError('GVS_EXPRESSION_COORDINATE_ORDER_MISMATCH')
         topology = _topology(self.design)
         n = len(expression.coordinate_order)
@@ -191,11 +190,11 @@ class GVSCasadiFunctions:
         qdot = ca.MX.sym('qdot', n)
         u = ca.MX.sym('u', m)
         state = _SymbolicKinematics(
-            topology, q, self.parameters.integration_steps_per_segment
+            topology, q, self.parameters.integration_steps_per_segment, self.resolved
         )
 
         descriptors = _mass_descriptors(
-            topology, self.parameters.quadrature_points_per_segment
+            topology, self.parameters.quadrature_points_per_segment, self.parameters.basis
         )
         mass = ca.MX.zeros(n, n)
         gravity = ca.MX.zeros(n, 1)
@@ -220,18 +219,16 @@ class GVSCasadiFunctions:
 
         elastic = ca.MX.zeros(n, 1)
         damping = ca.MX.zeros(n, 1)
-        nodes, weights = _quadrature(
-            self.parameters.quadrature_points_per_segment
-        )
-        for segment_index, segment in enumerate(topology[3]):
-            local_q = q[4 * segment_index:4 * segment_index + 4]
-            local_qdot = qdot[4 * segment_index:4 * segment_index + 4]
-            local_elastic = ca.MX.zeros(4, 1)
-            local_damping = ca.MX.zeros(4, 1)
+        for segment in topology[3]:
+            local = segment_basis(self.resolved, segment.id)
+            sl = segment_slice(local)
+            local_q = q[sl]
+            local_qdot = qdot[sl]
+            local_elastic = ca.MX.zeros(2 * len(local.knots), 1)
+            local_damping = ca.MX.zeros(2 * len(local.knots), 1)
             natural = _dm(segment.natural_curvature_rad_m)
-            for node, weight in zip(nodes, weights):
-                phi1 = 2 * float(node) - 1
-                basis = _dm([[1, phi1, 0, 0], [0, 0, 1, phi1]])
+            for node, weight in basis_quadrature(local, self.parameters.quadrature_points_per_segment):
+                basis = _dm(basis_matrix(self.resolved, local, float(node)))
                 stiffness, viscosity = _stiffness_and_damping(segment, float(node))
                 scale = segment.length_m * float(weight)
                 local_elastic += scale * ca.mtimes(
@@ -240,8 +237,8 @@ class GVSCasadiFunctions:
                 local_damping += scale * ca.mtimes(
                     [basis.T, _dm(viscosity), ca.mtimes(basis, local_qdot)]
                 )
-            elastic[4 * segment_index:4 * segment_index + 4] = local_elastic
-            damping[4 * segment_index:4 * segment_index + 4] = local_damping
+            elastic[sl] = local_elastic
+            damping[sl] = local_damping
 
         lengths = []
         for tendon in topology[0].tendons:
@@ -339,18 +336,19 @@ class GVSStaticCasadiExpressions:
         self.expression = expression
         self.design = expression.design
         self.parameters = expression.parameters
+        self.resolved = expression.resolved_basis
         topology = _topology(self.design)
         n = len(expression.coordinate_order)
         q = ca.MX.sym('q', n)
         u = ca.MX.sym('u', len(expression.tendon_order))
         state = _SymbolicKinematics(
-            topology, q, self.parameters.integration_steps_per_segment
+            topology, q, self.parameters.integration_steps_per_segment, self.resolved
         )
 
         gravity = ca.MX.zeros(n, 1)
         gravity_vector = _dm(expression.gravity_robot_base_m_s2)
         for descriptor in _mass_descriptors(
-            topology, self.parameters.quadrature_points_per_segment
+            topology, self.parameters.quadrature_points_per_segment, self.parameters.basis
         ):
             pose = (
                 state.point_pose(descriptor['component'], descriptor['s'])
@@ -364,21 +362,19 @@ class GVSStaticCasadiExpressions:
             )
 
         elastic = ca.MX.zeros(n, 1)
-        nodes, weights = _quadrature(
-            self.parameters.quadrature_points_per_segment
-        )
-        for segment_index, segment in enumerate(topology[3]):
-            local_q = q[4 * segment_index:4 * segment_index + 4]
-            local_elastic = ca.MX.zeros(4, 1)
+        for segment in topology[3]:
+            local = segment_basis(self.resolved, segment.id)
+            sl = segment_slice(local)
+            local_q = q[sl]
+            local_elastic = ca.MX.zeros(2 * len(local.knots), 1)
             natural = _dm(segment.natural_curvature_rad_m)
-            for node, weight in zip(nodes, weights):
-                phi1 = 2 * float(node) - 1
-                basis = _dm([[1, phi1, 0, 0], [0, 0, 1, phi1]])
+            for node, weight in basis_quadrature(local, self.parameters.quadrature_points_per_segment):
+                basis = _dm(basis_matrix(self.resolved, local, float(node)))
                 stiffness, _ = _stiffness_and_damping(segment, float(node))
                 local_elastic += segment.length_m * float(weight) * ca.mtimes(
                     [basis.T, _dm(stiffness), ca.mtimes(basis, local_q) - natural]
                 )
-            elastic[4 * segment_index:4 * segment_index + 4] = local_elastic
+            elastic[sl] = local_elastic
 
         lengths = []
         for tendon in topology[0].tendons:
@@ -602,8 +598,9 @@ def gvs_equilibrium_tool(ctx, args):
     if np.any(tensions > limits):
         raise ValueError('GVS tendon tension exceeds family.design force limit')
 
-    model = _bound_model(ctx)
-    n = len(coordinate_order(design))
+    from .gvs import GVSModel
+    model = GVSModel(GVSModelParameters(basis=args.basis))
+    n = len(coordinate_order(design, args.basis))
     q = np.asarray(args.initial_q, dtype=float)
     if q.shape != (n,):
         raise ValueError('GVS_EQUILIBRIUM_INITIAL_Q_DIMENSION_MISMATCH')
@@ -650,7 +647,7 @@ def gvs_equilibrium_tool(ctx, args):
         iterations = iteration + 1
     residual, _ = functions.equilibrium_terms(q, tensions)
     return GVSEquilibriumResult(
-        coordinate_order=coordinate_order(design),
+        coordinate_order=coordinate_order(design, args.basis),
         tendon_order=order,
         q_equilibrium=q.tolist(),
         residual_norm=float(np.linalg.norm(residual, ord=np.inf)),
