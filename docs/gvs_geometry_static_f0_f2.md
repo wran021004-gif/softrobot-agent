@@ -1,5 +1,8 @@
 # GVS/serial-cell consistency, F0–F2 (2026-09-22)
 
+Follow-up [F3 signed-force analysis](gvs_force_consistency_f3.md) shows that the
+dominant full-cell residual lies outside the first-order GVS strain subspace.
+
 The physical `two_segment_development` robot, mount, tip, target, and tendon routes were held fixed. Only the near/far cell counts changed. The three GVS states were zero; moderate `[2,-1,1,0.5,-4,2,-2,1]` rad/m; and the previous failed E1 equilibrium `q0`. All positions below use the same world mount. The segment orientation comparison removes the cell's principal-section frame rotation before comparing it with the GVS segment frame.
 
 ## A. F0 kinematic convergence
