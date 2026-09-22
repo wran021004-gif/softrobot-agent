@@ -73,9 +73,11 @@ class GVSPlatformTests(unittest.TestCase):
                 for definition in self.reg.extensions.values()
                 if definition.extension_id == extension_id
             ]
-            expected = 2 if extension_id in {
+            expected = 3 if extension_id in {
                 'dynamics.gvs_evaluate',
                 'dynamics.gvs_build_system',
+            } else 2 if extension_id in {
+                'dynamics.gvs_describe',
                 'linearization.linearize',
                 'control.lqr_describe',
             } else 1

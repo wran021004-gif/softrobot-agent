@@ -651,6 +651,10 @@ class GVSBuildSystemRequestV2(Contract):
     u0: list[FiniteFloat]
 
 
+class GVSBuildSystemRequestV3(GVSBuildSystemRequestV2):
+    basis: GVSBasisSpecification
+
+
 class GVSSystemArtifactResult(Contract):
     model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
     system: EvidenceRef
@@ -804,6 +808,10 @@ class GVSDynamicsRequestV2(Contract):
     samples_per_segment: int = Field(default=21, ge=2, le=201)
 
 
+class GVSDynamicsRequestV3(GVSDynamicsRequestV2):
+    basis: GVSBasisSpecification
+
+
 class GVSPose(Contract):
     position_m: Vec3
     rotation_matrix: Matrix3
@@ -888,6 +896,10 @@ class GVSEquilibriumRequest(Contract):
     max_iterations: int = Field(default=50, ge=1, le=500)
 
 
+class GVSEquilibriumRequestV2(GVSEquilibriumRequest):
+    basis: GVSBasisSpecification
+
+
 class GVSEquilibriumResult(Contract):
     model_id: Literal['gvs_variable_strain_bending_v1'] = 'gvs_variable_strain_bending_v1'
     coordinate_order: list[str] = Field(min_length=1)
@@ -913,8 +925,16 @@ class GVSInverseAssemblerParameters(Contract):
         return self
 
 
+class GVSInverseAssemblerParametersV2(GVSInverseAssemblerParameters):
+    basis: GVSBasisSpecification
+
+
 class GVSDescribeRequest(Contract):
     pass
+
+
+class GVSDescribeRequestV2(Contract):
+    basis: GVSBasisSpecification
 
 
 class GVSCoordinateDescription(Contract):

@@ -185,7 +185,8 @@ def optimization_describe_tool(ctx, args):
             variables='all robot-derived tendon_tensions_n/<tendon> variables',
             target_source='q_target in registered assembler parameters',
             assembler_parameters=(
-                'family.gvs_inverse_assembler_parameters: template=inverse_shape and ordered q_target; '
+                'family.gvs_inverse_assembler_parameters@2.0.0: template=inverse_shape, '
+                'explicit basis.strategy and ordered q_target; '
                 'no tendon order or force limits'
             ),
         ),
@@ -197,7 +198,8 @@ def optimization_describe_tool(ctx, args):
             variables='all q/<coordinate> and robot-derived tendon_tensions_n/<tendon> variables',
             target_source='frozen Task goal target_m; assembler parameters cannot override it',
             assembler_parameters=(
-                'family.gvs_inverse_assembler_parameters: template=inverse_tip_static; q_target forbidden'
+                'family.gvs_inverse_assembler_parameters@2.0.0: template=inverse_tip_static, '
+                'explicit basis.strategy; q_target forbidden'
             ),
         ),
     ])

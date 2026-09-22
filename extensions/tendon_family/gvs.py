@@ -766,15 +766,17 @@ class GVSModel:
         )
 
 
-def _bound_model(ctx):
+def _bound_model(ctx, basis=None):
     from schemas.platform import Binding, Payload
-    from extensions.tendon_family.contracts import GVSModelParameters
+    from extensions.tendon_family.contracts import GVSBasisSpecification, GVSModelParameters
     definition, parameters = ctx.reg.bind(
         Binding(
             extension_id='model.gvs',
             parameters=Payload(
                 contract='family.gvs_model',
-                data=GVSModelParameters().model_dump(mode='json'),
+                data=GVSModelParameters(
+                    basis=basis if basis is not None else GVSBasisSpecification()
+                ).model_dump(mode='json'),
             ),
         ),
         'dynamics_model',
@@ -786,13 +788,17 @@ def gvs_describe_tool(ctx, args):
     return ctx.reg.parse(_bound_model(ctx).describe(ctx.input.robot, ctx.reg))
 
 
-def gvs_evaluate_tool(ctx, args):
+def gvs_describe_tool_v2(ctx, args):
+    return ctx.reg.parse(_bound_model(ctx, args.basis).describe(ctx.input.robot, ctx.reg))
+
+
+def gvs_evaluate_tool(ctx, args, *, basis=None):
     from schemas.platform import Payload
     request = Payload(
         contract='family.gvs_dynamics_request',
         data=args.model_dump(mode='json'),
     )
-    result = _bound_model(ctx).evaluate(
+    result = _bound_model(ctx, basis).evaluate(
         ctx.input.robot,
         ctx.input.task.environment,
         request,
@@ -812,7 +818,7 @@ def gvs_evaluate_tool_v2(ctx, args):
         state=args.state,
         input=args.input,
         samples_per_segment=args.samples_per_segment,
-    ))
+    ), basis=getattr(args, 'basis', None))
     forces = args.detail in ('forces', 'full')
     diagnostics = args.detail == 'full'
     return GVSDynamicsResultV2(

@@ -22,8 +22,8 @@ def prepare(root,offline=False):
         'evaluation.run':'1.0.0','evidence.read':'1.0.0','session.control':'1.0.0',
         'diagnostics.saved_trajectory':'2.0.0','visualization.render_simulation_video':'2.0.0',
         'kinematics.pcc_describe':'1.0.0','kinematics.pcc_forward':'2.0.0',
-        'dynamics.gvs_describe':'1.0.0','dynamics.gvs_evaluate':'2.0.0',
-        'dynamics.gvs_build_system':'2.0.0','statics.gvs_equilibrium':'1.0.0',
+        'dynamics.gvs_describe':'2.0.0','dynamics.gvs_evaluate':'3.0.0',
+        'dynamics.gvs_build_system':'3.0.0','statics.gvs_equilibrium':'2.0.0',
         'linearization.linearize':'2.0.0','control.lqr_describe':'2.0.0',
         'control.lqr_synthesize':'1.0.0','optimization.describe':'1.0.0',
         'optimization.assemble':'1.0.0','optimization.solve':'1.0.0'}

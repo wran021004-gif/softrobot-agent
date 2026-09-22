@@ -547,7 +547,7 @@ def gvs_build_system_tool_v2(ctx, args):
     """Export at x0/u0 while taking all physical context from the frozen task."""
     from schemas.platform_math import SystemContext
 
-    model = _bound_model(ctx)
+    model = _bound_model(ctx, getattr(args, 'basis', None))
     system = model.build_system(
         ctx.input.robot,
         model.parameters,

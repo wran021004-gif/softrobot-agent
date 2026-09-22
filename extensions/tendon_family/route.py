@@ -1,6 +1,6 @@
 """Sequential, evidence-led route operations on existing Host sessions and Store events."""
 from copy import deepcopy
-from typing import Literal
+from typing import Literal, get_args
 from pydantic import Field
 from schemas.common import Contract
 from schemas.evidence import Identifier
@@ -116,7 +116,117 @@ def view(host):
 def design_summary(design):
     return dict(id=design.get('id'),components=[dict(id=c['id'],kind=c['kind'],length_m=c.get('length_m'),
         sections=[s['section'] for s in c.get('sections',[])]) for c in design.get('components',[])],
-        tendons=len(design.get('tendons',[])),actuators=len(design.get('actuators',[])))
+    tendons=len(design.get('tendons',[])),actuators=len(design.get('actuators',[])))
+
+
+def model_options(host, inp, combinations):
+    """Compact projection of deterministic assessments for invokable model paths."""
+    from .contracts import GVSBasisSpecification, GVSModelParameters
+    from .model_applicability import USES, assess_model_uses
+    from schemas.platform import Payload
+
+    grants = inp.policy.tool_bindings
+
+    def available(name, version):
+        if grants.get(name) != version:
+            return False
+        definition = host.reg.get(name, version, 'tool')
+        return (definition.capabilities.get('route_visible', False) and
+                host.reg.inspect(definition, grants)['executable'])
+
+    def option(assessment, binding, tools, backend_solves):
+        declaration = host.reg.mathematical_model(binding)
+        def short(reason):
+            return reason if len(reason) <= 160 else reason[:157] + '...'
+        return dict(model_id=assessment.model_id,
+            representation=dict(kind=assessment.representation_kind,
+                identity=assessment.representation_id,
+                strategy=assessment.representation_strategy,
+                generalized_coordinate_dimension=assessment.generalized_coordinate_dimension,
+                state_dimension=assessment.state_dimension),
+            uses={use: verdict.status for use, verdict in assessment.uses.items()},
+            reasons={use: [short(reason) for reason in verdict.reasons]
+                     for use, verdict in assessment.uses.items() if verdict.status != 'ALLOW'},
+            intended_uses=declaration.intended_uses,
+            assumptions=assessment.relevant_assumptions,
+            unsupported_requested_physics=assessment.unsupported_requested_physics,
+            validation='unavailable', tools=tools, backend_solves=backend_solves)
+
+    def binding(model_id, contract, data=None):
+        return Binding(extension_id=model_id,
+            parameters=Payload(contract=contract, data=data or {}))
+
+    options = {}
+    if available('kinematics.pcc_forward', '2.0.0'):
+        model = binding('model.pcc', 'family.pcc_model')
+        assessment = assess_model_uses(inp.robot, inp.task, model, list(USES), registry=host.reg)
+        tools = ['kinematics.pcc_forward']
+        if available('kinematics.pcc_describe', '1.0.0'):
+            tools.insert(0, 'kinematics.pcc_describe')
+        options['pcc'] = option(assessment, model, tools,
+            host.reg.get('kinematics.pcc_forward', '2.0.0').capabilities['backend_solves'])
+
+    describe_version = grants.get('dynamics.gvs_describe')
+    evaluate_version = grants.get('dynamics.gvs_evaluate')
+    if (describe_version in ('1.0.0', '2.0.0') and
+            evaluate_version in ('2.0.0', '3.0.0') and
+            available('dynamics.gvs_describe', describe_version) and
+            available('dynamics.gvs_evaluate', evaluate_version)):
+        strategies = (get_args(GVSBasisSpecification.model_fields['strategy'].annotation)
+                      if describe_version == '2.0.0' and evaluate_version == '3.0.0'
+                      else ('first_order',))
+        base_tools = ['dynamics.gvs_describe', 'dynamics.gvs_evaluate']
+        equilibrium_version = grants.get('statics.gvs_equilibrium')
+        build_version = grants.get('dynamics.gvs_build_system')
+        assembler = host.reg.get('optimization_assembler.gvs_inverse', '2.0.0',
+                                 'optimization_assembler')
+        can_optimize = (available('optimization.assemble', '1.0.0') and
+                        host.reg.inspect(assembler, {assembler.extension_id: assembler.version})['executable'])
+        representations = {}
+        for strategy in strategies:
+            tools = list(base_tools)
+            can_equilibrate = (equilibrium_version == '2.0.0' or
+                               (strategy == 'first_order' and equilibrium_version == '1.0.0'))
+            if can_equilibrate and available('statics.gvs_equilibrium', equilibrium_version):
+                tools.append('statics.gvs_equilibrium')
+            can_build = (build_version == '3.0.0' or
+                         (strategy == 'first_order' and build_version == '2.0.0'))
+            if can_build and available('dynamics.gvs_build_system', build_version):
+                tools.append('dynamics.gvs_build_system')
+                if available('linearization.linearize', '2.0.0'):
+                    tools.append('linearization.linearize')
+                    if available('control.lqr_synthesize', '1.0.0'):
+                        tools.append('control.lqr_synthesize')
+            if can_optimize:
+                tools.append('optimization.assemble')
+            parameters = GVSModelParameters(basis=GVSBasisSpecification(strategy=strategy))
+            model = binding('model.gvs', 'family.gvs_model', parameters.model_dump(mode='json'))
+            assessment = assess_model_uses(inp.robot, inp.task, model, list(USES), registry=host.reg)
+            if assessment.representation_id is not None:
+                representations[strategy] = option(assessment, model, tools,
+                    host.reg.get('dynamics.gvs_evaluate', evaluate_version).capabilities['backend_solves'])
+                if evaluate_version == '3.0.0':
+                    representations[strategy]['basis_argument'] = dict(basis=dict(strategy=strategy))
+                if can_optimize:
+                    representations[strategy]['optimization_assembler'] = dict(
+                        extension_id=assembler.extension_id, version=assembler.version,
+                        parameter_contract='family.gvs_inverse_assembler_parameters',
+                        parameter_version='2.0.0', basis=dict(strategy=strategy))
+        if representations:
+            options['gvs'] = dict(representations=representations)
+
+    serial = [(name, choice) for name, choice in combinations.items()
+              if choice['dynamics_model']['extension_id'] == 'model.serial_bending_cells'
+              and choice['executable']]
+    if serial and inp.policy.discretization is not None and grants.get('route.advance') == '1.0.0':
+        model = Binding.model_validate(serial[0][1]['dynamics_model'])
+        discretization = host.reg.parse(inp.policy.discretization)
+        assessment = assess_model_uses(inp.robot, inp.task, model, list(USES),
+            discretization=discretization, registry=host.reg)
+        options['serial_bending'] = option(assessment, model, ['route.advance'], 1)
+        options['serial_bending']['execution_backends'] = sorted({
+            choice['backend']['extension_id'] for _, choice in serial})
+    return dict(source='frozen_robot_and_task', options=options)
 
 
 def overview(host):
@@ -126,8 +236,8 @@ def overview(host):
     selected_node=next((n for n in reversed(completed) if n['action'] in ('build','run','optimize')),None)
     summary=selected_node['summary'] if selected_node else {}
     evaluated=next((n for n in reversed(completed) if n['action'] in ('run','optimize') and n['summary'].get('candidate_id')),None)
-    inp=host.store.session(host.run_id)['snapshot']['input']
-    space=inp['policy']['candidate_builder']['parameters']['data']
+    inp=SessionInput.model_validate(host.store.session(host.run_id)['snapshot']['input'])
+    space=inp.policy.candidate_builder.parameters.data
     with host.store.connect(True) as db:
         snapshot_ref=plain(EvidenceRef(artifact_id=db.execute('SELECT snapshot FROM sessions WHERE run_id=?',(host.run_id,)).fetchone()[0]))
     return dict(run_id=host.run_id,status=full['status'],stage='finished' if route['final'] else (selected_node['action'] if selected_node else 'selection'),
@@ -142,6 +252,7 @@ def overview(host):
         combinations={name:dict(dynamics_model=c['dynamics_model']['extension_id'],backend=c['backend']['extension_id'],
             controller=c['controller']['extension_id'],
             executable=c['executable'],reasons=c['reasons']) for name,c in full['combinations'].items()},
+        model_options=model_options(host, inp, full['combinations']),
         baseline=full['baseline'],space=dict(templates=list(space.get('templates',{})),
             parameters=space.get('parameters',{}),discretization_parameters=space.get('discretization_parameters',{}),
             control_parameters=space.get('control_parameters',{}),model_parameters=space.get('model_parameters',{})),max_trials=full['max_trials'],
