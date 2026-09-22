@@ -79,13 +79,13 @@ class GVSProjectorAndController(unittest.TestCase):
         controller=GVSLQRController(compiled.policy.controller.parameters.data,compiled.task.timing.control_period_s)
         controller.configure(physics,plan)
         q0=np.asarray(plan['reference']['equilibrium_q']);q,v=discretize(physics,design,q0,np.zeros(8))
-        controller.command(0.,geometry(physics,q),q,v)
+        controller.command(0.,geometry(physics,q),q0,np.zeros(8))
         np.testing.assert_allclose(controller.last['raw_desired_tension_n'],controller.u0,atol=1e-12)
         controller.configure(physics,plan)
         delta=np.array([.01,-.005,.004,0.,-.006,.003,0.,-.002]+[0.]*8)
         q,v=discretize(physics,design,q0+delta[:8],delta[8:])
         g=geometry(physics,q)
-        controller.command(0.,g,q,v)
+        controller.command(0.,g,q0+delta[:8],delta[8:])
         expected=controller.u0-controller.K@delta
         np.testing.assert_allclose(controller.last['raw_desired_tension_n'],expected,atol=1e-10)
         self.assertTrue(np.all(np.asarray(controller.last['desired_tension_n'])>=0.))
@@ -96,6 +96,18 @@ class GVSProjectorAndController(unittest.TestCase):
         self.assertEqual(plan['mapping']['bridge'],'execute_ideal_tension')
         self.assertFalse(self.reg.get('controller.lqr','1.0.0','controller').capabilities['backend_executable'])
         self.assertTrue(self.reg.get('controller.gvs_lqr','1.0.0','controller').capabilities['backend_executable'])
+        feedback_plan={**plan,'task_feedback':{**plan['task_feedback'],'gain':.5,'max_tension_n':.2}}
+        feedback=GVSLQRController({'task_feedback_gain':.5,'task_feedback_max_tension_n':.2},
+            compiled.task.timing.control_period_s)
+        feedback.configure(physics,feedback_plan)
+        q,v=discretize(physics,design,q0,np.zeros(8))
+        g=geometry(physics,q)
+        g['tip']=np.asarray(feedback_plan['task_feedback']['desired_tip_world_m'])-np.array([.001,0.,0.])
+        feedback.command(0.,g,q0,np.zeros(8))
+        expected=np.clip(.5*feedback.K[:,:8]@np.linalg.pinv(feedback.task_tip_jacobian)@
+            np.array([.001,0.,0.]),-.2,.2)
+        np.testing.assert_allclose(feedback.last['task_residual_tension_contribution_n'],expected)
+        np.testing.assert_allclose(feedback.last['raw_desired_tension_n'],feedback.u0+expected)
 
     def test_historical_development_length_servo_remains_finite(self):
         _,value=lqr_input(development_execution_mode='actuator_realistic');inp=SessionInput.model_validate(compile_input(value)['input'])

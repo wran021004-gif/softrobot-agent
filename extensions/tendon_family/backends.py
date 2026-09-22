@@ -178,7 +178,13 @@ class MujocoBackend(MatlabBackend):
         for step in range(round(s['duration_s']/dt)):
             if time.perf_counter()-start>timeout_s: complete=False; reason='MUJOCO_SOLVER_TIMEOUT'; break
             t=step*dt; g=current()
-            command=self.controller.command(t,g,data.qpos[qi].copy(),data.qvel[vi].copy())
+            if s['control']['mode']=='gvs_lqr':
+                from .gvs_projection import project
+                projection=project(p,self.controller.coordinate_order,data.qpos[qi],data.qvel[vi])
+                g['gvs_projection']=projection
+                command=self.controller.command(t,g,np.asarray(projection['q_gvs']),np.asarray(projection['qdot_gvs']))
+            else:
+                command=self.controller.command(t,g,data.qpos[qi].copy(),data.qvel[vi].copy())
             data.ctrl[aids]=command; data.xfrc_applied[:]=0; external=np.zeros(model.nv)
             for f in s['forces']:
                 if f['start_s']<=t<f['end_s']:

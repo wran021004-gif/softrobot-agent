@@ -9,7 +9,7 @@ from .contracts import GVSInverseAssemblerParameters, GVSModelParameters, GVSLQR
 from .control import execute_ideal_tension, execute_tension_reference
 from .gvs import GVSModel, coordinate_order, forward_kinematics
 from .gvs_casadi import CasadiLinearizer, ContinuousLQRController
-from .gvs_projection import PROJECTOR_ID, description as projector_description, project
+from .gvs_projection import PROJECTOR_ID, description as projector_description
 from .pcc import quaternion_wxyz_to_rotation
 
 
@@ -115,20 +115,25 @@ def resolve_gvs_lqr_control(inp,physics):
     assembly=inp.task.environment.data
     rotation=quaternion_wxyz_to_rotation(assembly['mount']['quaternion_wxyz'])
     world_tip=(rotation@local_tip+np.asarray(assembly['mount']['position_m'])).tolist()
+    def tip_at(q):
+        return rotation@np.asarray(forward_kinematics(design,q.tolist(),samples_per_segment=2)['tip_position_m'])
+    q0_array=np.asarray(q0)
+    tip_jacobian=np.column_stack([(tip_at(q0_array+np.eye(len(q0))[i]*1e-5)
+        -tip_at(q0_array-np.eye(len(q0))[i]*1e-5))/(2e-5) for i in range(len(q0))])
     projector=projector_description(physics,design)
     if inp.policy.backend.extension_id!='backend.family_mujoco':
         raise ValueError('GVS_LQR_BACKEND_EXECUTION_UNSUPPORTED: '+inp.policy.backend.extension_id)
     execution_mode=c.development_execution_mode or 'ideal_tension'
     if execution_mode=='ideal_tension':
         mapping=dict(id='direct_bounded_tendon_tension_v1',bridge='execute_ideal_tension',tendon_order=tendon_order,
-            force_limits_n=limits.tolist(),order=['project_backend_state','continuous_lqr','clip_tendon_force',
+            force_limits_n=limits.tolist(),order=['project_backend_state','continuous_lqr','bounded_task_feedback','clip_tendon_force',
                 'apply_direct_backend_tendon_force'],
             bypassed=['transmission_pseudoinverse','actuator_velocity_limit','actuator_travel_limit','tendon_length_servo'])
         lifecycle=dict(initialize='observe actual backend state; no actuator state',reset='clear observations',restore='not implemented')
     else:
         mapping=dict(id='ideal_tendon_transmission_v1',bridge='execute_tension_reference',transmission=physics['transmission'],
             actuator_order=[a['id'] for a in physics['actuators']],tendon_order=tendon_order,
-            order=['project_backend_state','continuous_lqr','clip_tendon_force','solve_transmission_minimum_norm',
+            order=['project_backend_state','continuous_lqr','bounded_task_feedback','clip_tendon_force','solve_transmission_minimum_norm',
                 'rate_limit_actuator_command','clip_actuator_travel','apply_length_servo'])
         lifecycle=dict(initialize='zero actuator command; observe actual backend state',reset='zero command and clear observations',restore='not implemented')
     plan=dict(mode='gvs_lqr',tension_execution_mode=execution_mode,
@@ -136,7 +141,7 @@ def resolve_gvs_lqr_control(inp,physics):
         equilibrium_q=list(q0),equilibrium_tensions_n=u0.tolist(),tendon_order=tendon_order,
         source=c.operating_point_source,operating_point_identity=point['identity'],derivation=point,
         nominal_external_forces='omitted_from_GVS_operating_point;backend_task_unchanged'),
-        algorithm=dict(id='gvs_lqr_tension_composition_v1',equation='u=clip(u0-K@(project(q,qdot)-x0),0,force_limit)',
+        algorithm=dict(id='gvs_lqr_tension_composition_v1',equation='u=clip(u0-K@(project(q,qdot)-x0)+u_task,0,force_limit)',
             x0=x0,u0=u0.tolist(),K=K.tolist(),Q_diagonal=qdiag,R_diagonal=rdiag,
             gain_identity=gain_identity,dynamic_system_identity=dynamic_system_identity,
             linearization_identity=linearization_identity,
@@ -149,6 +154,10 @@ def resolve_gvs_lqr_control(inp,physics):
         effective_parameters=c.model_dump(mode='json',exclude_none=True),backend_execution_source=(
             'development comparison override' if c.development_execution_mode else 'backend.family_mujoco fixed semantics'),
         predicted_equilibrium_tip_world_m=world_tip,
+        task_feedback=dict(measured_output='tip_position_m',desired_tip_world_m=world_tip,
+            gvs_tip_jacobian_world_m_per_curvature=tip_jacobian.tolist(),
+            equation='u_residual=clip(K_q @ pinv(J_tip_gvs) @ (tip_desired-tip_measured) * gain, +/-max_tension_n)',
+            gain=float(c.task_feedback_gain),max_tension_n=float(c.task_feedback_max_tension_n)),
         projector_id=PROJECTOR_ID)
     plan['identity']=digest(plan)
     return plan
@@ -161,26 +170,40 @@ class GVSLQRController:
     def configure(self,physics,plan):
         self.physics=physics;self.plan=plan;self.coordinate_order=plan['algorithm']['projector']['coordinate_order']
         self.K=np.asarray(plan['algorithm']['K']);self.x0=np.asarray(plan['algorithm']['x0']);self.u0=np.asarray(plan['algorithm']['u0'])
+        feedback=plan['task_feedback'];self.task_feedback_gain=feedback['gain']
+        self.task_feedback_limit=feedback['max_tension_n']
+        self.task_tip_target=np.asarray(feedback['desired_tip_world_m'])
+        self.task_tip_jacobian=np.asarray(feedback['gvs_tip_jacobian_world_m_per_curvature'])
+        self.task_tip_jacobian_pinv=np.linalg.pinv(self.task_tip_jacobian)
         self.execution_mode=plan.get('tension_execution_mode','actuator_realistic')
         self.u=None if self.execution_mode=='ideal_tension' else np.zeros(len(physics['actuators']))
         self.observations=[];self.last={}
 
     def command(self,t,geometry,q,v):
-        projection=project(self.physics,self.coordinate_order,q,v)
-        x=np.r_[projection['q_gvs'],projection['qdot_gvs']];delta=x-self.x0
-        raw=self.u0-self.K@delta
+        q=np.asarray(q,dtype=float);v=np.asarray(v,dtype=float)
+        if q.shape!=(len(self.coordinate_order),) or v.shape!=q.shape:
+            raise ValueError('GVS_LQR_REQUIRES_REDUCED_STATE')
+        projection=geometry.get('gvs_projection',{})
+        x=np.r_[q,v];delta=x-self.x0
+        lqr=-self.K@delta
+        tip_error=self.task_tip_target-np.asarray(geometry['tip'])
+        residual=np.clip(self.task_feedback_gain*self.K[:,:len(self.coordinate_order)]@
+            (self.task_tip_jacobian_pinv@tip_error),-self.task_feedback_limit,self.task_feedback_limit)
+        raw=self.u0+lqr+residual
         if self.execution_mode=='ideal_tension':
             command,bridge=execute_ideal_tension(self.physics,raw)
         else:
             self.u,command,bridge=execute_tension_reference(self.physics,self.period_s,self.u,geometry,raw)
         self.last={**bridge,'raw_desired_tension_n':raw.tolist(),
+            'lqr_tension_contribution_n':lqr.tolist(),'task_residual_tension_contribution_n':residual.tolist(),
+            'task_tip_error_m':tip_error.tolist(),
             'lqr_tension_saturated':(np.asarray(bridge['desired_tension_n'])!=raw).tolist(),
-            'projected_gvs_q':projection['q_gvs'],'projected_gvs_qdot':projection['qdot_gvs'],
+            'projected_gvs_q':q.tolist(),'projected_gvs_qdot':v.tolist(),
             'gvs_state_error':delta.tolist(),
-            'gvs_projection_residual_max_rad_m':projection['projection_residual_max_rad_m'],
-            'gvs_rate_projection_residual_max_rad_m_s':projection['rate_projection_residual_max_rad_m_s']}
+            'gvs_projection_residual_max_rad_m':projection.get('projection_residual_max_rad_m'),
+            'gvs_rate_projection_residual_max_rad_m_s':projection.get('rate_projection_residual_max_rad_m_s')}
         observation=dict(time_s=t,phase='current_state_before_integration',tip_position_m=geometry['tip'].tolist(),
-            qpos_rad=q.tolist(),qvel_rad_s=v.tolist(),tendon_length_m=geometry['lengths'].tolist(),**self.last)
+            gvs_q=q.tolist(),gvs_qdot=v.tolist(),tendon_length_m=geometry['lengths'].tolist(),**self.last)
         if self.execution_mode=='actuator_realistic':
             observation.update(actuator_command=self.u.tolist(),target_lengths_m=command.tolist())
         self.observations.append(observation)

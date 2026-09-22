@@ -189,6 +189,8 @@ class GVSLQRControl(Contract):
     state_weight_overrides: dict[str, Annotated[FiniteFloat, Field(ge=0)]] = Field(default_factory=dict)
     equilibrium_tolerance: FiniteFloat = Field(default=1e-7, gt=0)
     operating_point_source: Literal['gvs_inverse_tip_static'] = 'gvs_inverse_tip_static'
+    task_feedback_gain: FiniteFloat = Field(default=0., ge=0)
+    task_feedback_max_tension_n: FiniteFloat = Field(default=.5, gt=0)
     # Explicitly excluded from Route combinations. This preserves the historical
     # A/B research path without making backend realization a design decision.
     development_execution_mode: Literal['actuator_realistic'] | None = None
