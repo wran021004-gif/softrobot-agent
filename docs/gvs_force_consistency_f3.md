@@ -1,5 +1,8 @@
 # F3 signed static-force consistency (2026-09-22)
 
+The follow-up [F4 spatial residual analysis](gvs_unresolved_modes_f4.md)
+localizes the missing modes and tests two minimal basis additions.
+
 This analysis uses the unchanged `two_segment_development` robot, 24/16 near/far cells, the recomputed F2 `q0,u0`, and zero velocity. It calls `mj_forward` only; no dynamics integration or controller runs. The complete per-tendon Jacobian and virtual-work matrices are in `runs/gvs_static_consistency_f2_20260922/f3_force_report.json`.
 
 ## Force extraction
