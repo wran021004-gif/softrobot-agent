@@ -155,9 +155,127 @@ def force_attribution(root):
     return report
 
 
+def equilibrium_summary(root):
+    """Collect the existing zero-disturbance rollout and force diagnosis."""
+    import gzip
+    import json
+
+    from extensions.tendon_family.gvs_projection import project
+
+    root=Path(root).resolve()
+    point=read(root/'equilibrium.json')
+    report=read(root/'e1_report.json')
+    inp=read(root/'input.json')
+    physics=read(root/'backend'/'resolved_physics.json')
+    observations=read(root/'backend'/'controller_observations.json')
+    with gzip.open(root/'backend'/'trajectory.json.gz','rt',encoding='utf8') as stream:
+        trajectory=json.load(stream)
+    endpoint=trajectory[-1]
+    projected=project(physics,inp['robot']['structure']['data'],
+        endpoint['qpos_rad'],endpoint['qvel_rad_s'])
+    gvs_tip=np.asarray(point['gvs_predicted_tip_world_m'])
+    initial_tip=np.asarray(report['initial_tip_world_m'])
+    endpoint_tip=np.asarray(report['final_tip_world_m'])
+    steady=read(root/'settled_response.json') if (root/'settled_response.json').exists() else None
+    unresolved=read(root/'f4_unresolved_modes.json') if (root/'f4_unresolved_modes.json').exists() else None
+    design=inp['robot']['structure']['data']
+    assembly=inp['task']['environment']['data']
+    physics_audit=dict(segments=[dict(id=component['id'],length_m=component['length_m'],
+        density_kg_m3=component['physics']['density_kg_m3'],
+        natural_curvature_rad_m=component['natural_curvature_rad_m'],
+        backend_mass_kg=sum(part['mass_kg'] for part in physics['parts']
+            if part['entity'].startswith(component['id']+'_cell_')))
+        for component in design['components'] if component['kind']=='flexible_segment'],
+        gravity_world_m_s2=assembly['environment']['gravity_m_s2'],mount=assembly['mount'],
+        external_forces=assembly['external_forces'],
+        tendon_routes=[dict(id=tendon['id'],points=tendon['points'],
+            pretension_n=tendon['pretension_n'],force_limit_n=tendon['force_limit_n'])
+            for tendon in design['tendons']],
+        backend_tendon_reference_lengths_m=physics['reference_lengths_m'],
+        tendon_execution_mode=inp['policy']['controller']['parameters']['data']['tension_execution_mode'],
+        initial_backend_qpos_rad=point['backend_qpos_rad'],
+        gvs_backend_roundtrip_q_error_max_rad_m=point['roundtrip_q_error_max_rad_m'])
+    conclusion=('The saved GVS q0/u0 satisfies eight reduced virtual-work equations, '
+        'but the independently moving MuJoCo cells retain local tendon-guide loads outside '
+        'that strain subspace. The direct-tension command tracks u0; no actuator-semantic '
+        'conversion or startup offset explains the drift.') if unresolved else (
+        'GVS and MuJoCo static forces differ at the mapped initial state; see e2_force_report.json.')
+    summary=dict(source_artifacts=['equilibrium.json','e1_report.json','backend/controller_observations.json',
+        'backend/trajectory.json.gz','f4_unresolved_modes.json' if unresolved else 'e2_force_report.json',
+        *(['settled_response.json'] if steady else [])],
+        gvs_q0=point['q0'],gvs_u0_n=point['u0'],gvs_tip0_world_m=gvs_tip.tolist(),
+        mujoco_initialized_tip_world_m=initial_tip.tolist(),
+        mujoco_rollout_end_tip_world_m=endpoint_tip.tolist(),
+        mujoco_settled_tip_world_m=steady['tip_world_m'] if steady and steady['settled'] else None,
+        settle_status=steady['status'] if steady else 'NOT_CHECKED',
+        zero_disturbance_tip_drift_m=(endpoint_tip-initial_tip).tolist(),
+        zero_disturbance_tip_drift_norm_m=float(np.linalg.norm(endpoint_tip-initial_tip)),
+        settled_zero_disturbance_tip_drift_m=(np.asarray(steady['tip_world_m'])-initial_tip).tolist()
+            if steady and steady['settled'] else None,
+        settled_zero_disturbance_tip_drift_norm_m=float(np.linalg.norm(np.asarray(steady['tip_world_m'])-initial_tip))
+            if steady and steady['settled'] else None,
+        initial_tendon_command_n=observations[0]['desired_tension_n'],
+        initial_actual_tendon_tension_n=observations[0]['actual_tension_n'],
+        rollout_end_actual_tendon_tension_n=endpoint['tension_n'],
+        initial_reduced_state=point['q0']+[0.]*len(point['q0']),
+        rollout_end_reduced_state=projected['q_gvs']+projected['qdot_gvs'],
+        settled_reduced_state=steady['reduced_state'] if steady and steady['settled'] else None,
+        rollout_end_static_error_vector_m=(endpoint_tip-gvs_tip).tolist(),
+        rollout_end_static_error_norm_m=float(np.linalg.norm(endpoint_tip-gvs_tip)),
+        static_error_vector_m=(np.asarray(steady['tip_world_m'])-gvs_tip).tolist()
+            if steady and steady['settled'] else None,
+        static_error_norm_m=float(np.linalg.norm(np.asarray(steady['tip_world_m'])-gvs_tip))
+            if steady and steady['settled'] else None,
+        initial_geometry_error_norm_m=float(np.linalg.norm(initial_tip-gvs_tip)),
+        gvs_equilibrium_residual_norm=point['gvs_static_residual_norm'],
+        full_cell_initial_force_residual_norm_nm=unresolved['full_residual_l2_nm'] if unresolved else None,
+        force_residual_outside_gvs_subspace_fraction=unresolved['current_unresolved_fraction'] if unresolved else None,
+        physics_audit=physics_audit,root_cause_conclusion=conclusion)
+    atomic_json(root/'equilibrium_consistency.json',summary)
+    return summary
+
+
+def settle_saved(root, maximum_duration_s=2.):
+    """Check whether constant u0 reaches a near-stationary backend state."""
+    import mujoco
+    from extensions.tendon_family.gvs_projection import project
+
+    root=Path(root).resolve()
+    point=read(root/'equilibrium.json');inp=read(root/'input.json')
+    physics=read(root/'backend'/'resolved_physics.json')
+    model=mujoco.MjModel.from_xml_path(str(root/'backend'/'robot.xml'))
+    data=mujoco.MjData(model)
+    ji=[model.joint(name).id for name in physics['dofs']]
+    qi=model.jnt_qposadr[ji];vi=model.jnt_dofadr[ji]
+    aids=[model.actuator(name+'_direct_tension').id for name in point['tendon_order']]
+    data.qpos[qi]=point['backend_qpos_rad'];data.qvel[vi]=0.;data.ctrl[aids]=point['u0']
+    tipid=model.site('tip_site').id
+    steps=int(maximum_duration_s/model.opt.timestep)
+    hold=0;required=max(1,int(.1/model.opt.timestep))
+    settled=False
+    for _ in range(steps):
+        mujoco.mj_step(model,data)
+        if np.max(np.abs(data.qvel[vi]))<1e-3:
+            hold+=1
+            if hold>=required:
+                settled=True;break
+        else:
+            hold=0
+    mujoco.mj_forward(model,data)
+    projection=project(physics,inp['robot']['structure']['data'],data.qpos[qi],data.qvel[vi])
+    result=dict(status='SETTLED' if settled else 'NOT_SETTLED_WITHIN_HORIZON',settled=settled,
+        time_s=float(data.time),tip_world_m=data.site_xpos[tipid].tolist(),
+        reduced_state=projection['q_gvs']+projection['qdot_gvs'],
+        maximum_joint_rate_rad_s=float(np.max(np.abs(data.qvel[vi]))),
+        stationarity_definition='maximum absolute flexible joint rate < 0.001 rad/s continuously for 0.1 s',
+        direct_tendon_command_n=data.ctrl[aids].tolist(),integration_steps=int(round(data.time/model.opt.timestep)))
+    atomic_json(root/'settled_response.json',result)
+    return result
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action',choices=['e1','e2']);parser.add_argument('root')
+    parser.add_argument('action',choices=['e1','e2','settle','summary']);parser.add_argument('root')
     parser.add_argument('--source',default='runs/reach_free_gvs_candidate_rebuild_retry_20260921/inputs/route.json')
     parser.add_argument('--near-cells',type=int)
     parser.add_argument('--far-cells',type=int)
@@ -165,7 +283,9 @@ def main():
     import json
     cells=({'near':args.near_cells,'far':args.far_cells}
         if args.near_cells is not None and args.far_cells is not None else None)
-    report=static_experiment(args.root,args.source,cells) if args.action=='e1' else force_attribution(args.root)
+    report=(static_experiment(args.root,args.source,cells) if args.action=='e1' else
+        force_attribution(args.root) if args.action=='e2' else
+        settle_saved(args.root) if args.action=='settle' else equilibrium_summary(args.root))
     print(json.dumps(report,indent=2))
 
 

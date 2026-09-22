@@ -18,7 +18,37 @@ from schemas.platform_math import SystemContext
 from tools.state_io import atomic_json, read
 
 
-def run(root, output, gain=1., horizon=.5, disturbance_duration=.05):
+def save_paired_summary(output, report):
+    baselines={row['mode']:row for row in report['cases'] if row['case']=='none'}
+    cases=[]
+    for row in report['cases']:
+        if row['case']=='none': continue
+        baseline=baselines[row['mode']]
+        changes=[np.asarray(sample['lqr_contribution_n'])-np.asarray(reference['lqr_contribution_n'])
+            for sample,reference in zip(row['history'],baseline['history'])]
+        feedback=[np.asarray(sample['residual_contribution_n'])-np.asarray(reference['residual_contribution_n'])
+            for sample,reference in zip(row['history'],baseline['history'])]
+        reduced=[np.asarray(sample['projected_gvs_q'])-np.asarray(reference['projected_gvs_q'])
+            for sample,reference in zip(row['history'],baseline['history'])]
+        peak=row['disturbance_tip_delta_peak_norm_m']
+        cases.append(dict(tendon=row['case'],controller=row['mode'],
+            baseline_final_absolute_tip_error_m=baseline['final_tip_error_m'],
+            incremental_peak_tip_displacement_m=peak,
+            incremental_peak_direction_world=(np.asarray(row['disturbance_tip_delta_at_peak_m'])/peak).tolist(),
+            incremental_final_tip_displacement_m=row['disturbance_tip_delta_final_norm_m'],
+            incremental_peak_reduced_q_l2_rad_m=float(max(map(np.linalg.norm,reduced))),
+            incremental_settling_time_s_at_10pct_peak=row['incremental_settling_time_s_at_10pct_peak'],
+            maximum_incremental_lqr_tension_norm_n=float(max(map(np.linalg.norm,changes))),
+            maximum_incremental_task_feedback_tension_norm_n=float(max(map(np.linalg.norm,feedback))),
+            saturated_control_samples=row['saturated_control_samples']))
+    summary=dict(source='closed_loop_comparison.json',definition=report['definition'],
+        equilibrium_drift_inf=report['equilibrium_drift_inf'],pbh_min_rank=report['pbh_min_rank'],
+        closed_loop_eigenvalue_real_max=report['closed_loop_eigenvalue_real_max'],cases=cases)
+    atomic_json(Path(output)/'paired_summary.json',summary)
+    return summary
+
+
+def run(root, output, gain=1., horizon=1., disturbance_duration=.5):
     root=Path(root);output=Path(output);output.mkdir(parents=True,exist_ok=True)
     saved=read(root/'input.json');inp=SessionInput.model_validate(saved)
     point=read(root/'equilibrium.json');physics=read(root/'backend'/'resolved_physics.json')
@@ -65,10 +95,10 @@ def run(root, output, gain=1., horizon=.5, disturbance_duration=.05):
             for index in range(round(horizon/period)):
                 t=index*period;mujoco.mj_forward(model,data)
                 geometry=dict(tip=data.site_xpos[tipid].copy(),lengths=data.ten_length[tids].copy())
+                projection=project(physics,design,data.qpos[qi],data.qvel[vi])
                 if mode=='feedforward':
                     command=u0.copy();lqr=np.zeros(6);residual=np.zeros(6)
                 else:
-                    projection=project(physics,design,data.qpos[qi],data.qvel[vi])
                     geometry['gvs_projection']=projection
                     command=policy.command(t,geometry,np.asarray(projection['q_gvs']),np.asarray(projection['qdot_gvs']))
                     lqr=np.asarray(policy.last['lqr_tension_contribution_n'])
@@ -80,7 +110,9 @@ def run(root, output, gain=1., horizon=.5, disturbance_duration=.05):
                 for _ in range(steps): mujoco.mj_step(model,data)
                 mujoco.mj_forward(model,data)
                 actual=data.site_xpos[tipid].copy();error=tip(q0)-actual
+                observed_projection=project(physics,design,data.qpos[qi],data.qvel[vi])
                 history.append(dict(time_s=(index+1)*period,tip_error_m=error.tolist(),tip_error_norm_m=float(np.linalg.norm(error)),
+                    tip_world_m=actual.tolist(),projected_gvs_q=observed_projection['q_gvs'],
                     tip_displacement_from_initial_m=(actual-reference).tolist(),command_tension_n=command.tolist(),
                     applied_tension_n=data.ctrl[aids].tolist(),lqr_contribution_n=lqr.tolist(),residual_contribution_n=residual.tolist()))
                 if not np.isfinite(data.qpos).all(): raise ValueError('NONFINITE_MUJOCO_STATE')
@@ -90,11 +122,34 @@ def run(root, output, gain=1., horizon=.5, disturbance_duration=.05):
     baseline={row['mode']:row for row in rows if row['case']=='none'}
     for row in rows:
         if row['case']=='none': continue
-        deltas=np.asarray([np.asarray(sample['tip_displacement_from_initial_m'])-
-            np.asarray(reference['tip_displacement_from_initial_m']) for sample,reference in
+        deltas=np.asarray([np.asarray(sample['tip_world_m'])-
+            np.asarray(reference['tip_world_m']) for sample,reference in
             zip(row['history'],baseline[row['mode']]['history'])])
+        magnitudes=np.linalg.norm(deltas,axis=1)
+        peak_index=int(np.argmax(magnitudes))
+        # Settling is measured on the paired increment after the pulse ends.
+        # None means it did not enter and remain inside 10% of its own peak.
+        settling=next((float(row['history'][i]['time_s']) for i in range(len(magnitudes))
+            if row['history'][i]['time_s']>=disturbance_duration and
+            np.all(magnitudes[i:]<=.1*magnitudes[peak_index])),None)
+        reduced=np.asarray([np.asarray(sample['projected_gvs_q'])-
+            np.asarray(reference['projected_gvs_q']) for sample,reference in
+            zip(row['history'],baseline[row['mode']]['history'])])
+        represented=(J@reduced.T).T
+        linearized_residual=deltas-represented
+        commands=np.asarray([sample['applied_tension_n'] for sample in row['history']])
+        saturation=np.any((commands<=1e-9)|(commands>=limits-1e-9),axis=1)
+        row['disturbance_tip_delta_history_m']=deltas.tolist()
         row['disturbance_tip_delta_final_m']=deltas[-1].tolist()
-        row['disturbance_tip_delta_peak_norm_m']=float(np.max(np.linalg.norm(deltas,axis=1)))
+        row['disturbance_tip_delta_final_norm_m']=float(magnitudes[-1])
+        row['disturbance_tip_delta_peak_norm_m']=float(magnitudes[peak_index])
+        row['disturbance_tip_delta_at_peak_m']=deltas[peak_index].tolist()
+        row['disturbance_tip_peak_time_s']=float(row['history'][peak_index]['time_s'])
+        row['incremental_settling_time_s_at_10pct_peak']=settling
+        row['q0_jacobian_tip_delta_at_peak_m']=represented[peak_index].tolist()
+        row['q0_jacobian_residual_at_peak_m']=linearized_residual[peak_index].tolist()
+        row['q0_jacobian_residual_peak_norm_m']=float(np.max(np.linalg.norm(linearized_residual,axis=1)))
+        row['saturated_control_samples']=int(np.count_nonzero(saturation))
     report=dict(source=str(root),definition=(f'Saved q0, u0; +0.1 N tendon step for {disturbance_duration} s; '
         f'zero initial velocity; direct tension; {horizon} s horizon'),
         state_order=[s.name for s in linear.state_definition],input_order=point['tendon_order'],
@@ -106,8 +161,11 @@ def run(root, output, gain=1., horizon=.5, disturbance_duration=.05):
         pbh_min_rank=min(int(np.linalg.matrix_rank(np.c_[value*np.eye(len(A))-A,B],tol=1e-7))
             for value in np.linalg.eigvals(A)),
         closed_loop_eigenvalue_real_max=float(np.max(np.real(eigvals(A-B@K)))),Q_diagonal=qweights,R_diagonal=[100.]*6,
-        gain=K.tolist(),feedback_gain=gain,feedback_limit_n=.5,cases=rows)
+        gain=K.tolist(),feedback_gain=gain,feedback_limit_n=.5,
+        linearized_tip_decomposition_note='J evaluated at q0 is a local diagnostic only; later baseline drift makes its residual unsuitable as a full-order mode attribution.',
+        cases=rows)
     atomic_json(output/'closed_loop_comparison.json',report)
+    save_paired_summary(output,report)
     for row in rows: print(row['case'],row['mode'],'final',row['final_tip_error_m'],'peak',row['peak_tip_error_m'])
     return report
 
@@ -117,5 +175,6 @@ if __name__=='__main__':
     parser.add_argument('root',nargs='?',default='runs/gvs_static_consistency_f2_20260922')
     parser.add_argument('--output',default='runs/gvs_near_far_closed_loop_20260922')
     parser.add_argument('--gain',type=float,default=1.)
-    parser.add_argument('--disturbance-duration',type=float,default=.05)
-    args=parser.parse_args();run(args.root,args.output,args.gain,disturbance_duration=args.disturbance_duration)
+    parser.add_argument('--horizon',type=float,default=1.)
+    parser.add_argument('--disturbance-duration',type=float,default=.5)
+    args=parser.parse_args();run(args.root,args.output,args.gain,args.horizon,args.disturbance_duration)

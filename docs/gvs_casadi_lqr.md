@@ -81,3 +81,27 @@ dependency checks still apply. They perform no MATLAB or MuJoCo solve. Existing
 GVS omissions remain unchanged: branching, closed
 chains, contact, self-collision, torsion, shear, axial extension, tendon
 elasticity/friction, motor electrical dynamics, and arbitrary external forces.
+
+The executable tip residual uses the measured MuJoCo tip, not an estimated
+local shape. At each control sample it computes `e = tip_gvs(q0) - tip_measured`,
+`delta_q_ref = pinv(J_tip_gvs(q0)) e`, and
+`u_task = clip(gain K_q delta_q_ref, +/-task_feedback_max_tension_n)`.
+The full command is `clip(u0 - K(x_projected - x0) + u_task, 0, force_limit_n)`.
+This is a reduced-coordinate reference correction driven by a real tip
+measurement. The fixed GVS Jacobian and gain limit its correction directions;
+it does not observe or independently control the backend's unmodeled cell modes.
+
+For the next route, `kinematics.pcc_forward@2.0.0` and
+`dynamics.gvs_evaluate@2.0.0` return compact mathematical summaries with no
+backend solve. `statics.gvs_equilibrium@1.0.0`,
+`dynamics.gvs_build_system@2.0.0`, `linearization.linearize@2.0.0`, and
+`control.lqr_synthesize@1.0.0` also cost zero backend solves; the latter three
+pass saved `EvidenceRef` identities. `simulation.run@1.0.0` uses one MuJoCo
+backend solve; `evaluation.run@1.0.0` scores that exact result without a new
+solve. The candidate-owned `controller.gvs_lqr` recipe builds its own operating
+point, DynamicSystem, linearization, and gain for the candidate before backend
+execution. The deterministic public-chain smoke is
+`examples/gvs_lqr_reach.py`; its saved `study.json` records receipts, artifact
+references, model/gain identity checks, backend provenance, and evaluator
+source execution. The smoke proves interface continuity, while the separate
+static consistency diagnostic records the current model/backend mismatch.

@@ -1,4 +1,4 @@
-"""Bounded reach_free study: trusted GVS inverse equilibrium -> executable GVS-LQR -> MuJoCo."""
+"""Deterministic public GVS/LQR to MuJoCo/evaluation readiness smoke."""
 import argparse
 from copy import deepcopy
 import json
@@ -59,10 +59,11 @@ def operating_point(value):
 def run(root,tendon_weight=1.):
     from examples.platform_fixtures import project
     from examples.platform_tendon_family import example_design, design_space, session
-    from schemas.platform import EvaluationResult
+    from schemas.platform import EvaluationResult, EvidenceRef, SessionInput
+    from extensions.tendon_family.gvs_lqr import _candidate_operating_point
     from tools.platform_host import Host
     from tools.platform_store import Store
-    from tools.state_io import atomic_json, read
+    from tools.state_io import atomic_json, digest, read
 
     root=Path(root).resolve();root.mkdir(parents=True,exist_ok=False)
     design=example_design();value=session('family_mujoco',design,design_space(design))
@@ -72,10 +73,35 @@ def run(root,tendon_weight=1.):
         'contract':'family.gvs_lqr_control','version':'1.0.0','data':{
             'curvature_weight':1.,'state_rate_weight':.1,'tendon_tension_weight':tendon_weight,
             'operating_point_source':'gvs_inverse_tip_static'}}}
-    value['policy']['tool_bindings'].update({'simulation.run':'1.0.0','evaluation.run':'1.0.0'})
+    value['policy']['tool_bindings'].update({'simulation.run':'1.0.0','evaluation.run':'1.0.0',
+        'statics.gvs_equilibrium':'1.0.0','dynamics.gvs_build_system':'2.0.0',
+        'linearization.linearize':'2.0.0','control.lqr_synthesize':'1.0.0'})
     project_value=project();project_value['budget'].update(model_calls=0,tool_calls=100,backend_solves=6,wall_s=3600.)
     Store(root).create(project_value)
     host=Host(root,value['run_id']);host.create(value)
+    point=_candidate_operating_point(SessionInput.model_validate(value))
+    def invoke(name,tool,version,arguments):
+        receipt=host.invoke({'request_id':'readiness-'+name,'tool_id':tool,'tool_version':version,
+            'reason':'Deterministic public GVS to MuJoCo readiness smoke.',
+            'arguments':arguments})
+        if receipt['execution_status']!='completed':
+            raise ValueError('PUBLIC_CHAIN_FAILED: '+str(receipt))
+        return receipt,host.store.artifact(receipt['output'])
+    equilibrium_receipt,equilibrium=invoke('equilibrium','statics.gvs_equilibrium','1.0.0',{
+        'tendon_tensions_n':dict(zip(point['tendon_order'],point['u0'])),
+        'initial_q':point['q0'],'tolerance':1e-10})
+    if not equilibrium['converged'] or not np.allclose(equilibrium['q_equilibrium'],point['q0'],atol=1e-6):
+        raise ValueError('PUBLIC_EQUILIBRIUM_MISMATCH')
+    system_receipt,system=invoke('system','dynamics.gvs_build_system','2.0.0',{
+        'x0':point['q0']+[0.]*len(point['q0']),'u0':point['u0']})
+    linear_receipt,linear=invoke('linear','linearization.linearize','2.0.0',{
+        'system':system['system']})
+    lqr_receipt,lqr=invoke('lqr','control.lqr_synthesize','1.0.0',{
+        'model':linear['model'],'curvature_weight':1.,'state_rate_weight':.1,
+        'tendon_tension_weight':tendon_weight})
+    public_chain=dict(operating_point_identity=point['identity'],
+        receipts=[equilibrium_receipt,system_receipt,linear_receipt,lqr_receipt],
+        summaries=dict(equilibrium=equilibrium,system=system,linearization=linear,lqr=lqr))
     simulation=host.invoke({'request_id':'gvs-lqr-simulation','tool_id':'simulation.run','tool_version':'1.0.0',
         'reason':'Validate the trusted GVS inverse equilibrium and executable GVS-LQR composition on frozen reach_free MuJoCo.',
         'arguments':{'candidate_id':'gvs_lqr_baseline','changes':{}},'cache':'reuse'})
@@ -86,10 +112,25 @@ def run(root,tendon_weight=1.):
     if evaluation['execution_status']!='completed': raise ValueError('EVALUATION_FAILED: '+str(evaluation))
     outcome=EvaluationResult.model_validate(host.store.artifact(evaluation['output']))
     control_spec=read(root/'sessions'/value['run_id']/'executions'/simulation['execution_id']/'backend'/'control_spec.json')
-    result=dict(operating_point=control_spec['reference']['derivation'],controller=value['policy']['controller'],simulation=simulation,evaluation=evaluation,
+    if control_spec['reference']['operating_point_identity']!=point['identity']:
+        raise ValueError('BACKEND_OPERATING_POINT_IDENTITY_MISMATCH')
+    if digest(host.store.artifact(EvidenceRef.model_validate(system['system'])))!=control_spec['algorithm']['dynamic_system_identity']:
+        raise ValueError('BACKEND_DYNAMIC_SYSTEM_IDENTITY_MISMATCH')
+    if digest(host.store.artifact(EvidenceRef.model_validate(linear['model'])))!=control_spec['algorithm']['linearization_identity']:
+        raise ValueError('BACKEND_LINEARIZATION_IDENTITY_MISMATCH')
+    public_gain=host.store.artifact(EvidenceRef.model_validate(lqr['gain']))
+    if not np.array_equal(np.asarray(public_gain['K']),np.asarray(control_spec['algorithm']['K'])):
+        raise ValueError('BACKEND_LQR_GAIN_MISMATCH')
+    result=dict(operating_point=control_spec['reference']['derivation'],public_chain=public_chain,
+        control_identity=control_spec['identity'],controller=value['policy']['controller'],simulation=simulation,evaluation=evaluation,
         outcome=outcome.model_dump(mode='json'),usage=host.store.remaining(value['run_id']))
     atomic_json(root/'study.json',result);atomic_json(root/'input.json',value)
-    print(json.dumps(result,indent=2));return result
+    print(json.dumps(dict(study=str(root/'study.json'),
+        public_tools=[receipt['tool_id'] for receipt in public_chain['receipts']],
+        simulation_status=simulation['solver_status'],evaluation_status=evaluation['analysis_status'],
+        task_success=outcome.task_success,model_calls=result['usage']['used']['model_calls'],
+        backend_solves=result['usage']['used']['backend_solves']),indent=2))
+    return result
 
 
 def main(argv=None):
