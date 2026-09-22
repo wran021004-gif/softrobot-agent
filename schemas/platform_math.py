@@ -13,6 +13,10 @@ from schemas.platform import Binding, EvidenceRef, Objective, Payload, SignalSpe
 
 ModelCapability = Literal['kinematics', 'statics', 'dynamics', 'linearization', 'gradients']
 ModelRepresentation = Literal['dynamic_system', 'linearized_model']
+ModelUse = Literal['reachability', 'shape_prediction', 'static_equilibrium',
+    'reduced_dynamics', 'control_trend', 'linearization', 'local_model_control',
+    'contact_prediction', 'high_fidelity_validation']
+ModelUseStatus = Literal['ALLOW', 'WARN', 'REJECT']
 MathematicalExpression = Payload | EvidenceRef
 # Same path -> specification format as Space: type, bounds/options, optional when.
 # Vector/trajectory variables use indexed paths; no second variable namespace.
@@ -52,6 +56,31 @@ class MathematicalModel(Contract):
     discretization_contract: str | None = None
     capabilities: ModelCapabilities
     representations: list[ModelRepresentation] = Field(default_factory=list)
+    intended_uses: list[ModelUse] = Field(default_factory=list)
+    assumptions: list[str] = Field(default_factory=list)
+    unsupported_physics: list[str] = Field(default_factory=list)
+
+
+class ModelUseVerdict(Contract):
+    status: ModelUseStatus
+    reasons: list[str] = Field(min_length=1)
+    validation: Literal['unavailable'] = 'unavailable'
+
+
+class ModelUseAssessment(Contract):
+    """Deterministic, per-use physical applicability; not backend compilability."""
+    model_id: str
+    model_version: str
+    design_id: str
+    design_identity: str
+    representation_id: str | None = None
+    representation_kind: str | None = None
+    representation_strategy: str | None = None
+    generalized_coordinate_dimension: int | None = Field(default=None, ge=0)
+    state_dimension: int | None = Field(default=None, ge=0)
+    uses: dict[ModelUse, ModelUseVerdict] = Field(min_length=1)
+    relevant_assumptions: list[str]
+    unsupported_requested_physics: list[str]
 
 
 class ModelRequirement(Contract):

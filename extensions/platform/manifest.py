@@ -14,6 +14,7 @@ class Empty(Contract):
 CONTRACTS = [('platform.empty', '1.0.0', Empty)]
 CONTRACTS += [('platform.' + name, '1.0.0', schema) for name, schema in [
     ('mathematical_model', math_contracts.MathematicalModel),
+    ('model_use_assessment', math_contracts.ModelUseAssessment),
     ('dynamic_system', math_contracts.DynamicSystem),
     ('linearized_model', math_contracts.LinearizedModel),
     ('model_requirement', math_contracts.ModelRequirement),

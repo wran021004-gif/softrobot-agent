@@ -241,7 +241,15 @@ class DynamicsModel(Contract):
             required_robot_data=['family.design.components', 'family.design.tendons', 'family.design.actuators', 'family.design.tip'],
             discretization_contract='family.discretization',
             capabilities=ModelCapabilities(kinematics=True, dynamics=True),
-            representations=[])  # Existing backends execute it; no standard IR exporter yet.
+            representations=[],  # Existing backends execute it; no standard IR exporter yet.
+            intended_uses=['reachability', 'shape_prediction', 'reduced_dynamics',
+                           'control_trend', 'high_fidelity_validation'],
+            assumptions=['supported serial bending-cell topology',
+                         'two principal bending hinges per cell',
+                         'straight frictionless tendon paths'],
+            unsupported_physics=['material_torsion', 'shear', 'axial_extension',
+                                 'tendon_friction', 'rope_elasticity',
+                                 'motor_dynamics', 'self_collision'])
 
     @model_validator(mode='after')
     def implemented_effects(self):
@@ -399,6 +407,12 @@ class PCCModelParameters(Contract):
                 gradients=False,
             ),
             representations=[],
+            intended_uses=['reachability', 'shape_prediction'],
+            assumptions=['piecewise constant curvature', 'serial continuum geometry',
+                         'inextensible centerline', 'bending-dominated deformation'],
+            unsupported_physics=['static_equilibrium', 'dynamics', 'contact_response',
+                                 'local_deformation', 'material_torsion', 'shear',
+                                 'axial_extension', 'external_applied_forces'],
         )
 
 
@@ -577,6 +591,17 @@ class GVSModelParameters(Contract):
                 gradients=True,
             ),
             representations=['dynamic_system'],
+            intended_uses=['reachability', 'shape_prediction', 'static_equilibrium',
+                           'reduced_dynamics', 'control_trend', 'linearization',
+                           'local_model_control'],
+            assumptions=['supported serial tendon-driven continuum topology',
+                         'selected strain basis spans deformation relevant to the use',
+                         'inextensible centerline', 'no shear', 'no torsion',
+                         'straight frictionless tendon spans'],
+            unsupported_physics=['contact_response', 'self_collision',
+                                 'tendon_friction', 'rope_elasticity',
+                                 'axial_extension', 'material_torsion', 'shear',
+                                 'motor_dynamics', 'external_applied_forces'],
         )
 
 
