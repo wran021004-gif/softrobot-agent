@@ -154,9 +154,13 @@ def read_evidence(ctx, args):
     if args.pointer:
         if not args.pointer.startswith('/'):
             raise ValueError('JSON_POINTER_MUST_START_WITH_SLASH')
-        for part in args.pointer[1:].split('/'):
-            key = part.replace('~1', '/').replace('~0', '~')
-            value = value[int(key)] if isinstance(value, list) else value[key]
+        try:
+            for part in args.pointer[1:].split('/'):
+                key = part.replace('~1', '/').replace('~0', '~')
+                value = value[int(key)] if isinstance(value, list) else value[key]
+        except (KeyError, IndexError, TypeError, ValueError):
+            hint = '; use pointer="" to read the root object' if args.pointer == '/' else ''
+            raise ValueError('EVIDENCE_POINTER_NOT_FOUND: ' + args.pointer + hint) from None
     from tools.platform_store import encode
     presentation='original'
     total=len(value) if isinstance(value,(list,dict,str)) else 1

@@ -12,7 +12,7 @@ from extensions.tendon_family.route import create, overview, view, finalize_stop
 from tools.platform_host import Host
 from tools.platform_models import payload_for
 from tools.platform_store import plain, encode
-from tools.state_io import read
+from tools.state_io import atomic_json, read
 
 
 class RouteUsability(unittest.TestCase):
@@ -227,6 +227,31 @@ class RouteUsability(unittest.TestCase):
         import io
         with redirect_stdout(io.StringIO()):
             self.assertEqual(main(['resume',str(root)]),2)
+
+    def test_evidence_root_and_missing_pointer_errors_are_explicit(self):
+        root=Path('runs/route_usability_checks')/uuid4().hex
+        prepare(root,True)
+        route_input=read(root/'inputs/route.json')
+        combinations=route_input['policy']['route']['data']['combinations']
+        route_input['policy']['route']['data']['combinations']={'family_mujoco':combinations['family_mujoco']}
+        atomic_json(root/'inputs/route.json',route_input)
+        host=Host(root,'family-route');host.store.create(read(root/'inputs/project.json'))
+        create(root,route_input)
+        document={'present':{'value':1}}
+        with host.store.transaction() as db: ref=plain(host.store.put(db,document))
+        def read_pointer(request_id,pointer):
+            return host.invoke(dict(request_id=request_id,tool_id='evidence.read',
+                arguments=dict(reference=ref,pointer=pointer),reason='Verify JSON Pointer behavior'))
+        root=read_pointer('read-root','')
+        self.assertEqual(root['execution_status'],'completed',root)
+        self.assertEqual(host.observation(root)['content']['content'],document)
+        slash=read_pointer('read-slash','/')
+        self.assertEqual(slash['execution_status'],'failed',slash)
+        self.assertEqual(slash['error'],
+            'EVIDENCE_POINTER_NOT_FOUND: /; use pointer="" to read the root object')
+        missing=read_pointer('read-missing','/present/missing')
+        self.assertEqual(missing['execution_status'],'failed',missing)
+        self.assertEqual(missing['error'],'EVIDENCE_POINTER_NOT_FOUND: /present/missing')
 
     def test_optimize_source_and_charged_failure_accounting(self):
         # Synthetic optimizer failure after the charged simulation, before trial append.
