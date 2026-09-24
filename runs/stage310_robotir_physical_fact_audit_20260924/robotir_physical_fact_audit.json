@@ -1,0 +1,417 @@
+{
+  "reference": {
+    "robot_identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a",
+    "design_id": "two_segment_development",
+    "structure_contract": "family.design",
+    "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+    "discretization_identity": "152d5e04cfb37c640c63c648943859be5086add61b228c633b6db330c60e7b6e",
+    "basis_identity": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+    "source": "runs/stage35_case_b_retry_softagent_20260924/inputs/route.json"
+  },
+  "contract_inventory": {
+    "RobotDescription": [
+      "family",
+      "structure",
+      "channels",
+      "units",
+      "frame",
+      "assumptions",
+      "sources",
+      "unsupported"
+    ],
+    "Design": [
+      "version",
+      "id",
+      "components",
+      "tendons",
+      "actuators",
+      "tip",
+      "metadata"
+    ],
+    "Segment": [
+      "id",
+      "kind",
+      "connection",
+      "length_m",
+      "cells",
+      "sections",
+      "interpolation",
+      "physics",
+      "natural_curvature_rad_m"
+    ],
+    "Section": [
+      "kind",
+      "parameters",
+      "outer_yz_m",
+      "holes_yz_m",
+      "angle_rad"
+    ],
+    "PhysicalInput": [
+      "mode",
+      "density_kg_m3",
+      "young_pa",
+      "line_density_kg_m",
+      "bending_ei_nm2",
+      "bending_viscosity_nm2_s"
+    ],
+    "Rigid": [
+      "id",
+      "kind",
+      "connection",
+      "mass_kg",
+      "com_local_m",
+      "inertia_com_local_kg_m2",
+      "envelope_halfsize_m",
+      "guide_holes",
+      "hole_radius_m"
+    ],
+    "Tendon": [
+      "id",
+      "points",
+      "diameter_m",
+      "model",
+      "length_servo_gain_n_m",
+      "pretension_n",
+      "force_limit_n"
+    ],
+    "Actuator": [
+      "id",
+      "command_type",
+      "units",
+      "drum_radius_m",
+      "transmission",
+      "limits",
+      "velocity_limit"
+    ],
+    "Discretization": [
+      "version",
+      "model",
+      "cells",
+      "coordinates"
+    ],
+    "GVSModelParameters": [
+      "model_id",
+      "basis",
+      "integration_steps_per_segment",
+      "quadrature_points_per_segment",
+      "finite_difference_step"
+    ]
+  },
+  "ownership": {
+    "physical_design": "robot.structure:family.design",
+    "numerical_mesh": "policy.discretization:family.discretization",
+    "gvs_basis": "GVSModelParameters.basis",
+    "task_scene": "task.environment:experiment.assembly",
+    "legacy_cells": "Segment.cells compatibility input excluded from canonical Design"
+  },
+  "case_inventory": {
+    "flexible_segments": {
+      "near": {
+        "length_m": 0.16,
+        "interpolation": "step",
+        "section_stations": [
+          0.0
+        ],
+        "material_mode": "material",
+        "density_kg_m3": 1100.0,
+        "young_pa": 8000000.0,
+        "natural_curvature_rad_m": [
+          0.0,
+          0.0
+        ]
+      },
+      "far": {
+        "length_m": 0.12,
+        "interpolation": "linear",
+        "section_stations": [
+          0.0,
+          1.0
+        ],
+        "material_mode": "material",
+        "density_kg_m3": 1050.0,
+        "young_pa": 6000000.0,
+        "natural_curvature_rad_m": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "rigid_components": {
+      "mid_guide": {
+        "mass_kg": 0.002,
+        "com_local_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "inertia_com_local_kg_m2": [
+          [
+            4e-07,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            2e-07,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            2e-07
+          ]
+        ]
+      },
+      "connector": {
+        "mass_kg": 0.003,
+        "com_local_m": [
+          0.006,
+          0.0,
+          0.0
+        ],
+        "inertia_com_local_kg_m2": [
+          [
+            5e-08,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            7e-08,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            7e-08
+          ]
+        ]
+      },
+      "payload": {
+        "mass_kg": 0.01,
+        "com_local_m": [
+          0.007,
+          0.001,
+          -0.002
+        ],
+        "inertia_com_local_kg_m2": [
+          [
+            6e-07,
+            1e-07,
+            0.0
+          ],
+          [
+            1e-07,
+            8e-07,
+            1e-07
+          ],
+          [
+            0.0,
+            1e-07,
+            9e-07
+          ]
+        ]
+      }
+    },
+    "tendon_count": 6,
+    "actuator_count": 6,
+    "backend_cells": {
+      "near": 3,
+      "far": 3
+    },
+    "gvs_basis": {
+      "strategy": "structural_linear"
+    }
+  },
+  "physical_traces": [
+    {
+      "quantity": "flexible_mass",
+      "owner": "family.design",
+      "source": "Segment.physics density_kg_m3 or line_density_kg_m; Segment.sections, length_m",
+      "explicit_fact": "material density or line density, section geometry and length",
+      "gvs": "Gauss section quadrature along the continuous segment",
+      "backend": "cell-midpoint section area times density and cell length",
+      "independent_choice": "quadrature versus cell midpoint sampling",
+      "observation": "total mass gap 2.33e-6 kg, 0.0031%"
+    },
+    {
+      "quantity": "flexible_com",
+      "owner": "derived from family.design",
+      "source": "Section centroid and density; no single flexible COM field",
+      "explicit_fact": "cross-section shape and its along-segment stations",
+      "gvs": "quadrature material points placed by continuous strain kinematics",
+      "backend": "body COM at cell half-length plus rotated section centroid, placed by hinges",
+      "independent_choice": "continuous pose integration versus rigid-cell pose and lumping",
+      "observation": "far COM gap 9.321 mm; payload world COM gap 16.673 mm at q0"
+    },
+    {
+      "quantity": "inertia",
+      "owner": "mixed",
+      "source": "Rigid.inertia_com_local_kg_m2 explicit; flexible inertia derived from density and section area moments",
+      "explicit_fact": "rigid tensor, flexible density and section geometry",
+      "gvs": "quadrature cross-section inertia plus distributed translation",
+      "backend": "cell body inertia including m*ds^2/12, rotated into XML inertial frame",
+      "independent_choice": "distributed versus cell-local inertial approximation",
+      "observation": "rigid local tensors preserved; far deformed component inertia gap 13.34%"
+    },
+    {
+      "quantity": "gravity",
+      "owner": "task.environment, not RobotIR",
+      "source": "Assembly.environment.gravity_m_s2 and mount quaternion",
+      "explicit_fact": "world gravity and mount pose in the scene",
+      "gvs": "sum m J_com.T g over continuous mass quadrature",
+      "backend": "MuJoCo body COM Jacobians, equivalently -qfrc_bias at zero speed",
+      "independent_choice": "COM pose and Jacobian from each representation",
+      "observation": "generalized gravity gap 1.771e-3 N*m^2 at q0"
+    },
+    {
+      "quantity": "bending_elasticity",
+      "owner": "family.design",
+      "source": "PhysicalInput material E or equivalent EI; sections; natural_curvature_rad_m",
+      "explicit_fact": "restricted linear bending constitutive inputs",
+      "gvs": "integral of basis.T E I(s) (basis*q - natural curvature)",
+      "backend": "cell-center principal E I / ds hinge stiffness and springref",
+      "independent_choice": "basis/quadrature versus hinge stiffness conversion",
+      "observation": "mapped stiffness matrix gap 18.3%; elastic force gap 0.442e-3 N*m^2"
+    },
+    {
+      "quantity": "tendon_geometry_and_force",
+      "owner": "family.design",
+      "source": "Tendon ordered attachment points and holes; straight_frictionless model; force limit and pretension",
+      "explicit_fact": "route topology, anchor/guide locations, ideal frictionless span semantics",
+      "gvs": "continuous attachment poses and -J_length.T tension",
+      "backend": "compiler attachment sites, MuJoCo spatial tendon, negative gain direct tension",
+      "independent_choice": "moment arms are derivatives of different deformed geometries",
+      "observation": "route bindings and force sign match; Jacobian gap 2.33e-4 m^2/rad"
+    },
+    {
+      "quantity": "actuation",
+      "owner": "family.design plus control plan",
+      "source": "Actuator command type, drum, transmission ratio, travel and speed limits; tendon servo gain",
+      "explicit_fact": "kinematic transmission and command limits",
+      "gvs": "ideal tendon tension as model input; no motor state",
+      "backend": "ideal_tension or actuator_realistic control mode from scene/control, XML actuator implementation",
+      "independent_choice": "command-to-tension dynamics and execution mode belong to model/control",
+      "observation": "Stage 3.7 direct-tension u0 matches exactly; motor dynamics omitted"
+    },
+    {
+      "quantity": "shape_and_discretization",
+      "owner": "family.design plus separate model configuration",
+      "source": "section stations, connections and guide positions in design; cells in family.discretization; basis in GVS model parameters",
+      "explicit_fact": "physical geometry and topology; numerical resolution is separate",
+      "gvs": "structural_linear basis and 24 integration steps per segment",
+      "backend": "three principal-hinge cells per segment in this case",
+      "independent_choice": "deformation space, quadrature and cell placement",
+      "observation": "q transfer exact; tip gap 16.743 mm at q0"
+    },
+    {
+      "quantity": "boundary_and_task_interface",
+      "owner": "RobotDescription and Task/Assembly",
+      "source": "Design.tip and RobotDescription.channels; mount, gravity, external forces and target in task environment",
+      "explicit_fact": "named tip/channel interface and scene boundary conditions",
+      "gvs": "requires assembly and rejects external applied forces in build_system",
+      "backend": "scene mount, gravity, external forces and floor compiled into XML/execution",
+      "independent_choice": "supported load/contact physics differ by model",
+      "observation": "Stage 3.7 reference scene has no external forces"
+    }
+  ],
+  "gaps": [
+    {
+      "id": "cross_model_equivalence",
+      "priority": "HIGH",
+      "kind": "missing validation contract",
+      "finding": "No shared requirement says how a GVS state and cell state must agree in shape, COM, tendon Jacobian or force residual at a reference pose.",
+      "evidence": "exact q transfer but 16.743 mm tip, 9.321 mm far COM and 1.771e-3 N*m^2 gravity gaps",
+      "scope": "cross-model validation; not necessarily a new physical RobotIR field"
+    },
+    {
+      "id": "deformation_and_quadrature_policy",
+      "priority": "HIGH",
+      "kind": "separate model choice",
+      "finding": "GVS basis/integration and serial cell count/sample rule are separate numerical policies. RobotIR physical geometry alone cannot force equal deformed states.",
+      "evidence": "structural_linear versus three cells; 18.3% stiffness matrix gap",
+      "scope": "backend-specific approximation that needs explicit provenance and convergence criteria"
+    },
+    {
+      "id": "full_continuum_constitutive_law",
+      "priority": "HIGH for full Cosserat/FEM; outside current bending model",
+      "kind": "absent physical inputs",
+      "finding": "PhysicalInput supplies E or bending EI and bending viscosity, not a full shear/torsion/axial or nonlinear 3D material law.",
+      "evidence": "PhysicalInput schema; GVS and serial model capabilities explicitly omit shear, stretch and material torsion",
+      "scope": "only needed if those richer physics are claimed"
+    },
+    {
+      "id": "tendon_contact_mechanics",
+      "priority": "MEDIUM for current comparison; HIGH for contact-rich models",
+      "kind": "restricted explicit semantics",
+      "finding": "Ordered straight frictionless spans and guide points are explicit; guide contact/wrap, friction, cable elasticity and motor dynamics are not modeled.",
+      "evidence": "Tendon.model literal and generator paths; route bindings agree but moment arms differ",
+      "scope": "do not infer richer cable physics from current attachment data"
+    },
+    {
+      "id": "flexible_mass_distribution",
+      "priority": "MEDIUM",
+      "kind": "derived physical quantity",
+      "finding": "Flexible mass/COM/inertia are generated from section and density. Material-mode RobotIR defines a continuum distribution, but sampling/lumping is independent.",
+      "evidence": "0.0031% total mass gap but 9.321 mm far world COM gap",
+      "scope": "preserve source density/sections; record generator sampling and reference-state COM"
+    },
+    {
+      "id": "equivalent_mode_density",
+      "priority": "MEDIUM for future volumetric models",
+      "kind": "conditional information gap",
+      "finding": "Equivalent mode authorizes line density and principal bending EI without a volumetric Young modulus or density.",
+      "evidence": "PhysicalInput.authority validator",
+      "scope": "sufficient for reduced bending; cannot uniquely determine a 3D material law"
+    },
+    {
+      "id": "volumetric_geometry_and_interfaces",
+      "priority": "HIGH for FEM; outside current rod scope",
+      "kind": "absent physical representation",
+      "finding": "Sections and envelopes describe rods and rigid bodies, not a material-labelled 3D solid with bonded/contact interfaces.",
+      "evidence": "Section/Segment/Rigid contracts and compiler convex collision approximation",
+      "scope": "required only when claiming volumetric fidelity"
+    },
+    {
+      "id": "scene_separation",
+      "priority": "LOW",
+      "kind": "intentional ownership boundary",
+      "finding": "Mount, gravity, external forces and target belong to task assembly, not RobotIR.",
+      "evidence": "route.json task.environment and GVS build_system scene requirement",
+      "scope": "keep boundary conditions explicit in a composed experiment; not missing robot facts"
+    }
+  ],
+  "future_model_suitability": [
+    {
+      "model": "PCC",
+      "assessment": "SUFFICIENT for current kinematics",
+      "reason": "The existing PCC provider reads family.design components/tip plus explicit curvature query; it does not claim loads or dynamics."
+    },
+    {
+      "model": "current bending GVS",
+      "assessment": "SUFFICIENT for declared restricted model; cross-model fidelity unverified",
+      "reason": "Design supplies geometry/material/tendon inputs; basis and quadrature remain model parameters; no shear, stretch, torsion or contact."
+    },
+    {
+      "model": "serial MuJoCo",
+      "assessment": "SUFFICIENT for declared cell model; not continuum-equivalent by construction",
+      "reason": "Design plus family.discretization and scene compile into cells, hinge springs, masses and spatial tendons."
+    },
+    {
+      "model": "general Cosserat or SoRoSim-style model",
+      "assessment": "PARTIAL",
+      "reason": "Rod sections and connections exist, but full strain constitutive inputs, richer actuation and boundary semantics are absent; basis and strain modes must be chosen."
+    },
+    {
+      "model": "volumetric FEM",
+      "assessment": "INSUFFICIENT for general high-fidelity claims",
+      "reason": "Cross sections could seed a simple rod mesh, but 3D material law, volumetric domains/interfaces and contact/boundary semantics are not specified."
+    }
+  ],
+  "conclusion": {
+    "shared_source_of_supported_robot_design_inputs": true,
+    "cross_model_physical_equivalence_guaranteed": false,
+    "main_issue": "model-dependent reconstruction and missing equivalence criteria, with conditional gaps for richer physics",
+    "recommended_next_step": "Define one frozen reference-state equivalence contract for shape, COM, gravity, stiffness and tendon Jacobian, including approximation provenance and tolerances, before proposing new RobotIR fields."
+  }
+}
