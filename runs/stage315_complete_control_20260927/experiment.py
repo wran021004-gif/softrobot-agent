@@ -168,7 +168,8 @@ def public():
     raw['policy']['discretization']=dict(contract='family.discretization',data=dict(cells={'near':12,'far':12}))
     raw['policy']['model']=dict(adapter='offline');raw['policy']['allowed_tools']=['simulation.run','evaluation.run']
     raw['policy']['tool_bindings']={'simulation.run':'1.0.0','evaluation.run':'1.0.0'}
-    raw['policy']['budget']=dict(tool_calls=4,model_calls=0,backend_solves=1,worker_calls=0,wall_s=2100.)
+    # Host reserves timeout_s for each call, including read-only evaluation.
+    raw['policy']['budget']=dict(tool_calls=4,model_calls=0,backend_solves=1,worker_calls=0,wall_s=3600.)
     raw['policy']['timeout_s']=1800.
     inp=SessionInput.model_validate(compile_input(raw)['input'])
     seed=read(HERE/'gvs_full.json')['plans'][0]
@@ -210,11 +211,36 @@ def public():
         summary['graph_construction_s']=obs[0]['graph_construction_s']
     save('public_summary',summary);print(json.dumps(summary),flush=True)
 
+def evaluate_saved():
+    from tools.platform_host import Host
+    from tools.platform_store import Store
+    from extensions.tendon_family.gvs_lqr import _OPERATING_POINTS
+    point=read(ROOT/'runs/stage312_to_nmpc_20260926/operating_point_current.json')['point']
+    _OPERATING_POINTS[point['candidate_model_identity']]=point
+    db=Store(HERE);source=Host(HERE,'stage315-nmpc')
+    compatibility=source.compatibility();save('source_compatibility',compatibility)
+    if not compatibility['compatible']:raise ValueError('Producer dependencies changed')
+    value=db.session('stage315-nmpc')['snapshot']['input'];value['run_id']='stage315-evaluate'
+    value['policy'].update(allowed_tools=['evaluation.saved'],tool_bindings={'evaluation.saved':'1.0.0'},
+        budget=dict(tool_calls=2,model_calls=0,backend_solves=0,worker_calls=0,wall_s=60.),timeout_s=30.)
+    host=Host(HERE,'stage315-evaluate');host.create(value)
+    sim=read(HERE/'public_simulation_receipt.json')
+    receipt=host.invoke(dict(request_id='evaluate-saved',tool_id='evaluation.saved',tool_version='1.0.0',
+        arguments=dict(source_run_id='stage315-nmpc',execution_id=sim['execution_id'],result=sim['output']),
+        reason='Authorized read-only evaluation after wall-reservation rejection; preserve sealed producer and dependencies'))
+    save('saved_evaluation_receipt',receipt)
+    if receipt['execution_status']!='completed':raise RuntimeError(str(receipt))
+    evaluation=db.artifact(receipt['output']);save('saved_evaluation',evaluation)
+    summary=read(HERE/'public_summary.json');summary.update(evaluation=evaluation,evaluation_receipt='saved_evaluation_receipt.json',
+        evaluation_continuation='New read-only session; producer dependencies verified unchanged, original rejection retained')
+    save('public_summary',summary);print(json.dumps(receipt),flush=True)
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('phase',choices=['compare','gvs-check','gvs-full','replay','public'])
+    parser=argparse.ArgumentParser();parser.add_argument('phase',choices=['compare','gvs-check','gvs-full','replay','public','evaluate-saved'])
     parser.add_argument('--output',type=Path);args=parser.parse_args()
     if args.output:HERE=args.output.resolve();HERE.mkdir(parents=True,exist_ok=True)
     if args.phase=='compare':compare()
     elif args.phase=='replay':replay()
     elif args.phase=='public':public()
+    elif args.phase=='evaluate-saved':evaluate_saved()
     else:gvs(args.phase=='gvs-check')
