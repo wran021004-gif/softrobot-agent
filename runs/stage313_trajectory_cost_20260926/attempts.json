@@ -1,0 +1,19 @@
+{
+  "scope": "One fixed five-interval problem and seed; no backend execution or parameter sweep",
+  "original_baseline_solves": 1,
+  "investigations": [
+    {"change": "Projected inertial wrenches, retaining generalized mass multiplication", "warm_jacobian_s": 10.5818369, "retained": "Superseded by matrix-free implicit inertia"},
+    {"change": "Global residual or pose SX expansion", "outcome": "Stopped on multi-GB graph growth; no solve", "retained": false},
+    {"change": "Cell inlining / forward AD preference", "warm_jacobian_s": [10.6740691, 10.5777731], "outcome": "No useful improvement", "retained": false},
+    {"change": "Whole analytic NLP JIT", "outcome": "Generated 1492653674-byte C source; stopped", "retained": false},
+    {"change": "Limit AD direction batches before JIT", "outcome": "144236464-byte C source; LCC64 insufficient memory", "retained": false},
+    {"change": "Compile constraint values without unused Lagrangian gradient", "outcome": "Flat function compilation failed with insufficient memory; primal SX expansion also became oversized", "retained": false},
+    {"change": "Matrix-free inertia and sample-sized function boundaries", "value_max_difference": 1.3877787807814457e-14, "retained": true},
+    {"change": "Compiled values with IPOPT finite-difference Jacobian", "result": "rejected_fd_solve.json", "solve_s": 34.6773562, "iterations": 1, "violation": 0.0019065751364795436, "retained": false},
+    {"change": "Exact reverse AD constraint Jacobian", "warm_probe_s": 1.2847308, "retained": true},
+    {"change": "Force full interval Jacobians", "warm_probe_s": 1.2825561, "outcome": "No material improvement; reverted", "retained": false}
+  ],
+  "final_public_result": "public_result.json",
+  "final_threshold": 1e-5,
+  "ten_second_target_reached": false
+}

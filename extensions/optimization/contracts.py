@@ -29,6 +29,11 @@ class CasadiNLPSelector(Contract):
 
 
 class IpoptParameters(Contract):
+    constraint_jacobian_mode: Literal['automatic', 'reverse'] = Field(default='automatic', description=(
+        'Exact CasADi AD in both modes. Reverse mode avoids wide forward seed '
+        'batches for expensive constraint graphs. Objective derivatives and '
+        'the mathematical problem are unchanged.'
+    ))
     retain_feasible_iterate: bool = False
     max_cpu_s: FiniteFloat | None = Field(default=None, gt=0)
     max_iterations: int = Field(default=300, ge=1, le=10000)

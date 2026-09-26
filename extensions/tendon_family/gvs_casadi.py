@@ -206,6 +206,7 @@ class GVSCasadiFunctions:
         q = ca.MX.sym('q', n)
         qdot = ca.MX.sym('qdot', n)
         u = ca.MX.sym('u', m)
+        acceleration = ca.MX.sym('acceleration', n)
         state = _SymbolicKinematics(
             topology, q, self.parameters.integration_steps_per_segment, self.resolved
         )
@@ -215,8 +216,10 @@ class GVSCasadiFunctions:
         )
         mass = ca.MX.zeros(n, n)
         gravity = ca.MX.zeros(n, 1)
+        bias = ca.MX.zeros(n, 1)
+        inertial_wrench = ca.MX.zeros(n, 1)
         gravity_vector = _dm(expression.gravity_robot_base_m_s2)
-        for descriptor in descriptors:
+        for descriptor_index, descriptor in enumerate(descriptors):
             pose = (
                 state.point_pose(descriptor['component'], descriptor['s'])
                 if descriptor['kind'] == 'segment'
@@ -232,6 +235,36 @@ class GVSCasadiFunctions:
             mass += descriptor['mass'] * ca.mtimes(jv.T, jv)
             mass += ca.mtimes([jw.T, inertia_world, jw])
             gravity += descriptor['mass'] * ca.mtimes(jv.T, gravity_vector)
+            # Project each rigid mass sample's inertial wrench directly. This
+            # is the same Christoffel contraction of M(q), without forming and
+            # differentiating every entry of the generalized mass matrix.
+            linear_velocity = ca.mtimes(jv, qdot)
+            angular_velocity = ca.mtimes(jw, qdot)
+            linear_bias = ca.jtimes(linear_velocity, q, qdot)
+            angular_bias = ca.jtimes(angular_velocity, q, qdot)
+            bias += descriptor['mass'] * ca.mtimes(jv.T, linear_bias)
+            bias += ca.mtimes(jw.T,
+                ca.mtimes(inertia_world, angular_bias) +
+                ca.cross(angular_velocity, ca.mtimes(inertia_world, angular_velocity)))
+            # Implicit dynamics need M*a+C, not the dense generalized M or J.
+            # Directional kinematics plus adjoint wrench projection avoid
+            # materializing all generalized-coordinate pose derivatives.
+            velocity = ca.jtimes(position, q, qdot)
+            linear_acceleration = ca.jtimes(position, q, acceleration) + ca.jtimes(velocity, q, qdot)
+            rotation_vector = ca.reshape(rotation, 9, 1)
+            rotation_rate = ca.reshape(ca.jtimes(rotation_vector, q, qdot), 3, 3)
+            spin = ca.mtimes(rotation_rate, rotation.T)
+            spin = (spin-spin.T)/2
+            omega = ca.vertcat(spin[2,1],spin[0,2],spin[1,0])
+            alpha = ca.jtimes(omega,q,qdot) + ca.jtimes(omega,qdot,acceleration)
+            torque = ca.mtimes(inertia_world,alpha) + ca.cross(omega,ca.mtimes(inertia_world,omega))
+            projected_wrench = ca.jtimes(position,q,descriptor['mass']*linear_acceleration,True)
+            rotation_covector = ca.reshape(ca.mtimes(_skew(torque),rotation)/2,9,1)
+            projected_wrench += ca.jtimes(rotation_vector,q,rotation_covector,True)
+            # Keep directional/adjoint derivative graphs local to each sample.
+            sample_wrench = ca.Function('gvs_mass_wrench_'+str(descriptor_index),
+                [q,qdot,acceleration],[projected_wrench])
+            inertial_wrench += sample_wrench(q,qdot,acceleration)
         mass = (mass + mass.T) / 2
 
         elastic = ca.MX.zeros(n, 1)
@@ -277,11 +310,6 @@ class GVSCasadiFunctions:
         tendon_jacobian = ca.jacobian(tendon_lengths, q)
         tendon_force = -ca.mtimes(tendon_jacobian.T, u)
 
-        # Contract the Christoffel expression before AD. This is exactly
-        # C_i = sum_jk Gamma_ijk v_j v_k for symmetric M; materializing the
-        # full n*n*n derivative and scalar loop makes repeated OCP calls costly.
-        momentum = ca.mtimes(mass, qdot)
-        bias = ca.jtimes(momentum, q, qdot) - .5 * ca.gradient(ca.dot(qdot, momentum), q)
         qdd = ca.solve(
             mass,
             tendon_force + gravity - bias - elastic - damping,
@@ -303,9 +331,8 @@ class GVSCasadiFunctions:
         # ill-scaled acceleration residual of this stiff bending model.
         self.implicit_terms = ca.Function('gvs_implicit_terms', [x,u],
             [mass,tendon_force+gravity-bias-elastic-damping], ['x','u'], ['mass','force'])
-        acceleration=ca.MX.sym('acceleration',n)
         self.implicit_residual=ca.Function('gvs_force_balance',[x,u,acceleration],
-            [ca.mtimes(mass,acceleration)-(tendon_force+gravity-bias-elastic-damping)])
+            [inertial_wrench-(tendon_force+gravity-elastic-damping)])
         self._linearization = None
         self._linearization_symbols = (x,u,xdot)
         static_residual = tendon_force + gravity - elastic

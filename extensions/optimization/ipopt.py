@@ -155,7 +155,8 @@ class IpoptSolver:
         }
         if self.parameters.max_cpu_s is not None:
             options['ipopt.max_cpu_time']=float(self.parameters.max_cpu_s)
-        cache_key=(bundle.expression_digest,bundle.serialized_function,problem.objective.direction)
+        cache_key=(bundle.expression_digest,bundle.serialized_function,problem.objective.direction,
+                   self.parameters.constraint_jacobian_mode)
         cached=cache_key in self._compiled
         if not cached:
             if self.parameters.print_level:print('IPOPT constructing solver',flush=True)
@@ -169,6 +170,18 @@ class IpoptSolver:
             raw_objective, constraint_expression = function.call([x],True,False)
             signed_objective = raw_objective if problem.objective.direction == 'minimize' else -raw_objective
             nlp = {'x': x, 'f': signed_objective, 'g': constraint_expression}
+            if self.parameters.constraint_jacobian_mode == 'reverse':
+                # Keep exact AD, but color the constraint Jacobian in reverse
+                # mode instead of propagating wide forward seed batches.
+                constraints = ca.Function('constraint_values', [x],
+                    [constraint_expression], {'ad_weight':1.})
+                jacobian = constraints.jacobian()(x, ca.DM.zeros(constraint_expression.numel()))
+                p = ca.MX.sym('p', 0)
+                options['jac_g'] = ca.Function('nlp_jac_g', [x,p],
+                    [constraint_expression, jacobian])
+                # OptimizationResult does not request solution sensitivities.
+                options['no_nlp_grad'] = True
+                options['calc_lam_p'] = False
             selector=_FeasibleIterate(len(bundle.variable_order),len(problem.constraints)) if self.parameters.retain_feasible_iterate else None
             if selector is not None:options['iteration_callback']=selector
             solver = ca.nlpsol('ipopt_solver', 'ipopt', nlp, options)
@@ -184,6 +197,7 @@ class IpoptSolver:
         solution = solver(x0=x0, lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
         solve_s=time.perf_counter()-solve_start
         stats = solver.stats()
+        validation_start=time.perf_counter()
         values = np.asarray(solution['x'], dtype=float).reshape(-1)
         returned_values=values.copy();selected_iteration=None
         if not stats.get('success') and selector is not None and selector.best is not None:
@@ -221,6 +235,10 @@ class IpoptSolver:
             'construction_s':construction_s, 'solve_s':solve_s, 'cached_solver':cached,
             'selected_feasible_iteration':selected_iteration,
             'returned_iterate_constraint_violation':returned_violation,
+            'validation_s':time.perf_counter()-validation_start,
+            'function_statistics':{k:v for k,v in stats.items()
+                if k.startswith(('n_call_', 't_proc_', 't_wall_'))},
+            'constraint_derivative':'CasADi exact AD ('+self.parameters.constraint_jacobian_mode+')',
         }
         return OptimizationResult(
             status=status,
