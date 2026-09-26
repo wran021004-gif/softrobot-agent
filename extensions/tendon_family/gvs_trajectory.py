@@ -13,11 +13,13 @@ from .pcc import quaternion_wxyz_to_rotation
 
 
 def trajectory_authorization(robot, space, parameters):
-    p=GVSTrajectoryParameters.model_validate(parameters); n=len(coordinate_order(robot.structure.data,p.basis))
+    p=GVSTrajectoryParameters.model_validate(parameters)
+    coordinates=coordinate_order(robot.structure.data,p.basis); n=len(coordinates)
     result={}
     for k in range(p.horizon*p.substeps+1):
         for j in range(2*n):
             result[f'x/{k}/{j}']=dict(type='number',bounds=[None,None],units='1',
+                physical_coordinate=coordinates[j%n]+('.rate' if j>=n else ''),
                 physical_scale=p.curvature_scale_rad_m if j<n else p.rate_scale_rad_m_s,
                 physical_units='rad/m' if j<n else 'rad/(m*s)')
     for k in range(p.horizon):
@@ -40,11 +42,16 @@ class GVSTrajectoryAssembler:
             raise ValueError('GVS_TRAJECTORY_SPECIFICATION_MISMATCH')
         if {s.template_id for s in specification.constraints}!={'initial_state','implicit_dynamics','tendon_force_bounds'}:
             raise ValueError('GVS_TRAJECTORY_CONSTRAINTS_REQUIRED')
+        n=len(coordinate_order(robot.structure.data,p.basis))
+        m=len(robot.structure.data['tendons'])
+        if len(context.x0)!=2*n or len(context.u0)!=m:
+            raise ValueError('GVS_TRAJECTORY_INITIAL_STATE_AND_PREVIOUS_TENSION_REQUIRED: '
+                f'context.x0 requires {2*n} [q,qdot] values; context.u0 requires {m} tendon tensions')
         model_params=GVSModelParameters(basis=p.basis)
         system=GVSModel(model_params).build_system(robot,model_params,None,SystemContext(
             x0=context.x0,u0=context.u0,scene=task.environment))
         functions=functions_for(expression_from_system(system))
-        n=len(context.x0)//2; m=len(context.u0); steps=p.horizon*p.substeps
+        steps=p.horizon*p.substeps
         decision_symbols={name:ca.MX.sym('v_'+str(i)) for i,name in enumerate(expected)}
         symbols={name:value*expected[name].get('physical_scale',1.) for name,value in decision_symbols.items()}
         X=[ca.vertcat(*[symbols[f'x/{k}/{j}'] for j in range(2*n)]) for k in range(steps+1)]
@@ -84,6 +91,7 @@ class GVSTrajectoryAssembler:
             scale=variables[f'x/0/{j}']['physical_scale'];variables[f'x/0/{j}']['bounds']=[value/scale,value/scale]
         for t,value in zip(tendons,context.u0): variables['previous_u/'+t]['bounds']=[value,value]
         guess=dict(specification.initial_guess)
+        for t,value in zip(tendons,context.u0):guess['previous_u/'+t]=value
         for k in range(steps+1):
             for j,value in enumerate(context.x0):guess.setdefault(f'x/{k}/{j}',value/variables[f'x/{k}/{j}']['physical_scale'])
         for k in range(p.horizon):

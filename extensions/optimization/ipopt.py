@@ -15,7 +15,7 @@ from extensions.optimization.contracts import (
     OptimizationDescription,
     OptimizationTemplateDescription,
 )
-from schemas.platform import Binding, Payload
+from schemas.platform import Binding, EvidenceRef, Payload
 from schemas.platform_math import OptimizationProblem, OptimizationResult
 
 
@@ -300,6 +300,19 @@ def optimization_assemble_tool(ctx, args):
     authorization = definition.hook('authorization')
     if authorization is not None:
         space = authorization(ctx.input.robot, space, parameters)
+    context = args.context
+    if isinstance(context, EvidenceRef):
+        context = SystemContext.model_validate(ctx.artifact(context))
+    if context is None:
+        # Static assemblers do not need state/input vectors. Dynamic assemblers
+        # must reject these empty vectors, never infer an initial condition.
+        context = SystemContext(x0=[], u0=[])
+    scene = context.scene
+    if isinstance(scene, EvidenceRef):
+        scene = Payload.model_validate(ctx.artifact(scene))
+    if scene is not None and scene != ctx.input.task.environment:
+        raise ValueError('OPTIMIZATION_CONTEXT_SCENE_MUST_MATCH_TASK')
+    context = context.model_copy(update={'scene': ctx.input.task.environment})
     problem = assemble_optimization(
         ctx.reg, args.assembler,
         task=ctx.input.task,
@@ -307,7 +320,7 @@ def optimization_assemble_tool(ctx, args):
         space=space,
         mathematical_model=model_contract,
         specification=args.specification,
-        context=SystemContext(x0=[], u0=[], scene=ctx.input.task.environment),
+        context=context,
     )
     reference = ctx.save_artifact(problem, 'optimization_problem')
     return OptimizationAssemblyResult(

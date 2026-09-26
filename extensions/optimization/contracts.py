@@ -5,7 +5,7 @@ from pydantic import Field, FiniteFloat
 
 from schemas.common import Contract
 from schemas.platform import Binding, EvidenceRef
-from schemas.platform_math import OptimizationSpecification
+from schemas.platform_math import OptimizationSpecification, SystemContext
 
 
 class CasadiNLPExpression(Contract):
@@ -65,6 +65,14 @@ class OptimizationDescription(Contract):
 class OptimizationAssembleRequest(Contract):
     assembler: Binding
     specification: OptimizationSpecification
+    context: SystemContext | EvidenceRef | None = Field(default=None, description=(
+        'Explicit assembly initial conditions, inline or by saved SystemContext reference. '
+        'Required for GVS trajectories: x0=[q,qdot] in resolved basis order '
+        '(rad/m, rad/(m*s)); u0 is the previously applied tension in frozen tendon order (N). '
+        'These are not nominal equilibrium metadata or a warm start. '
+        'Scene may be omitted; if supplied it must match the frozen task environment. '
+        'Static assemblers may omit context.'
+    ))
 
 
 class OptimizationAssemblyResult(Contract):

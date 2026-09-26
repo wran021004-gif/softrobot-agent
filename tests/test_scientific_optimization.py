@@ -1,4 +1,5 @@
 """Focused real-mathematics checks for trusted assembly and IPOPT."""
+import json
 import math
 import unittest
 from uuid import uuid4
@@ -62,6 +63,92 @@ class ScientificOptimizationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.reg = registry()
+
+    def test_public_gvs_trajectory_initial_context(self):
+        """Real Host assembly with explicit measured values; no solve or backend."""
+        from extensions.tendon_family.gvs_trajectory import trajectory_authorization
+        from tools.state_io import atomic_json
+
+        root = ROOT / 'runs/public_gvs_trajectory_assembly' / uuid4().hex
+        grant = project()
+        grant['authorization_source'] = 'User-authorized public GVS trajectory assembly repair; no solve or simulation'
+        Store(root).create(grant)
+        value = json.loads((ROOT / 'runs/stage35_case_b_retry_softagent_20260924/inputs/route.json').read_text(encoding='utf8'))
+        value['run_id'] = 'public-gvs-assembly'
+        value['policy'].update(route=None, allowed_tools=['optimization.assemble'],
+            tool_bindings={'optimization.assemble': '1.0.0'}, timeout_s=30.)
+        value['policy']['budget'].update(tool_calls=3, backend_solves=0, model_calls=0)
+        # Authorize a fixed existing length for the static compatibility probe;
+        # the robot, task and physical value are unchanged.
+        length = next(c['length_m'] for c in value['robot']['structure']['data']['components'] if c['id']=='near')
+        value['policy']['candidate_builder']['parameters']['data']['parameters']['components/near/length_m'] = dict(
+            type='number', bounds=[length, length])
+        host = Host(root, value['run_id'], reg=self.reg)
+        host.create(value)
+        inp = SessionInput.model_validate(value)
+        parameters = dict(horizon=2, curvature_scale_rad_m=20., rate_scale_rad_m_s=200.)
+        coordinates = coordinate_order(inp.robot.structure.data, {'strategy': 'structural_linear'})
+        n = len(coordinates)
+        tendons = [t['id'] for t in inp.robot.structure.data['tendons']]
+        # Distinct nonzero entries detect reordering, zero/equilibrium substitution,
+        # and confusion between physical values and scaled decision variables.
+        x0 = [0.2*(j+1) for j in range(n)] + [-2.*(j+1) for j in range(n)]
+        u0 = [0.5+0.25*j for j in range(len(tendons))]
+        arguments = dict(assembler=dict(extension_id='optimization_assembler.gvs_trajectory',
+            parameters=dict(contract='family.gvs_trajectory_parameters', data=parameters)),
+            specification=dict(variables=list(trajectory_authorization(inp.robot, {}, parameters)),
+                horizon=2, objectives=[dict(template_id='dynamic_tip_tracking')],
+                constraints=[dict(template_id=k) for k in ('initial_state', 'implicit_dynamics', 'tendon_force_bounds')]),
+            context=dict(x0=x0, u0=u0))
+        request = dict(request_id='assemble-gvs', tool_id='optimization.assemble', tool_version='1.0.0',
+            arguments=arguments, reason='Verify supplied dynamic initial conditions through the public Host.')
+        receipt = host.invoke(request)
+        self.assertEqual(receipt['execution_status'], 'completed', receipt)
+        summary = host.store.artifact(receipt['output'])
+        problem = OptimizationProblem.model_validate(host.store.artifact(summary['problem']))
+        names = coordinates + [name+'.rate' for name in coordinates]
+        for j, (name, physical) in enumerate(zip(names, x0)):
+            spec = problem.variables[f'x/0/{j}']
+            scale = 20. if j < n else 200.
+            self.assertEqual(spec['physical_coordinate'], name)
+            self.assertEqual(spec['units'], '1')
+            self.assertEqual(spec['physical_units'], 'rad/m' if j < n else 'rad/(m*s)')
+            self.assertEqual(spec['physical_scale'], scale)
+            self.assertEqual(spec['bounds'], [physical/scale]*2)
+            self.assertEqual(problem.initial_guess[f'x/0/{j}'], physical/scale)
+        # Artifact JSON canonicalizes dictionary keys; vector order is explicit
+        # in the serialized expression rather than the variables dictionary.
+        order = problem.objective_function.data['variable_order']
+        self.assertEqual([k.removeprefix('previous_u/') for k in order if k.startswith('previous_u/')], tendons)
+        self.assertEqual([k for k in order if k.startswith('x/0/')], [f'x/0/{j}' for j in range(2*n)])
+        for tendon, tension in zip(tendons, u0):
+            self.assertEqual(problem.variables['previous_u/'+tendon]['bounds'], [tension]*2)
+            self.assertEqual(problem.variables['previous_u/'+tendon]['units'], 'N')
+            self.assertEqual(problem.initial_guess['previous_u/'+tendon], tension)
+            self.assertEqual(problem.initial_guess['u/0/'+tendon], tension)
+        self.assertEqual(len(problem.constraints), 2*2*n)
+
+        missing = host.invoke({**request, 'request_id': 'missing-context',
+            'arguments': {k:v for k,v in arguments.items() if k!='context'}})
+        self.assertEqual(missing['execution_status'], 'failed', missing)
+        self.assertIn('GVS_TRAJECTORY_INITIAL_STATE_AND_PREVIOUS_TENSION_REQUIRED', missing['error'])
+
+        # Static callers still omit context. Assemble only; never invoke solve.
+        static_arguments = dict(assembler=dict(extension_id='optimization_assembler.pcc_reach',
+            parameters=dict(contract='family.pcc_reach_assembler_parameters', data=dict(configuration=dict(segments={
+                s:dict(curvature_y_rad_m=0.,curvature_z_rad_m=0.) for s in ('near','far')})))),
+            specification=dict(variables=['components/near/length_m'],
+                objectives=[dict(template_id='tip_position_error_squared')],
+                constraints=[dict(template_id='authorized_design_bounds')]))
+        static = host.invoke({**request, 'request_id': 'static-no-context', 'arguments': static_arguments})
+        self.assertEqual(static['execution_status'], 'completed', static)
+        self.assertEqual(host.store.remaining(host.run_id)['used']['backend_solves'], 0)
+        atomic_json(root/'verification.json', dict(request=request, receipt=receipt,
+            problem=summary['problem'], initial_variables={k:v for k,v in problem.variables.items()
+                if k.startswith(('x/0/','previous_u/'))},
+            missing_context_receipt=missing, static_without_context_receipt=static,
+            backend_solves=0, optimizer_invoked=False))
+        print('\nPublic GVS assembly verified:', root/'verification.json')
 
     def test_legacy_versions_and_semantic_lqr_description(self):
         legacy_ids = (

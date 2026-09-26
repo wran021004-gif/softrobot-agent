@@ -24,6 +24,7 @@ SOURCES = (
     'tools/platform_optimization.py',
 )
 DEPS = tuple((name, version) for name, version, _ in CONTRACTS) + (
+    ('platform.system_context', '1.0.0'),
     ('platform.optimization_problem', '1.0.0'),
     ('platform.optimization_result', '1.0.0'),
 )
@@ -58,9 +59,10 @@ EXTENSIONS = [
         extension_dependencies=(
             ('optimization_assembler.pcc_reach', '1.0.0'),
             ('optimization_assembler.gvs_inverse', '1.0.0'),
+            ('optimization_assembler.gvs_trajectory', '1.0.0'),
         ),
         capabilities=dict(category='optimization', role='public_tool', route_visible=True,
-                          evidence_output=True, backend_solves=0),
+                          evidence_input=True, evidence_output=True, backend_solves=0),
     ),
     Extension(
         'optimization.solve', 'tool', '1.0.0', c.OptimizationSolveRequest, OptimizationResult,
