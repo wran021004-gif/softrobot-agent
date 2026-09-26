@@ -1,0 +1,228 @@
+{
+  "skill_id": "gvs_nmpc_free_reach",
+  "name": "Use and diagnose the fixed GVS NMPC free-reach profile",
+  "version": 1,
+  "status": "validated",
+  "category": "CONTROL",
+  "description": "Evidence-backed selection and diagnosis of one offline ideal-tension free-reach configuration. Combined configuration evidence; no isolated causal claim.",
+  "trigger_signature": {
+    "failure_categories": [],
+    "metrics": []
+  },
+  "when_to_apply": [
+    "Exact declared profile scope with an offline simulation budget"
+  ],
+  "when_not_to_apply": [
+    "Real-time or motor execution, contact tasks, global robustness claims; changed tasks without new validation"
+  ],
+  "applicability": {
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "task_types": [
+      "task.reach"
+    ],
+    "model_levels": [
+      "M2"
+    ],
+    "control_levels": [
+      "C3"
+    ],
+    "execution_scope": {
+      "robot": {
+        "family": "tendon_robot_family",
+        "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+      },
+      "task": {
+        "family": "task.reach",
+        "identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
+        "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+        "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+        "timing": {
+          "timestep_s": 0.0005,
+          "control_period_s": 0.01,
+          "sample_period_s": 0.01,
+          "duration_s": 0.35,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ]
+        },
+        "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31"
+      },
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "version": "1.1.0",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "version": "1.0.0",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "version": "1.0.0",
+        "data": {
+          "version": "serial_bending_discretization_v1",
+          "model": "serial_bending_cells_v1",
+          "cells": {
+            "near": 12,
+            "far": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell"
+        }
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "version": "2.0.0",
+        "parameters": {
+          "contract": "family.gvs_profile_control",
+          "version": "1.0.0",
+          "data": {
+            "profile_id": "gvs_nmpc_free_reach_v1"
+          }
+        }
+      },
+      "seed": 17
+    }
+  },
+  "required_tools": [
+    "control.profile_describe",
+    "simulation.run",
+    "evaluation.run",
+    "control.profile_report",
+    "evidence.read"
+  ],
+  "strategy": [
+    {
+      "action": "invoke_tool",
+      "tool": "control.profile_describe",
+      "evidence_refs": [],
+      "instruction": "Select the declared fixed free-reach profile only for its exact scope. Read the predictor/execution distinction, ideal-tension assumption and historical cost. Changed configurations are unvalidated starting points."
+    },
+    {
+      "action": "invoke_tool",
+      "tool": "simulation.run",
+      "evidence_refs": [],
+      "instruction": "Use simulation.run with the configured profile. The implementation imports numerical guesses and regenerates the entire warm state trajectory from actual measurements; nominal metadata is not the current state."
+    },
+    {
+      "action": "invoke_tool",
+      "tool": "evaluation.run",
+      "evidence_refs": [],
+      "instruction": "Use evaluation.run on the saved execution with its execution identity. Preserve the original task duration, bounds and authoritative evaluator."
+    },
+    {
+      "action": "invoke_tool",
+      "tool": "control.profile_report",
+      "evidence_refs": [],
+      "instruction": "Use control.profile_report to separate independently accepted plans from raw optimizer convergence and selected initialization. A feasible early stop is suboptimal; a historical guess is not new execution evidence."
+    },
+    {
+      "action": "inspect_evidence",
+      "tool": null,
+      "evidence_refs": [
+        {
+          "run_id": "gvs-profile-d38694fc8e72",
+          "path": "objects/f678edd3e8eacc583e72db4f4d096e0d11cc3d375657ee1a69980d40e9cf31bd.json",
+          "sha256": "f678edd3e8eacc583e72db4f4d096e0d11cc3d375657ee1a69980d40e9cf31bd",
+          "pointer": null
+        }
+      ],
+      "instruction": "Inspect complete update delivery, including preparation, construction and validation. Report reach, sampled final-window settling and deadline misses as separate results."
+    },
+    {
+      "action": "inspect_evidence",
+      "tool": null,
+      "evidence_refs": [
+        {
+          "run_id": "gvs-profile-d38694fc8e72",
+          "path": "objects/f678edd3e8eacc583e72db4f4d096e0d11cc3d375657ee1a69980d40e9cf31bd.json",
+          "sha256": "f678edd3e8eacc583e72db4f4d096e0d11cc3d375657ee1a69980d40e9cf31bd",
+          "pointer": null
+        }
+      ],
+      "instruction": "If numerical resets or incomplete execution occur, preserve the last valid trajectory boundary. Inspect the saved reason and evidence; do not treat post-reset samples as recovery or relabel completion as task success."
+    }
+  ],
+  "negative_constraints": [
+    "do_not_assume_model_mismatch_from_task_failure",
+    "do_not_bypass_agent_permissions",
+    "do_not_modify_task_tolerance",
+    "do_not_override_task_gate",
+    "do_not_retune_surrogate_without_provenance"
+  ],
+  "evidence": [
+    {
+      "run_id": "gvs-profile-d38694fc8e72",
+      "path": "objects/f678edd3e8eacc583e72db4f4d096e0d11cc3d375657ee1a69980d40e9cf31bd.json",
+      "sha256": "f678edd3e8eacc583e72db4f4d096e0d11cc3d375657ee1a69980d40e9cf31bd",
+      "pointer": null
+    }
+  ],
+  "validation": [
+    {
+      "validation_id": "public-profile-original",
+      "skill_ref": "gvs_nmpc_free_reach@1",
+      "strategy_sha256": "486d4054fdb33efe49e77546e934b143ee1194bd4d7c7d52e136e3d06a51fba8",
+      "method": "deterministic",
+      "outcome": "passed",
+      "validated_runs": [
+        "gvs-profile-d38694fc8e72"
+      ],
+      "failed_validation_runs": [],
+      "task_coverage": [
+        "task.reach"
+      ],
+      "robot_coverage": [
+        "tendon_robot_family"
+      ],
+      "seed_coverage": [
+        17
+      ],
+      "evidence_refs": [
+        {
+          "run_id": "gvs-profile-d38694fc8e72",
+          "path": "objects/92725c090f50c64d2edac205d96d8dd68dd809c4f3938cba397f18425a7de9f4.json",
+          "sha256": "92725c090f50c64d2edac205d96d8dd68dd809c4f3938cba397f18425a7de9f4",
+          "pointer": null
+        }
+      ],
+      "validated_by": "harness",
+      "validated_at": "2026-09-26T18:45:13.134439Z",
+      "summary": "Trusted predeclared strategy check against fresh public original-task execution; no approval, transfer, settling or real-time inference."
+    }
+  ],
+  "provenance": {
+    "source_runs": [
+      "gvs-profile-d38694fc8e72"
+    ],
+    "source_findings": [],
+    "supporting_evidence": [
+      {
+        "run_id": "gvs-profile-d38694fc8e72",
+        "path": "objects/f678edd3e8eacc583e72db4f4d096e0d11cc3d375657ee1a69980d40e9cf31bd.json",
+        "sha256": "f678edd3e8eacc583e72db4f4d096e0d11cc3d375657ee1a69980d40e9cf31bd",
+        "pointer": null
+      }
+    ],
+    "created_by": "harness",
+    "created_at": "2026-09-26T18:30:48.693291Z",
+    "last_validated_at": "2026-09-26T18:45:13.134439Z"
+  },
+  "human_approval": null,
+  "requires_new_physics": false,
+  "causal_claim": "none",
+  "authority": "recommendation_only",
+  "supersedes": null,
+  "deprecated_by": null
+}

@@ -5,6 +5,11 @@
 for one fixed robot and original 350 ms task. The older controller remains
 available under version 1.0.0.
 
+The [fresh public acceptance](../runs/stage316_public_profile_20260927/implementation_report.md)
+passed the original reach criterion with 8.473 mm endpoint error. Sampled
+settling failed; mean update delivery was 24.447 s and all 35 deadlines were
+missed. The validated development skill was retrieved in a separate fresh process.
+
 The predictor is `model.gvs` with a structural-linear basis. Execution remains
 `model.serial_bending_cells` in MuJoCo, with 12 cells per segment, direct ideal
 tensions, 10 ms command holds and 0.5 ms physics steps. The target is
