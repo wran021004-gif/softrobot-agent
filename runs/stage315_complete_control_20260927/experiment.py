@@ -18,7 +18,7 @@ from extensions.tendon_family.gvs_trajectory import TrajectoryWorkspace
 from extensions.tendon_family.pcc import quaternion_wxyz_to_rotation
 from schemas.platform import RobotDescription,TaskDefinition
 from schemas.platform_math import SystemContext
-from tools.state_io import atomic_json
+from tools.state_io import atomic_json,digest
 HERE=Path(__file__).resolve().parent
 OLD=ROOT/'runs/stage314_replanning_20260927'
 def read(path):return json.loads(path.read_text(encoding='utf8'))
@@ -174,7 +174,7 @@ def public():
     seed=read(HERE/'gvs_full.json')['plans'][0]
     _SEEDS[workspace_key(inp.task,inp.robot,p)]=seed
     db=Store(HERE)
-    if not db.db.exists():db.create(dict(project_id='stage315',grant_id='stage315-control',
+    if not db.db.exists():db.create(dict(project_id='stage315',grant_id='stage315-control-'+digest(str(HERE))[:12],
         authorization_source='User authorized bounded full-task public NMPC execution, no paid model calls',
         budget=dict(tool_calls=8,model_calls=0,backend_solves=2,worker_calls=0,wall_s=4200)))
     host=Host(HERE,inp.run_id);host.create(inp.model_dump(mode='json'));start=time.perf_counter()
