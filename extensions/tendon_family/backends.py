@@ -22,6 +22,14 @@ def physics_for(inp):
     raise ValueError('UNSUPPORTED_FAMILY_DESIGN_CONTRACT')
 
 
+def _mujoco_state_failed(data, previous_time):
+    """MuJoCo can reset invalid velocities to finite values during mj_step."""
+    import mujoco
+    warnings=(mujoco.mjtWarning.mjWARN_BADQPOS,mujoco.mjtWarning.mjWARN_BADQVEL,mujoco.mjtWarning.mjWARN_BADQACC)
+    return (data.time<=previous_time or any(data.warning[k].number for k in warnings)
+        or not all(np.isfinite(v).all() for v in (data.qpos,data.qvel,data.qacc)))
+
+
 class MatlabBackend:
     backend_id='backend.matlab_spatial'
     model='matlab_serial_bending_v1'
@@ -205,13 +213,21 @@ class MujocoBackend(MatlabBackend):
                 self.controller.last['predicted_tension_n']=actual_tension.tolist()
                 self.controller.observations[-1].update(tension_tracking_error_n=tracking,
                     predicted_tension_n=actual_tension.tolist(),actual_tension_n=actual_tension.tolist())
-            for _ in range(substeps): mujoco.mj_step(model,data); steps+=1
-            if not np.isfinite(data.qpos).all() or data.warning[mujoco.mjtWarning.mjWARN_BADQACC].number:
-                complete=False; reason='MUJOCO_NUMERICAL_FAILURE'; break
+            for _ in range(substeps):
+                previous_time=data.time
+                mujoco.mj_step(model,data); steps+=1
+                if _mujoco_state_failed(data,previous_time):
+                    complete=False; reason='MUJOCO_NUMERICAL_FAILURE'
+                    atomic_json(self.folder/'numerical_failure.json',dict(step=steps,
+                        time_before_step_s=previous_time,engine_time_s=data.time,
+                        warnings={k.name:int(data.warning[k].number) for k in
+                            (mujoco.mjtWarning.mjWARN_BADQPOS,mujoco.mjtWarning.mjWARN_BADQVEL,mujoco.mjtWarning.mjWARN_BADQACC)}))
+                    break
+            if not complete:break
             mujoco.mj_forward(model,data)
             routes=[[data.site_xpos[model.site(f"{td['entity']}_point_{j}").id].tolist() for j in range(len(td['points']))] for td in p['tendons']]
             lengths=data.ten_length[tids].copy()
-            row=dict(time_s=(step+1)*dt,solver_time_s=t,tip_m=data.site_xpos[model.site('tip_site').id].tolist(),
+            row=dict(time_s=(step+1)*dt,solver_time_s=t,engine_time_s=data.time,tip_m=data.site_xpos[model.site('tip_site').id].tolist(),
                 qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),
                 tendon_length_m=lengths.tolist(),tendon_length_change_m=(lengths-initial_lengths).tolist(),
                 tendon_length_rate_m_s=((lengths-previous_lengths)/dt).tolist(),body_positions_m=data.xpos[bids].tolist(),

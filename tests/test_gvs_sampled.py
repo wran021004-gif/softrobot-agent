@@ -12,6 +12,19 @@ from schemas.platform_math import LinearizedModel
 
 
 class SampledMath(unittest.TestCase):
+    def test_mujoco_velocity_reset_is_numerical_failure(self):
+        import mujoco
+        from extensions.tendon_family.backends import _mujoco_state_failed
+        model=mujoco.MjModel.from_xml_string('<mujoco><worldbody><body><joint type="hinge"/><geom type="sphere" size=".1"/></body></worldbody></mujoco>')
+        data=mujoco.MjData(model)
+        before=data.time;mujoco.mj_step(model,data)
+        self.assertFalse(_mujoco_state_failed(data,before))
+        data.qvel[0]=1e20;before=data.time;mujoco.mj_step(model,data)
+        self.assertTrue(np.isfinite(data.qpos).all())
+        self.assertTrue(np.isfinite(data.qvel).all())
+        self.assertGreater(data.warning[mujoco.mjtWarning.mjWARN_BADQVEL].number,0)
+        self.assertTrue(_mujoco_state_failed(data,before))
+
     def test_small_angle_pose_against_matrix_exponential(self):
         import casadi as ca
         from scipy.linalg import expm
