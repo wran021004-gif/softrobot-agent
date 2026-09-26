@@ -19,7 +19,7 @@ from extensions.tendon_family.model_applicability import assess_model_uses
 from schemas.platform import Binding, Payload, SessionInput
 from schemas.platform_math import ModelAgreementEvidence
 from tools.platform_store import Store
-from tools.state_io import atomic_json
+from tools.state_io import atomic_json, digest
 
 HERE = Path(__file__).resolve().parent
 SOURCE = ROOT/'runs/stage311_discretization_convergence_20260926/discretization_convergence.json'
@@ -33,7 +33,8 @@ def read(path):
 def store():
     result = Store(HERE)
     if not result.db.exists():
-        result.create(dict(project_id='stage312-nmpc', grant_id='stage312-nmpc-20260926',
+        grant='stage312-nmpc-20260926'+('' if HERE==Path(__file__).resolve().parent else '-'+digest(str(HERE))[:12])
+        result.create(dict(project_id='stage312-nmpc', grant_id=grant,
             authorization_source='User requested autonomous Stage 3.12 through deterministic public NMPC execution',
             budget=dict(tool_calls=40, model_calls=0, backend_solves=8, worker_calls=0, wall_s=43200)))
     return result
@@ -126,4 +127,9 @@ def main():
     atomic_json(HERE/'agreement_cost.json',result)
 
 
-if __name__=='__main__': main()
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path)
+    args=parser.parse_args()
+    if args.output:HERE=args.output.resolve()
+    main()

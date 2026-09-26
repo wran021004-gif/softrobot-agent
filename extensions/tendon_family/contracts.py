@@ -991,4 +991,5 @@ class GVSTrajectoryParameters(Contract):
     variation_weight: FiniteFloat = Field(default=1e-3,ge=0)
     max_iterations: int = Field(default=120,ge=1,le=1000)
     tolerance: FiniteFloat = Field(default=1e-6,gt=0)
+    evaluation_threads: int = Field(default=1,ge=1,le=8)
 

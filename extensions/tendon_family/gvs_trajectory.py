@@ -55,11 +55,19 @@ class GVSTrajectoryAssembler:
         if task.evaluator.extension_id!='evaluate.reach':
             raise ValueError('GVS_TRAJECTORY_REQUIRES_REACH_EVALUATOR')
         tolerance=task.evaluator.parameters.data['tolerance_m']
+        previous_state=ca.MX.sym('previous_state',2*n)
+        next_state=ca.MX.sym('next_state',2*n)
+        tension=ca.MX.sym('tension',m)
+        step_residual=ca.Function('gvs_implicit_step_residual',[previous_state,next_state,tension],
+            [ca.vertcat((next_state[:n]-previous_state[:n]-h*next_state[n:])/10.,
+                functions.implicit_residual(next_state,tension,(next_state[n:]-previous_state[n:])/h)/.001)],
+            {'jac_penalty':0})
+        mapped=step_residual.map(steps,'thread',p.evaluation_threads)
+        residuals=mapped(ca.horzcat(*X[:-1]),ca.horzcat(*X[1:]),
+            ca.horzcat(*[U[k//p.substeps] for k in range(steps)]))
         for k in range(steps):
             x,y,u=X[k],X[k+1],U[k//p.substeps]
-            terms=functions.implicit_terms(x=y,u=u)
-            residual=ca.vertcat((y[:n]-x[:n]-h*y[n:])/10.,
-                (ca.mtimes(terms['mass'],(y[n:]-x[n:])/h)-terms['force'])/.001)
+            residual=residuals[:,k]
             for j in range(2*n): constraints[f'dynamics_{k}_{j}']=residual[j]
             tip=ca.mtimes(ca.DM(rotation),local_tip(y[:n]))+mount
             objective+=h*(p.tracking_weight*ca.sumsqr((tip-target)/tolerance)+p.velocity_weight*ca.sumsqr(y[n:]))

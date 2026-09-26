@@ -129,10 +129,12 @@ class IpoptSolver:
             function=(shared[1] if shared is not None and shared[0]==bundle.serialized_function
                       else ca.Function.deserialize(bundle.serialized_function))
             x = ca.MX.sym('x', len(bundle.variable_order))
-            outputs = function(x=x)
-            raw_objective = outputs['objective']
+            # Inline only the transport wrapper. Otherwise the objective-only
+            # adjoint also evaluates the expensive constraint graph with zero
+            # seeds. Inner model functions retain their own AD boundaries.
+            raw_objective, constraint_expression = function.call([x],True,False)
             signed_objective = raw_objective if problem.objective.direction == 'minimize' else -raw_objective
-            nlp = {'x': x, 'f': signed_objective, 'g': outputs['constraints']}
+            nlp = {'x': x, 'f': signed_objective, 'g': constraint_expression}
             solver = ca.nlpsol('ipopt_solver', 'ipopt', nlp, options)
             self._compiled[cache_key]=(function,solver)
         function,solver=self._compiled[cache_key]

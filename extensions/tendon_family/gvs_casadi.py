@@ -303,6 +303,9 @@ class GVSCasadiFunctions:
         # ill-scaled acceleration residual of this stiff bending model.
         self.implicit_terms = ca.Function('gvs_implicit_terms', [x,u],
             [mass,tendon_force+gravity-bias-elastic-damping], ['x','u'], ['mass','force'])
+        acceleration=ca.MX.sym('acceleration',n)
+        self.implicit_residual=ca.Function('gvs_force_balance',[x,u,acceleration],
+            [ca.mtimes(mass,acceleration)-(tendon_force+gravity-bias-elastic-damping)])
         self._linearization = None
         self._linearization_symbols = (x,u,xdot)
         static_residual = tendon_force + gravity - elastic
