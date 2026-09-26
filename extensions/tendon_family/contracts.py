@@ -13,6 +13,7 @@ from schemas.platform_math import (
     SystemContext,
 )
 from schemas.environment_spec import Vec3
+from extensions.optimization.contracts import FeasibleReturnPolicy
 from extensions.experiment_dynamics.contracts import Matrix3, Mount
 
 
@@ -981,6 +982,10 @@ class GVSDescription(Contract):
 
 
 class GVSTrajectoryParameters(Contract):
+    feasible_return: FeasibleReturnPolicy | None = None
+    regenerate_warm_states: bool = True
+    terminal_velocity_weight: FiniteFloat = Field(default=0.,ge=0)
+    max_unusable_updates: int = Field(default=3,ge=1)
     constraint_jacobian_mode: Literal['automatic', 'reverse'] = 'automatic'
     curvature_scale_rad_m: FiniteFloat = Field(default=10.,gt=0)
     rate_scale_rad_m_s: FiniteFloat = Field(default=1000.,gt=0)

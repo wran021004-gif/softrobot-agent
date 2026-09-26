@@ -234,6 +234,27 @@ class ScientificOptimizationTests(unittest.TestCase):
         self.assertIsNone(solver.last_diagnostics['first_feasible_candidate'])
         self.assertIsNone(solver.last_diagnostics['selected_feasible_candidate'])
 
+    def test_optional_feasible_stop_preserves_raw_status_and_current_bounds(self):
+        x=ca.MX.sym('x')
+        expression,_=expression_payload(['x'],dict(variables={'x':x},expression=(x-2)**2),{})
+        problem=OptimizationProblem(variables={'x':dict(type='number',bounds=[-5.,5.])},
+            objective=Objective(metric='distance',direction='minimize',units='1'),
+            objective_function=expression,initial_guess={'x':0.})
+        solver=IpoptSolver(dict(feasible_return=dict(minimum_s=0.,budget_s=10.,relative_improvement=.1)))
+        result=solver.solve(problem)
+        self.assertEqual(result.status,'feasible_early_stop')
+        self.assertEqual(solver.last_diagnostics['return_status'],'User_Requested_Stop')
+        self.assertFalse(solver.last_diagnostics['success'])
+        self.assertLessEqual(result.objective_value,.9*4.)
+        self.assertLessEqual(result.constraint_violation,1e-5)
+        # Explicit settling may accept a good initialization without artificial
+        # improvement; it does not make an optimizer convergence claim.
+        problem.variables['x']['bounds']=[3.,4.];problem.initial_guess['x']=3.
+        result=solver.solve(problem,seed_settled=True)
+        self.assertEqual(result.status,'feasible_early_stop')
+        self.assertGreaterEqual(result.optimum['x'],3.)
+        self.assertEqual(solver.last_diagnostics['policy_stop_reason'],'verified_settled_seed')
+
     def test_pcc_public_evidence_chain_and_mathematical_verification(self):
         suffix = uuid4().hex
         root = ROOT / 'runs/scientific_optimization_tests' / suffix

@@ -35,8 +35,8 @@ def resolve_gvs_nmpc_control(inp,physics):
         projector=description(physics,basis),effective_parameters=p.model_dump(mode='json'),
         timing=dict(period_s=inp.task.timing.control_period_s,prediction_interval_s=inp.task.timing.control_period_s,
             physics_step_s=inp.task.timing.timestep_s,observation='interval_start_pre_step'),
-        plan_acceptance='Independently feasible converged or iteration-limited plans; nonconverged feasible updates are explicitly marked suboptimal and counted as solver failures.',
-        failure_response='If no usable feasible plan is returned, hold last bounded tension; use clipped nominal tension initially. Every use is recorded.')
+        plan_acceptance='Independently feasible converged, iteration-limited or intentional early-stop plans. Early stops are suboptimal, not convergence or solver errors; raw termination is retained.',
+        failure_response='Hold last bounded tension on an unusable solve (clipped nominal initially); stop after max_unusable_updates consecutive unusable updates. Every applied hold is recorded.')
     plan['identity']=digest(plan)
     return plan
 
@@ -61,7 +61,7 @@ class GVSNMPCController:
         # A failed first update must not discard the available offline seed.
         # It remains only an optimization guess, never a fallback command.
         self.workspace.last=self.seed
-        self.observations=[];self.last={};self.u=None
+        self.observations=[];self.last={};self.u=None;self.unusable_updates=0;self.stop_requested=False
 
     def command(self,t,geometry,q,v):
         start=time.perf_counter();x=np.r_[q,v];error=None;solved=None
@@ -71,11 +71,15 @@ class GVSNMPCController:
         except (RuntimeError,ValueError) as exc:
             success=False;error=str(exc)
         self.seed=None
+        self.unusable_updates=0 if success else self.unusable_updates+1
+        self.stop_requested=self.unusable_updates>=self.parameters.max_unusable_updates
         requested=np.asarray(solved['tensions'][0]) if success else self.previous.copy()
         command,bridge=execute_ideal_tension(self.physics,requested)
         self.previous=np.asarray(command).copy();elapsed=time.perf_counter()-start
         converged=solved is not None and solved['optimization_converged']
-        self.last={**bridge,'solver_failed':not success or not converged,'failure_response_used':not success,
+        intentional=solved is not None and solved['result']['status']=='feasible_early_stop'
+        self.last={**bridge,'solver_failed':not success or (not converged and not intentional),
+            'optimization_nonconverged':not converged,'failure_response_used':not success and not self.stop_requested,
             'feasible_suboptimal_update':success and not converged,
             'solver_error':error,'optimization_status':None if solved is None else solved['result']['status'],
             'optimization_constraint_violation':None if solved is None else solved['result']['constraint_violation'],
@@ -84,6 +88,11 @@ class GVSNMPCController:
             'update_wall_s':elapsed,'deadline_missed':elapsed>self.period_s,
             'solver_construction_s':None if solved is None else solved['diagnostics']['construction_s'],
             'optimization_solve_s':None if solved is None else solved['diagnostics']['solve_s'],
+            'policy_stop_reason':None if solved is None else solved['diagnostics']['policy_stop_reason'],
+            'plan_validation_s':None if solved is None else solved['diagnostics']['validation_s'],
+            'warm_preparation_s':None if solved is None else solved['warm_start']['preparation_s'],
+            'optimization_raw_status':None if solved is None else solved['diagnostics']['return_status'],
+            'unusable_updates':self.unusable_updates,'stop_requested':self.stop_requested,
             'gvs_projection_residual_max_rad_m':geometry['gvs_projection']['projection_residual_max_rad_m']}
         self.observations.append(dict(time_s=t,phase='current_state_before_integration',
             tip_position_m=geometry['tip'].tolist(),gvs_q=list(q),gvs_qdot=list(v),

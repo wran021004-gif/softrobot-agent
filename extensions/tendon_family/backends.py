@@ -195,6 +195,8 @@ class MujocoBackend(MatlabBackend):
                 command=self.controller.command(t,g,np.asarray(projection['q_gvs']),np.asarray(projection['qdot_gvs']))
                 if s['control']['mode']=='gvs_nmpc':
                     atomic_json(self.folder/'nmpc_updates.json',self.controller.observations)
+                    if self.controller.stop_requested:
+                        complete=False;reason='NMPC_SUSTAINED_UNUSABLE_REPLANNING';break
             else:
                 command=self.controller.command(t,g,data.qpos[qi].copy(),data.qvel[vi].copy())
             data.ctrl[aids]=command; data.xfrc_applied[:]=0; external=np.zeros(model.nv)

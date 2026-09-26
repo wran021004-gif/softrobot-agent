@@ -44,9 +44,11 @@ class _FeasibleIterate(ca.Callback):
         name=self.names[i]
         return ca.Sparsity.dense(self.nx if name in ('x','lam_x') else self.ng if name in ('g','lam_g') else 1 if name=='f' else 0,1)
 
-    def reset(self,lbx,ubx,lbg,ubg,start):
+    def reset(self,lbx,ubx,lbg,ubg,start,policy=None,seed_objective=None,seed_settled=False):
         self.bounds=(lbx,ubx,lbg,ubg);self.best=None;self.first=None;self.latest=None
         self.iteration=-1;self.start=start
+        self.policy=policy;self.seed_objective=seed_objective;self.seed_settled=seed_settled
+        self.stop_reason=None;self.stop_s=None
 
     def eval(self,args):
         elapsed=time.perf_counter()-self.start
@@ -60,8 +62,20 @@ class _FeasibleIterate(ca.Callback):
                 iteration_zero=self.iteration==0)
             self.latest=candidate
             if self.first is None:self.first=candidate
-            if self.best is None or objective<self.best['objective']:
+            if self.best is None or objective<self.best['objective'] or (self.best.get('initialization_only') and objective==self.best['objective']):
                 self.best=candidate
+        if self.policy is not None and self.best is not None:
+            base=self.seed_objective
+            improvement=(base-self.best['objective'])/max(abs(base),1e-12) if base is not None else None
+            if self.seed_settled and base is not None and self.best['objective']<=base+1e-12:
+                self.stop_reason='verified_settled_seed'
+            elif elapsed>=self.policy.minimum_s and improvement is not None and improvement>=self.policy.relative_improvement:
+                self.stop_reason='relative_seed_improvement'
+            elif elapsed>=self.policy.budget_s and (base is None or self.best['objective']<=base+1e-12):
+                self.stop_reason='budget_best_feasible'
+            if self.stop_reason is not None:
+                self.stop_s=elapsed
+                return [1]
         return [0]
 
 
@@ -130,7 +144,7 @@ class IpoptSolver:
             initial.append(min(max(value, lo), hi))
         return lower, upper, initial
 
-    def solve(self, problem: OptimizationProblem) -> OptimizationResult:
+    def solve(self, problem: OptimizationProblem, *, seed_settled=False) -> OptimizationResult:
         self.last_diagnostics=None
         problem = OptimizationProblem.model_validate(problem)
         payload = problem.objective_function
@@ -192,7 +206,7 @@ class IpoptSolver:
                 # OptimizationResult does not request solution sensitivities.
                 options['no_nlp_grad'] = True
                 options['calc_lam_p'] = False
-            selector=_FeasibleIterate(len(bundle.variable_order),len(problem.constraints)) if self.parameters.retain_feasible_iterate else None
+            selector=_FeasibleIterate(len(bundle.variable_order),len(problem.constraints)) if self.parameters.retain_feasible_iterate or self.parameters.feasible_return is not None else None
             if selector is not None:options['iteration_callback']=selector
             solver = ca.nlpsol('ipopt_solver', 'ipopt', nlp, options)
             self._compiled[cache_key]=(function,solver,selector)
@@ -207,7 +221,14 @@ class IpoptSolver:
         initial_violation=_violation(np.asarray(x0),np.asarray(initial_check['constraints']).ravel(),lbx,ubx,lbg,ubg)
         initial_check_s=time.perf_counter()-initial_check_start
         solve_start=time.perf_counter()
-        if selector is not None:selector.reset(lbx,ubx,lbg,ubg,solve_start)
+        initial_finite=np.isfinite(np.r_[x0,np.asarray(initial_check['constraints']).ravel(),float(initial_check['objective'])]).all()
+        seed_objective=float(initial_check['objective']) if initial_finite and initial_violation<=1e-5 else None
+        if seed_objective is not None and problem.objective.direction!='minimize':seed_objective=-seed_objective
+        if selector is not None:selector.reset(lbx,ubx,lbg,ubg,solve_start,self.parameters.feasible_return,seed_objective,seed_settled)
+        if selector is not None and seed_objective is not None and self.parameters.feasible_return is not None:
+            selector.best=dict(x=np.asarray(x0),objective=seed_objective,iteration=-1,
+                elapsed_s=0.,scaled_violation=initial_violation,iteration_zero=False,
+                initialization_only=True)
         solution = solver(x0=x0, lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
         solve_s=time.perf_counter()-solve_start
         stats = solver.stats()
@@ -245,6 +266,8 @@ class IpoptSolver:
         return_status = str(stats.get('return_status', ''))
         if bool(stats.get('success')):
             status = 'converged'
+        elif selector is not None and selector.stop_reason is not None and violation<=1e-5:
+            status = 'feasible_early_stop'
         elif return_status in ('Maximum_Iterations_Exceeded', 'Maximum_CpuTime_Exceeded'):
             status = 'iteration_limit'
         elif 'Infeasible' in return_status:
@@ -270,6 +293,9 @@ class IpoptSolver:
             'selected_feasible_candidate':selected_record,
             'candidate_timer_origin':'perf_counter immediately before numerical solver call; callback entry timestamps; iteration zero is the initial iterate, not convergence',
             'initial_scaled_violation':initial_violation,
+            'initial_objective':float(initial_check['objective']),
+            'policy_stop_reason':None if selector is None else selector.stop_reason,
+            'policy_stop_s':None if selector is None else selector.stop_s,
             'initial_check_s':initial_check_s,
             'returned_iterate_constraint_violation':returned_violation,
             'returned_iterate_objective':returned_objective,

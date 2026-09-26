@@ -28,7 +28,15 @@ class CasadiNLPSelector(Contract):
     constraint_index: int = Field(ge=0)
 
 
+class FeasibleReturnPolicy(Contract):
+    """Optional suboptimal return, relative to this solve's verified seed."""
+    minimum_s: FiniteFloat = Field(default=5., ge=0)
+    budget_s: FiniteFloat = Field(default=15., gt=0)
+    relative_improvement: FiniteFloat = Field(default=.1, gt=0, lt=1)
+
+
 class IpoptParameters(Contract):
+    feasible_return: FeasibleReturnPolicy | None = None
     constraint_jacobian_mode: Literal['automatic', 'reverse'] = Field(default='automatic', description=(
         'Exact CasADi AD in both modes. Reverse mode avoids wide forward seed '
         'batches for expensive constraint graphs. Objective derivatives and '

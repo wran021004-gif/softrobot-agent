@@ -267,7 +267,7 @@ class OptimizationProblem(Contract):
 
 
 class OptimizationResult(Contract):
-    status: Literal['converged', 'infeasible', 'unbounded', 'iteration_limit', 'failed', 'cancelled', 'unknown']
+    status: Literal['converged', 'feasible_early_stop', 'infeasible', 'unbounded', 'iteration_limit', 'failed', 'cancelled', 'unknown']
     optimum: dict[str, float] | None = None
     objective_value: float | None = None
     constraint_violation: float | None = Field(default=None, ge=0)
