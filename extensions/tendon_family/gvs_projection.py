@@ -7,7 +7,15 @@ from .contracts import Design, ResolvedGVSBasis
 from .gvs_basis import basis_matrix, resolve_basis, segment_slice
 
 
-PROJECTOR_ID = 'backend_discrete_to_gvs_resolved_v1'
+PROJECTOR_ID = 'backend_discrete_to_gvs_integrated_v2'
+
+
+def cell_average_basis(resolved, local, left, right):
+    """Exact average of the linear basis, split at structural knots."""
+    left, right = max(0., left), min(1., right)
+    edges = [left, *(k for k in local.knots if left < k < right), right]
+    return sum((b-a) * basis_matrix(resolved, local, (a+b)/2)
+               for a, b in zip(edges, edges[1:])) / (right-left)
 
 
 def _resolved(design, basis=None):
@@ -32,9 +40,10 @@ def _segments(physics, resolved):
                 raise ValueError('GVS_PROJECTOR_REQUIRES_BIAXIAL_CELL: ' + part['entity'])
             samples.append(dict(dofs=dofs, cell_length_m=ds,
                                 normalized_center=center / length,
+                                normalized_interval=((center-ds/2)/length, (center+ds/2)/length),
                                 principal_to_segment=rx(part['section_axis_rad'])[1:, 1:]))
             center += ds / 2
-        matrix = np.vstack([basis_matrix(resolved, local, sample['normalized_center'])
+        matrix = np.vstack([cell_average_basis(resolved, local, *sample['normalized_interval'])
                             for sample in samples])
         if np.linalg.matrix_rank(matrix) < matrix.shape[1]:
             raise ValueError('GVS_PROJECTOR_BASIS_RANK_DEFICIENT: ' + local.segment)
@@ -47,10 +56,10 @@ def description(physics, design, basis=None):
     segments = [dict(segment=local.segment, sample_count=len(samples),
                      condition_number=float(np.linalg.cond(matrix)))
                 for local, samples, matrix in _segments(physics, resolved)]
-    return dict(id=PROJECTOR_ID, version='1.0.0',
+    return dict(id=PROJECTOR_ID, version='2.0.0',
                 coordinate_order=resolved.coordinate_order,
                 resolved_basis=resolved.model_dump(mode='json'), segments=segments,
-                reconstruction='segment curvature from principal joint angle / actual cell length; least squares on resolved GVS basis at cell centers')
+                reconstruction='segment mean curvature from principal joint angle / actual cell length; least squares on exactly integrated basis split at knots')
 
 
 def project(physics, design, qpos, qvel, basis=None):
@@ -103,7 +112,7 @@ def discretization_jacobian(physics, design, basis=None):
     mapping = np.zeros((len(physics['dofs']), resolved.dimension))
     for local, samples, _ in _segments(physics, resolved):
         for sample in samples:
-            matrix = basis_matrix(resolved, local, sample['normalized_center'])
+            matrix = cell_average_basis(resolved, local, *sample['normalized_interval'])
             mapping[sample['dofs'], segment_slice(local)] = (
                 sample['cell_length_m'] * sample['principal_to_segment'].T @ matrix
             )

@@ -1,7 +1,7 @@
 """Deterministic tendon-family model-use assessment, independent of Route and backends."""
 
 from schemas.platform import Binding, RobotDescription, TaskDefinition
-from schemas.platform_math import ModelUse, ModelUseAssessment, ModelUseVerdict
+from schemas.platform_math import ModelUse, ModelUseAssessment, ModelUseVerdict, ModelAgreementEvidence
 from tools.state_io import digest
 
 from .contracts import Design, Discretization, Reserved, ResolvedGVSBasis, Segment
@@ -79,6 +79,7 @@ def assess_model_uses(robot: RobotDescription, task: TaskDefinition, model: Bind
                       uses: list[ModelUse], *, resolved_basis: ResolvedGVSBasis | None = None,
                       discretization: Discretization | None = None,
                       required_physics: dict[ModelUse, list[str]] | None = None,
+                      evidence=(), evidence_loader=None, evidence_context: dict | None = None,
                       registry=None) -> ModelUseAssessment:
     """Assess requested uses from frozen contracts; no simulation or model fitting.
 
@@ -175,7 +176,26 @@ def assess_model_uses(robot: RobotDescription, task: TaskDefinition, model: Bind
             if omitted:
                 status = 'REJECT'
                 reasons.append('Requested physics omitted by model: ' + ', '.join(sorted(omitted)))
-        verdicts[use] = ModelUseVerdict(status=status, reasons=reasons)
+        matched = []
+        # An explicit query scope is required: measurements at one state do not
+        # validate a whole task, even if its design and model names match.
+        if evidence_context is not None and evidence_loader is not None:
+            for ref in evidence:
+                item = ModelAgreementEvidence.model_validate(evidence_loader(ref))
+                if (item.design_identity == digest(design.model_dump(mode='json'))
+                    and model in item.model_bindings
+                    and item.representation_ids.get(model_id) == representation_id
+                    and use in item.measured_uses
+                    and evidence_context == dict(numerical_settings=item.numerical_settings,
+                        mapping_convention=item.mapping_convention,
+                        reference_state_input=item.reference_state_input, environment=item.environment)):
+                    matched.append(ref)
+        if matched:
+            reasons = [r.replace('validation evidence is unavailable', 'matched local measurements are available')
+                       for r in reasons]
+            reasons.append('Measured errors apply only to the exact supplied scope; no global agreement or task acceptance is implied.')
+        verdicts[use] = ModelUseVerdict(status=status, reasons=reasons,
+            validation='measured_local' if matched else 'unavailable', evidence=matched)
     return ModelUseAssessment(model_id=model_id, model_version=definition.version,
         design_id=design.id,
         design_identity=digest(design.model_dump(mode='json')),

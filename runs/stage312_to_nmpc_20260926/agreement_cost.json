@@ -1,0 +1,1319 @@
+{
+  "rows": [
+    {
+      "cells": 3,
+      "evidence": {
+        "artifact_id": "2ba9980d6c25259e1a954c6c8b7deacfca9d560fb62b5c885161065b1809a443",
+        "media_type": "application/json"
+      },
+      "record": {
+        "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+        "model_bindings": [
+          {
+            "extension_id": "model.gvs",
+            "version": "1.0.0",
+            "parameters": {
+              "contract": "family.gvs_model",
+              "version": "1.0.0",
+              "data": {
+                "model_id": "gvs_variable_strain_bending_v1",
+                "basis": {
+                  "strategy": "structural_linear"
+                },
+                "integration_steps_per_segment": 24,
+                "quadrature_points_per_segment": 5,
+                "finite_difference_step": 1e-06
+              }
+            }
+          }
+        ],
+        "representation_ids": {
+          "model.gvs": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+          "model.serial_bending_cells": "152d5e04cfb37c640c63c648943859be5086add61b228c633b6db330c60e7b6e"
+        },
+        "numerical_settings": {
+          "gvs": {
+            "model_id": "gvs_variable_strain_bending_v1",
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "integration_steps_per_segment": 24,
+            "quadrature_points_per_segment": 5,
+            "finite_difference_step": 1e-06
+          },
+          "serial": {
+            "version": "serial_bending_discretization_v1",
+            "model": "serial_bending_cells_v1",
+            "cells": {
+              "near": 3,
+              "far": 3
+            },
+            "coordinates": "two_principal_bending_angles_per_cell"
+          },
+          "backend_implementation": "mujoco_serial_bending_v1",
+          "mujoco_version": "3.13.0"
+        },
+        "mapping_convention": "integrated_curvature_split_knots_v2",
+        "reference_state_input": {
+          "q": [
+            1.6129601362410086,
+            -0.10549344917875342,
+            -1.39660100515328,
+            0.2798787804538121,
+            0.04082170366393039,
+            -0.13644731696793358,
+            -5.248961441103909,
+            -5.469003090633591,
+            -7.285809868929822,
+            4.347871889413201,
+            3.614829121308677,
+            3.666467499018495
+          ],
+          "qdot": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "u": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "coordinate_order": [
+            "near.kappa_y_node_0",
+            "near.kappa_y_node_1",
+            "near.kappa_y_node_2",
+            "near.kappa_z_node_0",
+            "near.kappa_z_node_1",
+            "near.kappa_z_node_2",
+            "far.kappa_y_node_0",
+            "far.kappa_y_node_1",
+            "far.kappa_y_node_2",
+            "far.kappa_z_node_0",
+            "far.kappa_z_node_1",
+            "far.kappa_z_node_2"
+          ],
+          "tendon_order": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ]
+        },
+        "environment": {
+          "environment": {
+            "schema_version": "1",
+            "environment_id": "reach_free",
+            "units": "SI",
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "truth_status": "HUMAN_OWNED",
+            "objects": [
+              {
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ],
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "contype": 0,
+                "conaffinity": 1
+              }
+            ],
+            "lights": [
+              {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ],
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ]
+              }
+            ]
+          },
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "external_forces": []
+        },
+        "measured_uses": [
+          "shape_prediction",
+          "static_equilibrium"
+        ],
+        "metrics": {
+          "tip": {
+            "absolute_error": 0.016939066240021387,
+            "relative_error": 0.048611100016588436,
+            "units": "m",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "com": {
+            "absolute_error": 0.004018284453796927,
+            "relative_error": 0.019092616812744073,
+            "units": "m",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "gravity": {
+            "absolute_error": 0.0013387391159525883,
+            "relative_error": 0.22508356586440112,
+            "units": "N*m^2/rad",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "constitutive_stiffness": {
+            "absolute_error": 0.0004406537461029322,
+            "relative_error": 0.10348519996066718,
+            "units": "N*m^3/rad^2",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "tendon_jacobian": {
+            "absolute_error": 0.0002697283919691687,
+            "relative_error": 0.050656797671376326,
+            "units": "m^2/rad",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "shape": {
+            "absolute_error": 0.007564872119276432,
+            "relative_error": 0.032410295577935025,
+            "units": "m",
+            "norm": "RMS over 202 material points; relative to world-position RMS"
+          }
+        },
+        "sources": [
+          {
+            "artifact_id": "b7ee9c18276faf6b1b741e9350fa2c25f9e0ab130db5be634b5723dbbd42ad96",
+            "media_type": "application/json"
+          }
+        ],
+        "source_locations": [
+          "runs\\stage311_discretization_convergence_20260926\\discretization_convergence.json#resolutions/3: complete per-tendon vectors and matrices"
+        ],
+        "limitations": [
+          "Single frozen state, static forces and geometry only; not equilibrium residual validation.",
+          "No dynamic, contact, global-equivalence or closed-loop validation.",
+          "Historical pre-Stage-3.11 evidence used midpoint mapping; unchanged.",
+          "Exact basis integration does not give exact finite-chain SE(3) geometry."
+        ],
+        "costs": {
+          "machine": {
+            "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+            "interpreter": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+            "platform": "Windows-10-10.0.19044-SP0",
+            "processor": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+            "logical_cpus": 20,
+            "numpy": "2.4.6",
+            "mujoco": "3.13.0"
+          },
+          "repetitions": [
+            {
+              "resolve_s": 0.006225599907338619,
+              "mjcf_s": 0.002208600053563714,
+              "compile_s": 0.004637399921193719,
+              "forward_s": 5.1229982636868955e-06,
+              "step_wall_s": 0.001295899972319603,
+              "numerical_valid": true,
+              "max_contacts": 0
+            },
+            {
+              "resolve_s": 0.004299100022763014,
+              "mjcf_s": 0.0023006999399513006,
+              "compile_s": 0.003628999926149845,
+              "forward_s": 5.139000713825226e-06,
+              "step_wall_s": 0.0012133000418543816,
+              "numerical_valid": true,
+              "max_contacts": 0
+            },
+            {
+              "resolve_s": 0.004253899911418557,
+              "mjcf_s": 0.0019751000218093395,
+              "compile_s": 0.0035245001781731844,
+              "forward_s": 5.109000485390425e-06,
+              "step_wall_s": 0.0013474998995661736,
+              "numerical_valid": true,
+              "max_contacts": 0
+            }
+          ],
+          "timestep_s": 0.0005,
+          "simulated_duration_s": 0.1,
+          "forward_calls": 100,
+          "step_calls": 200,
+          "warmup_forward": 10,
+          "warmup_step": 10,
+          "integrator": "implicitfast",
+          "rendering": false,
+          "execution": "held ideal tension u0; mapped q0, zero velocity"
+        }
+      },
+      "assessment": {
+        "model_id": "model.gvs",
+        "model_version": "1.0.0",
+        "design_id": "two_segment_development",
+        "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+        "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+        "representation_kind": "gvs_bending_basis_v1",
+        "representation_strategy": "structural_linear",
+        "generalized_coordinate_dimension": 12,
+        "state_dimension": 24,
+        "uses": {
+          "shape_prediction": {
+            "status": "ALLOW",
+            "reasons": [
+              "Resolved GVS bending coordinates support this reduced-model use.",
+              "Measured errors apply only to the exact supplied scope; no global agreement or task acceptance is implied."
+            ],
+            "validation": "measured_local",
+            "evidence": [
+              {
+                "artifact_id": "2ba9980d6c25259e1a954c6c8b7deacfca9d560fb62b5c885161065b1809a443",
+                "media_type": "application/json"
+              }
+            ]
+          },
+          "local_model_control": {
+            "status": "WARN",
+            "reasons": [
+              "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+            ],
+            "validation": "unavailable",
+            "evidence": []
+          }
+        },
+        "relevant_assumptions": [
+          "supported serial tendon-driven continuum topology",
+          "selected strain basis spans deformation relevant to the use",
+          "inextensible centerline",
+          "no shear",
+          "no torsion",
+          "straight frictionless tendon spans"
+        ],
+        "unsupported_requested_physics": []
+      }
+    },
+    {
+      "cells": 6,
+      "evidence": {
+        "artifact_id": "438785b99cccd79fab1e2c45a291316f5fc651c81209ed11b1f5ef86d1ebc14d",
+        "media_type": "application/json"
+      },
+      "record": {
+        "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+        "model_bindings": [
+          {
+            "extension_id": "model.gvs",
+            "version": "1.0.0",
+            "parameters": {
+              "contract": "family.gvs_model",
+              "version": "1.0.0",
+              "data": {
+                "model_id": "gvs_variable_strain_bending_v1",
+                "basis": {
+                  "strategy": "structural_linear"
+                },
+                "integration_steps_per_segment": 24,
+                "quadrature_points_per_segment": 5,
+                "finite_difference_step": 1e-06
+              }
+            }
+          }
+        ],
+        "representation_ids": {
+          "model.gvs": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+          "model.serial_bending_cells": "e4ec06b9253948c6c6622c10075fe03c255ea01d81e20aefd0dc296c50893a4e"
+        },
+        "numerical_settings": {
+          "gvs": {
+            "model_id": "gvs_variable_strain_bending_v1",
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "integration_steps_per_segment": 24,
+            "quadrature_points_per_segment": 5,
+            "finite_difference_step": 1e-06
+          },
+          "serial": {
+            "version": "serial_bending_discretization_v1",
+            "model": "serial_bending_cells_v1",
+            "cells": {
+              "near": 6,
+              "far": 6
+            },
+            "coordinates": "two_principal_bending_angles_per_cell"
+          },
+          "backend_implementation": "mujoco_serial_bending_v1",
+          "mujoco_version": "3.13.0"
+        },
+        "mapping_convention": "integrated_curvature_split_knots_v2",
+        "reference_state_input": {
+          "q": [
+            1.6129601362410086,
+            -0.10549344917875342,
+            -1.39660100515328,
+            0.2798787804538121,
+            0.04082170366393039,
+            -0.13644731696793358,
+            -5.248961441103909,
+            -5.469003090633591,
+            -7.285809868929822,
+            4.347871889413201,
+            3.614829121308677,
+            3.666467499018495
+          ],
+          "qdot": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "u": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "coordinate_order": [
+            "near.kappa_y_node_0",
+            "near.kappa_y_node_1",
+            "near.kappa_y_node_2",
+            "near.kappa_z_node_0",
+            "near.kappa_z_node_1",
+            "near.kappa_z_node_2",
+            "far.kappa_y_node_0",
+            "far.kappa_y_node_1",
+            "far.kappa_y_node_2",
+            "far.kappa_z_node_0",
+            "far.kappa_z_node_1",
+            "far.kappa_z_node_2"
+          ],
+          "tendon_order": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ]
+        },
+        "environment": {
+          "environment": {
+            "schema_version": "1",
+            "environment_id": "reach_free",
+            "units": "SI",
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "truth_status": "HUMAN_OWNED",
+            "objects": [
+              {
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ],
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "contype": 0,
+                "conaffinity": 1
+              }
+            ],
+            "lights": [
+              {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ],
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ]
+              }
+            ]
+          },
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "external_forces": []
+        },
+        "measured_uses": [
+          "shape_prediction",
+          "static_equilibrium"
+        ],
+        "metrics": {
+          "tip": {
+            "absolute_error": 0.008349873619790931,
+            "relative_error": 0.02396215564105485,
+            "units": "m",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "com": {
+            "absolute_error": 0.001858943002665567,
+            "relative_error": 0.008832646577095517,
+            "units": "m",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "gravity": {
+            "absolute_error": 0.0006565067275379594,
+            "relative_error": 0.11037914219983544,
+            "units": "N*m^2/rad",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "constitutive_stiffness": {
+            "absolute_error": 0.00014144152327107297,
+            "relative_error": 0.033216793112271124,
+            "units": "N*m^3/rad^2",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "tendon_jacobian": {
+            "absolute_error": 6.516309520566755e-05,
+            "relative_error": 0.012238065504989366,
+            "units": "m^2/rad",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "shape": {
+            "absolute_error": 0.0035613414233970167,
+            "relative_error": 0.015257908708347244,
+            "units": "m",
+            "norm": "RMS over 202 material points; relative to world-position RMS"
+          }
+        },
+        "sources": [
+          {
+            "artifact_id": "b7ee9c18276faf6b1b741e9350fa2c25f9e0ab130db5be634b5723dbbd42ad96",
+            "media_type": "application/json"
+          }
+        ],
+        "source_locations": [
+          "runs\\stage311_discretization_convergence_20260926\\discretization_convergence.json#resolutions/6: complete per-tendon vectors and matrices"
+        ],
+        "limitations": [
+          "Single frozen state, static forces and geometry only; not equilibrium residual validation.",
+          "No dynamic, contact, global-equivalence or closed-loop validation.",
+          "Historical pre-Stage-3.11 evidence used midpoint mapping; unchanged.",
+          "Exact basis integration does not give exact finite-chain SE(3) geometry."
+        ],
+        "costs": {
+          "machine": {
+            "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+            "interpreter": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+            "platform": "Windows-10-10.0.19044-SP0",
+            "processor": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+            "logical_cpus": 20,
+            "numpy": "2.4.6",
+            "mujoco": "3.13.0"
+          },
+          "repetitions": [
+            {
+              "resolve_s": 0.006695599993690848,
+              "mjcf_s": 0.0034528998658061028,
+              "compile_s": 0.004755400121212006,
+              "forward_s": 7.896998431533575e-06,
+              "step_wall_s": 0.0019388999789953232,
+              "numerical_valid": true,
+              "max_contacts": 0
+            },
+            {
+              "resolve_s": 0.006224100012332201,
+              "mjcf_s": 0.003291799919679761,
+              "compile_s": 0.0046542000491172075,
+              "forward_s": 8.523000869899989e-06,
+              "step_wall_s": 0.0020014001056551933,
+              "numerical_valid": true,
+              "max_contacts": 0
+            },
+            {
+              "resolve_s": 0.006571599980816245,
+              "mjcf_s": 0.0032748000230640173,
+              "compile_s": 0.004863400012254715,
+              "forward_s": 8.17399937659502e-06,
+              "step_wall_s": 0.0020059000235050917,
+              "numerical_valid": true,
+              "max_contacts": 0
+            }
+          ],
+          "timestep_s": 0.0005,
+          "simulated_duration_s": 0.1,
+          "forward_calls": 100,
+          "step_calls": 200,
+          "warmup_forward": 10,
+          "warmup_step": 10,
+          "integrator": "implicitfast",
+          "rendering": false,
+          "execution": "held ideal tension u0; mapped q0, zero velocity"
+        }
+      },
+      "assessment": {
+        "model_id": "model.gvs",
+        "model_version": "1.0.0",
+        "design_id": "two_segment_development",
+        "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+        "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+        "representation_kind": "gvs_bending_basis_v1",
+        "representation_strategy": "structural_linear",
+        "generalized_coordinate_dimension": 12,
+        "state_dimension": 24,
+        "uses": {
+          "shape_prediction": {
+            "status": "ALLOW",
+            "reasons": [
+              "Resolved GVS bending coordinates support this reduced-model use.",
+              "Measured errors apply only to the exact supplied scope; no global agreement or task acceptance is implied."
+            ],
+            "validation": "measured_local",
+            "evidence": [
+              {
+                "artifact_id": "438785b99cccd79fab1e2c45a291316f5fc651c81209ed11b1f5ef86d1ebc14d",
+                "media_type": "application/json"
+              }
+            ]
+          },
+          "local_model_control": {
+            "status": "WARN",
+            "reasons": [
+              "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+            ],
+            "validation": "unavailable",
+            "evidence": []
+          }
+        },
+        "relevant_assumptions": [
+          "supported serial tendon-driven continuum topology",
+          "selected strain basis spans deformation relevant to the use",
+          "inextensible centerline",
+          "no shear",
+          "no torsion",
+          "straight frictionless tendon spans"
+        ],
+        "unsupported_requested_physics": []
+      }
+    },
+    {
+      "cells": 12,
+      "evidence": {
+        "artifact_id": "0779a56c641c08f98b6d19e465e15e1f6ce133426f7ea2b3ed59b30de22bc348",
+        "media_type": "application/json"
+      },
+      "record": {
+        "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+        "model_bindings": [
+          {
+            "extension_id": "model.gvs",
+            "version": "1.0.0",
+            "parameters": {
+              "contract": "family.gvs_model",
+              "version": "1.0.0",
+              "data": {
+                "model_id": "gvs_variable_strain_bending_v1",
+                "basis": {
+                  "strategy": "structural_linear"
+                },
+                "integration_steps_per_segment": 24,
+                "quadrature_points_per_segment": 5,
+                "finite_difference_step": 1e-06
+              }
+            }
+          }
+        ],
+        "representation_ids": {
+          "model.gvs": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+          "model.serial_bending_cells": "e4088398892920a9ef6c52b104b4dc5efe8542f5204afb0cdaa183c492790ce6"
+        },
+        "numerical_settings": {
+          "gvs": {
+            "model_id": "gvs_variable_strain_bending_v1",
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "integration_steps_per_segment": 24,
+            "quadrature_points_per_segment": 5,
+            "finite_difference_step": 1e-06
+          },
+          "serial": {
+            "version": "serial_bending_discretization_v1",
+            "model": "serial_bending_cells_v1",
+            "cells": {
+              "near": 12,
+              "far": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell"
+          },
+          "backend_implementation": "mujoco_serial_bending_v1",
+          "mujoco_version": "3.13.0"
+        },
+        "mapping_convention": "integrated_curvature_split_knots_v2",
+        "reference_state_input": {
+          "q": [
+            1.6129601362410086,
+            -0.10549344917875342,
+            -1.39660100515328,
+            0.2798787804538121,
+            0.04082170366393039,
+            -0.13644731696793358,
+            -5.248961441103909,
+            -5.469003090633591,
+            -7.285809868929822,
+            4.347871889413201,
+            3.614829121308677,
+            3.666467499018495
+          ],
+          "qdot": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "u": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "coordinate_order": [
+            "near.kappa_y_node_0",
+            "near.kappa_y_node_1",
+            "near.kappa_y_node_2",
+            "near.kappa_z_node_0",
+            "near.kappa_z_node_1",
+            "near.kappa_z_node_2",
+            "far.kappa_y_node_0",
+            "far.kappa_y_node_1",
+            "far.kappa_y_node_2",
+            "far.kappa_z_node_0",
+            "far.kappa_z_node_1",
+            "far.kappa_z_node_2"
+          ],
+          "tendon_order": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ]
+        },
+        "environment": {
+          "environment": {
+            "schema_version": "1",
+            "environment_id": "reach_free",
+            "units": "SI",
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "truth_status": "HUMAN_OWNED",
+            "objects": [
+              {
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ],
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "contype": 0,
+                "conaffinity": 1
+              }
+            ],
+            "lights": [
+              {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ],
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ]
+              }
+            ]
+          },
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "external_forces": []
+        },
+        "measured_uses": [
+          "shape_prediction",
+          "static_equilibrium"
+        ],
+        "metrics": {
+          "tip": {
+            "absolute_error": 0.004139707660900267,
+            "relative_error": 0.01187997852372801,
+            "units": "m",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "com": {
+            "absolute_error": 0.0008935882993140595,
+            "relative_error": 0.004245826591752085,
+            "units": "m",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "gravity": {
+            "absolute_error": 0.0003255120275163389,
+            "relative_error": 0.0547286674543716,
+            "units": "N*m^2/rad",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "constitutive_stiffness": {
+            "absolute_error": 3.5360865524832564e-05,
+            "relative_error": 0.008304312108956359,
+            "units": "N*m^3/rad^2",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "tendon_jacobian": {
+            "absolute_error": 3.823818713980545e-05,
+            "relative_error": 0.007181387525132172,
+            "units": "m^2/rad",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "shape": {
+            "absolute_error": 0.0017255803974017922,
+            "relative_error": 0.007392930090751085,
+            "units": "m",
+            "norm": "RMS over 202 material points; relative to world-position RMS"
+          }
+        },
+        "sources": [
+          {
+            "artifact_id": "b7ee9c18276faf6b1b741e9350fa2c25f9e0ab130db5be634b5723dbbd42ad96",
+            "media_type": "application/json"
+          }
+        ],
+        "source_locations": [
+          "runs\\stage311_discretization_convergence_20260926\\discretization_convergence.json#resolutions/12: complete per-tendon vectors and matrices"
+        ],
+        "limitations": [
+          "Single frozen state, static forces and geometry only; not equilibrium residual validation.",
+          "No dynamic, contact, global-equivalence or closed-loop validation.",
+          "Historical pre-Stage-3.11 evidence used midpoint mapping; unchanged.",
+          "Exact basis integration does not give exact finite-chain SE(3) geometry."
+        ],
+        "costs": {
+          "machine": {
+            "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+            "interpreter": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+            "platform": "Windows-10-10.0.19044-SP0",
+            "processor": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+            "logical_cpus": 20,
+            "numpy": "2.4.6",
+            "mujoco": "3.13.0"
+          },
+          "repetitions": [
+            {
+              "resolve_s": 0.01000240002758801,
+              "mjcf_s": 0.005906800040975213,
+              "compile_s": 0.00787709979340434,
+              "forward_s": 1.5662000514566898e-05,
+              "step_wall_s": 0.004406800027936697,
+              "numerical_valid": true,
+              "max_contacts": 0
+            },
+            {
+              "resolve_s": 0.009820600040256977,
+              "mjcf_s": 0.0058299999218434095,
+              "compile_s": 0.007266500033438206,
+              "forward_s": 1.5667001716792582e-05,
+              "step_wall_s": 0.005053400062024593,
+              "numerical_valid": true,
+              "max_contacts": 0
+            },
+            {
+              "resolve_s": 0.009621000150218606,
+              "mjcf_s": 0.007673799991607666,
+              "compile_s": 0.007162099936977029,
+              "forward_s": 1.5762997791171073e-05,
+              "step_wall_s": 0.004519999958574772,
+              "numerical_valid": true,
+              "max_contacts": 0
+            }
+          ],
+          "timestep_s": 0.0005,
+          "simulated_duration_s": 0.1,
+          "forward_calls": 100,
+          "step_calls": 200,
+          "warmup_forward": 10,
+          "warmup_step": 10,
+          "integrator": "implicitfast",
+          "rendering": false,
+          "execution": "held ideal tension u0; mapped q0, zero velocity"
+        }
+      },
+      "assessment": {
+        "model_id": "model.gvs",
+        "model_version": "1.0.0",
+        "design_id": "two_segment_development",
+        "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+        "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+        "representation_kind": "gvs_bending_basis_v1",
+        "representation_strategy": "structural_linear",
+        "generalized_coordinate_dimension": 12,
+        "state_dimension": 24,
+        "uses": {
+          "shape_prediction": {
+            "status": "ALLOW",
+            "reasons": [
+              "Resolved GVS bending coordinates support this reduced-model use.",
+              "Measured errors apply only to the exact supplied scope; no global agreement or task acceptance is implied."
+            ],
+            "validation": "measured_local",
+            "evidence": [
+              {
+                "artifact_id": "0779a56c641c08f98b6d19e465e15e1f6ce133426f7ea2b3ed59b30de22bc348",
+                "media_type": "application/json"
+              }
+            ]
+          },
+          "local_model_control": {
+            "status": "WARN",
+            "reasons": [
+              "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+            ],
+            "validation": "unavailable",
+            "evidence": []
+          }
+        },
+        "relevant_assumptions": [
+          "supported serial tendon-driven continuum topology",
+          "selected strain basis spans deformation relevant to the use",
+          "inextensible centerline",
+          "no shear",
+          "no torsion",
+          "straight frictionless tendon spans"
+        ],
+        "unsupported_requested_physics": []
+      }
+    },
+    {
+      "cells": 24,
+      "evidence": {
+        "artifact_id": "b8de6942e1392cc725582ee22219506fe50639756ce94328044e5f0654c24689",
+        "media_type": "application/json"
+      },
+      "record": {
+        "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+        "model_bindings": [
+          {
+            "extension_id": "model.gvs",
+            "version": "1.0.0",
+            "parameters": {
+              "contract": "family.gvs_model",
+              "version": "1.0.0",
+              "data": {
+                "model_id": "gvs_variable_strain_bending_v1",
+                "basis": {
+                  "strategy": "structural_linear"
+                },
+                "integration_steps_per_segment": 24,
+                "quadrature_points_per_segment": 5,
+                "finite_difference_step": 1e-06
+              }
+            }
+          }
+        ],
+        "representation_ids": {
+          "model.gvs": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+          "model.serial_bending_cells": "059849be39bde8843c5a6bae0eac620219da836cec212f5788388e7ed347fe10"
+        },
+        "numerical_settings": {
+          "gvs": {
+            "model_id": "gvs_variable_strain_bending_v1",
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "integration_steps_per_segment": 24,
+            "quadrature_points_per_segment": 5,
+            "finite_difference_step": 1e-06
+          },
+          "serial": {
+            "version": "serial_bending_discretization_v1",
+            "model": "serial_bending_cells_v1",
+            "cells": {
+              "near": 24,
+              "far": 24
+            },
+            "coordinates": "two_principal_bending_angles_per_cell"
+          },
+          "backend_implementation": "mujoco_serial_bending_v1",
+          "mujoco_version": "3.13.0"
+        },
+        "mapping_convention": "integrated_curvature_split_knots_v2",
+        "reference_state_input": {
+          "q": [
+            1.6129601362410086,
+            -0.10549344917875342,
+            -1.39660100515328,
+            0.2798787804538121,
+            0.04082170366393039,
+            -0.13644731696793358,
+            -5.248961441103909,
+            -5.469003090633591,
+            -7.285809868929822,
+            4.347871889413201,
+            3.614829121308677,
+            3.666467499018495
+          ],
+          "qdot": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "u": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "coordinate_order": [
+            "near.kappa_y_node_0",
+            "near.kappa_y_node_1",
+            "near.kappa_y_node_2",
+            "near.kappa_z_node_0",
+            "near.kappa_z_node_1",
+            "near.kappa_z_node_2",
+            "far.kappa_y_node_0",
+            "far.kappa_y_node_1",
+            "far.kappa_y_node_2",
+            "far.kappa_z_node_0",
+            "far.kappa_z_node_1",
+            "far.kappa_z_node_2"
+          ],
+          "tendon_order": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ]
+        },
+        "environment": {
+          "environment": {
+            "schema_version": "1",
+            "environment_id": "reach_free",
+            "units": "SI",
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "truth_status": "HUMAN_OWNED",
+            "objects": [
+              {
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ],
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "contype": 0,
+                "conaffinity": 1
+              }
+            ],
+            "lights": [
+              {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ],
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ]
+              }
+            ]
+          },
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "external_forces": []
+        },
+        "measured_uses": [
+          "shape_prediction",
+          "static_equilibrium"
+        ],
+        "metrics": {
+          "tip": {
+            "absolute_error": 0.0020573032722765137,
+            "relative_error": 0.00590397213848796,
+            "units": "m",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "com": {
+            "absolute_error": 0.00043662281714559143,
+            "relative_error": 0.002074584872055176,
+            "units": "m",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "gravity": {
+            "absolute_error": 0.00016220937929396418,
+            "relative_error": 0.027272427520097682,
+            "units": "N*m^2/rad",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "constitutive_stiffness": {
+            "absolute_error": 8.840246714927325e-06,
+            "relative_error": 0.0020760851509524884,
+            "units": "N*m^3/rad^2",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "tendon_jacobian": {
+            "absolute_error": 2.049104243762826e-05,
+            "relative_error": 0.003848354944247658,
+            "units": "m^2/rad",
+            "norm": "Euclidean / Frobenius; relative to reference norm"
+          },
+          "shape": {
+            "absolute_error": 0.000847644534524789,
+            "relative_error": 0.0036315762481913903,
+            "units": "m",
+            "norm": "RMS over 202 material points; relative to world-position RMS"
+          }
+        },
+        "sources": [
+          {
+            "artifact_id": "b7ee9c18276faf6b1b741e9350fa2c25f9e0ab130db5be634b5723dbbd42ad96",
+            "media_type": "application/json"
+          }
+        ],
+        "source_locations": [
+          "runs\\stage311_discretization_convergence_20260926\\discretization_convergence.json#resolutions/24: complete per-tendon vectors and matrices"
+        ],
+        "limitations": [
+          "Single frozen state, static forces and geometry only; not equilibrium residual validation.",
+          "No dynamic, contact, global-equivalence or closed-loop validation.",
+          "Historical pre-Stage-3.11 evidence used midpoint mapping; unchanged.",
+          "Exact basis integration does not give exact finite-chain SE(3) geometry."
+        ],
+        "costs": {
+          "machine": {
+            "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+            "interpreter": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+            "platform": "Windows-10-10.0.19044-SP0",
+            "processor": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+            "logical_cpus": 20,
+            "numpy": "2.4.6",
+            "mujoco": "3.13.0"
+          },
+          "repetitions": [
+            {
+              "resolve_s": 0.03126759990118444,
+              "mjcf_s": 0.014881500042974949,
+              "compile_s": 0.01852989988401532,
+              "forward_s": 4.7743001487106086e-05,
+              "step_wall_s": 0.013462499948218465,
+              "numerical_valid": true,
+              "max_contacts": 0
+            },
+            {
+              "resolve_s": 0.01888630003668368,
+              "mjcf_s": 0.011937899980694056,
+              "compile_s": 0.016040700022131205,
+              "forward_s": 4.6984998043626547e-05,
+              "step_wall_s": 0.014425199944525957,
+              "numerical_valid": true,
+              "max_contacts": 0
+            },
+            {
+              "resolve_s": 0.01888419990427792,
+              "mjcf_s": 0.011037599993869662,
+              "compile_s": 0.015248800162225962,
+              "forward_s": 4.307199968025088e-05,
+              "step_wall_s": 0.013913000002503395,
+              "numerical_valid": true,
+              "max_contacts": 0
+            }
+          ],
+          "timestep_s": 0.0005,
+          "simulated_duration_s": 0.1,
+          "forward_calls": 100,
+          "step_calls": 200,
+          "warmup_forward": 10,
+          "warmup_step": 10,
+          "integrator": "implicitfast",
+          "rendering": false,
+          "execution": "held ideal tension u0; mapped q0, zero velocity"
+        }
+      },
+      "assessment": {
+        "model_id": "model.gvs",
+        "model_version": "1.0.0",
+        "design_id": "two_segment_development",
+        "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+        "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+        "representation_kind": "gvs_bending_basis_v1",
+        "representation_strategy": "structural_linear",
+        "generalized_coordinate_dimension": 12,
+        "state_dimension": 24,
+        "uses": {
+          "shape_prediction": {
+            "status": "ALLOW",
+            "reasons": [
+              "Resolved GVS bending coordinates support this reduced-model use.",
+              "Measured errors apply only to the exact supplied scope; no global agreement or task acceptance is implied."
+            ],
+            "validation": "measured_local",
+            "evidence": [
+              {
+                "artifact_id": "b8de6942e1392cc725582ee22219506fe50639756ce94328044e5f0654c24689",
+                "media_type": "application/json"
+              }
+            ]
+          },
+          "local_model_control": {
+            "status": "WARN",
+            "reasons": [
+              "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+            ],
+            "validation": "unavailable",
+            "evidence": []
+          }
+        },
+        "relevant_assumptions": [
+          "supported serial tendon-driven continuum topology",
+          "selected strain basis spans deformation relevant to the use",
+          "inextensible centerline",
+          "no shear",
+          "no torsion",
+          "straight frictionless tendon spans"
+        ],
+        "unsupported_requested_physics": []
+      }
+    }
+  ],
+  "development_cells_per_segment": 12,
+  "choice": "12 cells: 4.14 mm measured tip discrepancy, below a 5 mm development allocation within the 10 mm task tolerance. Single-state static allowance, not a dynamic guarantee.",
+  "focused_checks": "knot crossing, represented-state round trip and matched evidence consumption passed"
+}

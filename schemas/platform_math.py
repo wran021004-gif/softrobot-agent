@@ -64,7 +64,32 @@ class MathematicalModel(Contract):
 class ModelUseVerdict(Contract):
     status: ModelUseStatus
     reasons: list[str] = Field(min_length=1)
-    validation: Literal['unavailable'] = 'unavailable'
+    validation: Literal['unavailable', 'measured_local'] = 'unavailable'
+    evidence: list[EvidenceRef] = Field(default_factory=list)
+
+
+class AgreementMetric(Contract):
+    absolute_error: float = Field(ge=0)
+    relative_error: float | None = Field(default=None, ge=0)
+    units: str
+    norm: str
+
+
+class ModelAgreementEvidence(Contract):
+    """Scoped measurements, without a composite score or implied acceptance."""
+    design_identity: str
+    model_bindings: list[Binding]
+    representation_ids: dict[str, str]
+    numerical_settings: dict
+    mapping_convention: str
+    reference_state_input: dict
+    environment: dict
+    measured_uses: list[ModelUse]
+    metrics: dict[str, AgreementMetric]
+    sources: list[EvidenceRef]
+    source_locations: list[str]
+    limitations: list[str]
+    costs: dict = Field(default_factory=dict)
 
 
 class ModelUseAssessment(Contract):
