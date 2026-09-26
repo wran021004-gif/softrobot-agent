@@ -25,7 +25,8 @@ def comparison_basis(root,record):
     from .contracts import Control, GVSLQRControl
     from .compiler import normalize_inputs
     design,mesh,_=normalize_inputs(inp.robot.structure.data,inp.policy.discretization.data if inp.policy.discretization else None)
-    control_type=GVSLQRControl if inp.policy.controller.extension_id=='controller.gvs_lqr' else Control
+    from .contracts import GVSTrajectoryParameters
+    control_type=GVSTrajectoryParameters if inp.policy.controller.extension_id=='controller.gvs_nmpc' else GVSLQRControl if inp.policy.controller.extension_id in ('controller.gvs_lqr','controller.gvs_sampled_lqr') else Control
     return dict(task=digest(plain(inp.task)),seed=inp.seed,design=digest(plain(design)),
         discretization=digest(plain(mesh)),control=digest(plain(control_type.model_validate(inp.policy.controller.parameters.data))),
         model=execution['dynamics_model_identity'])

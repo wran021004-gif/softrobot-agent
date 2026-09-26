@@ -109,7 +109,17 @@ def resolve_gvs_lqr_control(inp,physics):
     rdiag=[float(c.tendon_tension_weight)]*len(tendon_order)
     lqr_parameters=LQRParameters(Q=np.diag(qdiag).tolist(),R=np.diag(rdiag).tolist(),tendon_order=tendon_order,
         force_limits_n=limits.tolist(),equilibrium_tolerance=c.equilibrium_tolerance)
-    lqr=ContinuousLQRController(lqr_parameters);K=lqr.configure_model(linear)
+    sampled=inp.policy.controller.extension_id=='controller.gvs_sampled_lqr'
+    if sampled:
+        from .gvs_sampled import DiscreteLQRController, zero_order_hold
+        # Require equilibrium in continuous units too; discretization must not
+        # disguise a non-equilibrium operating point through a small timestep.
+        if np.linalg.norm(linear.drift,np.inf)>c.equilibrium_tolerance:
+            raise ValueError('LQR_OPERATING_POINT_NOT_EQUILIBRIUM')
+        discrete=zero_order_hold(linear,inp.task.timing.control_period_s)
+        lqr=DiscreteLQRController(lqr_parameters);K=lqr.configure_model(discrete)
+    else:
+        lqr=ContinuousLQRController(lqr_parameters);K=lqr.configure_model(linear)
     gain_identity=digest(dict(K=K.tolist(),Q_diagonal=qdiag,R_diagonal=rdiag,x0=x0,u0=u0.tolist(),
         tendon_order=tendon_order,force_limits_n=limits.tolist()))
     linearization_identity=digest(linear.model_dump(mode='json'))
@@ -161,6 +171,15 @@ def resolve_gvs_lqr_control(inp,physics):
             equation='u_residual=clip(K_q @ pinv(J_tip_gvs) @ (tip_desired-tip_measured) * gain, +/-max_tension_n)',
             gain=float(c.task_feedback_gain),max_tension_n=float(c.task_feedback_max_tension_n)),
         projector_id=PROJECTOR_ID)
+    if sampled:
+        plan['mode']='gvs_sampled_lqr'
+        plan['algorithm'].update(id='gvs_sampled_lqr_tension_v1',
+            lqr_implementation='DiscreteLQRController', gain_source='augmented ZOH exponential + discrete Riccati equation',
+            discrete_linearization=discrete.model_dump(mode='json'), spectral_radius=lqr.spectral_radius,
+            stability_scope='Pure unsaturated sampled LQR; excludes optional task feedback and backend model mismatch.',
+            cost_semantics='Discrete stage weights: sum(delta_x.T Q delta_x + delta_u.T R delta_u). Same numeric diagonals as historical recipe; not exact continuous-cost discretization.',
+            weight_units='Q curvature entries: (m/rad)^2; Q rate entries: (m*s/rad)^2; R: 1/N^2; dimensionless stage cost')
+        plan['mapping']['order']=[s.replace('continuous_lqr','sampled_lqr') for s in plan['mapping']['order']]
     plan['identity']=digest(plan)
     return plan
 
@@ -171,6 +190,7 @@ class GVSLQRController:
 
     def configure(self,physics,plan):
         self.physics=physics;self.plan=plan;self.coordinate_order=plan['algorithm']['projector']['coordinate_order']
+        self.projector_id=plan['algorithm']['projector']['id']
         self.resolved_basis=ResolvedGVSBasis.model_validate(plan['algorithm']['projector']['resolved_basis'])
         self.K=np.asarray(plan['algorithm']['K']);self.x0=np.asarray(plan['algorithm']['x0']);self.u0=np.asarray(plan['algorithm']['u0'])
         feedback=plan['task_feedback'];self.task_feedback_gain=feedback['gain']

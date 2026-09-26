@@ -59,7 +59,7 @@ def _skew(vector):
     )
 
 
-def _segment_pose(length, ky, kz):
+def _segment_pose_expression(length, ky, kz):
     """Smooth constant-strain SE(3) exponential, including zero curvature."""
     curvature = ca.vertcat(0, ky, kz)
     omega = _skew(curvature)
@@ -69,11 +69,14 @@ def _segment_pose(length, ky, kz):
     # form there.
     k = ca.sqrt(k2 + 1e-30)
     theta = k * length
-    low = k2 < 1e-14
+    # The cancellation is controlled by bending angle, not curvature alone.
+    # At tiny nonzero theta, 1-cos(theta) and theta-sin(theta) lose digits;
+    # their differentiated expressions made stiff integration stall near zero.
+    low = theta**2 < 1e-4
     # Polynomial branches avoid the removable singularities at straight strain.
-    a0 = length - k2 * length**3 / 6 + k2**2 * length**5 / 120
-    b0 = length**2 / 2 - k2 * length**4 / 24 + k2**2 * length**6 / 720
-    c0 = length**3 / 6 - k2 * length**5 / 120 + k2**2 * length**7 / 5040
+    a0 = length - k2 * length**3 / 6 + k2**2 * length**5 / 120 - k2**3 * length**7 / 5040
+    b0 = length**2 / 2 - k2 * length**4 / 24 + k2**2 * length**6 / 720 - k2**3 * length**8 / 40320
+    c0 = length**3 / 6 - k2 * length**5 / 120 + k2**2 * length**7 / 5040 - k2**3 * length**9 / 362880
     a = ca.if_else(low, a0, ca.sin(theta) / k)
     b = ca.if_else(low, b0, (1 - ca.cos(theta)) / (k**2))
     c = ca.if_else(low, c0, (theta - ca.sin(theta)) / (k**3))
@@ -86,6 +89,20 @@ def _segment_pose(length, ky, kz):
         ca.horzcat(rotation, position),
         ca.DM([[0, 0, 0, 1]]),
     )
+
+
+@lru_cache(maxsize=1)
+def _segment_pose_kernel():
+    # Preserve this small repeated map as an AD function boundary. Inlining
+    # every integration cell into third-order dynamics derivatives exhausted
+    # memory when constructing the trajectory NLP Jacobian.
+    length,ky,kz=(ca.SX.sym(name) for name in ('length','ky','kz'))
+    return ca.Function('gvs_cell_pose',[length,ky,kz],
+        [_segment_pose_expression(length,ky,kz)],{'never_inline':True})
+
+
+def _segment_pose(length,ky,kz):
+    return _segment_pose_kernel()(length,ky,kz)
 
 
 class _SymbolicKinematics:
@@ -260,18 +277,11 @@ class GVSCasadiFunctions:
         tendon_jacobian = ca.jacobian(tendon_lengths, q)
         tendon_force = -ca.mtimes(tendon_jacobian.T, u)
 
-        mass_derivative = ca.jacobian(ca.reshape(mass, n * n, 1), q)
-        bias = ca.MX.zeros(n, 1)
-        for i in range(n):
-            for j in range(n):
-                for k in range(n):
-                    # CasADi reshape is column-major: M[i,j] -> i+n*j.
-                    gamma = (
-                        mass_derivative[i + n * j, k]
-                        + mass_derivative[i + n * k, j]
-                        - mass_derivative[j + n * k, i]
-                    ) / 2
-                    bias[i] += gamma * qdot[j] * qdot[k]
+        # Contract the Christoffel expression before AD. This is exactly
+        # C_i = sum_jk Gamma_ijk v_j v_k for symmetric M; materializing the
+        # full n*n*n derivative and scalar loop makes repeated OCP calls costly.
+        momentum = ca.mtimes(mass, qdot)
+        bias = ca.jtimes(momentum, q, qdot) - .5 * ca.gradient(ca.dot(qdot, momentum), q)
         qdd = ca.solve(
             mass,
             tendon_force + gravity - bias - elastic - damping,
@@ -289,13 +299,12 @@ class GVSCasadiFunctions:
             'tendon_length_jacobian', 'velocity_bias',
         ]
         self.function = ca.Function('gvs_dynamics', [x, u], outputs, ['x', 'u'], names)
-        self.linearization = ca.Function(
-            'gvs_linearization',
-            [x, u],
-            [ca.jacobian(xdot, x), ca.jacobian(xdot, u), xdot],
-            ['x', 'u'],
-            ['A', 'B', 'drift'],
-        )
+        # Implicit transcription uses force balance directly, avoiding the
+        # ill-scaled acceleration residual of this stiff bending model.
+        self.implicit_terms = ca.Function('gvs_implicit_terms', [x,u],
+            [mass,tendon_force+gravity-bias-elastic-damping], ['x','u'], ['mass','force'])
+        self._linearization = None
+        self._linearization_symbols = (x,u,xdot)
         static_residual = tendon_force + gravity - elastic
         self.q_symbol = q
         self.u_symbol = u
@@ -312,6 +321,14 @@ class GVSCasadiFunctions:
     def evaluate(self, x, u):
         values = self.function(x=np.asarray(x, dtype=float), u=np.asarray(u, dtype=float))
         return {name: np.asarray(values[name], dtype=float) for name in self.function.name_out()}
+
+    @property
+    def linearization(self):
+        if self._linearization is None:
+            x,u,xdot=self._linearization_symbols
+            self._linearization=ca.Function('gvs_linearization',[x,u],
+                [ca.jacobian(xdot,x),ca.jacobian(xdot,u),xdot],['x','u'],['A','B','drift'])
+        return self._linearization
 
     def linearize(self, x, u):
         values = self.linearization(

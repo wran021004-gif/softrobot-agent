@@ -21,6 +21,7 @@ from schemas.platform_math import OptimizationProblem, OptimizationResult
 
 BUNDLE_CONTRACT = 'optimization.casadi_nlp_expression'
 SELECTOR_CONTRACT = 'optimization.casadi_nlp_selector'
+_EXPRESSION_FUNCTIONS = {}
 
 
 def expression_payload(variable_order, objective, constraints):
@@ -35,6 +36,11 @@ def expression_payload(variable_order, objective, constraints):
     )
     serialized = function.serialize()
     digest = hashlib.sha256(serialized.encode('utf8')).hexdigest()
+    # In-process trusted assembly can share the already-built graph. Keep the
+    # transport string too, so a claimed digest alone never selects other code.
+    _EXPRESSION_FUNCTIONS[digest]=(serialized,function)
+    if len(_EXPRESSION_FUNCTIONS)>4:
+        del _EXPRESSION_FUNCTIONS[next(iter(_EXPRESSION_FUNCTIONS))]
     bundle = CasadiNLPExpression(
         variable_order=variable_order,
         constraint_order=constraint_names,
@@ -61,6 +67,7 @@ class IpoptSolver:
     def __init__(self, parameters=None):
         self.parameters = IpoptParameters.model_validate(parameters or {})
         self.last_diagnostics = None
+        self._compiled = {}
 
     @staticmethod
     def _bounds(problem, order):
@@ -105,12 +112,8 @@ class IpoptSolver:
             ):
                 raise ValueError('IPOPT_CONSTRAINT_SELECTOR_MISMATCH')
 
-        function = ca.Function.deserialize(bundle.serialized_function)
-        x = ca.MX.sym('x', len(bundle.variable_order))
-        outputs = function(x=x)
-        raw_objective = outputs['objective']
-        signed_objective = raw_objective if problem.objective.direction == 'minimize' else -raw_objective
-        nlp = {'x': x, 'f': signed_objective, 'g': outputs['constraints']}
+        import time
+        construction_start = time.perf_counter()
         options = {
             'ipopt.print_level': self.parameters.print_level,
             'ipopt.max_iter': self.parameters.max_iterations,
@@ -119,18 +122,38 @@ class IpoptSolver:
             'ipopt.hessian_approximation': self.parameters.hessian_approximation,
             'print_time': False,
         }
-        solver = ca.nlpsol('ipopt_solver', 'ipopt', nlp, options)
+        cache_key=(bundle.expression_digest,bundle.serialized_function,problem.objective.direction)
+        cached=cache_key in self._compiled
+        if not cached:
+            shared=_EXPRESSION_FUNCTIONS.get(bundle.expression_digest)
+            function=(shared[1] if shared is not None and shared[0]==bundle.serialized_function
+                      else ca.Function.deserialize(bundle.serialized_function))
+            x = ca.MX.sym('x', len(bundle.variable_order))
+            outputs = function(x=x)
+            raw_objective = outputs['objective']
+            signed_objective = raw_objective if problem.objective.direction == 'minimize' else -raw_objective
+            nlp = {'x': x, 'f': signed_objective, 'g': outputs['constraints']}
+            solver = ca.nlpsol('ipopt_solver', 'ipopt', nlp, options)
+            self._compiled[cache_key]=(function,solver)
+        function,solver=self._compiled[cache_key]
+        construction_s=time.perf_counter()-construction_start
         lbx, ubx, x0 = self._bounds(problem, bundle.variable_order)
         lbg = [-math.inf if item.lower is None else item.lower for item in problem.constraints]
         ubg = [math.inf if item.upper is None else item.upper for item in problem.constraints]
+        solve_start=time.perf_counter()
         solution = solver(x0=x0, lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
+        solve_s=time.perf_counter()-solve_start
         stats = solver.stats()
         values = np.asarray(solution['x'], dtype=float).reshape(-1)
-        constraint_values = np.asarray(solution['g'], dtype=float).reshape(-1)
-        raw_value = float(function(x=values)['objective'])
+        independent=function(x=values)
+        constraint_values = np.asarray(independent['constraints'], dtype=float).reshape(-1)
+        raw_value = float(independent['objective'])
         violation = 0.0
         for value, lo, hi in zip(constraint_values, lbg, ubg):
             violation = max(violation, lo - value, value - hi, 0.0)
+        violation=max(violation,float(np.max(np.maximum(np.asarray(lbx)-values,values-np.asarray(ubx)),initial=0.)))
+        if not np.isfinite(np.r_[values,constraint_values,raw_value]).all():
+            raise ValueError('IPOPT_NONFINITE_SOLUTION')
         return_status = str(stats.get('return_status', ''))
         if bool(stats.get('success')):
             status = 'converged'
@@ -153,6 +176,7 @@ class IpoptSolver:
             'constraint_lower': lbg,
             'constraint_upper': ubg,
             'options': self.parameters.model_dump(mode='json'),
+            'construction_s':construction_s, 'solve_s':solve_s, 'cached_solver':cached,
         }
         return OptimizationResult(
             status=status,

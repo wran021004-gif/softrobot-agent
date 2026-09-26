@@ -6,6 +6,7 @@ from . import contracts as c
 from . import legacy_scientific
 from . import optimization as opt
 from . import route
+from .contracts import GVSTrajectoryParameters
 
 CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('route_policy',route.RoutePolicy),
@@ -29,6 +30,7 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('pcc_reach_assembler_parameters',c.PCCReachAssemblerParameters),
     ('gvs_inverse_assembler_parameters',c.GVSInverseAssemblerParameters),]]
 CONTRACTS += [
+    ('family.gvs_trajectory_parameters','1.0.0',GVSTrajectoryParameters),
     ('family.pcc_forward_request', '2.0.0', c.PCCForwardRequestV2),
     ('family.pcc_kinematics_result', '2.0.0', c.PCCKinematicsResultV2),
     ('family.gvs_dynamics_request', '2.0.0', c.GVSDynamicsRequestV2),
@@ -50,7 +52,7 @@ CONTRACTS += [
     ('family.lqr_synthesis_description', '2.0.0', c.LQRSynthesisDescription),
     ('family.gvs_lqr_control', '1.0.0', c.GVSLQRControl),
 ]
-SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','model_applicability','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
+SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','gvs_sampled','gvs_trajectory','gvs_nmpc','model_applicability','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
@@ -120,7 +122,7 @@ for name,binding,model,deps,resources in [
             conversion='shared serial family physics',families=['task.reach'],robots=['tendon_robot_family','tendon_driven_continuum'],
             inactive_parameters=[] if name=='matlab_spatial' else ['max_step_s','rtol','atol','contact_stiffness_n_m','contact_damping_n_s_m'],
             robot_contracts=['family.design','domain.rod_design'],channels=['actuator_commands'],environments=['experiment.assembly'],
-            controllers=['controller.family']+(['controller.gvs_lqr'] if name=='family_mujoco' else []),signals=['tip_position','joint_position','joint_velocity','tendon_length','tendon_length_change','tendon_length_rate','tendon_tension','desired_tendon_tension','tendon_target_length','actuator_command','actuator_torque','external_torque'],
+            controllers=['controller.family']+(['controller.gvs_lqr','controller.gvs_sampled_lqr','controller.gvs_nmpc'] if name=='family_mujoco' else []),signals=['tip_position','joint_position','joint_velocity','tendon_length','tendon_length_change','tendon_length_rate','tendon_tension','desired_tendon_tension','tendon_target_length','actuator_command','actuator_torque','external_torque'],
             signal_specs_resolver='extensions.tendon_family.signals:observation_specs',signal_phases=['post_step','pre_step_solver'],
             structures=['serial flexible segments','fixed rigid connectors','guides','payloads'],
             sections=['circle','tube','ellipse','rectangle','simple polygon with holes'],
@@ -503,3 +505,27 @@ EXTENSIONS.extend([
             backend_solves=0),
     ),
 ])
+
+EXTENSIONS.append(Extension('controller.gvs_sampled_lqr','controller','1.0.0',c.GVSLQRControl,Payload,
+    'extensions.tendon_family.gvs_sampled:GVSSampledLQRController',
+    'Bounded sampled LQR using exact ZOH and discrete stage weights',**COMMON,
+    dependencies=('numpy','scipy','casadi'),
+    extension_dependencies=(('model.gvs','1.0.0'),),
+    capabilities=dict(category='control',role='adapter',channel='actuator_commands',backend_executable=True,
+        command_space='tendon_tensions',sampling='interval_start_pre_step; held for control period',reset=True,restore=False)))
+
+EXTENSIONS.append(Extension('optimization_assembler.gvs_trajectory','optimization_assembler','1.0.0',
+    GVSTrajectoryParameters,OptimizationProblem,'extensions.tendon_family.gvs_trajectory:GVSTrajectoryAssembler',
+    'Fixed-design free-reach implicit dynamic trajectory transcription',sources=OPT_SOURCES,
+    contract_dependencies=COMMON['contract_dependencies'],dependencies=('numpy','casadi','scipy'),
+    capabilities=dict(category='optimization',role='adapter',model='model.gvs',model_version='1.0.0',
+        authorization='extensions.tendon_family.gvs_trajectory:trajectory_authorization',
+        supported_objectives=['dynamic_tip_tracking'],
+        supported_constraints=['initial_state','implicit_dynamics','tendon_force_bounds'],
+        target_source='frozen Task goal and evaluator tolerance')))
+EXTENSIONS.append(Extension('controller.gvs_nmpc','controller','1.0.0',GVSTrajectoryParameters,Payload,
+    'extensions.tendon_family.gvs_nmpc:GVSNMPCController','Projected measured-state receding-horizon GVS tension control',
+    **COMMON,dependencies=('numpy','scipy','casadi'),
+    extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
+    capabilities=dict(category='control',role='adapter',channel='actuator_commands',backend_executable=True,
+        command_space='tendon_tensions',sampling='interval_start_pre_step; held for control period',reset=False,restore=False)))

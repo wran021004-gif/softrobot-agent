@@ -103,10 +103,17 @@ class ScientificOptimizationTests(unittest.TestCase):
             objective_function=expression,
             initial_guess={'x': 0},
         )
-        result = IpoptSolver().solve(problem)
+        solver=IpoptSolver()
+        result = solver.solve(problem)
         self.assertEqual(result.status, 'converged')
         self.assertAlmostEqual(result.optimum['x'], 3.0, places=7)
         self.assertLess(result.objective_value, 1e-14)
+        # NMPC updates measured-state equalities through bounds on a cached graph.
+        problem.variables['x']['bounds']=[4.,4.]
+        updated=solver.solve(problem)
+        self.assertTrue(solver.last_diagnostics['cached_solver'])
+        self.assertAlmostEqual(updated.optimum['x'],4.,places=7)
+        self.assertLess(updated.constraint_violation,1e-7)
 
     def test_pcc_public_evidence_chain_and_mathematical_verification(self):
         suffix = uuid4().hex

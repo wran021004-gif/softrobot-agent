@@ -37,7 +37,7 @@ class MatlabBackend:
                 raise ValueError('MATLAB_ONLY_SOLVER_PARAMETERS: MuJoCo uses scene timestep and its recorded XML contact settings')
         if inp.task.initializer.extension_id!='initialize.family': raise ValueError('NAMED_FAMILY_INITIALIZER_REQUIRED')
         controllers=['controller.family']
-        if cls.model=='mujoco_serial_bending_v1': controllers.append('controller.gvs_lqr')
+        if cls.model=='mujoco_serial_bending_v1': controllers.extend(['controller.gvs_lqr','controller.gvs_sampled_lqr','controller.gvs_nmpc'])
         if inp.policy.controller.extension_id not in controllers: raise ValueError('FAMILY_CONTROLLER_REQUIRED')
         from tools.platform_registry import registry
         resolve_execution(inp,registry())
@@ -87,7 +87,7 @@ class MatlabBackend:
             if execution_mode=='ideal_tension' else
             'Ideal length servos, tension only, slack gives zero tension; no motor inertia.')
         self.result=BackendResult(solver_status='completed' if complete else 'failed',backend_id=self.backend_id,model_id=self.execution['implementation_model_id'],
-            signals=export(rows,self.physics,self.scene['control']['mode'] in ('tension_reference','gvs_lqr'),
+            signals=export(rows,self.physics,self.scene['control']['mode'] in ('tension_reference','gvs_lqr','gvs_sampled_lqr','gvs_nmpc'),
                 self.scene['control'].get('tension_execution_mode','actuator_realistic')),
             data=Payload(contract='family.backend_data',data=data.model_dump(mode='json')),
             limitations=[self.physics['applicability']['collision'],execution_limitation,
@@ -171,18 +171,22 @@ class MujocoBackend(MatlabBackend):
             if data.ten_J.size==model.ntendon*model.nv: jac[:]=data.ten_J.reshape(model.ntendon,model.nv)
             else:
                 for k in range(model.ntendon):
-                    adr=model.ten_J_rowadr[k]; nnz=model.ten_J_rownnz[k]
-                    jac[k,model.ten_J_colind[adr:adr+nnz]]=data.ten_J[adr:adr+nnz]
+                    layout=model if hasattr(model,'ten_J_rowadr') else data
+                    adr=layout.ten_J_rowadr[k]; nnz=layout.ten_J_rownnz[k]
+                    jac[k,layout.ten_J_colind[adr:adr+nnz]]=data.ten_J[adr:adr+nnz]
             return dict(tip=data.site_xpos[model.site('tip_site').id].copy(),Jtip=J[:,vi],lengths=data.ten_length[tids].copy(),Jlength=jac[tids][:,vi])
         complete=True; reason=None
         for step in range(round(s['duration_s']/dt)):
             if time.perf_counter()-start>timeout_s: complete=False; reason='MUJOCO_SOLVER_TIMEOUT'; break
             t=step*dt; g=current()
-            if s['control']['mode']=='gvs_lqr':
-                from .gvs_projection import project
-                projection=project(p,self.controller.resolved_basis,data.qpos[qi],data.qvel[vi])
+            if s['control']['mode'] in ('gvs_lqr','gvs_sampled_lqr','gvs_nmpc'):
+                from .gvs_projection import project, PROJECTOR_ID
+                projection=project(p,self.controller.resolved_basis,data.qpos[qi],data.qvel[vi],
+                    convention=getattr(self.controller,'projector_id',PROJECTOR_ID))
                 g['gvs_projection']=projection
                 command=self.controller.command(t,g,np.asarray(projection['q_gvs']),np.asarray(projection['qdot_gvs']))
+                if s['control']['mode']=='gvs_nmpc':
+                    atomic_json(self.folder/'nmpc_updates.json',self.controller.observations)
             else:
                 command=self.controller.command(t,g,data.qpos[qi].copy(),data.qvel[vi].copy())
             data.ctrl[aids]=command; data.xfrc_applied[:]=0; external=np.zeros(model.nv)

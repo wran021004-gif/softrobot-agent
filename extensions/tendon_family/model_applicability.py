@@ -85,7 +85,9 @@ def assess_model_uses(robot: RobotDescription, task: TaskDefinition, model: Bind
 
     ``required_physics`` expresses explicit per-use physical requirements not
     encoded by Task. Task external forces are read directly from its assembly.
-    Validation is reported unavailable until matched physical evidence exists.
+    Optional evidence references are resolved by the existing artifact store.
+    Matching requires an explicit, exact local query scope; measurements do not
+    change the capability verdict or imply an unmeasured acceptance threshold.
     """
     from extensions.experiment_dynamics.contracts import Assembly
     from tools.platform_registry import registry as default_registry
@@ -183,7 +185,9 @@ def assess_model_uses(robot: RobotDescription, task: TaskDefinition, model: Bind
             for ref in evidence:
                 item = ModelAgreementEvidence.model_validate(evidence_loader(ref))
                 if (item.design_identity == digest(design.model_dump(mode='json'))
-                    and model in item.model_bindings
+                    and any(b.extension_id==model_id and b.version==definition.version
+                        and reg.bind(b,'dynamics_model')[1].model_dump(mode='json')==parameters.model_dump(mode='json')
+                        for b in item.model_bindings)
                     and item.representation_ids.get(model_id) == representation_id
                     and use in item.measured_uses
                     and evidence_context == dict(numerical_settings=item.numerical_settings,

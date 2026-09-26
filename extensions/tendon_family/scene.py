@@ -31,9 +31,12 @@ def assemble(inp,p):
             raise ValueError('FORCE_WINDOW_MUST_BE_ON_CONTROL_GRID')
         forces.append(dict(body=[b['entity'] for b in p['parts']].index(f.entity),**f.model_dump(mode='json')))
     task_identity=digest(inp.task.model_dump(mode='json'))
-    if inp.policy.controller.extension_id == 'controller.gvs_lqr':
+    if inp.policy.controller.extension_id in ('controller.gvs_lqr','controller.gvs_sampled_lqr'):
         from .gvs_lqr import resolve_gvs_lqr_control
         control=resolve_gvs_lqr_control(inp,p)
+    elif inp.policy.controller.extension_id == 'controller.gvs_nmpc':
+        from .gvs_nmpc import resolve_gvs_nmpc_control
+        control=resolve_gvs_nmpc_control(inp,p)
     else:
         control=resolve_control(inp,p)
     scene=dict(physics_identity=p['identity'],assembly=a,initial=initial.model_dump(mode='json'),

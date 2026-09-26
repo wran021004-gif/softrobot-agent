@@ -138,7 +138,8 @@ def apply(inp, parameters, changes):
     result = build(dict(baseline=inp.robot.structure.data,space=parameters,discretization=explicit,changes=design_changes),task_bounds=design_bounds)
     if result.status != 'valid': raise ValueError(result.status.upper()+': '+str(result.reason))
     from .contracts import Control, GVSLQRControl
-    control_type=GVSLQRControl if inp.policy.controller.extension_id=='controller.gvs_lqr' else Control
+    from .contracts import GVSTrajectoryParameters
+    control_type=GVSTrajectoryParameters if inp.policy.controller.extension_id=='controller.gvs_nmpc' else GVSLQRControl if inp.policy.controller.extension_id in ('controller.gvs_lqr','controller.gvs_sampled_lqr') else Control
     control=control_type.model_validate(inp.policy.controller.parameters.data).model_dump(mode='json')
     for path,value in changes.items():
         if path.startswith('control/'):
