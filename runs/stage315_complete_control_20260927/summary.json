@@ -1,0 +1,141 @@
+{
+  "gvs": {
+    "complete": true,
+    "endpoint_pass": true,
+    "settling_pass": true,
+    "last_time_s": 0.35000000000000003,
+    "terminal_error_m": 0.003661282089125241,
+    "terminal_tip_speed_m_s": 0.016614792490853385,
+    "final_window_max_error_m": 0.0040089276635039625,
+    "final_window_max_speed_m_s": 0.01922866044564646,
+    "tension_range_n": [
+      0.5529417509026899,
+      4.980115024271848
+    ],
+    "max_violation": 7.728925079558994e-06,
+    "solve_s": 519.196760799503,
+    "preparation_s": 346.0046331998892,
+    "integration_s": 220.61258780001663,
+    "delivery_s": 886.8641126002185,
+    "initialization_only_updates": 7,
+    "total_measured_s": 1125.177685300121
+  },
+  "replay": [
+    {
+      "timestep_s": 0.0005,
+      "complete": false,
+      "invalid": {
+        "time_before_step_s": 0.23600000000000018,
+        "engine_time_after_s": 0.0005,
+        "prior_max_velocity_rad_s": 139791252907.43768,
+        "warnings": {
+          "mjWARN_BADQPOS": 0,
+          "mjWARN_BADQVEL": 1,
+          "mjWARN_BADQACC": 0
+        }
+      },
+      "wall_s": 0.03684139996767044,
+      "last_valid": {
+        "time_s": 0.23600000000000002,
+        "tip_m": [
+          -0.07310354606233059,
+          -0.010293431118313285,
+          0.1467649608873891
+        ],
+        "tip_speed_m_s": 2799939843.4383597,
+        "max_velocity_rad_s": 139791252907.43768,
+        "max_acceleration_rad_s2": 9.573262222720364e+22,
+        "contacts": 0,
+        "tip_error_m": 0.3684629542743441
+      }
+    },
+    {
+      "timestep_s": 0.00025,
+      "complete": true,
+      "invalid": null,
+      "wall_s": 0.10332230012863874,
+      "last_valid": {
+        "time_s": 0.35000000000000003,
+        "tip_m": [
+          0.020988216774029178,
+          -0.03958209525357075,
+          0.10191197362162395
+        ],
+        "tip_speed_m_s": 2.955273575841454,
+        "max_velocity_rad_s": 5.208183289199204,
+        "max_acceleration_rad_s2": 5236.700116934362,
+        "contacts": 0,
+        "tip_error_m": 0.29272739680130194
+      }
+    }
+  ],
+  "mujoco": {
+    "evaluation": {
+      "candidate_id": "nmpc",
+      "comparison_identity": "5a6b23d5b63437964e5f4f8b769bda661e33f2e9d8a0b3d071453147e8b94822",
+      "constraints": [
+        {
+          "limit": 0.01,
+          "name": "task_bound",
+          "observed": 0.008473431053941154,
+          "satisfied": true,
+          "units": "m"
+        }
+      ],
+      "contract_version": "1.2.0",
+      "evaluator": "evaluate.reach",
+      "evaluator_version": "1.0.0",
+      "metrics": [
+        {
+          "name": "position_error",
+          "units": "m",
+          "value": 0.008473431053941154
+        }
+      ],
+      "original_execution_id": "53a547c6145f48e18b90366257f0ecc2",
+      "reason": null,
+      "source": {
+        "artifact_id": "6153614ffbaafd125bc20aa0a750a6879770ae8785607b6048db9dc0804d327a",
+        "media_type": "application/json"
+      },
+      "source_execution_id": "53a547c6145f48e18b90366257f0ecc2",
+      "task_success": true,
+      "validity": "valid"
+    },
+    "solver_status": "completed",
+    "wall_s": 881.2264099000022,
+    "backend_folder": "runs\\stage315_complete_control_20260927\\sessions\\stage315-nmpc\\executions\\53a547c6145f48e18b90366257f0ecc2\\backend",
+    "updates": 35,
+    "valid_samples": 35,
+    "terminal_error_m": 0.008473431053941154,
+    "last_valid_time_s": 0.35000000000000003,
+    "fallbacks": 0,
+    "mean_update_s": 25.072998805709982,
+    "deadline_misses": 35,
+    "tension_range_n": [
+      0.5662001386742109,
+      5.025997143201603
+    ],
+    "max_projection_residual_rad_m": 2.4722055426750034,
+    "maximum_plan_violation": 9.235746246775978e-06,
+    "max_error_m": 0.05434688844063781,
+    "minimum_error_m": 0.004194189273512849,
+    "solver_failures": 0,
+    "intentional_stops": 35,
+    "mean_validation_s": 0.2575321142960872,
+    "solver_construction_s": 3.9693762003444135,
+    "graph_construction_s": 1.3180874998215586,
+    "evaluation_receipt": "saved_evaluation_receipt.json",
+    "evaluation_continuation": "New read-only session; producer dependencies verified unchanged, original rejection retained",
+    "terminal_tip_speed_m_s": 0.020947365033184347,
+    "settling_pass": false,
+    "final_window_max_speed_m_s": 0.03156205037834025,
+    "final_window_max_error_m": 0.008694221274361258,
+    "max_sampled_contacts": 0,
+    "max_rate_projection_residual_rad_m_s": 12.563365398127491,
+    "initialization_only_updates": 7,
+    "mean_preparation_s": 9.583883294303503,
+    "mean_numerical_solve_s": 14.98640513712141,
+    "force_bound_violation_n": 0.0
+  }
+}
