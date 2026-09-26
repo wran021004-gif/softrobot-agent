@@ -218,6 +218,21 @@ class ScientificOptimizationTests(unittest.TestCase):
         self.assertLessEqual(result.constraint_violation,1e-5)
         self.assertAlmostEqual(result.optimum['y'],result.optimum['x']**2,places=8)
         self.assertEqual(solver.last_diagnostics['selected_feasible_iteration'],0)
+        first=solver.last_diagnostics['first_feasible_candidate']
+        self.assertTrue(first['iteration_zero'])
+        self.assertTrue(first['independently_feasible'])
+        self.assertGreaterEqual(first['elapsed_s'],0.)
+        self.assertLessEqual(first['elapsed_s'],solver.last_diagnostics['solve_s'])
+        self.assertEqual(first,solver.last_diagnostics['selected_feasible_candidate'])
+        # A cached solve with incompatible new bounds cannot inherit a feasible
+        # candidate or timestamp from the preceding solve.
+        problem.variables['x']['bounds']=[1.,5.]
+        problem.variables['y']['bounds']=[-5.,.5]
+        updated=solver.solve(problem)
+        self.assertTrue(solver.last_diagnostics['cached_solver'])
+        self.assertGreater(updated.constraint_violation,1e-5)
+        self.assertIsNone(solver.last_diagnostics['first_feasible_candidate'])
+        self.assertIsNone(solver.last_diagnostics['selected_feasible_candidate'])
 
     def test_pcc_public_evidence_chain_and_mathematical_verification(self):
         suffix = uuid4().hex

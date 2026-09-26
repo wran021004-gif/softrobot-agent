@@ -11,6 +11,16 @@ from .gvs_casadi import expression_from_system, functions_for
 from .pcc import quaternion_wxyz_to_rotation
 
 
+def implicit_step_residual(functions,n,m,h):
+    """Shared shooting and tail-initialization residual in physical coordinates."""
+    previous=ca.MX.sym('previous_state',2*n);following=ca.MX.sym('next_state',2*n)
+    tension=ca.MX.sym('tension',m)
+    return ca.Function('gvs_implicit_step_residual',[previous,following,tension],
+        [ca.vertcat((following[:n]-previous[:n]-h*following[n:])/10.,
+            functions.implicit_residual(following,tension,(following[n:]-previous[n:])/h)/.001)],
+        {'jac_penalty':0})
+
+
 
 def trajectory_authorization(robot, space, parameters):
     p=GVSTrajectoryParameters.model_validate(parameters)
@@ -65,13 +75,7 @@ class GVSTrajectoryAssembler:
         if task.evaluator.extension_id!='evaluate.reach':
             raise ValueError('GVS_TRAJECTORY_REQUIRES_REACH_EVALUATOR')
         tolerance=task.evaluator.parameters.data['tolerance_m']
-        previous_state=ca.MX.sym('previous_state',2*n)
-        next_state=ca.MX.sym('next_state',2*n)
-        tension=ca.MX.sym('tension',m)
-        step_residual=ca.Function('gvs_implicit_step_residual',[previous_state,next_state,tension],
-            [ca.vertcat((next_state[:n]-previous_state[:n]-h*next_state[n:])/10.,
-                functions.implicit_residual(next_state,tension,(next_state[n:]-previous_state[n:])/h)/.001)],
-            {'jac_penalty':0})
+        step_residual=implicit_step_residual(functions,n,m,h)
         mapped=step_residual.map(steps,'thread',p.evaluation_threads)
         residuals=mapped(ca.horzcat(*X[:-1]),ca.horzcat(*X[1:]),
             ca.horzcat(*[U[k//p.substeps] for k in range(steps)]))
@@ -126,19 +130,53 @@ class TrajectoryWorkspace:
             context=SystemContext(x0=nominal_x,u0=nominal_u,scene=task.environment))
         self.graph_s=time.perf_counter()-start
         self.solver=IpoptSolver(dict(max_iterations=self.parameters.max_iterations,tolerance=self.parameters.tolerance,
-            max_cpu_s=self.parameters.max_cpu_s,retain_feasible_iterate=True))
+            max_cpu_s=self.parameters.max_cpu_s,retain_feasible_iterate=True,
+            constraint_jacobian_mode=self.parameters.constraint_jacobian_mode))
+        self.robot=robot;self.scene=task.environment;self._tail_solver=None
         self.last=None
 
+    def _extend_tail(self,state,tension):
+        construction=time.perf_counter()
+        if self._tail_solver is None:
+            p=GVSModelParameters(basis=self.parameters.basis)
+            system=GVSModel(p).build_system(self.robot,p,None,SystemContext(
+                x0=self.nominal_x,u0=self.nominal_u,scene=self.scene))
+            functions=functions_for(expression_from_system(system))
+            self._tail_residual=implicit_step_residual(functions,self.n,self.m,self.period/self.parameters.substeps)
+            y=ca.MX.sym('scaled_next',2*self.n);old=ca.MX.sym('old',2*self.n);u=ca.MX.sym('u',self.m)
+            residual=ca.Function('tail_residual',[y,old,u],
+                [self._tail_residual(old,y*self.state_scales,u)],{'ad_weight':1.})
+            self._tail_solver=ca.rootfinder('tail_step','newton',residual,{'abstol':1e-10,'max_iter':30})
+        construction_s=time.perf_counter()-construction
+        start=time.perf_counter()
+        repeated_defect=float(np.max(abs(np.asarray(self._tail_residual(state,state,tension)))))
+        following=np.asarray(self._tail_solver(np.asarray(state)/self.state_scales,state,tension)).ravel()*self.state_scales
+        defect=float(np.max(abs(np.asarray(self._tail_residual(state,following,tension)))))
+        return following,dict(construction_s=construction_s,integration_s=time.perf_counter()-start,
+            repeated_terminal_scaled_defect=repeated_defect,extended_tail_scaled_defect=defect)
+
     def solve(self,measured_x,previous_u,warm=None):
+        update_start=time.perf_counter()
         for j,value in enumerate(measured_x):self.problem.variables[f'x/0/{j}']['bounds']=[float(value)/self.state_scales[j]]*2
         for t,value in zip(self.tendons,previous_u): self.problem.variables['previous_u/'+t]['bounds']=[float(value)]*2
         source=warm if warm is not None else self.last
+        tails=[]
         if source is not None:
             X=np.asarray(source['states']);U=np.asarray(source['tensions']);s=0 if warm is not None else self.parameters.substeps
+            # An explicit warm seed already starts at the current horizon. The
+            # last plan has executed exactly one command interval (s nodes).
+            if s:
+                X=np.concatenate([X[s:],np.repeat(X[-1:],s,axis=0)])
+                U=np.concatenate([U[1:],U[-1:]])
+                for k in range(len(X)-s,len(X)):
+                    X[k],diagnostic=self._extend_tail(X[k-1],U[-1]);tails.append(diagnostic)
             for k in range(len(X)):
-                for j in range(2*self.n):self.problem.initial_guess[f'x/{k}/{j}']=float(X[min(k+s,len(X)-1),j])/self.state_scales[j]
+                for j in range(2*self.n):self.problem.initial_guess[f'x/{k}/{j}']=float(X[k,j])/self.state_scales[j]
             for k in range(len(U)):
-                for j,t in enumerate(self.tendons):self.problem.initial_guess[f'u/{k}/{t}']=float(U[min(k+(warm is None),len(U)-1),j])
+                for j,t in enumerate(self.tendons):self.problem.initial_guess[f'u/{k}/{t}']=float(U[k,j])
+        for j,value in enumerate(measured_x):self.problem.initial_guess[f'x/0/{j}']=float(value)/self.state_scales[j]
+        for t,value in zip(self.tendons,previous_u):self.problem.initial_guess['previous_u/'+t]=float(value)
+        preparation_s=time.perf_counter()-update_start
         start=time.perf_counter(); result=self.solver.solve(self.problem);total=time.perf_counter()-start
         values=result.optimum;steps=self.parameters.horizon*self.parameters.substeps
         X=np.array([[values[f'x/{k}/{j}']*self.state_scales[j] for j in range(2*self.n)] for k in range(steps+1)])
@@ -146,7 +184,10 @@ class TrajectoryWorkspace:
         output=dict(states=X.tolist(),tensions=U.tolist(),result=result.model_dump(mode='json'),
             decision_state_scales=self.state_scales.tolist(),
             diagnostics=self.solver.last_diagnostics,total_s=total,graph_s=self.graph_s,
+            warm_start=dict(executed_intervals=int(source is not None and warm is None),
+                preparation_s=preparation_s,tail_initialization=tails),
             nominal_operating_state=self.nominal_x,measured_initial_state=list(measured_x),
+            previous_tensions_n=list(previous_u),
             period_s=self.period,substeps=self.parameters.substeps,
             integration='implicit Euler in mass/force form; q scale 10 rad/m, force scale .001 N*m^2/rad',
             cost='Stage weights per second on tip/tolerance, velocity/(1 rad/(m*s)), tension/(1 N) and delta tension/(1 N); dimensionless terminal weight. Smoothing is a design penalty.')
@@ -158,4 +199,5 @@ class TrajectoryWorkspace:
         # A finite unfinished iterate is still a useful next optimization guess.
         # Command acceptance remains the separate, stricter feasibility check.
         if result.status in ('converged','iteration_limit'):self.last=output
+        output['update_wall_s']=time.perf_counter()-update_start
         return output

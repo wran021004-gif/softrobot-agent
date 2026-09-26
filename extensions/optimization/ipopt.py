@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import math
+import time
 
 import casadi as ca
 import numpy as np
@@ -43,15 +44,24 @@ class _FeasibleIterate(ca.Callback):
         name=self.names[i]
         return ca.Sparsity.dense(self.nx if name in ('x','lam_x') else self.ng if name in ('g','lam_g') else 1 if name=='f' else 0,1)
 
-    def reset(self,lbx,ubx,lbg,ubg):
-        self.bounds=(lbx,ubx,lbg,ubg);self.best=None;self.iteration=-1
+    def reset(self,lbx,ubx,lbg,ubg,start):
+        self.bounds=(lbx,ubx,lbg,ubg);self.best=None;self.first=None;self.latest=None
+        self.iteration=-1;self.start=start
 
     def eval(self,args):
+        elapsed=time.perf_counter()-self.start
         self.iteration+=1;items=dict(zip(self.names,args))
         x=np.asarray(items['x']).ravel();g=np.asarray(items['g']).ravel();objective=float(items['f'])
-        if np.isfinite(np.r_[x,g,objective]).all() and _violation(x,g,*self.bounds)<=1e-5:
+        violation=_violation(x,g,*self.bounds)
+        self.latest=None
+        if np.isfinite(np.r_[x,g,objective]).all() and violation<=1e-5:
+            candidate=dict(x=x.copy(),objective=objective,iteration=self.iteration,
+                elapsed_s=elapsed,scaled_violation=violation,
+                iteration_zero=self.iteration==0)
+            self.latest=candidate
+            if self.first is None:self.first=candidate
             if self.best is None or objective<self.best['objective']:
-                self.best=dict(x=x.copy(),objective=objective,iteration=self.iteration)
+                self.best=candidate
         return [0]
 
 
@@ -121,6 +131,7 @@ class IpoptSolver:
         return lower, upper, initial
 
     def solve(self, problem: OptimizationProblem) -> OptimizationResult:
+        self.last_diagnostics=None
         problem = OptimizationProblem.model_validate(problem)
         payload = problem.objective_function
         if not isinstance(payload, Payload) or payload.contract != BUNDLE_CONTRACT:
@@ -143,7 +154,6 @@ class IpoptSolver:
             ):
                 raise ValueError('IPOPT_CONSTRAINT_SELECTOR_MISMATCH')
 
-        import time
         construction_start = time.perf_counter()
         options = {
             'ipopt.print_level': self.parameters.print_level,
@@ -192,22 +202,44 @@ class IpoptSolver:
         lbx, ubx, x0 = self._bounds(problem, bundle.variable_order)
         lbg = [-math.inf if item.lower is None else item.lower for item in problem.constraints]
         ubg = [math.inf if item.upper is None else item.upper for item in problem.constraints]
-        if selector is not None:selector.reset(lbx,ubx,lbg,ubg)
+        initial_check_start=time.perf_counter()
+        initial_check=function(x=x0)
+        initial_violation=_violation(np.asarray(x0),np.asarray(initial_check['constraints']).ravel(),lbx,ubx,lbg,ubg)
+        initial_check_s=time.perf_counter()-initial_check_start
         solve_start=time.perf_counter()
+        if selector is not None:selector.reset(lbx,ubx,lbg,ubg,solve_start)
         solution = solver(x0=x0, lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
         solve_s=time.perf_counter()-solve_start
         stats = solver.stats()
         validation_start=time.perf_counter()
         values = np.asarray(solution['x'], dtype=float).reshape(-1)
-        returned_values=values.copy();selected_iteration=None
+        returned_values=values.copy();selected_iteration=None;selected_candidate=None
         if not stats.get('success') and selector is not None and selector.best is not None:
             values=selector.best['x'];selected_iteration=selector.best['iteration']
-        independent=function(x=values)
-        constraint_values = np.asarray(independent['constraints'], dtype=float).reshape(-1)
-        raw_value = float(independent['objective'])
-        violation=_violation(values,constraint_values,lbx,ubx,lbg,ubg)
-        returned_g=constraint_values if np.array_equal(values,returned_values) else np.asarray(function(x=returned_values)['constraints']).ravel()
-        returned_violation=_violation(returned_values,returned_g,lbx,ubx,lbg,ubg)
+            selected_candidate=selector.best
+        elif selector is not None and selector.latest is not None and np.array_equal(values,selector.latest['x']):
+            selected_candidate=selector.latest
+            selected_iteration=selected_candidate['iteration']
+        # At most one model evaluation per distinct first/selected/raw vector.
+        verified={}
+        def verify(vector):
+            key=np.asarray(vector,dtype=float).tobytes()
+            if key not in verified:
+                check=function(x=vector)
+                g=np.asarray(check['constraints'],dtype=float).ravel()
+                verified[key]=(float(check['objective']),g,_violation(vector,g,lbx,ubx,lbg,ubg))
+            return verified[key]
+        raw_value,constraint_values,violation=verify(values)
+        returned_objective,returned_g,returned_violation=verify(returned_values)
+        def candidate_record(candidate):
+            if candidate is None:return None
+            objective,g,error=verify(candidate['x'])
+            return {**candidate,'x':candidate['x'].tolist(),
+                'objective':candidate['objective'] if problem.objective.direction=='minimize' else -candidate['objective'],
+                'independent_objective':objective,'independent_scaled_violation':error,
+                'independently_feasible':bool(error<=1e-5 and np.isfinite(np.r_[candidate['x'],g,objective]).all())}
+        first_record=candidate_record(None if selector is None else selector.first)
+        selected_record=candidate_record(selected_candidate)
         if not np.isfinite(np.r_[values,constraint_values,raw_value,returned_values,returned_g]).all():
             raise ValueError('IPOPT_NONFINITE_SOLUTION')
         return_status = str(stats.get('return_status', ''))
@@ -234,7 +266,13 @@ class IpoptSolver:
             'options': self.parameters.model_dump(mode='json'),
             'construction_s':construction_s, 'solve_s':solve_s, 'cached_solver':cached,
             'selected_feasible_iteration':selected_iteration,
+            'first_feasible_candidate':first_record,
+            'selected_feasible_candidate':selected_record,
+            'candidate_timer_origin':'perf_counter immediately before numerical solver call; callback entry timestamps; iteration zero is the initial iterate, not convergence',
+            'initial_scaled_violation':initial_violation,
+            'initial_check_s':initial_check_s,
             'returned_iterate_constraint_violation':returned_violation,
+            'returned_iterate_objective':returned_objective,
             'validation_s':time.perf_counter()-validation_start,
             'function_statistics':{k:v for k,v in stats.items()
                 if k.startswith(('n_call_', 't_proc_', 't_wall_'))},
