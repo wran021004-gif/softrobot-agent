@@ -23,8 +23,9 @@ def resolve_gvs_nmpc_control(inp,physics):
     p=GVSTrajectoryParameters.model_validate(inp.policy.controller.parameters.data)
     from .gvs_lqr import _candidate_operating_point
     # Operating point supplies a nominal reference and initial seed only.
-    nominal=inp.model_copy(deep=True)
-    nominal.policy.controller.parameters.data={'basis':p.basis.model_dump(mode='json')}
+    nominal_parameters=inp.policy.controller.parameters.model_copy(update={'data':{'basis':p.basis.model_dump(mode='json')}})
+    nominal_controller=inp.policy.controller.model_copy(update={'parameters':nominal_parameters})
+    nominal=inp.model_copy(update={'policy':inp.policy.model_copy(update={'controller':nominal_controller})})
     point=_candidate_operating_point(nominal)
     basis=resolve_basis(inp.robot.structure.data,p.basis)
     plan=dict(mode='gvs_nmpc',tension_execution_mode='ideal_tension',
@@ -34,7 +35,8 @@ def resolve_gvs_nmpc_control(inp,physics):
         projector=description(physics,basis),effective_parameters=p.model_dump(mode='json'),
         timing=dict(period_s=inp.task.timing.control_period_s,prediction_interval_s=inp.task.timing.control_period_s,
             physics_step_s=inp.task.timing.timestep_s,observation='interval_start_pre_step'),
-        failure_response='Hold last bounded tension; use clipped nominal tension if the first solve fails. Every use is recorded.')
+        plan_acceptance='Independently feasible converged or iteration-limited plans; nonconverged feasible updates are explicitly marked suboptimal and counted as solver failures.',
+        failure_response='If no usable feasible plan is returned, hold last bounded tension; use clipped nominal tension initially. Every use is recorded.')
     plan['identity']=digest(plan)
     return plan
 
@@ -69,7 +71,9 @@ class GVSNMPCController:
         requested=np.asarray(solved['tensions'][0]) if success else self.previous.copy()
         command,bridge=execute_ideal_tension(self.physics,requested)
         self.previous=np.asarray(command).copy();elapsed=time.perf_counter()-start
-        self.last={**bridge,'solver_failed':not success,'failure_response_used':not success,
+        converged=solved is not None and solved['optimization_converged']
+        self.last={**bridge,'solver_failed':not success or not converged,'failure_response_used':not success,
+            'feasible_suboptimal_update':success and not converged,
             'solver_error':error,'optimization_status':None if solved is None else solved['result']['status'],
             'optimization_constraint_violation':None if solved is None else solved['result']['constraint_violation'],
             'update_wall_s':elapsed,'deadline_missed':elapsed>self.period_s,

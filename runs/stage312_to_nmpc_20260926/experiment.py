@@ -80,9 +80,9 @@ def summarize(rows, observations, physics, basis, target, q0):
         initial_projected_q_distance=float(np.linalg.norm(np.asarray(observations[0]['gvs_q'])-q0)))
 
 
-def public_run(raw,label):
+def public_run(raw,label,run_suffix=''):
     from tools.platform_host import Host
-    raw=deepcopy(raw);raw['run_id']='stage312-'+label
+    raw=deepcopy(raw);raw['run_id']='stage312-'+label+run_suffix
     inp=SessionInput.model_validate(compile_input(raw)['input'])
     db=store(); host=Host(HERE,inp.run_id); host.create(inp.model_dump(mode='json'))
     start=time.perf_counter()
@@ -143,12 +143,17 @@ def baseline():
 
 def dynamic():
     import casadi as ca
+    import os, platform, scipy, mujoco
     from scipy.integrate import solve_ivp
     from scipy.optimize import root
     from extensions.tendon_family.gvs_casadi import expression_from_system,functions_for
     from extensions.tendon_family.gvs_trajectory import GVSTrajectoryParameters,TrajectoryWorkspace
     from extensions.tendon_family.gvs_nmpc import _WORKSPACES,_SEEDS,workspace_key
     raw,frozen,system=context();inp=SessionInput.model_validate(raw)
+    atomic_json(HERE/'execution_environment.json',dict(interpreter=sys.executable,python=sys.version,
+        platform=platform.platform(),processor=platform.processor(),numpy=np.__version__,
+        scipy=scipy.__version__,casadi=ca.__version__,mujoco=mujoco.__version__,derivative_evaluation_threads=1,
+        blas_environment={k:os.environ.get(k) for k in ('OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS')}))
     start=time.perf_counter();functions=functions_for(expression_from_system(system))
     graph_s=time.perf_counter()-start;print('dynamics graph',graph_s,flush=True)
     n=12;xinitial=np.zeros(24);u=np.array(frozen['u0_n']);h=.01
@@ -200,7 +205,7 @@ def dynamic():
             tip_difference_m=float(np.linalg.norm(tip(predicted)-tip(trusted.y[:,-1]))))
         verification['model_source_sha256']=model_hash
         atomic_json(HERE/'prediction_interval.json',verification);print('interval check',verification['tip_difference_m'],flush=True)
-    p=GVSTrajectoryParameters(horizon=35,evaluation_threads=4)
+    p=GVSTrajectoryParameters(horizon=5,evaluation_threads=1,max_cpu_s=120.)
     if (HERE/'offline_trajectory.json').exists():
         solved=read(HERE/'offline_trajectory.json')
         print('Reusing saved offline solution',flush=True)
@@ -208,15 +213,25 @@ def dynamic():
         workspace=TrajectoryWorkspace(inp.task,inp.robot,p,system.x0,system.u0)
         workspace.solver.parameters=workspace.solver.parameters.model_copy(update={'print_level':5})
         print('offline assembly',workspace.graph_s,flush=True)
-        solved=workspace.solve(xinitial,u)
+        # Reproduction reuses this archived, physically identical candidate;
+        # it need not repeat the unsuccessful cold-start computation.
+        warm_path=Path(__file__).resolve().parent/'offline_scaled_candidate.json'
+        warm=read(warm_path)
+        solved=workspace.solve(xinitial,u,warm=warm)
+        solved['warm_start_source']=str(warm_path.relative_to(ROOT))
         solved['outputs_world_m']=[tip(x).tolist() for x in solved['states']]
         solved['parameters']=p.model_dump(mode='json')
         atomic_json(HERE/'offline_trajectory.json',solved)
     print('offline solve',solved['result']['status'],solved['result']['constraint_violation'],solved['total_s'],flush=True)
+    execution_tensions=list(solved['tensions'])
+    execution_tensions += [execution_tensions[-1]]*(round(inp.task.timing.duration_s/h)-len(execution_tensions))
+    atomic_json(HERE/'offline_execution_sequence.json',dict(tensions=execution_tensions,
+        optimized_intervals=len(solved['tensions']),total_intervals=len(execution_tensions),period_s=h,
+        continuation='Hold the last optimized tension through the authoritative task duration. Only the prefix is optimized.'))
     # Replay the held sequence with independent adaptive integration.
     start=time.perf_counter();states=[xinitial];integration_calls=0
     cached_replay=(HERE/'offline_gvs_replay.json').exists()
-    for command in ([] if cached_replay else solved['tensions']):
+    for command in ([] if cached_replay else execution_tensions):
         interval=solve_ivp(lambda t,x:rhs(t,x,command),(0,h),states[-1],method='BDF',
             rtol=2e-6,atol=1e-8)
         if not interval.success:raise RuntimeError(interval.message)
@@ -229,27 +244,26 @@ def dynamic():
     else:atomic_json(HERE/'offline_gvs_replay.json',replay)
     print('GVS replay',replay['terminal_error_m'],flush=True)
     # Replay through the real backend with the same observation/hold loop.
-    if not (HERE/'offline_backend_replay.json').exists():replay_backend(inp,solved['tensions'],frozen)
-    parameters=GVSTrajectoryParameters(horizon=10,evaluation_threads=4)
+    if not (HERE/'offline_backend_replay.json').exists():replay_backend(inp,execution_tensions,frozen)
+    parameters=GVSTrajectoryParameters(horizon=5,max_iterations=40,evaluation_threads=1,max_cpu_s=120.)
     mpc=TrajectoryWorkspace(inp.task,inp.robot,parameters,system.x0,system.u0)
     mpc.solver.parameters=mpc.solver.parameters.model_copy(update={'print_level':5})
     key=workspace_key(inp.task,inp.robot,parameters);_WORKSPACES[key]=mpc
-    # The first solve uses the unshifted offline prefix; solve() shifts seeds by
-    # one interval, so prepend the initial sample and first input here.
-    _SEEDS[key]=dict(states=[solved['states'][0],*solved['states'][:10]],
-        tensions=[solved['tensions'][0],*solved['tensions'][:9]])
+    # Explicit seeds are unshifted; only a workspace's previous solution shifts.
+    _SEEDS[key]=dict(states=solved['states'][:parameters.horizon+1],tensions=solved['tensions'][:parameters.horizon])
     raw['policy']['controller']=dict(extension_id='controller.gvs_nmpc',parameters=dict(
         contract='family.gvs_trajectory_parameters',data=parameters.model_dump(mode='json')))
     raw['policy']['candidate_builder']['parameters']['data']['control_parameters']={}
     raw['task']['initializer']['parameters']['data']=dict(qpos_rad={},qvel_rad_s={})
-    summary=public_run(raw,'nmpc_task')
+    summary=public_run(raw,'nmpc_task',run_suffix='-feasible')
     observations=summary['observations'];times=[o['optimization_solve_s'] for o in observations if o['optimization_solve_s'] is not None]
     atomic_json(HERE/'nmpc_summary.json',dict(terminal_error_m=summary['terminal_error_m'],
         evaluation=summary['evaluation'],solver_failures=sum(o['solver_failed'] for o in observations),
         fallback_uses=sum(o['failure_response_used'] for o in observations),
+        feasible_suboptimal_updates=sum(o['feasible_suboptimal_update'] for o in observations),
         deadline_misses=sum(o['deadline_missed'] for o in observations),solve_times_s=times,
         mean_solve_s=float(np.mean(times)) if times else None,maximum_solve_s=max(times) if times else None,
-        graph_construction_s=mpc.graph_s,wall_s=summary['wall_s']))
+        graph_construction_s=mpc.graph_s,wall_s=summary['wall_s'],parameters=parameters.model_dump(mode='json')))
 
 
 def replay_backend(inp,tensions,frozen):
@@ -284,7 +298,8 @@ def finalize():
     physics=read(folder/'resolved_physics.json');scene=read(folder/'experiment_scene.json')
     replay=read(HERE/'offline_backend_replay.json');trajectory=read(HERE/'offline_trajectory.json')
     with gzip.open(HERE/'offline_backend/trajectory.json.gz','rt',encoding='utf8') as stream:rows=json.load(stream)
-    sequence_identity=digest(trajectory['tensions'])
+    execution=read(HERE/'offline_execution_sequence.json')
+    sequence_identity=digest(execution['tensions'])
     result=BackendResult(solver_status='completed' if replay['complete'] else 'failed',
         backend_id='backend.family_mujoco',model_id='mujoco_serial_bending_v1',
         signals=export(rows,physics,True,'ideal_tension'),
@@ -301,13 +316,13 @@ def finalize():
     atomic_json(HERE/'offline_backend_result.json',result.model_dump(mode='json'))
     atomic_json(HERE/'offline_backend_evaluation.json',evaluation.model_dump(mode='json'))
     residuals=np.array(trajectory['diagnostics']['constraint_values']).reshape(-1,24)
-    commanded=np.array([row['desired_tension_n'] for row in rows]);predicted=np.array(trajectory['tensions'])
+    commanded=np.array([row['desired_tension_n'] for row in rows]);predicted=np.array(execution['tensions'])
     gvs=read(HERE/'offline_gvs_replay.json');nmpc=read(HERE/'nmpc_task.json');observations=nmpc['observations']
     consistency=dict(offline_q_dynamics_residual_max_rad_m=float(np.max(abs(residuals[:,:12]))*10),
         offline_force_dynamics_residual_max=float(np.max(abs(residuals[:,12:]))*.001),
         measured_initial_equality_max=float(np.max(abs(np.array(trajectory['states'][0])))),
         replay_held_tension_difference_max_n=float(np.max(abs(commanded-predicted))),
-        offline_prediction_to_gvs_replay_max_tip_m=float(np.max(np.linalg.norm(np.array(trajectory['outputs_world_m'])-gvs['outputs_world_m'],axis=1))),
+        offline_prediction_to_gvs_replay_max_tip_m=float(np.max(np.linalg.norm(np.array(trajectory['outputs_world_m'])-np.array(gvs['outputs_world_m'])[:len(trajectory['outputs_world_m'])],axis=1))),
         nmpc_update_count=len(observations),nmpc_update_times_s=[o['time_s'] for o in observations],
         physics_steps=read(ROOT/nmpc['backend_folder']/'result.json')['data']['data']['numerical_steps'],
         identical_straight_initial_condition=bool(np.max(abs(observations[0]['measured_initial_state']))==0),

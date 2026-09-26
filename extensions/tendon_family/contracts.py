@@ -981,6 +981,9 @@ class GVSDescription(Contract):
 
 
 class GVSTrajectoryParameters(Contract):
+    curvature_scale_rad_m: FiniteFloat = Field(default=10.,gt=0)
+    rate_scale_rad_m_s: FiniteFloat = Field(default=1000.,gt=0)
+    max_cpu_s: FiniteFloat | None = Field(default=None,gt=0)
     basis: GVSBasisSpecification = Field(default_factory=lambda:GVSBasisSpecification(strategy='structural_linear'))
     horizon: int = Field(default=10,ge=1,le=100)
     substeps: int = Field(default=1,ge=1,le=8)

@@ -122,9 +122,12 @@ class IpoptSolver:
             'ipopt.hessian_approximation': self.parameters.hessian_approximation,
             'print_time': False,
         }
+        if self.parameters.max_cpu_s is not None:
+            options['ipopt.max_cpu_time']=float(self.parameters.max_cpu_s)
         cache_key=(bundle.expression_digest,bundle.serialized_function,problem.objective.direction)
         cached=cache_key in self._compiled
         if not cached:
+            if self.parameters.print_level:print('IPOPT constructing solver',flush=True)
             shared=_EXPRESSION_FUNCTIONS.get(bundle.expression_digest)
             function=(shared[1] if shared is not None and shared[0]==bundle.serialized_function
                       else ca.Function.deserialize(bundle.serialized_function))
@@ -139,6 +142,7 @@ class IpoptSolver:
             self._compiled[cache_key]=(function,solver)
         function,solver=self._compiled[cache_key]
         construction_s=time.perf_counter()-construction_start
+        if self.parameters.print_level:print('IPOPT solver ready',construction_s,'cached',cached,flush=True)
         lbx, ubx, x0 = self._bounds(problem, bundle.variable_order)
         lbg = [-math.inf if item.lower is None else item.lower for item in problem.constraints]
         ubg = [math.inf if item.upper is None else item.upper for item in problem.constraints]

@@ -29,6 +29,7 @@ class CasadiNLPSelector(Contract):
 
 
 class IpoptParameters(Contract):
+    max_cpu_s: FiniteFloat | None = Field(default=None, gt=0)
     max_iterations: int = Field(default=300, ge=1, le=10000)
     tolerance: FiniteFloat = Field(default=1e-8, gt=0)
     acceptable_tolerance: FiniteFloat = Field(default=1e-6, gt=0)
