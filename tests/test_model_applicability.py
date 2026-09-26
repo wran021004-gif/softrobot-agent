@@ -26,6 +26,43 @@ class ModelApplicabilityTests(unittest.TestCase):
     def setUpClass(cls):
         cls.reg = registry()
 
+    def test_local_evidence_requires_actual_task_environment(self):
+        from schemas.platform import EvidenceRef
+        from schemas.platform_math import ModelAgreementEvidence
+        from tools.state_io import digest
+
+        inp = context(example_design())
+        model = binding('model.gvs', 'family.gvs_model')
+        basis = resolve_basis(inp.robot.structure.data)
+        item = ModelAgreementEvidence(
+            design_identity=digest(Design.model_validate(inp.robot.structure.data).model_dump(mode='json')),
+            model_bindings=[model],
+            representation_ids={'model.gvs': digest(basis.model_dump(mode='json'))},
+            numerical_settings={'gvs': GVSModelParameters().model_dump(mode='json')},
+            mapping_convention='backend_discrete_to_gvs_integrated_v2',
+            reference_state_input={'q': [0.] * basis.dimension},
+            environment=inp.task.environment.data,
+            measured_uses=['shape_prediction'],
+            metrics={'tip': dict(absolute_error=0., relative_error=None, units='m', norm='Euclidean')},
+            sources=[], source_locations=[], limitations=['Synthetic single-state test fixture.'])
+        ref = EvidenceRef(artifact_id=digest(item.model_dump(mode='json')))
+        scope = {key: getattr(item, key) for key in
+                 ('numerical_settings', 'mapping_convention', 'reference_state_input', 'environment')}
+
+        def assess(task):
+            return assess_model_uses(inp.robot, task, model,
+                ['shape_prediction', 'local_model_control'], evidence=[ref],
+                evidence_loader=lambda _: item, evidence_context=scope, registry=self.reg)
+
+        matched = assess(inp.task)
+        self.assertEqual(matched.uses['shape_prediction'].validation, 'measured_local')
+        self.assertEqual(matched.uses['local_model_control'].validation, 'unavailable')
+        changed = deepcopy(inp.task.environment.data)
+        changed['mount']['position_m'][2] += .1
+        task = inp.task.model_copy(update={'environment': inp.task.environment.model_copy(update={'data': changed})})
+        # Reusing the historical query context cannot validate a changed mount.
+        self.assertEqual(assess(task).uses['shape_prediction'].validation, 'unavailable')
+
     def test_pcc_keeps_capability_and_use_verdicts_separate(self):
         inp = context(example_design())
         model = binding('model.pcc', 'family.pcc_model')

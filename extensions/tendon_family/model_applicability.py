@@ -185,6 +185,7 @@ def assess_model_uses(robot: RobotDescription, task: TaskDefinition, model: Bind
             for ref in evidence:
                 item = ModelAgreementEvidence.model_validate(evidence_loader(ref))
                 if (item.design_identity == digest(design.model_dump(mode='json'))
+                    and Assembly.model_validate(item.environment) == assembly
                     and any(b.extension_id==model_id and b.version==definition.version
                         and reg.bind(b,'dynamics_model')[1].model_dump(mode='json')==parameters.model_dump(mode='json')
                         for b in item.model_bindings)

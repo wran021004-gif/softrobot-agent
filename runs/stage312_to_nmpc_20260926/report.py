@@ -170,6 +170,8 @@ def main():
         d=read('dynamics_cost.json');lines += ['',f"Current graph check: Christoffel bias finite-difference maximum error {d['christoffel_finite_difference_max_error']:.6g}; A/B maximum differences from saved matrices {d['saved_A_max_error']:.6g} / {d['saved_B_max_error']:.6g} (rtol=1e-8, atol=1e-5). Graph construction {d['graph_s']:.4f} s; full dynamics call {d['call_s']:.4f} s; derivative construction plus first call {d['derivative_construction_and_call_s']:.4f} s."]
     if (HERE/'operating_point_current.json').exists():
         d=read('operating_point_current.json');lines += ['',f"Stable small-angle evaluation changes the saved point's numerical acceleration residual. The separately saved precision-refinement artifact moves q by {d['q_change_norm']:.6g} rad/m and reduces the residual to {d['drift_inf']:.6g}. Reproduction uses this derived point for sampled synthesis, while preserving frozen historical matrices and initial states. The archived local/backend results were obtained before this numerical-only refinement."]
+    if (HERE/'CHECKOUT_REVIEW.md').exists():
+        lines += ['', 'The subsequent [checkout verification](CHECKOUT_REVIEW.md) reproduces the saved-matrix radii without a new simulation and records the task-environment evidence-matching correction and its focused regression check.']
     (HERE/'implementation_report.md').write_text('\n'.join(lines)+'\n',encoding='utf8')
 
 

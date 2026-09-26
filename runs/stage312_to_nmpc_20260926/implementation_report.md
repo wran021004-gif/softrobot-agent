@@ -131,3 +131,5 @@ Agreement covers one fixed state, basis, design and numerical configuration. Loc
 Current graph check: Christoffel bias finite-difference maximum error 5.45138e-17; A/B maximum differences from saved matrices 1.34644e-05 / 4.6764e-07 (rtol=1e-8, atol=1e-5). Graph construction 1.1649 s; full dynamics call 0.0377 s; derivative construction plus first call 9.0441 s.
 
 Stable small-angle evaluation changes the saved point's numerical acceleration residual. The separately saved precision-refinement artifact moves q by 2.07429e-12 rad/m and reduces the residual to 1.28921e-08. Reproduction uses this derived point for sampled synthesis, while preserving frozen historical matrices and initial states. The archived local/backend results were obtained before this numerical-only refinement.
+
+The subsequent [checkout verification](CHECKOUT_REVIEW.md) reproduces the saved-matrix radii without a new simulation and records the task-environment evidence-matching correction and its focused regression check.
