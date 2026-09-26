@@ -1,0 +1,11 @@
+{
+  "numerically_valid": false,
+  "failure_time_s": 0.236,
+  "last_valid_observation_time_s": 0.23,
+  "warning": "Nan, Inf or huge value in QVEL at DOF 0. The simulation is unstable. Time = 0.2360.",
+  "source_log": "dynamic_iterate_warm.log",
+  "source_line": 1097,
+  "finding": "MuJoCo reset the state during the interval [0.23, 0.24]. The running backend checked BADQACC only and continued after BADQVEL. Post-reset observations are diagnostic only, not a valid task trajectory.",
+  "correction": "Backend now checks BADQPOS/BADQVEL/BADQACC, nonfinite states and time reset after every physics step. A focused real-engine velocity-reset test passes. No new full-task solve is performed.",
+  "artifact_policy": "Preserve raw public result and evaluation. Derive a failed BackendResult and reevaluate with the same authoritative evaluator."
+}

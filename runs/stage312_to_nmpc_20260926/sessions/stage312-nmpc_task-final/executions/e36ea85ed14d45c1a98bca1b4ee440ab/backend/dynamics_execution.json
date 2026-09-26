@@ -1,0 +1,44 @@
+{
+  "dynamics_model_id": "model.serial_bending_cells",
+  "dynamics_model_version": "1.0.0",
+  "dynamics_model": {
+    "model_id": "serial_bending_cells_v1",
+    "coordinates": "two_principal_bending_angles_per_cell",
+    "equations": "serial_rigid_body_dynamics_with_hinge_bending",
+    "tendon_model": "straight_frictionless_length_servo",
+    "included": [
+      "rigid_body_inertia",
+      "gravity",
+      "hinge_elasticity",
+      "hinge_damping",
+      "external_body_forces"
+    ],
+    "omitted": [
+      "axial_stretch",
+      "shear",
+      "material_torsion",
+      "tendon_friction",
+      "rope_elasticity",
+      "motor_dynamics",
+      "self_collision"
+    ]
+  },
+  "dynamics_model_identity": "1eff34702875c584c44cb607f6943d28f4c99b176ea8661cf02ec1358bd0d85f",
+  "backend_id": "backend.family_mujoco",
+  "backend_version": "1.1.0",
+  "implementation_model_id": "mujoco_serial_bending_v1",
+  "implementation": "MuJoCo articulated rigid-body dynamics",
+  "numerical_configuration": {
+    "integrator": "implicitfast",
+    "timestep_source": "task.timing.timestep_s",
+    "contact_model": "mujoco_convex_native",
+    "friction": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "selection_source": "ExperimentPolicy.dynamics_model",
+  "contact_semantics": "MuJoCo convex native contact",
+  "identity": "ee3f72d465d71cfe4d20ffd25544f2bba28679373fa5270e3920f8416a430c4f"
+}

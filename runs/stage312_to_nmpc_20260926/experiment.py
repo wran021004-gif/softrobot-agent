@@ -255,15 +255,21 @@ def dynamic():
         contract='family.gvs_trajectory_parameters',data=parameters.model_dump(mode='json')))
     raw['policy']['candidate_builder']['parameters']['data']['control_parameters']={}
     raw['task']['initializer']['parameters']['data']=dict(qpos_rad={},qvel_rad_s={})
-    summary=public_run(raw,'nmpc_task',run_suffix='-feasible')
+    summary=public_run(raw,'nmpc_task',run_suffix='-iterate-warm')
+    save_nmpc_summary(summary,parameters.model_dump(mode='json'),mpc.graph_s)
+
+
+def save_nmpc_summary(summary,parameters,graph_s):
     observations=summary['observations'];times=[o['optimization_solve_s'] for o in observations if o['optimization_solve_s'] is not None]
-    atomic_json(HERE/'nmpc_summary.json',dict(terminal_error_m=summary['terminal_error_m'],
+    complete=summary['solver_status']=='completed'
+    atomic_json(HERE/'nmpc_summary.json',dict(terminal_error_m=summary['terminal_error_m'] if complete else None,
+        last_recorded_error_m=summary['terminal_error_m'],numerically_valid=complete,
         evaluation=summary['evaluation'],solver_failures=sum(o['solver_failed'] for o in observations),
         fallback_uses=sum(o['failure_response_used'] for o in observations),
         feasible_suboptimal_updates=sum(o['feasible_suboptimal_update'] for o in observations),
         deadline_misses=sum(o['deadline_missed'] for o in observations),solve_times_s=times,
         mean_solve_s=float(np.mean(times)) if times else None,maximum_solve_s=max(times) if times else None,
-        graph_construction_s=mpc.graph_s,wall_s=summary['wall_s'],parameters=parameters.model_dump(mode='json')))
+        graph_construction_s=graph_s,wall_s=summary['wall_s'],parameters=parameters))
 
 
 def replay_backend(inp,tensions,frozen):
@@ -315,9 +321,53 @@ def finalize():
     evaluation=evaluator(inp.task,result,source,reg,digest(dict(task=inp.task.model_dump(mode='json'),source=source.model_dump())))
     atomic_json(HERE/'offline_backend_result.json',result.model_dump(mode='json'))
     atomic_json(HERE/'offline_backend_evaluation.json',evaluation.model_dump(mode='json'))
+    print('offline backend task_success',evaluation.task_success,flush=True)
+    if not (HERE/'nmpc_task.json').exists() and (HERE/'nmpc_task_simulation_receipt.json').exists():
+        receipt=read(HERE/'nmpc_task_simulation_receipt.json')
+        if receipt['execution_status']=='completed':
+            # Read-only recovery after the public evaluation correctly rejected
+            # changed session dependencies. Do not alter its rejection receipt.
+            result_path=next((HERE/'sessions').glob('*/executions/'+receipt['execution_id']+'/backend/result.json'))
+            folder=result_path.parent;original=BackendResult.model_validate(read(result_path))
+            with db.transaction() as conn:original_ref=db.put(conn,original)
+            raw_evaluation=evaluator(inp.task,original,original_ref,reg,digest(dict(task=inp.task.model_dump(mode='json'),source=original_ref.model_dump())))
+            atomic_json(HERE/'nmpc_raw_evaluation.json',raw_evaluation.model_dump(mode='json'))
+            with gzip.open(folder/'trajectory.json.gz','rt',encoding='utf8') as stream:nmpc_rows=json.load(stream)
+            observations=read(folder/'controller_observations.json')
+            summary=summarize(nmpc_rows,observations,read(folder/'resolved_physics.json'),
+                ResolvedGVSBasis.model_validate(frozen['resolved_basis']),inp.task.goal.data['target_m'],frozen['q0'])
+            summary.update(evaluation=raw_evaluation.model_dump(mode='json'),solver_status=original.solver_status,
+                wall_s=receipt['charged']['wall_s'],backend_folder=str(folder.relative_to(ROOT)),
+                timings=original.data.data['timings_s'],observations=observations,
+                evaluation_provenance='Registry evaluate.reach on saved output; public evaluation receipt remains DEPENDENCIES_CHANGED rejection. Numerical review below supersedes raw task scoring.')
+            atomic_json(HERE/'nmpc_task.json',summary)
+            save_nmpc_summary(summary,read(folder/'control_spec.json')['effective_parameters'],observations[0]['graph_construction_s'])
+    if not (HERE/'nmpc_task.json').exists():
+        print('NMPC still running; final execution checks remain pending.',flush=True)
+        return
     residuals=np.array(trajectory['diagnostics']['constraint_values']).reshape(-1,24)
     commanded=np.array([row['desired_tension_n'] for row in rows]);predicted=np.array(execution['tensions'])
     gvs=read(HERE/'offline_gvs_replay.json');nmpc=read(HERE/'nmpc_task.json');observations=nmpc['observations']
+    if (HERE/'numerical_reset_review.json').exists():
+        # The first experiment exposed a pre-existing BADQVEL reset-detection
+        # gap. Preserve its raw public result; mark a separate derived result
+        # failed and use the identical evaluator. Never score post-reset motion.
+        review=read(HERE/'numerical_reset_review.json')
+        original=BackendResult.model_validate(read(ROOT/nmpc['backend_folder']/'result.json'))
+        data=deepcopy(original.data.data);data['reason']='MUJOCO_NUMERICAL_FAILURE_BADQVEL_RESET'
+        derived=original.model_copy(update=dict(solver_status='failed',
+            data=original.data.model_copy(update={'data':data}),
+            limitations=original.limitations+[review['finding']]))
+        with db.transaction() as conn:derived_ref=db.put(conn,derived)
+        assessment=evaluator(inp.task,derived,derived_ref,reg,digest(dict(task=inp.task.model_dump(mode='json'),source=derived_ref.model_dump())))
+        atomic_json(HERE/'nmpc_numerically_reviewed_result.json',derived.model_dump(mode='json'))
+        atomic_json(HERE/'nmpc_numerically_reviewed_evaluation.json',assessment.model_dump(mode='json'))
+        reviewed_summary=read(HERE/'nmpc_summary.json')
+        reviewed_summary.update(numerically_valid=False,terminal_error_m=None,
+            raw_post_reset_endpoint_error_m=nmpc['terminal_error_m'],
+            raw_evaluation=nmpc['evaluation'],evaluation=assessment.model_dump(mode='json'),
+            numerical_failure_time_s=review['failure_time_s'],last_valid_observation_time_s=review['last_valid_observation_time_s'])
+        atomic_json(HERE/'nmpc_summary.json',reviewed_summary)
     consistency=dict(offline_q_dynamics_residual_max_rad_m=float(np.max(abs(residuals[:,:12]))*10),
         offline_force_dynamics_residual_max=float(np.max(abs(residuals[:,12:]))*.001),
         measured_initial_equality_max=float(np.max(abs(np.array(trajectory['states'][0])))),
@@ -325,10 +375,9 @@ def finalize():
         offline_prediction_to_gvs_replay_max_tip_m=float(np.max(np.linalg.norm(np.array(trajectory['outputs_world_m'])-np.array(gvs['outputs_world_m'])[:len(trajectory['outputs_world_m'])],axis=1))),
         nmpc_update_count=len(observations),nmpc_update_times_s=[o['time_s'] for o in observations],
         physics_steps=read(ROOT/nmpc['backend_folder']/'result.json')['data']['data']['numerical_steps'],
-        identical_straight_initial_condition=bool(np.max(abs(observations[0]['measured_initial_state']))==0),
+        identical_straight_initial_condition=bool(np.max(abs(np.asarray(observations[0]['measured_initial_state'])))==0),
         final_current_sampled_build=read(HERE/'sampled_current_build.json') if (HERE/'sampled_current_build.json').exists() else None)
     atomic_json(HERE/'execution_checks.json',consistency)
-    print('offline backend task_success',evaluation.task_success,flush=True)
 
 
 if __name__=='__main__':
