@@ -21,6 +21,8 @@ REQUIRED_CONSTRAINTS = {
 
 def skill_content_hash(skill):
     data = Skill.model_validate(skill).model_dump(mode="json", exclude={"status", "human_approval", "deprecated_by"})
+    if data['applicability'].get('execution_scope') is None:
+        data['applicability'].pop('execution_scope', None)
     return hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 
@@ -29,6 +31,8 @@ def strategy_hash(skill):
     fields = {"skill_id", "version", "trigger_signature", "when_to_apply", "when_not_to_apply", "applicability",
               "required_tools", "strategy", "negative_constraints", "requires_new_physics", "causal_claim", "authority"}
     data = Skill.model_validate(skill).model_dump(mode="json", include=fields)
+    if data['applicability'].get('execution_scope') is None:
+        data['applicability'].pop('execution_scope', None)
     return hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 

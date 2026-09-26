@@ -139,7 +139,8 @@ def apply(inp, parameters, changes):
     if result.status != 'valid': raise ValueError(result.status.upper()+': '+str(result.reason))
     from .contracts import Control, GVSLQRControl
     from .contracts import GVSTrajectoryParameters
-    control_type=GVSTrajectoryParameters if inp.policy.controller.extension_id=='controller.gvs_nmpc' else GVSLQRControl if inp.policy.controller.extension_id in ('controller.gvs_lqr','controller.gvs_sampled_lqr') else Control
+    from .gvs_profile import ProfileControl
+    control_type=ProfileControl if (inp.policy.controller.extension_id=='controller.gvs_nmpc' and inp.policy.controller.version=='2.0.0') else GVSTrajectoryParameters if inp.policy.controller.extension_id=='controller.gvs_nmpc' else GVSLQRControl if inp.policy.controller.extension_id in ('controller.gvs_lqr','controller.gvs_sampled_lqr') else Control
     control=control_type.model_validate(inp.policy.controller.parameters.data).model_dump(mode='json')
     for path,value in changes.items():
         if path.startswith('control/'):

@@ -84,6 +84,9 @@ def simulate(ctx, args):
     controller = controller_def.resolve()(parameters, inp.task.timing.control_period_s)
     ctx.record('simulation', 'started', candidate=args.candidate_id)
     try:
+        prepare = controller_def.hook('prepare_execution')
+        if prepare:
+            prepare(ctx, controller, inp)
         backend.compile(inp, ctx.reg)
         backend.initialize(Payload.model_validate(ctx.snapshot['initial']), controller)
         result = backend.run(folder=ctx.folder / 'backend', timeout_s=inp.policy.timeout_s)

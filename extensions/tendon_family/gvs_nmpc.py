@@ -20,13 +20,18 @@ def workspace_key(task,robot,parameters):
 
 
 def resolve_gvs_nmpc_control(inp,physics):
-    p=GVSTrajectoryParameters.model_validate(inp.policy.controller.parameters.data)
-    from .gvs_lqr import _candidate_operating_point
-    # Operating point supplies a nominal reference and initial seed only.
-    nominal_parameters=inp.policy.controller.parameters.model_copy(update={'data':{'basis':p.basis.model_dump(mode='json')}})
-    nominal_controller=inp.policy.controller.model_copy(update={'parameters':nominal_parameters})
-    nominal=inp.model_copy(update={'policy':inp.policy.model_copy(update={'controller':nominal_controller})})
-    point=_candidate_operating_point(nominal)
+    if inp.policy.controller.version == '2.0.0':
+        from .gvs_profile import checked_profile
+        profile=checked_profile(inp)
+        p=GVSTrajectoryParameters.model_validate(profile['parameters'])
+        point=profile['numerical']['nominal']
+    else:
+        p=GVSTrajectoryParameters.model_validate(inp.policy.controller.parameters.data)
+        from .gvs_lqr import _candidate_operating_point
+        nominal_parameters=inp.policy.controller.parameters.model_copy(update={'data':{'basis':p.basis.model_dump(mode='json')}})
+        nominal_controller=inp.policy.controller.model_copy(update={'parameters':nominal_parameters})
+        nominal=inp.model_copy(update={'policy':inp.policy.model_copy(update={'controller':nominal_controller})})
+        point=_candidate_operating_point(nominal)
     basis=resolve_basis(inp.robot.structure.data,p.basis)
     plan=dict(mode='gvs_nmpc',tension_execution_mode='ideal_tension',
         robot=inp.robot.model_dump(mode='json'),task=inp.task.model_dump(mode='json'),
@@ -37,6 +42,9 @@ def resolve_gvs_nmpc_control(inp,physics):
             physics_step_s=inp.task.timing.timestep_s,observation='interval_start_pre_step'),
         plan_acceptance='Independently feasible converged, iteration-limited or intentional early-stop plans. Early stops are suboptimal, not convergence or solver errors; raw termination is retained.',
         failure_response='Hold last bounded tension on an unusable solve (clipped nominal initially); stop after max_unusable_updates consecutive unusable updates. Every applied hold is recorded.')
+    if inp.policy.controller.version == '2.0.0':
+        plan['profile_id']=profile['profile_id']
+        plan['numerical_reference']=profile['numerical_reference']
     plan['identity']=digest(plan)
     return plan
 
@@ -54,10 +62,16 @@ class GVSNMPCController:
         self.previous=np.clip(plan['reference']['u0'],0,self.limits)
         robot=RobotDescription.model_validate(plan['robot']);task=TaskDefinition.model_validate(plan['task'])
         key=workspace_key(task,robot,self.parameters)
-        if key not in _WORKSPACES:
-            _WORKSPACES[key]=TrajectoryWorkspace(task,robot,self.parameters,
+        if hasattr(self,'profile'):
+            self.workspace=TrajectoryWorkspace(task,robot,self.parameters,
                 [*plan['reference']['q0'],*([0.]*len(self.coordinate_order))],plan['reference']['u0'])
-        self.workspace=_WORKSPACES[key];self.seed=_SEEDS.get(key)
+            from copy import deepcopy
+            self.seed=deepcopy(self.profile['numerical']['warm_guess'])
+        else:
+            if key not in _WORKSPACES:
+                _WORKSPACES[key]=TrajectoryWorkspace(task,robot,self.parameters,
+                    [*plan['reference']['q0'],*([0.]*len(self.coordinate_order))],plan['reference']['u0'])
+            self.workspace=_WORKSPACES[key];self.seed=_SEEDS.get(key)
         # A failed first update must not discard the available offline seed.
         # It remains only an optimization guess, never a fallback command.
         self.workspace.last=self.seed
@@ -78,7 +92,7 @@ class GVSNMPCController:
         self.previous=np.asarray(command).copy();elapsed=time.perf_counter()-start
         converged=solved is not None and solved['optimization_converged']
         intentional=solved is not None and solved['result']['status']=='feasible_early_stop'
-        self.last={**bridge,'solver_failed':not success or (not converged and not intentional),
+        self.last={**bridge,'plan_accepted':success,'solver_failed':not success or (not converged and not intentional),
             'optimization_nonconverged':not converged,'failure_response_used':not success and not self.stop_requested,
             'feasible_suboptimal_update':success and not converged,
             'solver_error':error,'optimization_status':None if solved is None else solved['result']['status'],
@@ -98,3 +112,12 @@ class GVSNMPCController:
             tip_position_m=geometry['tip'].tolist(),gvs_q=list(q),gvs_qdot=list(v),
             measured_initial_state=x.tolist(),graph_construction_s=self.workspace.graph_s,**self.last))
         return command
+
+
+class ProfileNMPCController(GVSNMPCController):
+    """Explicit v2 identity: declarative preparation and execution-local workspace."""
+    def __init__(self,parameters,period_s):
+        from .gvs_profile import ProfileControl, load_profile
+        ProfileControl.model_validate(parameters)
+        self.profile=load_profile()
+        super().__init__(self.profile['parameters'],period_s)

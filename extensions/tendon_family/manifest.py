@@ -7,6 +7,7 @@ from . import legacy_scientific
 from . import optimization as opt
 from . import route
 from .contracts import GVSTrajectoryParameters
+from . import gvs_profile
 
 CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('route_policy',route.RoutePolicy),
@@ -30,6 +31,7 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('pcc_reach_assembler_parameters',c.PCCReachAssemblerParameters),
     ('gvs_inverse_assembler_parameters',c.GVSInverseAssemblerParameters),]]
 CONTRACTS += [
+    ('family.gvs_profile_control','1.0.0',gvs_profile.ProfileControl),
     ('family.gvs_trajectory_parameters','1.0.0',GVSTrajectoryParameters),
     ('family.pcc_forward_request', '2.0.0', c.PCCForwardRequestV2),
     ('family.pcc_kinematics_result', '2.0.0', c.PCCKinematicsResultV2),
@@ -62,6 +64,8 @@ PCC_SOURCES=(*SOURCES,'extensions/tendon_family/pcc.py')
 GVS_SOURCES=(*SOURCES,'extensions/tendon_family/gvs.py','extensions/tendon_family/gvs_casadi.py','extensions/tendon_family/pcc.py',
     'extensions/tendon_family/scientific_optimization.py','extensions/tendon_family/legacy_scientific.py')
 OPT_SOURCES=(*GVS_SOURCES,'extensions/optimization/contracts.py','extensions/optimization/ipopt.py','tools/platform_optimization.py')
+PROFILE_SOURCES=(*OPT_SOURCES,'extensions/tendon_family/gvs_profile.py','extensions/tendon_family/gvs_reporting.py',
+    'tools/platform_skills.py','tools/skill_policy.py','schemas/skill.py')
 MATLAB=tuple('matlab/'+n+'.m' for n in ('tf_geometry','tf_point','tf_routes','tf_terms','tf_control','tf_run','tf_observe','tf_static','tf_view'))
 COMMON=dict(sources=SOURCES,contract_dependencies=tuple((n,v) for n,v,_ in CONTRACTS))
 EXTENSIONS=[
@@ -529,3 +533,24 @@ EXTENSIONS.append(Extension('controller.gvs_nmpc','controller','1.0.0',GVSTrajec
     extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
     capabilities=dict(category='control',role='adapter',channel='actuator_commands',backend_executable=True,
         command_space='tendon_tensions',sampling='interval_start_pre_step; held for control period',reset=False,restore=False)))
+
+EXTENSIONS.append(Extension('controller.gvs_nmpc','controller','2.0.0',gvs_profile.ProfileControl,Payload,
+    'extensions.tendon_family.gvs_nmpc:ProfileNMPCController',
+    'Reusable Stage 3.15 free-reach profile: GVS predictor, MuJoCo serial execution, explicit historical numerical import and measured-state warm regeneration. Offline ideal tension only.',
+    sources=PROFILE_SOURCES,assets=(gvs_profile.ASSET,),contract_dependencies=COMMON['contract_dependencies'],
+    dependencies=('numpy','scipy','casadi'),extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
+    capabilities=dict(category='control',role='adapter',channel='actuator_commands',backend_executable=True,
+        command_space='tendon_tensions',sampling='interval_start_pre_step; held for control period',reset=False,restore=False,
+        profile_id=gvs_profile.PROFILE_ID,predictor='model.gvs',execution_model='model.serial_bending_cells',
+        historical_cost='Stage 3.15 mean delivery 25.073 s per 0.01 s interval; all deadlines missed',
+        discovery_tool='control.profile_describe',prepare_execution='extensions.tendon_family.gvs_profile:prepare_execution')))
+for name,schema,binding,description in (
+    ('control.profile_describe',gvs_profile.ProfileControl,'extensions.tendon_family.gvs_profile:describe',
+     'Import declared historical numerical artifacts into this Store and describe the fixed free-reach profile, scope, evidence and historical cost; zero solves.'),
+    ('control.profile_declare_strategy',gvs_profile.ProfileStrategyRequest,'extensions.tendon_family.gvs_profile:declare_strategy',
+     'Bind a candidate strategy and its exact scope before executing this profile; zero solves.'),
+    ('control.profile_report',gvs_profile.ProfileReportRequest,'extensions.tendon_family.gvs_reporting:report',
+     'Summarize sealed public simulation/evaluation evidence, sampled settling, raw solve status, initialization selection, failure response and delivery cost; validate a predeclared strategy; zero solves.')):
+    EXTENSIONS.append(Extension(name,'tool','1.0.0',schema,gvs_profile.ProfileOutput,binding,description,
+        sources=PROFILE_SOURCES,assets=(gvs_profile.ASSET,),dependencies=('numpy','mujoco'),
+        side_effects='artifact_store',capabilities=dict(category='control',role='public_tool',route_visible=True,backend_solves=0)))

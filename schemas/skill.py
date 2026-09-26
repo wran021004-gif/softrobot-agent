@@ -29,6 +29,7 @@ class Applicability(Contract):
     task_types: tuple[Identifier, ...] = Field(min_length=1)
     model_levels: tuple[Literal["M0", "M1", "M2", "M3"], ...] = Field(min_length=1)
     control_levels: tuple[Literal["C0", "C1", "C2", "C3"], ...] = Field(min_length=1)
+    execution_scope: dict | None = None
 
 
 class MetricPredicate(Contract):

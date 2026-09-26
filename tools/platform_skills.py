@@ -51,7 +51,14 @@ def library(host):
     def validate(skill, root):
         if skill.provenance.source_findings:
             raise ValueError('PLATFORM_FINDING_ADAPTER_REQUIRED')
-        return validate_skill(skill, root, evidence_store=PlatformEvidenceStore(host), tool_manifests=manifests, robot_families=[family])
+        checked=validate_skill(skill, root, evidence_store=PlatformEvidenceStore(host), tool_manifests=manifests, robot_families=[family])
+        if checked.applicability.execution_scope is not None:
+            for record in checked.validation:
+                for run_id in (*record.validated_runs, *record.failed_validation_runs):
+                    source=host.store.session(run_id)['snapshot']['input']
+                    if scope_match(checked.applicability.execution_scope, source)!='matching':
+                        raise ValueError('SKILL_VALIDATION_EXECUTION_SCOPE_MISMATCH')
+        return checked
     return SkillRegistry(host.store.root / 'development_skills', host.store.root, validator=validate)
 
 
@@ -60,6 +67,8 @@ def applicable(host, reference):
     candidates = library(host).retrieve_skills(robot_family=inp['robot']['family'], task_type=inp['task']['family'],
         include_candidates=inp['policy']['allow_development_skills'])
     def same_model(skill):
+        if skill.applicability.execution_scope is not None:
+            return scope_match(skill.applicability.execution_scope, inp) != 'incompatible'
         # Old skill records have no explicit model-transfer scope. Keep their source
         # assumptions, never infer portability merely from a shared backend name.
         current = inp['robot']
@@ -71,5 +80,31 @@ def applicable(host, reference):
             if source['robot'] != current or source['policy']['backend'] != inp['policy']['backend']:
                 return False
         return True
-    return [s.model_dump(mode='json') for s in candidates if (reference is None or s.reference == reference)
-        and not set(s.required_tools) - set(inp['policy']['allowed_tools']) and same_model(s)]
+    records=[]
+    for s in candidates:
+        if ((reference is not None and s.reference != reference)
+                or set(s.required_tools)-set(inp['policy']['allowed_tools']) or not same_model(s)):
+            continue
+        record=s.model_dump(mode='json')
+        if s.applicability.execution_scope is not None:
+            match=scope_match(s.applicability.execution_scope, inp)
+            record['scope_assessment']=dict(match=match, validation_applies=match=='matching',
+                meaning='Only matching scope carries validation; changed configuration is an unvalidated starting point.')
+        records.append(record)
+    return records
+
+
+def scope_match(scope, inp):
+    # Scope is structured evidence metadata, never execution authorization.
+    from extensions.tendon_family.gvs_profile import execution_scope
+    current=execution_scope(inp)
+    if current == scope:
+        return 'matching'
+    if (current['robot']['family'] != scope['robot']['family']
+            or current['backend']['extension_id'] != scope['backend']['extension_id']
+            or current['execution_model'] != scope['execution_model']
+            or current['controller']['extension_id'] != scope['controller']['extension_id']
+            or current['controller']['version'] != scope['controller']['version']
+            or current['task']['family'] != scope['task']['family']):
+        return 'incompatible'
+    return 'unvalidated_starting_point'
