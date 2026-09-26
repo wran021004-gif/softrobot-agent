@@ -118,7 +118,7 @@ class TrajectoryWorkspace:
             context=SystemContext(x0=nominal_x,u0=nominal_u,scene=task.environment))
         self.graph_s=time.perf_counter()-start
         self.solver=IpoptSolver(dict(max_iterations=self.parameters.max_iterations,tolerance=self.parameters.tolerance,
-            max_cpu_s=self.parameters.max_cpu_s))
+            max_cpu_s=self.parameters.max_cpu_s,retain_feasible_iterate=True))
         self.last=None
 
     def solve(self,measured_x,previous_u,warm=None):
@@ -147,5 +147,7 @@ class TrajectoryWorkspace:
         accepted=result.status in ('converged','iteration_limit') and result.constraint_violation<=1e-5
         output['accepted']=accepted
         output['optimization_converged']=result.status=='converged'
-        if accepted:self.last=output
+        # A finite unfinished iterate is still a useful next optimization guess.
+        # Command acceptance remains the separate, stricter feasibility check.
+        if result.status in ('converged','iteration_limit'):self.last=output
         return output

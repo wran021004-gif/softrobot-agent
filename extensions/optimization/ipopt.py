@@ -24,6 +24,37 @@ SELECTOR_CONTRACT = 'optimization.casadi_nlp_selector'
 _EXPRESSION_FUNCTIONS = {}
 
 
+def _violation(x,g,lbx,ubx,lbg,ubg):
+    return float(max(np.max(np.maximum(np.asarray(lbx)-x,x-np.asarray(ubx)),initial=0.),
+        np.max(np.maximum(np.asarray(lbg)-g,g-np.asarray(ubg)),initial=0.)))
+
+
+class _FeasibleIterate(ca.Callback):
+    """Retain an iterate of this solve, never a plan from another initial state."""
+    def __init__(self,nx,ng):
+        ca.Callback.__init__(self);self.nx=nx;self.ng=ng
+        self.names=ca.nlpsol_out();self.construct('retain_feasible_iterate')
+
+    def get_n_in(self):return ca.nlpsol_n_out()
+    def get_n_out(self):return 1
+    def get_name_in(self,i):return self.names[i]
+    def get_name_out(self,i):return 'stop'
+    def get_sparsity_in(self,i):
+        name=self.names[i]
+        return ca.Sparsity.dense(self.nx if name in ('x','lam_x') else self.ng if name in ('g','lam_g') else 1 if name=='f' else 0,1)
+
+    def reset(self,lbx,ubx,lbg,ubg):
+        self.bounds=(lbx,ubx,lbg,ubg);self.best=None;self.iteration=-1
+
+    def eval(self,args):
+        self.iteration+=1;items=dict(zip(self.names,args))
+        x=np.asarray(items['x']).ravel();g=np.asarray(items['g']).ravel();objective=float(items['f'])
+        if np.isfinite(np.r_[x,g,objective]).all() and _violation(x,g,*self.bounds)<=1e-5:
+            if self.best is None or objective<self.best['objective']:
+                self.best=dict(x=x.copy(),objective=objective,iteration=self.iteration)
+        return [0]
+
+
 def expression_payload(variable_order, objective, constraints):
     """Serialize trusted MX expressions into the one format understood by IPOPT."""
     variable_order = list(variable_order)
@@ -138,27 +169,32 @@ class IpoptSolver:
             raw_objective, constraint_expression = function.call([x],True,False)
             signed_objective = raw_objective if problem.objective.direction == 'minimize' else -raw_objective
             nlp = {'x': x, 'f': signed_objective, 'g': constraint_expression}
+            selector=_FeasibleIterate(len(bundle.variable_order),len(problem.constraints)) if self.parameters.retain_feasible_iterate else None
+            if selector is not None:options['iteration_callback']=selector
             solver = ca.nlpsol('ipopt_solver', 'ipopt', nlp, options)
-            self._compiled[cache_key]=(function,solver)
-        function,solver=self._compiled[cache_key]
+            self._compiled[cache_key]=(function,solver,selector)
+        function,solver,selector=self._compiled[cache_key]
         construction_s=time.perf_counter()-construction_start
         if self.parameters.print_level:print('IPOPT solver ready',construction_s,'cached',cached,flush=True)
         lbx, ubx, x0 = self._bounds(problem, bundle.variable_order)
         lbg = [-math.inf if item.lower is None else item.lower for item in problem.constraints]
         ubg = [math.inf if item.upper is None else item.upper for item in problem.constraints]
+        if selector is not None:selector.reset(lbx,ubx,lbg,ubg)
         solve_start=time.perf_counter()
         solution = solver(x0=x0, lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
         solve_s=time.perf_counter()-solve_start
         stats = solver.stats()
         values = np.asarray(solution['x'], dtype=float).reshape(-1)
+        returned_values=values.copy();selected_iteration=None
+        if not stats.get('success') and selector is not None and selector.best is not None:
+            values=selector.best['x'];selected_iteration=selector.best['iteration']
         independent=function(x=values)
         constraint_values = np.asarray(independent['constraints'], dtype=float).reshape(-1)
         raw_value = float(independent['objective'])
-        violation = 0.0
-        for value, lo, hi in zip(constraint_values, lbg, ubg):
-            violation = max(violation, lo - value, value - hi, 0.0)
-        violation=max(violation,float(np.max(np.maximum(np.asarray(lbx)-values,values-np.asarray(ubx)),initial=0.)))
-        if not np.isfinite(np.r_[values,constraint_values,raw_value]).all():
+        violation=_violation(values,constraint_values,lbx,ubx,lbg,ubg)
+        returned_g=constraint_values if np.array_equal(values,returned_values) else np.asarray(function(x=returned_values)['constraints']).ravel()
+        returned_violation=_violation(returned_values,returned_g,lbx,ubx,lbg,ubg)
+        if not np.isfinite(np.r_[values,constraint_values,raw_value,returned_values,returned_g]).all():
             raise ValueError('IPOPT_NONFINITE_SOLUTION')
         return_status = str(stats.get('return_status', ''))
         if bool(stats.get('success')):
@@ -183,6 +219,8 @@ class IpoptSolver:
             'constraint_upper': ubg,
             'options': self.parameters.model_dump(mode='json'),
             'construction_s':construction_s, 'solve_s':solve_s, 'cached_solver':cached,
+            'selected_feasible_iteration':selected_iteration,
+            'returned_iterate_constraint_violation':returned_violation,
         }
         return OptimizationResult(
             status=status,

@@ -115,6 +115,23 @@ class ScientificOptimizationTests(unittest.TestCase):
         self.assertAlmostEqual(updated.optimum['x'],4.,places=7)
         self.assertLess(updated.constraint_violation,1e-7)
 
+    def test_limited_solve_retains_independently_feasible_iterate(self):
+        x,y=ca.MX.sym('x'),ca.MX.sym('y')
+        expression,selectors=expression_payload(['x','y'],
+            dict(variables={'x':x,'y':y},expression=(x-2)**2+y**2),{'parabola':y-x*x})
+        from schemas.platform_math import OptimizationConstraint
+        problem=OptimizationProblem(variables={k:dict(type='number',bounds=[-5.,5.]) for k in ('x','y')},
+            objective=Objective(metric='distance',direction='minimize',units='1'),objective_function=expression,
+            constraints=[OptimizationConstraint(name='parabola',expression=selectors[0],units='1',lower=0.,upper=0.)],
+            initial_guess={'x':0.,'y':0.})
+        solver=IpoptSolver(dict(max_iterations=1,retain_feasible_iterate=True))
+        result=solver.solve(problem)
+        self.assertEqual(result.status,'iteration_limit')
+        self.assertGreater(solver.last_diagnostics['returned_iterate_constraint_violation'],1e-5)
+        self.assertLessEqual(result.constraint_violation,1e-5)
+        self.assertAlmostEqual(result.optimum['y'],result.optimum['x']**2,places=8)
+        self.assertEqual(solver.last_diagnostics['selected_feasible_iteration'],0)
+
     def test_pcc_public_evidence_chain_and_mathematical_verification(self):
         suffix = uuid4().hex
         root = ROOT / 'runs/scientific_optimization_tests' / suffix

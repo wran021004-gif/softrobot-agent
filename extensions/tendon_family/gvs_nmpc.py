@@ -57,8 +57,11 @@ class GVSNMPCController:
         if key not in _WORKSPACES:
             _WORKSPACES[key]=TrajectoryWorkspace(task,robot,self.parameters,
                 [*plan['reference']['q0'],*([0.]*len(self.coordinate_order))],plan['reference']['u0'])
-        self.workspace=_WORKSPACES[key];self.workspace.last=None
-        self.seed=_SEEDS.get(key);self.observations=[];self.last={};self.u=None
+        self.workspace=_WORKSPACES[key];self.seed=_SEEDS.get(key)
+        # A failed first update must not discard the available offline seed.
+        # It remains only an optimization guess, never a fallback command.
+        self.workspace.last=self.seed
+        self.observations=[];self.last={};self.u=None
 
     def command(self,t,geometry,q,v):
         start=time.perf_counter();x=np.r_[q,v];error=None;solved=None
@@ -76,6 +79,8 @@ class GVSNMPCController:
             'feasible_suboptimal_update':success and not converged,
             'solver_error':error,'optimization_status':None if solved is None else solved['result']['status'],
             'optimization_constraint_violation':None if solved is None else solved['result']['constraint_violation'],
+            'optimization_selected_iteration':None if solved is None else solved['diagnostics']['selected_feasible_iteration'],
+            'optimization_returned_violation':None if solved is None else solved['diagnostics']['returned_iterate_constraint_violation'],
             'update_wall_s':elapsed,'deadline_missed':elapsed>self.period_s,
             'solver_construction_s':None if solved is None else solved['diagnostics']['construction_s'],
             'optimization_solve_s':None if solved is None else solved['diagnostics']['solve_s'],
