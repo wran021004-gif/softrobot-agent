@@ -559,6 +559,18 @@ EXTENSIONS.append(Extension('controller.gvs_nmpc','controller','3.0.0',gvs_profi
         route_applicability='extensions.tendon_family.gvs_profile:checked_reach',
         scope_assessment='extensions.tendon_family.gvs_profile:reach_assessment',
         route_report_tool='control.profile_report')))
+EXTENSIONS.append(Extension('controller.gvs_nmpc','controller','4.0.0',gvs_profile.ReachControl,Payload,
+    'extensions.tendon_family.gvs_nmpc:ReachNMPCController',
+    'Length-design free reach: candidate physics, basis, projection and input bounds; historical tensions only as guesses; measured-state regeneration in an isolated execution. Changed designs require fresh evaluation.',
+    sources=PROFILE_SOURCES,assets=(gvs_profile.ASSET,),contract_dependencies=COMMON['contract_dependencies'],
+    dependencies=('numpy','scipy','casadi'),extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
+    capabilities=dict(category='control',role='adapter',channel='actuator_commands',backend_executable=True,
+        command_space='tendon_tensions',sampling='interval_start_pre_step; held for control period',reset=False,restore=False,
+        profile_id='gvs_candidate_reach_v1',predictor='model.gvs',execution_model='model.serial_bending_cells',
+        discovery_tool='control.profile_describe',prepare_execution='extensions.tendon_family.gvs_profile:prepare_execution',
+        route_applicability='extensions.tendon_family.gvs_profile:checked_reach',
+        scope_assessment='extensions.tendon_family.gvs_profile:reach_assessment',
+        route_report_tool='control.profile_report')))
 for name,schema,binding,description in (
     ('control.profile_describe',gvs_profile.ProfileControl,'extensions.tendon_family.gvs_profile:describe',
      'Describe selected fixed or parameterized free-reach control, technical support, historical evidence and preparation. Fixed profile imports historical guesses; zero solves.'),

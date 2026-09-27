@@ -1,4 +1,4 @@
-"""Prepare and run one bounded real-provider Route capability-use experiment."""
+"""Prepare, audit and run a bounded real-provider Route from a frozen input."""
 import argparse
 import json
 import os
@@ -26,6 +26,11 @@ def route_input(run_id,offline=False,task_input=None,wall_s=3600.):
     p['model']=dict(adapter='offline' if offline else 'deepseek',model=config['model'],
         base_url=config['base_url'],thinking=config['thinking'],max_tokens=config['max_tokens'],
         timeout_s=config['timeout_s'],context_bytes=150000,max_turns=24)
+    # An explicit Route input owns its search space, tool grants and budgets.
+    # Legacy fixed-profile invocations retain the one-execution defaults below.
+    if task_input is not None and p.get('route') is not None:
+        p['model']['max_turns']=p['budget']['model_calls']
+        return inp
     p['budget'].update(model_calls=24,tool_calls=60,backend_solves=1,wall_s=wall_s)
     p['allowed_tools']=[]
     p['tool_bindings']={k:'1.0.0' for k in ('route.advance','route.inspect','simulation.run',
@@ -46,11 +51,12 @@ def prepare(root,source,input_path=None,wall_s=3600.):
             raise ValueError('FROZEN_SESSION_INPUT_CHANGED: use a fresh output folder')
         return Host(root,state['run_id'])
     identity='gvs-live-'+uuid4().hex[:12]
+    inp=route_input(identity,task_input=task_input,wall_s=wall_s)
     store=Store(root)
     store.create(dict(project_id=identity,grant_id=identity,
-        authorization_source='Attached user request: bounded genuine DeepSeek capability-use experiment; one fresh backend execution; scoped task context and evidence transmission. No human skill approval.',
-        budget=dict(model_calls=24,tool_calls=60,backend_solves=1,worker_calls=0,wall_s=wall_s)))
-    inp=route_input(identity,task_input=task_input,wall_s=wall_s);create(root,inp);host=Host(root,identity)
+        authorization_source=inp['policy']['route']['data']['source'],
+        budget=inp['policy']['budget']))
+    create(root,inp);host=Host(root,identity)
     from tools.platform_skills import import_skill_history
     imported=import_skill_history(host,source,read(source/'workflow.json')['run_id']) if task_input is None else None
     context=host.context()
@@ -62,7 +68,7 @@ def prepare(root,source,input_path=None,wall_s=3600.):
         context_bytes=len(json.dumps(payload).encode()),
         delivered_skills=[dict(reference=s['skill_id']+'@'+str(s['version']),status=s['status'],
             scope=s.get('scope_assessment'),human_approval=s['human_approval']) for s in context['skills']],
-        reservation_analysis=dict(project_wall_s=wall_s,session_wall_s=wall_s,tool_reservation_s=inp['policy']['timeout_s'],
+        reservation_analysis=dict(project_wall_s=inp['policy']['budget']['wall_s'],session_wall_s=inp['policy']['budget']['wall_s'],tool_reservation_s=inp['policy']['timeout_s'],
             parent_route_preflight_reservation_s=0,
             post_execution_report_reservation_s=inp['policy']['timeout_s'],
             note='Delegated Route has zero wall charge; child execution owns measured cost. Budget must retain the per-call reservation for evaluation and report after simulation.'))
@@ -149,6 +155,6 @@ if __name__=='__main__':
         host=prepare(root,args.source.resolve(),args.input,args.wall_s)
         if args.action=='run':
             load_credential(args.credential_file)
-            print('Starting real provider Route loop; at most one primary backend execution.',flush=True)
+            print('Starting real provider Route loop; backend attempt ceiling: '+str(host.store.remaining()['limit']['backend_solves'])+'.',flush=True)
             host.run()
             inspect(host)

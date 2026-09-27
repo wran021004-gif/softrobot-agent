@@ -1,0 +1,326 @@
+{
+  "interpreter": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+  "focused_checks": {
+    "candidate_checks_passed": 2,
+    "existing_parameterized_and_route_checks_passed": 6,
+    "initial_failure": "Two new checks exposed resolved tendon entity key mismatch; corrected; both then passed",
+    "plan_check": "plan_check.json",
+    "full_deterministic_rollouts": 0
+  },
+  "frozen_task": {
+    "contract_version": "1.0.0",
+    "task_id": "family-multisegment-dev",
+    "task_version": "1.0.0",
+    "name": "Independent development validation of a serial multi-segment soft arm",
+    "status": "development_valid",
+    "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "version": "1.0.0",
+      "data": {
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ]
+      }
+    },
+    "environment": {
+      "contract": "experiment.assembly",
+      "version": "1.0.0",
+      "data": {
+        "environment": {
+          "schema_version": "1",
+          "environment_id": "reach_free",
+          "units": "SI",
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "truth_status": "HUMAN_OWNED",
+          "objects": [
+            {
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ],
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "contype": 0,
+              "conaffinity": 1
+            }
+          ],
+          "lights": [
+            {
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ],
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            }
+          ]
+        },
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "external_forces": []
+      }
+    },
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "initializer": {
+      "extension_id": "initialize.family",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.initial",
+        "version": "1.0.0",
+        "data": {}
+      }
+    },
+    "timing": {
+      "timestep_s": 0.0005,
+      "control_period_s": 0.01,
+      "sample_period_s": 0.01,
+      "duration_s": 0.35,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ]
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "version": "1.0.0",
+        "data": {
+          "tolerance_m": 0.01
+        }
+      }
+    },
+    "objectives": [
+      {
+        "metric": "position_error",
+        "direction": "minimize",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "observations": [
+      {
+        "name": "tip_position",
+        "entity": "tip",
+        "dimension": 3,
+        "units": "m",
+        "frame": "world",
+        "phase": "post_step",
+        "missing": "unsupported"
+      }
+    ],
+    "sampling": {
+      "split": "development",
+      "seeds": [
+        17
+      ],
+      "aggregation": "per_instance",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    }
+  },
+  "budget": {
+    "model_calls": 24,
+    "tool_calls": 60,
+    "backend_solves": 3,
+    "worker_calls": 0,
+    "wall_s": 7200.0
+  },
+  "reservation_analysis": {
+    "project_wall_s": 7200.0,
+    "session_wall_s": 7200.0,
+    "tool_reservation_s": 1800.0,
+    "parent_route_preflight_reservation_s": 0,
+    "post_execution_report_reservation_s": 1800.0,
+    "note": "Delegated Route has zero wall charge; child execution owns measured cost. Budget must retain the per-call reservation for evaluation and report after simulation."
+  },
+  "tool_set": {
+    "route.advance": "1.0.0",
+    "route.inspect": "1.0.0",
+    "simulation.run": "1.0.0",
+    "evaluation.run": "1.0.0",
+    "evidence.read": "1.0.0",
+    "session.control": "1.0.0",
+    "control.profile_report": "1.0.0"
+  },
+  "candidate_capability": [
+    {
+      "combination": "candidate_gvs_nmpc",
+      "profile_id": "gvs_candidate_reach_v1",
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "version": "4.0.0",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "version": "1.0.0",
+          "data": {
+            "numerical_source": "bundled_guess",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": false,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.0001,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.0001
+            },
+            "settling": {
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            }
+          }
+        }
+      },
+      "predictor": "model.gvs",
+      "execution_model": "model.serial_bending_cells",
+      "command_space": "tendon_tensions",
+      "applicability": "compatible_unvalidated",
+      "executable": true,
+      "scope_assessment": {
+        "technical_compatibility": {
+          "status": "supported",
+          "reason": "Length-only candidate envelope",
+          "model_use_assessment": {
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "design_id": "two_segment_development",
+            "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+            "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "generalized_coordinate_dimension": 12,
+            "state_dimension": 24,
+            "uses": {
+              "reduced_dynamics": {
+                "status": "ALLOW",
+                "reasons": [
+                  "Resolved GVS bending coordinates support this reduced-model use."
+                ],
+                "validation": "unavailable",
+                "evidence": []
+              },
+              "local_model_control": {
+                "status": "WARN",
+                "reasons": [
+                  "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+                ],
+                "validation": "unavailable",
+                "evidence": []
+              }
+            },
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "unsupported_requested_physics": []
+          }
+        },
+        "historical_evidence": {
+          "status": "unvalidated_configuration",
+          "exact_execution_scope_match": false,
+          "historical_task_match": true,
+          "historical_robot_match": true,
+          "reason": "Fixed v2 success does not validate changed designs, targets, timing, initial states, recipes or acceptance conditions",
+          "sources": [
+            {
+              "path": "runs/stage315_complete_control_20260927/report.md",
+              "sha256": "0322ae0a589139dcd0443081c70ae318621d6fd8e39a6949032c2e3cf58c4579",
+              "classification": "historical artifact; no invented Store receipt"
+            },
+            {
+              "path": "runs/stage315_complete_control_20260927/summary.json",
+              "sha256": "b99b80e195b19f47ea6c10ed23a4992418b95564ec79862dbae9e6380cb761ef",
+              "classification": "historical artifact; no invented Store receipt"
+            },
+            {
+              "path": "runs/stage315_complete_control_20260927/saved_evaluation.json",
+              "sha256": "1f2d7f26e2da8df4475510433ce814660d5ea6af0bb868f6f8555974f20bff00",
+              "classification": "historical artifact; no invented Store receipt"
+            }
+          ]
+        },
+        "execution_preparation": {
+          "status": "pending_execution_hook",
+          "source": "bundled_guess",
+          "next_step": "simulation.run imports/generates and seals numerical guesses under its reserved wall/one-backend budget; actual-state regeneration and validation occur in each update"
+        }
+      },
+      "reasons": [],
+      "discovery": null,
+      "report_authorized": true,
+      "historical_cost": null
+    }
+  ]
+}
