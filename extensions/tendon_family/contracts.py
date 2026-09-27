@@ -982,6 +982,14 @@ class GVSDescription(Contract):
 
 
 class GVSTrajectoryParameters(Contract):
+    position_error_scale_m: FiniteFloat | None = Field(default=None,gt=0,
+        description='Position cost scale in m; None uses the task reach tolerance, without changing acceptance.')
+    tip_speed_scale_m_s: FiniteFloat = Field(default=.02,gt=0,
+        description='Spatial tip-speed cost scale in m/s; independent of acceptance.')
+    terminal_tip_speed_weight: FiniteFloat = Field(default=0.,ge=0,
+        description='Dimensionless terminal weight on squared world tip speed / tip_speed_scale_m_s. Zero preserves legacy cost.')
+    holding_tip_speed_weight: FiniteFloat = Field(default=0.,ge=0,
+        description='Per-second squared spatial speed weight on nodes at/after the configured task settling-window start. Requires explicit settling settings.')
     recover_returned_tensions: bool = Field(default=False,description=(
         'Reintegrate one lower-objective unfinished IPOPT tension sequence from the current measurement; '
         'deliver only if independently feasible and better than the selected plan. Cost is included in update timing.'))

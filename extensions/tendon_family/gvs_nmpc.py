@@ -15,7 +15,7 @@ _SEEDS={}
 
 def workspace_key(task,robot,parameters):
     return digest(dict(robot=robot.model_dump(mode='json'),environment=task.environment.model_dump(mode='json'),
-        goal=task.goal.model_dump(mode='json'),period=task.timing.control_period_s,
+        goal=task.goal.model_dump(mode='json'),timing=task.timing.model_dump(mode='json'),
         evaluator=task.evaluator.model_dump(mode='json'),parameters=parameters.model_dump(mode='json')))
 
 
@@ -75,7 +75,7 @@ class GVSNMPCController:
         key=workspace_key(task,robot,self.parameters)
         if hasattr(self,'profile'):
             self.workspace=TrajectoryWorkspace(task,robot,self.parameters,
-                [*plan['reference']['q0'],*([0.]*len(self.coordinate_order))],plan['reference']['u0'])
+                [*plan['reference']['q0'],*([0.]*len(self.coordinate_order))],plan['reference']['u0'],settling=plan.get('settling'))
             from copy import deepcopy
             self.seed=deepcopy(self.profile['numerical']['warm_guess'])
         else:
@@ -91,7 +91,7 @@ class GVSNMPCController:
     def command(self,t,geometry,q,v):
         start=time.perf_counter();x=np.r_[q,v];error=None;solved=None
         try:
-            solved=self.workspace.solve(x,self.previous,warm=self.seed)
+            solved=self.workspace.solve(x,self.previous,warm=self.seed,elapsed_s=t)
             success=solved['accepted']
         except (RuntimeError,ValueError) as exc:
             success=False;error=str(exc)
@@ -112,6 +112,7 @@ class GVSNMPCController:
             'plan_source':None if solved is None else ('reintegrated_returned_iterate' if solved['recovery']['selected'] else 'ipopt_selected'),
             'feasibility_recovery':None if solved is None else solved['recovery'],
             'feedback':None if solved is None else solved.get('feedback'),
+            'prediction_timing':None if solved is None else solved['prediction_timing'],
             'recovery_wall_s':None if solved is None else solved['recovery']['wall_s'],
             'recovery_integration_s':None if solved is None else solved['recovery'].get('integration_s',0.),
             'recovery_validation_s':None if solved is None else solved['recovery'].get('validation_s',0.),

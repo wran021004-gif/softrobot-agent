@@ -1,0 +1,47 @@
+{
+  "recipe": {
+    "seed_position_tolerance_fraction": 0.5,
+    "seed_speed_limit_m_s": 0.02,
+    "feasible_return": {
+      "minimum_s": 5.0,
+      "budget_s": 15.0,
+      "relative_improvement": 0.1
+    },
+    "regenerate_warm_states": true,
+    "terminal_velocity_weight": 0.0001,
+    "max_unusable_updates": 3,
+    "constraint_jacobian_mode": "reverse",
+    "curvature_scale_rad_m": 10.0,
+    "rate_scale_rad_m_s": 1000.0,
+    "max_cpu_s": 30.0,
+    "basis": {
+      "strategy": "structural_linear"
+    },
+    "horizon": 10,
+    "substeps": 1,
+    "tracking_weight": 1.0,
+    "terminal_weight": 5.0,
+    "velocity_weight": 0.0001,
+    "tension_weight": 0.0001,
+    "variation_weight": 0.001,
+    "max_iterations": 120,
+    "tolerance": 1e-06,
+    "evaluation_threads": 1,
+    "recover_returned_tensions": true,
+    "position_error_scale_m": 0.01,
+    "tip_speed_scale_m_s": 0.02,
+    "terminal_tip_speed_weight": 1.0,
+    "holding_tip_speed_weight": 100.0
+  },
+  "formulations_tried": 2,
+  "rationale": "Terminal spatial speed reduces rolling-end speed, but the late sample still predicts 0.088--0.112 m/s during the authoritative holding window. Add 100/s normalized spatial-speed cost on absolute-time holding nodes. Early two local cases have zero holding activation and reuse terminal-only results.",
+  "limitation": "Late historical state is already about 13 mm away and cannot be claimed recovered inside the 10 mm/0.02 m/s window. Initial and approach predictions retain approach; full B is the prospective test, not a predicted pass.",
+  "fixed_inputs_identity": "05c63a5fcb7f629eb76757095e2ddefcf39b28ed51dca456a675d1aa2fa0fe04",
+  "tests": {
+    "passed": 6,
+    "command": "python -m unittest tests.test_gvs_braking tests.test_gvs_feedback_recovery tests.test_gvs_parameterized_reach -v"
+  },
+  "full_backend_budget": 3,
+  "conditional_A": "Only after fresh B reach and sampled settling pass",
+  "conditional_LLM": "Only after fresh B reach+settling and fresh A reach pass; at most one fresh backend execution"
+}
