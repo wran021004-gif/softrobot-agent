@@ -32,6 +32,7 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('gvs_inverse_assembler_parameters',c.GVSInverseAssemblerParameters),]]
 CONTRACTS += [
     ('family.gvs_profile_control','1.0.0',gvs_profile.ProfileControl),
+    ('family.gvs_reach_control','1.0.0',gvs_profile.ReachControl),
     ('family.gvs_trajectory_parameters','1.0.0',GVSTrajectoryParameters),
     ('family.pcc_forward_request', '2.0.0', c.PCCForwardRequestV2),
     ('family.pcc_kinematics_result', '2.0.0', c.PCCKinematicsResultV2),
@@ -546,9 +547,21 @@ EXTENSIONS.append(Extension('controller.gvs_nmpc','controller','2.0.0',gvs_profi
         discovery_tool='control.profile_describe',prepare_execution='extensions.tendon_family.gvs_profile:prepare_execution',
         route_applicability='extensions.tendon_family.gvs_profile:checked_profile',
         route_report_tool='control.profile_report')))
+EXTENSIONS.append(Extension('controller.gvs_nmpc','controller','3.0.0',gvs_profile.ReachControl,Payload,
+    'extensions.tendon_family.gvs_nmpc:ReachNMPCController',
+    'Task-parameterized free reach for the fixed robot: explicit recipe/settling, compatible numerical guesses, isolated execution. New targets are unvalidated until evaluated.',
+    sources=PROFILE_SOURCES,assets=(gvs_profile.ASSET,),contract_dependencies=COMMON['contract_dependencies'],
+    dependencies=('numpy','scipy','casadi'),extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
+    capabilities=dict(category='control',role='adapter',channel='actuator_commands',backend_executable=True,
+        command_space='tendon_tensions',sampling='interval_start_pre_step; held for control period',reset=False,restore=False,
+        profile_id='gvs_parameterized_reach_v1',predictor='model.gvs',execution_model='model.serial_bending_cells',
+        discovery_tool='control.profile_describe',prepare_execution='extensions.tendon_family.gvs_profile:prepare_execution',
+        route_applicability='extensions.tendon_family.gvs_profile:checked_reach',
+        scope_assessment='extensions.tendon_family.gvs_profile:reach_assessment',
+        route_report_tool='control.profile_report')))
 for name,schema,binding,description in (
     ('control.profile_describe',gvs_profile.ProfileControl,'extensions.tendon_family.gvs_profile:describe',
-     'Import declared historical numerical artifacts into this Store and describe the fixed free-reach profile, scope, evidence and historical cost; zero solves.'),
+     'Describe selected fixed or parameterized free-reach control, technical support, historical evidence and preparation. Fixed profile imports historical guesses; zero solves.'),
     ('control.profile_declare_strategy',gvs_profile.ProfileStrategyRequest,'extensions.tendon_family.gvs_profile:declare_strategy',
      'Bind a candidate strategy and its exact scope before executing this profile; zero solves.'),
     ('control.profile_report',gvs_profile.ProfileReportRequest,'extensions.tendon_family.gvs_reporting:report',

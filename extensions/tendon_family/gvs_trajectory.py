@@ -204,7 +204,8 @@ class TrajectoryWorkspace:
                 state=np.array([self.problem.initial_guess[f'x/{k}/{j}'] for j in range(2*self.n)])*self.state_scales
                 tip,speed=self._motion(state[:self.n],state[self.n:])
                 metrics.append((np.linalg.norm(np.asarray(tip).ravel()-self.target),np.linalg.norm(np.asarray(speed))))
-            seed_settled=all(e<=.5*self.goal_tolerance and v<=.02 for e,v in metrics)
+            seed_settled=all(e<=self.parameters.seed_position_tolerance_fraction*self.goal_tolerance
+                and v<=self.parameters.seed_speed_limit_m_s for e,v in metrics)
         preparation_s=time.perf_counter()-update_start
         start=time.perf_counter(); result=self.solver.solve(self.problem,seed_settled=seed_settled);total=time.perf_counter()-start
         values=result.optimum;steps=self.parameters.horizon*self.parameters.substeps

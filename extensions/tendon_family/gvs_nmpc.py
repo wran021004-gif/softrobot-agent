@@ -20,7 +20,12 @@ def workspace_key(task,robot,parameters):
 
 
 def resolve_gvs_nmpc_control(inp,physics):
-    if inp.policy.controller.version == '2.0.0':
+    if inp.policy.controller.version == '3.0.0':
+        from .gvs_profile import checked_reach, reach_numerical
+        p=checked_reach(inp).recipe
+        numerical=reach_numerical(inp)
+        point=numerical['nominal']
+    elif inp.policy.controller.version == '2.0.0':
         from .gvs_profile import checked_profile
         profile=checked_profile(inp)
         p=GVSTrajectoryParameters.model_validate(profile['parameters'])
@@ -45,6 +50,12 @@ def resolve_gvs_nmpc_control(inp,physics):
     if inp.policy.controller.version == '2.0.0':
         plan['profile_id']=profile['profile_id']
         plan['numerical_reference']=profile['numerical_reference']
+    elif inp.policy.controller.version == '3.0.0':
+        plan['reference']['kind']='numerical_guess_metadata_not_current_target_equilibrium'
+        plan['reference'].pop('target_world_m')
+        plan['reference']['provenance']=numerical['provenance']
+        plan['numerical_reference']=dict(artifact_id=digest(numerical),media_type='application/json')
+        plan['settling']=checked_reach(inp).settling.model_dump(mode='json')
     plan['identity']=digest(plan)
     return plan
 
@@ -121,3 +132,18 @@ class ProfileNMPCController(GVSNMPCController):
         ProfileControl.model_validate(parameters)
         self.profile=load_profile()
         super().__init__(self.profile['parameters'],period_s)
+
+
+class ReachNMPCController(GVSNMPCController):
+    """v3 task parameters, public preparation, execution-local mutable workspace."""
+    def __init__(self,parameters,period_s):
+        from .gvs_profile import ReachControl
+        self.control=ReachControl.model_validate(parameters)
+        super().__init__(self.control.recipe,period_s)
+
+    def configure(self,physics,plan):
+        if not hasattr(self,'preparation'):
+            raise ValueError('GVS_REACH_PUBLIC_PREPARATION_REQUIRED')
+        if digest(self.profile['numerical'])!=plan['numerical_reference']['artifact_id']:
+            raise ValueError('GVS_REACH_PREPARATION_IDENTITY_MISMATCH')
+        super().configure(physics,plan)

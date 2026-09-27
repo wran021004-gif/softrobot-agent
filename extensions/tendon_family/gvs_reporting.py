@@ -5,17 +5,18 @@ from collections import Counter
 import numpy as np
 from schemas.platform import EvaluationResult
 from tools.platform_store import plain
-from .gvs_profile import execution_scope, checked_profile
+from .gvs_profile import execution_scope, checked_control, SampledSettling, settling_for
 
 
-def summarize(task, result, evaluation, rows, observations, motion, limits):
+def summarize(task, result, evaluation, rows, observations, motion, limits, settling=None):
+    acceptance=SampledSettling.model_validate(settling or {})
     duration=task.timing.duration_s
     complete=bool(result['solver_status']=='completed' and rows and abs(rows[-1]['time_s']-duration)<1e-8)
     valid=complete and evaluation is not None and evaluation['validity']=='valid'
     errors=[float(np.linalg.norm(np.asarray(r['tip_m'])-task.goal.data['target_m'])) for r in rows]
-    window=[r for r in motion if r['time_s']>=duration-.05-1e-9]
+    window=[r for r in motion if r['time_s']>=duration-acceptance.window_s-1e-9]
     # Missing or partial final-window data is unavailable, never vacuous success.
-    expected=round(.05/task.timing.sample_period_s)+1
+    expected=round(acceptance.window_s/task.timing.sample_period_s)+1
     available=complete and len(window)==expected and len(motion)==len(rows)
     def values(key):return [o[key] for o in observations if o.get(key) is not None]
     def mean(key):return float(np.mean(values(key))) if values(key) else None
@@ -27,8 +28,8 @@ def summarize(task, result, evaluation, rows, observations, motion, limits):
         terminal_error_m=errors[-1] if complete else None,last_valid_error_m=errors[-1] if errors else None,
         maximum_error_m=max(errors) if errors else None,minimum_error_m=min(errors) if errors else None,
         terminal_tip_speed_m_s=motion[-1]['tip_speed_m_s'] if complete and motion else None,
-        sampled_settling=dict(available=available,passed=all(r['tip_error_m']<=.01 and r['tip_speed_m_s']<=.02 for r in window) if available else None,
-            window_s=.05,position_limit_m=.01,speed_limit_m_s=.02,continuous_time_guarantee=False,
+        sampled_settling=dict(available=available,passed=all(r['tip_error_m']<=acceptance.position_limit_m and r['tip_speed_m_s']<=acceptance.speed_limit_m_s for r in window) if available else None,
+            **plain(acceptance),continuous_time_guarantee=False,
             max_error_m=max(r['tip_error_m'] for r in window) if available else None,
             max_speed_m_s=max(r['tip_speed_m_s'] for r in window) if available else None),
         updates=len(observations),accepted_plans=sum(o.get('plan_accepted',o.get('optimization_constraint_violation') is not None and
@@ -78,7 +79,7 @@ def reconstruct_motion(files, rows, target):
 
 def report(ctx,args):
     from .gvs_profile import ProfileOutput
-    checked_profile(ctx.input)
+    checked_control(ctx.input)
     def receipt(request,tool):
         row=ctx.store.lookup(ctx.run_id,request)
         value=json.loads(row['receipt']) if row and row['receipt'] else None
@@ -108,7 +109,12 @@ def report(ctx,args):
     observations=json.loads(files['controller_observations.json'])
     motion,physics=reconstruct_motion(files,rows,ctx.input.task.goal.data['target_m'])
     output=summarize(ctx.input.task,ctx.artifact(sim['output']),plain(evaluation),rows,observations,motion,
-        [t['force_limit_n'] for t in physics['tendons']])
+        [t['force_limit_n'] for t in physics['tendons']],settling_for(ctx.input))
+    preparations=[e['outputs'][0] for e in ctx.store.events(ctx.run_id)
+        if e['kind']=='control_preparation' and e['execution_id']==sim['execution_id']]
+    output.update(task=plain(ctx.input.task),execution_scope=execution_scope(ctx.input),
+        control_parameters=plain(ctx.input.policy.controller.parameters),
+        numerical_preparation=None if not preparations else ctx.artifact(preparations[-1]))
     output.update(simulation=sim['output'],evaluation=ev['output'],execution_id=sim['execution_id'],
         simulation_wall_s=sim['charged']['wall_s'] if 'charged' in sim else None,
         motion=plain(ctx.save_artifact(motion,'sampled_backend_motion')))
@@ -124,7 +130,7 @@ def report(ctx,args):
         worked=bool(output['valid_complete_execution'] and output['official_task_success'] and
             output['accepted_plans']==output['updates'] and output['hold_last_responses']==0)
         validation=SkillValidationEvidence(**declared,run_id=ctx.run_id,worked=worked,
-            summary='Trusted public original-task reach and plan acceptance check; settling and real-time results remain separate. No causal or transfer claim.')
+            summary='Trusted public frozen-task reach and plan acceptance check; settling and real-time results remain separate. No causal or transfer claim.')
         output['strategy_validation']=plain(ctx.save_artifact(validation,'skill_validation_experiment'))
         output['strategy_worked']=worked
     return ProfileOutput(detail=output)
@@ -138,4 +144,5 @@ def markdown(summary):
         f"Accepted plans: {s['accepted_plans']}/{s['updates']}; converged: {s['converged_updates']}; initialization selected: {s['initialization_selected']}; hold-last responses: {s['hold_last_responses']}.\n\n"
         f"Raw termination counts: {s['raw_termination_counts']}.\n\n"
         f"Mean delivered update: {s['mean_update_s']} s; preparation: {s['mean_preparation_s']} s; numerical solve: {s['mean_numerical_solve_s']} s; validation: {s['mean_validation_s']} s. Deadline misses: {s['deadline_misses']}/{s['updates']}.\n\n"
-        'One fixed free-reach simulation with ideal tendon tensions. No actuator, contact, robustness or global stability claim. Settling checks are sampled.\n')
+        f"Sampled acceptance: last {settling['window_s']} s, position <= {settling['position_limit_m']} m, speed <= {settling['speed_limit_m_s']} m/s.\n\n"
+        'One frozen free-reach simulation with ideal tendon tensions. No actuator, contact, robustness or global stability claim. Settling checks are sampled.\n')

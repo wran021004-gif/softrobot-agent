@@ -982,6 +982,8 @@ class GVSDescription(Contract):
 
 
 class GVSTrajectoryParameters(Contract):
+    seed_position_tolerance_fraction: FiniteFloat = Field(default=.5,gt=0)
+    seed_speed_limit_m_s: FiniteFloat = Field(default=.02,gt=0)
     feasible_return: FeasibleReturnPolicy | None = None
     regenerate_warm_states: bool = True
     terminal_velocity_weight: FiniteFloat = Field(default=0.,ge=0)

@@ -278,7 +278,10 @@ def profile_capability(inp,reg):
     if not definition.capabilities.get('profile_id'): return None
     check=definition.hook('route_applicability')
     if check: check(inp)
-    return definition.capabilities
+    capability=dict(definition.capabilities)
+    assess=definition.hook('scope_assessment')
+    if assess:capability['scope_assessment']=assess(inp)
+    return capability
 
 
 def control_profiles(host,inp,combinations):
@@ -296,7 +299,8 @@ def control_profiles(host,inp,combinations):
         rows.append(dict(combination=name,profile_id=capability['profile_id'],
             controller=choice['controller'],predictor=capability['predictor'],
             execution_model=capability['execution_model'],command_space=capability['command_space'],
-            applicability='matching',executable=authorized,
+            applicability='compatible_unvalidated' if capability.get('scope_assessment') else 'matching',executable=authorized,
+            scope_assessment=capability.get('scope_assessment'),
             reasons=[] if authorized else ['Required Route execution tools are not granted'],
             discovery=capability.get('discovery_tool') if capability.get('discovery_tool') in inp.policy.tool_bindings else None,
             report_authorized=capability.get('route_report_tool') in inp.policy.tool_bindings,
