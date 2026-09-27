@@ -1,0 +1,14 @@
+{
+  "interpreter": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+  "checks": 8,
+  "final_passed": 8,
+  "first_command": "-m unittest tests.test_gvs_braking tests.test_gvs_parameterized_reach tests.test_gvs_route_report -v",
+  "initial_result": "7 passed; timing fixture errored when assigning to frozen Pydantic parameters",
+  "correction": "Use model_copy(update=...) in timing test fixture; production logic unchanged",
+  "focused_rerun": "-m unittest tests.test_gvs_braking.BrakingTests.test_task_window_moves_fixed_inputs_without_rebuilding_graph -v",
+  "rerun_result": "1 passed (unittest OK). PowerShell stderr redirection wrapped ordinary unittest stderr as NativeCommandError; see original logs.",
+  "full_suite_run": false,
+  "actual_report_comparability": "same controller recipe, timing and initializer; explicit targets differ",
+  "numerical_evidence": "3 Stage 3.20 frozen states, paired baseline/lead solves (entry schedules identical); 2 fresh public full executions; 2 saved A one-period integrations; zero new backend diagnostic rollouts",
+  "live": "not executed because A failed the required physical gate"
+}

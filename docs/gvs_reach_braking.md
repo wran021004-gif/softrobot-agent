@@ -38,3 +38,10 @@ Stage 3.20's one fresh B reached 6.176 mm endpoint error, but failed sampled
 settling: maximum final-window speed 0.025266 m/s exceeded 0.02 m/s. All 35
 plans were independently feasible, none optimization-converged. Mean complete
 update took 27.411 s. Conditional A and LLM acceptance were not run.
+
+Stage 3.21 tested a 0.05 s braking lead with the same remaining recipe. B passed
+reach and sampled settling (8.411 mm endpoint error, 0.019552 m/s maximum window
+speed), but A failed both (10.930 mm and 0.054613 m/s). Thus this is not a
+validated reach-and-settle recipe for both tasks; the conditional live session
+was not launched. Aligned saved-state checks on A still underpredict next-period
+speed substantially. See `runs/stage321_window_braking_llm_20260927/implementation_report.md`.

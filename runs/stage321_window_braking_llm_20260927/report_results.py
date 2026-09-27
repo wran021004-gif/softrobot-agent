@@ -59,15 +59,30 @@ def main():
     results={label:evidence(label) for label in ('B','B_correction','A','live')}
     final_b=results['B_correction'] or results['B']
     liveaudit=read(HERE/'live/behavior_audit.json') if (HERE/'live/behavior_audit.json').exists() else None
+    live_status=dict(executed=liveaudit is not None,eligible=passes(final_b) and passes(results['A']),
+        real_model_requests=0 if liveaudit is None else liveaudit['real_model_requests'],
+        tool_calls=0 if liveaudit is None else liveaudit['tool_calls'],
+        backend_executions=0 if liveaudit is None else liveaudit['backend_executions'],
+        model_read_current_evidence=None if liveaudit is None else liveaudit['fresh_report_delivered'],
+        interpretation_check='not_executed' if liveaudit is None else 'see manual live audit',
+        reason='A failed reach and sampled settling; conditional paid session not launched' if results['A'] and not passes(results['A']) else 'See measured physical gates',
+        model_final='absent; no model response was fabricated' if liveaudit is None else 'live/model_final.txt')
+    atomic_json(HERE/'live_status.json',live_status)
     output=dict(starting_revision='dbe49b3',implementation_revision=read(HERE/'candidate.json')['source_revision'],
         candidate=read(HERE/'candidate.json'),diagnosis='diagnosis.json',executions=results,
         environment=dict(interpreter=sys.executable,python=platform.python_version(),os=platform.platform(),
             threads=dict(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')),
-        gates=dict(B=passes(final_b),A=passes(results['A']),live=passes(results['live'])),
+        gates=dict(B=passes(final_b),A=None if results['A'] is None else passes(results['A']),live=None if results['live'] is None else passes(results['live'])),
+        stage_complete=passes(final_b) and passes(results['A']) and passes(results['live']),
+        live_status=live_status,
+        public_counts=dict(model_requests=sum(e['ledger']['model_calls'] for e in results.values() if e),
+            tool_calls=sum(e['ledger']['tool_calls'] for e in results.values() if e),
+            backend_executions=sum(e['ledger']['backend_solves'] for e in results.values() if e)),
         fresh_backend_executions=sum(e is not None for e in results.values()),live_audit=liveaudit,
         timing_boundaries='Complete delivery includes warm preparation, solver construction/solve, recovery and validation. Recovery validation is also counted in validation: do not sum overlapping columns. Graph construction and public preparation are once per execution. Process time includes reporting; live additionally includes provider decisions. 0.01 s deadlines differ from the 10 s development target.')
     atomic_json(HERE/'results.json',output)
     lines=['# Stage 3.21: window braking and conditional LLM acceptance','',
+        'Stage complete: '+str(output['stage_complete'])+'. B passed reach and all sampled settling checks; A failed both. The conditional live session was not launched.' if results['A'] and not passes(results['A']) else 'See the measured acceptance gates below.','',
         'Implementation `'+output['implementation_revision']+'`; original baseline `dbe49b3`. Historical evidence and fixed v2 profile preserved.','',
         'The new reusable `holding_brake_lead_s` recipe field starts holding-speed cost earlier relative to the task window. Zero preserves the old schedule; the tested 0.05 s value is an empirical temporal margin, not a bound on model error. The authoritative 0.35 s task, 0.30–0.35 s sampled window, 10 mm / 0.02 m/s limits, physical model, ideal tensions, 10 ms control period and 0.5 ms physics step are unchanged.','',
         '## Diagnosis','',*['- '+s for s in diagnosis['findings']],'',
@@ -90,6 +105,18 @@ def main():
         lines+=['',f"{label}: execution `{s['execution_id']}`, evaluation `{s['evaluation']['artifact_id']}`. Accepted plans {s['accepted_plans']}/{s['updates']}; converged {s['converged_updates']}; initialization selections {s['initialization_selected']}; recovered {s['recovered_plans']}; maximum residual {s['maximum_plan_violation']:.3g}. Solver errors {s['solver_error_count']}; holds {s['hold_last_responses']}; force violation {s['force_bound_violation_n']} N; tension range {s['tension_range_n']} N.",
             '', '| Sample time s | Error mm | Speed mm/s |','|---:|---:|---:|']
         lines += [f"| {r['time_s']:.2f} | {r['tip_error_m']*1000:.4f} | {r['tip_speed_m_s']*1000:.4f} |" for r in e['final_window']]
+    if (HERE/'A_failure_review.json').exists():
+        review=read(HERE/'A_failure_review.json')
+        lines+=['','## Remaining physical blocker','',
+            'A drifts away during the holding window: all six speeds fail and the last two positions fail. It has zero initialization selections, 16 recovered plans, 35 feasible accepted plans, no holds and no solver errors. This is physical task failure, not a computation-budget rejection or a stopped execution.',
+            '', 'Two saved-state one-interval checks use exactly the actual applied tension. They do not compare a rolling endpoint with the current measurement:','',
+            '| Interval s | Predicted speed mm/s | Actual speed mm/s | Velocity-vector error mm/s |',
+            '|---|---:|---:|---:|']
+        for r in review['rows']:
+            c=r['one_period']
+            lines.append(f"| {r['time_s']:.2f}–{c['time_s']:.2f} | {c['predicted_speed_m_s']*1000:.3f} | {c['actual_speed_m_s']*1000:.3f} | {c['velocity_vector_error_m_s']*1000:.3f} |")
+        lines+=['', 'A also has 4.66–4.81 mm position reconstruction differences at those interval starts. The lead-only recipe therefore does not close the measured discrepancy across both tasks. The separate roles of representation, dynamics, integration and unfinished optimization remain unresolved. A new control correction would require fresh validation on both targets; B’s passing result cannot validate a changed recipe.',
+            '', 'The specified extra B execution is conditional on a failed B run; B passed on its first run. No second A run was specified, and the live session requires both tasks to pass. The unused conditional allowances were not spent. No claim that all numerical or model-request budgets were exhausted is made.']
     lines+=['','## Computation','',output['timing_boundaries'],'',
         '| Execution | Graph s | Solver construction s | Warm mean s | Solve mean s | Recovery mean s | Validation mean s | Process s |',
         '|---|---:|---:|---:|---:|---:|---:|---:|']
@@ -101,7 +128,7 @@ def main():
         'The existing v3 preparation freezes the full task, recipe, initialization provenance and evidence scope. `examples/gvs_nmpc_route_experiment.py --input` now accepts a public parameterized SessionInput, rejects changed inputs on resume, and advertises the frozen combination for model selection. No target-specific controller/Route branches or private cache injection. The real-provider project/session ceilings are 24 model calls, 60 tools, one backend and 3600 s. Child-owned reports remain available in current model context.','']
     if liveaudit:
         lines.append(f"Actual provider requests {liveaudit['real_model_requests']}; tools {liveaudit['tool_calls']}; backend executions {liveaudit['backend_executions']}; current report delivered {liveaudit['fresh_report_delivered']}. See live/behavior_audit.json, live/model_final.txt and live/platform.sqlite for unedited provider decisions, responses, receipts and evidence.")
-    else:lines.append('Live session not executed. It is conditional on both fresh B and A reach plus full sampled settling; missing outcomes are not passes.')
+    else:lines.append('Live session not executed: A failed the physical prerequisite. Real-provider requests / live tool calls / live backend executions: **0 / 0 / 0**. Current-evidence reading and explanation checks are unexecuted, not passed; no model final answer exists. The two deterministic public runs used '+str(output['public_counts']['tool_calls'])+' tools and two backend executions, with zero model calls.')
     lines+=['','## Focused verification and limitations','',
         'Eight focused tests: seven passed initially; the timing fixture attempted to mutate a frozen Pydantic object and was corrected to model_copy. Its focused rerun passed. No full suite. Local numerical solves used three frozen current states; no historical full rollout was repeated.',
         '', 'Evidence covers this fixed robot, tested explicit targets, free space and ideal tensions. Sampled settling is not continuous-time settling. Feasible unfinished optimization does not establish convergence. These executions do not establish robustness, arbitrary-target transfer, hardware performance or real-time control.','',
@@ -109,11 +136,13 @@ def main():
         '```powershell',"Set-Location 'D:\\softrobot-agent'","$py = 'C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe'",
         "$env:OPENBLAS_NUM_THREADS='1'","$env:OMP_NUM_THREADS='1'","$env:MKL_NUM_THREADS='1'",
         '& $py runs/stage321_window_braking_llm_20260927/report_results.py',
+        '# Optional short same-input diagnosis of the saved failed A trajectory (no backend rollout):',
+        '& $py runs/stage321_window_braking_llm_20260927/review_A.py',
         '& $py examples/gvs_parameterized_reach.py run --input runs/stage321_window_braking_llm_20260927/B_input.json --output runs/repro321_B',
         '# Only after B passes reach and all sampled settling checks:',
         '& $py examples/gvs_parameterized_reach.py run --input runs/stage321_window_braking_llm_20260927/A_input.json --output runs/repro321_A',
-        '# Only after both pass; this starts a fresh paid provider session:',
-        '& $py examples/gvs_nmpc_route_experiment.py run --input runs/stage321_window_braking_llm_20260927/B_input.json --output runs/repro321_live --wall-s 3600',
+        '# DO NOT launch for this candidate: A failed. After a newly validated candidate passes both gates:',
+        '# & $py examples/gvs_nmpc_route_experiment.py run --input runs/validated_candidate_B.json --output runs/repro321_live --wall-s 3600',
         '```']
     (HERE/'implementation_report.md').write_text('\n'.join(lines)+'\n',encoding='utf8')
     print(json.dumps(output['gates']))
