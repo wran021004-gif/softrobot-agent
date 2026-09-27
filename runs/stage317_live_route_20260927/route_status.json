@@ -1,6 +1,6 @@
 {
   "run_id": "gvs-live-1d8a5832db1e",
-  "status": "created",
+  "status": "stopped",
   "task": {
     "contract_version": "1.0.0",
     "task_id": "family-multisegment-dev",
@@ -156,17 +156,787 @@
   },
   "route": {
     "current": null,
-    "final": null,
-    "incumbent": null,
-    "next_step": "Select and evaluate an authorized candidate",
-    "nodes": [],
+    "final": {
+      "actual_solves": 0,
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.1.0"
+      },
+      "best_scope": "session-wide valid comparable evaluated candidates; no global optimum",
+      "best_valid_evaluation": {
+        "candidate_id": "build-profile-1",
+        "evaluation": {
+          "metrics": [
+            {
+              "name": "position_error",
+              "units": "m",
+              "value": 0.008473431053941154
+            }
+          ],
+          "source_execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+          "task_success": true,
+          "validity": "valid"
+        },
+        "evaluation_ref": {
+          "artifact_id": "1359c8df075550abefc4391694f03fd27c03352b8fa313c9c2e8214551eb2c9b",
+          "media_type": "application/json"
+        },
+        "node_id": "run-profile-1",
+        "score": 0.008473431053941154,
+        "search_run_id": null
+      },
+      "candidate_id": "build-profile-1",
+      "configuration": {
+        "artifact_id": "06f6050e13c9c384b421275e43c62a3bd74bf2350169cd20c6efac95c8d9410a",
+        "media_type": "application/json"
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "parameters": {
+          "contract": "family.gvs_profile_control",
+          "data": {
+            "profile_id": "gvs_nmpc_free_reach_v1"
+          },
+          "version": "1.0.0"
+        },
+        "version": "2.0.0"
+      },
+      "crosscheck_status": "not_reviewed",
+      "crosschecks": [],
+      "delivery_status": "evaluated",
+      "diagnoses": [],
+      "dynamics_model": {
+        "extension_id": "model.serial_bending_cells",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "evaluation": {
+        "candidate_id": "build-profile-1",
+        "comparison_identity": "e55ec99a72b635a15f438b68fb992591d262919795ed06e0131bc13401788727",
+        "constraints": [
+          {
+            "limit": 0.01,
+            "name": "task_bound",
+            "observed": 0.008473431053941154,
+            "satisfied": true,
+            "units": "m"
+          }
+        ],
+        "contract_version": "1.2.0",
+        "evaluator": "evaluate.reach",
+        "evaluator_version": "1.0.0",
+        "metrics": [
+          {
+            "name": "position_error",
+            "units": "m",
+            "value": 0.008473431053941154
+          }
+        ],
+        "original_execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+        "reason": null,
+        "source": {
+          "artifact_id": "52f067b938db0037c185fbb94d0b70f39cea4cd5defbb579a11645ea2854cbc7",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+        "task_success": true,
+        "validity": "valid"
+      },
+      "evaluation_ref": {
+        "artifact_id": "1359c8df075550abefc4391694f03fd27c03352b8fa313c9c2e8214551eb2c9b",
+        "media_type": "application/json"
+      },
+      "explicit_delivery": true,
+      "limitations": [
+        "Incumbent means lowest score among valid comparable evaluated candidates in this Route session; no global optimum claim.",
+        "Diagnosis is observational, not causal. Text adapter has not viewed videos.",
+        "Serial bending cells only; no torsion/shear/stretch, friction, motor dynamics or general trajectory optimization."
+      ],
+      "new_evaluations": 0,
+      "profile_report": {
+        "execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+        "owner_run_id": "gvs-live-1d8a5832db1e-53bb5822a962609c",
+        "reference": {
+          "artifact_id": "8b81aec5365f5dba252af789e7f7ad63f495fdbce7b84d019979ea26e6555cb1",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      },
+      "profile_report_summary": {
+        "accepted_plans": 35,
+        "backend_timings_s": {
+          "backend_call": 874.6856678000186,
+          "engine_compile": 0.023705400060862303,
+          "prepare_compile": 0.01478950004093349,
+          "solve": 874.3714689000044
+        },
+        "complete": true,
+        "converged_updates": 0,
+        "deadline_misses": 35,
+        "evaluation": {
+          "artifact_id": "1359c8df075550abefc4391694f03fd27c03352b8fa313c9c2e8214551eb2c9b",
+          "media_type": "application/json"
+        },
+        "evaluation_validity": "valid",
+        "execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+        "force_bound_violation_n": 0.0,
+        "graph_construction_s": 1.315431899856776,
+        "hold_last_responses": 0,
+        "initialization_selected": 7,
+        "last_valid_error_m": 0.008473431053941154,
+        "last_valid_time_s": 0.35000000000000003,
+        "max_projection_residual_rad_m": 2.4722055426750034,
+        "max_rate_projection_residual_rad_m_s": 12.563365398127491,
+        "max_sampled_contacts": 0,
+        "maximum_error_m": 0.05434688844063781,
+        "maximum_plan_violation": 9.235746246775978e-06,
+        "mean_numerical_solve_s": 14.895135168584861,
+        "mean_preparation_s": 9.57858682570846,
+        "mean_update_s": 24.977006899997857,
+        "mean_validation_s": 0.25670310284809345,
+        "minimum_error_m": 0.004194189273512849,
+        "motion": {
+          "artifact_id": "7a67809c880aac466f6bcf5be38bf94e7794ecdcbc3f3963a19977021cfe17fa",
+          "media_type": "application/json"
+        },
+        "official_task_success": true,
+        "optimization_status_counts": {
+          "feasible_early_stop": 35
+        },
+        "raw_termination_counts": {
+          "User_Requested_Stop": 35
+        },
+        "real_time_demonstrated": false,
+        "sampled_settling": {
+          "available": true,
+          "continuous_time_guarantee": false,
+          "max_error_m": 0.008694221274361258,
+          "max_speed_m_s": 0.03156205037834025,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        },
+        "simulation": {
+          "artifact_id": "52f067b938db0037c185fbb94d0b70f39cea4cd5defbb579a11645ea2854cbc7",
+          "media_type": "application/json"
+        },
+        "simulation_wall_s": 878.7349999998696,
+        "solver_construction_s": 3.9733558997977525,
+        "solver_error_count": 0,
+        "solver_failure_flags": 0,
+        "solver_status": "completed",
+        "tension_range_n": [
+          0.5662001386742109,
+          5.025997143201603
+        ],
+        "terminal_error_m": 0.008473431053941154,
+        "terminal_tip_speed_m_s": 0.020947365033184347,
+        "updates": 35,
+        "valid_complete_execution": true
+      },
+      "run_id": "gvs-live-1d8a5832db1e-53bb5822a962609c",
+      "search_run_id": null,
+      "selection_basis": "session-wide incumbent",
+      "simulation": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "route-executor",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 878.7349999998696,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+        "execution_status": "completed",
+        "original_execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+        "output": {
+          "artifact_id": "52f067b938db0037c185fbb94d0b70f39cea4cd5defbb579a11645ea2854cbc7",
+          "media_type": "application/json"
+        },
+        "request_id": "single-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      },
+      "stop_reason": "The session's single authorized fresh backend execution is complete and already evaluated: run node run-profile-1 (result artifact 28633019e2de029005187d0835517c42112181a07f7be139e1e2b5d17667c034) reports solver_status 'completed', solver_error_count 0, evaluation validity 'valid', official_task_success true, and position_error 0.008473431053941154 m against the frozen tolerance 0.01 m. The sealed profile report (reference 8b81aec5365f5dba252af789e7f7ad63f495fdbce7b84d019979ea26e6555cb1) supplies the separate settling and computational results: sampled_settling passed=false (max_error_m 0.008694 within the 0.01 m position limit, but max_speed_m_s 0.03156 exceeding the 0.02 m/s speed limit, sampled over a 0.05 s window with no continuous-time guarantee); 35 accepted plans all 'feasible_early_stop' with converged_updates 0; initialization_selected 7; deadline_misses 35 of 35; real_time_demonstrated false; mean_update_s 24.977 per 0.01 s control interval; total simulation_wall_s 878.735; force_bound_violation_n 0 and hold_last_responses 0, so no numerical reset masked an incomplete execution. No alternative authorized backend exists for crosscheck, and the route backend-solve budget is exhausted, so no further solve could change this outcome. Delivering the session incumbent (candidate build-profile-1, node run-profile-1) is the honest evidence-led termination.",
+      "task_success": true
+    },
+    "incumbent": {
+      "candidate_id": "build-profile-1",
+      "comparison_identity": "e55ec99a72b635a15f438b68fb992591d262919795ed06e0131bc13401788727",
+      "evaluation": {
+        "metrics": [
+          {
+            "name": "position_error",
+            "units": "m",
+            "value": 0.008473431053941154
+          }
+        ],
+        "source_execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+        "task_success": true,
+        "validity": "valid"
+      },
+      "evaluation_ref": {
+        "artifact_id": "1359c8df075550abefc4391694f03fd27c03352b8fa313c9c2e8214551eb2c9b",
+        "media_type": "application/json"
+      },
+      "node_id": "run-profile-1",
+      "owner_run_id": "gvs-live-1d8a5832db1e-53bb5822a962609c",
+      "profile_report": {
+        "execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+        "owner_run_id": "gvs-live-1d8a5832db1e-53bb5822a962609c",
+        "reference": {
+          "artifact_id": "8b81aec5365f5dba252af789e7f7ad63f495fdbce7b84d019979ea26e6555cb1",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      },
+      "profile_report_summary": {
+        "accepted_plans": 35,
+        "backend_timings_s": {
+          "backend_call": 874.6856678000186,
+          "engine_compile": 0.023705400060862303,
+          "prepare_compile": 0.01478950004093349,
+          "solve": 874.3714689000044
+        },
+        "complete": true,
+        "converged_updates": 0,
+        "deadline_misses": 35,
+        "evaluation": {
+          "artifact_id": "1359c8df075550abefc4391694f03fd27c03352b8fa313c9c2e8214551eb2c9b",
+          "media_type": "application/json"
+        },
+        "evaluation_validity": "valid",
+        "execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+        "force_bound_violation_n": 0.0,
+        "graph_construction_s": 1.315431899856776,
+        "hold_last_responses": 0,
+        "initialization_selected": 7,
+        "last_valid_error_m": 0.008473431053941154,
+        "last_valid_time_s": 0.35000000000000003,
+        "max_projection_residual_rad_m": 2.4722055426750034,
+        "max_rate_projection_residual_rad_m_s": 12.563365398127491,
+        "max_sampled_contacts": 0,
+        "maximum_error_m": 0.05434688844063781,
+        "maximum_plan_violation": 9.235746246775978e-06,
+        "mean_numerical_solve_s": 14.895135168584861,
+        "mean_preparation_s": 9.57858682570846,
+        "mean_update_s": 24.977006899997857,
+        "mean_validation_s": 0.25670310284809345,
+        "minimum_error_m": 0.004194189273512849,
+        "motion": {
+          "artifact_id": "7a67809c880aac466f6bcf5be38bf94e7794ecdcbc3f3963a19977021cfe17fa",
+          "media_type": "application/json"
+        },
+        "official_task_success": true,
+        "optimization_status_counts": {
+          "feasible_early_stop": 35
+        },
+        "raw_termination_counts": {
+          "User_Requested_Stop": 35
+        },
+        "real_time_demonstrated": false,
+        "sampled_settling": {
+          "available": true,
+          "continuous_time_guarantee": false,
+          "max_error_m": 0.008694221274361258,
+          "max_speed_m_s": 0.03156205037834025,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        },
+        "simulation": {
+          "artifact_id": "52f067b938db0037c185fbb94d0b70f39cea4cd5defbb579a11645ea2854cbc7",
+          "media_type": "application/json"
+        },
+        "simulation_wall_s": 878.7349999998696,
+        "solver_construction_s": 3.9733558997977525,
+        "solver_error_count": 0,
+        "solver_failure_flags": 0,
+        "solver_status": "completed",
+        "tension_range_n": [
+          0.5662001386742109,
+          5.025997143201603
+        ],
+        "terminal_error_m": 0.008473431053941154,
+        "terminal_tip_speed_m_s": 0.020947365033184347,
+        "updates": 35,
+        "valid_complete_execution": true
+      },
+      "score": 0.008473431053941154,
+      "search_run_id": null
+    },
+    "next_step": "Stop after delivering the evaluated incumbent: reach is achieved and independently evaluated, while sampled final-window settling, real-time delivery and optimizer convergence remain unmet and are reported as limitations rather than repaired inside this session.",
+    "nodes": [
+      {
+        "action": "build",
+        "execution_id": "298759d2289e42769b1f5a2e69916829",
+        "node_id": "build-profile-1",
+        "request_id": "model-1-tool",
+        "result": {
+          "artifact_id": "bf39431f9b7611be64492de3f6cfeb2edce8e701880a749d1c436aedf608165f",
+          "media_type": "application/json"
+        },
+        "selection": {
+          "action": "build",
+          "candidate_id": null,
+          "changes": {},
+          "combination": "validated_gvs_nmpc",
+          "evidence": [],
+          "max_trials": 1,
+          "next_step": "If the build validates, run the saved build with exactly one charged backend attempt, then inspect the resulting evaluation and profile report before finishing.",
+          "node_id": "build-profile-1",
+          "reason": "The frozen task requires one fresh execution of the exact declared reach task, and the only executable authorized combination is validated_gvs_nmpc (controller.gvs_nmpc with profile gvs_nmpc_free_reach_v1 on backend.family_mujoco). The profile's scope (matching) covers exactly this task, so no parameter changes are introduced; a changed configuration would only be an unvalidated starting point.",
+          "source_node": null,
+          "variables": {}
+        },
+        "status": "completed",
+        "summary": {
+          "actual_solves": 0,
+          "candidate_id": "build-profile-1",
+          "configuration": {
+            "artifact_id": "835a7adfaf2cfcf0afd2b60739b6490ea5848400eab8d416f8b0ea4afa635c46",
+            "media_type": "application/json"
+          },
+          "distinct_candidates": null,
+          "evaluated": false,
+          "evaluation": null,
+          "evaluation_ref": null,
+          "facts": "Built, not simulated, not evaluated. No task error or trajectory exists. Use run with this build node to execute and evaluate.",
+          "findings": {
+            "actuators": 6,
+            "components": [
+              {
+                "id": "near",
+                "kind": "flexible_segment",
+                "length_m": 0.16,
+                "sections": [
+                  {
+                    "angle_rad": 0.35,
+                    "holes_yz_m": [],
+                    "kind": "ellipse",
+                    "outer_yz_m": [],
+                    "parameters": {
+                      "semi_y_m": 0.01,
+                      "semi_z_m": 0.008
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "mid_guide",
+                "kind": "guide",
+                "length_m": null,
+                "sections": []
+              },
+              {
+                "id": "connector",
+                "kind": "rigid_connector",
+                "length_m": null,
+                "sections": []
+              },
+              {
+                "id": "far",
+                "kind": "flexible_segment",
+                "length_m": 0.12,
+                "sections": [
+                  {
+                    "angle_rad": -0.25,
+                    "holes_yz_m": [],
+                    "kind": "rectangle",
+                    "outer_yz_m": [],
+                    "parameters": {
+                      "height_z_m": 0.01,
+                      "width_y_m": 0.014
+                    }
+                  },
+                  {
+                    "angle_rad": 0.15,
+                    "holes_yz_m": [],
+                    "kind": "rectangle",
+                    "outer_yz_m": [],
+                    "parameters": {
+                      "height_z_m": 0.009,
+                      "width_y_m": 0.012
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "payload",
+                "kind": "payload",
+                "length_m": null,
+                "sections": []
+              }
+            ],
+            "id": "two_segment_development",
+            "tendons": 6
+          },
+          "new_evaluations": null,
+          "proposals": null,
+          "reused_evaluations": null,
+          "run_id": null,
+          "simulated": false,
+          "simulation": null,
+          "status": "built",
+          "stop_reason": null,
+          "task_success": null
+        }
+      },
+      {
+        "action": "run",
+        "execution_id": "02e0b197dd744ae1a411a881126d8f1d",
+        "node_id": "run-profile-1",
+        "request_id": "model-2-tool",
+        "result": {
+          "artifact_id": "28633019e2de029005187d0835517c42112181a07f7be139e1e2b5d17667c034",
+          "media_type": "application/json"
+        },
+        "selection": {
+          "action": "run",
+          "candidate_id": null,
+          "changes": {},
+          "combination": null,
+          "evidence": [
+            {
+              "artifact_id": "bf39431f9b7611be64492de3f6cfeb2edce8e701880a749d1c436aedf608165f",
+              "media_type": "application/json"
+            }
+          ],
+          "max_trials": 1,
+          "next_step": "Read the resulting evaluation and profile report from the run node result, then deliver the outcome with evidence.",
+          "node_id": "run-profile-1",
+          "reason": "The build node build-profile-1 validated the frozen two_segment_development configuration with the validated_gvs_nmpc combination. The frozen task guidance authorizes exactly one fresh backend execution of the original reach task, so I execute the saved build now to obtain an actual evaluation and trajectory.",
+          "source_node": "build-profile-1",
+          "variables": {}
+        },
+        "status": "completed",
+        "summary": {
+          "actual_solves": 1,
+          "candidate_id": "build-profile-1",
+          "configuration": {
+            "artifact_id": "06f6050e13c9c384b421275e43c62a3bd74bf2350169cd20c6efac95c8d9410a",
+            "media_type": "application/json"
+          },
+          "distinct_candidates": null,
+          "evaluated": true,
+          "evaluation": {
+            "candidate_id": "build-profile-1",
+            "metrics": [
+              {
+                "name": "position_error",
+                "units": "m",
+                "value": 0.008473431053941154
+              }
+            ],
+            "source_execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+            "task_success": true,
+            "validity": "valid"
+          },
+          "evaluation_ref": {
+            "artifact_id": "1359c8df075550abefc4391694f03fd27c03352b8fa313c9c2e8214551eb2c9b",
+            "media_type": "application/json"
+          },
+          "facts": null,
+          "findings": null,
+          "new_evaluations": null,
+          "profile_report": {
+            "execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+            "owner_run_id": "gvs-live-1d8a5832db1e-53bb5822a962609c",
+            "reference": {
+              "artifact_id": "8b81aec5365f5dba252af789e7f7ad63f495fdbce7b84d019979ea26e6555cb1",
+              "media_type": "application/json"
+            },
+            "request_id": "single-profile-report"
+          },
+          "profile_report_summary": {
+            "accepted_plans": 35,
+            "backend_timings_s": {
+              "backend_call": 874.6856678000186,
+              "engine_compile": 0.023705400060862303,
+              "prepare_compile": 0.01478950004093349,
+              "solve": 874.3714689000044
+            },
+            "complete": true,
+            "converged_updates": 0,
+            "deadline_misses": 35,
+            "evaluation": {
+              "artifact_id": "1359c8df075550abefc4391694f03fd27c03352b8fa313c9c2e8214551eb2c9b",
+              "media_type": "application/json"
+            },
+            "evaluation_validity": "valid",
+            "execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+            "force_bound_violation_n": 0.0,
+            "graph_construction_s": 1.315431899856776,
+            "hold_last_responses": 0,
+            "initialization_selected": 7,
+            "last_valid_error_m": 0.008473431053941154,
+            "last_valid_time_s": 0.35000000000000003,
+            "max_projection_residual_rad_m": 2.4722055426750034,
+            "max_rate_projection_residual_rad_m_s": 12.563365398127491,
+            "max_sampled_contacts": 0,
+            "maximum_error_m": 0.05434688844063781,
+            "maximum_plan_violation": 9.235746246775978e-06,
+            "mean_numerical_solve_s": 14.895135168584861,
+            "mean_preparation_s": 9.57858682570846,
+            "mean_update_s": 24.977006899997857,
+            "mean_validation_s": 0.25670310284809345,
+            "minimum_error_m": 0.004194189273512849,
+            "motion": {
+              "artifact_id": "7a67809c880aac466f6bcf5be38bf94e7794ecdcbc3f3963a19977021cfe17fa",
+              "media_type": "application/json"
+            },
+            "official_task_success": true,
+            "optimization_status_counts": {
+              "feasible_early_stop": 35
+            },
+            "raw_termination_counts": {
+              "User_Requested_Stop": 35
+            },
+            "real_time_demonstrated": false,
+            "sampled_settling": {
+              "available": true,
+              "continuous_time_guarantee": false,
+              "max_error_m": 0.008694221274361258,
+              "max_speed_m_s": 0.03156205037834025,
+              "passed": false,
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            },
+            "simulation": {
+              "artifact_id": "52f067b938db0037c185fbb94d0b70f39cea4cd5defbb579a11645ea2854cbc7",
+              "media_type": "application/json"
+            },
+            "simulation_wall_s": 878.7349999998696,
+            "solver_construction_s": 3.9733558997977525,
+            "solver_error_count": 0,
+            "solver_failure_flags": 0,
+            "solver_status": "completed",
+            "tension_range_n": [
+              0.5662001386742109,
+              5.025997143201603
+            ],
+            "terminal_error_m": 0.008473431053941154,
+            "terminal_tip_speed_m_s": 0.020947365033184347,
+            "updates": 35,
+            "valid_complete_execution": true
+          },
+          "proposals": null,
+          "reused_evaluations": null,
+          "run_id": "gvs-live-1d8a5832db1e-53bb5822a962609c",
+          "simulated": true,
+          "simulation": {
+            "execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+            "output": {
+              "artifact_id": "52f067b938db0037c185fbb94d0b70f39cea4cd5defbb579a11645ea2854cbc7",
+              "media_type": "application/json"
+            },
+            "solver_status": "completed"
+          },
+          "status": "valid",
+          "stop_reason": null,
+          "task_success": true
+        }
+      },
+      {
+        "action": "finish",
+        "execution_id": "14a6ef260b7645c5aa415cf141345edc",
+        "node_id": "finish-profile-1",
+        "request_id": "model-3-tool",
+        "result": {
+          "artifact_id": "533c37b4f1086394c78b4b62ecac6d5cdfd98f1218b5648e90243364e30f279e",
+          "media_type": "application/json"
+        },
+        "selection": {
+          "action": "finish",
+          "candidate_id": null,
+          "changes": {},
+          "combination": null,
+          "evidence": [
+            {
+              "artifact_id": "28633019e2de029005187d0835517c42112181a07f7be139e1e2b5d17667c034",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "1359c8df075550abefc4391694f03fd27c03352b8fa313c9c2e8214551eb2c9b",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "8b81aec5365f5dba252af789e7f7ad63f495fdbce7b84d019979ea26e6555cb1",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "52f067b938db0037c185fbb94d0b70f39cea4cd5defbb579a11645ea2854cbc7",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "bf39431f9b7611be64492de3f6cfeb2edce8e701880a749d1c436aedf608165f",
+              "media_type": "application/json"
+            }
+          ],
+          "max_trials": 1,
+          "next_step": "Stop after delivering the evaluated incumbent: reach is achieved and independently evaluated, while sampled final-window settling, real-time delivery and optimizer convergence remain unmet and are reported as limitations rather than repaired inside this session.",
+          "node_id": "finish-profile-1",
+          "reason": "The session's single authorized fresh backend execution is complete and already evaluated: run node run-profile-1 (result artifact 28633019e2de029005187d0835517c42112181a07f7be139e1e2b5d17667c034) reports solver_status 'completed', solver_error_count 0, evaluation validity 'valid', official_task_success true, and position_error 0.008473431053941154 m against the frozen tolerance 0.01 m. The sealed profile report (reference 8b81aec5365f5dba252af789e7f7ad63f495fdbce7b84d019979ea26e6555cb1) supplies the separate settling and computational results: sampled_settling passed=false (max_error_m 0.008694 within the 0.01 m position limit, but max_speed_m_s 0.03156 exceeding the 0.02 m/s speed limit, sampled over a 0.05 s window with no continuous-time guarantee); 35 accepted plans all 'feasible_early_stop' with converged_updates 0; initialization_selected 7; deadline_misses 35 of 35; real_time_demonstrated false; mean_update_s 24.977 per 0.01 s control interval; total simulation_wall_s 878.735; force_bound_violation_n 0 and hold_last_responses 0, so no numerical reset masked an incomplete execution. No alternative authorized backend exists for crosscheck, and the route backend-solve budget is exhausted, so no further solve could change this outcome. Delivering the session incumbent (candidate build-profile-1, node run-profile-1) is the honest evidence-led termination.",
+          "source_node": null,
+          "variables": {}
+        },
+        "status": "completed",
+        "summary": {
+          "actual_solves": 0,
+          "candidate_id": "build-profile-1",
+          "configuration": {
+            "artifact_id": "06f6050e13c9c384b421275e43c62a3bd74bf2350169cd20c6efac95c8d9410a",
+            "media_type": "application/json"
+          },
+          "distinct_candidates": null,
+          "evaluated": true,
+          "evaluation": {
+            "candidate_id": "build-profile-1",
+            "metrics": [
+              {
+                "name": "position_error",
+                "units": "m",
+                "value": 0.008473431053941154
+              }
+            ],
+            "source_execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+            "task_success": true,
+            "validity": "valid"
+          },
+          "evaluation_ref": {
+            "artifact_id": "1359c8df075550abefc4391694f03fd27c03352b8fa313c9c2e8214551eb2c9b",
+            "media_type": "application/json"
+          },
+          "facts": null,
+          "findings": null,
+          "new_evaluations": 0,
+          "profile_report": {
+            "execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+            "owner_run_id": "gvs-live-1d8a5832db1e-53bb5822a962609c",
+            "reference": {
+              "artifact_id": "8b81aec5365f5dba252af789e7f7ad63f495fdbce7b84d019979ea26e6555cb1",
+              "media_type": "application/json"
+            },
+            "request_id": "single-profile-report"
+          },
+          "profile_report_summary": {
+            "accepted_plans": 35,
+            "backend_timings_s": {
+              "backend_call": 874.6856678000186,
+              "engine_compile": 0.023705400060862303,
+              "prepare_compile": 0.01478950004093349,
+              "solve": 874.3714689000044
+            },
+            "complete": true,
+            "converged_updates": 0,
+            "deadline_misses": 35,
+            "evaluation": {
+              "artifact_id": "1359c8df075550abefc4391694f03fd27c03352b8fa313c9c2e8214551eb2c9b",
+              "media_type": "application/json"
+            },
+            "evaluation_validity": "valid",
+            "execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+            "force_bound_violation_n": 0.0,
+            "graph_construction_s": 1.315431899856776,
+            "hold_last_responses": 0,
+            "initialization_selected": 7,
+            "last_valid_error_m": 0.008473431053941154,
+            "last_valid_time_s": 0.35000000000000003,
+            "max_projection_residual_rad_m": 2.4722055426750034,
+            "max_rate_projection_residual_rad_m_s": 12.563365398127491,
+            "max_sampled_contacts": 0,
+            "maximum_error_m": 0.05434688844063781,
+            "maximum_plan_violation": 9.235746246775978e-06,
+            "mean_numerical_solve_s": 14.895135168584861,
+            "mean_preparation_s": 9.57858682570846,
+            "mean_update_s": 24.977006899997857,
+            "mean_validation_s": 0.25670310284809345,
+            "minimum_error_m": 0.004194189273512849,
+            "motion": {
+              "artifact_id": "7a67809c880aac466f6bcf5be38bf94e7794ecdcbc3f3963a19977021cfe17fa",
+              "media_type": "application/json"
+            },
+            "official_task_success": true,
+            "optimization_status_counts": {
+              "feasible_early_stop": 35
+            },
+            "raw_termination_counts": {
+              "User_Requested_Stop": 35
+            },
+            "real_time_demonstrated": false,
+            "sampled_settling": {
+              "available": true,
+              "continuous_time_guarantee": false,
+              "max_error_m": 0.008694221274361258,
+              "max_speed_m_s": 0.03156205037834025,
+              "passed": false,
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            },
+            "simulation": {
+              "artifact_id": "52f067b938db0037c185fbb94d0b70f39cea4cd5defbb579a11645ea2854cbc7",
+              "media_type": "application/json"
+            },
+            "simulation_wall_s": 878.7349999998696,
+            "solver_construction_s": 3.9733558997977525,
+            "solver_error_count": 0,
+            "solver_failure_flags": 0,
+            "solver_status": "completed",
+            "tension_range_n": [
+              0.5662001386742109,
+              5.025997143201603
+            ],
+            "terminal_error_m": 0.008473431053941154,
+            "terminal_tip_speed_m_s": 0.020947365033184347,
+            "updates": 35,
+            "valid_complete_execution": true
+          },
+          "proposals": null,
+          "reused_evaluations": null,
+          "run_id": "gvs-live-1d8a5832db1e-53bb5822a962609c",
+          "simulated": true,
+          "simulation": {
+            "execution_id": "c102aeb4a355401fab0a15af3c6d70b6",
+            "output": {
+              "artifact_id": "52f067b938db0037c185fbb94d0b70f39cea4cd5defbb579a11645ea2854cbc7",
+              "media_type": "application/json"
+            },
+            "solver_status": "completed"
+          },
+          "status": "completed",
+          "stop_reason": "The session's single authorized fresh backend execution is complete and already evaluated: run node run-profile-1 (result artifact 28633019e2de029005187d0835517c42112181a07f7be139e1e2b5d17667c034) reports solver_status 'completed', solver_error_count 0, evaluation validity 'valid', official_task_success true, and position_error 0.008473431053941154 m against the frozen tolerance 0.01 m. The sealed profile report (reference 8b81aec5365f5dba252af789e7f7ad63f495fdbce7b84d019979ea26e6555cb1) supplies the separate settling and computational results: sampled_settling passed=false (max_error_m 0.008694 within the 0.01 m position limit, but max_speed_m_s 0.03156 exceeding the 0.02 m/s speed limit, sampled over a 0.05 s window with no continuous-time guarantee); 35 accepted plans all 'feasible_early_stop' with converged_updates 0; initialization_selected 7; deadline_misses 35 of 35; real_time_demonstrated false; mean_update_s 24.977 per 0.01 s control interval; total simulation_wall_s 878.735; force_bound_violation_n 0 and hold_last_responses 0, so no numerical reset masked an incomplete execution. No alternative authorized backend exists for crosscheck, and the route backend-solve budget is exhausted, so no further solve could change this outcome. Delivering the session incumbent (candidate build-profile-1, node run-profile-1) is the honest evidence-led termination.",
+          "task_success": true
+        }
+      }
+    ],
     "source": "User authorized one fresh original-task capability-use experiment, with historical scoped development skill evidence."
   },
   "counts": {
-    "solves": 0,
-    "successful_integrations": 0,
-    "evaluations": 0,
-    "llm_requests": 0,
+    "solves": 1,
+    "successful_integrations": 1,
+    "evaluations": 1,
+    "llm_requests": 4,
     "diagnoses": 0,
     "videos": 0
   },
@@ -292,17 +1062,17 @@
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 0,
-      "model_calls": 0,
-      "backend_solves": 0,
+      "tool_calls": 7,
+      "model_calls": 4,
+      "backend_solves": 1,
       "worker_calls": 0,
-      "wall_s": 0.0
+      "wall_s": 912.0949999999721
     },
     "remaining": {
-      "backend_solves": 1,
-      "model_calls": 24,
-      "tool_calls": 60,
-      "wall_s": 7200.0,
+      "backend_solves": 0,
+      "model_calls": 20,
+      "tool_calls": 53,
+      "wall_s": 6287.905000000028,
       "worker_calls": 0
     },
     "occupied": {}
@@ -316,22 +1086,22 @@
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 0,
-      "model_calls": 0,
-      "backend_solves": 0,
+      "tool_calls": 7,
+      "model_calls": 4,
+      "backend_solves": 1,
       "worker_calls": 0,
-      "wall_s": 0.0
+      "wall_s": 912.0949999999721
     },
     "remaining": {
-      "backend_solves": 2,
-      "model_calls": 24,
-      "tool_calls": 60,
-      "wall_s": 7200.0,
+      "backend_solves": 1,
+      "model_calls": 20,
+      "tool_calls": 53,
+      "wall_s": 6287.905000000028,
       "worker_calls": 0
     },
     "occupied": {}
   },
-  "stop_reason": null,
+  "stop_reason": "The session's single authorized fresh backend execution is complete and already evaluated: run node run-profile-1 (result artifact 28633019e2de029005187d0835517c42112181a07f7be139e1e2b5d17667c034) reports solver_status 'completed', solver_error_count 0, evaluation validity 'valid', official_task_success true, and position_error 0.008473431053941154 m against the frozen tolerance 0.01 m. The sealed profile report (reference 8b81aec5365f5dba252af789e7f7ad63f495fdbce7b84d019979ea26e6555cb1) supplies the separate settling and computational results: sampled_settling passed=false (max_error_m 0.008694 within the 0.01 m position limit, but max_speed_m_s 0.03156 exceeding the 0.02 m/s speed limit, sampled over a 0.05 s window with no continuous-time guarantee); 35 accepted plans all 'feasible_early_stop' with converged_updates 0; initialization_selected 7; deadline_misses 35 of 35; real_time_demonstrated false; mean_update_s 24.977 per 0.01 s control interval; total simulation_wall_s 878.735; force_bound_violation_n 0 and hold_last_responses 0, so no numerical reset masked an incomplete execution. No alternative authorized backend exists for crosscheck, and the route backend-solve budget is exhausted, so no further solve could change this outcome. Delivering the session incumbent (candidate build-profile-1, node run-profile-1) is the honest evidence-led termination.",
   "limitations": [
     "Incumbent means lowest score among valid comparable evaluated candidates in this Route session; no global optimum claim.",
     "Diagnosis is observational, not causal. Text adapter has not viewed videos.",
