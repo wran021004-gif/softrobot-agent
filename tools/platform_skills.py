@@ -6,19 +6,59 @@ from schemas.platform import EvidenceRef
 from tools.platform_store import encode
 
 
+def skill_source(host,run_id):
+    """Local sessions or explicitly imported historical evidence, never executable authority."""
+    with host.store.connect(True) as db:
+        if db.execute('SELECT 1 FROM sessions WHERE run_id=?',(run_id,)).fetchone():
+            return host.store.session(run_id)['snapshot']['input'],host.store.events(run_id)
+        row=db.execute('SELECT value FROM meta WHERE key=?',('skill_source:'+run_id,)).fetchone()
+    if row is None: raise ValueError('SKILL_SOURCE_NOT_IMPORTED: '+run_id)
+    source=host.store.artifact(json.loads(row[0]))
+    return source['snapshot']['input'],source['events']
+
+
+def import_skill_history(host,source_root,source_run):
+    """Trusted preparation: preserve revisions and source bytes without importing grants/calls/sessions."""
+    from tools.platform_host import Host
+    from tools.platform_store import plain
+    source=Host(source_root,source_run)
+    history=library(source).history()  # Verify original lifecycle and evidence before import.
+    runs={run for revisions in history.values() for row in revisions
+        for run in row.skill.provenance.source_runs}
+    records={run:dict(source_root=str(source.store.root),source_project=source.store.config()['project_id'],
+        snapshot=source.store.session(run)['snapshot'],events=source.store.events(run)) for run in runs}
+    with source.store.connect(True) as original,host.store.transaction() as db:
+        # Preserve content-addressed artifacts (including nested references) exactly.
+        for row in original.execute('SELECT id,media,body FROM artifacts'):
+            ref=host.store.put(db,bytes(row['body']),row['media'])
+            if ref.artifact_id!=row['id']: raise ValueError('IMPORTED_ARTIFACT_HASH_MISMATCH')
+        for run,record in records.items():
+            ref=host.store.put(db,record)
+            db.execute('INSERT INTO meta VALUES (?,?)',('skill_source:'+run,encode(ref)))
+        imported=host.store.put(db,dict(source_root=str(source.store.root),source_runs=sorted(runs),
+            authority_imported=False,session_rows_imported=False,call_rows_imported=False))
+        host.store.event(db,host.run_id,'skill_history_import','imported',outputs=[imported])
+    for path in (source.store.root/'development_skills').glob('*/*.yaml'):
+        destination=host.store.root/'development_skills'/path.parent.name/path.name
+        destination.parent.mkdir(parents=True,exist_ok=True)
+        with destination.open('xb') as stream: stream.write(path.read_bytes())
+    library(host).history()
+    return plain(imported)
+
+
 class PlatformEvidenceStore:
     def __init__(self, host):
         self.host = host
 
     def run(self, run_id):
-        snapshot = self.host.store.session(run_id)['snapshot']['input']
+        snapshot,_ = skill_source(self.host,run_id)
         return SimpleNamespace(random_seed=snapshot['seed'])
 
     def reference(self, run_id, path, pointer=None):
         return ArtifactReference(run_id=run_id, path=path, pointer=pointer)
 
     def resolve(self, ref):
-        snapshot = self.host.store.session(ref.run_id)['snapshot']['input']
+        snapshot,events = skill_source(self.host,ref.run_id)
         if ref.path == 'task.yaml':
             value = dict(task_type=snapshot['task']['family'])
         elif ref.path == 'design_input.yaml':
@@ -28,7 +68,6 @@ class PlatformEvidenceStore:
             if ref.sha256 != identity:
                 raise ValueError('SKILL_SOURCE_HASH_REQUIRED')
             value = self.host.store.artifact(EvidenceRef(artifact_id=identity))
-            events = self.host.store.events(ref.run_id)
             if not any(identity == output['artifact_id'] for event in events for output in event['outputs']):
                 raise ValueError('SKILL_EVIDENCE_NOT_FROM_DECLARED_RUN')
         else:
@@ -55,7 +94,7 @@ def library(host):
         if checked.applicability.execution_scope is not None:
             for record in checked.validation:
                 for run_id in (*record.validated_runs, *record.failed_validation_runs):
-                    source=host.store.session(run_id)['snapshot']['input']
+                    source,_=skill_source(host,run_id)
                     if scope_match(checked.applicability.execution_scope, source)!='matching':
                         raise ValueError('SKILL_VALIDATION_EXECUTION_SCOPE_MISMATCH')
         return checked
@@ -74,7 +113,7 @@ def applicable(host, reference):
         current = inp['robot']
         for run in skill.provenance.source_runs:
             try:
-                source = host.store.session(run)['snapshot']['input']
+                source,_ = skill_source(host,run)
             except ValueError:
                 return False
             if source['robot'] != current or source['policy']['backend'] != inp['policy']['backend']:

@@ -543,7 +543,9 @@ EXTENSIONS.append(Extension('controller.gvs_nmpc','controller','2.0.0',gvs_profi
         command_space='tendon_tensions',sampling='interval_start_pre_step; held for control period',reset=False,restore=False,
         profile_id=gvs_profile.PROFILE_ID,predictor='model.gvs',execution_model='model.serial_bending_cells',
         historical_cost='Stage 3.15 mean delivery 25.073 s per 0.01 s interval; all deadlines missed',
-        discovery_tool='control.profile_describe',prepare_execution='extensions.tendon_family.gvs_profile:prepare_execution')))
+        discovery_tool='control.profile_describe',prepare_execution='extensions.tendon_family.gvs_profile:prepare_execution',
+        route_applicability='extensions.tendon_family.gvs_profile:checked_profile',
+        route_report_tool='control.profile_report')))
 for name,schema,binding,description in (
     ('control.profile_describe',gvs_profile.ProfileControl,'extensions.tendon_family.gvs_profile:describe',
      'Import declared historical numerical artifacts into this Store and describe the fixed free-reach profile, scope, evidence and historical cost; zero solves.'),

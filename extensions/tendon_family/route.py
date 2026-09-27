@@ -253,10 +253,7 @@ def overview(host):
             controller=c['controller']['extension_id'],
             executable=c['executable'],reasons=c['reasons']) for name,c in full['combinations'].items()},
         model_options=model_options(host, inp, full['combinations']),
-        control_profiles=[dict(profile_id='gvs_nmpc_free_reach_v1',controller='controller.gvs_nmpc@2.0.0',
-            predictor='model.gvs',execution='model.serial_bending_cells / MuJoCo / ideal tension',
-            discovery='control.profile_describe',scope='Fixed Stage 3.15 original free-reach task; offline, no contact or actuator validation',
-            historical_mean_update_s=25.073)],
+        control_profiles=control_profiles(host,inp,full['combinations']),
         baseline=full['baseline'],space=dict(templates=list(space.get('templates',{})),
             parameters=space.get('parameters',{}),discretization_parameters=space.get('discretization_parameters',{}),
             control_parameters=space.get('control_parameters',{}),model_parameters=space.get('model_parameters',{})),max_trials=full['max_trials'],
@@ -274,6 +271,37 @@ def overview(host):
 
 
 def inspect(ctx,args): return RouteResult(detail=overview(ctx.host))
+
+
+def profile_capability(inp,reg):
+    definition,_=reg.bind(inp.policy.controller,'controller')
+    if not definition.capabilities.get('profile_id'): return None
+    check=definition.hook('route_applicability')
+    if check: check(inp)
+    return definition.capabilities
+
+
+def control_profiles(host,inp,combinations):
+    """Only authorized combinations with matching physical/execution scope are options."""
+    rows=[]
+    for name,choice in combinations.items():
+        if not choice['executable']: continue
+        candidate=SessionInput.model_validate({**plain(inp),'policy':{**plain(inp.policy),
+            **{k:choice[k] for k in ('dynamics_model','backend','controller')}}})
+        try: capability=profile_capability(candidate,host.reg)
+        except ValueError: continue
+        if not capability: continue
+        required=('route.advance','simulation.run','evaluation.run')
+        authorized=all(t in inp.policy.tool_bindings for t in required)
+        rows.append(dict(combination=name,profile_id=capability['profile_id'],
+            controller=choice['controller'],predictor=capability['predictor'],
+            execution_model=capability['execution_model'],command_space=capability['command_space'],
+            applicability='matching',executable=authorized,
+            reasons=[] if authorized else ['Required Route execution tools are not granted'],
+            discovery=capability.get('discovery_tool') if capability.get('discovery_tool') in inp.policy.tool_bindings else None,
+            report_authorized=capability.get('route_report_tool') in inp.policy.tool_bindings,
+            historical_cost=capability.get('historical_cost')))
+    return rows
 
 
 def preflight(inp,args,reg):
@@ -341,7 +369,8 @@ def update_incumbent(ctx,route,node,out):
             route['incumbent']=dict(node_id=node['node_id'],search_run_id=out.get('run_id') if node['action']=='optimize' else None,
                 candidate_id=trial['candidate_id'],owner_run_id=trial.get('owner_run_id',out.get('run_id')),
                 evaluation_ref=trial['evaluation'],evaluation=summary,score=trial['score'],
-                comparison_identity=comparison)
+                comparison_identity=comparison,
+                **{k:trial[k] for k in ('profile_report','profile_report_summary') if k in trial})
 
 
 def run_built(ctx,args,route):
@@ -361,11 +390,21 @@ def run_built(ctx,args,route):
     ev=invoke(child,'single-evaluation','evaluation.run',dict(result=sim['output'],execution_id=sim['execution_id']))
     result=ctx.store.artifact(ev['output'])
     metadata=ctx.store.session(child.run_id)['state']['result_executions'][sim['execution_id']]
+    reported={}
+    capability=profile_capability(SessionInput.model_validate(inp),ctx.reg)
+    report_tool=capability.get('route_report_tool') if capability else None
+    if report_tool in inp['policy']['tool_bindings']:
+        receipt=invoke(child,'single-profile-report',report_tool,dict(
+            simulation_request_id='single-simulation',evaluation_request_id='single-evaluation'),parent=ctx.row['parent_id'])
+        detail=ctx.store.artifact(receipt['output'])['detail']
+        reported=dict(profile_report=dict(reference=receipt['output'],owner_run_id=child.run_id,
+            execution_id=sim['execution_id'],request_id='single-profile-report'),
+            profile_report_summary={k:v for k,v in detail.items() if k!='per_update_delivery_s'})
     return dict(status='valid' if result['validity']=='valid' else 'solver_failed',run_id=child.run_id,
         candidate_id=candidate,build_configuration=built['configuration'],configuration=metadata['candidate_input'],
         simulation=sim,evaluation=ev['output'],evaluation_data=result,metrics=result['metrics'],
         task_success=result['task_success'],score=score(result,inp['task']['objectives']),
-        simulated=True,evaluated=True,actual_solves=ctx.store.remaining(child.run_id)['used']['backend_solves'])
+        simulated=True,evaluated=True,actual_solves=ctx.store.remaining(child.run_id)['used']['backend_solves'],**reported)
 
 
 def summarize(out):
@@ -384,13 +423,15 @@ def summarize(out):
         configuration=best.get('configuration') if best else out.get('configuration'),
         proposals=out.get('proposals'),distinct_candidates=out.get('distinct_candidates'),actual_solves=out.get('actual_solves'),
         new_evaluations=out.get('new_evaluations'),reused_evaluations=out.get('reused_evaluations'),
-        findings=out.get('findings'))
+        findings=out.get('findings'),
+        **{k:(best or out)[k] for k in ('profile_report','profile_report_summary') if k in (best or out)})
 
 
 def delivery_summary(final):
     if final is None: return None
     return {k:final[k] for k in ('delivery_status','explicit_delivery','candidate_id','run_id','configuration',
-        'evaluation_ref','task_success','crosscheck_status','stop_reason','selection_basis') if k in final}
+        'evaluation_ref','task_success','crosscheck_status','stop_reason','selection_basis',
+        'profile_report','profile_report_summary') if k in final}
 
 
 def diagnosis_summary(report):
@@ -449,6 +490,10 @@ def advance(ctx,args):
             data['policy']['allowed_tools']=[]
             data['policy']['tool_bindings']={k:v for k,v in ctx.input.policy.tool_bindings.items() if k in (
                 'simulation.run','evaluation.run','diagnostics.saved_trajectory','visualization.render_simulation_video','evidence.read')}
+            capability=profile_capability(inp,ctx.reg)
+            report_tool=capability.get('route_report_tool') if capability else None
+            if report_tool in ctx.input.policy.tool_bindings:
+                data['policy']['tool_bindings'][report_tool]=ctx.input.policy.tool_bindings[report_tool]
             data['policy']['budget']['backend_solves']=args.max_trials
             data['policy']['search']=None
             if args.action=='build':
@@ -537,7 +582,8 @@ def delivery(ctx,route,child,trial,reason):
         diagnoses=diagnoses,stop_reason=reason,best_scope='session-wide valid comparable evaluated candidates; no global optimum',
         best_valid_evaluation=dict(node_id=best['node_id'],search_run_id=best['search_run_id'],candidate_id=best['candidate_id'],
             evaluation_ref=best['evaluation_ref'],evaluation=best['evaluation'],score=best['score']) if best else None,
-        limitations=view(ctx.host)['limitations'])
+        limitations=view(ctx.host)['limitations'],
+        **{k:trial[k] for k in ('profile_report','profile_report_summary') if k in trial})
 
 
 def finalize_stop(host):
