@@ -42,6 +42,10 @@ class ParameterizedReachTests(unittest.TestCase):
         self.assertEqual(len(controller.profile['numerical']['warm_guess']['tensions']),8)
         self.assertFalse(controller.preparation['nominal_is_current_target_solution'])
         self.assertEqual(controller.preparation['nominal_target_world_m'],[.29,.035,.19])
+        artifacts={digest(value):value for _,value in saved}
+        historical=artifacts[controller.preparation['historical_source']['artifact_id']]
+        self.assertEqual(historical['coordinate_order'],controller.preparation['coordinate_order'])
+        self.assertEqual(historical['nominal']['u0'],controller.profile['numerical']['nominal']['u0'])
         cold=inp.model_copy(deep=True)
         cold.policy.controller.parameters.data['numerical_source']='initial_state_pretension'
         material=reach_numerical(cold)

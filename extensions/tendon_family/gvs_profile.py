@@ -248,6 +248,11 @@ def prepare_execution(ctx, controller, inp):
     try:
         if inp.policy.controller.version=='3.0.0':
             numerical=reach_numerical(inp)
+            historical=numerical['provenance'].get('historical_source')
+            if historical is not None:
+                imported=ctx.save_artifact(load_profile()['numerical'],'historical_numerical_import')
+                if plain(imported)!=historical:
+                    raise ValueError('GVS_REACH_HISTORICAL_SOURCE_IDENTITY_MISMATCH')
             ref=ctx.save_artifact(numerical,'control_numerical_guess')
             controller.profile=dict(numerical=numerical)
             controller.preparation=dict(status='completed',wall_s=time.perf_counter()-started,
