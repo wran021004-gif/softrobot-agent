@@ -1,0 +1,275 @@
+{
+  "authority": "Task goal/initializer/timing; controller recipe; separately frozen sampled settling",
+  "controller": {
+    "extension_id": "controller.gvs_nmpc",
+    "parameters": {
+      "contract": "family.gvs_reach_control",
+      "data": {
+        "numerical_source": "bundled_guess",
+        "recipe": {
+          "basis": {
+            "strategy": "structural_linear"
+          },
+          "constraint_jacobian_mode": "reverse",
+          "curvature_scale_rad_m": 10.0,
+          "evaluation_threads": 1,
+          "feasible_return": {
+            "budget_s": 15.0,
+            "minimum_s": 5.0,
+            "relative_improvement": 0.1
+          },
+          "horizon": 10,
+          "max_cpu_s": 30.0,
+          "max_iterations": 120,
+          "max_unusable_updates": 3,
+          "rate_scale_rad_m_s": 1000.0,
+          "regenerate_warm_states": true,
+          "seed_position_tolerance_fraction": 0.5,
+          "seed_speed_limit_m_s": 0.02,
+          "substeps": 1,
+          "tension_weight": 0.0001,
+          "terminal_velocity_weight": 0.0001,
+          "terminal_weight": 5.0,
+          "tolerance": 1e-06,
+          "tracking_weight": 1.0,
+          "variation_weight": 0.001,
+          "velocity_weight": 0.0001
+        },
+        "settling": {
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        }
+      },
+      "version": "1.0.0"
+    },
+    "version": "3.0.0"
+  },
+  "effective_settling": {
+    "position_limit_m": 0.01,
+    "speed_limit_m_s": 0.02,
+    "window_s": 0.05
+  },
+  "execution_authorization": {
+    "project_budget": {
+      "limit": {
+        "backend_solves": 1,
+        "model_calls": 0,
+        "tool_calls": 12,
+        "wall_s": 5400.0,
+        "worker_calls": 0
+      },
+      "occupied": {},
+      "remaining": {
+        "backend_solves": 1,
+        "model_calls": 0,
+        "tool_calls": 11,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 1800.0,
+        "worker_calls": 0
+      }
+    },
+    "session_budget": {
+      "limit": {
+        "backend_solves": 1,
+        "model_calls": 0,
+        "tool_calls": 24,
+        "wall_s": 5400.0,
+        "worker_calls": 0
+      },
+      "occupied": {},
+      "remaining": {
+        "backend_solves": 1,
+        "model_calls": 0,
+        "tool_calls": 23,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 1800.0,
+        "worker_calls": 0
+      }
+    },
+    "simulation_tool_granted": true
+  },
+  "execution_preparation": {
+    "next_step": "simulation.run imports/generates and seals numerical guesses under its reserved wall/one-backend budget; actual-state regeneration and validation occur in each update",
+    "source": "bundled_guess",
+    "status": "pending_execution_hook"
+  },
+  "execution_scope": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.1.0"
+    },
+    "controller": {
+      "extension_id": "controller.gvs_nmpc",
+      "parameters": {
+        "contract": "family.gvs_reach_control",
+        "data": {
+          "numerical_source": "bundled_guess",
+          "recipe": {
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "constraint_jacobian_mode": "reverse",
+            "curvature_scale_rad_m": 10.0,
+            "evaluation_threads": 1,
+            "feasible_return": {
+              "budget_s": 15.0,
+              "minimum_s": 5.0,
+              "relative_improvement": 0.1
+            },
+            "horizon": 10,
+            "max_cpu_s": 30.0,
+            "max_iterations": 120,
+            "max_unusable_updates": 3,
+            "rate_scale_rad_m_s": 1000.0,
+            "regenerate_warm_states": true,
+            "seed_position_tolerance_fraction": 0.5,
+            "seed_speed_limit_m_s": 0.02,
+            "substeps": 1,
+            "tension_weight": 0.0001,
+            "terminal_velocity_weight": 0.0001,
+            "terminal_weight": 5.0,
+            "tolerance": 1e-06,
+            "tracking_weight": 1.0,
+            "variation_weight": 0.001,
+            "velocity_weight": 0.0001
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          }
+        },
+        "version": "1.0.0"
+      },
+      "version": "3.0.0"
+    },
+    "discretization": {
+      "contract": "family.discretization",
+      "data": {
+        "cells": {
+          "far": 12,
+          "near": 12
+        },
+        "coordinates": "two_principal_bending_angles_per_cell",
+        "model": "serial_bending_cells_v1",
+        "version": "serial_bending_discretization_v1"
+      },
+      "version": "1.0.0"
+    },
+    "execution_model": {
+      "extension_id": "model.serial_bending_cells",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "robot": {
+      "family": "tendon_robot_family",
+      "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+    },
+    "seed": 17,
+    "task": {
+      "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+      "family": "task.reach",
+      "goal": "5e2134b790c35bd55c062685f4b7dc76a71af4d9f6f30b88a4c0db2109578afe",
+      "identity": "31208c58077a57db8a761bade6da1676cca2f4f37bbcd54567847659346fa430",
+      "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      }
+    }
+  },
+  "historical_evidence": {
+    "exact_execution_scope_match": false,
+    "historical_task_match": false,
+    "reason": "Fixed v2 success does not validate v3 or changed targets, timing, initial states, recipes or acceptance conditions",
+    "sources": [
+      {
+        "classification": "historical artifact; no invented Store receipt",
+        "path": "runs/stage315_complete_control_20260927/report.md",
+        "sha256": "0322ae0a589139dcd0443081c70ae318621d6fd8e39a6949032c2e3cf58c4579"
+      },
+      {
+        "classification": "historical artifact; no invented Store receipt",
+        "path": "runs/stage315_complete_control_20260927/summary.json",
+        "sha256": "b99b80e195b19f47ea6c10ed23a4992418b95564ec79862dbae9e6380cb761ef"
+      },
+      {
+        "classification": "historical artifact; no invented Store receipt",
+        "path": "runs/stage315_complete_control_20260927/saved_evaluation.json",
+        "sha256": "1f2d7f26e2da8df4475510433ce814660d5ea6af0bb868f6f8555974f20bff00"
+      }
+    ],
+    "status": "unvalidated_configuration"
+  },
+  "invocation": "reach_input(run_id, target_m=..., initial=..., recipe=..., settling=...); simulation.run, evaluation.run, control.profile_report",
+  "technical_compatibility": {
+    "model_use_assessment": {
+      "design_id": "two_segment_development",
+      "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+      "generalized_coordinate_dimension": 12,
+      "model_id": "model.gvs",
+      "model_version": "1.0.0",
+      "relevant_assumptions": [
+        "supported serial tendon-driven continuum topology",
+        "selected strain basis spans deformation relevant to the use",
+        "inextensible centerline",
+        "no shear",
+        "no torsion",
+        "straight frictionless tendon spans"
+      ],
+      "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+      "representation_kind": "gvs_bending_basis_v1",
+      "representation_strategy": "structural_linear",
+      "state_dimension": 24,
+      "unsupported_requested_physics": [],
+      "uses": {
+        "local_model_control": {
+          "evidence": [],
+          "reasons": [
+            "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+          ],
+          "status": "WARN",
+          "validation": "unavailable"
+        },
+        "reduced_dynamics": {
+          "evidence": [],
+          "reasons": [
+            "Resolved GVS bending coordinates support this reduced-model use."
+          ],
+          "status": "ALLOW",
+          "validation": "unavailable"
+        }
+      }
+    },
+    "reason": "Same fixed robot/free-space execution; task-owned target, small named initial state and timing",
+    "status": "supported"
+  }
+}

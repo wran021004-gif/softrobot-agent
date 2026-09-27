@@ -1,0 +1,232 @@
+{
+  "implementation_commits": [
+    "8365356",
+    "6b0105c",
+    "dd7ea7e"
+  ],
+  "historical_baseline_commit": "58aa9eb",
+  "fixed_state_input_identity": "ee8ac3680813f942fa000815850234814b3939252a0c7e81bca1f010be453474",
+  "candidate_retained": false,
+  "candidate_total_delivery_change_fraction": -0.011908762908447112,
+  "neighboring_target_diagnosis": {
+    "execution_id": "b545c46bf6154c0783bcb26be5d4d10f",
+    "target_in_built_control": [
+      0.29,
+      0.05,
+      0.19
+    ],
+    "max_command_difference_from_shifted_initial_guess_n": 0.0,
+    "selected_initializations": 35,
+    "updates": 35,
+    "minimum_error_sample": {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 2.6297218625099252,
+      "time_s": 0.28,
+      "tip_error_m": 0.006222568480945919,
+      "tip_speed_m_s": 0.1625770507439591
+    },
+    "terminal_tip_speed_m_s": 0.2034726389134867,
+    "interpretation": "Actual state feedback and full warm regeneration were executed; selected initialization and command differences quantify whether optimization adapted the applied sequence. No hold-last or transfer-success inference."
+  },
+  "cost_comparison": [
+    {
+      "state": "start",
+      "baseline": {
+        "label": "start",
+        "preparation_s": 7.59851390006952,
+        "solve_s": 16.317833899986,
+        "validation_s": 0.28021140000782907,
+        "initial_check_s": 0.1270413000602275,
+        "solver_construction_s": 4.01563709997572,
+        "delivery_s": 28.341891600051895,
+        "initial_objective": 37.59306187999555,
+        "initial_violation": 2.8406096919120216e-14,
+        "objective": 37.59306187999555,
+        "violation": 2.8406096919120216e-14,
+        "status": "feasible_early_stop",
+        "selected_iteration": 0,
+        "accepted": true
+      },
+      "rejected_candidate": {
+        "label": "start",
+        "preparation_s": 7.617557799909264,
+        "solve_s": 15.911400400102139,
+        "validation_s": 0.2526903001125902,
+        "initial_check_s": 0.12711500003933907,
+        "solver_construction_s": 3.9689505000133067,
+        "delivery_s": 27.880091399885714,
+        "initial_objective": 37.59306187999555,
+        "initial_violation": 2.5370330836160804e-14,
+        "objective": 37.59306187999555,
+        "violation": 2.5370330836160804e-14,
+        "status": "feasible_early_stop",
+        "selected_iteration": 0,
+        "accepted": true
+      }
+    },
+    {
+      "state": "near_target",
+      "baseline": {
+        "label": "near_target",
+        "preparation_s": 12.251501500140876,
+        "solve_s": 11.701440799981356,
+        "validation_s": 0.2599381001200527,
+        "initial_check_s": 0.13238630001433194,
+        "solver_construction_s": 4.599802196025848e-06,
+        "delivery_s": 24.347464899998158,
+        "initial_objective": 0.13852242506019025,
+        "initial_violation": 4.9439619065339e-14,
+        "objective": 0.12409217336232427,
+        "violation": 7.434009391144719e-06,
+        "status": "feasible_early_stop",
+        "selected_iteration": 2,
+        "accepted": true
+      },
+      "rejected_candidate": {
+        "label": "near_target",
+        "preparation_s": 12.085583900101483,
+        "solve_s": 11.68106390000321,
+        "validation_s": 0.24879160011187196,
+        "initial_check_s": 0.12869090004824102,
+        "solver_construction_s": 4.899920895695686e-06,
+        "delivery_s": 24.146260699955747,
+        "initial_objective": 0.13852242506018403,
+        "initial_violation": 4.824699667560495e-14,
+        "objective": 0.12409217336232228,
+        "violation": 7.4340093988425546e-06,
+        "status": "feasible_early_stop",
+        "selected_iteration": 2,
+        "accepted": true
+      }
+    },
+    {
+      "state": "final_hold",
+      "baseline": {
+        "label": "final_hold",
+        "preparation_s": 12.154205800034106,
+        "solve_s": 11.90475509990938,
+        "validation_s": 0.25381319993175566,
+        "initial_check_s": 0.12741239997558296,
+        "solver_construction_s": 4.499917849898338e-06,
+        "delivery_s": 24.443457999965176,
+        "initial_objective": 0.08252511281739268,
+        "initial_violation": 4.6552930781096347e-14,
+        "objective": 0.05996809014965471,
+        "violation": 7.536578061146304e-06,
+        "status": "feasible_early_stop",
+        "selected_iteration": 2,
+        "accepted": true
+      },
+      "rejected_candidate": {
+        "label": "final_hold",
+        "preparation_s": 11.983365299878642,
+        "solve_s": 11.823810799978673,
+        "validation_s": 0.250246100127697,
+        "initial_check_s": 0.1263617998920381,
+        "solver_construction_s": 6.09993003308773e-06,
+        "delivery_s": 24.187905999831855,
+        "initial_objective": 0.0825251128196742,
+        "initial_violation": 1.3730753730192835e-10,
+        "objective": 0.059968090149667155,
+        "violation": 7.536578099879426e-06,
+        "status": "feasible_early_stop",
+        "selected_iteration": 2,
+        "accepted": true
+      }
+    }
+  ],
+  "target_selection": {
+    "new_target_m": [
+      0.29,
+      0.05,
+      0.19
+    ],
+    "old_terminal_tip_m": [
+      0.28478107549122267,
+      0.03960394453654096,
+      0.19483379307604623
+    ],
+    "old_terminal_error_new_target_m": 0.012596852691433109,
+    "target_selection": "Fixed +15 mm world-y shift before either new execution; original 10 mm tolerance unchanged"
+  },
+  "outcomes": {
+    "A": {
+      "execution_id": "da62410a51ac4d9b9c358076ac40df8c",
+      "official_task_success": true,
+      "terminal_error_m": 0.008473431053941154,
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.008694221274361258,
+        "max_speed_m_s": 0.03156205037834025,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "accepted_plans": 35,
+      "updates": 35,
+      "converged_updates": 0,
+      "initialization_selected": 7,
+      "solver_error_count": 0,
+      "hold_last_responses": 0,
+      "maximum_plan_violation": 9.235746246775978e-06,
+      "mean_update_s": 24.42801866283241,
+      "mean_preparation_s": 9.333918740014944,
+      "mean_numerical_solve_s": 14.594098874294598,
+      "mean_validation_s": 0.25631400571603863,
+      "graph_construction_s": 1.274376800050959,
+      "solver_construction_s": 3.931473700562492,
+      "deadline_misses": 35,
+      "simulation_wall_s": 859.405999999959,
+      "force_bound_violation_n": 0.0,
+      "tension_range_n": [
+        0.5662001386742109,
+        5.025997143201603
+      ],
+      "maximum_error_m": 0.05434688844063781,
+      "minimum_error_m": 0.004194189273512849,
+      "max_projection_residual_rad_m": 2.4722055426750034,
+      "real_time_demonstrated": false
+    },
+    "B": {
+      "execution_id": "b545c46bf6154c0783bcb26be5d4d10f",
+      "official_task_success": false,
+      "terminal_error_m": 0.013212549687364744,
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.013212549687364744,
+        "max_speed_m_s": 0.2071474222228893,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "accepted_plans": 35,
+      "updates": 35,
+      "converged_updates": 0,
+      "initialization_selected": 35,
+      "solver_error_count": 0,
+      "hold_last_responses": 0,
+      "maximum_plan_violation": 1.5815744981023672e-10,
+      "mean_update_s": 26.670625911426864,
+      "mean_preparation_s": 9.399847405696553,
+      "mean_numerical_solve_s": 16.772069468575395,
+      "mean_validation_s": 0.25580943140334317,
+      "graph_construction_s": 1.276657999958843,
+      "solver_construction_s": 3.9530565007589757,
+      "deadline_misses": 35,
+      "simulation_wall_s": 937.875,
+      "force_bound_violation_n": 0.0,
+      "tension_range_n": [
+        0.6315302379791942,
+        4.755852667139922
+      ],
+      "maximum_error_m": 0.06471057717713048,
+      "minimum_error_m": 0.006222568480945919,
+      "max_projection_residual_rad_m": 1.7361121071413765,
+      "real_time_demonstrated": false
+    }
+  }
+}
