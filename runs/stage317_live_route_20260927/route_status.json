@@ -1,0 +1,340 @@
+{
+  "run_id": "gvs-live-1d8a5832db1e",
+  "status": "created",
+  "task": {
+    "contract_version": "1.0.0",
+    "task_id": "family-multisegment-dev",
+    "task_version": "1.0.0",
+    "name": "Independent development validation of a serial multi-segment soft arm",
+    "status": "development_valid",
+    "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "version": "1.0.0",
+      "data": {
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ]
+      }
+    },
+    "environment": {
+      "contract": "experiment.assembly",
+      "version": "1.0.0",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "initializer": {
+      "extension_id": "initialize.family",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.initial",
+        "version": "1.0.0",
+        "data": {}
+      }
+    },
+    "timing": {
+      "timestep_s": 0.0005,
+      "control_period_s": 0.01,
+      "sample_period_s": 0.01,
+      "duration_s": 0.35,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ]
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "version": "1.0.0",
+        "data": {
+          "tolerance_m": 0.01
+        }
+      }
+    },
+    "objectives": [
+      {
+        "metric": "position_error",
+        "direction": "minimize",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "observations": [
+      {
+        "name": "tip_position",
+        "entity": "tip",
+        "dimension": 3,
+        "units": "m",
+        "frame": "world",
+        "phase": "post_step",
+        "missing": "unsupported"
+      }
+    ],
+    "sampling": {
+      "split": "development",
+      "seeds": [
+        17
+      ],
+      "aggregation": "per_instance",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    }
+  },
+  "route": {
+    "current": null,
+    "final": null,
+    "incumbent": null,
+    "next_step": "Select and evaluate an authorized candidate",
+    "nodes": [],
+    "source": "User authorized one fresh original-task capability-use experiment, with historical scoped development skill evidence."
+  },
+  "counts": {
+    "solves": 0,
+    "successful_integrations": 0,
+    "evaluations": 0,
+    "llm_requests": 0,
+    "diagnoses": 0,
+    "videos": 0
+  },
+  "combinations": {
+    "validated_gvs_nmpc": {
+      "dynamics_model": {
+        "extension_id": "model.serial_bending_cells",
+        "version": "1.0.0",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "version": "1.1.0",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "version": "2.0.0",
+        "parameters": {
+          "contract": "family.gvs_profile_control",
+          "version": "1.0.0",
+          "data": {
+            "profile_id": "gvs_nmpc_free_reach_v1"
+          }
+        }
+      },
+      "executable": true,
+      "reasons": []
+    }
+  },
+  "baseline": {
+    "id": "two_segment_development",
+    "components": [
+      {
+        "id": "near",
+        "kind": "flexible_segment",
+        "length_m": 0.16,
+        "sections": [
+          {
+            "angle_rad": 0.35,
+            "holes_yz_m": [],
+            "kind": "ellipse",
+            "outer_yz_m": [],
+            "parameters": {
+              "semi_y_m": 0.01,
+              "semi_z_m": 0.008
+            }
+          }
+        ]
+      },
+      {
+        "id": "mid_guide",
+        "kind": "guide",
+        "length_m": null,
+        "sections": []
+      },
+      {
+        "id": "connector",
+        "kind": "rigid_connector",
+        "length_m": null,
+        "sections": []
+      },
+      {
+        "id": "far",
+        "kind": "flexible_segment",
+        "length_m": 0.12,
+        "sections": [
+          {
+            "angle_rad": -0.25,
+            "holes_yz_m": [],
+            "kind": "rectangle",
+            "outer_yz_m": [],
+            "parameters": {
+              "height_z_m": 0.01,
+              "width_y_m": 0.014
+            }
+          },
+          {
+            "angle_rad": 0.15,
+            "holes_yz_m": [],
+            "kind": "rectangle",
+            "outer_yz_m": [],
+            "parameters": {
+              "height_z_m": 0.009,
+              "width_y_m": 0.012
+            }
+          }
+        ]
+      },
+      {
+        "id": "payload",
+        "kind": "payload",
+        "length_m": null,
+        "sections": []
+      }
+    ],
+    "tendons": 6,
+    "actuators": 6
+  },
+  "space": {
+    "templates": {},
+    "parameters": {},
+    "control_parameters": {},
+    "model_parameters": {},
+    "discretization_parameters": {}
+  },
+  "max_trials": 1,
+  "guidance": "Complete a fresh execution of the original reach task using the available applicable control capability, inspect the resulting evaluation and report, and deliver the outcome with evidence, including settling and computational limitations. Historical evidence is prior evidence only. One fresh backend execution is authorized for this session.",
+  "usage": {
+    "limit": {
+      "backend_solves": 1,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    },
+    "remaining": {
+      "backend_solves": 1,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "project_usage": {
+    "limit": {
+      "backend_solves": 2,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "stop_reason": null,
+  "limitations": [
+    "Incumbent means lowest score among valid comparable evaluated candidates in this Route session; no global optimum claim.",
+    "Diagnosis is observational, not causal. Text adapter has not viewed videos.",
+    "Serial bending cells only; no torsion/shear/stretch, friction, motor dynamics or general trajectory optimization."
+  ]
+}

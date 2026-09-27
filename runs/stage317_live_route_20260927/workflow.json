@@ -1,0 +1,45 @@
+{
+  "run_id": "gvs-live-1d8a5832db1e",
+  "interpreter": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+  "source_history": {
+    "artifact_id": "6b6ee0ceaa102d073d370527c14c7368984f4ad51df36a5bfc95336ada5544c1",
+    "media_type": "application/json"
+  },
+  "model": {
+    "adapter": "deepseek",
+    "model": "deepseek-flash",
+    "base_url": "https://api.deepseek.com",
+    "thinking": "enabled",
+    "max_tokens": 16384,
+    "timeout_s": 90,
+    "context_bytes": 150000,
+    "max_turns": 24
+  },
+  "threads": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "context_bytes": 37411,
+  "delivered_skills": [
+    {
+      "reference": "gvs_nmpc_free_reach@1",
+      "status": "validated",
+      "scope": {
+        "match": "matching",
+        "validation_applies": true,
+        "meaning": "Only matching scope carries validation; changed configuration is an unvalidated starting point."
+      },
+      "human_approval": null
+    }
+  ],
+  "reservation_analysis": {
+    "project_wall_s": 7200,
+    "session_wall_s": 7200,
+    "tool_reservation_s": 1800.0,
+    "parent_route_preflight_reservation_s": 0,
+    "anticipated_nested_execution_charge_s": 1800,
+    "post_execution_report_reservation_s": 1800.0,
+    "note": "Route preflight reserves zero wall; completed Route and child elapsed times are both charged. 7200 s leaves space for 1800 s cheap-tool reservations after the expected ~900 s simulation."
+  }
+}
