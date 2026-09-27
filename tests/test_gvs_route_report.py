@@ -30,6 +30,18 @@ def saved_run(backend,folder,timeout_s):
 
 
 class RouteReportTests(unittest.TestCase):
+    def test_parameterized_route_keeps_explicit_task_recipe_and_budget(self):
+        from extensions.tendon_family.gvs_profile import reach_input
+        frozen=reach_input('fixture',target_m=[.29,.05,.19],
+            recipe=dict(holding_tip_speed_weight=100.,holding_brake_lead_s=.05))
+        inp=route_input('new-session',True,task_input=frozen)
+        self.assertEqual(inp['task'],frozen['task'])
+        self.assertEqual(inp['policy']['controller'],frozen['policy']['controller'])
+        self.assertEqual(inp['policy']['route']['data']['combinations']['configured_gvs_nmpc']['controller'],frozen['policy']['controller'])
+        self.assertEqual(inp['policy']['budget']['backend_solves'],1)
+        self.assertEqual(inp['policy']['budget']['wall_s'],3600.)
+        self.assertEqual(frozen['run_id'],'fixture')
+
     def setup_route(self):
         root=Path('runs/gvs_route_checks')/uuid4().hex
         inp=route_input('route-check',True);host=Host(root,inp['run_id'])

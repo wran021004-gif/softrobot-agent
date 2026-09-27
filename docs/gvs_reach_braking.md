@@ -11,6 +11,11 @@
   default zero. Active at prediction nodes at/after task duration minus the
   configured `settling.window_s`. The prediction continues holding beyond the
   task endpoint; physical execution still ends at the original task duration.
+- `holding_brake_lead_s`: nonnegative empirical time margin, default zero.
+  Holding-speed cost starts at `max(0, duration - settling.window_s - lead)`.
+  The actual settling window and its position/speed limits remain unchanged.
+  A positive lead demands braking earlier to leave time for residual motion;
+  it is not a certified model-error bound or a physical settling guarantee.
 
 World tip velocity is the fixed-mount tip-position Jacobian times GVS generalized
 velocity. A rolling endpoint is not the absolute task endpoint. Holding activation

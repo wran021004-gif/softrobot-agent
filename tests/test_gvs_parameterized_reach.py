@@ -18,7 +18,7 @@ class ParameterizedReachTests(unittest.TestCase):
         joint=physics_for(baseline)['dofs'][0]
         inp=SessionInput.model_validate(reach_input('b',target_m=[.29,.05,.19],
             initial=dict(qpos_rad={joint:.001},qvel_rad_s={joint:.002}),
-            timing=dict(duration_s=.4),recipe=dict(horizon=8),
+            timing=dict(duration_s=.4),recipe=dict(horizon=8,holding_brake_lead_s=.02),
             settling=dict(window_s=.04,position_limit_m=.009,speed_limit_m_s=.015)))
         p=checked_reach(inp)
         from tools.platform_tools import simulation_preflight
@@ -32,6 +32,7 @@ class ParameterizedReachTests(unittest.TestCase):
         plan=resolve_gvs_nmpc_control(inp,physics_for(inp))
         self.assertEqual(plan['task']['goal']['data']['target_m'],[.29,.05,.19])
         self.assertEqual(plan['effective_parameters']['horizon'],8)
+        self.assertEqual(plan['effective_parameters']['holding_brake_lead_s'],.02)
         saved=[]
         def save(value,kind):
             saved.append((kind,value));return EvidenceRef(artifact_id=digest(value))

@@ -191,12 +191,14 @@ class TrajectoryWorkspace:
         if elapsed_s is None or not np.isfinite(elapsed_s) or elapsed_s<0:
             raise ValueError('GVS_HOLDING_COST_REQUIRES_CURRENT_EXECUTION_TIME')
         times=elapsed_s+np.arange(1,self.parameters.horizon*self.parameters.substeps+1)*self.period/self.parameters.substeps
-        weights=(times>=self.holding_start-1e-9).astype(float)
+        braking_start=max(0.,self.holding_start-self.parameters.holding_brake_lead_s)
+        weights=(times>=braking_start-1e-9).astype(float)
         for k,weight in enumerate(weights,1):
             self.problem.variables[f'holding/{k}']['bounds']=[float(weight)]*2
             self.problem.initial_guess[f'holding/{k}']=float(weight)
         return dict(current_time_s=float(elapsed_s),node_times_s=times.tolist(),holding_active=weights.tolist(),
             task_endpoint_s=self.duration,holding_start_s=self.holding_start,
+            braking_start_s=braking_start,holding_brake_lead_s=self.parameters.holding_brake_lead_s,
             beyond_task='Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged.')
 
     def solve(self,measured_x,previous_u,warm=None,*,elapsed_s=None):
@@ -263,7 +265,7 @@ class TrajectoryWorkspace:
             previous_tensions_n=list(previous_u),
             period_s=self.period,substeps=self.parameters.substeps,
             integration='implicit Euler in mass/force form; q scale 10 rad/m, force scale .001 N*m^2/rad',
-            cost='Stage weights per second on squared tip/position scale, curvature rate/(1 rad/(m*s)), tension/(1 N) and delta tension/(1 N); terminal weights on squared tip/position scale, curvature rate and world tip speed/speed scale. Optional holding speed cost starts at task duration minus configured settling window, using absolute prediction-node times. Position scale defaults to task tolerance. Smoothing is a design penalty.',
+            cost='Stage weights per second on squared tip/position scale, curvature rate/(1 rad/(m*s)), tension/(1 N) and delta tension/(1 N); terminal weights on squared tip/position scale, curvature rate and world tip speed/speed scale. Optional holding speed cost starts at max(0, task duration minus settling window minus holding_brake_lead_s), using absolute prediction-node times. Acceptance timing is unchanged. Position scale defaults to task tolerance. Smoothing is a design penalty.',
             cost_scales=dict(position_m=self.parameters.position_error_scale_m or self.goal_tolerance,
                 tip_speed_m_s=self.parameters.tip_speed_scale_m_s))
         # A feasible finite-iteration plan can drive suboptimal NMPC. Keep its

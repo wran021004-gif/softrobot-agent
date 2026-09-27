@@ -990,6 +990,8 @@ class GVSTrajectoryParameters(Contract):
         description='Dimensionless terminal weight on squared world tip speed / tip_speed_scale_m_s. Zero preserves legacy cost.')
     holding_tip_speed_weight: FiniteFloat = Field(default=0.,ge=0,
         description='Per-second squared spatial speed weight on nodes at/after the configured task settling-window start. Requires explicit settling settings.')
+    holding_brake_lead_s: FiniteFloat = Field(default=0.,ge=0,
+        description='Start holding-speed cost this many seconds before the task settling window (clamped at task start). Empirical braking margin, not an acceptance change; zero preserves historical scheduling.')
     recover_returned_tensions: bool = Field(default=False,description=(
         'Reintegrate one lower-objective unfinished IPOPT tension sequence from the current measurement; '
         'deliver only if independently feasible and better than the selected plan. Cost is included in update timing.'))

@@ -32,6 +32,16 @@ class BrakingTests(unittest.TestCase):
         self.assertEqual(after['holding_active'],[1.,1.,1.])
         self.assertEqual(graph,w.problem.objective_function.data['expression_digest'])
         self.assertEqual(w.problem.initial_guess['holding/1'],1.)
+        # Same graph, different task duration/window; lead is a cost schedule,
+        # never a change to the authoritative sampled acceptance window.
+        w.parameters=w.parameters.model_copy(update=dict(holding_brake_lead_s=.02))
+        lead=w._set_prediction_time(.32)
+        self.assertAlmostEqual(lead['braking_start_s'],.34)
+        self.assertAlmostEqual(lead['holding_start_s'],.36)
+        self.assertEqual(lead['holding_active'],[0.,1.,1.])
+        self.assertEqual(graph,w.problem.objective_function.data['expression_digest'])
+        w.parameters=w.parameters.model_copy(update=dict(holding_brake_lead_s=1.))
+        self.assertEqual(w._set_prediction_time(0.)['holding_active'],[1.,1.,1.])
 
     def test_spatial_speed_cost_matches_finite_difference_and_keeps_constraints(self):
         inp = SessionInput.model_validate(reach_input('brake-check', recipe=dict(horizon=1)))
