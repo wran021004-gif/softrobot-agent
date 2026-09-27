@@ -1,0 +1,2527 @@
+{
+  "starting_commit": "d02e4e5",
+  "implementation_commit": "fee35a6",
+  "environment": {
+    "interpreter": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+    "python": "3.11.16",
+    "os": "Windows-10-10.0.19044-SP0",
+    "processor": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+    "logical_processors": 20,
+    "threads": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  },
+  "candidate": {
+    "recipe": {
+      "seed_position_tolerance_fraction": 0.5,
+      "seed_speed_limit_m_s": 0.02,
+      "feasible_return": {
+        "minimum_s": 5.0,
+        "budget_s": 15.0,
+        "relative_improvement": 0.1
+      },
+      "regenerate_warm_states": true,
+      "terminal_velocity_weight": 0.0001,
+      "max_unusable_updates": 3,
+      "constraint_jacobian_mode": "reverse",
+      "curvature_scale_rad_m": 10.0,
+      "rate_scale_rad_m_s": 1000.0,
+      "max_cpu_s": 30.0,
+      "basis": {
+        "strategy": "structural_linear"
+      },
+      "horizon": 10,
+      "substeps": 1,
+      "tracking_weight": 1.0,
+      "terminal_weight": 5.0,
+      "velocity_weight": 0.0001,
+      "tension_weight": 0.0001,
+      "variation_weight": 0.001,
+      "max_iterations": 120,
+      "tolerance": 1e-06,
+      "evaluation_threads": 1,
+      "recover_returned_tensions": true,
+      "position_error_scale_m": 0.01,
+      "tip_speed_scale_m_s": 0.02,
+      "terminal_tip_speed_weight": 1.0,
+      "holding_tip_speed_weight": 100.0
+    },
+    "formulations_tried": 2,
+    "rationale": "Terminal spatial speed reduces rolling-end speed, but the late sample still predicts 0.088--0.112 m/s during the authoritative holding window. Add 100/s normalized spatial-speed cost on absolute-time holding nodes. Early two local cases have zero holding activation and reuse terminal-only results.",
+    "limitation": "Late historical state is already about 13 mm away and cannot be claimed recovered inside the 10 mm/0.02 m/s window. Initial and approach predictions retain approach; full B is the prospective test, not a predicted pass.",
+    "fixed_inputs_identity": "05c63a5fcb7f629eb76757095e2ddefcf39b28ed51dca456a675d1aa2fa0fe04",
+    "tests": {
+      "passed": 6,
+      "command": "python -m unittest tests.test_gvs_braking tests.test_gvs_feedback_recovery tests.test_gvs_parameterized_reach -v"
+    },
+    "full_backend_budget": 3,
+    "conditional_A": "Only after fresh B reach and sampled settling pass",
+    "conditional_LLM": "Only after fresh B reach+settling and fresh A reach pass; at most one fresh backend execution"
+  },
+  "prediction_checks": {
+    "input_identity": "05c63a5fcb7f629eb76757095e2ddefcf39b28ed51dca456a675d1aa2fa0fe04",
+    "rows": [
+      {
+        "label": "start",
+        "time_s": 0.0,
+        "reconstruction": {
+          "predicted_position_m": [
+            0.308,
+            0.0,
+            0.15
+          ],
+          "predicted_velocity_m_s": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "position_difference_m": 5.551115123125783e-17,
+          "velocity_difference_m_s": 0.0,
+          "predicted_speed_m_s": 0.0,
+          "actual_speed_m_s": 0.0
+        },
+        "one_period_prediction": {
+          "predicted_position_m": [
+            0.30779648417881356,
+            0.0028573498699653523,
+            0.15273623920570895
+          ],
+          "predicted_velocity_m_s": [
+            -0.04068226724844653,
+            0.28517323584211984,
+            0.2728025051788612
+          ],
+          "position_difference_m": 0.0009288856537947647,
+          "velocity_difference_m_s": 0.07707167287443532,
+          "predicted_speed_m_s": 0.3967367239631364,
+          "actual_speed_m_s": 0.4735915573365087
+        },
+        "next_reconstruction": {
+          "predicted_position_m": [
+            0.30786658934799144,
+            0.001980763750442909,
+            0.15174065543486712
+          ],
+          "predicted_velocity_m_s": [
+            -0.0381961211239395,
+            0.30693722356743824,
+            0.284245702701513
+          ],
+          "position_difference_m": 0.00039960902462115287,
+          "velocity_difference_m_s": 0.053728992718738613,
+          "predicted_speed_m_s": 0.4200774004686269,
+          "actual_speed_m_s": 0.4735915573365087
+        },
+        "prediction_to_next_projected_q_norm": 0.3037787746755523,
+        "prediction_to_next_projected_rate_norm": 30.51781528420597,
+        "prediction_timing": {
+          "construction_s": 4.439708299934864,
+          "integration_s": 1.2231844998896122,
+          "repeated_terminal_scaled_defect": 2.901080005929313,
+          "extended_tail_scaled_defect": 1.0842021724855044e-14
+        },
+        "wall_s": 5.6636599998455495
+      },
+      {
+        "label": "approach",
+        "time_s": 0.1,
+        "reconstruction": {
+          "predicted_position_m": [
+            0.29244521734296325,
+            0.039754361409302406,
+            0.18310018305683645
+          ],
+          "predicted_velocity_m_s": [
+            -0.12173685744541293,
+            0.35555528628162153,
+            0.23842548769665076
+          ],
+          "position_difference_m": 0.0038184222521338317,
+          "velocity_difference_m_s": 0.014112734478891581,
+          "predicted_speed_m_s": 0.44506868823460993,
+          "actual_speed_m_s": 0.45756464865208896
+        },
+        "one_period_prediction": {
+          "predicted_position_m": [
+            0.29148439330761694,
+            0.042887133291463306,
+            0.1851536314547061
+          ],
+          "predicted_velocity_m_s": [
+            -0.09885887859195593,
+            0.31245095412507884,
+            0.20497898709573478
+          ],
+          "position_difference_m": 0.004253495244943003,
+          "velocity_difference_m_s": 0.022402696132090172,
+          "predicted_speed_m_s": 0.38654244496681683,
+          "actual_speed_m_s": 0.40630625059100517
+        },
+        "next_reconstruction": {
+          "predicted_position_m": [
+            0.29132600218919036,
+            0.04313109038441545,
+            0.18530592880244107
+          ],
+          "predicted_velocity_m_s": [
+            -0.10635661272399248,
+            0.32092254494235073,
+            0.20614215166887756
+          ],
+          "position_difference_m": 0.00393712186001806,
+          "velocity_difference_m_s": 0.011574078895761458,
+          "predicted_speed_m_s": 0.3959767614609107,
+          "actual_speed_m_s": 0.40630625059100517
+        },
+        "prediction_to_next_projected_q_norm": 0.13601957535730302,
+        "prediction_to_next_projected_rate_norm": 12.464625824722152,
+        "prediction_timing": {
+          "construction_s": 2.998858690261841e-07,
+          "integration_s": 1.226922099944204,
+          "repeated_terminal_scaled_defect": 1.181619076817507,
+          "extended_tail_scaled_defect": 2.5153490401663703e-14
+        },
+        "wall_s": 1.2276407000608742
+      },
+      {
+        "label": "late",
+        "time_s": 0.28,
+        "reconstruction": {
+          "predicted_position_m": [
+            0.2810552252954694,
+            0.05782863679594856,
+            0.1954305368792264
+          ],
+          "predicted_velocity_m_s": [
+            0.001249706741906908,
+            -0.03515708559109564,
+            -0.0013332767583278057
+          ],
+          "position_difference_m": 0.00496327508596102,
+          "velocity_difference_m_s": 0.0008211189448256672,
+          "predicted_speed_m_s": 0.0352045460290953,
+          "actual_speed_m_s": 0.03503489487947024
+        },
+        "one_period_prediction": {
+          "predicted_position_m": [
+            0.28130710292869043,
+            0.05745211455027652,
+            0.19536029720283216
+          ],
+          "predicted_velocity_m_s": [
+            0.02512490310040356,
+            -0.03770935980203685,
+            -0.007038847312625984
+          ],
+          "position_difference_m": 0.005082693665337187,
+          "velocity_difference_m_s": 0.012560982103492614,
+          "predicted_speed_m_s": 0.045856318473843964,
+          "actual_speed_m_s": 0.03827024778281233
+        },
+        "next_reconstruction": {
+          "predicted_position_m": [
+            0.28113513642456983,
+            0.05747719829152746,
+            0.19539022180232463
+          ],
+          "predicted_velocity_m_s": [
+            0.01240567232624061,
+            -0.03528848002048337,
+            -0.005718976977706745
+          ],
+          "position_difference_m": 0.004960838953370616,
+          "velocity_difference_m_s": 0.000658922080187642,
+          "predicted_speed_m_s": 0.03784024611037362,
+          "actual_speed_m_s": 0.03827024778281233
+        },
+        "prediction_to_next_projected_q_norm": 0.16749362374803284,
+        "prediction_to_next_projected_rate_norm": 16.03149408280004,
+        "prediction_timing": {
+          "construction_s": 2.998858690261841e-07,
+          "integration_s": 1.2406911000143737,
+          "repeated_terminal_scaled_defect": 0.3019845588431265,
+          "extended_tail_scaled_defect": 3.190264892538597e-14
+        },
+        "wall_s": 1.2414591999258846
+      }
+    ],
+    "period_s": 0.01,
+    "integration": "Production implicit Euler, reconstructed only for these three intervals",
+    "frames": "World position m and velocity m/s; same interval-start state and actual held tension",
+    "timing": "Historical rolling endpoints are t+0.10 s; no absolute task-time input. Task endpoint 0.35 s; settling window 0.30--0.35 s."
+  },
+  "local_comparison": [
+    {
+      "variant": "baseline",
+      "label": "start",
+      "time_s": 0.0,
+      "reused_from": null,
+      "accepted": true,
+      "terminal_error_m": 0.0022164356320472623,
+      "terminal_speed_m_s": 0.6113699892902543,
+      "minimum_error_m": 0.0022164356320472623,
+      "peak_speed_m_s": 0.7610317810293102,
+      "holding_window_max_speed_m_s": null,
+      "violation": 6.169262149746668e-11,
+      "graph_s": 1.2588124999310821,
+      "solver_construction_s": 3.9363390000071377,
+      "warm_s": 7.463372000027448,
+      "solve_s": 16.151296899886802,
+      "recovery_s": 6.210289600072429,
+      "validation_s": 0.37008329993113875,
+      "delivery_s": 34.13292500004172
+    },
+    {
+      "variant": "baseline",
+      "label": "approach",
+      "time_s": 0.1,
+      "reused_from": null,
+      "accepted": true,
+      "terminal_error_m": 0.000716504867183994,
+      "terminal_speed_m_s": 0.1269520937366449,
+      "minimum_error_m": 0.000716504867183994,
+      "peak_speed_m_s": 0.44506868823460993,
+      "holding_window_max_speed_m_s": null,
+      "violation": 1.4144839759113598e-06,
+      "graph_s": 1.2588124999310821,
+      "solver_construction_s": 4.499917849898338e-06,
+      "warm_s": 12.025879099965096,
+      "solve_s": 14.182911100098863,
+      "recovery_s": 0.0,
+      "validation_s": 0.25093209999613464,
+      "delivery_s": 26.58668369986117
+    },
+    {
+      "variant": "baseline",
+      "label": "late",
+      "time_s": 0.28,
+      "reused_from": null,
+      "accepted": true,
+      "terminal_error_m": 0.0021797163633168913,
+      "terminal_speed_m_s": 0.10757346085285434,
+      "minimum_error_m": 0.0021797163633168913,
+      "peak_speed_m_s": 0.1436258353893189,
+      "holding_window_max_speed_m_s": 0.1436258353893189,
+      "violation": 4.214578186011869e-06,
+      "graph_s": 1.2588124999310821,
+      "solver_construction_s": 5.200039595365524e-06,
+      "warm_s": 11.898999499855563,
+      "solve_s": 14.246159699978307,
+      "recovery_s": 0.0,
+      "validation_s": 0.2429806999862194,
+      "delivery_s": 26.514269100036472
+    },
+    {
+      "variant": "terminal",
+      "label": "start",
+      "time_s": 0.0,
+      "reused_from": null,
+      "accepted": true,
+      "terminal_error_m": 0.005425759938313248,
+      "terminal_speed_m_s": 0.16846033965417012,
+      "minimum_error_m": 0.00489898905466955,
+      "peak_speed_m_s": 0.8828510862167224,
+      "holding_window_max_speed_m_s": null,
+      "violation": 7.986840355744818e-11,
+      "graph_s": 1.251297399867326,
+      "solver_construction_s": 3.8667272001039237,
+      "warm_s": 7.39631689991802,
+      "solve_s": 16.030017600161955,
+      "recovery_s": 9.193062600214034,
+      "validation_s": 0.3947130998130888,
+      "delivery_s": 36.85705489991233
+    },
+    {
+      "variant": "terminal",
+      "label": "approach",
+      "time_s": 0.1,
+      "reused_from": null,
+      "accepted": true,
+      "terminal_error_m": 0.0036554247517547856,
+      "terminal_speed_m_s": 0.02265409531437137,
+      "minimum_error_m": 0.0011382741801865448,
+      "peak_speed_m_s": 0.44506868823460993,
+      "holding_window_max_speed_m_s": null,
+      "violation": 1.3180645810906277e-12,
+      "graph_s": 1.251297399867326,
+      "solver_construction_s": 4.200031980872154e-06,
+      "warm_s": 11.967921999981627,
+      "solve_s": 16.107592900050804,
+      "recovery_s": 6.194980500033125,
+      "validation_s": 0.3725944000761956,
+      "delivery_s": 34.644717399962246
+    },
+    {
+      "variant": "terminal",
+      "label": "late",
+      "time_s": 0.28,
+      "reused_from": null,
+      "accepted": true,
+      "terminal_error_m": 0.005154262638418475,
+      "terminal_speed_m_s": 0.0149519312514204,
+      "minimum_error_m": 0.005147563285895687,
+      "peak_speed_m_s": 0.11152993800343576,
+      "holding_window_max_speed_m_s": 0.11152993800343576,
+      "violation": 5.711327678153966e-11,
+      "graph_s": 1.251297399867326,
+      "solver_construction_s": 3.5997945815324783e-06,
+      "warm_s": 11.968136799987406,
+      "solve_s": 16.700706799980253,
+      "recovery_s": 8.75189119996503,
+      "validation_s": 0.3694540997967124,
+      "delivery_s": 37.79395369999111
+    },
+    {
+      "variant": "holding",
+      "label": "start",
+      "time_s": 0.0,
+      "reused_from": "terminal.json; every holding multiplier is zero",
+      "accepted": true,
+      "terminal_error_m": 0.005425759938313248,
+      "terminal_speed_m_s": 0.16846033965417012,
+      "minimum_error_m": 0.00489898905466955,
+      "peak_speed_m_s": 0.8828510862167224,
+      "holding_window_max_speed_m_s": null,
+      "violation": 7.986840355744818e-11,
+      "graph_s": 1.251297399867326,
+      "solver_construction_s": 3.8667272001039237,
+      "warm_s": 7.39631689991802,
+      "solve_s": 16.030017600161955,
+      "recovery_s": 9.193062600214034,
+      "validation_s": 0.3947130998130888,
+      "delivery_s": 36.85705489991233
+    },
+    {
+      "variant": "holding",
+      "label": "approach",
+      "time_s": 0.1,
+      "reused_from": "terminal.json; every holding multiplier is zero",
+      "accepted": true,
+      "terminal_error_m": 0.0036554247517547856,
+      "terminal_speed_m_s": 0.02265409531437137,
+      "minimum_error_m": 0.0011382741801865448,
+      "peak_speed_m_s": 0.44506868823460993,
+      "holding_window_max_speed_m_s": null,
+      "violation": 1.3180645810906277e-12,
+      "graph_s": 1.251297399867326,
+      "solver_construction_s": 4.200031980872154e-06,
+      "warm_s": 11.967921999981627,
+      "solve_s": 16.107592900050804,
+      "recovery_s": 6.194980500033125,
+      "validation_s": 0.3725944000761956,
+      "delivery_s": 34.644717399962246
+    },
+    {
+      "variant": "holding",
+      "label": "late",
+      "time_s": 0.28,
+      "reused_from": null,
+      "accepted": true,
+      "terminal_error_m": 0.012249886240171273,
+      "terminal_speed_m_s": 0.010240549941818425,
+      "minimum_error_m": 0.012249886240171273,
+      "peak_speed_m_s": 0.035204546029095306,
+      "holding_window_max_speed_m_s": 0.015900961853461446,
+      "violation": 7.453889935837843e-13,
+      "graph_s": 1.255012199981138,
+      "solver_construction_s": 3.8578749999869615,
+      "warm_s": 16.241470800014213,
+      "solve_s": 16.826295600039884,
+      "recovery_s": 6.300691100070253,
+      "validation_s": 0.37646770011633635,
+      "delivery_s": 43.60269799991511
+    }
+  ],
+  "B": {
+    "summary": {
+      "accepted_noninitialization_plans": 33,
+      "accepted_plans": 35,
+      "backend_timings_s": {
+        "backend_call": 959.8760422000196,
+        "engine_compile": 0.022002900019288063,
+        "prepare_compile": 0.04896889999508858,
+        "solve": 959.59778309986
+      },
+      "complete": true,
+      "control_parameters": {
+        "contract": "family.gvs_reach_control",
+        "data": {
+          "numerical_source": "bundled_guess",
+          "recipe": {
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "constraint_jacobian_mode": "reverse",
+            "curvature_scale_rad_m": 10.0,
+            "evaluation_threads": 1,
+            "feasible_return": {
+              "budget_s": 15.0,
+              "minimum_s": 5.0,
+              "relative_improvement": 0.1
+            },
+            "holding_tip_speed_weight": 100.0,
+            "horizon": 10,
+            "max_cpu_s": 30.0,
+            "max_iterations": 120,
+            "max_unusable_updates": 3,
+            "position_error_scale_m": 0.01,
+            "rate_scale_rad_m_s": 1000.0,
+            "recover_returned_tensions": true,
+            "regenerate_warm_states": true,
+            "seed_position_tolerance_fraction": 0.5,
+            "seed_speed_limit_m_s": 0.02,
+            "substeps": 1,
+            "tension_weight": 0.0001,
+            "terminal_tip_speed_weight": 1.0,
+            "terminal_velocity_weight": 0.0001,
+            "terminal_weight": 5.0,
+            "tip_speed_scale_m_s": 0.02,
+            "tolerance": 1e-06,
+            "tracking_weight": 1.0,
+            "variation_weight": 0.001,
+            "velocity_weight": 0.0001
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          }
+        },
+        "version": "1.0.0"
+      },
+      "converged_updates": 0,
+      "deadline_misses": 35,
+      "evaluation": {
+        "artifact_id": "a35619fe6b6e9e28c9ee09661426de2d2909eac4fb199ff149100d06fece7a5a",
+        "media_type": "application/json"
+      },
+      "evaluation_validity": "valid",
+      "execution_id": "9ca134d46e3741ad84acdb116e6c7558",
+      "execution_scope": {
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.1.0"
+        },
+        "controller": {
+          "extension_id": "controller.gvs_nmpc",
+          "parameters": {
+            "contract": "family.gvs_reach_control",
+            "data": {
+              "numerical_source": "bundled_guess",
+              "recipe": {
+                "basis": {
+                  "strategy": "structural_linear"
+                },
+                "constraint_jacobian_mode": "reverse",
+                "curvature_scale_rad_m": 10.0,
+                "evaluation_threads": 1,
+                "feasible_return": {
+                  "budget_s": 15.0,
+                  "minimum_s": 5.0,
+                  "relative_improvement": 0.1
+                },
+                "holding_tip_speed_weight": 100.0,
+                "horizon": 10,
+                "max_cpu_s": 30.0,
+                "max_iterations": 120,
+                "max_unusable_updates": 3,
+                "position_error_scale_m": 0.01,
+                "rate_scale_rad_m_s": 1000.0,
+                "recover_returned_tensions": true,
+                "regenerate_warm_states": true,
+                "seed_position_tolerance_fraction": 0.5,
+                "seed_speed_limit_m_s": 0.02,
+                "substeps": 1,
+                "tension_weight": 0.0001,
+                "terminal_tip_speed_weight": 1.0,
+                "terminal_velocity_weight": 0.0001,
+                "terminal_weight": 5.0,
+                "tip_speed_scale_m_s": 0.02,
+                "tolerance": 1e-06,
+                "tracking_weight": 1.0,
+                "variation_weight": 0.001,
+                "velocity_weight": 0.0001
+              },
+              "settling": {
+                "position_limit_m": 0.01,
+                "speed_limit_m_s": 0.02,
+                "window_s": 0.05
+              }
+            },
+            "version": "1.0.0"
+          },
+          "version": "3.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "far": 12,
+              "near": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "execution_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "robot": {
+          "family": "tendon_robot_family",
+          "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+        },
+        "seed": 17,
+        "task": {
+          "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+          "family": "task.reach",
+          "goal": "5e2134b790c35bd55c062685f4b7dc76a71af4d9f6f30b88a4c0db2109578afe",
+          "identity": "31208c58077a57db8a761bade6da1676cca2f4f37bbcd54567847659346fa430",
+          "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.35,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          }
+        }
+      },
+      "force_bound_violation_n": 0.0,
+      "graph_construction_s": 1.3096568000037223,
+      "hold_last_responses": 0,
+      "initialization_selected": 2,
+      "last_valid_error_m": 0.00617634289140399,
+      "last_valid_time_s": 0.35000000000000003,
+      "max_projection_residual_rad_m": 2.8514624567288167,
+      "max_rate_projection_residual_rad_m_s": 22.763044946058706,
+      "max_sampled_contacts": 0,
+      "maximum_error_m": 0.06275809454599472,
+      "maximum_plan_violation": 9.567844202920838e-06,
+      "mean_numerical_solve_s": 14.92537988573978,
+      "mean_preparation_s": 9.521018668563505,
+      "mean_recovery_integration_s": 2.4247122828649093,
+      "mean_recovery_s": 2.464702222862148,
+      "mean_recovery_validation_s": 0.03997706857376865,
+      "mean_update_s": 27.411236354302883,
+      "mean_validation_s": 0.2997066599849079,
+      "minimum_error_m": 0.0024933506506993833,
+      "motion": {
+        "artifact_id": "a7f86d3a4b2dec76dafc5a8f991f1eb0ead2895871ffe1e78d6450012d3f8b75",
+        "media_type": "application/json"
+      },
+      "numerical_preparation": {
+        "actual_initial_state_source": "Task initializer then measured backend state at every update",
+        "coordinate_order": [
+          "near.kappa_y_node_0",
+          "near.kappa_y_node_1",
+          "near.kappa_y_node_2",
+          "near.kappa_z_node_0",
+          "near.kappa_z_node_1",
+          "near.kappa_z_node_2",
+          "far.kappa_y_node_0",
+          "far.kappa_y_node_1",
+          "far.kappa_y_node_2",
+          "far.kappa_z_node_0",
+          "far.kappa_z_node_1",
+          "far.kappa_z_node_2"
+        ],
+        "cost_accounting": "Included in simulation.run reserved/charged wall time; graph/solver construction and state regeneration are separate execution costs",
+        "current_scope": {
+          "backend": {
+            "extension_id": "backend.family_mujoco",
+            "parameters": {
+              "contract": "family.mujoco_parameters",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.1.0"
+          },
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "bundled_guess",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_tip_speed_weight": 100.0,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": 0.01,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": true,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 1.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "3.0.0"
+          },
+          "discretization": {
+            "contract": "family.discretization",
+            "data": {
+              "cells": {
+                "far": 12,
+                "near": 12
+              },
+              "coordinates": "two_principal_bending_angles_per_cell",
+              "model": "serial_bending_cells_v1",
+              "version": "serial_bending_discretization_v1"
+            },
+            "version": "1.0.0"
+          },
+          "execution_model": {
+            "extension_id": "model.serial_bending_cells",
+            "parameters": {
+              "contract": "family.dynamics_model",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "robot": {
+            "family": "tendon_robot_family",
+            "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+          },
+          "seed": 17,
+          "task": {
+            "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+            "family": "task.reach",
+            "goal": "5e2134b790c35bd55c062685f4b7dc76a71af4d9f6f30b88a4c0db2109578afe",
+            "identity": "31208c58077a57db8a761bade6da1676cca2f4f37bbcd54567847659346fa430",
+            "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005
+            }
+          }
+        },
+        "execution_scope": {
+          "backend": {
+            "extension_id": "backend.family_mujoco",
+            "parameters": {
+              "contract": "family.mujoco_parameters",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.1.0"
+          },
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "bundled_guess",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_tip_speed_weight": 100.0,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": 0.01,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": true,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 1.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "3.0.0"
+          },
+          "discretization": {
+            "contract": "family.discretization",
+            "data": {
+              "cells": {
+                "far": 12,
+                "near": 12
+              },
+              "coordinates": "two_principal_bending_angles_per_cell",
+              "model": "serial_bending_cells_v1",
+              "version": "serial_bending_discretization_v1"
+            },
+            "version": "1.0.0"
+          },
+          "execution_model": {
+            "extension_id": "model.serial_bending_cells",
+            "parameters": {
+              "contract": "family.dynamics_model",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "robot": {
+            "family": "tendon_robot_family",
+            "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+          },
+          "seed": 17,
+          "task": {
+            "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+            "family": "task.reach",
+            "goal": "5e2134b790c35bd55c062685f4b7dc76a71af4d9f6f30b88a4c0db2109578afe",
+            "identity": "31208c58077a57db8a761bade6da1676cca2f4f37bbcd54567847659346fa430",
+            "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005
+            }
+          }
+        },
+        "historical_source": {
+          "artifact_id": "ef29737728ddd95d0e5da3bde818d910bee86abe04f13bf41521277f7e216d68",
+          "media_type": "application/json"
+        },
+        "nominal_is_current_target_solution": false,
+        "nominal_target_world_m": [
+          0.29,
+          0.035,
+          0.19
+        ],
+        "reused": true,
+        "source": {
+          "artifact_id": "1fa5ad601ebc55e14b065a60628f04827e13df114fc86bfea04af329676d6009",
+          "media_type": "application/json"
+        },
+        "source_kind": "compatible_historical_guess",
+        "status": "completed",
+        "tendon_order": [
+          "near_t0",
+          "near_t1",
+          "near_t2",
+          "far_t0",
+          "far_t1",
+          "far_t2"
+        ],
+        "units": {
+          "q": "rad/m",
+          "qdot": "rad/(m*s)",
+          "tension": "N"
+        },
+        "validity": "compatible finite bounded numerical guess; no dynamic feasibility or task success asserted",
+        "wall_s": 0.03101920010522008,
+        "warm_guess_is_execution_evidence": false
+      },
+      "official_task_success": true,
+      "optimization_status_counts": {
+        "feasible_early_stop": 35
+      },
+      "per_update_delivery_s": [
+        36.86954630003311,
+        36.354854699922726,
+        32.644093999871984,
+        35.55404890002683,
+        35.51575899985619,
+        33.089376399992034,
+        24.492409400176257,
+        34.318196300184354,
+        35.914209600072354,
+        24.665285800118,
+        24.358703899895772,
+        36.148930500028655,
+        24.20357930008322,
+        24.419997199904174,
+        26.853042900096625,
+        24.216984000056982,
+        24.108448599930853,
+        24.101889400044456,
+        23.879540499998257,
+        24.09590100008063,
+        24.22413680003956,
+        23.91031700000167,
+        23.91053150012158,
+        32.96278310008347,
+        24.11805949988775,
+        21.389617200009525,
+        21.627139700111,
+        33.16901249997318,
+        21.776464599883184,
+        21.582935499958694,
+        24.447439400013536,
+        27.49857890000567,
+        26.96711180009879,
+        21.409616800025105,
+        24.59473040001467
+      ],
+      "raw_termination_counts": {
+        "User_Requested_Stop": 35
+      },
+      "real_time_demonstrated": false,
+      "recovered_plans": 10,
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.00617634289140399,
+        "max_speed_m_s": 0.02526597250395897,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "simulation": {
+        "artifact_id": "b96c42c430c65d54ff4311881f16d91fcf838dc8784daa1a1074e3ab11320502",
+        "media_type": "application/json"
+      },
+      "simulation_wall_s": 963.7970000000205,
+      "solver_construction_s": 3.8569149994291365,
+      "solver_error_count": 0,
+      "solver_failure_flags": 0,
+      "solver_status": "completed",
+      "task": {
+        "actuator_channels": [
+          "actuator_commands"
+        ],
+        "contract_version": "1.0.0",
+        "environment": {
+          "contract": "experiment.assembly",
+          "data": {
+            "environment": {
+              "coordinate_frame": "world_base_x_forward_yz_cross_section",
+              "environment_id": "reach_free",
+              "gravity_m_s2": [
+                0.0,
+                0.0,
+                -9.81
+              ],
+              "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+              "lights": [
+                {
+                  "direction": [
+                    0.0,
+                    0.0,
+                    -1.0
+                  ],
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    2.0
+                  ]
+                }
+              ],
+              "objects": [
+                {
+                  "conaffinity": 1,
+                  "contype": 0,
+                  "half_size_m": [
+                    2.0,
+                    2.0,
+                    0.1
+                  ],
+                  "kind": "plane",
+                  "name": "floor",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    -0.02
+                  ]
+                }
+              ],
+              "schema_version": "1",
+              "truth_status": "HUMAN_OWNED",
+              "units": "SI"
+            },
+            "external_forces": [],
+            "floor_id": "floor",
+            "mount": {
+              "position_m": [
+                0.0,
+                0.0,
+                0.15
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "version": "1.0.0"
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "failure_policy": "retain_invalid_and_constraint_failures",
+        "family": "task.reach",
+        "goal": {
+          "contract": "reference.reach_goal",
+          "data": {
+            "target_m": [
+              0.29,
+              0.05,
+              0.19
+            ]
+          },
+          "version": "1.0.0"
+        },
+        "initializer": {
+          "extension_id": "initialize.family",
+          "parameters": {
+            "contract": "family.initial",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "name": "Independent development validation of a serial multi-segment soft arm",
+        "objectives": [
+          {
+            "direction": "minimize",
+            "metric": "position_error",
+            "units": "m",
+            "weight": 1.0
+          }
+        ],
+        "observations": [
+          {
+            "dimension": 3,
+            "entity": "tip",
+            "frame": "world",
+            "missing": "unsupported",
+            "name": "tip_position",
+            "phase": "post_step",
+            "units": "m"
+          }
+        ],
+        "robot_families": [
+          "tendon_robot_family"
+        ],
+        "sampling": {
+          "aggregation": "per_instance",
+          "seeds": [
+            17
+          ],
+          "split": "development",
+          "window_s": [
+            0.0,
+            0.35
+          ]
+        },
+        "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+        "status": "development_valid",
+        "task_id": "family-multisegment-dev",
+        "task_version": "1.0.0",
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.35,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        }
+      },
+      "tension_range_n": [
+        0.16767469486054454,
+        4.806740562392352
+      ],
+      "terminal_error_m": 0.00617634289140399,
+      "terminal_tip_speed_m_s": 0.01611133291308337,
+      "updates": 35,
+      "valid_complete_execution": true
+    },
+    "quality": {
+      "first_entry_s": 0.09,
+      "final_window": [
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 1.7015143003844635,
+          "time_s": 0.3,
+          "tip_error_m": 0.005281803391231258,
+          "tip_speed_m_s": 0.02526597250395897
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 1.4268150405797897,
+          "time_s": 0.31,
+          "tip_error_m": 0.005482101911264981,
+          "tip_speed_m_s": 0.02115576495553616
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 1.4249475581892517,
+          "time_s": 0.32,
+          "tip_error_m": 0.00567116934561817,
+          "tip_speed_m_s": 0.02016439655067384
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 1.5880402346342573,
+          "time_s": 0.33,
+          "tip_error_m": 0.0058588443282132675,
+          "tip_speed_m_s": 0.02067870583066368
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 1.7537586370422757,
+          "time_s": 0.34,
+          "tip_error_m": 0.006027029679209988,
+          "tip_speed_m_s": 0.01762220935348377
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 1.8091227414310285,
+          "time_s": 0.35000000000000003,
+          "tip_error_m": 0.00617634289140399,
+          "tip_speed_m_s": 0.01611133291308337
+        }
+      ],
+      "minimum_error_sample": {
+        "contacts": 0,
+        "rate_projection_residual_rad_m_s": 16.072820717088767,
+        "time_s": 0.1,
+        "tip_error_m": 0.0024933506506993833,
+        "tip_speed_m_s": 0.34348443294232683
+      },
+      "peak_tip_speed_m_s": 0.8002550743545479,
+      "recovery_attempts": 11,
+      "recovery_errors": 0,
+      "applied_hold_activations": [
+        {
+          "time_s": 0.0,
+          "current_time_s": 0.0,
+          "node_times_s": [
+            0.01,
+            0.02,
+            0.03,
+            0.04,
+            0.05,
+            0.06,
+            0.07,
+            0.08,
+            0.09,
+            0.1
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.01,
+          "current_time_s": 0.01,
+          "node_times_s": [
+            0.02,
+            0.03,
+            0.04,
+            0.05,
+            0.060000000000000005,
+            0.06999999999999999,
+            0.08,
+            0.09,
+            0.09999999999999999,
+            0.11
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.02,
+          "current_time_s": 0.02,
+          "node_times_s": [
+            0.03,
+            0.04,
+            0.05,
+            0.06,
+            0.07,
+            0.08,
+            0.09000000000000001,
+            0.1,
+            0.11,
+            0.12000000000000001
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.03,
+          "current_time_s": 0.03,
+          "node_times_s": [
+            0.04,
+            0.05,
+            0.06,
+            0.07,
+            0.08,
+            0.09,
+            0.1,
+            0.11,
+            0.12,
+            0.13
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.04,
+          "current_time_s": 0.04,
+          "node_times_s": [
+            0.05,
+            0.06,
+            0.07,
+            0.08,
+            0.09,
+            0.1,
+            0.11000000000000001,
+            0.12,
+            0.13,
+            0.14
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.05,
+          "current_time_s": 0.05,
+          "node_times_s": [
+            0.060000000000000005,
+            0.07,
+            0.08,
+            0.09,
+            0.1,
+            0.11,
+            0.12000000000000001,
+            0.13,
+            0.14,
+            0.15000000000000002
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.06,
+          "current_time_s": 0.06,
+          "node_times_s": [
+            0.06999999999999999,
+            0.08,
+            0.09,
+            0.1,
+            0.11,
+            0.12,
+            0.13,
+            0.14,
+            0.15,
+            0.16
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.07,
+          "current_time_s": 0.07,
+          "node_times_s": [
+            0.08,
+            0.09000000000000001,
+            0.1,
+            0.11000000000000001,
+            0.12000000000000001,
+            0.13,
+            0.14,
+            0.15000000000000002,
+            0.16,
+            0.17
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.08,
+          "current_time_s": 0.08,
+          "node_times_s": [
+            0.09,
+            0.1,
+            0.11,
+            0.12,
+            0.13,
+            0.14,
+            0.15000000000000002,
+            0.16,
+            0.16999999999999998,
+            0.18
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.09,
+          "current_time_s": 0.09,
+          "node_times_s": [
+            0.09999999999999999,
+            0.11,
+            0.12,
+            0.13,
+            0.14,
+            0.15,
+            0.16,
+            0.16999999999999998,
+            0.18,
+            0.19
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.1,
+          "current_time_s": 0.1,
+          "node_times_s": [
+            0.11,
+            0.12000000000000001,
+            0.13,
+            0.14,
+            0.15000000000000002,
+            0.16,
+            0.17,
+            0.18,
+            0.19,
+            0.2
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.11,
+          "current_time_s": 0.11,
+          "node_times_s": [
+            0.12,
+            0.13,
+            0.14,
+            0.15,
+            0.16,
+            0.16999999999999998,
+            0.18,
+            0.19,
+            0.2,
+            0.21000000000000002
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.12,
+          "current_time_s": 0.12,
+          "node_times_s": [
+            0.13,
+            0.13999999999999999,
+            0.15,
+            0.16,
+            0.16999999999999998,
+            0.18,
+            0.19,
+            0.2,
+            0.21,
+            0.22
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.13,
+          "current_time_s": 0.13,
+          "node_times_s": [
+            0.14,
+            0.15,
+            0.16,
+            0.17,
+            0.18,
+            0.19,
+            0.2,
+            0.21000000000000002,
+            0.22,
+            0.23
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.14,
+          "current_time_s": 0.14,
+          "node_times_s": [
+            0.15000000000000002,
+            0.16,
+            0.17,
+            0.18000000000000002,
+            0.19,
+            0.2,
+            0.21000000000000002,
+            0.22000000000000003,
+            0.23,
+            0.24000000000000002
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.15,
+          "current_time_s": 0.15,
+          "node_times_s": [
+            0.16,
+            0.16999999999999998,
+            0.18,
+            0.19,
+            0.2,
+            0.21,
+            0.22,
+            0.22999999999999998,
+            0.24,
+            0.25
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.16,
+          "current_time_s": 0.16,
+          "node_times_s": [
+            0.17,
+            0.18,
+            0.19,
+            0.2,
+            0.21000000000000002,
+            0.22,
+            0.23,
+            0.24,
+            0.25,
+            0.26
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.17,
+          "current_time_s": 0.17,
+          "node_times_s": [
+            0.18000000000000002,
+            0.19,
+            0.2,
+            0.21000000000000002,
+            0.22000000000000003,
+            0.23,
+            0.24000000000000002,
+            0.25,
+            0.26,
+            0.27
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.18,
+          "current_time_s": 0.18,
+          "node_times_s": [
+            0.19,
+            0.19999999999999998,
+            0.21,
+            0.22,
+            0.22999999999999998,
+            0.24,
+            0.25,
+            0.26,
+            0.27,
+            0.28
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.19,
+          "current_time_s": 0.19,
+          "node_times_s": [
+            0.2,
+            0.21,
+            0.22,
+            0.23,
+            0.24,
+            0.25,
+            0.26,
+            0.27,
+            0.28,
+            0.29000000000000004
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.2,
+          "current_time_s": 0.2,
+          "node_times_s": [
+            0.21000000000000002,
+            0.22,
+            0.23,
+            0.24000000000000002,
+            0.25,
+            0.26,
+            0.27,
+            0.28,
+            0.29000000000000004,
+            0.30000000000000004
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.21,
+          "current_time_s": 0.21,
+          "node_times_s": [
+            0.22,
+            0.22999999999999998,
+            0.24,
+            0.25,
+            0.26,
+            0.27,
+            0.28,
+            0.29,
+            0.3,
+            0.31
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.22,
+          "current_time_s": 0.22,
+          "node_times_s": [
+            0.23,
+            0.24,
+            0.25,
+            0.26,
+            0.27,
+            0.28,
+            0.29000000000000004,
+            0.3,
+            0.31,
+            0.32
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.23,
+          "current_time_s": 0.23,
+          "node_times_s": [
+            0.24000000000000002,
+            0.25,
+            0.26,
+            0.27,
+            0.28,
+            0.29000000000000004,
+            0.30000000000000004,
+            0.31,
+            0.32,
+            0.33
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.24,
+          "current_time_s": 0.24,
+          "node_times_s": [
+            0.25,
+            0.26,
+            0.27,
+            0.27999999999999997,
+            0.29,
+            0.3,
+            0.31,
+            0.32,
+            0.32999999999999996,
+            0.33999999999999997
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.25,
+          "current_time_s": 0.25,
+          "node_times_s": [
+            0.26,
+            0.27,
+            0.28,
+            0.29,
+            0.3,
+            0.31,
+            0.32,
+            0.33,
+            0.33999999999999997,
+            0.35
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.26,
+          "current_time_s": 0.26,
+          "node_times_s": [
+            0.27,
+            0.28,
+            0.29000000000000004,
+            0.3,
+            0.31,
+            0.32,
+            0.33,
+            0.34,
+            0.35,
+            0.36
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.27,
+          "current_time_s": 0.27,
+          "node_times_s": [
+            0.28,
+            0.29000000000000004,
+            0.30000000000000004,
+            0.31,
+            0.32,
+            0.33,
+            0.34,
+            0.35000000000000003,
+            0.36,
+            0.37
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.28,
+          "current_time_s": 0.28,
+          "node_times_s": [
+            0.29000000000000004,
+            0.30000000000000004,
+            0.31000000000000005,
+            0.32,
+            0.33,
+            0.34,
+            0.35000000000000003,
+            0.36000000000000004,
+            0.37,
+            0.38
+          ],
+          "holding_active": [
+            0.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.29,
+          "current_time_s": 0.29,
+          "node_times_s": [
+            0.3,
+            0.31,
+            0.31999999999999995,
+            0.32999999999999996,
+            0.33999999999999997,
+            0.35,
+            0.36,
+            0.37,
+            0.38,
+            0.39
+          ],
+          "holding_active": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.3,
+          "current_time_s": 0.3,
+          "node_times_s": [
+            0.31,
+            0.32,
+            0.32999999999999996,
+            0.33999999999999997,
+            0.35,
+            0.36,
+            0.37,
+            0.38,
+            0.39,
+            0.4
+          ],
+          "holding_active": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.31,
+          "current_time_s": 0.31,
+          "node_times_s": [
+            0.32,
+            0.33,
+            0.33999999999999997,
+            0.35,
+            0.36,
+            0.37,
+            0.38,
+            0.39,
+            0.4,
+            0.41000000000000003
+          ],
+          "holding_active": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.32,
+          "current_time_s": 0.32,
+          "node_times_s": [
+            0.33,
+            0.34,
+            0.35,
+            0.36,
+            0.37,
+            0.38,
+            0.39,
+            0.4,
+            0.41000000000000003,
+            0.42000000000000004
+          ],
+          "holding_active": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.33,
+          "current_time_s": 0.33,
+          "node_times_s": [
+            0.34,
+            0.35000000000000003,
+            0.36,
+            0.37,
+            0.38,
+            0.39,
+            0.4,
+            0.41000000000000003,
+            0.42000000000000004,
+            0.43000000000000005
+          ],
+          "holding_active": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        {
+          "time_s": 0.34,
+          "current_time_s": 0.34,
+          "node_times_s": [
+            0.35000000000000003,
+            0.36000000000000004,
+            0.37,
+            0.38,
+            0.39,
+            0.4,
+            0.41000000000000003,
+            0.42000000000000004,
+            0.43000000000000005,
+            0.44000000000000006
+          ],
+          "holding_active": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        }
+      ],
+      "first_tension_changes_n": [
+        1.5698948187825108,
+        0.4677425697157031,
+        0.3566873451461353,
+        0.0,
+        0.2864150991849639,
+        0.056664477636992894,
+        0.027161515218191434,
+        0.0848799214306144,
+        0.08265543784965201,
+        0.012929581490346731,
+        0.02258558914057529,
+        0.18447647311870696,
+        0.011569897668914475,
+        0.07889417900167972,
+        0.04544832614505534,
+        0.0038090229697456124,
+        0.004245233395657966,
+        0.003826763517265075,
+        0.0030889251807031393,
+        0.004030729049531612,
+        0.0026378661757213706,
+        0.0022900788761912594,
+        0.003942018547713921,
+        0.018486005442153175,
+        0.003327557129109815,
+        0.0062438416533576735,
+        0.008135045655240258,
+        0.02504587737948727,
+        0.004298648262261118,
+        0.010948194536186673,
+        0.011753140697323694,
+        0.007378413302276954,
+        0.0,
+        0.019727283094293835,
+        0.012224362661199084
+      ],
+      "predicted_terminal": [
+        {
+          "time_s": 0.0,
+          "error_m": 0.005425759938313248,
+          "speed_m_s": 0.16846033965417012
+        },
+        {
+          "time_s": 0.01,
+          "error_m": 0.009846595096821145,
+          "speed_m_s": 0.037370083417405615
+        },
+        {
+          "time_s": 0.02,
+          "error_m": 0.009031168981286426,
+          "speed_m_s": 0.009032950026919232
+        },
+        {
+          "time_s": 0.03,
+          "error_m": 0.01000428411764466,
+          "speed_m_s": 0.08717731155809719
+        },
+        {
+          "time_s": 0.04,
+          "error_m": 0.0016046250847858287,
+          "speed_m_s": 0.001980963792936276
+        },
+        {
+          "time_s": 0.05,
+          "error_m": 0.002153691662084797,
+          "speed_m_s": 0.009967619222668775
+        },
+        {
+          "time_s": 0.06,
+          "error_m": 0.003744115883928372,
+          "speed_m_s": 0.020747403011840353
+        },
+        {
+          "time_s": 0.07,
+          "error_m": 0.005104595659582049,
+          "speed_m_s": 0.01159205904132963
+        },
+        {
+          "time_s": 0.08,
+          "error_m": 0.004950152485298426,
+          "speed_m_s": 0.016476321271844566
+        },
+        {
+          "time_s": 0.09,
+          "error_m": 0.006141679543160959,
+          "speed_m_s": 0.016087313852757405
+        },
+        {
+          "time_s": 0.1,
+          "error_m": 0.007051617175188759,
+          "speed_m_s": 0.017881176506420952
+        },
+        {
+          "time_s": 0.11,
+          "error_m": 0.004547664423042805,
+          "speed_m_s": 0.01735614932270434
+        },
+        {
+          "time_s": 0.12,
+          "error_m": 0.004937605008331877,
+          "speed_m_s": 0.005852687171047528
+        },
+        {
+          "time_s": 0.13,
+          "error_m": 0.003698335423658125,
+          "speed_m_s": 0.014710362358175475
+        },
+        {
+          "time_s": 0.14,
+          "error_m": 0.003695728180082009,
+          "speed_m_s": 0.005107538803332317
+        },
+        {
+          "time_s": 0.15,
+          "error_m": 0.0036795731162825637,
+          "speed_m_s": 0.0008797815712462756
+        },
+        {
+          "time_s": 0.16,
+          "error_m": 0.0036350313585752463,
+          "speed_m_s": 0.004487922226887709
+        },
+        {
+          "time_s": 0.17,
+          "error_m": 0.003596128406342139,
+          "speed_m_s": 0.00639870361247301
+        },
+        {
+          "time_s": 0.18,
+          "error_m": 0.003613714832854386,
+          "speed_m_s": 0.007264140795980809
+        },
+        {
+          "time_s": 0.19,
+          "error_m": 0.0036745253734304013,
+          "speed_m_s": 0.0076983840829387105
+        },
+        {
+          "time_s": 0.2,
+          "error_m": 0.0038191657190593366,
+          "speed_m_s": 0.007296077028246206
+        },
+        {
+          "time_s": 0.21,
+          "error_m": 0.003922352998080433,
+          "speed_m_s": 0.007746665278539633
+        },
+        {
+          "time_s": 0.22,
+          "error_m": 0.004014853625457943,
+          "speed_m_s": 0.008455646135466392
+        },
+        {
+          "time_s": 0.23,
+          "error_m": 0.0043089194400104175,
+          "speed_m_s": 0.006448752057456383
+        },
+        {
+          "time_s": 0.24,
+          "error_m": 0.004426682016139379,
+          "speed_m_s": 0.005793331814000338
+        },
+        {
+          "time_s": 0.25,
+          "error_m": 0.004422813966133273,
+          "speed_m_s": 0.006107115948789436
+        },
+        {
+          "time_s": 0.26,
+          "error_m": 0.004482010131300398,
+          "speed_m_s": 0.0056363656891445625
+        },
+        {
+          "time_s": 0.27,
+          "error_m": 0.004676530827465628,
+          "speed_m_s": 0.003531252848374086
+        },
+        {
+          "time_s": 0.28,
+          "error_m": 0.004560275925048065,
+          "speed_m_s": 0.0050560023672213805
+        },
+        {
+          "time_s": 0.29,
+          "error_m": 0.0045914300196183006,
+          "speed_m_s": 0.005373645960078278
+        },
+        {
+          "time_s": 0.3,
+          "error_m": 0.004707245634839078,
+          "speed_m_s": 0.005772102725687927
+        },
+        {
+          "time_s": 0.31,
+          "error_m": 0.004645574517425502,
+          "speed_m_s": 0.00652954121533605
+        },
+        {
+          "time_s": 0.32,
+          "error_m": 0.004650370526886862,
+          "speed_m_s": 0.006869356860147003
+        },
+        {
+          "time_s": 0.33,
+          "error_m": 0.004608604696340487,
+          "speed_m_s": 0.007191496021199047
+        },
+        {
+          "time_s": 0.34,
+          "error_m": 0.004661482728472785,
+          "speed_m_s": 0.006800569011729884
+        }
+      ]
+    },
+    "source_observations": {
+      "artifact_id": "e608c554a744108241ed70ef41d296e397801d72393902fe6dad38287b228f78",
+      "media_type": "application/octet-stream"
+    },
+    "process_timing": {
+      "process_wall_s": 968.6974447,
+      "scope": "Fresh public run process including preparation, simulation, evaluation and reporting",
+      "exit_code": 0
+    },
+    "actual_budget": {
+      "tool_calls": 4,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 966.5779999999795
+    }
+  },
+  "A": null,
+  "control_gates": {
+    "B_reach_and_settling": false,
+    "A_reach_preserved": null
+  },
+  "historical_B": {
+    "official_task_success": false,
+    "terminal_error_m": 0.014936741914756522,
+    "terminal_tip_speed_m_s": 0.0363290463679834,
+    "sampled_settling": {
+      "available": true,
+      "continuous_time_guarantee": false,
+      "max_error_m": 0.017224655193522752,
+      "max_speed_m_s": 0.05856447699122039,
+      "passed": false,
+      "position_limit_m": 0.01,
+      "speed_limit_m_s": 0.02,
+      "window_s": 0.05
+    },
+    "mean_update_s": 25.986573214276827,
+    "simulation_wall_s": 914.0310000001919
+  },
+  "full_backend_executions_this_round": 1,
+  "conditional_LLM": {
+    "eligible": false,
+    "executed": false,
+    "reason": "Control acceptance gates not both passed"
+  },
+  "limitations": [
+    "One robot, fixed physical scene, structural GVS predictor and 12-cell MuJoCo ideal-tension execution.",
+    "Local reconstructed predictions are not original saved plans, and are not 100 ms open-loop/closed-loop transfer comparisons.",
+    "Sampled settling is distinct from continuous settling, reach, optimization convergence and computational real-time operation.",
+    "No arbitrary-target, cross-robot, contact, hardware or robustness generalization established."
+  ]
+}

@@ -28,3 +28,8 @@ feasible plan establishes backend settling or optimization convergence.
 The bounded Stage 3.20 experiment and physical acceptance results are recorded in
 `runs/stage320_reach_brake_20260927/implementation_report.md`. The configuration
 is an experimental recipe, not a newly validated general control profile.
+
+Stage 3.20's one fresh B reached 6.176 mm endpoint error, but failed sampled
+settling: maximum final-window speed 0.025266 m/s exceeded 0.02 m/s. All 35
+plans were independently feasible, none optimization-converged. Mean complete
+update took 27.411 s. Conditional A and LLM acceptance were not run.
