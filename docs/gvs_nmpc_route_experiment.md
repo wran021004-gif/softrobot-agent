@@ -15,21 +15,26 @@ The GVS predictor remains distinct from the serial-cell MuJoCo execution model.
 The report needs no strategy declaration: it summarizes an execution whether
 or not that execution is used for later skill validation.
 
-The dedicated example prepares the exact fixed profile and uses the existing
-Host/DeepSeek tool loop. It loads only `DEEPSEEK_API_KEY` as data from the local
+The dedicated example accepts an explicit public SessionInput with `--input`
+(target, initialization, timing and controller recipe), or defaults to the fixed
+profile. It uses the existing Host/DeepSeek tool loop and loads only
+`DEEPSEEK_API_KEY` as data from the local
 credential file (or reuses the process environment). Provider configuration
 comes from `configs/deepseek.yaml`; the example uses its 16,384-token limit,
-24 maximum model calls, 60 tool calls including children, one primary backend
-execution, and a new 7,200-second project grant. The project ceiling of two
-backend attempts exists only for a separately justified infrastructure retry.
+24 maximum model calls, 60 tool calls including children, one backend execution,
+and a new 3,600-second project/session grant by default (`--wall-s`). The supplied
+task/recipe is frozen before model calls; a changed `--input` on resume is rejected.
+Route discovery exposes its declared combination for the model to select.
 
-Historical skill revisions and content-addressed evidence are imported as
+For the default fixed profile, historical skill revisions and content-addressed evidence are imported as
 source-preserving read-only data. Historical snapshots/events live in evidence
 artifacts, with their original identities; they are not new session rows,
 receipts or authorization. No grant or call ledger is imported. The existing
 skill validator reads these explicit historical sources. This does not grant
 human approval or validate transfer to another task. The new model receives
 the applicable validated development skill automatically in normal context.
+Parameterized inputs use their own capability scope assessment; the example
+does not import the fixed-profile skill as validation of those changed inputs.
 
 ```powershell
 Set-Location 'D:\softrobot-agent'
@@ -41,6 +46,8 @@ $out = 'runs/gvs_route_live_reproduction'
 & $py examples/gvs_nmpc_route_experiment.py prepare --output $out
 & $py examples/gvs_nmpc_route_experiment.py run --output $out
 & $py examples/gvs_nmpc_route_experiment.py inspect --output $out
+# Parameterized task: supply the same frozen input at prepare/run, in a new folder.
+# & $py examples/gvs_nmpc_route_experiment.py run --input runs/my_reach_input.json --output runs/my_live_reach
 ```
 
 Use a new output directory for a new authorized experiment. `inspect` is

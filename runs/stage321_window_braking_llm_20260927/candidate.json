@@ -1,0 +1,44 @@
+{
+  "recipe": {
+    "position_error_scale_m": 0.01,
+    "tip_speed_scale_m_s": 0.02,
+    "terminal_tip_speed_weight": 1.0,
+    "holding_tip_speed_weight": 100.0,
+    "recover_returned_tensions": true,
+    "seed_position_tolerance_fraction": 0.5,
+    "seed_speed_limit_m_s": 0.02,
+    "feasible_return": {
+      "minimum_s": 5.0,
+      "budget_s": 15.0,
+      "relative_improvement": 0.1
+    },
+    "regenerate_warm_states": true,
+    "terminal_velocity_weight": 0.0001,
+    "max_unusable_updates": 3,
+    "constraint_jacobian_mode": "reverse",
+    "curvature_scale_rad_m": 10.0,
+    "rate_scale_rad_m_s": 1000.0,
+    "max_cpu_s": 30.0,
+    "basis": {
+      "strategy": "structural_linear"
+    },
+    "horizon": 10,
+    "substeps": 1,
+    "tracking_weight": 1.0,
+    "terminal_weight": 5.0,
+    "velocity_weight": 0.0001,
+    "tension_weight": 0.0001,
+    "variation_weight": 0.001,
+    "max_iterations": 120,
+    "tolerance": 1e-06,
+    "evaluation_threads": 1,
+    "holding_brake_lead_s": 0.05
+  },
+  "source_revision": "17b817ccbe39720140509594f36824542b184693",
+  "rationale": "50 ms empirical braking lead: current trajectory has short-term velocity prediction discrepancy at entry, and is still moving 52 mm/s at 0.28 s. Demand low speed earlier to leave recovery time, without a constant vector correction or changed feasibility/budget.",
+  "limitation": "Empirical temporal margin motivated by three local states; no certified error bound or settling guarantee.",
+  "fixed_inputs_identity": "ae7d65bad01bf4c0f10a2cc97bed7797d1927638aefff82d6e11344e7de2da75",
+  "full_backend_budget": 4,
+  "conditional_A": "B reach and all sampled settling checks pass",
+  "conditional_LLM": "B and A both pass reach and sampled settling; one fresh backend execution"
+}
