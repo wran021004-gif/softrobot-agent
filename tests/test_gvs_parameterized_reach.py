@@ -21,6 +21,12 @@ class ParameterizedReachTests(unittest.TestCase):
             timing=dict(duration_s=.4),recipe=dict(horizon=8),
             settling=dict(window_s=.04,position_limit_m=.009,speed_limit_m_s=.015)))
         p=checked_reach(inp)
+        from tools.platform_tools import simulation_preflight
+        from tools.platform_registry import registry
+        from schemas.platform_operations import Simulate
+        preflight=simulation_preflight(inp,Simulate(),registry())
+        self.assertEqual(preflight['cost']['backend_solves'],1)
+        self.assertEqual(execution_scope(preflight['prepared'].effective),execution_scope(inp))
         self.assertNotEqual(execution_scope(inp),execution_scope(baseline))
         self.assertNotEqual(workspace_key(inp.task,inp.robot,p.recipe),workspace_key(baseline.task,baseline.robot,checked_reach(baseline).recipe))
         plan=resolve_gvs_nmpc_control(inp,physics_for(inp))
