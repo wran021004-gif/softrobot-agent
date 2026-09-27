@@ -44,17 +44,21 @@ class _FeasibleIterate(ca.Callback):
         name=self.names[i]
         return ca.Sparsity.dense(self.nx if name in ('x','lam_x') else self.ng if name in ('g','lam_g') else 1 if name=='f' else 0,1)
 
-    def reset(self,lbx,ubx,lbg,ubg,start,policy=None,seed_objective=None,seed_settled=False):
+    def reset(self,lbx,ubx,lbg,ubg,start,policy=None,seed_objective=None,seed_settled=False,trace=False):
         self.bounds=(lbx,ubx,lbg,ubg);self.best=None;self.first=None;self.latest=None
         self.iteration=-1;self.start=start
         self.policy=policy;self.seed_objective=seed_objective;self.seed_settled=seed_settled
         self.stop_reason=None;self.stop_s=None
+        self.trace=[] if trace else None
 
     def eval(self,args):
         elapsed=time.perf_counter()-self.start
         self.iteration+=1;items=dict(zip(self.names,args))
         x=np.asarray(items['x']).ravel();g=np.asarray(items['g']).ravel();objective=float(items['f'])
         violation=_violation(x,g,*self.bounds)
+        if self.trace is not None:
+            self.trace.append(dict(iteration=self.iteration,elapsed_s=elapsed,objective=objective,
+                scaled_violation=violation,eligible=bool(np.isfinite(np.r_[x,g,objective]).all() and violation<=1e-5)))
         self.latest=None
         if np.isfinite(np.r_[x,g,objective]).all() and violation<=1e-5:
             candidate=dict(x=x.copy(),objective=objective,iteration=self.iteration,
@@ -122,6 +126,8 @@ class IpoptSolver:
     def __init__(self, parameters=None):
         self.parameters = IpoptParameters.model_validate(parameters or {})
         self.last_diagnostics = None
+        self.diagnostic_trace = False
+        self.last_returned_optimum = None
         self._compiled = {}
 
     @staticmethod
@@ -145,6 +151,7 @@ class IpoptSolver:
         return lower, upper, initial
 
     def solve(self, problem: OptimizationProblem, *, seed_settled=False) -> OptimizationResult:
+        self.last_returned_optimum = None
         self.last_diagnostics=None
         problem = OptimizationProblem.model_validate(problem)
         payload = problem.objective_function
@@ -224,7 +231,7 @@ class IpoptSolver:
         initial_finite=np.isfinite(np.r_[x0,np.asarray(initial_check['constraints']).ravel(),float(initial_check['objective'])]).all()
         seed_objective=float(initial_check['objective']) if initial_finite and initial_violation<=1e-5 else None
         if seed_objective is not None and problem.objective.direction!='minimize':seed_objective=-seed_objective
-        if selector is not None:selector.reset(lbx,ubx,lbg,ubg,solve_start,self.parameters.feasible_return,seed_objective,seed_settled)
+        if selector is not None:selector.reset(lbx,ubx,lbg,ubg,solve_start,self.parameters.feasible_return,seed_objective,seed_settled,self.diagnostic_trace)
         if selector is not None and seed_objective is not None and self.parameters.feasible_return is not None:
             selector.best=dict(x=np.asarray(x0),objective=seed_objective,iteration=-1,
                 elapsed_s=0.,scaled_violation=initial_violation,iteration_zero=False,
@@ -304,6 +311,10 @@ class IpoptSolver:
                 if k.startswith(('n_call_', 't_proc_', 't_wall_'))},
             'constraint_derivative':'CasADi exact AD ('+self.parameters.constraint_jacobian_mode+')',
         }
+        if self.diagnostic_trace:
+            self.last_diagnostics['iteration_trace']=None if selector is None else selector.trace
+            self.last_diagnostics['diagnostic_plans']=dict(initial=list(x0),selected=values.tolist(),returned=returned_values.tolist())
+        self.last_returned_optimum = dict(zip(bundle.variable_order,returned_values.tolist()))
         return OptimizationResult(
             status=status,
             optimum=dict(zip(bundle.variable_order, values.tolist())),
@@ -311,6 +322,22 @@ class IpoptSolver:
             constraint_violation=float(violation),
             iterations=int(stats.get('iter_count', 0)),
         )
+
+    def evaluate_candidate(self, problem, optimum):
+        """Independently evaluate a repaired plan with the same frozen NLP."""
+        bundle=CasadiNLPExpression.model_validate(problem.objective_function.data)
+        key=(bundle.expression_digest,bundle.serialized_function,problem.objective.direction,
+             self.parameters.constraint_jacobian_mode)
+        function=self._compiled[key][0]
+        values=np.array([optimum[name] for name in bundle.variable_order])
+        check=function(x=values);g=np.asarray(check['constraints']).ravel()
+        objective=float(check['objective'])
+        lbx,ubx,_=self._bounds(problem,bundle.variable_order)
+        lbg=[-math.inf if c.lower is None else c.lower for c in problem.constraints]
+        ubg=[math.inf if c.upper is None else c.upper for c in problem.constraints]
+        violation=_violation(values,g,lbx,ubx,lbg,ubg)
+        return dict(objective=objective,scaled_violation=violation,
+            feasible=bool(np.isfinite(np.r_[values,g,objective]).all() and violation<=1e-5))
 
 
 def optimization_describe_tool(ctx, args):

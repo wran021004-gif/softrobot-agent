@@ -982,6 +982,9 @@ class GVSDescription(Contract):
 
 
 class GVSTrajectoryParameters(Contract):
+    recover_returned_tensions: bool = Field(default=False,description=(
+        'Reintegrate one lower-objective unfinished IPOPT tension sequence from the current measurement; '
+        'deliver only if independently feasible and better than the selected plan. Cost is included in update timing.'))
     seed_position_tolerance_fraction: FiniteFloat = Field(default=.5,gt=0)
     seed_speed_limit_m_s: FiniteFloat = Field(default=.02,gt=0)
     feasible_return: FeasibleReturnPolicy | None = None

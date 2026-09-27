@@ -69,3 +69,24 @@ the sealed evidence and exports; working backend folders need not be duplicated
 in Git. The Stage 3.18 implementation report records the two actual outcomes and
 the rejected fixed-state performance candidate. Ten seconds/update is a
 development cost goal, not the ten-millisecond control deadline.
+# Optional returned-plan feasibility recovery
+
+Set `recipe.recover_returned_tensions=true` through `reach_input` to enable the
+Stage 3.19 correction. It defaults to false, including the frozen v2 profile.
+The current measured state, historical guess provenance, full warm regeneration,
+IPOPT budget, objective and physical bounds are unchanged.
+
+When the unfinished returned IPOPT plan has lower objective than the selected
+feasible plan, its tensions are reintegrated once with the same implicit dynamics
+from the current measurement. The frozen NLP independently checks all equalities
+and bounds at the original `1e-5` threshold. The repaired plan is selected only
+if feasible and strictly better. A failed recovery retains the verified solver
+selection and records the recovery error; the ordinary bounded hold-last response
+still applies to unusable solves. Recovery is not optimizer convergence.
+
+Observations distinguish `plan_source=reintegrated_returned_iterate` from the
+solver's own selected iterate, record the parent iteration, objective improvement,
+first-command change and predicted terminal error/speed. Full update timing
+includes reintegration and independent validation. Recovery validation is included
+in total plan validation and must not be added again when accounting for delivery.
+No real-time guarantee follows from feasibility or useful feedback.

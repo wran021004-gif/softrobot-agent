@@ -38,6 +38,10 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
         optimization_status_counts=dict(Counter(o.get('optimization_status') or 'unavailable' for o in observations)),
         raw_termination_counts=dict(Counter(o.get('optimization_raw_status') or 'unavailable' for o in observations)),
         initialization_selected=sum(o.get('optimization_selected_iteration') in (-1,0) for o in observations),
+        recovered_plans=sum(o.get('plan_source')=='reintegrated_returned_iterate' for o in observations),
+        accepted_noninitialization_plans=sum(bool(o.get('plan_accepted')) and
+            (o.get('plan_source')=='reintegrated_returned_iterate' or
+             (o.get('optimization_selected_iteration') is not None and o['optimization_selected_iteration']>0)) for o in observations),
         converged_updates=sum(not o['optimization_nonconverged'] for o in observations),
         solver_error_count=sum(o.get('solver_error') is not None for o in observations),
         solver_failure_flags=sum(o['solver_failed'] for o in observations),
@@ -47,6 +51,8 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
         mean_update_s=mean('update_wall_s'),per_update_delivery_s=values('update_wall_s'),
         mean_preparation_s=mean('warm_preparation_s'),mean_numerical_solve_s=mean('optimization_solve_s'),
         mean_validation_s=mean('plan_validation_s'),solver_construction_s=sum(values('solver_construction_s')),
+        mean_recovery_s=mean('recovery_wall_s'),mean_recovery_integration_s=mean('recovery_integration_s'),
+        mean_recovery_validation_s=mean('recovery_validation_s'),
         graph_construction_s=observations[0]['graph_construction_s'] if observations else None,
         backend_timings_s=result['data']['data']['timings_s'],
         tension_range_n=[float(tensions.min()),float(tensions.max())] if rows else None,

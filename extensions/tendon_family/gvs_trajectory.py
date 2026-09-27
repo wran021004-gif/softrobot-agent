@@ -208,12 +208,16 @@ class TrajectoryWorkspace:
                 and v<=self.parameters.seed_speed_limit_m_s for e,v in metrics)
         preparation_s=time.perf_counter()-update_start
         start=time.perf_counter(); result=self.solver.solve(self.problem,seed_settled=seed_settled);total=time.perf_counter()-start
+        recovery=dict(enabled=self.parameters.recover_returned_tensions,attempted=False,selected=False,wall_s=0.)
+        if self.parameters.recover_returned_tensions and result.status in ('converged','iteration_limit','feasible_early_stop'):
+            result,recovery=self._recover_returned(result,measured_x)
         values=result.optimum;steps=self.parameters.horizon*self.parameters.substeps
         X=np.array([[values[f'x/{k}/{j}']*self.state_scales[j] for j in range(2*self.n)] for k in range(steps+1)])
         U=np.array([[values[f'u/{k}/{t}'] for t in self.tendons] for k in range(self.parameters.horizon)])
         output=dict(states=X.tolist(),tensions=U.tolist(),result=result.model_dump(mode='json'),
             decision_state_scales=self.state_scales.tolist(),
             diagnostics=self.solver.last_diagnostics,total_s=total,graph_s=self.graph_s,
+            recovery=recovery,
             warm_start=dict(executed_intervals=int(source is not None and warm is None),
                 preparation_s=preparation_s,regenerated_all_states=self.parameters.regenerate_warm_states,seed_settled=seed_settled,tail_initialization=tails),
             nominal_operating_state=self.nominal_x,measured_initial_state=list(measured_x),
@@ -226,8 +230,58 @@ class TrajectoryWorkspace:
         accepted=result.status in ('converged','iteration_limit','feasible_early_stop') and result.constraint_violation<=1e-5
         output['accepted']=accepted
         output['optimization_converged']=result.status=='converged'
+        if self.parameters.recover_returned_tensions:
+            def terminal_motion(values):
+                state=np.array([values[f'x/{steps}/{j}'] for j in range(2*self.n)])*self.state_scales
+                tip,speed=self._motion(state[:self.n],state[self.n:])
+                return dict(error_m=float(np.linalg.norm(np.asarray(tip).ravel()-self.target)),
+                    speed_m_s=float(np.linalg.norm(np.asarray(speed))))
+            output['feedback']=dict(initial_objective=self.solver.last_diagnostics['initial_objective'],
+                delivered_objective=result.objective_value,
+                first_command_change_from_initialization_n=float(max(abs(values[f'u/0/{t}']-self.problem.initial_guess[f'u/0/{t}']) for t in self.tendons)),
+                initial_terminal=terminal_motion(self.problem.initial_guess),delivered_terminal=terminal_motion(values))
         # A finite unfinished iterate is still a useful next optimization guess.
         # Command acceptance remains the separate, stricter feasibility check.
         if result.status in ('converged','iteration_limit','feasible_early_stop'):self.last=output
         output['update_wall_s']=time.perf_counter()-update_start
         return output
+
+    def _recover_returned(self,result,measured_x):
+        """One feasibility recovery, with unchanged objective and constraints.
+
+        IPOPT can lower tracking cost before its shooting defects meet delivery
+        tolerance. Reintegrate that returned control once; never force selection
+        or discard the already verified feasible candidate on a failed recovery.
+        """
+        start=time.perf_counter();d=self.solver.last_diagnostics
+        recovery=dict(enabled=True,attempted=False,selected=False,wall_s=0.,
+            source='returned_ipopt_tensions_reintegrated_from_current_measurement',
+            parent_iteration=result.iterations,selected_before_objective=result.objective_value,
+            initial_objective=d['initial_objective'],error=None)
+        raw=self.solver.last_returned_optimum
+        if raw is None or d['returned_iterate_objective']>=result.objective_value:
+            return result,recovery
+        recovery['attempted']=True
+        repaired=dict(raw);state=np.asarray(measured_x)
+        for j,v in enumerate(state):repaired[f'x/0/{j}']=float(v/self.state_scales[j])
+        try:
+            integration_start=time.perf_counter()
+            for k in range(1,self.parameters.horizon*self.parameters.substeps+1):
+                u=np.array([raw[f'u/{(k-1)//self.parameters.substeps}/{t}'] for t in self.tendons])
+                guess=np.array([raw[f'x/{k}/{j}'] for j in range(2*self.n)])*self.state_scales
+                state,_=self._extend_tail(state,u,guess)
+                for j,v in enumerate(state):repaired[f'x/{k}/{j}']=float(v/self.state_scales[j])
+            recovery['integration_s']=time.perf_counter()-integration_start
+            validation_start=time.perf_counter()
+            check=self.solver.evaluate_candidate(self.problem,repaired)
+            recovery.update(check,validation_s=time.perf_counter()-validation_start)
+            if check['feasible'] and check['objective']<result.objective_value:
+                recovery['selected']=True
+                recovery['first_command_change_n']=float(max(abs(repaired[f'u/0/{t}']-result.optimum[f'u/0/{t}']) for t in self.tendons))
+                # Feasibility recovery is not an IPOPT convergence event.
+                result=result.model_copy(update=dict(optimum=repaired,objective_value=check['objective'],
+                    constraint_violation=check['scaled_violation'],status='feasible_early_stop'))
+        except RuntimeError as exc:
+            recovery['error']=str(exc)
+        recovery['wall_s']=time.perf_counter()-start
+        return result,recovery
