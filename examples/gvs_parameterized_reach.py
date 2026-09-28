@@ -18,7 +18,7 @@ from tools.state_io import atomic_json
 
 def call(host,tool,args,request):
     receipt=host.invoke(dict(request_id=request,tool_id=tool,arguments=args,cache='new',
-        reason='Authorized deterministic task-parameterized free reach; no model calls'))
+        reason='Authorized deterministic frozen-task execution and evaluation; no model calls'))
     atomic_json(host.store.root/(request+'_receipt.json'),receipt)
     if receipt['execution_status']!='completed':raise RuntimeError(json.dumps(receipt))
     return receipt,host.store.artifact(receipt['output'])
@@ -50,7 +50,8 @@ def prepare(root,input_path=None):
 def run(root,input_path=None):
     host=prepare(root,input_path)
     print('Starting the one authorized full-duration backend execution',flush=True)
-    sim,_=call(host,'simulation.run',dict(candidate_id='parameterized-reach',changes={}),'simulate')
+    task=host.store.session(host.run_id)['snapshot']['input']['task']
+    sim,_=call(host,'simulation.run',dict(candidate_id='parameterized-tracking' if task['family']=='task.tracking' else 'parameterized-reach',changes={}),'simulate')
     ev,_=call(host,'evaluation.run',dict(result=sim['output'],execution_id=sim['execution_id']),'evaluate')
     report_receipt,report=call(host,'control.profile_report',dict(simulation_request_id='simulate',evaluation_request_id='evaluate'),'report')
     summary=report['detail']

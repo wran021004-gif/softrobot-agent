@@ -28,11 +28,44 @@ class CartesianReference(Contract):
         return self
 
 
+class ReferenceKnot(Contract):
+    time_s: FiniteFloat = Field(ge=0)
+    position_m: tuple[FiniteFloat, FiniteFloat, FiniteFloat]
+
+
+class CartesianReferenceV2(CartesianReference):
+    """Separate quintic segments, with zero velocity/acceleration at each knot."""
+    interpolation: Literal['piecewise_quintic']
+    knots: list[ReferenceKnot] = Field(min_length=2)
+
+    @model_validator(mode='after')
+    def ordered_knots(self):
+        if any(b.time_s <= a.time_s for a, b in zip(self.knots, self.knots[1:])):
+            raise ValueError('REFERENCE_KNOT_TIMES_MUST_INCREASE')
+        first, last = self.knots[0], self.knots[-1]
+        if (first.time_s, last.time_s, first.position_m, last.position_m) != (
+                self.start_s, self.end_s, self.start_m, self.end_m):
+            raise ValueError('REFERENCE_KNOT_ENDPOINTS_MUST_MATCH')
+        return self
+
+
 def reference_at(reference, times):
-    r = CartesianReference.model_validate(reference)
+    data = plain(reference)
+    cls = CartesianReferenceV2 if data['interpolation'] == 'piecewise_quintic' else CartesianReference
+    r = cls.model_validate(data)
     times = np.asarray(times, dtype=float)
     if not np.isfinite(times).all():
         raise ValueError('FINITE_REFERENCE_TIMES_REQUIRED')
+    if isinstance(r, CartesianReferenceV2):
+        knots = np.asarray([k.time_s for k in r.knots])
+        points = np.asarray([k.position_m for k in r.knots])
+        index = np.clip(np.searchsorted(knots, times, side='right')-1, 0, len(knots)-2)
+        duration = knots[index+1]-knots[index]
+        s = np.clip((times-knots[index])/duration, 0., 1.)
+        delta = points[index+1]-points[index]
+        blend = 10*s**3-15*s**4+6*s**5
+        rate = 30*s**2*(1-s)**2/duration
+        return points[index]+blend[..., None]*delta, rate[..., None]*delta
     s = np.clip((times-r.start_s)/(r.end_s-r.start_s), 0., 1.)
     delta = np.asarray(r.end_m)-r.start_m
     blend = 10*s**3-15*s**4+6*s**5

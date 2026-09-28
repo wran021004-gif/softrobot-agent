@@ -75,6 +75,20 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
             acceptance=plain(task.evaluator.parameters),metrics=[] if evaluation is None else evaluation['metrics'],
             rule='All inclusive uniform samples in scoring interval; arithmetic RMS; max <= declared limit. Complete grid required. Terminal error is at execution endpoint.',
             velocity_error_max_m_s=max((r['velocity_error_m_s'] for r in motion),default=None),continuous_time_guarantee=False)
+        knots=task.goal.data.get('knots',[])
+        if knots:
+            segments=[]
+            for a,b in zip(knots,knots[1:]):
+                selected=[(r['time_s'],e) for r,e in zip(rows,errors)
+                    if a['time_s']-1e-9<=r['time_s']<=b['time_s']+1e-9]
+                peak=max(selected,key=lambda item:item[1]) if selected else (None,None)
+                segments.append(dict(interval_s=[a['time_s'],b['time_s']],
+                    maximum_error_m=peak[1],maximum_error_time_s=peak[0]))
+            summary['tracking']['segment_diagnostics']=segments
+            summary['tracking']['knot_diagnostics']=[dict(time_s=k['time_s'],
+                samples=[r for r in motion if abs(r['time_s']-k['time_s'])<=task.timing.sample_period_s+1e-9])
+                for k in knots[1:-1]]
+            summary['tracking']['diagnostic_scope']='Segment endpoints overlap for diagnostics only. Global evaluation scores each time once. Zero reference speed/acceleration at a knot does not require or prove robot settling.'
         comparisons=[]
         for observation in observations:
             pred=observation.get('one_step_prediction')

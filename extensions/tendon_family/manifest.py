@@ -32,6 +32,7 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('gvs_inverse_assembler_parameters',c.GVSInverseAssemblerParameters),]]
 CONTRACTS += [
     ('family.cartesian_reference','1.0.0',tracking.CartesianReference),
+    ('family.cartesian_reference','2.0.0',tracking.CartesianReferenceV2),
     ('family.tracking_evaluation','1.0.0',tracking.TrackingEvaluation),
     ('family.gvs_tracking_control','1.0.0',tracking.TrackingControl),
     ('family.gvs_profile_control','1.0.0',gvs_profile.ProfileControl),
@@ -604,7 +605,7 @@ EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='optimiz
         supported_constraints=['initial_state','implicit_dynamics','tendon_force_bounds'])))
 EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='controller.gvs_nmpc' and d.version=='4.0.0'),
     version='5.0.0',input_schema=tracking.TrackingControl,binding='extensions.tendon_family.gvs_nmpc:TrackingNMPCController',
-    description='Frozen constant or quintic world reference, absolute prediction-node timing and relative tip velocity; length-only design envelope',
+    description='Frozen constant, single or piecewise quintic world reference; stop-at-waypoint semantics, absolute prediction-node timing and relative tip velocity; length-only design envelope',
     capabilities=dict(category='control',role='adapter',channel='actuator_commands',backend_executable=True,
         command_space='tendon_tensions',sampling='interval_start_pre_step; held for control period',reset=False,restore=False,
         profile_id='gvs_time_reference_tracking_v1',required_candidate_analysis='analysis.gvs_candidate_evaluate',
