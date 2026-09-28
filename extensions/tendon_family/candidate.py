@@ -70,6 +70,8 @@ def candidate_facts(baseline, configuration, reference, candidate_id, owner_run_
 
     def value(inp, path):
         path = canonical_path(path)
+        if path in space.get('semantic_decisions', {}):
+            return inp['robot']['structure']['data'].get('metadata', {}).get('design_decisions', {}).get('selections', {}).get(path, space['semantic_decisions'][path]['baseline_value'])
         for prefix, field in (('control/', 'controller'), ('model/', 'dynamics_model')):
             if path.startswith(prefix):
                 return read_parameter(inp['policy'][field]['parameters']['data'], path[len(prefix):])
@@ -96,7 +98,17 @@ def candidate_facts(baseline, configuration, reference, candidate_id, owner_run_
                     ('_m', 'm'), ('_s', 's'), ('_rad', 'rad'), ('_pa', 'Pa'), ('_kg', 'kg'), ('_n', 'N'))
                     if path.lower().endswith(suffix)), None)
             parameters.append(dict(path=path, **values, baseline_delta=after-before if numeric else None, unit=unit))
-    return dict(candidate_id=candidate_id, configuration=plain(reference),
+    extra = {}
+    if space.get('semantic_decisions'):
+        from .design_decisions import physical_effects, physical_summary
+        design = effective['robot']['structure']['data']
+        effects = physical_effects(space['semantic_source'], design)
+        extra = dict(physical_changes=effects, semantic_provenance=design.get('metadata', {}).get('design_decisions'),
+            physical_summary=physical_summary(design, effective['policy']['discretization']['data']),
+            multi_category_coverage=bool(any(r['category']=='length' and abs(r['baseline_delta'])>=.001-1e-12 for r in effects)
+                and any(r['path']=='design/section_scale' and abs(r['baseline_delta'])>=.01-1e-12 for r in parameters)
+                and any(r['path']=='design/material_scenario' and r['effective_value']!='baseline' for r in parameters)))
+    return dict(**extra, candidate_id=candidate_id, configuration=plain(reference),
         frozen_baseline_identity=digest(baseline), effective_identity=digest(effective),
         owner_run_id=owner_run_id, execution_id=execution_id, parameters=parameters)
 
@@ -109,6 +121,11 @@ def check_design_statement(facts, statement):
     for key in ('candidate_id', 'configuration', 'owner_run_id', 'execution_id'):
         if statement.get(key) != facts.get(key):
             mismatches.append(key)
+    if 'physical_changes' in facts:
+        physical_check=check_design_statement(dict(parameters=facts['physical_changes']),
+            dict(parameters=statement.get('physical_changes',[])))
+        if not physical_check['accepted']:
+            mismatches.append('physical_changes')
     rows = statement.get('parameters', [])
     actual = {r.get('path'): r for r in rows if isinstance(r, dict)}
     if len(actual) != len(rows) or set(actual) != {r['path'] for r in facts['parameters']}:
@@ -130,6 +147,7 @@ def validate_final(data,discretization,space,changes,task_bounds):
     normalized_task = {canonical_path(k):v for k,v in task_bounds.items()}
     normalized_changes = {canonical_path(k):v for k,v in changes.items()}
     for path in dict.fromkeys([*specifications,*normalized_task]):
+        if path in space.semantic_decisions: continue
         spec = specifications.get(path,dict(type='number',bounds=normalized_task.get(path)))
         target = discretization if path.startswith('discretization/') else data
         local_path = path.removeprefix('discretization/')
@@ -173,7 +191,7 @@ def build(value, *, task_bounds=None):
             baseline_discretization_reused=template not in req.space.template_discretizations))
     try:
         for path,value in req.changes.items():
-            if path == 'template': continue
+            if path == 'template' or path in req.space.semantic_decisions: continue
             path = canonical_path(path)
             target = discretization if path.startswith('discretization/') else data
             local_path = path.removeprefix('discretization/')
@@ -182,6 +200,8 @@ def build(value, *, task_bounds=None):
             if isinstance(obj,list): obj[int(key)] = value
             else: obj[key] = value
             summary.append(dict(operation='set',path=path,before=old,after=value))
+        from .design_decisions import expand
+        expand(data, req.space, req.changes)
         validate_final(data,discretization,req.space,req.changes,task_bounds or {})
         candidate = Design.model_validate(data)
         model = Discretization.model_validate(discretization)
@@ -205,7 +225,7 @@ def apply(inp, parameters, changes):
     from .contracts import GVSTrajectoryParameters
     from .gvs_profile import ProfileControl, ReachControl
     from .tracking import TrackingControl
-    control_type=({'1.0.0':GVSTrajectoryParameters,'2.0.0':ProfileControl,'3.0.0':ReachControl,'4.0.0':ReachControl,'5.0.0':TrackingControl}[inp.policy.controller.version]
+    control_type=({'1.0.0':GVSTrajectoryParameters,'2.0.0':ProfileControl,'3.0.0':ReachControl,'4.0.0':ReachControl,'5.0.0':TrackingControl,'6.0.0':ReachControl}[inp.policy.controller.version]
         if inp.policy.controller.extension_id=='controller.gvs_nmpc' else
         GVSLQRControl if inp.policy.controller.extension_id in ('controller.gvs_lqr','controller.gvs_sampled_lqr') else Control)
     control=control_type.model_validate(inp.policy.controller.parameters.data).model_dump(mode='json')

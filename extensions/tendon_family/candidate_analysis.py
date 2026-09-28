@@ -15,6 +15,7 @@ class CandidateDynamicsRequest(GVSDynamicsRequestV2):
 class CandidateAnalysisResult(Contract):
     binding: dict
     calculation: dict
+    physical_summary: dict
 
 
 def resolve_candidate(ctx, source_node):
@@ -44,7 +45,9 @@ def evaluate_candidate(ctx,args):
     request=GVSDynamicsRequestV3(**args.model_dump(exclude={'source_node'}),
         basis=inp.policy.controller.parameters.data['recipe']['basis'])
     result=gvs_evaluate_tool_v2(SimpleNamespace(input=inp,reg=ctx.reg),request)
-    return CandidateAnalysisResult(binding=binding,calculation=plain(result))
+    from .design_decisions import physical_summary
+    return CandidateAnalysisResult(binding=binding,calculation=plain(result),
+        physical_summary=physical_summary(inp.robot.structure.data, inp.policy.discretization.data))
 
 
 def require_completed_analysis(ctx, built, tool):

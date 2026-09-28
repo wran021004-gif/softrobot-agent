@@ -311,9 +311,18 @@ class ExperimentSpec(Contract):
     source_roles: dict[str, str]
 
 
+class SemanticDecision(Contract):
+    """Declarative group expansion; operations are implemented by the builder."""
+    operation: Literal['section_scale', 'material_scenario']
+    components: list[Name] = Field(min_length=1)
+    baseline_value: float | str
+
+
 class Space(Contract):
     # Physical design paths or full physical-design options.
     parameters: ParameterDefinitions = Field(default_factory=dict)
+    semantic_decisions: dict[str, SemanticDecision] = Field(default_factory=dict)
+    semantic_source: Design | None = None
     control_parameters: ParameterDefinitions = Field(default_factory=dict)
     model_parameters: ParameterDefinitions = Field(default_factory=dict, description=
         'model/<path> in dynamics_model parameters: model-specific tuning such as regularization. '
@@ -327,6 +336,9 @@ class Space(Contract):
 
     @model_validator(mode='after')
     def template_meshes(self):
+        if self.semantic_decisions and (self.semantic_source is None or
+                set(self.semantic_decisions)-set(self.parameters)):
+            raise ValueError('SEMANTIC_DECISIONS_REQUIRE_SOURCE_AND_AUTHORIZED_PARAMETERS')
         if any(not path.startswith('model/') for path in self.model_parameters):
             raise ValueError('MODEL_PARAMETER_PATH_REQUIRES_MODEL_PREFIX')
         unknown = set(self.template_discretizations) - set(self.templates)

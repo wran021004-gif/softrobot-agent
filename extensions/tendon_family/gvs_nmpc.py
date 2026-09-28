@@ -25,7 +25,7 @@ def resolve_gvs_nmpc_control(inp,physics):
         from .gvs_profile import candidate_numerical, load_profile
         control=checked_tracking(inp);p=control.recipe
         numerical=candidate_numerical(inp,control,load_profile());point=numerical['nominal']
-    elif inp.policy.controller.version in ('3.0.0','4.0.0'):
+    elif inp.policy.controller.version in ('3.0.0','4.0.0','6.0.0'):
         from .gvs_profile import checked_reach, reach_numerical
         p=checked_reach(inp).recipe
         numerical=reach_numerical(inp)
@@ -55,7 +55,7 @@ def resolve_gvs_nmpc_control(inp,physics):
     if inp.policy.controller.version == '2.0.0':
         plan['profile_id']=profile['profile_id']
         plan['numerical_reference']=profile['numerical_reference']
-    elif inp.policy.controller.version in ('3.0.0','4.0.0','5.0.0'):
+    elif inp.policy.controller.version in ('3.0.0','4.0.0','5.0.0','6.0.0'):
         plan['reference']['kind']='numerical_guess_metadata_not_current_target_equilibrium'
         plan['reference'].pop('target_world_m')
         plan['reference']['provenance']=numerical['provenance']
@@ -132,13 +132,13 @@ class GVSNMPCController:
             'optimization_raw_status':None if solved is None else solved['diagnostics']['return_status'],
             'unusable_updates':self.unusable_updates,'stop_requested':self.stop_requested,
             'gvs_projection_residual_max_rad_m':geometry['gvs_projection']['projection_residual_max_rad_m']}
-        if success and self.workspace.tracking:
+        if success and (self.workspace.tracking or 'settling' in self.plan):
             node=self.parameters.substeps
             predicted=np.asarray(solved['states'][node])
             tip,velocity=self.workspace._motion(predicted[:len(q)],predicted[len(q):])
             self.last['one_step_prediction']=dict(time_s=t+self.period_s,state=predicted.tolist(),
                 tip_position_m=np.asarray(tip).ravel().tolist(),tip_velocity_m_s=np.asarray(velocity).ravel().tolist(),
-                applied_tension_n=list(command),integration='implicit Euler',substeps=node)
+                frame='world',prediction_source='accepted_plan',applied_tension_n=list(command),integration='implicit Euler',substeps=node)
         self.observations.append(dict(time_s=t,phase='current_state_before_integration',
             tip_position_m=geometry['tip'].tolist(),gvs_q=list(q),gvs_qdot=list(v),
             measured_initial_state=x.tolist(),graph_construction_s=self.workspace.graph_s,**self.last))

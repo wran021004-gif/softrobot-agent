@@ -35,7 +35,7 @@ class RouteAction(Contract):
     evidence: list[EvidenceRef] = Field(default_factory=list, description='After the first action, cite at least one previous route node result reference here. route overview already supplies these references; a separate read is optional.')
     reason: str = Field(min_length=1,description='English explanation grounded in the current overview or cited evidence.')
     next_step: str = Field(min_length=1,description='English statement of the intended next decision or stopping condition.')
-    design_statement: dict | None = Field(default=None, description='On finish, restate candidate_facts: candidate_id, configuration, owner_run_id, execution_id and parameters (path, baseline_value, effective_value, baseline_delta, unit). Checked independently of reach and prose interpretation; legacy callers may omit.')
+    design_statement: dict | None = Field(default=None, description='On finish, restate candidate_facts: candidate_id, configuration, owner_run_id, execution_id and parameters (path, baseline_value, effective_value, baseline_delta, unit), plus physical_changes when supplied. Checked independently of reach and prose interpretation; legacy callers may omit.')
     result_statement: TrackingFacts | None = Field(default=None, description='On tracking finish, copy factual_result exactly from the selected summary. Typed consistency is checked separately from provider reasoning; omission is not a pass.')
 
 
@@ -607,6 +607,9 @@ def advance(ctx,args):
                 product=ctx.store.artifact(receipt['output']); report=ctx.store.artifact(product['report'])
                 out=dict(candidate_id=trial['candidate_id'],configuration=trial['configuration'],receipt=receipt,product=product,
                     findings=diagnosis_summary(report) if args.action=='diagnose' else dict(video_generated=True,viewed_by_model=False))
+                if args.action=='diagnose':
+                    from .candidate_comparison import feedback
+                    out['findings']['design_feedback']=feedback(trial)
             else:
                 out=delivery(ctx,route,child,trial,args.reason,args.design_statement,plain(args.result_statement))
                 out['selection_basis']='explicit valid candidate' if args.candidate_id else 'session-wide incumbent'

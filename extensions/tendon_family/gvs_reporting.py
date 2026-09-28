@@ -89,19 +89,54 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
                 samples=[r for r in motion if abs(r['time_s']-k['time_s'])<=task.timing.sample_period_s+1e-9])
                 for k in knots[1:-1]]
             summary['tracking']['diagnostic_scope']='Segment endpoints overlap for diagnostics only. Global evaluation scores each time once. Zero reference speed/acceleration at a knot does not require or prove robot settling.'
-        comparisons=[]
-        for observation in observations:
-            pred=observation.get('one_step_prediction')
-            if pred is None:continue
-            following=next((r for r in rows if abs(r['time_s']-pred['time_s'])<1e-8),None)
-            if following is not None:
-                comparisons.append(dict(start_s=observation['time_s'],end_s=pred['time_s'],
-                    applied_input_difference_n=float(np.max(np.abs(np.asarray(observation['actual_tension_n'])-pred['applied_tension_n']))) if 'actual_tension_n' in observation else None,
-                    applied_tension_n=pred['applied_tension_n'],predicted_tip_m=pred['tip_position_m'],measured_tip_m=following['tip_m'],
-                    tip_difference_m=float(np.linalg.norm(np.asarray(pred['tip_position_m'])-following['tip_m']))))
-        summary['one_step_prediction_comparisons']=comparisons
+    comparisons, missing = aligned_predictions(rows, observations)
+    summary['one_step_prediction_comparisons']=comparisons
+    summary['one_step_prediction_summary']=dict(aligned_count=len(comparisons), missing=missing,
+        maximum_tip_difference_m=max((r['tip_difference_m'] for r in comparisons),default=None),
+        mean_tip_difference_m=float(np.mean([r['tip_difference_m'] for r in comparisons])) if comparisons else None,
+        frame='world', scope='Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison')
+    summary['drive_utilization']=[dict(tendon_index=i,limit_n=limit,
+        maximum_n=float(tensions[:,i].max()) if rows else None,
+        minimum_n=float(tensions[:,i].min()) if rows else None,
+        near_upper_fraction=float(np.mean(tensions[:,i]>=.99*limit)) if rows else None,
+        near_zero_fraction=float(np.mean(tensions[:,i]<=1e-6)) if rows else None) for i,limit in enumerate(limits)]
+    summary['error_phases']=[dict(interval_s=[a,b],maximum_error_m=max(es,default=None),
+        final_error_m=es[-1] if es else None) for a,b in ((0.,duration/3),(duration/3,2*duration/3),(2*duration/3,duration))
+        for es in [[e for r,e in zip(rows,errors) if a-1e-9<=r['time_s']<=b+1e-9]]]
+    summary['diagnostic_hypotheses']=[]
+    summary['diagnostic_limitations']=['Sampled observations do not identify a dominant cause.',
+        'Force proximity alone does not imply a required physical design change.',
+        'Ideal tensions; omitted shear, stretch, torsion, tendon friction and actuator dynamics.']
     return summary
 
+
+
+def aligned_predictions(rows, observations):
+    comparisons=[]; missing=[]
+    for o in observations:
+        pred=o.get('one_step_prediction')
+        reason=None
+        if pred is None:
+            reason='accepted first-step prediction unavailable'
+        elif pred.get('frame','world')!='world':
+            reason='coordinate frame mismatch'
+        else:
+            following=[r for r in rows if abs(r['time_s']-pred['time_s'])<1e-8]
+            intervening=any(o['time_s']+1e-8<r['time_s']<pred['time_s']-1e-8 for r in observations)
+            actual=o.get('actual_tension_n')
+            difference=None if actual is None else float(np.max(np.abs(np.asarray(actual)-pred['applied_tension_n'])))
+            if len(following)!=1: reason='next execution timestamp missing or ambiguous'
+            elif intervening: reason='intervening control update'
+            elif difference is None: reason='applied input unavailable'
+            elif difference>1e-8: reason='applied input mismatch'
+            else:
+                r=following[0]
+                comparisons.append(dict(start_s=o['time_s'],end_s=pred['time_s'],frame='world',
+                    applied_input_difference_n=difference,applied_tension_n=pred['applied_tension_n'],
+                    predicted_tip_m=pred['tip_position_m'],measured_tip_m=r['tip_m'],
+                    tip_difference_m=float(np.linalg.norm(np.asarray(pred['tip_position_m'])-r['tip_m']))))
+        if reason:missing.append(dict(time_s=o['time_s'],reason=reason))
+    return comparisons,missing
 
 
 def reconstruct_motion(files, rows, target):
@@ -171,6 +206,9 @@ def report(ctx,args):
         configuration=metadata['candidate_input'],candidate_id=candidate['candidate_id'],
         simulation_wall_s=sim['charged']['wall_s'] if 'charged' in sim else None,
         motion=plain(ctx.save_artifact(motion,'sampled_backend_motion')))
+    comparisons=output.pop('one_step_prediction_comparisons')
+    output['one_step_prediction_evidence']=plain(ctx.save_artifact(comparisons,'one_step_prediction_comparisons'))
+    output['drive_utilization']=[dict(row,tendon=physics['tendons'][i]['entity']) for i,row in enumerate(output['drive_utilization'])]
     # The trusted report validates a predeclared strategy against this new run.
     declared=ctx.store.session(ctx.run_id)['state'].get('control_profile_strategy')
     if declared:

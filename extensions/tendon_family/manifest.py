@@ -59,7 +59,7 @@ CONTRACTS += [
     ('family.lqr_synthesis_description', '2.0.0', c.LQRSynthesisDescription),
     ('family.gvs_lqr_control', '1.0.0', c.GVSLQRControl),
 ]
-SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','gvs_sampled','gvs_trajectory','gvs_nmpc','model_applicability','execution','backends','signals','candidate','delivery_facts','preparation','mjcf','saved','tracking','candidate_analysis','manifest','optimization','crosscheck','route'))+(
+SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','gvs_sampled','gvs_trajectory','gvs_nmpc','model_applicability','execution','backends','signals','candidate','design_decisions','candidate_comparison','diagnostics','delivery_facts','preparation','mjcf','saved','tracking','candidate_analysis','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
@@ -612,3 +612,12 @@ EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='control
         predictor='model.gvs',execution_model='model.serial_bending_cells',discovery_tool='control.profile_describe',
         prepare_execution='extensions.tendon_family.gvs_profile:prepare_execution',route_applicability='extensions.tendon_family.tracking:checked_tracking',
         scope_assessment='extensions.tendon_family.tracking:assessment',route_report_tool='control.profile_report')))
+
+EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='controller.gvs_nmpc' and d.version=='4.0.0'),
+    version='6.0.0', assets=(gvs_profile.ASSET,'extensions/tendon_family/profiles/multiphysics_reach_experiment_v1.json'),
+    description='Candidate-aware free reach with explicit length, uniform section scale and material scope; fixed controller algorithm; fresh execution required for performance evidence.'))
+
+from . import candidate_comparison
+EXTENSIONS.append(Extension('analysis.compare_candidates','tool','1.0.0',candidate_comparison.CompareRequest,route.RouteResult,
+    'extensions.tendon_family.candidate_comparison:compare','Compare owned evaluated candidates, actual physical changes, reach, force utilization, solver behavior and cost; zero solves.',
+    **COMMON, capabilities=dict(category='analysis',role='public_tool',route_visible=True,backend_solves=0)))

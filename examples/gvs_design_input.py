@@ -9,6 +9,37 @@ from extensions.tendon_family.gvs_profile import candidate_reach_input
 from tools.state_io import atomic_json
 
 
+def multiphysics_input(run_id='gvs-multiphysics-design'):
+    """One reusable configuration; derive robot and recipe from bundled inputs."""
+    import json
+    from copy import deepcopy
+    from schemas.platform import SessionInput
+    from extensions.tendon_family.gvs_profile import load_profile, checked_reach
+    config=json.loads((ROOT/'extensions/tendon_family/profiles/multiphysics_reach_experiment_v1.json').read_text())
+    value=candidate_reach_input(run_id)
+    task=value['task']; policy=value['policy']; design=value['robot']['structure']['data']
+    assert task['goal']['data']['target_m']==config['target_m']
+    assert all(task['timing'][k]==v for k,v in config['timing'].items())
+    assert task['evaluator']['parameters']['data']['tolerance_m']==config['terminal_tolerance_m']
+    assert policy['discretization']['data']['cells']==config['cells']
+    assert len(design['tendons'])==6 and all(t['force_limit_n']==config['force_limit_n'] for t in design['tendons'])
+    assert policy['controller']['parameters']['data']['recipe']['basis']['strategy']=='structural_linear'
+    policy['controller']['version']=config['controller_version']
+    policy['candidate_builder']['parameters']['data'].update(parameters=config['parameters'],
+        semantic_decisions=config['semantic_decisions'],semantic_source=deepcopy(design))
+    policy['editable']={k:v['bounds'] for k,v in config['parameters'].items() if v['type']=='number'}
+    policy['budget']=config['budget']; policy['timeout_s']=config['timeout_s']; policy['allowed_tools']=[]
+    policy['tool_bindings']={k:'1.0.0' for k in ('route.advance','route.inspect','simulation.run',
+        'evaluation.run','evidence.read','session.control','control.profile_report','control.profile_describe',
+        'analysis.gvs_candidate_evaluate','analysis.compare_candidates','diagnostics.saved_trajectory')}
+    policy['tool_bindings']['diagnostics.saved_trajectory']='2.0.0'
+    policy['route']=dict(contract='family.route_policy',version='1.0.0',data=dict(source=config['source'],
+        combinations={'candidate_gvs_nmpc':{k:policy[k] for k in ('dynamics_model','backend','controller')}},
+        max_trials=config['budget']['backend_solves'],guidance=config['guidance']))
+    checked_reach(SessionInput.model_validate(value))
+    return value
+
+
 def experiment_input(run_id='gvs-length-design',*,target_m=(.29,.035,.19)):
     value=candidate_reach_input(run_id,target_m=target_m,
         timing=dict(duration_s=.35,control_period_s=.01,timestep_s=.0005,sample_period_s=.01))
@@ -35,7 +66,8 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--target',type=float,nargs=3,default=(.29,.035,.19))
+    parser.add_argument('--multiphysics',action='store_true')
     args=parser.parse_args()
     if args.output.exists():raise ValueError('INPUT_ALREADY_EXISTS: use a new path')
-    atomic_json(args.output,experiment_input(target_m=args.target))
+    atomic_json(args.output,multiphysics_input() if args.multiphysics else experiment_input(target_m=args.target))
     print(str(args.output))

@@ -1,0 +1,22 @@
+{
+  "source": "User-authorized Stage 3.29 numerical multi-parameter design experiment",
+  "target_m": [0.29, 0.035, 0.19],
+  "timing": {"duration_s": 0.35, "control_period_s": 0.01, "timestep_s": 0.0005, "sample_period_s": 0.01},
+  "terminal_tolerance_m": 0.01,
+  "cells": {"near": 12, "far": 12},
+  "force_limit_n": 8.0,
+  "controller_version": "6.0.0",
+  "parameters": {
+    "components/near/length_m": {"type": "number", "bounds": [0.15, 0.17], "unit": "m", "category": "length"},
+    "components/far/length_m": {"type": "number", "bounds": [0.11, 0.13], "unit": "m", "category": "length"},
+    "design/section_scale": {"type": "number", "bounds": [0.95, 1.05], "unit": "1", "category": "section"},
+    "design/material_scenario": {"type": "choice", "options": ["baseline", "compliant", "stiff"], "unit": null, "category": "material"}
+  },
+  "semantic_decisions": {
+    "design/section_scale": {"operation": "section_scale", "components": ["near", "far"], "baseline_value": 1.0},
+    "design/material_scenario": {"operation": "material_scenario", "components": ["near", "far"], "baseline_value": "baseline"}
+  },
+  "budget": {"model_calls": 32, "tool_calls": 80, "backend_solves": 4, "worker_calls": 0, "wall_s": 10800},
+  "timeout_s": 1800,
+  "guidance": "Choose your own candidates and engineering rationale using exactly the four declared decisions. All lengths are metres. Section scale multiplies every transverse dimension at every station of both sections relative to frozen source, preserving shape, aspect ratio and orientation. Material choices are numerical scenarios: baseline original, compliant 0.9x Young modulus, stiff 1.1x Young modulus; density and bending viscosity remain original. No experimental material validation is claimed. Frozen world target [0.29,0.035,0.19], duration 0.35 s, terminal tolerance 0.01 m, six ideal tensions 0 to 8 N. Controller recipe, initialization rule, scene, rigid parts, tendon routing, basis and mesh are fixed. Inspect route context for scope and remaining budgets. Build with route.advance, optionally analyze the explicit build with analysis.gvs_candidate_evaluate, run it through route.advance, diagnose saved results, and compare already evaluated candidates using analysis.compare_candidates. Preparation and bookkeeping are automatic. Cite prior node results after the first action. No fixed candidate sequence is supplied. A passing multi-category experiment requires at least one length delta >=0.001 m, section scale delta >=0.01, and nonbaseline material. This coverage is separate from unchanged reach evaluation; exploratory designs may change subsets. Stop early after a covered design passes, or justifiably finish when evidence/resources warrant. At most four backend attempts including failures, 32 provider requests, 80 platform tool calls, zero workers, 10800 charged seconds. Reserve 1800 seconds for the next call/report and time for final explanation. Explicitly finish with the evaluated candidate; copy candidate_facts identities, every parameters row AND physical_changes into design_statement. Explain the actual selections and physical effects, original task result, sampled settling, feasible plans versus convergence, one-step discrepancy, cost and limited tested scope. Use existing compact report/context; detailed evidence is available by reference. Historical success validates only historical configuration. Failed reach may be delivered honestly; no optimum or real-time claim."
+}
