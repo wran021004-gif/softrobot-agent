@@ -1,0 +1,372 @@
+{
+  "binding": {
+    "basis": {
+      "axes": [
+        "y",
+        "z"
+      ],
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "far.kappa_y_node_0",
+        "far.kappa_y_node_1",
+        "far.kappa_y_node_2",
+        "far.kappa_z_node_0",
+        "far.kappa_z_node_1",
+        "far.kappa_z_node_2"
+      ],
+      "dimension": 12,
+      "representation_id": "gvs_bending_basis_v1",
+      "segments": [
+        {
+          "knots": [
+            0.0,
+            0.5,
+            1.0
+          ],
+          "length_m": 0.162,
+          "locations": [
+            {
+              "kinds": [
+                "segment_boundary"
+              ],
+              "s": 0.0
+            },
+            {
+              "kinds": [
+                "tendon_guide"
+              ],
+              "s": 0.5
+            },
+            {
+              "kinds": [
+                "component_attachment",
+                "rigid_attachment",
+                "segment_boundary",
+                "tendon_anchor",
+                "tendon_guide"
+              ],
+              "s": 1.0
+            }
+          ],
+          "segment": "near",
+          "start": 0
+        },
+        {
+          "knots": [
+            0.0,
+            0.5,
+            1.0
+          ],
+          "length_m": 0.12,
+          "locations": [
+            {
+              "kinds": [
+                "segment_boundary"
+              ],
+              "s": 0.0
+            },
+            {
+              "kinds": [
+                "tendon_guide"
+              ],
+              "s": 0.5
+            },
+            {
+              "kinds": [
+                "component_attachment",
+                "rigid_attachment",
+                "segment_boundary",
+                "tendon_anchor"
+              ],
+              "s": 1.0
+            }
+          ],
+          "segment": "far",
+          "start": 6
+        }
+      ],
+      "specification": {
+        "strategy": "structural_linear"
+      }
+    },
+    "calculation_frame": "robot_base",
+    "candidate_id": "changed-build",
+    "configuration": {
+      "artifact_id": "dc80660cfacedca5858ba6358009d64fb9ff778523b3296ce02a4a621aa75049",
+      "media_type": "application/json"
+    },
+    "coordinate_order": [
+      "near.kappa_y_node_0",
+      "near.kappa_y_node_1",
+      "near.kappa_y_node_2",
+      "near.kappa_z_node_0",
+      "near.kappa_z_node_1",
+      "near.kappa_z_node_2",
+      "far.kappa_y_node_0",
+      "far.kappa_y_node_1",
+      "far.kappa_y_node_2",
+      "far.kappa_z_node_0",
+      "far.kappa_z_node_1",
+      "far.kappa_z_node_2"
+    ],
+    "effective_configuration_identity": "dc80660cfacedca5858ba6358009d64fb9ff778523b3296ce02a4a621aa75049",
+    "execution_data_used": false,
+    "model": "model.gvs@1.0.0",
+    "owner_run_id": "tracking-analysis-proof",
+    "physical_context": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "robot_identity": "44840dc7315c9f7505baefa78c849cca095039ec62f38341784c905d35fabbfd",
+    "source_node": "changed-build",
+    "task_identity": "eef5a5f74f8ed6107ccefb016d9bfd3739abc1870fb94acfcd509b69b2fef50f"
+  },
+  "calculation": {
+    "backbone_points_m": null,
+    "coordinate_order": [
+      "near.kappa_y_node_0",
+      "near.kappa_y_node_1",
+      "near.kappa_y_node_2",
+      "near.kappa_z_node_0",
+      "near.kappa_z_node_1",
+      "near.kappa_z_node_2",
+      "far.kappa_y_node_0",
+      "far.kappa_y_node_1",
+      "far.kappa_y_node_2",
+      "far.kappa_z_node_0",
+      "far.kappa_z_node_1",
+      "far.kappa_z_node_2"
+    ],
+    "damping_force": null,
+    "detail": "summary",
+    "dynamics_equation": "M*qdd+c+elastic+damping=tendon+gravity",
+    "elastic_force": null,
+    "frame": "robot_base",
+    "gravity_force": null,
+    "mass_matrix": null,
+    "model_id": "gvs_variable_strain_bending_v1",
+    "q": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "qdd": [
+      9425.18607235228,
+      -7923.552412776424,
+      8572.353952785592,
+      13.785578040073444,
+      -16.06717929562006,
+      22.80174471492044,
+      -6262.104397048732,
+      2666.0931510741507,
+      -2444.4078206806153,
+      7.710060979799751,
+      -24.19340791652927,
+      69.12660415177392
+    ],
+    "qdot": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "segment_end_poses": {
+      "far": {
+        "position_m": [
+          0.29600000000000015,
+          0.0,
+          0.0
+        ],
+        "rotation_matrix": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "near": {
+        "position_m": [
+          0.1620000000000001,
+          0.0,
+          0.0
+        ],
+        "rotation_matrix": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    "tendon_generalized_force": null,
+    "tendon_length_jacobian": null,
+    "tendon_lengths_m": null,
+    "tendon_order": null,
+    "tip": {
+      "position_m": [
+        0.31000000000000016,
+        0.0,
+        0.0
+      ],
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "velocity_bias": null
+  },
+  "direct_exact_match": true,
+  "baseline_tip_m": [
+    0.308,
+    0.0,
+    0.0
+  ],
+  "changed_tip_m": [
+    0.31000000000000016,
+    0.0,
+    0.0
+  ],
+  "usage": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 6,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 2,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 1.6090000001713634
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 4,
+      "wall_s": 7198.390999999829,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  }
+}

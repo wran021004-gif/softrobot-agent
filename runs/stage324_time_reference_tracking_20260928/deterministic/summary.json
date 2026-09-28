@@ -1,0 +1,1664 @@
+{
+  "accepted_noninitialization_plans": 39,
+  "accepted_plans": 40,
+  "backend_timings_s": {
+    "backend_call": 1216.3148956999648,
+    "engine_compile": 0.023313899990171194,
+    "prepare_compile": 0.03919460019096732,
+    "solve": 1216.013571599964
+  },
+  "complete": true,
+  "control_parameters": {
+    "contract": "family.gvs_tracking_control",
+    "data": {
+      "numerical_source": "initial_state_pretension",
+      "recipe": {
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "constraint_jacobian_mode": "reverse",
+        "curvature_scale_rad_m": 10.0,
+        "evaluation_threads": 1,
+        "feasible_return": {
+          "budget_s": 15.0,
+          "minimum_s": 5.0,
+          "relative_improvement": 0.1
+        },
+        "holding_brake_lead_s": 0.0,
+        "holding_tip_speed_weight": 0.0,
+        "horizon": 10,
+        "max_cpu_s": 30.0,
+        "max_iterations": 120,
+        "max_unusable_updates": 3,
+        "position_error_scale_m": null,
+        "rate_scale_rad_m_s": 1000.0,
+        "recover_returned_tensions": true,
+        "regenerate_warm_states": true,
+        "seed_position_tolerance_fraction": 0.5,
+        "seed_speed_limit_m_s": 0.02,
+        "substeps": 1,
+        "tension_weight": 0.0001,
+        "terminal_tip_speed_weight": 0.0,
+        "terminal_velocity_weight": 0.01,
+        "terminal_weight": 5.0,
+        "tip_speed_scale_m_s": 0.02,
+        "tolerance": 1e-06,
+        "tracking_weight": 1.0,
+        "variation_weight": 0.001,
+        "velocity_weight": 0.01
+      }
+    },
+    "version": "1.0.0"
+  },
+  "converged_updates": 0,
+  "deadline_misses": 40,
+  "evaluation": {
+    "artifact_id": "332f29b62d3ccb53b39ef9ab18f811dd5d1df3d38241bdb903325f3df1133174",
+    "media_type": "application/json"
+  },
+  "evaluation_validity": "valid",
+  "execution_id": "e643574e7a2d486e9ef6f1d7a1060e91",
+  "execution_scope": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.1.0"
+    },
+    "controller": {
+      "extension_id": "controller.gvs_nmpc",
+      "parameters": {
+        "contract": "family.gvs_tracking_control",
+        "data": {
+          "numerical_source": "initial_state_pretension",
+          "recipe": {
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "constraint_jacobian_mode": "reverse",
+            "curvature_scale_rad_m": 10.0,
+            "evaluation_threads": 1,
+            "feasible_return": {
+              "budget_s": 15.0,
+              "minimum_s": 5.0,
+              "relative_improvement": 0.1
+            },
+            "holding_brake_lead_s": 0.0,
+            "holding_tip_speed_weight": 0.0,
+            "horizon": 10,
+            "max_cpu_s": 30.0,
+            "max_iterations": 120,
+            "max_unusable_updates": 3,
+            "position_error_scale_m": null,
+            "rate_scale_rad_m_s": 1000.0,
+            "recover_returned_tensions": true,
+            "regenerate_warm_states": true,
+            "seed_position_tolerance_fraction": 0.5,
+            "seed_speed_limit_m_s": 0.02,
+            "substeps": 1,
+            "tension_weight": 0.0001,
+            "terminal_tip_speed_weight": 0.0,
+            "terminal_velocity_weight": 0.01,
+            "terminal_weight": 5.0,
+            "tip_speed_scale_m_s": 0.02,
+            "tolerance": 1e-06,
+            "tracking_weight": 1.0,
+            "variation_weight": 0.001,
+            "velocity_weight": 0.01
+          }
+        },
+        "version": "1.0.0"
+      },
+      "version": "5.0.0"
+    },
+    "discretization": {
+      "contract": "family.discretization",
+      "data": {
+        "cells": {
+          "far": 12,
+          "near": 12
+        },
+        "coordinates": "two_principal_bending_angles_per_cell",
+        "model": "serial_bending_cells_v1",
+        "version": "serial_bending_discretization_v1"
+      },
+      "version": "1.0.0"
+    },
+    "execution_model": {
+      "extension_id": "model.serial_bending_cells",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "robot": {
+      "family": "tendon_robot_family",
+      "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+    },
+    "seed": 17,
+    "task": {
+      "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+      "family": "task.tracking",
+      "goal": "ae8e17344f8993a3c6b113c896425033aebdfcabb0f66b3f9394c7e77627260d",
+      "identity": "eef5a5f74f8ed6107ccefb016d9bfd3739abc1870fb94acfcd509b69b2fef50f",
+      "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.4,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      }
+    }
+  },
+  "force_bound_violation_n": 0.0,
+  "graph_construction_s": 1.2834695000201464,
+  "hold_last_responses": 0,
+  "initialization_selected": 1,
+  "last_valid_error_m": 0.003872882630204964,
+  "last_valid_time_s": 0.4,
+  "max_projection_residual_rad_m": 4.258667402198798,
+  "max_rate_projection_residual_rad_m_s": 23.804182603660752,
+  "max_sampled_contacts": 0,
+  "maximum_error_m": 0.005772548837294318,
+  "maximum_plan_violation": 7.927183010674724e-06,
+  "mean_numerical_solve_s": 15.85032900502556,
+  "mean_preparation_s": 9.468019430001732,
+  "mean_recovery_integration_s": 4.438032629986992,
+  "mean_recovery_s": 4.520016139990185,
+  "mean_recovery_validation_s": 0.08195732751046307,
+  "mean_update_s": 30.390883490006672,
+  "mean_validation_s": 0.4025435450428631,
+  "minimum_error_m": 8.91553125878986e-05,
+  "motion": {
+    "artifact_id": "e54d54a05bbaa43d3d97a9584818077be09a32751904e682ae27c5e6a0be63b4",
+    "media_type": "application/json"
+  },
+  "numerical_preparation": {
+    "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+    "coordinate_order": [
+      "near.kappa_y_node_0",
+      "near.kappa_y_node_1",
+      "near.kappa_y_node_2",
+      "near.kappa_z_node_0",
+      "near.kappa_z_node_1",
+      "near.kappa_z_node_2",
+      "far.kappa_y_node_0",
+      "far.kappa_y_node_1",
+      "far.kappa_y_node_2",
+      "far.kappa_z_node_0",
+      "far.kappa_z_node_1",
+      "far.kappa_z_node_2"
+    ],
+    "cost_accounting": "Included in simulation.run reserved/charged wall time; graph/solver construction and state regeneration are separate execution costs",
+    "current_scope": {
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.1.0"
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "parameters": {
+          "contract": "family.gvs_tracking_control",
+          "data": {
+            "numerical_source": "initial_state_pretension",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": true,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.01,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.01
+            }
+          },
+          "version": "1.0.0"
+        },
+        "version": "5.0.0"
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "data": {
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        },
+        "version": "1.0.0"
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "robot": {
+        "family": "tendon_robot_family",
+        "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+      },
+      "seed": 17,
+      "task": {
+        "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+        "family": "task.tracking",
+        "goal": "ae8e17344f8993a3c6b113c896425033aebdfcabb0f66b3f9394c7e77627260d",
+        "identity": "eef5a5f74f8ed6107ccefb016d9bfd3739abc1870fb94acfcd509b69b2fef50f",
+        "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.4,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        }
+      }
+    },
+    "execution_scope": {
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.1.0"
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "parameters": {
+          "contract": "family.gvs_tracking_control",
+          "data": {
+            "numerical_source": "initial_state_pretension",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": true,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.01,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.01
+            }
+          },
+          "version": "1.0.0"
+        },
+        "version": "5.0.0"
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "data": {
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        },
+        "version": "1.0.0"
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "robot": {
+        "family": "tendon_robot_family",
+        "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+      },
+      "seed": 17,
+      "task": {
+        "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+        "family": "task.tracking",
+        "goal": "ae8e17344f8993a3c6b113c896425033aebdfcabb0f66b3f9394c7e77627260d",
+        "identity": "eef5a5f74f8ed6107ccefb016d9bfd3739abc1870fb94acfcd509b69b2fef50f",
+        "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.4,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        }
+      }
+    },
+    "force_limits_n": [
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ],
+    "historical_states_reused": false,
+    "nominal_is_current_target_solution": false,
+    "physics_identity": "8563494a2c71a30caf654c52fd3ab51e8a90ae46479a8ba6964238e63478efac",
+    "previous_input_source": "candidate bounded pretension",
+    "resolved_basis_identity": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+    "reused": false,
+    "source": {
+      "artifact_id": "e0b792479abddbd058fde742aed0a1c7d6769f1f0e86209521992181eb099285",
+      "media_type": "application/json"
+    },
+    "source_kind": "project_initial_state_and_bounded_pretension",
+    "status": "completed",
+    "tendon_order": [
+      "near_t0",
+      "near_t1",
+      "near_t2",
+      "far_t0",
+      "far_t1",
+      "far_t2"
+    ],
+    "units": {
+      "q": "rad/m",
+      "qdot": "rad/(m*s)",
+      "tension": "N"
+    },
+    "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use",
+    "wall_s": 0.03598390007391572,
+    "warm_guess_is_execution_evidence": false
+  },
+  "official_task_success": true,
+  "one_step_prediction_comparisons": [
+    {
+      "applied_tension_n": [
+        4.682888225772572,
+        4.509445004022073,
+        4.42170235344612,
+        4.473674547674945,
+        4.108601314362428,
+        3.8332963763445465
+      ],
+      "end_s": 0.01,
+      "measured_tip_m": [
+        0.30799588566146885,
+        -5.445636312144866e-05,
+        0.14993125135327168
+      ],
+      "predicted_tip_m": [
+        0.3079939774369024,
+        5.493018760228407e-06,
+        0.14959444494063928
+      ],
+      "start_s": 0.0,
+      "tip_difference_m": 0.0003421054359394114
+    },
+    {
+      "applied_tension_n": [
+        4.698891465228893,
+        4.946694467155081,
+        3.9973024770260417,
+        4.937618891614289,
+        4.438940607427969,
+        3.02506481401311
+      ],
+      "end_s": 0.02,
+      "measured_tip_m": [
+        0.3079160709146603,
+        -8.543675072585285e-05,
+        0.15055172670313074
+      ],
+      "predicted_tip_m": [
+        0.30790410504322685,
+        -1.1705895595535027e-05,
+        0.1506278740681728
+      ],
+      "start_s": 0.01,
+      "tip_difference_m": 0.00010666696902160753
+    },
+    {
+      "applied_tension_n": [
+        4.6690378511179,
+        5.045368818392571,
+        3.947816345922527,
+        4.875141732292009,
+        4.503614237138018,
+        3.100649082519174
+      ],
+      "end_s": 0.03,
+      "measured_tip_m": [
+        0.30762862531329266,
+        -0.0001730083306639347,
+        0.1517516398838296
+      ],
+      "predicted_tip_m": [
+        0.3076675851739817,
+        -9.348149247535503e-05,
+        0.15120397539769068
+      ],
+      "start_s": 0.02,
+      "tip_difference_m": 0.0005547781341355996
+    },
+    {
+      "applied_tension_n": [
+        4.682668002058353,
+        5.211528235476043,
+        3.787860155222401,
+        4.871234907259281,
+        4.496828186177114,
+        3.2474096360767013
+      ],
+      "end_s": 0.04,
+      "measured_tip_m": [
+        0.30714190466186064,
+        -0.0002792681482733345,
+        0.15286091612883002
+      ],
+      "predicted_tip_m": [
+        0.30726151706184773,
+        -0.00012365108507712667,
+        0.15191599329118521
+      ],
+      "start_s": 0.03,
+      "tip_difference_m": 0.0009650922057975539
+    },
+    {
+      "applied_tension_n": [
+        4.705877622810147,
+        5.34997884955334,
+        3.6394998783462196,
+        4.907450111220289,
+        4.47892322034126,
+        3.4061632857167967
+      ],
+      "end_s": 0.05,
+      "measured_tip_m": [
+        0.30656540683845385,
+        -0.0002919590802987463,
+        0.1536353198891338
+      ],
+      "predicted_tip_m": [
+        0.3067685992750777,
+        -7.063640355287857e-05,
+        0.1524283897364088
+      ],
+      "start_s": 0.04,
+      "tip_difference_m": 0.0012437649645732419
+    },
+    {
+      "applied_tension_n": [
+        4.709395555054448,
+        5.373856586078953,
+        3.617758287593152,
+        4.943162548813857,
+        4.494477456308673,
+        3.567102023043503
+      ],
+      "end_s": 0.060000000000000005,
+      "measured_tip_m": [
+        0.3059976369805283,
+        -0.00016392236887354325,
+        0.1540317447037884
+      ],
+      "predicted_tip_m": [
+        0.3062759354540214,
+        8.098324046189667e-05,
+        0.15262009081673178
+      ],
+      "start_s": 0.05,
+      "tip_difference_m": 0.0014595189257678627
+    },
+    {
+      "applied_tension_n": [
+        4.717885676180852,
+        5.374538527802355,
+        3.608267457201512,
+        4.954510029629339,
+        4.496940584465604,
+        3.7487147553318296
+      ],
+      "end_s": 0.06999999999999999,
+      "measured_tip_m": [
+        0.305517469161592,
+        0.00011011568415396323,
+        0.15400907252597054
+      ],
+      "predicted_tip_m": [
+        0.3058627353251838,
+        0.00036399535894860233,
+        0.15242905607381407
+      ],
+      "start_s": 0.06,
+      "tip_difference_m": 0.0016371058615985582
+    },
+    {
+      "applied_tension_n": [
+        4.731326644731526,
+        5.450139460052927,
+        3.5000071391759118,
+        4.970851842653942,
+        4.51846794098147,
+        3.8396130170425566
+      ],
+      "end_s": 0.08,
+      "measured_tip_m": [
+        0.3051477989531501,
+        0.000507312180373329,
+        0.15364362158405465
+      ],
+      "predicted_tip_m": [
+        0.30553584938364897,
+        0.0007476531898646492,
+        0.15202060538303871
+      ],
+      "start_s": 0.07,
+      "tip_difference_m": 0.0016859799898616423
+    },
+    {
+      "applied_tension_n": [
+        4.7413639052298775,
+        5.5020062494980735,
+        3.4120492375875675,
+        4.9876876963010535,
+        4.538480068267187,
+        3.8557299520853228
+      ],
+      "end_s": 0.09,
+      "measured_tip_m": [
+        0.30484903889060916,
+        0.0009948952575367857,
+        0.1531315315854434
+      ],
+      "predicted_tip_m": [
+        0.3052705868966573,
+        0.001220683877485623,
+        0.15149761428029107
+      ],
+      "start_s": 0.08,
+      "tip_difference_m": 0.0017024596859772736
+    },
+    {
+      "applied_tension_n": [
+        4.748261738967884,
+        5.593279843674327,
+        3.2705959897250008,
+        5.1661572481738265,
+        4.610629511763292,
+        3.4019931847866975
+      ],
+      "end_s": 0.09999999999999999,
+      "measured_tip_m": [
+        0.30437490841278847,
+        0.0015826779008520655,
+        0.15316681203053392
+      ],
+      "predicted_tip_m": [
+        0.3047957115380768,
+        0.001806131751096661,
+        0.1517753933546183
+      ],
+      "start_s": 0.09,
+      "tip_difference_m": 0.001470732071156523
+    },
+    {
+      "applied_tension_n": [
+        4.760370695735638,
+        5.599055232253146,
+        3.2390206014332388,
+        4.787096345672061,
+        4.342521834678682,
+        3.8564473876433536
+      ],
+      "end_s": 0.11,
+      "measured_tip_m": [
+        0.3040450828724151,
+        0.0022594941704679725,
+        0.15320268788664076
+      ],
+      "predicted_tip_m": [
+        0.3046490173376701,
+        0.002458088797630615,
+        0.15120203766300125
+      ],
+      "start_s": 0.1,
+      "tip_difference_m": 0.0020992327125903707
+    },
+    {
+      "applied_tension_n": [
+        4.762099535946522,
+        5.568537175985873,
+        3.269115297164319,
+        4.803719041058716,
+        4.303913222445652,
+        3.8752200927124463
+      ],
+      "end_s": 0.12,
+      "measured_tip_m": [
+        0.30389165604297846,
+        0.0030522460072600678,
+        0.15296500977761182
+      ],
+      "predicted_tip_m": [
+        0.30449009029022756,
+        0.0032450480302364925,
+        0.15101287658355858
+      ],
+      "start_s": 0.11,
+      "tip_difference_m": 0.0020508827796022117
+    },
+    {
+      "applied_tension_n": [
+        4.760166422100903,
+        5.5762606487587485,
+        3.263867659067792,
+        4.829411608781539,
+        4.307366999843441,
+        3.8474310993463847
+      ],
+      "end_s": 0.13,
+      "measured_tip_m": [
+        0.3038007778854725,
+        0.0039652689666692725,
+        0.1526779532495172
+      ],
+      "predicted_tip_m": [
+        0.3044009114002961,
+        0.004116105340165654,
+        0.15076523859053342
+      ],
+      "start_s": 0.12,
+      "tip_difference_m": 0.0020103206743889122
+    },
+    {
+      "applied_tension_n": [
+        4.760998575458572,
+        5.548297618935838,
+        3.293116785060823,
+        4.816410363438703,
+        4.295884361224497,
+        3.8752512428115815
+      ],
+      "end_s": 0.14,
+      "measured_tip_m": [
+        0.3037345960038417,
+        0.004967055660373564,
+        0.1524153249055094
+      ],
+      "predicted_tip_m": [
+        0.3043558593346759,
+        0.00507358174724627,
+        0.1504595840128833
+      ],
+      "start_s": 0.13,
+      "tip_difference_m": 0.0020548085975373893
+    },
+    {
+      "applied_tension_n": [
+        4.780143356425764,
+        5.670842252073289,
+        3.0937885000286234,
+        4.7448988370084555,
+        4.227336722602833,
+        3.8938489213700187
+      ],
+      "end_s": 0.15000000000000002,
+      "measured_tip_m": [
+        0.30373983031859975,
+        0.006039325058516117,
+        0.15213283859875432
+      ],
+      "predicted_tip_m": [
+        0.3043797323048876,
+        0.006100109973925158,
+        0.15017047719446014
+      ],
+      "start_s": 0.14,
+      "tip_difference_m": 0.0020649531808396545
+    },
+    {
+      "applied_tension_n": [
+        4.782332019235342,
+        5.64631448267364,
+        3.11493813613415,
+        4.697406912970315,
+        4.189442379528017,
+        3.969406923616027
+      ],
+      "end_s": 0.16,
+      "measured_tip_m": [
+        0.30381322613196104,
+        0.007162678739005271,
+        0.1517935563531912
+      ],
+      "predicted_tip_m": [
+        0.3044585221897913,
+        0.0071784452988376025,
+        0.14978069877849437
+      ],
+      "start_s": 0.15,
+      "tip_difference_m": 0.0021138238343520023
+    },
+    {
+      "applied_tension_n": [
+        4.7872295164723795,
+        5.6394807478888325,
+        3.1195421608479417,
+        4.682557813187557,
+        4.153134361086597,
+        4.014964984709214
+      ],
+      "end_s": 0.17,
+      "measured_tip_m": [
+        0.30394219857967497,
+        0.008343325108227826,
+        0.151346992896998
+      ],
+      "predicted_tip_m": [
+        0.3045758460700823,
+        0.008319581299019137,
+        0.14934046148046443
+      ],
+      "start_s": 0.16,
+      "tip_difference_m": 0.002104338669537641
+    },
+    {
+      "applied_tension_n": [
+        4.7855433940923415,
+        5.6191186312301955,
+        3.147154029687567,
+        4.709485502331503,
+        4.160186645603614,
+        4.003462432247489
+      ],
+      "end_s": 0.18000000000000002,
+      "measured_tip_m": [
+        0.304069418352616,
+        0.009573355459605784,
+        0.1508581857259205
+      ],
+      "predicted_tip_m": [
+        0.3046809770251186,
+        0.009496779048517106,
+        0.14890407255700283
+      ],
+      "start_s": 0.17,
+      "tip_difference_m": 0.002049006157527537
+    },
+    {
+      "applied_tension_n": [
+        4.776912944101747,
+        5.57789943241912,
+        3.2024438663145602,
+        4.7700339935276235,
+        4.192813467576924,
+        3.951066330326464
+      ],
+      "end_s": 0.19,
+      "measured_tip_m": [
+        0.3041270322764378,
+        0.010832172743009903,
+        0.15045505104004706
+      ],
+      "predicted_tip_m": [
+        0.30472518496243284,
+        0.010702704645712595,
+        0.14855242677359903
+      ],
+      "start_s": 0.18,
+      "tip_difference_m": 0.0019986314625907798
+    },
+    {
+      "applied_tension_n": [
+        4.799309298502677,
+        5.672936698964146,
+        3.0631412587159783,
+        4.710017397370175,
+        4.1452025990887975,
+        3.9866474347343894
+      ],
+      "end_s": 0.2,
+      "measured_tip_m": [
+        0.3041871806148517,
+        0.012097194258950821,
+        0.15006389641435947
+      ],
+      "predicted_tip_m": [
+        0.30479904590772516,
+        0.011909860193958635,
+        0.1481337042576375
+      ],
+      "start_s": 0.19,
+      "tip_difference_m": 0.0020334982051628636
+    },
+    {
+      "applied_tension_n": [
+        4.801735757123321,
+        5.6579959572459,
+        3.0747511693551144,
+        4.687050682052311,
+        4.127826463470778,
+        4.025663123895704
+      ],
+      "end_s": 0.21000000000000002,
+      "measured_tip_m": [
+        0.3042634391225519,
+        0.013344179999926847,
+        0.14961853632139213
+      ],
+      "predicted_tip_m": [
+        0.3048696553137224,
+        0.013106027929851796,
+        0.14767585053358215
+      ],
+      "start_s": 0.2,
+      "tip_difference_m": 0.0020489613342074605
+    },
+    {
+      "applied_tension_n": [
+        4.80150537442185,
+        5.638183794775969,
+        3.0966285644185825,
+        4.6914423722583285,
+        4.115559884406388,
+        4.040706705946557
+      ],
+      "end_s": 0.22,
+      "measured_tip_m": [
+        0.3043444787823101,
+        0.014571535668581461,
+        0.14909221246271945
+      ],
+      "predicted_tip_m": [
+        0.30493746835092733,
+        0.014289338560048862,
+        0.14717001207511649
+      ],
+      "start_s": 0.21,
+      "tip_difference_m": 0.0020312868253041013
+    },
+    {
+      "applied_tension_n": [
+        4.799664542896287,
+        5.618779525270522,
+        3.1210787554685275,
+        4.695047530464269,
+        4.113654008402954,
+        4.048619381787378
+      ],
+      "end_s": 0.23,
+      "measured_tip_m": [
+        0.30441989016623566,
+        0.01576945527544876,
+        0.14848159331508315
+      ],
+      "predicted_tip_m": [
+        0.30499988878182377,
+        0.015436289336164428,
+        0.14658514763015895
+      ],
+      "start_s": 0.22,
+      "tip_difference_m": 0.002010946089046382
+    },
+    {
+      "applied_tension_n": [
+        4.791215044719648,
+        5.61252881000024,
+        3.1382970972713453,
+        4.7977301260319765,
+        4.158889355932487,
+        3.928003386109119
+      ],
+      "end_s": 0.24000000000000002,
+      "measured_tip_m": [
+        0.3044115018596378,
+        0.016932411448566543,
+        0.14797610063218541
+      ],
+      "predicted_tip_m": [
+        0.30497315544254994,
+        0.016556483079943247,
+        0.1461982797552346
+      ],
+      "start_s": 0.23,
+      "tip_difference_m": 0.001901952669247045
+    },
+    {
+      "applied_tension_n": [
+        4.796948066277188,
+        5.613943247461294,
+        3.131010787129626,
+        4.7650498161608335,
+        4.141472030905255,
+        3.969041451978894
+      ],
+      "end_s": 0.25,
+      "measured_tip_m": [
+        0.30437092844239855,
+        0.018041033925378584,
+        0.1475387360399976
+      ],
+      "predicted_tip_m": [
+        0.30495471934002044,
+        0.017613537515927685,
+        0.145691080619292
+      ],
+      "start_s": 0.24,
+      "tip_difference_m": 0.0019842871631652313
+    },
+    {
+      "applied_tension_n": [
+        4.805505610961517,
+        5.62498910686787,
+        3.1086224505308837,
+        4.764985682151788,
+        4.132199624254379,
+        3.967891829207648
+      ],
+      "end_s": 0.26,
+      "measured_tip_m": [
+        0.304324966581596,
+        0.01908210197840452,
+        0.14709075011628558
+      ],
+      "predicted_tip_m": [
+        0.3049146642570181,
+        0.018615877486711858,
+        0.14524767118542012
+      ],
+      "start_s": 0.25,
+      "tip_difference_m": 0.001990489530354893
+    },
+    {
+      "applied_tension_n": [
+        4.803137829031961,
+        5.616684573975442,
+        3.1181778636118778,
+        4.768515030436158,
+        4.1324691129745545,
+        3.9661163595557376
+      ],
+      "end_s": 0.27,
+      "measured_tip_m": [
+        0.3042740769548839,
+        0.02004672051178062,
+        0.14662794452408556
+      ],
+      "predicted_tip_m": [
+        0.3048695607835342,
+        0.01954114374481305,
+        0.14478598519401048
+      ],
+      "start_s": 0.26,
+      "tip_difference_m": 0.002000755615044495
+    },
+    {
+      "applied_tension_n": [
+        4.802186747308787,
+        5.6288530243798505,
+        3.107081410987427,
+        4.778311704735697,
+        4.142638431277829,
+        3.944101067489319
+      ],
+      "end_s": 0.28,
+      "measured_tip_m": [
+        0.3042151267723198,
+        0.02091819073290272,
+        0.1461708712960345
+      ],
+      "predicted_tip_m": [
+        0.3048163102547717,
+        0.020374794866588063,
+        0.14434908990454107
+      ],
+      "start_s": 0.27,
+      "tip_difference_m": 0.001993887681263062
+    },
+    {
+      "applied_tension_n": [
+        4.799435800755429,
+        5.619741336824118,
+        3.1226649418760575,
+        4.8726331254669315,
+        4.1607304788108195,
+        3.8500676413101043
+      ],
+      "end_s": 0.29000000000000004,
+      "measured_tip_m": [
+        0.30409363499713044,
+        0.021720773635052423,
+        0.14587431954840036
+      ],
+      "predicted_tip_m": [
+        0.30470019361129164,
+        0.021165093838426685,
+        0.14411272941959738
+      ],
+      "start_s": 0.28,
+      "tip_difference_m": 0.001944194735793527
+    },
+    {
+      "applied_tension_n": [
+        4.805028735497014,
+        5.627971831784403,
+        3.108073769796237,
+        4.847267490475291,
+        4.1534200656851405,
+        3.8744917561752916
+      ],
+      "end_s": 0.3,
+      "measured_tip_m": [
+        0.30395313152010756,
+        0.022447565066179388,
+        0.14570247049292145
+      ],
+      "predicted_tip_m": [
+        0.3045953197467413,
+        0.021852397765897442,
+        0.14386391953204025
+      ],
+      "start_s": 0.29,
+      "tip_difference_m": 0.002036393741276254
+    },
+    {
+      "applied_tension_n": [
+        4.808976681839347,
+        5.624376232975885,
+        3.107535893468538,
+        4.832508129369415,
+        4.146489142695121,
+        3.8935463467031908
+      ],
+      "end_s": 0.31,
+      "measured_tip_m": [
+        0.3038256026935786,
+        0.023078673232263796,
+        0.14556340755428646
+      ],
+      "predicted_tip_m": [
+        0.30449259369309944,
+        0.022459160810371616,
+        0.14368078856308222
+      ],
+      "start_s": 0.3,
+      "tip_difference_m": 0.002091154442016026
+    },
+    {
+      "applied_tension_n": [
+        4.811038215573519,
+        5.650008061793454,
+        3.0753913070381538,
+        4.810958632530668,
+        4.154063416497906,
+        3.8937813085016852
+      ],
+      "end_s": 0.32,
+      "measured_tip_m": [
+        0.3037243063097289,
+        0.02358961630550678,
+        0.14543053483362128
+      ],
+      "predicted_tip_m": [
+        0.30441120682066264,
+        0.02294215588046713,
+        0.14353342908362982
+      ],
+      "start_s": 0.31,
+      "tip_difference_m": 0.00211897322790172
+    },
+    {
+      "applied_tension_n": [
+        4.82277458758235,
+        5.650107020000442,
+        3.064111477238664,
+        4.804166328592181,
+        4.127386938627067,
+        3.9179248139357683
+      ],
+      "end_s": 0.33,
+      "measured_tip_m": [
+        0.3036554738067214,
+        0.02399887807889019,
+        0.14528322672610747
+      ],
+      "predicted_tip_m": [
+        0.30435684558138304,
+        0.023354171436966855,
+        0.14335777630102112
+      ],
+      "start_s": 0.32,
+      "tip_difference_m": 0.0021482384318080847
+    },
+    {
+      "applied_tension_n": [
+        4.822792167879673,
+        5.654170709859674,
+        3.0588865226151056,
+        4.8184927274667215,
+        4.137227500517523,
+        3.8943344388022014
+      ],
+      "end_s": 0.34,
+      "measured_tip_m": [
+        0.30359653366253403,
+        0.024315417375091082,
+        0.14516077487213255
+      ],
+      "predicted_tip_m": [
+        0.30430809098995576,
+        0.023656773885404655,
+        0.14325069070233973
+      ],
+      "start_s": 0.33,
+      "tip_difference_m": 0.002142089310091205
+    },
+    {
+      "applied_tension_n": [
+        4.831507167982791,
+        5.662572728910062,
+        3.0422575159495655,
+        4.81310811842779,
+        4.12171106393695,
+        3.906523466121251
+      ],
+      "end_s": 0.35000000000000003,
+      "measured_tip_m": [
+        0.30355331991902906,
+        0.024546196683604974,
+        0.14506748590160676
+      ],
+      "predicted_tip_m": [
+        0.3042804752395561,
+        0.023885133073037985,
+        0.1431334773876893
+      ],
+      "start_s": 0.34,
+      "tip_difference_m": 0.002169366010910058
+    },
+    {
+      "applied_tension_n": [
+        4.836261002666541,
+        5.655092333554895,
+        3.046159984608494,
+        4.818510892814056,
+        4.112790448141521,
+        3.9111709544672704
+      ],
+      "end_s": 0.36000000000000004,
+      "measured_tip_m": [
+        0.30352210507074495,
+        0.02470338009246136,
+        0.1449958643559136
+      ],
+      "predicted_tip_m": [
+        0.304261365781506,
+        0.02404068586711633,
+        0.1430486784941704
+      ],
+      "start_s": 0.35000000000000003,
+      "tip_difference_m": 0.0021856813159637735
+    },
+    {
+      "applied_tension_n": [
+        4.842354327493854,
+        5.659834201423565,
+        3.0361284819763674,
+        4.8283951621084515,
+        4.098388342140914,
+        3.91119122764122
+      ],
+      "end_s": 0.37,
+      "measured_tip_m": [
+        0.3034985842593615,
+        0.02480411541804404,
+        0.1449485728498122
+      ],
+      "predicted_tip_m": [
+        0.304249688703802,
+        0.02414270062473127,
+        0.14299380446830912
+      ],
+      "start_s": 0.36,
+      "tip_difference_m": 0.0021960753267124913
+    },
+    {
+      "applied_tension_n": [
+        4.844941290596896,
+        5.652081898767215,
+        3.0420617798003846,
+        4.8310562651511715,
+        4.089908409868145,
+        3.9180043578443255
+      ],
+      "end_s": 0.38,
+      "measured_tip_m": [
+        0.3034817382882168,
+        0.02485539261845443,
+        0.14492148177412695
+      ],
+      "predicted_tip_m": [
+        0.30424603442214543,
+        0.024190706322517797,
+        0.1429489626048769
+      ],
+      "start_s": 0.37,
+      "tip_difference_m": 0.0022173832157304446
+    },
+    {
+      "applied_tension_n": [
+        4.846300232207172,
+        5.644868101407804,
+        3.048511766023317,
+        4.829666938822668,
+        4.075663974941671,
+        3.9332339290988694
+      ],
+      "end_s": 0.39,
+      "measured_tip_m": [
+        0.30347615774454884,
+        0.024864767129261636,
+        0.14488818054213107
+      ],
+      "predicted_tip_m": [
+        0.3042527370470268,
+        0.024200172481986575,
+        0.14289454921378908
+      ],
+      "start_s": 0.38,
+      "tip_difference_m": 0.0022403855319052786
+    },
+    {
+      "applied_tension_n": [
+        4.847976839790928,
+        5.638169637305621,
+        3.0543479218567455,
+        4.82658950224378,
+        4.063565416963691,
+        3.94783656861467
+      ],
+      "end_s": 0.4,
+      "measured_tip_m": [
+        0.30348410038467183,
+        0.024839281079665668,
+        0.14482224666927793
+      ],
+      "predicted_tip_m": [
+        0.30427049146217056,
+        0.024174047699921774,
+        0.14281428261164172
+      ],
+      "start_s": 0.39,
+      "tip_difference_m": 0.002256737918557211
+    }
+  ],
+  "optimization_status_counts": {
+    "feasible_early_stop": 40
+  },
+  "per_update_delivery_s": [
+    47.265963200014085,
+    35.8853237000294,
+    35.08518289984204,
+    35.690798999974504,
+    35.227188100107014,
+    21.553402999881655,
+    27.080636099912226,
+    34.04755140002817,
+    34.96147030009888,
+    35.98683419986628,
+    33.301129300147295,
+    24.233404400059953,
+    33.44339909986593,
+    27.25325489998795,
+    35.62148250010796,
+    21.88186819991097,
+    33.25537560018711,
+    33.26593050011434,
+    21.59999129991047,
+    35.27005259995349,
+    21.649413399863988,
+    21.394000300206244,
+    21.50098820007406,
+    33.51234130002558,
+    33.10020689992234,
+    33.255232699913904,
+    26.91222790000029,
+    33.168199699837714,
+    33.46105800010264,
+    34.611691899830475,
+    19.31923420005478,
+    34.032934200018644,
+    33.99456310016103,
+    34.01300530019216,
+    34.78727030009031,
+    19.149877900024876,
+    34.156424100045115,
+    21.89419010002166,
+    24.901100100018084,
+    24.91113969986327
+  ],
+  "raw_termination_counts": {
+    "User_Requested_Stop": 40
+  },
+  "real_time_demonstrated": false,
+  "recovered_plans": 25,
+  "simulation": {
+    "artifact_id": "e3987d85b0c3e4b7b950d8ec9318a18a635de9dcdc1fc83eec6aa632bf3370a4",
+    "media_type": "application/json"
+  },
+  "simulation_wall_s": 1220.5469999997877,
+  "solver_construction_s": 3.936633199919015,
+  "solver_error_count": 0,
+  "solver_failure_flags": 0,
+  "solver_status": "completed",
+  "task": {
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.tracking",
+      "parameters": {
+        "contract": "family.tracking_evaluation",
+        "data": {
+          "max_position_error_m": 0.01,
+          "tension_limits_n": {
+            "far_t0": 8.0,
+            "far_t1": 8.0,
+            "far_t2": 8.0,
+            "near_t0": 8.0,
+            "near_t1": 8.0,
+            "near_t2": 8.0
+          }
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.tracking",
+    "goal": {
+      "contract": "family.cartesian_reference",
+      "data": {
+        "end_m": [
+          0.30599999999999994,
+          0.024,
+          0.142
+        ],
+        "end_s": 0.4,
+        "frame": "world",
+        "interpolation": "quintic",
+        "outside": "clamp_position_zero_velocity",
+        "provenance": "Baseline MuJoCo mj_forward at task initializer; no integration. robot sha256 ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a; frozen for every candidate.",
+        "start_m": [
+          0.30799999999999994,
+          0.0,
+          0.15
+        ],
+        "start_s": 0.0,
+        "units": "SI"
+      },
+      "version": "1.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "Short world-frame quintic tracking",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "max_position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.01,
+        0.4
+      ]
+    },
+    "source": "Stage 3.24 predeclared path and sampled acceptance; no trajectory reused",
+    "status": "development_valid",
+    "task_id": "gvs-cartesian-tracking",
+    "task_version": "1.0.0",
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.4,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    }
+  },
+  "tension_range_n": [
+    3.02506481401311,
+    5.672936698964146
+  ],
+  "terminal_error_m": 0.003872882630204964,
+  "terminal_tip_speed_m_s": 0.009478078526392389,
+  "tracking": {
+    "acceptance": {
+      "contract": "family.tracking_evaluation",
+      "data": {
+        "max_position_error_m": 0.01,
+        "tension_limits_n": {
+          "far_t0": 8.0,
+          "far_t1": 8.0,
+          "far_t2": 8.0,
+          "near_t0": 8.0,
+          "near_t1": 8.0,
+          "near_t2": 8.0
+        }
+      },
+      "version": "1.0.0"
+    },
+    "continuous_time_guarantee": false,
+    "metrics": [
+      {
+        "name": "max_position_error",
+        "units": "m",
+        "value": 0.005772548837294318
+      },
+      {
+        "name": "rms_position_error",
+        "units": "m",
+        "value": 0.004412616885360754
+      },
+      {
+        "name": "terminal_position_error",
+        "units": "m",
+        "value": 0.003872882630204964
+      }
+    ],
+    "reference": {
+      "end_m": [
+        0.30599999999999994,
+        0.024,
+        0.142
+      ],
+      "end_s": 0.4,
+      "frame": "world",
+      "interpolation": "quintic",
+      "outside": "clamp_position_zero_velocity",
+      "provenance": "Baseline MuJoCo mj_forward at task initializer; no integration. robot sha256 ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a; frozen for every candidate.",
+      "start_m": [
+        0.30799999999999994,
+        0.0,
+        0.15
+      ],
+      "start_s": 0.0,
+      "units": "SI"
+    },
+    "rule": "All inclusive uniform samples in scoring interval; arithmetic RMS; max <= declared limit. Complete grid required. Terminal error is at execution endpoint.",
+    "scoring_interval_s": [
+      0.01,
+      0.4
+    ],
+    "velocity_error_max_m_s": 0.13704289525701807
+  },
+  "updates": 40,
+  "valid_complete_execution": true
+}

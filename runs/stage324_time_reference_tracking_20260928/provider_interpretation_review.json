@@ -1,0 +1,130 @@
+{
+  "public_call_chain_completed": true,
+  "explicit_delivery": true,
+  "mathematical_analysis_used_intended_candidate": true,
+  "delivered_changed_candidate_passed_tracking": true,
+  "structured_candidate_facts_matched": true,
+  "provider_final_prose_accurate": false,
+  "overall_delivery_acceptance": false,
+  "unassisted_end_to_end_success": false,
+  "candidate_facts": {
+    "candidate_id": "cand_near165",
+    "configuration": {
+      "artifact_id": "ad97dadde9a7422ea64f447428ad87bb8a48ae5c33e93576c4a7ac1e4a54e1d7",
+      "media_type": "application/json"
+    },
+    "effective_identity": "9a2d28258575201ea2fa4887fcc258614c100b7a887fb3a94c81bb066a88a6d8",
+    "execution_id": "842ae454986e4a41b9dbaca5a57fb40a",
+    "frozen_baseline_identity": "2b34ed0fa887d28068486e26d82d9404b128d4666f7bc9796fe9e92c7cd2a392",
+    "owner_run_id": "gvs-live-6971718592bc-0e6ec10af4ba158f",
+    "parameters": [
+      {
+        "baseline_delta": 0.0,
+        "baseline_value": 0.12,
+        "effective_value": 0.12,
+        "path": "components/far/length_m",
+        "unit": "m"
+      },
+      {
+        "baseline_delta": 0.0050000000000000044,
+        "baseline_value": 0.16,
+        "effective_value": 0.165,
+        "path": "components/near/length_m",
+        "unit": "m"
+      }
+    ]
+  },
+  "analysis_binding_checks": {
+    "configuration_matches_executed_build": true,
+    "robot_identity_matches": true,
+    "effective_configuration_identity_matches": false,
+    "task_identity_matches": true,
+    "frozen_task_preserved": true,
+    "frozen_recipe_preserved": true,
+    "pre_execution_analysis_request": "model-7-tool",
+    "execution_request": "model-11-tool",
+    "no_physical_execution_id_in_analysis": true,
+    "analysis_uses_execution_data": false,
+    "normalized_effective_configuration_matches": true,
+    "raw_identity_difference": "Only policy.allowed_tools list ordering changes on execution input normalization; equal grants and otherwise identical complete effective configuration. The analysis reference identifies the immutable build; execution CandidateInput is separately referenced."
+  },
+  "analysis_reference": {
+    "artifact_id": "ccc04a6ec422d0a5406b021560fc8a6312a6b058fd363b7230c424eeb977f7b4",
+    "media_type": "application/json"
+  },
+  "evaluation_reference": {
+    "artifact_id": "60db46fb085bbeb99f8c3763873bc2062a00fd42281e819284a91abe71c43286",
+    "media_type": "application/json"
+  },
+  "report_binding": {
+    "execution_id": "842ae454986e4a41b9dbaca5a57fb40a",
+    "owner_run_id": "gvs-live-6971718592bc-0e6ec10af4ba158f",
+    "reference": {
+      "artifact_id": "8bc193ac382b0333744bd678ef7112cfd97e80dfb3182afd190ca3331a03487a",
+      "media_type": "application/json"
+    },
+    "request_id": "single-profile-report"
+  },
+  "actual_usage": {
+    "tool_calls": 15,
+    "model_calls": 17,
+    "backend_solves": 1,
+    "worker_calls": 0,
+    "wall_s": 1357.079999999376
+  },
+  "provider_tool_decisions": 17,
+  "child_tool_calls": 3,
+  "total_tool_invocation_attempts_including_rejections": 20,
+  "preflight_rejections": 5,
+  "token_usage": {
+    "prompt_tokens": 307216,
+    "completion_tokens": 41360,
+    "total_tokens": 348576,
+    "prompt_cache_hit_tokens": 81920,
+    "prompt_cache_miss_tokens": 225296,
+    "reasoning_tokens": 34495
+  },
+  "monetary_charge": "not returned by provider",
+  "provider_response": {
+    "artifact_id": "f689cb34bc915e838708558172a49beb68424e05e619874a76e0916a107a6208",
+    "media_type": "application/json"
+  },
+  "provider_response_identity": "05686d4f34c1caa9eb8e6cfe36bc5948e44966de290188691bcc62aba042d88c",
+  "provider_explanation_identity": "555b0b46854ab22f80097a180d50a320bbdec62f9f399d1c131c2b0e141cfff9",
+  "raw_provider_id": "e2f664e2-d588-481c-bbb0-abd3ee81e889",
+  "reviewed_text_fields": [
+    "arguments.reason",
+    "arguments.next_step",
+    "outer reason",
+    "assistant message content",
+    "design_statement"
+  ],
+  "discrepancies": [
+    {
+      "field": "arguments.reason",
+      "quote": "zero deadline-nonconforming updates",
+      "evidence": {
+        "deadline_misses": 40,
+        "updates": 40,
+        "mean_update_s": 27.929852807486895,
+        "control_period_s": 0.01
+      },
+      "finding": "False and internally contradictory: all 40 complete updates missed the 0.01 s deadline. The same paragraph correctly says deadline_misses 40 and real_time_demonstrated false; those clauses do not erase the contradiction."
+    }
+  ],
+  "accurate_final_claims": [
+    "candidate lengths, signed deltas and evidence identities",
+    "interval max/RMS/terminal errors and sampled tendon bounds",
+    "complete valid execution and 40 feasible early-stop plans",
+    "zero optimizer convergence",
+    "rounded mean update and simulation wall time",
+    "explicit lack of real-time demonstration"
+  ],
+  "earlier_failures_preserved": [
+    "live/first_stop_behavior_audit.json",
+    "live/first_stop_route_status.json",
+    "live_first_stop.log",
+    "protocol_continuation.json"
+  ],
+  "stopping_reason": "Provider explicitly finished; immutable delivery preserved as a negative prose example. No fresh session, delivery-only retry or unused backend attempt was launched."
+}
