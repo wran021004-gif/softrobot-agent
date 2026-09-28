@@ -1,4 +1,4 @@
-"""Thin Stage 3.30 input path; execution uses gvs_nmpc_route_experiment.py."""
+"""Thin Stage 3.31 input path; execution uses gvs_nmpc_route_experiment.py."""
 import argparse
 from pathlib import Path
 import sys
@@ -10,35 +10,32 @@ def revision_input(source):
     inp=read(source/'frozen_input.json')
     inp['run_id']='gvs-autonomous-design-revision'
     p=inp['policy']
-    p['budget'].update(model_calls=32,tool_calls=80,backend_solves=3,wall_s=10800.,worker_calls=0)
-    p['model']['max_turns']=32
+    p['budget'].update(model_calls=64,tool_calls=160,backend_solves=6,wall_s=21600.,worker_calls=0)
+    p['model'].update(adapter='deepseek',model='deepseek-flash',base_url='https://api.deepseek.com',
+        thinking='enabled',reasoning_effort='high',max_tokens=65536,timeout_s=600.,
+        max_turns=64,context_bytes=150000,length_recovery=dict(enabled=True,max_tokens=131072,timeout_s=900.))
     route=p['route']['data']
-    route['max_trials']=3
-    route['source']='User-authorized Stage 3.30 autonomous design revision from supplied historical failure evidence'
-    route['guidance']=('Use the supplied failed case to propose and execute a different authorized design. '
-        'Distinguish observations from hypotheses. Explain what the modification is intended to improve or test. '
-        'Compare the revised execution with the prior failure, then decide whether to revise again or deliver. '
-        'Your initial action should lead to a revised build or a specific evidenced blocker; further analysis is optional. '
-        'Do not simulate the historical design again. In reason/next_step state relevant observed facts, a working hypothesis explicitly labeled as such, '
-        'and the proposed change and what execution tests. Choose all revisions yourself; no direction or sequence is prescribed. '
-        'Only four declared decisions are authorized: near/far length, common section scale, and material scenario. '
-        'Section scale multiplies transverse dimensions at every station relative to frozen source. Material Young-modulus factors are '
-        'baseline 1, compliant 0.9, stiff 1.1; density and viscosity unchanged. All scientific/control settings are frozen. '
-        'Coverage is separate from the original reach evaluator: length delta from baseline >=0.001 m, section-scale delta >=0.01, nonbaseline material. '
-        'A meaningful repair requires at least one decision changed relative to the supplied failure and a fresh complete evaluation. '
-        'Use build then run; run takes source_node and omits combination. Cite previous node results after the first action. '
-        'Historical case is attributed prior evidence, not a current selectable execution. Comparisons appear automatically after each run. '
-        'A covered revised design passing the unchanged task may be delivered immediately. If a revision fails and resources remain, '
-        'revise based on evidence or identify a concrete stopping reason. One failed point never proves the authorized space infeasible; '
-        'maximum values are not presumed optimal. Constant tensions do not imply static equilibrium. Accepted feasible plans are not convergence. '
-        'Zero convergence does not prove reach impossible; 10 ms deadline misses are diagnostics in this offline experiment. '
-        'Ceilings: 32 provider requests, 80 platform tool calls, 3 fresh backend attempts including failures/retries, zero workers, '
-        '10800 charged wall seconds; retain the 1800-second per-call reservation and final-report budget. Historical execution costs zero fresh attempts. '
-        'On finish copy candidate_facts into design_statement (including parameters and physical_changes) and free_reach factual_result into result_statement. '
-        'Do not search for tracking-only metrics. Keep final reason factual and concise: historical starting case, revisions actually tested, '
-        'actual changes, selected evaluated design, original reach result, separate settling/convergence/computation diagnostics, '
-        'supported conclusions, uncertainty, and stopping reason. No optimality/global infeasibility/static equilibrium/dominant-cause claim without evidence. '
-        'Use existing compact context and retained detail references. Do not claim independently generating the supplied historical failure.')
+    route['max_trials']=6
+    route['source']='User-authorized Stage 3.31 autonomous revision and fresh evaluation from supplied failure'
+    route['guidance']=(
+        'Choose a meaningful revision of the supplied failed design within the four declared decisions. '
+        'Give a short evidence-based rationale, labeling intended effects as hypotheses; no mechanics derivation or proof is required. '
+        'Start with build. Perform the required analysis.gvs_candidate_evaluate on that saved source_node using its frozen basis, '
+        'then run the build with source_node and no combination. Cite previous route results after the first action. '
+        'Read the automatic comparison and diagnostics, then revise again or deliver an evaluated candidate. '
+        'All scientific and controller settings remain frozen. Section scale and numerical Young-modulus scenarios expand from '
+        'the frozen baseline; density and bending viscosity stay unchanged. These are not validated real-world materials. '
+        'Coverage requires length delta from baseline >=0.001 m, section-scale delta >=0.01, and nonbaseline material; '
+        'coverage is separate from the original reach criterion. Settling is diagnostic only. '
+        'The supplied historical execution is prior evidence, costs no new attempt, cannot be delivered, and must not be rerun. '
+        'Change at least one of its decisions and obtain a fresh evaluation. No revision direction is prescribed. '
+        'Ceilings: 64 provider requests, 160 tool calls, 6 fresh backend attempts, 21600 charged seconds, zero workers. '
+        'Retain the 1800-second per-call reservation and final-delivery capacity. Use remaining resources to revise if useful; '
+        'a covered revision passing the unchanged task can be delivered immediately. '
+        'On finish copy selected candidate_facts into design_statement and factual_result into result_statement. '
+        'Give a concise factual explanation: supplied prior case, tested revisions, selected result, and stopping reason. '
+        'Distinguish original reach acceptance from settling and terminal motion, accepted plans from convergence, '
+        'simulation duration from computation, and observations from hypotheses. Do not infer global infeasibility from failed samples.')
     return inp
 
 

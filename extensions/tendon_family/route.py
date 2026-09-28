@@ -48,6 +48,20 @@ class Inspect(Contract):
     pass
 
 
+def task_result_schema(schema, task_family):
+    """Small provider projection only; RouteAction retains both runtime contracts."""
+    names={'task.reach':('ReachFacts','TrackingFacts'),
+           'task.tracking':('TrackingFacts','ReachFacts')}
+    if task_family not in names: return schema
+    schema=deepcopy(schema)
+    keep,remove=names[task_family]
+    field=schema['properties']['result_statement']
+    field['anyOf']=[{'$ref':'#/$defs/'+keep},{'type':'null'}]
+    field['description']='On finish copy the selected factual_result exactly; typed consistency is checked separately from prose.'
+    schema['$defs'].pop(remove,None)
+    return schema
+
+
 def policy(inp):
     if inp.policy.route is None: raise ValueError('ROUTE_NOT_CONFIGURED')
     return RoutePolicy.model_validate(inp.policy.route.data)

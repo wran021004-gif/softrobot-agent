@@ -3,7 +3,7 @@
 Identifiers and policy are host-owned; extension payloads carry no import paths.
 """
 from typing import Literal
-from pydantic import Field, model_validator
+from pydantic import Field, model_validator, model_serializer
 from schemas.common import Contract
 from schemas.evidence import Identifier
 
@@ -154,6 +154,13 @@ class Budget(Contract):
     wall_s: float = Field(ge=0)
 
 
+class ModelLengthRecovery(Contract):
+    """One length-exhaustion retry; disable after its phase-wide use."""
+    enabled: bool = True
+    max_tokens: int = Field(ge=1)
+    timeout_s: float = Field(gt=0)
+
+
 class ModelConfig(Contract):
     adapter: Identifier = 'offline'
     adapter_version: str = '1.0.0'
@@ -163,6 +170,8 @@ class ModelConfig(Contract):
     model: str = 'offline-contract-fixture'
     base_url: str = 'https://api.deepseek.com'
     thinking: Literal['enabled','disabled'] | None = None
+    reasoning_effort: Literal['low','high','max'] | None = None
+    length_recovery: ModelLengthRecovery | None = None
     max_tokens: int = Field(default=2000,ge=1)
     supports_tools: Literal[True] = True
     supports_text: Literal[True] = True
@@ -172,6 +181,14 @@ class ModelConfig(Contract):
     max_repairs: int = Field(default=2, ge=0, le=10)
     max_no_progress: int = Field(default=3, ge=1, le=20)
     context_bytes: int = Field(default=64000, ge=4000)
+
+    # Optional additions must not change identities of older frozen snapshots.
+    @model_serializer(mode='wrap')
+    def serialize_optional_model_settings(self, handler):
+        data=handler(self)
+        for key in ('reasoning_effort','length_recovery'):
+            if data.get(key) is None: data.pop(key,None)
+        return data
 
 
 class ExperimentPolicy(Contract):

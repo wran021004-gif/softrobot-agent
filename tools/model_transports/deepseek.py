@@ -17,8 +17,11 @@ def request_completion(config, payload, key):
         with build_opener(NoRedirect).open(request, timeout=config['timeout_s']) as response:
             return json.loads(response.read().decode('utf-8'))
     except HTTPError as exc:
-        # Do not persist server bodies, request headers or credential-bearing objects.
-        raise RuntimeError(f'DEEPSEEK_HTTP_{exc.code}') from None
+        # Preserve endpoint rejection evidence, never headers or credentials.
+        body=exc.read().decode('utf-8',errors='replace').replace(key,'[REDACTED]')
+        error=RuntimeError(f'DEEPSEEK_HTTP_{exc.code}')
+        error.provider_response=dict(status_code=exc.code,body=body)
+        raise error from None
     except URLError:
         raise RuntimeError('DEEPSEEK_NETWORK_ERROR') from None
 

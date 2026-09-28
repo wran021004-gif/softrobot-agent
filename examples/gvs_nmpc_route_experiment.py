@@ -23,13 +23,16 @@ def route_input(run_id,offline=False,task_input=None,wall_s=3600.):
     inp=deepcopy(task_input) if task_input is not None else profile_input(run_id)
     inp['run_id']=run_id
     p=inp['policy'];config=load('configs/deepseek.yaml')
-    p['model']=dict(adapter='offline' if offline else 'deepseek',model=config['model'],
-        base_url=config['base_url'],thinking=config['thinking'],max_tokens=config['max_tokens'],
-        timeout_s=config['timeout_s'],context_bytes=150000,max_turns=24)
+    from schemas.platform import ModelConfig
+    defaults={k:v for k,v in config.items() if k in ModelConfig.model_fields}
+    defaults={'adapter':'deepseek','context_bytes':150000,'max_turns':24,**defaults}
+    explicit=p.get('model',{}) if task_input is not None else {}
+    resolved={**defaults,**explicit}
+    if offline: resolved['adapter']='offline'
+    p['model']=ModelConfig.model_validate(resolved).model_dump(mode='json')
     # An explicit Route input owns its search space, tool grants and budgets.
     # Legacy fixed-profile invocations retain the one-execution defaults below.
     if task_input is not None and p.get('route') is not None:
-        p['model']['max_turns']=p['budget']['model_calls']
         return inp
     p['budget'].update(model_calls=24,tool_calls=60,backend_solves=1,wall_s=wall_s)
     p['allowed_tools']=[]
