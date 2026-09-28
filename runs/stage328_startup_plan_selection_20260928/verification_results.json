@@ -1,0 +1,15 @@
+{
+  "initial_tests": {
+    "command": "python -m unittest tests.test_stage328_selection -v",
+    "passed": 4,
+    "limitation": "Mocks omitted production source key; did not detect the duplicate-key diagnostic defect"
+  },
+  "corrected_tests": {
+    "command": "python -m unittest tests.test_stage328_selection -v",
+    "passed": 4,
+    "fix": "Mock recovery includes actual source key, exercising corrected dictionary construction"
+  },
+  "local_saved_case_checks": 4,
+  "whole_suite_run": false,
+  "corrections": 1
+}

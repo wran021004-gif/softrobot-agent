@@ -1,0 +1,182 @@
+diff --git a/extensions/optimization/ipopt.py b/extensions/optimization/ipopt.py
+index e1e0c29..921447d 100644
+--- a/extensions/optimization/ipopt.py
++++ b/extensions/optimization/ipopt.py
+@@ -44,18 +44,22 @@ class _FeasibleIterate(ca.Callback):
+         name=self.names[i]
+         return ca.Sparsity.dense(self.nx if name in ('x','lam_x') else self.ng if name in ('g','lam_g') else 1 if name=='f' else 0,1)
+ 
+-    def reset(self,lbx,ubx,lbg,ubg,start,policy=None,seed_objective=None,seed_settled=False,trace=False):
++    def reset(self,lbx,ubx,lbg,ubg,start,policy=None,seed_objective=None,seed_settled=False,trace=False,retain_recent=0):
+         self.bounds=(lbx,ubx,lbg,ubg);self.best=None;self.first=None;self.latest=None
+         self.iteration=-1;self.start=start
+         self.policy=policy;self.seed_objective=seed_objective;self.seed_settled=seed_settled
+         self.stop_reason=None;self.stop_s=None
+         self.trace=[] if trace else None
++        self.retain_recent=retain_recent;self.recent=[]
+ 
+     def eval(self,args):
+         elapsed=time.perf_counter()-self.start
+         self.iteration+=1;items=dict(zip(self.names,args))
+         x=np.asarray(items['x']).ravel();g=np.asarray(items['g']).ravel();objective=float(items['f'])
+         violation=_violation(x,g,*self.bounds)
++        if self.retain_recent and np.isfinite(np.r_[x,g,objective]).all():
++            self.recent.append(dict(x=x.copy(),objective=objective,iteration=self.iteration))
++            self.recent=self.recent[-self.retain_recent:]
+         if self.trace is not None:
+             self.trace.append(dict(iteration=self.iteration,elapsed_s=elapsed,objective=objective,
+                 scaled_violation=violation,eligible=bool(np.isfinite(np.r_[x,g,objective]).all() and violation<=1e-5)))
+@@ -128,6 +132,8 @@ class IpoptSolver:
+         self.last_diagnostics = None
+         self.diagnostic_trace = False
+         self.last_returned_optimum = None
++        self.recovery_candidate_limit=0
++        self.last_recovery_candidates=[]
+         self._compiled = {}
+ 
+     @staticmethod
+@@ -152,6 +158,7 @@ class IpoptSolver:
+ 
+     def solve(self, problem: OptimizationProblem, *, seed_settled=False) -> OptimizationResult:
+         self.last_returned_optimum = None
++        self.last_recovery_candidates=[]
+         self.last_diagnostics=None
+         problem = OptimizationProblem.model_validate(problem)
+         payload = problem.objective_function
+@@ -231,7 +238,7 @@ class IpoptSolver:
+         initial_finite=np.isfinite(np.r_[x0,np.asarray(initial_check['constraints']).ravel(),float(initial_check['objective'])]).all()
+         seed_objective=float(initial_check['objective']) if initial_finite and initial_violation<=1e-5 else None
+         if seed_objective is not None and problem.objective.direction!='minimize':seed_objective=-seed_objective
+-        if selector is not None:selector.reset(lbx,ubx,lbg,ubg,solve_start,self.parameters.feasible_return,seed_objective,seed_settled,self.diagnostic_trace)
++        if selector is not None:selector.reset(lbx,ubx,lbg,ubg,solve_start,self.parameters.feasible_return,seed_objective,seed_settled,self.diagnostic_trace,min(3,self.recovery_candidate_limit))
+         if selector is not None and seed_objective is not None and self.parameters.feasible_return is not None:
+             selector.best=dict(x=np.asarray(x0),objective=seed_objective,iteration=-1,
+                 elapsed_s=0.,scaled_violation=initial_violation,iteration_zero=False,
+@@ -315,6 +322,9 @@ class IpoptSolver:
+             self.last_diagnostics['iteration_trace']=None if selector is None else selector.trace
+             self.last_diagnostics['diagnostic_plans']=dict(initial=list(x0),selected=values.tolist(),returned=returned_values.tolist())
+         self.last_returned_optimum = dict(zip(bundle.variable_order,returned_values.tolist()))
++        if selector is not None:
++            self.last_recovery_candidates=[dict(iteration=c['iteration'],objective=c['objective'],
++                optimum=dict(zip(bundle.variable_order,c['x'].tolist()))) for c in selector.recent]
+         return OptimizationResult(
+             status=status,
+             optimum=dict(zip(bundle.variable_order, values.tolist())),
+diff --git a/extensions/tendon_family/contracts.py b/extensions/tendon_family/contracts.py
+index b6fb6d1..d38b4d8 100644
+--- a/extensions/tendon_family/contracts.py
++++ b/extensions/tendon_family/contracts.py
+@@ -995,6 +995,10 @@ class GVSTrajectoryParameters(Contract):
+     recover_returned_tensions: bool = Field(default=False,description=(
+         'Reintegrate one lower-objective unfinished IPOPT tension sequence from the current measurement; '
+         'deliver only if independently feasible and better than the selected plan. Cost is included in update timing.'))
++    startup_recovery_shortlist: bool = Field(default=False,description=(
++        'For tracking with only an initialization feasible incumbent, compare up to three recent recovered '
++        'plans including the returned iterate. Alternatives must reduce original objective without raising '
++        'the returned-recovery plan peak error. No extra NLP solves; original stopping settings retained.'))
+     seed_position_tolerance_fraction: FiniteFloat = Field(default=.5,gt=0)
+     seed_speed_limit_m_s: FiniteFloat = Field(default=.02,gt=0)
+     feasible_return: FeasibleReturnPolicy | None = None
+diff --git a/extensions/tendon_family/gvs_nmpc.py b/extensions/tendon_family/gvs_nmpc.py
+index e393a93..eccedd5 100644
+--- a/extensions/tendon_family/gvs_nmpc.py
++++ b/extensions/tendon_family/gvs_nmpc.py
+@@ -115,7 +115,7 @@ class GVSNMPCController:
+             'solver_error':error,'optimization_status':None if solved is None else solved['result']['status'],
+             'optimization_constraint_violation':None if solved is None else solved['result']['constraint_violation'],
+             'optimization_selected_iteration':None if solved is None or solved['recovery']['selected'] else solved['diagnostics']['selected_feasible_iteration'],
+-            'plan_source':None if solved is None else ('reintegrated_returned_iterate' if solved['recovery']['selected'] else 'ipopt_selected'),
++            'plan_source':None if solved is None else (('reintegrated_recent_shortlist' if solved['recovery'].get('activated') else 'reintegrated_returned_iterate') if solved['recovery']['selected'] else 'ipopt_selected'),
+             'feasibility_recovery':None if solved is None else solved['recovery'],
+             'feedback':None if solved is None else solved.get('feedback'),
+             'prediction_timing':None if solved is None else solved['prediction_timing'],
+diff --git a/extensions/tendon_family/gvs_trajectory.py b/extensions/tendon_family/gvs_trajectory.py
+index dc26a52..a677b45 100644
+--- a/extensions/tendon_family/gvs_trajectory.py
++++ b/extensions/tendon_family/gvs_trajectory.py
+@@ -184,6 +184,7 @@ class TrajectoryWorkspace:
+             max_cpu_s=self.parameters.max_cpu_s,retain_feasible_iterate=True,
+             feasible_return=self.parameters.feasible_return,
+             constraint_jacobian_mode=self.parameters.constraint_jacobian_mode))
++        self.solver.recovery_candidate_limit=3 if self.tracking and self.parameters.startup_recovery_shortlist else 0
+         self.robot=robot;self.scene=task.environment;self._tail_solver=None
+         self.last=None
+ 
+@@ -291,7 +292,10 @@ class TrajectoryWorkspace:
+         start=time.perf_counter(); result=self.solver.solve(self.problem,seed_settled=seed_settled);total=time.perf_counter()-start
+         recovery=dict(enabled=self.parameters.recover_returned_tensions,attempted=False,selected=False,wall_s=0.)
+         if self.parameters.recover_returned_tensions and result.status in ('converged','iteration_limit','feasible_early_stop'):
+-            result,recovery=self._recover_returned(result,measured_x)
++            if self.tracking and self.parameters.startup_recovery_shortlist:
++                result,recovery=self._recover_shortlist(result,measured_x)
++            else:
++                result,recovery=self._recover_returned(result,measured_x)
+         values=result.optimum;steps=self.parameters.horizon*self.parameters.substeps
+         X=np.array([[values[f'x/{k}/{j}']*self.state_scales[j] for j in range(2*self.n)] for k in range(steps+1)])
+         U=np.array([[values[f'u/{k}/{t}'] for t in self.tendons] for k in range(self.parameters.horizon)])
+@@ -334,6 +338,65 @@ class TrajectoryWorkspace:
+         output['update_wall_s']=time.perf_counter()-update_start
+         return output
+ 
++    def _plan_peak(self,values):
++        errors=[]
++        for k in range(1,self.parameters.horizon*self.parameters.substeps+1):
++            state=np.array([values[f'x/{k}/{j}'] for j in range(2*self.n)])*self.state_scales
++            tip,_=self._motion(state[:self.n],state[self.n:])
++            errors.append(float(np.linalg.norm(np.asarray(tip).ravel()-self.reference_positions[k])))
++        return max(errors)
++
++    def _recover_shortlist(self,result,measured_x):
++        """Bounded recovery only when no improved feasible iterate was retained."""
++        start=time.perf_counter();d=self.solver.last_diagnostics
++        incumbent=result
++        active=d['selected_feasible_iteration'] in (-1,0)
++        original_raw=self.solver.last_returned_optimum
++        original_objective=d['returned_iterate_objective']
++        result,recovery=self._recover_returned(result,measured_x)
++        recovery.update(strategy='initialization_incumbent_recent_three',candidate_cap=3,
++            activated=active,candidate_count=1,recovery_attempts=int(recovery['attempted']),candidates=[])
++        recovery['candidates'].append(dict(source='returned',iteration=incumbent.iterations,
++            raw_objective=original_objective,**{k:recovery.get(k) for k in ('attempted','feasible','objective','wall_s','error')}))
++        if not active:
++            recovery['selection_reason']='optimized_feasible_incumbent_present; original recovery policy'
++            recovery['wall_s']=time.perf_counter()-start
++            return result,recovery
++        anchor_peak=self._plan_peak(result.optimum)
++        recovery['anchor_peak_m']=anchor_peak
++        seen={tuple(original_raw.values())} if original_raw is not None else set()
++        candidates=[]
++        for c in reversed(self.solver.last_recovery_candidates):
++            key=tuple(c['optimum'].values())
++            if key in seen:continue
++            seen.add(key);candidates.append(c)
++            if len(candidates)==2:break
++        recovery['candidate_count']+=len(candidates)
++        selected_iteration=incumbent.iterations if recovery['selected'] else d['selected_feasible_iteration']
++        try:
++            for c in candidates:
++                self.solver.last_returned_optimum=c['optimum'];d['returned_iterate_objective']=c['objective']
++                candidate,detail=self._recover_returned(incumbent,measured_x)
++                recovery['recovery_attempts']+=int(detail['attempted'])
++                for key in ('integration_s','validation_s'):
++                    recovery[key]=recovery.get(key,0.)+detail.get(key,0.)
++                peak=self._plan_peak(candidate.optimum) if detail['selected'] else None
++                chosen=bool(detail['selected'] and candidate.objective_value<result.objective_value and peak<=anchor_peak+1e-12)
++                recovery['candidates'].append(dict(source='recent_callback',iteration=c['iteration'],
++                    raw_objective=c['objective'],peak_m=peak,chosen=chosen,**detail))
++                if chosen:
++                    result=candidate;selected_iteration=c['iteration'];recovery['selected']=True
++            recovery.update(parent_iteration=selected_iteration,objective=result.objective_value,
++                scaled_violation=result.constraint_violation,feasible=result.constraint_violation<=1e-5,
++                selected_peak_m=self._plan_peak(result.optimum),
++                selection_reason='lowest recovered original objective with peak no worse than original recovery; feasible incumbent preserved',
++                source='bounded_recent_tensions_reintegrated_from_current_measurement')
++            recovery['first_command_change_n']=float(max(abs(result.optimum[f'u/0/{t}']-incumbent.optimum[f'u/0/{t}']) for t in self.tendons))
++        finally:
++            self.solver.last_returned_optimum=original_raw;d['returned_iterate_objective']=original_objective
++        recovery['wall_s']=time.perf_counter()-start
++        return result,recovery
++
+     def _recover_returned(self,result,measured_x):
+         """One feasibility recovery, with unchanged objective and constraints.
+ 

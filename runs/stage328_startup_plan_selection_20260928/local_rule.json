@@ -1,0 +1,21 @@
+{
+  "direction": "initialization-incumbent recent-three recovery",
+  "activation": "tracking, enabled, independent selected feasible callback index -1 or 0",
+  "selection": "Recover returned candidate as before. Recover at most two other latest finite callback iterates against original incumbent. Choose lowest recovered original objective among feasible improvements with horizon peak no greater than original recovery output.",
+  "stopping": "unchanged production feasible-return 5/15 seconds, 0.1 improvement, 30 seconds CPU, 120 iterations",
+  "limits": {
+    "candidates": 3,
+    "extra_nlp_solves": 0
+  },
+  "acceptance": {
+    "startup_peak_reduction_at_least_m": 0.0005,
+    "all_feasible": true,
+    "objective_nonincrease_relative_tolerance": 0.01,
+    "critical_peak_increase_at_most_m": 0.0001,
+    "each_added_update_s_at_most": 7.0,
+    "each_update_ratio_at_most": 1.4,
+    "startup_first_command_increase_at_most_n": 0.1
+  },
+  "warm": "t=0 exact numerical seed; t=.04 constant actual previous tensions reconstructed identically for both variants",
+  "tradeoff": "No objective/peak exchange allowed against original recovery; lower objective alone insufficient. Peak is model prediction, not a certified uncertainty margin."
+}
