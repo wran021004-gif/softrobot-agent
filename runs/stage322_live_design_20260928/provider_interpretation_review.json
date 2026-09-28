@@ -1,0 +1,90 @@
+{
+  "binding": {
+    "run_id": "gvs-live-e593ca2b7c60-e552cdda64495450",
+    "execution_id": "5fc1457877a7456282f2f6f7d089a783",
+    "configuration": {
+      "artifact_id": "e27be7be491f1984cc30da2e6af232056d17122fdb5a6c7653e63e5d8516e14c",
+      "media_type": "application/json"
+    },
+    "evaluation": {
+      "artifact_id": "51b6caf274252ff1aaa341826f906307e985d3137e5ec4d01cd6c88b1c9d33f2",
+      "media_type": "application/json"
+    },
+    "report": {
+      "execution_id": "5fc1457877a7456282f2f6f7d089a783",
+      "owner_run_id": "gvs-live-e593ca2b7c60-e552cdda64495450",
+      "reference": {
+        "artifact_id": "0aafd631b896f6361d7f58b9e5ac21fb2174385f26c55663449d9754233f3489",
+        "media_type": "application/json"
+      },
+      "request_id": "single-profile-report"
+    },
+    "provider_request_id": "model-23",
+    "provider_response": {
+      "artifact_id": "f6e475a9918483a4a9fc72c12a91b705d2b4cd41e42dce18d52eba081ac4f292",
+      "media_type": "application/json"
+    },
+    "conclusion_digest": "a921c383046171146a4c8286f12b09d65512614d1de8a76718f4133a038f990d"
+  },
+  "reviewer": "Codex assistant; direct review of raw provider finish and current artifacts",
+  "status": "reviewed_material_error",
+  "correct_use_of_current_evidence": false,
+  "findings": [
+    {
+      "topic": "changed_design_vs_baseline",
+      "verdict": "fail",
+      "provider_claim": "near segment length set to 0.15 m versus the 0.16 m baseline, an authorized 10 mm absolute change",
+      "evidence": "The provider build selected near=0.159 m; effective configuration and backend export both match that design. Far remains 0.120 m. Actual near change is -1 mm.",
+      "material": true
+    },
+    {
+      "topic": "original_reach_vs_sampled_settling",
+      "verdict": "pass",
+      "evidence": "Correctly reports 0.009438 m reach error against 0.01 m tolerance and failed sampled settling: max speed 0.06404 m/s > 0.02 m/s over 0.05 s despite position inside tolerance."
+    },
+    {
+      "topic": "accepted_feasible_plans_vs_optimizer_convergence",
+      "verdict": "incomplete",
+      "evidence": "Reports completed backend, zero solver errors and 13 initialization-selected plans correctly; makes no false convergence claim, but final explanation does not explicitly state that all 35 plans were feasible early stops and zero optimizer updates converged."
+    },
+    {
+      "topic": "simulation_vs_computation_time",
+      "verdict": "pass",
+      "evidence": "Correctly distinguishes reach simulation from real-time feasibility: 35 missed deadlines and mean update 25.87 s versus 0.01 s control period."
+    },
+    {
+      "topic": "current_vs_historical_evidence",
+      "verdict": "pass",
+      "evidence": "Finish cites the delivered run result, current evaluation and current profile report. Correctly says historical states were not reused; numerical states were regenerated for candidate dynamics."
+    },
+    {
+      "topic": "tested_scope_vs_transfer",
+      "verdict": "pass",
+      "evidence": "Limits claims to executed evaluation and notes local-model-control applicability warnings; does not claim global stability or validated length rectangle."
+    }
+  ],
+  "provider_output_preserved": true,
+  "sources": {
+    "raw": "provider_delivery_raw.json",
+    "conclusion": "model_final.txt",
+    "context": "provider_delivery_context.json",
+    "configuration": {
+      "artifact_id": "e27be7be491f1984cc30da2e6af232056d17122fdb5a6c7653e63e5d8516e14c",
+      "media_type": "application/json"
+    },
+    "evaluation": {
+      "artifact_id": "51b6caf274252ff1aaa341826f906307e985d3137e5ec4d01cd6c88b1c9d33f2",
+      "media_type": "application/json"
+    },
+    "report": {
+      "execution_id": "5fc1457877a7456282f2f6f7d089a783",
+      "owner_run_id": "gvs-live-e593ca2b7c60-e552cdda64495450",
+      "reference": {
+        "artifact_id": "0aafd631b896f6361d7f58b9e5ac21fb2174385f26c55663449d9754233f3489",
+        "media_type": "application/json"
+      },
+      "request_id": "single-profile-report"
+    }
+  },
+  "conclusion": "Explicit provider delivery identifies the right execution, which passes reach. The numerical design description is materially wrong, so interpretation and overall final-delivery acceptance fail. No replacement provider explanation is synthesized."
+}

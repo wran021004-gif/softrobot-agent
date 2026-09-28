@@ -1,164 +1,37 @@
 {
   "record_type": "bounded_engineering_experience",
-  "status": "blocked_before_provider_execution",
+  "status": "experiment_completed_final_interpretation_failed",
   "validated_skill": false,
   "task": {
     "task_id": "family-multisegment-dev",
     "identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
-    "contract": {
-      "contract_version": "1.0.0",
-      "task_id": "family-multisegment-dev",
-      "task_version": "1.0.0",
-      "name": "Independent development validation of a serial multi-segment soft arm",
-      "status": "development_valid",
-      "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
-      "family": "task.reach",
-      "goal": {
-        "contract": "reference.reach_goal",
+    "target_m": [
+      0.29,
+      0.035,
+      0.19
+    ],
+    "timing": {
+      "timestep_s": 0.0005,
+      "control_period_s": 0.01,
+      "sample_period_s": 0.01,
+      "duration_s": 0.35,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ]
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
         "version": "1.0.0",
         "data": {
-          "target_m": [
-            0.29,
-            0.035,
-            0.19
-          ]
+          "tolerance_m": 0.01
         }
-      },
-      "environment": {
-        "contract": "experiment.assembly",
-        "version": "1.0.0",
-        "data": {
-          "environment": {
-            "schema_version": "1",
-            "environment_id": "reach_free",
-            "units": "SI",
-            "coordinate_frame": "world_base_x_forward_yz_cross_section",
-            "gravity_m_s2": [
-              0.0,
-              0.0,
-              -9.81
-            ],
-            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
-            "truth_status": "HUMAN_OWNED",
-            "objects": [
-              {
-                "kind": "plane",
-                "name": "floor",
-                "position_m": [
-                  0.0,
-                  0.0,
-                  -0.02
-                ],
-                "half_size_m": [
-                  2.0,
-                  2.0,
-                  0.1
-                ],
-                "contype": 0,
-                "conaffinity": 1
-              }
-            ],
-            "lights": [
-              {
-                "position_m": [
-                  0.0,
-                  0.0,
-                  2.0
-                ],
-                "direction": [
-                  0.0,
-                  0.0,
-                  -1.0
-                ]
-              }
-            ]
-          },
-          "floor_id": "floor",
-          "mount": {
-            "position_m": [
-              0.0,
-              0.0,
-              0.15
-            ],
-            "quaternion_wxyz": [
-              1.0,
-              0.0,
-              0.0,
-              0.0
-            ]
-          },
-          "external_forces": []
-        }
-      },
-      "robot_families": [
-        "tendon_robot_family"
-      ],
-      "actuator_channels": [
-        "actuator_commands"
-      ],
-      "initializer": {
-        "extension_id": "initialize.family",
-        "version": "1.0.0",
-        "parameters": {
-          "contract": "family.initial",
-          "version": "1.0.0",
-          "data": {}
-        }
-      },
-      "timing": {
-        "timestep_s": 0.0005,
-        "control_period_s": 0.01,
-        "sample_period_s": 0.01,
-        "duration_s": 0.35,
-        "termination": [
-          "duration",
-          "numerical_failure"
-        ]
-      },
-      "evaluator": {
-        "extension_id": "evaluate.reach",
-        "version": "1.0.0",
-        "parameters": {
-          "contract": "reference.reach_evaluation",
-          "version": "1.0.0",
-          "data": {
-            "tolerance_m": 0.01
-          }
-        }
-      },
-      "objectives": [
-        {
-          "metric": "position_error",
-          "direction": "minimize",
-          "units": "m",
-          "weight": 1.0
-        }
-      ],
-      "failure_policy": "retain_invalid_and_constraint_failures",
-      "observations": [
-        {
-          "name": "tip_position",
-          "entity": "tip",
-          "dimension": 3,
-          "units": "m",
-          "frame": "world",
-          "phase": "post_step",
-          "missing": "unsupported"
-        }
-      ],
-      "sampling": {
-        "split": "development",
-        "seeds": [
-          17
-        ],
-        "aggregation": "per_instance",
-        "window_s": [
-          0.0,
-          0.35
-        ]
       }
     },
-    "acceptance": "A provider-selected authorized >=1 mm length change must itself pass the unchanged evaluator, with valid identity chain, explicit provider delivery and correct use of current evidence."
+    "acceptance": "Same provider-selected authorized >=1 mm changed execution must pass the unchanged original evaluator and be explicitly delivered with a correct evidence-grounded explanation."
   },
   "designs": {
     "baseline_lengths_m": {
@@ -175,10 +48,61 @@
         0.13
       ]
     },
-    "provider_selected_lengths_m": null,
-    "provider_rationale": null,
-    "tested_configurations": [],
-    "final_lengths_m": null
+    "tested_configurations": [
+      {
+        "candidate_id": "build_extend_v1",
+        "lengths_m": {
+          "near": 0.17,
+          "far": 0.13
+        },
+        "execution_id": "f0d964a9c28d4959a36e87cde24f4cb2",
+        "reach_success": false
+      },
+      {
+        "candidate_id": "near_shorten_v2",
+        "lengths_m": {
+          "near": 0.159,
+          "far": 0.12
+        },
+        "execution_id": "5fc1457877a7456282f2f6f7d089a783",
+        "reach_success": true
+      }
+    ],
+    "final_lengths_m": {
+      "near": 0.159,
+      "far": 0.12
+    },
+    "provider_final_claimed_near_length_m": 0.15,
+    "provider_final_claim_is_correct": false
+  },
+  "provider": {
+    "adapter": "deepseek",
+    "model": "deepseek-flash",
+    "actual_responses": 24,
+    "build_rationales": [
+      {
+        "candidate": "build_extend_v1",
+        "rationale": "Authorized millimeter-scale physical modification: extend near 0.16->0.17 m (+10 mm) and far 0.12->0.13 m (+10 mm), both inside the authorized bounds [0.15,0.17] and [0.11,0.13]. Rationale: the frozen target is ~0.295 m from the mount base, so the 0.28 m baseline bending length forces a near-straight, curvature-saturated reach dominated by gravity sag; extra length adds reachable radius at the same tip target with lower curvature/tension demand. Build only constructs and validates the edited design (zero solves).",
+        "raw_response": {
+          "artifact_id": "4aa33b4172a95a5a371bbe094c82db6c2a525cce46b9390c55b575e649fd3671",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "candidate": "near_shorten_v2",
+        "rationale": "Single informed length revision after the failed extended design (run_extend_v1: position_error 0.0263 m > 0.01 m tolerance, 35/35 updates stopped on feasibility with zero converged updates, sampled settling failed). Both lengths of build_extend_v1 are already pinned at their upper bounds (near 0.17, far 0.13), so extension cannot continue. Compared with the historical old-design reach (about 8.5 mm), the +20 mm total length increased error by about 17.8 mm, consistent with gravity-sag domination for a target 40 mm above the mount and with the bundled tension guess mismatching a deviating length. Shortening the proximal near segment by the smallest authorized meaningful amount (1 mm, to 0.159 m) reduces the moment arm that dominates whole-arm sag, keeps the far segment and every other frozen item untouched, and keeps the total arc long enough to span the about 0.29 m mount-to-target distance.",
+        "raw_response": {
+          "artifact_id": "d8950c3e40e9bdc3b0c6a35bff8e4646d236605671682bc226a0ca304b8ca8d2",
+          "media_type": "application/json"
+        }
+      }
+    ],
+    "final_response": {
+      "artifact_id": "f6e475a9918483a4a9fc72c12a91b705d2b4cd41e42dce18d52eba081ac4f292",
+      "media_type": "application/json"
+    },
+    "final_text": "model_final.txt",
+    "interpretation_review": "provider_interpretation_review.json"
   },
   "controller": {
     "extension_id": "controller.gvs_nmpc",
@@ -231,7 +155,7 @@
       }
     }
   },
-  "predictor": "Candidate-resolved GVS dynamics",
+  "predictor": "Candidate-resolved GVS dynamics, structural-linear basis, 10 prediction intervals, one implicit substep each, measured-state warm regeneration.",
   "execution_model": {
     "extension_id": "model.serial_bending_cells",
     "version": "1.0.0",
@@ -250,98 +174,231 @@
       "data": {}
     }
   },
-  "tension_semantics": "Direct ideal bounded tendon tensions; frozen tendon order and limits; no motor dynamics.",
+  "discretization": "12 serial bending cells per section",
+  "tension_semantics": "Six direct ideal tendon tensions, each bounded 0..8 N; no motor state or actuator rate/travel law.",
   "numerical_preparation": {
-    "status": "not_executed_in_continuation",
-    "intended_provenance": "Candidate physics and measured state; bundled historical tensions used only as guesses.",
-    "historical_check": "../stage322_live_design_20260927/plan_check.json",
-    "historical_check_is_provider_choice": false
+    "by_trial": "trial_results.json",
+    "provenance": "Candidate physics/basis/order/bounds; historical tensions used only as guesses; historical states not reused, states regenerated from current measurements.",
+    "new_dependency_changes_during_execution": false
   },
   "identity": {
     "route_run_id": "gvs-live-e593ca2b7c60",
     "previous_run_id": "gvs-live-ce84ecb1bfcd",
     "frozen_input_identity": "ee09551ebafbcc682d9d5c9835164776d06e9f77d7c21d5660ce08fde9fe1582",
-    "execution_id": null,
-    "evaluation": null,
-    "report": null,
-    "provider_response": null,
-    "provider_delivery": null
+    "delivery_binding": {
+      "run_id": "gvs-live-e593ca2b7c60-e552cdda64495450",
+      "execution_id": "5fc1457877a7456282f2f6f7d089a783",
+      "configuration": {
+        "artifact_id": "e27be7be491f1984cc30da2e6af232056d17122fdb5a6c7653e63e5d8516e14c",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "artifact_id": "51b6caf274252ff1aaa341826f906307e985d3137e5ec4d01cd6c88b1c9d33f2",
+        "media_type": "application/json"
+      },
+      "report": {
+        "execution_id": "5fc1457877a7456282f2f6f7d089a783",
+        "owner_run_id": "gvs-live-e593ca2b7c60-e552cdda64495450",
+        "reference": {
+          "artifact_id": "0aafd631b896f6361d7f58b9e5ac21fb2174385f26c55663449d9754233f3489",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      },
+      "provider_request_id": "model-23",
+      "provider_response": {
+        "artifact_id": "f6e475a9918483a4a9fc72c12a91b705d2b4cd41e42dce18d52eba081ac4f292",
+        "media_type": "application/json"
+      },
+      "conclusion_digest": "a921c383046171146a4c8286f12b09d65512614d1de8a76718f4133a038f990d"
+    }
   },
   "results": {
     "acceptance": {
-      "real_call_chain": false,
-      "changed_design_execution": false,
-      "delivered_original_reach": false,
-      "delivered_changed_design_reach": false,
-      "current_report_delivered_to_provider": false,
-      "explicit_provider_delivery": false,
+      "real_call_chain": true,
+      "changed_design_execution": true,
+      "delivered_original_reach": true,
+      "delivered_changed_design_reach": true,
+      "current_report_delivered_to_provider": true,
+      "explicit_provider_delivery": true,
       "provider_interpretation_accepted": false,
-      "final_delivery_accepted": false,
-      "provider_interpretation_review": null
+      "final_delivery_accepted": false
     },
-    "reach_error_m": null,
-    "sampled_settling": null,
-    "solver": null,
-    "tension": null,
-    "timing": null
+    "delivered_metrics": {
+      "accepted_noninitialization_plans": 22,
+      "accepted_plans": 35,
+      "backend_timings_s": {
+        "backend_call": 905.5215588000137,
+        "engine_compile": 0.021183100063353777,
+        "prepare_compile": 0.06299769994802773,
+        "solve": 905.5000299999956
+      },
+      "complete": true,
+      "converged_updates": 0,
+      "deadline_misses": 35,
+      "evaluation": {
+        "artifact_id": "51b6caf274252ff1aaa341826f906307e985d3137e5ec4d01cd6c88b1c9d33f2",
+        "media_type": "application/json"
+      },
+      "evaluation_validity": "valid",
+      "execution_id": "5fc1457877a7456282f2f6f7d089a783",
+      "force_bound_violation_n": 0.0,
+      "graph_construction_s": 1.2921025999821723,
+      "hold_last_responses": 0,
+      "initialization_selected": 13,
+      "last_valid_error_m": 0.009438402440635051,
+      "last_valid_time_s": 0.35000000000000003,
+      "max_projection_residual_rad_m": 2.3672155618932416,
+      "max_rate_projection_residual_rad_m_s": 9.85413740415368,
+      "max_sampled_contacts": 0,
+      "maximum_error_m": 0.05402551557038124,
+      "maximum_plan_violation": 9.918989398393328e-06,
+      "mean_numerical_solve_s": 15.67219906571055,
+      "mean_preparation_s": 9.692578851438261,
+      "mean_recovery_integration_s": 0.0,
+      "mean_recovery_s": 0.0,
+      "mean_recovery_validation_s": 0.0,
+      "mean_update_s": 25.866045231451945,
+      "mean_validation_s": 0.2576937714591622,
+      "minimum_error_m": 0.009438402440635051,
+      "motion": {
+        "artifact_id": "a909059696bc18879040a91a9e25520bcfe47b93f62099329f36c37c26bda3db",
+        "media_type": "application/json"
+      },
+      "official_task_success": true,
+      "optimization_status_counts": {
+        "feasible_early_stop": 35
+      },
+      "raw_termination_counts": {
+        "User_Requested_Stop": 35
+      },
+      "real_time_demonstrated": false,
+      "recovered_plans": 0,
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.009722841863024669,
+        "max_speed_m_s": 0.06404039353320505,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "simulation": {
+        "artifact_id": "5203c4fa82c3fea756d273f888e1463a8815f084525a4a6c3eb34b8436745c49",
+        "media_type": "application/json"
+      },
+      "simulation_wall_s": 909.7970000000205,
+      "solver_construction_s": 3.978249801089987,
+      "solver_error_count": 0,
+      "solver_failure_flags": 0,
+      "solver_status": "completed",
+      "tension_range_n": [
+        0.6315302379791942,
+        5.005156948176003
+      ],
+      "terminal_error_m": 0.009438402440635051,
+      "terminal_tip_speed_m_s": 0.035530995686914216,
+      "updates": 35,
+      "valid_complete_execution": true
+    },
+    "all_trials": "trial_results.json",
+    "failure": "Provider delivered the correct passing execution but described 0.150 m / -10 mm instead of the tested 0.159 m / -1 mm. Final explanation also omitted explicit zero-convergence qualification."
   },
-  "usage": {
-    "limit": {
-      "backend_solves": 3,
-      "model_calls": 24,
-      "tool_calls": 60,
-      "wall_s": 7200.0,
-      "worker_calls": 0
+  "costs": {
+    "usage": {
+      "limit": {
+        "backend_solves": 3,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 7200.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 30,
+        "model_calls": 24,
+        "backend_solves": 2,
+        "worker_calls": 0,
+        "wall_s": 2372.451000000583
+      },
+      "remaining": {
+        "backend_solves": 1,
+        "model_calls": 0,
+        "tool_calls": 30,
+        "wall_s": 4827.548999999417,
+        "worker_calls": 0
+      },
+      "occupied": {}
     },
-    "used": {
+    "previous_session_usage": {
       "tool_calls": 0,
       "model_calls": 0,
       "backend_solves": 0,
       "worker_calls": 0,
       "wall_s": 0.0
     },
-    "remaining": {
-      "backend_solves": 3,
-      "model_calls": 24,
-      "tool_calls": 60,
-      "wall_s": 7200.0,
-      "worker_calls": 0
+    "tokens": {
+      "completion_tokens": 89555,
+      "prompt_cache_hit_tokens": 96256,
+      "prompt_cache_miss_tokens": 380948,
+      "prompt_tokens": 477204,
+      "total_tokens": 566759
     },
-    "occupied": {}
+    "reasoning_tokens_in_completion": 81782,
+    "provider_event_span_s": 2415.124389,
+    "provider_event_span_definition": "First request context submission to final raw response; not charged wall time and not simulation duration.",
+    "provider_billed_currency_amount": null,
+    "monetary_cost_status": "Provider usage returned token counts, not an invoice or currency charge; no monetary amount inferred."
   },
-  "stage_prior_usage": {
-    "tool_calls": 0,
-    "model_calls": 0,
-    "backend_solves": 0,
-    "worker_calls": 0,
-    "wall_s": 0.0
-  },
-  "provider_cost": {
-    "requests": 0,
-    "incurred_by_this_experiment": 0,
-    "currency": null,
-    "note": "No process or provider request; no inferred token price."
+  "workflow_observations": {
+    "provider_actions": {
+      "route.advance": 5,
+      "evidence.read": 19
+    },
+    "final_context_contains_exact_near_length": false,
+    "context_reference": "provider_delivery_context.json",
+    "stop": "Explicit provider finish after changed-design reach pass; two attempts used; model allowance exhausted; no third attempt or extra correction request."
   },
   "evidence": {
     "audit": "design_audit.json",
     "behavior": "behavior_audit.json",
     "report": "implementation_report.md",
-    "failure": "launch_review.json",
-    "continuation": "continuation.json",
-    "input": "experiment_input.json",
-    "workflow": "workflow.json",
-    "verification": "prelaunch_verification.json"
+    "backend_report": "report.md",
+    "trials": "trial_results.json",
+    "raw_delivery": "provider_delivery_raw.json",
+    "interpretation": "provider_interpretation_review.json",
+    "launch": "launch_continuation.json",
+    "historical_rejection": "launch_review.json"
   },
-  "learned": [
-    "Final delivery must be joined by owning execution and evidence references, not candidate label.",
-    "Aggregate changed execution and a different successful delivery do not establish a successful design.",
-    "Interpretation review belongs to the exact provider response and current delivered evidence.",
-    "Automatic approval review rejected attached authorization as untrusted despite explicit supersession text; no bypass was attempted."
+  "lessons": [
+    {
+      "finding": "Delivered identity and narrative correctness need separate checks.",
+      "support": "All identity checks passed, yet raw finish misstated the design length.",
+      "scope": "This provider delivery."
+    },
+    {
+      "finding": "A small authorized design change reached the target under the frozen recipe; the larger extension did not.",
+      "support": "Near/far 0.159/0.120 m reached 9.4384 mm; 0.170/0.130 m reached 26.2783 mm.",
+      "scope": "Only these two tested configurations, target and 0.35 s task."
+    },
+    {
+      "finding": "Feasible plans and task reach do not imply optimizer convergence, settling or real-time feasibility.",
+      "support": "35/35 feasible early stops, 0 converged updates, failed speed settling and 35 deadline misses for the passing candidate.",
+      "scope": "Recorded simulation only."
+    },
+    {
+      "finding": "Compact context omitted exact selected length and provider spent 19 requests reading evidence.",
+      "support": "Saved final payload contains no 0.159 value; behavior audit records 19 evidence.read actions.",
+      "scope": "Observed interface/behavior limitation; omission is not proof of sole causation."
+    }
   ],
   "limitations": [
-    "No genuine provider choice, backend result or interpretation exists.",
-    "Only three synthetic audit cases and empty-session artifact generation were verified.",
-    "No physical configuration or range was newly validated."
+    "Only two physical designs were tested; no allowed-rectangle validation.",
+    "No fresh baseline was rerun and no improvement over the historical baseline is claimed.",
+    "Settling failed; no continuous-time settling guarantee.",
+    "No optimizer convergence or real-time demonstration.",
+    "Ideal-tension free-reach simulation does not validate motor dynamics, contact, robustness or global stability.",
+    "Provider interpretation materially failed despite correct execution identity."
   ],
-  "next_step": "Resolve the trusted-instruction conflict identified by automatic approval review, then run the prepared real session under the unchanged stage-wide budget."
+  "next_step": "Add resolved near/far lengths and baseline deltas to the compact current-candidate delivery context, bound to its configuration reference; verify the final explanation against those values. Keep this failed provider explanation preserved; no new paid call in this exhausted stage budget."
 }
