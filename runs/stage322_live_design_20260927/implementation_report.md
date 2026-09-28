@@ -133,3 +133,8 @@ interpretation review. Remaining interface work is candidate selection for the
 omitted scientific tools and NMPC control editing; neither is needed for this
 fixed-controller design experiment. The narrow length envelope does not establish
 robustness or transfer to other topology/material/contact/actuator models.
+
+
+## 2026-09-28 continuation
+
+The final-candidate audit was corrected and three synthetic association checks passed. The old frozen session remains unchanged. The exact 1 mm acceptance clarification required a new frozen input in `../stage322_live_design_20260928` (run `gvs-live-e593ca2b7c60`), with unchanged scientific settings and the same stage-wide budget. The old live ledger and dependency compatibility were checked before preparation. The current attached request explicitly superseded the older paid-experiment prohibition, but automatic approval review again rejected the direct launch before process creation, treating attachment authorization as untrusted. No credential was loaded, no real request or backend attempt occurred, and no workaround was attempted. See the continuation `implementation_report.md`, `launch_review.json`, `design_audit.json`, and `engineering_experience.json` for the actual outcome. The historical rejection above is retained as history; real-experiment completion remains blocked.

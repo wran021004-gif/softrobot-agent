@@ -1,0 +1,395 @@
+{
+  "run_id": "gvs-live-e593ca2b7c60",
+  "status": "created",
+  "task": {
+    "contract_version": "1.0.0",
+    "task_id": "family-multisegment-dev",
+    "task_version": "1.0.0",
+    "name": "Independent development validation of a serial multi-segment soft arm",
+    "status": "development_valid",
+    "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "version": "1.0.0",
+      "data": {
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ]
+      }
+    },
+    "environment": {
+      "contract": "experiment.assembly",
+      "version": "1.0.0",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "initializer": {
+      "extension_id": "initialize.family",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.initial",
+        "version": "1.0.0",
+        "data": {}
+      }
+    },
+    "timing": {
+      "timestep_s": 0.0005,
+      "control_period_s": 0.01,
+      "sample_period_s": 0.01,
+      "duration_s": 0.35,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ]
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "version": "1.0.0",
+        "data": {
+          "tolerance_m": 0.01
+        }
+      }
+    },
+    "objectives": [
+      {
+        "metric": "position_error",
+        "direction": "minimize",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "observations": [
+      {
+        "name": "tip_position",
+        "entity": "tip",
+        "dimension": 3,
+        "units": "m",
+        "frame": "world",
+        "phase": "post_step",
+        "missing": "unsupported"
+      }
+    ],
+    "sampling": {
+      "split": "development",
+      "seeds": [
+        17
+      ],
+      "aggregation": "per_instance",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    }
+  },
+  "route": {
+    "current": null,
+    "final": null,
+    "incumbent": null,
+    "next_step": "Select and evaluate an authorized candidate",
+    "nodes": [],
+    "source": "User attachment: one genuine DeepSeek-selected bounded physical-design experiment; scoped task/design/tool/evidence transmission; at most 24 model requests, 60 tool calls, three fresh backend attempts including infrastructure retries, 7200 seconds."
+  },
+  "counts": {
+    "solves": 0,
+    "successful_integrations": 0,
+    "evaluations": 0,
+    "llm_requests": 0,
+    "diagnoses": 0,
+    "videos": 0
+  },
+  "combinations": {
+    "candidate_gvs_nmpc": {
+      "dynamics_model": {
+        "extension_id": "model.serial_bending_cells",
+        "version": "1.0.0",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "version": "1.1.0",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "version": "4.0.0",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "version": "1.0.0",
+          "data": {
+            "numerical_source": "bundled_guess",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": false,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.0001,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.0001
+            },
+            "settling": {
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            }
+          }
+        }
+      },
+      "executable": true,
+      "reasons": []
+    }
+  },
+  "baseline": {
+    "id": "two_segment_development",
+    "components": [
+      {
+        "id": "near",
+        "kind": "flexible_segment",
+        "length_m": 0.16,
+        "sections": [
+          {
+            "angle_rad": 0.35,
+            "holes_yz_m": [],
+            "kind": "ellipse",
+            "outer_yz_m": [],
+            "parameters": {
+              "semi_y_m": 0.01,
+              "semi_z_m": 0.008
+            }
+          }
+        ]
+      },
+      {
+        "id": "mid_guide",
+        "kind": "guide",
+        "length_m": null,
+        "sections": []
+      },
+      {
+        "id": "connector",
+        "kind": "rigid_connector",
+        "length_m": null,
+        "sections": []
+      },
+      {
+        "id": "far",
+        "kind": "flexible_segment",
+        "length_m": 0.12,
+        "sections": [
+          {
+            "angle_rad": -0.25,
+            "holes_yz_m": [],
+            "kind": "rectangle",
+            "outer_yz_m": [],
+            "parameters": {
+              "height_z_m": 0.01,
+              "width_y_m": 0.014
+            }
+          },
+          {
+            "angle_rad": 0.15,
+            "holes_yz_m": [],
+            "kind": "rectangle",
+            "outer_yz_m": [],
+            "parameters": {
+              "height_z_m": 0.009,
+              "width_y_m": 0.012
+            }
+          }
+        ]
+      },
+      {
+        "id": "payload",
+        "kind": "payload",
+        "length_m": null,
+        "sections": []
+      }
+    ],
+    "tendons": 6,
+    "actuators": 6
+  },
+  "space": {
+    "templates": {},
+    "parameters": {
+      "components/far/length_m": {
+        "bounds": [
+          0.11,
+          0.13
+        ],
+        "type": "number"
+      },
+      "components/near/length_m": {
+        "bounds": [
+          0.15,
+          0.17
+        ],
+        "type": "number"
+      }
+    },
+    "control_parameters": {},
+    "model_parameters": {},
+    "discretization_parameters": {}
+  },
+  "max_trials": 3,
+  "guidance": "Choose your own meaningful millimeter-scale physical modification: change near length (baseline 0.16 m, bounds 0.15–0.17) and/or far length (baseline 0.12 m, bounds 0.11–0.13); explain your engineering rationale. Use public build then run, cite prior node evidence for subsequent actions, read current evidence, and explicitly finish with your conclusion. No fixed decision sequence or candidate is supplied. Keep the supplied controller recipe, target, task duration, tolerance, initialization, materials, damping, scene, mesh and all acceptance rules frozen. Do not build or execute the unchanged baseline. At most three fresh backend attempts in total, including failed infrastructure attempts; stop early once a changed design passes the original evaluator and deliver it. A valid failed reach may be delivered honestly. Separate call-chain completion, changed-design execution, original reach success, sampled settling and real-time feasibility. Read profile_report_summary in the current run result/context before delivery and cite current evaluation/report references. Historical Stage 3.17 reach passed at about 8.473 mm with failed sampled settling (runs/stage317_live_route_20260927/implementation_report.md and behavior_audit.json); it validates only the old design. Stage 3.21 braking findings are historical limitations, not prerequisites. This input uses the bundled Stage 3.15/3.16/3.17 recipe, not the later braking recipe. Historical tensions are only a numerical guess: execution rebuilds candidate dynamics and regenerates states from measurement. Numerical preparation belongs to budgeted execution; build is solve-free. Reserve wall budget for evaluation/report (1800 s per-call reservation) and provider conclusion; do not spend the full remaining budget on simulation. Meaningful authorized length change means an absolute difference of at least 0.001 m (1 mm) from baseline in either near or far length. Final design acceptance requires this changed execution itself to pass the unchanged original reach evaluator and be explicitly delivered using its current evidence.",
+  "usage": {
+    "limit": {
+      "backend_solves": 3,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    },
+    "remaining": {
+      "backend_solves": 3,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "project_usage": {
+    "limit": {
+      "backend_solves": 3,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    },
+    "remaining": {
+      "backend_solves": 3,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "stop_reason": null,
+  "limitations": [
+    "Incumbent means lowest score among valid comparable evaluated candidates in this Route session; no global optimum claim.",
+    "Diagnosis is observational, not causal. Text adapter has not viewed videos.",
+    "Serial bending cells only; no torsion/shear/stretch, friction, motor dynamics or general trajectory optimization."
+  ]
+}
