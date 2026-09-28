@@ -1,0 +1,48 @@
+{
+  "experiment": "autonomous design revision from supplied historical failure evidence",
+  "run_id": "gvs-live-48f6184309c0",
+  "status": "failed",
+  "stop_reason": "MODEL_LENGTH_RETRY_FAILED: MODEL_RESPONSE_LENGTH_TRUNCATED: provider finish_reason=\"length\"",
+  "acceptance": {
+    "reach_tools_context_delivery_integration": {
+      "accepted": true,
+      "evidence": "Six focused checks passed; live post-execution delivery was not exercised"
+    },
+    "autonomous_revision_and_fresh_evaluation": {
+      "accepted": false,
+      "reason": "No tool call, build, or fresh evaluation"
+    },
+    "covered_revised_design_passed_original_task": {
+      "accepted": false,
+      "reason": "No revised candidate evaluated"
+    },
+    "structured_delivery_and_provider_prose_accurate": {
+      "accepted": false,
+      "status": "not_delivered",
+      "structured_statement": null,
+      "provider_final_explanation": null,
+      "reason": "Both provider responses were length-truncated with empty content and no tool calls; no prose exists to accept"
+    }
+  },
+  "historical_binding": {
+    "source_session": "gvs-live-81630b95545d",
+    "owner": "gvs-live-81630b95545d-b77192b4ed2f3834",
+    "execution": "6d018c9f0e8a40989eb8e42a4ac4d941",
+    "scientific_conditions_match": true,
+    "original_session_state_unchanged": true,
+    "original_final_sha256": "bf07f531df56ab921178ac433c8f210ff4dc8b239f4cddca36b230599b5302a5"
+  },
+  "implementation": {
+    "frozen_commit": "24a23c5ba6173652be13aa141625b58c6685bfb6",
+    "current_commit": "24a23c5ba6173652be13aa141625b58c6685bfb6",
+    "source_unchanged": true
+  },
+  "evaluated_current_candidates": 0,
+  "provider_delivery_present": false,
+  "developer_replacement_delivery": false,
+  "failure_class": "Provider output truncation; bounded existing protocol correction also truncated",
+  "budget_exhausted": false,
+  "configuration_changed_during_run": false,
+  "continuation": "Stopped session preserved; no retry outside frozen correction policy",
+  "next_justified_step": "Address first-action response budgeting using the saved truncation evidence, then freeze a separate protocol experiment under the same science. No controller tuning or numerical sweep is justified by this run."
+}

@@ -1,0 +1,505 @@
+{
+  "run_id": "gvs-live-48f6184309c0",
+  "provider_responses": [
+    {
+      "request_id": "model-0",
+      "reference": {
+        "artifact_id": "9ded98e9c4cc72c63ab37158ec5322e6d424e393ad02e1962488412e3d748f25",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "c645a46b-cff1-4740-acae-7f4b01b1d6fb",
+      "usage": {
+        "completion_tokens": 16384,
+        "completion_tokens_details": {
+          "reasoning_tokens": 16384
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 14903,
+        "prompt_tokens": 14903,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "total_tokens": 31287
+      }
+    },
+    {
+      "request_id": "model-1",
+      "reference": {
+        "artifact_id": "9deec1a8344dc106bc78f546d99d6a26ae2ee4adee5d94b8fa409fd947dbd92b",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "30103265-39a4-489e-8834-b11f4c9cb887",
+      "usage": {
+        "completion_tokens": 16384,
+        "completion_tokens_details": {
+          "reasoning_tokens": 16384
+        },
+        "prompt_cache_hit_tokens": 8576,
+        "prompt_cache_miss_tokens": 6457,
+        "prompt_tokens": 15033,
+        "prompt_tokens_details": {
+          "cached_tokens": 8576
+        },
+        "total_tokens": 31417
+      }
+    }
+  ],
+  "context_deliveries": [
+    {
+      "request_id": "model-0",
+      "payload": {
+        "artifact_id": "ec49240b32c3eb00e6878338664c39f815ed5a99f2eb483a3b7a84a2a79e2f4f",
+        "media_type": "application/json"
+      },
+      "skills": [],
+      "control_profiles": [
+        {
+          "applicability": "compatible_unvalidated",
+          "combination": "candidate_gvs_nmpc",
+          "command_space": "tendon_tensions",
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "bundled_guess",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_brake_lead_s": 0.0,
+                  "holding_tip_speed_weight": 0.0,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": null,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": false,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "6.0.0"
+          },
+          "discovery": "control.profile_describe",
+          "executable": true,
+          "execution_model": "model.serial_bending_cells",
+          "historical_cost": null,
+          "predictor": "model.gvs",
+          "profile_id": "gvs_candidate_reach_v1",
+          "reasons": [],
+          "report_authorized": true,
+          "scope_assessment": {
+            "execution_preparation": {
+              "next_step": "simulation.run imports/generates and seals numerical guesses under its reserved wall/one-backend budget; actual-state regeneration and validation occur in each update",
+              "source": "bundled_guess",
+              "status": "pending_execution_hook"
+            },
+            "historical_evidence": {
+              "exact_execution_scope_match": false,
+              "historical_robot_match": true,
+              "historical_task_match": true,
+              "reason": "Fixed v2 success does not validate changed designs, targets, timing, initial states, recipes or acceptance conditions",
+              "sources": [
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/report.md",
+                  "sha256": "0322ae0a589139dcd0443081c70ae318621d6fd8e39a6949032c2e3cf58c4579"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/summary.json",
+                  "sha256": "b99b80e195b19f47ea6c10ed23a4992418b95564ec79862dbae9e6380cb761ef"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/saved_evaluation.json",
+                  "sha256": "1f2d7f26e2da8df4475510433ce814660d5ea6af0bb868f6f8555974f20bff00"
+                }
+              ],
+              "status": "unvalidated_configuration"
+            },
+            "technical_compatibility": {
+              "model_use_assessment": {
+                "design_id": "two_segment_development",
+                "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+                "generalized_coordinate_dimension": 12,
+                "model_id": "model.gvs",
+                "model_version": "1.0.0",
+                "relevant_assumptions": [
+                  "supported serial tendon-driven continuum topology",
+                  "selected strain basis spans deformation relevant to the use",
+                  "inextensible centerline",
+                  "no shear",
+                  "no torsion",
+                  "straight frictionless tendon spans"
+                ],
+                "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+                "representation_kind": "gvs_bending_basis_v1",
+                "representation_strategy": "structural_linear",
+                "state_dimension": 24,
+                "unsupported_requested_physics": [],
+                "uses": {
+                  "local_model_control": {
+                    "evidence": [],
+                    "reasons": [
+                      "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+                    ],
+                    "status": "WARN",
+                    "validation": "unavailable"
+                  },
+                  "reduced_dynamics": {
+                    "evidence": [],
+                    "reasons": [
+                      "Resolved GVS bending coordinates support this reduced-model use."
+                    ],
+                    "status": "ALLOW",
+                    "validation": "unavailable"
+                  }
+                }
+              },
+              "reason": "Length, uniform section scaling, material density/elasticity/declared viscosity; unchanged topology and routing",
+              "status": "supported"
+            }
+          }
+        }
+      ],
+      "fresh_report": null,
+      "incumbent_report": null
+    },
+    {
+      "request_id": "model-1",
+      "payload": {
+        "artifact_id": "621055419ec14c7e78ababf07e49f01c47fe88af17919300ae6bd81cd793c4c5",
+        "media_type": "application/json"
+      },
+      "skills": [],
+      "control_profiles": [
+        {
+          "applicability": "compatible_unvalidated",
+          "combination": "candidate_gvs_nmpc",
+          "command_space": "tendon_tensions",
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "bundled_guess",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_brake_lead_s": 0.0,
+                  "holding_tip_speed_weight": 0.0,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": null,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": false,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "6.0.0"
+          },
+          "discovery": "control.profile_describe",
+          "executable": true,
+          "execution_model": "model.serial_bending_cells",
+          "historical_cost": null,
+          "predictor": "model.gvs",
+          "profile_id": "gvs_candidate_reach_v1",
+          "reasons": [],
+          "report_authorized": true,
+          "scope_assessment": {
+            "execution_preparation": {
+              "next_step": "simulation.run imports/generates and seals numerical guesses under its reserved wall/one-backend budget; actual-state regeneration and validation occur in each update",
+              "source": "bundled_guess",
+              "status": "pending_execution_hook"
+            },
+            "historical_evidence": {
+              "exact_execution_scope_match": false,
+              "historical_robot_match": true,
+              "historical_task_match": true,
+              "reason": "Fixed v2 success does not validate changed designs, targets, timing, initial states, recipes or acceptance conditions",
+              "sources": [
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/report.md",
+                  "sha256": "0322ae0a589139dcd0443081c70ae318621d6fd8e39a6949032c2e3cf58c4579"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/summary.json",
+                  "sha256": "b99b80e195b19f47ea6c10ed23a4992418b95564ec79862dbae9e6380cb761ef"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/saved_evaluation.json",
+                  "sha256": "1f2d7f26e2da8df4475510433ce814660d5ea6af0bb868f6f8555974f20bff00"
+                }
+              ],
+              "status": "unvalidated_configuration"
+            },
+            "technical_compatibility": {
+              "model_use_assessment": {
+                "design_id": "two_segment_development",
+                "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+                "generalized_coordinate_dimension": 12,
+                "model_id": "model.gvs",
+                "model_version": "1.0.0",
+                "relevant_assumptions": [
+                  "supported serial tendon-driven continuum topology",
+                  "selected strain basis spans deformation relevant to the use",
+                  "inextensible centerline",
+                  "no shear",
+                  "no torsion",
+                  "straight frictionless tendon spans"
+                ],
+                "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+                "representation_kind": "gvs_bending_basis_v1",
+                "representation_strategy": "structural_linear",
+                "state_dimension": 24,
+                "unsupported_requested_physics": [],
+                "uses": {
+                  "local_model_control": {
+                    "evidence": [],
+                    "reasons": [
+                      "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+                    ],
+                    "status": "WARN",
+                    "validation": "unavailable"
+                  },
+                  "reduced_dynamics": {
+                    "evidence": [],
+                    "reasons": [
+                      "Resolved GVS bending coordinates support this reduced-model use."
+                    ],
+                    "status": "ALLOW",
+                    "validation": "unavailable"
+                  }
+                }
+              },
+              "reason": "Length, uniform section scaling, material density/elasticity/declared viscosity; unchanged topology and routing",
+              "status": "supported"
+            }
+          }
+        }
+      ],
+      "fresh_report": null,
+      "incumbent_report": null
+    }
+  ],
+  "actions": [
+    {
+      "request_id": "model-0",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 77.29700000002049,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": "MODEL_RESPONSE_LENGTH_TRUNCATED: provider finish_reason=\"length\"",
+        "execution_id": "177589c8a6d04e6c81bb56f1e835bc8a",
+        "execution_status": "failed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "eadc8637194592c4ad8302c24998b107fe9d367253fa7a336881b45958896776",
+          "media_type": "application/json"
+        },
+        "request_id": "model-0",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      },
+      "decision": {
+        "error": "MODEL_RESPONSE_LENGTH_TRUNCATED: provider finish_reason=\"length\"",
+        "finish_reason": "length",
+        "length_truncated": true,
+        "response": {
+          "artifact_id": "9ded98e9c4cc72c63ab37158ec5322e6d424e393ad02e1962488412e3d748f25",
+          "media_type": "application/json"
+        }
+      }
+    },
+    {
+      "request_id": "model-1",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 79.43800000008196,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": "MODEL_RESPONSE_LENGTH_TRUNCATED: provider finish_reason=\"length\"",
+        "execution_id": "514a5ba6104b42b6914a04502b3152b6",
+        "execution_status": "failed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "6a72416aa45917dc173bc2c9e213aade171e4b90becfff09c6583489542d5487",
+          "media_type": "application/json"
+        },
+        "request_id": "model-1",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      },
+      "decision": {
+        "error": "MODEL_RESPONSE_LENGTH_TRUNCATED: provider finish_reason=\"length\"",
+        "finish_reason": "length",
+        "length_truncated": true,
+        "response": {
+          "artifact_id": "9deec1a8344dc106bc78f546d99d6a26ae2ee4adee5d94b8fa409fd947dbd92b",
+          "media_type": "application/json"
+        }
+      }
+    }
+  ],
+  "counts": {
+    "solves": 0,
+    "successful_integrations": 0,
+    "evaluations": 0,
+    "llm_requests": 2,
+    "diagnoses": 0,
+    "videos": 0
+  },
+  "project_usage": {
+    "limit": {
+      "backend_solves": 3,
+      "model_calls": 32,
+      "tool_calls": 80,
+      "wall_s": 10800.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 2,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 156.73500000010245
+    },
+    "remaining": {
+      "backend_solves": 3,
+      "model_calls": 30,
+      "tool_calls": 80,
+      "wall_s": 10643.264999999898,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "session_usage": {
+    "limit": {
+      "backend_solves": 3,
+      "model_calls": 32,
+      "tool_calls": 80,
+      "wall_s": 10800.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 2,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 156.73500000010245
+    },
+    "remaining": {
+      "backend_solves": 3,
+      "model_calls": 30,
+      "tool_calls": 80,
+      "wall_s": 10643.264999999898,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "tool_calls": 0,
+  "real_model_requests": 2,
+  "backend_executions": 0,
+  "stop_reason": "MODEL_LENGTH_RETRY_FAILED: MODEL_RESPONSE_LENGTH_TRUNCATED: provider finish_reason=\"length\"",
+  "status": "failed",
+  "final": {
+    "candidate_id": null,
+    "crosscheck_status": "not_reviewed",
+    "delivery_status": "incomplete",
+    "evaluated": false,
+    "explicit_delivery": false,
+    "selection_basis": "Host terminal summary of session-wide incumbent; not an explicit model delivery",
+    "stop_reason": "MODEL_LENGTH_RETRY_FAILED: MODEL_RESPONSE_LENGTH_TRUNCATED: provider finish_reason=\"length\""
+  },
+  "actual_provider_response_received": true,
+  "skill_delivered": false,
+  "fresh_report_delivered": false,
+  "provider_authored_delivery": null
+}
