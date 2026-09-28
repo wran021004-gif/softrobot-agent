@@ -1,0 +1,157 @@
+{
+  "controller": {
+    "extension_id": "controller.gvs_nmpc",
+    "parameters": {
+      "contract": "family.gvs_tracking_control",
+      "data": {
+        "numerical_source": "initial_state_pretension",
+        "recipe": {
+          "basis": {
+            "strategy": "structural_linear"
+          },
+          "constraint_jacobian_mode": "reverse",
+          "curvature_scale_rad_m": 10.0,
+          "evaluation_threads": 1,
+          "feasible_return": {
+            "budget_s": 15.0,
+            "minimum_s": 5.0,
+            "relative_improvement": 0.1
+          },
+          "holding_brake_lead_s": 0.0,
+          "holding_tip_speed_weight": 0.0,
+          "horizon": 10,
+          "max_cpu_s": 30.0,
+          "max_iterations": 120,
+          "max_unusable_updates": 3,
+          "position_error_scale_m": null,
+          "rate_scale_rad_m_s": 1000.0,
+          "recover_returned_tensions": true,
+          "regenerate_warm_states": true,
+          "seed_position_tolerance_fraction": 0.5,
+          "seed_speed_limit_m_s": 0.02,
+          "substeps": 1,
+          "tension_weight": 0.0001,
+          "terminal_tip_speed_weight": 0.0,
+          "terminal_velocity_weight": 0.01,
+          "terminal_weight": 5.0,
+          "tip_speed_scale_m_s": 0.02,
+          "tolerance": 1e-06,
+          "tracking_weight": 1.0,
+          "variation_weight": 0.001,
+          "velocity_weight": 0.01
+        }
+      },
+      "version": "1.0.0"
+    },
+    "version": "5.0.0"
+  },
+  "execution_scope": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.1.0"
+    },
+    "controller": {
+      "extension_id": "controller.gvs_nmpc",
+      "parameters": {
+        "contract": "family.gvs_tracking_control",
+        "data": {
+          "numerical_source": "initial_state_pretension",
+          "recipe": {
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "constraint_jacobian_mode": "reverse",
+            "curvature_scale_rad_m": 10.0,
+            "evaluation_threads": 1,
+            "feasible_return": {
+              "budget_s": 15.0,
+              "minimum_s": 5.0,
+              "relative_improvement": 0.1
+            },
+            "holding_brake_lead_s": 0.0,
+            "holding_tip_speed_weight": 0.0,
+            "horizon": 10,
+            "max_cpu_s": 30.0,
+            "max_iterations": 120,
+            "max_unusable_updates": 3,
+            "position_error_scale_m": null,
+            "rate_scale_rad_m_s": 1000.0,
+            "recover_returned_tensions": true,
+            "regenerate_warm_states": true,
+            "seed_position_tolerance_fraction": 0.5,
+            "seed_speed_limit_m_s": 0.02,
+            "substeps": 1,
+            "tension_weight": 0.0001,
+            "terminal_tip_speed_weight": 0.0,
+            "terminal_velocity_weight": 0.01,
+            "terminal_weight": 5.0,
+            "tip_speed_scale_m_s": 0.02,
+            "tolerance": 1e-06,
+            "tracking_weight": 1.0,
+            "variation_weight": 0.001,
+            "velocity_weight": 0.01
+          }
+        },
+        "version": "1.0.0"
+      },
+      "version": "5.0.0"
+    },
+    "discretization": {
+      "contract": "family.discretization",
+      "data": {
+        "cells": {
+          "far": 12,
+          "near": 12
+        },
+        "coordinates": "two_principal_bending_angles_per_cell",
+        "model": "serial_bending_cells_v1",
+        "version": "serial_bending_discretization_v1"
+      },
+      "version": "1.0.0"
+    },
+    "execution_model": {
+      "extension_id": "model.serial_bending_cells",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "robot": {
+      "family": "tendon_robot_family",
+      "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+    },
+    "seed": 17,
+    "task": {
+      "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+      "family": "task.tracking",
+      "goal": "d26a8eeba954f122653b24cc25519f1446d457e163ed7135db263edd8441c7e2",
+      "identity": "032622bc8070a7383892e51f8e04031afbb9c718720a3319a79645f981c46cee",
+      "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.7,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      }
+    }
+  },
+  "historical_evidence": {
+    "reason": "Archived reaching is not tracking evidence",
+    "status": "unvalidated_tracking"
+  },
+  "technical_compatibility": {
+    "reason": "Length-only robot envelope; frozen world reference; ideal bounded tensions",
+    "status": "supported"
+  }
+}

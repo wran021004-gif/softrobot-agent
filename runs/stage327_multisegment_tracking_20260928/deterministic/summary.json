@@ -1,0 +1,2664 @@
+{
+  "accepted_noninitialization_plans": 70,
+  "accepted_plans": 70,
+  "backend_timings_s": {
+    "backend_call": 609.0738431001082,
+    "engine_compile": 0.02458900003693998,
+    "prepare_compile": 0.04903619992546737,
+    "solve": 608.7649757999461
+  },
+  "candidate_id": "parameterized-tracking",
+  "complete": true,
+  "configuration": {
+    "artifact_id": "acc3107480f65492fa8024434cd16ad2f9f108bdfef0f01be48b18416ebbe30d",
+    "media_type": "application/json"
+  },
+  "constraints": [
+    {
+      "limit": 0.01,
+      "name": "sampled_tracking_bound",
+      "observed": 0.011264183232736126,
+      "satisfied": false,
+      "units": "m"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_far_t0",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_far_t1",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_far_t2",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_near_t0",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_near_t1",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_near_t2",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    }
+  ],
+  "control_parameters": {
+    "contract": "family.gvs_tracking_control",
+    "data": {
+      "numerical_source": "initial_state_pretension",
+      "recipe": {
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "constraint_jacobian_mode": "reverse",
+        "curvature_scale_rad_m": 10.0,
+        "evaluation_threads": 1,
+        "feasible_return": {
+          "budget_s": 15.0,
+          "minimum_s": 5.0,
+          "relative_improvement": 0.1
+        },
+        "holding_brake_lead_s": 0.0,
+        "holding_tip_speed_weight": 0.0,
+        "horizon": 10,
+        "max_cpu_s": 30.0,
+        "max_iterations": 120,
+        "max_unusable_updates": 3,
+        "position_error_scale_m": null,
+        "rate_scale_rad_m_s": 1000.0,
+        "recover_returned_tensions": true,
+        "regenerate_warm_states": true,
+        "seed_position_tolerance_fraction": 0.5,
+        "seed_speed_limit_m_s": 0.02,
+        "substeps": 1,
+        "tension_weight": 0.0001,
+        "terminal_tip_speed_weight": 0.0,
+        "terminal_velocity_weight": 0.01,
+        "terminal_weight": 5.0,
+        "tip_speed_scale_m_s": 0.02,
+        "tolerance": 1e-06,
+        "tracking_weight": 1.0,
+        "variation_weight": 0.001,
+        "velocity_weight": 0.01
+      }
+    },
+    "version": "1.0.0"
+  },
+  "converged_updates": 0,
+  "deadline_misses": 70,
+  "evaluation": {
+    "artifact_id": "7a835ead847c89b9c973c52e496b63fb663882fe36382515a49627bef8c30c14",
+    "media_type": "application/json"
+  },
+  "evaluation_reason": null,
+  "evaluation_validity": "valid",
+  "execution_failure_reason": null,
+  "execution_id": "6e54d5b00a9e4447a78000dc470ebf1e",
+  "execution_scope": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.1.0"
+    },
+    "controller": {
+      "extension_id": "controller.gvs_nmpc",
+      "parameters": {
+        "contract": "family.gvs_tracking_control",
+        "data": {
+          "numerical_source": "initial_state_pretension",
+          "recipe": {
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "constraint_jacobian_mode": "reverse",
+            "curvature_scale_rad_m": 10.0,
+            "evaluation_threads": 1,
+            "feasible_return": {
+              "budget_s": 15.0,
+              "minimum_s": 5.0,
+              "relative_improvement": 0.1
+            },
+            "holding_brake_lead_s": 0.0,
+            "holding_tip_speed_weight": 0.0,
+            "horizon": 10,
+            "max_cpu_s": 30.0,
+            "max_iterations": 120,
+            "max_unusable_updates": 3,
+            "position_error_scale_m": null,
+            "rate_scale_rad_m_s": 1000.0,
+            "recover_returned_tensions": true,
+            "regenerate_warm_states": true,
+            "seed_position_tolerance_fraction": 0.5,
+            "seed_speed_limit_m_s": 0.02,
+            "substeps": 1,
+            "tension_weight": 0.0001,
+            "terminal_tip_speed_weight": 0.0,
+            "terminal_velocity_weight": 0.01,
+            "terminal_weight": 5.0,
+            "tip_speed_scale_m_s": 0.02,
+            "tolerance": 1e-06,
+            "tracking_weight": 1.0,
+            "variation_weight": 0.001,
+            "velocity_weight": 0.01
+          }
+        },
+        "version": "1.0.0"
+      },
+      "version": "5.0.0"
+    },
+    "discretization": {
+      "contract": "family.discretization",
+      "data": {
+        "cells": {
+          "far": 12,
+          "near": 12
+        },
+        "coordinates": "two_principal_bending_angles_per_cell",
+        "model": "serial_bending_cells_v1",
+        "version": "serial_bending_discretization_v1"
+      },
+      "version": "1.0.0"
+    },
+    "execution_model": {
+      "extension_id": "model.serial_bending_cells",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "robot": {
+      "family": "tendon_robot_family",
+      "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+    },
+    "seed": 17,
+    "task": {
+      "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+      "family": "task.tracking",
+      "goal": "d26a8eeba954f122653b24cc25519f1446d457e163ed7135db263edd8441c7e2",
+      "identity": "032622bc8070a7383892e51f8e04031afbb9c718720a3319a79645f981c46cee",
+      "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.7,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      }
+    }
+  },
+  "force_bound_violation_n": 0.0,
+  "graph_construction_s": 1.4863275000825524,
+  "hold_last_responses": 0,
+  "initialization_selected": 0,
+  "last_valid_error_m": 0.0015412978148487623,
+  "last_valid_time_s": 0.7000000000000001,
+  "max_projection_residual_rad_m": 2.7178343422173867,
+  "max_rate_projection_residual_rad_m_s": 12.74295077056212,
+  "max_sampled_contacts": 0,
+  "maximum_error_m": 0.011264183232736126,
+  "maximum_plan_violation": 8.140396172244546e-06,
+  "mean_numerical_solve_s": 5.753759328575272,
+  "mean_preparation_s": 2.633527331430066,
+  "mean_recovery_integration_s": 0.0866116471422304,
+  "mean_recovery_s": 0.08849820428461369,
+  "mean_recovery_validation_s": 0.001884501427412033,
+  "mean_update_s": 8.684704441430846,
+  "mean_validation_s": 0.09832174713789885,
+  "minimum_error_m": 5.53284908043732e-05,
+  "motion": {
+    "artifact_id": "b7f6d1782aeef75778efdce3fe3f6818f00adec4d658bdda8a5bb174a8e138d9",
+    "media_type": "application/json"
+  },
+  "numerical_preparation": {
+    "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+    "coordinate_order": [
+      "near.kappa_y_node_0",
+      "near.kappa_y_node_1",
+      "near.kappa_y_node_2",
+      "near.kappa_z_node_0",
+      "near.kappa_z_node_1",
+      "near.kappa_z_node_2",
+      "far.kappa_y_node_0",
+      "far.kappa_y_node_1",
+      "far.kappa_y_node_2",
+      "far.kappa_z_node_0",
+      "far.kappa_z_node_1",
+      "far.kappa_z_node_2"
+    ],
+    "cost_accounting": "Included in simulation.run reserved/charged wall time; graph/solver construction and state regeneration are separate execution costs",
+    "current_scope": {
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.1.0"
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "parameters": {
+          "contract": "family.gvs_tracking_control",
+          "data": {
+            "numerical_source": "initial_state_pretension",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": true,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.01,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.01
+            }
+          },
+          "version": "1.0.0"
+        },
+        "version": "5.0.0"
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "data": {
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        },
+        "version": "1.0.0"
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "robot": {
+        "family": "tendon_robot_family",
+        "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+      },
+      "seed": 17,
+      "task": {
+        "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+        "family": "task.tracking",
+        "goal": "d26a8eeba954f122653b24cc25519f1446d457e163ed7135db263edd8441c7e2",
+        "identity": "032622bc8070a7383892e51f8e04031afbb9c718720a3319a79645f981c46cee",
+        "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.7,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        }
+      }
+    },
+    "execution_scope": {
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.1.0"
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "parameters": {
+          "contract": "family.gvs_tracking_control",
+          "data": {
+            "numerical_source": "initial_state_pretension",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": true,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.01,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.01
+            }
+          },
+          "version": "1.0.0"
+        },
+        "version": "5.0.0"
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "data": {
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        },
+        "version": "1.0.0"
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "robot": {
+        "family": "tendon_robot_family",
+        "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+      },
+      "seed": 17,
+      "task": {
+        "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+        "family": "task.tracking",
+        "goal": "d26a8eeba954f122653b24cc25519f1446d457e163ed7135db263edd8441c7e2",
+        "identity": "032622bc8070a7383892e51f8e04031afbb9c718720a3319a79645f981c46cee",
+        "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.7,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        }
+      }
+    },
+    "force_limits_n": [
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ],
+    "historical_states_reused": false,
+    "nominal_is_current_target_solution": false,
+    "physics_identity": "8563494a2c71a30caf654c52fd3ab51e8a90ae46479a8ba6964238e63478efac",
+    "previous_input_source": "candidate bounded pretension",
+    "resolved_basis_identity": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+    "reused": false,
+    "source": {
+      "artifact_id": "e2b5c7a0a46b88770a03f2fda2c76a3918f1c86cd5e5ae5ddf59868004818e2c",
+      "media_type": "application/json"
+    },
+    "source_kind": "project_initial_state_and_bounded_pretension",
+    "status": "completed",
+    "tendon_order": [
+      "near_t0",
+      "near_t1",
+      "near_t2",
+      "far_t0",
+      "far_t1",
+      "far_t2"
+    ],
+    "units": {
+      "q": "rad/m",
+      "qdot": "rad/(m*s)",
+      "tension": "N"
+    },
+    "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use",
+    "wall_s": 0.035960299894213676,
+    "warm_guess_is_execution_evidence": false
+  },
+  "official_task_success": false,
+  "one_step_prediction_comparisons": [
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.734408779857107,
+        5.009030864006651,
+        1.870175824284265,
+        3.861506482310669,
+        3.622770706499656,
+        1.9983280582012597
+      ],
+      "end_s": 0.01,
+      "measured_tip_m": [
+        0.30797109196859296,
+        -0.0002732676450534822,
+        0.15134911731902342
+      ],
+      "predicted_tip_m": [
+        0.307953533856073,
+        -0.00036695043556163754,
+        0.15196193332041072
+      ],
+      "start_s": 0.0,
+      "tip_difference_m": 0.0006201840082660727
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.827523146152957,
+        5.042566877102313,
+        1.8704918532822985,
+        3.9103007732278616,
+        3.5441129324335536,
+        2.043466636347772
+      ],
+      "end_s": 0.02,
+      "measured_tip_m": [
+        0.3077704441096809,
+        -0.0007228685628238196,
+        0.1542104489720122
+      ],
+      "predicted_tip_m": [
+        0.30778624214888667,
+        -0.0006334069779417354,
+        0.15403780181918142
+      ],
+      "start_s": 0.01,
+      "tip_difference_m": 0.00019508970396444217
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8623811371284607,
+        5.034538392414316,
+        1.8593470147306836,
+        3.739450068176964,
+        3.375713448865981,
+        2.3265809661216723
+      ],
+      "end_s": 0.03,
+      "measured_tip_m": [
+        0.3073860204844408,
+        -0.0011309041635105851,
+        0.15730916842692494
+      ],
+      "predicted_tip_m": [
+        0.3074854335955571,
+        -0.0009591034612473121,
+        0.15644022137953334
+      ],
+      "start_s": 0.02,
+      "tip_difference_m": 0.0008913290184497244
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.889885600792179,
+        5.020270758650159,
+        1.8683939678809238,
+        3.5913483301360785,
+        3.207724305206407,
+        2.705935727440414
+      ],
+      "end_s": 0.04,
+      "measured_tip_m": [
+        0.3070297371218297,
+        -0.0013778138542026406,
+        0.15972322113500217
+      ],
+      "predicted_tip_m": [
+        0.30719943053188054,
+        -0.0011502114915182397,
+        0.15842032869389217
+      ],
+      "start_s": 0.03,
+      "tip_difference_m": 0.001333464435977131
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.916580291127779,
+        4.994491131338283,
+        1.8747367211638672,
+        3.479849626976738,
+        3.0344439294310503,
+        3.108501662554149
+      ],
+      "end_s": 0.05,
+      "measured_tip_m": [
+        0.30691045214835466,
+        -0.001358834724069213,
+        0.16094956886513745
+      ],
+      "predicted_tip_m": [
+        0.3071009384632837,
+        -0.0011016217256943869,
+        0.1594477118503037
+      ],
+      "start_s": 0.04,
+      "tip_difference_m": 0.0015355839461629963
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.9307972369738864,
+        4.965242503126138,
+        1.8915381043797617,
+        3.3587566120454686,
+        2.8906876017926884,
+        3.5161132392461316
+      ],
+      "end_s": 0.060000000000000005,
+      "measured_tip_m": [
+        0.307089511063766,
+        -0.0010375411776395586,
+        0.16069649021573756
+      ],
+      "predicted_tip_m": [
+        0.30725162486732416,
+        -0.0008064230083390058,
+        0.15917369154697542
+      ],
+      "start_s": 0.05,
+      "tip_difference_m": 0.0015487453887158833
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.935730242504467,
+        4.935592457511308,
+        1.9141017386440407,
+        3.2660586355067474,
+        2.808750684464445,
+        3.830057002523757
+      ],
+      "end_s": 0.06999999999999999,
+      "measured_tip_m": [
+        0.30744888385388963,
+        -0.0004545579777478489,
+        0.15886892185445853
+      ],
+      "predicted_tip_m": [
+        0.3075488746046271,
+        -0.0002838912646091652,
+        0.15753231762175104
+      ],
+      "start_s": 0.06,
+      "tip_difference_m": 0.0013511610385509806
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.9278134962110727,
+        4.919660337030368,
+        1.9380743190868297,
+        3.2779807763640307,
+        2.848027956438107,
+        3.907691095314412
+      ],
+      "end_s": 0.08,
+      "measured_tip_m": [
+        0.30776069466874073,
+        0.0002955432257273631,
+        0.1557396228012022
+      ],
+      "predicted_tip_m": [
+        0.307800300669811,
+        0.00038531040753685337,
+        0.15482170245241605
+      ],
+      "start_s": 0.07,
+      "tip_difference_m": 0.0009231492560612798
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.9098916782388624,
+        4.919816175508864,
+        1.9676895423871235,
+        3.52705319666055,
+        3.067854295107115,
+        3.5360818231492686
+      ],
+      "end_s": 0.09,
+      "measured_tip_m": [
+        0.3078753224705657,
+        0.0011055212790909254,
+        0.1522262446829059
+      ],
+      "predicted_tip_m": [
+        0.30789068459553515,
+        0.001121416138539459,
+        0.15196182967803096
+      ],
+      "start_s": 0.08,
+      "tip_difference_m": 0.0002653374007626631
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8586583340860594,
+        4.911014648969896,
+        2.0531620238984525,
+        4.281964995905847,
+        3.5780819719269954,
+        2.1080993427157453
+      ],
+      "end_s": 0.09999999999999999,
+      "measured_tip_m": [
+        0.3078887509642053,
+        0.0019180972281499906,
+        0.15060206745420718
+      ],
+      "predicted_tip_m": [
+        0.3078937921117798,
+        0.0018909257721960648,
+        0.15131943379115081
+      ],
+      "start_s": 0.09,
+      "tip_difference_m": 0.0007178984347158415
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8653123903580284,
+        4.951432859366168,
+        2.0063233952413047,
+        3.9382115055539253,
+        3.3816026256557943,
+        2.6202251423964262
+      ],
+      "end_s": 0.11,
+      "measured_tip_m": [
+        0.30785670450287855,
+        0.0027004655141248638,
+        0.15009395846481793
+      ],
+      "predicted_tip_m": [
+        0.30788203038851836,
+        0.0026399122451346044,
+        0.1498229433626453
+      ],
+      "start_s": 0.1,
+      "tip_difference_m": 0.0002788499318172702
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.867473362765237,
+        4.944242882662643,
+        2.010176076958237,
+        3.9262159628117193,
+        3.335293390785881,
+        2.6752981458142724
+      ],
+      "end_s": 0.12,
+      "measured_tip_m": [
+        0.3077904332627836,
+        0.003492065322626784,
+        0.14970892220913923
+      ],
+      "predicted_tip_m": [
+        0.30782890617771846,
+        0.003441105316344467,
+        0.1492668683156272
+      ],
+      "start_s": 0.11,
+      "tip_difference_m": 0.0004466416149364419
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.867334210021217,
+        4.950010590041614,
+        2.0046532290506343,
+        3.9186126920905187,
+        3.275135653260775,
+        2.736958902126449
+      ],
+      "end_s": 0.13,
+      "measured_tip_m": [
+        0.307707211454136,
+        0.004375321915219266,
+        0.14923096501794533
+      ],
+      "predicted_tip_m": [
+        0.30775922347874146,
+        0.004315519205938219,
+        0.14866215673704863
+      ],
+      "start_s": 0.12,
+      "tip_difference_m": 0.0005743034695677641
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.867063376559431,
+        4.950442477235169,
+        2.0054599403564355,
+        3.930826964930113,
+        3.279126537575762,
+        2.7217158087404676
+      ],
+      "end_s": 0.14,
+      "measured_tip_m": [
+        0.30761697706329905,
+        0.00535199498408751,
+        0.14866738103589472
+      ],
+      "predicted_tip_m": [
+        0.3076787373158861,
+        0.005243410428826753,
+        0.14807773043414182
+      ],
+      "start_s": 0.13,
+      "tip_difference_m": 0.0006027377262029818
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8672276713267015,
+        4.9474702662326235,
+        2.009144053300714,
+        3.948668075194765,
+        3.2770883511025923,
+        2.7069212929828317
+      ],
+      "end_s": 0.15000000000000002,
+      "measured_tip_m": [
+        0.307520147076429,
+        0.006404379974118675,
+        0.14810623225987923
+      ],
+      "predicted_tip_m": [
+        0.3075920023211411,
+        0.006251888539149885,
+        0.14749381756995325
+      ],
+      "start_s": 0.14,
+      "tip_difference_m": 0.0006351917555892971
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.867632370680363,
+        4.942815948949327,
+        2.0139218272196096,
+        3.9514096975142503,
+        3.2718616079438716,
+        2.7104424394253455
+      ],
+      "end_s": 0.16,
+      "measured_tip_m": [
+        0.30741779495139515,
+        0.0075156383644099855,
+        0.1475937463235946
+      ],
+      "predicted_tip_m": [
+        0.3075013391098227,
+        0.007313249963402358,
+        0.14694189775404187
+      ],
+      "start_s": 0.15,
+      "tip_difference_m": 0.0006876388942589843
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.867602705813279,
+        4.936457187335951,
+        2.020304260128579,
+        3.9551767448026807,
+        3.260440617287392,
+        2.7187860650232425
+      ],
+      "end_s": 0.17,
+      "measured_tip_m": [
+        0.30731109550014946,
+        0.008674577113018576,
+        0.14715185437755837
+      ],
+      "predicted_tip_m": [
+        0.3074065724591756,
+        0.008424754730665545,
+        0.1464611783038206
+      ],
+      "start_s": 0.16,
+      "tip_difference_m": 0.0007406487097560064
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8676168943828935,
+        4.929939827213179,
+        2.026138531891901,
+        3.9454718744297383,
+        3.243308526234542,
+        2.7454122424672933
+      ],
+      "end_s": 0.18000000000000002,
+      "measured_tip_m": [
+        0.3072042691019017,
+        0.009870699463877725,
+        0.1467693200247724
+      ],
+      "predicted_tip_m": [
+        0.3073123386997249,
+        0.009569657187799379,
+        0.14602970110832617
+      ],
+      "start_s": 0.17,
+      "tip_difference_m": 0.0008058173685924048
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.867777911882506,
+        4.923991558543147,
+        2.0308017333166997,
+        3.926925476917326,
+        3.218029985144939,
+        2.787726398529483
+      ],
+      "end_s": 0.19,
+      "measured_tip_m": [
+        0.3071038215230852,
+        0.011094420002139036,
+        0.14640455959855042
+      ],
+      "predicted_tip_m": [
+        0.3072233737783366,
+        0.010742118442115417,
+        0.14561752327172522
+      ],
+      "start_s": 0.18,
+      "tip_difference_m": 0.0008705373689125981
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8685346422775733,
+        4.920439286739572,
+        2.0327213733944514,
+        3.902046817155987,
+        3.1912857131044245,
+        2.8368600756500393
+      ],
+      "end_s": 0.2,
+      "measured_tip_m": [
+        0.3070152807807624,
+        0.012334383178809645,
+        0.14600859571884875
+      ],
+      "predicted_tip_m": [
+        0.3071438664742318,
+        0.01192822923259455,
+        0.14518754627790256
+      ],
+      "start_s": 0.19,
+      "tip_difference_m": 0.0009249959421906393
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8676924080101154,
+        4.917079939308879,
+        2.0366602312956648,
+        3.905313041126229,
+        3.182245192443035,
+        2.842796607062064
+      ],
+      "end_s": 0.21000000000000002,
+      "measured_tip_m": [
+        0.3069307340103189,
+        0.013578293245399956,
+        0.14560687063629546
+      ],
+      "predicted_tip_m": [
+        0.30706483295243936,
+        0.013118577776188179,
+        0.14479798836834185
+      ],
+      "start_s": 0.2,
+      "tip_difference_m": 0.0009400060437679188
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8678950888718058,
+        4.914701348008976,
+        2.0385627191455056,
+        3.9008399314681927,
+        3.172486297348086,
+        2.856460982507076
+      ],
+      "end_s": 0.22,
+      "measured_tip_m": [
+        0.30684626353056815,
+        0.014810702109338646,
+        0.14522495063840987
+      ],
+      "predicted_tip_m": [
+        0.3069873449307952,
+        0.014296200797517892,
+        0.14441279361493645
+      ],
+      "start_s": 0.21,
+      "tip_difference_m": 0.000971707050572609
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8677035184227355,
+        4.91321102078848,
+        2.039913146482502,
+        3.8964916333884827,
+        3.1606529582714153,
+        2.871802928495382
+      ],
+      "end_s": 0.23,
+      "measured_tip_m": [
+        0.30676128052729995,
+        0.01601811847384878,
+        0.14486263315118963
+      ],
+      "predicted_tip_m": [
+        0.3069092235092903,
+        0.01545180091335504,
+        0.14404628483243215
+      ],
+      "start_s": 0.22,
+      "tip_difference_m": 0.0010045035006320034
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.867494996156432,
+        4.912364291720942,
+        2.0406959666775717,
+        3.89454710544602,
+        3.1506764550052613,
+        2.8830367221355138
+      ],
+      "end_s": 0.24000000000000002,
+      "measured_tip_m": [
+        0.30667522618291204,
+        0.01718902278446559,
+        0.14451824112395883
+      ],
+      "predicted_tip_m": [
+        0.3068297687662329,
+        0.016572399772034667,
+        0.14370192313350794
+      ],
+      "start_s": 0.23,
+      "tip_difference_m": 0.0010346411991858193
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.867316701765824,
+        4.911736941472901,
+        2.041304589415263,
+        3.8934595924453466,
+        3.1432583222868087,
+        2.891091033096996
+      ],
+      "end_s": 0.25,
+      "measured_tip_m": [
+        0.3065881073475494,
+        0.018310935618625634,
+        0.14419179599727489
+      ],
+      "predicted_tip_m": [
+        0.30674924284478217,
+        0.017645509052684596,
+        0.143377327085017
+      ],
+      "start_s": 0.24,
+      "tip_difference_m": 0.0010640097613100622
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.867191270270139,
+        4.911544641959563,
+        2.041504130061543,
+        3.8936282422351165,
+        3.137060874170969,
+        2.8967399359372497
+      ],
+      "end_s": 0.26,
+      "measured_tip_m": [
+        0.30650050511675114,
+        0.01937210833993491,
+        0.14388343657768188
+      ],
+      "predicted_tip_m": [
+        0.306668175687232,
+        0.018660928935101646,
+        0.14307183640175022
+      ],
+      "start_s": 0.25,
+      "tip_difference_m": 0.0010920551321415306
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8670025521618068,
+        4.911466683881208,
+        2.0417181010447387,
+        3.895109621014215,
+        3.1329842260914873,
+        2.899178163888359
+      ],
+      "end_s": 0.27,
+      "measured_tip_m": [
+        0.30641322117042047,
+        0.020361608973569808,
+        0.14359516776981954
+      ],
+      "predicted_tip_m": [
+        0.3065874130027131,
+        0.019607668046560344,
+        0.14278755850663896
+      ],
+      "start_s": 0.26,
+      "tip_difference_m": 0.0011184822027338745
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.86671121000532,
+        4.911820217147904,
+        2.0416583894038873,
+        3.897169631466104,
+        3.129564832954838,
+        2.900418398063207
+      ],
+      "end_s": 0.28,
+      "measured_tip_m": [
+        0.3063275326644788,
+        0.02127003052319087,
+        0.14332866813530307
+      ],
+      "predicted_tip_m": [
+        0.30650823521065806,
+        0.02047719062002434,
+        0.14252415706006036
+      ],
+      "start_s": 0.27,
+      "tip_difference_m": 0.0011438909880040827
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8663745831977256,
+        4.912006809513649,
+        2.0418790513091754,
+        3.900418595045746,
+        3.128487358366572,
+        2.8984066986760544
+      ],
+      "end_s": 0.29000000000000004,
+      "measured_tip_m": [
+        0.30624465555727565,
+        0.02208857986027372,
+        0.14308798170418732
+      ],
+      "predicted_tip_m": [
+        0.3064318285070222,
+        0.021260454806711362,
+        0.14228706210629719
+      ],
+      "start_s": 0.28,
+      "tip_difference_m": 0.001167174802563434
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.865915439940671,
+        4.91240381047086,
+        2.042026078551077,
+        3.9037043830055755,
+        3.127123248768573,
+        2.8966283454177937
+      ],
+      "end_s": 0.3,
+      "measured_tip_m": [
+        0.30616617876545166,
+        0.02281067167256991,
+        0.14287571763760784
+      ],
+      "predicted_tip_m": [
+        0.30635973838686986,
+        0.02195204675813582,
+        0.14207567909588373
+      ],
+      "start_s": 0.29,
+      "tip_difference_m": 0.001189438413275169
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.865481224206338,
+        4.912440503172843,
+        2.0425493823095247,
+        3.90668248106199,
+        3.1274154706240833,
+        2.8936919260822886
+      ],
+      "end_s": 0.31,
+      "measured_tip_m": [
+        0.3060937414801811,
+        0.023430349608686018,
+        0.14269385616017638
+      ],
+      "predicted_tip_m": [
+        0.30629355651136375,
+        0.02254511005684507,
+        0.14189353946475092
+      ],
+      "start_s": 0.3,
+      "tip_difference_m": 0.001209992530475631
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8662403335965054,
+        4.912092946676052,
+        2.042380405126018,
+        3.911398194244731,
+        3.124383908746744,
+        2.8920388796339
+      ],
+      "end_s": 0.32,
+      "measured_tip_m": [
+        0.30602838729832466,
+        0.02394762176955168,
+        0.14254264274142517
+      ],
+      "predicted_tip_m": [
+        0.3062339323595888,
+        0.023042636147111936,
+        0.14173972324183184
+      ],
+      "start_s": 0.31,
+      "tip_difference_m": 0.0012271623657283193
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8681564648745663,
+        4.910972539788576,
+        2.041973100308014,
+        3.917981538663203,
+        3.119891514898689,
+        2.8899518737452103
+      ],
+      "end_s": 0.33,
+      "measured_tip_m": [
+        0.30597015326373905,
+        0.02436786830011105,
+        0.14242299937368857
+      ],
+      "predicted_tip_m": [
+        0.30618111424196676,
+        0.023447570650778807,
+        0.1416168921844495
+      ],
+      "start_s": 0.32,
+      "tip_difference_m": 0.0012414753715817956
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.87066825180526,
+        4.909446719311485,
+        2.0414472948499345,
+        3.925595421419029,
+        3.113379254214455,
+        2.8887720795419405
+      ],
+      "end_s": 0.34,
+      "measured_tip_m": [
+        0.30591874439559974,
+        0.024699550894530648,
+        0.14233555419916277
+      ],
+      "predicted_tip_m": [
+        0.306134912175522,
+        0.023767593085580463,
+        0.1415244303386364
+      ],
+      "start_s": 0.33,
+      "tip_difference_m": 0.0012542710169078132
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8734762435396726,
+        4.90743501298614,
+        2.041142814057894,
+        3.93376352427526,
+        3.105370500563943,
+        2.888535608069386
+      ],
+      "end_s": 0.35000000000000003,
+      "measured_tip_m": [
+        0.30587369139537973,
+        0.024952941538136316,
+        0.14227982209056836
+      ],
+      "predicted_tip_m": [
+        0.3060948977155051,
+        0.02401198301997324,
+        0.14146219271321087
+      ],
+      "start_s": 0.34,
+      "tip_difference_m": 0.0012660382962948046
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.875784875335577,
+        4.905225895267379,
+        2.0414365222974555,
+        3.941306334869757,
+        3.096057717472405,
+        2.890224730447671
+      ],
+      "end_s": 0.36000000000000004,
+      "measured_tip_m": [
+        0.3058346650208997,
+        0.025138971879197537,
+        0.14225290164788112
+      ],
+      "predicted_tip_m": [
+        0.30606075761366147,
+        0.02419075876100708,
+        0.14142687678543395
+      ],
+      "start_s": 0.35000000000000003,
+      "tip_difference_m": 0.001277710081118209
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8776879318286146,
+        4.902346786235515,
+        2.0427296365540357,
+        3.9502510501191805,
+        3.0853012397407076,
+        2.8921374813300016
+      ],
+      "end_s": 0.37,
+      "measured_tip_m": [
+        0.30580066604877065,
+        0.02527044672085534,
+        0.14225231900343127
+      ],
+      "predicted_tip_m": [
+        0.30603131883615503,
+        0.024317075178691472,
+        0.1414180344745559
+      ],
+      "start_s": 0.36,
+      "tip_difference_m": 0.00128769122108404
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.877260304678033,
+        4.899569819959266,
+        2.045860376526041,
+        3.9565330599764175,
+        3.0748325664012386,
+        2.8966118233108893
+      ],
+      "end_s": 0.38,
+      "measured_tip_m": [
+        0.3057713622895317,
+        0.025358452154254127,
+        0.14227247256618603
+      ],
+      "predicted_tip_m": [
+        0.30600661343337215,
+        0.02439913550081433,
+        0.14142769643715244
+      ],
+      "start_s": 0.37,
+      "tip_difference_m": 0.001299722374366974
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.874965050279317,
+        4.896368992863513,
+        2.0510147620587706,
+        3.96229715537972,
+        3.064071675883785,
+        2.90224385561061
+      ],
+      "end_s": 0.39,
+      "measured_tip_m": [
+        0.30574636599388366,
+        0.02541276879520976,
+        0.14230576332097916
+      ],
+      "predicted_tip_m": [
+        0.30598582527941176,
+        0.02444820927794565,
+        0.14145074021909912
+      ],
+      "start_s": 0.38,
+      "tip_difference_m": 0.0013110226224283738
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8706419234853966,
+        4.893725817370109,
+        2.05732927446743,
+        3.962824206307979,
+        3.053017849154619,
+        2.9132234654359515
+      ],
+      "end_s": 0.4,
+      "measured_tip_m": [
+        0.3057265127676933,
+        0.025440713531651338,
+        0.14233690763166906
+      ],
+      "predicted_tip_m": [
+        0.30596988856756663,
+        0.024469904414115933,
+        0.1414692498711067
+      ],
+      "start_s": 0.39,
+      "tip_difference_m": 0.0013245875252764295
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.864770982994904,
+        4.8931709928456995,
+        2.0629744156965217,
+        3.9592579579944984,
+        3.0499140666167066,
+        2.9205911464609935
+      ],
+      "end_s": 0.41000000000000003,
+      "measured_tip_m": [
+        0.3057132119838957,
+        0.02543936721422833,
+        0.1423544607124216
+      ],
+      "predicted_tip_m": [
+        0.3059600219880005,
+        0.02445942156021808,
+        0.14148053976543082
+      ],
+      "start_s": 0.4,
+      "tip_difference_m": 0.0013360188937769752
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8582894320825405,
+        4.892730875841244,
+        2.069071244279232,
+        3.951589202142546,
+        3.0512499253798984,
+        2.9279689117300687
+      ],
+      "end_s": 0.42000000000000004,
+      "measured_tip_m": [
+        0.3057085010139643,
+        0.02539984544332657,
+        0.14235024248515335
+      ],
+      "predicted_tip_m": [
+        0.305957688477521,
+        0.024412418405984113,
+        0.14147164993224814
+      ],
+      "start_s": 0.41000000000000003,
+      "tip_difference_m": 0.0013450023866481428
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8507797224800764,
+        4.892860237661526,
+        2.0755372088248527,
+        3.939906956525692,
+        3.0581038714260695,
+        2.9341763436630233
+      ],
+      "end_s": 0.43,
+      "measured_tip_m": [
+        0.30571439887957164,
+        0.02530994215617408,
+        0.14231647588301055
+      ],
+      "predicted_tip_m": [
+        0.30596477235161446,
+        0.024317024651859954,
+        0.14143603123931112
+      ],
+      "start_s": 0.42,
+      "tip_difference_m": 0.0013504646668814374
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.84291222913984,
+        4.892966270350922,
+        2.0823776181475173,
+        3.9264743619176796,
+        3.0683397897068607,
+        2.9391039340114142
+      ],
+      "end_s": 0.44,
+      "measured_tip_m": [
+        0.305732206081798,
+        0.025157094391307155,
+        0.14224694032654117
+      ],
+      "predicted_tip_m": [
+        0.30598223957488985,
+        0.02416332816127739,
+        0.1413675490844089
+      ],
+      "start_s": 0.43,
+      "tip_difference_m": 0.0013503395959365942
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.834738993101019,
+        4.892776329884353,
+        2.0897994761306116,
+        3.9128870744651865,
+        3.0804529295689567,
+        2.942671708427575
+      ],
+      "end_s": 0.45,
+      "measured_tip_m": [
+        0.30576208262290117,
+        0.024931240481677237,
+        0.14213709625437568
+      ],
+      "predicted_tip_m": [
+        0.3060102932285758,
+        0.02394206505643322,
+        0.14126154419570527
+      ],
+      "start_s": 0.44,
+      "tip_difference_m": 0.001344123481722582
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.826619555824764,
+        4.892089405478943,
+        2.0976566654105016,
+        3.898562785751157,
+        3.0945379657659418,
+        2.945621418283258
+      ],
+      "end_s": 0.46,
+      "measured_tip_m": [
+        0.3058037970760853,
+        0.024623297293433065,
+        0.14198259020122125
+      ],
+      "predicted_tip_m": [
+        0.3060489631472005,
+        0.023643546348055832,
+        0.14111284237959
+      ],
+      "start_s": 0.45,
+      "tip_difference_m": 0.0013328464242462344
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8183220869870276,
+        4.890925536490661,
+        2.1061611432198557,
+        3.887780692779931,
+        3.1064468163454553,
+        2.9475145918591887
+      ],
+      "end_s": 0.47000000000000003,
+      "measured_tip_m": [
+        0.3058556405821928,
+        0.024229941887546277,
+        0.14178065954805347
+      ],
+      "predicted_tip_m": [
+        0.3060963589700801,
+        0.023266891955973895,
+        0.14091965060352685
+      ],
+      "start_s": 0.46,
+      "tip_difference_m": 0.0013140574247434845
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8100183338556164,
+        4.889027067012253,
+        2.115479511868819,
+        3.879367035216018,
+        3.118176529959806,
+        2.9478216807552817
+      ],
+      "end_s": 0.48000000000000004,
+      "measured_tip_m": [
+        0.30591533039497687,
+        0.02375119283487699,
+        0.14153110806079597
+      ],
+      "predicted_tip_m": [
+        0.30615089469551365,
+        0.022809182118431717,
+        0.1406813214465138
+      ],
+      "start_s": 0.47000000000000003,
+      "tip_difference_m": 0.0012903534474702195
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7815341135526497,
+        4.865345035389482,
+        2.1651239024340785,
+        3.8814971416930772,
+        3.140283969799524,
+        2.938536066823039
+      ],
+      "end_s": 0.49,
+      "measured_tip_m": [
+        0.30597795978176223,
+        0.02318257301265636,
+        0.14124898853581547
+      ],
+      "predicted_tip_m": [
+        0.3062083755710128,
+        0.022261783756979302,
+        0.1404099453272938
+      ],
+      "start_s": 0.48,
+      "tip_difference_m": 0.0012668613953675432
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7739194458373966,
+        4.8570873479337715,
+        2.1803037565286134,
+        3.8841524159410885,
+        3.1365238923090217,
+        2.9422573552950926
+      ],
+      "end_s": 0.5,
+      "measured_tip_m": [
+        0.30604137242841956,
+        0.02254058292539272,
+        0.14091889438928062
+      ],
+      "predicted_tip_m": [
+        0.3062658895629132,
+        0.021657413074332936,
+        0.14008378993024947
+      ],
+      "start_s": 0.49,
+      "tip_difference_m": 0.0012360406089590653
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.588807788999457,
+        4.489646533511297,
+        2.7172609546064597,
+        4.074445385302926,
+        3.1872257832742785,
+        2.8405781667067638
+      ],
+      "end_s": 0.51,
+      "measured_tip_m": [
+        0.3060403804431817,
+        0.02191232083605557,
+        0.14071986426984698
+      ],
+      "predicted_tip_m": [
+        0.30625906880301595,
+        0.021080794238634376,
+        0.13986363667730498
+      ],
+      "start_s": 0.5,
+      "tip_difference_m": 0.001213419453930146
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.496223632646058,
+        4.463475161690964,
+        2.826320703632601,
+        4.036336275856462,
+        3.2150346622013806,
+        2.8625194105113394
+      ],
+      "end_s": 0.52,
+      "measured_tip_m": [
+        0.3060067249003418,
+        0.0212456123350215,
+        0.14044371004408265
+      ],
+      "predicted_tip_m": [
+        0.3062454447984309,
+        0.02038199627189556,
+        0.13947692438822612
+      ],
+      "start_s": 0.51,
+      "tip_difference_m": 0.0013181405079136159
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.4065246599759123,
+        4.452367585942694,
+        2.918035444705985,
+        4.039215406563325,
+        3.240427738374682,
+        2.8433999010990476
+      ],
+      "end_s": 0.53,
+      "measured_tip_m": [
+        0.3059555962599751,
+        0.02045931415671974,
+        0.1400010760703636
+      ],
+      "predicted_tip_m": [
+        0.30620628282199647,
+        0.01960501460556876,
+        0.13899750989666687
+      ],
+      "start_s": 0.52,
+      "tip_difference_m": 0.0013415724134250712
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.3238080920591404,
+        4.452892188602594,
+        2.9927217185318966,
+        4.079944170302053,
+        3.2558306127473324,
+        2.794855070947706
+      ],
+      "end_s": 0.54,
+      "measured_tip_m": [
+        0.30587578453620623,
+        0.019550144908740668,
+        0.13943238623937332
+      ],
+      "predicted_tip_m": [
+        0.30613867391656313,
+        0.018729828038285462,
+        0.1384157477290061
+      ],
+      "start_s": 0.53,
+      "tip_difference_m": 0.001332510583454973
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2530281045764253,
+        4.464956448298654,
+        3.046138171708227,
+        4.154802316106084,
+        3.2561347809833125,
+        2.7252998820704897
+      ],
+      "end_s": 0.55,
+      "measured_tip_m": [
+        0.30574649546509985,
+        0.018564653938493835,
+        0.13883117643015108
+      ],
+      "predicted_tip_m": [
+        0.30602689155516705,
+        0.01779177917050677,
+        0.13780661363084076
+      ],
+      "start_s": 0.54,
+      "tip_difference_m": 0.0013136537991596672
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2011996364963284,
+        4.48769902596208,
+        3.0726173847306835,
+        4.260330764594625,
+        3.2364834527859645,
+        2.6421043944726232
+      ],
+      "end_s": 0.56,
+      "measured_tip_m": [
+        0.3055430934367764,
+        0.01758416943439513,
+        0.1383183981230069
+      ],
+      "predicted_tip_m": [
+        0.3058505763216478,
+        0.016864400215200054,
+        0.13727820745042907
+      ],
+      "start_s": 0.55,
+      "tip_difference_m": 0.001301771903486724
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.175399374548691,
+        4.5195052947592265,
+        3.066221629334583,
+        4.383308510225638,
+        3.196154341553294,
+        2.5577923266839684
+      ],
+      "end_s": 0.5700000000000001,
+      "measured_tip_m": [
+        0.3052433046481984,
+        0.01671102457220606,
+        0.13801731578286666
+      ],
+      "predicted_tip_m": [
+        0.30559150389921047,
+        0.01603995837813187,
+        0.1369405169812349
+      ],
+      "start_s": 0.56,
+      "tip_difference_m": 0.0013157006553278672
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.180580507993204,
+        4.559878232184958,
+        3.020486878034917,
+        4.474980445232154,
+        3.1491698422649153,
+        2.5074309014857947
+      ],
+      "end_s": 0.5800000000000001,
+      "measured_tip_m": [
+        0.30484820091367626,
+        0.016026480874424834,
+        0.1379941767617634
+      ],
+      "predicted_tip_m": [
+        0.3052542010685881,
+        0.015379646720360577,
+        0.1368364068489353
+      ],
+      "start_s": 0.5700000000000001,
+      "tip_difference_m": 0.001386961325957728
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2055613384036437,
+        4.5919676055642125,
+        2.9579751050017307,
+        4.468461559548822,
+        3.1100079346651954,
+        2.535084872686562
+      ],
+      "end_s": 0.59,
+      "measured_tip_m": [
+        0.30441099126870363,
+        0.01554064339143527,
+        0.13817977629252182
+      ],
+      "predicted_tip_m": [
+        0.3048879287938138,
+        0.014881097707092259,
+        0.13687775851122166
+      ],
+      "start_s": 0.58,
+      "tip_difference_m": 0.0015354869636097506
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2723375642486645,
+        4.662287264834499,
+        2.810757746171193,
+        4.106823840310477,
+        3.1839992528919074,
+        2.7886667440903237
+      ],
+      "end_s": 0.6,
+      "measured_tip_m": [
+        0.3041700245592203,
+        0.01497263257643316,
+        0.13812216442091768
+      ],
+      "predicted_tip_m": [
+        0.30472050682541324,
+        0.01419303726462595,
+        0.13655467877752528
+      ],
+      "start_s": 0.59,
+      "tip_difference_m": 0.0018351596164437485
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.265624073590664,
+        4.652163869053816,
+        2.8291272655009756,
+        4.144921131418312,
+        3.175703587477449,
+        2.7706368488619315
+      ],
+      "end_s": 0.61,
+      "measured_tip_m": [
+        0.30405761790517705,
+        0.014339224602982814,
+        0.13786640256835456
+      ],
+      "predicted_tip_m": [
+        0.3045875708952755,
+        0.013660694562865356,
+        0.13638735995286766
+      ],
+      "start_s": 0.6,
+      "tip_difference_m": 0.0017113796321922285
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.260038994155595,
+        4.644972972518684,
+        2.8420401919768503,
+        4.146305557829099,
+        3.174566218495364,
+        2.774894244564485
+      ],
+      "end_s": 0.62,
+      "measured_tip_m": [
+        0.3039991439325257,
+        0.013775554501819602,
+        0.1376010331294218
+      ],
+      "predicted_tip_m": [
+        0.3045279086960545,
+        0.013139105621235537,
+        0.13613757265374082
+      ],
+      "start_s": 0.61,
+      "tip_difference_m": 0.001681182892081272
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2536763204288524,
+        4.6355379770048675,
+        2.8577637748382223,
+        4.135706555562606,
+        3.171570097564855,
+        2.7916689057714885
+      ],
+      "end_s": 0.63,
+      "measured_tip_m": [
+        0.30396923666122,
+        0.013324804266885584,
+        0.13738750028213784
+      ],
+      "predicted_tip_m": [
+        0.30450090999026563,
+        0.012711476652315635,
+        0.1359173171625277
+      ],
+      "start_s": 0.62,
+      "tip_difference_m": 0.0016793706252043168
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2455798608047455,
+        4.627870638357148,
+        2.873112435729686,
+        4.116503260985264,
+        3.1731212853997937,
+        2.8115413053250897
+      ],
+      "end_s": 0.64,
+      "measured_tip_m": [
+        0.3039582118020197,
+        0.012987839045661727,
+        0.13723783035539494
+      ],
+      "predicted_tip_m": [
+        0.30449378231044755,
+        0.012383794957533424,
+        0.13575375958464794
+      ],
+      "start_s": 0.63,
+      "tip_difference_m": 0.0016894292179567623
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2381438704231225,
+        4.619386525420511,
+        2.888666058694938,
+        4.09807002655457,
+        3.1748167617036662,
+        2.830696718152467
+      ],
+      "end_s": 0.65,
+      "measured_tip_m": [
+        0.30396109075541,
+        0.012751340387768524,
+        0.13714590888020428
+      ],
+      "predicted_tip_m": [
+        0.3044992328478823,
+        0.012153847082471561,
+        0.13564776777109522
+      ],
+      "start_s": 0.64,
+      "tip_difference_m": 0.0017003005453059346
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2301884560699334,
+        4.612870488583283,
+        2.902572644608643,
+        4.078154472407914,
+        3.1794278227076687,
+        2.8479132333906096
+      ],
+      "end_s": 0.66,
+      "measured_tip_m": [
+        0.30397527426189735,
+        0.012597145752803155,
+        0.13709852894720564
+      ],
+      "predicted_tip_m": [
+        0.30451480938431613,
+        0.012002225448777378,
+        0.13558779244953276
+      ],
+      "start_s": 0.65,
+      "tip_difference_m": 0.001710950929122899
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2230599914270535,
+        4.605437173345955,
+        2.916707273969508,
+        4.060437229434267,
+        3.185246827116822,
+        2.862369104681884
+      ],
+      "end_s": 0.67,
+      "measured_tip_m": [
+        0.30399788602810385,
+        0.012506645037655759,
+        0.13708188173202712
+      ],
+      "predicted_tip_m": [
+        0.30453728050604123,
+        0.01191423783257642,
+        0.13556120642635144
+      ],
+      "start_s": 0.66,
+      "tip_difference_m": 0.0017188211322738249
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2163776395975017,
+        4.600205075629656,
+        2.9281221899202317,
+        4.04531269814617,
+        3.1932135076590122,
+        2.871796691560411
+      ],
+      "end_s": 0.68,
+      "measured_tip_m": [
+        0.3040253851175433,
+        0.01246256789854906,
+        0.13708609343597797
+      ],
+      "predicted_tip_m": [
+        0.3045636263231346,
+        0.011871945920227802,
+        0.13555976055111665
+      ],
+      "start_s": 0.67,
+      "tip_difference_m": 0.0017228551860448325
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2105446610916357,
+        4.594344591590934,
+        2.9394848373102436,
+        4.034754420477238,
+        3.2014357128589235,
+        2.8771890419589226
+      ],
+      "end_s": 0.6900000000000001,
+      "measured_tip_m": [
+        0.3040533376835672,
+        0.012450680716050566,
+        0.13710644856495802
+      ],
+      "predicted_tip_m": [
+        0.3045899932687884,
+        0.011863002999304428,
+        0.13557646464110623
+      ],
+      "start_s": 0.68,
+      "tip_difference_m": 0.001724591291626503
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.2053467013222643,
+        4.589827014898796,
+        2.9488105347019196,
+        4.0308103751984765,
+        3.208652197553443,
+        2.8771144261168753
+      ],
+      "end_s": 0.7000000000000001,
+      "measured_tip_m": [
+        0.3040764224479542,
+        0.012462304362082576,
+        0.1371440621207846
+      ],
+      "predicted_tip_m": [
+        0.30461178031057423,
+        0.011878793245107417,
+        0.13561299444664834
+      ],
+      "start_s": 0.6900000000000001,
+      "tip_difference_m": 0.0017237347497476715
+    }
+  ],
+  "optimization_status_counts": {
+    "feasible_early_stop": 70
+  },
+  "per_update_delivery_s": [
+    31.90827689995058,
+    10.543890799861401,
+    8.359228300163522,
+    9.058726899791509,
+    18.377677300013602,
+    8.412029400002211,
+    7.62832530005835,
+    8.355699399951845,
+    8.190235699992627,
+    7.70201150001958,
+    8.319161599967629,
+    8.324343500193208,
+    7.924527200171724,
+    7.7141715998295695,
+    7.753261199919507,
+    8.49829010013491,
+    8.503494000062346,
+    7.661435300018638,
+    7.627959699835628,
+    7.79160079988651,
+    7.857277299975976,
+    7.754507799865678,
+    7.753729099873453,
+    7.703544299816713,
+    7.798760699806735,
+    8.528987400000915,
+    8.510402799816802,
+    7.7244015000760555,
+    8.559233400039375,
+    8.545183000154793,
+    7.706037199823186,
+    7.800054300110787,
+    7.739678400103003,
+    7.7287187001202255,
+    7.7445883001200855,
+    7.692164500011131,
+    8.46456510014832,
+    8.459283499978483,
+    8.43358390009962,
+    8.564039700198919,
+    7.711097399936989,
+    7.88398509984836,
+    7.760026399977505,
+    7.734612900065258,
+    7.854615800082684,
+    7.683061100076884,
+    7.735325499903411,
+    7.697727200109512,
+    10.502872199984267,
+    7.681443399982527,
+    19.538780899951234,
+    7.859324600081891,
+    7.814202199922875,
+    7.8107334999367595,
+    7.792727800086141,
+    7.789951900020242,
+    7.736546499887481,
+    7.664032300002873,
+    8.556749900104478,
+    7.683912500040606,
+    7.899836099939421,
+    7.685734299942851,
+    7.715118300169706,
+    7.812085399869829,
+    7.7866591000929475,
+    7.837176000000909,
+    7.745585400145501,
+    7.769639600068331,
+    7.7291959000285715,
+    7.733464299933985
+  ],
+  "raw_termination_counts": {
+    "User_Requested_Stop": 70
+  },
+  "real_time_demonstrated": false,
+  "recovered_plans": 3,
+  "simulation": {
+    "artifact_id": "cf694c9d665be55655ff82c23357f14543d53a283046cf501c86ab241da9f0c3",
+    "media_type": "application/json"
+  },
+  "simulation_wall_s": 612.6720000000205,
+  "solver_construction_s": 4.519122100202367,
+  "solver_error_count": 0,
+  "solver_failure_flags": 0,
+  "solver_status": "completed",
+  "task": {
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.tracking",
+      "parameters": {
+        "contract": "family.tracking_evaluation",
+        "data": {
+          "max_position_error_m": 0.01,
+          "tension_limits_n": {
+            "far_t0": 8.0,
+            "far_t1": 8.0,
+            "far_t2": 8.0,
+            "near_t0": 8.0,
+            "near_t1": 8.0,
+            "near_t2": 8.0
+          }
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.tracking",
+    "goal": {
+      "contract": "family.cartesian_reference",
+      "data": {
+        "end_m": [
+          0.30499999999999994,
+          0.012,
+          0.13599999999999998
+        ],
+        "end_s": 0.7,
+        "frame": "world",
+        "interpolation": "piecewise_quintic",
+        "knots": [
+          {
+            "position_m": [
+              0.30799999999999994,
+              0.0,
+              0.15
+            ],
+            "time_s": 0.0
+          },
+          {
+            "position_m": [
+              0.30599999999999994,
+              0.024,
+              0.142
+            ],
+            "time_s": 0.4
+          },
+          {
+            "position_m": [
+              0.30499999999999994,
+              0.012,
+              0.13599999999999998
+            ],
+            "time_s": 0.7
+          }
+        ],
+        "outside": "clamp_position_zero_velocity",
+        "provenance": "Stage 3.26 committed reference endpoints; fixed world path for every length candidate. Separate quintic time laws; zero reference velocity and acceleration at the middle knot, no dwell or actual settling requirement.",
+        "start_m": [
+          0.30799999999999994,
+          0.0,
+          0.15
+        ],
+        "start_s": 0.0,
+        "units": "SI"
+      },
+      "version": "2.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "Two-segment world-frame stop-at-waypoint tracking",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "max_position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.01,
+        0.7
+      ]
+    },
+    "source": "Stage 3.27 predeclared two-segment reference; baseline endpoints retain stored precision",
+    "status": "development_valid",
+    "task_id": "gvs-cartesian-tracking",
+    "task_version": "2.0.0",
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.7,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    }
+  },
+  "tension_range_n": [
+    1.8593470147306836,
+    5.042566877102313
+  ],
+  "terminal_error_m": 0.0015412978148487623,
+  "terminal_tip_speed_m_s": 0.005472565258268096,
+  "tracking": {
+    "acceptance": {
+      "contract": "family.tracking_evaluation",
+      "data": {
+        "max_position_error_m": 0.01,
+        "tension_limits_n": {
+          "far_t0": 8.0,
+          "far_t1": 8.0,
+          "far_t2": 8.0,
+          "near_t0": 8.0,
+          "near_t1": 8.0,
+          "near_t2": 8.0
+        }
+      },
+      "version": "1.0.0"
+    },
+    "continuous_time_guarantee": false,
+    "diagnostic_scope": "Segment endpoints overlap for diagnostics only. Global evaluation scores each time once. Zero reference speed/acceleration at a knot does not require or prove robot settling.",
+    "knot_diagnostics": [
+      {
+        "samples": [
+          {
+            "contacts": 0,
+            "rate_projection_residual_rad_m_s": 2.5914903145406347,
+            "time_s": 0.39,
+            "tip_error_m": 0.0014708401231313434,
+            "tip_speed_m_s": 0.005879356263289996,
+            "velocity_error_m_s": 0.005479195442295282
+          },
+          {
+            "contacts": 0,
+            "rate_projection_residual_rad_m_s": 2.437064813948163,
+            "time_s": 0.4,
+            "tip_error_m": 0.001504645306640365,
+            "tip_speed_m_s": 0.003632552051959179,
+            "velocity_error_m_s": 0.003632552051959179
+          },
+          {
+            "contacts": 0,
+            "rate_projection_residual_rad_m_s": 2.2775201072886535,
+            "time_s": 0.41000000000000003,
+            "tip_error_m": 0.0015143147203388546,
+            "tip_speed_m_s": 0.0022721042122287494,
+            "velocity_error_m_s": 0.0020271539668111015
+          }
+        ],
+        "time_s": 0.4
+      }
+    ],
+    "metrics": [
+      {
+        "name": "max_position_error",
+        "units": "m",
+        "value": 0.011264183232736126
+      },
+      {
+        "name": "rms_position_error",
+        "units": "m",
+        "value": 0.0030351395812108144
+      },
+      {
+        "name": "terminal_position_error",
+        "units": "m",
+        "value": 0.0015412978148487623
+      }
+    ],
+    "reference": {
+      "end_m": [
+        0.30499999999999994,
+        0.012,
+        0.13599999999999998
+      ],
+      "end_s": 0.7,
+      "frame": "world",
+      "interpolation": "piecewise_quintic",
+      "knots": [
+        {
+          "position_m": [
+            0.30799999999999994,
+            0.0,
+            0.15
+          ],
+          "time_s": 0.0
+        },
+        {
+          "position_m": [
+            0.30599999999999994,
+            0.024,
+            0.142
+          ],
+          "time_s": 0.4
+        },
+        {
+          "position_m": [
+            0.30499999999999994,
+            0.012,
+            0.13599999999999998
+          ],
+          "time_s": 0.7
+        }
+      ],
+      "outside": "clamp_position_zero_velocity",
+      "provenance": "Stage 3.26 committed reference endpoints; fixed world path for every length candidate. Separate quintic time laws; zero reference velocity and acceleration at the middle knot, no dwell or actual settling requirement.",
+      "start_m": [
+        0.30799999999999994,
+        0.0,
+        0.15
+      ],
+      "start_s": 0.0,
+      "units": "SI"
+    },
+    "rule": "All inclusive uniform samples in scoring interval; arithmetic RMS; max <= declared limit. Complete grid required. Terminal error is at execution endpoint.",
+    "scoring_interval_s": [
+      0.01,
+      0.7
+    ],
+    "segment_diagnostics": [
+      {
+        "interval_s": [
+          0.0,
+          0.4
+        ],
+        "maximum_error_m": 0.011264183232736126,
+        "maximum_error_time_s": 0.05
+      },
+      {
+        "interval_s": [
+          0.4,
+          0.7
+        ],
+        "maximum_error_m": 0.0015412978148487623,
+        "maximum_error_time_s": 0.7000000000000001
+      }
+    ],
+    "velocity_error_max_m_s": 0.3510657665759009
+  },
+  "updates": 70,
+  "valid_complete_execution": true,
+  "factual_result": {
+    "candidate": {
+      "candidate_id": "parameterized-tracking",
+      "configuration": {
+        "artifact_id": "acc3107480f65492fa8024434cd16ad2f9f108bdfef0f01be48b18416ebbe30d",
+        "media_type": "application/json"
+      },
+      "frozen_baseline_identity": "e82116094cd94f93126929585a8535d03044837ff1c9e88108dbda4b1ab6c5cd",
+      "effective_identity": "e82116094cd94f93126929585a8535d03044837ff1c9e88108dbda4b1ab6c5cd",
+      "owner_run_id": "gvs-stage327-multisegment-20260928",
+      "execution_id": "6e54d5b00a9e4447a78000dc470ebf1e",
+      "parameters": []
+    },
+    "configuration": {
+      "artifact_id": "acc3107480f65492fa8024434cd16ad2f9f108bdfef0f01be48b18416ebbe30d",
+      "media_type": "application/json"
+    },
+    "execution_id": "6e54d5b00a9e4447a78000dc470ebf1e",
+    "simulation": {
+      "artifact_id": "cf694c9d665be55655ff82c23357f14543d53a283046cf501c86ab241da9f0c3",
+      "media_type": "application/json"
+    },
+    "evaluation": {
+      "artifact_id": "7a835ead847c89b9c973c52e496b63fb663882fe36382515a49627bef8c30c14",
+      "media_type": "application/json"
+    },
+    "report": {
+      "reference": {
+        "artifact_id": "1efc533fddc93115823aeee4d8d2896c0156829e7ecdcc100a3609247305db81",
+        "media_type": "application/json"
+      },
+      "owner_run_id": "gvs-stage327-multisegment-20260928",
+      "execution_id": "6e54d5b00a9e4447a78000dc470ebf1e",
+      "request_id": "report"
+    },
+    "task_accepted": false,
+    "valid_complete_execution": true,
+    "maximum_tracking_error_m": 0.011264183232736126,
+    "rms_tracking_error_m": 0.0030351395812108144,
+    "declared_limit_m": 0.01,
+    "control_updates": 70,
+    "accepted_feasible_plans": 70,
+    "converged_updates": 0,
+    "deadline_misses": 70,
+    "control_period_s": 0.01,
+    "simulated_duration_s": 0.7000000000000001,
+    "measured_computation_s": 612.6720000000205,
+    "mean_complete_update_s": 8.684704441430846,
+    "real_time_demonstrated": false
+  }
+}

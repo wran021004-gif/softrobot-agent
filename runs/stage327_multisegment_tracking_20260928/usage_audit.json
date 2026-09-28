@@ -1,0 +1,97 @@
+{
+  "deterministic": {
+    "started": true,
+    "provider_request_attempts": 0,
+    "transport_submissions": 0,
+    "provider_transport_statuses": {},
+    "backend_attempts": 1,
+    "charged_tool_calls": 4,
+    "tool_attempts": 4,
+    "preflight_rejection_count": 0,
+    "preflight_rejections": [],
+    "event_kind_counts": {
+      "session": 1,
+      "tool": 8,
+      "candidate": 1,
+      "simulation": 2,
+      "control_numerical_guess": 1,
+      "control_preparation": 1,
+      "result_provenance": 1,
+      "evaluation": 1,
+      "sampled_backend_motion": 1
+    },
+    "tool_receipts": [
+      {
+        "tool": "control.profile_describe",
+        "request_id": "describe",
+        "status": "completed",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.1090000001713634,
+          "worker_calls": 0
+        }
+      },
+      {
+        "tool": "simulation.run",
+        "request_id": "simulate",
+        "status": "completed",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 612.6720000000205,
+          "worker_calls": 0
+        }
+      },
+      {
+        "tool": "evaluation.run",
+        "request_id": "evaluate",
+        "status": "completed",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.1869999999180436,
+          "worker_calls": 0
+        }
+      },
+      {
+        "tool": "control.profile_report",
+        "request_id": "report",
+        "status": "completed",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.3909999998286366,
+          "worker_calls": 0
+        }
+      }
+    ],
+    "corrections": [],
+    "provider_responses": [],
+    "controller_updates_by_rollout": [
+      {
+        "path": "deterministic/sessions/gvs-stage327-multisegment-20260928/executions/6e54d5b00a9e4447a78000dc470ebf1e/backend/controller_observations.json",
+        "updates": 70
+      }
+    ],
+    "charged_usage": {
+      "tool_calls": 4,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 616.3589999999385
+    },
+    "monetary_cost": null,
+    "monetary_cost_note": "No monetary charge returned by the provider API; no price estimate substituted."
+  },
+  "live": {
+    "started": false,
+    "provider_request_attempts": 0,
+    "backend_attempts": 0,
+    "charged_tool_calls": 0
+  }
+}
