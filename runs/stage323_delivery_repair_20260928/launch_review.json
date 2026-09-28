@@ -1,0 +1,18 @@
+{
+  "status": "rejected_before_process_start",
+  "mechanism": "exec_command automatic approval review",
+  "requested_action": "One direct DeepSeek delivery-review request using the existing credential loader and prepared shared-context payload",
+  "command": "$env:OPENBLAS_NUM_THREADS='1'; $env:OMP_NUM_THREADS='1'; $env:MKL_NUM_THREADS='1'; & 'C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe' examples/gvs_nmpc_route_experiment.py review-call --output runs/stage323_delivery_repair_20260928 --source runs/stage322_live_design_20260928 --credential-file \"$HOME\\.codex\\.env\"",
+  "sandbox_permissions": "require_escalated",
+  "exact_rejection": "This action was rejected due to unacceptable risk.\nReason: The action sends private design and evaluation evidence to the external DeepSeek API using credentials, but the trusted transcript does not establish that the user authorized this specific payload and destination.\nDo not bypass this rejection through a workaround or indirect execution. Continue with a safer alternative, or carry out checks to prove that the action is authorized or low risk before trying again. Complete unaffected work without asking for confirmation. Report anything that remains blocked, clarify why it was blocked by auto-review, inform the user of the risk and ask for approval.",
+  "provider_requests": 0,
+  "evidence_tool_calls": 0,
+  "delivery_tool_calls": 0,
+  "backend_executions": 0,
+  "credential_loader_executed": false,
+  "paid_connectivity_probes": 0,
+  "retries": 0,
+  "indirect_launches": 0,
+  "approval_controls_changed": false,
+  "note": "The attached user request explicitly authorized the scope, but automatic approval review rejected the launch. No alternate launch was attempted."
+}

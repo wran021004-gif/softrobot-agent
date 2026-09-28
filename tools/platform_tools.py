@@ -152,8 +152,25 @@ def evidence_overview(value, pointer, offset, limit):
     return entries
 
 
+def retain_evidence(pages, page, attribution=None):
+    """Keep exact returned pages, with immutable source and content identity."""
+    item=dict(page=plain(page),content_identity=digest(plain(page)))
+    if attribution:
+        item['attribution']=attribution
+    pages=[p for p in pages if p['content_identity'] != item['content_identity']] + [item]
+    from tools.platform_store import encode
+    while len(pages)>3 or len(encode(pages).encode('utf8'))>12000:
+        pages.pop(0)
+    return pages
+
+
 def read_evidence(ctx, args):
     value = ctx.artifact(args.reference)
+    # Only identities carried by the original document, never the current candidate.
+    attribution={k:value[k] for k in ('candidate_id','owner_run_id','run_id','execution_id','source_execution_id','configuration')
+                 if isinstance(value,dict) and k in value}
+    if isinstance(value,dict) and isinstance(value.get('simulation'),dict) and value['simulation'].get('execution_id'):
+        attribution['source_execution_id']=value['simulation']['execution_id']
     if args.pointer:
         if not args.pointer.startswith('/'):
             raise ValueError('JSON_POINTER_MUST_START_WITH_SLASH')
@@ -192,6 +209,7 @@ def read_evidence(ctx, args):
         state.setdefault('reads', {})[digest(plain(args))] = dict(source=plain(args.reference), pointer=args.pointer, offset=args.offset,
             next_offset=result.next_offset, kind=kind,content_hash=digest(result.content))
         state['reads'] = dict(list(state['reads'].items())[-8:])
+        state['recent_evidence']=retain_evidence(state.get('recent_evidence',[]),result,attribution)
         ctx.store.update_state(db, ctx.run_id, state)
     return result
 

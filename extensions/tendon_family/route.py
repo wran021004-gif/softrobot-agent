@@ -34,6 +34,7 @@ class RouteAction(Contract):
     evidence: list[EvidenceRef] = Field(default_factory=list, description='After the first action, cite at least one previous route node result reference here. route overview already supplies these references; a separate read is optional.')
     reason: str = Field(min_length=1,description='English explanation grounded in the current overview or cited evidence.')
     next_step: str = Field(min_length=1,description='English statement of the intended next decision or stopping condition.')
+    design_statement: dict | None = Field(default=None, description='On finish, restate candidate_facts: candidate_id, configuration, owner_run_id, execution_id and parameters (path, baseline_value, effective_value, baseline_delta, unit). Checked independently of reach and prose interpretation; legacy callers may omit.')
 
 
 class RouteResult(Contract):
@@ -117,6 +118,30 @@ def design_summary(design):
     return dict(id=design.get('id'),components=[dict(id=c['id'],kind=c['kind'],length_m=c.get('length_m'),
         sections=[s['section'] for s in c.get('sections',[])]) for c in design.get('components',[])],
     tendons=len(design.get('tendons',[])),actuators=len(design.get('actuators',[])))
+
+
+def trial_facts(store, baseline, trial):
+    from .candidate import candidate_facts
+    execution = (trial.get('simulation') or {}).get('execution_id')
+    owner = trial.get('owner_run_id') or trial.get('run_id')
+    reference = trial.get('configuration')
+    if execution and owner:
+        reference = store.session(owner)['state']['result_executions'][execution]['candidate_input']
+    return candidate_facts(baseline, store.artifact(reference), reference,
+        trial['candidate_id'], owner if execution else None, execution)
+
+
+def compact_reports(projection):
+    """One copy per exact report binding; different executions remain distinct."""
+    reports = {}
+    for item in (projection.get('selected_summary'), projection.get('incumbent'),
+                 projection.get('route', {}).get('final')):
+        if item and item.get('profile_report') and 'profile_report_summary' in item:
+            key = digest(item['profile_report'])
+            reports[key] = dict(binding=item['profile_report'], facts=item.pop('profile_report_summary'))
+            item['profile_report_summary_ref'] = key
+    projection['profile_reports'] = reports
+    return projection
 
 
 def model_options(host, inp, combinations):
@@ -234,17 +259,28 @@ def overview(host):
     full=view(host); route=full['route']; nodes=route['nodes']
     completed=[n for n in nodes if n['status']=='completed']
     selected_node=next((n for n in reversed(completed) if n['action'] in ('build','run','optimize')),None)
-    summary=selected_node['summary'] if selected_node else {}
+    summary=deepcopy(selected_node['summary']) if selected_node else {}
     evaluated=next((n for n in reversed(completed) if n['action'] in ('run','optimize') and n['summary'].get('candidate_id')),None)
     inp=SessionInput.model_validate(host.store.session(host.run_id)['snapshot']['input'])
+    # Read-only projection also repairs context for old immutable route evidence.
+    if selected_node and summary.get('candidate_id'):
+        result=host.store.artifact(selected_node['result'])
+        summary['candidate_facts']=trial_facts(host.store, inp, result.get('best') or result)
+    incumbent=deepcopy(route.get('incumbent'))
+    if incumbent:
+        node=next(n for n in nodes if n['node_id']==incumbent['node_id'])
+        result=host.store.artifact(node['result'])
+        trial=(next(t for t in result['trials'] if t['candidate_id']==incumbent['candidate_id'])
+               if node['action']=='optimize' else result)
+        incumbent['candidate_facts']=trial_facts(host.store, inp, trial)
     space=inp.policy.candidate_builder.parameters.data
     with host.store.connect(True) as db:
         snapshot_ref=plain(EvidenceRef(artifact_id=db.execute('SELECT snapshot FROM sessions WHERE run_id=?',(host.run_id,)).fetchone()[0]))
-    return dict(run_id=host.run_id,status=full['status'],stage='finished' if route['final'] else (selected_node['action'] if selected_node else 'selection'),
+    projection=dict(run_id=host.run_id,status=full['status'],stage='finished' if route['final'] else (selected_node['action'] if selected_node else 'selection'),
         selected_candidate=summary.get('candidate_id'),has_solve=full['counts']['solves']>0,
         has_evaluation=full['counts']['evaluations']>0,selected_summary=summary,
         latest_evaluated_node=evaluated['node_id'] if evaluated else None,
-        incumbent=route.get('incumbent'),
+        incumbent=incumbent,
         frozen_input=dict(reference=snapshot_ref,task_pointer='/input/task',design_pointer='/input/robot/structure/data',
             space_pointer='/input/policy/candidate_builder/parameters/data',combinations_pointer='/input/policy/route/data/combinations'),
         route=dict(current=route['current'],next_step=route['next_step'],final=delivery_summary(route['final']),nodes=[
@@ -268,6 +304,11 @@ def overview(host):
         evidence_access='Node result references below are already available for citation. Read details only when needed. evidence.read returns content or a labeled pointer overview.',
         guidance=full['guidance'],
         limitations=full['limitations'])
+    if route.get('final',{}):
+        final=route['final']
+        if final.get('configuration') and final.get('simulation'):
+            projection['route']['final']['candidate_facts']=trial_facts(host.store,inp,final)
+    return compact_reports(projection)
 
 
 def inspect(ctx,args): return RouteResult(detail=overview(ctx.host))
@@ -373,7 +414,7 @@ def update_incumbent(ctx,route,node,out):
             route['incumbent']=dict(node_id=node['node_id'],search_run_id=out.get('run_id') if node['action']=='optimize' else None,
                 candidate_id=trial['candidate_id'],owner_run_id=trial.get('owner_run_id',out.get('run_id')),
                 evaluation_ref=trial['evaluation'],evaluation=summary,score=trial['score'],
-                comparison_identity=comparison,
+                comparison_identity=comparison,candidate_facts=trial_facts(ctx.store,ctx.input,trial),
                 **{k:trial[k] for k in ('profile_report','profile_report_summary') if k in trial})
 
 
@@ -404,7 +445,10 @@ def run_built(ctx,args,route):
         reported=dict(profile_report=dict(reference=receipt['output'],owner_run_id=child.run_id,
             execution_id=sim['execution_id'],request_id='single-profile-report'),
             profile_report_summary={k:v for k,v in detail.items() if k!='per_update_delivery_s'})
-    return dict(status='valid' if result['validity']=='valid' else 'solver_failed',run_id=child.run_id,
+    from .candidate import candidate_facts
+    facts=candidate_facts(ctx.input,ctx.store.artifact(metadata['candidate_input']),metadata['candidate_input'],
+        candidate,child.run_id,sim['execution_id'])
+    return dict(status='valid' if result['validity']=='valid' else 'solver_failed',run_id=child.run_id,candidate_facts=facts,
         candidate_id=candidate,build_configuration=built['configuration'],configuration=metadata['candidate_input'],
         simulation=sim,evaluation=ev['output'],evaluation_data=result,metrics=result['metrics'],
         task_success=result['task_success'],score=score(result,inp['task']['objectives']),
@@ -424,6 +468,7 @@ def summarize(out):
         evaluated=bool(isinstance(ev,dict) and ev.get('source_execution_id') and ev.get('validity')),
         task_success=best.get('task_success') if best else out.get('task_success'),
         facts=out.get('facts'),
+        candidate_facts=(best or out).get('candidate_facts'),
         configuration=best.get('configuration') if best else out.get('configuration'),
         proposals=out.get('proposals'),distinct_candidates=out.get('distinct_candidates'),actual_solves=out.get('actual_solves'),
         new_evaluations=out.get('new_evaluations'),reused_evaluations=out.get('reused_evaluations'),
@@ -435,7 +480,8 @@ def delivery_summary(final):
     if final is None: return None
     return {k:final[k] for k in ('delivery_status','explicit_delivery','candidate_id','run_id','configuration',
         'evaluation_ref','task_success','crosscheck_status','stop_reason','selection_basis',
-        'profile_report','profile_report_summary') if k in final}
+        'profile_report','profile_report_summary','candidate_facts','design_statement','design_statement_check',
+        'interpretation_status') if k in final}
 
 
 def diagnosis_summary(report):
@@ -506,11 +552,17 @@ def advance(ctx,args):
                 out=dict(status='built',candidate_id=args.candidate_id or args.node_id,configuration=plain(ref),
                     simulated=False,evaluated=False,facts='Built, not simulated, not evaluated. No task error or trajectory exists. Use run with this build node to execute and evaluate.',
                     actual_solves=0,findings=design_summary(data['robot']['structure']['data']))
+                out['candidate_facts']=trial_facts(ctx.store,ctx.input,out)
             else:
                 out=optimize(ctx.store.root,dict(session=data,variables=args.variables,max_trials=args.max_trials),
                     parent_run_id=ctx.run_id,parent_event_id=ctx.row['parent_id'],starting_trial=starting_trial,actor='route-executor')
                 if out['status']=='unknown': raise TimeoutError('UNCONFIRMED child execution')
                 if out['status'] not in ('completed',): raise ValueError('OPTIMIZATION_EXECUTION_FAILED: '+str(out.get('stop_reason')))
+                for trial in out.get('trials',[]):
+                    if trial.get('configuration') and trial.get('simulation'):
+                        trial['candidate_facts']=trial_facts(ctx.store,ctx.input,trial)
+                if out.get('best'):
+                    out['best']['candidate_facts']=trial_facts(ctx.store,ctx.input,out['best'])
         elif args.action=='run':
             out=run_built(ctx,args,route)
         elif args.action in ('diagnose','crosscheck','video','finish'):
@@ -539,7 +591,7 @@ def advance(ctx,args):
                 out=dict(candidate_id=trial['candidate_id'],configuration=trial['configuration'],receipt=receipt,product=product,
                     findings=diagnosis_summary(report) if args.action=='diagnose' else dict(video_generated=True,viewed_by_model=False))
             else:
-                out=delivery(ctx,route,child,trial,args.reason)
+                out=delivery(ctx,route,child,trial,args.reason,args.design_statement)
                 out['selection_basis']='explicit valid candidate' if args.candidate_id else 'session-wide incumbent'
                 out['explicit_delivery']=True
                 route['final']=out
@@ -567,8 +619,11 @@ def _save(ctx,route,status,stop=False):
             request=ctx.request.request_id,execution=ctx.row['execution_id'],outputs=[ref])
 
 
-def delivery(ctx,route,child,trial,reason):
+def delivery(ctx,route,child,trial,reason,design_statement=None):
     configuration=ctx.store.artifact(trial['configuration'])['effective']
+    from .candidate import check_design_statement
+    baseline=ctx.store.session(ctx.host.run_id)['snapshot']['input']
+    facts=trial_facts(ctx.store,baseline,trial)
     reviews=[]; diagnoses=[]
     for n in route['nodes']:
         if n.get('result') and n['action'] in ('crosscheck','diagnose'):
@@ -578,6 +633,8 @@ def delivery(ctx,route,child,trial,reason):
     search_run=trial.get('search_run_id') or child.run_id
     best=route.get('incumbent')
     return dict(delivery_status='evaluated',candidate_id=trial['candidate_id'],run_id=child.run_id,configuration=trial['configuration'],
+        candidate_facts=facts,design_statement=design_statement,design_statement_check=check_design_statement(facts,design_statement),
+        interpretation_status='prose_review_required',
         search_run_id=trial.get('search_run_id'),actual_solves=0,new_evaluations=0,
         simulation=trial['simulation'],
         dynamics_model=configuration['policy']['dynamics_model'],backend=configuration['policy']['backend'],

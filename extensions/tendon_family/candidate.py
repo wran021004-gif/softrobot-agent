@@ -60,6 +60,70 @@ def read_parameter(data,path):
         raise ValueError('CONSTRAINED_PARAMETER_MISSING: '+path) from exc
 
 
+def candidate_facts(baseline, configuration, reference, candidate_id, owner_run_id=None, execution_id=None):
+    """Project declared paths from frozen input and effective input, never labels/prose."""
+    from tools.platform_store import plain
+    from tools.state_io import digest
+    baseline = plain(baseline)
+    effective = configuration.get('effective', configuration)  # CandidateInput is a wrapper.
+    space = baseline['policy']['candidate_builder']['parameters']['data']
+
+    def value(inp, path):
+        path = canonical_path(path)
+        for prefix, field in (('control/', 'controller'), ('model/', 'dynamics_model')):
+            if path.startswith(prefix):
+                return read_parameter(inp['policy'][field]['parameters']['data'], path[len(prefix):])
+        if path.startswith('discretization/'):
+            return read_parameter(inp['policy']['discretization']['data'], path[len('discretization/'):])
+        return read_parameter(inp['robot']['structure']['data'], path)
+
+    parameters = []
+    for group in ('parameters', 'control_parameters', 'model_parameters', 'discretization_parameters'):
+        for path, spec in space.get(group, {}).items():
+            values = {}
+            for label, inp in (('baseline_value', baseline), ('effective_value', effective)):
+                try:
+                    active = all(value(inp, p) == v for p, v in spec.get('when', {}).items())
+                    values[label] = value(inp, path) if active else None
+                except ValueError:  # A complete template can remove an entity/path.
+                    values[label] = None
+            before, after = values.values()
+            numeric = all(isinstance(v, (float, int)) and not isinstance(v, bool) for v in (before, after))
+            unit = spec.get('unit', spec.get('units'))
+            if unit is None:
+                # Existing physical fields encode SI units in their names.
+                unit = next((u for suffix, u in (('_rad_m', 'rad/m'), ('_m_s', 'm/s'),
+                    ('_m', 'm'), ('_s', 's'), ('_rad', 'rad'), ('_pa', 'Pa'), ('_kg', 'kg'), ('_n', 'N'))
+                    if path.lower().endswith(suffix)), None)
+            parameters.append(dict(path=path, **values, baseline_delta=after-before if numeric else None, unit=unit))
+    return dict(candidate_id=candidate_id, configuration=plain(reference),
+        frozen_baseline_identity=digest(baseline), effective_identity=digest(effective),
+        owner_run_id=owner_run_id, execution_id=execution_id, parameters=parameters)
+
+
+def check_design_statement(facts, statement):
+    """Structured interpretation only; a prose review remains independently required."""
+    if statement is None:
+        return dict(status='not_supplied', accepted=False, mismatches=[])
+    mismatches = []
+    for key in ('candidate_id', 'configuration', 'owner_run_id', 'execution_id'):
+        if statement.get(key) != facts.get(key):
+            mismatches.append(key)
+    rows = statement.get('parameters', [])
+    actual = {r.get('path'): r for r in rows if isinstance(r, dict)}
+    if len(actual) != len(rows) or set(actual) != {r['path'] for r in facts['parameters']}:
+        mismatches.append('parameter_paths')
+    for expected in facts['parameters']:
+        row = actual.get(expected['path'], {})
+        for key in ('baseline_value', 'effective_value', 'baseline_delta', 'unit'):
+            a, b = expected[key], row.get(key)
+            numeric = all(isinstance(v, (float, int)) and not isinstance(v, bool) for v in (a, b))
+            equal = math.isclose(a, b, rel_tol=1e-9, abs_tol=1e-12) if numeric else type(a) is type(b) and a == b
+            if key not in row or not equal:
+                mismatches.append(expected['path'] + ':' + key)
+    return dict(status='matched' if not mismatches else 'mismatch', accepted=not mismatches, mismatches=mismatches)
+
+
 def validate_final(data,discretization,space,changes,task_bounds):
     specifications = {canonical_path(k):v for k,v in space.parameters.items()}
     specifications.update({canonical_path(k):v for k,v in space.discretization_parameters.items()})

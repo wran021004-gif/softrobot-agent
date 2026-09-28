@@ -171,6 +171,9 @@ def input_for(host):
             'Outer reason explains the tool request. Nested arguments.reason explains the domain action; supply both when the tool requires the nested field. '
             'Call route.inspect and evidence.read in separate turns, never together. '
             'For normal route delivery use route.advance with action="finish". '
+            'Restate the delivered candidate_facts in design_statement, including unchanged parameters and signed baseline deltas. '
+            'Keep the explanation consistent with these effective configuration facts. '
+            'profile_report_summary_ref resolves in route.profile_reports; recent_evidence contains original attributed pages. '
             'Use English for every explanation, reason and next_step. The compact route overview is already in context. '
             'The overview contains the current combinations, baseline design, authorized parameter bounds, budgets and route state; '
             'model_options separately reports deterministic ModelUseAssessment verdicts for the frozen robot and task. '
@@ -191,6 +194,10 @@ def payload_for(host, adapter=None):
     config = model_input.context['policy']['model']
     adapter = adapter or OfflineAdapter()
     payload = adapter.encode(model_input, config)
+    # Optional retained pages yield to required current facts within the same cap.
+    while len(encode(payload).encode('utf8')) > config['context_bytes'] and model_input.context.get('recent_evidence'):
+        model_input.context['recent_evidence'].pop(0)
+        payload = adapter.encode(model_input, config)
     if len(encode(payload).encode('utf8')) > config['context_bytes']:
         model_input.context['model_notes'] = []
         model_input.context['memory'] = model_input.context['memory'][:2]
@@ -336,7 +343,7 @@ def run_loop(host, adapter=None):
             receipt = model_host.invoke(pending['decision'], parent=pending['parent'])
             with host.store.transaction() as db:
                 state = host.store.session(host.run_id, db)['state']
-                signature = digest({k: pending['decision'].get(k) for k in ('tool_id', 'arguments')})
+                signature = action_signature(pending['decision'], receipt, host.store)
                 repeated = state.get('last_signature') == signature
                 state['repeated'] = state.get('repeated', 0) + 1 if repeated else 0
                 state['last_signature'] = signature
@@ -359,6 +366,12 @@ def run_loop(host, adapter=None):
                 return _stop(host, 'failed', 'BOUNDED_REPAIR_LIMIT')
             if state['repeated'] >= config['max_no_progress']:
                 return _stop(host, 'stopped', 'NO_NEW_INFORMATION_LOOP')
+
+
+def action_signature(decision, receipt, store):
+    if decision.get('tool_id') == 'evidence.read' and receipt.get('output') and receipt['execution_status']=='completed':
+        return digest(dict(tool_id='evidence.read',page=store.artifact(receipt['output'])))
+    return digest({k:decision.get(k) for k in ('tool_id','arguments')})
 
 
 def _model_failure(host, receipt):

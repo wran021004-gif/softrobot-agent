@@ -1,0 +1,44 @@
+{
+  "status": "passed",
+  "tests": [
+    {
+      "module": "tests.test_stage323_delivery_repair",
+      "tests": 3,
+      "result": "passed",
+      "latest_duration_s": 2.563
+    },
+    {
+      "module": "tests.test_stage322_design_audit",
+      "tests": 3,
+      "result": "passed",
+      "note": "Passed together with initial focused checks; not repeated after evidence-retention-only refinements."
+    }
+  ],
+  "checks": {
+    "saved_evidence_reads_replayed": 19,
+    "max_retained_pages": 3,
+    "max_retained_bytes": 12000,
+    "original_page_content_preserved": true,
+    "returned_content_identity_ignores_requested_byte_limit": true,
+    "pagination_preserved": true,
+    "optional_pages_trimmed_before_current_facts": true,
+    "identical_selected_incumbent_reports_stored_once": true,
+    "different_reports_distinct": true,
+    "candidate_switch_preserves_separate_incumbent": true,
+    "alternate_declared_parameter_path": true,
+    "numeric_tolerance": true,
+    "wrong_lengths_deltas_units_and_configuration_rejected": true,
+    "old_negative_prose_not_live_success": true,
+    "old_session_state_unchanged": true
+  },
+  "prepared_payload_bytes": 50560,
+  "context_limit_bytes": 150000,
+  "backend_executions": 0,
+  "provider_requests": 0,
+  "scope": "Offline saved-artifact reads and mocked execution receipts only. No full suite, simulation, benchmark, solver, dependency upgrade or design search.",
+  "initial_test_fixes": [
+    "Fixture rows indexed by declared path rather than dictionary ordering.",
+    "Context pressure margin accounts for serialized limit digit count."
+  ],
+  "preparation_fix": "Use model_copy for the frozen ModelInput contract."
+}
