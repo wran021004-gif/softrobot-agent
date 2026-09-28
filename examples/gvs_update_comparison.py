@@ -50,7 +50,7 @@ def freeze(output):
     atomic_json(target, value)
 
 
-def compare(output, label):
+def compare(output, label, selection=None, project_saved_state=False):
     from schemas.platform import SessionInput
     from extensions.tendon_family.gvs_nmpc import TrackingNMPCController
     from extensions.tendon_family.gvs_profile import candidate_numerical, load_profile
@@ -58,7 +58,16 @@ def compare(output, label):
     import extensions.optimization.ipopt as ipopt
     if (output/(label+'.json')).exists():
         raise ValueError('COMPARISON_RESULT_ALREADY_EXISTS')
-    saved = json.loads((output/'selected_states.json').read_text())
+    saved = json.loads((selection or output/'selected_states.json').read_text())
+    raw_states = None
+    if project_saved_state:
+        import gzip
+        source = ROOT / saved['observation_source']
+        rows = json.loads(gzip.decompress(source.with_name('trajectory.json.gz').read_bytes()))
+        initial = json.loads(source.with_name('experiment_scene.json').read_text())
+        raw_states = [initial if sample['time_s'] == 0 else next(
+            row for row in rows if abs(row['time_s']-sample['time_s']) < 1e-8)
+            for sample in saved['samples']]
     inp = SessionInput.model_validate(saved['input'])
     numerical = candidate_numerical(inp, checked_tracking(inp), load_profile())
     controller = TrackingNMPCController(inp.policy.controller.parameters.data, inp.task.timing.control_period_s)
@@ -84,13 +93,27 @@ def compare(output, label):
         ws.solver._compiled[key] = (function, solver.solver, selector)
     construction = time.perf_counter()-started
     records = []
-    for sample in saved['samples']:
+    for index, sample in enumerate(saved['samples']):
         controller.previous = np.asarray(sample['previous_u']).copy()
         controller.seed = deepcopy(sample['warm'])
         controller.unusable_updates = 0
         geometry = deepcopy(sample['geometry']); geometry['tip'] = np.asarray(geometry['tip'])
         x = sample['measured_x']; n = len(x)//2
         start = time.perf_counter()
+        projection_s = 0.
+        projection_difference = 0.
+        if raw_states is not None:
+            from extensions.tendon_family.gvs_projection import project
+            raw = raw_states[index]
+            projection = project(saved['physics'], controller.resolved_basis,
+                raw['qpos_rad'], raw['qvel_rad_s'], convention=controller.projector_id)
+            projected = np.r_[projection['q_gvs'], projection['qdot_gvs']]
+            projection_difference = float(np.max(abs(projected-np.asarray(x))))
+            if projection_difference > 1e-12:
+                raise ValueError('SAVED_PROJECTION_MISMATCH')
+            x = projected
+            geometry['gvs_projection'] = projection
+            projection_s = time.perf_counter()-start
         controller.command(sample['time_s'], geometry, x[:n], x[n:])
         wall = time.perf_counter()-start
         solved = ws.last
@@ -103,6 +126,7 @@ def compare(output, label):
         stamp=time.perf_counter(); residual(old,y,u); residual_s=time.perf_counter()-stamp
         stamp=time.perf_counter(); jacobian(old,y,u,ca.DM.zeros(2*n)); jacobian_s=time.perf_counter()-stamp
         record=dict(time_s=sample['time_s'], complete_update_s=wall, observation=controller.observations[-1],
+            projection_s=projection_s, projection_max_difference=projection_difference,
             objective=solved['result']['objective_value'], diagnostics=solved['diagnostics'],
             warm_start=solved['warm_start'], recovery=solved['recovery'],
             selected_states=solved['states'], selected_tensions=solved['tensions'],
@@ -116,7 +140,7 @@ def compare(output, label):
             'solve',record['observation']['optimization_solve_s'],'objective',record['objective'],flush=True)
 
 
-def verify(output):
+def verify(output, selection=None):
     """Check every saved selected plan against the original production graph.
 
     Value evaluation only: no optimization, implicit reintegration or rollout.
@@ -124,7 +148,7 @@ def verify(output):
     from schemas.platform import SessionInput
     from extensions.tendon_family.gvs_trajectory import TrajectoryWorkspace
     from extensions.optimization.ipopt import _EXPRESSION_FUNCTIONS, _violation
-    saved=json.loads((output/'selected_states.json').read_text())
+    saved=json.loads((selection or output/'selected_states.json').read_text())
     inp=SessionInput.model_validate(saved['input'])
     first=saved['samples'][0]
     ws=TrajectoryWorkspace(inp.task,inp.robot,inp.policy.controller.parameters.data['recipe'],
@@ -165,7 +189,9 @@ if __name__ == '__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action',choices=['freeze','baseline','modified','verify'])
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--selection',type=Path,help='Reuse an immutable saved-case file')
+    parser.add_argument('--project-saved-state',action='store_true',help='Include projection of archived serial joint state in the outer timer')
     args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=True)
     if args.action=='freeze':freeze(args.output)
-    elif args.action=='verify':verify(args.output)
-    else:compare(args.output,args.action)
+    elif args.action=='verify':verify(args.output,args.selection)
+    else:compare(args.output,args.action,args.selection,args.project_saved_state)

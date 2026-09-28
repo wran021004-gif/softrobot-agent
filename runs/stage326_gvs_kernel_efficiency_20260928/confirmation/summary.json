@@ -1,0 +1,1812 @@
+{
+  "accepted_noninitialization_plans": 40,
+  "accepted_plans": 40,
+  "backend_timings_s": {
+    "backend_call": 360.31672739982605,
+    "engine_compile": 0.024670599959790707,
+    "prepare_compile": 0.04036920005455613,
+    "solve": 359.9971256998833
+  },
+  "candidate_id": "parameterized-reach",
+  "complete": true,
+  "configuration": {
+    "artifact_id": "fa80a6e830d385734b67a242abb73f80f92e639749520211c0e7f8c97236f8fa",
+    "media_type": "application/json"
+  },
+  "constraints": [
+    {
+      "limit": 0.01,
+      "name": "sampled_tracking_bound",
+      "observed": 0.007705286904268452,
+      "satisfied": true,
+      "units": "m"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_far_t0",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_far_t1",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_far_t2",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_near_t0",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_near_t1",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 1e-08,
+      "name": "tension_bound_near_t2",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    }
+  ],
+  "control_parameters": {
+    "contract": "family.gvs_tracking_control",
+    "data": {
+      "numerical_source": "initial_state_pretension",
+      "recipe": {
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "constraint_jacobian_mode": "reverse",
+        "curvature_scale_rad_m": 10.0,
+        "evaluation_threads": 1,
+        "feasible_return": {
+          "budget_s": 15.0,
+          "minimum_s": 5.0,
+          "relative_improvement": 0.1
+        },
+        "holding_brake_lead_s": 0.0,
+        "holding_tip_speed_weight": 0.0,
+        "horizon": 10,
+        "max_cpu_s": 30.0,
+        "max_iterations": 120,
+        "max_unusable_updates": 3,
+        "position_error_scale_m": null,
+        "rate_scale_rad_m_s": 1000.0,
+        "recover_returned_tensions": true,
+        "regenerate_warm_states": true,
+        "seed_position_tolerance_fraction": 0.5,
+        "seed_speed_limit_m_s": 0.02,
+        "substeps": 1,
+        "tension_weight": 0.0001,
+        "terminal_tip_speed_weight": 0.0,
+        "terminal_velocity_weight": 0.01,
+        "terminal_weight": 5.0,
+        "tip_speed_scale_m_s": 0.02,
+        "tolerance": 1e-06,
+        "tracking_weight": 1.0,
+        "variation_weight": 0.001,
+        "velocity_weight": 0.01
+      }
+    },
+    "version": "1.0.0"
+  },
+  "converged_updates": 0,
+  "deadline_misses": 40,
+  "evaluation": {
+    "artifact_id": "afb5ca8379648a62c2665a61847c7fd8a8a5884675549f31dcbef7981c7a8f0d",
+    "media_type": "application/json"
+  },
+  "evaluation_reason": null,
+  "evaluation_validity": "valid",
+  "execution_failure_reason": null,
+  "execution_id": "67f8d7f01c514dc2bab4085eb008630b",
+  "execution_scope": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.1.0"
+    },
+    "controller": {
+      "extension_id": "controller.gvs_nmpc",
+      "parameters": {
+        "contract": "family.gvs_tracking_control",
+        "data": {
+          "numerical_source": "initial_state_pretension",
+          "recipe": {
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "constraint_jacobian_mode": "reverse",
+            "curvature_scale_rad_m": 10.0,
+            "evaluation_threads": 1,
+            "feasible_return": {
+              "budget_s": 15.0,
+              "minimum_s": 5.0,
+              "relative_improvement": 0.1
+            },
+            "holding_brake_lead_s": 0.0,
+            "holding_tip_speed_weight": 0.0,
+            "horizon": 10,
+            "max_cpu_s": 30.0,
+            "max_iterations": 120,
+            "max_unusable_updates": 3,
+            "position_error_scale_m": null,
+            "rate_scale_rad_m_s": 1000.0,
+            "recover_returned_tensions": true,
+            "regenerate_warm_states": true,
+            "seed_position_tolerance_fraction": 0.5,
+            "seed_speed_limit_m_s": 0.02,
+            "substeps": 1,
+            "tension_weight": 0.0001,
+            "terminal_tip_speed_weight": 0.0,
+            "terminal_velocity_weight": 0.01,
+            "terminal_weight": 5.0,
+            "tip_speed_scale_m_s": 0.02,
+            "tolerance": 1e-06,
+            "tracking_weight": 1.0,
+            "variation_weight": 0.001,
+            "velocity_weight": 0.01
+          }
+        },
+        "version": "1.0.0"
+      },
+      "version": "5.0.0"
+    },
+    "discretization": {
+      "contract": "family.discretization",
+      "data": {
+        "cells": {
+          "far": 12,
+          "near": 12
+        },
+        "coordinates": "two_principal_bending_angles_per_cell",
+        "model": "serial_bending_cells_v1",
+        "version": "serial_bending_discretization_v1"
+      },
+      "version": "1.0.0"
+    },
+    "execution_model": {
+      "extension_id": "model.serial_bending_cells",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "robot": {
+      "family": "tendon_robot_family",
+      "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+    },
+    "seed": 17,
+    "task": {
+      "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+      "family": "task.tracking",
+      "goal": "ae8e17344f8993a3c6b113c896425033aebdfcabb0f66b3f9394c7e77627260d",
+      "identity": "eef5a5f74f8ed6107ccefb016d9bfd3739abc1870fb94acfcd509b69b2fef50f",
+      "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.4,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      }
+    }
+  },
+  "force_bound_violation_n": 0.0,
+  "graph_construction_s": 1.5312252999283373,
+  "hold_last_responses": 0,
+  "initialization_selected": 0,
+  "last_valid_error_m": 0.0013823494339803859,
+  "last_valid_time_s": 0.4,
+  "max_projection_residual_rad_m": 1.4074568625357342,
+  "max_rate_projection_residual_rad_m_s": 9.850897841094245,
+  "max_sampled_contacts": 0,
+  "maximum_error_m": 0.007705286904268452,
+  "maximum_plan_violation": 5.769263548664749e-06,
+  "mean_numerical_solve_s": 5.855387047486147,
+  "mean_preparation_s": 2.7257934025197756,
+  "mean_recovery_integration_s": 0.15329365499783307,
+  "mean_recovery_s": 0.15660968000302092,
+  "mean_recovery_validation_s": 0.003312127501703799,
+  "mean_update_s": 8.992280202498659,
+  "mean_validation_s": 0.09777645499561913,
+  "minimum_error_m": 0.00033992939486103687,
+  "motion": {
+    "artifact_id": "dd7d42bbd6e92debd1f4d8ea2fbfe594577e0878d40c83c289249b8a7f422826",
+    "media_type": "application/json"
+  },
+  "numerical_preparation": {
+    "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+    "coordinate_order": [
+      "near.kappa_y_node_0",
+      "near.kappa_y_node_1",
+      "near.kappa_y_node_2",
+      "near.kappa_z_node_0",
+      "near.kappa_z_node_1",
+      "near.kappa_z_node_2",
+      "far.kappa_y_node_0",
+      "far.kappa_y_node_1",
+      "far.kappa_y_node_2",
+      "far.kappa_z_node_0",
+      "far.kappa_z_node_1",
+      "far.kappa_z_node_2"
+    ],
+    "cost_accounting": "Included in simulation.run reserved/charged wall time; graph/solver construction and state regeneration are separate execution costs",
+    "current_scope": {
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.1.0"
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "parameters": {
+          "contract": "family.gvs_tracking_control",
+          "data": {
+            "numerical_source": "initial_state_pretension",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": true,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.01,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.01
+            }
+          },
+          "version": "1.0.0"
+        },
+        "version": "5.0.0"
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "data": {
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        },
+        "version": "1.0.0"
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "robot": {
+        "family": "tendon_robot_family",
+        "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+      },
+      "seed": 17,
+      "task": {
+        "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+        "family": "task.tracking",
+        "goal": "ae8e17344f8993a3c6b113c896425033aebdfcabb0f66b3f9394c7e77627260d",
+        "identity": "eef5a5f74f8ed6107ccefb016d9bfd3739abc1870fb94acfcd509b69b2fef50f",
+        "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.4,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        }
+      }
+    },
+    "execution_scope": {
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.1.0"
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "parameters": {
+          "contract": "family.gvs_tracking_control",
+          "data": {
+            "numerical_source": "initial_state_pretension",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": true,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.01,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.01
+            }
+          },
+          "version": "1.0.0"
+        },
+        "version": "5.0.0"
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "data": {
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        },
+        "version": "1.0.0"
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "robot": {
+        "family": "tendon_robot_family",
+        "identity": "ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a"
+      },
+      "seed": 17,
+      "task": {
+        "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+        "family": "task.tracking",
+        "goal": "ae8e17344f8993a3c6b113c896425033aebdfcabb0f66b3f9394c7e77627260d",
+        "identity": "eef5a5f74f8ed6107ccefb016d9bfd3739abc1870fb94acfcd509b69b2fef50f",
+        "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.4,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        }
+      }
+    },
+    "force_limits_n": [
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ],
+    "historical_states_reused": false,
+    "nominal_is_current_target_solution": false,
+    "physics_identity": "8563494a2c71a30caf654c52fd3ab51e8a90ae46479a8ba6964238e63478efac",
+    "previous_input_source": "candidate bounded pretension",
+    "resolved_basis_identity": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+    "reused": false,
+    "source": {
+      "artifact_id": "e0b792479abddbd058fde742aed0a1c7d6769f1f0e86209521992181eb099285",
+      "media_type": "application/json"
+    },
+    "source_kind": "project_initial_state_and_bounded_pretension",
+    "status": "completed",
+    "tendon_order": [
+      "near_t0",
+      "near_t1",
+      "near_t2",
+      "far_t0",
+      "far_t1",
+      "far_t2"
+    ],
+    "units": {
+      "q": "rad/m",
+      "qdot": "rad/(m*s)",
+      "tension": "N"
+    },
+    "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use",
+    "wall_s": 0.038087100023403764,
+    "warm_guess_is_execution_evidence": false
+  },
+  "official_task_success": true,
+  "one_step_prediction_comparisons": [
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.6445345522500383,
+        4.9277539313675405,
+        1.5556871052154821,
+        3.410423215224082,
+        3.217783348179747,
+        2.1256326573437434
+      ],
+      "end_s": 0.01,
+      "measured_tip_m": [
+        0.30798418888359513,
+        -0.00022921709471205627,
+        0.1508170529839587
+      ],
+      "predicted_tip_m": [
+        0.30797805436478215,
+        -0.00030229071836177684,
+        0.15123392296716334
+      ],
+      "start_s": 0.0,
+      "tip_difference_m": 0.0004232705632233444
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7154968497322307,
+        5.039876577367152,
+        1.5500545878910719,
+        3.485020066408763,
+        3.242875337965709,
+        2.0780359396047983
+      ],
+      "end_s": 0.02,
+      "measured_tip_m": [
+        0.3078823505552464,
+        -0.0006658918205133095,
+        0.15276212416174165
+      ],
+      "predicted_tip_m": [
+        0.3078908338955428,
+        -0.0006133033613577922,
+        0.15268387156213156
+      ],
+      "start_s": 0.01,
+      "tip_difference_m": 9.466246587044076e-05
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7512832046874274,
+        5.082733810212276,
+        1.4924808393232099,
+        3.3818834791688372,
+        3.1036910795565813,
+        2.266916120206703
+      ],
+      "end_s": 0.03,
+      "measured_tip_m": [
+        0.3076837035790326,
+        -0.001113676132956646,
+        0.1549418021593569
+      ],
+      "predicted_tip_m": [
+        0.3077355324174284,
+        -0.0009588610110432755,
+        0.1543531550448078
+      ],
+      "start_s": 0.02,
+      "tip_difference_m": 0.0006108677237581922
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.785971750117762,
+        5.097493132734196,
+        1.4586832726068866,
+        3.294066545486606,
+        2.9264266279139655,
+        2.588542930205715
+      ],
+      "end_s": 0.04,
+      "measured_tip_m": [
+        0.30750892252128803,
+        -0.0013875596770417196,
+        0.15659505578539562
+      ],
+      "predicted_tip_m": [
+        0.307598014328523,
+        -0.001155524763947332,
+        0.15567117729734078
+      ],
+      "start_s": 0.03,
+      "tip_difference_m": 0.0009567282851999333
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.816931487693512,
+        5.1058886066991,
+        1.4315850485810395,
+        3.265797203801325,
+        2.788257353740922,
+        2.8899020615188338
+      ],
+      "end_s": 0.05,
+      "measured_tip_m": [
+        0.30746602027519077,
+        -0.0013599147621227194,
+        0.15735983642375712
+      ],
+      "predicted_tip_m": [
+        0.3075590304246288,
+        -0.0011040434887344339,
+        0.15633877786034495
+      ],
+      "start_s": 0.04,
+      "tip_difference_m": 0.0010567315583255518
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.8320494428680987,
+        5.1011195266763405,
+        1.4287145845731628,
+        3.2282835494219175,
+        2.6968027869577633,
+        3.1822672060428645
+      ],
+      "end_s": 0.060000000000000005,
+      "measured_tip_m": [
+        0.30756155716237327,
+        -0.0010108339091662384,
+        0.15709898393244887
+      ],
+      "predicted_tip_m": [
+        0.30763554092163153,
+        -0.0007926238528578934,
+        0.15610860025407977
+      ],
+      "start_s": 0.05,
+      "tip_difference_m": 0.001016832855334629
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.832775768139661,
+        5.075670754668853,
+        1.4532527621833526,
+        3.1840510502649266,
+        2.654572831575454,
+        3.427821829960124
+      ],
+      "end_s": 0.06999999999999999,
+      "measured_tip_m": [
+        0.3077153475058593,
+        -0.0004045226311985569,
+        0.15577437673359928
+      ],
+      "predicted_tip_m": [
+        0.3077618690865321,
+        -0.0002567178445889402,
+        0.15492717995421823
+      ],
+      "start_s": 0.06,
+      "tip_difference_m": 0.0008612507738206315
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.82323914931329,
+        5.029338024427372,
+        1.5057731066838709,
+        3.195422856943666,
+        2.6891597901615993,
+        3.5322643648121987
+      ],
+      "end_s": 0.08,
+      "measured_tip_m": [
+        0.30781164079710793,
+        0.00036427482373353997,
+        0.15353856814013706
+      ],
+      "predicted_tip_m": [
+        0.3078384111837425,
+        0.00043407586060007755,
+        0.15297178934154382
+      ],
+      "start_s": 0.07,
+      "tip_difference_m": 0.0005716878911460354
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.796252991186374,
+        4.981981317074864,
+        1.5818281011749615,
+        3.355665675749997,
+        2.8732880122341866,
+        3.3146556833621608
+      ],
+      "end_s": 0.09,
+      "measured_tip_m": [
+        0.307795836964155,
+        0.0011780170038513914,
+        0.15097562000434056
+      ],
+      "predicted_tip_m": [
+        0.3078247615011716,
+        0.00116477897859987,
+        0.15086091708756383
+      ],
+      "start_s": 0.08,
+      "tip_difference_m": 0.00011903206824748353
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7416771583887165,
+        4.951008967450589,
+        1.6900836268310162,
+        3.9078108229120256,
+        3.3335535497940394,
+        2.153070824285974
+      ],
+      "end_s": 0.09999999999999999,
+      "measured_tip_m": [
+        0.30780474031801003,
+        0.001907362159515638,
+        0.14986820978814203
+      ],
+      "predicted_tip_m": [
+        0.3078436324727815,
+        0.001825254075497148,
+        0.15055123258827358
+      ],
+      "start_s": 0.09,
+      "tip_difference_m": 0.0006890388107091643
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7480217871333754,
+        4.992143495634465,
+        1.6468324489942128,
+        3.654783620275296,
+        3.074938707046446,
+        2.655277540438722
+      ],
+      "end_s": 0.11,
+      "measured_tip_m": [
+        0.3078118649494917,
+        0.002638368781653086,
+        0.14950698415717997
+      ],
+      "predicted_tip_m": [
+        0.3078386210429555,
+        0.002593377943061648,
+        0.1493654760146862
+      ],
+      "start_s": 0.1,
+      "tip_difference_m": 0.00015087948331912003
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7486159131095036,
+        4.997853962036915,
+        1.6413213615214952,
+        3.6619320264190147,
+        3.0263945038693087,
+        2.695544880691778
+      ],
+      "end_s": 0.12,
+      "measured_tip_m": [
+        0.30780488929929073,
+        0.003460232536918022,
+        0.14911010655638235
+      ],
+      "predicted_tip_m": [
+        0.3078341206960449,
+        0.0034002130702238,
+        0.14889057202648012
+      ],
+      "start_s": 0.11,
+      "tip_difference_m": 0.00022946071724338547
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7502663586306566,
+        5.004518774612846,
+        1.6351341161966564,
+        3.6805011248286688,
+        3.010196760111273,
+        2.6927594762877405
+      ],
+      "end_s": 0.13,
+      "measured_tip_m": [
+        0.3077876329309205,
+        0.0043884807212730016,
+        0.14862792304276753
+      ],
+      "predicted_tip_m": [
+        0.30782000370136714,
+        0.004288394981254932,
+        0.1483757527132825
+      ],
+      "start_s": 0.12,
+      "tip_difference_m": 0.0002732304836706025
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.751818244997613,
+        5.006373220271366,
+        1.6338305850630632,
+        3.697884203200731,
+        3.0203896877927034,
+        2.666004809568045
+      ],
+      "end_s": 0.14,
+      "measured_tip_m": [
+        0.307760818077605,
+        0.005395085918410321,
+        0.1481073343204053
+      ],
+      "predicted_tip_m": [
+        0.3077971738449975,
+        0.005239981239306101,
+        0.14784962692894674
+      ],
+      "start_s": 0.13,
+      "tip_difference_m": 0.0003029724458017457
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7526600528551635,
+        5.006972756221788,
+        1.633627427449979,
+        3.710837602902701,
+        3.0126435895776176,
+        2.6607103042828153
+      ],
+      "end_s": 0.15000000000000002,
+      "measured_tip_m": [
+        0.30772406438977684,
+        0.006463870146309449,
+        0.1475864408653812
+      ],
+      "predicted_tip_m": [
+        0.30776484684689603,
+        0.006262922255504791,
+        0.1473063132993811
+      ],
+      "start_s": 0.14,
+      "tip_difference_m": 0.00034715229634939694
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.751493566327915,
+        5.007728804881926,
+        1.634991270195764,
+        3.726280811089913,
+        3.0088858831926744,
+        2.6493760456395905
+      ],
+      "end_s": 0.16,
+      "measured_tip_m": [
+        0.30767717634679115,
+        0.007586810737591109,
+        0.14710197794786145
+      ],
+      "predicted_tip_m": [
+        0.30772313596781514,
+        0.007335501590390852,
+        0.14680782013495974
+      ],
+      "start_s": 0.15,
+      "tip_difference_m": 0.0003896118493094193
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7512459963636218,
+        5.006060291064867,
+        1.6375198152519712,
+        3.727373144148544,
+        3.0046889479765984,
+        2.6536347041426076
+      ],
+      "end_s": 0.17,
+      "measured_tip_m": [
+        0.30762110357183686,
+        0.008746214498875261,
+        0.14666831748819287
+      ],
+      "predicted_tip_m": [
+        0.3076730908860577,
+        0.008440286668936986,
+        0.14634531025536823
+      ],
+      "start_s": 0.16,
+      "tip_difference_m": 0.0004479153831112158
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7511909073147303,
+        5.002059213498885,
+        1.6415468315143784,
+        3.7291519115558556,
+        2.989980727027453,
+        2.6671360725599493
+      ],
+      "end_s": 0.18000000000000002,
+      "measured_tip_m": [
+        0.3075569953289837,
+        0.009934996131599821,
+        0.14627789499532293
+      ],
+      "predicted_tip_m": [
+        0.3076151676426409,
+        0.009580177088355906,
+        0.14592520216067378
+      ],
+      "start_s": 0.17,
+      "tip_difference_m": 0.0005036594158135143
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7510189188126346,
+        4.9981820935358,
+        1.644907527382739,
+        3.7231691768013904,
+        2.970835558428619,
+        2.6926961904382214
+      ],
+      "end_s": 0.19,
+      "measured_tip_m": [
+        0.3074862462290293,
+        0.011149527765958171,
+        0.1459062438955054
+      ],
+      "predicted_tip_m": [
+        0.30755091066499224,
+        0.010742486219138129,
+        0.14552281990671573
+      ],
+      "start_s": 0.18,
+      "tip_difference_m": 0.0005629194127896523
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.750669498418058,
+        4.997880543146888,
+        1.6449433913561033,
+        3.7078691571822446,
+        2.9435871091450014,
+        2.7352300221245645
+      ],
+      "end_s": 0.2,
+      "measured_tip_m": [
+        0.3074106364601065,
+        0.012384436364426373,
+        0.14550649056249412
+      ],
+      "predicted_tip_m": [
+        0.3074815801634341,
+        0.011923755018503217,
+        0.14509428589370565
+      ],
+      "start_s": 0.19,
+      "tip_difference_m": 0.0006222322721415283
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7495935654438077,
+        4.9975173285434265,
+        1.6464679069923667,
+        3.71157229658034,
+        2.935313839576151,
+        2.7402290613340443
+      ],
+      "end_s": 0.21000000000000002,
+      "measured_tip_m": [
+        0.3073292435160355,
+        0.013626387206005341,
+        0.14509298361852496
+      ],
+      "predicted_tip_m": [
+        0.3074064165540863,
+        0.013108183828725896,
+        0.14469386072254464
+      ],
+      "start_s": 0.2,
+      "tip_difference_m": 0.0006586269840520703
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7494373412097866,
+        4.996757025152442,
+        1.647397450180679,
+        3.711157315131205,
+        2.9285515376736377,
+        2.747740299705172
+      ],
+      "end_s": 0.22,
+      "measured_tip_m": [
+        0.3072422546427136,
+        0.014856942466184053,
+        0.14469150474207151
+      ],
+      "predicted_tip_m": [
+        0.3073261665127859,
+        0.014281499849247467,
+        0.14429641492570638
+      ],
+      "start_s": 0.21,
+      "tip_difference_m": 0.0007030443587152136
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.748884971136813,
+        4.99719206927198,
+        1.647546012850505,
+        3.710394804292671,
+        2.919265893753621,
+        2.7581138568307337
+      ],
+      "end_s": 0.23,
+      "measured_tip_m": [
+        0.30715052716300145,
+        0.016061957565984105,
+        0.14430714917556695
+      ],
+      "predicted_tip_m": [
+        0.307241267413816,
+        0.01543290572958002,
+        0.14391319697625862
+      ],
+      "start_s": 0.22,
+      "tip_difference_m": 0.0007477555358144179
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.748700872593457,
+        4.997337086134044,
+        1.6476251793568675,
+        3.711670635852297,
+        2.910676401633836,
+        2.7655912252410864
+      ],
+      "end_s": 0.24000000000000002,
+      "measured_tip_m": [
+        0.3070548947089624,
+        0.017230924655328834,
+        0.1439418896116431
+      ],
+      "predicted_tip_m": [
+        0.30715260819133167,
+        0.016550563067789962,
+        0.1435515717873772
+      ],
+      "start_s": 0.23,
+      "tip_difference_m": 0.0007904352082079791
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7483295825350584,
+        4.998114269278497,
+        1.6473126039287718,
+        3.7123391397659,
+        2.9034442346192493,
+        2.7724576727176737
+      ],
+      "end_s": 0.25,
+      "measured_tip_m": [
+        0.30695664587881766,
+        0.018352932650586434,
+        0.14359575909172534
+      ],
+      "predicted_tip_m": [
+        0.30706154366237204,
+        0.017622617025000488,
+        0.1432088697808678
+      ],
+      "start_s": 0.24,
+      "tip_difference_m": 0.0008330953107690816
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.748191448725632,
+        4.998875730701322,
+        1.6468443511198128,
+        3.7129155036959562,
+        2.8985457737033915,
+        2.7770767505475016
+      ],
+      "end_s": 0.26,
+      "measured_tip_m": [
+        0.30685753465350385,
+        0.01941547718339297,
+        0.14326873291131328
+      ],
+      "predicted_tip_m": [
+        0.3069696956596926,
+        0.018637452221745145,
+        0.14288654463180728
+      ],
+      "start_s": 0.25,
+      "tip_difference_m": 0.0008740542393056284
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7476449645815157,
+        4.999977552596519,
+        1.6464874139879513,
+        3.7142013646544365,
+        2.8958371325795498,
+        2.7788656048471148
+      ],
+      "end_s": 0.27,
+      "measured_tip_m": [
+        0.3067595366389508,
+        0.020406079089290204,
+        0.14296336115136563
+      ],
+      "predicted_tip_m": [
+        0.3068788982792942,
+        0.019583621799689515,
+        0.1425869638013853
+      ],
+      "start_s": 0.26,
+      "tip_difference_m": 0.0009123366481047421
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7471829758396935,
+        5.000989083127592,
+        1.646171771935049,
+        3.71622395735163,
+        2.893437381606532,
+        2.7795325532930475
+      ],
+      "end_s": 0.28,
+      "measured_tip_m": [
+        0.3066645781181634,
+        0.021314624511527096,
+        0.14268252682328347
+      ],
+      "predicted_tip_m": [
+        0.3067908808730835,
+        0.020452309628390314,
+        0.14231106079192699
+      ],
+      "start_s": 0.27,
+      "tip_difference_m": 0.0009473786761540214
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.746372365468204,
+        5.0021503099696485,
+        1.6460922452489295,
+        3.7191315899778234,
+        2.8923763415704693,
+        2.7780585345251545
+      ],
+      "end_s": 0.29000000000000004,
+      "measured_tip_m": [
+        0.3065744758189776,
+        0.02213277061164474,
+        0.14243022884481873
+      ],
+      "predicted_tip_m": [
+        0.30670749170090555,
+        0.02123456805124767,
+        0.1420634724044227
+      ],
+      "start_s": 0.28,
+      "tip_difference_m": 0.0009792708261358947
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7456839324087614,
+        5.003183538293936,
+        1.646035412136767,
+        3.7218286493373607,
+        2.89102750061835,
+        2.777044713960922
+      ],
+      "end_s": 0.3,
+      "measured_tip_m": [
+        0.3064909780595456,
+        0.02285400864652341,
+        0.1422085886254618
+      ],
+      "predicted_tip_m": [
+        0.3066302938968981,
+        0.021924609103065394,
+        0.14184400499503955
+      ],
+      "start_s": 0.29,
+      "tip_difference_m": 0.0010080246214696632
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7446435278866734,
+        5.004235642244045,
+        1.646336496761378,
+        3.724755937253895,
+        2.8909387629185064,
+        2.7746877604476095
+      ],
+      "end_s": 0.31,
+      "measured_tip_m": [
+        0.30641570480824837,
+        0.023472740760787272,
+        0.1420198567832486
+      ],
+      "predicted_tip_m": [
+        0.3065609331204236,
+        0.022516226551046216,
+        0.1416568012487615
+      ],
+      "start_s": 0.3,
+      "tip_difference_m": 0.0010333537715688334
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7435067942795004,
+        5.005383301282699,
+        1.646555617597135,
+        3.728117809522827,
+        2.8891285205305373,
+        2.773552564767532
+      ],
+      "end_s": 0.32,
+      "measured_tip_m": [
+        0.30634977177363387,
+        0.02398670225291027,
+        0.14186460235958356
+      ],
+      "predicted_tip_m": [
+        0.30650023791833453,
+        0.023008661734283224,
+        0.14150056430168634
+      ],
+      "start_s": 0.31,
+      "tip_difference_m": 0.001054384666227144
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.744619127165632,
+        5.0041965473495225,
+        1.6469725726604454,
+        3.7324674323102958,
+        2.883372442768986,
+        2.775093596337256
+      ],
+      "end_s": 0.33,
+      "measured_tip_m": [
+        0.3062932566199662,
+        0.024400165428783562,
+        0.14173928209190328
+      ],
+      "predicted_tip_m": [
+        0.30644814743388316,
+        0.023406829852296113,
+        0.14137160246105354
+      ],
+      "start_s": 0.32,
+      "tip_difference_m": 0.0010704648722369703
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.745554562841288,
+        5.0036439757813636,
+        1.6469969351661302,
+        3.7375265267660094,
+        2.8774518894809407,
+        2.776138892486704
+      ],
+      "end_s": 0.34,
+      "measured_tip_m": [
+        0.30624575005387794,
+        0.024719804817622943,
+        0.14164104622687554
+      ],
+      "predicted_tip_m": [
+        0.30640474580807886,
+        0.023713797277533623,
+        0.14127060640633957
+      ],
+      "start_s": 0.33,
+      "tip_difference_m": 0.0010837695701620376
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7473182503938425,
+        5.002141180994929,
+        1.6471470517922955,
+        3.7431602938865858,
+        2.8696460947702604,
+        2.7783623516462104
+      ],
+      "end_s": 0.35000000000000003,
+      "measured_tip_m": [
+        0.3062066988070732,
+        0.024953817642813403,
+        0.14156749402849184
+      ],
+      "predicted_tip_m": [
+        0.3063692520209178,
+        0.023938876488775587,
+        0.14119327054136663
+      ],
+      "start_s": 0.34,
+      "tip_difference_m": 0.0010938794777337118
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7491764150276072,
+        5.000814303245756,
+        1.647026393247916,
+        3.749486083876413,
+        2.8603343278343205,
+        2.781366317325023
+      ],
+      "end_s": 0.36000000000000004,
+      "measured_tip_m": [
+        0.30617512278068065,
+        0.025112900020811436,
+        0.1415157168728429
+      ],
+      "predicted_tip_m": [
+        0.3063408131382046,
+        0.024091732097639006,
+        0.1411376514563461
+      ],
+      "start_s": 0.35000000000000003,
+      "tip_difference_m": 0.0011014402757497127
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7512332088682574,
+        4.999213505322044,
+        1.6469558099618047,
+        3.756275012799172,
+        2.8498180406246836,
+        2.7850744234469778
+      ],
+      "end_s": 0.37,
+      "measured_tip_m": [
+        0.3061498356319823,
+        0.025209287249811422,
+        0.14148285571806274
+      ],
+      "predicted_tip_m": [
+        0.3063183171618283,
+        0.024183931285351186,
+        0.14110089534849438
+      ],
+      "start_s": 0.36,
+      "tip_difference_m": 0.0011070838286571748
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.753224755890055,
+        4.9977292474519395,
+        1.646785725564923,
+        3.763428332471928,
+        2.837280281985595,
+        2.790388667734246
+      ],
+      "end_s": 0.38,
+      "measured_tip_m": [
+        0.3061293168945922,
+        0.025257321095648533,
+        0.14146461320417705
+      ],
+      "predicted_tip_m": [
+        0.30630025926795995,
+        0.024229476416250846,
+        0.14107839909719938
+      ],
+      "start_s": 0.37,
+      "tip_difference_m": 0.0011112368408252532
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.7550517135300487,
+        4.996294086088446,
+        1.646680996345153,
+        3.7706737541789903,
+        2.824313470699159,
+        2.7960477165051643
+      ],
+      "end_s": 0.39,
+      "measured_tip_m": [
+        0.3061120014183721,
+        0.02527171522307828,
+        0.1414566776864588
+      ],
+      "predicted_tip_m": [
+        0.30628529821883255,
+        0.024241585868923506,
+        0.14106710275466666
+      ],
+      "start_s": 0.38,
+      "tip_difference_m": 0.001114884251759808
+    },
+    {
+      "applied_input_difference_n": 0.0,
+      "applied_tension_n": [
+        3.756075562370606,
+        4.996073766623528,
+        1.6461176042369594,
+        3.7789431257094286,
+        2.8108841794066106,
+        2.8012124665527733
+      ],
+      "end_s": 0.4,
+      "measured_tip_m": [
+        0.30609621123998865,
+        0.025267454203715706,
+        0.14145668315283885
+      ],
+      "predicted_tip_m": [
+        0.3062718093481865,
+        0.024235027760926033,
+        0.14106534686480798
+      ],
+      "start_s": 0.39,
+      "tip_difference_m": 0.00111798172869854
+    }
+  ],
+  "optimization_status_counts": {
+    "feasible_early_stop": 40
+  },
+  "per_update_delivery_s": [
+    31.50437429989688,
+    10.926217099884525,
+    9.52673349995166,
+    9.679662399925292,
+    18.310841399943456,
+    8.662687100004405,
+    10.207111700205132,
+    8.502103599952534,
+    8.703097300138324,
+    7.903557199984789,
+    7.702860800083727,
+    7.867506500100717,
+    7.802808499895036,
+    8.49836859991774,
+    7.9519462999887764,
+    7.825103300157934,
+    7.95622819988057,
+    7.805479699978605,
+    7.7271149000152946,
+    7.777532600099221,
+    7.7021909998729825,
+    7.723051600158215,
+    7.942646599840373,
+    7.6919416999444366,
+    7.823615999892354,
+    7.749854999827221,
+    7.876814600080252,
+    7.702609200030565,
+    7.72182169998996,
+    7.816480699926615,
+    7.801073000067845,
+    8.454920200165361,
+    7.712367600062862,
+    7.8206164999864995,
+    7.781327100005001,
+    7.802003900054842,
+    7.68184299999848,
+    7.7582618000451475,
+    7.8091915000695735,
+    8.477240399923176
+  ],
+  "raw_termination_counts": {
+    "User_Requested_Stop": 40
+  },
+  "real_time_demonstrated": false,
+  "recovered_plans": 3,
+  "simulation": {
+    "artifact_id": "5328aa8231d13c6fed7d8b9e06d56d3a5e23d573dc675eaec7e6b5a8ef566eb1",
+    "media_type": "application/json"
+  },
+  "simulation_wall_s": 363.780999999959,
+  "solver_construction_s": 4.471128900768235,
+  "solver_error_count": 0,
+  "solver_failure_flags": 0,
+  "solver_status": "completed",
+  "task": {
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.tracking",
+      "parameters": {
+        "contract": "family.tracking_evaluation",
+        "data": {
+          "max_position_error_m": 0.01,
+          "tension_limits_n": {
+            "far_t0": 8.0,
+            "far_t1": 8.0,
+            "far_t2": 8.0,
+            "near_t0": 8.0,
+            "near_t1": 8.0,
+            "near_t2": 8.0
+          }
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.tracking",
+    "goal": {
+      "contract": "family.cartesian_reference",
+      "data": {
+        "end_m": [
+          0.30599999999999994,
+          0.024,
+          0.142
+        ],
+        "end_s": 0.4,
+        "frame": "world",
+        "interpolation": "quintic",
+        "outside": "clamp_position_zero_velocity",
+        "provenance": "Baseline MuJoCo mj_forward at task initializer; no integration. robot sha256 ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a; frozen for every candidate.",
+        "start_m": [
+          0.30799999999999994,
+          0.0,
+          0.15
+        ],
+        "start_s": 0.0,
+        "units": "SI"
+      },
+      "version": "1.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "Short world-frame quintic tracking",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "max_position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.01,
+        0.4
+      ]
+    },
+    "source": "Stage 3.24 predeclared path and sampled acceptance; no trajectory reused",
+    "status": "development_valid",
+    "task_id": "gvs-cartesian-tracking",
+    "task_version": "1.0.0",
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.4,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    }
+  },
+  "tension_range_n": [
+    1.4287145845731628,
+    5.1058886066991
+  ],
+  "terminal_error_m": 0.0013823494339803859,
+  "terminal_tip_speed_m_s": 0.0019885520052631295,
+  "tracking": {
+    "acceptance": {
+      "contract": "family.tracking_evaluation",
+      "data": {
+        "max_position_error_m": 0.01,
+        "tension_limits_n": {
+          "far_t0": 8.0,
+          "far_t1": 8.0,
+          "far_t2": 8.0,
+          "near_t0": 8.0,
+          "near_t1": 8.0,
+          "near_t2": 8.0
+        }
+      },
+      "version": "1.0.0"
+    },
+    "continuous_time_guarantee": false,
+    "metrics": [
+      {
+        "name": "max_position_error",
+        "units": "m",
+        "value": 0.007705286904268452
+      },
+      {
+        "name": "rms_position_error",
+        "units": "m",
+        "value": 0.0027291758466180347
+      },
+      {
+        "name": "terminal_position_error",
+        "units": "m",
+        "value": 0.0013823494339803859
+      }
+    ],
+    "reference": {
+      "end_m": [
+        0.30599999999999994,
+        0.024,
+        0.142
+      ],
+      "end_s": 0.4,
+      "frame": "world",
+      "interpolation": "quintic",
+      "outside": "clamp_position_zero_velocity",
+      "provenance": "Baseline MuJoCo mj_forward at task initializer; no integration. robot sha256 ba16d1977581e01edd9b36839eedc9c8e29b4255fb7f94576264cc4ef353899a; frozen for every candidate.",
+      "start_m": [
+        0.30799999999999994,
+        0.0,
+        0.15
+      ],
+      "start_s": 0.0,
+      "units": "SI"
+    },
+    "rule": "All inclusive uniform samples in scoring interval; arithmetic RMS; max <= declared limit. Complete grid required. Terminal error is at execution endpoint.",
+    "scoring_interval_s": [
+      0.01,
+      0.4
+    ],
+    "velocity_error_max_m_s": 0.24747408138504842
+  },
+  "updates": 40,
+  "valid_complete_execution": true,
+  "factual_result": {
+    "candidate": {
+      "candidate_id": "parameterized-reach",
+      "configuration": {
+        "artifact_id": "fa80a6e830d385734b67a242abb73f80f92e639749520211c0e7f8c97236f8fa",
+        "media_type": "application/json"
+      },
+      "frozen_baseline_identity": "de743d4c7c99d88158b3a6bf76953946af70450d141afbea0c789166cf846263",
+      "effective_identity": "de743d4c7c99d88158b3a6bf76953946af70450d141afbea0c789166cf846263",
+      "owner_run_id": "gvs-stage326-confirmation-20260928",
+      "execution_id": "67f8d7f01c514dc2bab4085eb008630b",
+      "parameters": []
+    },
+    "configuration": {
+      "artifact_id": "fa80a6e830d385734b67a242abb73f80f92e639749520211c0e7f8c97236f8fa",
+      "media_type": "application/json"
+    },
+    "execution_id": "67f8d7f01c514dc2bab4085eb008630b",
+    "simulation": {
+      "artifact_id": "5328aa8231d13c6fed7d8b9e06d56d3a5e23d573dc675eaec7e6b5a8ef566eb1",
+      "media_type": "application/json"
+    },
+    "evaluation": {
+      "artifact_id": "afb5ca8379648a62c2665a61847c7fd8a8a5884675549f31dcbef7981c7a8f0d",
+      "media_type": "application/json"
+    },
+    "report": {
+      "reference": {
+        "artifact_id": "7a5b20bebf94c94799a94bfa7e8f0cb2f0ff11584497d476837aab6ce57c89a1",
+        "media_type": "application/json"
+      },
+      "owner_run_id": "gvs-stage326-confirmation-20260928",
+      "execution_id": "67f8d7f01c514dc2bab4085eb008630b",
+      "request_id": "report"
+    },
+    "task_accepted": true,
+    "valid_complete_execution": true,
+    "maximum_tracking_error_m": 0.007705286904268452,
+    "rms_tracking_error_m": 0.0027291758466180347,
+    "declared_limit_m": 0.01,
+    "control_updates": 40,
+    "accepted_feasible_plans": 40,
+    "converged_updates": 0,
+    "deadline_misses": 40,
+    "control_period_s": 0.01,
+    "simulated_duration_s": 0.4,
+    "measured_computation_s": 363.780999999959,
+    "mean_complete_update_s": 8.992280202498659,
+    "real_time_demonstrated": false
+  }
+}

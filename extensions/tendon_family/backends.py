@@ -186,14 +186,22 @@ class MujocoBackend(MatlabBackend):
         complete=True; reason=None
         for step in range(round(s['duration_s']/dt)):
             if time.perf_counter()-start>timeout_s: complete=False; reason='MUJOCO_SOLVER_TIMEOUT'; break
+            update_start=time.perf_counter()
             t=step*dt; g=current()
             if s['control']['mode'] in ('gvs_lqr','gvs_sampled_lqr','gvs_nmpc'):
                 from .gvs_projection import project, PROJECTOR_ID
                 projection=project(p,self.controller.resolved_basis,data.qpos[qi],data.qvel[vi],
                     convention=getattr(self.controller,'projector_id',PROJECTOR_ID))
                 g['gvs_projection']=projection
+                state_preparation_s=time.perf_counter()-update_start
                 command=self.controller.command(t,g,np.asarray(projection['q_gvs']),np.asarray(projection['qdot_gvs']))
                 if s['control']['mode']=='gvs_nmpc':
+                    elapsed=time.perf_counter()-update_start
+                    timing=dict(controller_boundary_wall_s=self.controller.last['update_wall_s'],
+                        state_preparation_s=state_preparation_s,update_wall_s=elapsed,
+                        deadline_missed=elapsed>dt)
+                    self.controller.last.update(timing)
+                    self.controller.observations[-1].update(timing)
                     atomic_json(self.folder/'nmpc_updates.json',self.controller.observations)
                     if self.controller.stop_requested:
                         complete=False;reason='NMPC_SUSTAINED_UNUSABLE_REPLANNING';break

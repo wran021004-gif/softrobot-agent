@@ -1,0 +1,22 @@
+{
+  "selection_path": "runs/stage325_tracking_efficiency_20260928/selected_states.json",
+  "selection_git_commit": "1b4c00f",
+  "selection_sha256_lf": "bb9abec2d39d2cd7c4cc05be7c368c45d216cb2fc6c5e70c0ca6bb84dfeb7752",
+  "warm_start": "Identical reconstructed constant previous tensions and repeated measured state; unavailable original warm plans are not reproduced",
+  "timing": "Outer projection from archived serial joint state plus command including state preparation, optimization, recovery, validation, ideal-tension conversion, prediction and observation. Archive loading and setup outside; geometry tip read from archive. No physical integration or backend rollout.",
+  "cache_conditions": "Fresh process per variant; one workspace/solver, prime one implicit step and construct NLP solver without optimizing; persist caches across three ordered cases",
+  "acceptance": {
+    "total_time_ratio_max": 0.85,
+    "each_time_ratio_max": 1.05,
+    "objective_relative_degradation_max": 0.01,
+    "objective_absolute_floor": 1e-08,
+    "feasibility_max": 1e-05,
+    "residual_equivalence_rtol": 1e-10,
+    "residual_equivalence_atol": 1e-10,
+    "jacobian_equivalence_rtol": 1e-09,
+    "jacobian_equivalence_atol": 1e-09
+  },
+  "stopping_policy": "Frozen min 5 s, budget 15 s, relative improvement 0.1 and all remaining recipe settings unchanged",
+  "direction": "MX common-subexpression elimination in mass-sample wrench functions and their derivative functions",
+  "compiler_check": "gcc/clang/cl absent from PATH; no compiler in standard LLVM/MSYS/MinGW locations and no VS installer discovery tool. No installation attempted."
+}

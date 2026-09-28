@@ -332,7 +332,10 @@ class GVSCasadiFunctions:
         self.implicit_terms = ca.Function('gvs_implicit_terms', [x,u],
             [mass,tendon_force+gravity-bias-elastic-damping], ['x','u'], ['mass','force'])
         self.implicit_residual=ca.Function('gvs_force_balance',[x,u,acceleration],
-            [inertial_wrench-(tendon_force+gravity-elastic-damping)])
+            [inertial_wrench-(tendon_force+gravity-elastic-damping)],
+            # Sample wrench calls inline here. Share repeated MX kinematics
+            # and derivative expressions without expanding the graph to SX.
+            {'cse':True,'der_options':{'cse':True}})
         self._linearization = None
         self._linearization_symbols = (x,u,xdot)
         static_residual = tendon_force + gravity - elastic
