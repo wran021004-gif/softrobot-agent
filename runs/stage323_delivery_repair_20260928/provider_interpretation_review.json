@@ -1,6 +1,6 @@
 {
-  "status": "not_performed_launch_rejected",
-  "reviewer": "Codex assistant",
+  "status": "reviewed_accepted",
+  "reviewer": "Codex assistant; direct evidence-bound review of actual provider-authored final text, not provider self-certification",
   "binding": {
     "candidate_facts": {
       "candidate_id": "near_shorten_v2",
@@ -45,22 +45,70 @@
     "first_attempt_evaluation_ref": {
       "artifact_id": "275f619b5819761d092317488108dbf54f7eb99fd14aeb792b983a322810c72b",
       "media_type": "application/json"
-    }
+    },
+    "provider_request_id": "delivery-review-1",
+    "provider_request_identity": "4c15469b179eac0bb99959505e1309679edf905051ef160564f1e6fb0ed87235",
+    "provider_response_path": "attempt_1/raw_response.json",
+    "provider_response_identity": "6996a35e96d8bb234418592feadb80db82fabf7222e219fcc29af70cee039e6d",
+    "conclusion_digest": "7b2265b3d7703687940dc22837b65011979cd59a43bf2d0f5133bf5b5ecb7801"
   },
-  "provider_request_identity": "4c15469b179eac0bb99959505e1309679edf905051ef160564f1e6fb0ed87235",
-  "provider_response": null,
-  "response_identity": null,
-  "structured_delivery": null,
-  "provider_authored_explanation": null,
-  "structured_values_match": null,
-  "provider_prose_matches": null,
-  "correct_use_of_current_evidence": null,
+  "response_identity": "6996a35e96d8bb234418592feadb80db82fabf7222e219fcc29af70cee039e6d",
+  "structured_values_match": true,
+  "provider_prose_matches": true,
+  "correct_use_of_current_evidence": true,
   "physical_reach_accepted": true,
-  "new_delivery_review_passed": false,
+  "new_delivery_review_passed": true,
   "findings": [
-    "No provider process was started: automatic approval review rejected the launch.",
-    "Offline structured-value tests are not a live provider success.",
-    "Historical reach and failed interpretation remain unchanged."
+    {
+      "topic": "design_values_and_signed_baseline_deltas",
+      "verdict": "pass",
+      "evidence": "The structured statement and complete final explanation both give near 0.159 m versus baseline 0.160 m, signed delta -0.001 m (1 mm shortening); far remains 0.120 m with zero delta. No contradictory 0.150 m / -10 mm selected-design claim appears."
+    },
+    {
+      "topic": "exact_candidate_execution_and_evidence_association",
+      "verdict": "pass",
+      "evidence": "Selected owner, execution, effective configuration, baseline/effective identities, evaluation and report match the authoritative facts. The distinct first-attempt configuration, execution and evaluation are correctly attributed."
+    },
+    {
+      "topic": "original_reach_and_first_attempt_failure",
+      "verdict": "pass",
+      "evidence": "Selected terminal error 0.009438402440635051 m is below 0.01 m; first-attempt error 0.02627825408036219 m exceeds 0.01 m. Valid evaluation is distinguished from task success."
+    },
+    {
+      "topic": "failed_sampled_settling",
+      "verdict": "pass",
+      "evidence": "Correctly states final-window position within 0.01 m but maximum speed 0.06404039353320505 m/s exceeds 0.02 m/s over 0.05 s, with no continuous-time guarantee."
+    },
+    {
+      "topic": "accepted_feasible_plans_versus_convergence",
+      "verdict": "pass",
+      "evidence": "Explicitly reports 35 accepted feasible_early_stop plans, zero converged updates and User_Requested_Stop. Acceptance is not claimed to mean optimizer convergence."
+    },
+    {
+      "topic": "simulation_duration_versus_computation",
+      "verdict": "pass",
+      "evidence": "Explicitly distinguishes 0.35 s simulated duration from 909.797 s charged simulation wall time, 25.866045 s mean complete update versus 0.01 s control period, 35 missed deadlines and no real-time feasibility."
+    },
+    {
+      "topic": "controller_recipe_and_limited_tested_scope",
+      "verdict": "pass",
+      "evidence": "Correct controller.gvs_nmpc@4.0.0 recipe, structural_linear basis, horizon 10, substeps 1, regenerated warm states, candidate-associated report, twelve bending cells per section, fixed target/timing, two tested points and no broader validation or new execution. The warm-guess statement is scoped by numerical_source and warm_guess_is_execution_evidence false; no improved controller performance is claimed."
+    },
+    {
+      "topic": "all_final_provider_text_and_preserved_history",
+      "verdict": "pass",
+      "evidence": "Reviewed arguments.explanation, the entire structured delivery, outer reason/evidence and assistant message.content against the same evidence. No contradictory final prose was found. The response explicitly preserves original Stage 3.22 reach=true but provider interpretation=false and final acceptance=false."
+    }
   ],
-  "launch_review": "launch_review.json"
+  "provider_output_preserved": true,
+  "provider_text_modified": false,
+  "original_stage322_acceptance_changed": false,
+  "sources": {
+    "request": "attempt_1/request.json",
+    "raw": "attempt_1/raw_response.json",
+    "structured_delivery": "attempt_1/structured_delivery.json",
+    "explanation": "attempt_1/provider_explanation.txt",
+    "context": "review_context.json",
+    "historical_rejection": "launch_review.json"
+  }
 }

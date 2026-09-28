@@ -1,10 +1,8 @@
-# Stage 3.23: delivery repair and first live review passed
+# Stage 3.23: delivery repair implemented; live launch rejected
 
-Candidate-fact propagation, bounded evidence reuse, and structured delivery checks are implemented. Three new focused tests and the three existing Stage 3.22 delivery-association tests pass. **The first genuine DeepSeek delivery-review response passed** structured values, exact evidence association and independent review of the provider-authored final explanation. The review stopped after one request, with no correction or new backend execution.
+Candidate-fact propagation, bounded evidence reuse, and structured delivery checks are implemented. Three new focused tests and the three existing Stage 3.22 delivery-association tests pass. **The genuine provider review was not performed:** automatic approval review rejected the direct launch before process creation. This is not a live provider success.
 
-The earlier automatic approval rejection is preserved in `launch_review.json` and `launch_rejection.txt`, and the blocked report/experience/state/review are preserved in their `_prelaunch` files. Direct authorization in the subsequent user chat named the exact prepared request, endpoint and credential path; the same request was submitted successfully after repairing only the local continuation state. `launch_continuation.json` records this authorization and outcome.
-
-The initial implementation started clean on `feat/gvs-dynamics` at `f43d780`; the later authorized continuation also started with a clean working tree on that branch. Python was checked during implementation: `C:\Users\gugugaga\miniconda3\envs\softagent\python.exe`, Python 3.11.16. Repository Python calls retained `OPENBLAS_NUM_THREADS=1`, `OMP_NUM_THREADS=1`, and `MKL_NUM_THREADS=1`. No dependency changes, subagents, commits, pushes or merges were performed by the assistant.
+The repository started clean on `feat/gvs-dynamics` at `f43d780`. Python was checked once: `C:\Users\gugugaga\miniconda3\envs\softagent\python.exe`, Python 3.11.16. Repository Python calls retained `OPENBLAS_NUM_THREADS=1`, `OMP_NUM_THREADS=1`, and `MKL_NUM_THREADS=1`. No dependency changes, subagents, commits, pushes or merges were made.
 
 ## Implementation
 
@@ -28,29 +26,23 @@ The existing example workflow has `review-prepare` and `review-call` entry point
 
 The three existing tests in `tests/test_stage322_design_audit.py` also passed. After adding explicit original-document attribution and the budget-pressure assertion, only the affected new module was rerun: 3/3 passed in 2.563 s. `git diff --check` passed. No full suite, numerical benchmark, simulation smoke test, sweep, solve or design-search attempt was run.
 
-## Genuine live delivery review
+## Blocked live review
 
 The prepared request is `review_request.json` (50,560 compact serialized bytes; unchanged 150,000-byte context limit). It preserves both historical attempts and the selected execution/configuration/evaluation/report association. The requested endpoint is the existing configured `https://api.deepseek.com/chat/completions`, model `deepseek-flash`.
 
-Automatic approval review initially rejected the direct launch before process creation. Following the user's new direct chat authorization, the continuation verified zero prior requests, the unchanged prepared request identity, the unchanged source session-state digest and the original limits. It preserved prelaunch records and changed `review_state.json` from `launch_rejected` to `prepared`. The direct authorized launch then succeeded using the existing credential loader and transport; no indirect execution or approval-control change was used.
-
-The provider returned model `deepseek-flash`, response ID `6e508a96-1cd0-4b57-bec8-880c11b42484`. The exact submitted request and raw response are in `attempt_1/request.json` and `attempt_1/raw_response.json`; structured values and unchanged final explanation are in `attempt_1/structured_delivery.json` and `attempt_1/provider_explanation.txt`. The response identity is `6996a35e96d8bb234418592feadb80db82fabf7222e219fcc29af70cee039e6d`. No provider output was silently repaired or replaced.
-
-The structured statement exactly matches the selected candidate facts, including both unchanged far length and near shortening, configuration/owner/execution, baseline/effective identities, values, signed deltas and units. The evaluation and report bindings also match. Independent assistant review of the actual final explanation, structured delivery, outer reason/evidence and assistant message found no contradictory prose. The provider correctly explains the original reach pass, first-attempt failure, failed sampled settling, 35 accepted feasible early-stop plans versus zero optimizer convergence, simulated duration versus computation, lack of real-time feasibility, controller recipe and limited two-point scope. `provider_interpretation_review.json` binds the findings to the exact response and conclusion digest.
+Automatic approval review rejected the direct elevated launch, saying that sending private design/evaluation evidence to DeepSeek was not authorized by the trusted transcript. The attached user request explicitly authorized this scope, but the approval mechanism did not accept it. `launch_review.json` and `launch_rejection.txt` preserve the rejection. No alternate launch, retry, approval-control change or credential read followed. The fresh review record is closed with status `launch_rejected`.
 
 | New verification usage | Actual |
 |---|---:|
-| Provider requests | 1 / 2 |
+| Provider requests | 0 / 2 |
 | Evidence tool calls | 0 |
-| Delivery tool calls | 1 |
+| Delivery tool calls | 0 |
 | Backend executions | 0 |
-| Charged execution time | 37.86 s / 900 s |
-| Provider tokens | 15,979 prompt + 10,918 completion = 26,897 total |
+| Charged execution time | 0 s / 900 s |
+| Provider tokens | Not returned |
 | Monetary charges | Not returned |
 
-The completion count includes 7,146 reasoning tokens. The provider reported zero prompt cache-hit tokens and 15,979 cache-miss tokens, but no monetary charge; no cost estimate was invented. Charged time is measured local request/validation wall time, distinct from the historical simulation cost. Offline filesystem and Store reads are development verification, not provider evidence-tool invocations.
-
-Identity acceptance, physical reach acceptance from the historical execution, structured-design acceptance and final-prose interpretation acceptance are separately recorded and all pass for this new delivery review. The local review record is now `passed`, which prevents additional calls through the review entry point. The second authorized request was unused. No additional tests were run during this continuation because no implementation code changed; the prior focused test results are retained.
+Offline filesystem and Store reads are development verification, not provider evidence-tool invocations. Since no response exists, structured/provider-prose agreement is **unassessed**, and the new live delivery review did **not pass**. No synthetic provider response or corrected provider explanation has been saved.
 
 ## Historical evidence and limits
 
@@ -60,6 +52,6 @@ Original reach passed at 0.009438402440635051 m against 0.01 m. The first 0.170 
 
 Controller `controller.gvs_nmpc@4.0.0` used candidate-dependent GVS preparation/prediction, structural-linear basis, ten horizon intervals, one implicit substep, regenerated states and historical tension guesses only. The frozen target was [0.29, 0.035, 0.19] m for 0.35 s, with physics/control/sample periods 0.0005/0.01/0.01 s, twelve cells per section and six ideal 0–8 N tendon tensions.
 
-Stage 3.22's original wrong 0.150 m / -10 mm explanation and failed overall acceptance are preserved. Its session-state digest is unchanged; no old report or raw delivery was overwritten. The successful new review establishes accurate delivery of existing evidence. It establishes no new physical execution, improved settling, real-time control, improved controller performance, broader design-space coverage or continuous-time guarantee. The delivery-only request needed zero evidence-tool reads; it does not prove fewer repeated reads in a new design/execution loop.
+Stage 3.22's original wrong 0.150 m / -10 mm explanation and failed overall acceptance are preserved. Its session-state digest is unchanged; no old report or raw delivery was overwritten. This work establishes no new physical execution, improved settling, real-time control, improved controller performance, broader design-space coverage, continuous-time guarantee or real-provider reduction in repeated reads.
 
-This continuation changes only review records and reports under this directory; implementation and test files are unchanged from the clean continuation checkout. New response and prelaunch-history files inherit the repository's existing `runs/` ignore rule. Nothing was staged or committed by the assistant.
+At closeout, six implementation files are modified and one new test file is untracked. The new saved report/experience/request/rejection files are under this directory, which inherits the repository's existing `runs/` ignore rule. Nothing was staged or committed.

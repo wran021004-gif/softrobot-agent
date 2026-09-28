@@ -1,23 +1,88 @@
 {
-  "status": "not_performed_launch_rejected",
-  "passed": false,
+  "status": "passed",
+  "passed": true,
   "acceptance": {
-    "identity": null,
+    "identity": true,
     "physical_reach_from_existing_execution": true,
-    "structured_design": null,
-    "provider_prose": null,
-    "overall": false
+    "structured_design": true,
+    "provider_prose": true,
+    "overall": true
+  },
+  "binding": {
+    "candidate_facts": {
+      "candidate_id": "near_shorten_v2",
+      "configuration": {
+        "artifact_id": "e27be7be491f1984cc30da2e6af232056d17122fdb5a6c7653e63e5d8516e14c",
+        "media_type": "application/json"
+      },
+      "frozen_baseline_identity": "e5f274a09ec2bc32051b91258d02e4cf3dffd90f1f8d7a0dd57d889062c3a3b0",
+      "effective_identity": "0c425a0a8cc221a228b2c39c83e4c1b7f89e2a2bc098d138785aeb5bbb6fc7be",
+      "owner_run_id": "gvs-live-e593ca2b7c60-e552cdda64495450",
+      "execution_id": "5fc1457877a7456282f2f6f7d089a783",
+      "parameters": [
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.12,
+          "effective_value": 0.12,
+          "baseline_delta": 0.0,
+          "unit": "m"
+        },
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.16,
+          "effective_value": 0.159,
+          "baseline_delta": -0.0010000000000000009,
+          "unit": "m"
+        }
+      ]
+    },
+    "evaluation_ref": {
+      "artifact_id": "51b6caf274252ff1aaa341826f906307e985d3137e5ec4d01cd6c88b1c9d33f2",
+      "media_type": "application/json"
+    },
+    "profile_report": {
+      "execution_id": "5fc1457877a7456282f2f6f7d089a783",
+      "owner_run_id": "gvs-live-e593ca2b7c60-e552cdda64495450",
+      "reference": {
+        "artifact_id": "0aafd631b896f6361d7f58b9e5ac21fb2174385f26c55663449d9754233f3489",
+        "media_type": "application/json"
+      },
+      "request_id": "single-profile-report"
+    },
+    "first_attempt_evaluation_ref": {
+      "artifact_id": "275f619b5819761d092317488108dbf54f7eb99fd14aeb792b983a322810c72b",
+      "media_type": "application/json"
+    },
+    "provider_request_id": "delivery-review-1",
+    "provider_request_identity": "4c15469b179eac0bb99959505e1309679edf905051ef160564f1e6fb0ed87235",
+    "provider_response_path": "attempt_1/raw_response.json",
+    "provider_response_identity": "6996a35e96d8bb234418592feadb80db82fabf7222e219fcc29af70cee039e6d",
+    "conclusion_digest": "7b2265b3d7703687940dc22837b65011979cd59a43bf2d0f5133bf5b5ecb7801"
   },
   "usage": {
-    "provider_requests": 0,
+    "provider_requests": 1,
     "evidence_tool_calls": 0,
-    "delivery_tool_calls": 0,
+    "delivery_tool_calls": 1,
     "backend_executions": 0,
     "paid_connectivity_probes": 0,
     "retries": 0,
-    "charged_time_s": 0,
-    "provider_tokens": null,
-    "monetary_charge": null
+    "correction_requests": 0,
+    "charged_time_s": 37.859999999869615,
+    "provider_tokens": {
+      "prompt_tokens": 15979,
+      "completion_tokens": 10918,
+      "total_tokens": 26897,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 7146
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 15979
+    },
+    "monetary_charge": null,
+    "monetary_charge_status": "Not returned by provider; no estimate made."
   },
   "limits": {
     "model_calls": 2,
@@ -25,6 +90,10 @@
     "backend_solves": 0,
     "wall_s": 900.0
   },
-  "raw_response_received": false,
-  "reason": "launch_review.json preserves the exact automatic approval rejection. No credential read or transmission occurred."
+  "raw_response_received": true,
+  "provider_model": "deepseek-flash",
+  "provider_response_id": "6e508a96-1cd0-4b57-bec8-880c11b42484",
+  "old_source_state_unchanged": true,
+  "reason": "First genuine response passed both structured comparison and independent final-prose review. Stopped immediately; no correction request.",
+  "scope": "Accurate new delivery of existing evidence only; no new end-to-end execution, settling, real-time feasibility, controller performance improvement or wider design-space validation."
 }
