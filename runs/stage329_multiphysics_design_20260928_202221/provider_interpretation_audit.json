@@ -1,0 +1,62 @@
+{
+  "scope": "Developer assessment of unchanged provider output, not a replacement explanation or new provider review",
+  "source": "live/model_final.txt",
+  "explanation_sha256": "bf07f531df56ab921178ac433c8f210ff4dc8b239f4cddca36b230599b5302a5",
+  "selected_candidate": "build_covered_stiff_long",
+  "configuration": {
+    "artifact_id": "dd52a46de78edd4ac5ce620dd3677a27c1c1f2d88f8fe8c227e910bebffbcfeb",
+    "media_type": "application/json"
+  },
+  "execution_id": "6d018c9f0e8a40989eb8e42a4ac4d941",
+  "structured_statement": {
+    "accepted": true,
+    "mismatches": [],
+    "status": "matched"
+  },
+  "prose_accepted": false,
+  "correct": [
+    "Actual high-level values and coverage",
+    "Original task failure and terminal error",
+    "35 accepted feasible early-stop initialization plans; zero converged updates",
+    "35 deadline misses, mean update time, and no real-time demonstration",
+    "Historical evidence scope does not transfer"
+  ],
+  "contradicted": [
+    {
+      "claim": "settles at a static error around 0.039 m",
+      "evidence": {
+        "terminal_tip_speed_m_s": 0.23423393816834698,
+        "sampled_settling": {
+          "available": true,
+          "continuous_time_guarantee": false,
+          "max_error_m": 0.04193534320448598,
+          "max_speed_m_s": 0.23544224946060138,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        }
+      },
+      "assessment": "Constant tension is observed; static mechanical settling is contradicted by nonzero terminal speed and failed sampled settling."
+    }
+  ],
+  "unsupported": [
+    {
+      "claim": "authorized bounds in the direction that favours reach",
+      "assessment": "Only one online candidate was evaluated; monotonic benefit of length, scale or modulus is not established."
+    },
+    {
+      "claim": "bounded optimization ... cannot repair a solver-convergence/real-time limitation",
+      "assessment": "Single-candidate early-stop behavior cannot rule out useful design revisions or establish a dominant cause. Convergence and real-time status are diagnostics, not added task-success conditions."
+    }
+  ],
+  "omissions": [
+    "No discussion of aligned one-step discrepancy",
+    "No explicit separation of sampled settling from reach in prose"
+  ],
+  "autonomous_workflow_completed": true,
+  "multi_category_live_reach_pass": false,
+  "source_unchanged_during_live": true,
+  "overall_delivery_accepted": false,
+  "correction_requests": 0
+}

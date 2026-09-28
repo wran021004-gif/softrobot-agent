@@ -1,0 +1,448 @@
+[
+  {
+    "node_id": "run_covered_stiff_long",
+    "result": {
+      "artifact_id": "bf257c9c414029723160372c2e54c5efa1f16537954be38a0e74b9984b8875e8",
+      "media_type": "application/json"
+    },
+    "candidate_facts": {
+      "physical_changes": [
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.16,
+          "effective_value": 0.17,
+          "baseline_delta": 0.010000000000000009,
+          "unit": "m",
+          "category": "length"
+        },
+        {
+          "path": "components/near/sections/0/section/parameters/semi_y_m",
+          "baseline_value": 0.01,
+          "effective_value": 0.0105,
+          "baseline_delta": 0.0005000000000000004,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/near/sections/0/section/parameters/semi_z_m",
+          "baseline_value": 0.008,
+          "effective_value": 0.008400000000000001,
+          "baseline_delta": 0.00040000000000000105,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/near/physics/young_pa",
+          "baseline_value": 8000000.0,
+          "effective_value": 8800000.0,
+          "baseline_delta": 800000.0,
+          "unit": "Pa",
+          "category": "material"
+        },
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.12,
+          "effective_value": 0.13,
+          "baseline_delta": 0.010000000000000009,
+          "unit": "m",
+          "category": "length"
+        },
+        {
+          "path": "components/far/sections/0/section/parameters/height_z_m",
+          "baseline_value": 0.01,
+          "effective_value": 0.0105,
+          "baseline_delta": 0.0005000000000000004,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/far/sections/0/section/parameters/width_y_m",
+          "baseline_value": 0.014,
+          "effective_value": 0.014700000000000001,
+          "baseline_delta": 0.000700000000000001,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/far/sections/1/section/parameters/height_z_m",
+          "baseline_value": 0.009,
+          "effective_value": 0.00945,
+          "baseline_delta": 0.00045000000000000075,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/far/sections/1/section/parameters/width_y_m",
+          "baseline_value": 0.012,
+          "effective_value": 0.0126,
+          "baseline_delta": 0.0005999999999999998,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/far/physics/young_pa",
+          "baseline_value": 6000000.0,
+          "effective_value": 6600000.000000001,
+          "baseline_delta": 600000.0000000009,
+          "unit": "Pa",
+          "category": "material"
+        }
+      ],
+      "semantic_provenance": {
+        "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "material_groups": {
+          "far": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 6600000.000000001
+          },
+          "near": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 8800000.0
+          }
+        },
+        "selections": {
+          "design/material_scenario": "stiff",
+          "design/section_scale": 1.05
+        },
+        "source": "Frozen experiment semantic_source; original per-section material parameters",
+        "source_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4"
+      },
+      "physical_summary": {
+        "physics_identity": "f5a446749070b02a6c590c1b97109c759f3c062896f791a9373ba833e132e1cf",
+        "sections": [
+          {
+            "component": "near",
+            "length_m": 0.17,
+            "material": {
+              "bending_ei_nm2": null,
+              "bending_viscosity_nm2_s": [
+                0.0005,
+                0.0007
+              ],
+              "density_kg_m3": 1100.0,
+              "line_density_kg_m": null,
+              "mode": "material",
+              "young_pa": 8800000.0
+            },
+            "mass_kg": 0.05181554427271792,
+            "cells": 12,
+            "area_range_m2": [
+              0.0002770884720466198,
+              0.0002770884720466198
+            ],
+            "cell_inertia_diagonal_kg_m2": [
+              [
+                1.951826783322943e-07,
+                1.4838476585450392e-07,
+                1.9122974402500756e-07
+              ],
+              [
+                1.951826783322943e-07,
+                1.4838476585450392e-07,
+                1.9122974402500756e-07
+              ]
+            ],
+            "cell_stiffness_nm_rad": [
+              [
+                3.036211601840533,
+                4.744080627875834
+              ],
+              [
+                3.036211601840533,
+                4.744080627875834
+              ]
+            ],
+            "cell_damping_nm_s_rad": [
+              [
+                0.03529411764705882,
+                0.04941176470588235
+              ],
+              [
+                0.03529411764705882,
+                0.04941176470588235
+              ]
+            ]
+          },
+          {
+            "component": "far",
+            "length_m": 0.13,
+            "material": {
+              "bending_ei_nm2": null,
+              "bending_viscosity_nm2_s": [
+                0.0003,
+                0.0004
+              ],
+              "density_kg_m3": 1050.0,
+              "line_density_kg_m": null,
+              "mode": "material",
+              "young_pa": 6600000.000000001
+            },
+            "mass_kg": 0.0186105770703125,
+            "cells": 12,
+            "area_range_m2": [
+              0.00012045195312500002,
+              0.000152791953125
+            ],
+            "cell_inertia_diagonal_kg_m2": [
+              [
+                4.6760874523245223e-08,
+                3.2833047468843065e-08,
+                4.792359451836881e-08
+              ],
+              [
+                2.867065019974821e-08,
+                2.3691153148072975e-08,
+                3.177970809203078e-08
+              ]
+            ],
+            "cell_stiffness_nm_rad": [
+              [
+                0.8481115590595374,
+                1.6563423799031138
+              ],
+              [
+                0.551175636266644,
+                0.9843885198246886
+              ]
+            ],
+            "cell_damping_nm_s_rad": [
+              [
+                0.02769230769230769,
+                0.036923076923076927
+              ],
+              [
+                0.02769230769230769,
+                0.036923076923076927
+              ]
+            ]
+          }
+        ],
+        "force_limits_n": {
+          "near_t0": 8.0,
+          "near_t1": 8.0,
+          "near_t2": 8.0,
+          "far_t0": 8.0,
+          "far_t1": 8.0,
+          "far_t2": 8.0
+        },
+        "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "applicability": {
+          "compilable": true,
+          "backends": [
+            "backend.matlab_spatial",
+            "backend.family_mujoco"
+          ],
+          "physics": "serial rigid cells with two principal bending hinges; fixed rigid attachments; straight frictionless tendons",
+          "omitted": [
+            "axial stretch",
+            "shear",
+            "material torsion",
+            "friction",
+            "elastic rope",
+            "motor dynamics",
+            "self collision"
+          ],
+          "collision": "section convex hull extrusions; holes filled for collision only; exact polygon/circular area moments; guide box envelope"
+        }
+      },
+      "multi_category_coverage": true,
+      "candidate_id": "build_covered_stiff_long",
+      "configuration": {
+        "artifact_id": "dd52a46de78edd4ac5ce620dd3677a27c1c1f2d88f8fe8c227e910bebffbcfeb",
+        "media_type": "application/json"
+      },
+      "frozen_baseline_identity": "5f89b64a363dc2c82c43e3ab63168141f85280d8343652c993bdf2aae96b2a0a",
+      "effective_identity": "2cd5205a68ccd442a52f418783cec6690fce6aeea13c09206d518fb1b0c259fa",
+      "owner_run_id": "gvs-live-81630b95545d-b77192b4ed2f3834",
+      "execution_id": "6d018c9f0e8a40989eb8e42a4ac4d941",
+      "parameters": [
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.12,
+          "effective_value": 0.13,
+          "baseline_delta": 0.010000000000000009,
+          "unit": "m"
+        },
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.16,
+          "effective_value": 0.17,
+          "baseline_delta": 0.010000000000000009,
+          "unit": "m"
+        },
+        {
+          "path": "design/material_scenario",
+          "baseline_value": "baseline",
+          "effective_value": "stiff",
+          "baseline_delta": null,
+          "unit": null
+        },
+        {
+          "path": "design/section_scale",
+          "baseline_value": 1.0,
+          "effective_value": 1.05,
+          "baseline_delta": 0.050000000000000044,
+          "unit": "1"
+        }
+      ]
+    },
+    "evaluation": {
+      "artifact_id": "e54ce8f59fd86dde35e930aecad98fd4efb00baa7a5a418bfeacd831e1978c88",
+      "media_type": "application/json"
+    },
+    "report": {
+      "execution_id": "6d018c9f0e8a40989eb8e42a4ac4d941",
+      "owner_run_id": "gvs-live-81630b95545d-b77192b4ed2f3834",
+      "reference": {
+        "artifact_id": "7de778386ce7b7fa3aff4b3226a9a14df8fe013bd4dbc49407e500f7fb6913d2",
+        "media_type": "application/json"
+      },
+      "request_id": "single-profile-report"
+    },
+    "observations": {
+      "valid_complete_execution": true,
+      "official_task_success": false,
+      "terminal_error_m": 0.038874362971136237,
+      "error_phases": [
+        {
+          "final_error_m": 0.045440677361310355,
+          "interval_s": [
+            0.0,
+            0.11666666666666665
+          ],
+          "maximum_error_m": 0.0638325217476723
+        },
+        {
+          "final_error_m": 0.04600234527519641,
+          "interval_s": [
+            0.11666666666666665,
+            0.2333333333333333
+          ],
+          "maximum_error_m": 0.04613092128583371
+        },
+        {
+          "final_error_m": 0.038874362971136237,
+          "interval_s": [
+            0.2333333333333333,
+            0.35
+          ],
+          "maximum_error_m": 0.04573902816698244
+        }
+      ],
+      "drive_utilization": [
+        {
+          "limit_n": 8.0,
+          "maximum_n": 1.7512764858409064,
+          "minimum_n": 1.7512764858409064,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "near_t0",
+          "tendon_index": 0
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 4.755852667139922,
+          "minimum_n": 4.755852667139922,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "near_t1",
+          "tendon_index": 1
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 3.1031566686630025,
+          "minimum_n": 3.1031566686630025,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "near_t2",
+          "tendon_index": 2
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 3.218253612486097,
+          "minimum_n": 3.218253612486097,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "far_t0",
+          "tendon_index": 3
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 0.7859357597552847,
+          "minimum_n": 0.7859357597552847,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "far_t1",
+          "tendon_index": 4
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 0.6315302379791942,
+          "minimum_n": 0.6315302379791942,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "far_t2",
+          "tendon_index": 5
+        }
+      ],
+      "updates": 35,
+      "accepted_plans": 35,
+      "converged_updates": 0,
+      "solver_error_count": 0,
+      "hold_last_responses": 0,
+      "max_projection_residual_rad_m": 0.968401981548912,
+      "max_rate_projection_residual_rad_m_s": 9.225391475427315,
+      "mean_update_s": 18.436285745711732,
+      "simulation_wall_s": 649.2039999999106,
+      "backend_timings_s": {
+        "backend_call": 645.7826914999168,
+        "engine_compile": 0.0267537001054734,
+        "prepare_compile": 0.0656851998064667,
+        "solve": 645.4407814999577
+      },
+      "one_step_prediction_summary": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_tip_difference_m": 0.0035069399307551567,
+        "mean_tip_difference_m": 0.0028130658331136336,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+      },
+      "one_step_prediction_evidence": {
+        "artifact_id": "7e8973e9a4788df5f4adfc50e771f12947526653bda96810369e846414afcdf3",
+        "media_type": "application/json"
+      },
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.04193534320448598,
+        "max_speed_m_s": 0.23544224946060138,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "real_time_demonstrated": false
+    },
+    "hypotheses": [],
+    "limitations": [
+      "Sampled observations do not identify a dominant cause.",
+      "Force proximity alone does not imply a required physical design change.",
+      "Ideal tensions; omitted shear, stretch, torsion, tendon friction and actuator dynamics."
+    ]
+  }
+]

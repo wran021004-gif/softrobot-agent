@@ -1,0 +1,475 @@
+{
+  "binding": {
+    "basis": {
+      "axes": [
+        "y",
+        "z"
+      ],
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "far.kappa_y_node_0",
+        "far.kappa_y_node_1",
+        "far.kappa_y_node_2",
+        "far.kappa_z_node_0",
+        "far.kappa_z_node_1",
+        "far.kappa_z_node_2"
+      ],
+      "dimension": 12,
+      "representation_id": "gvs_bending_basis_v1",
+      "segments": [
+        {
+          "knots": [
+            0.0,
+            0.5,
+            1.0
+          ],
+          "length_m": 0.162,
+          "locations": [
+            {
+              "kinds": [
+                "segment_boundary"
+              ],
+              "s": 0.0
+            },
+            {
+              "kinds": [
+                "tendon_guide"
+              ],
+              "s": 0.5
+            },
+            {
+              "kinds": [
+                "component_attachment",
+                "rigid_attachment",
+                "segment_boundary",
+                "tendon_anchor",
+                "tendon_guide"
+              ],
+              "s": 1.0
+            }
+          ],
+          "segment": "near",
+          "start": 0
+        },
+        {
+          "knots": [
+            0.0,
+            0.5,
+            1.0
+          ],
+          "length_m": 0.12,
+          "locations": [
+            {
+              "kinds": [
+                "segment_boundary"
+              ],
+              "s": 0.0
+            },
+            {
+              "kinds": [
+                "tendon_guide"
+              ],
+              "s": 0.5
+            },
+            {
+              "kinds": [
+                "component_attachment",
+                "rigid_attachment",
+                "segment_boundary",
+                "tendon_anchor"
+              ],
+              "s": 1.0
+            }
+          ],
+          "segment": "far",
+          "start": 6
+        }
+      ],
+      "specification": {
+        "strategy": "structural_linear"
+      }
+    },
+    "calculation_frame": "robot_base",
+    "candidate_id": "plumbing_representative",
+    "configuration": {
+      "artifact_id": "539c3515b38af20b9ebbec173021d3bf400a9deb4519aaea7fa601158ddc86a9",
+      "media_type": "application/json"
+    },
+    "coordinate_order": [
+      "near.kappa_y_node_0",
+      "near.kappa_y_node_1",
+      "near.kappa_y_node_2",
+      "near.kappa_z_node_0",
+      "near.kappa_z_node_1",
+      "near.kappa_z_node_2",
+      "far.kappa_y_node_0",
+      "far.kappa_y_node_1",
+      "far.kappa_y_node_2",
+      "far.kappa_z_node_0",
+      "far.kappa_z_node_1",
+      "far.kappa_z_node_2"
+    ],
+    "effective_configuration_identity": "539c3515b38af20b9ebbec173021d3bf400a9deb4519aaea7fa601158ddc86a9",
+    "execution_data_used": false,
+    "model": "model.gvs@1.0.0",
+    "owner_run_id": "gvs-live-2f2acae024c6",
+    "physical_context": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "robot_identity": "3d06320d88db8ee9c50810ce305c12d54d582dc914b472edb49a031440063ac0",
+    "source_node": "plumbing_build",
+    "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+  },
+  "calculation": {
+    "backbone_points_m": null,
+    "coordinate_order": [
+      "near.kappa_y_node_0",
+      "near.kappa_y_node_1",
+      "near.kappa_y_node_2",
+      "near.kappa_z_node_0",
+      "near.kappa_z_node_1",
+      "near.kappa_z_node_2",
+      "far.kappa_y_node_0",
+      "far.kappa_y_node_1",
+      "far.kappa_y_node_2",
+      "far.kappa_z_node_0",
+      "far.kappa_z_node_1",
+      "far.kappa_z_node_2"
+    ],
+    "damping_force": null,
+    "detail": "summary",
+    "dynamics_equation": "M*qdd+c+elastic+damping=tendon+gravity",
+    "elastic_force": null,
+    "frame": "robot_base",
+    "gravity_force": null,
+    "mass_matrix": null,
+    "model_id": "gvs_variable_strain_bending_v1",
+    "q": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "qdd": [
+      9425.100158994645,
+      -7924.915054056863,
+      8577.267004409228,
+      14.371372838345158,
+      -16.768377669470798,
+      23.881735666133654,
+      -6266.935006451647,
+      2671.4037230288286,
+      -2461.624079275306,
+      7.0897653198681185,
+      -23.9576924518064,
+      68.9960983269877
+    ],
+    "qdot": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "segment_end_poses": {
+      "far": {
+        "position_m": [
+          0.29600000000000015,
+          0.0,
+          0.0
+        ],
+        "rotation_matrix": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      "near": {
+        "position_m": [
+          0.1620000000000001,
+          0.0,
+          0.0
+        ],
+        "rotation_matrix": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    "tendon_generalized_force": null,
+    "tendon_length_jacobian": null,
+    "tendon_lengths_m": null,
+    "tendon_order": null,
+    "tip": {
+      "position_m": [
+        0.31000000000000016,
+        0.0,
+        0.0
+      ],
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "velocity_bias": null
+  },
+  "physical_summary": {
+    "applicability": {
+      "backends": [
+        "backend.matlab_spatial",
+        "backend.family_mujoco"
+      ],
+      "collision": "section convex hull extrusions; holes filled for collision only; exact polygon/circular area moments; guide box envelope",
+      "compilable": true,
+      "omitted": [
+        "axial stretch",
+        "shear",
+        "material torsion",
+        "friction",
+        "elastic rope",
+        "motor dynamics",
+        "self collision"
+      ],
+      "physics": "serial rigid cells with two principal bending hinges; fixed rigid attachments; straight frictionless tendons"
+    },
+    "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+    "force_limits_n": {
+      "far_t0": 8.0,
+      "far_t1": 8.0,
+      "far_t2": 8.0,
+      "near_t0": 8.0,
+      "near_t1": 8.0,
+      "near_t2": 8.0
+    },
+    "physics_identity": "dd6c6d6ad5664bd750456ab10964e9d9e0c771cbf310e3dc4e1d33c90541fa48",
+    "sections": [
+      {
+        "area_range_m2": [
+          0.0002614810397435857,
+          0.0002614810397435857
+        ],
+        "cell_damping_nm_s_rad": [
+          [
+            0.037037037037037035,
+            0.05185185185185185
+          ],
+          [
+            0.037037037037037035,
+            0.05185185185185185
+          ]
+        ],
+        "cell_inertia_diagonal_kg_m2": [
+          [
+            1.6563452138221657e-07,
+            1.2361082487573599e-07,
+            1.599696222523201e-07
+          ],
+          [
+            1.6563452138221657e-07,
+            1.2361082487573599e-07,
+            1.599696222523201e-07
+          ]
+        ],
+        "cell_stiffness_nm_rad": [
+          [
+            2.3214495893267335,
+            3.6272649833230206
+          ],
+          [
+            2.3214495893267335,
+            3.6272649833230206
+          ]
+        ],
+        "cells": 12,
+        "component": "near",
+        "length_m": 0.162,
+        "mass_kg": 0.04659592128230696,
+        "material": {
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0005,
+            0.0007
+          ],
+          "density_kg_m3": 1100.0,
+          "line_density_kg_m": null,
+          "mode": "material",
+          "young_pa": 7200000.0
+        }
+      },
+      {
+        "area_range_m2": [
+          0.0001136673125,
+          0.00014418571250000002
+        ],
+        "cell_damping_nm_s_rad": [
+          [
+            0.029999999999999995,
+            0.04
+          ],
+          [
+            0.029999999999999995,
+            0.04
+          ]
+        ],
+        "cell_inertia_diagonal_kg_m2": [
+          [
+            3.8438285596526836e-08,
+            2.5633041176054993e-08,
+            3.803774410797184e-08
+          ],
+          [
+            2.356779362773043e-08,
+            1.840531734252046e-08,
+            2.505425597270997e-08
+          ]
+        ],
+        "cell_stiffness_nm_rad": [
+          [
+            0.6694349828042567,
+            1.3073911335885517
+          ],
+          [
+            0.4350562713653378,
+            0.7770016866322268
+          ]
+        ],
+        "cells": 12,
+        "component": "far",
+        "length_m": 0.12,
+        "mass_kg": 0.016211361075000003,
+        "material": {
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0003,
+            0.0004
+          ],
+          "density_kg_m3": 1050.0,
+          "line_density_kg_m": null,
+          "mode": "material",
+          "young_pa": 5400000.0
+        }
+      }
+    ]
+  }
+}
