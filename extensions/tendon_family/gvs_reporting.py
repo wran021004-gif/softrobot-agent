@@ -13,7 +13,12 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
     duration=task.timing.duration_s
     complete=bool(result['solver_status']=='completed' and rows and abs(rows[-1]['time_s']-duration)<1e-8)
     valid=complete and evaluation is not None and evaluation['validity']=='valid'
-    errors=[float(np.linalg.norm(np.asarray(r['tip_m'])-task.goal.data['target_m'])) for r in rows]
+    tracking=task.family=='task.tracking'
+    if tracking:
+        from .tracking import reference_at
+        desired,_=reference_at(task.goal.data,[r['time_s'] for r in rows])
+        errors=np.linalg.norm(np.asarray([r['tip_m'] for r in rows])-desired,axis=1).tolist() if rows else []
+    else:errors=[float(np.linalg.norm(np.asarray(r['tip_m'])-task.goal.data['target_m'])) for r in rows]
     window=[r for r in motion if r['time_s']>=duration-acceptance.window_s-1e-9]
     # Missing or partial final-window data is unavailable, never vacuous success.
     expected=round(acceptance.window_s/task.timing.sample_period_s)+1
@@ -21,7 +26,7 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
     def values(key):return [o[key] for o in observations if o.get(key) is not None]
     def mean(key):return float(np.mean(values(key))) if values(key) else None
     tensions=np.array([r['tension_n'] for r in rows])
-    return dict(complete=complete,valid_complete_execution=valid,
+    summary=dict(complete=complete,valid_complete_execution=valid,
         official_task_success=None if evaluation is None else evaluation['task_success'],
         evaluation_validity=None if evaluation is None else evaluation['validity'],
         solver_status=result['solver_status'],last_valid_time_s=rows[-1]['time_s'] if rows else None,
@@ -61,6 +66,28 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
         max_rate_projection_residual_rad_m_s=max((r['rate_projection_residual_rad_m_s'] for r in motion),default=None),
         max_sampled_contacts=max((r['contacts'] for r in motion),default=None),
         real_time_demonstrated=bool(complete and observations and all(not o['deadline_missed'] for o in observations)))
+    if tracking:
+        summary.pop('sampled_settling')
+        summary['execution_failure_reason']=result['data']['data'].get('reason')
+        summary['evaluation_reason']=None if evaluation is None else evaluation.get('reason')
+        summary['constraints']=[] if evaluation is None else evaluation['constraints']
+        summary['tracking']=dict(reference=task.goal.data,scoring_interval_s=list(task.sampling.window_s),
+            acceptance=plain(task.evaluator.parameters),metrics=[] if evaluation is None else evaluation['metrics'],
+            rule='All inclusive uniform samples in scoring interval; arithmetic RMS; max <= declared limit. Complete grid required. Terminal error is at execution endpoint.',
+            velocity_error_max_m_s=max((r['velocity_error_m_s'] for r in motion),default=None),continuous_time_guarantee=False)
+        comparisons=[]
+        for observation in observations:
+            pred=observation.get('one_step_prediction')
+            if pred is None:continue
+            following=next((r for r in rows if abs(r['time_s']-pred['time_s'])<1e-8),None)
+            if following is not None:
+                comparisons.append(dict(start_s=observation['time_s'],end_s=pred['time_s'],
+                    applied_input_difference_n=float(np.max(np.abs(np.asarray(observation['actual_tension_n'])-pred['applied_tension_n']))) if 'actual_tension_n' in observation else None,
+                    applied_tension_n=pred['applied_tension_n'],predicted_tip_m=pred['tip_position_m'],measured_tip_m=following['tip_m'],
+                    tip_difference_m=float(np.linalg.norm(np.asarray(pred['tip_position_m'])-following['tip_m']))))
+        summary['one_step_prediction_comparisons']=comparisons
+    return summary
+
 
 
 def reconstruct_motion(files, rows, target):
@@ -77,8 +104,13 @@ def reconstruct_motion(files, rows, target):
         data.qpos[qi]=row['qpos_rad'];data.qvel[vi]=row['qvel_rad_s'];mujoco.mj_forward(model,data)
         J=np.zeros((3,model.nv));Jr=np.zeros_like(J);mujoco.mj_jacSite(model,data,J,Jr,model.site('tip_site').id)
         projection=project(physics,basis,row['qpos_rad'],row['qvel_rad_s'])
-        motion.append(dict(time_s=row['time_s'],tip_speed_m_s=float(np.linalg.norm(J@data.qvel)),
-            tip_error_m=float(np.linalg.norm(np.asarray(row['tip_m'])-target)),contacts=int(data.ncon),
+        tracking=isinstance(target,dict)
+        if tracking:
+            from .tracking import reference_at
+            position,velocity=reference_at(target,row['time_s'])
+        else:position,velocity=target,np.zeros(3)
+        motion.append(dict(velocity_error_m_s=float(np.linalg.norm(J@data.qvel-velocity)),time_s=row['time_s'],tip_speed_m_s=float(np.linalg.norm(J@data.qvel)),
+            tip_error_m=float(np.linalg.norm(np.asarray(row['tip_m'])-position)),contacts=int(data.ncon),
             rate_projection_residual_rad_m_s=projection['rate_projection_residual_max_rad_m_s']))
     return motion,physics
 
@@ -113,9 +145,9 @@ def report(ctx,args):
     files={f['filename']:ctx.store.artifact(f['reference'],raw=True) for f in bundle['files']}
     rows=json.loads(gzip.decompress(files['trajectory.json.gz']))
     observations=json.loads(files['controller_observations.json'])
-    motion,physics=reconstruct_motion(files,rows,ctx.input.task.goal.data['target_m'])
+    motion,physics=reconstruct_motion(files,rows,ctx.input.task.goal.data if ctx.input.task.family=='task.tracking' else ctx.input.task.goal.data['target_m'])
     output=summarize(ctx.input.task,ctx.artifact(sim['output']),plain(evaluation),rows,observations,motion,
-        [t['force_limit_n'] for t in physics['tendons']],settling_for(ctx.input))
+        [t['force_limit_n'] for t in physics['tendons']],None if ctx.input.task.family=='task.tracking' else settling_for(ctx.input))
     preparations=[e['outputs'][0] for e in ctx.store.events(ctx.run_id)
         if e['kind']=='control_preparation' and e['execution_id']==sim['execution_id']]
     output.update(task=plain(ctx.input.task),execution_scope=execution_scope(ctx.input),
@@ -143,7 +175,10 @@ def report(ctx,args):
 
 
 def markdown(summary):
-    s=summary;settling=s['sampled_settling']
+    s=summary
+    if 'tracking' in s:
+        return ('# Public GVS tracking result\n\n'+json.dumps({k:s[k] for k in ('valid_complete_execution','official_task_success','tracking','accepted_plans','converged_updates','mean_update_s','backend_timings_s')},indent=2)+'\n')
+    settling=s['sampled_settling']
     return ('# Public GVS NMPC result\n\n'
         f"Complete execution: {s['complete']}; valid: {s['evaluation_validity']}; official task success: {s['official_task_success']}.\n\n"
         f"Terminal error: {s['terminal_error_m']} m; sampled settling: {settling['passed']} (available: {settling['available']}).\n\n"

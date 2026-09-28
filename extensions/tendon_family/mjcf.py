@@ -27,7 +27,7 @@ def compile_xml(physics, scene, config, path):
     assets=ET.SubElement(root,'asset'); world=ET.SubElement(root,'worldbody')
     ET.SubElement(world,'light',pos='0 -0.3 1',dir='0 0 -1')
     ET.SubElement(world,'geom',name=scene['floor_id'],type='plane',pos=fmt([0,0,scene['floor_z_m']]),size='1 1 .01',contype='2',conaffinity='1',rgba='.6 .6 .6 1')
-    ET.SubElement(world,'site',name='task_target',pos=fmt(scene['target_world_m']),size='.004',rgba='1 0 0 1')
+    if scene.get('target_world_m') is not None:ET.SubElement(world,'site',name='task_target',pos=fmt(scene['target_world_m']),size='.004',rgba='1 0 0 1')
     base=ET.SubElement(world,'body',name='fixed_base',pos=fmt(scene['mount_position']),quat=quaternion(scene['mount_rotation']))
     bodies=[]
     for i,part in enumerate(p['parts']):

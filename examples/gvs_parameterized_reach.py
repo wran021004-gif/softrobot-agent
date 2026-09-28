@@ -55,7 +55,7 @@ def run(root,input_path=None):
     _,report=call(host,'control.profile_report',dict(simulation_request_id='simulate',evaluation_request_id='evaluate'),'report')
     summary=report['detail'];atomic_json(root/'summary.json',summary)
     (root/'report.md').write_text(markdown(summary),encoding='utf8')
-    print(json.dumps({k:summary[k] for k in ('complete','official_task_success','terminal_error_m','sampled_settling',
+    print(json.dumps({k:summary[k] for k in ('complete','official_task_success','terminal_error_m',('tracking' if 'tracking' in summary else 'sampled_settling'),
         'accepted_plans','updates','mean_update_s','deadline_misses')}),flush=True)
 
 

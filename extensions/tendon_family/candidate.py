@@ -204,7 +204,8 @@ def apply(inp, parameters, changes):
     from .contracts import Control, GVSLQRControl
     from .contracts import GVSTrajectoryParameters
     from .gvs_profile import ProfileControl, ReachControl
-    control_type=({'1.0.0':GVSTrajectoryParameters,'2.0.0':ProfileControl,'3.0.0':ReachControl,'4.0.0':ReachControl}[inp.policy.controller.version]
+    from .tracking import TrackingControl
+    control_type=({'1.0.0':GVSTrajectoryParameters,'2.0.0':ProfileControl,'3.0.0':ReachControl,'4.0.0':ReachControl,'5.0.0':TrackingControl}[inp.policy.controller.version]
         if inp.policy.controller.extension_id=='controller.gvs_nmpc' else
         GVSLQRControl if inp.policy.controller.extension_id in ('controller.gvs_lqr','controller.gvs_sampled_lqr') else Control)
     control=control_type.model_validate(inp.policy.controller.parameters.data).model_dump(mode='json')

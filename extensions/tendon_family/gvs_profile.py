@@ -216,6 +216,9 @@ def candidate_numerical(inp,control,baseline):
 
 
 def checked_control(inp):
+    if inp.policy.controller.version=='5.0.0':
+        from .tracking import checked_tracking
+        return checked_tracking(inp)
     if inp.policy.controller.version in ('3.0.0','4.0.0'):
         checked_reach(inp)
     else:checked_profile(inp)
@@ -293,6 +296,9 @@ def summary(profile=None):
 
 
 def describe(ctx, args):
+    if ctx.input.policy.controller.version=='5.0.0':
+        from .tracking import assessment
+        return ProfileOutput(detail=dict(controller=plain(ctx.input.policy.controller),execution_scope=execution_scope(ctx.input),**assessment(ctx.input)))
     if ctx.input.policy.controller.version in ('3.0.0','4.0.0'):
         return ProfileOutput(detail=dict(controller=plain(ctx.input.policy.controller),
             execution_scope=execution_scope(ctx.input),**reach_assessment(ctx.input),
@@ -315,8 +321,8 @@ def prepare_execution(ctx, controller, inp):
     """Budgeted public execution hook. Imports data, never injects a cache."""
     started = time.perf_counter()
     try:
-        if inp.policy.controller.version in ('3.0.0','4.0.0'):
-            numerical=reach_numerical(inp)
+        if inp.policy.controller.version in ('3.0.0','4.0.0','5.0.0'):
+            numerical=candidate_numerical(inp,checked_control(inp),load_profile()) if inp.policy.controller.version=='5.0.0' else reach_numerical(inp)
             historical=numerical['provenance'].get('historical_source')
             if historical is not None:
                 imported=ctx.save_artifact(load_profile()['numerical'],'historical_numerical_import')

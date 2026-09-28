@@ -351,6 +351,8 @@ def control_profiles(host,inp,combinations):
 
 def preflight(inp,args,reg):
     spec=policy(inp)
+    if inp.task.family=='task.tracking' and args.action in ('optimize','crosscheck'):
+        raise ValueError('TRACKING_ROUTE_REQUIRES_EXPLICIT_ANALYZED_BUILD_AND_RUN')
     if args.max_trials>spec.max_trials: raise ValueError('ROUTE_TRIAL_LIMIT')
     if args.action in ('build','crosscheck') or (args.action=='optimize' and (args.combination or not args.source_node)):
         selected(inp,spec,args.combination,reg)
@@ -429,6 +431,10 @@ def run_built(ctx,args,route):
     candidate=built['candidate_id']
     if args.candidate_id and args.candidate_id!=candidate: raise ValueError('CANDIDATE_SELECTION_MISMATCH')
     inp=ctx.store.artifact(built['configuration'])
+    capability=profile_capability(SessionInput.model_validate(inp),ctx.reg)
+    if capability and capability.get('required_candidate_analysis'):
+        from .candidate_analysis import require_completed_analysis
+        require_completed_analysis(ctx,built,capability['required_candidate_analysis'])
     child=Host(ctx.store.root,inp['run_id'],actor='route-executor')
     ensure_session(child,inp,parent_run_id=ctx.run_id,parent_event_id=ctx.row['parent_id'])
     sim=invoke(child,'single-simulation','simulation.run',dict(candidate_id=candidate,changes={}))

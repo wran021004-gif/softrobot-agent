@@ -43,7 +43,7 @@ def assemble(inp,p):
         qpos_rad=[initial.qpos_rad.get(j,0.) for j in p['dofs']],qvel_rad_s=[initial.qvel_rad_s.get(j,0.) for j in p['dofs']],
         mount_rotation=quat(assembly.mount.quaternion_wxyz).tolist(),mount_position=list(assembly.mount.position_m),
         gravity=list(env.gravity_m_s2),floor_z_m=env.objects[0].position_m[2],floor_id=assembly.floor_id,
-        forces=forces,target_world_m=inp.task.goal.data['target_m'],control=control,duration_s=t.duration_s,
+        forces=forces,target_world_m=inp.task.goal.data.get('target_m'),control=control,duration_s=t.duration_s,
         timestep_s=t.timestep_s,control_period_s=t.control_period_s,sample_period_s=t.sample_period_s,
         observation_phase='post_step',task_identity=task_identity,
         entity_mapping=dict(parts=p['entity_map'],dofs=list(p['dofs']),tendons=[x['entity'] for x in p['tendons']],
@@ -51,6 +51,9 @@ def assemble(inp,p):
         semantics=dict(units='SI',world_frame=inp.robot.frame,force_frame='world',
             initial_state='named model coordinates; unspecified joints are zero',
             timing='control observations and force signals are interval-start/pre-step; saved state signals are interval-end/post-step'))
+    if inp.task.family=='task.tracking':
+        scene.pop('target_world_m')
+        scene['time_reference']=inp.task.goal.model_dump(mode='json')
     scene['identity']=digest(scene)
     from .execution import resolve_execution
     from tools.platform_registry import registry

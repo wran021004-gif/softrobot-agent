@@ -43,12 +43,23 @@ def trajectory_authorization(robot, space, parameters):
     return result
 
 
+def tracking_authorization(robot, space, parameters):
+    result=trajectory_authorization(robot,space,parameters)
+    p=GVSTrajectoryParameters.model_validate(parameters)
+    for k in range(1,p.horizon*p.substeps+1):
+        for quantity,unit in (('position','m'),('velocity','m/s')):
+            for j in range(3):
+                result[f'reference/{quantity}/{k}/{j}']=dict(type='number',bounds=[0.,0.],units=unit)
+    return result
+
+
 class GVSTrajectoryAssembler:
     def __init__(self,parameters): self.parameters=GVSTrajectoryParameters.model_validate(parameters)
 
     def assemble(self,task,robot,space,mathematical_model,specification,context):
         p=self.parameters
-        expected=trajectory_authorization(robot,{},p)
+        tracking=task.family=='task.tracking'
+        expected=(tracking_authorization if tracking else trajectory_authorization)(robot,{},p)
         if specification.variables!=list(expected) or space!=expected:
             raise ValueError('GVS_TRAJECTORY_REQUIRES_FIXED_DESIGN_ORDER_AND_PHYSICAL_BOUNDS')
         if specification.horizon!=p.horizon or [s.template_id for s in specification.objectives]!=['dynamic_tip_tracking']:
@@ -75,12 +86,12 @@ class GVSTrajectoryAssembler:
         local_tip=ca.Function('local_tip',[functions.q_symbol],[functions.tip_position_expression])
         tip_rate=ca.MX.sym('tip_rate',n)
         local_velocity=ca.Function('local_tip_velocity',[functions.q_symbol,tip_rate],
-            [ca.jacobian(functions.tip_position_expression,functions.q_symbol)@tip_rate]) if p.terminal_tip_speed_weight or p.holding_tip_speed_weight else None
-        target=ca.DM(task.goal.data['target_m']); mount=ca.DM(assembly['mount']['position_m'])
+            [ca.jacobian(functions.tip_position_expression,functions.q_symbol)@tip_rate]) if tracking or p.terminal_tip_speed_weight or p.holding_tip_speed_weight else None
+        target=None if tracking else ca.DM(task.goal.data['target_m']); mount=ca.DM(assembly['mount']['position_m'])
         dt=task.timing.control_period_s; h=dt/p.substeps; constraints={}; objective=0
-        if task.evaluator.extension_id!='evaluate.reach':
+        if task.evaluator.extension_id!=('evaluate.tracking' if tracking else 'evaluate.reach'):
             raise ValueError('GVS_TRAJECTORY_REQUIRES_REACH_EVALUATOR')
-        tolerance=p.position_error_scale_m or task.evaluator.parameters.data['tolerance_m']
+        tolerance=p.position_error_scale_m or task.evaluator.parameters.data['max_position_error_m' if tracking else 'tolerance_m']
         step_residual=implicit_step_residual(functions,n,m,h)
         mapped=step_residual.map(steps,'thread',p.evaluation_threads)
         residuals=mapped(ca.horzcat(*X[:-1]),ca.horzcat(*X[1:]),
@@ -90,16 +101,20 @@ class GVSTrajectoryAssembler:
             residual=residuals[:,k]
             for j in range(2*n): constraints[f'dynamics_{k}_{j}']=residual[j]
             tip=ca.mtimes(ca.DM(rotation),local_tip(y[:n]))+mount
-            objective+=h*(p.tracking_weight*ca.sumsqr((tip-target)/tolerance)+p.velocity_weight*ca.sumsqr(y[n:]))
+            if tracking:
+                target=ca.vertcat(*[symbols[f'reference/position/{k+1}/{j}'] for j in range(3)])
+                target_velocity=ca.vertcat(*[symbols[f'reference/velocity/{k+1}/{j}'] for j in range(3)])
+                velocity_error=ca.mtimes(ca.DM(rotation),local_velocity(y[:n],y[n:]))-target_velocity
+            objective+=h*(p.tracking_weight*ca.sumsqr((tip-target)/tolerance)+p.velocity_weight*ca.sumsqr(velocity_error/p.tip_speed_scale_m_s if tracking else y[n:]))
             if p.holding_tip_speed_weight:
                 speed=ca.mtimes(ca.DM(rotation),local_velocity(y[:n],y[n:]))
                 objective+=h*p.holding_tip_speed_weight*symbols[f'holding/{k+1}']*ca.sumsqr(speed/p.tip_speed_scale_m_s)
         for k,u in enumerate(U):
             objective+=dt*(p.tension_weight*ca.sumsqr(u)+p.variation_weight*ca.sumsqr(u-(previous if k==0 else U[k-1])))
-        objective+=p.terminal_weight*ca.sumsqr((tip-target)/tolerance)+p.terminal_velocity_weight*ca.sumsqr(X[-1][n:])
+        objective+=p.terminal_weight*ca.sumsqr((tip-target)/tolerance)+p.terminal_velocity_weight*ca.sumsqr(velocity_error/p.tip_speed_scale_m_s if tracking else X[-1][n:])
         if local_velocity is not None:
             world_velocity=ca.mtimes(ca.DM(rotation),local_velocity(X[-1][:n],X[-1][n:]))
-            objective+=p.terminal_tip_speed_weight*ca.sumsqr(world_velocity/p.tip_speed_scale_m_s)
+            objective+=p.terminal_tip_speed_weight*ca.sumsqr((world_velocity-target_velocity if tracking else world_velocity)/p.tip_speed_scale_m_s)
         objective*=specification.objectives[0].weight
         bundle,selectors=expression_payload(list(expected),dict(variables=decision_symbols,expression=objective),constraints)
         variables={name:dict(spec) for name,spec in expected.items()}
@@ -112,6 +127,15 @@ class GVSTrajectoryAssembler:
         if p.holding_tip_speed_weight:
             for k in range(1,steps+1):variables[f'holding/{k}']['bounds']=[0.,0.]
         guess=dict(specification.initial_guess)
+        if tracking:
+            from .tracking import reference_at
+            positions,velocities=reference_at(task.goal.data,np.arange(1,steps+1)*h)
+            for quantity,values in (('position',positions),('velocity',velocities)):
+                for k,row in enumerate(values,1):
+                    for j,value in enumerate(row):
+                        name=f'reference/{quantity}/{k}/{j}'
+                        variables[name]['bounds']=[float(value)]*2
+                        guess[name]=float(value)
         if p.holding_tip_speed_weight:
             for k in range(1,steps+1):guess[f'holding/{k}']=0.
         for t,value in zip(tendons,context.u0):guess['previous_u/'+t]=value
@@ -132,6 +156,8 @@ class TrajectoryWorkspace:
         from tools.platform_optimization import assemble_optimization
         from schemas.platform_math import OptimizationSpecification, ObjectiveSelection, ConstraintSelection
         self.parameters=GVSTrajectoryParameters.model_validate(parameters); self.n=len(nominal_x)//2
+        self.tracking=task.family=='task.tracking'
+        self.reference=task.goal.data if self.tracking else None
         self.duration=task.timing.duration_s;self.holding_start=None
         if self.parameters.holding_tip_speed_weight:
             if settling is None:raise ValueError('GVS_HOLDING_COST_REQUIRES_SETTLING_CONFIGURATION')
@@ -141,12 +167,12 @@ class TrajectoryWorkspace:
             np.full(self.n,self.parameters.rate_scale_rad_m_s)]
         self.m=len(nominal_u);self.nominal_x=list(nominal_x);self.nominal_u=list(nominal_u)
         self.tendons=[t['id'] for t in robot.structure.data['tendons']]
-        self.period=task.timing.control_period_s; self.target=task.goal.data['target_m']
-        self.goal_tolerance=task.evaluator.parameters.data['tolerance_m']
+        self.period=task.timing.control_period_s; self.target=task.goal.data.get('target_m')
+        self.goal_tolerance=task.evaluator.parameters.data['max_position_error_m' if self.tracking else 'tolerance_m']
         reg=registry();start=time.perf_counter()
-        binding=Binding(extension_id='optimization_assembler.gvs_trajectory',parameters=Payload(
+        binding=Binding(extension_id='optimization_assembler.gvs_tracking' if self.tracking else 'optimization_assembler.gvs_trajectory',parameters=Payload(
             contract='family.gvs_trajectory_parameters',data=self.parameters.model_dump(mode='json')))
-        space=trajectory_authorization(robot,{},self.parameters)
+        space=(tracking_authorization if self.tracking else trajectory_authorization)(robot,{},self.parameters)
         self.problem=assemble_optimization(reg,binding,task=task,robot=robot,space=space,
             mathematical_model=GVSModelParameters(basis=self.parameters.basis).mathematical_model,
             specification=OptimizationSpecification(variables=list(space),horizon=self.parameters.horizon,
@@ -187,6 +213,21 @@ class TrajectoryWorkspace:
             repeated_terminal_scaled_defect=repeated_defect,extended_tail_scaled_defect=defect)
 
     def _set_prediction_time(self,elapsed_s):
+        if self.tracking:
+            from .tracking import reference_at
+            if elapsed_s is None or not np.isfinite(elapsed_s) or elapsed_s<0:
+                raise ValueError('TRACKING_REQUIRES_ABSOLUTE_EXECUTION_TIME')
+            times=elapsed_s+np.arange(self.parameters.horizon*self.parameters.substeps+1)*self.period/self.parameters.substeps
+            self.reference_positions,self.reference_velocities=reference_at(self.reference,times)
+            for quantity,values in (('position',self.reference_positions),('velocity',self.reference_velocities)):
+                for k,row in enumerate(values[1:],1):
+                    for j,value in enumerate(row):
+                        name=f'reference/{quantity}/{k}/{j}'
+                        self.problem.variables[name]['bounds']=[float(value)]*2
+                        self.problem.initial_guess[name]=float(value)
+            return dict(current_time_s=float(elapsed_s),node_times_s=times.tolist(),
+                reference_position_m=self.reference_positions.tolist(),reference_velocity_m_s=self.reference_velocities.tolist(),
+                beyond_task='Evaluate frozen reference at absolute node time; clamp outside reference interval')
         if self.holding_start is None:return None
         if elapsed_s is None or not np.isfinite(elapsed_s) or elapsed_s<0:
             raise ValueError('GVS_HOLDING_COST_REQUIRES_CURRENT_EXECUTION_TIME')
@@ -238,7 +279,7 @@ class TrajectoryWorkspace:
         for t,value in zip(self.tendons,previous_u):self.problem.initial_guess['previous_u/'+t]=float(value)
         preparation_s=time.perf_counter()-update_start
         seed_settled=False
-        if self.parameters.feasible_return is not None and self._tail_solver is not None:
+        if not self.tracking and self.parameters.feasible_return is not None and self._tail_solver is not None:
             metrics=[]
             for k in range(self.parameters.horizon*self.parameters.substeps+1):
                 state=np.array([self.problem.initial_guess[f'x/{k}/{j}'] for j in range(2*self.n)])*self.state_scales
@@ -271,14 +312,18 @@ class TrajectoryWorkspace:
         # A feasible finite-iteration plan can drive suboptimal NMPC. Keep its
         # nonconverged solver status; feasibility never implies optimality.
         accepted=result.status in ('converged','iteration_limit','feasible_early_stop') and result.constraint_violation<=1e-5
+        if self.tracking:
+            output['prediction_timing']['seed_settled_shortcut']='disabled for tracking, including constant references'
+            output['cost']='Squared position and world tip velocity reference errors; terminal reference at terminal node; bounded tension and tension variation. No zero-speed holding schedule.'
         output['accepted']=accepted
         output['optimization_converged']=result.status=='converged'
         if self.parameters.recover_returned_tensions:
             def terminal_motion(values):
                 state=np.array([values[f'x/{steps}/{j}'] for j in range(2*self.n)])*self.state_scales
                 tip,speed=self._motion(state[:self.n],state[self.n:])
-                return dict(error_m=float(np.linalg.norm(np.asarray(tip).ravel()-self.target)),
-                    speed_m_s=float(np.linalg.norm(np.asarray(speed))))
+                return dict(error_m=float(np.linalg.norm(np.asarray(tip).ravel()-(self.reference_positions[-1] if self.tracking else self.target))),
+                    speed_m_s=float(np.linalg.norm(np.asarray(speed))),
+                    velocity_error_m_s=float(np.linalg.norm(np.asarray(speed).ravel()-self.reference_velocities[-1])) if self.tracking else None)
             output['feedback']=dict(initial_objective=self.solver.last_diagnostics['initial_objective'],
                 delivered_objective=result.objective_value,
                 first_command_change_from_initialization_n=float(max(abs(values[f'u/0/{t}']-self.problem.initial_guess[f'u/0/{t}']) for t in self.tendons)),

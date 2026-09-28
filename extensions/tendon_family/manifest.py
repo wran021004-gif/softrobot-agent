@@ -7,7 +7,7 @@ from . import legacy_scientific
 from . import optimization as opt
 from . import route
 from .contracts import GVSTrajectoryParameters
-from . import gvs_profile
+from . import gvs_profile, tracking, candidate_analysis
 
 CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('route_policy',route.RoutePolicy),
@@ -31,6 +31,9 @@ CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('pcc_reach_assembler_parameters',c.PCCReachAssemblerParameters),
     ('gvs_inverse_assembler_parameters',c.GVSInverseAssemblerParameters),]]
 CONTRACTS += [
+    ('family.cartesian_reference','1.0.0',tracking.CartesianReference),
+    ('family.tracking_evaluation','1.0.0',tracking.TrackingEvaluation),
+    ('family.gvs_tracking_control','1.0.0',tracking.TrackingControl),
     ('family.gvs_profile_control','1.0.0',gvs_profile.ProfileControl),
     ('family.gvs_reach_control','1.0.0',gvs_profile.ReachControl),
     ('family.gvs_trajectory_parameters','1.0.0',GVSTrajectoryParameters),
@@ -55,7 +58,7 @@ CONTRACTS += [
     ('family.lqr_synthesis_description', '2.0.0', c.LQRSynthesisDescription),
     ('family.gvs_lqr_control', '1.0.0', c.GVSLQRControl),
 ]
-SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','gvs_sampled','gvs_trajectory','gvs_nmpc','model_applicability','execution','backends','signals','candidate','preparation','mjcf','saved','manifest','optimization','crosscheck','route'))+(
+SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','gvs_sampled','gvs_trajectory','gvs_nmpc','model_applicability','execution','backends','signals','candidate','preparation','mjcf','saved','tracking','candidate_analysis','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
@@ -124,7 +127,7 @@ for name,binding,model,deps,resources in [
             model=model,models={'model.serial_bending_cells':dict(implementation_model_id=model,
                 implementation='MATLAB native spatial serial dynamics' if name=='matlab_spatial' else 'MuJoCo articulated rigid-body dynamics',
                 contact_semantics='lowest-envelope-vertex penalty contact' if name=='matlab_spatial' else 'MuJoCo convex native contact')},
-            conversion='shared serial family physics',families=['task.reach'],robots=['tendon_robot_family','tendon_driven_continuum'],
+            conversion='shared serial family physics',families=['task.reach']+(['task.tracking'] if name=='family_mujoco' else []),robots=['tendon_robot_family','tendon_driven_continuum'],
             inactive_parameters=[] if name=='matlab_spatial' else ['max_step_s','rtol','atol','contact_stiffness_n_m','contact_damping_n_s_m'],
             robot_contracts=['family.design','domain.rod_design'],channels=['actuator_commands'],environments=['experiment.assembly'],
             controllers=['controller.family']+(['controller.gvs_lqr','controller.gvs_sampled_lqr','controller.gvs_nmpc'] if name=='family_mujoco' else []),signals=['tip_position','joint_position','joint_velocity','tendon_length','tendon_length_change','tendon_length_rate','tendon_tension','desired_tendon_tension','tendon_target_length','actuator_command','actuator_torque','external_torque'],
@@ -581,3 +584,30 @@ for name,schema,binding,description in (
     EXTENSIONS.append(Extension(name,'tool','1.0.0',schema,gvs_profile.ProfileOutput,binding,description,
         sources=PROFILE_SOURCES,assets=(gvs_profile.ASSET,),dependencies=('numpy','mujoco'),
         side_effects='artifact_store',capabilities=dict(category='control',role='public_tool',route_visible=True,backend_solves=0)))
+
+from schemas.platform import TaskDefinition, EvaluationResult
+from extensions.reference.contracts import Empty
+EXTENSIONS.extend([
+    Extension('task.tracking','task','1.0.0',TaskDefinition,Empty,
+        'extensions.tendon_family.tracking:tracking_task','Explicit frozen world-frame Cartesian time-reference tracking',**COMMON),
+    Extension('evaluate.tracking','evaluator','1.0.0',tracking.TrackingEvaluation,EvaluationResult,
+        'extensions.tendon_family.tracking:evaluate_tracking','Inclusive uniform sampled interval max and arithmetic RMS tracking errors; missing data never succeeds',**COMMON),
+    Extension('analysis.gvs_candidate_evaluate','tool','1.0.0',candidate_analysis.CandidateDynamicsRequest,candidate_analysis.CandidateAnalysisResult,
+        'extensions.tendon_family.candidate_analysis:evaluate_candidate','Calculate GVS dynamics and tip kinematics for an explicit owned build node with its frozen basis; pre-execution, no backend solve',
+        sources=GVS_SOURCES,dependencies=('numpy','scipy'),capabilities=dict(category='mathematical_models',role='public_tool',route_visible=True,backend_solves=0)),
+])
+from dataclasses import replace
+EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='optimization_assembler.gvs_trajectory'),
+    extension_id='optimization_assembler.gvs_tracking',description='Timed Cartesian tracking with prescribed fixed reference parameters',
+    capabilities=dict(category='optimization',role='adapter',model='model.gvs',model_version='1.0.0',
+        authorization='extensions.tendon_family.gvs_trajectory:tracking_authorization',supported_objectives=['dynamic_tip_tracking'],
+        supported_constraints=['initial_state','implicit_dynamics','tendon_force_bounds'])))
+EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='controller.gvs_nmpc' and d.version=='4.0.0'),
+    version='5.0.0',input_schema=tracking.TrackingControl,binding='extensions.tendon_family.gvs_nmpc:TrackingNMPCController',
+    description='Frozen constant or quintic world reference, absolute prediction-node timing and relative tip velocity; length-only design envelope',
+    capabilities=dict(category='control',role='adapter',channel='actuator_commands',backend_executable=True,
+        command_space='tendon_tensions',sampling='interval_start_pre_step; held for control period',reset=False,restore=False,
+        profile_id='gvs_time_reference_tracking_v1',required_candidate_analysis='analysis.gvs_candidate_evaluate',
+        predictor='model.gvs',execution_model='model.serial_bending_cells',discovery_tool='control.profile_describe',
+        prepare_execution='extensions.tendon_family.gvs_profile:prepare_execution',route_applicability='extensions.tendon_family.tracking:checked_tracking',
+        scope_assessment='extensions.tendon_family.tracking:assessment',route_report_tool='control.profile_report')))
