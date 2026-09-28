@@ -59,7 +59,7 @@ CONTRACTS += [
     ('family.lqr_synthesis_description', '2.0.0', c.LQRSynthesisDescription),
     ('family.gvs_lqr_control', '1.0.0', c.GVSLQRControl),
 ]
-SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','gvs_sampled','gvs_trajectory','gvs_nmpc','model_applicability','execution','backends','signals','candidate','design_decisions','candidate_comparison','diagnostics','delivery_facts','preparation','mjcf','saved','tracking','candidate_analysis','manifest','optimization','crosscheck','route'))+(
+SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','gvs_sampled','gvs_trajectory','gvs_nmpc','model_applicability','execution','backends','signals','candidate','design_decisions','candidate_comparison','historical_failure','diagnostics','delivery_facts','preparation','mjcf','saved','tracking','candidate_analysis','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',

@@ -7,7 +7,7 @@ from schemas.evidence import Identifier
 from schemas.platform import Binding, EvidenceRef, SessionInput
 from tools.platform_store import plain
 from tools.state_io import digest
-from .delivery_facts import TrackingFacts, bound_tracking_facts
+from .delivery_facts import TrackingFacts, ReachFacts, bound_result_facts
 
 
 class Combination(Contract):
@@ -18,6 +18,7 @@ class Combination(Contract):
 
 class RoutePolicy(Contract):
     source: str
+    historical_case: EvidenceRef | None = None
     combinations: dict[str, Combination]
     max_trials: int = Field(default=3,ge=1,le=100)
     guidance: str = 'Select a legal combination and structure; evaluate, inspect evidence, then continue, adjust or finish. Reserve a solve for independent review when useful.'
@@ -36,7 +37,7 @@ class RouteAction(Contract):
     reason: str = Field(min_length=1,description='English explanation grounded in the current overview or cited evidence.')
     next_step: str = Field(min_length=1,description='English statement of the intended next decision or stopping condition.')
     design_statement: dict | None = Field(default=None, description='On finish, restate candidate_facts: candidate_id, configuration, owner_run_id, execution_id and parameters (path, baseline_value, effective_value, baseline_delta, unit), plus physical_changes when supplied. Checked independently of reach and prose interpretation; legacy callers may omit.')
-    result_statement: TrackingFacts | None = Field(default=None, description='On tracking finish, copy factual_result exactly from the selected summary. Typed consistency is checked separately from provider reasoning; omission is not a pass.')
+    result_statement: ReachFacts | TrackingFacts | None = Field(default=None, description='On free-reach or tracking finish, copy the applicable factual_result exactly from the selected summary. Typed consistency is checked separately from provider reasoning; omission is not a pass.')
 
 
 class RouteResult(Contract):
@@ -140,7 +141,8 @@ def compact_reports(projection):
                  projection.get('route', {}).get('final')):
         if item and item.get('profile_report') and 'profile_report_summary' in item:
             key = digest(item['profile_report'])
-            reports[key] = dict(binding=item['profile_report'], facts=item.pop('profile_report_summary'))
+            detail=item.pop('profile_report_summary')
+            reports[key] = dict(binding=item['profile_report'], facts=(item.get('factual_result') or detail) if 'tracking' not in detail else detail)
             item['profile_report_summary_ref'] = key
     projection['profile_reports'] = reports
     return projection
@@ -268,7 +270,7 @@ def overview(host):
     if selected_node and summary.get('candidate_id'):
         result=host.store.artifact(selected_node['result'])
         summary['candidate_facts']=trial_facts(host.store, inp, result.get('best') or result)
-        facts=bound_tracking_facts(host.store,result.get('best') or result,summary['candidate_facts'])
+        facts=bound_result_facts(host.store,result.get('best') or result,summary['candidate_facts'])
         if facts is not None:summary['factual_result']=facts
     incumbent=deepcopy(route.get('incumbent'))
     if incumbent:
@@ -277,7 +279,7 @@ def overview(host):
         trial=(next(t for t in result['trials'] if t['candidate_id']==incumbent['candidate_id'])
                if node['action']=='optimize' else result)
         incumbent['candidate_facts']=trial_facts(host.store, inp, trial)
-        facts=bound_tracking_facts(host.store,trial,incumbent['candidate_facts'])
+        facts=bound_result_facts(host.store,trial,incumbent['candidate_facts'])
         if facts is not None:incumbent['factual_result']=facts
     space=inp.policy.candidate_builder.parameters.data
     with host.store.connect(True) as db:
@@ -314,6 +316,16 @@ def overview(host):
         final=route['final']
         if final.get('configuration') and final.get('simulation'):
             projection['route']['final']['candidate_facts']=trial_facts(host.store,inp,final)
+    projection['result_contract']=dict(task_family=inp.task.family,
+        result_type='tracking' if inp.task.family=='task.tracking' else 'free_reach',
+        delivery='Copy selected factual_result into result_statement; keep design_statement checks. No tracking metrics required for free reach.')
+    projection['experiment_progress']=dict(evaluated_candidate_count=full['counts']['evaluations'],
+        remaining_execution_opportunities=full['project_usage']['remaining']['backend_solves'])
+    prior=policy(inp).historical_case
+    if prior:
+        projection['historical_case']=host.store.artifact(prior)
+        from .candidate_comparison import historical_comparisons
+        projection['historical_comparisons']=historical_comparisons(host,inp,projection['historical_case'])
     return compact_reports(projection)
 
 
@@ -439,6 +451,13 @@ def run_built(ctx,args,route):
     candidate=built['candidate_id']
     if args.candidate_id and args.candidate_id!=candidate: raise ValueError('CANDIDATE_SELECTION_MISMATCH')
     inp=ctx.store.artifact(built['configuration'])
+    prior=policy(ctx.input).historical_case
+    if prior:
+        from .candidate import candidate_facts
+        before=ctx.artifact(prior)['candidate_facts']['parameters']
+        current=candidate_facts(ctx.input,inp,built['configuration'],candidate)['parameters']
+        if {r['path']:r['effective_value'] for r in before}=={r['path']:r['effective_value'] for r in current}:
+            raise ValueError('FRESH_REVISION_REQUIRED: identical historical design would not count; change a declared decision before run')
     capability=profile_capability(SessionInput.model_validate(inp),ctx.reg)
     if capability and capability.get('required_candidate_analysis'):
         from .candidate_analysis import require_completed_analysis
@@ -462,8 +481,8 @@ def run_built(ctx,args,route):
     from .candidate import candidate_facts
     facts=candidate_facts(ctx.input,ctx.store.artifact(metadata['candidate_input']),metadata['candidate_input'],
         candidate,child.run_id,sim['execution_id'])
-    from .delivery_facts import bound_tracking_facts
-    factual_result=bound_tracking_facts(ctx.store,dict(**reported,evaluation=ev['output'],simulation=sim),facts)
+    from .delivery_facts import bound_result_facts
+    factual_result=bound_result_facts(ctx.store,dict(**reported,evaluation=ev['output'],simulation=sim),facts)
     if factual_result is not None: reported['factual_result']=factual_result
     return dict(status='valid' if result['validity']=='valid' else 'solver_failed',run_id=child.run_id,candidate_facts=facts,
         candidate_id=candidate,build_configuration=built['configuration'],configuration=metadata['candidate_input'],
@@ -609,10 +628,13 @@ def advance(ctx,args):
                     findings=diagnosis_summary(report) if args.action=='diagnose' else dict(video_generated=True,viewed_by_model=False))
                 if args.action=='diagnose':
                     from .candidate_comparison import feedback
+                    trial['factual_result']=bound_result_facts(ctx.store,trial,trial_facts(ctx.store,ctx.input,trial))
                     out['findings']['design_feedback']=feedback(trial)
             else:
                 out=delivery(ctx,route,child,trial,args.reason,args.design_statement,plain(args.result_statement))
                 out['selection_basis']='explicit valid candidate' if args.candidate_id else 'session-wide incumbent'
+                if (out.get('factual_result') or {}).get('result_type')=='free_reach' and not out['result_statement_check']['accepted']:
+                    raise ValueError('REACH_RESULT_STATEMENT_REQUIRED: copy factual_result into result_statement')
                 out['explicit_delivery']=True
                 route['final']=out
     except Exception as exc:
@@ -644,11 +666,11 @@ def delivery(ctx,route,child,trial,reason,design_statement=None,result_statement
     from .candidate import check_design_statement
     baseline=ctx.store.session(ctx.host.run_id)['snapshot']['input']
     facts=trial_facts(ctx.store,baseline,trial)
-    from .delivery_facts import bound_tracking_facts, check_tracking_statement
-    factual_result=bound_tracking_facts(ctx.store,trial,facts)
-    result_check=check_tracking_statement(factual_result,result_statement) if factual_result else None
-    if result_statement is not None and result_check is not None and not result_check['accepted']:
-        raise ValueError('TRACKING_RESULT_STATEMENT_MISMATCH: '+str(result_check))
+    from .delivery_facts import bound_result_facts, check_result_statement
+    factual_result=bound_result_facts(ctx.store,trial,facts)
+    result_check=check_result_statement(factual_result,result_statement) if factual_result else None
+    if result_check is not None and not result_check['accepted'] and (result_statement is not None or (design_statement is not None and factual_result.get('result_type')=='free_reach')):
+        raise ValueError(('REACH' if factual_result.get('result_type')=='free_reach' else 'TRACKING')+'_RESULT_STATEMENT_MISMATCH: '+str(result_check))
     reviews=[]; diagnoses=[]
     for n in route['nodes']:
         if n.get('result') and n['action'] in ('crosscheck','diagnose'):

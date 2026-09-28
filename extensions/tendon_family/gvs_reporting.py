@@ -27,6 +27,7 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
     def mean(key):return float(np.mean(values(key))) if values(key) else None
     tensions=np.array([r['tension_n'] for r in rows])
     summary=dict(complete=complete,valid_complete_execution=valid,
+        terminal_position_m=rows[-1]['tip_m'] if complete else None,
         official_task_success=None if evaluation is None else evaluation['task_success'],
         evaluation_validity=None if evaluation is None else evaluation['validity'],
         solver_status=result['solver_status'],last_valid_time_s=rows[-1]['time_s'] if rows else None,
@@ -234,12 +235,7 @@ def markdown(summary):
         facts = s.get('factual_result') or tracking_facts(s)
         return ('# Public GVS tracking result\n\nProgram-generated factual result:\n\n```json\n'+
             json.dumps(facts,indent=2)+'\n```\n\nSampled simulation acceptance; provider reasoning and its review are separate.\n')
-    settling=s['sampled_settling']
-    return ('# Public GVS NMPC result\n\n'
-        f"Complete execution: {s['complete']}; valid: {s['evaluation_validity']}; official task success: {s['official_task_success']}.\n\n"
-        f"Terminal error: {s['terminal_error_m']} m; sampled settling: {settling['passed']} (available: {settling['available']}).\n\n"
-        f"Accepted plans: {s['accepted_plans']}/{s['updates']}; converged: {s['converged_updates']}; initialization selected: {s['initialization_selected']}; hold-last responses: {s['hold_last_responses']}.\n\n"
-        f"Raw termination counts: {s['raw_termination_counts']}.\n\n"
-        f"Mean delivered update: {s['mean_update_s']} s; preparation: {s['mean_preparation_s']} s; numerical solve: {s['mean_numerical_solve_s']} s; validation: {s['mean_validation_s']} s. Deadline misses: {s['deadline_misses']}/{s['updates']}.\n\n"
-        f"Sampled acceptance: last {settling['window_s']} s, position <= {settling['position_limit_m']} m, speed <= {settling['speed_limit_m_s']} m/s.\n\n"
-        'One frozen free-reach simulation with ideal tendon tensions. No actuator, contact, robustness or global stability claim. Settling checks are sampled.\n')
+    from .delivery_facts import reach_facts
+    facts=s.get('factual_result') or reach_facts(s)
+    return ('# Public GVS free-reach result\n\nProgram-generated factual result:\n\n```json\n'+
+        json.dumps(facts,indent=2)+'\n```\n\nReach acceptance, sampled settling, convergence and computation are separate. Provider prose requires independent review.\n')

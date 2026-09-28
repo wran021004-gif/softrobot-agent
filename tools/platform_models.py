@@ -178,7 +178,7 @@ def input_for(host):
             'For normal route delivery use route.advance with action="finish". '
             'Restate the delivered candidate_facts in design_statement, including unchanged parameters and signed baseline deltas. '
             'Keep the explanation consistent with these effective configuration facts. '
-            'For tracking, copy factual_result into result_statement on finish. Its deadline_misses and real_time_demonstrated are authoritative; typed agreement does not establish prose correctness. '
+            'For the applicable task (free_reach or tracking), copy factual_result into result_statement on finish. Free reach has no tracking metrics; do not search for tracking objects. Its deadline_misses and real_time_demonstrated are authoritative; typed agreement does not establish prose correctness. '
             'profile_report_summary_ref resolves in route.profile_reports; recent_evidence contains original attributed pages. '
             'Use English for every explanation, reason and next_step. The compact route overview is already in context. '
             'The overview contains the current combinations, baseline design, authorized parameter bounds, budgets and route state; '
