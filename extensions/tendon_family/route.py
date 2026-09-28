@@ -7,6 +7,7 @@ from schemas.evidence import Identifier
 from schemas.platform import Binding, EvidenceRef, SessionInput
 from tools.platform_store import plain
 from tools.state_io import digest
+from .delivery_facts import TrackingFacts, bound_tracking_facts
 
 
 class Combination(Contract):
@@ -25,7 +26,7 @@ class RoutePolicy(Contract):
 class RouteAction(Contract):
     node_id: Identifier = Field(description='Unique label for this route action; reuse the original request_id to recover a sealed call.')
     action: Literal['build','run','optimize','diagnose','crosscheck','video','finish'] = Field(description='build constructs only; run simulates and evaluates a saved build; optimize searches and evaluates; diagnose analyzes saved results; crosscheck executes independently; video renders saved results; finish delivers an evaluated candidate.')
-    combination: str | None = Field(default=None, description='Authorized combination name. Required for build, optimize without source_node, and crosscheck. With an optimization source, omit to preserve its bindings; an explicit choice must match them.')
+    combination: str | None = Field(default=None, description='OMIT for run: the saved build owns its combination. Required for build, optimize without source_node, and crosscheck. With an optimization source, omit to preserve its bindings; an explicit choice must match them.')
     changes: dict = Field(default_factory=dict, description='build/optimize only: edits from the declared space, including template, physical paths, discretization paths and control/ paths. Applied to the source configuration, or the frozen baseline when no source is supplied.')
     variables: dict[str, tuple[float,float]] = Field(default_factory=dict, description='optimize only, required: continuous numeric variables[path] = [lower_bound, upper_bound], a continuous interval, NOT two requested samples. Integer, choice, template, and discretization changes belong in explicit changes. Bounds must be within the authorized space and include the starting value.')
     max_trials: int = Field(default=1,ge=1,description='Maximum optimizer proposals, bounded by route max_trials; independent of single run, which needs one solve. Duplicate proposals may reuse saved results.')
@@ -35,6 +36,7 @@ class RouteAction(Contract):
     reason: str = Field(min_length=1,description='English explanation grounded in the current overview or cited evidence.')
     next_step: str = Field(min_length=1,description='English statement of the intended next decision or stopping condition.')
     design_statement: dict | None = Field(default=None, description='On finish, restate candidate_facts: candidate_id, configuration, owner_run_id, execution_id and parameters (path, baseline_value, effective_value, baseline_delta, unit). Checked independently of reach and prose interpretation; legacy callers may omit.')
+    result_statement: TrackingFacts | None = Field(default=None, description='On tracking finish, copy factual_result exactly from the selected summary. Typed consistency is checked separately from provider reasoning; omission is not a pass.')
 
 
 class RouteResult(Contract):
@@ -266,6 +268,8 @@ def overview(host):
     if selected_node and summary.get('candidate_id'):
         result=host.store.artifact(selected_node['result'])
         summary['candidate_facts']=trial_facts(host.store, inp, result.get('best') or result)
+        facts=bound_tracking_facts(host.store,result.get('best') or result,summary['candidate_facts'])
+        if facts is not None:summary['factual_result']=facts
     incumbent=deepcopy(route.get('incumbent'))
     if incumbent:
         node=next(n for n in nodes if n['node_id']==incumbent['node_id'])
@@ -273,6 +277,8 @@ def overview(host):
         trial=(next(t for t in result['trials'] if t['candidate_id']==incumbent['candidate_id'])
                if node['action']=='optimize' else result)
         incumbent['candidate_facts']=trial_facts(host.store, inp, trial)
+        facts=bound_tracking_facts(host.store,trial,incumbent['candidate_facts'])
+        if facts is not None:incumbent['factual_result']=facts
     space=inp.policy.candidate_builder.parameters.data
     with host.store.connect(True) as db:
         snapshot_ref=plain(EvidenceRef(artifact_id=db.execute('SELECT snapshot FROM sessions WHERE run_id=?',(host.run_id,)).fetchone()[0]))
@@ -359,7 +365,9 @@ def preflight(inp,args,reg):
     if args.source_node and args.action=='build': raise ValueError('BUILD_SOURCE_NOT_SUPPORTED: use optimize to modify a saved source or build from baseline')
     if args.action not in ('build','optimize') and (args.changes or args.variables):
         raise ValueError('CHANGES_AND_VARIABLES_ONLY_FOR_BUILD_OR_OPTIMIZE')
-    if args.action=='run' and args.combination: raise ValueError('RUN_PRESERVES_BUILD_COMBINATION: omit combination')
+    if args.action=='run' and args.combination:
+        from tools.platform_validation import ToolArgumentError
+        raise ToolArgumentError('arguments.combination: RUN_PRESERVES_BUILD_COMBINATION; omit combination and retain the explicit build source_node')
     if args.action in ('run','diagnose','crosscheck','video') and not args.source_node:
         raise ValueError('SOURCE_NODE_REQUIRED')
     if args.action=='finish' and args.candidate_id and not args.source_node:
@@ -417,7 +425,7 @@ def update_incumbent(ctx,route,node,out):
                 candidate_id=trial['candidate_id'],owner_run_id=trial.get('owner_run_id',out.get('run_id')),
                 evaluation_ref=trial['evaluation'],evaluation=summary,score=trial['score'],
                 comparison_identity=comparison,candidate_facts=trial_facts(ctx.store,ctx.input,trial),
-                **{k:trial[k] for k in ('profile_report','profile_report_summary') if k in trial})
+                **{k:trial[k] for k in ('profile_report','profile_report_summary','factual_result') if k in trial})
 
 
 def run_built(ctx,args,route):
@@ -454,6 +462,9 @@ def run_built(ctx,args,route):
     from .candidate import candidate_facts
     facts=candidate_facts(ctx.input,ctx.store.artifact(metadata['candidate_input']),metadata['candidate_input'],
         candidate,child.run_id,sim['execution_id'])
+    from .delivery_facts import bound_tracking_facts
+    factual_result=bound_tracking_facts(ctx.store,dict(**reported,evaluation=ev['output'],simulation=sim),facts)
+    if factual_result is not None: reported['factual_result']=factual_result
     return dict(status='valid' if result['validity']=='valid' else 'solver_failed',run_id=child.run_id,candidate_facts=facts,
         candidate_id=candidate,build_configuration=built['configuration'],configuration=metadata['candidate_input'],
         simulation=sim,evaluation=ev['output'],evaluation_data=result,metrics=result['metrics'],
@@ -479,7 +490,7 @@ def summarize(out):
         proposals=out.get('proposals'),distinct_candidates=out.get('distinct_candidates'),actual_solves=out.get('actual_solves'),
         new_evaluations=out.get('new_evaluations'),reused_evaluations=out.get('reused_evaluations'),
         findings=out.get('findings'),
-        **{k:(best or out)[k] for k in ('profile_report','profile_report_summary') if k in (best or out)})
+        **{k:(best or out)[k] for k in ('profile_report','profile_report_summary','factual_result') if k in (best or out)})
 
 
 def delivery_summary(final):
@@ -487,7 +498,7 @@ def delivery_summary(final):
     return {k:final[k] for k in ('delivery_status','explicit_delivery','candidate_id','run_id','configuration',
         'evaluation_ref','task_success','crosscheck_status','stop_reason','selection_basis',
         'profile_report','profile_report_summary','candidate_facts','design_statement','design_statement_check',
-        'interpretation_status') if k in final}
+        'interpretation_status','factual_result','result_statement','result_statement_check') if k in final}
 
 
 def diagnosis_summary(report):
@@ -597,7 +608,7 @@ def advance(ctx,args):
                 out=dict(candidate_id=trial['candidate_id'],configuration=trial['configuration'],receipt=receipt,product=product,
                     findings=diagnosis_summary(report) if args.action=='diagnose' else dict(video_generated=True,viewed_by_model=False))
             else:
-                out=delivery(ctx,route,child,trial,args.reason,args.design_statement)
+                out=delivery(ctx,route,child,trial,args.reason,args.design_statement,plain(args.result_statement))
                 out['selection_basis']='explicit valid candidate' if args.candidate_id else 'session-wide incumbent'
                 out['explicit_delivery']=True
                 route['final']=out
@@ -625,11 +636,16 @@ def _save(ctx,route,status,stop=False):
             request=ctx.request.request_id,execution=ctx.row['execution_id'],outputs=[ref])
 
 
-def delivery(ctx,route,child,trial,reason,design_statement=None):
+def delivery(ctx,route,child,trial,reason,design_statement=None,result_statement=None):
     configuration=ctx.store.artifact(trial['configuration'])['effective']
     from .candidate import check_design_statement
     baseline=ctx.store.session(ctx.host.run_id)['snapshot']['input']
     facts=trial_facts(ctx.store,baseline,trial)
+    from .delivery_facts import bound_tracking_facts, check_tracking_statement
+    factual_result=bound_tracking_facts(ctx.store,trial,facts)
+    result_check=check_tracking_statement(factual_result,result_statement) if factual_result else None
+    if result_statement is not None and result_check is not None and not result_check['accepted']:
+        raise ValueError('TRACKING_RESULT_STATEMENT_MISMATCH: '+str(result_check))
     reviews=[]; diagnoses=[]
     for n in route['nodes']:
         if n.get('result') and n['action'] in ('crosscheck','diagnose'):
@@ -641,6 +657,7 @@ def delivery(ctx,route,child,trial,reason,design_statement=None):
     return dict(delivery_status='evaluated',candidate_id=trial['candidate_id'],run_id=child.run_id,configuration=trial['configuration'],
         candidate_facts=facts,design_statement=design_statement,design_statement_check=check_design_statement(facts,design_statement),
         interpretation_status='prose_review_required',
+        factual_result=factual_result,result_statement=result_statement,result_statement_check=result_check,
         search_run_id=trial.get('search_run_id'),actual_solves=0,new_evaluations=0,
         simulation=trial['simulation'],
         dynamics_model=configuration['policy']['dynamics_model'],backend=configuration['policy']['backend'],

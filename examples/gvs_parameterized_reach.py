@@ -52,8 +52,18 @@ def run(root,input_path=None):
     print('Starting the one authorized full-duration backend execution',flush=True)
     sim,_=call(host,'simulation.run',dict(candidate_id='parameterized-reach',changes={}),'simulate')
     ev,_=call(host,'evaluation.run',dict(result=sim['output'],execution_id=sim['execution_id']),'evaluate')
-    _,report=call(host,'control.profile_report',dict(simulation_request_id='simulate',evaluation_request_id='evaluate'),'report')
-    summary=report['detail'];atomic_json(root/'summary.json',summary)
+    report_receipt,report=call(host,'control.profile_report',dict(simulation_request_id='simulate',evaluation_request_id='evaluate'),'report')
+    summary=report['detail']
+    if 'tracking' in summary:
+        from extensions.tendon_family.route import trial_facts
+        from extensions.tendon_family.delivery_facts import bound_tracking_facts
+        saved=host.store.session(host.run_id)
+        config=saved['state']['result_executions'][sim['execution_id']]['candidate_input']
+        trial=dict(candidate_id=host.store.artifact(config)['candidate_id'],configuration=config,run_id=host.run_id,
+            simulation=sim,evaluation=ev['output'],profile_report=dict(reference=report_receipt['output'],
+                owner_run_id=host.run_id,execution_id=sim['execution_id'],request_id=report_receipt['request_id']))
+        summary['factual_result']=bound_tracking_facts(host.store,trial,trial_facts(host.store,saved['snapshot']['input'],trial))
+    atomic_json(root/'summary.json',summary)
     (root/'report.md').write_text(markdown(summary),encoding='utf8')
     print(json.dumps({k:summary[k] for k in ('complete','official_task_success','terminal_error_m',('tracking' if 'tracking' in summary else 'sampled_settling'),
         'accepted_plans','updates','mean_update_s','deadline_misses')}),flush=True)

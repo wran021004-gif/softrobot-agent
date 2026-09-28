@@ -154,6 +154,7 @@ def report(ctx,args):
         control_parameters=plain(ctx.input.policy.controller.parameters),
         numerical_preparation=None if not preparations else ctx.artifact(preparations[-1]))
     output.update(simulation=sim['output'],evaluation=ev['output'],execution_id=sim['execution_id'],
+        configuration=metadata['candidate_input'],candidate_id=candidate['candidate_id'],
         simulation_wall_s=sim['charged']['wall_s'] if 'charged' in sim else None,
         motion=plain(ctx.save_artifact(motion,'sampled_backend_motion')))
     # The trusted report validates a predeclared strategy against this new run.
@@ -177,7 +178,10 @@ def report(ctx,args):
 def markdown(summary):
     s=summary
     if 'tracking' in s:
-        return ('# Public GVS tracking result\n\n'+json.dumps({k:s[k] for k in ('valid_complete_execution','official_task_success','tracking','accepted_plans','converged_updates','mean_update_s','backend_timings_s')},indent=2)+'\n')
+        from .delivery_facts import tracking_facts
+        facts = s.get('factual_result') or tracking_facts(s)
+        return ('# Public GVS tracking result\n\nProgram-generated factual result:\n\n```json\n'+
+            json.dumps(facts,indent=2)+'\n```\n\nSampled simulation acceptance; provider reasoning and its review are separate.\n')
     settling=s['sampled_settling']
     return ('# Public GVS NMPC result\n\n'
         f"Complete execution: {s['complete']}; valid: {s['evaluation_validity']}; official task success: {s['official_task_success']}.\n\n"

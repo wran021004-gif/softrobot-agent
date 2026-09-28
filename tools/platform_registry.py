@@ -177,7 +177,7 @@ def dependency_identity(definition):
     paths = set(definition.sources) | set(definition.assets)
     if definition.binding:
         paths.add(definition.binding.split(':')[0].replace('.', '/') + '.py')
-    paths.update(('schemas/platform.py', 'schemas/platform_math.py', 'schemas/common.py', 'tools/platform_registry.py', 'tools/platform_host.py', 'tools/platform_store.py'))
+    paths.update(('schemas/platform.py', 'schemas/platform_math.py', 'schemas/common.py', 'tools/platform_registry.py', 'tools/platform_host.py', 'tools/platform_store.py', 'tools/platform_validation.py'))
     if definition.legacy_service is not None:
         paths.update(('tools/tool_registry.py', 'tools/service_execution.py', 'tools/service_worker.py',
                       'schemas/public_tools.py', 'extensions/services/manifest.py'))

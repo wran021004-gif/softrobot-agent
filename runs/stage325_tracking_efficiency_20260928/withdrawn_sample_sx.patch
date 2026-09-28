@@ -1,0 +1,13 @@
+diff --git a/extensions/tendon_family/gvs_casadi.py b/extensions/tendon_family/gvs_casadi.py
+index 4b53600..e839979 100644
+--- a/extensions/tendon_family/gvs_casadi.py
++++ b/extensions/tendon_family/gvs_casadi.py
+@@ -263,7 +263,7 @@ class GVSCasadiFunctions:
+             projected_wrench += ca.jtimes(rotation_vector,q,rotation_covector,True)
+             # Keep directional/adjoint derivative graphs local to each sample.
+             sample_wrench = ca.Function('gvs_mass_wrench_'+str(descriptor_index),
+-                [q,qdot,acceleration],[projected_wrench])
++                [q,qdot,acceleration],[projected_wrench]).expand()
+             inertial_wrench += sample_wrench(q,qdot,acceleration)
+         mass = (mass + mass.T) / 2
+ 

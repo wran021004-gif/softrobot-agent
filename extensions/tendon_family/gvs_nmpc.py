@@ -142,6 +142,10 @@ class GVSNMPCController:
         self.observations.append(dict(time_s=t,phase='current_state_before_integration',
             tip_position_m=geometry['tip'].tolist(),gvs_q=list(q),gvs_qdot=list(v),
             measured_initial_state=x.tolist(),graph_construction_s=self.workspace.graph_s,**self.last))
+        # Prediction evaluation and observation construction are operational work.
+        elapsed=time.perf_counter()-start
+        self.last.update(update_wall_s=elapsed,deadline_missed=elapsed>self.period_s)
+        self.observations[-1].update(update_wall_s=elapsed,deadline_missed=elapsed>self.period_s)
         return command
 
 

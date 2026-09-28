@@ -275,6 +275,8 @@ def inspect(host):
         provider_authored_delivery=(final or {}).get('stop_reason') if (final or {}).get('explicit_delivery') else None)
     atomic_json(store.root/'route_status.json',out);atomic_json(store.root/'behavior_audit.json',audit)
     if summary:
+        if (final or {}).get('factual_result') is not None:
+            summary={**summary,'factual_result':final['factual_result']}
         atomic_json(store.root/'summary.json',summary)
         from extensions.tendon_family.gvs_reporting import markdown
         (store.root/'report.md').write_text(markdown(summary),encoding='utf8')

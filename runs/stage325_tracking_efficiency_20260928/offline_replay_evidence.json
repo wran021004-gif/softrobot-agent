@@ -1,0 +1,1869 @@
+{
+  "provenance": "Read-only extraction of retained Stage 3.25 offline replay; no tests rerun",
+  "historical_store": "runs/stage324_time_reference_tracking_20260928/live/platform.sqlite",
+  "historical_rejections": [
+    {
+      "event": {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "20e76266bbc148ad85c3d30417f8b385",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "1add445123673d78bf4499ccd409b38d8620448007fc2a2cdaf07eee63c65103",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool",
+        "outputs": [
+          {
+            "artifact_id": "9697bae658defef2febbc7cd24e50cdc9604543b7f7b968ea998cbab4be73a41",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": "ebfeb5dc5fae481aad3ecb4492cbcbb6",
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "model-1-tool",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 19,
+        "status": "rejected",
+        "timestamp": "2026-09-28T04:57:35.045416+00:00"
+      },
+      "request": {
+        "arguments": {
+          "byte_limit": 4096,
+          "limit": 40,
+          "pointer": "",
+          "reason": "I need the candidate's tendon pretension/channel definitions so the GVS analysis can use the actual total tensions for all six tendons rather than guessing.",
+          "reference": {
+            "artifact_id": "9f6f87bdbfb7f68b39a23da207a47185235883459e9554cc1b4bee52d0e1aa3a",
+            "media_type": "application/json"
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "The GVS kinematic/dynamics analysis requires real total tendon tensions for all six named tendons; the build summary omitted them, so I read the immutable candidate configuration artifact to obtain the pretension values.",
+        "request_id": "model-1-tool",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      },
+      "raw_response_reference": {
+        "artifact_id": "9af43ebe5b0b26a70a97c806a7aa09ea6343b2cbe683e04ea229e8d0a0e5cacb",
+        "media_type": "application/json"
+      },
+      "historical_outputs": [
+        {
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "error": "1 validation error for ReadEvidence\nreason\n  Extra inputs are not permitted [type=extra_forbidden, input_value=\"I need the candidate's t...s rather than guessing.\", input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden",
+          "execution_id": "not_executed",
+          "execution_status": "rejected",
+          "request_id": "model-1-tool",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "event": {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "6d5e457cd076439fa4842ca18c8b0b8b",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "58eb7dffe470e443fe5a29ed7b23e859cab46519967420b1d08f607281d172d8",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool",
+        "outputs": [
+          {
+            "artifact_id": "1cedb9aad84f971bcf83a7ebe3ea9823f3693661d53aba72fb86bfe32e42808a",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": "a0d225d6d2a442a398a424ec5ecaf2ff",
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "model-8-tool",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 74,
+        "status": "rejected",
+        "timestamp": "2026-09-28T04:58:55.796421+00:00"
+      },
+      "request": {
+        "arguments": {
+          "action": "run",
+          "combination": "tracking",
+          "evidence": [
+            {
+              "artifact_id": "80e2b4979bfe24158b8b447be42b150af09eaf2fc8f8271c0432461ebbe8b881",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "ccc04a6ec422d0a5406b021560fc8a6312a6b058fd363b7230c424eeb977f7b4",
+              "media_type": "application/json"
+            }
+          ],
+          "next_step": "Read the returned evaluation (task_success, max_position_error, solve status). If the changed candidate passes the 0.01 m interval tracking tolerance, finish immediately with the exact candidate_facts design_statement; if it fails, use at most the remaining two charged attempts on a justified revision (e.g. a different authorized near/far length or an explicit length optimization) and stop early on a pass.",
+          "node_id": "run_near165",
+          "reason": "The build node build_near165 is complete (near length 0.165 m, +5 mm over the 0.160 m baseline; far unchanged at 0.120 m) and the required zero-state structural-linear GVS analysis on that build node has already been computed pre-execution (tip at the straight, all-zero-tension state: position_m [0.313, 0.0, 0.0], qdd nonzero, no solve consumed). Execution and evaluation remain the validation authority, so I now run this saved build exactly once to obtain the task-error evaluation for the frozen reference before deciding whether to revise the candidate.",
+          "source_node": "build_near165"
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "The zero-solve prerequisites (build plus pre-execution GVS candidate analysis on that explicit build node) are satisfied, so the next evidence-led action is the single charged run of the saved build to obtain a genuine simulation evaluation; this consumes 1 of the 3 authorized backend solves.",
+        "request_id": "model-8-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      },
+      "raw_response_reference": {
+        "artifact_id": "88a7034f2794842514953f59869d3488c74980093161c5d6d68d793eec3cfde2",
+        "media_type": "application/json"
+      },
+      "historical_outputs": [
+        {
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "error": "RUN_PRESERVES_BUILD_COMBINATION: omit combination",
+          "execution_id": "not_executed",
+          "execution_status": "rejected",
+          "request_id": "model-8-tool",
+          "tool_id": "route.advance",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "event": {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "f759ecd807794233bbf5852607626846",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "7587afbaf54357145f392fffc49894377fbcee560a45140c4b50475a8949e04d",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool",
+        "outputs": [
+          {
+            "artifact_id": "975b44f1a5b88c0843c2d35459a656cf2de5813546453d295c00b1978a0f060c",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": "a38ae6d5eff04a769d4191df41c2ef75",
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "model-9-tool",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 81,
+        "status": "rejected",
+        "timestamp": "2026-09-28T04:59:03.889985+00:00"
+      },
+      "request": {
+        "arguments": {
+          "byte_limit": 4096,
+          "limit": 20,
+          "offset": 0,
+          "pointer": "",
+          "reason": "Read the saved zero-state GVS candidate analysis for build_near165 to interpret its kinematics/dynamics before the charged run.",
+          "reference": {
+            "artifact_id": "ccc04a6ec422d0a5406b021560fc8a6312a6b058fd363b7230c424eeb977f7b4",
+            "media_type": "application/json"
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "The route next_step requires interpreting the zero-state structural-linear GVS analysis on the explicit build node before spending a backend solve; the analysis result artifact is cited in recent_actions but its content is not included in recent_evidence, so I read it.",
+        "request_id": "model-9-tool",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      },
+      "raw_response_reference": {
+        "artifact_id": "3eafa4ff98f58c4dcfa246d6b8201796bd0cd5a35e7aee4155069364e7f2b06d",
+        "media_type": "application/json"
+      },
+      "historical_outputs": [
+        {
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "error": "1 validation error for ReadEvidence\nreason\n  Extra inputs are not permitted [type=extra_forbidden, input_value='Read the saved zero-stat...before the charged run.', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden",
+          "execution_id": "not_executed",
+          "execution_status": "rejected",
+          "request_id": "model-9-tool",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "event": {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "62250b5a44684f70b644209e7dc62669",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "2808aa26b03ec7f8a5940de52ce225e96813d6284b8d43092e153748a5f033cd",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool",
+        "outputs": [
+          {
+            "artifact_id": "5319f83a7a47ed91f176eae2390344824ebeee65d9adf3715a93ce107791fec6",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": "030b2ad20876489582ded1aa96f8dbbd",
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "model-10-tool",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 88,
+        "status": "rejected",
+        "timestamp": "2026-09-28T04:59:13.507726+00:00"
+      },
+      "request": {
+        "arguments": {
+          "detail": "full",
+          "include_backbone": false,
+          "input": {
+            "tendon_tensions_n": {
+              "far_t0": 0.2,
+              "far_t1": 0.2,
+              "far_t2": 0.2,
+              "near_t0": 0.2,
+              "near_t1": 0.2,
+              "near_t2": 0.2
+            }
+          },
+          "reason": "Zero-state structural-linear basis analysis of the built near=0.165 m candidate: 12 generalized coordinates (controller basis coordinate count) and the six named tendons at their 0.2 N design pretension, pre-execution, zero backend solves.",
+          "source_node": "build_near165",
+          "state": {
+            "q": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "qdot": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "The route next_step requires running the zero-state structural-linear GVS analysis on the explicit build node build_near165 before any charged backend solve; the build exists but has no simulation or evaluation, so this zero-backend mathematical calculation is the appropriate next action.",
+        "request_id": "model-10-tool",
+        "tool_id": "analysis.gvs_candidate_evaluate",
+        "tool_version": "1.0.0"
+      },
+      "raw_response_reference": {
+        "artifact_id": "549746e2e2e36a68aa3c66bc9e5442e06778e6e80bb6fd4ce6ff4508246d96f6",
+        "media_type": "application/json"
+      },
+      "historical_outputs": [
+        {
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "error": "1 validation error for CandidateDynamicsRequest\nreason\n  Extra inputs are not permitted [type=extra_forbidden, input_value='Zero-state structural-li...n, zero backend solves.', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden",
+          "execution_id": "not_executed",
+          "execution_status": "rejected",
+          "request_id": "model-10-tool",
+          "tool_id": "analysis.gvs_candidate_evaluate",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "event": {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "ed43fcd3f47e46c4a19ec441713f94df",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "40103a6110f9209609c0b67fd16ad8901dd297397757c9510b0a410c31fcac53",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool",
+        "outputs": [
+          {
+            "artifact_id": "2714a852ae415f5f4ddbb62db5e7bc99a42c6f692f55e7f6da3eaa10fd7ddf5b",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": "9dada2702ea64402b6724630769e29a6",
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "model-14-tool",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 141,
+        "status": "rejected",
+        "timestamp": "2026-09-28T05:22:34.189865+00:00"
+      },
+      "request": {
+        "arguments": {
+          "byte_limit": 8192,
+          "limit": 20,
+          "offset": 8,
+          "pointer": "",
+          "reason": "The inline overview shows only the first 8 keys of the run_near165 result page; I need the remaining keys to obtain the sealed simulation_request_id and evaluation_request_id required by control.profile_report before delivery.",
+          "reference": {
+            "artifact_id": "1b82dc501fc4f6c885451189e0714a7cdc89c4c45ea5a3196549695fa76ca19a",
+            "media_type": "application/json"
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Retrieve the omitted tail of the run_near165 result evidence so I can cite the exact sealed request identifiers and then read the current profile report summary before finishing.",
+        "request_id": "model-14-tool",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      },
+      "raw_response_reference": {
+        "artifact_id": "d9b242e7fdf06bb3ae875ac9c43877642f45719e534e387bb1f56eb690bd76df",
+        "media_type": "application/json"
+      },
+      "historical_outputs": [
+        {
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "error": "1 validation error for ReadEvidence\nreason\n  Extra inputs are not permitted [type=extra_forbidden, input_value='The inline overview show...report before delivery.', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden",
+          "execution_id": "not_executed",
+          "execution_status": "rejected",
+          "request_id": "model-14-tool",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    }
+  ],
+  "replay": {
+    "path": "runs\\stage325_tracking_efficiency_20260928\\offline_replay_820673a9f6724ff0a7feaaa05845a053",
+    "events": [
+      {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "99d9a525eb704cc79ee5db5749c32160",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "1add445123673d78bf4499ccd409b38d8620448007fc2a2cdaf07eee63c65103",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool",
+        "outputs": [
+          {
+            "artifact_id": "637dc047d18787c1cffb36bfc8989b8defaa5e39b5d6393798c5ee99c064fbe8",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": null,
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "model-1-tool",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 160,
+        "status": "rejected",
+        "timestamp": "2026-09-28T06:45:28.482201+00:00"
+      },
+      {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "dd54dc6009414055aac34dc5d963175c",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "58eb7dffe470e443fe5a29ed7b23e859cab46519967420b1d08f607281d172d8",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool",
+        "outputs": [
+          {
+            "artifact_id": "ef25403e2e0a0e4d0aa365da755815ff8e72f9af79b4ec297b2777a4c7f1bee0",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": null,
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "model-8-tool",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 161,
+        "status": "rejected",
+        "timestamp": "2026-09-28T06:45:29.709221+00:00"
+      },
+      {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "7b74f19d004f40508b9a4df42406430e",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "7587afbaf54357145f392fffc49894377fbcee560a45140c4b50475a8949e04d",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool",
+        "outputs": [
+          {
+            "artifact_id": "70cedf8f4ca8b870f75755e56ba23371da9348e33c25fa54963fb53465cd1e4a",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": null,
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "model-9-tool",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 162,
+        "status": "rejected",
+        "timestamp": "2026-09-28T06:45:30.904070+00:00"
+      },
+      {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "247c699391cc4d7d83b590e6d514abd1",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "2808aa26b03ec7f8a5940de52ce225e96813d6284b8d43092e153748a5f033cd",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool",
+        "outputs": [
+          {
+            "artifact_id": "d7e1b0e4be0d8b6fe171ac6d106f5347bf3994a2794eadd718975f89649f45e3",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": null,
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "model-10-tool",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 163,
+        "status": "rejected",
+        "timestamp": "2026-09-28T06:45:32.121748+00:00"
+      },
+      {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "1ce1969335384ce98ce0b924283f5194",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "40103a6110f9209609c0b67fd16ad8901dd297397757c9510b0a410c31fcac53",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool",
+        "outputs": [
+          {
+            "artifact_id": "91e5a8b5d1b9d2f6fa9bea1efd2aad4617526862c58e8856417370d23d59051a",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": null,
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "model-14-tool",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 164,
+        "status": "rejected",
+        "timestamp": "2026-09-28T06:45:33.313540+00:00"
+      },
+      {
+        "agent_id": "host",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "6563244c12b840c3b8d728000d332976",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "c02522450336418d195fe19e9b9618163dfd6b4ff0cb07b682340bb0da04302e",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "91e5a8b5d1b9d2f6fa9bea1efd2aad4617526862c58e8856417370d23d59051a",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool_argument_correction",
+        "outputs": [
+          {
+            "artifact_id": "9351d9b5990ded27a87d555630547cb1c5ebf7e962356b0f2c2f49271908080f",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": null,
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "model-14-tool",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 165,
+        "status": "scheduled",
+        "timestamp": "2026-09-28T06:45:33.411096+00:00"
+      },
+      {
+        "agent_id": "host",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "905f4b99b89343669c10da9418ebe102",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [],
+        "kind": "session",
+        "outputs": [],
+        "parent_id": null,
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": null,
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 166,
+        "status": "resumed",
+        "timestamp": "2026-09-28T06:45:34.689955+00:00"
+      },
+      {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1800.0,
+          "worker_calls": 0
+        },
+        "event_id": "81411b43fc00400f963d77210d92822f",
+        "execution_id": "927f05c39355408b99daad9e3b342531",
+        "implementation_version": "1.0.0",
+        "inputs": [
+          {
+            "artifact_id": "d708f7e10280aa02cb2728e17a83702cf75fba1c8397aa59e06cb373a694db33",
+            "media_type": "application/json"
+          }
+        ],
+        "kind": "tool",
+        "outputs": [],
+        "parent_id": null,
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "offline-corrected-read",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 167,
+        "status": "reserved",
+        "timestamp": "2026-09-28T06:45:36.562726+00:00"
+      },
+      {
+        "agent_id": "model",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.4380000000819564,
+          "worker_calls": 0
+        },
+        "event_id": "3a3d4f04fea340658f9331f44b5e523a",
+        "execution_id": "927f05c39355408b99daad9e3b342531",
+        "implementation_version": "1.0.0",
+        "inputs": [],
+        "kind": "tool",
+        "outputs": [
+          {
+            "artifact_id": "0a5b7a750996a7d80f005084f7bc2d569304cb2d28a4f5458c58c326ddbab4d1",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": "81411b43fc00400f963d77210d92822f",
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": "offline-corrected-read",
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 168,
+        "status": "completed",
+        "timestamp": "2026-09-28T06:45:36.656631+00:00"
+      },
+      {
+        "agent_id": "host",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "f12370a0eac4467f904c49f0e333d7a8",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [],
+        "kind": "session",
+        "outputs": [],
+        "parent_id": null,
+        "project_id": "gvs-live-6971718592bc",
+        "request_id": null,
+        "run_id": "gvs-live-6971718592bc",
+        "sequence": 169,
+        "status": "needs_input",
+        "timestamp": "2026-09-28T06:45:36.889025+00:00"
+      }
+    ],
+    "status": "needs_input",
+    "state": {
+      "argument_limit_correction_used": true,
+      "last_receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.4380000000819564,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "927f05c39355408b99daad9e3b342531",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "0a5b7a750996a7d80f005084f7bc2d569304cb2d28a4f5458c58c326ddbab4d1",
+          "media_type": "application/json"
+        },
+        "request_id": "offline-corrected-read",
+        "result_contract": "EvidencePage",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      },
+      "last_signature": "33522c21ebc59da013888ec875de71a8b9f0da36d7d833e04ce5b2e32544db43",
+      "model_notes": [],
+      "pending": null,
+      "reads": {
+        "2e3e5938ea56ee1be3c00c5239b18961bb44605dab5d83817ecc8db2050facc5": {
+          "content_hash": "80e2b4979bfe24158b8b447be42b150af09eaf2fc8f8271c0432461ebbe8b881",
+          "kind": "content",
+          "next_offset": null,
+          "offset": 0,
+          "pointer": "",
+          "source": {
+            "artifact_id": "80e2b4979bfe24158b8b447be42b150af09eaf2fc8f8271c0432461ebbe8b881",
+            "media_type": "application/json"
+          }
+        },
+        "55e91ca37359c1f95ca245a427f47f27250595806a7a9d15baf3173d0b317568": {
+          "content_hash": "1e6752d9fa75f0cc9bae3bc6cc0cbdcb1381eaed02c4104a4453340f70d10eb3",
+          "kind": "content",
+          "next_offset": 3,
+          "offset": 0,
+          "pointer": "/input/robot/structure/data",
+          "source": {
+            "artifact_id": "2e80e7b97c0208a8744d3c2f5a323436ae309f3e31dd99a3f8931da472c108be",
+            "media_type": "application/json"
+          }
+        },
+        "64b5822a7422546b9d7200d1c82461dfc7ab08f552b17ca90b94a14fefad775b": {
+          "content_hash": "2d4d8886aecdbfc67c7f041e9aba6c0a9c8da034deabbe0eb3c7891fd7afeaa6",
+          "kind": "content",
+          "next_offset": 1,
+          "offset": 0,
+          "pointer": "",
+          "source": {
+            "artifact_id": "2e80e7b97c0208a8744d3c2f5a323436ae309f3e31dd99a3f8931da472c108be",
+            "media_type": "application/json"
+          }
+        },
+        "a287cdb12960a281b08068e9704cec0aede250e8c1e21431a983d8e416be3d26": {
+          "content_hash": "cfdeca011d620bf54728e5649247a9c9ea36923396133568fa2e81509b316d31",
+          "kind": "content",
+          "next_offset": null,
+          "offset": 3,
+          "pointer": "/input/robot/structure/data",
+          "source": {
+            "artifact_id": "2e80e7b97c0208a8744d3c2f5a323436ae309f3e31dd99a3f8931da472c108be",
+            "media_type": "application/json"
+          }
+        },
+        "e07f136d6e161a83796f88855c30b9c9531e18411a711eb7a046f41b389e6227": {
+          "content_hash": "aa2ae25e3c5c88bd39a26b21f501da863dead4236549edc0b8b91a1060dd6edd",
+          "kind": "content",
+          "next_offset": 10,
+          "offset": 8,
+          "pointer": "",
+          "source": {
+            "artifact_id": "1b82dc501fc4f6c885451189e0714a7cdc89c4c45ea5a3196549695fa76ca19a",
+            "media_type": "application/json"
+          }
+        },
+        "efcc51357cf30e2673f26052a14bc73258e45adde26be73d7ae56fe44def62a3": {
+          "content_hash": "17d7eecbb026f6d2b6dec95e5146fd68456082d4809773d775f98904b83d4996",
+          "kind": "content",
+          "next_offset": 1,
+          "offset": 0,
+          "pointer": "",
+          "source": {
+            "artifact_id": "9f6f87bdbfb7f68b39a23da207a47185235883459e9554cc1b4bee52d0e1aa3a",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "recent_actions": [
+        {
+          "action": "run",
+          "error": "RUN_PRESERVES_BUILD_COMBINATION: omit combination",
+          "node_id": "run_near165",
+          "offset": null,
+          "output": null,
+          "pointer": null,
+          "reference": null,
+          "status": "rejected",
+          "tool_id": "route.advance"
+        },
+        {
+          "action": null,
+          "error": "1 validation error for ReadEvidence\nreason\n  Extra inputs are not permitted [type=extra_forbidden, input_value='Read the saved zero-stat...before the charged run.', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden",
+          "node_id": null,
+          "offset": 0,
+          "output": null,
+          "pointer": "",
+          "reference": {
+            "artifact_id": "ccc04a6ec422d0a5406b021560fc8a6312a6b058fd363b7230c424eeb977f7b4",
+            "media_type": "application/json"
+          },
+          "status": "rejected",
+          "tool_id": "evidence.read"
+        },
+        {
+          "action": null,
+          "error": "1 validation error for CandidateDynamicsRequest\nreason\n  Extra inputs are not permitted [type=extra_forbidden, input_value='Zero-state structural-li...n, zero backend solves.', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden",
+          "node_id": null,
+          "offset": null,
+          "output": null,
+          "pointer": null,
+          "reference": null,
+          "status": "rejected",
+          "tool_id": "analysis.gvs_candidate_evaluate"
+        },
+        {
+          "action": null,
+          "error": null,
+          "node_id": null,
+          "offset": 8,
+          "output": {
+            "artifact_id": "0a5b7a750996a7d80f005084f7bc2d569304cb2d28a4f5458c58c326ddbab4d1",
+            "media_type": "application/json"
+          },
+          "pointer": "",
+          "reference": {
+            "artifact_id": "1b82dc501fc4f6c885451189e0714a7cdc89c4c45ea5a3196549695fa76ca19a",
+            "media_type": "application/json"
+          },
+          "status": "completed",
+          "tool_id": "evidence.read"
+        }
+      ],
+      "recent_evidence": [
+        {
+          "content_identity": "2b4b7f0ce738f22d1e17c1c4f825996537c616a0e5d7989f80a66506319864e7",
+          "page": {
+            "content": {
+              "approval": {
+                "capabilities_ready": true,
+                "definition_valid": true,
+                "formally_approved": false,
+                "purpose": "Independent development interface validation; not formal research approval"
+              }
+            },
+            "kind": "content",
+            "next_offset": 1,
+            "offset": 0,
+            "pointer": "",
+            "presentation": "original",
+            "returned_items": 1,
+            "source": {
+              "artifact_id": "2e80e7b97c0208a8744d3c2f5a323436ae309f3e31dd99a3f8931da472c108be",
+              "media_type": "application/json"
+            },
+            "total_items": 9
+          }
+        },
+        {
+          "content_identity": "c3b7baa71b921b82ef53bcb988d73c7acc7835889adfe7b458369e433f0f2d0e",
+          "page": {
+            "content": {
+              "metadata": {},
+              "tendons": [
+                {
+                  "diameter_m": 0.001,
+                  "force_limit_n": 8.0,
+                  "id": "near_t0",
+                  "length_servo_gain_n_m": 900.0,
+                  "model": "straight_frictionless",
+                  "points": [
+                    {
+                      "attachment": {
+                        "part": "fixed_base",
+                        "position_m": [
+                          0.0,
+                          0.01764119840114235,
+                          0.0035760479543111017
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": null,
+                      "role": "start"
+                    },
+                    {
+                      "attachment": {
+                        "part": "near",
+                        "position_m": [
+                          0.0,
+                          0.01817043435317662,
+                          0.0034687665156817684
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.5
+                      },
+                      "hole": null,
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "mid_guide",
+                        "position_m": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": "near_h0",
+                      "role": "anchor"
+                    }
+                  ],
+                  "pretension_n": 0.2
+                },
+                {
+                  "diameter_m": 0.001,
+                  "force_limit_n": 8.0,
+                  "id": "near_t1",
+                  "length_servo_gain_n_m": 900.0,
+                  "model": "straight_frictionless",
+                  "points": [
+                    {
+                      "attachment": {
+                        "part": "fixed_base",
+                        "position_m": [
+                          0.0,
+                          -0.010593020110596225,
+                          0.01455293526875262
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": null,
+                      "role": "start"
+                    },
+                    {
+                      "attachment": {
+                        "part": "near",
+                        "position_m": [
+                          0.0,
+                          -0.010910810713914112,
+                          0.014116347210690041
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.5
+                      },
+                      "hole": null,
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "mid_guide",
+                        "position_m": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": "near_h1",
+                      "role": "anchor"
+                    }
+                  ],
+                  "pretension_n": 0.2
+                },
+                {
+                  "diameter_m": 0.001,
+                  "force_limit_n": 8.0,
+                  "id": "near_t2",
+                  "length_servo_gain_n_m": 900.0,
+                  "model": "straight_frictionless",
+                  "points": [
+                    {
+                      "attachment": {
+                        "part": "fixed_base",
+                        "position_m": [
+                          0.0,
+                          -0.005531991659611548,
+                          -0.01712883733001129
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": null,
+                      "role": "start"
+                    },
+                    {
+                      "attachment": {
+                        "part": "near",
+                        "position_m": [
+                          0.0,
+                          -0.005697951409399894,
+                          -0.01661497221011095
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.5
+                      },
+                      "hole": null,
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "mid_guide",
+                        "position_m": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": "near_h2",
+                      "role": "anchor"
+                    }
+                  ],
+                  "pretension_n": 0.2
+                },
+                {
+                  "diameter_m": 0.001,
+                  "force_limit_n": 8.0,
+                  "id": "far_t0",
+                  "length_servo_gain_n_m": 900.0,
+                  "model": "straight_frictionless",
+                  "points": [
+                    {
+                      "attachment": {
+                        "part": "fixed_base",
+                        "position_m": [
+                          0.0,
+                          0.016826528120258744,
+                          0.014172789119229201
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": null,
+                      "role": "start"
+                    },
+                    {
+                      "attachment": {
+                        "part": "near",
+                        "position_m": [
+                          0.0,
+                          0.017331323963866507,
+                          0.013747605445652325
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.5
+                      },
+                      "hole": null,
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "mid_guide",
+                        "position_m": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": "far_h0",
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "far",
+                        "position_m": [
+                          0.0,
+                          0.013461222496206996,
+                          0.01133823129538336
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.5
+                      },
+                      "hole": null,
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "far",
+                        "position_m": [
+                          0.0,
+                          0.01177856968418112,
+                          0.00992095238346044
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 1.0
+                      },
+                      "hole": null,
+                      "role": "anchor"
+                    }
+                  ],
+                  "pretension_n": 0.2
+                },
+                {
+                  "diameter_m": 0.001,
+                  "force_limit_n": 8.0,
+                  "id": "far_t1",
+                  "length_servo_gain_n_m": 900.0,
+                  "model": "straight_frictionless",
+                  "points": [
+                    {
+                      "attachment": {
+                        "part": "fixed_base",
+                        "position_m": [
+                          0.0,
+                          -0.020728891494710477,
+                          0.0073697393034299116
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": null,
+                      "role": "start"
+                    },
+                    {
+                      "attachment": {
+                        "part": "near",
+                        "position_m": [
+                          0.0,
+                          -0.021350758239551793,
+                          0.007148647124327014
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.5
+                      },
+                      "hole": null,
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "mid_guide",
+                        "position_m": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": "far_h1",
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "far",
+                        "position_m": [
+                          0.0,
+                          -0.01658311319576838,
+                          0.005895791442743929
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.5
+                      },
+                      "hole": null,
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "far",
+                        "position_m": [
+                          0.0,
+                          -0.014510224046297333,
+                          0.005158817512400938
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 1.0
+                      },
+                      "hole": null,
+                      "role": "anchor"
+                    }
+                  ],
+                  "pretension_n": 0.2
+                },
+                {
+                  "diameter_m": 0.001,
+                  "force_limit_n": 8.0,
+                  "id": "far_t2",
+                  "length_servo_gain_n_m": 900.0,
+                  "model": "straight_frictionless",
+                  "points": [
+                    {
+                      "attachment": {
+                        "part": "fixed_base",
+                        "position_m": [
+                          0.0,
+                          0.0019249776356678207,
+                          -0.021915621394388494
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": null,
+                      "role": "start"
+                    },
+                    {
+                      "attachment": {
+                        "part": "near",
+                        "position_m": [
+                          0.0,
+                          0.0019827269647378553,
+                          -0.02125815275255684
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.5
+                      },
+                      "hole": null,
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "mid_guide",
+                        "position_m": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.0
+                      },
+                      "hole": "far_h2",
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "far",
+                        "position_m": [
+                          0.0,
+                          0.0015399821085342567,
+                          -0.017532497115510796
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 0.5
+                      },
+                      "hole": null,
+                      "role": "guide"
+                    },
+                    {
+                      "attachment": {
+                        "part": "far",
+                        "position_m": [
+                          0.0,
+                          0.0013474843449674744,
+                          -0.015340934976071944
+                        ],
+                        "quaternion_wxyz": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "s": 1.0
+                      },
+                      "hole": null,
+                      "role": "anchor"
+                    }
+                  ],
+                  "pretension_n": 0.2
+                }
+              ],
+              "tip": {
+                "part": "payload",
+                "position_m": [
+                  0.014,
+                  0.0,
+                  0.0
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "s": 0.0
+              },
+              "version": "tendon_family_v1"
+            },
+            "kind": "content",
+            "next_offset": null,
+            "offset": 3,
+            "pointer": "/input/robot/structure/data",
+            "presentation": "original",
+            "returned_items": 4,
+            "source": {
+              "artifact_id": "2e80e7b97c0208a8744d3c2f5a323436ae309f3e31dd99a3f8931da472c108be",
+              "media_type": "application/json"
+            },
+            "total_items": 7
+          }
+        },
+        {
+          "attribution": {
+            "candidate_id": "cand_near165",
+            "configuration": {
+              "artifact_id": "ad97dadde9a7422ea64f447428ad87bb8a48ae5c33e93576c4a7ac1e4a54e1d7",
+              "media_type": "application/json"
+            },
+            "run_id": "gvs-live-6971718592bc-0e6ec10af4ba158f",
+            "source_execution_id": "842ae454986e4a41b9dbaca5a57fb40a"
+          },
+          "content_identity": "0a5b7a750996a7d80f005084f7bc2d569304cb2d28a4f5458c58c326ddbab4d1",
+          "page": {
+            "content": {
+              "metrics": [
+                {
+                  "name": "max_position_error",
+                  "units": "m",
+                  "value": 0.00719823810484788
+                },
+                {
+                  "name": "rms_position_error",
+                  "units": "m",
+                  "value": 0.006001923582692169
+                },
+                {
+                  "name": "terminal_position_error",
+                  "units": "m",
+                  "value": 0.00719823810484788
+                }
+              ],
+              "profile_report": {
+                "execution_id": "842ae454986e4a41b9dbaca5a57fb40a",
+                "owner_run_id": "gvs-live-6971718592bc-0e6ec10af4ba158f",
+                "reference": {
+                  "artifact_id": "8bc193ac382b0333744bd678ef7112cfd97e80dfb3182afd190ca3331a03487a",
+                  "media_type": "application/json"
+                },
+                "request_id": "single-profile-report"
+              }
+            },
+            "kind": "content",
+            "next_offset": 10,
+            "offset": 8,
+            "pointer": "",
+            "presentation": "original",
+            "returned_items": 2,
+            "source": {
+              "artifact_id": "1b82dc501fc4f6c885451189e0714a7cdc89c4c45ea5a3196549695fa76ca19a",
+              "media_type": "application/json"
+            },
+            "total_items": 17
+          }
+        }
+      ],
+      "repairs": 3,
+      "repeated": 0,
+      "route": {
+        "current": null,
+        "final": null,
+        "incumbent": null,
+        "next_step": "After the build succeeds, run the zero-state structural-linear GVS kinematics/dynamics analysis on this explicit build node before spending any backend solve, then decide on the single charged run.",
+        "nodes": [
+          {
+            "action": "build",
+            "execution_id": "c024f6adaf794574a35fbcbed1fe16c7",
+            "node_id": "build_near165",
+            "request_id": "model-0-tool",
+            "result": {
+              "artifact_id": "80e2b4979bfe24158b8b447be42b150af09eaf2fc8f8271c0432461ebbe8b881",
+              "media_type": "application/json"
+            },
+            "selection": {
+              "action": "build",
+              "candidate_id": "cand_near165",
+              "changes": {
+                "components/near/length_m": 0.165
+              },
+              "combination": "tracking",
+              "design_statement": null,
+              "evidence": [],
+              "max_trials": 1,
+              "next_step": "After the build succeeds, run the zero-state structural-linear GVS kinematics/dynamics analysis on this explicit build node before spending any backend solve, then decide on the single charged run.",
+              "node_id": "build_near165",
+              "reason": "Construct a first changed-length candidate in the authorized tracking combination: near segment 0.165 m versus baseline 0.160 m (+5 mm, inside the authorized [0.15, 0.17] bound), leaving far at its baseline 0.120 m and every control, reference, initializer and physics value frozen. Build only validates the configuration and produces no trajectory.",
+              "source_node": null,
+              "variables": {}
+            },
+            "status": "completed",
+            "summary": {
+              "actual_solves": 0,
+              "candidate_facts": {
+                "candidate_id": "cand_near165",
+                "configuration": {
+                  "artifact_id": "9f6f87bdbfb7f68b39a23da207a47185235883459e9554cc1b4bee52d0e1aa3a",
+                  "media_type": "application/json"
+                },
+                "effective_identity": "9f6f87bdbfb7f68b39a23da207a47185235883459e9554cc1b4bee52d0e1aa3a",
+                "execution_id": null,
+                "frozen_baseline_identity": "2b34ed0fa887d28068486e26d82d9404b128d4666f7bc9796fe9e92c7cd2a392",
+                "owner_run_id": null,
+                "parameters": [
+                  {
+                    "baseline_delta": 0.0,
+                    "baseline_value": 0.12,
+                    "effective_value": 0.12,
+                    "path": "components/far/length_m",
+                    "unit": "m"
+                  },
+                  {
+                    "baseline_delta": 0.0050000000000000044,
+                    "baseline_value": 0.16,
+                    "effective_value": 0.165,
+                    "path": "components/near/length_m",
+                    "unit": "m"
+                  }
+                ]
+              },
+              "candidate_id": "cand_near165",
+              "configuration": {
+                "artifact_id": "9f6f87bdbfb7f68b39a23da207a47185235883459e9554cc1b4bee52d0e1aa3a",
+                "media_type": "application/json"
+              },
+              "distinct_candidates": null,
+              "evaluated": false,
+              "evaluation": null,
+              "evaluation_ref": null,
+              "facts": "Built, not simulated, not evaluated. No task error or trajectory exists. Use run with this build node to execute and evaluate.",
+              "findings": {
+                "actuators": 6,
+                "components": [
+                  {
+                    "id": "near",
+                    "kind": "flexible_segment",
+                    "length_m": 0.165,
+                    "sections": [
+                      {
+                        "angle_rad": 0.35,
+                        "holes_yz_m": [],
+                        "kind": "ellipse",
+                        "outer_yz_m": [],
+                        "parameters": {
+                          "semi_y_m": 0.01,
+                          "semi_z_m": 0.008
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "mid_guide",
+                    "kind": "guide",
+                    "length_m": null,
+                    "sections": []
+                  },
+                  {
+                    "id": "connector",
+                    "kind": "rigid_connector",
+                    "length_m": null,
+                    "sections": []
+                  },
+                  {
+                    "id": "far",
+                    "kind": "flexible_segment",
+                    "length_m": 0.12,
+                    "sections": [
+                      {
+                        "angle_rad": -0.25,
+                        "holes_yz_m": [],
+                        "kind": "rectangle",
+                        "outer_yz_m": [],
+                        "parameters": {
+                          "height_z_m": 0.01,
+                          "width_y_m": 0.014
+                        }
+                      },
+                      {
+                        "angle_rad": 0.15,
+                        "holes_yz_m": [],
+                        "kind": "rectangle",
+                        "outer_yz_m": [],
+                        "parameters": {
+                          "height_z_m": 0.009,
+                          "width_y_m": 0.012
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "payload",
+                    "kind": "payload",
+                    "length_m": null,
+                    "sections": []
+                  }
+                ],
+                "id": "two_segment_development",
+                "tendons": 6
+              },
+              "new_evaluations": null,
+              "proposals": null,
+              "reused_evaluations": null,
+              "run_id": null,
+              "simulated": false,
+              "simulation": null,
+              "status": "built",
+              "stop_reason": null,
+              "task_success": null
+            }
+          }
+        ],
+        "source": "User authorized Stage 3.24 bounded live DeepSeek tracking regression"
+      },
+      "stop_reason": "BOUNDED_ARGUMENT_CORRECTION_FAILED",
+      "turn": 12
+    },
+    "remaining": {
+      "limit": {
+        "backend_solves": 3,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 7200.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 16,
+        "model_calls": 17,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 1358.517999999458
+      },
+      "remaining": {
+        "backend_solves": 2,
+        "model_calls": 7,
+        "tool_calls": 44,
+        "wall_s": 5841.482000000542,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    }
+  },
+  "new_replay_artifacts": {
+    "637dc047d18787c1cffb36bfc8989b8defaa5e39b5d6393798c5ee99c064fbe8": {
+      "caller": "model",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 0,
+        "wall_s": 0.0,
+        "worker_calls": 0
+      },
+      "error": "INVALID_TOOL_ARGUMENTS: arguments.reason: Extra inputs are not permitted; omit arguments.reason for this tool; keep the required OUTER reason. Required fields: reference. Allowed fields: reference, pointer, offset, limit, byte_limit",
+      "execution_id": "not_executed",
+      "execution_status": "rejected",
+      "request_id": "model-1-tool",
+      "tool_id": "evidence.read",
+      "tool_version": "1.0.0"
+    },
+    "ef25403e2e0a0e4d0aa365da755815ff8e72f9af79b4ec297b2777a4c7f1bee0": {
+      "caller": "model",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 0,
+        "wall_s": 0.0,
+        "worker_calls": 0
+      },
+      "error": "INVALID_TOOL_ARGUMENTS: arguments.combination: RUN_PRESERVES_BUILD_COMBINATION; omit combination and retain the explicit build source_node",
+      "execution_id": "not_executed",
+      "execution_status": "rejected",
+      "request_id": "model-8-tool",
+      "tool_id": "route.advance",
+      "tool_version": "1.0.0"
+    },
+    "70cedf8f4ca8b870f75755e56ba23371da9348e33c25fa54963fb53465cd1e4a": {
+      "caller": "model",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 0,
+        "wall_s": 0.0,
+        "worker_calls": 0
+      },
+      "error": "INVALID_TOOL_ARGUMENTS: arguments.reason: Extra inputs are not permitted; omit arguments.reason for this tool; keep the required OUTER reason. Required fields: reference. Allowed fields: reference, pointer, offset, limit, byte_limit",
+      "execution_id": "not_executed",
+      "execution_status": "rejected",
+      "request_id": "model-9-tool",
+      "tool_id": "evidence.read",
+      "tool_version": "1.0.0"
+    },
+    "d7e1b0e4be0d8b6fe171ac6d106f5347bf3994a2794eadd718975f89649f45e3": {
+      "caller": "model",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 0,
+        "wall_s": 0.0,
+        "worker_calls": 0
+      },
+      "error": "INVALID_TOOL_ARGUMENTS: arguments.reason: Extra inputs are not permitted; omit arguments.reason for this tool; keep the required OUTER reason. Required fields: state, input, source_node. Allowed fields: state, input, detail, include_backbone, samples_per_segment, source_node",
+      "execution_id": "not_executed",
+      "execution_status": "rejected",
+      "request_id": "model-10-tool",
+      "tool_id": "analysis.gvs_candidate_evaluate",
+      "tool_version": "1.0.0"
+    },
+    "91e5a8b5d1b9d2f6fa9bea1efd2aad4617526862c58e8856417370d23d59051a": {
+      "caller": "model",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 0,
+        "wall_s": 0.0,
+        "worker_calls": 0
+      },
+      "error": "INVALID_TOOL_ARGUMENTS: arguments.reason: Extra inputs are not permitted; omit arguments.reason for this tool; keep the required OUTER reason. Required fields: reference. Allowed fields: reference, pointer, offset, limit, byte_limit",
+      "execution_id": "not_executed",
+      "execution_status": "rejected",
+      "request_id": "model-14-tool",
+      "tool_id": "evidence.read",
+      "tool_version": "1.0.0"
+    },
+    "c02522450336418d195fe19e9b9618163dfd6b4ff0cb07b682340bb0da04302e": {
+      "arguments": {
+        "byte_limit": 8192,
+        "limit": 20,
+        "offset": 8,
+        "pointer": "",
+        "reason": "The inline overview shows only the first 8 keys of the run_near165 result page; I need the remaining keys to obtain the sealed simulation_request_id and evaluation_request_id required by control.profile_report before delivery.",
+        "reference": {
+          "artifact_id": "1b82dc501fc4f6c885451189e0714a7cdc89c4c45ea5a3196549695fa76ca19a",
+          "media_type": "application/json"
+        }
+      },
+      "evidence": [],
+      "reason": "Retrieve the omitted tail of the run_near165 result evidence so I can cite the exact sealed request identifiers and then read the current profile report summary before finishing.",
+      "request_id": "model-14-tool",
+      "tool_id": "evidence.read",
+      "tool_version": "1.0.0"
+    },
+    "9351d9b5990ded27a87d555630547cb1c5ebf7e962356b0f2c2f49271908080f": {
+      "request_id": "model-14-tool",
+      "requirement": "INVALID_TOOL_ARGUMENTS: arguments.reason: Extra inputs are not permitted; omit arguments.reason for this tool; keep the required OUTER reason. Required fields: reference. Allowed fields: reference, pointer, offset, limit, byte_limit The rejected call did not execute. Correct only the arguments using the supplied schema. All counters and limits remain in force.",
+      "type": "tool_arguments"
+    },
+    "d708f7e10280aa02cb2728e17a83702cf75fba1c8397aa59e06cb373a694db33": {
+      "arguments": {
+        "byte_limit": 8192,
+        "limit": 20,
+        "offset": 8,
+        "pointer": "",
+        "reference": {
+          "artifact_id": "1b82dc501fc4f6c885451189e0714a7cdc89c4c45ea5a3196549695fa76ca19a",
+          "media_type": "application/json"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Retrieve the omitted tail of the run_near165 result evidence so I can cite the exact sealed request identifiers and then read the current profile report summary before finishing.",
+      "request_id": "offline-corrected-read",
+      "tool_id": "evidence.read",
+      "tool_version": "1.0.0"
+    }
+  },
+  "provider_requests": 0,
+  "backend_rollouts": 0
+}

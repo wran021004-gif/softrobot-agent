@@ -152,7 +152,8 @@ class Host:
             discovery = self.reg.inspect(definition, inp.policy.tool_bindings)
             if not discovery['executable']:
                 raise ValueError('; '.join(discovery['reasons']))
-            arguments = definition.input_schema.model_validate_json(json.dumps(request.arguments, allow_nan=False), strict=True)
+            from tools.platform_validation import validate_arguments
+            arguments = validate_arguments(definition.input_schema, request.arguments)
             for ref in request.evidence:
                 self.store.artifact(ref)
             # References nested in typed input contracts receive the same integrity checks.
@@ -255,6 +256,12 @@ class Host:
             raise ValueError('DEPENDENCIES_CHANGED: ' + repr(compatible['changed']))
         with self.store.transaction() as db:
             session = self.store.session(self.run_id, db)
+            if session['state'].get('route', {}).get('final'):
+                raise ValueError('FINISHED_DELIVERY_IS_IMMUTABLE')
+            if session['status']=='budget_exhausted':
+                raise ValueError('BUDGET_EXHAUSTED: resume cannot replenish authorization')
+            if session['state'].get('stop_reason')=='BOUNDED_ARGUMENT_CORRECTION_FAILED':
+                raise ValueError('BOUNDED_ARGUMENT_CORRECTION_FAILED: correction opportunity already consumed')
             self.store.update_state(db, self.run_id, session['state'], 'running')
             self.store.event(db, self.run_id, 'session', 'resumed')
 
