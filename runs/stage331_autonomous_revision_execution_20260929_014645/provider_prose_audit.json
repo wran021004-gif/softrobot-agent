@@ -1,0 +1,40 @@
+{
+  "provider_explanation_preserved": true,
+  "provider_explanation_file": "provider_explanation.txt",
+  "complete_final_provider_message": "original_provider_delivery.json",
+  "review_method": "Direct evidence audit by Codex; no additional provider request, LLM judge, or rewritten delivery.",
+  "numerical_result_claims_accurate": true,
+  "overall_prose_fully_supported": false,
+  "status": "qualified: numerical results accurate; stopping rationale exceeds sampled evidence",
+  "checks": {
+    "historical_evidence_attributed": true,
+    "tested_candidates_and_errors_accurate": true,
+    "selected_candidate_accurate": true,
+    "reach_failure_distinct_from_settling": true,
+    "accepted_plans_distinct_from_convergence": true,
+    "simulation_distinct_from_computation": true,
+    "explicit_global_optimality_disclaimer": true
+  },
+  "findings": [
+    {
+      "severity": "qualification",
+      "quote": "the improving direction is at its declared limits",
+      "reason": "All three fresh candidates fixed both lengths at 0.17/0.13 m. Only section/material combinations varied. These samples establish the best tested candidate, not an improving direction or a need to stop at the length bounds. The statement is not labeled as a hypothesis. The separate next_step disclaims global optimality but does not substantiate this direction claim."
+    },
+    {
+      "severity": "omission",
+      "reason": "Final prose does not state the selected terminal speed (0.03504922546562082 m/s) or distinguish its 7 initialization-selected and 28 noninitialization accepted plans. Those facts are correctly retained in the structured delivery; no claim of static equilibrium or initialization-only operation is made."
+    }
+  ],
+  "intermediate_rationale_issues": [
+    {
+      "request_id": "model-4",
+      "reason": "The stiffness rationale correctly proposed an intermediate tested setting, but the parenthetical ratio is mislabeled: (1.1/0.9)*(1.01/1.05)^4 is about 1.0464 relative to the compliant candidate, not about 0.94 of the stiff endpoint. This was a hypothesis, not a measured prediction."
+    },
+    {
+      "request_id": "model-8",
+      "reason": "The stated section-scale delta -0.03 is relative to the previous 1.05 candidate. The frozen baseline delta for 1.02 is +0.02. Structured candidate facts and coverage use the correct frozen baseline."
+    }
+  ],
+  "delivery_unchanged": true
+}

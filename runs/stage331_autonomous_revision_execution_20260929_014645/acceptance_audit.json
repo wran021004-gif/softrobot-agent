@@ -1,0 +1,48 @@
+{
+  "A_effective_configuration": {
+    "accepted": true,
+    "evidence": "request_configuration_audit.json",
+    "normal_requests": 18,
+    "recovery_requests": 0
+  },
+  "B_autonomous_repair_workflow": {
+    "accepted": true,
+    "uninterrupted_attempt": true,
+    "provider_chosen_revisions": 3,
+    "fresh_complete_evaluations": 3,
+    "feedback_used": true,
+    "explicit_provider_delivery": true,
+    "manual_guidance_or_argument_repair": false,
+    "automatic_argument_corrections": 2
+  },
+  "C_design_effectiveness": {
+    "accepted": false,
+    "covered_revisions": 3,
+    "original_reach_passes": 0,
+    "best_terminal_error_m": 0.011787523596227019,
+    "original_tolerance_m": 0.01,
+    "conclusion": "Autonomous repair workflow completed; successful revised design not demonstrated."
+  },
+  "D_delivery_accuracy": {
+    "accepted": false,
+    "structured_design_accepted": true,
+    "structured_result_accepted": true,
+    "numerical_prose_accurate": true,
+    "prose_fully_supported": false,
+    "reason": "Unsupported improving-direction/bounds claim in final stopping rationale; preserve original explanation and qualification.",
+    "evidence": "provider_prose_audit.json"
+  },
+  "stop": {
+    "kind": "explicit_provider_finish",
+    "budget_exhausted": false,
+    "implementation_blocker": null,
+    "remaining": {
+      "backend_solves": 3,
+      "model_calls": 46,
+      "tool_calls": 135,
+      "wall_s": 19200.533999999752,
+      "worker_calls": 0
+    },
+    "no_replacement_attempt": "No implementation defect blocked execution; unsuccessful physics and a prose qualification are not grounds to discard the attempt."
+  }
+}
