@@ -161,6 +161,11 @@ class ModelLengthRecovery(Contract):
     timeout_s: float = Field(gt=0)
 
 
+class ModelProtocolRecovery(Contract):
+    max_total: int = Field(ge=0)
+    max_consecutive: int = Field(ge=0)
+
+
 class ModelConfig(Contract):
     adapter: Identifier = 'offline'
     adapter_version: str = '1.0.0'
@@ -172,6 +177,7 @@ class ModelConfig(Contract):
     thinking: Literal['enabled','disabled'] | None = None
     reasoning_effort: Literal['low','high','max'] | None = None
     length_recovery: ModelLengthRecovery | None = None
+    protocol_recovery: ModelProtocolRecovery | None = None
     max_tokens: int = Field(default=2000,ge=1)
     supports_tools: Literal[True] = True
     supports_text: Literal[True] = True
@@ -186,7 +192,7 @@ class ModelConfig(Contract):
     @model_serializer(mode='wrap')
     def serialize_optional_model_settings(self, handler):
         data=handler(self)
-        for key in ('reasoning_effort','length_recovery'):
+        for key in ('reasoning_effort','length_recovery','protocol_recovery'):
             if data.get(key) is None: data.pop(key,None)
         return data
 

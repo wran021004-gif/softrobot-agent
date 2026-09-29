@@ -45,7 +45,7 @@ def route_input(run_id,offline=False,task_input=None,wall_s=3600.):
     return inp
 
 
-def prepare(root,source,input_path=None,wall_s=3600.,historical_failure=None,historical_candidates=None):
+def prepare(root,source,input_path=None,wall_s=3600.,historical_failure=None,historical_candidates=None,historical_sources=None):
     from tools.state_io import digest
     task_input=read(input_path) if input_path is not None else None
     if (root/'workflow.json').exists():
@@ -59,9 +59,10 @@ def prepare(root,source,input_path=None,wall_s=3600.,historical_failure=None,his
     store.create(dict(project_id=identity,grant_id=identity,
         authorization_source=inp['policy']['route']['data']['source'],
         budget=inp['policy']['budget']))
-    if historical_failure is not None:
-        from extensions.tendon_family.historical_failure import bind_failure, bind_cases
-        prior=(bind_cases(historical_failure,inp,historical_candidates,store) if historical_candidates
+    if historical_failure is not None or historical_sources is not None:
+        from extensions.tendon_family.historical_failure import bind_failure, bind_cases, bind_sources
+        prior=(bind_sources(historical_sources,inp,store) if historical_sources is not None else
+            bind_cases(historical_failure,inp,historical_candidates,store) if historical_candidates
             else bind_failure(historical_failure,inp))
         with store.transaction() as db: reference=store.put(db,prior)
         inp['policy']['route']['data']['historical_case']=plain(reference)
@@ -310,6 +311,7 @@ if __name__=='__main__':
     parser.add_argument('--input',type=Path,help='Frozen public SessionInput with explicit task and controller recipe')
     parser.add_argument('--historical-failure',type=Path,help='Read-only Stage 3.29 evidence directory; bind only its supplied failed live case')
     parser.add_argument('--historical-candidate',action='append',help='Explicit evaluated candidate ID in the supplied evidence directory; repeat to bind a collection')
+    parser.add_argument('--historical-sources',type=Path,help='Explicit source/session/ledger descriptors and selected evaluated IDs')
     parser.add_argument('--wall-s',type=float,default=3600.)
     parser.add_argument('--credential-file',type=Path,default=Path.home()/'.codex/.env')
     parser.add_argument('--correction',type=Path,help='Specific recorded discrepancy for the one permitted correction')
@@ -318,7 +320,8 @@ if __name__=='__main__':
     elif args.action=='review-call':delivery_review_call(root,args.source.resolve(),args.credential_file,args.correction)
     elif args.action=='inspect':host=Host(root,read(root/'workflow.json')['run_id']);inspect(host)
     else:
-        host=prepare(root,args.source.resolve(),args.input,args.wall_s,args.historical_failure,args.historical_candidate)
+        host=prepare(root,args.source.resolve(),args.input,args.wall_s,args.historical_failure,args.historical_candidate,
+            read(args.historical_sources) if args.historical_sources else None)
         if args.action=='run':
             load_credential(args.credential_file)
             print('Starting real provider Route loop; backend attempt ceiling: '+str(host.store.remaining()['limit']['backend_solves'])+'.',flush=True)

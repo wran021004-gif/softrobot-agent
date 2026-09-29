@@ -398,6 +398,13 @@ def run_loop(host, adapter=None):
                 state['turn'] += 1
                 state['pending'] = None
                 state.pop('protocol_correction', None)
+                if receipt['execution_status'] == 'completed' and state.get('protocol_corrections_consecutive', 0):
+                    before = state['protocol_corrections_consecutive']
+                    state['protocol_corrections_consecutive'] = 0
+                    host.store.event(db, host.run_id, 'model_protocol_correction', 'consecutive_reset',
+                        request=receipt['request_id'], execution=receipt['execution_id'],
+                        outputs=[host.store.put(db, dict(before=before, consecutive_used=0,
+                            total_used=state.get('protocol_corrections_used', 0)))])
                 host.store.update_state(db, host.run_id, state)
             if receipt['execution_status'] == 'unknown':
                 return _stop(host, 'needs_input', 'TOOL_EXECUTION_UNKNOWN')
@@ -480,13 +487,27 @@ def _model_failure(host, receipt):
                 inputs=[receipt['output']], outputs=[ref])
         return None
     malformed = 'protocol_errors' in failure or 'tool_call_count' in failure
-    if malformed and not state.get('protocol_corrections_used', 0):
+    config = host.store.session(host.run_id)['snapshot']['input']['policy']['model']
+    limits = config.get('protocol_recovery') or dict(max_total=1, max_consecutive=1)
+    total = state.get('protocol_corrections_used', 0)
+    consecutive = state.get('protocol_corrections_consecutive', 0)
+    if malformed and total < limits['max_total'] and consecutive < limits['max_consecutive']:
+        # Reserve eligibility before consuming an allowance. Actual requests still
+        # use the ordinary reservation, receipt and turn path below.
+        for scope in (None, host.run_id):
+            remaining = host.store.remaining(scope)['remaining']
+            if state['turn'] + 1 >= config['max_turns'] or remaining['model_calls'] < 1 or remaining['wall_s'] < config['timeout_s']:
+                return _stop(host, 'failed', 'MODEL_PROTOCOL_CORRECTION_BUDGET_EXHAUSTED: normal request/turn/wall budget')
         with host.store.transaction() as db:
             state = host.store.session(host.run_id, db)['state']
-            state['protocol_corrections_used'] = 1
+            state['protocol_corrections_used'] = total + 1
+            state['protocol_corrections_consecutive'] = consecutive + 1
             problem = (f"Your previous response contained {failure['tool_call_count']} tool calls; exactly one is required. "
                 if 'tool_call_count' in failure else 'Your previous tool-call envelope was invalid. '+failure['error']+' ')
             state['protocol_correction'] = dict(
+                type='malformed_protocol', total_used=total+1, consecutive_used=consecutive+1,
+                remaining_total=limits['max_total']-total-1,
+                remaining_consecutive=limits['max_consecutive']-consecutive-1,
                 request_id=receipt['request_id'], response=failure['response'],
                 errors=failure.get('protocol_errors', []),
                 requirement=(problem +
@@ -494,7 +515,9 @@ def _model_failure(host, receipt):
                     'Function arguments must be a JSON-encoded object with outer arguments (object), reason (nonempty English string), '
                     'and tool_version (declared version); evidence is optional. Outer reason is separate from arguments.reason. '
                     'Inspect the route and read evidence in separate turns. '
-                    'For normal delivery call route.advance with action="finish". This is the only protocol correction opportunity.'))
+                    'For normal delivery call route.advance with action="finish". '
+                    f"After this scheduled correction, remaining allowances: total {limits['max_total']-total-1}, "
+                    f"consecutive {limits['max_consecutive']-consecutive-1}. A completed legal tool call resets only consecutive usage."))
             if 'tool_call_count' in failure:
                 state['protocol_correction']['tool_call_count'] = failure['tool_call_count']
             state['turn'] += 1
@@ -505,6 +528,9 @@ def _model_failure(host, receipt):
                 inputs=[receipt['output']], outputs=[ref])
         return None
     reason = receipt.get('error') or 'MODEL_RESPONSE_FAILED'
+    if malformed and config.get('protocol_recovery') is not None:
+        limit = 'TOTAL' if total >= limits['max_total'] else 'CONSECUTIVE'
+        return _stop(host, 'failed', f'MODEL_PROTOCOL_CORRECTION_{limit}_LIMIT: ' + reason)
     if truncated:
         reason = 'MODEL_LENGTH_RETRY_FAILED: ' + reason
     elif state.get('protocol_correction', {}).get('type') == 'length_truncation':

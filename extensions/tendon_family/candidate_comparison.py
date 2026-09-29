@@ -11,9 +11,10 @@ class CompareRequest(Contract):
 def feedback(trial):
     s=trial.get('profile_report_summary',{})
     return dict(candidate_facts=trial.get('candidate_facts'), factual_result=trial.get('factual_result'), evaluation=trial.get('evaluation'),
+        length_allocation=length_allocation(trial.get('candidate_facts')),
         report=trial.get('profile_report'), observations={k:s.get(k) for k in (
             'valid_complete_execution','official_task_success','terminal_error_m','error_phases','motion_summary',
-            'drive_utilization','updates','accepted_plans','converged_updates','solver_error_count',
+            'drive_utilization','updates','accepted_plans','initialization_selected','accepted_noninitialization_plans','converged_updates','solver_error_count',
             'hold_last_responses','max_projection_residual_rad_m','max_rate_projection_residual_rad_m_s',
             'mean_update_s','simulation_wall_s','backend_timings_s','one_step_prediction_summary',
             'one_step_prediction_evidence','sampled_settling','real_time_demonstrated')},
@@ -45,15 +46,28 @@ def compare(ctx,args):
 def historical_comparisons(host, baseline, prior):
     from .historical_failure import cases
     rows=[]
-    for case in cases(prior):
+    selected=cases(prior)
+    if 'cases' in prior:
+        selected=[min(selected,key=lambda c:c['factual_result']['terminal_error_m'])]
+    for case in selected:
         compared=_historical_comparisons(host,baseline,case)
         if 'cases' in prior:
             # Detailed facts live once in exploration samples / current delivery.
             for row in compared:
                 row['candidate_id']=row.pop('candidate_facts')['candidate_id']
                 row['terminal_error_m']=row.pop('factual_result')['terminal_error_m']
+                row['historical_candidate_id']=case['candidate_facts']['candidate_id']
+                row['comparison_scope']='Compare fresh samples to best supplied historical sample; all supplied measurements are in exploration_summary.'
         rows.extend(compared)
     return rows
+
+
+def length_allocation(candidate):
+    if not candidate: return None
+    values={p['path']:p['effective_value'] for p in candidate['parameters']}
+    near=values['components/near/length_m'];far=values['components/far/length_m']
+    return dict(length_pair_m=[near,far],total_length_m=near+far,near_minus_far_m=near-far,
+        meaningful_independent_lengths=abs((near-far)-.04)>=.001-1e-9)
 
 
 def _historical_comparisons(host, baseline, prior):
@@ -74,6 +88,8 @@ def _historical_comparisons(host, baseline, prior):
             historical_execution_id=before['execution_id'],historical_owner_run_id=prior['owner_run_id'],
             current_owner_run_id=candidate['owner_run_id'],candidate_facts={k:v for k,v in candidate.items() if k not in ('physical_summary','semantic_provenance','physical_changes')},factual_result=facts,
             changed_decisions=changes,meaningful_revision=bool(changes and facts['valid_complete_execution']),
+            length_allocation=length_allocation(candidate),initialization_selected=facts['initialization_selected'],
+            accepted_noninitialization_plans=facts['accepted_noninitialization_plans'],
             terminal_error_delta_m=None if facts['terminal_error_m'] is None else facts['terminal_error_m']-before['terminal_error_m'],
             scope='Historical execution is supplied prior evidence, not owned or charged by this session; sampled comparison, no causal or global claim.'))
     return rows
@@ -84,10 +100,16 @@ def exploration_summary(host, baseline, prior):
     from .route import trial_facts
     from .delivery_facts import bound_result_facts
     def sample(candidate,result,**extra):
+        values={p['path']:p['effective_value'] for p in candidate['parameters']}
+        near=values['components/near/length_m']; far=values['components/far/length_m']
         return dict(candidate_id=candidate['candidate_id'],owner_run_id=candidate['owner_run_id'],
             execution_id=candidate['execution_id'],parameters=candidate['parameters'],
             coverage=candidate.get('multi_category_coverage'),terminal_error_m=result['terminal_error_m'],
-            task_accepted=result['task_accepted'],valid_complete_execution=result['valid_complete_execution'],**extra)
+            task_accepted=result['task_accepted'],valid_complete_execution=result['valid_complete_execution'],
+            length_pair_m=[near,far],total_length_m=near+far,near_minus_far_m=near-far,
+            meaningful_independent_lengths=abs((near-far)-.04)>=.001-1e-9,
+            initialization_selected=result['initialization_selected'],
+            accepted_noninitialization_plans=result['accepted_noninitialization_plans'],**extra)
     historical=[sample(c['candidate_facts'],c['factual_result'],motion_summary=c.get('motion_summary'),
         detail_export=c.get('detail_export')) for c in cases(prior)] if prior else []
     fresh=[]
@@ -120,7 +142,20 @@ def exploration_summary(host, baseline, prior):
             sample_count=len(rows))
     valid=[r for r in historical+fresh if r['valid_complete_execution'] and r['terminal_error_m'] is not None]
     best=min(valid,key=lambda r:r['terminal_error_m']) if valid else None
+    def best_of(rows):
+        valid=[r for r in rows if r['valid_complete_execution'] and r['terminal_error_m'] is not None]
+        row=min(valid,key=lambda r:r['terminal_error_m']) if valid else None
+        return None if row is None else {k:row[k] for k in ('candidate_id','owner_run_id','execution_id','terminal_error_m','task_accepted')}
     return dict(historical=tested(historical),fresh=tested(fresh),historical_samples=historical,fresh_samples=fresh,
+        best_historical=best_of(historical),best_fresh=best_of(fresh),
+        length_coupling=dict(reference_difference_m=.04,meaningful_departure_m=.001,
+            historical_relationship_unbroken=all(abs(r['near_minus_far_m']-.04)<=1e-9 for r in historical),
+            evaluated_relationship_unbroken=all(abs(r['near_minus_far_m']-.04)<=1e-9 for r in historical+fresh),
+            meaningful_departure_evaluated=any(r['meaningful_independent_lengths'] for r in valid),
+            historical_limitation=(f'All {len(historical)} supplied evaluated cases lie on near-minus-far=0.04 m. Independent allocation has not yet been evaluated in that history. '
+                + ('Both lengths have changed across these cases, but remain coupled.' if len({tuple(r['length_pair_m']) for r in historical})>1 else 'The sampled lengths are constant.'))
+                if historical and all(abs(r['near_minus_far_m']-.04)<=1e-9 for r in historical) else 'See evaluated length pairs; sampled coverage does not identify causal effects.',
+            scope='Exploration assessment only, not feasibility or task acceptance. Departure does not identify each segment causal effect. Plan counts are diagnostic, not proof of causation or convergence.'),
         best_measured=None if best is None else {k:best[k] for k in ('candidate_id','owner_run_id','execution_id','terminal_error_m','task_accepted')},
         remaining_resources=host.store.remaining()['remaining'],
         scope='Evaluated samples only. Baseline coverage is not exploration coverage; bounds do not establish exhaustion. Historical samples are not fresh executions.')

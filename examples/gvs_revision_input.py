@@ -47,6 +47,18 @@ def revision_input(source):
     return inp
 
 
+def independent_lengths_input(source):
+    inp=revision_input(source)
+    inp['run_id']='gvs-bounded-recovery-independent-lengths'
+    inp['policy']['model']['protocol_recovery']=dict(max_total=4,max_consecutive=2)
+    route=inp['policy']['route']['data']
+    route['source']='User-authorized Stage 3.33 autonomous independent-length exploration with seven selected historical evaluations'
+    route['guidance']=route['guidance'].replace(
+        'At least one fresh complete evaluation must meaningfully change a previously constant length (>=0.001 m from the supplied cases). ',
+        'Read the seven-case comparison and length_coupling summary. The FIRST fresh design must meaningfully break the historical relationship: abs((near_length - far_length) - 0.04 m) >= 0.001 m. Choose actual segment changes and values yourself. This is an exploration assessment, not a physical constraint or replacement task criterion. ')
+    return inp
+
+
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source',type=Path,required=True)
