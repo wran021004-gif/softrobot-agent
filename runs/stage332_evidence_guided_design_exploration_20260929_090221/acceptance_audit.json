@@ -1,23 +1,73 @@
 {
   "A_evidence_feedback_integration": {
     "accepted": true,
-    "verification": "tests.test_stage332_exploration",
-    "historical_cases": 3,
-    "charges_for_history": 0
+    "prior_cases": 3,
+    "all_actual_request_contexts_include_three_cases": true,
+    "actual_contexts": 12,
+    "fresh_samples_visible_by_last_request": 4,
+    "evidence": [
+      "context_feedback_audit.json",
+      "prior_case_bindings.json",
+      "exploration_final.json"
+    ]
   },
   "B_fresh_length_exploration": {
-    "accepted": false,
-    "status": "not_run"
+    "accepted": true,
+    "evaluations": 4,
+    "values_m": {
+      "components/near/length_m": [
+        0.165,
+        0.168,
+        0.1666,
+        0.1675
+      ],
+      "components/far/length_m": [
+        0.125,
+        0.128,
+        0.1266,
+        0.1275
+      ]
+    },
+    "meaningful_relative_to_supplied_cases": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "limitation": "Both lengths changed together; segment effects were not independently identified."
   },
   "C_autonomous_workflow": {
     "accepted": false,
-    "status": "not_started; initial transport failed before tool selection; network-enabled launch awaiting approval"
+    "autonomous_selection_build_execution_feedback": true,
+    "uninterrupted_frozen_replacement": true,
+    "evaluated_revisions": 4,
+    "manual_candidate_guidance": false,
+    "manual_argument_replacement": false,
+    "explicit_provider_delivery": false,
+    "reason": "The model protocol failed after four complete evaluations, before explicit delivery. Full select-build-evaluate-deliver workflow was not completed."
   },
   "D_design_effectiveness": {
     "accepted": false,
-    "status": "no fresh candidates evaluated"
+    "fresh_covered_candidates": 4,
+    "passes": 0,
+    "best_fresh_terminal_error_m": 0.012611358712897407,
+    "best_historical_terminal_error_m": 0.011787523596227019,
+    "historical_still_better": true
   },
   "E_delivery_stopping_accuracy": {
-    "status": "no provider delivery; external approval blocker, not voluntary stop or design infeasibility"
-  }
+    "accepted": false,
+    "host_factual_summary_correct": true,
+    "explicit_provider_delivery": false,
+    "provider_final_explanation": null,
+    "stop_kind": "protocol_blocker",
+    "remaining": {
+      "model_calls": 51,
+      "tool_calls": 139,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 18540.311999999685
+    },
+    "evidence": "provider_prose_audit.json"
+  },
+  "conclusion": "Evidence integration and meaningful fresh length exploration completed. Four covered fresh executions failed unchanged reach acceptance. Autonomous iteration occurred, but full autonomous delivery was blocked by the second malformed JSON response."
 }

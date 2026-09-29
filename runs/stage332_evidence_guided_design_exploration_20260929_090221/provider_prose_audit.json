@@ -1,0 +1,51 @@
+{
+  "review_method": "Direct evidence audit of original provider explanations; no additional model request, general prose classifier or rewritten delivery.",
+  "provider_final_delivery_exists": false,
+  "provider_final_stopping_explanation_exists": false,
+  "original_last_response": "original_provider_last_response.json",
+  "overall_delivery_accepted": false,
+  "intermediate_findings": [
+    {
+      "request_id": "model-2",
+      "finding": "The two signed endpoint error vectors are quoted accurately, but two points do not establish monotonic behavior or guarantee a zero crossing of the closed-loop endpoint map. Subsequent interpolation is labeled a hypothesis; the fresh evaluation failed."
+    },
+    {
+      "request_id": "model-4",
+      "finding": "Proposed rerunning the exact supplied compliant 0.170/0.130 scale-1.05 case and called it untested-in-session. This conflicts with the no-historical-rerun brief. The call failed for missing nested evidence before any build or execution; the proposal did not consume a backend attempt. Monotonic improvement was not established."
+    },
+    {
+      "request_id": "model-8",
+      "finding": "Claim that sampled error decreases with longer segments omits contrary third result: 0.1666/0.1266 had 0.02457285 m error, worse than 0.165/0.125 at 0.01994850 m. This near-bound proposal was rejected for the extra reason_en field and never built."
+    },
+    {
+      "request_id": "model-9",
+      "finding": "Accurately quotes three signed error vectors and marks interpolation as an unvalidated hypothesis. The fourth execution failed. Referring to a noisy closed-loop response is not established by repeated-run evidence; no repeatability or noise experiment was performed."
+    },
+    {
+      "request_id": "model-11",
+      "finding": "Malformed tool text suggests separating the two lengths. It was not valid JSON, not executed, and is not a stopping explanation or delivery."
+    }
+  ],
+  "structured_host_summary": {
+    "facts_match_best_fresh": true,
+    "selected_candidate": "fresh_near0p168_far0p128_compliant_s1p05",
+    "design_statement_supplied": false,
+    "result_statement_supplied": false,
+    "explicit_provider_delivery": false
+  },
+  "stopping": {
+    "kind": "provider_protocol_failure_after_existing_correction_used",
+    "host_stop_reason": "MODEL_PROTOCOL_CORRECTION_FAILED: INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls[0].function.arguments: Invalid JSON: expected `:` at line 1 column 8. Expected a JSON object with arguments, reason and tool_version, optional evidence, and no extra outer fields.",
+    "budget_exhausted": false,
+    "voluntary_stop": false,
+    "implementation_defect_established": false,
+    "remaining": {
+      "model_calls": 51,
+      "tool_calls": 139,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 18540.311999999685
+    },
+    "unused_design_directions": "Fresh trials kept section scale/material fixed and varied both lengths together at near-minus-far=0.04 m. Independent segment changes and other authorized combinations remain untested. No global infeasibility or optimality claim."
+  }
+}

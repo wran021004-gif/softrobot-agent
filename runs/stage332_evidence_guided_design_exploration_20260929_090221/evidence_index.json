@@ -1,8 +1,11 @@
 {
-  "status": "blocked_pending_direct_external_transfer_authorization",
+  "status": "assessed_real_experiment_stopped_on_provider_protocol",
   "implementation_commit": "d014e0f",
+  "initial_evidence_commit": "c8f97a9",
   "implementation_report": "implementation_report.md",
+  "initial_blocked_checkpoint": "blocked_launch_report.md",
   "source_identity": "source_identity.json",
+  "source_and_input_verification": "freeze_status.json",
   "original_input": "frozen_input.json",
   "original_resolved_input": "resolved_frozen_input.json",
   "replacement_input": "replacement_input.json",
@@ -11,23 +14,38 @@
     "frozen_provider_request.json",
     "replacement_provider_request.json"
   ],
+  "model_configuration": "model_configuration.json",
+  "actual_request_configuration_audit": "request_configuration_audit.json",
   "bindings": "prior_case_bindings.json",
-  "exploration_and_motion": "exploration_initial.json",
+  "exploration_and_motion": [
+    "exploration_initial.json",
+    "exploration_final.json"
+  ],
+  "context_feedback_audit": "context_feedback_audit.json",
   "raw_provider_records": "raw_provider_records.json.gz",
   "ledgers": [
     "live_platform.sqlite.gz",
     "live_network_platform.sqlite.gz"
   ],
-  "original_live_store": "live/platform.sqlite",
-  "prepared_replacement": "live_network/platform.sqlite",
+  "live_stores": [
+    "live/platform.sqlite",
+    "live_network/platform.sqlite"
+  ],
   "usage": "usage_audit.json",
-  "interruption": "interruption.json",
-  "blocker": "approval_blocker.json",
+  "initial_interruption": "interruption.json",
+  "resolved_approval_blocker": "approval_blocker.json",
+  "new_protocol_blocker": "protocol_and_tool_issues.json",
   "payload_authorization": "external_payload_authorization_audit.json",
   "acceptance": "acceptance_audit.json",
-  "source_and_input_verification": "freeze_status.json",
+  "phase_summary": "phase_summary.json",
   "fresh_candidates": "actual_new_candidates.json",
-  "reusable_command": "resume_experiment.ps1",
-  "backend_execution_files": null,
-  "provider_delivery": null
+  "candidate_comparisons": "candidate_comparisons.json",
+  "route_actions": "route_actions.json",
+  "backend_execution_files": "backend_evidence.zip",
+  "original_provider_last_response": "original_provider_last_response.json",
+  "original_last_tool_arguments": "provider_last_tool_arguments.txt",
+  "provider_final_delivery": null,
+  "host_terminal_summary": "host_terminal_summary.json",
+  "provider_prose_audit": "provider_prose_audit.json",
+  "launch_script": "resume_experiment.ps1"
 }
