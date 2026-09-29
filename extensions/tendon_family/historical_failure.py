@@ -9,9 +9,9 @@ from .delivery_facts import bound_result_facts
 from .gvs_profile import execution_scope
 
 
-def bind_failure(source, experiment):
-    index=read(source/'evidence_index.json')
-    store=Store(source/'live')
+def bind_failure(source, experiment, index=None, store=None):
+    index=read(source/'evidence_index.json') if index is None else index
+    store=Store(source/'live') if store is None else store
     frozen=read(source/'frozen_input.json')
     selected=store.artifact(index['configuration'])
     effective=selected['effective']
@@ -55,3 +55,47 @@ def bind_failure(source, experiment):
             historical_source_commit=session['snapshot'].get('project_commit'),
             source_hash_policy='Reporting source hashes may differ; scientific conditions compared by value, not source hash.'),
         attribution='Supplied by developer. Not a current-session execution, selectable incumbent, or charged backend attempt. Prior provider conclusions excluded.')
+
+
+def cases(prior):
+    return prior.get('cases',[prior])
+
+
+def bind_cases(source, experiment, candidate_ids, destination):
+    """Bind only explicitly selected evaluated cases; export details, never owners."""
+    import gzip
+    from tempfile import TemporaryDirectory
+    from contextlib import nullcontext
+    from pathlib import Path
+    from .gvs_reporting import motion_summary
+    index=read(source/'evidence_index.json')
+    records=read(source/'actual_revised_candidates.json')
+    selected=[r for r in records if r['candidate_facts']['candidate_id'] in candidate_ids]
+    if len(selected)!=len(candidate_ids) or len(set(candidate_ids))!=len(candidate_ids):
+        raise ValueError('EXPLICIT_HISTORICAL_CASES_REQUIRED')
+    store=Store(source/'live')
+    with (nullcontext(None) if store.db.is_file() else TemporaryDirectory(dir=destination.root)) as temporary:
+        if not store.db.is_file():
+            store=Store(Path(temporary))
+            store.db.write_bytes(gzip.decompress((source/'platform.sqlite.gz').read_bytes()))
+        bound=[]
+        for record in selected:
+            facts=record['candidate_facts']; result=record['factual_result']
+            binding=dict(live_session=index['run_id'],configuration=facts['configuration'],
+                candidate_id=facts['candidate_id'],profile_report=result['report'],evaluation=result['evaluation'])
+            case=bind_failure(source,experiment,binding,store)
+            report=store.artifact(result['report']['reference'])['detail']
+            motion=store.artifact(report['motion'])
+            case['motion_summary']=motion_summary(motion,case['factual_result']['signed_position_error_m'],
+                experiment['task']['timing']['duration_s'],report['sampled_settling']['window_s'],
+                experiment['task']['evaluator']['parameters']['data']['tolerance_m'])
+            # An explicitly attributed, small export permits ordinary evidence.read.
+            detail=dict(source_session_id=index['run_id'],owner_run_id=case['owner_run_id'],
+                source_directory=str(source),configuration=store.artifact(facts['configuration']),
+                report=store.artifact(result['report']['reference']),evaluation=store.artifact(result['evaluation']),
+                sampled_motion=motion,source_bindings=binding)
+            with destination.transaction() as db:
+                case['detail_export']=plain(destination.put(db,detail))
+            bound.append(case)
+    return dict(kind='supplied_prior_cases',cases=bound,
+        attribution='Explicitly supplied historical samples only; no source ownership imported, no rerun or new backend charge. Provider conclusions excluded.')

@@ -157,6 +157,7 @@ def compact_reports(projection):
             key = digest(item['profile_report'])
             detail=item.pop('profile_report_summary')
             reports[key] = dict(binding=item['profile_report'], facts=(item.get('factual_result') or detail) if 'tracking' not in detail else detail)
+            if detail.get('motion_summary'): reports[key]['motion_summary']=detail['motion_summary']
             item['profile_report_summary_ref'] = key
     projection['profile_reports'] = reports
     return projection
@@ -337,9 +338,11 @@ def overview(host):
         remaining_execution_opportunities=full['project_usage']['remaining']['backend_solves'])
     prior=policy(inp).historical_case
     if prior:
-        projection['historical_case']=host.store.artifact(prior)
-        from .candidate_comparison import historical_comparisons
-        projection['historical_comparisons']=historical_comparisons(host,inp,projection['historical_case'])
+        bound=host.store.artifact(prior)
+        from .candidate_comparison import historical_comparisons, exploration_summary, prior_overview
+        projection['historical_case']=prior_overview(bound)
+        projection['historical_comparisons']=historical_comparisons(host,inp,bound)
+        projection['exploration_summary']=exploration_summary(host,inp,bound)
     return compact_reports(projection)
 
 
@@ -468,9 +471,11 @@ def run_built(ctx,args,route):
     prior=policy(ctx.input).historical_case
     if prior:
         from .candidate import candidate_facts
-        before=ctx.artifact(prior)['candidate_facts']['parameters']
+        from .historical_failure import cases
+        previous=cases(ctx.artifact(prior))
         current=candidate_facts(ctx.input,inp,built['configuration'],candidate)['parameters']
-        if {r['path']:r['effective_value'] for r in before}=={r['path']:r['effective_value'] for r in current}:
+        if any({r['path']:r['effective_value'] for r in c['candidate_facts']['parameters']}==
+               {r['path']:r['effective_value'] for r in current} for c in previous):
             raise ValueError('FRESH_REVISION_REQUIRED: identical historical design would not count; change a declared decision before run')
     capability=profile_capability(SessionInput.model_validate(inp),ctx.reg)
     if capability and capability.get('required_candidate_analysis'):

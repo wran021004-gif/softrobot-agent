@@ -12,7 +12,7 @@ def feedback(trial):
     s=trial.get('profile_report_summary',{})
     return dict(candidate_facts=trial.get('candidate_facts'), factual_result=trial.get('factual_result'), evaluation=trial.get('evaluation'),
         report=trial.get('profile_report'), observations={k:s.get(k) for k in (
-            'valid_complete_execution','official_task_success','terminal_error_m','error_phases',
+            'valid_complete_execution','official_task_success','terminal_error_m','error_phases','motion_summary',
             'drive_utilization','updates','accepted_plans','converged_updates','solver_error_count',
             'hold_last_responses','max_projection_residual_rad_m','max_rate_projection_residual_rad_m_s',
             'mean_update_s','simulation_wall_s','backend_timings_s','one_step_prediction_summary',
@@ -43,6 +43,20 @@ def compare(ctx,args):
 
 
 def historical_comparisons(host, baseline, prior):
+    from .historical_failure import cases
+    rows=[]
+    for case in cases(prior):
+        compared=_historical_comparisons(host,baseline,case)
+        if 'cases' in prior:
+            # Detailed facts live once in exploration samples / current delivery.
+            for row in compared:
+                row['candidate_id']=row.pop('candidate_facts')['candidate_id']
+                row['terminal_error_m']=row.pop('factual_result')['terminal_error_m']
+        rows.extend(compared)
+    return rows
+
+
+def _historical_comparisons(host, baseline, prior):
     from .route import trial_facts
     from .delivery_facts import bound_result_facts
     before=prior['factual_result']
@@ -63,3 +77,61 @@ def historical_comparisons(host, baseline, prior):
             terminal_error_delta_m=None if facts['terminal_error_m'] is None else facts['terminal_error_m']-before['terminal_error_m'],
             scope='Historical execution is supplied prior evidence, not owned or charged by this session; sampled comparison, no causal or global claim.'))
     return rows
+
+
+def exploration_summary(host, baseline, prior):
+    from .historical_failure import cases
+    from .route import trial_facts
+    from .delivery_facts import bound_result_facts
+    def sample(candidate,result,**extra):
+        return dict(candidate_id=candidate['candidate_id'],owner_run_id=candidate['owner_run_id'],
+            execution_id=candidate['execution_id'],parameters=candidate['parameters'],
+            coverage=candidate.get('multi_category_coverage'),terminal_error_m=result['terminal_error_m'],
+            task_accepted=result['task_accepted'],valid_complete_execution=result['valid_complete_execution'],**extra)
+    historical=[sample(c['candidate_facts'],c['factual_result'],motion_summary=c.get('motion_summary'),
+        detail_export=c.get('detail_export')) for c in cases(prior)] if prior else []
+    fresh=[]
+    nodes=host.store.session(host.run_id)['state']['route']['nodes']
+    for node in nodes:
+        if node['action']!='run' or node['status']!='completed': continue
+        trial=host.store.artifact(node['result'])
+        candidate=trial_facts(host.store,baseline,trial)
+        result=bound_result_facts(host.store,trial,candidate)
+        if result is None: continue
+        fresh.append(sample(candidate,result,node_id=node['node_id'],evidence=node['result'],
+            motion_summary=trial.get('profile_report_summary',{}).get('motion_summary')))
+        build=next(n for n in nodes if n['node_id']==node['selection']['source_node'])
+        parent_id=build['selection'].get('source_node')
+        if parent_id:
+            parent=next(n for n in nodes if n['node_id']==parent_id)
+            facts=trial_facts(host.store,baseline,host.store.artifact(parent['result']))
+            old={r['path']:r['effective_value'] for r in facts['parameters']}
+            fresh[-1]['parent_changes']=dict(source_node=parent_id,changes=[dict(path=r['path'],
+                parent_value=old[r['path']],current_value=r['effective_value']) for r in candidate['parameters']
+                if old[r['path']]!=r['effective_value']])
+        else: fresh[-1]['build_parent']='frozen baseline; parameter rows state baseline values and deltas'
+    def tested(rows):
+        values={}
+        for row in rows:
+            for p in row['parameters']:
+                bucket=values.setdefault(p['path'],[])
+                if p['effective_value'] not in bucket: bucket.append(p['effective_value'])
+        return dict(values_tested=values,constant_decisions={k:v[0] for k,v in values.items() if len(v)==1},
+            sample_count=len(rows))
+    valid=[r for r in historical+fresh if r['valid_complete_execution'] and r['terminal_error_m'] is not None]
+    best=min(valid,key=lambda r:r['terminal_error_m']) if valid else None
+    return dict(historical=tested(historical),fresh=tested(fresh),historical_samples=historical,fresh_samples=fresh,
+        best_measured=None if best is None else {k:best[k] for k in ('candidate_id','owner_run_id','execution_id','terminal_error_m','task_accepted')},
+        remaining_resources=host.store.remaining()['remaining'],
+        scope='Evaluated samples only. Baseline coverage is not exploration coverage; bounds do not establish exhaustion. Historical samples are not fresh executions.')
+
+
+def prior_overview(prior):
+    """Keep source identities and detail paths, avoiding repeated full result facts."""
+    if 'cases' not in prior: return prior
+    return dict(kind=prior['kind'],attribution=prior['attribution'],cases=[dict(
+        source_session_id=c['source_session_id'],owner_run_id=c['owner_run_id'],source_directory=c['source_directory'],
+        candidate_id=c['candidate_facts']['candidate_id'],configuration=c['candidate_facts']['configuration'],
+        execution_id=c['factual_result']['execution_id'],evaluation=c['factual_result']['evaluation'],
+        report=c['factual_result']['report'],detail_export=c['detail_export'],compatibility=c['compatibility']) for c in prior['cases']],
+        evidence_access='Original bindings belong to the source store. Read detail_export with evidence.read in this session; exploration_summary contains compact measurements.')

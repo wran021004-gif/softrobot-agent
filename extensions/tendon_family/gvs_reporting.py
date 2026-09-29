@@ -8,6 +8,25 @@ from tools.platform_store import plain
 from .gvs_profile import execution_scope, checked_control, SampledSettling, settling_for
 
 
+def motion_summary(motion, signed_error, duration, window_s, tolerance):
+    """Sampled diagnostics only; the existing endpoint evaluator remains authority."""
+    minimum=min(motion,key=lambda r:r['tip_error_m']) if motion else None
+    late=[r for r in motion if duration-window_s-1e-9<=r['time_s']<=duration+1e-9]
+    terminal=motion[-1] if motion and abs(motion[-1]['time_s']-duration)<1e-8 else None
+    return dict(minimum_sampled_error_m=None if minimum is None else minimum['tip_error_m'],
+        minimum_sampled_error_time_s=None if minimum is None else minimum['time_s'],
+        terminal_error_m=None if terminal is None else terminal['tip_error_m'],
+        signed_terminal_position_error_m=signed_error,error_convention='actual_tip minus target; world frame',
+        terminal_tip_speed_m_s=None if terminal is None else terminal['tip_speed_m_s'],
+        late_interval_s=[duration-window_s,duration],
+        late_sample_interval_s=[late[0]['time_s'],late[-1]['time_s']] if late else None,
+        late_error_change_m=late[-1]['tip_error_m']-late[0]['tip_error_m'] if len(late)>1 else None,
+        late_change_definition='last sampled error minus first sampled error in stated interval',
+        entered_tolerance_earlier_but_ended_outside=None if terminal is None else bool(
+            terminal['tip_error_m']>tolerance and any(r['time_s']<duration and r['tip_error_m']<=tolerance for r in motion)),
+        tolerance_m=tolerance,scope='Sampled observations, not continuous-time guarantees or new acceptance criteria.')
+
+
 def summarize(task, result, evaluation, rows, observations, motion, limits, settling=None):
     acceptance=SampledSettling.model_validate(settling or {})
     duration=task.timing.duration_s
@@ -67,6 +86,10 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
         max_rate_projection_residual_rad_m_s=max((r['rate_projection_residual_rad_m_s'] for r in motion),default=None),
         max_sampled_contacts=max((r['contacts'] for r in motion),default=None),
         real_time_demonstrated=bool(complete and observations and all(not o['deadline_missed'] for o in observations)))
+    if not tracking:
+        summary['motion_summary']=motion_summary(motion,
+            None if not complete else (np.asarray(rows[-1]['tip_m'])-task.goal.data['target_m']).tolist(),
+            duration,acceptance.window_s,task.evaluator.parameters.data['tolerance_m'])
     if tracking:
         summary.pop('sampled_settling')
         summary['execution_failure_reason']=result['data']['data'].get('reason')

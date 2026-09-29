@@ -1,4 +1,4 @@
-"""Thin Stage 3.31 input path; execution uses gvs_nmpc_route_experiment.py."""
+"""Thin evidence-guided revision input; execution uses gvs_nmpc_route_experiment.py."""
 import argparse
 from pathlib import Path
 import sys
@@ -8,7 +8,7 @@ from tools.state_io import read, atomic_json
 
 def revision_input(source):
     inp=read(source/'frozen_input.json')
-    inp['run_id']='gvs-autonomous-design-revision'
+    inp['run_id']='gvs-evidence-guided-design-exploration'
     p=inp['policy']
     p['budget'].update(model_calls=64,tool_calls=160,backend_solves=6,wall_s=21600.,worker_calls=0)
     p['model'].update(adapter='deepseek',model='deepseek-flash',base_url='https://api.deepseek.com',
@@ -16,24 +16,32 @@ def revision_input(source):
         max_turns=64,context_bytes=150000,length_recovery=dict(enabled=True,max_tokens=131072,timeout_s=900.))
     route=p['route']['data']
     route['max_trials']=6
-    route['source']='User-authorized Stage 3.31 autonomous revision and fresh evaluation from supplied failure'
+    route.pop('historical_case',None)
+    route['source']='User-authorized Stage 3.32 evidence-guided design exploration using three supplied Stage 3.31 cases'
     route['guidance']=(
-        'Choose a meaningful revision of the supplied failed design within the four declared decisions. '
+        'Priority: find a covered fresh design passing the unchanged reach evaluator within budget. '
+        'Read the supplied prior cases, exploration_summary and sampled motion feedback. '
+        'At least one fresh complete evaluation must meaningfully change a previously constant length (>=0.001 m from the supplied cases). '
+        'Choose which segment or both and choose the actual values independently within the four declared decisions. '
         'Give a short evidence-based rationale, labeling intended effects as hypotheses; no mechanics derivation or proof is required. '
-        'Start with build. Perform the required analysis.gvs_candidate_evaluate on that saved source_node using its frozen basis, '
-        'then run the build with source_node and no combination. Cite previous route results after the first action. '
+        'Start with a length-varying build, then run it with source_node and no combination. Cite previous route results after the first action. '
+        'analysis.gvs_candidate_evaluate is optional for this free-reach controller: use it for a specific question. '
+        'Analytical comparisons must identify state/input conditions and limitations; zero-state results do not predict closed-loop reach. '
         'Read the automatic comparison and diagnostics, then revise again or deliver an evaluated candidate. '
         'All scientific and controller settings remain frozen. Section scale and numerical Young-modulus scenarios expand from '
         'the frozen baseline; density and bending viscosity stay unchanged. These are not validated real-world materials. '
         'Coverage requires length delta from baseline >=0.001 m, section-scale delta >=0.01, and nonbaseline material; '
         'coverage is separate from the original reach criterion. Settling is diagnostic only. '
-        'The supplied historical execution is prior evidence, costs no new attempt, cannot be delivered, and must not be rerun. '
-        'Change at least one of its decisions and obtain a fresh evaluation. No revision direction is prescribed. '
+        'Historical executions are prior evidence, cost no new attempt, cannot be delivered, and must not be rerun. '
+        'Baseline coverage does not establish exploration of every variable. Earlier sampled entry into tolerance does not replace endpoint acceptance or prove settling. '
+        'Do not assume longer always reaches better: saved samples can enter the target neighborhood and move away. '
         'Ceilings: 64 provider requests, 160 tool calls, 6 fresh backend attempts, 21600 charged seconds, zero workers. '
-        'Retain the 1800-second per-call reservation and final-delivery capacity. Use remaining resources to revise if useful; '
+        'Retain the 1800-second per-call reservation and final-delivery capacity. After failure continue when a concrete legal untested hypothesis and resources remain; '
         'a covered revision passing the unchanged task can be delivered immediately. '
         'On finish copy selected candidate_facts into design_statement and factual_result into result_statement. '
-        'Give a concise factual explanation: supplied prior case, tested revisions, selected result, and stopping reason. '
+        'Give a concise factual explanation: supplied cases, tested revisions, selected result, comparison to best historical, and stopping reason. '
+        'Distinguish covered fresh pass, insufficient remaining execution-and-delivery budget, specific capability/execution blocker, or voluntary early stop. '
+        'A bound does not prove useful directions exhausted. State unused resources if stopping voluntarily. '
         'Distinguish original reach acceptance from settling and terminal motion, accepted plans from convergence, '
         'simulation duration from computation, and observations from hypotheses. Do not infer global infeasibility from failed samples.')
     return inp
