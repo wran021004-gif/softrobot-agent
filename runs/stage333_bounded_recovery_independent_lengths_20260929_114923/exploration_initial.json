@@ -1,0 +1,610 @@
+{
+  "historical": {
+    "values_tested": {
+      "components/far/length_m": [
+        0.13,
+        0.125,
+        0.128,
+        0.1266,
+        0.1275
+      ],
+      "components/near/length_m": [
+        0.17,
+        0.165,
+        0.168,
+        0.1666,
+        0.1675
+      ],
+      "design/material_scenario": [
+        "compliant",
+        "stiff"
+      ],
+      "design/section_scale": [
+        1.05,
+        1.01,
+        1.02
+      ]
+    },
+    "constant_decisions": {},
+    "sample_count": 7
+  },
+  "fresh": {
+    "values_tested": {},
+    "constant_decisions": {},
+    "sample_count": 0
+  },
+  "historical_samples": [
+    {
+      "candidate_id": "rev_compliant_max",
+      "owner_run_id": "gvs-live-c0f08900d76e-a7a46a25d0958b8b",
+      "execution_id": "b1bc6758f2d54f4791f14e6a19827264",
+      "parameters": [
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.12,
+          "effective_value": 0.13,
+          "baseline_delta": 0.010000000000000009,
+          "unit": "m"
+        },
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.16,
+          "effective_value": 0.17,
+          "baseline_delta": 0.010000000000000009,
+          "unit": "m"
+        },
+        {
+          "path": "design/material_scenario",
+          "baseline_value": "baseline",
+          "effective_value": "compliant",
+          "baseline_delta": null,
+          "unit": null
+        },
+        {
+          "path": "design/section_scale",
+          "baseline_value": 1.0,
+          "effective_value": 1.05,
+          "baseline_delta": 0.050000000000000044,
+          "unit": "1"
+        }
+      ],
+      "coverage": true,
+      "terminal_error_m": 0.011787523596227019,
+      "task_accepted": false,
+      "valid_complete_execution": true,
+      "length_pair_m": [
+        0.17,
+        0.13
+      ],
+      "total_length_m": 0.30000000000000004,
+      "near_minus_far_m": 0.04000000000000001,
+      "meaningful_independent_lengths": false,
+      "initialization_selected": 7,
+      "accepted_noninitialization_plans": 28,
+      "motion_summary": {
+        "minimum_sampled_error_m": 0.005913071343373567,
+        "minimum_sampled_error_time_s": 0.16,
+        "terminal_error_m": 0.011787523596227019,
+        "signed_terminal_position_error_m": [
+          -0.010610914600433285,
+          0.0037558004036140416,
+          0.003499738161939131
+        ],
+        "error_convention": "actual_tip minus target; world frame",
+        "terminal_tip_speed_m_s": 0.03504922546562082,
+        "late_interval_s": [
+          0.3,
+          0.35
+        ],
+        "late_sample_interval_s": [
+          0.3,
+          0.35000000000000003
+        ],
+        "late_error_change_m": 0.0007148636397187914,
+        "late_change_definition": "last sampled error minus first sampled error in stated interval",
+        "entered_tolerance_earlier_but_ended_outside": true,
+        "tolerance_m": 0.01,
+        "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria."
+      },
+      "detail_export": {
+        "artifact_id": "2b88c697176eb56f4dd54c4114f4371b61f79ad3da86d10417ea4076c05feee2",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "candidate_id": "c2_stiff_scale1p01",
+      "owner_run_id": "gvs-live-c0f08900d76e-9167555586e1dae4",
+      "execution_id": "c58e66f983cd4a9da2404fecbe68a1e3",
+      "parameters": [
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.12,
+          "effective_value": 0.13,
+          "baseline_delta": 0.010000000000000009,
+          "unit": "m"
+        },
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.16,
+          "effective_value": 0.17,
+          "baseline_delta": 0.010000000000000009,
+          "unit": "m"
+        },
+        {
+          "path": "design/material_scenario",
+          "baseline_value": "baseline",
+          "effective_value": "stiff",
+          "baseline_delta": null,
+          "unit": null
+        },
+        {
+          "path": "design/section_scale",
+          "baseline_value": 1.0,
+          "effective_value": 1.01,
+          "baseline_delta": 0.010000000000000009,
+          "unit": "1"
+        }
+      ],
+      "coverage": true,
+      "terminal_error_m": 0.02703943448806645,
+      "task_accepted": false,
+      "valid_complete_execution": true,
+      "length_pair_m": [
+        0.17,
+        0.13
+      ],
+      "total_length_m": 0.30000000000000004,
+      "near_minus_far_m": 0.04000000000000001,
+      "meaningful_independent_lengths": false,
+      "initialization_selected": 35,
+      "accepted_noninitialization_plans": 0,
+      "motion_summary": {
+        "minimum_sampled_error_m": 0.02703943448806645,
+        "minimum_sampled_error_time_s": 0.35000000000000003,
+        "terminal_error_m": 0.02703943448806645,
+        "signed_terminal_position_error_m": [
+          0.02016723084146843,
+          0.011969298293671216,
+          -0.013459187047458743
+        ],
+        "error_convention": "actual_tip minus target; world frame",
+        "terminal_tip_speed_m_s": 0.24015719810135083,
+        "late_interval_s": [
+          0.3,
+          0.35
+        ],
+        "late_sample_interval_s": [
+          0.3,
+          0.35000000000000003
+        ],
+        "late_error_change_m": -0.0065062657498760335,
+        "late_change_definition": "last sampled error minus first sampled error in stated interval",
+        "entered_tolerance_earlier_but_ended_outside": false,
+        "tolerance_m": 0.01,
+        "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria."
+      },
+      "detail_export": {
+        "artifact_id": "3d9b0d26da819b7882e0ea8043def65870e5d7103238df811c63f4b19cee37d4",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "candidate_id": "c3_compliant_scale1p02",
+      "owner_run_id": "gvs-live-c0f08900d76e-bb0162ad985d2b68",
+      "execution_id": "f5135bd2be9e4df48e3adfa936ad56b3",
+      "parameters": [
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.12,
+          "effective_value": 0.13,
+          "baseline_delta": 0.010000000000000009,
+          "unit": "m"
+        },
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.16,
+          "effective_value": 0.17,
+          "baseline_delta": 0.010000000000000009,
+          "unit": "m"
+        },
+        {
+          "path": "design/material_scenario",
+          "baseline_value": "baseline",
+          "effective_value": "compliant",
+          "baseline_delta": null,
+          "unit": null
+        },
+        {
+          "path": "design/section_scale",
+          "baseline_value": 1.0,
+          "effective_value": 1.02,
+          "baseline_delta": 0.020000000000000018,
+          "unit": "1"
+        }
+      ],
+      "coverage": true,
+      "terminal_error_m": 0.012342134134044017,
+      "task_accepted": false,
+      "valid_complete_execution": true,
+      "length_pair_m": [
+        0.17,
+        0.13
+      ],
+      "total_length_m": 0.30000000000000004,
+      "near_minus_far_m": 0.04000000000000001,
+      "meaningful_independent_lengths": false,
+      "initialization_selected": 13,
+      "accepted_noninitialization_plans": 22,
+      "motion_summary": {
+        "minimum_sampled_error_m": 0.005348301422198505,
+        "minimum_sampled_error_time_s": 0.17,
+        "terminal_error_m": 0.012342134134044017,
+        "signed_terminal_position_error_m": [
+          -0.01098502323335393,
+          0.0025142527476387996,
+          0.005033495074637462
+        ],
+        "error_convention": "actual_tip minus target; world frame",
+        "terminal_tip_speed_m_s": 0.0416443683896788,
+        "late_interval_s": [
+          0.3,
+          0.35
+        ],
+        "late_sample_interval_s": [
+          0.3,
+          0.35000000000000003
+        ],
+        "late_error_change_m": 0.0013519618382555661,
+        "late_change_definition": "last sampled error minus first sampled error in stated interval",
+        "entered_tolerance_earlier_but_ended_outside": true,
+        "tolerance_m": 0.01,
+        "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria."
+      },
+      "detail_export": {
+        "artifact_id": "f2f3a2c32112a661ddfebe7d3fb929b6db319c6dd02586fd0da003853f62739b",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "candidate_id": "fresh_near0p165_far0p125_compliant_s1p05",
+      "owner_run_id": "gvs-live-b8f4ab5f17f2-6531d4450859cd45",
+      "execution_id": "34d36e2562dc4dd798f00eeab066a938",
+      "parameters": [
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.12,
+          "effective_value": 0.125,
+          "baseline_delta": 0.0050000000000000044,
+          "unit": "m"
+        },
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.16,
+          "effective_value": 0.165,
+          "baseline_delta": 0.0050000000000000044,
+          "unit": "m"
+        },
+        {
+          "path": "design/material_scenario",
+          "baseline_value": "baseline",
+          "effective_value": "compliant",
+          "baseline_delta": null,
+          "unit": null
+        },
+        {
+          "path": "design/section_scale",
+          "baseline_value": 1.0,
+          "effective_value": 1.05,
+          "baseline_delta": 0.050000000000000044,
+          "unit": "1"
+        }
+      ],
+      "coverage": true,
+      "terminal_error_m": 0.019948497256370795,
+      "task_accepted": false,
+      "valid_complete_execution": true,
+      "length_pair_m": [
+        0.165,
+        0.125
+      ],
+      "total_length_m": 0.29000000000000004,
+      "near_minus_far_m": 0.04000000000000001,
+      "meaningful_independent_lengths": false,
+      "initialization_selected": 35,
+      "accepted_noninitialization_plans": 0,
+      "motion_summary": {
+        "minimum_sampled_error_m": 0.019948497256370795,
+        "minimum_sampled_error_time_s": 0.35000000000000003,
+        "terminal_error_m": 0.019948497256370795,
+        "signed_terminal_position_error_m": [
+          0.010891856592814664,
+          0.009276268935608754,
+          -0.013901828562575963
+        ],
+        "error_convention": "actual_tip minus target; world frame",
+        "terminal_tip_speed_m_s": 0.22868824318522438,
+        "late_interval_s": [
+          0.3,
+          0.35
+        ],
+        "late_sample_interval_s": [
+          0.3,
+          0.35000000000000003
+        ],
+        "late_error_change_m": -0.007672620059499712,
+        "late_change_definition": "last sampled error minus first sampled error in stated interval",
+        "entered_tolerance_earlier_but_ended_outside": false,
+        "tolerance_m": 0.01,
+        "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria."
+      },
+      "detail_export": {
+        "artifact_id": "1b3538f20db080803dced55708d93f76dbd51c70f3de9a6d53a1676a83146632",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "candidate_id": "fresh_near0p168_far0p128_compliant_s1p05",
+      "owner_run_id": "gvs-live-b8f4ab5f17f2-3b4237ced557ddd8",
+      "execution_id": "63e16843e31b4444bdfa43f83cd204bf",
+      "parameters": [
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.12,
+          "effective_value": 0.128,
+          "baseline_delta": 0.008000000000000007,
+          "unit": "m"
+        },
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.16,
+          "effective_value": 0.168,
+          "baseline_delta": 0.008000000000000007,
+          "unit": "m"
+        },
+        {
+          "path": "design/material_scenario",
+          "baseline_value": "baseline",
+          "effective_value": "compliant",
+          "baseline_delta": null,
+          "unit": null
+        },
+        {
+          "path": "design/section_scale",
+          "baseline_value": 1.0,
+          "effective_value": 1.05,
+          "baseline_delta": 0.050000000000000044,
+          "unit": "1"
+        }
+      ],
+      "coverage": true,
+      "terminal_error_m": 0.012611358712897407,
+      "task_accepted": false,
+      "valid_complete_execution": true,
+      "length_pair_m": [
+        0.168,
+        0.128
+      ],
+      "total_length_m": 0.29600000000000004,
+      "near_minus_far_m": 0.04000000000000001,
+      "meaningful_independent_lengths": false,
+      "initialization_selected": 25,
+      "accepted_noninitialization_plans": 10,
+      "motion_summary": {
+        "minimum_sampled_error_m": 0.008876971545770093,
+        "minimum_sampled_error_time_s": 0.27,
+        "terminal_error_m": 0.012611358712897407,
+        "signed_terminal_position_error_m": [
+          -0.009164068142830828,
+          0.0013684988269518222,
+          0.008555316161285798
+        ],
+        "error_convention": "actual_tip minus target; world frame",
+        "terminal_tip_speed_m_s": 0.05483547565373871,
+        "late_interval_s": [
+          0.3,
+          0.35
+        ],
+        "late_sample_interval_s": [
+          0.3,
+          0.35000000000000003
+        ],
+        "late_error_change_m": -0.0006611059546908597,
+        "late_change_definition": "last sampled error minus first sampled error in stated interval",
+        "entered_tolerance_earlier_but_ended_outside": true,
+        "tolerance_m": 0.01,
+        "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria."
+      },
+      "detail_export": {
+        "artifact_id": "1297273140a9e6aa837d93eb8a946769390bd3895dc11f833d7c5e9977ef10d4",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "candidate_id": "b4_n1666_f1266_compliant_s1p05",
+      "owner_run_id": "gvs-live-b8f4ab5f17f2-a0939c0f7a88cd67",
+      "execution_id": "e05b9f1670ca441f904fcabb4bf6fcfc",
+      "parameters": [
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.12,
+          "effective_value": 0.1266,
+          "baseline_delta": 0.006599999999999995,
+          "unit": "m"
+        },
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.16,
+          "effective_value": 0.1666,
+          "baseline_delta": 0.006599999999999995,
+          "unit": "m"
+        },
+        {
+          "path": "design/material_scenario",
+          "baseline_value": "baseline",
+          "effective_value": "compliant",
+          "baseline_delta": null,
+          "unit": null
+        },
+        {
+          "path": "design/section_scale",
+          "baseline_value": 1.0,
+          "effective_value": 1.05,
+          "baseline_delta": 0.050000000000000044,
+          "unit": "1"
+        }
+      ],
+      "coverage": true,
+      "terminal_error_m": 0.024572848476714596,
+      "task_accepted": false,
+      "valid_complete_execution": true,
+      "length_pair_m": [
+        0.1666,
+        0.1266
+      ],
+      "total_length_m": 0.2932,
+      "near_minus_far_m": 0.04000000000000001,
+      "meaningful_independent_lengths": false,
+      "initialization_selected": 35,
+      "accepted_noninitialization_plans": 0,
+      "motion_summary": {
+        "minimum_sampled_error_m": 0.024572848476714596,
+        "minimum_sampled_error_time_s": 0.35000000000000003,
+        "terminal_error_m": 0.024572848476714596,
+        "signed_terminal_position_error_m": [
+          0.013485709994825179,
+          0.012237956116817598,
+          -0.01649827076629226
+        ],
+        "error_convention": "actual_tip minus target; world frame",
+        "terminal_tip_speed_m_s": 0.2332356818382806,
+        "late_interval_s": [
+          0.3,
+          0.35
+        ],
+        "late_sample_interval_s": [
+          0.3,
+          0.35000000000000003
+        ],
+        "late_error_change_m": -0.007624160746017652,
+        "late_change_definition": "last sampled error minus first sampled error in stated interval",
+        "entered_tolerance_earlier_but_ended_outside": false,
+        "tolerance_m": 0.01,
+        "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria."
+      },
+      "detail_export": {
+        "artifact_id": "aad51d3c04d486701e611d533530715b05fa3a8411187e26ef87c989f9ee6d7b",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "candidate_id": "b6_n1675_f1275_compliant_s1p05",
+      "owner_run_id": "gvs-live-b8f4ab5f17f2-7319ca81b0a00ef1",
+      "execution_id": "4e1e4c5905e1460b8e9a771d43b7906f",
+      "parameters": [
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.12,
+          "effective_value": 0.1275,
+          "baseline_delta": 0.007500000000000007,
+          "unit": "m"
+        },
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.16,
+          "effective_value": 0.1675,
+          "baseline_delta": 0.007500000000000007,
+          "unit": "m"
+        },
+        {
+          "path": "design/material_scenario",
+          "baseline_value": "baseline",
+          "effective_value": "compliant",
+          "baseline_delta": null,
+          "unit": null
+        },
+        {
+          "path": "design/section_scale",
+          "baseline_value": 1.0,
+          "effective_value": 1.05,
+          "baseline_delta": 0.050000000000000044,
+          "unit": "1"
+        }
+      ],
+      "coverage": true,
+      "terminal_error_m": 0.02727007724351483,
+      "task_accepted": false,
+      "valid_complete_execution": true,
+      "length_pair_m": [
+        0.1675,
+        0.1275
+      ],
+      "total_length_m": 0.29500000000000004,
+      "near_minus_far_m": 0.04000000000000001,
+      "meaningful_independent_lengths": false,
+      "initialization_selected": 35,
+      "accepted_noninitialization_plans": 0,
+      "motion_summary": {
+        "minimum_sampled_error_m": 0.02727007724351483,
+        "minimum_sampled_error_time_s": 0.35000000000000003,
+        "terminal_error_m": 0.02727007724351483,
+        "signed_terminal_position_error_m": [
+          0.014925463216872714,
+          0.013938712666402994,
+          -0.018072076522428232
+        ],
+        "error_convention": "actual_tip minus target; world frame",
+        "terminal_tip_speed_m_s": 0.23480779153871517,
+        "late_interval_s": [
+          0.3,
+          0.35
+        ],
+        "late_sample_interval_s": [
+          0.3,
+          0.35000000000000003
+        ],
+        "late_error_change_m": -0.007554490056611178,
+        "late_change_definition": "last sampled error minus first sampled error in stated interval",
+        "entered_tolerance_earlier_but_ended_outside": false,
+        "tolerance_m": 0.01,
+        "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria."
+      },
+      "detail_export": {
+        "artifact_id": "21f28033f04e4088018d0b702f4031b4f858dbf030c9c17c16b30fcba57638ce",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "fresh_samples": [],
+  "best_historical": {
+    "candidate_id": "rev_compliant_max",
+    "owner_run_id": "gvs-live-c0f08900d76e-a7a46a25d0958b8b",
+    "execution_id": "b1bc6758f2d54f4791f14e6a19827264",
+    "terminal_error_m": 0.011787523596227019,
+    "task_accepted": false
+  },
+  "best_fresh": null,
+  "length_coupling": {
+    "reference_difference_m": 0.04,
+    "meaningful_departure_m": 0.001,
+    "historical_relationship_unbroken": true,
+    "evaluated_relationship_unbroken": true,
+    "meaningful_departure_evaluated": false,
+    "historical_limitation": "All 7 supplied evaluated cases lie on near-minus-far=0.04 m. Independent allocation has not yet been evaluated in that history. Both lengths have changed across these cases, but remain coupled.",
+    "scope": "Exploration assessment only, not feasibility or task acceptance. Departure does not identify each segment causal effect. Plan counts are diagnostic, not proof of causation or convergence."
+  },
+  "best_measured": {
+    "candidate_id": "rev_compliant_max",
+    "owner_run_id": "gvs-live-c0f08900d76e-a7a46a25d0958b8b",
+    "execution_id": "b1bc6758f2d54f4791f14e6a19827264",
+    "terminal_error_m": 0.011787523596227019,
+    "task_accepted": false
+  },
+  "remaining_resources": {
+    "backend_solves": 6,
+    "model_calls": 64,
+    "tool_calls": 160,
+    "wall_s": 21600.0,
+    "worker_calls": 0
+  },
+  "scope": "Evaluated samples only. Baseline coverage is not exploration coverage; bounds do not establish exhaustion. Historical samples are not fresh executions."
+}
