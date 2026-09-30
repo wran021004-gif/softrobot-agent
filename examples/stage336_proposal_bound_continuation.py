@@ -318,6 +318,9 @@ def prepare(root):
     host,inp,manifest,manifest_ref,reuse_receipt=configure(root,run_id,budget,
         'User-authorized revised Stage 3.36 proposal-bound DeepSeek continuation at implementation commit '+commit+'.',
         reuse_root=BLOCKED_ROOT)
+    # compile_input expands allowed_tools; freeze the authoritative session form,
+    # not the caller's equivalent pre-normalized input.
+    inp=host.store.session(run_id)['snapshot']['input']
     payload=payload_for(host,DeepSeekAdapter())
     values=dict(frozen_input=inp,historical_import_manifest=manifest,runtime_identity=runtime,
         experiment_prompt=dict(guidance=inp['policy']['route']['data']['guidance']),provider_tools=payload['tools'],
@@ -458,13 +461,17 @@ def package(source,destination,blocker=None):
         actual_robot_outcomes=robot,actual_usage=usage,actual_tool_inventory=read(source/'provider_tools.json'),
         actual_parent_import=read(source/'historical_import_manifest.json'),actual_local_only_artifacts=dict(remotely_available=False,files=local))
     blocked=read(blocker) if blocker is not None else None
+    prelaunch=read(source/'prelaunch_verification.json') if (source/'prelaunch_verification.json').is_file() else None
+    prelaunch_rejected=bool(prelaunch and prelaunch.get('status')=='rejected')
     if blocked is not None:outputs['actual_live_launch_rejection']=blocked
     for name,value in outputs.items():atomic_json(destination/(name+'.json'),value)
     files=[path for path in destination.glob('actual_*.json') if path.name!='actual_manifest.json']
     atomic_json(destination/'actual_manifest.json',dict(run_id=host.run_id,
-        status='blocked_before_process' if blocked is not None else result['status'],
-        stop_reason='PLATFORM_APPROVAL_REJECTION_BEFORE_PROCESS' if blocked is not None else result['stop_reason'],
-        implementation_commit=freeze['implementation_commit'],single_live_continuation_launched=blocked is None,no_retry=True,
+        status='blocked_before_process' if blocked is not None else 'rejected_before_credentials' if prelaunch_rejected else result['status'],
+        stop_reason='PLATFORM_APPROVAL_REJECTION_BEFORE_PROCESS' if blocked is not None else
+            'LIVE_PRELAUNCH_VERIFICATION_FAILED' if prelaunch_rejected else result['stop_reason'],
+        implementation_commit=freeze['implementation_commit'],
+        single_live_continuation_launched=bool(blocked is None and not prelaunch_rejected and behavior['real_model_requests']),no_retry=True,
         files={path.name:dict(size=path.stat().st_size,sha256=sha256(path)) for path in sorted(files)},usage=usage))
     manifest_files=[path for path in destination.iterdir() if path.is_file() and path.name!='sha256_manifest.json']
     atomic_json(destination/'sha256_manifest.json',{
