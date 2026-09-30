@@ -1,0 +1,25 @@
+Useful descriptive association: late output minimum eigenvalue vs terminal error rho=-0.600; late affine-corrected energy rho=0.833. These use post-control states and are not prospective design screens.
+
+Weak plant-only distinction: passing vs immediate failure equilibrium weak output eigenvalues 361.513 vs 353.713, a 2.21% difference, while terminal errors are 7.727 vs 32.991 mm.
+
+Counterexample: rev_compliant_max fails at 11.788 mm despite a larger qualified equilibrium weak eigenvalue (377.593) and larger late weak eigenvalue (1849.823) than the passing case (1382.151).
+
+Counterexample: fresh_near0p168_far0p128 fails at 12.611 mm despite lower late nominal correction energy (4.04774e-05) than the passing case (8.54885e-05). These 0.35 s windows exceed the 0.01 s remaining at t=0.34.
+
+Initial tip-output Gramian is rank two in all nine cases: axial first-order correction is unreachable at the straight configuration. This common geometry does not distinguish outcomes.
+
+Saved prediction discrepancy is not a success proxy: passing mean 4.060 mm exceeds its failed predecessor 3.370 mm.
+
+Controller-selection association is stronger (rho=-0.858), but noncausal: passing selects optimized plans 12/35 vs predecessor 0/35; rev_compliant_max selects 28/35 and still fails. Inspect selected iteration, not plan_source alone.
+
+All nine have 35 feasible updates, zero converged updates and 35 deadline misses. These counts cannot distinguish success. Mean update time is roughly 12-18 s for a 0.01 s period; no real-time operation was demonstrated.
+
+All nine fail the saved settling window; passing terminal speed is 0.142 m/s, above the saved 0.02 m/s settling speed limit. Terminal reach acceptance is narrower than settling.
+
+All saved tensions are below 8 N and no bound entries are saturated. Headroom shows unused actuator range, not proof that a feasible correcting tension trajectory exists.
+
+Passing and some failures have unstable modes at transient frozen points; other failures have none. Neither transient open-loop poles nor static poles certify closed-loop performance.
+
+All 45 measured states fail the equilibrium residual criterion. Nine static force solves converge within the fixed 20-iteration limit; only eight also pass the independent normalized dynamic-drift criterion. c3_compliant_scale1p02 is excluded from equilibrium-only frequency summaries, without a recovery solve.
+
+Unavailable: defensible task-required bandwidth threshold, causal plant/controller decomposition, continuous settling guarantee, and validation against real hardware. No threshold was inferred from the single terminal pass.

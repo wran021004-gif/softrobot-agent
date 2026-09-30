@@ -1,0 +1,579 @@
+{
+  "analysis_version": "1.0.0",
+  "bindings": [
+    {
+      "build_node": "b4_n1666_f1266_compliant_s1p05",
+      "candidate_id": "b4_n1666_f1266_compliant_s1p05",
+      "configuration": {
+        "artifact_id": "6d3775e9aacb9768354cfdb7626005a75ba25a9af22df43d8faa704beac7b685",
+        "media_type": "application/json"
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "data": {
+            "numerical_source": "bundled_guess",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": false,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.0001,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.0001
+            },
+            "settling": {
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            }
+          },
+          "version": "1.0.0"
+        },
+        "version": "6.0.0"
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "data": {
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        },
+        "version": "1.0.0"
+      },
+      "effective_configuration_identity": "98b9ee803d6ec9241ca7cc932f5df95371e7732ac8069c527b37cee3ebe9fea2",
+      "evaluation": {
+        "artifact_id": "4105f850a698749b3dbb8650611ac5f3d13ac800558d5f714623a894789b281d",
+        "media_type": "application/json"
+      },
+      "execution_id": "e05b9f1670ca441f904fcabb4bf6fcfc",
+      "frozen_input_sha256": "49b17141897a3960c06d5899e874e05e32a48ef578ccc28e3d67199138d89989",
+      "ledger_sha256": "6accddeaf7abc766a7c684a739f044f27fa82934a309906be085e1b1ab4c246d",
+      "model": "model.gvs@1.0.0",
+      "owner_run_id": "gvs-live-b8f4ab5f17f2-a0939c0f7a88cd67",
+      "report": {
+        "execution_id": "e05b9f1670ca441f904fcabb4bf6fcfc",
+        "owner_run_id": "gvs-live-b8f4ab5f17f2-a0939c0f7a88cd67",
+        "reference": {
+          "artifact_id": "48206fc698d86c2af0086c8eccda28c57f2b4b9e0253a92c076596b840073d25",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      },
+      "run_node": "run_b4_n1666_f1266_s1p05",
+      "saved_signal_locations": {
+        "actual_commands.json": "runs\\stage332_evidence_guided_design_exploration_20260929_090221\\live_network\\sessions\\gvs-live-b8f4ab5f17f2-a0939c0f7a88cd67\\executions\\e05b9f1670ca441f904fcabb4bf6fcfc\\backend\\actual_commands.json",
+        "controller_observations.json": "runs\\stage332_evidence_guided_design_exploration_20260929_090221\\live_network\\sessions\\gvs-live-b8f4ab5f17f2-a0939c0f7a88cd67\\executions\\e05b9f1670ca441f904fcabb4bf6fcfc\\backend\\controller_observations.json",
+        "nmpc_updates.json": "runs\\stage332_evidence_guided_design_exploration_20260929_090221\\live_network\\sessions\\gvs-live-b8f4ab5f17f2-a0939c0f7a88cd67\\executions\\e05b9f1670ca441f904fcabb4bf6fcfc\\backend\\nmpc_updates.json"
+      },
+      "saved_signal_sha256": {
+        "actual_commands.json": "af59b35bc58799938acb8b612a73912cffff70a4a3f66dc172806272e1b67fce",
+        "controller_observations.json": "84924f6b7e6d336237e41bcb1779f8c41087cf7a81615da7bf39f1e11af02746",
+        "nmpc_updates.json": "7a6e7af535a9e1a95eb4e163305ab0ce3581cc69a5f5033c056af0c9b778be4e"
+      },
+      "simulation": {
+        "artifact_id": "745dec6c3784d65c753d13abcc224ce98eb8c1952de92f90a74f84fd9aba5f67",
+        "media_type": "application/json"
+      },
+      "source_commit": "d014e0f39e6a0821adc27073d610d6e4266ef638",
+      "source_directory": "runs\\stage332_evidence_guided_design_exploration_20260929_090221",
+      "source_session_id": "gvs-live-b8f4ab5f17f2",
+      "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+    }
+  ],
+  "evidence": [
+    {
+      "artifact_id": "9006f439b8c534fcf2f6595f0af8577f09509badf0ef7d6b09e5c16c2acc9ae9",
+      "media_type": "application/json"
+    }
+  ],
+  "facts": [
+    {
+      "evidence": [
+        {
+          "artifact_id": "9006f439b8c534fcf2f6595f0af8577f09509badf0ef7d6b09e5c16c2acc9ae9",
+          "media_type": "application/json"
+        }
+      ],
+      "fact_id": "saved-terminal-error",
+      "observed": null,
+      "statement": "Saved evaluator terminal error 0.024572848476714596 m; task accepted False."
+    }
+  ],
+  "kind": "saved_case",
+  "limitations": [
+    "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+    "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+    "Numerical agreement is implementation verification, not physical model validation.",
+    "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+    "Observations do not establish causal attribution."
+  ],
+  "protocol": {
+    "artifact_id": "3f87ad2b10366783f51cd0dcef6c988244b6878efec20594ae3527747e9719cd",
+    "media_type": "application/json"
+  },
+  "records": [
+    {
+      "factual_result": {
+        "accepted_noninitialization_plans": 0,
+        "accepted_plans": 35,
+        "applied_tension_ranges": [
+          {
+            "limit_n": 8.0,
+            "maximum_n": 1.7512764858409064,
+            "minimum_n": 1.7512764858409064,
+            "tendon": "near_t0",
+            "tendon_index": 0
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 4.755852667139922,
+            "minimum_n": 4.755852667139922,
+            "tendon": "near_t1",
+            "tendon_index": 1
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 3.1031566686630025,
+            "minimum_n": 3.1031566686630025,
+            "tendon": "near_t2",
+            "tendon_index": 2
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 3.218253612486097,
+            "minimum_n": 3.218253612486097,
+            "tendon": "far_t0",
+            "tendon_index": 3
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 0.7859357597552847,
+            "minimum_n": 0.7859357597552847,
+            "tendon": "far_t1",
+            "tendon_index": 4
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 0.6315302379791942,
+            "minimum_n": 0.6315302379791942,
+            "tendon": "far_t2",
+            "tendon_index": 5
+          }
+        ],
+        "candidate": {
+          "candidate_id": "b4_n1666_f1266_compliant_s1p05",
+          "configuration": {
+            "artifact_id": "6d3775e9aacb9768354cfdb7626005a75ba25a9af22df43d8faa704beac7b685",
+            "media_type": "application/json"
+          },
+          "execution_id": "e05b9f1670ca441f904fcabb4bf6fcfc",
+          "owner_run_id": "gvs-live-b8f4ab5f17f2-a0939c0f7a88cd67"
+        },
+        "complete": true,
+        "configuration": {
+          "artifact_id": "6d3775e9aacb9768354cfdb7626005a75ba25a9af22df43d8faa704beac7b685",
+          "media_type": "application/json"
+        },
+        "control_period_s": 0.01,
+        "control_updates": 35,
+        "converged_updates": 0,
+        "coordinate_frame": "world",
+        "deadline_misses": 35,
+        "error_convention": "actual_tip minus target",
+        "evaluation": {
+          "artifact_id": "4105f850a698749b3dbb8650611ac5f3d13ac800558d5f714623a894789b281d",
+          "media_type": "application/json"
+        },
+        "evaluation_validity": "valid",
+        "execution_id": "e05b9f1670ca441f904fcabb4bf6fcfc",
+        "force_bound_violation_n": 0.0,
+        "hold_last_responses": 0,
+        "initialization_selected": 35,
+        "mean_complete_update_s": 18.375968437149588,
+        "measured_computation_s": 646.75,
+        "one_step_prediction_evidence": {
+          "artifact_id": "ebb4b7b0363e12144b3c165d282c3f7f39b5fd0c0bba2335ee0d1de6c46a259f",
+          "media_type": "application/json"
+        },
+        "one_step_prediction_summary": {
+          "aligned_count": 35,
+          "frame": "world",
+          "maximum_tip_difference_m": 0.004295654062710488,
+          "mean_tip_difference_m": 0.0033335518215991474,
+          "missing": [],
+          "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+        },
+        "real_time_demonstrated": false,
+        "report": {
+          "execution_id": "e05b9f1670ca441f904fcabb4bf6fcfc",
+          "owner_run_id": "gvs-live-b8f4ab5f17f2-a0939c0f7a88cd67",
+          "reference": {
+            "artifact_id": "48206fc698d86c2af0086c8eccda28c57f2b4b9e0253a92c076596b840073d25",
+            "media_type": "application/json"
+          },
+          "request_id": "single-profile-report"
+        },
+        "result_type": "free_reach",
+        "sampled_settling": {
+          "available": true,
+          "continuous_time_guarantee": false,
+          "max_error_m": 0.03219700922273225,
+          "max_speed_m_s": 0.2332356818382806,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        },
+        "signed_position_error_m": [
+          0.013485709994825179,
+          0.012237956116817598,
+          -0.01649827076629226
+        ],
+        "simulated_duration_s": 0.35000000000000003,
+        "simulation": {
+          "artifact_id": "745dec6c3784d65c753d13abcc224ce98eb8c1952de92f90a74f84fd9aba5f67",
+          "media_type": "application/json"
+        },
+        "solver_error_count": 0,
+        "target_position_m": [
+          0.29,
+          0.035,
+          0.19
+        ],
+        "task_accepted": false,
+        "terminal_error_m": 0.024572848476714596,
+        "terminal_position_m": [
+          0.30348570999482516,
+          0.0472379561168176,
+          0.17350172923370774
+        ],
+        "terminal_tip_speed_m_s": 0.2332356818382806,
+        "valid_complete_execution": true
+      },
+      "observation_count": 35,
+      "plan_sources": {
+        "ipopt_selected": 35
+      },
+      "samples": [
+        {
+          "actual_time_s": 0.0,
+          "available": true,
+          "command_index": 0,
+          "command_interval_s": [
+            0.0,
+            0.01
+          ],
+          "input_interpretation": "actual applied input for interval starting at this pre-step state",
+          "observation_index": 0,
+          "phase": "current_state_before_integration",
+          "preceding_input_n": null,
+          "preceding_input_reason": "initial condition; no preceding interval",
+          "remaining_task_s": 0.35,
+          "requested_time_s": 0.0,
+          "u": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "x": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "actual_time_s": 0.1,
+          "available": true,
+          "command_index": 10,
+          "command_interval_s": [
+            0.1,
+            0.11
+          ],
+          "input_interpretation": "actual applied input for interval starting at this pre-step state",
+          "observation_index": 10,
+          "phase": "current_state_before_integration",
+          "preceding_input_n": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "preceding_input_reason": "input producing the current observation",
+          "remaining_task_s": 0.24999999999999997,
+          "requested_time_s": 0.1,
+          "u": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "x": [
+            2.242581815214692,
+            0.4418666769676259,
+            -1.2517454810093207,
+            -0.05093225502637259,
+            -0.14567432379400688,
+            -0.2507925427441282,
+            -3.2319999845476213,
+            -3.774549441034549,
+            -5.03981598349272,
+            3.2250871185986845,
+            2.8652394768313267,
+            3.059140304457367,
+            2.707833219348422,
+            4.279024711132074,
+            4.01546337027081,
+            8.540191482079852,
+            5.173438546075209,
+            1.79347242950361,
+            -10.381739979956118,
+            -13.136165434255894,
+            -27.91489654658118,
+            10.635498682013935,
+            7.927905521791148,
+            10.58343366635173
+          ]
+        },
+        {
+          "actual_time_s": 0.2,
+          "available": true,
+          "command_index": 20,
+          "command_interval_s": [
+            0.2,
+            0.21000000000000002
+          ],
+          "input_interpretation": "actual applied input for interval starting at this pre-step state",
+          "observation_index": 20,
+          "phase": "current_state_before_integration",
+          "preceding_input_n": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "preceding_input_reason": "input producing the current observation",
+          "remaining_task_s": 0.14999999999999997,
+          "requested_time_s": 0.2,
+          "u": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "x": [
+            2.3512421550802864,
+            0.597358140760871,
+            -1.0955201886151202,
+            0.7725691181791757,
+            0.4079224564522906,
+            0.02536766941332525,
+            -3.780915564032154,
+            -4.293200463623565,
+            -6.655375707793533,
+            4.202477776394696,
+            3.446610241113926,
+            3.5423667213540546,
+            -0.21918142441813557,
+            -0.0385067611471612,
+            -0.05293349869059733,
+            5.428120228275582,
+            3.7818532873086035,
+            2.0405180549079196,
+            -5.18231025088113,
+            -2.522823770728933,
+            -8.381685921847595,
+            8.153312295106803,
+            4.472497601770311,
+            1.8830937566504997
+          ]
+        },
+        {
+          "actual_time_s": 0.3,
+          "available": true,
+          "command_index": 30,
+          "command_interval_s": [
+            0.3,
+            0.31
+          ],
+          "input_interpretation": "actual applied input for interval starting at this pre-step state",
+          "observation_index": 30,
+          "phase": "current_state_before_integration",
+          "preceding_input_n": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "preceding_input_reason": "input producing the current observation",
+          "remaining_task_s": 0.04999999999999999,
+          "requested_time_s": 0.3,
+          "u": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "x": [
+            2.2167948165983553,
+            0.5029075895599973,
+            -1.1523586556648364,
+            0.7938311483815685,
+            0.429581696724377,
+            0.04053292303839516,
+            -4.2504516118594875,
+            -4.519631222037253,
+            -7.153995087686673,
+            4.517109883906764,
+            3.631659318184531,
+            3.6283218594888877,
+            -2.175106289103612,
+            -1.6203982469999068,
+            -0.8848778728331929,
+            -4.503741018399621,
+            -3.043113593902334,
+            -1.5956196809524457,
+            -3.4392064121108814,
+            -2.067922898026365,
+            -2.802679481302831,
+            -2.229034931460908,
+            -1.0085983990087897,
+            0.07510097195311698
+          ]
+        },
+        {
+          "actual_time_s": 0.34,
+          "available": true,
+          "command_index": 34,
+          "command_interval_s": [
+            0.34,
+            0.35
+          ],
+          "input_interpretation": "actual applied input for interval starting at this pre-step state",
+          "observation_index": 34,
+          "phase": "current_state_before_integration",
+          "preceding_input_n": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "preceding_input_reason": "input producing the current observation",
+          "remaining_task_s": 0.009999999999999953,
+          "requested_time_s": 0.34,
+          "u": [
+            1.7512764858409064,
+            4.755852667139922,
+            3.1031566686630025,
+            3.218253612486097,
+            0.7859357597552847,
+            0.6315302379791942
+          ],
+          "x": [
+            2.1235598930729456,
+            0.4332548072321967,
+            -1.189229137009601,
+            0.5680862199229482,
+            0.275965104329572,
+            -0.04053998503869445,
+            -4.358669269558822,
+            -4.597893609582477,
+            -7.247980153034094,
+            4.358976466990141,
+            3.553105325650016,
+            3.621809454817216,
+            -2.4257041525761376,
+            -1.8117484946072142,
+            -0.9370316149720671,
+            -6.441138543561577,
+            -4.401629935804713,
+            -2.3310807620521676,
+            -2.008741061257485,
+            -1.8424981715484188,
+            -1.9818795756884018,
+            -5.346484244075536,
+            -2.7507310461038434,
+            -0.37053393839927196
+          ]
+        }
+      ],
+      "saved_tension_bound_usage": {
+        "count": 35,
+        "saturated_entries": 0
+      },
+      "selected_iterations": {
+        "-1": 2,
+        "0": 33
+      }
+    }
+  ]
+}

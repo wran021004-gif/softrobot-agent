@@ -1,0 +1,351 @@
+{
+  "analysis_version": "1.0.0",
+  "bindings": [
+    {
+      "build_node": "b2_n168_f128",
+      "candidate_id": "fresh_near0p168_far0p128_compliant_s1p05",
+      "configuration": {
+        "artifact_id": "1a122e47fddfce54bd33e5b1536496e55a3772a519533430197a253f55456180",
+        "media_type": "application/json"
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "data": {
+            "numerical_source": "bundled_guess",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": false,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.0001,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.0001
+            },
+            "settling": {
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            }
+          },
+          "version": "1.0.0"
+        },
+        "version": "6.0.0"
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "data": {
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        },
+        "version": "1.0.0"
+      },
+      "effective_configuration_identity": "64a3acc15e82fffeed76e3f311491c6040dd33e9faa2058a9871554064178feb",
+      "evaluation": {
+        "artifact_id": "8e0b88746b6d0f4f1cb42dfd43093265f37cdca3d2be17bae19a2cc73cca6788",
+        "media_type": "application/json"
+      },
+      "execution_id": "63e16843e31b4444bdfa43f83cd204bf",
+      "frozen_input_sha256": "49b17141897a3960c06d5899e874e05e32a48ef578ccc28e3d67199138d89989",
+      "ledger_sha256": "6accddeaf7abc766a7c684a739f044f27fa82934a309906be085e1b1ab4c246d",
+      "model": "model.gvs@1.0.0",
+      "owner_run_id": "gvs-live-b8f4ab5f17f2-3b4237ced557ddd8",
+      "report": {
+        "execution_id": "63e16843e31b4444bdfa43f83cd204bf",
+        "owner_run_id": "gvs-live-b8f4ab5f17f2-3b4237ced557ddd8",
+        "reference": {
+          "artifact_id": "84ea1f24134cc68e9dd76f16a11f14470af3812aac50e8e1146a70585ca2c5ea",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      },
+      "run_node": "run_b2_n168_f128",
+      "saved_signal_locations": {
+        "actual_commands.json": "runs\\stage332_evidence_guided_design_exploration_20260929_090221\\live_network\\sessions\\gvs-live-b8f4ab5f17f2-3b4237ced557ddd8\\executions\\63e16843e31b4444bdfa43f83cd204bf\\backend\\actual_commands.json",
+        "controller_observations.json": "runs\\stage332_evidence_guided_design_exploration_20260929_090221\\live_network\\sessions\\gvs-live-b8f4ab5f17f2-3b4237ced557ddd8\\executions\\63e16843e31b4444bdfa43f83cd204bf\\backend\\controller_observations.json",
+        "nmpc_updates.json": "runs\\stage332_evidence_guided_design_exploration_20260929_090221\\live_network\\sessions\\gvs-live-b8f4ab5f17f2-3b4237ced557ddd8\\executions\\63e16843e31b4444bdfa43f83cd204bf\\backend\\nmpc_updates.json"
+      },
+      "saved_signal_sha256": {
+        "actual_commands.json": "e3cf6aed94d72cead606754f63f9ff5cfc73ac0dbb059b5af2b5746cb1a8bf92",
+        "controller_observations.json": "b32c98fd95f61ce44761d834d6b84efb754b06ad371df1407d81ab9790b77433",
+        "nmpc_updates.json": "8ec416a3cb7f461ed9c0ac6f65cbf4d6004628160828e62cd457771b249a02d4"
+      },
+      "simulation": {
+        "artifact_id": "f51e774bd8681138e2986716df44b022608c07c67baee34d07d185b9ef069eea",
+        "media_type": "application/json"
+      },
+      "source_commit": "d014e0f39e6a0821adc27073d610d6e4266ef638",
+      "source_directory": "runs\\stage332_evidence_guided_design_exploration_20260929_090221",
+      "source_session_id": "gvs-live-b8f4ab5f17f2",
+      "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+    }
+  ],
+  "evidence": [
+    {
+      "artifact_id": "e925c65bbea76894020632ba4a41a8a3213b32eab152056fd8d6253043dc10be",
+      "media_type": "application/json"
+    }
+  ],
+  "facts": [],
+  "kind": "linearization",
+  "limitations": [
+    "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+    "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+    "Numerical agreement is implementation verification, not physical model validation.",
+    "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses."
+  ],
+  "protocol": {
+    "artifact_id": "3f87ad2b10366783f51cd0dcef6c988244b6878efec20594ae3527747e9719cd",
+    "media_type": "application/json"
+  },
+  "records": [
+    {
+      "derivative_check": {
+        "dynamics": {
+          "max_absolute_error": 0.0002044134889729321,
+          "max_scaled_error": 1.8101574709473924e-05,
+          "passed": true
+        },
+        "output": {
+          "max_absolute_error": 1.4076029231091525e-10,
+          "max_scaled_error": 1.415519420564425e-07,
+          "passed": true
+        },
+        "step": 1e-05
+      },
+      "model": {
+        "artifact_id": "65f2d57e8834a85989bbf41627de641f2e7c9d201f78ada3d8651948d88d2f42",
+        "media_type": "application/json"
+      },
+      "point": {
+        "actual_time_s": 0.0,
+        "available": true,
+        "command_index": 0,
+        "command_interval_s": [
+          0.0,
+          0.01
+        ],
+        "input_interpretation": "actual applied input for interval starting at this pre-step state",
+        "observation_index": 0,
+        "phase": "current_state_before_integration",
+        "preceding_input_n": null,
+        "preceding_input_reason": "initial condition; no preceding interval",
+        "remaining_task_s": 0.35,
+        "requested_time_s": 0.0
+      }
+    },
+    {
+      "derivative_check": null,
+      "model": {
+        "artifact_id": "389808850576ef5721a71d50a29b7be47a1e389e7292cb09bc3cf205cc9b9003",
+        "media_type": "application/json"
+      },
+      "point": {
+        "actual_time_s": 0.1,
+        "available": true,
+        "command_index": 10,
+        "command_interval_s": [
+          0.1,
+          0.11
+        ],
+        "input_interpretation": "actual applied input for interval starting at this pre-step state",
+        "observation_index": 10,
+        "phase": "current_state_before_integration",
+        "preceding_input_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "preceding_input_reason": "input producing the current observation",
+        "remaining_task_s": 0.24999999999999997,
+        "requested_time_s": 0.1
+      }
+    },
+    {
+      "derivative_check": null,
+      "model": {
+        "artifact_id": "0b29120001c02dbc07dd9166f2a177f64252ab909dc4b1c26076dc649272aa05",
+        "media_type": "application/json"
+      },
+      "point": {
+        "actual_time_s": 0.2,
+        "available": true,
+        "command_index": 20,
+        "command_interval_s": [
+          0.2,
+          0.21000000000000002
+        ],
+        "input_interpretation": "actual applied input for interval starting at this pre-step state",
+        "observation_index": 20,
+        "phase": "current_state_before_integration",
+        "preceding_input_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "preceding_input_reason": "input producing the current observation",
+        "remaining_task_s": 0.14999999999999997,
+        "requested_time_s": 0.2
+      }
+    },
+    {
+      "derivative_check": null,
+      "model": {
+        "artifact_id": "7e34e5dddbd2bc57add7a574608521cf6550700c2b78c39e680f0f806ef660e0",
+        "media_type": "application/json"
+      },
+      "point": {
+        "actual_time_s": 0.3,
+        "available": true,
+        "command_index": 30,
+        "command_interval_s": [
+          0.3,
+          0.31
+        ],
+        "input_interpretation": "actual applied input for interval starting at this pre-step state",
+        "observation_index": 30,
+        "phase": "current_state_before_integration",
+        "preceding_input_n": [
+          2.2249156766853195,
+          4.139416531091537,
+          3.835454858923241,
+          4.266060485960678,
+          1.5310086546987838,
+          1.5807784506324762
+        ],
+        "preceding_input_reason": "input producing the current observation",
+        "remaining_task_s": 0.04999999999999999,
+        "requested_time_s": 0.3
+      }
+    },
+    {
+      "derivative_check": null,
+      "model": {
+        "artifact_id": "babc7ca4a903adb1e4b82a3799b07654f62ffbc53fb26fd91f52d6005180551b",
+        "media_type": "application/json"
+      },
+      "point": {
+        "actual_time_s": 0.34,
+        "available": true,
+        "command_index": 34,
+        "command_interval_s": [
+          0.34,
+          0.35
+        ],
+        "input_interpretation": "actual applied input for interval starting at this pre-step state",
+        "observation_index": 34,
+        "phase": "current_state_before_integration",
+        "preceding_input_n": [
+          1.7846799312501975,
+          3.8767907953915985,
+          4.303782495760726,
+          4.3575983295783445,
+          2.039066777857796,
+          1.6850239228208392
+        ],
+        "preceding_input_reason": "input producing the current observation",
+        "remaining_task_s": 0.009999999999999953,
+        "requested_time_s": 0.34
+      }
+    },
+    {
+      "model": {
+        "artifact_id": "7a52ce378c1049eecf41d74888e14e595e3cf50d8d009b5e5def1dfb162fd862",
+        "media_type": "application/json"
+      },
+      "point": {
+        "actual_time_s": null,
+        "available": true,
+        "equilibrium": {
+          "attempts": 1,
+          "force_tolerance": 1e-10,
+          "initialization": "first requested saved measured q; first actually applied tension",
+          "max_residual_evaluations": 262,
+          "result": {
+            "converged": true,
+            "coordinate_order": [
+              "near.kappa_y_node_0",
+              "near.kappa_y_node_1",
+              "near.kappa_y_node_2",
+              "near.kappa_z_node_0",
+              "near.kappa_z_node_1",
+              "near.kappa_z_node_2",
+              "far.kappa_y_node_0",
+              "far.kappa_y_node_1",
+              "far.kappa_y_node_2",
+              "far.kappa_z_node_0",
+              "far.kappa_z_node_1",
+              "far.kappa_z_node_2"
+            ],
+            "iterations": 3,
+            "model_id": "gvs_variable_strain_bending_v1",
+            "q_equilibrium": [
+              2.0806744919782183,
+              0.21477018546457208,
+              -1.1509782853426307,
+              0.3406556059296148,
+              0.07735530381358202,
+              -0.11254152887713119,
+              -4.217423771224196,
+              -4.824013039423734,
+              -6.760842000438071,
+              3.9003635355929327,
+              3.3130288058928135,
+              3.3726003205024644
+            ],
+            "residual_norm": 2.4175490168781844e-12,
+            "solver": "casadi_ad_damped_newton",
+            "tendon_order": [
+              "near_t0",
+              "near_t1",
+              "near_t2",
+              "far_t0",
+              "far_t1",
+              "far_t2"
+            ]
+          }
+        },
+        "phase": "computed_static_equilibrium",
+        "remaining_task_s": null
+      }
+    }
+  ]
+}
