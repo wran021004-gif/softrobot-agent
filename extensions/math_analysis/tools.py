@@ -28,9 +28,26 @@ def _model(value):
     return OutputLinearizedModel.model_validate(value)
 
 
+def _model_references(ctx,references):
+    """Expand public linearization envelopes without duplicating their formulas."""
+    expanded=[]
+    for reference in references:
+        value=ctx.artifact(reference)
+        if value.get('kind') in ('linearization','candidate_linearization'):
+            nested=[record['model'] for record in value.get('records',[]) if record.get('model')]
+            if not nested: raise ValueError('LINEARIZATION_ENVELOPE_HAS_NO_MODELS')
+            expanded.extend(nested)
+        else: expanded.append(reference)
+    unique=[]
+    for reference in expanded:
+        if plain(reference) not in [plain(item) for item in unique]: unique.append(reference)
+    return unique
+
+
 def control_metrics(ctx,args):
     p=_protocol(ctx,args)
-    models=[_model(ctx.artifact(r)) for r in args.models]
+    model_refs=_model_references(ctx,args.models)
+    models=[_model(ctx.artifact(r)) for r in model_refs]
     if any(m.time_domain!='continuous' for m in models):
         raise ValueError('CONTINUOUS_INPUT_MODEL_REQUIRED')
     if any(m.protocol_identity!=digest(plain(p)) for m in models): raise ValueError('MODEL_PROTOCOL_MISMATCH')
@@ -46,15 +63,16 @@ def control_metrics(ctx,args):
             for m in models: records.append(calculate(m,backend))
     else:
         records=[calculate(m) for m in models]
-    for r,ref in zip(records,args.models): r['model_reference']=plain(ref)
+    for r,ref in zip(records,model_refs): r['model_reference']=plain(ref)
     return AnalysisResult(kind='control_metrics',protocol=args.protocol,bindings=[m.binding for m in models],
-        records=records,evidence=args.models,limitations=LIMITATIONS)
+        records=records,evidence=[*args.models,*[r for r in model_refs if plain(r) not in [plain(v) for v in args.models]]],limitations=LIMITATIONS)
 
 
 def bounded_endpoint_analysis(ctx,args):
     p=TaskAnalysisProtocol.model_validate(ctx.artifact(args.protocol))
     target=EndpointTarget.model_validate(ctx.artifact(args.target)); models=[]
-    for ref in args.models:
+    model_refs=_model_references(ctx,args.models)
+    for ref in model_refs:
         model=EndpointLinearizedModel.model_validate(ctx.artifact(ref))
         if model.time_domain!='continuous': raise ValueError('CONTINUOUS_INPUT_MODEL_REQUIRED')
         if model.protocol_identity!=digest(plain(p)): raise ValueError('MODEL_PROTOCOL_MISMATCH')
@@ -65,7 +83,7 @@ def bounded_endpoint_analysis(ctx,args):
             raise ValueError('ENDPOINT_TOLERANCE_MODEL_BINDING_MISMATCH')
         models.append(model)
     records=[]
-    for ref,model in zip(args.models,models):
+    for ref,model in zip(model_refs,models):
         position=bounded_endpoint(model,p,target,braking=False)
         warm=None
         if position.get('delta_input_n') is not None: warm=np.asarray(position['delta_input_n']).reshape(-1)
@@ -73,7 +91,7 @@ def bounded_endpoint_analysis(ctx,args):
         records.append(dict(binding=model.binding,operating_point=model.operating_point,model_reference=plain(ref),
             target_contract=plain(target),position_only=position,position_and_braking=braking))
     return AnalysisResult(kind='bounded_endpoint',protocol=args.protocol,bindings=[m.binding for m in models],
-        records=records,evidence=[*args.models,args.target],limitations=LIMITATIONS+[
+        records=records,evidence=[*args.models,*[r for r in model_refs if plain(r) not in [plain(v) for v in args.models]],args.target],limitations=LIMITATIONS+[
             'A feasible witness is local-model evidence only; undetermined is not infeasible.',
             'The speed constraint is a terminal braking diagnostic and does not alter the reach evaluator or establish settling.'])
 

@@ -125,7 +125,7 @@ class EndpointTarget(Contract):
 
 
 class MetricsRequest(Contract):
-    models: list[EvidenceRef] = Field(min_length=1)
+    models: list[EvidenceRef] = Field(min_length=1, description='Bare linear-model references or candidate-linearization result envelopes containing model references.')
     protocol: EvidenceRef
     implementation: Literal['scipy','matlab'] = 'scipy'
 
@@ -149,7 +149,7 @@ class CandidateLinearizeRequest(Contract):
 
 
 class BoundedEndpointRequest(Contract):
-    models: list[EvidenceRef] = Field(min_length=1)
+    models: list[EvidenceRef] = Field(min_length=1, description='Bare endpoint-model references or candidate-linearization result envelopes containing model references.')
     protocol: EvidenceRef
     target: EvidenceRef
 

@@ -105,11 +105,15 @@ class TaskAnalysisTests(unittest.TestCase):
         budget=dict(tool_calls=5,model_calls=0,backend_solves=0,worker_calls=0,wall_s=60.)
         cfg=project(); cfg['budget']=budget; store.create(cfg)
         inp=reference_input('fixture-task-v2'); inp['policy'].update(budget=budget,timeout_s=20.,
-            tool_bindings={'analysis.control_metrics':'2.0.0'},allowed_tools=[])
+            tool_bindings={'analysis.control_metrics':'2.0.0','analysis.bounded_endpoint':'1.0.0'},allowed_tools=[])
         host=Host(root,'fixture-task-v2'); host.create(inp); p=protocol()
         with store.transaction() as db:
             pref=store.put(db,p); mref=store.put(db,model_for(p))
             discrete=store.put(db,model_for(p,time_domain='discrete'))
+            envelope=store.put(db,dict(kind='candidate_linearization',protocol=plain(pref),bindings=[],
+                records=[dict(model=plain(mref))],evidence=[]))
+            target=store.put(db,EndpointTarget(position_m=(.00008,0.,0.),position_tolerance_m=1e-6,
+                position_scale_m=.01,tip_speed_limit_m_s=.02,tip_velocity_scale_m_s=.02))
         real_version=importlib.metadata.version
         def without_matlab(name):
             if name=='matlabengine': raise importlib.metadata.PackageNotFoundError(name)
@@ -119,6 +123,13 @@ class TaskAnalysisTests(unittest.TestCase):
         with patch('importlib.metadata.version',side_effect=without_matlab):
             receipt=host.invoke(request('scipy-without-matlab',mref))
         self.assertEqual(receipt['execution_status'],'completed',receipt)
+        expanded=host.invoke(request('scipy-envelope',envelope))
+        self.assertEqual(expanded['execution_status'],'completed',expanded)
+        self.assertEqual(store.artifact(expanded['output'])['records'][0]['model_reference'],plain(mref))
+        endpoint=host.invoke(dict(request_id='endpoint-envelope',tool_id='analysis.bounded_endpoint',tool_version='1.0.0',
+            arguments=dict(models=[plain(envelope)],protocol=plain(pref),target=plain(target)),reason='Public envelope expansion regression'))
+        self.assertEqual(endpoint['execution_status'],'completed',endpoint)
+        self.assertEqual(store.artifact(endpoint['output'])['records'][0]['model_reference'],plain(mref))
         rejected=host.invoke(request('reject-discrete',discrete))
         self.assertEqual(rejected['execution_status'],'failed',rejected)
         self.assertIn('CONTINUOUS_INPUT_MODEL_REQUIRED',rejected['error'])
