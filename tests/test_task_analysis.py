@@ -158,7 +158,7 @@ class TaskAnalysisTests(unittest.TestCase):
             eref=plain(store.put(db,dict(kind='bounded_endpoint',protocol=pref,bindings=[binding],records=[],evidence=[tref])))
             sref=plain(store.put(db,dict(kind='design_screen',protocol=pref,bindings=[binding],
                 records=[dict(priority_reasoning=dict(priority='conditional_support'))],evidence=[lref,mref,eref])))
-            oref=plain(store.put(db,dict(kind='mathematical_design_optimization',starting_binding=binding)))
+            oref=plain(store.put(db,dict(kind='mathematical_design_optimization',starting_binding=binding,proposals=[])))
         receipt=host.invoke(dict(request_id='record',tool_id='route.record_analysis',tool_version='1.0.0',
             reason='Synthetic exact linkage',arguments=dict(node_id='analysis',source_node='build',evidence=[build_node['result']],
                 linearization=lref,metrics=mref,endpoint=eref,screen=sref,math_optimization=oref,

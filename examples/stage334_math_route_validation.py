@@ -57,7 +57,7 @@ def main():
     value=json.loads(json.dumps(frozen));value['run_id']='stage334-deterministic-math-route'
     value['policy'].update(budget=budget,timeout_s=1800.,model={},allowed_tools=[],tool_bindings=VERSIONS)
     value['policy']['route']['data'].update(analysis_protocol=pref,endpoint_target=tref,analysis_required_before_run=True,
-        max_trials=3,guidance='Build, invoke the configured shared analysis and mathematical optimizer, attach their exact report, and do not execute a backend in this deterministic validation.')
+        math_evaluation_limit=8,max_trials=3,guidance='Build, invoke the configured shared analysis and mathematical optimizer, attach their exact report, and do not execute a backend in this deterministic validation.')
     value['policy']['route']['data']['historical_case']=None
     create_route(store.root,value);host=Host(store.root,value['run_id'],actor='deterministic-validation');receipts=[]
     build_ref,_=call(host,receipts,'route.advance',dict(node_id='math_start',action='build',combination='candidate_gvs_nmpc',

@@ -151,6 +151,9 @@ def optimize_math(ctx,args):
     from .math_analysis import linearize_candidate_configuration, _validate_task_protocol
 
     start,start_binding=resolve_candidate(ctx,args.source_node)
+    route_data=ctx.input.policy.route.data if ctx.input.policy.route is not None else {}
+    evaluation_limit=int(route_data.get('math_evaluation_limit',24))
+    if args.max_evaluations>evaluation_limit: raise ValueError('ROUTE_MATH_EVALUATION_LIMIT')
     p=TaskAnalysisProtocol.model_validate(ctx.artifact(args.protocol)); _validate_task_protocol(start,p)
     target=EndpointTarget.model_validate(ctx.artifact(args.target))
     if not np.allclose(target.position_m,start.task.goal.data['target_m'],rtol=0,atol=p.endpoint_check_atol):
@@ -194,11 +197,12 @@ def optimize_math(ctx,args):
         linear_ref=plain(ctx.save_artifact(linear,'math_optimizer_linearization'))
         point=next((row for row in linear.records[1:] if row.get('model') and
             row['point'].get('name')=='controller_start_input'),None)
-        endpoint=None; objective=dict(position_residual_upper_bound_ratio=None,
+        endpoint=None; endpoint_ref=None; objective=dict(position_residual_upper_bound_ratio=None,
             feasible_witness_normalized_input_energy=None,applicability='unavailable')
         if point is not None:
             model=EndpointLinearizedModel.model_validate(ctx.artifact(point['model']))
             endpoint=bounded_endpoint(model,p,target,braking=False)
+            endpoint_ref=plain(ctx.save_artifact(endpoint,'math_optimizer_endpoint'))
             residual=endpoint['independent_residual_problems']['position']['candidate_residual']
             objective=dict(position_residual_upper_bound_ratio=residual/target.position_tolerance_m,
                 feasible_witness_normalized_input_energy=endpoint['normalized_input_energy']
@@ -207,12 +211,22 @@ def optimize_math(ctx,args):
                 status=endpoint['status'],candidate_residual_m=residual,
                 residual_role='upper bound on the bounded minimum; not an infeasibility proof',
                 position_tolerance_m=target.position_tolerance_m)
+        compact_binding={key:binding[key] for key in ('source_node','candidate_id','configuration','owner_run_id',
+            'effective_configuration_identity','robot_identity','task_identity','model','target_m','task_duration_s',
+            'control_period_s','physics_timestep_s','tendon_order','tension_bounds_n')}
         row=dict(evaluation_index=len(evaluations)+1,candidate_id=candidate_id,configuration=configuration,
             build_identity=identity,material_scenario=scenario,parameters=values,binding=binding,
-            linearization=linear_ref,controller_start_endpoint=endpoint,objective=objective,
+            candidate_binding=compact_binding,linearization=linear_ref,controller_start_endpoint=endpoint_ref,
+            endpoint_summary=None if endpoint is None else dict(question=endpoint['question'],status=endpoint['status'],
+                sampled_horizon=endpoint['sampled_horizon'],checks=endpoint['checks'],
+                position_error_m=endpoint['endpoint']['position_error_m'],tip_speed_m_s=endpoint['endpoint']['tip_speed_m_s'],
+                certificate=endpoint['infeasibility_certificate']),objective=objective,
             unavailable_constructions=[r.get('name') for r in linear.records[1:] if not r.get('available',False)],
             backend_executed=False,nmpc_solved=False,provider_called=False)
-        evaluations.append(row); evidence.extend([configuration,linear_ref]); cache[identity]=row
+        row.pop('binding')
+        evaluations.append(row); evidence.extend([configuration,linear_ref]);
+        if endpoint_ref: evidence.append(endpoint_ref)
+        cache[identity]=row
         return row
 
     # One explicit start per discrete scenario, then bounded coordinate moves.

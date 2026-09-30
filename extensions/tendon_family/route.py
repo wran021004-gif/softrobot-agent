@@ -24,6 +24,9 @@ class RoutePolicy(Contract):
     analysis_protocol: EvidenceRef | None = None
     endpoint_target: EvidenceRef | None = None
     analysis_required_before_run: bool = False
+    math_evaluation_limit: int = Field(default=24,ge=1,le=24)
+    math_selection_required_before_run: bool = False
+    stop_on_task_success: bool = False
     guidance: str = 'Select a legal combination and structure; evaluate, inspect evidence, then continue, adjust or finish. Reserve a solve for independent review when useful.'
 
 
@@ -148,7 +151,8 @@ def view(host):
             'Serial bending cells only; no torsion/shear/stretch, friction, motor dynamics or general trajectory optimization.'])
     if spec.analysis_protocol and spec.endpoint_target:
         result['analysis_workflow']=dict(protocol=plain(spec.analysis_protocol),endpoint_target=plain(spec.endpoint_target),
-            required_before_run=spec.analysis_required_before_run,
+            required_before_run=spec.analysis_required_before_run,math_evaluation_limit=spec.math_evaluation_limit,
+            math_selection_required_before_run=spec.math_selection_required_before_run,
             call_order=['analysis.linearize_candidate','analysis.control_metrics','analysis.bounded_endpoint',
                 'design.screen','design.optimize_math','route.record_analysis'])
     return result
@@ -494,6 +498,8 @@ def run_built(ctx,args,route):
     candidate=built['candidate_id']
     if args.candidate_id and args.candidate_id!=candidate: raise ValueError('CANDIDATE_SELECTION_MISMATCH')
     inp=ctx.store.artifact(built['configuration'])
+    if policy(ctx.input).stop_on_task_success and route.get('incumbent',{}).get('evaluation',{}).get('task_success') is True:
+        raise ValueError('TASK_SUCCESS_STOP_POLICY: finish the passing incumbent')
     if policy(ctx.input).analysis_required_before_run:
         reports=[]
         for item in route['nodes']:
@@ -502,6 +508,8 @@ def run_built(ctx,args,route):
                 if report.get('build_configuration')==built['configuration']: reports.append(report)
         if not reports:
             raise ValueError('CANDIDATE_BOUND_SHARED_ANALYSIS_REQUIRED_BEFORE_EXECUTION')
+        if policy(ctx.input).math_selection_required_before_run and not any(r.get('math_selection_trace',{}).get('matches_proposal') for r in reports):
+            raise ValueError('MATH_OPTIMIZER_PROPOSAL_MATCH_REQUIRED_BEFORE_EXECUTION')
     prior=policy(ctx.input).historical_case
     if prior:
         from .candidate import candidate_facts
@@ -737,16 +745,32 @@ def record_analysis(ctx,args):
         if plain(spec.endpoint_target) not in endpoint['evidence']:
             raise ValueError('ROUTE_ENDPOINT_TARGET_EVIDENCE_MISMATCH')
         math_optimization=None
+        selection_trace=dict(required=spec.math_selection_required_before_run,matches_proposal=False)
         if args.math_optimization:
             optimized=ctx.artifact(args.math_optimization)
             if optimized.get('kind')!='mathematical_design_optimization' or optimized['starting_binding']['configuration']!=expected:
                 raise ValueError('ROUTE_MATH_OPTIMIZATION_STARTING_BUILD_MISMATCH')
             math_optimization=plain(args.math_optimization)
+            from .candidate import read_parameter
+            candidate=SessionInput.model_validate(ctx.artifact(expected))
+            design=candidate.robot.structure.data
+            values={path:read_parameter(design,path) for path in ('components/near/length_m','components/far/length_m')}
+            selections=design.get('metadata',{}).get('design_decisions',{}).get('selections',{})
+            values['design/section_scale']=selections.get('design/section_scale',1.)
+            material=selections.get('design/material_scenario','baseline')
+            matched=next((row for row in optimized['proposals'] if row['material_scenario']==material and
+                all(abs(float(row['parameters'][path])-float(value))<=1e-12 for path,value in values.items())),None)
+            selection_trace=dict(required=spec.math_selection_required_before_run,matches_proposal=matched is not None,
+                build_parameters={**values,'design/material_scenario':material},
+                optimizer_candidate_id=None if matched is None else matched['candidate_id'],
+                optimizer_configuration=None if matched is None else matched['configuration'],
+                optimizer_objective=None if matched is None else matched['objective'])
         report=screen['records'][0]
         out=dict(status='analyzed',candidate_id=built['candidate_id'],source_node=args.source_node,
             build_configuration=expected,protocol=screen['protocol'],linearization=plain(args.linearization),
             metrics=plain(args.metrics),endpoint=plain(args.endpoint),screen=plain(args.screen),
             math_optimization=math_optimization,shared_report_identity=digest(screen),
+            math_selection_trace=selection_trace,
             validation_disposition=args.validation_disposition,disposition_reason=args.reason,
             hard_rejection=False,screen_priority=report['priority_reasoning'],
             advisory_scope='Shared local mathematics informs prioritization only; execution remains the physical validation authority.',
