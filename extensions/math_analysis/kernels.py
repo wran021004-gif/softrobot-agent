@@ -166,12 +166,47 @@ def _output_endpoint(model, mapping, name):
 
 
 def _minimum_residual_certificate(matrix, base, target, lower, upper, limit, atol):
-    fit=lsq_linear(matrix,np.asarray(target)-base,bounds=(lower,upper),tol=1e-12,max_iter=100)
-    residual=float(np.linalg.norm(base+matrix@fit.x-np.asarray(target)))
-    certified=bool(fit.success and residual>limit+atol)
-    return dict(certified_infeasible=certified,minimum_residual=residual,limit=limit,
+    """Return a candidate upper bound and a separately checkable dual lower bound.
+
+    ``lsq_linear`` is useful for finding a small residual, but its success flag is
+    not a proof that the returned residual is the global minimum at the scale of
+    the problem.  A unit separating direction supplies a sound lower bound over
+    the complete box, independently of that flag.
+    """
+    matrix=np.asarray(matrix,dtype=float); base=np.asarray(base,dtype=float)
+    target=np.asarray(target,dtype=float); lower=np.asarray(lower,dtype=float); upper=np.asarray(upper,dtype=float)
+    b=target-base
+    residual_scale=max(float(np.linalg.norm(b,np.inf)),float(np.max(np.abs(matrix),initial=0.)*
+        np.max(np.maximum(np.abs(lower),np.abs(upper)),initial=0.)),float(limit),float(atol),np.finfo(float).tiny)
+    fit=lsq_linear(matrix/residual_scale,b/residual_scale,bounds=(lower,upper),tol=1e-12,max_iter=100)
+    candidate=np.asarray(fit.x,dtype=float)
+    residual_vector=matrix@candidate-b
+    candidate_residual=float(np.linalg.norm(residual_vector))
+    if candidate_residual>0 and np.all(np.isfinite(residual_vector)):
+        direction=residual_vector/candidate_residual
+        coefficients=matrix.T@direction
+        box_terms=np.minimum(coefficients*lower,coefficients*upper)
+        raw_bound=float(-direction@b+np.sum(box_terms))
+    else:
+        direction=np.zeros_like(b); coefficients=np.zeros(matrix.shape[1]); box_terms=np.zeros(matrix.shape[1])
+        raw_bound=0.
+    lower_bound=max(0.,raw_bound)
+    roundoff=16*np.finfo(float).eps*(1.+abs(float(direction@b))+float(np.sum(np.abs(box_terms))))
+    numerical_allowance=float(atol)+float(roundoff)
+    margin=float(lower_bound-float(limit)-numerical_allowance)
+    certified=bool(np.isfinite(lower_bound) and margin>0.)
+    return dict(certified_infeasible=certified,candidate_residual=candidate_residual,
+        candidate_residual_role='upper_bound_on_minimum_residual_not_a_proven_lower_bound',limit=float(limit),
         solver='scipy.optimize.lsq_linear',solver_success=bool(fit.success),optimality=float(fit.optimality),
-        reason='Independent convex box-constrained minimum exceeds limit.' if certified else 'No infeasibility certificate.')
+        solver_residual_scale=residual_scale,
+        candidate_delta_input=candidate.tolist(),candidate_residual_vector=residual_vector.tolist(),
+        separating_direction=dict(direction=direction.tolist(),unit_norm=float(np.linalg.norm(direction)),
+            lower_bound=lower_bound,raw_bound=raw_bound,numerical_allowance=numerical_allowance,
+            margin_over_limit=margin,target_minus_base=b.tolist(),matrix_transpose_direction=coefficients.tolist(),
+            box_min_terms=box_terms.tolist(),lower=lower.tolist(),upper=upper.tolist(),
+            formula='max(0, -v.T@(target-base) + sum(min((P.T@v)*lower,(P.T@v)*upper)))'),
+        reason='Separating-direction lower bound exceeds the limit with positive numerical margin.' if certified
+            else 'No independently checkable lower bound exceeds the permitted residual.')
 
 
 def bounded_endpoint(model,p,target, *, braking=False, warm_start=None):
@@ -229,7 +264,7 @@ def bounded_endpoint(model,p,target, *, braking=False, warm_start=None):
             tip_velocity_m_s=vend.tolist(),tip_speed_m_s=speed,
             zero_perturbation_position_m=pbase.tolist(),zero_perturbation_tip_velocity_m_s=vbase.tolist()),
         checks=checks,infeasibility_certificate=certificate,
-        independent_lower_bounds=dict(position=pc,tip_speed=vc),
+        independent_residual_problems=dict(position=pc,tip_speed=vc),
         tension_bounds_n=dict(lower=[0.]*nu,upper=np.asarray(model.binding['tension_limits_n']).tolist(),
             delta_lower=(-np.asarray(model.u0)).tolist(),delta_upper=(np.asarray(model.binding['tension_limits_n'])-np.asarray(model.u0)).tolist()),
         normalized_input_energy=objective(z),delta_input_n=z.reshape(steps,nu).tolist(),

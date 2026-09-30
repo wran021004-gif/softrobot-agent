@@ -134,3 +134,129 @@ def optimize(root, value, *, parent_run_id=None, parent_event_id=None, starting_
         outcome['best_minus_baseline_rank_score']=outcome['best']['score']-outcome['baseline']['score']
     atomic_json(Path(root)/(inp.run_id+'_optimization.json'),outcome)
     return outcome
+
+
+def optimize_math(ctx,args):
+    """Deterministic configuration-only search; never calls NMPC or a backend."""
+    import math
+    import numpy as np
+    from schemas.platform_analysis import (EndpointLinearizedModel, EndpointTarget, MathOptimizationResult,
+        TaskAnalysisProtocol)
+    from tools.platform_tasks import compile_input
+    from tools.platform_tools import _candidate
+    from tools.state_io import digest
+    from extensions.math_analysis.kernels import bounded_endpoint, LIMITATIONS
+    from .candidate import read_parameter
+    from .candidate_analysis import configuration_binding, resolve_candidate
+    from .math_analysis import linearize_candidate_configuration, _validate_task_protocol
+
+    start,start_binding=resolve_candidate(ctx,args.source_node)
+    p=TaskAnalysisProtocol.model_validate(ctx.artifact(args.protocol)); _validate_task_protocol(start,p)
+    target=EndpointTarget.model_validate(ctx.artifact(args.target))
+    if not np.allclose(target.position_m,start.task.goal.data['target_m'],rtol=0,atol=p.endpoint_check_atol):
+        raise ValueError('MATH_OPTIMIZER_TARGET_MISMATCH')
+    if not np.isclose(target.position_tolerance_m,start.task.evaluator.parameters.data['tolerance_m'],rtol=0,atol=p.endpoint_check_atol):
+        raise ValueError('MATH_OPTIMIZER_REACH_TOLERANCE_MISMATCH')
+    space_spec=start.policy.candidate_builder.parameters.data['parameters']
+    for path,bounds in args.variables.items():
+        spec=space_spec.get(path)
+        if spec is None or spec.get('type')!='number' or not spec['bounds'][0]<=bounds[0]<bounds[1]<=spec['bounds'][1]:
+            raise ValueError('MATH_OPTIMIZER_BOUNDS_OUTSIDE_AUTHORIZED_SPACE: '+path)
+    initial={path:read_parameter(start.robot.structure.data,path) if not path.startswith('design/')
+        else start.robot.structure.data.get('metadata',{}).get('design_decisions',{}).get('selections',{}).get(path,
+            start.policy.candidate_builder.parameters.data['semantic_decisions'][path]['baseline_value'])
+        for path in args.variables}
+    parameter_space=ParameterSpace(list(args.variables),args.variables)
+    initial_vector=parameter_space.encode(initial)
+    evaluations=[]; cache={}; states={scenario:dict(best=list(initial_vector),best_key=None,iteration=0)
+        for scenario in args.material_scenarios}
+    evidence=[start_binding['configuration'],plain(args.protocol),plain(args.target)]
+    primary_resolution=p.endpoint_check_atol/target.position_tolerance_m
+
+    def key_for(objective):
+        residual=objective.get('position_residual_upper_bound_ratio')
+        energy=objective.get('feasible_witness_normalized_input_energy')
+        ordered_residual=math.inf if residual is None else 0. if residual<=primary_resolution else residual
+        return (ordered_residual,math.inf if energy is None else energy)
+
+    def evaluate(scenario,vector):
+        values=parameter_space.decode(vector)
+        changes={**values,'design/material_scenario':scenario}
+        candidate=_candidate(start,changes,ctx.reg); data=plain(candidate)
+        data['run_id']=start.run_id[:32]+'-math-'+digest(dict(scenario=scenario,values=values))[:16]
+        compiled=compile_input(data,ctx.reg)['input']; identity=digest(compiled)
+        if identity in cache: return cache[identity]
+        configuration=plain(ctx.save_artifact(compiled,'math_optimizer_configuration'))
+        candidate_id='math-'+scenario+'-'+identity[:12]
+        binding=configuration_binding(candidate,configuration,candidate_id,ctx.run_id,
+            'design.optimize_math:'+args.source_node)
+        linear=linearize_candidate_configuration(ctx,candidate,binding,p,args.protocol)
+        linear_ref=plain(ctx.save_artifact(linear,'math_optimizer_linearization'))
+        point=next((row for row in linear.records[1:] if row.get('model') and
+            row['point'].get('name')=='controller_start_input'),None)
+        endpoint=None; objective=dict(position_residual_upper_bound_ratio=None,
+            feasible_witness_normalized_input_energy=None,applicability='unavailable')
+        if point is not None:
+            model=EndpointLinearizedModel.model_validate(ctx.artifact(point['model']))
+            endpoint=bounded_endpoint(model,p,target,braking=False)
+            residual=endpoint['independent_residual_problems']['position']['candidate_residual']
+            objective=dict(position_residual_upper_bound_ratio=residual/target.position_tolerance_m,
+                feasible_witness_normalized_input_energy=endpoint['normalized_input_energy']
+                    if endpoint['status']=='feasible_in_local_model' else None,
+                applicability='controller-start frozen local affine exact-ZOH model',
+                status=endpoint['status'],candidate_residual_m=residual,
+                residual_role='upper bound on the bounded minimum; not an infeasibility proof',
+                position_tolerance_m=target.position_tolerance_m)
+        row=dict(evaluation_index=len(evaluations)+1,candidate_id=candidate_id,configuration=configuration,
+            build_identity=identity,material_scenario=scenario,parameters=values,binding=binding,
+            linearization=linear_ref,controller_start_endpoint=endpoint,objective=objective,
+            unavailable_constructions=[r.get('name') for r in linear.records[1:] if not r.get('available',False)],
+            backend_executed=False,nmpc_solved=False,provider_called=False)
+        evaluations.append(row); evidence.extend([configuration,linear_ref]); cache[identity]=row
+        return row
+
+    # One explicit start per discrete scenario, then bounded coordinate moves.
+    for scenario in args.material_scenarios:
+        if len(evaluations)>=args.max_evaluations: break
+        row=evaluate(scenario,initial_vector); states[scenario]['best_key']=key_for(row['objective'])
+    attempts=0
+    while len(evaluations)<args.max_evaluations and attempts<args.max_evaluations*12:
+        scenario=args.material_scenarios[attempts%len(args.material_scenarios)]; state=states[scenario]
+        phase=state['iteration']//(2*len(initial_vector)); step=.5 if phase==0 else .25
+        proposal=coordinate_proposal(dict(best=state['best'],iteration=state['iteration'],step=step))['x']
+        state['iteration']+=1; attempts+=1
+        before=len(evaluations); row=evaluate(scenario,proposal)
+        if len(evaluations)==before: continue
+        candidate_key=key_for(row['objective'])
+        if candidate_key<state['best_key']:
+            state['best']=list(proposal);state['best_key']=candidate_key
+    def tied(a,b):
+        ka,kb=key_for(a['objective']),key_for(b['objective'])
+        return abs(ka[0]-kb[0])<=p.endpoint_check_atol/target.position_tolerance_m and (
+            (math.isinf(ka[1]) and math.isinf(kb[1])) or abs(ka[1]-kb[1])<=p.endpoint_check_atol)
+    proposals=[]
+    for scenario in args.material_scenarios:
+        rows=[row for row in evaluations if row['material_scenario']==scenario]
+        best=min(rows,key=lambda row:key_for(row['objective']))
+        tied_rows=[row for row in rows if tied(row,best)]
+        proposals.append(dict(material_scenario=scenario,candidate_id=best['candidate_id'],
+            configuration=best['configuration'],parameters=best['parameters'],objective=best['objective'],
+            tied_candidate_ids=[row['candidate_id'] for row in tied_rows],
+            selection_rationale='Lowest declared residual-upper-bound ratio; feasible local input energy is a secondary lexicographic component only.'))
+    return MathOptimizationResult(starting_binding=start_binding,protocol=args.protocol,target=args.target,
+        objective=dict(objective_id=args.objective,primary=dict(name='controller_start_bounded_position_residual_upper_bound_ratio',
+            definition='SciPy bounded least-squares candidate residual divided by official reach tolerance',units='1',direction='minimize'),
+            secondary=dict(name='feasible_position_witness_normalized_input_energy',
+                definition='Exact-ZOH held-input sum(period * ||delta_u/input_scale||^2), used only after primary ordering',
+                units='s (normalized input squared integral)',direction='minimize'),
+            ordering='lexicographic; primary values within endpoint_check_atol/tolerance are tied; no fitted weights or historical outcomes',
+            primary_tie_resolution=primary_resolution,operating_point='controller_start_input'),
+        bounds=args.variables,material_scenarios=args.material_scenarios,evaluations=evaluations,proposals=proposals,
+        provenance=dict(method='bounded_coordinate_pattern_local_v1',deterministic=True,seed=None,
+            evaluation_budget=args.max_evaluations,distinct_evaluations=len(evaluations),iterations=attempts,
+            stop_reason='evaluation_budget' if len(evaluations)>=args.max_evaluations else 'no_new_distinct_proposals',
+            implementation_identity=digest(dict(source=__file__,objective=args.objective,protocol=plain(p))),
+            physical_backend_calls=0,nmpc_solves=0,provider_calls=0),evidence=evidence,
+        limitations=LIMITATIONS+['The objective is a local mathematical proxy and does not predict closed-loop success.',
+            'Candidate residuals are upper bounds; only explicit separating-direction records may certify local infeasibility.',
+            'Scenario winners and ties are bounded-search proposals, not global optima.'])

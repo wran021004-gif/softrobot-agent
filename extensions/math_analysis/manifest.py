@@ -1,7 +1,8 @@
 """Trusted numerical tools using the existing extension registry."""
 from tools.platform_registry import Extension
 from schemas.platform_analysis import (MetricsRequest, LinearizeRequest, SavedLinearizeRequestV2, SavedCaseRequest, CompareRequest,
-    CandidateLinearizeRequest, BoundedEndpointRequest, DesignScreenRequest, AnalysisResult)
+    CandidateLinearizeRequest, BoundedEndpointRequest, DesignScreenRequest, MathOptimizeRequest,
+    MathOptimizationResult, AnalysisResult)
 from extensions.tendon_family.manifest import GVS_SOURCES
 
 CONTRACTS=[]
@@ -11,6 +12,8 @@ SOURCES=(*GVS_SOURCES,'schemas/platform_analysis.py','extensions/math_analysis/k
     'extensions/tendon_family/math_analysis.py','extensions/tendon_family/saved_cases.py',
     'extensions/tendon_family/candidate_analysis.py','extensions/tendon_family/model_applicability.py',
     'schemas/platform_diagnostics.py')
+MATLAB_ASSETS=('matlab/analyze_linear_model.m','matlab/analyze_bounded_endpoint.m',
+    'matlab/bounded_residual_certificate.m')
 EXTENSIONS=[]
 for name,schema,binding,description,deps in (
     ('analysis.control_metrics',MetricsRequest,'extensions.math_analysis.tools:control_metrics','Batch output-aware local metrics from saved models and a frozen protocol',('numpy','scipy','matlab.engine')),
@@ -20,7 +23,7 @@ for name,schema,binding,description,deps in (
     caps=dict(category='analysis',role='public_tool',route_visible=True,backend_solves=0)
     if name=='analysis.control_metrics': caps['preflight']='extensions.math_analysis.tools:preflight'
     EXTENSIONS.append(Extension(name,'tool','1.0.0',schema,AnalysisResult,binding,description,
-        sources=SOURCES,assets=('matlab/analyze_linear_model.m',),dependencies=deps,
+        sources=SOURCES,assets=MATLAB_ASSETS,dependencies=deps,
         side_effects='artifact_store',cache=True,capabilities=caps))
 
 # Changed boundary behavior is explicitly versioned. MATLAB is selected at
@@ -33,7 +36,7 @@ for name,schema,binding,description,deps in (
     caps=dict(category='analysis',role='public_tool',route_visible=True,backend_solves=0)
     if name=='analysis.control_metrics': caps['preflight']='extensions.math_analysis.tools:preflight'
     EXTENSIONS.append(Extension(name,'tool','2.0.0',schema,AnalysisResult,binding,description,
-        sources=SOURCES,assets=('matlab/analyze_linear_model.m',),dependencies=deps,
+        sources=SOURCES,assets=MATLAB_ASSETS,dependencies=deps,
         side_effects='artifact_store',cache=True,capabilities=caps))
 
 EXTENSIONS.extend([
@@ -52,4 +55,10 @@ EXTENSIONS.extend([
         'Structured deterministic candidate screen over shared local metrics, bounds and applicability',
         sources=SOURCES,dependencies=('numpy',),side_effects='artifact_store',cache=True,
         capabilities=dict(category='analysis',role='public_tool',route_visible=True,backend_solves=0)),
+    Extension('design.optimize_math','tool','1.0.0',MathOptimizeRequest,MathOptimizationResult,
+        'extensions.tendon_family.optimization:optimize_math',
+        'Deterministic configuration-only bounded search over near/far length, section scale and discrete material scenarios',
+        sources=SOURCES,dependencies=('numpy','scipy','casadi'),side_effects='artifact_store',cache=True,
+        capabilities=dict(category='parameter_search',role='public_tool',route_visible=True,backend_solves=0,
+            provider_calls=0,nmpc_solves=0,maximum_distinct_evaluations=24)),
 ])

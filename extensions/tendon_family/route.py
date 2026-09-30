@@ -21,6 +21,9 @@ class RoutePolicy(Contract):
     historical_case: EvidenceRef | None = None
     combinations: dict[str, Combination]
     max_trials: int = Field(default=3,ge=1,le=100)
+    analysis_protocol: EvidenceRef | None = None
+    endpoint_target: EvidenceRef | None = None
+    analysis_required_before_run: bool = False
     guidance: str = 'Select a legal combination and structure; evaluate, inspect evidence, then continue, adjust or finish. Reserve a solve for independent review when useful.'
 
 
@@ -38,6 +41,20 @@ class RouteAction(Contract):
     next_step: str = Field(min_length=1,description='English statement of the intended next decision or stopping condition.')
     design_statement: dict | None = Field(default=None, description='On finish, restate candidate_facts: candidate_id, configuration, owner_run_id, execution_id and parameters (path, baseline_value, effective_value, baseline_delta, unit), plus physical_changes when supplied. Checked independently of reach and prose interpretation; legacy callers may omit.')
     result_statement: ReachFacts | TrackingFacts | None = Field(default=None, description='On free-reach or tracking finish, copy the applicable factual_result exactly from the selected summary. Typed consistency is checked separately from provider reasoning; omission is not a pass.')
+
+
+class RouteAnalysisAction(Contract):
+    node_id: Identifier
+    source_node: Identifier = Field(description='Owned completed Route build analyzed by all supplied evidence.')
+    evidence: list[EvidenceRef] = Field(default_factory=list)
+    linearization: EvidenceRef
+    metrics: EvidenceRef
+    endpoint: EvidenceRef
+    screen: EvidenceRef
+    math_optimization: EvidenceRef | None = None
+    validation_disposition: Literal['recommended','deferred','additional_analysis']
+    reason: str = Field(min_length=1)
+    next_step: str = Field(min_length=1)
 
 
 class RouteResult(Contract):
@@ -119,7 +136,7 @@ def view(host):
             if receipt['tool_id']=='simulation.run' and receipt.get('solver_status')=='completed': counts['successful_integrations']+=1
             key={'evaluation.run':'evaluations','diagnostics.saved_trajectory':'diagnoses','visualization.render_simulation_video':'videos'}.get(receipt['tool_id'])
             if key: counts[key]+=1
-    return dict(run_id=host.run_id,status=session['status'],task=plain(inp.task),route=route,counts=counts,
+    result=dict(run_id=host.run_id,status=session['status'],task=plain(inp.task),route=route,counts=counts,
         combinations=combinations,baseline=design_summary(inp.robot.structure.data),space=dict(
             templates={name:design_summary(design) for name,design in space.get('templates',{}).items()},
             parameters=space.get('parameters',{}),control_parameters=space.get('control_parameters',{}),
@@ -129,6 +146,12 @@ def view(host):
         limitations=['Incumbent means lowest score among valid comparable evaluated candidates in this Route session; no global optimum claim.',
             'Diagnosis is observational, not causal. Text adapter has not viewed videos.',
             'Serial bending cells only; no torsion/shear/stretch, friction, motor dynamics or general trajectory optimization.'])
+    if spec.analysis_protocol and spec.endpoint_target:
+        result['analysis_workflow']=dict(protocol=plain(spec.analysis_protocol),endpoint_target=plain(spec.endpoint_target),
+            required_before_run=spec.analysis_required_before_run,
+            call_order=['analysis.linearize_candidate','analysis.control_metrics','analysis.bounded_endpoint',
+                'design.screen','design.optimize_math','route.record_analysis'])
+    return result
 
 
 def design_summary(design):
@@ -327,6 +350,9 @@ def overview(host):
         evidence_access='Node result references below are already available for citation. Read details only when needed. evidence.read returns content or a labeled pointer overview.',
         guidance=full['guidance'],
         limitations=full['limitations'])
+    if full.get('analysis_workflow'):
+        projection['analysis_workflow']=full['analysis_workflow']
+        projection['available_actions']['record_analysis']='Attach exact shared analysis/optimizer evidence for a completed build; advisory and zero backend solves.'
     if route.get('final',{}):
         final=route['final']
         if final.get('configuration') and final.get('simulation'):
@@ -468,6 +494,14 @@ def run_built(ctx,args,route):
     candidate=built['candidate_id']
     if args.candidate_id and args.candidate_id!=candidate: raise ValueError('CANDIDATE_SELECTION_MISMATCH')
     inp=ctx.store.artifact(built['configuration'])
+    if policy(ctx.input).analysis_required_before_run:
+        reports=[]
+        for item in route['nodes']:
+            if item.get('action')=='analyze' and item.get('status')=='completed' and item.get('result'):
+                report=ctx.store.artifact(item['result'])
+                if report.get('build_configuration')==built['configuration']: reports.append(report)
+        if not reports:
+            raise ValueError('CANDIDATE_BOUND_SHARED_ANALYSIS_REQUIRED_BEFORE_EXECUTION')
     prior=policy(ctx.input).historical_case
     if prior:
         from .candidate import candidate_facts
@@ -514,7 +548,7 @@ def summarize(out):
     best=out.get('best')
     ev=best.get('evaluation_data') if best else out.get('evaluation_data',out.get('evaluation'))
     sim=best.get('simulation') if best else out.get('simulation')
-    return dict(status=out.get('status','completed'),run_id=out.get('run_id'),stop_reason=out.get('stop_reason'),
+    summary=dict(status=out.get('status','completed'),run_id=out.get('run_id'),stop_reason=out.get('stop_reason'),
         candidate_id=best.get('candidate_id') if best else out.get('candidate_id'),
         evaluation={k:ev[k] for k in ('validity','metrics','task_success','candidate_id','source_execution_id') if k in ev} if isinstance(ev,dict) else None,
         evaluation_ref=best.get('evaluation') if best else out.get('evaluation_ref',out.get('evaluation')),
@@ -529,6 +563,10 @@ def summarize(out):
         new_evaluations=out.get('new_evaluations'),reused_evaluations=out.get('reused_evaluations'),
         findings=out.get('findings'),
         **{k:(best or out)[k] for k in ('profile_report','profile_report_summary','factual_result') if k in (best or out)})
+    if out.get('screen'):
+        summary.update(analysis_report=out['screen'],math_optimization=out.get('math_optimization'),
+            validation_disposition=out.get('validation_disposition'))
+    return summary
 
 
 def delivery_summary(final):
@@ -668,6 +706,63 @@ def advance(ctx,args):
     _save(ctx,route,'completed',stop=args.action=='finish')
     return RouteResult(detail=dict(node={k:node[k] for k in ('node_id','action','status')},
         result=plain(ref),summary=node['summary'],final=delivery_summary(route['final'])))
+
+
+def record_analysis(ctx,args):
+    """Attach one exact shared report chain without expanding the legacy Route action contract."""
+    spec=policy(ctx.input);route=ctx.store.session(ctx.run_id)['state']['route']
+    if route['final']: raise ValueError('ROUTE_ALREADY_FINISHED')
+    if not spec.analysis_protocol or not spec.endpoint_target: raise ValueError('ROUTE_ANALYSIS_NOT_CONFIGURED')
+    if any(n['node_id']==args.node_id for n in route['nodes']): raise ValueError('NODE_ID_ALREADY_USED: resume original tool request')
+    if route['current']: raise ValueError('ROUTE_NODE_UNRESOLVED')
+    results={n['result']['artifact_id'] for n in route['nodes'] if n.get('result')}
+    if results and not results.intersection(r.artifact_id for r in args.evidence):
+        raise ValueError('ROUTE_EVIDENCE_REQUIRED: cite a previous node result')
+    node=dict(node_id=args.node_id,action='analyze',request_id=ctx.request.request_id,
+        execution_id=ctx.row['execution_id'],selection=plain(args),status='running')
+    route['nodes'].append(node);route['current']=args.node_id;route['next_step']=args.next_step;_save(ctx,route,'started')
+    try:
+        build_node,built=source_node(ctx,args,route)
+        if build_node['action']!='build': raise ValueError('ANALYSIS_REQUIRES_BUILD_SOURCE_NODE')
+        linear=ctx.artifact(args.linearization);metrics=ctx.artifact(args.metrics)
+        endpoint=ctx.artifact(args.endpoint);screen=ctx.artifact(args.screen);expected=built['configuration']
+        for result,kind in ((linear,'candidate_linearization'),(metrics,'control_metrics'),
+                (endpoint,'bounded_endpoint'),(screen,'design_screen')):
+            if result.get('kind')!=kind or not result.get('bindings') or any(b['configuration']!=expected for b in result['bindings']):
+                raise ValueError('ROUTE_ANALYSIS_CANDIDATE_BINDING_MISMATCH: '+kind)
+        if screen['evidence']!=[plain(args.linearization),plain(args.metrics),plain(args.endpoint)]:
+            raise ValueError('ROUTE_SCREEN_EVIDENCE_CHAIN_MISMATCH')
+        if screen['protocol']!=plain(spec.analysis_protocol) or endpoint['protocol']!=plain(spec.analysis_protocol):
+            raise ValueError('ROUTE_ANALYSIS_PROTOCOL_MISMATCH')
+        if plain(spec.endpoint_target) not in endpoint['evidence']:
+            raise ValueError('ROUTE_ENDPOINT_TARGET_EVIDENCE_MISMATCH')
+        math_optimization=None
+        if args.math_optimization:
+            optimized=ctx.artifact(args.math_optimization)
+            if optimized.get('kind')!='mathematical_design_optimization' or optimized['starting_binding']['configuration']!=expected:
+                raise ValueError('ROUTE_MATH_OPTIMIZATION_STARTING_BUILD_MISMATCH')
+            math_optimization=plain(args.math_optimization)
+        report=screen['records'][0]
+        out=dict(status='analyzed',candidate_id=built['candidate_id'],source_node=args.source_node,
+            build_configuration=expected,protocol=screen['protocol'],linearization=plain(args.linearization),
+            metrics=plain(args.metrics),endpoint=plain(args.endpoint),screen=plain(args.screen),
+            math_optimization=math_optimization,shared_report_identity=digest(screen),
+            validation_disposition=args.validation_disposition,disposition_reason=args.reason,
+            hard_rejection=False,screen_priority=report['priority_reasoning'],
+            advisory_scope='Shared local mathematics informs prioritization only; execution remains the physical validation authority.',
+            actual_solves=0,simulated=False,evaluated=False)
+    except Exception as exc:
+        node.update(status='failed',error=str(exc));route['current']=None;_save(ctx,route,'failed');raise
+    with ctx.store.transaction() as db: ref=ctx.store.put(db,out)
+    node.update(status='completed',result=plain(ref),summary=summarize(out));route['current']=None;_save(ctx,route,'completed')
+    return RouteResult(detail=dict(node={k:node[k] for k in ('node_id','action','status')},
+        result=plain(ref),summary=node['summary'],final=delivery_summary(route['final'])))
+
+
+def preflight_analysis(inp,args,reg):
+    spec=policy(inp)
+    if not spec.analysis_protocol or not spec.endpoint_target: raise ValueError('ROUTE_ANALYSIS_NOT_CONFIGURED')
+    return dict(cost={'wall_s':0.})
 
 
 def _save(ctx,route,status,stop=False):

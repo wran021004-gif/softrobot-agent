@@ -162,6 +162,40 @@ class DesignScreenRequest(Contract):
     endpoint: EvidenceRef
 
 
+class MathOptimizeRequest(Contract):
+    source_node: str = Field(description='Owned completed Route build supplying the explicit starting configuration.')
+    protocol: EvidenceRef
+    target: EvidenceRef
+    variables: dict[str, tuple[float, float]]
+    material_scenarios: list[Literal['compliant','stiff']] = Field(min_length=2,max_length=2)
+    objective: Literal['controller_start_local_endpoint_lexicographic_v1'] = 'controller_start_local_endpoint_lexicographic_v1'
+    max_evaluations: int = Field(default=12,ge=2,le=24)
+
+    @model_validator(mode='after')
+    def frozen_space(self):
+        required={'components/near/length_m','components/far/length_m','design/section_scale'}
+        if set(self.variables)!=required:
+            raise ValueError('MATH_OPTIMIZER_REQUIRES_NEAR_FAR_AND_SECTION_SCALE')
+        if set(self.material_scenarios)!={'compliant','stiff'}:
+            raise ValueError('MATH_OPTIMIZER_REQUIRES_STIFF_AND_COMPLIANT_SCENARIOS')
+        return self
+
+
+class MathOptimizationResult(Contract):
+    kind: Literal['mathematical_design_optimization'] = 'mathematical_design_optimization'
+    starting_binding: dict
+    protocol: EvidenceRef
+    target: EvidenceRef
+    objective: dict
+    bounds: dict[str, tuple[float, float]]
+    material_scenarios: list[str]
+    evaluations: list[dict]
+    proposals: list[dict]
+    provenance: dict
+    evidence: list[EvidenceRef]
+    limitations: list[str]
+
+
 class AnalysisResult(Contract):
     analysis_version: Literal['1.0.0'] = '1.0.0'
     kind: str

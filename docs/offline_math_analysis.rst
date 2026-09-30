@@ -174,3 +174,50 @@ The braking result is a terminal diagnostic only. It does not modify the reach
 evaluator or establish settling throughout a window. Likewise, rank-two local
 tip-position controllability at a straight configuration is not a global reach
 rejection because nonlinear bending can produce axial shortening.
+
+Repaired certificates and mathematical design search
+----------------------------------------------------
+
+The task-time residual calculation now records two different quantities.  The
+bounded least-squares candidate residual is an upper bound on the unknown
+minimum.  Local infeasibility is reported only when a unit separating direction
+gives a box-wide lower bound above the endpoint limit plus its recorded
+numerical allowance.  Solver success or failure alone is not a certificate.
+
+Candidate analysis binds the exact build, target, task duration, control period,
+initializer, controller numerical source, tendon order and bounds, GVS basis,
+coordinates, world endpoint frame, and official/diagnostic endpoint
+requirements.  Its pre-execution points are the standardized initializer with
+declared pretension, the controller-preparation start input, one target-static
+attempt, and one geometric intermediate attempt.  Failed constructions retain
+their achieved position and residual and are not global reachability claims.
+
+``design.optimize_math@1.0.0`` is a deterministic mathematics-only bounded
+coordinate search.  It varies only near length, far length, and common section
+scale within explicit caller bounds, and evaluates compliant and stiff material
+scenarios separately.  Its declared lexicographic proxy is:
+
+1. the controller-start local bounded-position candidate residual divided by
+   the official reach tolerance; and
+2. for primary ties, exact-ZOH normalized input energy of a feasible local
+   position witness.
+
+There are no fitted weights or historical terminal outcomes in this proxy.  A
+proposal is not a prediction of closed-loop success or a global optimum.
+``route.record_analysis@1.0.0`` attaches the exact shared linearization,
+metrics, endpoint, screen, and optional optimizer result to the owned build.
+Configured Routes may require that report before ``run``; the screen remains
+advisory.
+
+Focused reproduction on Windows PowerShell::
+
+  & 'C:\Users\gugugaga\miniconda3\envs\softagent\python.exe' -m unittest tests.test_task_analysis tests.test_math_analysis
+  & 'C:\Users\gugugaga\miniconda3\envs\softagent\python.exe' examples/stage334_math_route_validation.py --output runs/stage334_math_route_validation_reproduction
+  & 'C:\Users\gugugaga\miniconda3\envs\softagent\python.exe' examples/stage334_matlab_endpoint_verification.py --output runs/stage334_matlab_endpoint_reproduction --long-root runs/stage334_math_route_validation_reproduction
+
+The MATLAB endpoint verification uses one Engine session.  It records the
+actual Control System Toolbox and Optimization Toolbox license checks, uses
+``lsqlin`` for bounded residuals and ``fmincon`` for the joint position/braking
+witness, and compares endpoint maps, residual candidates, separating bounds,
+independently checked constraints, and feasibility rather than demanding
+identical control vectors.

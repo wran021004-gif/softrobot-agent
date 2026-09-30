@@ -77,7 +77,12 @@ def linear_model(case,point,p,case_ref,graph):
         'target_m':inp.task.goal.data['target_m'], 'mount':inp.task.environment.data['mount'],
         'tension_limits_n':f.expression.tendon_force_limits_n,'model_identity':digest(plain(f.expression)),
         'output_expression':'R_world_base * symbolic_tip_position(q) + p_world_base; AD in x and u',
-        'coordinate_order':f.expression.coordinate_order,'tendon_order':f.expression.tendon_order}
+        'coordinate_order':f.expression.coordinate_order,'tendon_order':f.expression.tendon_order,
+        'analysis_protocol_identity':digest(plain(p)),'task_duration_s':inp.task.timing.duration_s,
+        'control_period_s':inp.task.timing.control_period_s,'physics_timestep_s':inp.task.timing.timestep_s,
+        'initializer':plain(inp.task.initializer),'controller':plain(inp.policy.controller),
+        'endpoint_requirements':dict(official_reach=plain(inp.task.evaluator),
+            terminal_braking_diagnostic=inp.policy.controller.parameters.data.get('settling'))}
     position=EndpointOutputLinearization(name='tip_position',units='m',value0=np.asarray(y).reshape(-1).tolist(),
         C=np.asarray(C).tolist(),D=np.asarray(D).tolist(),scales=[p.output_scale_m]*3)
     velocity=EndpointOutputLinearization(name='tip_velocity',units='m/s',value0=np.asarray(v).reshape(-1).tolist(),
@@ -148,31 +153,65 @@ def linearize_saved(ctx,args):
 
 def _configuration_boundary(inp,binding):
     """Explicit execution-before-screening information boundary."""
+    from .gvs_basis import resolve_basis
+    tendons=inp.robot.structure.data['tendons']; control=inp.policy.controller.parameters.data
+    coordinate_order=binding.get('coordinate_order')
+    if coordinate_order is None:
+        coordinate_order=list(resolve_basis(inp.robot.structure.data,binding['basis']).coordinate_order)
     return dict(study_candidate_id=binding['candidate_id'],build_node=binding['source_node'],
         robot=plain(inp.robot),task=plain(inp.task),initializer=plain(inp.task.initializer),
         model=dict(extension_id='model.gvs',version='1.0.0',basis=binding['basis']),
         controller_recipe=inp.policy.controller.parameters.data['recipe'],
+        analysis_binding=dict(candidate_id=binding['candidate_id'],configuration=binding.get('configuration'),
+            effective_configuration_identity=binding.get('effective_configuration_identity',digest(plain(inp))),
+            task_identity=binding.get('task_identity',digest(plain(inp.task))),
+            target_m=inp.task.goal.data['target_m'],duration_s=inp.task.timing.duration_s,
+            control_period_s=inp.task.timing.control_period_s,physics_timestep_s=inp.task.timing.timestep_s,
+            initializer=plain(inp.task.initializer),controller_numerical_source=control.get('numerical_source'),
+            tendon_order=binding.get('tendon_order',[row['id'] for row in tendons]),
+            tension_bounds_n=binding.get('tension_bounds_n',[[0.,row['force_limit_n']] for row in tendons]),
+            basis=binding['basis'],coordinate_order=coordinate_order,endpoint_frame='world',
+            endpoint_requirements=binding.get('endpoint_requirements',dict(official_reach=plain(inp.task.evaluator),
+                terminal_braking_diagnostic=control.get('settling')))),
         discretization=plain(inp.policy.discretization),mount=inp.task.environment.data['mount'],
         excluded_fields=['execution trajectories','evaluator results','terminal errors','observed tensions','optimizer histories'],
         execution_data_used=False)
 
 
 def _candidate_points(inp,graph,p):
-    """Frozen initial, target-static attempt, and halfway geometric point."""
+    """Configuration-only standardized and controller-declared operating points."""
     from scipy.optimize import least_squares, minimize
     _,system,f,output=graph; n=len(system.x0)//2
     design=inp.robot.structure.data
     limits=np.asarray([row['force_limit_n'] for row in design['tendons']],dtype=float)
     pretension=np.clip([row['pretension_n'] for row in design['tendons']],0,limits)
-    q0=np.zeros(n); x0=np.r_[q0,np.zeros(n)]
+    from .gvs_profile import reach_numerical
+    numerical=reach_numerical(inp)
+    x0=np.asarray(numerical.get('measured_initial_state'),dtype=float)
+    if x0.shape!=(2*n,):
+        q=np.asarray(numerical['nominal']['q0'],dtype=float)
+        if q.shape!=(n,): raise ValueError('CONTROLLER_INITIALIZER_PROJECTION_UNSUPPORTED')
+        x0=np.r_[q,np.zeros(n)]
+    q0=x0[:n]
+    controller_start=np.asarray(numerical['nominal']['u0'],dtype=float)
+    if controller_start.shape!=limits.shape or np.any(controller_start<0) or np.any(controller_start>limits):
+        raise ValueError('CONTROLLER_START_INPUT_UNSUPPORTED')
     initial_tip=np.asarray(output(x0,pretension)[0]).reshape(-1)
     target=np.asarray(inp.task.goal.data['target_m'],dtype=float)
     tolerance=float(inp.task.evaluator.parameters.data['tolerance_m'])
-    points=[dict(name='initial',x=x0.tolist(),u=pretension.tolist(),available=True,
-        phase='configuration_derived_initial',remaining_task_s=p.duration_s,actual_time_s=None,
-        construction=dict(method='declared zero-unspecified initializer plus tendon pretension',
+    points=[dict(name='standardized_initial_pretension',x=x0.tolist(),u=pretension.tolist(),available=True,
+        phase='configuration_standardized_initial_pretension',scope='standardized initial/pretension',remaining_task_s=p.duration_s,actual_time_s=None,
+        construction=dict(method='actual initializer projected by existing controller preparation plus declared tendon pretension',
             position_residual_m=float(np.linalg.norm(initial_tip-target)),static_equilibrium=False,
-            input_source='family.design.tendons[].pretension_n',execution_data_used=False))]
+            achieved_world_point_m=initial_tip.tolist(),initializer_source=plain(inp.task.initializer),
+            input_source='family.design.tendons[].pretension_n',execution_data_used=False)),
+        dict(name='controller_start_input',x=x0.tolist(),u=controller_start.tolist(),available=True,
+            phase='configuration_controller_start_input',scope='controller-start input',remaining_task_s=p.duration_s,actual_time_s=None,
+            construction=dict(method='existing immutable controller preparation/numerical-source logic',
+                position_residual_m=float(np.linalg.norm(np.asarray(output(x0,controller_start)[0]).reshape(-1)-target)),
+                achieved_world_point_m=np.asarray(output(x0,controller_start)[0]).reshape(-1).tolist(),static_equilibrium=False,
+                numerical_source=inp.policy.controller.parameters.data.get('numerical_source'),
+                preparation_provenance=numerical['provenance'],execution_trajectory_used=False))]
 
     qsym,usym=f.q_symbol,f.u_symbol
     mount=inp.task.environment.data['mount']
@@ -197,10 +236,11 @@ def _candidate_points(inp,graph,p):
         options=dict(maxiter=p.construction_max_iterations,ftol=1e-12,disp=False))
     h,r,_,_=static_values(solved.x); pos_res=float(np.linalg.norm(h-target)); force_res=float(np.linalg.norm(r,np.inf))
     available=bool(solved.success and pos_res<=tolerance+p.endpoint_check_atol and force_res<=p.static_force_tolerance)
-    target_record=dict(name='target_equilibrium',available=available,
+    target_record=dict(name='target_equilibrium',available=available,scope='target-associated static attempt',
         construction=dict(method='single bounded-tension target-associated static SLSQP attempt; no recovery',
             solver='scipy.optimize.SLSQP',success=bool(solved.success),status=int(solved.status),message=str(solved.message),
             iterations=int(solved.nit),maximum_iterations=p.construction_max_iterations,
+            requested_world_point_m=target.tolist(),achieved_world_point_m=h.tolist(),
             position_residual_m=pos_res,position_limit_m=tolerance,static_residual_inf=force_res,
             static_force_tolerance=p.static_force_tolerance,tension_bounds_n=[np.zeros(len(limits)).tolist(),limits.tolist()],
             q_bounds='unbounded, matching existing GVS inverse-static authorization',execution_data_used=False))
@@ -216,22 +256,33 @@ def _candidate_points(inp,graph,p):
     waypoint=least_squares(halfway_residual,q0,jac=halfway_jac,max_nfev=p.construction_max_iterations,
         xtol=1e-12,ftol=1e-12,gtol=1e-12)
     waypoint_tip=np.asarray(output(np.r_[waypoint.x,np.zeros(n)],pretension)[0]).reshape(-1)
-    points.append(dict(name='halfway_waypoint',x=np.r_[waypoint.x,np.zeros(n)].tolist(),u=pretension.tolist(),available=True,
-        phase='configuration_geometric_waypoint_non_equilibrium',remaining_task_s=p.duration_s,actual_time_s=None,
+    waypoint_available=bool(waypoint.success and np.all(np.isfinite(waypoint.x)))
+    waypoint_record=dict(name='halfway_waypoint',available=waypoint_available,scope='geometric intermediate point',
         construction=dict(method='single bounded-evaluation inverse-kinematic least-squares attempt at fixed halfway world point',
             solver='scipy.optimize.least_squares',success=bool(waypoint.success),status=int(waypoint.status),
             function_evaluations=int(waypoint.nfev),maximum_evaluations=p.construction_max_iterations,
             requested_world_point_m=halfway.tolist(),achieved_world_point_m=waypoint_tip.tolist(),
             position_residual_m=float(np.linalg.norm(waypoint_tip-halfway)),static_equilibrium=False,
-            input_source='family.design.tendons[].pretension_n',execution_data_used=False)))
+            input_source='family.design.tendons[].pretension_n',execution_data_used=False))
+    if waypoint_available:
+        waypoint_record.update(x=np.r_[waypoint.x,np.zeros(n)].tolist(),u=pretension.tolist(),
+            phase='configuration_geometric_intermediate_non_equilibrium',remaining_task_s=p.duration_s,actual_time_s=None)
+    else: waypoint_record['reason']='Geometric intermediate construction unavailable within the frozen single-attempt limits.'
+    points.append(waypoint_record)
     return points
 
 
-def linearize_candidate(ctx,args):
-    from .candidate_analysis import resolve_candidate
+def _validate_task_protocol(inp,p):
+    if not np.isclose(p.duration_s,inp.task.timing.duration_s,rtol=0,atol=p.horizon_alignment_atol_s):
+        raise ValueError('ANALYSIS_PROTOCOL_TASK_DURATION_MISMATCH')
+    if not np.isclose(p.period_s,inp.task.timing.control_period_s,rtol=0,atol=p.horizon_alignment_atol_s):
+        raise ValueError('ANALYSIS_PROTOCOL_CONTROL_PERIOD_MISMATCH')
+
+
+def linearize_candidate_configuration(ctx,inp,binding,p,protocol_ref):
     from .model_applicability import assess_model_uses
-    inp,binding=resolve_candidate(ctx,args.source_node)
-    p=TaskAnalysisProtocol.model_validate(ctx.artifact(args.protocol))
+    _validate_task_protocol(inp,p)
+    binding={**binding,'analysis_protocol_identity':digest(plain(p))}
     boundary=_configuration_boundary(inp,binding)
     if any(key in boundary for key in ('trajectory','evaluation','terminal_error','actual_tension_n','optimizer_history')):
         raise ValueError('CONFIGURATION_ONLY_BOUNDARY_VIOLATION')
@@ -252,11 +303,19 @@ def linearize_candidate(ctx,args):
     applicability=assess_model_uses(inp.robot,inp.task,model_binding,
         ['reachability','static_equilibrium','linearization','local_model_control'],registry=ctx.reg)
     records.insert(0,dict(configuration_only_input=boundary,configuration_only_identity=digest(boundary),
-        applicability=plain(applicability),operating_point_rule=p.candidate_rule))
-    return AnalysisResult(kind='candidate_linearization',protocol=args.protocol,bindings=[binding],records=records,
+        applicability=plain(applicability),operating_point_rule=p.candidate_rule,
+        requested_operating_points=len(points),analysis_binding=boundary['analysis_binding']))
+    return AnalysisResult(kind='candidate_linearization',protocol=protocol_ref,bindings=[binding],records=records,
         evidence=[binding['configuration']],limitations=LIMITATIONS+[
             'Retrospective emulation of information available before execution; candidates and outcomes already existed.',
             'Intermediate waypoint is geometric and is not asserted to be a static equilibrium.'])
+
+
+def linearize_candidate(ctx,args):
+    from .candidate_analysis import resolve_candidate
+    inp,binding=resolve_candidate(ctx,args.source_node)
+    p=TaskAnalysisProtocol.model_validate(ctx.artifact(args.protocol))
+    return linearize_candidate_configuration(ctx,inp,binding,p,args.protocol)
 
 
 def saved_case(ctx,args):

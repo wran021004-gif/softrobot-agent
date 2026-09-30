@@ -18,6 +18,27 @@ class CandidateAnalysisResult(Contract):
     physical_summary: dict
 
 
+def configuration_binding(inp, configuration, candidate_id, owner_run_id, source_node):
+    inp=SessionInput.model_validate(inp)
+    basis=inp.policy.controller.parameters.data['recipe']['basis']
+    from .gvs_basis import resolve_basis
+    resolved=resolve_basis(inp.robot.structure.data,basis)
+    tendons=inp.robot.structure.data['tendons']; control=inp.policy.controller.parameters.data
+    return dict(source_node=source_node,candidate_id=candidate_id,configuration=plain(configuration),
+        owner_run_id=owner_run_id,effective_configuration_identity=digest(plain(inp)),robot_identity=digest(plain(inp.robot)),
+        task_identity=digest(plain(inp.task)),physical_context=plain(inp.task.environment),
+        model='model.gvs@1.0.0',basis=plain(resolved),coordinate_order=list(resolved.coordinate_order),
+        calculation_frame='robot_base',endpoint_frame='world',target_m=inp.task.goal.data['target_m'],
+        task_duration_s=inp.task.timing.duration_s,control_period_s=inp.task.timing.control_period_s,
+        physics_timestep_s=inp.task.timing.timestep_s,initializer=plain(inp.task.initializer),
+        controller=plain(inp.policy.controller),controller_numerical_source=control.get('numerical_source'),
+        tendon_order=[row['id'] for row in tendons],tension_bounds_n=[[0.,row['force_limit_n']] for row in tendons],
+        declared_pretension_n=[row['pretension_n'] for row in tendons],
+        endpoint_requirements=dict(official_reach=plain(inp.task.evaluator),
+            terminal_braking_diagnostic=control.get('settling')),
+        analysis_protocol='supplied_by_analysis_call',execution_data_used=False)
+
+
 def resolve_candidate(ctx, source_node):
     state=ctx.store.session(ctx.run_id)['state']
     node=next((n for n in state.get('route',{}).get('nodes',[]) if n['node_id']==source_node
@@ -28,14 +49,7 @@ def resolve_candidate(ctx, source_node):
     inp=SessionInput.model_validate(ctx.artifact(built['configuration']))
     if plain(inp.task)!=plain(ctx.input.task):
         raise ValueError('CANDIDATE_ANALYSIS_FROZEN_TASK_MISMATCH')
-    basis=inp.policy.controller.parameters.data['recipe']['basis']
-    from .gvs_basis import resolve_basis
-    resolved=resolve_basis(inp.robot.structure.data,basis)
-    return inp, dict(source_node=source_node,candidate_id=built['candidate_id'],configuration=built['configuration'],
-        owner_run_id=ctx.run_id,effective_configuration_identity=digest(plain(inp)),robot_identity=digest(plain(inp.robot)),
-        task_identity=digest(plain(inp.task)),physical_context=plain(inp.task.environment),
-        model='model.gvs@1.0.0',basis=plain(resolved),coordinate_order=list(resolved.coordinate_order),
-        calculation_frame='robot_base',execution_data_used=False)
+    return inp,configuration_binding(inp,built['configuration'],built['candidate_id'],ctx.run_id,source_node)
 
 
 def evaluate_candidate(ctx,args):

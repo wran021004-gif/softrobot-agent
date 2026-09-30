@@ -58,6 +58,11 @@ def bounded_endpoint_analysis(ctx,args):
         model=EndpointLinearizedModel.model_validate(ctx.artifact(ref))
         if model.time_domain!='continuous': raise ValueError('CONTINUOUS_INPUT_MODEL_REQUIRED')
         if model.protocol_identity!=digest(plain(p)): raise ValueError('MODEL_PROTOCOL_MISMATCH')
+        if 'target_m' in model.binding and not np.allclose(target.position_m,model.binding['target_m'],rtol=0,atol=p.endpoint_check_atol):
+            raise ValueError('ENDPOINT_TARGET_MODEL_BINDING_MISMATCH')
+        requirements=model.binding.get('endpoint_requirements',{}).get('official_reach',{}).get('parameters',{}).get('data',{})
+        if requirements and not np.isclose(target.position_tolerance_m,requirements['tolerance_m'],rtol=0,atol=p.endpoint_check_atol):
+            raise ValueError('ENDPOINT_TOLERANCE_MODEL_BINDING_MISMATCH')
         models.append(model)
     records=[]
     for ref,model in zip(args.models,models):
@@ -110,8 +115,19 @@ def design_screen(ctx,args):
         if not result.bindings or any(item['configuration']!=binding['configuration'] for item in result.bindings):
             raise ValueError('SCREEN_CANDIDATE_BINDING_MISMATCH')
     header=linear.records[0]; applicability=header['applicability']
+    task=inp.task
+    if not np.isclose(p.duration_s,task.timing.duration_s,rtol=0,atol=p.horizon_alignment_atol_s):
+        raise ValueError('SCREEN_TASK_DURATION_MISMATCH')
+    if not np.isclose(p.period_s,task.timing.control_period_s,rtol=0,atol=p.horizon_alignment_atol_s):
+        raise ValueError('SCREEN_CONTROL_PERIOD_MISMATCH')
     metric_by_model={row['model_reference']['artifact_id']:row for row in metrics.records}
     endpoint_by_model={row['model_reference']['artifact_id']:row for row in endpoint.records}
+    for row in endpoint.records:
+        target_contract=row['target_contract']
+        if not np.allclose(target_contract['position_m'],task.goal.data['target_m'],rtol=0,atol=p.endpoint_check_atol):
+            raise ValueError('SCREEN_ENDPOINT_TARGET_MISMATCH')
+        if not np.isclose(target_contract['position_tolerance_m'],task.evaluator.parameters.data['tolerance_m'],rtol=0,atol=p.endpoint_check_atol):
+            raise ValueError('SCREEN_ENDPOINT_REQUIREMENT_MISMATCH')
     points=[]
     for row in linear.records[1:]:
         if 'model' not in row:
@@ -132,7 +148,9 @@ def design_screen(ctx,args):
     report=dict(candidate_build_binding=binding,configuration_only_identity=header['configuration_only_identity'],
         execution_data_used=False,reachability_evidence=dict(model_scope=applicability['uses']['reachability'],
             hard_rejection=False,reason='No necessary global reach violation is established by these local calculations.'),
-        operating_points=points,operating_point_availability=dict(requested=3,available=sum(r.get('available',False) for r in points)),
+        endpoint_contract=endpoint.records[0]['target_contract'] if endpoint.records else None,
+        official_reach_evaluator=plain(task.evaluator),terminal_braking_is_diagnostic=True,
+        operating_points=points,operating_point_availability=dict(requested=header.get('requested_operating_points',len(points)),available=sum(r.get('available',False) for r in points)),
         applicability=applicability,metric_evidence_references=[plain(args.linearization),plain(args.metrics),plain(args.endpoint)],
         priority_reasoning=dict(position_feasible_witnesses=feasible_position,braking_feasible_witnesses=feasible_braking,
             priority='conditional_support' if feasible_position else 'insufficient_evidence',
