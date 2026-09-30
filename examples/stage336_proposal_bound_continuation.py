@@ -275,7 +275,7 @@ def audit(host):
     return result
 
 
-def package(source,destination):
+def package(source,destination,blocker=None):
     runtime=require_softagent_runtime();destination.mkdir(parents=True,exist_ok=True)
     workflow=read(source/'workflow.json');freeze=read(source/'freeze_manifest.json');host=Host(source,workflow['run_id'])
     result=audit(host);behavior=read(source/'behavior_audit.json')
@@ -321,25 +321,33 @@ def package(source,destination):
         actual_model_decisions=dict(run_id=host.run_id,decisions=decisions),actual_acceptance=acceptance,
         actual_robot_outcomes=robot,actual_usage=usage,actual_tool_inventory=read(source/'provider_tools.json'),
         actual_parent_import=read(source/'historical_import_manifest.json'),actual_local_only_artifacts=dict(remotely_available=False,files=local))
+    blocked=read(blocker) if blocker is not None else None
+    if blocked is not None:outputs['actual_live_launch_rejection']=blocked
     for name,value in outputs.items():atomic_json(destination/(name+'.json'),value)
     files=[path for path in destination.glob('actual_*.json') if path.name!='actual_manifest.json']
-    atomic_json(destination/'actual_manifest.json',dict(run_id=host.run_id,status=result['status'],stop_reason=result['stop_reason'],
-        implementation_commit=freeze['implementation_commit'],single_live_continuation=True,no_retry=True,
+    atomic_json(destination/'actual_manifest.json',dict(run_id=host.run_id,
+        status='blocked_before_process' if blocked is not None else result['status'],
+        stop_reason='PLATFORM_APPROVAL_REJECTION_BEFORE_PROCESS' if blocked is not None else result['stop_reason'],
+        implementation_commit=freeze['implementation_commit'],single_live_continuation_launched=blocked is None,no_retry=True,
         files={path.name:dict(size=path.stat().st_size,sha256=sha256(path)) for path in sorted(files)},usage=usage))
+    manifest_files=[path for path in destination.iterdir() if path.is_file() and path.name!='sha256_manifest.json']
+    atomic_json(destination/'sha256_manifest.json',{
+        path.name:dict(size=path.stat().st_size,sha256=sha256(path)) for path in sorted(manifest_files)})
     print(json.dumps(dict(status=result['status'],stop_reason=result['stop_reason'],usage=usage,robot=robot),indent=2),flush=True)
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['offline','prepare','run','inspect','package'])
     parser.add_argument('--output',type=Path,required=True);parser.add_argument('--evidence',type=Path)
-    parser.add_argument('--source',type=Path);parser.add_argument('--credential-file',type=Path,default=Path.home()/'.codex/.env')
+    parser.add_argument('--source',type=Path);parser.add_argument('--blocker',type=Path)
+    parser.add_argument('--credential-file',type=Path,default=Path.home()/'.codex/.env')
     args=parser.parse_args();root=args.output.resolve()
     if args.action=='offline':
         if args.evidence is None:raise ValueError('--evidence is required')
         offline(root,args.evidence.resolve());return
     if args.action=='package':
         if args.source is None:raise ValueError('--source is required')
-        package(args.source.resolve(),root);return
+        package(args.source.resolve(),root,args.blocker.resolve() if args.blocker else None);return
     host=prepare(root) if args.action in ('prepare','run') else Host(root,read(root/'workflow.json')['run_id'])
     require_softagent_runtime()
     if args.action=='run':

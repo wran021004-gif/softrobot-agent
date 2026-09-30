@@ -1,0 +1,1339 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "tool_7326cfe326e285005dd7947d704de323f25f3537",
+      "description": "analysis.bind_historical_math@1.0.0: Validate and bind the frozen historical optimizer, candidate analysis, metrics, endpoint and screen to one exact proposal-bound build. Returns compact named references with original lineage; performs zero new mathematical evaluations and zero backend solves.",
+      "parameters": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Shared provider schema/decoder contract; domain arguments remain Host-owned.",
+        "properties": {
+          "arguments": {
+            "additionalProperties": false,
+            "properties": {
+              "source_node": {
+                "description": "Proposal-bound build node in the current Route session.",
+                "title": "Source Node",
+                "type": "string"
+              },
+              "import_manifest": {
+                "$ref": "#/$defs/EvidenceRef",
+                "description": "Frozen historical-mathematics import manifest authorized by this Route session."
+              }
+            },
+            "required": [
+              "source_node",
+              "import_manifest"
+            ],
+            "title": "HistoricalMathBindingRequest",
+            "type": "object",
+            "description": "Only the selected tool domain fields belong here. Required: source_node, import_manifest. Do not include nested reason; reason belongs only in the outer envelope."
+          },
+          "reason": {
+            "description": "Required outer transport metadata: an English explanation for requesting this tool. A nested arguments.reason does not supply this field.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Optional outer transport evidence references. Route citations belong separately in arguments.evidence when required by the route schema.",
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "tool_version": {
+            "description": "Required outer transport metadata: exactly the version declared for this tool.",
+            "title": "Tool Version",
+            "type": "string",
+            "const": "1.0.0"
+          }
+        },
+        "required": [
+          "arguments",
+          "reason",
+          "tool_version"
+        ],
+        "title": "ToolEnvelope",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tool_50b250efdcd0f7d33e671b6a1da81f1ff4adc8d2",
+      "description": "control.profile_describe@1.0.0: Describe selected fixed or parameterized free-reach control, technical support, historical evidence and preparation. Fixed profile imports historical guesses; zero solves.",
+      "parameters": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Shared provider schema/decoder contract; domain arguments remain Host-owned.",
+        "properties": {
+          "arguments": {
+            "additionalProperties": false,
+            "properties": {
+              "profile_id": {
+                "const": "gvs_nmpc_free_reach_v1",
+                "default": "gvs_nmpc_free_reach_v1",
+                "title": "Profile Id",
+                "type": "string"
+              }
+            },
+            "title": "ProfileControl",
+            "type": "object",
+            "description": "Only the selected tool domain fields belong here. Required: . Do not include nested reason; reason belongs only in the outer envelope."
+          },
+          "reason": {
+            "description": "Required outer transport metadata: an English explanation for requesting this tool. A nested arguments.reason does not supply this field.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Optional outer transport evidence references. Route citations belong separately in arguments.evidence when required by the route schema.",
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "tool_version": {
+            "description": "Required outer transport metadata: exactly the version declared for this tool.",
+            "title": "Tool Version",
+            "type": "string",
+            "const": "1.0.0"
+          }
+        },
+        "required": [
+          "arguments",
+          "reason",
+          "tool_version"
+        ],
+        "title": "ToolEnvelope",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tool_649a7605be5870dcbf62639e9f6635502a2d046c",
+      "description": "control.profile_report@1.0.0: Summarize sealed public simulation/evaluation evidence, sampled settling, raw solve status, initialization selection, failure response and delivery cost; validate a predeclared strategy; zero solves.",
+      "parameters": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Shared provider schema/decoder contract; domain arguments remain Host-owned.",
+        "properties": {
+          "arguments": {
+            "additionalProperties": false,
+            "properties": {
+              "simulation_request_id": {
+                "title": "Simulation Request Id",
+                "type": "string"
+              },
+              "evaluation_request_id": {
+                "title": "Evaluation Request Id",
+                "type": "string"
+              }
+            },
+            "required": [
+              "simulation_request_id",
+              "evaluation_request_id"
+            ],
+            "title": "ProfileReportRequest",
+            "type": "object",
+            "description": "Only the selected tool domain fields belong here. Required: simulation_request_id, evaluation_request_id. Do not include nested reason; reason belongs only in the outer envelope."
+          },
+          "reason": {
+            "description": "Required outer transport metadata: an English explanation for requesting this tool. A nested arguments.reason does not supply this field.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Optional outer transport evidence references. Route citations belong separately in arguments.evidence when required by the route schema.",
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "tool_version": {
+            "description": "Required outer transport metadata: exactly the version declared for this tool.",
+            "title": "Tool Version",
+            "type": "string",
+            "const": "1.0.0"
+          }
+        },
+        "required": [
+          "arguments",
+          "reason",
+          "tool_version"
+        ],
+        "title": "ToolEnvelope",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tool_330c83718a1a07cd50435175043dad2dfce852dd",
+      "description": "design.build_proposal@1.0.0: Construct and validate the exact complete effective configuration of one named optimizer proposal. The model supplies the optimizer result and exact proposal candidate_id; it never retypes design values. Zero backend solves.",
+      "parameters": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Shared provider schema/decoder contract; domain arguments remain Host-owned.",
+        "properties": {
+          "arguments": {
+            "additionalProperties": false,
+            "properties": {
+              "node_id": {
+                "description": "Unique Route construction node identifier.",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "title": "Node Id",
+                "type": "string"
+              },
+              "optimizer_result": {
+                "$ref": "#/$defs/EvidenceRef",
+                "description": "Exact mathematical optimizer result containing the selected proposal."
+              },
+              "optimizer_candidate_id": {
+                "description": "Exact proposal candidate_id from optimizer_result; never a build label.",
+                "minLength": 1,
+                "title": "Optimizer Candidate Id",
+                "type": "string"
+              },
+              "reason": {
+                "description": "Concise evidence-grounded reason for constructing this already-selected proposal.",
+                "minLength": 1,
+                "title": "Reason",
+                "type": "string"
+              },
+              "next_step": {
+                "description": "Intended analysis/report or stopping decision after construction.",
+                "minLength": 1,
+                "title": "Next Step",
+                "type": "string"
+              }
+            },
+            "required": [
+              "node_id",
+              "optimizer_result",
+              "optimizer_candidate_id",
+              "reason",
+              "next_step"
+            ],
+            "title": "ProposalBuildAction",
+            "type": "object",
+            "description": "Only the selected tool domain fields belong here. Required: node_id, optimizer_result, optimizer_candidate_id, reason, next_step. Supply nested reason as well as outer reason."
+          },
+          "reason": {
+            "description": "Required outer transport metadata: an English explanation for requesting this tool. A nested arguments.reason does not supply this field.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Optional outer transport evidence references. Route citations belong separately in arguments.evidence when required by the route schema.",
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "tool_version": {
+            "description": "Required outer transport metadata: exactly the version declared for this tool.",
+            "title": "Tool Version",
+            "type": "string",
+            "const": "1.0.0"
+          }
+        },
+        "required": [
+          "arguments",
+          "reason",
+          "tool_version"
+        ],
+        "title": "ToolEnvelope",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tool_720b551d99ff78e89e02c44fe48b8fb974566ea8",
+      "description": "evidence.read@1.0.0: Read immutable saved evidence with JSON Pointer and offset paging. An oversized subtree returns a labeled pointer overview, not original content. Follow its pointers using the same source reference and next_offset at the same pointer. No solve or evaluation is performed.",
+      "parameters": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Shared provider schema/decoder contract; domain arguments remain Host-owned.",
+        "properties": {
+          "arguments": {
+            "additionalProperties": false,
+            "properties": {
+              "reference": {
+                "$ref": "#/$defs/EvidenceRef",
+                "description": "Existing immutable evidence reference, not a node_id. A build has no evaluation or trajectory to read."
+              },
+              "pointer": {
+                "default": "",
+                "description": "JSON Pointer into original evidence, e.g. /detail or /signals/0/values. Empty reads the root. Oversized nested content returns a labeled overview with valid child pointers; follow those pointers using the same source reference.",
+                "title": "Pointer",
+                "type": "string"
+              },
+              "offset": {
+                "default": 0,
+                "minimum": 0,
+                "title": "Offset",
+                "type": "integer"
+              },
+              "limit": {
+                "default": 20,
+                "maximum": 100,
+                "minimum": 1,
+                "title": "Limit",
+                "type": "integer"
+              },
+              "byte_limit": {
+                "default": 4096,
+                "description": "Requested content byte cap; response and observation envelopes also count toward the inline limit. Pages may be smaller. Follow next_offset at the same pointer.",
+                "maximum": 8192,
+                "minimum": 128,
+                "title": "Byte Limit",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "reference"
+            ],
+            "title": "ReadEvidence",
+            "type": "object",
+            "description": "Only the selected tool domain fields belong here. Required: reference. Do not include nested reason; reason belongs only in the outer envelope."
+          },
+          "reason": {
+            "description": "Required outer transport metadata: an English explanation for requesting this tool. A nested arguments.reason does not supply this field.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Optional outer transport evidence references. Route citations belong separately in arguments.evidence when required by the route schema.",
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "tool_version": {
+            "description": "Required outer transport metadata: exactly the version declared for this tool.",
+            "title": "Tool Version",
+            "type": "string",
+            "const": "1.0.0"
+          }
+        },
+        "required": [
+          "arguments",
+          "reason",
+          "tool_version"
+        ],
+        "title": "ToolEnvelope",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tool_4c096284fcae2fd8c6fbe318f6bb870519e6c32e",
+      "description": "route.advance@1.0.0: Advance one evidence-led action. build constructs and validates only: no solve, score or trajectory. run executes a saved build and evaluates its saved result (one charged backend attempt). optimize searches within variables[path]=[lower_bound, upper_bound], executing and evaluating candidates (up to max_trials charged attempts); bounds are not sample values. diagnose analyzes saved results; crosscheck independently executes the same physical/control configuration on an authorized alternative backend (one charged attempt); video renders saved results; finish delivers a valid evaluation, including an unmet task tolerance. Only run, optimize and crosscheck consume solver budget. source_node and changes semantics are specified in the input schema. Cite previous node result evidence after the first action.",
+      "parameters": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          },
+          "ReachFacts": {
+            "additionalProperties": false,
+            "properties": {
+              "result_type": {
+                "const": "free_reach",
+                "default": "free_reach",
+                "title": "Result Type",
+                "type": "string"
+              },
+              "candidate": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Candidate"
+              },
+              "configuration": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Configuration"
+              },
+              "execution_id": {
+                "title": "Execution Id",
+                "type": "string"
+              },
+              "simulation": {
+                "additionalProperties": true,
+                "title": "Simulation",
+                "type": "object"
+              },
+              "evaluation": {
+                "additionalProperties": true,
+                "title": "Evaluation",
+                "type": "object"
+              },
+              "report": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Report"
+              },
+              "task_accepted": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Task Accepted"
+              },
+              "evaluation_validity": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Evaluation Validity"
+              },
+              "complete": {
+                "title": "Complete",
+                "type": "boolean"
+              },
+              "valid_complete_execution": {
+                "title": "Valid Complete Execution",
+                "type": "boolean"
+              },
+              "target_position_m": {
+                "items": {
+                  "type": "number"
+                },
+                "title": "Target Position M",
+                "type": "array"
+              },
+              "terminal_position_m": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "number"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Terminal Position M"
+              },
+              "signed_position_error_m": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "number"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Signed Position Error M"
+              },
+              "error_convention": {
+                "const": "actual_tip minus target",
+                "default": "actual_tip minus target",
+                "title": "Error Convention",
+                "type": "string"
+              },
+              "coordinate_frame": {
+                "const": "world",
+                "default": "world",
+                "title": "Coordinate Frame",
+                "type": "string"
+              },
+              "terminal_error_m": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Terminal Error M"
+              },
+              "terminal_tip_speed_m_s": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Terminal Tip Speed M S"
+              },
+              "sampled_settling": {
+                "additionalProperties": true,
+                "title": "Sampled Settling",
+                "type": "object"
+              },
+              "control_updates": {
+                "title": "Control Updates",
+                "type": "integer"
+              },
+              "accepted_plans": {
+                "title": "Accepted Plans",
+                "type": "integer"
+              },
+              "initialization_selected": {
+                "title": "Initialization Selected",
+                "type": "integer"
+              },
+              "accepted_noninitialization_plans": {
+                "title": "Accepted Noninitialization Plans",
+                "type": "integer"
+              },
+              "converged_updates": {
+                "title": "Converged Updates",
+                "type": "integer"
+              },
+              "solver_error_count": {
+                "title": "Solver Error Count",
+                "type": "integer"
+              },
+              "hold_last_responses": {
+                "title": "Hold Last Responses",
+                "type": "integer"
+              },
+              "applied_tension_ranges": {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "title": "Applied Tension Ranges",
+                "type": "array"
+              },
+              "force_bound_violation_n": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Force Bound Violation N"
+              },
+              "one_step_prediction_summary": {
+                "additionalProperties": true,
+                "title": "One Step Prediction Summary",
+                "type": "object"
+              },
+              "one_step_prediction_evidence": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "One Step Prediction Evidence"
+              },
+              "simulated_duration_s": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Simulated Duration S"
+              },
+              "measured_computation_s": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Measured Computation S"
+              },
+              "mean_complete_update_s": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Mean Complete Update S"
+              },
+              "control_period_s": {
+                "title": "Control Period S",
+                "type": "number"
+              },
+              "deadline_misses": {
+                "title": "Deadline Misses",
+                "type": "integer"
+              },
+              "real_time_demonstrated": {
+                "title": "Real Time Demonstrated",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "candidate",
+              "configuration",
+              "execution_id",
+              "simulation",
+              "evaluation",
+              "report",
+              "task_accepted",
+              "evaluation_validity",
+              "complete",
+              "valid_complete_execution",
+              "target_position_m",
+              "terminal_position_m",
+              "signed_position_error_m",
+              "terminal_error_m",
+              "terminal_tip_speed_m_s",
+              "sampled_settling",
+              "control_updates",
+              "accepted_plans",
+              "initialization_selected",
+              "accepted_noninitialization_plans",
+              "converged_updates",
+              "solver_error_count",
+              "hold_last_responses",
+              "applied_tension_ranges",
+              "force_bound_violation_n",
+              "one_step_prediction_summary",
+              "one_step_prediction_evidence",
+              "simulated_duration_s",
+              "measured_computation_s",
+              "mean_complete_update_s",
+              "control_period_s",
+              "deadline_misses",
+              "real_time_demonstrated"
+            ],
+            "title": "ReachFacts",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Shared provider schema/decoder contract; domain arguments remain Host-owned.",
+        "properties": {
+          "arguments": {
+            "additionalProperties": false,
+            "properties": {
+              "node_id": {
+                "description": "Unique label for this route action; reuse the original request_id to recover a sealed call.",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "title": "Node Id",
+                "type": "string"
+              },
+              "action": {
+                "description": "build constructs only; run simulates and evaluates a saved build; optimize searches and evaluates; diagnose analyzes saved results; crosscheck executes independently; video renders saved results; finish delivers an evaluated candidate.",
+                "enum": [
+                  "build",
+                  "run",
+                  "optimize",
+                  "diagnose",
+                  "crosscheck",
+                  "video",
+                  "finish"
+                ],
+                "title": "Action",
+                "type": "string"
+              },
+              "combination": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "OMIT for run: the saved build owns its combination. Required for build, optimize without source_node, and crosscheck. With an optimization source, omit to preserve its bindings; an explicit choice must match them.",
+                "title": "Combination"
+              },
+              "changes": {
+                "additionalProperties": true,
+                "description": "build/optimize only: edits from the declared space, including template, physical paths, discretization paths and control/ paths. Applied to the source configuration, or the frozen baseline when no source is supplied.",
+                "title": "Changes",
+                "type": "object"
+              },
+              "variables": {
+                "additionalProperties": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                "description": "optimize only, required: continuous numeric variables[path] = [lower_bound, upper_bound], a continuous interval, NOT two requested samples. Integer, choice, template, and discretization changes belong in explicit changes. Bounds must be within the authorized space and include the starting value.",
+                "title": "Variables",
+                "type": "object"
+              },
+              "max_trials": {
+                "default": 1,
+                "description": "Maximum optimizer proposals, bounded by route max_trials; independent of single run, which needs one solve. Duplicate proposals may reuse saved results.",
+                "minimum": 1,
+                "title": "Max Trials",
+                "type": "integer"
+              },
+              "source_node": {
+                "anyOf": [
+                  {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Completed node_id: run requires build; optimize accepts build/run/optimize; diagnose/crosscheck/video require an evaluated run or optimize node. Finish defaults to the session incumbent; supply source_node with candidate_id to select another valid candidate. Never an artifact ID.",
+                "title": "Source Node"
+              },
+              "candidate_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Optional candidate label on build; selects an optimization trial on later actions. Finish without candidate_id delivers the session-wide incumbent. A single run preserves the build candidate label.",
+                "title": "Candidate Id"
+              },
+              "evidence": {
+                "description": "After the first action, cite at least one previous route node result reference here. route overview already supplies these references; a separate read is optional.",
+                "items": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "reason": {
+                "description": "English explanation grounded in the current overview or cited evidence.",
+                "minLength": 1,
+                "title": "Reason",
+                "type": "string"
+              },
+              "next_step": {
+                "description": "English statement of the intended next decision or stopping condition.",
+                "minLength": 1,
+                "title": "Next Step",
+                "type": "string"
+              },
+              "design_statement": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "On finish, restate candidate_facts: candidate_id, configuration, owner_run_id, execution_id and parameters (path, baseline_value, effective_value, baseline_delta, unit), plus physical_changes when supplied. Checked independently of reach and prose interpretation; legacy callers may omit.",
+                "title": "Design Statement"
+              },
+              "result_statement": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ReachFacts"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "On finish copy the selected factual_result exactly; typed consistency is checked separately from prose.",
+                "title": "Result Statement"
+              }
+            },
+            "required": [
+              "node_id",
+              "action",
+              "reason",
+              "next_step"
+            ],
+            "title": "RouteAction",
+            "type": "object",
+            "description": "Only the selected tool domain fields belong here. Required: node_id, action, reason, next_step. Supply nested reason as well as outer reason."
+          },
+          "reason": {
+            "description": "Required outer transport metadata: an English explanation for requesting this tool. A nested arguments.reason does not supply this field.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Optional outer transport evidence references. Route citations belong separately in arguments.evidence when required by the route schema.",
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "tool_version": {
+            "description": "Required outer transport metadata: exactly the version declared for this tool.",
+            "title": "Tool Version",
+            "type": "string",
+            "const": "1.0.0"
+          }
+        },
+        "required": [
+          "arguments",
+          "reason",
+          "tool_version"
+        ],
+        "title": "ToolEnvelope",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tool_590e2d11a0ee981ee18038ff05f19690be3f6940",
+      "description": "route.inspect@1.0.0: Read the compact factual route overview: selected candidate, solve/evaluation existence, result references, authorized combinations and bounds, remaining budget and next-action prerequisites. The same overview is already in model context; inspect again only when needed. No solve.",
+      "parameters": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Shared provider schema/decoder contract; domain arguments remain Host-owned.",
+        "properties": {
+          "arguments": {
+            "additionalProperties": false,
+            "properties": {},
+            "title": "Inspect",
+            "type": "object",
+            "description": "Only the selected tool domain fields belong here. Required: . Do not include nested reason; reason belongs only in the outer envelope."
+          },
+          "reason": {
+            "description": "Required outer transport metadata: an English explanation for requesting this tool. A nested arguments.reason does not supply this field.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Optional outer transport evidence references. Route citations belong separately in arguments.evidence when required by the route schema.",
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "tool_version": {
+            "description": "Required outer transport metadata: exactly the version declared for this tool.",
+            "title": "Tool Version",
+            "type": "string",
+            "const": "1.0.0"
+          }
+        },
+        "required": [
+          "arguments",
+          "reason",
+          "tool_version"
+        ],
+        "title": "ToolEnvelope",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tool_7410e0b2e7ea084f967a50da79e0b091d9fedfe8",
+      "description": "route.record_analysis@1.0.0: Attach the exact shared candidate-bound analysis, screen and optional mathematical optimization to a completed build. Advisory only; zero backend solves.",
+      "parameters": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Shared provider schema/decoder contract; domain arguments remain Host-owned.",
+        "properties": {
+          "arguments": {
+            "additionalProperties": false,
+            "properties": {
+              "node_id": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "title": "Node Id",
+                "type": "string"
+              },
+              "source_node": {
+                "description": "Owned completed Route build analyzed by all supplied evidence.",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "title": "Source Node",
+                "type": "string"
+              },
+              "evidence": {
+                "items": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "title": "Evidence",
+                "type": "array"
+              },
+              "linearization": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "metrics": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "endpoint": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "screen": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "historical_math_binding": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Owned output of analysis.bind_historical_math for source_node. Named references are inherited from it; any explicit references must match."
+              },
+              "math_optimization": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "selected_optimizer_candidate_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Exact proposal candidate_id selected from math_optimization. Required with math_optimization when mathematical proposal selection is enforced; the proposal is compared to this build by complete scientific configuration, not bookkeeping labels.",
+                "title": "Selected Optimizer Candidate Id"
+              },
+              "validation_disposition": {
+                "enum": [
+                  "recommended",
+                  "deferred",
+                  "additional_analysis"
+                ],
+                "title": "Validation Disposition",
+                "type": "string"
+              },
+              "reason": {
+                "minLength": 1,
+                "title": "Reason",
+                "type": "string"
+              },
+              "next_step": {
+                "minLength": 1,
+                "title": "Next Step",
+                "type": "string"
+              }
+            },
+            "required": [
+              "node_id",
+              "source_node",
+              "validation_disposition",
+              "reason",
+              "next_step"
+            ],
+            "title": "RouteAnalysisAction",
+            "type": "object",
+            "description": "Only the selected tool domain fields belong here. Required: node_id, source_node, validation_disposition, reason, next_step. Supply nested reason as well as outer reason."
+          },
+          "reason": {
+            "description": "Required outer transport metadata: an English explanation for requesting this tool. A nested arguments.reason does not supply this field.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Optional outer transport evidence references. Route citations belong separately in arguments.evidence when required by the route schema.",
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "tool_version": {
+            "description": "Required outer transport metadata: exactly the version declared for this tool.",
+            "title": "Tool Version",
+            "type": "string",
+            "const": "1.0.0"
+          }
+        },
+        "required": [
+          "arguments",
+          "reason",
+          "tool_version"
+        ],
+        "title": "ToolEnvelope",
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "tool_f39e1ce2d33e6f84cb552729355dc5bdf7e4f926",
+      "description": "session.control@1.0.0: Stop or pause for missing information, missing capability or execution failure. For normal evaluated route delivery use route.advance(action=\"finish\") instead.",
+      "parameters": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Shared provider schema/decoder contract; domain arguments remain Host-owned.",
+        "properties": {
+          "arguments": {
+            "additionalProperties": false,
+            "properties": {
+              "status": {
+                "enum": [
+                  "stopped",
+                  "paused",
+                  "needs_input",
+                  "capability_missing",
+                  "failed"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "reason": {
+                "minLength": 1,
+                "title": "Reason",
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "reason"
+            ],
+            "title": "Stop",
+            "type": "object",
+            "description": "Only the selected tool domain fields belong here. Required: status, reason. Supply nested reason as well as outer reason."
+          },
+          "reason": {
+            "description": "Required outer transport metadata: an English explanation for requesting this tool. A nested arguments.reason does not supply this field.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Optional outer transport evidence references. Route citations belong separately in arguments.evidence when required by the route schema.",
+            "items": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "tool_version": {
+            "description": "Required outer transport metadata: exactly the version declared for this tool.",
+            "title": "Tool Version",
+            "type": "string",
+            "const": "1.0.0"
+          }
+        },
+        "required": [
+          "arguments",
+          "reason",
+          "tool_version"
+        ],
+        "title": "ToolEnvelope",
+        "type": "object"
+      }
+    }
+  }
+]
