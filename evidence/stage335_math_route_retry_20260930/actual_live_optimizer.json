@@ -1,0 +1,130 @@
+{
+  "objective": {
+    "objective_id": "controller_start_local_endpoint_lexicographic_v1",
+    "observed_scope_evidence": {
+      "all_world_x_position_control_rows_zero": true,
+      "interpretation": "Observed values describe only this bounded sample and local model; they do not predict nonlinear bending or closed-loop performance.",
+      "material_pair_primary_ratios_equal": true,
+      "observed_primary_ratio_range": [
+        0.19999999999999463,
+        2.8000000000000025
+      ]
+    },
+    "operating_point": "controller_start_input",
+    "ordering": "lexicographic; primary values within endpoint_check_atol/tolerance are tied; no fitted weights or historical outcomes",
+    "primary": {
+      "definition": "SciPy bounded least-squares position candidate residual divided by official reach tolerance; terminal braking is excluded",
+      "direction": "minimize",
+      "name": "controller_start_bounded_position_residual_upper_bound_ratio",
+      "units": "1"
+    },
+    "primary_tie_resolution": 1e-06,
+    "sampled_configuration_aggregation": "none; only controller_start_input contributes to the objective",
+    "secondary": {
+      "definition": "Exact-ZOH held-input sum(period * ||delta_u/input_scale||^2), used only after primary ordering",
+      "direction": "minimize",
+      "name": "feasible_position_witness_normalized_input_energy",
+      "units": "s (normalized input squared integral)"
+    },
+    "terminal_braking_in_objective": false
+  },
+  "proposals": [
+    {
+      "candidate_id": "math-compliant-4795c8184616",
+      "configuration": {
+        "artifact_id": "73627f1e3360566b9e4d2234dbb396c66fbcfc0708e1c8ba3b7692dbb747326b",
+        "media_type": "application/json"
+      },
+      "material_scenario": "compliant",
+      "objective": {
+        "applicability": "controller-start frozen local affine exact-ZOH model",
+        "candidate_residual_m": 0.0019999999999999463,
+        "feasible_witness_normalized_input_energy": 4.367701514792259e-05,
+        "matrix_evidence": {
+          "world_x_position_control_nonzero_count": 0,
+          "world_x_position_control_row_linf": 0.0,
+          "world_x_position_control_row_shape": [
+            210
+          ]
+        },
+        "position_residual_upper_bound_ratio": 0.19999999999999463,
+        "position_tolerance_m": 0.01,
+        "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+        "scope": "position endpoint only; terminal braking and other sampled configurations are not objective terms",
+        "status": "feasible_in_local_model"
+      },
+      "parameters": {
+        "components/far/length_m": 0.11,
+        "components/near/length_m": 0.15,
+        "design/section_scale": 0.95
+      },
+      "selection_rationale": "Lowest declared residual-upper-bound ratio; feasible local input energy is a secondary lexicographic component only.",
+      "tied_candidate_ids": [
+        "math-compliant-4795c8184616"
+      ]
+    },
+    {
+      "candidate_id": "math-stiff-cccc020c6300",
+      "configuration": {
+        "artifact_id": "edc2269a365358bcbfc4717bfee623509a539269b93b895a60f14f623f4b907e",
+        "media_type": "application/json"
+      },
+      "material_scenario": "stiff",
+      "objective": {
+        "applicability": "controller-start frozen local affine exact-ZOH model",
+        "candidate_residual_m": 0.0019999999999999463,
+        "feasible_witness_normalized_input_energy": 8.463648352583415e-05,
+        "matrix_evidence": {
+          "world_x_position_control_nonzero_count": 0,
+          "world_x_position_control_row_linf": 0.0,
+          "world_x_position_control_row_shape": [
+            210
+          ]
+        },
+        "position_residual_upper_bound_ratio": 0.19999999999999463,
+        "position_tolerance_m": 0.01,
+        "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+        "scope": "position endpoint only; terminal braking and other sampled configurations are not objective terms",
+        "status": "feasible_in_local_model"
+      },
+      "parameters": {
+        "components/far/length_m": 0.11,
+        "components/near/length_m": 0.15,
+        "design/section_scale": 0.95
+      },
+      "selection_rationale": "Lowest declared residual-upper-bound ratio; feasible local input energy is a secondary lexicographic component only.",
+      "tied_candidate_ids": [
+        "math-stiff-cccc020c6300"
+      ]
+    }
+  ],
+  "provenance": {
+    "cache_hits_this_call": 0,
+    "cumulative_evaluation_limit": 16,
+    "cumulative_evaluations_remaining": 0,
+    "cumulative_evaluations_used": 16,
+    "deterministic": true,
+    "failed_evaluations_counted": 0,
+    "implementation_identity": "4211ebe3cb04e6913e848513ce0b381ca5f99fd06c9142bad9add8068e83bb80",
+    "iterations": 14,
+    "method": "bounded_coordinate_pattern_local_v1",
+    "new_evaluations_this_call": 16,
+    "nmpc_solves": 0,
+    "physical_backend_calls": 0,
+    "provider_calls": 0,
+    "requested_new_evaluation_cap": 16,
+    "returned_scientific_configurations": 16,
+    "seed": null,
+    "stop_reason": "requested_evaluation_cap"
+  },
+  "limitations": [
+    "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+    "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+    "Numerical agreement is implementation verification, not physical model validation.",
+    "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+    "The objective can favor geometric alignment at the straight controller-start configuration; it does not predict nonlinear bending, closed-loop reach, settling, real-time performance, or global optimality.",
+    "Terminal braking and other sampled configurations are not aggregated into this optimization objective.",
+    "Candidate residuals are upper bounds; only explicit separating-direction records may certify local infeasibility.",
+    "Scenario winners and ties are bounded-search proposals, not global optima."
+  ]
+}

@@ -293,6 +293,131 @@ def package_blocked_live(source,destination):
     print('Packaged blocked live freeze: '+str(destination),flush=True)
 
 
+def package_live_result(source,destination):
+    """Package the completed one-shot live audit without mutating its raw store."""
+    runtime=require_softagent_runtime();destination.mkdir(parents=True,exist_ok=True)
+    workflow=read(source/'workflow.json');run_id=workflow['run_id'];store=Store(source)
+    audit=read(source/'behavior_audit.json');math=read(source/'math_influence_audit.json')
+    freeze=read(source/'freeze_manifest.json');session=store.session(run_id);route=session['state']['route']
+    frozen_files=freeze['files'];hashes={name:sha256(source/name) for name in frozen_files}
+    prelaunch=read(destination/'live_behavior_audit.json')
+    freeze_verification=dict(run_id=run_id,verified_before_launch=True,
+        verification_basis=('The retained prepared session and all frozen-file digests were checked immediately before '
+            'the single launch; this post-run package recomputes those immutable file digests and retains the original '
+            'zero-use prelaunch audit separately.'),
+        implementation_commit=freeze['implementation_commit'],implementation_dirty=freeze['implementation_dirty'],
+        runtime=runtime,runtime_matches_frozen=runtime==read(source/'runtime_identity.json'),
+        frozen_file_hashes_match=hashes==frozen_files,
+        files={name:dict(expected=frozen_files[name],actual=hashes[name],matches=hashes[name]==frozen_files[name])
+            for name in frozen_files},limits=freeze['limits'],live_math_evaluation_limit=freeze['live_math_evaluation_limit'],
+        total_offline_plus_live_limit=freeze['total_offline_plus_live_limit'],
+        retained_prelaunch_counts={key:prelaunch[key] for key in ('real_model_requests','tool_calls','backend_executions')},
+        retained_prelaunch_status=prelaunch['status'])
+    if not freeze_verification['frozen_file_hashes_match'] or not freeze_verification['runtime_matches_frozen']:
+        raise RuntimeError('LIVE_FREEZE_CHANGED')
+
+    optimizer_ref=json.loads(store.lookup(run_id,'model-5-tool')['receipt'])['output']
+    optimizer=store.artifact(optimizer_ref);proposals=optimizer['proposals'];selected=proposals[0];other=proposals[1]
+    build=next(node for node in route['nodes'] if node.get('action')=='build' and node.get('selection',{}).get('changes'))
+    failed_report=next(node for node in route['nodes'] if node.get('action')=='analyze')
+    report_call=store.lookup(run_id,'model-21-tool');report_receipt=json.loads(report_call['receipt'])
+    changed=build['selection']['changes'];selected_parameters={**selected['parameters'],
+        'design/material_scenario':selected['material_scenario']}
+    exact_parameters_match=changed==selected_parameters
+    primary_tied=selected['objective']['position_residual_upper_bound_ratio']==other['objective']['position_residual_upper_bound_ratio']
+    lower_secondary=selected['objective']['feasible_witness_normalized_input_energy'] < other['objective']['feasible_witness_normalized_input_energy']
+    attempted_id=failed_report['selection']['selected_optimizer_candidate_id']
+    cited_refs={key:failed_report['selection'][key] for key in
+        ('linearization','metrics','endpoint','screen','math_optimization')}
+    cited_refs['build_result']=build['result']
+    cited_artifacts={key:store.artifact(ref) for key,ref in cited_refs.items()}
+    binding_summary={key:dict(candidate_id=value['bindings'][0]['candidate_id'],
+        source_node=value['bindings'][0]['source_node'],
+        scientific_configuration_identity=value['bindings'][0]['scientific_configuration_identity'])
+        for key,value in cited_artifacts.items() if key in ('linearization','metrics','endpoint','screen')}
+    candidate_bound_consistent=all(value['candidate_id']==build['selection']['candidate_id']
+        and value['source_node']==build['node_id']
+        and value['scientific_configuration_identity'].startswith(selected['candidate_id'].rsplit('-',1)[-1])
+        for value in binding_summary.values())
+    selection_review=dict(run_id=run_id,
+        model_selection=dict(actual_optimizer_candidate_id=selected['candidate_id'],
+            model_build_candidate_label=build['selection']['candidate_id'],selected_parameters=selected_parameters,
+            exact_parameters_match=exact_parameters_match,model_build_reason=build['selection']['reason'],
+            rationale_supported=primary_tied and lower_secondary,
+            rationale_evidence=dict(primary_ratio=selected['objective']['position_residual_upper_bound_ratio'],
+                candidate_residual_m=selected['objective']['candidate_residual_m'],
+                selected_secondary_energy=selected['objective']['feasible_witness_normalized_input_energy'],
+                alternate_candidate_id=other['candidate_id'],
+                alternate_secondary_energy=other['objective']['feasible_witness_normalized_input_energy'],
+                matrix_evidence=selected['objective']['matrix_evidence'],
+                objective_id=optimizer['objective']['objective_id'],
+                applicability=selected['objective']['applicability'],limitations=optimizer['limitations'])),
+        citation_review=dict(optimizer_artifact=optimizer_ref,optimizer_artifact_cited_accurately=True,
+            exact_parameters_cited_accurately=exact_parameters_match,primary_and_secondary_cited_accurately=primary_tied and lower_secondary,
+            scope_and_limitations_cited_accurately=True,
+            cited_candidate_bound_artifacts=cited_refs,candidate_bound_bindings=binding_summary,
+            cited_candidate_bound_artifacts_exist=True,candidate_bound_artifacts_consistent=candidate_bound_consistent,
+            actual_optimizer_candidate_id=selected['candidate_id'],attempted_report_candidate_id=attempted_id,
+            optimizer_candidate_id_cited_accurately=attempted_id==selected['candidate_id'],
+            finding=('The model chose and built the exact returned compliant configuration, but renamed the proposal '
+                'when binding the report; the build label is not the optimizer candidate_id.')),
+        automatic_report_linkage=dict(completed=False,node_id=failed_report['node_id'],status=failed_report['status'],
+            receipt=report_receipt,route_rejection=report_receipt['error'],
+            correction_received=False,following_provider_request_error='DEEPSEEK_NETWORK_ERROR'),
+        backend_spending_decision=dict(model_recommended_one_backend_validation=True,
+            decision_text=failed_report['selection']['next_step'],backend_attempted=False),
+        acceptance_a_math_influenced_executed_design=False)
+    if not exact_parameters_match or not primary_tied or not lower_secondary or not candidate_bound_consistent:
+        raise RuntimeError('LIVE_SELECTION_REVIEW_MISMATCH')
+
+    turns=[]
+    for item in audit['actions']:
+        provider=item['receipt'];decision=item['decision'];row=dict(request_id=item['request_id'],provider_receipt=provider,
+            decision=decision)
+        tool_request=decision.get('request_id') if isinstance(decision,dict) else None
+        if tool_request:
+            call=store.lookup(run_id,tool_request)
+            row['tool_receipt']=None if call is None else json.loads(call['receipt'])
+        turns.append(row)
+    route_nodes=[dict(node_id=node['node_id'],action=node['action'],status=node['status'],result=node.get('result'),
+        selection=node.get('selection')) for node in route['nodes']]
+    outcomes=dict(run_id=run_id,valid_backend_execution=dict(status='unavailable',backend_executions=0),
+        official_reach=dict(status='unavailable',reason='No backend execution occurred.'),
+        sampled_settling_0p05_s=dict(status='unavailable',reason='No trajectory or official evaluation exists.'),
+        complete_update_real_time=dict(status='unavailable',reason='No control profile report exists.'),
+        interpretation='The run stopped in report linkage/provider transport; this is not a robot-performance failure.')
+    raw_files=[]
+    for path in sorted(source.iterdir()):
+        if path.is_file(): raw_files.append(dict(path=str(path.resolve()),size=path.stat().st_size,sha256=sha256(path)))
+    local=dict(remotely_available=False,
+        note='Hashes identify the untouched local raw store and supporting files; they do not make those raw files remotely available.',
+        files=raw_files)
+
+    for name,value in (('actual_live_freeze_verification',freeze_verification),
+            ('actual_live_behavior_audit',audit),('actual_live_math_influence_audit',math),
+            ('actual_live_workflow',workflow),('actual_live_optimizer',{key:optimizer[key]
+                for key in ('objective','proposals','provenance','limitations')}),
+            ('actual_live_provider_turn_extract',dict(run_id=run_id,turns=turns)),
+            ('actual_live_route_nodes',dict(run_id=run_id,nodes=route_nodes)),
+            ('actual_live_selection_review',selection_review),('actual_live_outcomes',outcomes),
+            ('actual_live_local_only_artifacts',local)):
+        atomic_json(destination/(name+'.json'),value)
+    files=sorted(path for path in destination.glob('actual_live_*.json') if path.name!='actual_live_manifest.json')
+    manifest=dict(run_id=run_id,status=audit['status'],stop_reason=audit['stop_reason'],
+        implementation_commit=freeze['implementation_commit'],single_live_launch=True,no_retry=True,
+        files={path.name:dict(size=path.stat().st_size,sha256=sha256(path)) for path in files},
+        usage=dict(provider_requests=audit['real_model_requests'],tool_calls=audit['tool_calls'],
+            math_evaluations=dict(offline=freeze['offline_math_evaluations'],live=math['math_ledger']['used'],
+                total=freeze['offline_math_evaluations']+math['math_ledger']['used']),
+            backend_attempts=audit['backend_executions'],workers=math['usage']['worker_calls'],
+            charged_wall_s=math['usage']['wall_s']),
+        automatic_report_linkage=False,qualifying_math_led_execution=False,
+        original_blocked_launch_record=dict(path='live_blocker.json',preserved=True,
+            sha256=sha256(destination/'live_blocker.json')))
+    atomic_json(destination/'actual_live_manifest.json',manifest)
+    print('Packaged actual live result: '+str(destination),flush=True)
+
+
 def live_guidance():
     return (
         'Conduct the one bounded Stage 3.35 math-led retry on the frozen reach task. The mathematical tools are local proxies: they use a controller-start frozen local affine exact-ZOH position model, not the nonlinear backend. The primary objective is the official-tolerance-normalized position residual upper bound; normalized input energy of a position-feasible witness is secondary. Terminal braking and other sampled configurations are not objective terms. The prior evidence found a zero world-x position-control mapping row at the straight start, equal primary residuals across compliant/stiff scenarios and tested section scales, and length-dominated primary values. This can favor geometric alignment; it does not predict nonlinear bending, closed-loop reach, settling, real-time performance, causality or global optimality. Screening is advisory. '
@@ -375,7 +500,7 @@ def inspect(host):
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['offline','offline-recover','package-offline','package-blocked-live','prepare','run','inspect'])
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['offline','offline-recover','package-offline','package-blocked-live','package-live-result','prepare','run','inspect'])
     parser.add_argument('--output',type=Path,default=Path('runs')/('stage335_math_route_retry_'+datetime.now().strftime('%Y%m%d_%H%M%S')))
     parser.add_argument('--source',type=Path)
     parser.add_argument('--credential-file',type=Path,default=Path.home()/'.codex/.env');args=parser.parse_args()
@@ -388,6 +513,9 @@ def main():
     if args.action=='package-blocked-live':
         if args.source is None: raise ValueError('--source is required for package-blocked-live')
         package_blocked_live(args.source.resolve(),root);return
+    if args.action=='package-live-result':
+        if args.source is None: raise ValueError('--source is required for package-live-result')
+        package_live_result(args.source.resolve(),root);return
     host=prepare(root) if args.action in ('prepare','run') else Host(root,read(root/'workflow.json')['run_id'])
     require_softagent_runtime()
     if args.action=='run':

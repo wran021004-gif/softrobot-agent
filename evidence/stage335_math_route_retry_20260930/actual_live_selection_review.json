@@ -1,0 +1,145 @@
+{
+  "run_id": "gvs-stage335-81350ebec934",
+  "model_selection": {
+    "actual_optimizer_candidate_id": "math-compliant-4795c8184616",
+    "model_build_candidate_label": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+    "selected_parameters": {
+      "components/far/length_m": 0.11,
+      "components/near/length_m": 0.15,
+      "design/section_scale": 0.95,
+      "design/material_scenario": "compliant"
+    },
+    "exact_parameters_match": true,
+    "model_build_reason": "The single bounded design.optimize_math call returned two tied proposals, math-compliant-4795c8184616 and math-stiff-cccc020c6300, both at near 0.15 m, far 0.11 m, section scale 0.95, with identical primary residual upper bound (0.002 m, ratio 0.2 of the 0.01 m tolerance) and identical matrix evidence (world-x position-control row norm 0, shape [210]). I select the compliant proposal because the secondary lexicographic component, the feasible-witness normalized input energy, is lower for compliant (4.3677e-05) than for stiff (8.4636e-05). Because build with a saved source is not supported, I materialize exactly those selected near/far/scale/material values as changes on the frozen baseline, which is the required solve-free construction step; this configuration (0.15/0.11/0.95/compliant) is not among the excluded historical evaluated configurations.",
+    "rationale_supported": true,
+    "rationale_evidence": {
+      "primary_ratio": 0.19999999999999463,
+      "candidate_residual_m": 0.0019999999999999463,
+      "selected_secondary_energy": 4.367701514792259e-05,
+      "alternate_candidate_id": "math-stiff-cccc020c6300",
+      "alternate_secondary_energy": 8.463648352583415e-05,
+      "matrix_evidence": {
+        "world_x_position_control_nonzero_count": 0,
+        "world_x_position_control_row_linf": 0.0,
+        "world_x_position_control_row_shape": [
+          210
+        ]
+      },
+      "objective_id": "controller_start_local_endpoint_lexicographic_v1",
+      "applicability": "controller-start frozen local affine exact-ZOH model",
+      "limitations": [
+        "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+        "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+        "Numerical agreement is implementation verification, not physical model validation.",
+        "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+        "The objective can favor geometric alignment at the straight controller-start configuration; it does not predict nonlinear bending, closed-loop reach, settling, real-time performance, or global optimality.",
+        "Terminal braking and other sampled configurations are not aggregated into this optimization objective.",
+        "Candidate residuals are upper bounds; only explicit separating-direction records may certify local infeasibility.",
+        "Scenario winners and ties are bounded-search proposals, not global optima."
+      ]
+    }
+  },
+  "citation_review": {
+    "optimizer_artifact": {
+      "artifact_id": "9e408e81d706b22246e1d856d122bdcffaa605308ed975cbfa0ade0c563c7245",
+      "media_type": "application/json"
+    },
+    "optimizer_artifact_cited_accurately": true,
+    "exact_parameters_cited_accurately": true,
+    "primary_and_secondary_cited_accurately": true,
+    "scope_and_limitations_cited_accurately": true,
+    "cited_candidate_bound_artifacts": {
+      "linearization": {
+        "artifact_id": "fecccc31a1f81a66e76ed3484e80cf2ecbf74fd27875bb25ea445460ca370cf5",
+        "media_type": "application/json"
+      },
+      "metrics": {
+        "artifact_id": "c95db3eb25e6286562329cd8a8ad51419347177391f1a2150635beead37a1e9b",
+        "media_type": "application/json"
+      },
+      "endpoint": {
+        "artifact_id": "bcae2da3662e176688a48f8b94a93d6abbc7e02b78e076ca2c294d1dc96c8085",
+        "media_type": "application/json"
+      },
+      "screen": {
+        "artifact_id": "73bef851229f297f586e3c9c42e08eaeb02be61e57e356a6aec531f2b50ba890",
+        "media_type": "application/json"
+      },
+      "math_optimization": {
+        "artifact_id": "9e408e81d706b22246e1d856d122bdcffaa605308ed975cbfa0ade0c563c7245",
+        "media_type": "application/json"
+      },
+      "build_result": {
+        "artifact_id": "f39d23a86000a687ca02d5dc25da53fe88d7713312fa9cff08295cd5e54dcfed",
+        "media_type": "application/json"
+      }
+    },
+    "candidate_bound_bindings": {
+      "linearization": {
+        "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d"
+      },
+      "metrics": {
+        "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d"
+      },
+      "endpoint": {
+        "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d"
+      },
+      "screen": {
+        "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d"
+      }
+    },
+    "cited_candidate_bound_artifacts_exist": true,
+    "candidate_bound_artifacts_consistent": true,
+    "actual_optimizer_candidate_id": "math-compliant-4795c8184616",
+    "attempted_report_candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+    "optimizer_candidate_id_cited_accurately": false,
+    "finding": "The model chose and built the exact returned compliant configuration, but renamed the proposal when binding the report; the build label is not the optimizer candidate_id."
+  },
+  "automatic_report_linkage": {
+    "completed": false,
+    "node_id": "a_mathsel_bound",
+    "status": "failed",
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "model",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 2.6410000000614673,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": "ROUTE_SELECTED_OPTIMIZER_PROPOSAL_NOT_FOUND",
+      "execution_id": "a09edefa7c4141a49180a08b6fb43da9",
+      "execution_status": "failed",
+      "original_execution_id": null,
+      "output": null,
+      "request_id": "model-21-tool",
+      "result_contract": null,
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "route.record_analysis",
+      "tool_version": "1.0.0"
+    },
+    "route_rejection": "ROUTE_SELECTED_OPTIMIZER_PROPOSAL_NOT_FOUND",
+    "correction_received": false,
+    "following_provider_request_error": "DEEPSEEK_NETWORK_ERROR"
+  },
+  "backend_spending_decision": {
+    "model_recommended_one_backend_validation": true,
+    "decision_text": "Treat the attached advisory evidence as recommending one backend validation of this changed build; execute the saved build once, then read its official evaluation and profile report before any further physical search.",
+    "backend_attempted": false
+  },
+  "acceptance_a_math_influenced_executed_design": false
+}

@@ -1,0 +1,111 @@
+{
+  "run_id": "gvs-stage335-81350ebec934",
+  "nodes": [
+    {
+      "node_id": "b0_baseline_seed",
+      "action": "build",
+      "status": "completed",
+      "result": {
+        "artifact_id": "4ebb6bd837dfb97d778c70e3dfcc164955d4537882be0907fda2723fde14cd83",
+        "media_type": "application/json"
+      },
+      "selection": {
+        "action": "build",
+        "candidate_id": "seed_baseline_unchanged",
+        "changes": {},
+        "combination": "candidate_gvs_nmpc",
+        "design_statement": null,
+        "evidence": [],
+        "max_trials": 1,
+        "next_step": "Invoke analysis.linearize_candidate on this completed build to obtain the configuration-only local model for the controller-start frozen basis, then continue the analysis workflow before any backend execution.",
+        "node_id": "b0_baseline_seed",
+        "reason": "Guidance requires the unchanged baseline to be built as a solve-free analysis seed for the candidate-bound math workflow (linearization, metrics, bounded endpoint, screen). No parameters are edited, so this build reproduces the frozen baseline design: near 0.16 m, far 0.12 m, baseline material scenario and section scale 1.0.",
+        "result_statement": null,
+        "source_node": null,
+        "variables": {}
+      }
+    },
+    {
+      "node_id": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant",
+      "action": "build",
+      "status": "completed",
+      "result": {
+        "artifact_id": "f39d23a86000a687ca02d5dc25da53fe88d7713312fa9cff08295cd5e54dcfed",
+        "media_type": "application/json"
+      },
+      "selection": {
+        "action": "build",
+        "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "changes": {
+          "components/far/length_m": 0.11,
+          "components/near/length_m": 0.15,
+          "design/material_scenario": "compliant",
+          "design/section_scale": 0.95
+        },
+        "combination": "candidate_gvs_nmpc",
+        "design_statement": null,
+        "evidence": [
+          {
+            "artifact_id": "4ebb6bd837dfb97d778c70e3dfcc164955d4537882be0907fda2723fde14cd83",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "9e408e81d706b22246e1d856d122bdcffaa605308ed975cbfa0ade0c563c7245",
+            "media_type": "application/json"
+          }
+        ],
+        "max_trials": 1,
+        "next_step": "After this build completes, run analysis.linearize_candidate on this completed build node, then analysis.control_metrics and analysis.bounded_endpoint, then design.screen and route.record_analysis with the original optimizer artifact and selected_optimizer_candidate_id before deciding on any backend run.",
+        "node_id": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "reason": "The single bounded design.optimize_math call returned two tied proposals, math-compliant-4795c8184616 and math-stiff-cccc020c6300, both at near 0.15 m, far 0.11 m, section scale 0.95, with identical primary residual upper bound (0.002 m, ratio 0.2 of the 0.01 m tolerance) and identical matrix evidence (world-x position-control row norm 0, shape [210]). I select the compliant proposal because the secondary lexicographic component, the feasible-witness normalized input energy, is lower for compliant (4.3677e-05) than for stiff (8.4636e-05). Because build with a saved source is not supported, I materialize exactly those selected near/far/scale/material values as changes on the frozen baseline, which is the required solve-free construction step; this configuration (0.15/0.11/0.95/compliant) is not among the excluded historical evaluated configurations.",
+        "result_statement": null,
+        "source_node": null,
+        "variables": {}
+      }
+    },
+    {
+      "node_id": "a_mathsel_bound",
+      "action": "analyze",
+      "status": "failed",
+      "result": null,
+      "selection": {
+        "endpoint": {
+          "artifact_id": "bcae2da3662e176688a48f8b94a93d6abbc7e02b78e076ca2c294d1dc96c8085",
+          "media_type": "application/json"
+        },
+        "evidence": [
+          {
+            "artifact_id": "f39d23a86000a687ca02d5dc25da53fe88d7713312fa9cff08295cd5e54dcfed",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "9e408e81d706b22246e1d856d122bdcffaa605308ed975cbfa0ade0c563c7245",
+            "media_type": "application/json"
+          }
+        ],
+        "linearization": {
+          "artifact_id": "fecccc31a1f81a66e76ed3484e80cf2ecbf74fd27875bb25ea445460ca370cf5",
+          "media_type": "application/json"
+        },
+        "math_optimization": {
+          "artifact_id": "9e408e81d706b22246e1d856d122bdcffaa605308ed975cbfa0ade0c563c7245",
+          "media_type": "application/json"
+        },
+        "metrics": {
+          "artifact_id": "c95db3eb25e6286562329cd8a8ad51419347177391f1a2150635beead37a1e9b",
+          "media_type": "application/json"
+        },
+        "next_step": "Treat the attached advisory evidence as recommending one backend validation of this changed build; execute the saved build once, then read its official evaluation and profile report before any further physical search.",
+        "node_id": "a_mathsel_bound",
+        "reason": "The bounded frozen design.optimize_math run (artifact 9e408e81, 16/16 cumulative math evaluations used) returned the proposal I selected myself: candidate_id mathsel_c1_n0p15_f0p11_s0p95_compliant with near length 0.15 m, far length 0.11 m, common section scale 0.95 and compliant material scenario, i.e. the lower edge of the authorized space [0.15,0.17] m, [0.11,0.13] m, [0.95,1.05] with compliant/stiff scenarios. Its objective is controller_start_local_endpoint_lexicographic_v1: primary = official-tolerance-normalized position residual upper bound of the controller-start frozen local affine exact-ZOH position/velocity model, secondary = normalized input energy of a position-feasible witness; terminal braking is not an objective term. Applicability is therefore restricted to that local affine proxy at the straight controller start, not to the nonlinear backend. Matrix evidence in that run shows a zero world-x position-control mapping row at the straight start with equal primary residuals across the compliant and stiff scenarios and across tested section scales, and dominant length terms, so the ranking can favor geometric alignment. Limitations: local proxy only; no prediction of nonlinear bending, closed-loop reach, sampled settling, real-time feasibility, causality or global optimality; screening is advisory. The candidate-bound shared analysis for exactly this build (linearization fecccc31, control metrics c95db3eb, bounded endpoint bcae2da3) and design.screen 73bef851 are attached, together with the changed build result f39d23a8 and the original optimizer result 9e408e81.",
+        "screen": {
+          "artifact_id": "73bef851229f297f586e3c9c42e08eaeb02be61e57e356a6aec531f2b50ba890",
+          "media_type": "application/json"
+        },
+        "selected_optimizer_candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant",
+        "validation_disposition": "recommended"
+      }
+    }
+  ]
+}
