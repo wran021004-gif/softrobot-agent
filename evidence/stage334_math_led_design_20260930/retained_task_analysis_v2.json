@@ -1,0 +1,113 @@
+{
+  "kind": "retained_historical_evidence_not_regenerated",
+  "verification": {
+    "baseline_immutable": true,
+    "nine_completed_builds": true,
+    "configuration_only_before_outcomes": true,
+    "prohibited_usage_zero": true,
+    "public_calls_completed": true,
+    "shared_contract": true,
+    "outcome_count": 9,
+    "passed": true
+  },
+  "report": "Offline task-time and design screening analysis\n\n1. Interface fixes and baseline preservation\nSciPy public calls no longer require MATLAB Engine; discrete input models and misaligned sampled horizons are rejected. The retained baseline was not rewritten and representative numerical matrices were preserved.\n\n2. Observed control divergence\nThe saved primary command sequences first differ at 0.23 s. The passing case selects noninitialization iteration 19 there; the predecessor selects initialization at all 35 updates. Their states already differ before this event because their geometries differ.\n\n3. Conditional local-model correction and braking\nExact-ZOH affine endpoint calculations use actual remaining task time, affine drift, and 0 <= applied tension <= candidate limits. Position and terminal-speed constraints are reported separately; undetermined is never relabelled infeasible. At t=0.34 the calculation uses one 0.01 s step, while original 0.35 s energy remains a distinct nominal baseline.\n\n4. Actual pre-execution screening capability\nNine genuine completed build nodes were created without Route run actions. Configuration-only screens use declared initial/pretension data, one bounded target-static attempt, one fixed halfway waypoint, shared control metrics, bounded endpoint results and applicability. Historical outcomes were joined only after these artifacts were saved. No scalar score or fitted threshold was created.\n\n5. Unsupported conclusions\nThe evidence does not prove why the passing execution succeeded, global or physical feasibility/infeasibility, nonlinear settling, real-time operation, or prospective independent validation. Rank two at the straight configuration is not a global reach rejection.\n\nReproduction (PowerShell, from D:\\softrobot-agent):\n& 'C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe' examples/offline_task_analysis.py\n\nPublic call chain: route.advance(build) -> analysis.linearize_candidate -> analysis.control_metrics -> analysis.bounded_endpoint -> design.screen. The same design.screen report was consumed by design-facing and diagnostic-facing callers.\n\nResource usage:\n{\n  \"limit\": {\n    \"backend_solves\": 0,\n    \"model_calls\": 0,\n    \"tool_calls\": 240,\n    \"wall_s\": 14400.0,\n    \"worker_calls\": 0\n  },\n  \"used\": {\n    \"tool_calls\": 65,\n    \"model_calls\": 0,\n    \"backend_solves\": 0,\n    \"worker_calls\": 0,\n    \"wall_s\": 245.73600000026636\n  },\n  \"remaining\": {\n    \"backend_solves\": 0,\n    \"model_calls\": 0,\n    \"tool_calls\": 175,\n    \"wall_s\": 14154.263999999734,\n    \"worker_calls\": 0\n  },\n  \"occupied\": {},\n  \"actual_counts\": {\n    \"model_requests\": 0,\n    \"workers\": 0,\n    \"backend_calls\": 0\n  },\n  \"elapsed_s\": 272.97962320013903,\n  \"matlab_batches\": 0,\n  \"nmpc_solves\": 0,\n  \"physical_backend_executions\": 0\n}",
+  "resource_usage": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 240,
+      "wall_s": 14400.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 65,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 245.73600000026636
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 175,
+      "wall_s": 14154.263999999734,
+      "worker_calls": 0
+    },
+    "occupied": {},
+    "actual_counts": {
+      "model_requests": 0,
+      "workers": 0,
+      "backend_calls": 0
+    },
+    "elapsed_s": 272.97962320013903,
+    "matlab_batches": 0,
+    "nmpc_solves": 0,
+    "physical_backend_executions": 0
+  },
+  "source_identity": {
+    "commit": "c92d91b33c4bc1797b94384173a32d259e46de78",
+    "branch": "feat/gvs-dynamics",
+    "worktree_dirty": true,
+    "hashes": {
+      "schemas/platform_analysis.py": "42780bc3890a01800dae4dd42c01f901309a2ca3a17ebcea864e7e7e8ed95a13",
+      "extensions/math_analysis/kernels.py": "235dcf289d9bdc5782adb1c769f2a0915af5dd60f39e3d8bc725d9041325cd0d",
+      "extensions/math_analysis/tools.py": "ca36690fcfbe71d575061c3ab1592bb9c1126e544b0f7a51843cf03caa040fed",
+      "extensions/math_analysis/manifest.py": "a51d81de3ebdb37e84d3d3b575f50b502b49eed4c196cb79e2213231b7ccc9cb",
+      "extensions/math_analysis/matlab.py": "f4abccd700832f0f848c5ecab1a72571ddc259448e7a81f8d8d20c3ce30e1ba4",
+      "extensions/tendon_family/math_analysis.py": "e0478f114588ea4806af4dc98067fa02877e63b7a617eb1ab9dc4a2b151f8260",
+      "extensions/tendon_family/saved_cases.py": "3243a868ba2cd6f8be4ce033dd5743ae171f48f66744f5262251702437d15572",
+      "extensions/tendon_family/candidate_analysis.py": "e0be014d04430f9f663533dd0b8bafda9c587ad6b54ed24882dbf4fac65e4cbf",
+      "extensions/tendon_family/model_applicability.py": "6dd4e523222cf8dc0ea1b71fc986a961db75cc4be137e2b39ee4522099082433",
+      "extensions/tendon_family/gvs_casadi.py": "c1cdd5a03863b9de8a471d93f9dd203959c0e55ad72573312d8ed6e71455e94c",
+      "examples/offline_task_analysis.py": "7ba08de4c5e3ae6b92086685e5e0567ea9a7906a900fe0d1578136707207315e",
+      "examples/offline_math_analysis.py": "296b3342887d80ede70f1cf94885d8fdfc56d59b5d4a253eac59fe5b9696f95d",
+      "matlab/analyze_linear_model.m": "dd86ae17776681f4fd6214d6cb78f92c35e26b6c12c2ab6b1a087decc399cba8",
+      "tests/test_math_analysis.py": "cca64e0a08b03ecb75eb6153d1f9a1827f0dd3cd1901482d8b4bdee5343a1a5a",
+      "tests/test_task_analysis.py": "2290cce0812c21150c7c93075efa8d782fe354de61b4893364bb493cb80000e6",
+      "docs/offline_math_analysis.rst": "7834cb28e9669f6913a1e218a7fad0eb8757a083ba35adb7656cff65c058fd16"
+    }
+  },
+  "control_divergence": {
+    "passing_first_positive_noninitialization_time_s": 0.23,
+    "passing_selected_iteration_at_divergence": 19,
+    "predecessor_initialization_selected_all_updates": true,
+    "first_applied_tension_divergence": {
+      "command_index": 23,
+      "time_s": 0.23,
+      "passing_minus_predecessor_n": [
+        -0.5539287822436905,
+        -0.11155634365492872,
+        1.1460436309968314,
+        1.431040287305601,
+        3.0338853543099047,
+        -0.6314487797947322
+      ]
+    },
+    "verified": true
+  },
+  "shared_screen_callers": {
+    "design": {
+      "artifact_id": "a7737ad58fc092c74832a30476c599f62e505ef66db5e3f5e1f7830bbf48ace3",
+      "media_type": "application/json"
+    },
+    "diagnostic": {
+      "artifact_id": "a7737ad58fc092c74832a30476c599f62e505ef66db5e3f5e1f7830bbf48ace3",
+      "media_type": "application/json"
+    },
+    "identical_contract": true
+  },
+  "local_full_artifacts": {
+    "primary_remaining_time_analysis.json": {
+      "sha256": "6c7a1da5ee03d22050a977c1a444f4a7fcf0f2febb8c2c238c49b47d2251d3ca",
+      "bytes": 2855551
+    },
+    "late_remaining_time_all_cases.json": {
+      "sha256": "ee91dd544feb8854eccba4ac013783a95e9069a7f6652362bd3437e6f29c2c33",
+      "bytes": 3511254
+    },
+    "configuration_build_bindings.json": {
+      "sha256": "2785e021db22c7d8b22cac2e0adbcaf55e8c8958384ded66a234c0079027c8d7",
+      "bytes": 18456
+    }
+  }
+}

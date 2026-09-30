@@ -1,0 +1,375 @@
+[
+  {
+    "event_id": "5705f2c784fe47ffa1b6b811b4ff487a",
+    "status": "normalized",
+    "request_id": "model-0-tool",
+    "tool_id": "route.advance",
+    "tool_version": "1.0.0",
+    "reason": "Create the required solve-free analysis seed build from the authorized combination, using the unchanged frozen baseline only as a mathematical starting configuration that will never be executed.",
+    "arguments": {
+      "action": "build",
+      "candidate_id": "seed_baseline_math",
+      "changes": {},
+      "combination": "candidate_gvs_nmpc",
+      "next_step": "Run analysis.linearize_candidate on the completed seed build to obtain the configuration-only local model required by the analysis workflow.",
+      "node_id": "seed_build01",
+      "reason": "Create the required solve-free analysis seed build from the authorized combination, using the unchanged frozen baseline as a mathematical starting configuration. This build is never executed; it only supplies an owned completed node for the analysis workflow (linearize, control_metrics, bounded_endpoint, screen) and a root for design.optimize_math."
+    }
+  },
+  {
+    "event_id": "b2d8933e142b4a7191fcc8cea6a17f46",
+    "status": "normalized",
+    "request_id": "model-1-tool",
+    "tool_id": "analysis.linearize_candidate",
+    "tool_version": "1.0.0",
+    "reason": "First step of the required analysis workflow: obtain the configuration-only position/velocity local model for the completed seed build seed_build01 using the configured protocol, so the local model can be evaluated by analysis.control_metrics and analysis.bounded_endpoint. This is zero-solve analysis on the frozen baseline as a mathematical starting configuration.",
+    "arguments": {
+      "protocol": {
+        "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+        "media_type": "application/json"
+      },
+      "source_node": "seed_build01"
+    }
+  },
+  {
+    "event_id": "600ca8c3af114214b76c94111e2fafc4",
+    "status": "normalized",
+    "request_id": "model-2-tool",
+    "tool_id": "analysis.control_metrics",
+    "tool_version": "2.0.0",
+    "reason": "The declared analysis workflow requires analysis.control_metrics immediately after the seed-build linearization. I request configuration-only continuous-model local metrics for the linearized seed build under the frozen reach protocol, to supply the metrics artifact that design.screen later consumes.",
+    "arguments": {
+      "implementation": "scipy",
+      "models": [
+        {
+          "artifact_id": "1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237",
+          "media_type": "application/json"
+        }
+      ],
+      "protocol": {
+        "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+        "media_type": "application/json"
+      }
+    }
+  },
+  {
+    "event_id": "beee1d8f320149efa03386fa35425ff6",
+    "status": "normalized",
+    "request_id": "model-3-tool",
+    "tool_id": "evidence.read",
+    "tool_version": "1.0.0",
+    "reason": "The analysis.control_metrics step failed with 25 OutputLinearizedModel validation errors after analysis.linearize_candidate completed, so I need to see the actual structure of the saved linearization artifact 1183cbb1... to determine what evidence shape the metrics step requires.",
+    "arguments": {
+      "byte_limit": 8192,
+      "limit": 20,
+      "pointer": "",
+      "reference": {
+        "artifact_id": "1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237",
+        "media_type": "application/json"
+      }
+    }
+  },
+  {
+    "event_id": "8f8c4bdcdbf14a42aee69776a4213b47",
+    "status": "normalized",
+    "request_id": "model-4-tool",
+    "tool_id": "evidence.read",
+    "tool_version": "1.0.0",
+    "reason": "The linearization artifact page returned only 4 of 8 items at the root pointer, and the failed analysis.control_metrics call shows it was handed the linearization container rather than a concrete model object. I need the remaining root entries (kind, limitations, protocol, records) to find the exact model evidence references required by analysis.control_metrics.",
+    "arguments": {
+      "byte_limit": 8192,
+      "limit": 20,
+      "offset": 4,
+      "pointer": "",
+      "reference": {
+        "artifact_id": "1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237",
+        "media_type": "application/json"
+      }
+    }
+  },
+  {
+    "event_id": "712bfea1f47f4d26814b5d2cad79c9bc",
+    "status": "normalized",
+    "request_id": "model-5-tool",
+    "tool_id": "evidence.read",
+    "tool_version": "1.0.0",
+    "reason": "The earlier analysis.control_metrics attempt failed with an OutputLinearizedModel validation error on the container artifact from analysis.linearize_candidate. I need to inspect the saved linearization records to see whether each record is a complete linear model document (state/input/output definitions, A, B, C, D) and whether it carries its own artifact reference that control_metrics should consume.",
+    "arguments": {
+      "byte_limit": 8192,
+      "limit": 4,
+      "pointer": "/records",
+      "reference": {
+        "artifact_id": "1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237",
+        "media_type": "application/json"
+      }
+    }
+  },
+  {
+    "event_id": "1eb6f894c7a8444bb134133fd23f40fb",
+    "status": "normalized",
+    "request_id": "model-6-tool",
+    "tool_id": "analysis.linearize_candidate",
+    "tool_version": "1.0.0",
+    "reason": "The only completed route node is the solve-free seed build seed_build01 (unchanged baseline math starting configuration). The declared analysis workflow requires analysis.linearize_candidate first, using the frozen GVS bending-basis protocol artifact, so I request the configuration-only local model for this owned build.",
+    "arguments": {
+      "protocol": {
+        "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+        "media_type": "application/json"
+      },
+      "source_node": "seed_build01"
+    }
+  },
+  {
+    "event_id": "abe12cca8a0f4020aafb0ea4beedb3e7",
+    "status": "normalized",
+    "request_id": "model-7-tool",
+    "tool_id": "analysis.control_metrics",
+    "tool_version": "2.0.0",
+    "reason": "The route's analysis workflow requires configuration-only local control metrics on the owned completed seed build before any execution; the linearization artifact 1183cbb1... and the frozen GVS bending basis protocol 5e359e66... are already produced, so I request the shared continuous-model local metrics for that linearization.",
+    "arguments": {
+      "implementation": "scipy",
+      "models": [
+        {
+          "artifact_id": "1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237",
+          "media_type": "application/json"
+        }
+      ],
+      "protocol": {
+        "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+        "media_type": "application/json"
+      }
+    }
+  },
+  {
+    "event_id": "38abc99f94324529bc4ae1a5f8338d99",
+    "status": "normalized",
+    "request_id": "model-8-tool",
+    "tool_id": "analysis.compare_candidates",
+    "tool_version": "1.0.0",
+    "reason": "placeholder",
+    "arguments": {}
+  },
+  {
+    "event_id": "144cd7d3ee2341269fd2b9cfed7c717a",
+    "status": "normalized",
+    "request_id": "model-9-tool",
+    "tool_id": "evidence.read",
+    "tool_version": "1.0.0",
+    "reason": "Read the saved linearize_candidate result structure to find the exact linearized-model evidence reference that analysis.control_metrics requires, since the previous control_metrics call failed validation after being handed the composite bundle.",
+    "arguments": {
+      "byte_limit": 4096,
+      "limit": 20,
+      "offset": 0,
+      "pointer": "/records/0",
+      "reference": {
+        "artifact_id": "1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237",
+        "media_type": "application/json"
+      }
+    }
+  },
+  {
+    "event_id": "fa66af08e0b94e7fb46437c5c1dfb166",
+    "status": "normalized",
+    "request_id": "model-10-tool",
+    "tool_id": "evidence.read",
+    "tool_version": "1.0.0",
+    "reason": "The saved linearization bundle for seed_build01 (artifact 1183cbb...) was rejected wholesale by analysis.control_metrics as an OutputLinearizedModel, so I need the bundle's labeled structure to identify the exact model-level evidence record required by the shared analysis chain.",
+    "arguments": {
+      "byte_limit": 2048,
+      "limit": 8,
+      "offset": 0,
+      "pointer": "",
+      "reference": {
+        "artifact_id": "1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237",
+        "media_type": "application/json"
+      }
+    }
+  },
+  {
+    "event_id": "ed1c9fe4e624461b992ec20ad061e761",
+    "status": "normalized",
+    "request_id": "model-11-tool",
+    "tool_id": "analysis.linearize_candidate",
+    "tool_version": "1.0.0",
+    "reason": "The route's analysis workflow requires an owned completed build and specifies analysis.linearize_candidate as the first call. seed_build01 is a completed build of the unchanged baseline (a solve-free mathematical starting configuration), so I request configuration-only local position/velocity models for it against the frozen protocol artifact, with the GVS bending basis supplied by the frozen controller.",
+    "arguments": {
+      "protocol": {
+        "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+        "media_type": "application/json"
+      },
+      "source_node": "seed_build01"
+    }
+  },
+  {
+    "event_id": "d6ee134068464ae29f4ac4cf105a0128",
+    "status": "protocol_failed",
+    "error": "INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls: EXACTLY_ONE_TOOL_CALL_REQUIRED: received 2"
+  },
+  {
+    "event_id": "9496d65c03754fc6ac75dfcda64e8ea9",
+    "status": "normalized",
+    "request_id": "model-13-tool",
+    "tool_id": "analysis.control_metrics",
+    "tool_version": "2.0.0",
+    "reason": "The analysis workflow for the owned completed seed build (seed_build01) requires configuration-only local continuous metrics after linearization. The linearization artifact 1183cbb1... for candidate seed_baseline_math (effective identity 4c3130cf...) is complete, so I now request analysis.control_metrics with the route analysis protocol 5e359e66... to obtain exact aligned held-horizon local metrics. This is a zero-solve mathematical step and does not consume backend budget.",
+    "arguments": {
+      "implementation": "scipy",
+      "models": [
+        {
+          "artifact_id": "1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237",
+          "media_type": "application/json"
+        }
+      ],
+      "protocol": {
+        "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+        "media_type": "application/json"
+      }
+    }
+  },
+  {
+    "event_id": "de36edb899ed4168a6666c5eedce197d",
+    "status": "normalized",
+    "request_id": "model-14-tool",
+    "tool_id": "evidence.read",
+    "tool_version": "1.0.0",
+    "reason": "The failed analysis.control_metrics call decoded its model reference into the linearization envelope, not an OutputLinearizedModel. I need to inspect the envelope's bindings subtree to find the actual model artifact reference that control_metrics requires.",
+    "arguments": {
+      "byte_limit": 8192,
+      "limit": 20,
+      "offset": 0,
+      "pointer": "/bindings",
+      "reference": {
+        "artifact_id": "1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237",
+        "media_type": "application/json"
+      }
+    }
+  },
+  {
+    "event_id": "073f028d757b4a10bcfd4b8b24dcf6ba",
+    "status": "normalized",
+    "request_id": "model-15-tool",
+    "tool_id": "design.optimize_math",
+    "tool_version": "1.0.0",
+    "reason": "The seed build seed_build01 is a completed, solve-free mathematical starting configuration, and the guidance requires the configuration-only math search to run with exactly the authorized bounds (near 0.15-0.17 m, far 0.11-0.13 m, section scale 0.95-1.05) under both compliant and stiff material scenarios against the frozen protocol and endpoint target. This call is zero-backend and produces the proposal set I must choose an exact design from.",
+    "arguments": {
+      "material_scenarios": [
+        "compliant",
+        "stiff"
+      ],
+      "max_evaluations": 16,
+      "objective": "controller_start_local_endpoint_lexicographic_v1",
+      "protocol": {
+        "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+        "media_type": "application/json"
+      },
+      "source_node": "seed_build01",
+      "target": {
+        "artifact_id": "d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be",
+        "media_type": "application/json"
+      },
+      "variables": {
+        "components/far/length_m": [
+          0.11,
+          0.13
+        ],
+        "components/near/length_m": [
+          0.15,
+          0.17
+        ],
+        "design/section_scale": [
+          0.95,
+          1.05
+        ]
+      }
+    }
+  },
+  {
+    "event_id": "d8c7c94664e94f7e8a23b18aaf1c9064",
+    "status": "protocol_failed",
+    "error": "INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls: EXACTLY_ONE_TOOL_CALL_REQUIRED: received 2"
+  },
+  {
+    "event_id": "1a5638afab884f32900828cd51ea3324",
+    "status": "normalized",
+    "request_id": "model-17-tool",
+    "tool_id": "evidence.read",
+    "tool_version": "1.0.0",
+    "reason": "The completed design.optimize_math output artifact was returned only as a pointer overview, so the exact proposal values are not in context; reading /proposals supplies the authorized near/far length, section-scale and material scenario values needed to pick one proposal to build.",
+    "arguments": {
+      "byte_limit": 4096,
+      "limit": 2,
+      "offset": 0,
+      "pointer": "/proposals",
+      "reference": {
+        "artifact_id": "d923766bc6e95bee1de4c6436ccd5158e15013a363bdee2a8fee07f5d2144f5b",
+        "media_type": "application/json"
+      }
+    }
+  },
+  {
+    "event_id": "5e47686a835343428dbc0e23b3a08600",
+    "status": "normalized",
+    "request_id": "model-18-tool",
+    "tool_id": "analysis.linearize_candidate",
+    "tool_version": "1.0.0",
+    "reason": "Begin the mandated analysis workflow (call_order: linearize_candidate first) on the owned completed build seed_build01, whose immutable effective configuration is the unchanged frozen baseline. The frozen controller's basis is the structural_linear gvs_bending_basis_v1 (12 bending coordinates) declared in protocol 5e359e66..., which this linearization takes as its basis. This is a zero-solve configuration-only local model, not a success prediction.",
+    "arguments": {
+      "protocol": {
+        "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+        "media_type": "application/json"
+      },
+      "source_node": "seed_build01"
+    }
+  },
+  {
+    "event_id": "b7bcf96fa7684c59a7512ca0cb4bfab6",
+    "status": "protocol_failed",
+    "error": "INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls: EXACTLY_ONE_TOOL_CALL_REQUIRED: received 2"
+  },
+  {
+    "event_id": "b92d0415928942cfb3213db24b03f3e0",
+    "status": "normalized",
+    "request_id": "model-20-tool",
+    "tool_id": "analysis.control_metrics",
+    "tool_version": "2.0.0",
+    "reason": "The completed seed build seed_build01 now has its configuration-only linearization (artifact 1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237, source_node seed_build01, candidate seed_baseline_math) produced under the frozen protocol 5e359e66…. The next mandated step of the route analysis workflow (linearize -> control_metrics -> bounded_endpoint -> screen -> optimize_math -> record_analysis) is therefore analysis.control_metrics, evaluating continuous-model local metrics of that linearized model. This is a zero-backend, configuration-only computation that gates the later design.screen call, so it is the correct single next action.",
+    "arguments": {
+      "models": [
+        {
+          "artifact_id": "1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237",
+          "media_type": "application/json"
+        }
+      ],
+      "protocol": {
+        "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+        "media_type": "application/json"
+      }
+    }
+  },
+  {
+    "event_id": "7125105d9269462ca15ae481f33668e8",
+    "status": "normalized",
+    "request_id": "model-21-tool",
+    "tool_id": "route.inspect",
+    "tool_version": "1.0.0",
+    "reason": "Stopping because a required capability is unavailable: the mandated pre-run analysis chain (analysis.linearize_candidate -> analysis.control_metrics -> analysis.bounded_endpoint -> design.screen -> design.optimize_math -> route.record_analysis) is blocked at its second step. analysis.control_metrics@2.0.0 failed to decode the only available model evidence, the candidate linearization artifact 1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237 for seed_build01 (25 OutputLinearizedModel validation errors: 19 missing model-record fields such as state_definition, A, B, x0, u0, protocol_identity; 6 forbidden envelope fields bindings, facts, kind, limitations, protocol, records), and since records are inline no EvidenceRef exists for the individual model, so bounded_endpoint and design.screen cannot receive shared evidence either; route.record_analysis is also missing from the exposed tool registry. With that gate unsatisfiable, no changed build can be screening-validated and route.advance run/finish cannot honestly deliver an evaluated free-reach candidate. No backend solve was charged (3 remain), the baseline was never executed, and I make no success claim.",
+    "arguments": {
+      "reason": "The frozen pre-run analysis gate cannot be satisfied in this session. analysis.control_metrics@2.0.0 (execution 982e532b29444fd39dd15c6b02b1c1d4, request_id model-20-tool, solver_status not_run, execution_status failed) rejected the seed build's candidate linearization artifact 1183cbb150035231b89033f24a8b365529e7ea9fc0878eaa1c3b397d7cabd237 (kind=candidate_linearization, source_node seed_build01, candidate seed_baseline_math, effective configuration identity 4c3130cf749e92f7b4e79ba05e3f62bdf6129a3cfbff00426a00f1072d097128) with 25 OutputLinearizedModel validation errors: 19 required record fields missing (state_definition, input_definition, output_definition, x0, u0, A, B, time_domain, drift, y0, C, D, binding, operating_point, state_scales, input_scales, output_scales, normalization_derivation, protocol_identity) and 6 forbidden envelope fields supplied (bindings, facts, kind, limitations, protocol, records). The linearization output is a candidate_linearization container whose model records are inline, so no EvidenceRef can name an individual OutputLinearizedModel for the models argument; analysis.bounded_endpoint and design.screen require that same models/metrics evidence, and the mandated route.record_analysis step has no exposed tool schema. No protocol_correction was present to follow. Budget is intact: 0 of 3 backend solves charged, the baseline/seed build was never executed, none of the nine historical configurations was replayed, and no candidate_facts, reach pass or success is claimed.",
+      "status": "capability_missing"
+    }
+  },
+  {
+    "event_id": "659f2ff5b73a4cafa186752418b78a62",
+    "status": "normalized",
+    "request_id": "model-22-tool",
+    "tool_id": "route.inspect",
+    "tool_version": "1.0.0",
+    "reason": "Repair the rejected route.inspect call. The tool's arguments schema has no fields (Required: none), so the previously supplied arguments.status and arguments.reason were invalid extras; the corrected call passes an empty arguments object while keeping the required outer reason. This returns the authoritative compact route overview (selected candidate, gates, remaining budget) with zero solves, so I can choose the correct final action.",
+    "arguments": {}
+  },
+  {
+    "event_id": "ea4384d17ad946f690e5000f07e369fe",
+    "status": "protocol_failed",
+    "error": "INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls[0].function.name: Expected a registered function name from the supplied tools."
+  }
+]

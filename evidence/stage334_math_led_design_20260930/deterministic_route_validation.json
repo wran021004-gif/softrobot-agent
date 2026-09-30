@@ -1,0 +1,891 @@
+{
+  "verification": {
+    "all_calls_completed": true,
+    "no_provider_backend_or_worker": true,
+    "optimizer_evaluations": 8,
+    "optimizer_within_budget": true,
+    "route_report_links_optimizer": true,
+    "route_report_links_screen": true,
+    "route_context_configured": true,
+    "passed": true
+  },
+  "usage": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 80,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 8,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 126.0629999996163
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 72,
+      "wall_s": 7073.937000000384,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "report": {
+    "detail": {
+      "final": null,
+      "node": {
+        "action": "analyze",
+        "node_id": "math_report",
+        "status": "completed"
+      },
+      "result": {
+        "artifact_id": "fb4e29877d4cce3ace994cbc73f886cb5f2e4049c9ece99582e265d730ff7adb",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "actual_solves": 0,
+        "analysis_report": {
+          "artifact_id": "43e9480e6648cdb95d6670b0a1f2f0f31b9db6421bff28945f0cf5a3f52c3a5c",
+          "media_type": "application/json"
+        },
+        "candidate_facts": null,
+        "candidate_id": "math-start",
+        "configuration": null,
+        "distinct_candidates": null,
+        "evaluated": false,
+        "evaluation": null,
+        "evaluation_ref": null,
+        "facts": null,
+        "findings": null,
+        "math_optimization": {
+          "artifact_id": "e3051a2d5544b1f6bcd1062c905476e1a8fa391735f8edd52b7405b75b441704",
+          "media_type": "application/json"
+        },
+        "new_evaluations": null,
+        "proposals": null,
+        "reused_evaluations": null,
+        "run_id": null,
+        "simulated": false,
+        "simulation": null,
+        "status": "analyzed",
+        "stop_reason": null,
+        "task_success": null,
+        "validation_disposition": "recommended"
+      }
+    }
+  },
+  "optimizer": {
+    "kind": "mathematical_design_optimization",
+    "starting_binding": {
+      "analysis_protocol": "supplied_by_analysis_call",
+      "basis": {
+        "axes": [
+          "y",
+          "z"
+        ],
+        "coordinate_order": [
+          "near.kappa_y_node_0",
+          "near.kappa_y_node_1",
+          "near.kappa_y_node_2",
+          "near.kappa_z_node_0",
+          "near.kappa_z_node_1",
+          "near.kappa_z_node_2",
+          "far.kappa_y_node_0",
+          "far.kappa_y_node_1",
+          "far.kappa_y_node_2",
+          "far.kappa_z_node_0",
+          "far.kappa_z_node_1",
+          "far.kappa_z_node_2"
+        ],
+        "dimension": 12,
+        "representation_id": "gvs_bending_basis_v1",
+        "segments": [
+          {
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "length_m": 0.16,
+            "locations": [
+              {
+                "kinds": [
+                  "segment_boundary"
+                ],
+                "s": 0.0
+              },
+              {
+                "kinds": [
+                  "tendon_guide"
+                ],
+                "s": 0.5
+              },
+              {
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor",
+                  "tendon_guide"
+                ],
+                "s": 1.0
+              }
+            ],
+            "segment": "near",
+            "start": 0
+          },
+          {
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "length_m": 0.12,
+            "locations": [
+              {
+                "kinds": [
+                  "segment_boundary"
+                ],
+                "s": 0.0
+              },
+              {
+                "kinds": [
+                  "tendon_guide"
+                ],
+                "s": 0.5
+              },
+              {
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ],
+                "s": 1.0
+              }
+            ],
+            "segment": "far",
+            "start": 6
+          }
+        ],
+        "specification": {
+          "strategy": "structural_linear"
+        }
+      },
+      "calculation_frame": "robot_base",
+      "candidate_id": "math-start",
+      "configuration": {
+        "artifact_id": "757b50b2ca74e1b1b50291a68460b7a662a66a2ae1e76b7dac33533d7eceb2cb",
+        "media_type": "application/json"
+      },
+      "control_period_s": 0.01,
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "data": {
+            "numerical_source": "bundled_guess",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": false,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.0001,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.0001
+            },
+            "settling": {
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            }
+          },
+          "version": "1.0.0"
+        },
+        "version": "6.0.0"
+      },
+      "controller_numerical_source": "bundled_guess",
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "far.kappa_y_node_0",
+        "far.kappa_y_node_1",
+        "far.kappa_y_node_2",
+        "far.kappa_z_node_0",
+        "far.kappa_z_node_1",
+        "far.kappa_z_node_2"
+      ],
+      "declared_pretension_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "effective_configuration_identity": "757b50b2ca74e1b1b50291a68460b7a662a66a2ae1e76b7dac33533d7eceb2cb",
+      "endpoint_frame": "world",
+      "endpoint_requirements": {
+        "official_reach": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "terminal_braking_diagnostic": {
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        }
+      },
+      "execution_data_used": false,
+      "initializer": {
+        "extension_id": "initialize.family",
+        "parameters": {
+          "contract": "family.initial",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "model": "model.gvs@1.0.0",
+      "owner_run_id": "stage334-deterministic-math-route",
+      "physical_context": {
+        "contract": "experiment.assembly",
+        "data": {
+          "environment": {
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "environment_id": "reach_free",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "lights": [
+              {
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ],
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ]
+              }
+            ],
+            "objects": [
+              {
+                "conaffinity": 1,
+                "contype": 0,
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ]
+              }
+            ],
+            "schema_version": "1",
+            "truth_status": "HUMAN_OWNED",
+            "units": "SI"
+          },
+          "external_forces": [],
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "version": "1.0.0"
+      },
+      "physics_timestep_s": 0.0005,
+      "robot_identity": "8102c55baa18b392613733cf4edfa68ca4f585dd15f1387eab8480c31ffca1f7",
+      "source_node": "math_start",
+      "target_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "task_duration_s": 0.35,
+      "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
+      "tendon_order": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1",
+        "far_t2"
+      ],
+      "tension_bounds_n": [
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ]
+      ]
+    },
+    "bounds": {
+      "components/far/length_m": [
+        0.11,
+        0.13
+      ],
+      "components/near/length_m": [
+        0.15,
+        0.17
+      ],
+      "design/section_scale": [
+        0.95,
+        1.05
+      ]
+    },
+    "material_scenarios": [
+      "compliant",
+      "stiff"
+    ],
+    "objective": {
+      "objective_id": "controller_start_local_endpoint_lexicographic_v1",
+      "operating_point": "controller_start_input",
+      "ordering": "lexicographic; primary values within endpoint_check_atol/tolerance are tied; no fitted weights or historical outcomes",
+      "primary": {
+        "definition": "SciPy bounded least-squares candidate residual divided by official reach tolerance",
+        "direction": "minimize",
+        "name": "controller_start_bounded_position_residual_upper_bound_ratio",
+        "units": "1"
+      },
+      "primary_tie_resolution": 1e-06,
+      "secondary": {
+        "definition": "Exact-ZOH held-input sum(period * ||delta_u/input_scale||^2), used only after primary ordering",
+        "direction": "minimize",
+        "name": "feasible_position_witness_normalized_input_energy",
+        "units": "s (normalized input squared integral)"
+      }
+    },
+    "provenance": {
+      "deterministic": true,
+      "distinct_evaluations": 8,
+      "evaluation_budget": 8,
+      "implementation_identity": "4211ebe3cb04e6913e848513ce0b381ca5f99fd06c9142bad9add8068e83bb80",
+      "iterations": 6,
+      "method": "bounded_coordinate_pattern_local_v1",
+      "nmpc_solves": 0,
+      "physical_backend_calls": 0,
+      "provider_calls": 0,
+      "seed": null,
+      "stop_reason": "evaluation_budget"
+    },
+    "proposals": [
+      {
+        "candidate_id": "math-compliant-e3eb2dc753ae",
+        "configuration": {
+          "artifact_id": "e3eb2dc753ae9114301b458cf3dad83db5baa5f788bdfc8a801aed54100d8e75",
+          "media_type": "application/json"
+        },
+        "material_scenario": "compliant",
+        "objective": {
+          "applicability": "controller-start frozen local affine exact-ZOH model",
+          "candidate_residual_m": 0.008000000000000118,
+          "feasible_witness_normalized_input_energy": 5.732271900264529e-05,
+          "position_residual_upper_bound_ratio": 0.8000000000000118,
+          "position_tolerance_m": 0.01,
+          "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+          "status": "feasible_in_local_model"
+        },
+        "parameters": {
+          "components/far/length_m": 0.12,
+          "components/near/length_m": 0.15,
+          "design/section_scale": 1.0
+        },
+        "selection_rationale": "Lowest declared residual-upper-bound ratio; feasible local input energy is a secondary lexicographic component only.",
+        "tied_candidate_ids": [
+          "math-compliant-e3eb2dc753ae"
+        ]
+      },
+      {
+        "candidate_id": "math-stiff-c8f6b443b63c",
+        "configuration": {
+          "artifact_id": "c8f6b443b63c6135568577216a8969fd10d1d257a970b4d10b82570f51e29bbe",
+          "media_type": "application/json"
+        },
+        "material_scenario": "stiff",
+        "objective": {
+          "applicability": "controller-start frozen local affine exact-ZOH model",
+          "candidate_residual_m": 0.008000000000000118,
+          "feasible_witness_normalized_input_energy": 0.00015266005070019108,
+          "position_residual_upper_bound_ratio": 0.8000000000000118,
+          "position_tolerance_m": 0.01,
+          "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+          "status": "feasible_in_local_model"
+        },
+        "parameters": {
+          "components/far/length_m": 0.12,
+          "components/near/length_m": 0.15,
+          "design/section_scale": 1.0
+        },
+        "selection_rationale": "Lowest declared residual-upper-bound ratio; feasible local input energy is a secondary lexicographic component only.",
+        "tied_candidate_ids": [
+          "math-stiff-c8f6b443b63c"
+        ]
+      }
+    ],
+    "evaluations": [
+      {
+        "evaluation_index": 1,
+        "candidate_id": "math-compliant-c2b0178aa5bc",
+        "configuration": {
+          "artifact_id": "c2b0178aa5bca1742c47522cf9d9dd64f681896fc58490cd71e1ff905861f5a0",
+          "media_type": "application/json"
+        },
+        "material_scenario": "compliant",
+        "parameters": {
+          "components/far/length_m": 0.12,
+          "components/near/length_m": 0.16,
+          "design/section_scale": 1.0
+        },
+        "objective": {
+          "applicability": "controller-start frozen local affine exact-ZOH model",
+          "candidate_residual_m": 0.018000000000000016,
+          "feasible_witness_normalized_input_energy": null,
+          "position_residual_upper_bound_ratio": 1.8000000000000016,
+          "position_tolerance_m": 0.01,
+          "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+          "status": "infeasible_in_local_model"
+        },
+        "unavailable_constructions": [
+          null,
+          null,
+          null,
+          "halfway_waypoint"
+        ],
+        "provider_called": false,
+        "backend_executed": false,
+        "nmpc_solved": false
+      },
+      {
+        "evaluation_index": 2,
+        "candidate_id": "math-stiff-46f0052dc8da",
+        "configuration": {
+          "artifact_id": "46f0052dc8da187e27b65fddd070c713aed4a4a1dd9ec54aaf954df40c252880",
+          "media_type": "application/json"
+        },
+        "material_scenario": "stiff",
+        "parameters": {
+          "components/far/length_m": 0.12,
+          "components/near/length_m": 0.16,
+          "design/section_scale": 1.0
+        },
+        "objective": {
+          "applicability": "controller-start frozen local affine exact-ZOH model",
+          "candidate_residual_m": 0.018000000000000016,
+          "feasible_witness_normalized_input_energy": null,
+          "position_residual_upper_bound_ratio": 1.8000000000000016,
+          "position_tolerance_m": 0.01,
+          "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+          "status": "infeasible_in_local_model"
+        },
+        "unavailable_constructions": [
+          null,
+          null,
+          null,
+          "halfway_waypoint"
+        ],
+        "provider_called": false,
+        "backend_executed": false,
+        "nmpc_solved": false
+      },
+      {
+        "evaluation_index": 3,
+        "candidate_id": "math-compliant-d68428b745ef",
+        "configuration": {
+          "artifact_id": "d68428b745ef5200d594f1cb9547257a98d36a0fb139af3676b17933668af2e2",
+          "media_type": "application/json"
+        },
+        "material_scenario": "compliant",
+        "parameters": {
+          "components/far/length_m": 0.12,
+          "components/near/length_m": 0.17,
+          "design/section_scale": 1.0
+        },
+        "objective": {
+          "applicability": "controller-start frozen local affine exact-ZOH model",
+          "candidate_residual_m": 0.028000000000000025,
+          "feasible_witness_normalized_input_energy": null,
+          "position_residual_upper_bound_ratio": 2.8000000000000025,
+          "position_tolerance_m": 0.01,
+          "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+          "status": "infeasible_in_local_model"
+        },
+        "unavailable_constructions": [
+          null,
+          null,
+          null,
+          "halfway_waypoint"
+        ],
+        "provider_called": false,
+        "backend_executed": false,
+        "nmpc_solved": false
+      },
+      {
+        "evaluation_index": 4,
+        "candidate_id": "math-stiff-5dc5b24a9709",
+        "configuration": {
+          "artifact_id": "5dc5b24a9709a76b56fd0db598b1017845035d1e31a227bf4cdb42692fb9d3a1",
+          "media_type": "application/json"
+        },
+        "material_scenario": "stiff",
+        "parameters": {
+          "components/far/length_m": 0.12,
+          "components/near/length_m": 0.17,
+          "design/section_scale": 1.0
+        },
+        "objective": {
+          "applicability": "controller-start frozen local affine exact-ZOH model",
+          "candidate_residual_m": 0.028000000000000025,
+          "feasible_witness_normalized_input_energy": null,
+          "position_residual_upper_bound_ratio": 2.8000000000000025,
+          "position_tolerance_m": 0.01,
+          "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+          "status": "infeasible_in_local_model"
+        },
+        "unavailable_constructions": [
+          null,
+          null,
+          null,
+          "halfway_waypoint"
+        ],
+        "provider_called": false,
+        "backend_executed": false,
+        "nmpc_solved": false
+      },
+      {
+        "evaluation_index": 5,
+        "candidate_id": "math-compliant-e3eb2dc753ae",
+        "configuration": {
+          "artifact_id": "e3eb2dc753ae9114301b458cf3dad83db5baa5f788bdfc8a801aed54100d8e75",
+          "media_type": "application/json"
+        },
+        "material_scenario": "compliant",
+        "parameters": {
+          "components/far/length_m": 0.12,
+          "components/near/length_m": 0.15,
+          "design/section_scale": 1.0
+        },
+        "objective": {
+          "applicability": "controller-start frozen local affine exact-ZOH model",
+          "candidate_residual_m": 0.008000000000000118,
+          "feasible_witness_normalized_input_energy": 5.732271900264529e-05,
+          "position_residual_upper_bound_ratio": 0.8000000000000118,
+          "position_tolerance_m": 0.01,
+          "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+          "status": "feasible_in_local_model"
+        },
+        "unavailable_constructions": [
+          null,
+          null,
+          null,
+          "halfway_waypoint"
+        ],
+        "provider_called": false,
+        "backend_executed": false,
+        "nmpc_solved": false
+      },
+      {
+        "evaluation_index": 6,
+        "candidate_id": "math-stiff-c8f6b443b63c",
+        "configuration": {
+          "artifact_id": "c8f6b443b63c6135568577216a8969fd10d1d257a970b4d10b82570f51e29bbe",
+          "media_type": "application/json"
+        },
+        "material_scenario": "stiff",
+        "parameters": {
+          "components/far/length_m": 0.12,
+          "components/near/length_m": 0.15,
+          "design/section_scale": 1.0
+        },
+        "objective": {
+          "applicability": "controller-start frozen local affine exact-ZOH model",
+          "candidate_residual_m": 0.008000000000000118,
+          "feasible_witness_normalized_input_energy": 0.00015266005070019108,
+          "position_residual_upper_bound_ratio": 0.8000000000000118,
+          "position_tolerance_m": 0.01,
+          "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+          "status": "feasible_in_local_model"
+        },
+        "unavailable_constructions": [
+          null,
+          null,
+          null,
+          "halfway_waypoint"
+        ],
+        "provider_called": false,
+        "backend_executed": false,
+        "nmpc_solved": false
+      },
+      {
+        "evaluation_index": 7,
+        "candidate_id": "math-compliant-a10d307c186c",
+        "configuration": {
+          "artifact_id": "a10d307c186cfa029abaa300ba2c1bc13b6158a1f44c6529979e9309bcedb39e",
+          "media_type": "application/json"
+        },
+        "material_scenario": "compliant",
+        "parameters": {
+          "components/far/length_m": 0.13,
+          "components/near/length_m": 0.15,
+          "design/section_scale": 1.0
+        },
+        "objective": {
+          "applicability": "controller-start frozen local affine exact-ZOH model",
+          "candidate_residual_m": 0.01800000000000007,
+          "feasible_witness_normalized_input_energy": null,
+          "position_residual_upper_bound_ratio": 1.8000000000000071,
+          "position_tolerance_m": 0.01,
+          "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+          "status": "infeasible_in_local_model"
+        },
+        "unavailable_constructions": [
+          null,
+          null,
+          null,
+          "halfway_waypoint"
+        ],
+        "provider_called": false,
+        "backend_executed": false,
+        "nmpc_solved": false
+      },
+      {
+        "evaluation_index": 8,
+        "candidate_id": "math-stiff-fbc966fc81fc",
+        "configuration": {
+          "artifact_id": "fbc966fc81fc63ab3b78349fe3d1c54d12d949367062a187389070c856c6e5f6",
+          "media_type": "application/json"
+        },
+        "material_scenario": "stiff",
+        "parameters": {
+          "components/far/length_m": 0.13,
+          "components/near/length_m": 0.15,
+          "design/section_scale": 1.0
+        },
+        "objective": {
+          "applicability": "controller-start frozen local affine exact-ZOH model",
+          "candidate_residual_m": 0.01800000000000007,
+          "feasible_witness_normalized_input_energy": null,
+          "position_residual_upper_bound_ratio": 1.8000000000000071,
+          "position_tolerance_m": 0.01,
+          "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+          "status": "infeasible_in_local_model"
+        },
+        "unavailable_constructions": [
+          null,
+          null,
+          null,
+          "halfway_waypoint"
+        ],
+        "provider_called": false,
+        "backend_executed": false,
+        "nmpc_solved": false
+      }
+    ],
+    "limitations": [
+      "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+      "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+      "Numerical agreement is implementation verification, not physical model validation.",
+      "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+      "The objective is a local mathematical proxy and does not predict closed-loop success.",
+      "Candidate residuals are upper bounds; only explicit separating-direction records may certify local infeasibility.",
+      "Scenario winners and ties are bounded-search proposals, not global optima."
+    ],
+    "protocol": {
+      "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+      "media_type": "application/json"
+    },
+    "target": {
+      "artifact_id": "d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be",
+      "media_type": "application/json"
+    },
+    "evidence": [
+      {
+        "artifact_id": "757b50b2ca74e1b1b50291a68460b7a662a66a2ae1e76b7dac33533d7eceb2cb",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "c2b0178aa5bca1742c47522cf9d9dd64f681896fc58490cd71e1ff905861f5a0",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "b55464759d4df84bbad41e10a516c494265e6271a29338b3110b800a0faad7b4",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "3821d340f3c639f95f5c40005e6e21b6b3af5dc6658c141caeec205d4480daaa",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "46f0052dc8da187e27b65fddd070c713aed4a4a1dd9ec54aaf954df40c252880",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "91f2fbf9d4ea4fb3ae97a63fb8aa34d539b58431feff5e2a7104ab2f3fd26c6c",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "bda5cb84b054b2ed63a0913a67d9619a813f6934c01ef1d4517a2222ce8c9eab",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "d68428b745ef5200d594f1cb9547257a98d36a0fb139af3676b17933668af2e2",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "da10bf383a0d20c887c10206d6ee895d6825ddf8dd4c95da780ce3bcffbedcd1",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "6beaa1572364f7555f614385d704d256880e42bcaf74de783e785ec685f6fca5",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "5dc5b24a9709a76b56fd0db598b1017845035d1e31a227bf4cdb42692fb9d3a1",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "2e2613dd8d5bb917d73ea8b95b831ab5df884d17538d9eb5226140b0e5ccade5",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "65545aedac0d4366f8e22aac27304b2f2f0cbff828ad2c37c0713c1c657af053",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "e3eb2dc753ae9114301b458cf3dad83db5baa5f788bdfc8a801aed54100d8e75",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "d67703e54d718dfb3016bd86d40371392c63e4d128dcd3c94c9fb1f5517be995",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "8c5171e5e0650ea5c2ec8cab2c4e24aa7f13222caed07c04fb75ff49c96b3990",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "c8f6b443b63c6135568577216a8969fd10d1d257a970b4d10b82570f51e29bbe",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "6ef337f42f47db683f1e2dcfea038439589d2d7173cb310e0171a92fc0913a28",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "cf185038a1b94526fd3d9332d6712db0496df0f7597551dde1f333c49c43fbe0",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "a10d307c186cfa029abaa300ba2c1bc13b6158a1f44c6529979e9309bcedb39e",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "f3b50066f9112c2961e39737d76fce1ccb853207baf2d3b682bf78350d3e74ff",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "1e30e68c518e032580b05084c3193e31e8505caa120a56ce82cf7192a2acc411",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "fbc966fc81fc63ab3b78349fe3d1c54d12d949367062a187389070c856c6e5f6",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "b1a29f3dbb8e91a14954ba0b2fc9edb967dfd2e43a069e3d546ce1a9f1e96495",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "f5df7d4a0b8e3cf9d1b8e403d2e54b4dd358fd457006bd2f9b48e1b58b91d37f",
+        "media_type": "application/json"
+      }
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "analysis": {
+    "protocol_id": "task-local-v2",
+    "baseline_lengths_m": {
+      "near": 0.16,
+      "far": 0.12
+    },
+    "duration_s": 0.35,
+    "period_s": 0.01,
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.35
+    ],
+    "samples_s": [],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0,
+      1000.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "endpoint_target": {
+    "position_m": [
+      0.29,
+      0.035,
+      0.19
+    ],
+    "position_tolerance_m": 0.01,
+    "position_scale_m": 0.01,
+    "tip_velocity_m_s": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "tip_speed_limit_m_s": 0.02,
+    "tip_velocity_scale_m_s": 0.02
+  },
+  "novelty_rule": {
+    "rule_id": "stage334-math-led-novelty-v1",
+    "declared_before_launch": true,
+    "prohibited": [
+      "unchanged baseline",
+      "any exact one of the nine bound historical evaluated configurations"
+    ],
+    "required": [
+      "first executed candidate is a changed compliant or stiff design matching an exact design.optimize_math proposal",
+      "candidate-bound shared screen and Route report precede execution"
+    ],
+    "comparison": "Exact declared near length, far length, material scenario and common section scale.",
+    "stop": "Stop further physical search when a qualifying changed candidate passes official reach, or at budget/stop policy."
+  },
+  "live_optimizer_objective": {
+    "objective_id": "controller_start_local_endpoint_lexicographic_v1",
+    "operating_point": "controller_start_input",
+    "ordering": "lexicographic; primary values within endpoint_check_atol/tolerance are tied; no fitted weights or historical outcomes",
+    "primary": {
+      "definition": "SciPy bounded least-squares candidate residual divided by official reach tolerance",
+      "direction": "minimize",
+      "name": "controller_start_bounded_position_residual_upper_bound_ratio",
+      "units": "1"
+    },
+    "primary_tie_resolution": 1e-06,
+    "secondary": {
+      "definition": "Exact-ZOH held-input sum(period * ||delta_u/input_scale||^2), used only after primary ordering",
+      "direction": "minimize",
+      "name": "feasible_position_witness_normalized_input_energy",
+      "units": "s (normalized input squared integral)"
+    }
+  },
+  "shared_optimizer_budget": {
+    "deterministic_evaluations": 8,
+    "live_evaluations": 16,
+    "limit": 24,
+    "total": 24
+  }
+}
