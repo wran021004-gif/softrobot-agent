@@ -1,0 +1,223 @@
+{
+  "run_id": "gvs-stage336-fd94c5aeaaa5",
+  "status": "failed",
+  "stop_reason": "DEEPSEEK_NETWORK_ERROR",
+  "route_nodes": [
+    {
+      "node_id": "proposal-build",
+      "action": "build",
+      "status": "completed",
+      "result": {
+        "artifact_id": "a622f1b786708254ef7878fca54b8cf29788cf052f944ce8466cf6e6ac10d365",
+        "media_type": "application/json"
+      },
+      "selection": {
+        "next_step": "Bind its frozen historical mathematical evidence via analysis.bind_historical_math.",
+        "node_id": "proposal-build",
+        "optimizer_candidate_id": "math-compliant-4795c8184616",
+        "optimizer_result": {
+          "artifact_id": "9e408e81d706b22246e1d856d122bdcffaa605308ed975cbfa0ade0c563c7245",
+          "media_type": "application/json"
+        },
+        "reason": "Construct the exact proposal selected in Stage 3.35 (math-compliant-4795c8184616), attributing that selection to Stage 3.35 without claiming new mathematics."
+      }
+    },
+    {
+      "node_id": "proposal-analysis",
+      "action": "analyze",
+      "status": "completed",
+      "result": {
+        "artifact_id": "c0f9b2e0eb62a7fbf50f2a7cc24e14fb5fb0e8f70f4cc7868f5236e8eda4dd47",
+        "media_type": "application/json"
+      },
+      "selection": {
+        "endpoint": null,
+        "evidence": [
+          {
+            "artifact_id": "a622f1b786708254ef7878fca54b8cf29788cf052f944ce8466cf6e6ac10d365",
+            "media_type": "application/json"
+          }
+        ],
+        "historical_math_binding": {
+          "artifact_id": "d5bce3e77c1d85374c904ee14ae73048943b947fb6c372dae6d100c4d818afb9",
+          "media_type": "application/json"
+        },
+        "linearization": null,
+        "math_optimization": null,
+        "metrics": null,
+        "next_step": "Exercise the single authorized backend validation of the proposal-bound build via route.advance action=run, then read the official evaluation and profile evidence.",
+        "node_id": "proposal-analysis",
+        "reason": "Attach the exact shared Stage 3.35 analysis to the completed proposal build proposal-build: the frozen historical linearization, metrics, endpoint and screen named references delivered by analysis.bind_historical_math, plus the selected math-compliant-4795c8184616 optimizer candidate. All of this is taken verbatim from the sealed import manifest; zero new mathematics and zero solves. The local proxy has a zero world-x row at the straight start, so it is advisory only and cannot establish closed-loop reach, settling or real-time behavior.",
+        "screen": null,
+        "selected_optimizer_candidate_id": null,
+        "source_node": "proposal-build",
+        "validation_disposition": "recommended"
+      }
+    }
+  ],
+  "proposal_build": {
+    "candidate_id": "proposal-build",
+    "build_candidate_id": "proposal-build",
+    "optimizer_candidate_id": "math-compliant-4795c8184616",
+    "source_build_node": "proposal-build",
+    "optimizer_result": {
+      "artifact_id": "9e408e81d706b22246e1d856d122bdcffaa605308ed975cbfa0ade0c563c7245",
+      "media_type": "application/json"
+    },
+    "proposal_configuration": {
+      "artifact_id": "73627f1e3360566b9e4d2234dbb396c66fbcfc0708e1c8ba3b7692dbb747326b",
+      "media_type": "application/json"
+    },
+    "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+    "configuration": {
+      "artifact_id": "56750ad0316b0c8ea2d6445b5b9baa57b1f90eaedabba9efb6f5f8eec9fe9b97",
+      "media_type": "application/json"
+    }
+  },
+  "analysis_report": {
+    "source_build_node": "proposal-build",
+    "build_candidate_id": "proposal-build",
+    "optimizer_candidate_id": "math-compliant-4795c8184616",
+    "references": {
+      "endpoint": {
+        "historical_computation": true,
+        "kind": "bounded_endpoint",
+        "reference": {
+          "artifact_id": "bcae2da3662e176688a48f8b94a93d6abbc7e02b78e076ca2c294d1dc96c8085",
+          "media_type": "application/json"
+        },
+        "source_binding": {
+          "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+          "configuration": {
+            "artifact_id": "d54a7d6634e090bb192b3a783cad8cd2f460a87ab60dc9fad1a43e0dffc12b41",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage335-81350ebec934",
+          "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+          "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant"
+        },
+        "tool_id": "analysis.bounded_endpoint",
+        "tool_version": "1.0.0"
+      },
+      "linearization": {
+        "historical_computation": true,
+        "kind": "candidate_linearization",
+        "reference": {
+          "artifact_id": "fecccc31a1f81a66e76ed3484e80cf2ecbf74fd27875bb25ea445460ca370cf5",
+          "media_type": "application/json"
+        },
+        "source_binding": {
+          "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+          "configuration": {
+            "artifact_id": "d54a7d6634e090bb192b3a783cad8cd2f460a87ab60dc9fad1a43e0dffc12b41",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage335-81350ebec934",
+          "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+          "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant"
+        },
+        "tool_id": "analysis.linearize_candidate",
+        "tool_version": "1.0.0"
+      },
+      "metrics": {
+        "historical_computation": true,
+        "kind": "control_metrics",
+        "reference": {
+          "artifact_id": "c95db3eb25e6286562329cd8a8ad51419347177391f1a2150635beead37a1e9b",
+          "media_type": "application/json"
+        },
+        "source_binding": {
+          "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+          "configuration": {
+            "artifact_id": "d54a7d6634e090bb192b3a783cad8cd2f460a87ab60dc9fad1a43e0dffc12b41",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage335-81350ebec934",
+          "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+          "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant"
+        },
+        "tool_id": "analysis.control_metrics",
+        "tool_version": "2.0.0"
+      },
+      "screen": {
+        "historical_computation": true,
+        "kind": "design_screen",
+        "reference": {
+          "artifact_id": "73bef851229f297f586e3c9c42e08eaeb02be61e57e356a6aec531f2b50ba890",
+          "media_type": "application/json"
+        },
+        "source_binding": {
+          "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+          "configuration": {
+            "artifact_id": "d54a7d6634e090bb192b3a783cad8cd2f460a87ab60dc9fad1a43e0dffc12b41",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage335-81350ebec934",
+          "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+          "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant"
+        },
+        "tool_id": "design.screen",
+        "tool_version": "1.0.0"
+      }
+    },
+    "math_selection_trace": {
+      "build_candidate_id": "proposal-build",
+      "historical_computation": true,
+      "matches_proposal": true,
+      "optimizer_candidate_id": "math-compliant-4795c8184616",
+      "optimizer_configuration": {
+        "artifact_id": "73627f1e3360566b9e4d2234dbb396c66fbcfc0708e1c8ba3b7692dbb747326b",
+        "media_type": "application/json"
+      },
+      "optimizer_objective": {
+        "applicability": "controller-start frozen local affine exact-ZOH model",
+        "candidate_residual_m": 0.0019999999999999463,
+        "feasible_witness_normalized_input_energy": 4.367701514792259e-05,
+        "matrix_evidence": {
+          "world_x_position_control_nonzero_count": 0,
+          "world_x_position_control_row_linf": 0.0,
+          "world_x_position_control_row_shape": [
+            210
+          ]
+        },
+        "position_residual_upper_bound_ratio": 0.19999999999999463,
+        "position_tolerance_m": 0.01,
+        "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+        "scope": "position endpoint only; terminal braking and other sampled configurations are not objective terms",
+        "status": "feasible_in_local_model"
+      },
+      "optimizer_result": {
+        "artifact_id": "9e408e81d706b22246e1d856d122bdcffaa605308ed975cbfa0ade0c563c7245",
+        "media_type": "application/json"
+      },
+      "optimizer_starting_build": {
+        "artifact_id": "af43aa0cc7e33b87343d6238e48422781c38191d78baef1c5c074533ab4096b8",
+        "media_type": "application/json"
+      },
+      "proposal_configuration": {
+        "artifact_id": "73627f1e3360566b9e4d2234dbb396c66fbcfc0708e1c8ba3b7692dbb747326b",
+        "media_type": "application/json"
+      },
+      "provenance_inherited_from_build": true,
+      "required": true,
+      "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+      "source_build_node": "proposal-build"
+    },
+    "historical_math_binding": {
+      "artifact_id": "d5bce3e77c1d85374c904ee14ae73048943b947fb6c372dae6d100c4d818afb9",
+      "media_type": "application/json"
+    },
+    "validation_disposition": "recommended",
+    "disposition_reason": "Attach the exact shared Stage 3.35 analysis to the completed proposal build proposal-build: the frozen historical linearization, metrics, endpoint and screen named references delivered by analysis.bind_historical_math, plus the selected math-compliant-4795c8184616 optimizer candidate. All of this is taken verbatim from the sealed import manifest; zero new mathematics and zero solves. The local proxy has a zero world-x row at the straight start, so it is advisory only and cannot establish closed-loop reach, settling or real-time behavior."
+  },
+  "execution": null,
+  "usage": {
+    "tool_calls": 4,
+    "model_calls": 5,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 84.54599999985658
+  },
+  "math_evaluations_new": 0,
+  "within_limits": true
+}
