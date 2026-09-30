@@ -19,12 +19,13 @@ class Combination(Contract):
 class RoutePolicy(Contract):
     source: str
     historical_case: EvidenceRef | None = None
+    historical_math: EvidenceRef | None = Field(default=None, description='Optional frozen import manifest for exact historical mathematical artifacts. It grants no execution or global cross-run ownership.')
     combinations: dict[str, Combination]
     max_trials: int = Field(default=3,ge=1,le=100)
     analysis_protocol: EvidenceRef | None = None
     endpoint_target: EvidenceRef | None = None
     analysis_required_before_run: bool = False
-    math_evaluation_limit: int = Field(default=24,ge=1,le=24)
+    math_evaluation_limit: int = Field(default=24,ge=0,le=24)
     math_selection_required_before_run: bool = False
     stop_on_task_success: bool = False
     guidance: str = 'Select a legal combination and structure; evaluate, inspect evidence, then continue, adjust or finish. Reserve a solve for independent review when useful.'
@@ -50,15 +51,24 @@ class RouteAnalysisAction(Contract):
     node_id: Identifier
     source_node: Identifier = Field(description='Owned completed Route build analyzed by all supplied evidence.')
     evidence: list[EvidenceRef] = Field(default_factory=list)
-    linearization: EvidenceRef
-    metrics: EvidenceRef
-    endpoint: EvidenceRef
-    screen: EvidenceRef
+    linearization: EvidenceRef | None = None
+    metrics: EvidenceRef | None = None
+    endpoint: EvidenceRef | None = None
+    screen: EvidenceRef | None = None
+    historical_math_binding: EvidenceRef | None = Field(default=None, description='Owned output of analysis.bind_historical_math for source_node. Named references are inherited from it; any explicit references must match.')
     math_optimization: EvidenceRef | None = None
     selected_optimizer_candidate_id: str | None = Field(default=None, description='Exact proposal candidate_id selected from math_optimization. Required with math_optimization when mathematical proposal selection is enforced; the proposal is compared to this build by complete scientific configuration, not bookkeeping labels.')
     validation_disposition: Literal['recommended','deferred','additional_analysis']
     reason: str = Field(min_length=1)
     next_step: str = Field(min_length=1)
+
+
+class ProposalBuildAction(Contract):
+    node_id: Identifier = Field(description='Unique Route construction node identifier.')
+    optimizer_result: EvidenceRef = Field(description='Exact mathematical optimizer result containing the selected proposal.')
+    optimizer_candidate_id: str = Field(min_length=1, description='Exact proposal candidate_id from optimizer_result; never a build label.')
+    reason: str = Field(min_length=1, description='Concise evidence-grounded reason for constructing this already-selected proposal.')
+    next_step: str = Field(min_length=1, description='Intended analysis/report or stopping decision after construction.')
 
 
 class RouteResult(Contract):
@@ -159,8 +169,10 @@ def view(host):
             required_before_run=spec.analysis_required_before_run,math_evaluation_limit=spec.math_evaluation_limit,
             math_evaluations_used=ledger['used'],math_evaluations_remaining=ledger['remaining'],
             math_selection_required_before_run=spec.math_selection_required_before_run,
-            call_order=['analysis.linearize_candidate','analysis.control_metrics','analysis.bounded_endpoint',
-                'design.screen','design.optimize_math','route.record_analysis'],
+            call_order=['design.build_proposal','analysis.bind_historical_math','route.record_analysis']
+                if spec.historical_math else ['analysis.linearize_candidate','analysis.control_metrics','analysis.bounded_endpoint',
+                    'design.screen','design.optimize_math','route.record_analysis'],
+            historical_math=plain(spec.historical_math) if spec.historical_math else None,
             optimizer_scope=('Primary: official-tolerance-normalized position residual upper bound from the controller-start '
                 'frozen local affine exact-ZOH model. Secondary: normalized input energy of a position-feasible witness. '
                 'Terminal braking and other sampled configurations are not aggregated into this objective.'),
@@ -369,6 +381,9 @@ def overview(host):
         limitations=full['limitations'])
     if full.get('analysis_workflow'):
         projection['analysis_workflow']=full['analysis_workflow']
+        projection['available_actions']['build_proposal']='Construct one exact named optimizer proposal without retyping its configuration; zero solves.'
+        if full['analysis_workflow'].get('historical_math'):
+            projection['available_actions']['bind_historical_math']='Bind frozen named historical references to the exact proposal build; zero new mathematics and zero solves.'
         projection['available_actions']['record_analysis']='Attach exact shared analysis/optimizer evidence for a completed build; advisory and zero backend solves.'
     if route.get('final',{}):
         final=route['final']
@@ -448,6 +463,13 @@ def preflight(inp,args,reg):
     return dict(cost={'wall_s':0.})
 
 
+def preflight_proposal(inp,args,reg):
+    spec=policy(inp)
+    if not spec.analysis_protocol or not spec.endpoint_target:
+        raise ValueError('ROUTE_ANALYSIS_NOT_CONFIGURED')
+    return dict(cost={'wall_s':0.})
+
+
 def source_node(ctx,args,route):
     node=next((n for n in route['nodes'] if n['node_id']==args.source_node and n['status']=='completed'),None)
     if not node: raise ValueError('COMPLETED_SOURCE_NODE_REQUIRED')
@@ -498,6 +520,132 @@ def update_incumbent(ctx,route,node,out):
                 evaluation_ref=trial['evaluation'],evaluation=summary,score=trial['score'],
                 comparison_identity=comparison,candidate_facts=trial_facts(ctx.store,ctx.input,trial),
                 **{k:trial[k] for k in ('profile_report','profile_report_summary','factual_result') if k in trial})
+
+
+def _proposal_ids(optimized):
+    return [row.get('candidate_id') for row in optimized.get('proposals',[]) if row.get('candidate_id')]
+
+
+def _proposal_error(field,value,valid,code='ROUTE_SELECTED_OPTIMIZER_PROPOSAL_NOT_FOUND'):
+    return ValueError(f'{code}: field={field}; submitted={value!r}; valid_optimizer_candidate_ids={valid!r}')
+
+
+def _optimizer_source(ctx,reference):
+    """Accept only a same-run optimizer receipt or the one frozen historical import."""
+    import json
+    wanted=plain(reference)
+    with ctx.store.connect(True) as db:
+        for row in db.execute('SELECT receipt FROM calls WHERE run_id=? AND receipt IS NOT NULL',(ctx.run_id,)):
+            receipt=json.loads(row['receipt'])
+            if (receipt.get('tool_id')=='design.optimize_math' and receipt.get('execution_status')=='completed'
+                    and receipt.get('output')==wanted):
+                return dict(mode='current_run',tool_version=receipt['tool_version'])
+    frozen=policy(ctx.input).historical_math
+    if frozen:
+        manifest=ctx.artifact(frozen)
+        if manifest.get('kind')!='historical_math_import_manifest':
+            raise ValueError('ROUTE_HISTORICAL_MATH_MANIFEST_KIND_MISMATCH')
+        if manifest.get('optimizer_result')==wanted:
+            return dict(mode='historical_import',tool_version=manifest.get('optimizer_tool_version'),
+                import_manifest=plain(frozen),manifest=manifest)
+    raise ValueError('ROUTE_OPTIMIZER_RESULT_NOT_OWNED_OR_FROZEN_IMPORT: field=optimizer_result; submitted='+repr(wanted))
+
+
+def _build_data(ctx,inp,node_id,max_trials):
+    data=plain(SessionInput.model_validate(inp));data['run_id']=ctx.run_id[:40]+'-'+digest(node_id)[:16]
+    data['policy']['allowed_tools']=[]
+    data['policy']['tool_bindings']={k:v for k,v in ctx.input.policy.tool_bindings.items() if k in (
+        'simulation.run','evaluation.run','diagnostics.saved_trajectory','visualization.render_simulation_video','evidence.read')}
+    capability=profile_capability(SessionInput.model_validate(data),ctx.reg)
+    report_tool=capability.get('route_report_tool') if capability else None
+    if report_tool in ctx.input.policy.tool_bindings:
+        data['policy']['tool_bindings'][report_tool]=ctx.input.policy.tool_bindings[report_tool]
+    data['policy']['budget']['backend_solves']=max_trials
+    data['policy']['search']=None
+    return data
+
+
+def _compiled_build(ctx,inp,node_id,max_trials):
+    """Shared Route build compiler used by ordinary and proposal-bound construction."""
+    from tools.platform_tasks import compile_input
+    data=_build_data(ctx,inp,node_id,max_trials)
+    compiled=compile_input(data,ctx.reg)
+    with ctx.store.transaction() as db:
+        reference=ctx.store.put(db,compiled['input'])
+    return data,compiled,plain(reference)
+
+
+def build_proposal(ctx,args):
+    """Construct one exact optimizer proposal and retain its immutable source identity."""
+    spec=policy(ctx.input);route=ctx.store.session(ctx.run_id)['state']['route']
+    if route['final']: raise ValueError('ROUTE_ALREADY_FINISHED')
+    if any(n['node_id']==args.node_id for n in route['nodes']):
+        raise ValueError('NODE_ID_ALREADY_USED: resume original tool request')
+    if route['current']: raise ValueError('ROUTE_NODE_UNRESOLVED')
+    optimized=ctx.artifact(args.optimizer_result)
+    valid=_proposal_ids(optimized)
+    if optimized.get('kind')!='mathematical_design_optimization':
+        raise ValueError('ROUTE_MATH_OPTIMIZATION_RESULT_REQUIRED: field=optimizer_result; submitted='+repr(plain(args.optimizer_result)))
+    source=_optimizer_source(ctx,args.optimizer_result)
+    matches=[row for row in optimized.get('proposals',[]) if row.get('candidate_id')==args.optimizer_candidate_id]
+    if len(matches)>1:
+        raise _proposal_error('optimizer_candidate_id',args.optimizer_candidate_id,valid,'ROUTE_OPTIMIZER_PROPOSAL_ID_NOT_UNIQUE')
+    if not matches:
+        raise _proposal_error('optimizer_candidate_id',args.optimizer_candidate_id,valid)
+    proposal=matches[0];proposal_ref=proposal.get('configuration')
+    evaluation=next((row for row in optimized.get('evaluations',[]) if
+        row.get('candidate_id')==args.optimizer_candidate_id and row.get('configuration')==proposal_ref),None)
+    if proposal_ref not in optimized.get('evidence',[]) or evaluation is None:
+        raise ValueError('ROUTE_OPTIMIZER_PROPOSAL_EVIDENCE_CHAIN_MISMATCH: field=optimizer_candidate_id; submitted='+repr(args.optimizer_candidate_id))
+    proposed=SessionInput.model_validate(ctx.artifact(proposal_ref))
+    if plain(proposed.task)!=plain(ctx.input.task):
+        raise ValueError('ROUTE_PROPOSAL_FROZEN_TASK_MISMATCH: field=proposal_configuration; submitted='+repr(proposal_ref))
+    combination=next((name for name,choice in spec.combinations.items() if all(
+        plain(getattr(proposed.policy,key))==plain(getattr(choice,key)) for key in ('dynamics_model','backend','controller'))),None)
+    if combination is None:
+        raise ValueError('ROUTE_PROPOSAL_COMBINATION_NOT_AUTHORIZED: field=proposal_configuration; submitted='+repr(proposal_ref))
+    from .candidate_analysis import scientific_configuration,scientific_configuration_identity
+    scientific_id=scientific_configuration_identity(proposed)
+    declared=(evaluation.get('candidate_binding') or {}).get('scientific_configuration_identity')
+    if declared and declared!=scientific_id:
+        raise ValueError('ROUTE_OPTIMIZER_PROPOSAL_SCIENTIFIC_IDENTITY_MISMATCH: field=proposal_configuration; submitted='+repr(proposal_ref))
+    if source['mode']=='historical_import':
+        manifest=source['manifest']
+        if manifest.get('optimizer_candidate_id')!=args.optimizer_candidate_id:
+            raise _proposal_error('optimizer_candidate_id',args.optimizer_candidate_id,
+                [manifest.get('optimizer_candidate_id')],'ROUTE_HISTORICAL_IMPORT_PROPOSAL_MISMATCH')
+        if manifest.get('proposal_configuration')!=proposal_ref or manifest.get('scientific_configuration_identity')!=scientific_id:
+            raise ValueError('ROUTE_HISTORICAL_IMPORT_PROPOSAL_CONFIGURATION_MISMATCH')
+    node=dict(node_id=args.node_id,action='build',request_id=ctx.request.request_id,
+        execution_id=ctx.row['execution_id'],selection=plain(args),status='running')
+    route['nodes'].append(node);route['current']=args.node_id;route['next_step']=args.next_step;_save(ctx,route,'started')
+    try:
+        data,compiled,configuration=_compiled_build(ctx,proposed,args.node_id,1)
+        built_input=SessionInput.model_validate(compiled['input'])
+        if scientific_configuration(built_input)!=scientific_configuration(proposed):
+            raise ValueError('ROUTE_BUILT_PROPOSAL_SCIENTIFIC_CONFIGURATION_MISMATCH')
+        provenance=dict(build_candidate_id=args.node_id,optimizer_candidate_id=args.optimizer_candidate_id,
+            source_build_node=args.node_id,
+            optimizer_starting_build_node=optimized.get('starting_binding',{}).get('source_node'),
+            optimizer_result=plain(args.optimizer_result),proposal_configuration=proposal_ref,
+            scientific_configuration_identity=scientific_id,optimizer_source=source['mode'],
+            original_optimizer_owner_run_id=optimized.get('starting_binding',{}).get('owner_run_id'),
+            optimizer_tool=dict(id='design.optimize_math',version=source.get('tool_version','1.0.0')),
+            proposal_parameters=proposal.get('parameters'),material_scenario=proposal.get('material_scenario'))
+        out=dict(status='built',candidate_id=args.node_id,build_candidate_id=args.node_id,
+            optimizer_candidate_id=args.optimizer_candidate_id,source_build_node=provenance['source_build_node'],
+            optimizer_result=plain(args.optimizer_result),proposal_configuration=proposal_ref,
+            scientific_configuration_identity=scientific_id,configuration=configuration,
+            proposal_provenance=provenance,simulated=False,evaluated=False,
+            facts='Exact optimizer proposal built and validated; not simulated or evaluated.',actual_solves=0,
+            findings=design_summary(data['robot']['structure']['data']))
+        out['candidate_facts']=trial_facts(ctx.store,ctx.input,out)
+    except Exception as exc:
+        node.update(status='failed',error=str(exc));route['current']=None;_save(ctx,route,'failed');raise
+    with ctx.store.transaction() as db: ref=ctx.store.put(db,out)
+    node.update(status='completed',result=plain(ref),summary=summarize(out));route['current']=None;_save(ctx,route,'completed')
+    return RouteResult(detail=dict(node={k:node[k] for k in ('node_id','action','status')},
+        result=plain(ref),summary=node['summary'],proposal_provenance=provenance,final=delivery_summary(route['final'])))
 
 
 def _built_run_inputs(ctx,args,route):
@@ -580,6 +728,8 @@ def run_built(ctx,args,route):
     if factual_result is not None: reported['factual_result']=factual_result
     return dict(status='valid' if result['validity']=='valid' else 'solver_failed',run_id=child.run_id,candidate_facts=facts,
         candidate_id=candidate,build_configuration=built['configuration'],configuration=metadata['candidate_input'],
+        **{k:built[k] for k in ('build_candidate_id','optimizer_candidate_id','source_build_node','optimizer_result',
+            'proposal_configuration','scientific_configuration_identity','proposal_provenance') if k in built},
         simulation=sim,evaluation=ev['output'],evaluation_data=result,metrics=result['metrics'],
         task_success=result['task_success'],score=score(result,inp['task']['objectives']),
         simulated=True,evaluated=True,actual_solves=ctx.store.remaining(child.run_id)['used']['backend_solves'],**reported)
@@ -603,6 +753,9 @@ def summarize(out):
         proposals=out.get('proposals'),distinct_candidates=out.get('distinct_candidates'),actual_solves=out.get('actual_solves'),
         new_evaluations=out.get('new_evaluations'),reused_evaluations=out.get('reused_evaluations'),
         findings=out.get('findings'),
+        **{k:out[k] for k in ('build_candidate_id','optimizer_candidate_id','source_build_node',
+            'optimizer_result','proposal_configuration','scientific_configuration_identity','proposal_provenance',
+            'references','historical_math_binding') if k in out},
         **{k:(best or out)[k] for k in ('profile_report','profile_report_summary','factual_result') if k in (best or out)})
     if out.get('screen'):
         summary.update(analysis_report=out['screen'],math_optimization=out.get('math_optimization'),
@@ -616,7 +769,9 @@ def delivery_summary(final):
     return {k:final[k] for k in ('delivery_status','explicit_delivery','candidate_id','run_id','configuration',
         'evaluation_ref','task_success','crosscheck_status','stop_reason','selection_basis',
         'profile_report','profile_report_summary','candidate_facts','design_statement','design_statement_check',
-        'interpretation_status','factual_result','result_statement','result_statement_check') if k in final}
+        'interpretation_status','factual_result','result_statement','result_statement_check','build_candidate_id',
+        'optimizer_candidate_id','source_build_node','optimizer_result','proposal_configuration',
+        'scientific_configuration_identity','proposal_provenance') if k in final}
 
 
 def diagnosis_summary(report):
@@ -633,7 +788,6 @@ def diagnosis_summary(report):
 def advance(ctx,args):
     from tools.platform_host import Host
     from tools.platform_tools import _candidate
-    from tools.platform_tasks import compile_input
     from .optimization import optimize
     from .crosscheck import crosscheck,invoke
     spec=policy(ctx.input)
@@ -671,24 +825,14 @@ def advance(ctx,args):
             else:
                 inp=selected(ctx.input,spec,args.combination,ctx.reg)
             inp=_candidate(inp,args.changes,ctx.reg)
-            data=plain(inp); data['run_id']=ctx.run_id[:40]+'-'+digest(args.node_id)[:16]
-            data['policy']['allowed_tools']=[]
-            data['policy']['tool_bindings']={k:v for k,v in ctx.input.policy.tool_bindings.items() if k in (
-                'simulation.run','evaluation.run','diagnostics.saved_trajectory','visualization.render_simulation_video','evidence.read')}
-            capability=profile_capability(inp,ctx.reg)
-            report_tool=capability.get('route_report_tool') if capability else None
-            if report_tool in ctx.input.policy.tool_bindings:
-                data['policy']['tool_bindings'][report_tool]=ctx.input.policy.tool_bindings[report_tool]
-            data['policy']['budget']['backend_solves']=args.max_trials
-            data['policy']['search']=None
             if args.action=='build':
-                compiled=compile_input(data,ctx.reg)
-                with ctx.store.transaction() as db: ref=ctx.store.put(db,compiled['input'])
-                out=dict(status='built',candidate_id=args.candidate_id or args.node_id,configuration=plain(ref),
+                data,compiled,configuration=_compiled_build(ctx,inp,args.node_id,args.max_trials)
+                out=dict(status='built',candidate_id=args.candidate_id or args.node_id,configuration=configuration,
                     simulated=False,evaluated=False,facts='Built, not simulated, not evaluated. No task error or trajectory exists. Use run with this build node to execute and evaluate.',
                     actual_solves=0,findings=design_summary(data['robot']['structure']['data']))
                 out['candidate_facts']=trial_facts(ctx.store,ctx.input,out)
             else:
+                data=_build_data(ctx,inp,args.node_id,args.max_trials)
                 out=optimize(ctx.store.root,dict(session=data,variables=args.variables,max_trials=args.max_trials),
                     parent_run_id=ctx.run_id,parent_event_id=ctx.row['parent_id'],starting_trial=starting_trial,actor='route-executor')
                 if out['status']=='unknown': raise TimeoutError('UNCONFIRMED child execution')
@@ -766,49 +910,97 @@ def record_analysis(ctx,args):
     try:
         build_node,built=source_node(ctx,args,route)
         if build_node['action']!='build': raise ValueError('ANALYSIS_REQUIRES_BUILD_SOURCE_NODE')
-        linear=ctx.artifact(args.linearization);metrics=ctx.artifact(args.metrics)
-        endpoint=ctx.artifact(args.endpoint);screen=ctx.artifact(args.screen);expected=built['configuration']
-        for result,kind in ((linear,'candidate_linearization'),(metrics,'control_metrics'),
-                (endpoint,'bounded_endpoint'),(screen,'design_screen')):
-            if result.get('kind')!=kind or not result.get('bindings') or any(b['configuration']!=expected for b in result['bindings']):
-                raise ValueError('ROUTE_ANALYSIS_CANDIDATE_BINDING_MISMATCH: '+kind)
-        if screen['evidence']!=[plain(args.linearization),plain(args.metrics),plain(args.endpoint)]:
-            raise ValueError('ROUTE_SCREEN_EVIDENCE_CHAIN_MISMATCH')
-        if screen['protocol']!=plain(spec.analysis_protocol) or endpoint['protocol']!=plain(spec.analysis_protocol):
-            raise ValueError('ROUTE_ANALYSIS_PROTOCOL_MISMATCH')
-        if plain(spec.endpoint_target) not in endpoint['evidence']:
-            raise ValueError('ROUTE_ENDPOINT_TARGET_EVIDENCE_MISMATCH')
-        math_optimization=None
-        selection_trace=dict(required=spec.math_selection_required_before_run,matches_proposal=False)
-        if args.math_optimization:
+        expected=built['configuration'];historical=None
+        refs={name:plain(getattr(args,name)) if getattr(args,name) else None
+            for name in ('linearization','metrics','endpoint','screen')}
+        if args.historical_math_binding:
             import json
             owned=False
             with ctx.store.connect(True) as db:
                 for row in db.execute('SELECT receipt FROM calls WHERE run_id=? AND receipt IS NOT NULL',(ctx.run_id,)):
                     receipt=json.loads(row['receipt'])
-                    if (receipt.get('tool_id')=='design.optimize_math' and receipt.get('execution_status')=='completed'
-                            and receipt.get('output')==plain(args.math_optimization)):
+                    if (receipt.get('tool_id')=='analysis.bind_historical_math'
+                            and receipt.get('execution_status')=='completed'
+                            and receipt.get('output')==plain(args.historical_math_binding)):
                         owned=True;break
+            if not owned:
+                raise ValueError('ROUTE_HISTORICAL_MATH_BINDING_OWNED_TOOL_RESULT_REQUIRED: field=historical_math_binding; submitted='+repr(plain(args.historical_math_binding)))
+            historical=ctx.artifact(args.historical_math_binding)
+            if (historical.get('kind')!='historical_math_binding' or historical.get('source_build_node')!=args.source_node
+                    or historical.get('build_candidate_id')!=built['candidate_id']
+                    or historical.get('scientific_configuration_identity')!=built.get('scientific_configuration_identity')):
+                raise ValueError('ROUTE_HISTORICAL_MATH_BUILD_BINDING_MISMATCH')
+            for name in refs:
+                inherited=historical.get('references',{}).get(name,{}).get('reference')
+                if refs[name] is not None and refs[name]!=inherited:
+                    raise ValueError(f'ROUTE_HISTORICAL_REFERENCE_CONFLICT: field={name}; submitted={refs[name]!r}; stored_original={inherited!r}')
+                refs[name]=inherited
+        missing=[name for name,value in refs.items() if value is None]
+        if missing:
+            raise ValueError('ROUTE_ANALYSIS_REFERENCE_REQUIRED: fields='+repr(missing))
+        linear=ctx.artifact(refs['linearization']);metrics=ctx.artifact(refs['metrics'])
+        endpoint=ctx.artifact(refs['endpoint']);screen=ctx.artifact(refs['screen'])
+        for result,kind in ((linear,'candidate_linearization'),(metrics,'control_metrics'),
+                (endpoint,'bounded_endpoint'),(screen,'design_screen')):
+            wrong_configuration=(historical is None and result.get('bindings') and
+                any(b['configuration']!=expected for b in result['bindings']))
+            if result.get('kind')!=kind or not result.get('bindings') or wrong_configuration:
+                raise ValueError('ROUTE_ANALYSIS_CANDIDATE_BINDING_MISMATCH: '+kind)
+        if screen['evidence']!=[refs['linearization'],refs['metrics'],refs['endpoint']]:
+            raise ValueError('ROUTE_SCREEN_EVIDENCE_CHAIN_MISMATCH')
+        if screen['protocol']!=plain(spec.analysis_protocol) or endpoint['protocol']!=plain(spec.analysis_protocol):
+            raise ValueError('ROUTE_ANALYSIS_PROTOCOL_MISMATCH')
+        if plain(spec.endpoint_target) not in endpoint['evidence']:
+            raise ValueError('ROUTE_ENDPOINT_TARGET_EVIDENCE_MISMATCH')
+        stored=built.get('proposal_provenance')
+        if stored and args.math_optimization and plain(args.math_optimization)!=stored['optimizer_result']:
+            raise ValueError('ROUTE_OPTIMIZER_RESULT_CONFLICT: field=math_optimization; '
+                f'submitted={plain(args.math_optimization)!r}; build_stored_original={stored["optimizer_result"]!r}')
+        if stored and args.selected_optimizer_candidate_id and args.selected_optimizer_candidate_id!=stored['optimizer_candidate_id']:
+            optimized=ctx.artifact(stored['optimizer_result'])
+            raise ValueError('ROUTE_OPTIMIZER_PROPOSAL_ID_CONFLICT: field=selected_optimizer_candidate_id; '
+                f'submitted={args.selected_optimizer_candidate_id!r}; valid_optimizer_candidate_ids={_proposal_ids(optimized)!r}; '
+                f'build_stored_original={stored["optimizer_candidate_id"]!r}')
+        math_ref=(stored or {}).get('optimizer_result') or (plain(args.math_optimization) if args.math_optimization else None)
+        selected_id=(stored or {}).get('optimizer_candidate_id') or args.selected_optimizer_candidate_id
+        math_optimization=None
+        selection_trace=dict(required=spec.math_selection_required_before_run,matches_proposal=False)
+        if math_ref:
+            import json
+            if historical is not None:
+                if historical.get('optimizer_result')!=math_ref or historical.get('optimizer_candidate_id')!=selected_id:
+                    raise ValueError('ROUTE_HISTORICAL_MATH_OPTIMIZER_BINDING_MISMATCH')
+                owned=True
+            else:
+                owned=False
+                with ctx.store.connect(True) as db:
+                    for row in db.execute('SELECT receipt FROM calls WHERE run_id=? AND receipt IS NOT NULL',(ctx.run_id,)):
+                        receipt=json.loads(row['receipt'])
+                        if (receipt.get('tool_id')=='design.optimize_math' and receipt.get('execution_status')=='completed'
+                                and receipt.get('output')==math_ref):
+                            owned=True;break
             if not owned: raise ValueError('ROUTE_MATH_OPTIMIZATION_OWNED_TOOL_RESULT_REQUIRED')
-            if plain(args.math_optimization) not in [plain(ref) for ref in args.evidence]:
+            if not stored and math_ref not in [plain(ref) for ref in args.evidence]:
                 raise ValueError('ROUTE_MATH_OPTIMIZATION_EVIDENCE_CITATION_REQUIRED')
-            optimized=ctx.artifact(args.math_optimization)
+            optimized=ctx.artifact(math_ref)
             if optimized.get('kind')!='mathematical_design_optimization':
                 raise ValueError('ROUTE_MATH_OPTIMIZATION_RESULT_REQUIRED')
             if optimized.get('protocol')!=plain(spec.analysis_protocol) or optimized.get('target')!=plain(spec.endpoint_target):
                 raise ValueError('ROUTE_MATH_OPTIMIZATION_PROTOCOL_OR_TARGET_MISMATCH')
             start=optimized.get('starting_binding',{})
-            start_node=next((n for n in route['nodes'] if n.get('node_id')==start.get('source_node')
-                and n.get('action')=='build' and n.get('status')=='completed'),None)
-            if (start.get('owner_run_id')!=ctx.run_id or start_node is None
-                    or ctx.artifact(start_node['result']).get('configuration')!=start.get('configuration')):
-                raise ValueError('ROUTE_MATH_OPTIMIZATION_STARTING_BUILD_OWNERSHIP_MISMATCH')
-            math_optimization=plain(args.math_optimization)
-            if spec.math_selection_required_before_run and not args.selected_optimizer_candidate_id:
+            if historical is None:
+                start_node=next((n for n in route['nodes'] if n.get('node_id')==start.get('source_node')
+                    and n.get('action')=='build' and n.get('status')=='completed'),None)
+                if (start.get('owner_run_id')!=ctx.run_id or start_node is None
+                        or ctx.artifact(start_node['result']).get('configuration')!=start.get('configuration')):
+                    raise ValueError('ROUTE_MATH_OPTIMIZATION_STARTING_BUILD_OWNERSHIP_MISMATCH')
+            math_optimization=math_ref
+            if spec.math_selection_required_before_run and not selected_id:
                 raise ValueError('ROUTE_SELECTED_OPTIMIZER_CANDIDATE_ID_REQUIRED')
             proposals=[row for row in optimized.get('proposals',[])
-                if row.get('candidate_id')==args.selected_optimizer_candidate_id]
-            if len(proposals)>1: raise ValueError('ROUTE_OPTIMIZER_PROPOSAL_ID_NOT_UNIQUE')
+                if row.get('candidate_id')==selected_id]
+            if len(proposals)>1: raise _proposal_error('selected_optimizer_candidate_id',selected_id,
+                _proposal_ids(optimized),'ROUTE_OPTIMIZER_PROPOSAL_ID_NOT_UNIQUE')
             matched=proposals[0] if proposals else None
             from .candidate_analysis import scientific_configuration,scientific_configuration_identity
             build_input=SessionInput.model_validate(ctx.artifact(expected))
@@ -824,20 +1016,35 @@ def record_analysis(ctx,args):
                 declared=(evaluation.get('candidate_binding') or {}).get('scientific_configuration_identity')
                 if declared and declared!=scientific_configuration_identity(proposed):
                     raise ValueError('ROUTE_OPTIMIZER_PROPOSAL_SCIENTIFIC_IDENTITY_MISMATCH')
-            elif args.selected_optimizer_candidate_id:
-                raise ValueError('ROUTE_SELECTED_OPTIMIZER_PROPOSAL_NOT_FOUND')
+            elif selected_id:
+                raise _proposal_error('selected_optimizer_candidate_id',selected_id,_proposal_ids(optimized))
             selection_trace=dict(required=spec.math_selection_required_before_run,matches_proposal=matched is not None,
                 scientific_configuration_identity=scientific_configuration_identity(build_input),
                 optimizer_candidate_id=None if matched is None else matched['candidate_id'],
                 optimizer_configuration=None if matched is None else matched['configuration'],
                 optimizer_objective=None if matched is None else matched['objective'],
-                optimizer_starting_build=start.get('configuration'),optimizer_result=plain(args.math_optimization))
+                optimizer_starting_build=start.get('configuration'),optimizer_result=math_ref,
+                proposal_configuration=None if matched is None else matched['configuration'],
+                build_candidate_id=built['candidate_id'],source_build_node=args.source_node,
+                provenance_inherited_from_build=stored is not None,
+                historical_computation=historical is not None)
         report=screen['records'][0]
+        tool_ids=dict(linearization='analysis.linearize_candidate',metrics='analysis.control_metrics',
+            endpoint='analysis.bounded_endpoint',screen='design.screen')
+        references=(historical['references'] if historical is not None else {
+            name:dict(reference=reference,kind=result['kind'],tool_id=tool_ids[name],
+                tool_version=ctx.input.policy.tool_bindings.get(tool_ids[name]),
+                source_binding=result['bindings'][0],historical_computation=False)
+            for name,reference,result in ((name,refs[name],value) for name,value in (
+                ('linearization',linear),('metrics',metrics),('endpoint',endpoint),('screen',screen)))})
         out=dict(status='analyzed',candidate_id=built['candidate_id'],source_node=args.source_node,
-            build_configuration=expected,protocol=screen['protocol'],linearization=plain(args.linearization),
-            metrics=plain(args.metrics),endpoint=plain(args.endpoint),screen=plain(args.screen),
+            source_build_node=args.source_node,
+            build_candidate_id=built['candidate_id'],optimizer_candidate_id=selected_id,
+            build_configuration=expected,protocol=screen['protocol'],linearization=refs['linearization'],
+            metrics=refs['metrics'],endpoint=refs['endpoint'],screen=refs['screen'],references=references,
             math_optimization=math_optimization,shared_report_identity=digest(screen),
             math_selection_trace=selection_trace,
+            historical_math_binding=plain(args.historical_math_binding) if args.historical_math_binding else None,
             validation_disposition=args.validation_disposition,disposition_reason=args.reason,
             hard_rejection=False,screen_priority=report['priority_reasoning'],
             advisory_scope='Shared local mathematics informs prioritization only; execution remains the physical validation authority.',
@@ -897,7 +1104,9 @@ def delivery(ctx,route,child,trial,reason,design_statement=None,result_statement
         best_valid_evaluation=dict(node_id=best['node_id'],search_run_id=best['search_run_id'],candidate_id=best['candidate_id'],
             evaluation_ref=best['evaluation_ref'],evaluation=best['evaluation'],score=best['score']) if best else None,
         limitations=view(ctx.host)['limitations'],
-        **{k:trial[k] for k in ('profile_report','profile_report_summary') if k in trial})
+        **{k:trial[k] for k in ('profile_report','profile_report_summary','build_candidate_id','optimizer_candidate_id',
+            'source_build_node','optimizer_result','proposal_configuration','scientific_configuration_identity',
+            'proposal_provenance') if k in trial})
 
 
 def finalize_stop(host):

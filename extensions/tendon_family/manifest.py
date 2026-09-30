@@ -7,7 +7,7 @@ from . import legacy_scientific
 from . import optimization as opt
 from . import route
 from .contracts import GVSTrajectoryParameters
-from . import gvs_profile, tracking, candidate_analysis
+from . import gvs_profile, tracking, candidate_analysis, historical_math
 
 CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('route_policy',route.RoutePolicy),
@@ -59,7 +59,7 @@ CONTRACTS += [
     ('family.lqr_synthesis_description', '2.0.0', c.LQRSynthesisDescription),
     ('family.gvs_lqr_control', '1.0.0', c.GVSLQRControl),
 ]
-SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','gvs_sampled','gvs_trajectory','gvs_nmpc','model_applicability','execution','backends','signals','candidate','design_decisions','candidate_comparison','historical_failure','diagnostics','delivery_facts','preparation','mjcf','saved','tracking','candidate_analysis','manifest','optimization','crosscheck','route'))+(
+SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','gvs_sampled','gvs_trajectory','gvs_nmpc','model_applicability','execution','backends','signals','candidate','design_decisions','candidate_comparison','historical_failure','diagnostics','delivery_facts','preparation','mjcf','saved','tracking','candidate_analysis','historical_math','manifest','optimization','crosscheck','route'))+(
     'tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
@@ -85,6 +85,10 @@ EXTENSIONS=[
         'extensions.tendon_family.route:record_analysis','Attach the exact shared candidate-bound analysis, screen and optional mathematical optimization to a completed build. Advisory only; zero backend solves.',**COMMON,
         capabilities=dict(category='orchestration',role='public_tool',route_visible=True,
             preflight='extensions.tendon_family.route:preflight_analysis')),
+    Extension('design.build_proposal','tool','1.0.0',route.ProposalBuildAction,route.RouteResult,
+        'extensions.tendon_family.route:build_proposal','Construct and validate the exact complete effective configuration of one named optimizer proposal. The model supplies the optimizer result and exact proposal candidate_id; it never retypes design values. Zero backend solves.',**COMMON,
+        capabilities=dict(category='orchestration',role='public_tool',route_visible=True,
+            preflight='extensions.tendon_family.route:preflight_proposal')),
     Extension('search.family_coordinate','search','1.0.0',opt.SearchParameters,Payload,
         'extensions.tendon_family.optimization:CoordinateSearch','Bounded coordinate search; first candidate is the starting configuration; jointly tunes design and control',**COMMON,
         capabilities=dict(category='parameter_search',role='adapter',checkpoint='family.search_state',
@@ -591,6 +595,7 @@ for name,schema,binding,description in (
         side_effects='artifact_store',capabilities=dict(category='control',role='public_tool',route_visible=True,backend_solves=0)))
 
 from schemas.platform import TaskDefinition, EvaluationResult
+from schemas.platform_analysis import HistoricalMathBindingRequest, HistoricalMathBindingResult
 from extensions.reference.contracts import Empty
 EXTENSIONS.extend([
     Extension('task.tracking','task','1.0.0',TaskDefinition,Empty,
@@ -599,6 +604,9 @@ EXTENSIONS.extend([
         'extensions.tendon_family.tracking:evaluate_tracking','Inclusive uniform sampled interval max and arithmetic RMS tracking errors; missing data never succeeds',**COMMON),
     Extension('analysis.gvs_candidate_evaluate','tool','1.0.0',candidate_analysis.CandidateDynamicsRequest,candidate_analysis.CandidateAnalysisResult,
         'extensions.tendon_family.candidate_analysis:evaluate_candidate','Calculate GVS dynamics and tip kinematics for an explicit owned build node with its frozen basis; pre-execution, no backend solve',
+        sources=GVS_SOURCES,dependencies=('numpy','scipy'),capabilities=dict(category='mathematical_models',role='public_tool',route_visible=True,backend_solves=0)),
+    Extension('analysis.bind_historical_math','tool','1.0.0',HistoricalMathBindingRequest,HistoricalMathBindingResult,
+        'extensions.tendon_family.historical_math:bind','Validate and bind the frozen historical optimizer, candidate analysis, metrics, endpoint and screen to one exact proposal-bound build. Returns compact named references with original lineage; performs zero new mathematical evaluations and zero backend solves.',
         sources=GVS_SOURCES,dependencies=('numpy','scipy'),capabilities=dict(category='mathematical_models',role='public_tool',route_visible=True,backend_solves=0)),
 ])
 from dataclasses import replace

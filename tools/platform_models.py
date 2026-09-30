@@ -218,6 +218,7 @@ def input_for(host):
             'Pass the intended GVS basis in basis-taking scientific requests; linearization and LQR use the resulting artifacts. '
             'use evidence.read only for details omitted from it rather than rediscovering those facts. '
             'Build only constructs: it produces no task error or trajectory. Use run on a saved build to simulate and evaluate it without optimization. '
+            'When design.build_proposal is available, construct an optimizer selection with that tool and its exact optimizer candidate_id; never retype proposal parameters or substitute a build label. Historical named references from analysis.bind_historical_math can be passed to route.record_analysis through historical_math_binding. '
             'An evaluation may be valid even when task_success is false; deliver that fact honestly. '
             'Prefer zero-backend scientific analysis or explicit optimization when it can reduce expensive simulation trial-and-error. '
             'Simulation remains the validation authority; mathematical models are approximations and may be skipped when irrelevant. '

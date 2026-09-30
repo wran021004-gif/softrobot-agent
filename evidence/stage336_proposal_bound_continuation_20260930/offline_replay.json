@@ -1,0 +1,217 @@
+{
+  "run_id": "stage336-offline-f4ca53613f12",
+  "runtime": {
+    "sys_executable": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+    "python_version": "3.11.16",
+    "environment_prefix": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent"
+  },
+  "production_decoder": "DeepSeekAdapter.decode",
+  "host_boundary": true,
+  "public_tools_present": true,
+  "wrong_identifier": {
+    "submitted": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+    "status": "failed",
+    "error": "ROUTE_SELECTED_OPTIMIZER_PROPOSAL_NOT_FOUND: field=optimizer_candidate_id; submitted='mathsel_c1_n0p15_f0p11_s0p95_compliant'; valid_optimizer_candidate_ids=['math-compliant-4795c8184616', 'math-stiff-cccc020c6300']"
+  },
+  "correct_build": {
+    "status": "completed",
+    "build_candidate_id": "proposal-build",
+    "optimizer_candidate_id": "math-compliant-4795c8184616",
+    "source_build_node": "proposal-build",
+    "optimizer_result": {
+      "artifact_id": "9e408e81d706b22246e1d856d122bdcffaa605308ed975cbfa0ade0c563c7245",
+      "media_type": "application/json"
+    },
+    "proposal_configuration": {
+      "artifact_id": "73627f1e3360566b9e4d2234dbb396c66fbcfc0708e1c8ba3b7692dbb747326b",
+      "media_type": "application/json"
+    },
+    "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+    "complete_scientific_configuration_equal": true
+  },
+  "historical_binding": {
+    "status": "completed",
+    "reference": {
+      "artifact_id": "bbed1eb7c139d221cfa8d23ecbd287229c8ffc15a704b9f22da00e62b2abb5c9",
+      "media_type": "application/json"
+    },
+    "usage": {
+      "backend_executions": 0,
+      "historical_mathematical_evaluations": 16,
+      "new_mathematical_evaluations": 0,
+      "nmpc_solves": 0,
+      "workers": 0
+    }
+  },
+  "conflicting_identifier": {
+    "status": "failed",
+    "error": "ROUTE_OPTIMIZER_PROPOSAL_ID_CONFLICT: field=selected_optimizer_candidate_id; submitted='math-stiff-cccc020c6300'; valid_optimizer_candidate_ids=['math-compliant-4795c8184616', 'math-stiff-cccc020c6300']; build_stored_original='math-compliant-4795c8184616'"
+  },
+  "altered_configuration": {
+    "status": "failed",
+    "error": "HISTORICAL_MATH_ALTERED_SCIENTIFIC_CONFIGURATION_REJECTED: field=source_node; submitted='altered-build'; actual='c48218eef9af07c2ca2356f24bd89a68a379dc9ab86a61ec325c70ff1178956f'; expected='4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d'"
+  },
+  "report": {
+    "status": "completed",
+    "reference": {
+      "artifact_id": "e824964ada4fba482b91a7ec1c5f314190c657ba4cbe17838ec0d905ce1a0b6f",
+      "media_type": "application/json"
+    },
+    "references": {
+      "endpoint": {
+        "historical_computation": true,
+        "kind": "bounded_endpoint",
+        "reference": {
+          "artifact_id": "bcae2da3662e176688a48f8b94a93d6abbc7e02b78e076ca2c294d1dc96c8085",
+          "media_type": "application/json"
+        },
+        "source_binding": {
+          "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+          "configuration": {
+            "artifact_id": "d54a7d6634e090bb192b3a783cad8cd2f460a87ab60dc9fad1a43e0dffc12b41",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage335-81350ebec934",
+          "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+          "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant"
+        },
+        "tool_id": "analysis.bounded_endpoint",
+        "tool_version": "1.0.0"
+      },
+      "linearization": {
+        "historical_computation": true,
+        "kind": "candidate_linearization",
+        "reference": {
+          "artifact_id": "fecccc31a1f81a66e76ed3484e80cf2ecbf74fd27875bb25ea445460ca370cf5",
+          "media_type": "application/json"
+        },
+        "source_binding": {
+          "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+          "configuration": {
+            "artifact_id": "d54a7d6634e090bb192b3a783cad8cd2f460a87ab60dc9fad1a43e0dffc12b41",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage335-81350ebec934",
+          "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+          "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant"
+        },
+        "tool_id": "analysis.linearize_candidate",
+        "tool_version": "1.0.0"
+      },
+      "metrics": {
+        "historical_computation": true,
+        "kind": "control_metrics",
+        "reference": {
+          "artifact_id": "c95db3eb25e6286562329cd8a8ad51419347177391f1a2150635beead37a1e9b",
+          "media_type": "application/json"
+        },
+        "source_binding": {
+          "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+          "configuration": {
+            "artifact_id": "d54a7d6634e090bb192b3a783cad8cd2f460a87ab60dc9fad1a43e0dffc12b41",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage335-81350ebec934",
+          "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+          "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant"
+        },
+        "tool_id": "analysis.control_metrics",
+        "tool_version": "2.0.0"
+      },
+      "screen": {
+        "historical_computation": true,
+        "kind": "design_screen",
+        "reference": {
+          "artifact_id": "73bef851229f297f586e3c9c42e08eaeb02be61e57e356a6aec531f2b50ba890",
+          "media_type": "application/json"
+        },
+        "source_binding": {
+          "candidate_id": "mathsel_c1_n0p15_f0p11_s0p95_compliant",
+          "configuration": {
+            "artifact_id": "d54a7d6634e090bb192b3a783cad8cd2f460a87ab60dc9fad1a43e0dffc12b41",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage335-81350ebec934",
+          "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+          "source_node": "b_mathsel_c1_n0p15_f0p11_s0p95_compliant"
+        },
+        "tool_id": "design.screen",
+        "tool_version": "1.0.0"
+      }
+    },
+    "selection_trace": {
+      "build_candidate_id": "proposal-build",
+      "historical_computation": true,
+      "matches_proposal": true,
+      "optimizer_candidate_id": "math-compliant-4795c8184616",
+      "optimizer_configuration": {
+        "artifact_id": "73627f1e3360566b9e4d2234dbb396c66fbcfc0708e1c8ba3b7692dbb747326b",
+        "media_type": "application/json"
+      },
+      "optimizer_objective": {
+        "applicability": "controller-start frozen local affine exact-ZOH model",
+        "candidate_residual_m": 0.0019999999999999463,
+        "feasible_witness_normalized_input_energy": 4.367701514792259e-05,
+        "matrix_evidence": {
+          "world_x_position_control_nonzero_count": 0,
+          "world_x_position_control_row_linf": 0.0,
+          "world_x_position_control_row_shape": [
+            210
+          ]
+        },
+        "position_residual_upper_bound_ratio": 0.19999999999999463,
+        "position_tolerance_m": 0.01,
+        "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+        "scope": "position endpoint only; terminal braking and other sampled configurations are not objective terms",
+        "status": "feasible_in_local_model"
+      },
+      "optimizer_result": {
+        "artifact_id": "9e408e81d706b22246e1d856d122bdcffaa605308ed975cbfa0ade0c563c7245",
+        "media_type": "application/json"
+      },
+      "optimizer_starting_build": {
+        "artifact_id": "af43aa0cc7e33b87343d6238e48422781c38191d78baef1c5c074533ab4096b8",
+        "media_type": "application/json"
+      },
+      "proposal_configuration": {
+        "artifact_id": "73627f1e3360566b9e4d2234dbb396c66fbcfc0708e1c8ba3b7692dbb747326b",
+        "media_type": "application/json"
+      },
+      "provenance_inherited_from_build": true,
+      "required": true,
+      "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d",
+      "source_build_node": "proposal-build"
+    }
+  },
+  "execution_gate": {
+    "eligible": true,
+    "source_node": "proposal-build",
+    "candidate_id": "proposal-build",
+    "build_configuration": {
+      "artifact_id": "387bd0fef72bfd5077f8d125d0b738469c877fca0557fa1c008095fbafc554f4",
+      "media_type": "application/json"
+    },
+    "scientific_configuration_identity": "4795c818461629949cbd583e2ab526417fb6a7254a6bd345ab568a69c70f1d0d"
+  },
+  "usage": {
+    "tool_calls": 7,
+    "model_calls": 0,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 9.45200000028126
+  },
+  "math_ledger": {
+    "attempts": [],
+    "cache": {},
+    "limit": 0,
+    "remaining": 0,
+    "used": 0
+  },
+  "limits": {
+    "paid_provider_requests": 0,
+    "new_mathematical_evaluations": 0,
+    "backend_executions": 0,
+    "nmpc_solves": 0,
+    "workers": 0
+  }
+}

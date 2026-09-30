@@ -66,7 +66,10 @@ def resolve_candidate(ctx, source_node):
     inp=SessionInput.model_validate(ctx.artifact(built['configuration']))
     if plain(inp.task)!=plain(ctx.input.task):
         raise ValueError('CANDIDATE_ANALYSIS_FROZEN_TASK_MISMATCH')
-    return inp,configuration_binding(inp,built['configuration'],built['candidate_id'],ctx.run_id,source_node)
+    binding=configuration_binding(inp,built['configuration'],built['candidate_id'],ctx.run_id,source_node)
+    if built.get('proposal_provenance'):
+        binding['proposal_provenance']=built['proposal_provenance']
+    return inp,binding
 
 
 def evaluate_candidate(ctx,args):

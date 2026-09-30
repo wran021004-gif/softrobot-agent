@@ -196,6 +196,24 @@ class MathOptimizationResult(Contract):
     limitations: list[str]
 
 
+class HistoricalMathBindingRequest(Contract):
+    source_node: str = Field(description='Proposal-bound build node in the current Route session.')
+    import_manifest: EvidenceRef = Field(description='Frozen historical-mathematics import manifest authorized by this Route session.')
+
+
+class HistoricalMathBindingResult(Contract):
+    kind: Literal['historical_math_binding'] = 'historical_math_binding'
+    build_candidate_id: str
+    optimizer_candidate_id: str
+    source_build_node: str
+    optimizer_result: EvidenceRef
+    proposal_configuration: EvidenceRef
+    scientific_configuration_identity: str
+    references: dict[str, dict]
+    lineage: dict
+    usage: dict
+
+
 class AnalysisResult(Contract):
     analysis_version: Literal['1.0.0'] = '1.0.0'
     kind: str
