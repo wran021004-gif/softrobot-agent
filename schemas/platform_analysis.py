@@ -32,6 +32,22 @@ class AnalysisProtocol(Contract):
     authority_reason: str = 'No independently justified task-required MIMO gain threshold; usable bandwidth undefined.'
     authority_rule: str = 'Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.'
 
+    @model_validator(mode='after')
+    def ordered_frequency_grid(self):
+        if any(b <= a for a, b in zip(self.frequency_rad_s, self.frequency_rad_s[1:])):
+            raise ValueError('FREQUENCY_GRID_MUST_BE_STRICTLY_INCREASING')
+        return self
+
+
+class TaskAnalysisProtocol(AnalysisProtocol):
+    """Frozen task-time and candidate-construction additions to the v1 baseline."""
+    protocol_id: Literal['task-local-v2'] = 'task-local-v2'
+    candidate_rule: Literal['initial_target_equilibrium_halfway'] = 'initial_target_equilibrium_halfway'
+    endpoint_max_iterations: int = Field(default=100, ge=1, le=100)
+    construction_max_iterations: int = Field(default=20, ge=1, le=20)
+    horizon_alignment_atol_s: PositiveFloat = 1e-12
+    endpoint_check_atol: PositiveFloat = 1e-8
+
 
 class OutputLinearizedModel(LinearizedModel):
     analysis_version: Literal['1.0.0'] = '1.0.0'
@@ -59,6 +75,55 @@ class OutputLinearizedModel(LinearizedModel):
         return self
 
 
+class EndpointOutputLinearization(Contract):
+    name: Literal['tip_position', 'tip_velocity']
+    dimension: Literal[3] = 3
+    units: Literal['m', 'm/s']
+    frame: Literal['world'] = 'world'
+    phase: Literal['instantaneous'] = 'instantaneous'
+    value0: list[float] = Field(min_length=3, max_length=3)
+    C: list[list[float]]
+    D: list[list[float]]
+    scales: list[PositiveFloat] = Field(min_length=3, max_length=3)
+
+    @model_validator(mode='after')
+    def dimensions(self):
+        nx = len(self.C[0]) if self.C else 0
+        nu = len(self.D[0]) if self.D else 0
+        if (len(self.C) != 3 or any(len(row) != nx for row in self.C)
+                or len(self.D) != 3 or any(len(row) != nu for row in self.D)):
+            raise ValueError('ENDPOINT_OUTPUT_DIMENSION_MISMATCH')
+        return self
+
+
+class EndpointLinearizedModel(OutputLinearizedModel):
+    analysis_version: Literal['2.0.0'] = '2.0.0'
+    endpoint_outputs: list[EndpointOutputLinearization] = Field(min_length=2, max_length=2)
+
+    @model_validator(mode='after')
+    def endpoint_dimensions(self):
+        outputs = {row.name: row for row in self.endpoint_outputs}
+        if set(outputs) != {'tip_position', 'tip_velocity'}:
+            raise ValueError('POSITION_AND_VELOCITY_ENDPOINT_OUTPUTS_REQUIRED')
+        nx, nu = len(self.x0), len(self.u0)
+        if any(len(row.C[0]) != nx or len(row.D[0]) != nu for row in outputs.values()):
+            raise ValueError('ENDPOINT_MODEL_DIMENSION_MISMATCH')
+        position = outputs['tip_position']
+        if (position.value0 != self.y0 or position.C != self.C or position.D != self.D
+                or position.scales != self.output_scales):
+            raise ValueError('POSITION_OUTPUT_MUST_MATCH_FREQUENCY_OUTPUT')
+        return self
+
+
+class EndpointTarget(Contract):
+    position_m: tuple[float, float, float]
+    position_tolerance_m: PositiveFloat
+    position_scale_m: PositiveFloat
+    tip_velocity_m_s: tuple[float, float, float] = (0., 0., 0.)
+    tip_speed_limit_m_s: PositiveFloat = .02
+    tip_velocity_scale_m_s: PositiveFloat = .02
+
+
 class MetricsRequest(Contract):
     models: list[EvidenceRef] = Field(min_length=1)
     protocol: EvidenceRef
@@ -70,8 +135,31 @@ class LinearizeRequest(Contract):
     protocol: EvidenceRef
 
 
+class SavedLinearizeRequestV2(LinearizeRequest):
+    include_static_equilibrium: bool = False
+
+
 class SavedCaseRequest(LinearizeRequest):
     pass
+
+
+class CandidateLinearizeRequest(Contract):
+    source_node: str
+    protocol: EvidenceRef
+
+
+class BoundedEndpointRequest(Contract):
+    models: list[EvidenceRef] = Field(min_length=1)
+    protocol: EvidenceRef
+    target: EvidenceRef
+
+
+class DesignScreenRequest(Contract):
+    source_node: str
+    protocol: EvidenceRef
+    linearization: EvidenceRef
+    metrics: EvidenceRef
+    endpoint: EvidenceRef
 
 
 class AnalysisResult(Contract):

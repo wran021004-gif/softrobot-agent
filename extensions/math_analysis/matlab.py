@@ -2,6 +2,7 @@
 import importlib.metadata
 import numpy as np
 from tools.matlab_tools import MatlabTools
+from .kernels import aligned_steps
 
 
 class MatlabBatch:
@@ -22,6 +23,11 @@ class MatlabBatch:
 
     def calculate(self,A,B,C,D,drift,p):
         import matlab
+        sampling=[]
+        for horizon in p.windows_s:
+            steps,effective=aligned_steps(horizon,p.period_s,getattr(p,'horizon_alignment_atol_s',1e-12))
+            sampling.append(dict(requested_horizon_s=horizon,effective_horizon_s=effective,
+                step_count=steps,period_s=p.period_s))
         values=[matlab.double(np.asarray(v).tolist()) for v in (A,B,C,D,drift.reshape(-1,1))]
         out=self.tools.eng.analyze_linear_model(*values,float(p.period_s),matlab.double([p.windows_s]),
             matlab.double([p.frequency_rad_s]),float(p.pole_margin_s_inv),nargout=1)
@@ -32,4 +38,5 @@ class MatlabBatch:
             singular_values=np.asarray(out['singular_values']).tolist(),
             continuous_gramians=[np.asarray(w).tolist() for w in out['continuous_gramians']],
             held_gramians=[np.asarray(w).tolist() for w in out['held_gramians']],
+            held_sampling=sampling,
             gramian_algorithms=list(out['gramian_algorithms']))

@@ -1,6 +1,7 @@
 """Trusted numerical tools using the existing extension registry."""
 from tools.platform_registry import Extension
-from schemas.platform_analysis import MetricsRequest, LinearizeRequest, SavedCaseRequest, CompareRequest, AnalysisResult
+from schemas.platform_analysis import (MetricsRequest, LinearizeRequest, SavedLinearizeRequestV2, SavedCaseRequest, CompareRequest,
+    CandidateLinearizeRequest, BoundedEndpointRequest, DesignScreenRequest, AnalysisResult)
 from extensions.tendon_family.manifest import GVS_SOURCES
 
 CONTRACTS=[]
@@ -8,6 +9,7 @@ CONTRACTS=[]
 SOURCES=(*GVS_SOURCES,'schemas/platform_analysis.py','extensions/math_analysis/kernels.py',
     'extensions/math_analysis/tools.py','extensions/math_analysis/matlab.py','extensions/math_analysis/manifest.py',
     'extensions/tendon_family/math_analysis.py','extensions/tendon_family/saved_cases.py',
+    'extensions/tendon_family/candidate_analysis.py','extensions/tendon_family/model_applicability.py',
     'schemas/platform_diagnostics.py')
 EXTENSIONS=[]
 for name,schema,binding,description,deps in (
@@ -20,3 +22,34 @@ for name,schema,binding,description,deps in (
     EXTENSIONS.append(Extension(name,'tool','1.0.0',schema,AnalysisResult,binding,description,
         sources=SOURCES,assets=('matlab/analyze_linear_model.m',),dependencies=deps,
         side_effects='artifact_store',cache=True,capabilities=caps))
+
+# Changed boundary behavior is explicitly versioned. MATLAB is selected at
+# invocation preflight, so SciPy discovery has no optional Engine dependency.
+for name,schema,binding,description,deps in (
+    ('analysis.control_metrics',MetricsRequest,'extensions.math_analysis.tools:control_metrics','Continuous-model local metrics with exact aligned held horizons and optional MATLAB implementation',('numpy','scipy')),
+    ('analysis.linearize_saved_case',SavedLinearizeRequestV2,'extensions.tendon_family.math_analysis:linearize_saved','World-tip position and full moving-state velocity linearization at requested saved points',('numpy','scipy','casadi')),
+    ('analysis.saved_case',SavedCaseRequest,'extensions.tendon_family.math_analysis:saved_case','Phase-aware saved divergence facts with separate backend finite differences and GVS velocity',('numpy','casadi')),
+):
+    caps=dict(category='analysis',role='public_tool',route_visible=True,backend_solves=0)
+    if name=='analysis.control_metrics': caps['preflight']='extensions.math_analysis.tools:preflight'
+    EXTENSIONS.append(Extension(name,'tool','2.0.0',schema,AnalysisResult,binding,description,
+        sources=SOURCES,assets=('matlab/analyze_linear_model.m',),dependencies=deps,
+        side_effects='artifact_store',cache=True,capabilities=caps))
+
+EXTENSIONS.extend([
+    Extension('analysis.linearize_candidate','tool','1.0.0',CandidateLinearizeRequest,AnalysisResult,
+        'extensions.tendon_family.math_analysis:linearize_candidate',
+        'Configuration-only position/velocity local models for an explicit owned completed build node',
+        sources=SOURCES,dependencies=('numpy','scipy','casadi'),side_effects='artifact_store',cache=True,
+        capabilities=dict(category='analysis',role='public_tool',route_visible=True,backend_solves=0)),
+    Extension('analysis.bounded_endpoint','tool','1.0.0',BoundedEndpointRequest,AnalysisResult,
+        'extensions.math_analysis.tools:bounded_endpoint_analysis',
+        'Exact-ZOH task-time bounded position correction and terminal braking diagnostics',
+        sources=SOURCES,dependencies=('numpy','scipy'),side_effects='artifact_store',cache=True,
+        capabilities=dict(category='analysis',role='public_tool',route_visible=True,backend_solves=0)),
+    Extension('design.screen','tool','1.0.0',DesignScreenRequest,AnalysisResult,
+        'extensions.math_analysis.tools:design_screen',
+        'Structured deterministic candidate screen over shared local metrics, bounds and applicability',
+        sources=SOURCES,dependencies=('numpy',),side_effects='artifact_store',cache=True,
+        capabilities=dict(category='analysis',role='public_tool',route_visible=True,backend_solves=0)),
+])

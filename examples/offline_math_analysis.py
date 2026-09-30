@@ -23,6 +23,13 @@ from extensions.math_analysis.kernels import normalized,raw_scipy
 SOURCE=Path('runs/stage333_bounded_recovery_independent_lengths_20260929_114923')
 
 
+def verification_acceptance(report):
+    scipy=all(report[k] for k in ('protocol_binding_passed','derivative_checks_passed',
+        'repeat_checks_passed','serialized_outputs_verified','prohibited_usage_zero','caller_contract_identical'))
+    return dict(acceptance_status='full_cross_implementation' if scipy and report['matlab_checks_passed'] else 'scipy_only_partial',
+        full_cross_implementation_accepted=bool(scipy and report['matlab_checks_passed']))
+
+
 def save(store,value):
     with store.transaction() as db: return plain(store.put(db,value))
 
@@ -229,6 +236,7 @@ def verify_saved_study(root):
         serialized_outputs_verified=all(host.store.artifact(r['output']) is not None for r in receipts if r.get('output')),
         prohibited_usage_zero=all(used[k]==0 for k in ('model_calls','backend_solves','worker_calls')),
         caller_contract_identical=json.loads((root/'shared_callers.json').read_text(encoding='utf8'))['identical_contract'])
+    report.update(verification_acceptance(report))
     atomic_json(root/'verification.json',report)
     atomic_json(root/'build_binding_verification.json',build_bindings)
     atomic_json(root/'model_applicability.json',applicability)
@@ -243,7 +251,8 @@ def verify_saved_study(root):
         new_files={str(f).replace('\\','/'):file_hash(f) for folder in ('extensions/math_analysis',) for f in Path(folder).glob('*.py')}))
     assert len(identities)==9 and len(models)==54
     assert all(original_files.values())
-    assert all(report[k] for k in ('protocol_binding_passed','derivative_checks_passed','repeat_checks_passed','serialized_outputs_verified','prohibited_usage_zero','caller_contract_identical'))
+    assert all(report[k] for k in ('protocol_binding_passed','derivative_checks_passed','repeat_checks_passed',
+        'serialized_outputs_verified','prohibited_usage_zero','caller_contract_identical','matlab_checks_passed'))
     return report
 
 

@@ -46,7 +46,10 @@ def read_cases(descriptor,destination):
         if metadata['candidate_input']!=facts['configuration']: raise ValueError('EXECUTION_CONFIGURATION_MISMATCH')
         prefix=Path('sessions')/owner/'executions'/eid/'backend'
         arrays={}; hashes={}; locations={}
-        for name in ('controller_observations.json','actual_commands.json','nmpc_updates.json'):
+        names=['controller_observations.json','actual_commands.json','nmpc_updates.json']
+        if trial['candidate_id'] in set(descriptor.get('trajectory_candidate_ids',[])):
+            names.append('trajectory.json.gz')
+        for name in names:
             path=live/prefix/name
             if path.exists(): body=path.read_bytes(); location=str(path)
             elif (source/descriptor.get('backend_evidence','backend_evidence.zip')).exists():
@@ -56,7 +59,8 @@ def read_cases(descriptor,destination):
                     if member not in z.namelist(): continue
                     body=z.read(member); location=str(archive)+'!'+member
             else: continue
-            arrays[name]=json.loads(body); hashes[name]=hashlib.sha256(body).hexdigest(); locations[name]=location
+            decoded=gzip.decompress(body) if name.endswith('.gz') else body
+            arrays[name]=json.loads(decoded); hashes[name]=hashlib.sha256(body).hexdigest(); locations[name]=location
         cases.append(dict(binding=dict(candidate_id=facts['candidate_id'],source_session_id=descriptor['source_session_id'],
             owner_run_id=owner,execution_id=eid,run_node=node['node_id'],build_node=node['selection']['source_node'],
             source_directory=str(source),source_commit=session['snapshot'].get('project_commit'),

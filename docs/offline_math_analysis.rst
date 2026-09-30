@@ -16,7 +16,7 @@ If Windows sandbox access prevents MATLAB startup, --matlab-only --output PATH
 retries just saved matrices in an environment where MATLAB can launch.
 --report-only --output PATH verifies/renders retained results without Engine work.
 
-Public tools, all version 1.0.0:
+Historical baseline tools, all version 1.0.0:
 
 * analysis.linearize_saved_case: case and protocol EvidenceRefs -> model EvidenceRefs.
 * analysis.control_metrics: models and protocol EvidenceRefs, implementation
@@ -110,3 +110,67 @@ unstable and stiff systems), normalization/ZOH and held energy, unreachable targ
 sampling phases, and public Host evidence/serialization/zero execution accounting.
 The study additionally checks nine CasADi directional derivatives, seven real
 MATLAB/SciPy representative models, and repeats lightweight saved-matrix calculations.
+
+Task-time analysis stage
+------------------------
+
+Run the bounded follow-on study from the repository root in PowerShell::
+
+  & 'C:\Users\gugugaga\miniconda3\envs\softagent\python.exe' examples/offline_task_analysis.py
+
+This creates a fresh ``runs/offline_task_analysis_*`` directory. It never runs
+``--report-only`` against the retained baseline. It creates nine genuine Route
+``build`` nodes, but performs no Route ``run``, physical backend execution, NMPC
+solve, provider request, or worker call. Configuration-only screening artifacts
+are saved before the historical outcome mapping is read and joined.
+
+Changed public boundaries are explicitly versioned:
+
+* ``analysis.control_metrics@2.0.0`` declares only NumPy and SciPy as mandatory.
+  A MATLAB request performs Engine/package preflight, reserves the MATLAB resource,
+  checks Control System Toolbox and its license, and closes its one batch Engine.
+* ``analysis.linearize_saved_case@2.0.0`` emits separate world-tip position and
+  full moving-state velocity derivatives. It rejects no missing sample by invention.
+* ``analysis.saved_case@2.0.0`` reports exact saved phase/index/input facts, backend
+  position finite differences with their intervals, and separate GVS ``J(q) qdot``.
+* ``analysis.linearize_candidate@1.0.0`` requires an owned completed build node and
+  consumes its immutable effective configuration through an explicit configuration-only boundary.
+* ``analysis.bounded_endpoint@1.0.0`` uses exact ZOH dynamics, affine drift, actual
+  remaining task time, and physical unilateral tension boxes for separate position
+  and terminal-speed questions.
+* ``design.screen@1.0.0`` aggregates those same artifacts and applicability checks;
+  it returns structured conditional reasoning, not a fitted scalar score.
+
+``analysis.control_metrics@2.0.0`` accepts continuous input models only. Sampled
+horizons must equal an integer number of declared periods within the frozen
+tolerance; results record requested/effective duration and step count. Frequency
+grids must be strictly increasing before connected-band interpretation.
+
+The endpoint target is a separate typed contract with three-dimensional position
+and velocity values, units, scales, and limits. Velocity is not appended to the
+three-dimensional position target or frequency response. A returned endpoint is
+checked independently for position, speed, lower bounds, upper bounds and finite
+values. Solver failure or a violating candidate is ``undetermined`` unless a
+separate convex minimum-residual calculation supplies the recorded local-model
+infeasibility certificate.
+
+Compact public call sequence (each reference is an existing ``EvidenceRef``)::
+
+  linear = host.invoke(dict(request_id='linear', tool_id='analysis.linearize_candidate',
+      tool_version='1.0.0', reason='Configuration-only screen',
+      arguments=dict(source_node='screen_build_01', protocol=protocol_ref)))
+  metrics = host.invoke(dict(request_id='metrics', tool_id='analysis.control_metrics',
+      tool_version='2.0.0', reason='Shared local metrics',
+      arguments=dict(models=model_refs, protocol=protocol_ref, implementation='scipy')))
+  endpoint = host.invoke(dict(request_id='endpoint', tool_id='analysis.bounded_endpoint',
+      tool_version='1.0.0', reason='Task-time bounded endpoint',
+      arguments=dict(models=model_refs, protocol=protocol_ref, target=target_ref)))
+  screen = host.invoke(dict(request_id='screen', tool_id='design.screen',
+      tool_version='1.0.0', reason='Deterministic aggregation',
+      arguments=dict(source_node='screen_build_01', protocol=protocol_ref,
+                     linearization=linear_ref, metrics=metrics_ref, endpoint=endpoint_ref)))
+
+The braking result is a terminal diagnostic only. It does not modify the reach
+evaluator or establish settling throughout a window. Likewise, rank-two local
+tip-position controllability at a straight configuration is not a global reach
+rejection because nonlinear bending can produce axial shortening.
