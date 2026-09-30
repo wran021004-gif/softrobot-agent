@@ -9,7 +9,7 @@ from .delivery_facts import bound_result_facts
 from .gvs_profile import execution_scope
 
 
-def bind_failure(source, experiment, index=None, store=None, frozen_path='frozen_input.json'):
+def bind_failure(source, experiment, index=None, store=None, frozen_path='frozen_input.json', allow_success=False):
     index=read(source/'evidence_index.json') if index is None else index
     store=Store(source/'live') if store is None else store
     frozen=read(source/frozen_path)
@@ -26,7 +26,7 @@ def bind_failure(source, experiment, index=None, store=None, frozen_path='frozen
     summary=store.artifact(report['reference'])['detail']
     trial=dict(profile_report=report,evaluation=index['evaluation'],simulation=dict(output=summary['simulation']))
     result=bound_result_facts(store,trial,facts)
-    if not result['valid_complete_execution'] or result['task_accepted'] is not False:
+    if not result['valid_complete_execution'] or (not allow_success and result['task_accepted'] is not False):
         raise ValueError('SUPPLIED_COMPLETE_FAILED_CASE_REQUIRED')
     # Require the identical baseline/task/space and reconstruct the old declared
     # design with today's expansion. Source-code hashes are recorded separately.
@@ -45,7 +45,9 @@ def bind_failure(source, experiment, index=None, store=None, frozen_path='frozen
            for choice in policy(current).combinations.values()
            for k in ('controller','backend','dynamics_model')):
         raise ValueError('HISTORICAL_COMBINATION_MISMATCH')
-    return dict(kind='supplied_historical_failure',experiment_description='autonomous design revision from supplied historical failure evidence',
+    passed=result['task_accepted'] is True
+    return dict(kind='supplied_historical_evaluated_case' if passed else 'supplied_historical_failure',
+        experiment_description=('prior evaluated design evidence' if passed else 'autonomous design revision from supplied historical failure evidence'),
         source_session_id=index['live_session'],owner_run_id=report['owner_run_id'],
         source_state_identity=digest(session['state']),source_directory=str(source),
         candidate_facts={k:v for k,v in facts.items() if k not in ('physical_summary','semantic_provenance','physical_changes')},factual_result=result,
@@ -85,9 +87,6 @@ def bind_cases(source, experiment, candidate_ids, destination, descriptor=None):
             frozen_input='frozen_input.json')
     source_id=descriptor['source_session_id']
     records=read(source/descriptor['records'])
-    selected=[r for r in records if r['candidate_facts']['candidate_id'] in candidate_ids]
-    if len(selected)!=len(candidate_ids) or len(set(candidate_ids))!=len(candidate_ids):
-        raise ValueError('EXPLICIT_HISTORICAL_CASES_REQUIRED')
     store=Store(source/descriptor['live_store'])
     if not store.db.is_file():
         retained=destination.root/'historical_ledgers'/source_id
@@ -95,6 +94,24 @@ def bind_cases(source, experiment, candidate_ids, destination, descriptor=None):
         store=Store(retained)
         store.db.write_bytes(gzip.decompress((source/descriptor['ledger']).read_bytes()))
     session=store.session(source_id)
+    selected=[r for r in records if r['candidate_facts']['candidate_id'] in candidate_ids]
+    if len(selected)!=len(candidate_ids) and descriptor.get('allow_ledger_record_reconstruction'):
+        # Some archived sessions retained an authoritative ledger but wrote an
+        # empty convenience export. Reconstruct only explicitly named completed
+        # runs, then subject them to the same ledger-equality checks below.
+        from .route import trial_facts
+        reconstructed=[]
+        for node in session['state']['route']['nodes']:
+            if node['action']!='run' or node['status']!='completed' or not node.get('result'):
+                continue
+            trial=store.artifact(node['result'])
+            facts=trial.get('candidate_facts') or trial_facts(store,session['snapshot']['input'],trial)
+            if facts['candidate_id'] in candidate_ids:
+                reconstructed.append(dict(node_id=node['node_id'],evidence=node['result'],candidate_facts=facts,
+                    factual_result=bound_result_facts(store,trial,facts)))
+        selected=reconstructed
+    if len(selected)!=len(candidate_ids) or len(set(candidate_ids))!=len(candidate_ids):
+        raise ValueError('EXPLICIT_HISTORICAL_CASES_REQUIRED')
     frozen=read(source/descriptor['frozen_input'])
     if session['snapshot']['input']!=frozen:
         # Older callers supply the unresolved input; scientific equality is
@@ -109,12 +126,19 @@ def bind_cases(source, experiment, candidate_ids, destination, descriptor=None):
             raise ValueError('HISTORICAL_SOURCE_NODE_MISMATCH')
         from .route import trial_facts
         trial=store.artifact(node['result'])
-        ledger_facts=trial_facts(store,session['snapshot']['input'],trial)
-        if ledger_facts!=facts or bound_result_facts(store,trial,ledger_facts)!=result:
+        ledger_facts=trial.get('candidate_facts') or trial_facts(store,session['snapshot']['input'],trial)
+        recomputed=trial_facts(store,session['snapshot']['input'],trial)
+        # Bind the byte-for-byte facts retained by the run. Independently
+        # reproduce every semantic field; physical_summary is excluded from
+        # that second equality because recomputing mass can differ at the last
+        # floating-point bit across numerical-library builds.
+        semantic=lambda value:{k:v for k,v in value.items() if k!='physical_summary'}
+        if (ledger_facts!=facts or semantic(recomputed)!=semantic(ledger_facts) or
+                bound_result_facts(store,trial,ledger_facts)!=result):
             raise ValueError('HISTORICAL_RECORD_LEDGER_MISMATCH')
         binding=dict(live_session=source_id,configuration=facts['configuration'],
             candidate_id=facts['candidate_id'],profile_report=result['report'],evaluation=result['evaluation'])
-        case=bind_failure(source,experiment,binding,store,descriptor['frozen_input'])
+        case=bind_failure(source,experiment,binding,store,descriptor['frozen_input'],allow_success=True)
         report=store.artifact(result['report']['reference'])['detail']
         motion=store.artifact(report['motion'])
         case['motion_summary']=motion_summary(motion,case['factual_result']['signed_position_error_m'],

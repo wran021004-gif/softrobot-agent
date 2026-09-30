@@ -39,7 +39,8 @@ def historical_sources():
     sources.append(dict(directory=str(SOURCE),source_session_id='gvs-live-f4a6655fe472',
         candidate_ids=['b1_near0p17_far0p128_compliant_s1p05','b2_near0p169_far0p129_compliant_s1p05'],
         records='actual_fresh_candidates.json',live_store='live',ledger='platform.sqlite.gz',
-        frozen_input='resolved_frozen_input.json',backend_evidence='backend_evidence.zip'))
+        frozen_input='resolved_frozen_input.json',backend_evidence='backend_evidence.zip',
+        allow_ledger_record_reconstruction=True))
     return sources
 
 
