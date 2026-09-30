@@ -1,13 +1,1452 @@
 {
   "run_id": "gvs-live-f4a6655fe472",
-  "provider_responses": [],
-  "context_deliveries": [],
-  "actions": [],
+  "provider_responses": [
+    {
+      "request_id": "model-0",
+      "reference": {
+        "artifact_id": "f7942eea73e13459c1e5272d24c332d261fe044b288d960e50fca2eabeee723b",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "75ccd5c1-05f1-40c8-8441-ca486705dd01",
+      "usage": {
+        "completion_tokens": 4769,
+        "completion_tokens_details": {
+          "reasoning_tokens": 4029
+        },
+        "prompt_cache_hit_tokens": 7680,
+        "prompt_cache_miss_tokens": 13263,
+        "prompt_tokens": 20943,
+        "prompt_tokens_details": {
+          "cached_tokens": 7680
+        },
+        "total_tokens": 25712
+      }
+    },
+    {
+      "request_id": "model-1",
+      "reference": {
+        "artifact_id": "2a9628101e2bd88a09c733b10aa9d2dfb51570739f815706bc9a47f43b1d826a",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "8689663e-e0ac-427b-8de4-21b26eb1d00b",
+      "usage": {
+        "completion_tokens": 1295,
+        "completion_tokens_details": {
+          "reasoning_tokens": 903
+        },
+        "prompt_cache_hit_tokens": 7552,
+        "prompt_cache_miss_tokens": 16655,
+        "prompt_tokens": 24207,
+        "prompt_tokens_details": {
+          "cached_tokens": 7552
+        },
+        "total_tokens": 25502
+      }
+    },
+    {
+      "request_id": "model-2",
+      "reference": {
+        "artifact_id": "4e813c429f5fd55bafd11e4775f6d685aa99abe6f7ec515905f2b120a78df031",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "932e4484-11cc-4b47-bb6e-accd4f3aa497",
+      "usage": {
+        "completion_tokens": 31852,
+        "completion_tokens_details": {
+          "reasoning_tokens": 31301
+        },
+        "prompt_cache_hit_tokens": 7552,
+        "prompt_cache_miss_tokens": 24508,
+        "prompt_tokens": 32060,
+        "prompt_tokens_details": {
+          "cached_tokens": 7552
+        },
+        "total_tokens": 63912
+      }
+    },
+    {
+      "request_id": "model-3",
+      "reference": {
+        "artifact_id": "b4f94bf67956024fed5d0dfc00267afb5a5da6aa09adc37d16b39f63f79e18d0",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "802bb2c4-3f4d-44aa-8f2d-bd8a97eac795",
+      "usage": {
+        "completion_tokens": 17649,
+        "completion_tokens_details": {
+          "reasoning_tokens": 16963
+        },
+        "prompt_cache_hit_tokens": 7552,
+        "prompt_cache_miss_tokens": 23390,
+        "prompt_tokens": 30942,
+        "prompt_tokens_details": {
+          "cached_tokens": 7552
+        },
+        "total_tokens": 48591
+      }
+    },
+    {
+      "request_id": "model-4",
+      "reference": {
+        "artifact_id": "534cbd77de1b83c2244a6571d5df25330dc2cc98deb510e00180b1f321c7f7e2",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "2ce4a100-e8b8-48ca-8b6e-acb2a3a3bb9b",
+      "usage": {
+        "completion_tokens": 5448,
+        "completion_tokens_details": {
+          "reasoning_tokens": 2361
+        },
+        "prompt_cache_hit_tokens": 7552,
+        "prompt_cache_miss_tokens": 26161,
+        "prompt_tokens": 33713,
+        "prompt_tokens_details": {
+          "cached_tokens": 7552
+        },
+        "total_tokens": 39161
+      }
+    }
+  ],
+  "context_deliveries": [
+    {
+      "request_id": "model-0",
+      "payload": {
+        "artifact_id": "acce2e30f8fe4e3fa4dbc40f8f138ce1de242e8f386484e8dcb0e5d7f1aca15f",
+        "media_type": "application/json"
+      },
+      "skills": [],
+      "control_profiles": [
+        {
+          "applicability": "compatible_unvalidated",
+          "combination": "candidate_gvs_nmpc",
+          "command_space": "tendon_tensions",
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "bundled_guess",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_brake_lead_s": 0.0,
+                  "holding_tip_speed_weight": 0.0,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": null,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": false,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "6.0.0"
+          },
+          "discovery": "control.profile_describe",
+          "executable": true,
+          "execution_model": "model.serial_bending_cells",
+          "historical_cost": null,
+          "predictor": "model.gvs",
+          "profile_id": "gvs_candidate_reach_v1",
+          "reasons": [],
+          "report_authorized": true,
+          "scope_assessment": {
+            "execution_preparation": {
+              "next_step": "simulation.run imports/generates and seals numerical guesses under its reserved wall/one-backend budget; actual-state regeneration and validation occur in each update",
+              "source": "bundled_guess",
+              "status": "pending_execution_hook"
+            },
+            "historical_evidence": {
+              "exact_execution_scope_match": false,
+              "historical_robot_match": true,
+              "historical_task_match": true,
+              "reason": "Fixed v2 success does not validate changed designs, targets, timing, initial states, recipes or acceptance conditions",
+              "sources": [
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/report.md",
+                  "sha256": "0322ae0a589139dcd0443081c70ae318621d6fd8e39a6949032c2e3cf58c4579"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/summary.json",
+                  "sha256": "b99b80e195b19f47ea6c10ed23a4992418b95564ec79862dbae9e6380cb761ef"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/saved_evaluation.json",
+                  "sha256": "1f2d7f26e2da8df4475510433ce814660d5ea6af0bb868f6f8555974f20bff00"
+                }
+              ],
+              "status": "unvalidated_configuration"
+            },
+            "technical_compatibility": {
+              "model_use_assessment": {
+                "design_id": "two_segment_development",
+                "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+                "generalized_coordinate_dimension": 12,
+                "model_id": "model.gvs",
+                "model_version": "1.0.0",
+                "relevant_assumptions": [
+                  "supported serial tendon-driven continuum topology",
+                  "selected strain basis spans deformation relevant to the use",
+                  "inextensible centerline",
+                  "no shear",
+                  "no torsion",
+                  "straight frictionless tendon spans"
+                ],
+                "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+                "representation_kind": "gvs_bending_basis_v1",
+                "representation_strategy": "structural_linear",
+                "state_dimension": 24,
+                "unsupported_requested_physics": [],
+                "uses": {
+                  "local_model_control": {
+                    "evidence": [],
+                    "reasons": [
+                      "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+                    ],
+                    "status": "WARN",
+                    "validation": "unavailable"
+                  },
+                  "reduced_dynamics": {
+                    "evidence": [],
+                    "reasons": [
+                      "Resolved GVS bending coordinates support this reduced-model use."
+                    ],
+                    "status": "ALLOW",
+                    "validation": "unavailable"
+                  }
+                }
+              },
+              "reason": "Length, uniform section scaling, material density/elasticity/declared viscosity; unchanged topology and routing",
+              "status": "supported"
+            }
+          }
+        }
+      ],
+      "fresh_report": null,
+      "incumbent_report": null
+    },
+    {
+      "request_id": "model-1",
+      "payload": {
+        "artifact_id": "99404b78915b31f0f79674425b7a55cbef9b27942c048e7468f2d270b5581335",
+        "media_type": "application/json"
+      },
+      "skills": [],
+      "control_profiles": [
+        {
+          "applicability": "compatible_unvalidated",
+          "combination": "candidate_gvs_nmpc",
+          "command_space": "tendon_tensions",
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "bundled_guess",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_brake_lead_s": 0.0,
+                  "holding_tip_speed_weight": 0.0,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": null,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": false,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "6.0.0"
+          },
+          "discovery": "control.profile_describe",
+          "executable": true,
+          "execution_model": "model.serial_bending_cells",
+          "historical_cost": null,
+          "predictor": "model.gvs",
+          "profile_id": "gvs_candidate_reach_v1",
+          "reasons": [],
+          "report_authorized": true,
+          "scope_assessment": {
+            "execution_preparation": {
+              "next_step": "simulation.run imports/generates and seals numerical guesses under its reserved wall/one-backend budget; actual-state regeneration and validation occur in each update",
+              "source": "bundled_guess",
+              "status": "pending_execution_hook"
+            },
+            "historical_evidence": {
+              "exact_execution_scope_match": false,
+              "historical_robot_match": true,
+              "historical_task_match": true,
+              "reason": "Fixed v2 success does not validate changed designs, targets, timing, initial states, recipes or acceptance conditions",
+              "sources": [
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/report.md",
+                  "sha256": "0322ae0a589139dcd0443081c70ae318621d6fd8e39a6949032c2e3cf58c4579"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/summary.json",
+                  "sha256": "b99b80e195b19f47ea6c10ed23a4992418b95564ec79862dbae9e6380cb761ef"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/saved_evaluation.json",
+                  "sha256": "1f2d7f26e2da8df4475510433ce814660d5ea6af0bb868f6f8555974f20bff00"
+                }
+              ],
+              "status": "unvalidated_configuration"
+            },
+            "technical_compatibility": {
+              "model_use_assessment": {
+                "design_id": "two_segment_development",
+                "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+                "generalized_coordinate_dimension": 12,
+                "model_id": "model.gvs",
+                "model_version": "1.0.0",
+                "relevant_assumptions": [
+                  "supported serial tendon-driven continuum topology",
+                  "selected strain basis spans deformation relevant to the use",
+                  "inextensible centerline",
+                  "no shear",
+                  "no torsion",
+                  "straight frictionless tendon spans"
+                ],
+                "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+                "representation_kind": "gvs_bending_basis_v1",
+                "representation_strategy": "structural_linear",
+                "state_dimension": 24,
+                "unsupported_requested_physics": [],
+                "uses": {
+                  "local_model_control": {
+                    "evidence": [],
+                    "reasons": [
+                      "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+                    ],
+                    "status": "WARN",
+                    "validation": "unavailable"
+                  },
+                  "reduced_dynamics": {
+                    "evidence": [],
+                    "reasons": [
+                      "Resolved GVS bending coordinates support this reduced-model use."
+                    ],
+                    "status": "ALLOW",
+                    "validation": "unavailable"
+                  }
+                }
+              },
+              "reason": "Length, uniform section scaling, material density/elasticity/declared viscosity; unchanged topology and routing",
+              "status": "supported"
+            }
+          }
+        }
+      ],
+      "fresh_report": null,
+      "incumbent_report": null
+    },
+    {
+      "request_id": "model-2",
+      "payload": {
+        "artifact_id": "7d58327d11caea07f81448f9bf0d9e41d70709c481e5674e78303791cf991362",
+        "media_type": "application/json"
+      },
+      "skills": [],
+      "control_profiles": [
+        {
+          "applicability": "compatible_unvalidated",
+          "combination": "candidate_gvs_nmpc",
+          "command_space": "tendon_tensions",
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "bundled_guess",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_brake_lead_s": 0.0,
+                  "holding_tip_speed_weight": 0.0,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": null,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": false,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "6.0.0"
+          },
+          "discovery": "control.profile_describe",
+          "executable": true,
+          "execution_model": "model.serial_bending_cells",
+          "historical_cost": null,
+          "predictor": "model.gvs",
+          "profile_id": "gvs_candidate_reach_v1",
+          "reasons": [],
+          "report_authorized": true,
+          "scope_assessment": {
+            "execution_preparation": {
+              "next_step": "simulation.run imports/generates and seals numerical guesses under its reserved wall/one-backend budget; actual-state regeneration and validation occur in each update",
+              "source": "bundled_guess",
+              "status": "pending_execution_hook"
+            },
+            "historical_evidence": {
+              "exact_execution_scope_match": false,
+              "historical_robot_match": true,
+              "historical_task_match": true,
+              "reason": "Fixed v2 success does not validate changed designs, targets, timing, initial states, recipes or acceptance conditions",
+              "sources": [
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/report.md",
+                  "sha256": "0322ae0a589139dcd0443081c70ae318621d6fd8e39a6949032c2e3cf58c4579"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/summary.json",
+                  "sha256": "b99b80e195b19f47ea6c10ed23a4992418b95564ec79862dbae9e6380cb761ef"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/saved_evaluation.json",
+                  "sha256": "1f2d7f26e2da8df4475510433ce814660d5ea6af0bb868f6f8555974f20bff00"
+                }
+              ],
+              "status": "unvalidated_configuration"
+            },
+            "technical_compatibility": {
+              "model_use_assessment": {
+                "design_id": "two_segment_development",
+                "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+                "generalized_coordinate_dimension": 12,
+                "model_id": "model.gvs",
+                "model_version": "1.0.0",
+                "relevant_assumptions": [
+                  "supported serial tendon-driven continuum topology",
+                  "selected strain basis spans deformation relevant to the use",
+                  "inextensible centerline",
+                  "no shear",
+                  "no torsion",
+                  "straight frictionless tendon spans"
+                ],
+                "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+                "representation_kind": "gvs_bending_basis_v1",
+                "representation_strategy": "structural_linear",
+                "state_dimension": 24,
+                "unsupported_requested_physics": [],
+                "uses": {
+                  "local_model_control": {
+                    "evidence": [],
+                    "reasons": [
+                      "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+                    ],
+                    "status": "WARN",
+                    "validation": "unavailable"
+                  },
+                  "reduced_dynamics": {
+                    "evidence": [],
+                    "reasons": [
+                      "Resolved GVS bending coordinates support this reduced-model use."
+                    ],
+                    "status": "ALLOW",
+                    "validation": "unavailable"
+                  }
+                }
+              },
+              "reason": "Length, uniform section scaling, material density/elasticity/declared viscosity; unchanged topology and routing",
+              "status": "supported"
+            }
+          }
+        }
+      ],
+      "fresh_report": {
+        "execution_id": "b16b853401b2404ba2afe248fba62631",
+        "owner_run_id": "gvs-live-f4a6655fe472-b80e9ce577253b2a",
+        "reference": {
+          "artifact_id": "09a562774aed36becc9aa7266025b583152d43f1ef25c8c12aead9b00938db64",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      },
+      "incumbent_report": {
+        "execution_id": "b16b853401b2404ba2afe248fba62631",
+        "owner_run_id": "gvs-live-f4a6655fe472-b80e9ce577253b2a",
+        "reference": {
+          "artifact_id": "09a562774aed36becc9aa7266025b583152d43f1ef25c8c12aead9b00938db64",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      }
+    },
+    {
+      "request_id": "model-3",
+      "payload": {
+        "artifact_id": "2ec72d7802052b541696d2e20396c10dab108a729d090d24601f10ae016bd2e0",
+        "media_type": "application/json"
+      },
+      "skills": [],
+      "control_profiles": [
+        {
+          "applicability": "compatible_unvalidated",
+          "combination": "candidate_gvs_nmpc",
+          "command_space": "tendon_tensions",
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "bundled_guess",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_brake_lead_s": 0.0,
+                  "holding_tip_speed_weight": 0.0,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": null,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": false,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "6.0.0"
+          },
+          "discovery": "control.profile_describe",
+          "executable": true,
+          "execution_model": "model.serial_bending_cells",
+          "historical_cost": null,
+          "predictor": "model.gvs",
+          "profile_id": "gvs_candidate_reach_v1",
+          "reasons": [],
+          "report_authorized": true,
+          "scope_assessment": {
+            "execution_preparation": {
+              "next_step": "simulation.run imports/generates and seals numerical guesses under its reserved wall/one-backend budget; actual-state regeneration and validation occur in each update",
+              "source": "bundled_guess",
+              "status": "pending_execution_hook"
+            },
+            "historical_evidence": {
+              "exact_execution_scope_match": false,
+              "historical_robot_match": true,
+              "historical_task_match": true,
+              "reason": "Fixed v2 success does not validate changed designs, targets, timing, initial states, recipes or acceptance conditions",
+              "sources": [
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/report.md",
+                  "sha256": "0322ae0a589139dcd0443081c70ae318621d6fd8e39a6949032c2e3cf58c4579"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/summary.json",
+                  "sha256": "b99b80e195b19f47ea6c10ed23a4992418b95564ec79862dbae9e6380cb761ef"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/saved_evaluation.json",
+                  "sha256": "1f2d7f26e2da8df4475510433ce814660d5ea6af0bb868f6f8555974f20bff00"
+                }
+              ],
+              "status": "unvalidated_configuration"
+            },
+            "technical_compatibility": {
+              "model_use_assessment": {
+                "design_id": "two_segment_development",
+                "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+                "generalized_coordinate_dimension": 12,
+                "model_id": "model.gvs",
+                "model_version": "1.0.0",
+                "relevant_assumptions": [
+                  "supported serial tendon-driven continuum topology",
+                  "selected strain basis spans deformation relevant to the use",
+                  "inextensible centerline",
+                  "no shear",
+                  "no torsion",
+                  "straight frictionless tendon spans"
+                ],
+                "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+                "representation_kind": "gvs_bending_basis_v1",
+                "representation_strategy": "structural_linear",
+                "state_dimension": 24,
+                "unsupported_requested_physics": [],
+                "uses": {
+                  "local_model_control": {
+                    "evidence": [],
+                    "reasons": [
+                      "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+                    ],
+                    "status": "WARN",
+                    "validation": "unavailable"
+                  },
+                  "reduced_dynamics": {
+                    "evidence": [],
+                    "reasons": [
+                      "Resolved GVS bending coordinates support this reduced-model use."
+                    ],
+                    "status": "ALLOW",
+                    "validation": "unavailable"
+                  }
+                }
+              },
+              "reason": "Length, uniform section scaling, material density/elasticity/declared viscosity; unchanged topology and routing",
+              "status": "supported"
+            }
+          }
+        }
+      ],
+      "fresh_report": null,
+      "incumbent_report": {
+        "execution_id": "b16b853401b2404ba2afe248fba62631",
+        "owner_run_id": "gvs-live-f4a6655fe472-b80e9ce577253b2a",
+        "reference": {
+          "artifact_id": "09a562774aed36becc9aa7266025b583152d43f1ef25c8c12aead9b00938db64",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      }
+    },
+    {
+      "request_id": "model-4",
+      "payload": {
+        "artifact_id": "6a7147be3f6720fb7682d73c13b414bc2db12fcb5f0fe63b2d81df9755bdcccc",
+        "media_type": "application/json"
+      },
+      "skills": [],
+      "control_profiles": [
+        {
+          "applicability": "compatible_unvalidated",
+          "combination": "candidate_gvs_nmpc",
+          "command_space": "tendon_tensions",
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "bundled_guess",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_brake_lead_s": 0.0,
+                  "holding_tip_speed_weight": 0.0,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": null,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": false,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "6.0.0"
+          },
+          "discovery": "control.profile_describe",
+          "executable": true,
+          "execution_model": "model.serial_bending_cells",
+          "historical_cost": null,
+          "predictor": "model.gvs",
+          "profile_id": "gvs_candidate_reach_v1",
+          "reasons": [],
+          "report_authorized": true,
+          "scope_assessment": {
+            "execution_preparation": {
+              "next_step": "simulation.run imports/generates and seals numerical guesses under its reserved wall/one-backend budget; actual-state regeneration and validation occur in each update",
+              "source": "bundled_guess",
+              "status": "pending_execution_hook"
+            },
+            "historical_evidence": {
+              "exact_execution_scope_match": false,
+              "historical_robot_match": true,
+              "historical_task_match": true,
+              "reason": "Fixed v2 success does not validate changed designs, targets, timing, initial states, recipes or acceptance conditions",
+              "sources": [
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/report.md",
+                  "sha256": "0322ae0a589139dcd0443081c70ae318621d6fd8e39a6949032c2e3cf58c4579"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/summary.json",
+                  "sha256": "b99b80e195b19f47ea6c10ed23a4992418b95564ec79862dbae9e6380cb761ef"
+                },
+                {
+                  "classification": "historical artifact; no invented Store receipt",
+                  "path": "runs/stage315_complete_control_20260927/saved_evaluation.json",
+                  "sha256": "1f2d7f26e2da8df4475510433ce814660d5ea6af0bb868f6f8555974f20bff00"
+                }
+              ],
+              "status": "unvalidated_configuration"
+            },
+            "technical_compatibility": {
+              "model_use_assessment": {
+                "design_id": "two_segment_development",
+                "design_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+                "generalized_coordinate_dimension": 12,
+                "model_id": "model.gvs",
+                "model_version": "1.0.0",
+                "relevant_assumptions": [
+                  "supported serial tendon-driven continuum topology",
+                  "selected strain basis spans deformation relevant to the use",
+                  "inextensible centerline",
+                  "no shear",
+                  "no torsion",
+                  "straight frictionless tendon spans"
+                ],
+                "representation_id": "56bba5caad5f7e62bea5ba3f85b75b16664a36c29a2ca99efcc0bef75601db71",
+                "representation_kind": "gvs_bending_basis_v1",
+                "representation_strategy": "structural_linear",
+                "state_dimension": 24,
+                "unsupported_requested_physics": [],
+                "uses": {
+                  "local_model_control": {
+                    "evidence": [],
+                    "reasons": [
+                      "Local control can use the reduced model and linearizer, but operating-point and closed-loop agreement are unvalidated; validation evidence is unavailable."
+                    ],
+                    "status": "WARN",
+                    "validation": "unavailable"
+                  },
+                  "reduced_dynamics": {
+                    "evidence": [],
+                    "reasons": [
+                      "Resolved GVS bending coordinates support this reduced-model use."
+                    ],
+                    "status": "ALLOW",
+                    "validation": "unavailable"
+                  }
+                }
+              },
+              "reason": "Length, uniform section scaling, material density/elasticity/declared viscosity; unchanged topology and routing",
+              "status": "supported"
+            }
+          }
+        }
+      ],
+      "fresh_report": {
+        "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+        "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e",
+        "reference": {
+          "artifact_id": "0b46bbc5b1511b61e6879162a5b6fa359c37ed52246f4b193e406ad997862330",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      },
+      "incumbent_report": {
+        "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+        "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e",
+        "reference": {
+          "artifact_id": "0b46bbc5b1511b61e6879162a5b6fa359c37ed52246f4b193e406ad997862330",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "request_id": "model-0",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 22.906000000191852,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "0478e0d6a22846a69267d552c87ab13a",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "0f712dea53f9043ddfb5dd8664881ee9350c91fd6ff40af42f82b89b015fcde8",
+          "media_type": "application/json"
+        },
+        "request_id": "model-0",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "action": "build",
+          "candidate_id": "b1_near0p17_far0p128_compliant_s1p05",
+          "changes": {
+            "components/far/length_m": 0.128,
+            "components/near/length_m": 0.17,
+            "design/material_scenario": "compliant",
+            "design/section_scale": 1.05
+          },
+          "combination": "candidate_gvs_nmpc",
+          "next_step": "Run this saved build with source_node and no combination to get one charged simulation/evaluation and read its reach facts.",
+          "node_id": "b1_near0p17_far0p128_compliant_s1p05",
+          "reason": "First fresh design must meaningfully break the historical near-minus-far = 0.04 m relationship: 0.17 - 0.128 = 0.042 m, a 0.002 m departure. Keeping total length 0.298 m close to the best historical region (0.30 m, solver found 28 non-initialization plans) is intended, as a hypothesis only, to preserve the controller's ability to plan while testing an independent allocation. Compliant material and section_scale 1.05 match the strongest historical case so the length allocation is the changed factor."
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Construct the first fresh length-varying design that breaks the historical near-minus-far = 0.04 m coupling while keeping total length near the best-performing 0.30 m region.",
+        "request_id": "model-0-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-1",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 8.093000000109896,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "72fe8252a4f840fbba7f7b69e887160a",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "7e16f8a36e541bbfd678cdd89059515c5d15b0328676aa0ceeada7b6efd96917",
+          "media_type": "application/json"
+        },
+        "request_id": "model-1",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "action": "run",
+          "evidence": [
+            {
+              "artifact_id": "9701790b7354414b0c21d4278c63e6140cbea8067f984d0ff36751b94781ed0a",
+              "media_type": "application/json"
+            }
+          ],
+          "next_step": "Read the returned reach facts (terminal_error_m, signed errors, accepted plans, deadline misses) and compare against the best supplied historical case (rev_compliant_max, terminal_error_m=0.011787523596227019) before deciding whether to revise lengths/scale again or deliver.",
+          "node_id": "run_b1_near0p17_far0p128_compliant_s1p05",
+          "reason": "The build node b1_near0p17_far0p128_compliant_s1p05 is completed and unexecuted; running it is the required next action to obtain one charged simulation plus evaluation of the frozen free-reach task. Its combination is already owned by the saved build, so no combination is supplied.",
+          "source_node": "b1_near0p17_far0p128_compliant_s1p05"
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Run the completed build node to get one charged simulation/evaluation on the frozen free-reach task, since the build produced no trajectory or task error.",
+        "request_id": "model-1-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-2",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 153.01599999982864,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "1db1a3ceda08499c837f7d154b4f8d01",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "56f3db78cd875ff6e508006d757b75a3b87fffd4c5c2a951c780e0a5451cb05b",
+          "media_type": "application/json"
+        },
+        "request_id": "model-2",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "action": "build",
+          "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+          "changes": {
+            "components/far/length_m": 0.129,
+            "components/near/length_m": 0.169,
+            "design/material_scenario": "compliant",
+            "design/section_scale": 1.05
+          },
+          "combination": "candidate_gvs_nmpc",
+          "evidence": [
+            {
+              "artifact_id": "493001d4620a56e4847f1b81093b391c6c71ffe41b643c77b3920f9b923c26a7",
+              "media_type": "application/json"
+            }
+          ],
+          "next_step": "Run the new build with source_node and no combination, then compare its terminal_error_m against the incumbent 0.032991 m and the best supplied historical case 0.011788 m before choosing the next revision.",
+          "node_id": "b2_near0p169_far0p129_compliant_s1p05",
+          "reason": "The two best supplied outcomes (rev_compliant_max 0.011788 m and fresh_near0p168_far0p128 0.012611 m) both lie on the coupling-intact line near_length - far_length = 0.04 m with total length >= 0.296 m (the target sits ~0.294 m from the mount, so shorter arms are geometrically unreachable). The incumbent b1 broke that coupling (0.042) and its terminal error 0.032991 m was far worse. Hypothesis: a 1 mm shift of the good family, near 0.169 m and far 0.129 m, compliant material, section scale 1.05, is a covered, untested design that preserves the favourable geometry while exceeding the reach threshold."
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Construct (zero-solve) a second fresh, covered candidate on the coupling-intact reachable family suggested by the supplied best cases, to be simulated next.",
+        "request_id": "model-2-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-3",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 88.375,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "e4cefd96a2524370816d2a7260434072",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "c1fd8d8d9550eb1878688fafab100e2b07a9ef54531b3f145118560380f43c22",
+          "media_type": "application/json"
+        },
+        "request_id": "model-3",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "action": "run",
+          "evidence": [
+            {
+              "artifact_id": "31db91512c0b844fddab88a359667a5ace595ed41e3fadea8600b6d59bbb3e3c"
+            },
+            {
+              "artifact_id": "493001d4620a56e4847f1b81093b391c6c71ffe41b643c77b3920f9b923c26a7"
+            }
+          ],
+          "next_step": "Compare the new terminal_error_m and signed error components against the incumbent 0.032991 m and the historical best 0.011788 m; if the fresh result is still above the 0.01 m tolerance, build and run one or two further covered length allocations near the max-total corner (e.g. near 0.168-0.170 m with far 0.129-0.130 m) before delivering the best valid candidate.",
+          "node_id": "run_b2_near0p169_far0p129_compliant_s1p05",
+          "reason": "The build b2_near0p169_far0p129_compliant_s1p05 (near 0.169 m, far 0.129 m, compliant, section_scale 1.05) exists but has never been simulated, so it has no task error or trajectory. Running it with its own saved build (no combination override) yields one fresh evaluated free-reach result at total length 0.298 m with near-minus-far = 0.040 m, which I can compare against the incumbent b1 result (terminal_error_m 0.032991 m, same 0.298 m total but near-minus-far 0.042 m) and against the best supplied historical case rev_compliant_max (0.011788 m).",
+          "source_node": "b2_near0p169_far0p129_compliant_s1p05"
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Execute the one saved build node b2_near0p169_far0p129_compliant_s1p05 so that a fresh evaluated free-reach result exists for the length allocation near 0.169 m / far 0.129 m at compliant material and section scale 1.05; this is the single charged backend attempt needed to turn a build-only candidate into an evaluable incumbent and to compare it with the incumbent 0.032991 m and the historical best 0.011788 m.",
+        "request_id": "model-3-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-4",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 19.45300000021234,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "114ee85b62e54c88b680ec58bb65fcba",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "20a57ff7a017c92e8e2f4e84f390d91d01f0ee0336f5bc74af6677b7e7dd5bd8",
+          "media_type": "application/json"
+        },
+        "request_id": "model-4",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "action": "finish",
+          "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+          "design_statement": {
+            "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+            "configuration": {
+              "artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5",
+              "media_type": "application/json"
+            },
+            "effective_identity": "d8c2d74a76e2b2aca58b24c155fba7f34afb6314b6f7f9cd69719d4f7548d7e2",
+            "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+            "frozen_baseline_identity": "014de9897b7392599303e34533267bc567190379aa96dc7fee0aba4842acfbb7",
+            "multi_category_coverage": true,
+            "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e",
+            "parameters": [
+              {
+                "baseline_delta": 0.009000000000000008,
+                "baseline_value": 0.12,
+                "effective_value": 0.129,
+                "path": "components/far/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": 0.009000000000000008,
+                "baseline_value": 0.16,
+                "effective_value": 0.169,
+                "path": "components/near/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": null,
+                "baseline_value": "baseline",
+                "effective_value": "compliant",
+                "path": "design/material_scenario",
+                "unit": null
+              },
+              {
+                "baseline_delta": 0.050000000000000044,
+                "baseline_value": 1.0,
+                "effective_value": 1.05,
+                "path": "design/section_scale",
+                "unit": "1"
+              }
+            ],
+            "physical_changes": [
+              {
+                "baseline_delta": 0.009000000000000008,
+                "baseline_value": 0.16,
+                "category": "length",
+                "effective_value": 0.169,
+                "path": "components/near/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": 0.0005000000000000004,
+                "baseline_value": 0.01,
+                "category": "section",
+                "effective_value": 0.0105,
+                "path": "components/near/sections/0/section/parameters/semi_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": 0.00040000000000000105,
+                "baseline_value": 0.008,
+                "category": "section",
+                "effective_value": 0.008400000000000001,
+                "path": "components/near/sections/0/section/parameters/semi_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -800000.0,
+                "baseline_value": 8000000.0,
+                "category": "material",
+                "effective_value": 7200000.0,
+                "path": "components/near/physics/young_pa",
+                "unit": "Pa"
+              },
+              {
+                "baseline_delta": 0.009000000000000008,
+                "baseline_value": 0.12,
+                "category": "length",
+                "effective_value": 0.129,
+                "path": "components/far/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": 0.0005000000000000004,
+                "baseline_value": 0.01,
+                "category": "section",
+                "effective_value": 0.0105,
+                "path": "components/far/sections/0/section/parameters/height_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": 0.000700000000000001,
+                "baseline_value": 0.014,
+                "category": "section",
+                "effective_value": 0.014700000000000001,
+                "path": "components/far/sections/0/section/parameters/width_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": 0.00045000000000000075,
+                "baseline_value": 0.009,
+                "category": "section",
+                "effective_value": 0.00945,
+                "path": "components/far/sections/1/section/parameters/height_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": 0.0005999999999999998,
+                "baseline_value": 0.012,
+                "category": "section",
+                "effective_value": 0.0126,
+                "path": "components/far/sections/1/section/parameters/width_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -600000.0,
+                "baseline_value": 6000000.0,
+                "category": "material",
+                "effective_value": 5400000.0,
+                "path": "components/far/physics/young_pa",
+                "unit": "Pa"
+              }
+            ]
+          },
+          "evidence": [
+            {
+              "artifact_id": "21a83c08a3837a52aec996d9f0119e25cf445b349bc36f5c04d7253e570475ed",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "493001d4620a56e4847f1b81093b391c6c71ffe41b643c77b3920f9b923c26a7",
+              "media_type": "application/json"
+            }
+          ],
+          "next_step": "Deliver the covered fresh passing candidate now with a zero-solve finish; no further charged solver attempts, no crosscheck, diagnose or video are needed, and no tracking metrics are reported for this free-reach task.",
+          "node_id": "finish_b2_fresh_pass",
+          "reason": "The session incumbent b2_near0p169_far0p129_compliant_s1p05 is a valid, complete, covered fresh free-reach execution (multi_category_coverage true: near 0.169 m +0.009 m, far 0.129 m +0.009 m, design/section_scale 1.05 +0.05, nonbaseline design/material_scenario compliant) whose terminal tip error 0.0077269 m is inside the frozen 0.01 m tolerance, so task_accepted is true. The first fresh build broke the historical near-far = 0.04 m relationship (near-far = 0.042 m, departure 0.002 m >= 0.001 m), satisfying the mandated meaningful departure; the guidance states a covered revision passing the unchanged task may be delivered immediately.",
+          "result_statement": {
+            "accepted_noninitialization_plans": 12,
+            "accepted_plans": 35,
+            "applied_tension_ranges": [
+              {
+                "limit_n": 8.0,
+                "maximum_n": 2.077194118027104,
+                "minimum_n": 1.197347703597216,
+                "tendon": "near_t0",
+                "tendon_index": 0
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 4.755852667139922,
+                "minimum_n": 3.8122215280499736,
+                "tendon": "near_t1",
+                "tendon_index": 1
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 4.804765797726525,
+                "minimum_n": 3.1031566686630025,
+                "tendon": "near_t2",
+                "tendon_index": 2
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 4.920791140393819,
+                "minimum_n": 3.218253612486097,
+                "tendon": "far_t0",
+                "tendon_index": 3
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 3.8198211140651894,
+                "minimum_n": 0.7859357597552847,
+                "tendon": "far_t1",
+                "tendon_index": 4
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 2.0545855359439265,
+                "minimum_n": 8.145818446189429e-05,
+                "tendon": "far_t2",
+                "tendon_index": 5
+              }
+            ],
+            "candidate": {
+              "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+              "configuration": {
+                "artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5",
+                "media_type": "application/json"
+              },
+              "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+              "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e"
+            },
+            "complete": true,
+            "configuration": {
+              "artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5",
+              "media_type": "application/json"
+            },
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "converged_updates": 0,
+            "coordinate_frame": "world",
+            "deadline_misses": 35,
+            "error_convention": "actual_tip minus target",
+            "evaluation": {
+              "artifact_id": "b4e7bc1240f43c8a27a87909b5955462079f4a46222ec053c613256a6de93fce",
+              "media_type": "application/json"
+            },
+            "evaluation_validity": "valid",
+            "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+            "force_bound_violation_n": 0.0,
+            "hold_last_responses": 0,
+            "initialization_selected": 23,
+            "mean_complete_update_s": 15.340472751430102,
+            "measured_computation_s": 540.280999999959,
+            "one_step_prediction_evidence": {
+              "artifact_id": "2d431cc6383b75f759d59196cfad602c36d3545183a395c5f5022e9061a35a0b",
+              "media_type": "application/json"
+            },
+            "one_step_prediction_summary": {
+              "aligned_count": 35,
+              "frame": "world",
+              "maximum_tip_difference_m": 0.007535415657909328,
+              "mean_tip_difference_m": 0.004059976742465859,
+              "missing": [],
+              "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+            },
+            "real_time_demonstrated": false,
+            "report": {
+              "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+              "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e",
+              "reference": {
+                "artifact_id": "0b46bbc5b1511b61e6879162a5b6fa359c37ed52246f4b193e406ad997862330",
+                "media_type": "application/json"
+              },
+              "request_id": "single-profile-report"
+            },
+            "result_type": "free_reach",
+            "sampled_settling": {
+              "available": true,
+              "continuous_time_guarantee": false,
+              "max_error_m": 0.010781152479219073,
+              "max_speed_m_s": 0.4080379021769773,
+              "passed": false,
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            },
+            "signed_position_error_m": [
+              -0.007155638897093364,
+              0.0023117928912372576,
+              0.0017767463844345355
+            ],
+            "simulated_duration_s": 0.35000000000000003,
+            "simulation": {
+              "artifact_id": "85497e413a426c7cdef2045949fbdc67f55bc17ff13131229b5f7dadfc1d2d92",
+              "media_type": "application/json"
+            },
+            "solver_error_count": 0,
+            "target_position_m": [
+              0.29,
+              0.035,
+              0.19
+            ],
+            "task_accepted": true,
+            "terminal_error_m": 0.0077268610775768345,
+            "terminal_position_m": [
+              0.2828443611029066,
+              0.03731179289123726,
+              0.19177674638443454
+            ],
+            "terminal_tip_speed_m_s": 0.1422878074819384,
+            "valid_complete_execution": true
+          },
+          "source_node": "run_b2_near0p169_far0p129_compliant_s1p05"
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Deliver the session-wide valid incumbent, which is a covered fresh free-reach execution that meets the unchanged 0.01 m reach tolerance.",
+        "request_id": "model-4-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      }
+    }
+  ],
   "counts": {
-    "solves": 0,
-    "successful_integrations": 0,
-    "evaluations": 0,
-    "llm_requests": 0,
+    "solves": 2,
+    "successful_integrations": 2,
+    "evaluations": 2,
+    "llm_requests": 5,
     "diagnoses": 0,
     "videos": 0
   },
@@ -20,17 +1459,17 @@
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 0,
-      "model_calls": 0,
-      "backend_solves": 0,
+      "tool_calls": 11,
+      "model_calls": 5,
+      "backend_solves": 2,
       "worker_calls": 0,
-      "wall_s": 0.0
+      "wall_s": 1478.9220000004862
     },
     "remaining": {
-      "backend_solves": 6,
-      "model_calls": 64,
-      "tool_calls": 160,
-      "wall_s": 21600.0,
+      "backend_solves": 4,
+      "model_calls": 59,
+      "tool_calls": 149,
+      "wall_s": 20121.077999999514,
       "worker_calls": 0
     },
     "occupied": {}
@@ -44,29 +1483,1710 @@
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 0,
-      "model_calls": 0,
-      "backend_solves": 0,
+      "tool_calls": 11,
+      "model_calls": 5,
+      "backend_solves": 2,
       "worker_calls": 0,
-      "wall_s": 0.0
+      "wall_s": 1478.9220000004862
     },
     "remaining": {
-      "backend_solves": 6,
-      "model_calls": 64,
-      "tool_calls": 160,
-      "wall_s": 21600.0,
+      "backend_solves": 4,
+      "model_calls": 59,
+      "tool_calls": 149,
+      "wall_s": 20121.077999999514,
       "worker_calls": 0
     },
     "occupied": {}
   },
-  "tool_calls": 0,
-  "real_model_requests": 0,
-  "backend_executions": 0,
-  "stop_reason": null,
-  "status": "created",
-  "final": null,
-  "actual_provider_response_received": false,
+  "tool_calls": 11,
+  "real_model_requests": 5,
+  "backend_executions": 2,
+  "stop_reason": "The session incumbent b2_near0p169_far0p129_compliant_s1p05 is a valid, complete, covered fresh free-reach execution (multi_category_coverage true: near 0.169 m +0.009 m, far 0.129 m +0.009 m, design/section_scale 1.05 +0.05, nonbaseline design/material_scenario compliant) whose terminal tip error 0.0077269 m is inside the frozen 0.01 m tolerance, so task_accepted is true. The first fresh build broke the historical near-far = 0.04 m relationship (near-far = 0.042 m, departure 0.002 m >= 0.001 m), satisfying the mandated meaningful departure; the guidance states a covered revision passing the unchanged task may be delivered immediately.",
+  "status": "stopped",
+  "final": {
+    "actual_solves": 0,
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.1.0"
+    },
+    "best_scope": "session-wide valid comparable evaluated candidates; no global optimum",
+    "best_valid_evaluation": {
+      "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+      "evaluation": {
+        "metrics": [
+          {
+            "name": "position_error",
+            "units": "m",
+            "value": 0.0077268610775768345
+          }
+        ],
+        "source_execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+        "task_success": true,
+        "validity": "valid"
+      },
+      "evaluation_ref": {
+        "artifact_id": "b4e7bc1240f43c8a27a87909b5955462079f4a46222ec053c613256a6de93fce",
+        "media_type": "application/json"
+      },
+      "node_id": "run_b2_near0p169_far0p129_compliant_s1p05",
+      "score": 0.0077268610775768345,
+      "search_run_id": null
+    },
+    "candidate_facts": {
+      "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+      "configuration": {
+        "artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5",
+        "media_type": "application/json"
+      },
+      "effective_identity": "d8c2d74a76e2b2aca58b24c155fba7f34afb6314b6f7f9cd69719d4f7548d7e2",
+      "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+      "frozen_baseline_identity": "014de9897b7392599303e34533267bc567190379aa96dc7fee0aba4842acfbb7",
+      "multi_category_coverage": true,
+      "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e",
+      "parameters": [
+        {
+          "baseline_delta": 0.009000000000000008,
+          "baseline_value": 0.12,
+          "effective_value": 0.129,
+          "path": "components/far/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.009000000000000008,
+          "baseline_value": 0.16,
+          "effective_value": 0.169,
+          "path": "components/near/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": null,
+          "baseline_value": "baseline",
+          "effective_value": "compliant",
+          "path": "design/material_scenario",
+          "unit": null
+        },
+        {
+          "baseline_delta": 0.050000000000000044,
+          "baseline_value": 1.0,
+          "effective_value": 1.05,
+          "path": "design/section_scale",
+          "unit": "1"
+        }
+      ],
+      "physical_changes": [
+        {
+          "baseline_delta": 0.009000000000000008,
+          "baseline_value": 0.16,
+          "category": "length",
+          "effective_value": 0.169,
+          "path": "components/near/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.0005000000000000004,
+          "baseline_value": 0.01,
+          "category": "section",
+          "effective_value": 0.0105,
+          "path": "components/near/sections/0/section/parameters/semi_y_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.00040000000000000105,
+          "baseline_value": 0.008,
+          "category": "section",
+          "effective_value": 0.008400000000000001,
+          "path": "components/near/sections/0/section/parameters/semi_z_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": -800000.0,
+          "baseline_value": 8000000.0,
+          "category": "material",
+          "effective_value": 7200000.0,
+          "path": "components/near/physics/young_pa",
+          "unit": "Pa"
+        },
+        {
+          "baseline_delta": 0.009000000000000008,
+          "baseline_value": 0.12,
+          "category": "length",
+          "effective_value": 0.129,
+          "path": "components/far/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.0005000000000000004,
+          "baseline_value": 0.01,
+          "category": "section",
+          "effective_value": 0.0105,
+          "path": "components/far/sections/0/section/parameters/height_z_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.000700000000000001,
+          "baseline_value": 0.014,
+          "category": "section",
+          "effective_value": 0.014700000000000001,
+          "path": "components/far/sections/0/section/parameters/width_y_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.00045000000000000075,
+          "baseline_value": 0.009,
+          "category": "section",
+          "effective_value": 0.00945,
+          "path": "components/far/sections/1/section/parameters/height_z_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.0005999999999999998,
+          "baseline_value": 0.012,
+          "category": "section",
+          "effective_value": 0.0126,
+          "path": "components/far/sections/1/section/parameters/width_y_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": -600000.0,
+          "baseline_value": 6000000.0,
+          "category": "material",
+          "effective_value": 5400000.0,
+          "path": "components/far/physics/young_pa",
+          "unit": "Pa"
+        }
+      ],
+      "physical_summary": {
+        "applicability": {
+          "backends": [
+            "backend.matlab_spatial",
+            "backend.family_mujoco"
+          ],
+          "collision": "section convex hull extrusions; holes filled for collision only; exact polygon/circular area moments; guide box envelope",
+          "compilable": true,
+          "omitted": [
+            "axial stretch",
+            "shear",
+            "material torsion",
+            "friction",
+            "elastic rope",
+            "motor dynamics",
+            "self collision"
+          ],
+          "physics": "serial rigid cells with two principal bending hinges; fixed rigid attachments; straight frictionless tendons"
+        },
+        "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "force_limits_n": {
+          "far_t0": 8.0,
+          "far_t1": 8.0,
+          "far_t2": 8.0,
+          "near_t0": 8.0,
+          "near_t1": 8.0,
+          "near_t2": 8.0
+        },
+        "physics_identity": "86781ac8990ccf4d45e545ce386a2deb1426417f8dd5851a26bc76a908afd52a",
+        "sections": [
+          {
+            "area_range_m2": [
+              0.0002770884720466198,
+              0.0002770884720466198
+            ],
+            "cell_damping_nm_s_rad": [
+              [
+                0.03550295857988165,
+                0.04970414201183431
+              ],
+              [
+                0.03550295857988165,
+                0.04970414201183431
+              ]
+            ],
+            "cell_inertia_diagonal_kg_m2": [
+              [
+                1.9403454493033963e-07,
+                1.4666979704445285e-07,
+                1.892627459316006e-07
+              ],
+              [
+                1.9403454493033963e-07,
+                1.4666979704445285e-07,
+                1.892627459316006e-07
+              ]
+            ],
+            "cell_stiffness_nm_rad": [
+              [
+                2.498872378061332,
+                3.9044880907208315
+              ],
+              [
+                2.498872378061332,
+                3.9044880907208315
+              ]
+            ],
+            "cells": 12,
+            "component": "near",
+            "length_m": 0.169,
+            "mass_kg": 0.05151074695346663,
+            "material": {
+              "bending_ei_nm2": null,
+              "bending_viscosity_nm2_s": [
+                0.0005,
+                0.0007
+              ],
+              "density_kg_m3": 1100.0,
+              "line_density_kg_m": null,
+              "mode": "material",
+              "young_pa": 7200000.0
+            }
+          },
+          {
+            "area_range_m2": [
+              0.00012045195312500002,
+              0.000152791953125
+            ],
+            "cell_damping_nm_s_rad": [
+              [
+                0.027906976744186043,
+                0.037209302325581395
+              ],
+              [
+                0.027906976744186043,
+                0.037209302325581395
+              ]
+            ],
+            "cell_inertia_diagonal_kg_m2": [
+              [
+                4.640117548845103e-08,
+                3.2321989300616966e-08,
+                4.729645521899251e-08
+              ],
+              [
+                2.8450106736673224e-08,
+                2.3305130656613215e-08,
+                3.1331465947155964e-08
+              ]
+            ],
+            "cell_stiffness_nm_rad": [
+              [
+                0.6992886004930645,
+                1.3656945627108126
+              ],
+              [
+                0.4544577127779939,
+                0.8116522679315613
+              ]
+            ],
+            "cells": 12,
+            "component": "far",
+            "length_m": 0.129,
+            "mass_kg": 0.018467418785156252,
+            "material": {
+              "bending_ei_nm2": null,
+              "bending_viscosity_nm2_s": [
+                0.0003,
+                0.0004
+              ],
+              "density_kg_m3": 1050.0,
+              "line_density_kg_m": null,
+              "mode": "material",
+              "young_pa": 5400000.0
+            }
+          }
+        ]
+      },
+      "semantic_provenance": {
+        "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "material_groups": {
+          "far": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          },
+          "near": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          }
+        },
+        "selections": {
+          "design/material_scenario": "compliant",
+          "design/section_scale": 1.05
+        },
+        "source": "Frozen experiment semantic_source; original per-section material parameters",
+        "source_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4"
+      }
+    },
+    "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+    "configuration": {
+      "artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5",
+      "media_type": "application/json"
+    },
+    "controller": {
+      "extension_id": "controller.gvs_nmpc",
+      "parameters": {
+        "contract": "family.gvs_reach_control",
+        "data": {
+          "numerical_source": "bundled_guess",
+          "recipe": {
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "constraint_jacobian_mode": "reverse",
+            "curvature_scale_rad_m": 10.0,
+            "evaluation_threads": 1,
+            "feasible_return": {
+              "budget_s": 15.0,
+              "minimum_s": 5.0,
+              "relative_improvement": 0.1
+            },
+            "holding_brake_lead_s": 0.0,
+            "holding_tip_speed_weight": 0.0,
+            "horizon": 10,
+            "max_cpu_s": 30.0,
+            "max_iterations": 120,
+            "max_unusable_updates": 3,
+            "position_error_scale_m": null,
+            "rate_scale_rad_m_s": 1000.0,
+            "recover_returned_tensions": false,
+            "regenerate_warm_states": true,
+            "seed_position_tolerance_fraction": 0.5,
+            "seed_speed_limit_m_s": 0.02,
+            "substeps": 1,
+            "tension_weight": 0.0001,
+            "terminal_tip_speed_weight": 0.0,
+            "terminal_velocity_weight": 0.0001,
+            "terminal_weight": 5.0,
+            "tip_speed_scale_m_s": 0.02,
+            "tolerance": 1e-06,
+            "tracking_weight": 1.0,
+            "variation_weight": 0.001,
+            "velocity_weight": 0.0001
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          }
+        },
+        "version": "1.0.0"
+      },
+      "version": "6.0.0"
+    },
+    "crosscheck_status": "not_reviewed",
+    "crosschecks": [],
+    "delivery_status": "evaluated",
+    "design_statement": {
+      "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+      "configuration": {
+        "artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5",
+        "media_type": "application/json"
+      },
+      "effective_identity": "d8c2d74a76e2b2aca58b24c155fba7f34afb6314b6f7f9cd69719d4f7548d7e2",
+      "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+      "frozen_baseline_identity": "014de9897b7392599303e34533267bc567190379aa96dc7fee0aba4842acfbb7",
+      "multi_category_coverage": true,
+      "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e",
+      "parameters": [
+        {
+          "baseline_delta": 0.009000000000000008,
+          "baseline_value": 0.12,
+          "effective_value": 0.129,
+          "path": "components/far/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.009000000000000008,
+          "baseline_value": 0.16,
+          "effective_value": 0.169,
+          "path": "components/near/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": null,
+          "baseline_value": "baseline",
+          "effective_value": "compliant",
+          "path": "design/material_scenario",
+          "unit": null
+        },
+        {
+          "baseline_delta": 0.050000000000000044,
+          "baseline_value": 1.0,
+          "effective_value": 1.05,
+          "path": "design/section_scale",
+          "unit": "1"
+        }
+      ],
+      "physical_changes": [
+        {
+          "baseline_delta": 0.009000000000000008,
+          "baseline_value": 0.16,
+          "category": "length",
+          "effective_value": 0.169,
+          "path": "components/near/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.0005000000000000004,
+          "baseline_value": 0.01,
+          "category": "section",
+          "effective_value": 0.0105,
+          "path": "components/near/sections/0/section/parameters/semi_y_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.00040000000000000105,
+          "baseline_value": 0.008,
+          "category": "section",
+          "effective_value": 0.008400000000000001,
+          "path": "components/near/sections/0/section/parameters/semi_z_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": -800000.0,
+          "baseline_value": 8000000.0,
+          "category": "material",
+          "effective_value": 7200000.0,
+          "path": "components/near/physics/young_pa",
+          "unit": "Pa"
+        },
+        {
+          "baseline_delta": 0.009000000000000008,
+          "baseline_value": 0.12,
+          "category": "length",
+          "effective_value": 0.129,
+          "path": "components/far/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.0005000000000000004,
+          "baseline_value": 0.01,
+          "category": "section",
+          "effective_value": 0.0105,
+          "path": "components/far/sections/0/section/parameters/height_z_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.000700000000000001,
+          "baseline_value": 0.014,
+          "category": "section",
+          "effective_value": 0.014700000000000001,
+          "path": "components/far/sections/0/section/parameters/width_y_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.00045000000000000075,
+          "baseline_value": 0.009,
+          "category": "section",
+          "effective_value": 0.00945,
+          "path": "components/far/sections/1/section/parameters/height_z_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": 0.0005999999999999998,
+          "baseline_value": 0.012,
+          "category": "section",
+          "effective_value": 0.0126,
+          "path": "components/far/sections/1/section/parameters/width_y_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": -600000.0,
+          "baseline_value": 6000000.0,
+          "category": "material",
+          "effective_value": 5400000.0,
+          "path": "components/far/physics/young_pa",
+          "unit": "Pa"
+        }
+      ]
+    },
+    "design_statement_check": {
+      "accepted": true,
+      "mismatches": [],
+      "status": "matched"
+    },
+    "diagnoses": [],
+    "dynamics_model": {
+      "extension_id": "model.serial_bending_cells",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "evaluation": {
+      "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+      "comparison_identity": "3e24542c9d59d3b49d7e702b0ded1bd86e182a08f9a23bfecaa4167f51613fee",
+      "constraints": [
+        {
+          "limit": 0.01,
+          "name": "task_bound",
+          "observed": 0.0077268610775768345,
+          "satisfied": true,
+          "units": "m"
+        }
+      ],
+      "contract_version": "1.2.0",
+      "evaluator": "evaluate.reach",
+      "evaluator_version": "1.0.0",
+      "metrics": [
+        {
+          "name": "position_error",
+          "units": "m",
+          "value": 0.0077268610775768345
+        }
+      ],
+      "original_execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+      "reason": null,
+      "source": {
+        "artifact_id": "85497e413a426c7cdef2045949fbdc67f55bc17ff13131229b5f7dadfc1d2d92",
+        "media_type": "application/json"
+      },
+      "source_execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+      "task_success": true,
+      "validity": "valid"
+    },
+    "evaluation_ref": {
+      "artifact_id": "b4e7bc1240f43c8a27a87909b5955462079f4a46222ec053c613256a6de93fce",
+      "media_type": "application/json"
+    },
+    "explicit_delivery": true,
+    "factual_result": {
+      "accepted_noninitialization_plans": 12,
+      "accepted_plans": 35,
+      "applied_tension_ranges": [
+        {
+          "limit_n": 8.0,
+          "maximum_n": 2.077194118027104,
+          "minimum_n": 1.197347703597216,
+          "tendon": "near_t0",
+          "tendon_index": 0
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 4.755852667139922,
+          "minimum_n": 3.8122215280499736,
+          "tendon": "near_t1",
+          "tendon_index": 1
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 4.804765797726525,
+          "minimum_n": 3.1031566686630025,
+          "tendon": "near_t2",
+          "tendon_index": 2
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 4.920791140393819,
+          "minimum_n": 3.218253612486097,
+          "tendon": "far_t0",
+          "tendon_index": 3
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 3.8198211140651894,
+          "minimum_n": 0.7859357597552847,
+          "tendon": "far_t1",
+          "tendon_index": 4
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 2.0545855359439265,
+          "minimum_n": 8.145818446189429e-05,
+          "tendon": "far_t2",
+          "tendon_index": 5
+        }
+      ],
+      "candidate": {
+        "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+        "configuration": {
+          "artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5",
+          "media_type": "application/json"
+        },
+        "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+        "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e"
+      },
+      "complete": true,
+      "configuration": {
+        "artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5",
+        "media_type": "application/json"
+      },
+      "control_period_s": 0.01,
+      "control_updates": 35,
+      "converged_updates": 0,
+      "coordinate_frame": "world",
+      "deadline_misses": 35,
+      "error_convention": "actual_tip minus target",
+      "evaluation": {
+        "artifact_id": "b4e7bc1240f43c8a27a87909b5955462079f4a46222ec053c613256a6de93fce",
+        "media_type": "application/json"
+      },
+      "evaluation_validity": "valid",
+      "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+      "force_bound_violation_n": 0.0,
+      "hold_last_responses": 0,
+      "initialization_selected": 23,
+      "mean_complete_update_s": 15.340472751430102,
+      "measured_computation_s": 540.280999999959,
+      "one_step_prediction_evidence": {
+        "artifact_id": "2d431cc6383b75f759d59196cfad602c36d3545183a395c5f5022e9061a35a0b",
+        "media_type": "application/json"
+      },
+      "one_step_prediction_summary": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_tip_difference_m": 0.007535415657909328,
+        "mean_tip_difference_m": 0.004059976742465859,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+      },
+      "real_time_demonstrated": false,
+      "report": {
+        "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+        "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e",
+        "reference": {
+          "artifact_id": "0b46bbc5b1511b61e6879162a5b6fa359c37ed52246f4b193e406ad997862330",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      },
+      "result_type": "free_reach",
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.010781152479219073,
+        "max_speed_m_s": 0.4080379021769773,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "signed_position_error_m": [
+        -0.007155638897093364,
+        0.0023117928912372576,
+        0.0017767463844345355
+      ],
+      "simulated_duration_s": 0.35000000000000003,
+      "simulation": {
+        "artifact_id": "85497e413a426c7cdef2045949fbdc67f55bc17ff13131229b5f7dadfc1d2d92",
+        "media_type": "application/json"
+      },
+      "solver_error_count": 0,
+      "target_position_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "task_accepted": true,
+      "terminal_error_m": 0.0077268610775768345,
+      "terminal_position_m": [
+        0.2828443611029066,
+        0.03731179289123726,
+        0.19177674638443454
+      ],
+      "terminal_tip_speed_m_s": 0.1422878074819384,
+      "valid_complete_execution": true
+    },
+    "interpretation_status": "prose_review_required",
+    "limitations": [
+      "Incumbent means lowest score among valid comparable evaluated candidates in this Route session; no global optimum claim.",
+      "Diagnosis is observational, not causal. Text adapter has not viewed videos.",
+      "Serial bending cells only; no torsion/shear/stretch, friction, motor dynamics or general trajectory optimization."
+    ],
+    "new_evaluations": 0,
+    "profile_report": {
+      "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+      "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e",
+      "reference": {
+        "artifact_id": "0b46bbc5b1511b61e6879162a5b6fa359c37ed52246f4b193e406ad997862330",
+        "media_type": "application/json"
+      },
+      "request_id": "single-profile-report"
+    },
+    "profile_report_summary": {
+      "accepted_noninitialization_plans": 12,
+      "accepted_plans": 35,
+      "backend_timings_s": {
+        "backend_call": 537.1055258999113,
+        "engine_compile": 0.02116929995827377,
+        "prepare_compile": 0.06185409985482693,
+        "solve": 537.0840054999571
+      },
+      "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+      "complete": true,
+      "configuration": {
+        "artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5",
+        "media_type": "application/json"
+      },
+      "control_parameters": {
+        "contract": "family.gvs_reach_control",
+        "data": {
+          "numerical_source": "bundled_guess",
+          "recipe": {
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "constraint_jacobian_mode": "reverse",
+            "curvature_scale_rad_m": 10.0,
+            "evaluation_threads": 1,
+            "feasible_return": {
+              "budget_s": 15.0,
+              "minimum_s": 5.0,
+              "relative_improvement": 0.1
+            },
+            "holding_brake_lead_s": 0.0,
+            "holding_tip_speed_weight": 0.0,
+            "horizon": 10,
+            "max_cpu_s": 30.0,
+            "max_iterations": 120,
+            "max_unusable_updates": 3,
+            "position_error_scale_m": null,
+            "rate_scale_rad_m_s": 1000.0,
+            "recover_returned_tensions": false,
+            "regenerate_warm_states": true,
+            "seed_position_tolerance_fraction": 0.5,
+            "seed_speed_limit_m_s": 0.02,
+            "substeps": 1,
+            "tension_weight": 0.0001,
+            "terminal_tip_speed_weight": 0.0,
+            "terminal_velocity_weight": 0.0001,
+            "terminal_weight": 5.0,
+            "tip_speed_scale_m_s": 0.02,
+            "tolerance": 1e-06,
+            "tracking_weight": 1.0,
+            "variation_weight": 0.001,
+            "velocity_weight": 0.0001
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          }
+        },
+        "version": "1.0.0"
+      },
+      "converged_updates": 0,
+      "deadline_misses": 35,
+      "diagnostic_hypotheses": [],
+      "diagnostic_limitations": [
+        "Sampled observations do not identify a dominant cause.",
+        "Force proximity alone does not imply a required physical design change.",
+        "Ideal tensions; omitted shear, stretch, torsion, tendon friction and actuator dynamics."
+      ],
+      "drive_utilization": [
+        {
+          "limit_n": 8.0,
+          "maximum_n": 2.077194118027104,
+          "minimum_n": 1.197347703597216,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "near_t0",
+          "tendon_index": 0
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 4.755852667139922,
+          "minimum_n": 3.8122215280499736,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "near_t1",
+          "tendon_index": 1
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 4.804765797726525,
+          "minimum_n": 3.1031566686630025,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "near_t2",
+          "tendon_index": 2
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 4.920791140393819,
+          "minimum_n": 3.218253612486097,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "far_t0",
+          "tendon_index": 3
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 3.8198211140651894,
+          "minimum_n": 0.7859357597552847,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "far_t1",
+          "tendon_index": 4
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 2.0545855359439265,
+          "minimum_n": 8.145818446189429e-05,
+          "near_upper_fraction": 0.0,
+          "near_zero_fraction": 0.0,
+          "tendon": "far_t2",
+          "tendon_index": 5
+        }
+      ],
+      "error_phases": [
+        {
+          "final_error_m": 0.040061456335545025,
+          "interval_s": [
+            0.0,
+            0.11666666666666665
+          ],
+          "maximum_error_m": 0.0626521946603067
+        },
+        {
+          "final_error_m": 0.04301616318884714,
+          "interval_s": [
+            0.11666666666666665,
+            0.2333333333333333
+          ],
+          "maximum_error_m": 0.04301616318884714
+        },
+        {
+          "final_error_m": 0.0077268610775768345,
+          "interval_s": [
+            0.2333333333333333,
+            0.35
+          ],
+          "maximum_error_m": 0.039743245056623515
+        }
+      ],
+      "evaluation": {
+        "artifact_id": "b4e7bc1240f43c8a27a87909b5955462079f4a46222ec053c613256a6de93fce",
+        "media_type": "application/json"
+      },
+      "evaluation_validity": "valid",
+      "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+      "execution_scope": {
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.1.0"
+        },
+        "controller": {
+          "extension_id": "controller.gvs_nmpc",
+          "parameters": {
+            "contract": "family.gvs_reach_control",
+            "data": {
+              "numerical_source": "bundled_guess",
+              "recipe": {
+                "basis": {
+                  "strategy": "structural_linear"
+                },
+                "constraint_jacobian_mode": "reverse",
+                "curvature_scale_rad_m": 10.0,
+                "evaluation_threads": 1,
+                "feasible_return": {
+                  "budget_s": 15.0,
+                  "minimum_s": 5.0,
+                  "relative_improvement": 0.1
+                },
+                "holding_brake_lead_s": 0.0,
+                "holding_tip_speed_weight": 0.0,
+                "horizon": 10,
+                "max_cpu_s": 30.0,
+                "max_iterations": 120,
+                "max_unusable_updates": 3,
+                "position_error_scale_m": null,
+                "rate_scale_rad_m_s": 1000.0,
+                "recover_returned_tensions": false,
+                "regenerate_warm_states": true,
+                "seed_position_tolerance_fraction": 0.5,
+                "seed_speed_limit_m_s": 0.02,
+                "substeps": 1,
+                "tension_weight": 0.0001,
+                "terminal_tip_speed_weight": 0.0,
+                "terminal_velocity_weight": 0.0001,
+                "terminal_weight": 5.0,
+                "tip_speed_scale_m_s": 0.02,
+                "tolerance": 1e-06,
+                "tracking_weight": 1.0,
+                "variation_weight": 0.001,
+                "velocity_weight": 0.0001
+              },
+              "settling": {
+                "position_limit_m": 0.01,
+                "speed_limit_m_s": 0.02,
+                "window_s": 0.05
+              }
+            },
+            "version": "1.0.0"
+          },
+          "version": "6.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "far": 12,
+              "near": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "execution_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "robot": {
+          "family": "tendon_robot_family",
+          "identity": "54a96107674329bb3781c39c5d345eedd216c1023a62f651c3d828d303f81bd9"
+        },
+        "seed": 17,
+        "task": {
+          "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+          "family": "task.reach",
+          "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+          "identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
+          "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.35,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          }
+        }
+      },
+      "force_bound_violation_n": 0.0,
+      "graph_construction_s": 1.3897271000314504,
+      "hold_last_responses": 0,
+      "initialization_selected": 23,
+      "last_valid_error_m": 0.0077268610775768345,
+      "last_valid_time_s": 0.35000000000000003,
+      "max_projection_residual_rad_m": 4.707719073737209,
+      "max_rate_projection_residual_rad_m_s": 40.91976844926141,
+      "max_sampled_contacts": 0,
+      "maximum_error_m": 0.0626521946603067,
+      "maximum_plan_violation": 9.755305028759593e-06,
+      "mean_numerical_solve_s": 12.254200162844999,
+      "mean_preparation_s": 2.841370171408302,
+      "mean_recovery_integration_s": 0.0,
+      "mean_recovery_s": 0.0,
+      "mean_recovery_validation_s": 0.0,
+      "mean_update_s": 15.340472751430102,
+      "mean_validation_s": 0.0863763942782368,
+      "minimum_error_m": 0.0077268610775768345,
+      "motion": {
+        "artifact_id": "0e81354ac42510f83903afb5cd675030633bde47291f4b341d3f678c06abc6c2",
+        "media_type": "application/json"
+      },
+      "motion_summary": {
+        "entered_tolerance_earlier_but_ended_outside": false,
+        "error_convention": "actual_tip minus target; world frame",
+        "late_change_definition": "last sampled error minus first sampled error in stated interval",
+        "late_error_change_m": -0.0023728389262937426,
+        "late_interval_s": [
+          0.3,
+          0.35
+        ],
+        "late_sample_interval_s": [
+          0.3,
+          0.35000000000000003
+        ],
+        "minimum_sampled_error_m": 0.0077268610775768345,
+        "minimum_sampled_error_time_s": 0.35000000000000003,
+        "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria.",
+        "signed_terminal_position_error_m": [
+          -0.007155638897093364,
+          0.0023117928912372576,
+          0.0017767463844345355
+        ],
+        "terminal_error_m": 0.0077268610775768345,
+        "terminal_tip_speed_m_s": 0.1422878074819384,
+        "tolerance_m": 0.01
+      },
+      "numerical_preparation": {
+        "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+        "coordinate_order": [
+          "near.kappa_y_node_0",
+          "near.kappa_y_node_1",
+          "near.kappa_y_node_2",
+          "near.kappa_z_node_0",
+          "near.kappa_z_node_1",
+          "near.kappa_z_node_2",
+          "far.kappa_y_node_0",
+          "far.kappa_y_node_1",
+          "far.kappa_y_node_2",
+          "far.kappa_z_node_0",
+          "far.kappa_z_node_1",
+          "far.kappa_z_node_2"
+        ],
+        "cost_accounting": "Included in simulation.run reserved/charged wall time; graph/solver construction and state regeneration are separate execution costs",
+        "current_scope": {
+          "backend": {
+            "extension_id": "backend.family_mujoco",
+            "parameters": {
+              "contract": "family.mujoco_parameters",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.1.0"
+          },
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "bundled_guess",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_brake_lead_s": 0.0,
+                  "holding_tip_speed_weight": 0.0,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": null,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": false,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "6.0.0"
+          },
+          "discretization": {
+            "contract": "family.discretization",
+            "data": {
+              "cells": {
+                "far": 12,
+                "near": 12
+              },
+              "coordinates": "two_principal_bending_angles_per_cell",
+              "model": "serial_bending_cells_v1",
+              "version": "serial_bending_discretization_v1"
+            },
+            "version": "1.0.0"
+          },
+          "execution_model": {
+            "extension_id": "model.serial_bending_cells",
+            "parameters": {
+              "contract": "family.dynamics_model",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "robot": {
+            "family": "tendon_robot_family",
+            "identity": "54a96107674329bb3781c39c5d345eedd216c1023a62f651c3d828d303f81bd9"
+          },
+          "seed": 17,
+          "task": {
+            "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+            "family": "task.reach",
+            "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+            "identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
+            "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005
+            }
+          }
+        },
+        "execution_scope": {
+          "backend": {
+            "extension_id": "backend.family_mujoco",
+            "parameters": {
+              "contract": "family.mujoco_parameters",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.1.0"
+          },
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "bundled_guess",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_brake_lead_s": 0.0,
+                  "holding_tip_speed_weight": 0.0,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": null,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": false,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "6.0.0"
+          },
+          "discretization": {
+            "contract": "family.discretization",
+            "data": {
+              "cells": {
+                "far": 12,
+                "near": 12
+              },
+              "coordinates": "two_principal_bending_angles_per_cell",
+              "model": "serial_bending_cells_v1",
+              "version": "serial_bending_discretization_v1"
+            },
+            "version": "1.0.0"
+          },
+          "execution_model": {
+            "extension_id": "model.serial_bending_cells",
+            "parameters": {
+              "contract": "family.dynamics_model",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "robot": {
+            "family": "tendon_robot_family",
+            "identity": "54a96107674329bb3781c39c5d345eedd216c1023a62f651c3d828d303f81bd9"
+          },
+          "seed": 17,
+          "task": {
+            "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+            "family": "task.reach",
+            "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+            "identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
+            "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31",
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005
+            }
+          }
+        },
+        "force_limits_n": [
+          8.0,
+          8.0,
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        "historical_source": {
+          "artifact_id": "ef29737728ddd95d0e5da3bde818d910bee86abe04f13bf41521277f7e216d68",
+          "media_type": "application/json"
+        },
+        "historical_states_reused": false,
+        "nominal_is_current_target_solution": false,
+        "physics_identity": "86781ac8990ccf4d45e545ce386a2deb1426417f8dd5851a26bc76a908afd52a",
+        "previous_input_source": "compatible bounded historical initial input",
+        "resolved_basis_identity": "89104835cd3b0c59ba211dfc4c751d5ba1f9a74a4f2fa7281b89fd79950b74ee",
+        "reused": true,
+        "source": {
+          "artifact_id": "65a8c3505c582630c3c3782c6e1b38e89c9b446863b5b1056ee22f4553ab0329",
+          "media_type": "application/json"
+        },
+        "source_kind": "compatible_historical_tensions_only",
+        "status": "completed",
+        "tendon_order": [
+          "near_t0",
+          "near_t1",
+          "near_t2",
+          "far_t0",
+          "far_t1",
+          "far_t2"
+        ],
+        "units": {
+          "q": "rad/m",
+          "qdot": "rad/(m*s)",
+          "tension": "N"
+        },
+        "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use",
+        "wall_s": 0.0779808999504894,
+        "warm_guess_is_execution_evidence": false
+      },
+      "official_task_success": true,
+      "one_step_prediction_evidence": {
+        "artifact_id": "2d431cc6383b75f759d59196cfad602c36d3545183a395c5f5022e9061a35a0b",
+        "media_type": "application/json"
+      },
+      "one_step_prediction_summary": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_tip_difference_m": 0.007535415657909328,
+        "mean_tip_difference_m": 0.004059976742465859,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+      },
+      "optimization_status_counts": {
+        "feasible_early_stop": 35
+      },
+      "raw_termination_counts": {
+        "User_Requested_Stop": 35
+      },
+      "real_time_demonstrated": false,
+      "recovered_plans": 0,
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.010781152479219073,
+        "max_speed_m_s": 0.4080379021769773,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "simulation": {
+        "artifact_id": "85497e413a426c7cdef2045949fbdc67f55bc17ff13131229b5f7dadfc1d2d92",
+        "media_type": "application/json"
+      },
+      "simulation_wall_s": 540.280999999959,
+      "solver_construction_s": 4.107098199194297,
+      "solver_error_count": 0,
+      "solver_failure_flags": 0,
+      "solver_status": "completed",
+      "task": {
+        "actuator_channels": [
+          "actuator_commands"
+        ],
+        "contract_version": "1.0.0",
+        "environment": {
+          "contract": "experiment.assembly",
+          "data": {
+            "environment": {
+              "coordinate_frame": "world_base_x_forward_yz_cross_section",
+              "environment_id": "reach_free",
+              "gravity_m_s2": [
+                0.0,
+                0.0,
+                -9.81
+              ],
+              "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+              "lights": [
+                {
+                  "direction": [
+                    0.0,
+                    0.0,
+                    -1.0
+                  ],
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    2.0
+                  ]
+                }
+              ],
+              "objects": [
+                {
+                  "conaffinity": 1,
+                  "contype": 0,
+                  "half_size_m": [
+                    2.0,
+                    2.0,
+                    0.1
+                  ],
+                  "kind": "plane",
+                  "name": "floor",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    -0.02
+                  ]
+                }
+              ],
+              "schema_version": "1",
+              "truth_status": "HUMAN_OWNED",
+              "units": "SI"
+            },
+            "external_forces": [],
+            "floor_id": "floor",
+            "mount": {
+              "position_m": [
+                0.0,
+                0.0,
+                0.15
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "version": "1.0.0"
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "failure_policy": "retain_invalid_and_constraint_failures",
+        "family": "task.reach",
+        "goal": {
+          "contract": "reference.reach_goal",
+          "data": {
+            "target_m": [
+              0.29,
+              0.035,
+              0.19
+            ]
+          },
+          "version": "1.0.0"
+        },
+        "initializer": {
+          "extension_id": "initialize.family",
+          "parameters": {
+            "contract": "family.initial",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "name": "Independent development validation of a serial multi-segment soft arm",
+        "objectives": [
+          {
+            "direction": "minimize",
+            "metric": "position_error",
+            "units": "m",
+            "weight": 1.0
+          }
+        ],
+        "observations": [
+          {
+            "dimension": 3,
+            "entity": "tip",
+            "frame": "world",
+            "missing": "unsupported",
+            "name": "tip_position",
+            "phase": "post_step",
+            "units": "m"
+          }
+        ],
+        "robot_families": [
+          "tendon_robot_family"
+        ],
+        "sampling": {
+          "aggregation": "per_instance",
+          "seeds": [
+            17
+          ],
+          "split": "development",
+          "window_s": [
+            0.0,
+            0.35
+          ]
+        },
+        "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+        "status": "development_valid",
+        "task_id": "family-multisegment-dev",
+        "task_version": "1.0.0",
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.35,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        }
+      },
+      "tension_range_n": [
+        8.145818446189429e-05,
+        4.920791140393819
+      ],
+      "terminal_error_m": 0.0077268610775768345,
+      "terminal_position_m": [
+        0.2828443611029066,
+        0.03731179289123726,
+        0.19177674638443454
+      ],
+      "terminal_tip_speed_m_s": 0.1422878074819384,
+      "updates": 35,
+      "valid_complete_execution": true
+    },
+    "result_statement": {
+      "accepted_noninitialization_plans": 12,
+      "accepted_plans": 35,
+      "applied_tension_ranges": [
+        {
+          "limit_n": 8.0,
+          "maximum_n": 2.077194118027104,
+          "minimum_n": 1.197347703597216,
+          "tendon": "near_t0",
+          "tendon_index": 0
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 4.755852667139922,
+          "minimum_n": 3.8122215280499736,
+          "tendon": "near_t1",
+          "tendon_index": 1
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 4.804765797726525,
+          "minimum_n": 3.1031566686630025,
+          "tendon": "near_t2",
+          "tendon_index": 2
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 4.920791140393819,
+          "minimum_n": 3.218253612486097,
+          "tendon": "far_t0",
+          "tendon_index": 3
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 3.8198211140651894,
+          "minimum_n": 0.7859357597552847,
+          "tendon": "far_t1",
+          "tendon_index": 4
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 2.0545855359439265,
+          "minimum_n": 8.145818446189429e-05,
+          "tendon": "far_t2",
+          "tendon_index": 5
+        }
+      ],
+      "candidate": {
+        "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+        "configuration": {
+          "artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5",
+          "media_type": "application/json"
+        },
+        "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+        "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e"
+      },
+      "complete": true,
+      "configuration": {
+        "artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5",
+        "media_type": "application/json"
+      },
+      "control_period_s": 0.01,
+      "control_updates": 35,
+      "converged_updates": 0,
+      "coordinate_frame": "world",
+      "deadline_misses": 35,
+      "error_convention": "actual_tip minus target",
+      "evaluation": {
+        "artifact_id": "b4e7bc1240f43c8a27a87909b5955462079f4a46222ec053c613256a6de93fce",
+        "media_type": "application/json"
+      },
+      "evaluation_validity": "valid",
+      "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+      "force_bound_violation_n": 0.0,
+      "hold_last_responses": 0,
+      "initialization_selected": 23,
+      "mean_complete_update_s": 15.340472751430102,
+      "measured_computation_s": 540.280999999959,
+      "one_step_prediction_evidence": {
+        "artifact_id": "2d431cc6383b75f759d59196cfad602c36d3545183a395c5f5022e9061a35a0b",
+        "media_type": "application/json"
+      },
+      "one_step_prediction_summary": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_tip_difference_m": 0.007535415657909328,
+        "mean_tip_difference_m": 0.004059976742465859,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+      },
+      "real_time_demonstrated": false,
+      "report": {
+        "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+        "owner_run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e",
+        "reference": {
+          "artifact_id": "0b46bbc5b1511b61e6879162a5b6fa359c37ed52246f4b193e406ad997862330",
+          "media_type": "application/json"
+        },
+        "request_id": "single-profile-report"
+      },
+      "result_type": "free_reach",
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.010781152479219073,
+        "max_speed_m_s": 0.4080379021769773,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "signed_position_error_m": [
+        -0.007155638897093364,
+        0.0023117928912372576,
+        0.0017767463844345355
+      ],
+      "simulated_duration_s": 0.35000000000000003,
+      "simulation": {
+        "artifact_id": "85497e413a426c7cdef2045949fbdc67f55bc17ff13131229b5f7dadfc1d2d92",
+        "media_type": "application/json"
+      },
+      "solver_error_count": 0,
+      "target_position_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "task_accepted": true,
+      "terminal_error_m": 0.0077268610775768345,
+      "terminal_position_m": [
+        0.2828443611029066,
+        0.03731179289123726,
+        0.19177674638443454
+      ],
+      "terminal_tip_speed_m_s": 0.1422878074819384,
+      "valid_complete_execution": true
+    },
+    "result_statement_check": {
+      "accepted": true,
+      "mismatched_fields": [],
+      "scope": "Typed claims only; free-text reasoning requires separate review"
+    },
+    "run_id": "gvs-live-f4a6655fe472-2ca2bdf3ffc6811e",
+    "search_run_id": null,
+    "selection_basis": "explicit valid candidate",
+    "simulation": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "route-executor",
+      "charged": {
+        "backend_solves": 1,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 540.280999999959,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+      "execution_status": "completed",
+      "original_execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+      "output": {
+        "artifact_id": "85497e413a426c7cdef2045949fbdc67f55bc17ff13131229b5f7dadfc1d2d92",
+        "media_type": "application/json"
+      },
+      "request_id": "single-simulation",
+      "result_contract": "BackendResult",
+      "result_version": "1.0.0",
+      "solver_status": "completed",
+      "task_success": null,
+      "tool_id": "simulation.run",
+      "tool_version": "1.0.0"
+    },
+    "stop_reason": "The session incumbent b2_near0p169_far0p129_compliant_s1p05 is a valid, complete, covered fresh free-reach execution (multi_category_coverage true: near 0.169 m +0.009 m, far 0.129 m +0.009 m, design/section_scale 1.05 +0.05, nonbaseline design/material_scenario compliant) whose terminal tip error 0.0077269 m is inside the frozen 0.01 m tolerance, so task_accepted is true. The first fresh build broke the historical near-far = 0.04 m relationship (near-far = 0.042 m, departure 0.002 m >= 0.001 m), satisfying the mandated meaningful departure; the guidance states a covered revision passing the unchanged task may be delivered immediately.",
+    "task_success": true
+  },
+  "actual_provider_response_received": true,
   "skill_delivered": false,
-  "fresh_report_delivered": false,
-  "provider_authored_delivery": null
+  "fresh_report_delivered": true,
+  "provider_authored_delivery": "The session incumbent b2_near0p169_far0p129_compliant_s1p05 is a valid, complete, covered fresh free-reach execution (multi_category_coverage true: near 0.169 m +0.009 m, far 0.129 m +0.009 m, design/section_scale 1.05 +0.05, nonbaseline design/material_scenario compliant) whose terminal tip error 0.0077269 m is inside the frozen 0.01 m tolerance, so task_accepted is true. The first fresh build broke the historical near-far = 0.04 m relationship (near-far = 0.042 m, departure 0.002 m >= 0.001 m), satisfying the mandated meaningful departure; the guidance states a covered revision passing the unchanged task may be delivered immediately."
 }
