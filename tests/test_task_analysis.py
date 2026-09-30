@@ -169,14 +169,13 @@ class TaskAnalysisTests(unittest.TestCase):
             eref=plain(store.put(db,dict(kind='bounded_endpoint',protocol=pref,bindings=[binding],records=[],evidence=[tref])))
             sref=plain(store.put(db,dict(kind='design_screen',protocol=pref,bindings=[binding],
                 records=[dict(priority_reasoning=dict(priority='conditional_support'))],evidence=[lref,mref,eref])))
-            oref=plain(store.put(db,dict(kind='mathematical_design_optimization',starting_binding=binding,proposals=[])))
         receipt=host.invoke(dict(request_id='record',tool_id='route.record_analysis',tool_version='1.0.0',
             reason='Synthetic exact linkage',arguments=dict(node_id='analysis',source_node='build',evidence=[build_node['result']],
-                linearization=lref,metrics=mref,endpoint=eref,screen=sref,math_optimization=oref,
+                linearization=lref,metrics=mref,endpoint=eref,screen=sref,
                 validation_disposition='recommended',reason='Local evidence remains advisory.',next_step='Backend validation.')))
         self.assertEqual(receipt['execution_status'],'completed',receipt)
         summary=store.artifact(receipt['output'])['detail']['summary']
-        self.assertEqual(summary['analysis_report'],sref);self.assertEqual(summary['math_optimization'],oref)
+        self.assertEqual(summary['analysis_report'],sref);self.assertIsNone(summary['math_optimization'])
         self.assertEqual(store.remaining(host.run_id)['used']['backend_solves'],0)
 
     def test_velocity_derivative_keeps_moving_configuration_term_and_boundary_is_configuration_only(self):

@@ -57,7 +57,7 @@ EXTENSIONS.extend([
         capabilities=dict(category='analysis',role='public_tool',route_visible=True,backend_solves=0)),
     Extension('design.optimize_math','tool','1.0.0',MathOptimizeRequest,MathOptimizationResult,
         'extensions.tendon_family.optimization:optimize_math',
-        'Deterministic configuration-only bounded search over near/far length, section scale and discrete material scenarios',
+        'Deterministic bounded search over near/far length, section scale and material scenario. Primary is controller-start frozen local exact-ZOH position residual/tolerance; secondary is position-feasible witness energy. Terminal braking and other sampled configurations are excluded. Cumulative Route evaluation accounting; advisory, not a nonlinear reach/settling/real-time/global-optimality prediction.',
         sources=SOURCES,dependencies=('numpy','scipy','casadi'),side_effects='artifact_store',cache=True,
         capabilities=dict(category='parameter_search',role='public_tool',route_visible=True,backend_solves=0,
             provider_calls=0,nmpc_solves=0,maximum_distinct_evaluations=24)),

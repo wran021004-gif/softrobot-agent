@@ -83,7 +83,7 @@ EXTENSIONS=[
         capabilities=dict(category='orchestration',role='public_tool')),
     Extension('route.record_analysis','tool','1.0.0',route.RouteAnalysisAction,route.RouteResult,
         'extensions.tendon_family.route:record_analysis','Attach the exact shared candidate-bound analysis, screen and optional mathematical optimization to a completed build. Advisory only; zero backend solves.',**COMMON,
-        capabilities=dict(category='orchestration',role='public_tool',
+        capabilities=dict(category='orchestration',role='public_tool',route_visible=True,
             preflight='extensions.tendon_family.route:preflight_analysis')),
     Extension('search.family_coordinate','search','1.0.0',opt.SearchParameters,Payload,
         'extensions.tendon_family.optimization:CoordinateSearch','Bounded coordinate search; first candidate is the starting configuration; jointly tunes design and control',**COMMON,

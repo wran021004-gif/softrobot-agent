@@ -138,6 +138,7 @@ def optimize(root, value, *, parent_run_id=None, parent_event_id=None, starting_
 
 def optimize_math(ctx,args):
     """Deterministic configuration-only search; never calls NMPC or a backend."""
+    from copy import deepcopy
     import math
     import numpy as np
     from schemas.platform_analysis import (EndpointLinearizedModel, EndpointTarget, MathOptimizationResult,
@@ -145,15 +146,52 @@ def optimize_math(ctx,args):
     from tools.platform_tasks import compile_input
     from tools.platform_tools import _candidate
     from tools.state_io import digest
-    from extensions.math_analysis.kernels import bounded_endpoint, LIMITATIONS
+    from extensions.math_analysis.kernels import bounded_endpoint, endpoint_map, _output_endpoint, LIMITATIONS
     from .candidate import read_parameter
-    from .candidate_analysis import configuration_binding, resolve_candidate
+    from .candidate_analysis import (configuration_binding, resolve_candidate, scientific_configuration,
+        scientific_configuration_identity)
     from .math_analysis import linearize_candidate_configuration, _validate_task_protocol
 
     start,start_binding=resolve_candidate(ctx,args.source_node)
     route_data=ctx.input.policy.route.data if ctx.input.policy.route is not None else {}
     evaluation_limit=int(route_data.get('math_evaluation_limit',24))
     if args.max_evaluations>evaluation_limit: raise ValueError('ROUTE_MATH_EVALUATION_LIMIT')
+
+    def current_ledger(db=None):
+        if db is None:
+            with ctx.store.transaction() as conn: return current_ledger(conn)
+        state=ctx.store.session(ctx.run_id,db)['state'];route=state['route']
+        ledger=route.setdefault('math_evaluations',dict(limit=evaluation_limit,used=0,
+            remaining=evaluation_limit,cache={},attempts=[]))
+        if ledger['limit']!=evaluation_limit: raise ValueError('ROUTE_MATH_EVALUATION_LEDGER_LIMIT_MISMATCH')
+        ledger['remaining']=max(0,evaluation_limit-ledger['used'])
+        ctx.store.update_state(db,ctx.run_id,state)
+        return deepcopy(ledger)
+
+    def begin_evaluation(identity,scenario,values):
+        with ctx.store.transaction() as db:
+            ledger=current_ledger(db)
+            if identity in ledger['cache']: return deepcopy(ledger['cache'][identity]),False
+            if ledger['used']>=ledger['limit']: raise ValueError('ROUTE_MATH_EVALUATION_BUDGET_EXHAUSTED')
+            ledger['used']+=1;ledger['remaining']=ledger['limit']-ledger['used']
+            ledger['attempts'].append(dict(identity=identity,scenario=scenario,parameters=values,
+                request_id=ctx.request.request_id,status='started',ordinal=ledger['used']))
+            state=ctx.store.session(ctx.run_id,db)['state'];state['route']['math_evaluations']=ledger
+            ctx.store.update_state(db,ctx.run_id,state)
+            return None,True
+
+    def finish_evaluation(identity,row,status,error=None):
+        with ctx.store.transaction() as db:
+            ledger=current_ledger(db)
+            attempt=next(item for item in reversed(ledger['attempts'])
+                if item['identity']==identity and item['status']=='started')
+            attempt['status']=status
+            if error is not None: attempt['error']=str(error)
+            if status=='completed': ledger['cache'][identity]=deepcopy(row)
+            state=ctx.store.session(ctx.run_id,db)['state'];state['route']['math_evaluations']=ledger
+            ctx.store.update_state(db,ctx.run_id,state)
+
+    current_ledger()
     p=TaskAnalysisProtocol.model_validate(ctx.artifact(args.protocol)); _validate_task_protocol(start,p)
     target=EndpointTarget.model_validate(ctx.artifact(args.target))
     if not np.allclose(target.position_m,start.task.goal.data['target_m'],rtol=0,atol=p.endpoint_check_atol):
@@ -171,7 +209,8 @@ def optimize_math(ctx,args):
         for path in args.variables}
     parameter_space=ParameterSpace(list(args.variables),args.variables)
     initial_vector=parameter_space.encode(initial)
-    evaluations=[]; cache={}; states={scenario:dict(best=list(initial_vector),best_key=None,iteration=0)
+    evaluations=[];seen=set();new_evaluations=0;cache_hits=0
+    states={scenario:dict(best=list(initial_vector),best_key=None,iteration=0)
         for scenario in args.material_scenarios}
     evidence=[start_binding['configuration'],plain(args.protocol),plain(args.target)]
     primary_resolution=p.endpoint_check_atol/target.position_tolerance_m
@@ -183,64 +222,97 @@ def optimize_math(ctx,args):
         return (ordered_residual,math.inf if energy is None else energy)
 
     def evaluate(scenario,vector):
+        nonlocal new_evaluations,cache_hits
         values=parameter_space.decode(vector)
         changes={**values,'design/material_scenario':scenario}
         candidate=_candidate(start,changes,ctx.reg); data=plain(candidate)
         data['run_id']=start.run_id[:32]+'-math-'+digest(dict(scenario=scenario,values=values))[:16]
-        compiled=compile_input(data,ctx.reg)['input']; identity=digest(compiled)
-        if identity in cache: return cache[identity]
-        configuration=plain(ctx.save_artifact(compiled,'math_optimizer_configuration'))
-        candidate_id='math-'+scenario+'-'+identity[:12]
-        binding=configuration_binding(candidate,configuration,candidate_id,ctx.run_id,
-            'design.optimize_math:'+args.source_node)
-        linear=linearize_candidate_configuration(ctx,candidate,binding,p,args.protocol)
-        linear_ref=plain(ctx.save_artifact(linear,'math_optimizer_linearization'))
-        point=next((row for row in linear.records[1:] if row.get('model') and
-            row['point'].get('name')=='controller_start_input'),None)
-        endpoint=None; endpoint_ref=None; objective=dict(position_residual_upper_bound_ratio=None,
-            feasible_witness_normalized_input_energy=None,applicability='unavailable')
-        if point is not None:
-            model=EndpointLinearizedModel.model_validate(ctx.artifact(point['model']))
-            endpoint=bounded_endpoint(model,p,target,braking=False)
-            endpoint_ref=plain(ctx.save_artifact(endpoint,'math_optimizer_endpoint'))
-            residual=endpoint['independent_residual_problems']['position']['candidate_residual']
-            objective=dict(position_residual_upper_bound_ratio=residual/target.position_tolerance_m,
-                feasible_witness_normalized_input_energy=endpoint['normalized_input_energy']
-                    if endpoint['status']=='feasible_in_local_model' else None,
-                applicability='controller-start frozen local affine exact-ZOH model',
-                status=endpoint['status'],candidate_residual_m=residual,
-                residual_role='upper bound on the bounded minimum; not an infeasibility proof',
-                position_tolerance_m=target.position_tolerance_m)
-        compact_binding={key:binding[key] for key in ('source_node','candidate_id','configuration','owner_run_id',
-            'effective_configuration_identity','robot_identity','task_identity','model','target_m','task_duration_s',
-            'control_period_s','physics_timestep_s','tendon_order','tension_bounds_n')}
-        row=dict(evaluation_index=len(evaluations)+1,candidate_id=candidate_id,configuration=configuration,
-            build_identity=identity,material_scenario=scenario,parameters=values,binding=binding,
-            candidate_binding=compact_binding,linearization=linear_ref,controller_start_endpoint=endpoint_ref,
-            endpoint_summary=None if endpoint is None else dict(question=endpoint['question'],status=endpoint['status'],
-                sampled_horizon=endpoint['sampled_horizon'],checks=endpoint['checks'],
-                position_error_m=endpoint['endpoint']['position_error_m'],tip_speed_m_s=endpoint['endpoint']['tip_speed_m_s'],
-                certificate=endpoint['infeasibility_certificate']),objective=objective,
-            unavailable_constructions=[r.get('name') for r in linear.records[1:] if not r.get('available',False)],
-            backend_executed=False,nmpc_solved=False,provider_called=False)
-        row.pop('binding')
-        evaluations.append(row); evidence.extend([configuration,linear_ref]);
+        compiled=compile_input(data,ctx.reg)['input'];candidate=type(start).model_validate(compiled)
+        scientific_id=scientific_configuration_identity(candidate)
+        identity=digest(dict(scientific_configuration=scientific_configuration(candidate),
+            protocol=plain(p),target=plain(target),objective=args.objective))
+        cached,_=begin_evaluation(identity,scenario,values)
+        if cached is not None:
+            row=deepcopy(cached);row['cache_hit']=True
+            row['reused_by_request_id']=ctx.request.request_id
+            cache_hits+=1
+            added=identity not in seen
+            if identity not in seen:
+                row['evaluation_index']=len(evaluations)+1;evaluations.append(row);seen.add(identity)
+                for ref in (row.get('configuration'),row.get('linearization'),row.get('controller_start_endpoint')):
+                    if ref and ref not in evidence:evidence.append(ref)
+            return row,added
+        try:
+            configuration=plain(ctx.save_artifact(compiled,'math_optimizer_configuration'))
+            candidate_id='math-'+scenario+'-'+scientific_id[:12]
+            binding=configuration_binding(candidate,configuration,candidate_id,ctx.run_id,
+                'design.optimize_math:'+args.source_node)
+            linear=linearize_candidate_configuration(ctx,candidate,binding,p,args.protocol)
+            linear_ref=plain(ctx.save_artifact(linear,'math_optimizer_linearization'))
+            point=next((item for item in linear.records[1:] if item.get('model') and
+                item['point'].get('name')=='controller_start_input'),None)
+            endpoint=None; endpoint_ref=None; objective=dict(position_residual_upper_bound_ratio=None,
+                feasible_witness_normalized_input_energy=None,applicability='unavailable')
+            if point is not None:
+                model=EndpointLinearizedModel.model_validate(ctx.artifact(point['model']))
+                endpoint=bounded_endpoint(model,p,target,braking=False)
+                endpoint_ref=plain(ctx.save_artifact(endpoint,'math_optimizer_endpoint'))
+                residual=endpoint['independent_residual_problems']['position']['candidate_residual']
+                mapping=endpoint_map(model,model.operating_point['remaining_task_s'],p.period_s,p.horizon_alignment_atol_s)
+                _,_,position_map=_output_endpoint(model,mapping,'tip_position');world_x=np.asarray(position_map)[0]
+                objective=dict(position_residual_upper_bound_ratio=residual/target.position_tolerance_m,
+                    feasible_witness_normalized_input_energy=endpoint['normalized_input_energy']
+                        if endpoint['status']=='feasible_in_local_model' else None,
+                    applicability='controller-start frozen local affine exact-ZOH model',
+                    scope='position endpoint only; terminal braking and other sampled configurations are not objective terms',
+                    status=endpoint['status'],candidate_residual_m=residual,
+                    residual_role='upper bound on the bounded minimum; not an infeasibility proof',
+                    position_tolerance_m=target.position_tolerance_m,
+                    matrix_evidence=dict(world_x_position_control_row_shape=list(world_x.shape),
+                        world_x_position_control_row_linf=float(np.max(np.abs(world_x))),
+                        world_x_position_control_nonzero_count=int(np.count_nonzero(world_x))))
+            compact_binding={key:binding[key] for key in ('source_node','candidate_id','configuration','owner_run_id',
+                'effective_configuration_identity','scientific_configuration_identity','robot_identity','task_identity',
+                'model','target_m','task_duration_s','control_period_s','physics_timestep_s','tendon_order','tension_bounds_n')}
+            row=dict(evaluation_index=len(evaluations)+1,candidate_id=candidate_id,configuration=configuration,
+                build_identity=identity,scientific_configuration_identity=scientific_id,
+                material_scenario=scenario,parameters=values,candidate_binding=compact_binding,
+                linearization=linear_ref,controller_start_endpoint=endpoint_ref,
+                endpoint_summary=None if endpoint is None else dict(question=endpoint['question'],status=endpoint['status'],
+                    sampled_horizon=endpoint['sampled_horizon'],checks=endpoint['checks'],
+                    position_error_m=endpoint['endpoint']['position_error_m'],tip_speed_m_s=endpoint['endpoint']['tip_speed_m_s'],
+                    certificate=endpoint['infeasibility_certificate']),objective=objective,
+                unavailable_constructions=[r.get('name') for r in linear.records[1:] if not r.get('available',False)],
+                cache_hit=False,producer_request_id=ctx.request.request_id,
+                backend_executed=False,nmpc_solved=False,provider_called=False)
+            finish_evaluation(identity,row,'completed');new_evaluations+=1
+        except Exception as exc:
+            finish_evaluation(identity,{},'failed',exc);raise
+        evaluations.append(row);seen.add(identity);evidence.extend([configuration,linear_ref]);
         if endpoint_ref: evidence.append(endpoint_ref)
-        cache[identity]=row
-        return row
+        return row,True
 
     # One explicit start per discrete scenario, then bounded coordinate moves.
     for scenario in args.material_scenarios:
-        if len(evaluations)>=args.max_evaluations: break
-        row=evaluate(scenario,initial_vector); states[scenario]['best_key']=key_for(row['objective'])
+        try: row,_=evaluate(scenario,initial_vector)
+        except ValueError as exc:
+            if 'ROUTE_MATH_EVALUATION_BUDGET_EXHAUSTED' in str(exc): break
+            raise
+        states[scenario]['best_key']=key_for(row['objective'])
+    if any(state['best_key'] is None for state in states.values()):
+        raise ValueError('ROUTE_MATH_EVALUATION_BUDGET_EXHAUSTED_BEFORE_ALL_SCENARIO_STARTS')
     attempts=0
-    while len(evaluations)<args.max_evaluations and attempts<args.max_evaluations*12:
+    budget_exhausted=False
+    while new_evaluations<args.max_evaluations and attempts<args.max_evaluations*12:
         scenario=args.material_scenarios[attempts%len(args.material_scenarios)]; state=states[scenario]
         phase=state['iteration']//(2*len(initial_vector)); step=.5 if phase==0 else .25
         proposal=coordinate_proposal(dict(best=state['best'],iteration=state['iteration'],step=step))['x']
         state['iteration']+=1; attempts+=1
-        before=len(evaluations); row=evaluate(scenario,proposal)
-        if len(evaluations)==before: continue
+        try: row,added=evaluate(scenario,proposal)
+        except ValueError as exc:
+            if 'ROUTE_MATH_EVALUATION_BUDGET_EXHAUSTED' in str(exc): budget_exhausted=True;break
+            raise
+        if not added: continue
         candidate_key=key_for(row['objective'])
         if candidate_key<state['best_key']:
             state['best']=list(proposal);state['best_key']=candidate_key
@@ -257,20 +329,40 @@ def optimize_math(ctx,args):
             configuration=best['configuration'],parameters=best['parameters'],objective=best['objective'],
             tied_candidate_ids=[row['candidate_id'] for row in tied_rows],
             selection_rationale='Lowest declared residual-upper-bound ratio; feasible local input energy is a secondary lexicographic component only.'))
+    grouped={}
+    for row in evaluations:
+        grouped.setdefault(tuple(sorted(row['parameters'].items())),{})[row['material_scenario']]=row['objective'].get('position_residual_upper_bound_ratio')
+    material_pairs=[values for values in grouped.values() if set(values)==set(args.material_scenarios)]
+    ratios=[row['objective'].get('position_residual_upper_bound_ratio') for row in evaluations
+        if row['objective'].get('position_residual_upper_bound_ratio') is not None]
+    ledger=current_ledger()
     return MathOptimizationResult(starting_binding=start_binding,protocol=args.protocol,target=args.target,
         objective=dict(objective_id=args.objective,primary=dict(name='controller_start_bounded_position_residual_upper_bound_ratio',
-            definition='SciPy bounded least-squares candidate residual divided by official reach tolerance',units='1',direction='minimize'),
+            definition='SciPy bounded least-squares position candidate residual divided by official reach tolerance; terminal braking is excluded',units='1',direction='minimize'),
             secondary=dict(name='feasible_position_witness_normalized_input_energy',
                 definition='Exact-ZOH held-input sum(period * ||delta_u/input_scale||^2), used only after primary ordering',
                 units='s (normalized input squared integral)',direction='minimize'),
             ordering='lexicographic; primary values within endpoint_check_atol/tolerance are tied; no fitted weights or historical outcomes',
-            primary_tie_resolution=primary_resolution,operating_point='controller_start_input'),
+            primary_tie_resolution=primary_resolution,operating_point='controller_start_input',
+            sampled_configuration_aggregation='none; only controller_start_input contributes to the objective',
+            terminal_braking_in_objective=False,observed_scope_evidence=dict(
+                all_world_x_position_control_rows_zero=all(row['objective'].get('matrix_evidence',{}).get(
+                    'world_x_position_control_nonzero_count')==0 for row in evaluations if row['objective'].get('matrix_evidence')),
+                material_pair_primary_ratios_equal=bool(material_pairs) and all(len(set(values.values()))==1 for values in material_pairs),
+                observed_primary_ratio_range=[min(ratios),max(ratios)] if ratios else None,
+                interpretation='Observed values describe only this bounded sample and local model; they do not predict nonlinear bending or closed-loop performance.')),
         bounds=args.variables,material_scenarios=args.material_scenarios,evaluations=evaluations,proposals=proposals,
         provenance=dict(method='bounded_coordinate_pattern_local_v1',deterministic=True,seed=None,
-            evaluation_budget=args.max_evaluations,distinct_evaluations=len(evaluations),iterations=attempts,
-            stop_reason='evaluation_budget' if len(evaluations)>=args.max_evaluations else 'no_new_distinct_proposals',
+            requested_new_evaluation_cap=args.max_evaluations,new_evaluations_this_call=new_evaluations,
+            cache_hits_this_call=cache_hits,returned_scientific_configurations=len(evaluations),iterations=attempts,
+            cumulative_evaluation_limit=ledger['limit'],cumulative_evaluations_used=ledger['used'],
+            cumulative_evaluations_remaining=ledger['remaining'],failed_evaluations_counted=sum(
+                item['status']=='failed' for item in ledger['attempts']),
+            stop_reason='cumulative_evaluation_budget' if budget_exhausted else
+                'requested_evaluation_cap' if new_evaluations>=args.max_evaluations else 'no_new_distinct_proposals',
             implementation_identity=digest(dict(source=__file__,objective=args.objective,protocol=plain(p))),
             physical_backend_calls=0,nmpc_solves=0,provider_calls=0),evidence=evidence,
-        limitations=LIMITATIONS+['The objective is a local mathematical proxy and does not predict closed-loop success.',
+        limitations=LIMITATIONS+['The objective can favor geometric alignment at the straight controller-start configuration; it does not predict nonlinear bending, closed-loop reach, settling, real-time performance, or global optimality.',
+            'Terminal braking and other sampled configurations are not aggregated into this optimization objective.',
             'Candidate residuals are upper bounds; only explicit separating-direction records may certify local infeasibility.',
             'Scenario winners and ties are bounded-search proposals, not global optima.'])

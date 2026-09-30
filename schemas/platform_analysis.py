@@ -169,7 +169,7 @@ class MathOptimizeRequest(Contract):
     variables: dict[str, tuple[float, float]]
     material_scenarios: list[Literal['compliant','stiff']] = Field(min_length=2,max_length=2)
     objective: Literal['controller_start_local_endpoint_lexicographic_v1'] = 'controller_start_local_endpoint_lexicographic_v1'
-    max_evaluations: int = Field(default=12,ge=2,le=24)
+    max_evaluations: int = Field(default=12,ge=2,le=24, description='Maximum new mathematical evaluations requested by this call. All calls share the Route cumulative allowance; cache hits are free and failures count once work begins.')
 
     @model_validator(mode='after')
     def frozen_space(self):

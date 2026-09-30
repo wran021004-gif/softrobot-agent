@@ -78,7 +78,7 @@ def main():
         variables=variables,material_scenarios=['compliant','stiff'],max_evaluations=8,
         objective='controller_start_local_endpoint_lexicographic_v1'),
         'Run the declared bounded mathematics-only coordinate search; no provider, NMPC, or backend.')
-    report_ref,report=call(host,receipts,'route.record_analysis',dict(node_id='math_report',source_node='math_start',evidence=[build_node_ref],
+    report_ref,report=call(host,receipts,'route.record_analysis',dict(node_id='math_report',source_node='math_start',evidence=[build_node_ref,optimize_ref],
         linearization=linear_ref,metrics=metrics_ref,endpoint=endpoint_ref,screen=screen_ref,
         math_optimization=optimize_ref,validation_disposition='recommended',
         reason='Shared local evidence supplies conditional candidate proposals; backend validation would be required to test closed-loop reach.',

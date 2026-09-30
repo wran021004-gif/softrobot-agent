@@ -1,0 +1,1303 @@
+[
+  {
+    "turn": 0,
+    "tool": "route.advance",
+    "advertised_name": "tool_4c096284fcae2fd8c6fbe318f6bb870519e6c32e",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-0",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-0",
+                "type": "function",
+                "function": {
+                  "name": "tool_4c096284fcae2fd8c6fbe318f6bb870519e6c32e",
+                  "arguments": "{\"arguments\":{\"action\":\"build\",\"candidate_id\":\"unchanged-analysis-seed\",\"changes\":{},\"combination\":\"candidate_gvs_nmpc\",\"evidence\":[],\"max_trials\":1,\"next_step\":\"Obtain candidate-bound shared mathematics.\",\"node_id\":\"seed\",\"reason\":\"Build the unchanged configuration only as a mathematical seed.\",\"variables\":{}},\"reason\":\"Build the solve-free analysis seed.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-0-tool",
+      "tool_id": "route.advance",
+      "arguments": {
+        "action": "build",
+        "candidate_id": "unchanged-analysis-seed",
+        "changes": {},
+        "combination": "candidate_gvs_nmpc",
+        "evidence": [],
+        "max_trials": 1,
+        "next_step": "Obtain candidate-bound shared mathematics.",
+        "node_id": "seed",
+        "reason": "Build the unchanged configuration only as a mathematical seed.",
+        "variables": {}
+      },
+      "reason": "Build the solve-free analysis seed.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 0.0,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "40b8f327b05548ea8b20df378e7a1f51",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "ac520608e30797534dd9803d55441fcd8174a55a586c60216dcbfe0345bf8107",
+        "media_type": "application/json"
+      },
+      "request_id": "model-0-tool",
+      "result_contract": "RouteResult",
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "route.advance",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 1,
+    "tool": "analysis.linearize_candidate",
+    "advertised_name": "tool_bfed349accdfdbb81ecb4d42ba5514fd623bdc32",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-1",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-1",
+                "type": "function",
+                "function": {
+                  "name": "tool_bfed349accdfdbb81ecb4d42ba5514fd623bdc32",
+                  "arguments": "{\"arguments\":{\"protocol\":{\"artifact_id\":\"5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb\",\"media_type\":\"application/json\"},\"source_node\":\"seed\"},\"reason\":\"Linearize the exact owned seed build.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-1-tool",
+      "tool_id": "analysis.linearize_candidate",
+      "arguments": {
+        "protocol": {
+          "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+          "media_type": "application/json"
+        },
+        "source_node": "seed"
+      },
+      "reason": "Linearize the exact owned seed build.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 13.765999999828637,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "8a00371ec3c5445a89b0d72dd6a8275e",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "74c8f6218bb41a51a22cee974abb4f6fe3b4a5ee1a74cadc32f715d1698da755",
+        "media_type": "application/json"
+      },
+      "request_id": "model-1-tool",
+      "result_contract": "AnalysisResult",
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "analysis.linearize_candidate",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 2,
+    "tool": "analysis.control_metrics",
+    "advertised_name": "tool_90e08d14921f2e474351d624f0b346e78ba32c40",
+    "advertised_version": "2.0.0",
+    "response": {
+      "id": "offline-stage335-replay-2",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-2",
+                "type": "function",
+                "function": {
+                  "name": "tool_90e08d14921f2e474351d624f0b346e78ba32c40",
+                  "arguments": "{\"arguments\":{\"implementation\":\"scipy\",\"models\":[{\"artifact_id\":\"74c8f6218bb41a51a22cee974abb4f6fe3b4a5ee1a74cadc32f715d1698da755\",\"media_type\":\"application/json\"}],\"protocol\":{\"artifact_id\":\"5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb\",\"media_type\":\"application/json\"}},\"reason\":\"Use the returned candidate-linearization envelope through the shared metrics tool.\",\"evidence\":[],\"tool_version\":\"2.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-2-tool",
+      "tool_id": "analysis.control_metrics",
+      "arguments": {
+        "implementation": "scipy",
+        "models": [
+          {
+            "artifact_id": "74c8f6218bb41a51a22cee974abb4f6fe3b4a5ee1a74cadc32f715d1698da755",
+            "media_type": "application/json"
+          }
+        ],
+        "protocol": {
+          "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+          "media_type": "application/json"
+        }
+      },
+      "reason": "Use the returned candidate-linearization envelope through the shared metrics tool.",
+      "evidence": [],
+      "tool_version": "2.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 1.452999999979511,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "e487f1115fb848e5b7d25b2dbd5bddc4",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "f5c4c1a255ef9d2e632f8e73188880b9d727819593d9e2265c88e5e3cf809a74",
+        "media_type": "application/json"
+      },
+      "request_id": "model-2-tool",
+      "result_contract": "AnalysisResult",
+      "result_version": "2.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "analysis.control_metrics",
+      "tool_version": "2.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 3,
+    "tool": "analysis.bounded_endpoint",
+    "advertised_name": "tool_d589bfc73e8dced8409e7d6c2329e61db82e062e",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-3",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-3",
+                "type": "function",
+                "function": {
+                  "name": "tool_d589bfc73e8dced8409e7d6c2329e61db82e062e",
+                  "arguments": "{\"arguments\":{\"models\":[{\"artifact_id\":\"74c8f6218bb41a51a22cee974abb4f6fe3b4a5ee1a74cadc32f715d1698da755\",\"media_type\":\"application/json\"}],\"protocol\":{\"artifact_id\":\"5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb\",\"media_type\":\"application/json\"},\"target\":{\"artifact_id\":\"d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be\",\"media_type\":\"application/json\"}},\"reason\":\"Use the same returned envelope for bounded endpoint analysis.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-3-tool",
+      "tool_id": "analysis.bounded_endpoint",
+      "arguments": {
+        "models": [
+          {
+            "artifact_id": "74c8f6218bb41a51a22cee974abb4f6fe3b4a5ee1a74cadc32f715d1698da755",
+            "media_type": "application/json"
+          }
+        ],
+        "protocol": {
+          "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+          "media_type": "application/json"
+        },
+        "target": {
+          "artifact_id": "d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be",
+          "media_type": "application/json"
+        }
+      },
+      "reason": "Use the same returned envelope for bounded endpoint analysis.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 2.7339999999385327,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "bfbcb846b23c466e9f233dfed4a98bc5",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "b8eecebd185a00deb55e35032d5aeaed253561fd6497eef6e9ef33e478d7b401",
+        "media_type": "application/json"
+      },
+      "request_id": "model-3-tool",
+      "result_contract": "AnalysisResult",
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "analysis.bounded_endpoint",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 4,
+    "tool": "design.screen",
+    "advertised_name": "tool_1f59f7af35db7f660d4d98b3c13333470c759830",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-4",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-4",
+                "type": "function",
+                "function": {
+                  "name": "tool_1f59f7af35db7f660d4d98b3c13333470c759830",
+                  "arguments": "{\"arguments\":{\"endpoint\":{\"artifact_id\":\"b8eecebd185a00deb55e35032d5aeaed253561fd6497eef6e9ef33e478d7b401\",\"media_type\":\"application/json\"},\"linearization\":{\"artifact_id\":\"74c8f6218bb41a51a22cee974abb4f6fe3b4a5ee1a74cadc32f715d1698da755\",\"media_type\":\"application/json\"},\"metrics\":{\"artifact_id\":\"f5c4c1a255ef9d2e632f8e73188880b9d727819593d9e2265c88e5e3cf809a74\",\"media_type\":\"application/json\"},\"protocol\":{\"artifact_id\":\"5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb\",\"media_type\":\"application/json\"},\"source_node\":\"seed\"},\"reason\":\"Create the advisory seed screen from returned references.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-4-tool",
+      "tool_id": "design.screen",
+      "arguments": {
+        "endpoint": {
+          "artifact_id": "b8eecebd185a00deb55e35032d5aeaed253561fd6497eef6e9ef33e478d7b401",
+          "media_type": "application/json"
+        },
+        "linearization": {
+          "artifact_id": "74c8f6218bb41a51a22cee974abb4f6fe3b4a5ee1a74cadc32f715d1698da755",
+          "media_type": "application/json"
+        },
+        "metrics": {
+          "artifact_id": "f5c4c1a255ef9d2e632f8e73188880b9d727819593d9e2265c88e5e3cf809a74",
+          "media_type": "application/json"
+        },
+        "protocol": {
+          "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+          "media_type": "application/json"
+        },
+        "source_node": "seed"
+      },
+      "reason": "Create the advisory seed screen from returned references.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 1.4840000001713634,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "b9d78b8703c64ffab03ef9dd7b9712a9",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "8f20c0290b355b38a10e73b02122eedd20c963c406cd60b750750261f200b69b",
+        "media_type": "application/json"
+      },
+      "request_id": "model-4-tool",
+      "result_contract": "AnalysisResult",
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "design.screen",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 5,
+    "tool": "design.optimize_math",
+    "advertised_name": "tool_fbe31d62df176657fb5034fc03467e3888971c18",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-5",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-5",
+                "type": "function",
+                "function": {
+                  "name": "tool_fbe31d62df176657fb5034fc03467e3888971c18",
+                  "arguments": "{\"arguments\":{\"material_scenarios\":[\"compliant\",\"stiff\"],\"max_evaluations\":6,\"objective\":\"controller_start_local_endpoint_lexicographic_v1\",\"protocol\":{\"artifact_id\":\"5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb\",\"media_type\":\"application/json\"},\"source_node\":\"seed\",\"target\":{\"artifact_id\":\"d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be\",\"media_type\":\"application/json\"},\"variables\":{\"components/far/length_m\":[0.11,0.13],\"components/near/length_m\":[0.15,0.17],\"design/section_scale\":[0.95,1.05]}},\"reason\":\"Run the bounded position-only local proxy and retain its original seed provenance.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-5-tool",
+      "tool_id": "design.optimize_math",
+      "arguments": {
+        "material_scenarios": [
+          "compliant",
+          "stiff"
+        ],
+        "max_evaluations": 6,
+        "objective": "controller_start_local_endpoint_lexicographic_v1",
+        "protocol": {
+          "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+          "media_type": "application/json"
+        },
+        "source_node": "seed",
+        "target": {
+          "artifact_id": "d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be",
+          "media_type": "application/json"
+        },
+        "variables": {
+          "components/far/length_m": [
+            0.11,
+            0.13
+          ],
+          "components/near/length_m": [
+            0.15,
+            0.17
+          ],
+          "design/section_scale": [
+            0.95,
+            1.05
+          ]
+        }
+      },
+      "reason": "Run the bounded position-only local proxy and retain its original seed provenance.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 81.82799999997951,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "b9486f76118f40ca8f8865c5f9c3bc17",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "7b5d3b022025cdf4159f20a103686a50bcf837f75b0c31ab60bf6a8e164bafdc",
+        "media_type": "application/json"
+      },
+      "request_id": "model-5-tool",
+      "result_contract": "MathOptimizationResult",
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "design.optimize_math",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 6,
+    "tool": "design.optimize_math",
+    "advertised_name": "tool_fbe31d62df176657fb5034fc03467e3888971c18",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-6",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-6",
+                "type": "function",
+                "function": {
+                  "name": "tool_fbe31d62df176657fb5034fc03467e3888971c18",
+                  "arguments": "{\"arguments\":{\"material_scenarios\":[\"compliant\",\"stiff\"],\"max_evaluations\":2,\"objective\":\"controller_start_local_endpoint_lexicographic_v1\",\"protocol\":{\"artifact_id\":\"5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb\",\"media_type\":\"application/json\"},\"source_node\":\"seed\",\"target\":{\"artifact_id\":\"d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be\",\"media_type\":\"application/json\"},\"variables\":{\"components/far/length_m\":[0.11,0.13],\"components/near/length_m\":[0.15,0.17],\"design/section_scale\":[0.95,1.05]}},\"reason\":\"Verify cumulative accounting and effective-scientific-identity cache reuse.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-6-tool",
+      "tool_id": "design.optimize_math",
+      "arguments": {
+        "material_scenarios": [
+          "compliant",
+          "stiff"
+        ],
+        "max_evaluations": 2,
+        "objective": "controller_start_local_endpoint_lexicographic_v1",
+        "protocol": {
+          "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+          "media_type": "application/json"
+        },
+        "source_node": "seed",
+        "target": {
+          "artifact_id": "d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be",
+          "media_type": "application/json"
+        },
+        "variables": {
+          "components/far/length_m": [
+            0.11,
+            0.13
+          ],
+          "components/near/length_m": [
+            0.15,
+            0.17
+          ],
+          "design/section_scale": [
+            0.95,
+            1.05
+          ]
+        }
+      },
+      "reason": "Verify cumulative accounting and effective-scientific-identity cache reuse.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 34.640000000130385,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "14edc7dec2254e90830b8eb86ba1cd4a",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "10773e4b6e899a0ad3ab30faddcb9d6ff1cf47ac530392331223a9ca8f3eed25",
+        "media_type": "application/json"
+      },
+      "request_id": "model-6-tool",
+      "result_contract": "MathOptimizationResult",
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "design.optimize_math",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 7,
+    "tool": "route.advance",
+    "advertised_name": "tool_4c096284fcae2fd8c6fbe318f6bb870519e6c32e",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-7",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-7",
+                "type": "function",
+                "function": {
+                  "name": "tool_4c096284fcae2fd8c6fbe318f6bb870519e6c32e",
+                  "arguments": "{\"arguments\":{\"action\":\"build\",\"candidate_id\":\"offline-selected-proposal\",\"changes\":{\"components/far/length_m\":0.12,\"components/near/length_m\":0.15,\"design/material_scenario\":\"compliant\",\"design/section_scale\":1.0},\"combination\":\"candidate_gvs_nmpc\",\"evidence\":[{\"artifact_id\":\"ac520608e30797534dd9803d55441fcd8174a55a586c60216dcbfe0345bf8107\",\"media_type\":\"application/json\"}],\"max_trials\":1,\"next_step\":\"Obtain candidate-bound analysis before testing the run gate.\",\"node_id\":\"selected-build\",\"reason\":\"Select the exact optimizer proposal math-compliant-1c7e41de122e.\",\"variables\":{}},\"reason\":\"Build the exact scripted proposal for integration verification only.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-7-tool",
+      "tool_id": "route.advance",
+      "arguments": {
+        "action": "build",
+        "candidate_id": "offline-selected-proposal",
+        "changes": {
+          "components/far/length_m": 0.12,
+          "components/near/length_m": 0.15,
+          "design/material_scenario": "compliant",
+          "design/section_scale": 1.0
+        },
+        "combination": "candidate_gvs_nmpc",
+        "evidence": [
+          {
+            "artifact_id": "ac520608e30797534dd9803d55441fcd8174a55a586c60216dcbfe0345bf8107",
+            "media_type": "application/json"
+          }
+        ],
+        "max_trials": 1,
+        "next_step": "Obtain candidate-bound analysis before testing the run gate.",
+        "node_id": "selected-build",
+        "reason": "Select the exact optimizer proposal math-compliant-1c7e41de122e.",
+        "variables": {}
+      },
+      "reason": "Build the exact scripted proposal for integration verification only.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 0.0,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "7af3a26954f54afb9ce029f56e8b4baf",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "339c3277493cc816998728178a3da01520ee142686f5e90ddf5724606d70bc43",
+        "media_type": "application/json"
+      },
+      "request_id": "model-7-tool",
+      "result_contract": "RouteResult",
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "route.advance",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 8,
+    "tool": "analysis.linearize_candidate",
+    "advertised_name": "tool_bfed349accdfdbb81ecb4d42ba5514fd623bdc32",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-8",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-8",
+                "type": "function",
+                "function": {
+                  "name": "tool_bfed349accdfdbb81ecb4d42ba5514fd623bdc32",
+                  "arguments": "{\"arguments\":{\"protocol\":{\"artifact_id\":\"5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb\",\"media_type\":\"application/json\"},\"source_node\":\"selected-build\"},\"reason\":\"Linearize the selected changed build.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-8-tool",
+      "tool_id": "analysis.linearize_candidate",
+      "arguments": {
+        "protocol": {
+          "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+          "media_type": "application/json"
+        },
+        "source_node": "selected-build"
+      },
+      "reason": "Linearize the selected changed build.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 7.077999999979511,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "145db769fa7341ca83c7be9ef53281e6",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "e5c26a4b9628d4d5b20597cfba3079164ae1291fb33831fff85f6d218f078a5e",
+        "media_type": "application/json"
+      },
+      "request_id": "model-8-tool",
+      "result_contract": "AnalysisResult",
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "analysis.linearize_candidate",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 9,
+    "tool": "analysis.control_metrics",
+    "advertised_name": "tool_90e08d14921f2e474351d624f0b346e78ba32c40",
+    "advertised_version": "2.0.0",
+    "response": {
+      "id": "offline-stage335-replay-9",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-9",
+                "type": "function",
+                "function": {
+                  "name": "tool_90e08d14921f2e474351d624f0b346e78ba32c40",
+                  "arguments": "{\"arguments\":{\"implementation\":\"scipy\",\"models\":[{\"artifact_id\":\"e5c26a4b9628d4d5b20597cfba3079164ae1291fb33831fff85f6d218f078a5e\",\"media_type\":\"application/json\"}],\"protocol\":{\"artifact_id\":\"5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb\",\"media_type\":\"application/json\"}},\"reason\":\"Compute changed-build local metrics from its returned envelope.\",\"evidence\":[],\"tool_version\":\"2.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-9-tool",
+      "tool_id": "analysis.control_metrics",
+      "arguments": {
+        "implementation": "scipy",
+        "models": [
+          {
+            "artifact_id": "e5c26a4b9628d4d5b20597cfba3079164ae1291fb33831fff85f6d218f078a5e",
+            "media_type": "application/json"
+          }
+        ],
+        "protocol": {
+          "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+          "media_type": "application/json"
+        }
+      },
+      "reason": "Compute changed-build local metrics from its returned envelope.",
+      "evidence": [],
+      "tool_version": "2.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 1.4369999999180436,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "601fa09b14d34f69b3231596468f8386",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "bfb552557c7209a285615aa1d2675fe0b4578993d330a899dfa505a407fed317",
+        "media_type": "application/json"
+      },
+      "request_id": "model-9-tool",
+      "result_contract": "AnalysisResult",
+      "result_version": "2.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "analysis.control_metrics",
+      "tool_version": "2.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 10,
+    "tool": "analysis.bounded_endpoint",
+    "advertised_name": "tool_d589bfc73e8dced8409e7d6c2329e61db82e062e",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-10",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-10",
+                "type": "function",
+                "function": {
+                  "name": "tool_d589bfc73e8dced8409e7d6c2329e61db82e062e",
+                  "arguments": "{\"arguments\":{\"models\":[{\"artifact_id\":\"e5c26a4b9628d4d5b20597cfba3079164ae1291fb33831fff85f6d218f078a5e\",\"media_type\":\"application/json\"}],\"protocol\":{\"artifact_id\":\"5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb\",\"media_type\":\"application/json\"},\"target\":{\"artifact_id\":\"d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be\",\"media_type\":\"application/json\"}},\"reason\":\"Compute changed-build endpoint evidence from its returned envelope.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-10-tool",
+      "tool_id": "analysis.bounded_endpoint",
+      "arguments": {
+        "models": [
+          {
+            "artifact_id": "e5c26a4b9628d4d5b20597cfba3079164ae1291fb33831fff85f6d218f078a5e",
+            "media_type": "application/json"
+          }
+        ],
+        "protocol": {
+          "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+          "media_type": "application/json"
+        },
+        "target": {
+          "artifact_id": "d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be",
+          "media_type": "application/json"
+        }
+      },
+      "reason": "Compute changed-build endpoint evidence from its returned envelope.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 1.9059999999590218,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "65b0dad82d3f42c0a0f34dd5edb98214",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "f4a6500f1bc89cee92f8a0e5f57a865c827ad6ae7ea3edba0bd5f2406421c104",
+        "media_type": "application/json"
+      },
+      "request_id": "model-10-tool",
+      "result_contract": "AnalysisResult",
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "analysis.bounded_endpoint",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 11,
+    "tool": "design.screen",
+    "advertised_name": "tool_1f59f7af35db7f660d4d98b3c13333470c759830",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-11",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-11",
+                "type": "function",
+                "function": {
+                  "name": "tool_1f59f7af35db7f660d4d98b3c13333470c759830",
+                  "arguments": "{\"arguments\":{\"endpoint\":{\"artifact_id\":\"f4a6500f1bc89cee92f8a0e5f57a865c827ad6ae7ea3edba0bd5f2406421c104\",\"media_type\":\"application/json\"},\"linearization\":{\"artifact_id\":\"e5c26a4b9628d4d5b20597cfba3079164ae1291fb33831fff85f6d218f078a5e\",\"media_type\":\"application/json\"},\"metrics\":{\"artifact_id\":\"bfb552557c7209a285615aa1d2675fe0b4578993d330a899dfa505a407fed317\",\"media_type\":\"application/json\"},\"protocol\":{\"artifact_id\":\"5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb\",\"media_type\":\"application/json\"},\"source_node\":\"selected-build\"},\"reason\":\"Create the candidate-bound advisory screen.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-11-tool",
+      "tool_id": "design.screen",
+      "arguments": {
+        "endpoint": {
+          "artifact_id": "f4a6500f1bc89cee92f8a0e5f57a865c827ad6ae7ea3edba0bd5f2406421c104",
+          "media_type": "application/json"
+        },
+        "linearization": {
+          "artifact_id": "e5c26a4b9628d4d5b20597cfba3079164ae1291fb33831fff85f6d218f078a5e",
+          "media_type": "application/json"
+        },
+        "metrics": {
+          "artifact_id": "bfb552557c7209a285615aa1d2675fe0b4578993d330a899dfa505a407fed317",
+          "media_type": "application/json"
+        },
+        "protocol": {
+          "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+          "media_type": "application/json"
+        },
+        "source_node": "selected-build"
+      },
+      "reason": "Create the candidate-bound advisory screen.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 1.5309999999590218,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "3da308a226b44e729a510461cf7793a8",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "18cb9108e9a08c8c8b11af135ac22e0e9cc72debd76bfd031fefbec078e4eb1e",
+        "media_type": "application/json"
+      },
+      "request_id": "model-11-tool",
+      "result_contract": "AnalysisResult",
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "design.screen",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 12,
+    "tool": "route.record_analysis",
+    "advertised_name": "tool_7410e0b2e7ea084f967a50da79e0b091d9fedfe8",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-12",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-12",
+                "type": "function",
+                "function": {
+                  "name": "tool_7410e0b2e7ea084f967a50da79e0b091d9fedfe8",
+                  "arguments": "{\"arguments\":{\"endpoint\":{\"artifact_id\":\"f4a6500f1bc89cee92f8a0e5f57a865c827ad6ae7ea3edba0bd5f2406421c104\",\"media_type\":\"application/json\"},\"evidence\":[{\"artifact_id\":\"339c3277493cc816998728178a3da01520ee142686f5e90ddf5724606d70bc43\",\"media_type\":\"application/json\"},{\"artifact_id\":\"7b5d3b022025cdf4159f20a103686a50bcf837f75b0c31ab60bf6a8e164bafdc\",\"media_type\":\"application/json\"}],\"linearization\":{\"artifact_id\":\"e5c26a4b9628d4d5b20597cfba3079164ae1291fb33831fff85f6d218f078a5e\",\"media_type\":\"application/json\"},\"math_optimization\":{\"artifact_id\":\"7b5d3b022025cdf4159f20a103686a50bcf837f75b0c31ab60bf6a8e164bafdc\",\"media_type\":\"application/json\"},\"metrics\":{\"artifact_id\":\"bfb552557c7209a285615aa1d2675fe0b4578993d330a899dfa505a407fed317\",\"media_type\":\"application/json\"},\"next_step\":\"Verify execution eligibility without executing.\",\"node_id\":\"selected-report\",\"reason\":\"The exact original proposal is linked; local evidence is advisory for backend spending.\",\"screen\":{\"artifact_id\":\"18cb9108e9a08c8c8b11af135ac22e0e9cc72debd76bfd031fefbec078e4eb1e\",\"media_type\":\"application/json\"},\"selected_optimizer_candidate_id\":\"math-compliant-1c7e41de122e\",\"source_node\":\"selected-build\",\"validation_disposition\":\"recommended\"},\"reason\":\"Bind the original optimizer proposal to the changed build.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-12-tool",
+      "tool_id": "route.record_analysis",
+      "arguments": {
+        "endpoint": {
+          "artifact_id": "f4a6500f1bc89cee92f8a0e5f57a865c827ad6ae7ea3edba0bd5f2406421c104",
+          "media_type": "application/json"
+        },
+        "evidence": [
+          {
+            "artifact_id": "339c3277493cc816998728178a3da01520ee142686f5e90ddf5724606d70bc43",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "7b5d3b022025cdf4159f20a103686a50bcf837f75b0c31ab60bf6a8e164bafdc",
+            "media_type": "application/json"
+          }
+        ],
+        "linearization": {
+          "artifact_id": "e5c26a4b9628d4d5b20597cfba3079164ae1291fb33831fff85f6d218f078a5e",
+          "media_type": "application/json"
+        },
+        "math_optimization": {
+          "artifact_id": "7b5d3b022025cdf4159f20a103686a50bcf837f75b0c31ab60bf6a8e164bafdc",
+          "media_type": "application/json"
+        },
+        "metrics": {
+          "artifact_id": "bfb552557c7209a285615aa1d2675fe0b4578993d330a899dfa505a407fed317",
+          "media_type": "application/json"
+        },
+        "next_step": "Verify execution eligibility without executing.",
+        "node_id": "selected-report",
+        "reason": "The exact original proposal is linked; local evidence is advisory for backend spending.",
+        "screen": {
+          "artifact_id": "18cb9108e9a08c8c8b11af135ac22e0e9cc72debd76bfd031fefbec078e4eb1e",
+          "media_type": "application/json"
+        },
+        "selected_optimizer_candidate_id": "math-compliant-1c7e41de122e",
+        "source_node": "selected-build",
+        "validation_disposition": "recommended"
+      },
+      "reason": "Bind the original optimizer proposal to the changed build.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 1.4850000001024455,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": "ROUTE_EVIDENCE_REQUIRED: cite a previous node result",
+      "execution_id": "78ce8e3f41f44b8f997b612f3667a0dd",
+      "execution_status": "failed",
+      "original_execution_id": null,
+      "output": null,
+      "request_id": "model-12-tool",
+      "result_contract": null,
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "route.record_analysis",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  },
+  {
+    "turn": 13,
+    "tool": "route.record_analysis",
+    "advertised_name": "tool_7410e0b2e7ea084f967a50da79e0b091d9fedfe8",
+    "advertised_version": "1.0.0",
+    "response": {
+      "id": "offline-stage335-replay-13",
+      "object": "chat.completion",
+      "model": "deepseek-flash",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "tool_calls",
+          "message": {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "offline-replay-13",
+                "type": "function",
+                "function": {
+                  "name": "tool_7410e0b2e7ea084f967a50da79e0b091d9fedfe8",
+                  "arguments": "{\"arguments\":{\"endpoint\":{\"artifact_id\":\"f4a6500f1bc89cee92f8a0e5f57a865c827ad6ae7ea3edba0bd5f2406421c104\",\"media_type\":\"application/json\"},\"evidence\":[{\"artifact_id\":\"d69de7914206e2e4dc49012c4e12ead388a5ce936f42498cabd7a789b975d266\",\"media_type\":\"application/json\"},{\"artifact_id\":\"7b5d3b022025cdf4159f20a103686a50bcf837f75b0c31ab60bf6a8e164bafdc\",\"media_type\":\"application/json\"}],\"linearization\":{\"artifact_id\":\"e5c26a4b9628d4d5b20597cfba3079164ae1291fb33831fff85f6d218f078a5e\",\"media_type\":\"application/json\"},\"math_optimization\":{\"artifact_id\":\"7b5d3b022025cdf4159f20a103686a50bcf837f75b0c31ab60bf6a8e164bafdc\",\"media_type\":\"application/json\"},\"metrics\":{\"artifact_id\":\"bfb552557c7209a285615aa1d2675fe0b4578993d330a899dfa505a407fed317\",\"media_type\":\"application/json\"},\"next_step\":\"Verify execution eligibility without executing.\",\"node_id\":\"selected-report-corrected\",\"reason\":\"The exact original proposal is linked; local evidence is advisory for backend spending.\",\"screen\":{\"artifact_id\":\"18cb9108e9a08c8c8b11af135ac22e0e9cc72debd76bfd031fefbec078e4eb1e\",\"media_type\":\"application/json\"},\"selected_optimizer_candidate_id\":\"math-compliant-1c7e41de122e\",\"source_node\":\"selected-build\",\"validation_disposition\":\"recommended\"},\"reason\":\"Correct the node-result citation while preserving the original optimizer result.\",\"evidence\":[],\"tool_version\":\"1.0.0\"}"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "decoded": {
+      "request_id": "model-13-tool",
+      "tool_id": "route.record_analysis",
+      "arguments": {
+        "endpoint": {
+          "artifact_id": "f4a6500f1bc89cee92f8a0e5f57a865c827ad6ae7ea3edba0bd5f2406421c104",
+          "media_type": "application/json"
+        },
+        "evidence": [
+          {
+            "artifact_id": "d69de7914206e2e4dc49012c4e12ead388a5ce936f42498cabd7a789b975d266",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "7b5d3b022025cdf4159f20a103686a50bcf837f75b0c31ab60bf6a8e164bafdc",
+            "media_type": "application/json"
+          }
+        ],
+        "linearization": {
+          "artifact_id": "e5c26a4b9628d4d5b20597cfba3079164ae1291fb33831fff85f6d218f078a5e",
+          "media_type": "application/json"
+        },
+        "math_optimization": {
+          "artifact_id": "7b5d3b022025cdf4159f20a103686a50bcf837f75b0c31ab60bf6a8e164bafdc",
+          "media_type": "application/json"
+        },
+        "metrics": {
+          "artifact_id": "bfb552557c7209a285615aa1d2675fe0b4578993d330a899dfa505a407fed317",
+          "media_type": "application/json"
+        },
+        "next_step": "Verify execution eligibility without executing.",
+        "node_id": "selected-report-corrected",
+        "reason": "The exact original proposal is linked; local evidence is advisory for backend spending.",
+        "screen": {
+          "artifact_id": "18cb9108e9a08c8c8b11af135ac22e0e9cc72debd76bfd031fefbec078e4eb1e",
+          "media_type": "application/json"
+        },
+        "selected_optimizer_candidate_id": "math-compliant-1c7e41de122e",
+        "source_node": "selected-build",
+        "validation_disposition": "recommended"
+      },
+      "reason": "Correct the node-result citation while preserving the original optimizer result.",
+      "evidence": [],
+      "tool_version": "1.0.0",
+      "cache": "new"
+    },
+    "receipt": {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "offline-provider-fixture",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 1.6090000001713634,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": null,
+      "execution_id": "928798011a9b4069b4973fec2bce009b",
+      "execution_status": "completed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "42c1f3bb72c3362559b29d3b59b0b07592bd85b0c8d148c9239298f327756547",
+        "media_type": "application/json"
+      },
+      "request_id": "model-13-tool",
+      "result_contract": "RouteResult",
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "route.record_analysis",
+      "tool_version": "1.0.0"
+    },
+    "replayed_sealed_request": true
+  }
+]

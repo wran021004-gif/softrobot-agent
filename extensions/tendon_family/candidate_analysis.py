@@ -18,6 +18,22 @@ class CandidateAnalysisResult(Contract):
     physical_summary: dict
 
 
+def scientific_configuration(inp):
+    """Identity of every setting that can change the declared scientific case.
+
+    Deliberately excludes run/candidate labels, provider transport, accounting and
+    tool grants.  Those are bookkeeping, whereas the complete robot, task and
+    bound model/controller/build policy below determine the calculation.
+    """
+    inp=SessionInput.model_validate(inp)
+    return dict(robot=plain(inp.robot),task=plain(inp.task),seed=inp.seed,policy={key:plain(getattr(inp.policy,key))
+        for key in ('dynamics_model','backend','controller','discretization','candidate_builder','editable')})
+
+
+def scientific_configuration_identity(inp):
+    return digest(scientific_configuration(inp))
+
+
 def configuration_binding(inp, configuration, candidate_id, owner_run_id, source_node):
     inp=SessionInput.model_validate(inp)
     basis=inp.policy.controller.parameters.data['recipe']['basis']
@@ -25,7 +41,8 @@ def configuration_binding(inp, configuration, candidate_id, owner_run_id, source
     resolved=resolve_basis(inp.robot.structure.data,basis)
     tendons=inp.robot.structure.data['tendons']; control=inp.policy.controller.parameters.data
     return dict(source_node=source_node,candidate_id=candidate_id,configuration=plain(configuration),
-        owner_run_id=owner_run_id,effective_configuration_identity=digest(plain(inp)),robot_identity=digest(plain(inp.robot)),
+        owner_run_id=owner_run_id,effective_configuration_identity=digest(plain(inp)),
+        scientific_configuration_identity=scientific_configuration_identity(inp),robot_identity=digest(plain(inp.robot)),
         task_identity=digest(plain(inp.task)),physical_context=plain(inp.task.environment),
         model='model.gvs@1.0.0',basis=plain(resolved),coordinate_order=list(resolved.coordinate_order),
         calculation_frame='robot_base',endpoint_frame='world',target_m=inp.task.goal.data['target_m'],

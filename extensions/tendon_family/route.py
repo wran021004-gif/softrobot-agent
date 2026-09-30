@@ -55,6 +55,7 @@ class RouteAnalysisAction(Contract):
     endpoint: EvidenceRef
     screen: EvidenceRef
     math_optimization: EvidenceRef | None = None
+    selected_optimizer_candidate_id: str | None = Field(default=None, description='Exact proposal candidate_id selected from math_optimization. Required with math_optimization when mathematical proposal selection is enforced; the proposal is compared to this build by complete scientific configuration, not bookkeeping labels.')
     validation_disposition: Literal['recommended','deferred','additional_analysis']
     reason: str = Field(min_length=1)
     next_step: str = Field(min_length=1)
@@ -112,7 +113,9 @@ def create(root, value):
     with host.store.transaction() as db:
         state=host.store.session(host.run_id,db)['state']
         if 'route' not in state:
-            state['route']=dict(source=spec.source,nodes=[],current=None,next_step='Select and evaluate an authorized candidate',incumbent=None,final=None)
+            state['route']=dict(source=spec.source,nodes=[],current=None,next_step='Select and evaluate an authorized candidate',incumbent=None,final=None,
+                math_evaluations=dict(limit=spec.math_evaluation_limit,used=0,remaining=spec.math_evaluation_limit,
+                    cache={},attempts=[]))
             host.store.update_state(db,host.run_id,state)
     return view(host)
 
@@ -150,11 +153,21 @@ def view(host):
             'Diagnosis is observational, not causal. Text adapter has not viewed videos.',
             'Serial bending cells only; no torsion/shear/stretch, friction, motor dynamics or general trajectory optimization.'])
     if spec.analysis_protocol and spec.endpoint_target:
+        ledger=route.get('math_evaluations',dict(limit=spec.math_evaluation_limit,used=0,
+            remaining=spec.math_evaluation_limit,cache={},attempts=[]))
         result['analysis_workflow']=dict(protocol=plain(spec.analysis_protocol),endpoint_target=plain(spec.endpoint_target),
             required_before_run=spec.analysis_required_before_run,math_evaluation_limit=spec.math_evaluation_limit,
+            math_evaluations_used=ledger['used'],math_evaluations_remaining=ledger['remaining'],
             math_selection_required_before_run=spec.math_selection_required_before_run,
             call_order=['analysis.linearize_candidate','analysis.control_metrics','analysis.bounded_endpoint',
-                'design.screen','design.optimize_math','route.record_analysis'])
+                'design.screen','design.optimize_math','route.record_analysis'],
+            optimizer_scope=('Primary: official-tolerance-normalized position residual upper bound from the controller-start '
+                'frozen local affine exact-ZOH model. Secondary: normalized input energy of a position-feasible witness. '
+                'Terminal braking and other sampled configurations are not aggregated into this objective.'),
+            optimizer_limits=('The straight-start world-x position-control mapping can be zero; prior evidence found equal '
+                'primary residuals across material scenarios and tested section scales, with length changes dominant. '
+                'This can favor geometric alignment and does not predict nonlinear bending, closed-loop reach, settling, '
+                'real-time performance or global optimality. Screening remains advisory.'))
     return result
 
 
@@ -487,18 +500,14 @@ def update_incumbent(ctx,route,node,out):
                 **{k:trial[k] for k in ('profile_report','profile_report_summary','factual_result') if k in trial})
 
 
-def run_built(ctx,args,route):
-    """Execute the immutable build with stable child request identities, without search."""
-    from tools.platform_host import Host
-    from .optimization import ensure_session
-    from .crosscheck import invoke
-    from tools.platform_search import score
+def _built_run_inputs(ctx,args,route):
+    """Apply the exact run gate without beginning backend/controller work."""
     node,built=source_node(ctx,args,route)
     if node['action']!='build': raise ValueError('BUILT_SOURCE_NODE_REQUIRED')
     candidate=built['candidate_id']
     if args.candidate_id and args.candidate_id!=candidate: raise ValueError('CANDIDATE_SELECTION_MISMATCH')
     inp=ctx.store.artifact(built['configuration'])
-    if policy(ctx.input).stop_on_task_success and route.get('incumbent',{}).get('evaluation',{}).get('task_success') is True:
+    if policy(ctx.input).stop_on_task_success and (route.get('incumbent') or {}).get('evaluation',{}).get('task_success') is True:
         raise ValueError('TASK_SUCCESS_STOP_POLICY: finish the passing incumbent')
     if policy(ctx.input).analysis_required_before_run:
         reports=[]
@@ -523,6 +532,30 @@ def run_built(ctx,args,route):
     if capability and capability.get('required_candidate_analysis'):
         from .candidate_analysis import require_completed_analysis
         require_completed_analysis(ctx,built,capability['required_candidate_analysis'])
+    return node,built,candidate,inp
+
+
+def check_run_eligibility(host,source_node_id,candidate_id=None):
+    """Read-only verification of the same preconditions used immediately by run."""
+    from types import SimpleNamespace
+    session=host.store.session(host.run_id)
+    ctx=SimpleNamespace(host=host,store=host.store,reg=host.reg,run_id=host.run_id,
+        input=SessionInput.model_validate(session['snapshot']['input']),artifact=host.store.artifact)
+    args=SimpleNamespace(source_node=source_node_id,candidate_id=candidate_id)
+    _,built,candidate,inp=_built_run_inputs(ctx,args,session['state']['route'])
+    from .candidate_analysis import scientific_configuration_identity
+    return dict(eligible=True,source_node=source_node_id,candidate_id=candidate,
+        build_configuration=built['configuration'],
+        scientific_configuration_identity=scientific_configuration_identity(inp))
+
+
+def run_built(ctx,args,route):
+    """Execute the immutable build with stable child request identities, without search."""
+    from tools.platform_host import Host
+    from .optimization import ensure_session
+    from .crosscheck import invoke
+    from tools.platform_search import score
+    _,built,candidate,inp=_built_run_inputs(ctx,args,route)
     child=Host(ctx.store.root,inp['run_id'],actor='route-executor')
     ensure_session(child,inp,parent_run_id=ctx.run_id,parent_event_id=ctx.row['parent_id'])
     sim=invoke(child,'single-simulation','simulation.run',dict(candidate_id=candidate,changes={}))
@@ -573,6 +606,7 @@ def summarize(out):
         **{k:(best or out)[k] for k in ('profile_report','profile_report_summary','factual_result') if k in (best or out)})
     if out.get('screen'):
         summary.update(analysis_report=out['screen'],math_optimization=out.get('math_optimization'),
+            math_selection_trace=out.get('math_selection_trace'),
             validation_disposition=out.get('validation_disposition'))
     return summary
 
@@ -747,24 +781,57 @@ def record_analysis(ctx,args):
         math_optimization=None
         selection_trace=dict(required=spec.math_selection_required_before_run,matches_proposal=False)
         if args.math_optimization:
+            import json
+            owned=False
+            with ctx.store.connect(True) as db:
+                for row in db.execute('SELECT receipt FROM calls WHERE run_id=? AND receipt IS NOT NULL',(ctx.run_id,)):
+                    receipt=json.loads(row['receipt'])
+                    if (receipt.get('tool_id')=='design.optimize_math' and receipt.get('execution_status')=='completed'
+                            and receipt.get('output')==plain(args.math_optimization)):
+                        owned=True;break
+            if not owned: raise ValueError('ROUTE_MATH_OPTIMIZATION_OWNED_TOOL_RESULT_REQUIRED')
+            if plain(args.math_optimization) not in [plain(ref) for ref in args.evidence]:
+                raise ValueError('ROUTE_MATH_OPTIMIZATION_EVIDENCE_CITATION_REQUIRED')
             optimized=ctx.artifact(args.math_optimization)
-            if optimized.get('kind')!='mathematical_design_optimization' or optimized['starting_binding']['configuration']!=expected:
-                raise ValueError('ROUTE_MATH_OPTIMIZATION_STARTING_BUILD_MISMATCH')
+            if optimized.get('kind')!='mathematical_design_optimization':
+                raise ValueError('ROUTE_MATH_OPTIMIZATION_RESULT_REQUIRED')
+            if optimized.get('protocol')!=plain(spec.analysis_protocol) or optimized.get('target')!=plain(spec.endpoint_target):
+                raise ValueError('ROUTE_MATH_OPTIMIZATION_PROTOCOL_OR_TARGET_MISMATCH')
+            start=optimized.get('starting_binding',{})
+            start_node=next((n for n in route['nodes'] if n.get('node_id')==start.get('source_node')
+                and n.get('action')=='build' and n.get('status')=='completed'),None)
+            if (start.get('owner_run_id')!=ctx.run_id or start_node is None
+                    or ctx.artifact(start_node['result']).get('configuration')!=start.get('configuration')):
+                raise ValueError('ROUTE_MATH_OPTIMIZATION_STARTING_BUILD_OWNERSHIP_MISMATCH')
             math_optimization=plain(args.math_optimization)
-            from .candidate import read_parameter
-            candidate=SessionInput.model_validate(ctx.artifact(expected))
-            design=candidate.robot.structure.data
-            values={path:read_parameter(design,path) for path in ('components/near/length_m','components/far/length_m')}
-            selections=design.get('metadata',{}).get('design_decisions',{}).get('selections',{})
-            values['design/section_scale']=selections.get('design/section_scale',1.)
-            material=selections.get('design/material_scenario','baseline')
-            matched=next((row for row in optimized['proposals'] if row['material_scenario']==material and
-                all(abs(float(row['parameters'][path])-float(value))<=1e-12 for path,value in values.items())),None)
+            if spec.math_selection_required_before_run and not args.selected_optimizer_candidate_id:
+                raise ValueError('ROUTE_SELECTED_OPTIMIZER_CANDIDATE_ID_REQUIRED')
+            proposals=[row for row in optimized.get('proposals',[])
+                if row.get('candidate_id')==args.selected_optimizer_candidate_id]
+            if len(proposals)>1: raise ValueError('ROUTE_OPTIMIZER_PROPOSAL_ID_NOT_UNIQUE')
+            matched=proposals[0] if proposals else None
+            from .candidate_analysis import scientific_configuration,scientific_configuration_identity
+            build_input=SessionInput.model_validate(ctx.artifact(expected))
+            if matched:
+                proposal_ref=matched.get('configuration')
+                evaluation=next((row for row in optimized.get('evaluations',[]) if
+                    row.get('candidate_id')==matched['candidate_id'] and row.get('configuration')==proposal_ref),None)
+                if (proposal_ref not in optimized.get('evidence',[]) or evaluation is None):
+                    raise ValueError('ROUTE_OPTIMIZER_PROPOSAL_EVIDENCE_CHAIN_MISMATCH')
+                proposed=SessionInput.model_validate(ctx.artifact(proposal_ref))
+                if scientific_configuration(proposed)!=scientific_configuration(build_input):
+                    raise ValueError('ROUTE_SELECTED_PROPOSAL_SCIENTIFIC_CONFIGURATION_MISMATCH')
+                declared=(evaluation.get('candidate_binding') or {}).get('scientific_configuration_identity')
+                if declared and declared!=scientific_configuration_identity(proposed):
+                    raise ValueError('ROUTE_OPTIMIZER_PROPOSAL_SCIENTIFIC_IDENTITY_MISMATCH')
+            elif args.selected_optimizer_candidate_id:
+                raise ValueError('ROUTE_SELECTED_OPTIMIZER_PROPOSAL_NOT_FOUND')
             selection_trace=dict(required=spec.math_selection_required_before_run,matches_proposal=matched is not None,
-                build_parameters={**values,'design/material_scenario':material},
+                scientific_configuration_identity=scientific_configuration_identity(build_input),
                 optimizer_candidate_id=None if matched is None else matched['candidate_id'],
                 optimizer_configuration=None if matched is None else matched['configuration'],
-                optimizer_objective=None if matched is None else matched['objective'])
+                optimizer_objective=None if matched is None else matched['objective'],
+                optimizer_starting_build=start.get('configuration'),optimizer_result=plain(args.math_optimization))
         report=screen['records'][0]
         out=dict(status='analyzed',candidate_id=built['candidate_id'],source_node=args.source_node,
             build_configuration=expected,protocol=screen['protocol'],linearization=plain(args.linearization),
