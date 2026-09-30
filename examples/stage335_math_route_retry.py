@@ -262,6 +262,37 @@ def package_offline(source,destination):
     print('Packaged offline evidence: '+str(destination),flush=True)
 
 
+def package_blocked_live(source,destination):
+    """Retain a frozen live launch that an external platform gate rejected pre-process."""
+    require_softagent_runtime();destination.mkdir(parents=True,exist_ok=True)
+    for name in ('freeze_manifest.json','workflow.json','frozen_input.json','analysis_protocol.json',
+            'endpoint_target.json','experiment_prompt.json','provider_tools.json','provider_configuration.json',
+            'runtime_identity.json','behavior_audit.json','math_influence_audit.json'):
+        atomic_json(destination/('live_'+name),read(source/name))
+    blocker=dict(stage='3.35',run_id=read(source/'workflow.json')['run_id'],launch_process_started=False,
+        provider_request_submitted=False,provider_responses=0,tool_calls=0,live_math_evaluations=0,
+        backend_attempts=0,nmpc_solves=0,workers=0,charged_wall_s=0.,
+        platform_rejection=('This executes a paid external DeepSeek workflow using configured credentials and may export '
+            'repository-derived data, but trusted user authorization for this exact destination, payload, and spend is not established.'),
+        handling='No retry, workaround, indirect execution, counter reset, or second live experiment was attempted.',
+        acceptance_a_math_influenced_executed_design=False,
+        acceptance_b_robot_outcomes=dict(valid_execution='unavailable',official_reach='unavailable',
+            sampled_settling='unavailable',complete_update_real_time='unavailable'),
+        push_status=dict(pushed=False,local_commit=read(source/'workflow.json')['implementation_commit'],
+            platform_rejection='External origin push rejected because trust and authorization for the specific payload/destination were not established.'))
+    atomic_json(destination/'live_blocker.json',blocker)
+    local=[]
+    for path in sorted(source.rglob('*')):
+        if path.is_file(): local.append(dict(path=str(path.resolve()),size=path.stat().st_size,sha256=sha256(path)))
+    atomic_json(destination/'live_local_only_artifacts.json',dict(remotely_available=False,
+        note='The prepared raw store has no provider response or trajectory. Hashes do not make local files remotely available.',files=local))
+    files=[path for path in destination.iterdir() if path.is_file() and path.name!='delivery_manifest.json']
+    atomic_json(destination/'delivery_manifest.json',dict(files={path.name:dict(size=path.stat().st_size,sha256=sha256(path))
+        for path in files},implementation_commit=blocker['push_status']['local_commit'],live_launch='blocked_before_process',
+        provider_requests=0,tool_calls=0,math_evaluations=dict(offline=8,live=0,total=8),backend_attempts=0,workers=0))
+    print('Packaged blocked live freeze: '+str(destination),flush=True)
+
+
 def live_guidance():
     return (
         'Conduct the one bounded Stage 3.35 math-led retry on the frozen reach task. The mathematical tools are local proxies: they use a controller-start frozen local affine exact-ZOH position model, not the nonlinear backend. The primary objective is the official-tolerance-normalized position residual upper bound; normalized input energy of a position-feasible witness is secondary. Terminal braking and other sampled configurations are not objective terms. The prior evidence found a zero world-x position-control mapping row at the straight start, equal primary residuals across compliant/stiff scenarios and tested section scales, and length-dominated primary values. This can favor geometric alignment; it does not predict nonlinear bending, closed-loop reach, settling, real-time performance, causality or global optimality. Screening is advisory. '
@@ -344,7 +375,7 @@ def inspect(host):
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['offline','offline-recover','package-offline','prepare','run','inspect'])
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['offline','offline-recover','package-offline','package-blocked-live','prepare','run','inspect'])
     parser.add_argument('--output',type=Path,default=Path('runs')/('stage335_math_route_retry_'+datetime.now().strftime('%Y%m%d_%H%M%S')))
     parser.add_argument('--source',type=Path)
     parser.add_argument('--credential-file',type=Path,default=Path.home()/'.codex/.env');args=parser.parse_args()
@@ -354,6 +385,9 @@ def main():
     if args.action=='package-offline':
         if args.source is None: raise ValueError('--source is required for package-offline')
         package_offline(args.source.resolve(),root);return
+    if args.action=='package-blocked-live':
+        if args.source is None: raise ValueError('--source is required for package-blocked-live')
+        package_blocked_live(args.source.resolve(),root);return
     host=prepare(root) if args.action in ('prepare','run') else Host(root,read(root/'workflow.json')['run_id'])
     require_softagent_runtime()
     if args.action=='run':
