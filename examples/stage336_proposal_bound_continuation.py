@@ -33,6 +33,10 @@ HISTORICAL_ROOTS=[
 ]
 PARENT_EVIDENCE=ROOT/'evidence/stage335_math_route_retry_20260930'
 PARENT_RUN='gvs-stage335-81350ebec934'
+BLOCKED_ROOT=ROOT/'runs/stage336_proposal_bound_continuation_20260930_live'
+BLOCKED_EVIDENCE=ROOT/'evidence/stage336_proposal_bound_continuation_20260930'
+BLOCKED_RUN='gvs-stage336-dc706ed007f2'
+ENTRYPOINT=Path(__file__).resolve()
 OPTIMIZER={'artifact_id':'9e408e81d706b22246e1d856d122bdcffaa605308ed975cbfa0ade0c563c7245','media_type':'application/json'}
 PROPOSAL_ID='math-compliant-4795c8184616'
 OLD_BUILD_LABEL='mathsel_c1_n0p15_f0p11_s0p95_compliant'
@@ -49,6 +53,11 @@ TOOLS={'route.advance':'1.0.0','route.inspect':'1.0.0','route.record_analysis':'
 
 
 def sha256(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def proposal_arguments_example():
+    return dict(node_id='proposal-build',optimizer_result=OPTIMIZER,optimizer_candidate_id=PROPOSAL_ID,
+        reason='Construct the exact proposal selected in Stage 3.35.',next_step='Bind its historical mathematical evidence.')
 
 
 def source_stores():return [Store(PARENT_ROOT),*(Store(path) for path in HISTORICAL_ROOTS)]
@@ -125,8 +134,35 @@ def import_manifest(store,inp,created_by):
     return value,reference
 
 
+def reuse_imported_artifacts(source_root,destination):
+    """Reuse an already verified store without repeating recursive artifact discovery."""
+    source=Store(source_root)
+    packaged=read(BLOCKED_EVIDENCE/'actual_local_only_artifacts.json')
+    expected=next(row for row in packaged['files'] if Path(row['path']).name=='platform.sqlite')
+    actual=sha256(source.db)
+    if source.root!=BLOCKED_ROOT.resolve() or actual!=expected['sha256']:
+        raise RuntimeError('BLOCKED_STAGE336_STORE_HASH_MISMATCH')
+    copied=0
+    with source.connect(True) as source_db, destination.transaction() as target_db:
+        for row in source_db.execute('SELECT id,media,body FROM artifacts ORDER BY id'):
+            saved=destination.put(target_db,row['body'],row['media'])
+            if saved.artifact_id!=row['id']:raise RuntimeError('REUSED_ARTIFACT_IDENTITY_CHANGED')
+            copied+=1
+    inp=read(source.root/'frozen_input.json')
+    reference=inp['policy']['route']['data']['historical_math']
+    manifest=destination.artifact(reference)
+    for ref in (OPTIMIZER,*NAMED.values(),manifest['proposal_configuration']):destination.artifact(ref)
+    receipt=dict(kind='immutable_artifact_store_reuse',source_run_id=BLOCKED_RUN,
+        source_store=dict(path=str(source.db),size=source.db.stat().st_size,sha256=actual),
+        packaged_evidence='evidence/stage336_proposal_bound_continuation_20260930/actual_local_only_artifacts.json',
+        copied_artifact_rows=copied,recursive_dependency_traversal=False,mathematical_recomputation=False,
+        historical_import_manifest=reference)
+    return manifest,reference,receipt
+
+
 def guidance(manifest_ref):
     refs=', '.join(name+'='+value['artifact_id'] for name,value in NAMED.items())
+    example=json.dumps(proposal_arguments_example(),sort_keys=True,separators=(',',':'))
     return (
         'Conduct ONE explicitly separate Stage 3.36 proposal-bound continuation of Stage 3.35. The Stage 3.35 model selected '
         f'{PROPOSAL_ID} (near 0.15 m, far 0.11 m, common section scale 0.95, compliant) because compliant and stiff tied on '
@@ -136,8 +172,9 @@ def guidance(manifest_ref):
         'row at the straight start and does not predict nonlinear bending, closed-loop reach, sampled settling, real-time feasibility, '
         'causality, or global optimality. Screening is advisory. '
         f'The exact optimizer result is {OPTIMIZER["artifact_id"]}; the frozen historical import manifest is {manifest_ref["artifact_id"]}; '
-        f'named historical references are {refs}. Invoke design.build_proposal with the exact optimizer result and candidate_id '
-        f'{PROPOSAL_ID}; never retype its parameters and never use the old build label as an optimizer ID. Then invoke '
+        f'named historical references are {refs}. Invoke design.build_proposal with optimizer_result and optimizer_candidate_id '
+        f'{PROPOSAL_ID}; never retype its parameters and never use the old build label as an optimizer ID. Its nested arguments '
+        f'object has exactly the required fields node_id, optimizer_result, optimizer_candidate_id, reason, and next_step; for example: {example}. Then invoke '
         'analysis.bind_historical_math and route.record_analysis through historical_math_binding. No fresh optimizer, linearization, '
         'Gramian/frequency, endpoint, screen, MATLAB, or retrospective-study tools are authorized. Decide yourself, from the original '
         'selection evidence and its limitations, whether one backend validation is warranted. Do not fabricate the decision. If yes, '
@@ -147,17 +184,20 @@ def guidance(manifest_ref):
         'continuation does not retroactively complete or alter the original Stage 3.35 experiment. Use English and exact identities.')
 
 
-def configure(root,run_id,budget,created_by,timeout_s=1800.):
-    inp=deepcopy(read(PARENT_ROOT/'frozen_input.json'));inp['run_id']=run_id
+def configure(root,run_id,budget,created_by,timeout_s=1800.,reuse_root=None):
+    inp=deepcopy(read((reuse_root or PARENT_ROOT)/'frozen_input.json'));inp['run_id']=run_id
     inp['policy']['budget']=budget;inp['policy']['timeout_s']=timeout_s;inp['policy']['allowed_tools']=[]
     inp['policy']['tool_bindings']=dict(TOOLS);inp['policy']['model']['max_turns']=16
     store=Store(root);store.create(dict(project_id=run_id,grant_id=run_id,authorization_source=created_by,budget=budget))
-    manifest,manifest_ref=import_manifest(store,inp,created_by)
+    if reuse_root is None:
+        manifest,manifest_ref=import_manifest(store,inp,created_by);reuse_receipt=None
+    else:
+        manifest,manifest_ref,reuse_receipt=reuse_imported_artifacts(reuse_root,store)
     inp['policy']['route']['data'].update(source=created_by,historical_math=manifest_ref,max_trials=1,
         analysis_required_before_run=True,math_evaluation_limit=0,math_selection_required_before_run=True,
         stop_on_task_success=True,guidance=guidance(manifest_ref))
     create(root,inp)
-    return Host(root,run_id),inp,manifest,manifest_ref
+    return Host(root,run_id),inp,manifest,manifest_ref,reuse_receipt
 
 
 def fixture_call(host,turn,tool,arguments):
@@ -173,7 +213,7 @@ def fixture_call(host,turn,tool,arguments):
 def offline(root,evidence):
     runtime=require_softagent_runtime();run_id='stage336-offline-'+os.urandom(6).hex()
     budget=dict(model_calls=1,tool_calls=20,backend_solves=1,worker_calls=1,wall_s=300.)
-    host,inp,manifest,manifest_ref=configure(root,run_id,budget,'Stage 3.36 offline production-boundary replay.',30.)
+    host,inp,manifest,manifest_ref,_=configure(root,run_id,budget,'Stage 3.36 offline production-boundary replay.',30.)
     receipts=[]
     wrong,payload=fixture_call(host,0,'design.build_proposal',dict(node_id='wrong-build',optimizer_result=OPTIMIZER,
         optimizer_candidate_id=OLD_BUILD_LABEL,reason='Replay the exact Stage 3.35 identifier error.',next_step='Correct the identifier.'));receipts.append(wrong)
@@ -221,6 +261,53 @@ def offline(root,evidence):
     print(json.dumps(dict(status='passed',wrong_error=wrong['error'],gate=gate,usage=result['usage']),indent=2),flush=True)
 
 
+def executable_identity(host):
+    snapshot=host.store.session(host.run_id)['snapshot']
+    return dict(session_dependencies_sha256=digest(snapshot['dependencies']),
+        dependency_count=len(snapshot['dependencies']),entrypoint=str(ENTRYPOINT.relative_to(ROOT)),
+        entrypoint_sha256=sha256(ENTRYPOINT))
+
+
+def provider_call_example(host):
+    return dict(function_name=provider_name('design.build_proposal'),envelope=dict(
+        arguments=proposal_arguments_example(),reason='Construct the exact frozen optimizer proposal.',tool_version='1.0.0'))
+
+
+def verify_prelaunch(root,host,runtime=None):
+    """Reject any frozen/runtime/source mismatch before credentials or provider use."""
+    runtime=runtime or require_softagent_runtime();freeze=read(root/'freeze_manifest.json')
+    failures=[];actual_hashes={}
+    for name,expected in freeze['files'].items():
+        path=root/name
+        actual=sha256(path) if path.is_file() else None;actual_hashes[name]=actual
+        if actual!=expected:failures.append('frozen_file:'+name)
+    snapshot=host.store.session(host.run_id)['snapshot'];frozen_input=read(root/'frozen_input.json')
+    project=host.store.config();frozen_project=read(root/'project_configuration.json')
+    compatibility=host.compatibility();current_executable=executable_identity(host)
+    current_payload=payload_for(host,DeepSeekAdapter())
+    checks=dict(run_id=freeze['run_id']==host.run_id,
+        runtime=runtime==read(root/'runtime_identity.json'),
+        frozen_file_hashes=not any(name.startswith('frozen_file:') for name in failures),
+        session_input=snapshot['input']==frozen_input,
+        session_input_identity=snapshot.get('input_identity')==digest(snapshot['input'])==freeze['session_input_identity'],
+        project_configuration=project==frozen_project and digest(project)==freeze['project_configuration_identity'],
+        executable_identity=current_executable==freeze['executable_identity'],
+        dependency_compatibility=compatibility['compatible'],
+        provider_payload=current_payload==read(root/'actual_provider_payload.json'))
+    failures.extend(name for name,passed in checks.items() if not passed and name not in failures)
+    receipt=dict(kind='stage336_prelaunch_verification',run_id=host.run_id,
+        checked_at=datetime.now().astimezone().isoformat(),status='passed' if not failures else 'rejected',
+        checked_before_credentials=True,checked_before_provider=True,checked_before_backend=True,
+        implementation_commit_informational=freeze['implementation_commit'],git_head_equality_required=False,
+        checks=checks,failures=failures,compatibility=compatibility,
+        frozen_file_hashes={name:dict(expected=freeze['files'][name],actual=actual,
+            matches=actual==freeze['files'][name]) for name,actual in actual_hashes.items()},
+        executable_identity=dict(expected=freeze['executable_identity'],actual=current_executable))
+    atomic_json(root/'prelaunch_verification.json',receipt)
+    if failures:raise RuntimeError('LIVE_PRELAUNCH_VERIFICATION_FAILED: '+','.join(failures))
+    return receipt
+
+
 def prepare(root):
     runtime=require_softagent_runtime()
     if (root/'workflow.json').is_file():return Host(root,read(root/'workflow.json')['run_id'])
@@ -228,21 +315,30 @@ def prepare(root):
         raise RuntimeError('LIVE_FREEZE_REQUIRES_CLEAN_WORKTREE')
     run_id='gvs-stage336-'+os.urandom(6).hex();budget=dict(model_calls=16,tool_calls=60,backend_solves=1,worker_calls=0,wall_s=3600.)
     commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
-    host,inp,manifest,manifest_ref=configure(root,run_id,budget,
-        'User-authorized one separate Stage 3.36 proposal-bound DeepSeek continuation at implementation commit '+commit+'.')
+    host,inp,manifest,manifest_ref,reuse_receipt=configure(root,run_id,budget,
+        'User-authorized revised Stage 3.36 proposal-bound DeepSeek continuation at implementation commit '+commit+'.',
+        reuse_root=BLOCKED_ROOT)
     payload=payload_for(host,DeepSeekAdapter())
     values=dict(frozen_input=inp,historical_import_manifest=manifest,runtime_identity=runtime,
         experiment_prompt=dict(guidance=inp['policy']['route']['data']['guidance']),provider_tools=payload['tools'],
-        actual_provider_payload=payload,provider_configuration=inp['policy']['model'],parent_stage=dict(
+        proposal_call_example=provider_call_example(host),actual_provider_payload=payload,
+        provider_configuration=inp['policy']['model'],project_configuration=host.store.config(),
+        artifact_reuse_receipt=reuse_receipt,parent_stage=dict(
             stage='Stage 3.35',run_id=PARENT_RUN,evidence_manifest='evidence/stage335_math_route_retry_20260930/actual_live_manifest.json',
             evidence_manifest_sha256=sha256(PARENT_EVIDENCE/'actual_live_manifest.json'),optimizer_result=OPTIMIZER,
-            optimizer_candidate_id=PROPOSAL_ID,named_references=NAMED))
+            optimizer_candidate_id=PROPOSAL_ID,named_references=NAMED,revision_parent=dict(stage='Stage 3.36 blocked freeze',
+                run_id=BLOCKED_RUN,root=str(BLOCKED_ROOT.relative_to(ROOT)),
+                evidence_manifest='evidence/stage336_proposal_bound_continuation_20260930/actual_manifest.json',
+                evidence_manifest_sha256=sha256(BLOCKED_EVIDENCE/'actual_manifest.json'))))
     for name,value in values.items():atomic_json(root/(name+'.json'),value)
     names=[name+'.json' for name in values]
-    freeze=dict(run_id=run_id,stage='Stage 3.36 proposal-bound continuation',implementation_commit=commit,
+    snapshot=host.store.session(run_id)['snapshot']
+    freeze=dict(run_id=run_id,stage='Stage 3.36 revised proposal-bound continuation',implementation_commit=commit,
         implementation_dirty=False,parent_run_id=PARENT_RUN,historical_import=manifest_ref,limits=budget,new_math_limit=0,
         backend_attempt_limit=1,provider_request_limit=16,workers_limit=0,provider_configuration=inp['policy']['model'],
-        scientific_configuration_identity=manifest['scientific_configuration_identity'],files={name:sha256(root/name) for name in names},status='prepared')
+        scientific_configuration_identity=manifest['scientific_configuration_identity'],
+        session_input_identity=snapshot['input_identity'],project_configuration_identity=digest(host.store.config()),
+        executable_identity=executable_identity(host),files={name:sha256(root/name) for name in names},status='prepared')
     atomic_json(root/'freeze_manifest.json',freeze);atomic_json(root/'workflow.json',freeze)
     standard_inspect(host)
     print('Prepared '+run_id+' at '+commit+'; no provider, backend, math, NMPC, or worker calls.',flush=True)
@@ -266,13 +362,51 @@ def audit(host):
             'source_build_node','optimizer_result','proposal_configuration','scientific_configuration_identity','configuration')},
         analysis_report=None if report is None else {key:report.get(key) for key in ('source_build_node','build_candidate_id',
             'optimizer_candidate_id','references','math_selection_trace','historical_math_binding','validation_disposition','disposition_reason')},
-        execution=None if execution is None else {key:execution.get(key) for key in ('status','candidate_id','build_configuration',
+        execution=None if execution is None else {key:execution.get(key) for key in ('status','candidate_id','build_configuration','configuration',
             'simulation','evaluation','evaluation_data','task_success','factual_result','profile_report','profile_report_summary','actual_solves')},
         usage=usage,math_evaluations_new=ledger.get('used',0),within_limits=usage['model_calls']<=16 and usage['tool_calls']<=60
             and usage['backend_solves']<=1 and usage['worker_calls']==0 and usage['wall_s']<=3600 and ledger.get('used',0)==0)
     atomic_json(host.store.root/'stage336_audit.json',result);workflow=read(host.store.root/'workflow.json')
     workflow.update(status=standard['status'],stop_reason=standard['stop_reason'],actual_usage=usage);atomic_json(host.store.root/'workflow.json',workflow)
     return result
+
+
+def extract_robot_outcomes(host,execution):
+    """Package only sealed execution/profile facts; never fill gaps with predictions."""
+    frozen=host.store.session(host.run_id)['snapshot']['input'];candidate_input=frozen
+    tolerance_source='frozen_session_input'
+    if execution is not None and execution.get('configuration') is not None:
+        candidate_input=host.store.artifact(execution['configuration'])
+        tolerance_source='executed_candidate_configuration'
+    task=candidate_input.get('task',{});parameters=task.get('evaluator',{}).get('parameters',{}).get('data',{})
+    tolerance=parameters.get('tolerance_m') if task.get('family')=='task.reach' else None
+    facts=None if execution is None else execution.get('factual_result')
+    profile=None if execution is None else execution.get('profile_report_summary')
+    simulation={} if execution is None else (execution.get('simulation') or {})
+    evaluation_data={} if execution is None else (execution.get('evaluation_data') or {})
+    profile_binding={} if execution is None else (execution.get('profile_report') or {})
+    execution_evidence=None if execution is None else dict(route_status=execution.get('status'),
+        execution_id=simulation.get('execution_id') or (facts or {}).get('execution_id'),
+        simulation_reference=simulation.get('output') or (facts or {}).get('simulation'),
+        simulation_status=simulation.get('execution_status'),solver_status=simulation.get('solver_status'),
+        profile_report_reference=profile_binding.get('reference'))
+    evaluation_evidence=None if execution is None else dict(reference=execution.get('evaluation'),
+        validity=evaluation_data.get('validity') if evaluation_data else (facts or {}).get('evaluation_validity'),
+        task_accepted=evaluation_data.get('task_success') if evaluation_data else (facts or {}).get('task_accepted'))
+    reach=dict(available=facts is not None,task_accepted=None if facts is None else facts.get('task_accepted'),
+        evaluation_validity=None if facts is None else facts.get('evaluation_validity'),
+        terminal_error_m=None if facts is None else facts.get('terminal_error_m'),tolerance_m=tolerance,
+        tolerance_source=tolerance_source)
+    complete_update=None if profile is None else dict(deadline_misses=profile.get('deadline_misses'),
+        real_time_demonstrated=profile.get('real_time_demonstrated'),mean_complete_update_s=profile.get('mean_update_s'),
+        control_period_s=profile.get('task',{}).get('timing',{}).get('control_period_s'),
+        control_updates=profile.get('updates'),measured_computation_s=profile.get('simulation_wall_s'))
+    return dict(candidate_executed=execution is not None,
+        valid_backend_execution=bool(execution and execution.get('status')=='valid'),
+        execution_evidence=execution_evidence,evaluation_evidence=evaluation_evidence,official_reach=reach,
+        sampled_settling=None if profile is None else profile.get('sampled_settling'),
+        complete_update_real_time=complete_update,
+        interpretation='Unavailable fields mean no valid measured evidence was produced; local mathematics is never substituted.')
 
 
 def package(source,destination,blocker=None):
@@ -292,13 +426,7 @@ def package(source,destination,blocker=None):
             optimizer_candidate_id=arguments.get('optimizer_candidate_id') or arguments.get('selected_optimizer_candidate_id'),
             validation_disposition=arguments.get('validation_disposition'),nested_reason=arguments.get('reason'),
             next_step=arguments.get('next_step'),receipt=action.get('receipt')))
-    execution=result['execution'];profile=None if execution is None else execution.get('profile_report_summary')
-    facts=None if execution is None else execution.get('factual_result')
-    robot=dict(candidate_executed=execution is not None,valid_backend_execution=bool(execution and execution.get('status')=='valid'),
-        official_reach=None if facts is None else dict(task_accepted=facts.get('task_accepted'),terminal_error_m=facts.get('terminal_error_m'),
-            tolerance_m=facts.get('tolerance_m')),sampled_settling=None if profile is None else profile.get('settling'),
-        complete_update_real_time=None if profile is None else {key:profile.get(key) for key in ('deadline_misses','real_time_demonstrated','delivery_cost')},
-        interpretation='Unavailable fields mean no valid measured evidence was produced; local mathematics is never substituted.')
+    execution=result['execution'];robot=extract_robot_outcomes(host,execution)
     if execution is not None:
         gate=dict(eligible=True,basis='The actual route.advance run passed the same Route gate before backend execution.')
     elif result['proposal_build'] is not None:
@@ -317,7 +445,15 @@ def package(source,destination,blocker=None):
             tool_calls=behavior['tool_calls'],math_evaluations=result['math_evaluations_new'],backend_attempts=behavior['backend_executions'],
             workers=result['usage']['worker_calls'],charged_wall_s=result['usage']['wall_s']),
         cumulative_math_evaluations=24+result['math_evaluations_new'])
-    outputs=dict(actual_freeze_verification=verification,actual_workflow=workflow,actual_stage336_audit=result,
+    outputs=dict(actual_freeze_manifest=freeze,actual_frozen_input=read(source/'frozen_input.json'),
+        actual_experiment_prompt=read(source/'experiment_prompt.json'),
+        actual_proposal_call_example=read(source/'proposal_call_example.json'),
+        actual_provider_configuration=read(source/'provider_configuration.json'),
+        actual_parent_provenance=read(source/'parent_stage.json'),
+        actual_artifact_reuse_receipt=read(source/'artifact_reuse_receipt.json'),
+        actual_freeze_verification=verification,
+        actual_prelaunch_verification=read(source/'prelaunch_verification.json') if (source/'prelaunch_verification.json').is_file() else None,
+        actual_workflow=workflow,actual_stage336_audit=result,
         actual_model_decisions=dict(run_id=host.run_id,decisions=decisions),actual_acceptance=acceptance,
         actual_robot_outcomes=robot,actual_usage=usage,actual_tool_inventory=read(source/'provider_tools.json'),
         actual_parent_import=read(source/'historical_import_manifest.json'),actual_local_only_artifacts=dict(remotely_available=False,files=local))
@@ -337,7 +473,7 @@ def package(source,destination,blocker=None):
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['offline','prepare','run','inspect','package'])
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['offline','prepare','verify','run','inspect','package'])
     parser.add_argument('--output',type=Path,required=True);parser.add_argument('--evidence',type=Path)
     parser.add_argument('--source',type=Path);parser.add_argument('--blocker',type=Path)
     parser.add_argument('--credential-file',type=Path,default=Path.home()/'.codex/.env')
@@ -351,7 +487,9 @@ def main():
     host=prepare(root) if args.action in ('prepare','run') else Host(root,read(root/'workflow.json')['run_id'])
     require_softagent_runtime()
     if args.action=='run':
-        load_credential(args.credential_file);print('Starting the one Stage 3.36 DeepSeek continuation.',flush=True);host.run();audit(host)
+        verify_prelaunch(root,host);load_credential(args.credential_file)
+        print('Starting the one revised Stage 3.36 DeepSeek continuation.',flush=True);host.run();audit(host)
+    elif args.action=='verify':print(json.dumps(verify_prelaunch(root,host),indent=2),flush=True)
     elif args.action=='inspect':print(json.dumps(audit(host),indent=2),flush=True)
 
 

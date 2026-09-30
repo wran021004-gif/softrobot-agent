@@ -86,7 +86,7 @@ EXTENSIONS=[
         capabilities=dict(category='orchestration',role='public_tool',route_visible=True,
             preflight='extensions.tendon_family.route:preflight_analysis')),
     Extension('design.build_proposal','tool','1.0.0',route.ProposalBuildAction,route.RouteResult,
-        'extensions.tendon_family.route:build_proposal','Construct and validate the exact complete effective configuration of one named optimizer proposal. The model supplies the optimizer result and exact proposal candidate_id; it never retypes design values. Zero backend solves.',**COMMON,
+        'extensions.tendon_family.route:build_proposal','Construct and validate the exact complete effective configuration of one named optimizer proposal. The model supplies optimizer_result and the exact optimizer_candidate_id; it never retypes design values. Zero backend solves.',**COMMON,
         capabilities=dict(category='orchestration',role='public_tool',route_visible=True,
             preflight='extensions.tendon_family.route:preflight_proposal')),
     Extension('search.family_coordinate','search','1.0.0',opt.SearchParameters,Payload,
