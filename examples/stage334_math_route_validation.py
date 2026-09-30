@@ -63,6 +63,7 @@ def main():
     build_ref,_=call(host,receipts,'route.advance',dict(node_id='math_start',action='build',combination='candidate_gvs_nmpc',
         candidate_id='math-start',changes={},variables={},max_trials=1,evidence=[],reason='Create the explicit immutable optimizer start.',
         next_step='Run candidate-bound shared mathematics.'),'Deterministic Route build; zero backend solves.')
+    build_node_ref=store.session(host.run_id)['state']['route']['nodes'][0]['result']
     linear_ref,linear=call(host,receipts,'analysis.linearize_candidate',dict(source_node='math_start',protocol=pref),
         'Bind configuration-only local models to the exact completed build.')
     models=[row['model'] for row in linear['records'] if 'model' in row]
@@ -77,7 +78,7 @@ def main():
         variables=variables,material_scenarios=['compliant','stiff'],max_evaluations=8,
         objective='controller_start_local_endpoint_lexicographic_v1'),
         'Run the declared bounded mathematics-only coordinate search; no provider, NMPC, or backend.')
-    report_ref,report=call(host,receipts,'route.record_analysis',dict(node_id='math_report',source_node='math_start',evidence=[build_ref],
+    report_ref,report=call(host,receipts,'route.record_analysis',dict(node_id='math_report',source_node='math_start',evidence=[build_node_ref],
         linearization=linear_ref,metrics=metrics_ref,endpoint=endpoint_ref,screen=screen_ref,
         math_optimization=optimize_ref,validation_disposition='recommended',
         reason='Shared local evidence supplies conditional candidate proposals; backend validation would be required to test closed-loop reach.',
