@@ -1,0 +1,22 @@
+{
+  "classification": "Offline-only instruction repair after the single stopped attempt; not live-validated",
+  "observed_failures": [
+    "VERIFICATION_REQUIRES_EXPLICIT_ADOPTION",
+    "INVALID_TOOL_CALL_ENVELOPE: next_action outside arguments"
+  ],
+  "changes": [
+    "Normal and correction prompts explain defer/reject -> stop, adopt with named recommendation -> bounded_verification",
+    "Explain that stop declines verification while the coordinator may proceed to diagnostic checking",
+    "Require complete outer envelope on correction; decision fields belong inside arguments"
+  ],
+  "checks": {
+    "tests": 1,
+    "passed": 1,
+    "seconds": 6.103,
+    "log": "python.exe : test_corrections_and_advertised_delivery_follow_phase (tests.test_diagnostic_feedback.FeedbackTests.test_c\norrections_and_advertised_delivery_follow_phase) ... ok\nAt line:2 char:1\n+ & 'C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe' -m unittes ...\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    + CategoryInfo          : NotSpecified: (test_correction...w_phase) ... ok:String) [], RemoteException\n    + FullyQualifiedErrorId : NativeCommandError\n \n\n----------------------------------------------------------------------\nRan 1 test in 6.103s\n\nOK\n"
+  },
+  "live_validation": false,
+  "budgets_reset": false,
+  "guard_reset": false,
+  "additional_paid_attempts": 0
+}

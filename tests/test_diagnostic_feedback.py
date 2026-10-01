@@ -83,7 +83,12 @@ class FeedbackTests(TestCase):
             ('design',{'verification':self.binding},'design.review_verification')]:
             configure_role(self.host,role,'phase',**context)
             self.assertIn(expected,delivery_instruction(self.host));self.assertNotIn('route.advance',delivery_instruction(self.host))
+            if expected=='design.respond_diagnosis':
+                self.assertIn('defer or reject requires next_action=stop',delivery_instruction(self.host))
+                self.assertIn('inside arguments, never at the top level',delivery_instruction(self.host))
             payload=payload_for(self.host,ReadableDeepSeekAdapter())
+            if expected=='design.respond_diagnosis':
+                self.assertIn('defer or reject requires next_action=stop',payload['messages'][0]['content'])
             names=[t['function']['description'].split('@')[0] for t in payload['tools']]
             self.assertEqual(set(names),{'evidence.read',expected})
         host,_=self.role_host({'diagnosis.submit':'1.0.0','diagnosis.check_request':'1.0.0'})
