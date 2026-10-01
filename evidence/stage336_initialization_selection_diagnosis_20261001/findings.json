@@ -1,0 +1,32 @@
+{
+  "directly_observed": [
+    "All 35 current plans were accepted; selected iterations were 0 on 34 updates and -1 on one update, both classified as initialization.",
+    "All 35 current raw IPOPT terminations were User_Requested_Stop with budget_best_feasible; none was numerical convergence.",
+    "Every current raw returned iterate violated the 1e-5 delivery tolerance, while every retained initialization candidate met it.",
+    "All six current applied tensions were constant and equal to the retained compatible historical tension guess.",
+    "The historical passing run first selected a noninitialization plan at command 23 (0.23 s), iteration 19, where all six applied tensions first changed."
+  ],
+  "independently_recomputed": [
+    "Exact update/command timestamp alignment and requested-versus-applied tension equality.",
+    "Selected-timestamp target errors, tension deltas, one-step tip discrepancies, interval-labelled backend velocities, and instantaneous GVS J(q)qdot.",
+    "Input SHA-256 equality before and after analysis."
+  ],
+  "established_from_implementation_and_configuration": [
+    "The initialization is independently evaluated and eligible at <=1e-5; later feasible iterates replace it only with a lower objective (the first callback candidate may replace the synthetic seed on equality).",
+    "feasible_early_stop means callback-stopped and feasible, not converged; User_Requested_Stop is the raw callback termination.",
+    "Recovery was disabled, so no reintegrated returned plan could replace callback selection.",
+    "The current and historical success use identical core selection code and declared controller settings."
+  ],
+  "plausible_but_unresolved": [
+    "Geometry-dependent dynamics may explain why the successful case produced an eligible improved iterate and the current case did not.",
+    "The first noninitialization command may have contributed to the historical trajectory, but the saved executions cannot isolate its causal effect."
+  ],
+  "unsupported": [
+    "The 2 mm local mathematical residual predicted the 66.721 mm closed-loop outcome.",
+    "The current robot is globally unreachable or physically infeasible.",
+    "Zero force-bound violation establishes sufficient control authority.",
+    "The shared mathematics layer is invalid.",
+    "The historical noninitialization switch caused task success."
+  ],
+  "mathematical_witness_comparison": "The Stage 3.35 witness is a controller-start local affine endpoint control sequence; executed NMPC full inputs and witness-aligned nonlinear states are not retained in a common evaluable record. No input-by-input comparison or model-error ratio is supported."
+}

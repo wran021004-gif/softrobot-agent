@@ -1,0 +1,1741 @@
+{
+  "current": [
+    {
+      "command_index": 0,
+      "timestamp_s": 0.0,
+      "timestamp_semantics": "measured/projected current state before integration; command applies over the following control interval",
+      "command_interval_s": [
+        0.0,
+        0.01
+      ],
+      "projected_state": {
+        "q_rad_m": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "qdot_rad_m_s": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "measured_initial_state": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "projection_residual_max_rad_m": 0.0
+      },
+      "world_tip_position_m": [
+        0.2879999999999998,
+        0.0,
+        0.15
+      ],
+      "tip_minus_target_m": [
+        -0.0020000000000001683,
+        -0.035,
+        -0.04000000000000001
+      ],
+      "target_error_norm_m": 0.05318834458788882,
+      "instantaneous_gvs_tip_velocity": {
+        "value_m_s": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "frame": "world",
+        "source": "offline evaluation of J_tip(q) qdot from the matching saved configuration and projected state"
+      },
+      "backend_tip_velocity_estimates": [],
+      "previous_applied_tension_n": null,
+      "applied_first_tension_n": [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ],
+      "change_from_previous_command_n": null,
+      "selection": {
+        "kind": "initialization",
+        "selected_iteration": 0,
+        "selected_objective": null,
+        "objective_convention": "dimensionless minimization cost; running squared normalized tip error, qdot, tension, and tension variation plus terminal squared normalized tip error and qdot",
+        "objective_availability": "neither initialization nor selected/raw objective values were serialized",
+        "selected_constraint_violation": 9.606844399850933e-13,
+        "feasibility_tolerance": 1e-05,
+        "selected_feasible": true,
+        "raw_returned_constraint_violation": 0.049454436777828736,
+        "raw_returned_feasible": false,
+        "plan_accepted": true,
+        "plan_source": "ipopt_selected",
+        "recovery": {
+          "enabled": false,
+          "attempted": false,
+          "selected": false,
+          "wall_s": 0.0
+        },
+        "rejection_or_selection_reason": "initialization candidate retained; implementation guarantees that no later eligible feasible iterate with strictly lower recorded objective replaced it",
+        "raw_returned_plan_reason": "raw returned iterate failed the 1e-5 delivery-feasibility tolerance"
+      },
+      "termination": {
+        "optimization_status": "feasible_early_stop",
+        "raw_status": "User_Requested_Stop",
+        "policy_stop_reason": "budget_best_feasible",
+        "stopping_iteration": null,
+        "stopping_iteration_availability": "IPOPT iter_count was not serialized; selected_iteration is not the stopping iteration",
+        "numerically_converged": false
+      },
+      "timing_s": {
+        "warm_preparation_s": 8.4377784000244,
+        "optimization_solve_s": 15.143826100043952,
+        "plan_validation_s": 0.07329480000771582,
+        "recovery_wall_s": 0.0,
+        "state_preparation_s": 0.001582099823281169,
+        "controller_boundary_wall_s": 27.829593300120905,
+        "update_wall_s": 27.831184499897063
+      },
+      "one_step_prediction": {
+        "time_s": 0.01,
+        "state": [
+          0.32747110526225204,
+          -0.01643153863290646,
+          -0.3333917082690998,
+          -0.007863671134174119,
+          -0.08990034327385578,
+          -0.1525877305844795,
+          -0.1417652771584212,
+          -0.411079039387628,
+          -0.7296152985626901,
+          0.5355359644840973,
+          0.5006118050958399,
+          0.561467457783519,
+          32.7471105262252,
+          -1.643153863290646,
+          -33.339170826909985,
+          -0.786367113417412,
+          -8.990034327385578,
+          -15.258773058447952,
+          -14.17652771584212,
+          -41.1079039387628,
+          -72.96152985626901,
+          53.553596448409735,
+          50.06118050958399,
+          56.1467457783519
+        ],
+        "tip_position_m": [
+          0.2879011619359266,
+          0.0015078500869916247,
+          0.15169297633426893
+        ],
+        "tip_velocity_m_s": [
+          -0.019762666031859503,
+          0.15067369868751512,
+          0.16897538001694715
+        ],
+        "frame": "world",
+        "prediction_source": "accepted_plan",
+        "applied_tension_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "integration": "implicit Euler",
+        "substeps": 1
+      },
+      "one_step_prediction_discrepancy": {
+        "actual_sample_time_s": 0.01,
+        "predicted_time_s": 0.01,
+        "actual_minus_prediction_m": [
+          1.860860035024503e-05,
+          -0.00018618112471045843,
+          -0.00036536329190123285
+        ],
+        "norm_m": 0.0004104875470393126
+      },
+      "retained_plan_evidence": {
+        "initialization_full_plan": "not saved",
+        "best_eligible_intermediate_full_plan": "not saved",
+        "returned_full_plan": "not saved",
+        "recovered_or_regenerated_full_plan": "not saved; recovery disabled",
+        "final_selected_full_plan": "not saved",
+        "saved": [
+          "selected iteration",
+          "constraint violations",
+          "first tension",
+          "one-step predicted state/tip",
+          "timings"
+        ]
+      }
+    },
+    {
+      "command_index": 22,
+      "timestamp_s": 0.22,
+      "timestamp_semantics": "measured/projected current state before integration; command applies over the following control interval",
+      "command_interval_s": [
+        0.22,
+        0.23
+      ],
+      "projected_state": {
+        "q_rad_m": [
+          1.3461176513300273,
+          -0.46834381811240794,
+          -2.450262806977962,
+          0.8136800146348826,
+          0.40439360071205155,
+          -0.07233935142008532,
+          -7.897601517612548,
+          -6.898293166835936,
+          -9.27057074662307,
+          6.72050321582681,
+          5.131668670043906,
+          5.24030225109499
+        ],
+        "qdot_rad_m_s": [
+          -7.0266385900570105,
+          -5.536430669490634,
+          -3.744093811411953,
+          1.8908590991126437,
+          1.4412697815348696,
+          0.7952163928604805,
+          -28.418158769817808,
+          -15.576546021588873,
+          -18.62462690968793,
+          12.033055446419544,
+          5.951380645650441,
+          4.961955957334578
+        ],
+        "measured_initial_state": [
+          1.3461176513300273,
+          -0.46834381811240794,
+          -2.450262806977962,
+          0.8136800146348826,
+          0.40439360071205155,
+          -0.07233935142008532,
+          -7.897601517612548,
+          -6.898293166835936,
+          -9.27057074662307,
+          6.72050321582681,
+          5.131668670043906,
+          5.24030225109499,
+          -7.0266385900570105,
+          -5.536430669490634,
+          -3.744093811411953,
+          1.8908590991126437,
+          1.4412697815348696,
+          0.7952163928604805,
+          -28.418158769817808,
+          -15.576546021588873,
+          -18.62462690968793,
+          12.033055446419544,
+          5.951380645650441,
+          4.961955957334578
+        ],
+        "projection_residual_max_rad_m": 2.0096605939471486
+      },
+      "world_tip_position_m": [
+        0.2524574517101649,
+        0.05394448418146641,
+        0.2118564463310753
+      ],
+      "tip_minus_target_m": [
+        -0.037542548289835054,
+        0.01894448418146641,
+        0.021856446331075308
+      ],
+      "target_error_norm_m": 0.04739241140962974,
+      "instantaneous_gvs_tip_velocity": {
+        "value_m_s": [
+          -0.17679747740458013,
+          0.06709385130876974,
+          0.2647601634534257
+        ],
+        "frame": "world",
+        "source": "offline evaluation of J_tip(q) qdot from the matching saved configuration and projected state"
+      },
+      "backend_tip_velocity_estimates": [
+        {
+          "kind": "backward_interval_average",
+          "interval_s": [
+            0.21,
+            0.22
+          ],
+          "value_m_s": [
+            -0.19475705432346874,
+            0.08659458607799533,
+            0.2766932794023289
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        },
+        {
+          "kind": "forward_interval_average",
+          "interval_s": [
+            0.22,
+            0.23
+          ],
+          "value_m_s": [
+            -0.18359874854297892,
+            0.052736890853043124,
+            0.26299034253813836
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        }
+      ],
+      "previous_applied_tension_n": [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ],
+      "applied_first_tension_n": [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ],
+      "change_from_previous_command_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "selection": {
+        "kind": "initialization",
+        "selected_iteration": 0,
+        "selected_objective": null,
+        "objective_convention": "dimensionless minimization cost; running squared normalized tip error, qdot, tension, and tension variation plus terminal squared normalized tip error and qdot",
+        "objective_availability": "neither initialization nor selected/raw objective values were serialized",
+        "selected_constraint_violation": 1.4763017197605421e-10,
+        "feasibility_tolerance": 1e-05,
+        "selected_feasible": true,
+        "raw_returned_constraint_violation": 0.004990669306776524,
+        "raw_returned_feasible": false,
+        "plan_accepted": true,
+        "plan_source": "ipopt_selected",
+        "recovery": {
+          "enabled": false,
+          "attempted": false,
+          "selected": false,
+          "wall_s": 0.0
+        },
+        "rejection_or_selection_reason": "initialization candidate retained; implementation guarantees that no later eligible feasible iterate with strictly lower recorded objective replaced it",
+        "raw_returned_plan_reason": "raw returned iterate failed the 1e-5 delivery-feasibility tolerance"
+      },
+      "termination": {
+        "optimization_status": "feasible_early_stop",
+        "raw_status": "User_Requested_Stop",
+        "policy_stop_reason": "budget_best_feasible",
+        "stopping_iteration": null,
+        "stopping_iteration_availability": "IPOPT iter_count was not serialized; selected_iteration is not the stopping iteration",
+        "numerically_converged": false
+      },
+      "timing_s": {
+        "warm_preparation_s": 2.44484920008108,
+        "optimization_solve_s": 15.296376600163057,
+        "plan_validation_s": 0.09349570004269481,
+        "recovery_wall_s": 0.0,
+        "state_preparation_s": 0.001514399889856577,
+        "controller_boundary_wall_s": 17.87171659991145,
+        "update_wall_s": 17.873236699961126
+      },
+      "one_step_prediction": {
+        "time_s": 0.23,
+        "state": [
+          1.3051968126578042,
+          -0.5673568853562395,
+          -2.423426014511004,
+          0.8319972395867437,
+          0.3999254553102158,
+          -0.053270060971841574,
+          -8.124811734014234,
+          -7.065709857245763,
+          -9.344102085443403,
+          6.793489600097996,
+          5.182454680910819,
+          5.2344877947115585,
+          -4.092083867222301,
+          -9.901306724383154,
+          2.683679246695839,
+          1.8317224951861029,
+          -0.4468145401835801,
+          1.9069290448243752,
+          -22.72102164016847,
+          -16.74166904098279,
+          -7.353133882033192,
+          7.298638427118567,
+          5.078601086691433,
+          -0.5814456383431429
+        ],
+        "tip_position_m": [
+          0.2538088361378251,
+          0.051418172965231206,
+          0.21117757745332671
+        ],
+        "tip_velocity_m_s": [
+          -0.15171345658825927,
+          0.03147699133529975,
+          0.25005249211393393
+        ],
+        "frame": "world",
+        "prediction_source": "accepted_plan",
+        "applied_tension_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "integration": "implicit Euler",
+        "substeps": 1
+      },
+      "one_step_prediction_discrepancy": {
+        "actual_sample_time_s": 0.23,
+        "predicted_time_s": 0.23,
+        "actual_minus_prediction_m": [
+          -0.003187371913089987,
+          0.0030536801247656384,
+          0.003308772303129981
+        ],
+        "norm_m": 0.0055165456737621315
+      },
+      "retained_plan_evidence": {
+        "initialization_full_plan": "not saved",
+        "best_eligible_intermediate_full_plan": "not saved",
+        "returned_full_plan": "not saved",
+        "recovered_or_regenerated_full_plan": "not saved; recovery disabled",
+        "final_selected_full_plan": "not saved",
+        "saved": [
+          "selected iteration",
+          "constraint violations",
+          "first tension",
+          "one-step predicted state/tip",
+          "timings"
+        ]
+      }
+    },
+    {
+      "command_index": 23,
+      "timestamp_s": 0.23,
+      "timestamp_semantics": "measured/projected current state before integration; command applies over the following control interval",
+      "command_interval_s": [
+        0.23,
+        0.24000000000000002
+      ],
+      "projected_state": {
+        "q_rad_m": [
+          1.2775450971093332,
+          -0.5227201445661414,
+          -2.4871570912792755,
+          0.8256510313323376,
+          0.414036763550373,
+          -0.06688165424815501,
+          -8.17701081999179,
+          -7.0509347806951395,
+          -9.450824231568324,
+          6.833180160426892,
+          5.186731407358013,
+          5.286635103260381
+        ],
+        "qdot_rad_m_s": [
+          -6.693705764627766,
+          -5.339318956605277,
+          -3.6335487792022687,
+          0.5714645832126038,
+          0.5329329595297932,
+          0.31939815471918787,
+          -27.488100186969064,
+          -14.981045430007661,
+          -17.496059383795398,
+          10.565962471387396,
+          5.1020397552468735,
+          4.34498321831063
+        ],
+        "measured_initial_state": [
+          1.2775450971093332,
+          -0.5227201445661414,
+          -2.4871570912792755,
+          0.8256510313323376,
+          0.414036763550373,
+          -0.06688165424815501,
+          -8.17701081999179,
+          -7.0509347806951395,
+          -9.450824231568324,
+          6.833180160426892,
+          5.186731407358013,
+          5.286635103260381,
+          -6.693705764627766,
+          -5.339318956605277,
+          -3.6335487792022687,
+          0.5714645832126038,
+          0.5329329595297932,
+          0.31939815471918787,
+          -27.488100186969064,
+          -14.981045430007661,
+          -17.496059383795398,
+          10.565962471387396,
+          5.1020397552468735,
+          4.34498321831063
+        ],
+        "projection_residual_max_rad_m": 2.0976739397249355
+      },
+      "world_tip_position_m": [
+        0.25062146422473514,
+        0.054471853089996844,
+        0.2144863497564567
+      ],
+      "tip_minus_target_m": [
+        -0.039378535775264845,
+        0.01947185308999684,
+        0.024486349756456693
+      ],
+      "target_error_norm_m": 0.05029317515287496,
+      "instantaneous_gvs_tip_velocity": {
+        "value_m_s": [
+          -0.16568264626371862,
+          0.03440827623222919,
+          0.2509978064425663
+        ],
+        "frame": "world",
+        "source": "offline evaluation of J_tip(q) qdot from the matching saved configuration and projected state"
+      },
+      "backend_tip_velocity_estimates": [
+        {
+          "kind": "backward_interval_average",
+          "interval_s": [
+            0.22,
+            0.23
+          ],
+          "value_m_s": [
+            -0.18359874854297892,
+            0.052736890853043124,
+            0.26299034253813836
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        },
+        {
+          "kind": "forward_interval_average",
+          "interval_s": [
+            0.23,
+            0.24
+          ],
+          "value_m_s": [
+            -0.17079955456736662,
+            0.01980350439793475,
+            0.24813376331205053
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        }
+      ],
+      "previous_applied_tension_n": [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ],
+      "applied_first_tension_n": [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ],
+      "change_from_previous_command_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "selection": {
+        "kind": "initialization",
+        "selected_iteration": 0,
+        "selected_objective": null,
+        "objective_convention": "dimensionless minimization cost; running squared normalized tip error, qdot, tension, and tension variation plus terminal squared normalized tip error and qdot",
+        "objective_availability": "neither initialization nor selected/raw objective values were serialized",
+        "selected_constraint_violation": 1.4089532492100876e-10,
+        "feasibility_tolerance": 1e-05,
+        "selected_feasible": true,
+        "raw_returned_constraint_violation": 0.0029350001180695334,
+        "raw_returned_feasible": false,
+        "plan_accepted": true,
+        "plan_source": "ipopt_selected",
+        "recovery": {
+          "enabled": false,
+          "attempted": false,
+          "selected": false,
+          "wall_s": 0.0
+        },
+        "rejection_or_selection_reason": "initialization candidate retained; implementation guarantees that no later eligible feasible iterate with strictly lower recorded objective replaced it",
+        "raw_returned_plan_reason": "raw returned iterate failed the 1e-5 delivery-feasibility tolerance"
+      },
+      "termination": {
+        "optimization_status": "feasible_early_stop",
+        "raw_status": "User_Requested_Stop",
+        "policy_stop_reason": "budget_best_feasible",
+        "stopping_iteration": null,
+        "stopping_iteration_availability": "IPOPT iter_count was not serialized; selected_iteration is not the stopping iteration",
+        "numerically_converged": false
+      },
+      "timing_s": {
+        "warm_preparation_s": 2.427426799898967,
+        "optimization_solve_s": 15.312798000173643,
+        "plan_validation_s": 0.07273079990409315,
+        "recovery_wall_s": 0.0,
+        "state_preparation_s": 0.0013921000063419342,
+        "controller_boundary_wall_s": 17.854212200036272,
+        "update_wall_s": 17.855609299847856
+      },
+      "one_step_prediction": {
+        "time_s": 0.24000000000000002,
+        "state": [
+          1.2396749556618893,
+          -0.618802052526241,
+          -2.458569129617992,
+          0.8311256014078143,
+          0.40078139506338784,
+          -0.05236227086508126,
+          -8.392958204125282,
+          -7.212363578422202,
+          -9.511395123961803,
+          6.8908966842729535,
+          5.22930689587049,
+          5.274804902235932,
+          -3.7870141447443686,
+          -9.608190796009955,
+          2.858796166128338,
+          0.547457007547671,
+          -1.3255368486985193,
+          1.4519383383073754,
+          -21.594738413349315,
+          -16.142879772706305,
+          -6.05708923934783,
+          5.7716523846062175,
+          4.257548851247734,
+          -1.1830201024449252
+        ],
+        "tip_position_m": [
+          0.25222475045317316,
+          0.05160542616289636,
+          0.21360565483587163
+        ],
+        "tip_velocity_m_s": [
+          -0.13889487776507056,
+          0.0005263814262989975,
+          0.23530364594798722
+        ],
+        "frame": "world",
+        "prediction_source": "accepted_plan",
+        "applied_tension_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "integration": "implicit Euler",
+        "substeps": 1
+      },
+      "one_step_prediction_discrepancy": {
+        "actual_sample_time_s": 0.24,
+        "predicted_time_s": 0.24000000000000002,
+        "actual_minus_prediction_m": [
+          -0.0033112817741116907,
+          0.003064461971079832,
+          0.0033620325537055684
+        ],
+        "norm_m": 0.005626613284377622
+      },
+      "retained_plan_evidence": {
+        "initialization_full_plan": "not saved",
+        "best_eligible_intermediate_full_plan": "not saved",
+        "returned_full_plan": "not saved",
+        "recovered_or_regenerated_full_plan": "not saved; recovery disabled",
+        "final_selected_full_plan": "not saved",
+        "saved": [
+          "selected iteration",
+          "constraint violations",
+          "first tension",
+          "one-step predicted state/tip",
+          "timings"
+        ]
+      }
+    },
+    {
+      "command_index": 24,
+      "timestamp_s": 0.24,
+      "timestamp_semantics": "measured/projected current state before integration; command applies over the following control interval",
+      "command_interval_s": [
+        0.24,
+        0.25
+      ],
+      "projected_state": {
+        "q_rad_m": [
+          1.212625115643602,
+          -0.5748405681162996,
+          -2.5227372016959877,
+          0.8245539184514631,
+          0.41464277432162555,
+          -0.0661808965840841,
+          -8.446424167739908,
+          -7.197590462744404,
+          -9.620207225059982,
+          6.930918529774624,
+          5.2332624800626375,
+          5.327086488604789
+        ],
+        "qdot_rad_m_s": [
+          -6.300797562227227,
+          -5.088944760405837,
+          -3.4836432564700006,
+          -0.7189165218788808,
+          -0.3629818692398583,
+          -0.1540987705246481,
+          -26.425974358554463,
+          -14.378415522020603,
+          -16.445437175217435,
+          9.051474545361845,
+          4.24656191648488,
+          3.7818651589961796
+        ],
+        "measured_initial_state": [
+          1.212625115643602,
+          -0.5748405681162996,
+          -2.5227372016959877,
+          0.8245539184514631,
+          0.41464277432162555,
+          -0.0661808965840841,
+          -8.446424167739908,
+          -7.197590462744404,
+          -9.620207225059982,
+          6.930918529774624,
+          5.2332624800626375,
+          5.327086488604789,
+          -6.300797562227227,
+          -5.088944760405837,
+          -3.4836432564700006,
+          -0.7189165218788808,
+          -0.3629818692398583,
+          -0.1540987705246481,
+          -26.425974358554463,
+          -14.378415522020603,
+          -16.445437175217435,
+          9.051474545361845,
+          4.24656191648488,
+          3.7818651589961796
+        ],
+        "projection_residual_max_rad_m": 2.1832800954411686
+      },
+      "world_tip_position_m": [
+        0.24891346867906147,
+        0.05466988813397619,
+        0.2169676873895772
+      ],
+      "tip_minus_target_m": [
+        -0.04108653132093851,
+        0.019669888133976188,
+        0.026967687389577194
+      ],
+      "target_error_norm_m": 0.05293641202737071,
+      "instantaneous_gvs_tip_velocity": {
+        "value_m_s": [
+          -0.15317190955967425,
+          0.0029089310522810927,
+          0.23613928244250876
+        ],
+        "frame": "world",
+        "source": "offline evaluation of J_tip(q) qdot from the matching saved configuration and projected state"
+      },
+      "backend_tip_velocity_estimates": [
+        {
+          "kind": "backward_interval_average",
+          "interval_s": [
+            0.23,
+            0.24
+          ],
+          "value_m_s": [
+            -0.17079955456736662,
+            0.01980350439793475,
+            0.24813376331205053
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        },
+        {
+          "kind": "forward_interval_average",
+          "interval_s": [
+            0.24,
+            0.25
+          ],
+          "value_m_s": [
+            -0.15674014824293966,
+            -0.011579074351113206,
+            0.23234472555398436
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        }
+      ],
+      "previous_applied_tension_n": [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ],
+      "applied_first_tension_n": [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ],
+      "change_from_previous_command_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "selection": {
+        "kind": "initialization",
+        "selected_iteration": 0,
+        "selected_objective": null,
+        "objective_convention": "dimensionless minimization cost; running squared normalized tip error, qdot, tension, and tension variation plus terminal squared normalized tip error and qdot",
+        "objective_availability": "neither initialization nor selected/raw objective values were serialized",
+        "selected_constraint_violation": 2.3288662664988635e-11,
+        "feasibility_tolerance": 1e-05,
+        "selected_feasible": true,
+        "raw_returned_constraint_violation": 0.0035657892788511225,
+        "raw_returned_feasible": false,
+        "plan_accepted": true,
+        "plan_source": "ipopt_selected",
+        "recovery": {
+          "enabled": false,
+          "attempted": false,
+          "selected": false,
+          "wall_s": 0.0
+        },
+        "rejection_or_selection_reason": "initialization candidate retained; implementation guarantees that no later eligible feasible iterate with strictly lower recorded objective replaced it",
+        "raw_returned_plan_reason": "raw returned iterate failed the 1e-5 delivery-feasibility tolerance"
+      },
+      "termination": {
+        "optimization_status": "feasible_early_stop",
+        "raw_status": "User_Requested_Stop",
+        "policy_stop_reason": "budget_best_feasible",
+        "stopping_iteration": null,
+        "stopping_iteration_availability": "IPOPT iter_count was not serialized; selected_iteration is not the stopping iteration",
+        "numerically_converged": false
+      },
+      "timing_s": {
+        "warm_preparation_s": 2.556673099985346,
+        "optimization_solve_s": 15.395450099837035,
+        "plan_validation_s": 0.07237319997511804,
+        "recovery_wall_s": 0.0,
+        "state_preparation_s": 0.002046699868515134,
+        "controller_boundary_wall_s": 18.063178699929267,
+        "update_wall_s": 18.0652310999576
+      },
+      "one_step_prediction": {
+        "time_s": 0.25,
+        "state": [
+          1.1783483484393757,
+          -0.6675409900313555,
+          -2.492066337136467,
+          0.817643115934711,
+          0.3930253591668678,
+          -0.056021347284271245,
+          -8.649894141780246,
+          -7.352914740881595,
+          -9.668671081863815,
+          6.973181468908313,
+          5.267685811360868,
+          5.309817200391754,
+          -3.4276767204226326,
+          -9.270042191505595,
+          3.067086455952057,
+          -0.6910802516752079,
+          -2.161741515475776,
+          1.015954929981286,
+          -20.34699740403397,
+          -15.532427813719142,
+          -4.846385680383361,
+          4.226293913368929,
+          3.442333129823078,
+          -1.726928821303561
+        ],
+        "tip_position_m": [
+          0.2507693630546354,
+          0.051489425949438984,
+          0.21588140016951893
+        ],
+        "tip_velocity_m_s": [
+          -0.12511813459723342,
+          -0.028657392042708618,
+          0.21969315482410604
+        ],
+        "frame": "world",
+        "prediction_source": "accepted_plan",
+        "applied_tension_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "integration": "implicit Euler",
+        "substeps": 1
+      },
+      "one_step_prediction_discrepancy": {
+        "actual_sample_time_s": 0.25,
+        "predicted_time_s": 0.25,
+        "actual_minus_prediction_m": [
+          -0.0034232958580033,
+          0.0030646714410260747,
+          0.003409734475598114
+        ],
+        "norm_m": 0.005721665384042109
+      },
+      "retained_plan_evidence": {
+        "initialization_full_plan": "not saved",
+        "best_eligible_intermediate_full_plan": "not saved",
+        "returned_full_plan": "not saved",
+        "recovered_or_regenerated_full_plan": "not saved; recovery disabled",
+        "final_selected_full_plan": "not saved",
+        "saved": [
+          "selected iteration",
+          "constraint violations",
+          "first tension",
+          "one-step predicted state/tip",
+          "timings"
+        ]
+      }
+    }
+  ],
+  "historical_success": [
+    {
+      "command_index": 22,
+      "timestamp_s": 0.22,
+      "timestamp_semantics": "measured/projected current state before integration; command applies over the following control interval",
+      "command_interval_s": [
+        0.22,
+        0.23
+      ],
+      "projected_state": {
+        "q_rad_m": [
+          2.499151920945832,
+          0.6907759812364853,
+          -1.071221569436476,
+          0.872600558386768,
+          0.4739973994647464,
+          0.0538803572739144,
+          -3.8071688175095524,
+          -4.333693919046458,
+          -6.910952320502419,
+          4.340792848510448,
+          3.531501549167682,
+          3.5964353248887506
+        ],
+        "qdot_rad_m_s": [
+          -0.19292609304174171,
+          -0.03411238922251601,
+          -0.0812297807322113,
+          4.089803675074999,
+          2.8744895390038945,
+          1.5627411509229259,
+          -4.249700737748898,
+          -1.790677429990072,
+          -6.831275257148616,
+          6.819127272465889,
+          3.8041983221696754,
+          1.4158895506119271
+        ],
+        "measured_initial_state": [
+          2.499151920945832,
+          0.6907759812364853,
+          -1.071221569436476,
+          0.872600558386768,
+          0.4739973994647464,
+          0.0538803572739144,
+          -3.8071688175095524,
+          -4.333693919046458,
+          -6.910952320502419,
+          4.340792848510448,
+          3.531501549167682,
+          3.5964353248887506,
+          -0.19292609304174171,
+          -0.03411238922251601,
+          -0.0812297807322113,
+          4.089803675074999,
+          2.8744895390038945,
+          1.5627411509229259,
+          -4.249700737748898,
+          -1.790677429990072,
+          -6.831275257148616,
+          6.819127272465889,
+          3.8041983221696754,
+          1.4158895506119271
+        ],
+        "projection_residual_max_rad_m": 1.3703365804018555
+      },
+      "world_tip_position_m": [
+        0.3075760864559204,
+        0.0591857392465643,
+        0.15945807992046399
+      ],
+      "tip_minus_target_m": [
+        0.017576086455920403,
+        0.024185739246564295,
+        -0.030541920079536017
+      ],
+      "target_error_norm_m": 0.04273964997696582,
+      "instantaneous_gvs_tip_velocity": {
+        "value_m_s": [
+          -0.05399573725499749,
+          0.15119995662022084,
+          0.03696286419658489
+        ],
+        "frame": "world",
+        "source": "offline evaluation of J_tip(q) qdot from the matching saved configuration and projected state"
+      },
+      "backend_tip_velocity_estimates": [
+        {
+          "kind": "backward_interval_average",
+          "interval_s": [
+            0.21,
+            0.22
+          ],
+          "value_m_s": [
+            -0.06173857624135465,
+            0.17143620057227513,
+            0.035286848306553785
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        },
+        {
+          "kind": "forward_interval_average",
+          "interval_s": [
+            0.22,
+            0.23
+          ],
+          "value_m_s": [
+            -0.054033301206413094,
+            0.13757512541801425,
+            0.04290722655211628
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        }
+      ],
+      "previous_applied_tension_n": [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ],
+      "applied_first_tension_n": [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ],
+      "change_from_previous_command_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "selection": {
+        "kind": "initialization",
+        "selected_iteration": 0,
+        "selected_objective": null,
+        "objective_convention": "dimensionless minimization cost; running squared normalized tip error, qdot, tension, and tension variation plus terminal squared normalized tip error and qdot",
+        "objective_availability": "neither initialization nor selected/raw objective values were serialized",
+        "selected_constraint_violation": 8.969973201711223e-11,
+        "feasibility_tolerance": 1e-05,
+        "selected_feasible": true,
+        "raw_returned_constraint_violation": 0.006553799899876658,
+        "raw_returned_feasible": false,
+        "plan_accepted": true,
+        "plan_source": "ipopt_selected",
+        "recovery": {
+          "enabled": false,
+          "attempted": false,
+          "selected": false,
+          "wall_s": 0.0
+        },
+        "rejection_or_selection_reason": "initialization candidate retained; implementation guarantees that no later eligible feasible iterate with strictly lower recorded objective replaced it",
+        "raw_returned_plan_reason": "raw returned iterate failed the 1e-5 delivery-feasibility tolerance"
+      },
+      "termination": {
+        "optimization_status": "feasible_early_stop",
+        "raw_status": "User_Requested_Stop",
+        "policy_stop_reason": "budget_best_feasible",
+        "stopping_iteration": null,
+        "stopping_iteration_availability": "IPOPT iter_count was not serialized; selected_iteration is not the stopping iteration",
+        "numerically_converged": false
+      },
+      "timing_s": {
+        "warm_preparation_s": 2.4248763998039067,
+        "optimization_solve_s": 15.638618100201711,
+        "plan_validation_s": 0.08532710000872612,
+        "recovery_wall_s": 0.0,
+        "state_preparation_s": 0.0013823998160660267,
+        "controller_boundary_wall_s": 18.189780900022015,
+        "update_wall_s": 18.1911686998792
+      },
+      "one_step_prediction": {
+        "time_s": 0.23,
+        "state": [
+          2.537723052452953,
+          0.6379524308849096,
+          -1.0346715494648386,
+          0.9173124909305623,
+          0.48481383408069545,
+          0.07764685429496296,
+          -3.8089008241109705,
+          -4.369106139140517,
+          -6.883870264981339,
+          4.380683659122718,
+          3.5603052630251453,
+          3.5686912673818423,
+          3.8571131507120655,
+          -5.282355035157572,
+          3.655001997163716,
+          4.471193254379436,
+          1.0816434615949053,
+          2.3766497021048556,
+          -0.1732006601418272,
+          -3.541222009405952,
+          2.708205552108059,
+          3.989081061226948,
+          2.880371385746313,
+          -2.774405750690839
+        ],
+        "tip_position_m": [
+          0.30884136426028547,
+          0.05742858495449977,
+          0.15761749219866236
+        ],
+        "tip_velocity_m_s": [
+          -0.037025152015524636,
+          0.11127245574359693,
+          0.04537158231559745
+        ],
+        "frame": "world",
+        "prediction_source": "accepted_plan",
+        "applied_tension_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "integration": "implicit Euler",
+        "substeps": 1
+      },
+      "one_step_prediction_discrepancy": {
+        "actual_sample_time_s": 0.23,
+        "predicted_time_s": 0.23,
+        "actual_minus_prediction_m": [
+          -0.001805610816429215,
+          0.003132905546244673,
+          0.0022696599873227863
+        ],
+        "norm_m": 0.004269272073802614
+      },
+      "retained_plan_evidence": {
+        "initialization_full_plan": "not saved",
+        "best_eligible_intermediate_full_plan": "not saved",
+        "returned_full_plan": "not saved",
+        "recovered_or_regenerated_full_plan": "not saved; recovery disabled",
+        "final_selected_full_plan": "not saved",
+        "saved": [
+          "selected iteration",
+          "constraint violations",
+          "first tension",
+          "one-step predicted state/tip",
+          "timings"
+        ]
+      }
+    },
+    {
+      "command_index": 23,
+      "timestamp_s": 0.23,
+      "timestamp_semantics": "measured/projected current state before integration; command applies over the following control interval",
+      "command_interval_s": [
+        0.23,
+        0.24000000000000002
+      ],
+      "projected_state": {
+        "q_rad_m": [
+          2.495709851477685,
+          0.6892492576584751,
+          -1.0727365945387684,
+          0.9080862933912627,
+          0.49906789881224745,
+          0.06757638966190188,
+          -3.8499249718533637,
+          -4.35152533980562,
+          -6.975237690623776,
+          4.404336136010868,
+          3.5671386874845377,
+          3.6095261814009536
+        ],
+        "qdot_rad_m_s": [
+          -0.47936038874400166,
+          -0.25883024838384805,
+          -0.2130738603017812,
+          3.053579437431998,
+          2.1704508241234546,
+          1.1923647439661211,
+          -4.291323038133559,
+          -1.7793331127624439,
+          -6.079310813917816,
+          5.9196709206288025,
+          3.3387023070878747,
+          1.2160007656269394
+        ],
+        "measured_initial_state": [
+          2.495709851477685,
+          0.6892492576584751,
+          -1.0727365945387684,
+          0.9080862933912627,
+          0.49906789881224745,
+          0.06757638966190188,
+          -3.8499249718533637,
+          -4.35152533980562,
+          -6.975237690623776,
+          4.404336136010868,
+          3.5671386874845377,
+          3.6095261814009536,
+          -0.47936038874400166,
+          -0.25883024838384805,
+          -0.2130738603017812,
+          3.053579437431998,
+          2.1704508241234546,
+          1.1923647439661211,
+          -4.291323038133559,
+          -1.7793331127624439,
+          -6.079310813917816,
+          5.9196709206288025,
+          3.3387023070878747,
+          1.2160007656269394
+        ],
+        "projection_residual_max_rad_m": 1.3909778157476818
+      },
+      "world_tip_position_m": [
+        0.30703575344385625,
+        0.06056149050074444,
+        0.15988715218598515
+      ],
+      "tip_minus_target_m": [
+        0.017035753443856272,
+        0.025561490500744438,
+        -0.030112847814014854
+      ],
+      "target_error_norm_m": 0.04301616318884714,
+      "instantaneous_gvs_tip_velocity": {
+        "value_m_s": [
+          -0.04624626886970298,
+          0.11753461477363261,
+          0.04432462557828619
+        ],
+        "frame": "world",
+        "source": "offline evaluation of J_tip(q) qdot from the matching saved configuration and projected state"
+      },
+      "backend_tip_velocity_estimates": [
+        {
+          "kind": "backward_interval_average",
+          "interval_s": [
+            0.22,
+            0.23
+          ],
+          "value_m_s": [
+            -0.054033301206413094,
+            0.13757512541801425,
+            0.04290722655211628
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        },
+        {
+          "kind": "forward_interval_average",
+          "interval_s": [
+            0.23,
+            0.24
+          ],
+          "value_m_s": [
+            -0.15719429110629432,
+            -0.09265533036955324,
+            0.30293480266137596
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        }
+      ],
+      "previous_applied_tension_n": [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ],
+      "applied_first_tension_n": [
+        1.197347703597216,
+        4.644296323484993,
+        4.249200299659834,
+        4.649293899791698,
+        3.8198211140651894,
+        8.145818446189429e-05
+      ],
+      "change_from_previous_command_n": [
+        -0.5539287822436905,
+        -0.11155634365492872,
+        1.1460436309968314,
+        1.431040287305601,
+        3.0338853543099047,
+        -0.6314487797947322
+      ],
+      "selection": {
+        "kind": "optimized_noninitialization",
+        "selected_iteration": 19,
+        "selected_objective": null,
+        "objective_convention": "dimensionless minimization cost; running squared normalized tip error, qdot, tension, and tension variation plus terminal squared normalized tip error and qdot",
+        "objective_availability": "neither initialization nor selected/raw objective values were serialized",
+        "selected_constraint_violation": 6.541643684208898e-06,
+        "feasibility_tolerance": 1e-05,
+        "selected_feasible": true,
+        "raw_returned_constraint_violation": 6.541643684208898e-06,
+        "raw_returned_feasible": true,
+        "plan_accepted": true,
+        "plan_source": "ipopt_selected",
+        "recovery": {
+          "enabled": false,
+          "attempted": false,
+          "selected": false,
+          "wall_s": 0.0
+        },
+        "rejection_or_selection_reason": "positive callback iteration retained as the best eligible feasible plan",
+        "raw_returned_plan_reason": "raw returned iterate met the saved delivery-feasibility tolerance; equality with the selected vector is not serialized"
+      },
+      "termination": {
+        "optimization_status": "feasible_early_stop",
+        "raw_status": "User_Requested_Stop",
+        "policy_stop_reason": "relative_seed_improvement",
+        "stopping_iteration": null,
+        "stopping_iteration_availability": "IPOPT iter_count was not serialized; selected_iteration is not the stopping iteration",
+        "numerically_converged": false
+      },
+      "timing_s": {
+        "warm_preparation_s": 2.40988039993681,
+        "optimization_solve_s": 15.570658099837601,
+        "plan_validation_s": 0.0723172000143677,
+        "recovery_wall_s": 0.0,
+        "state_preparation_s": 0.0013810000382363796,
+        "controller_boundary_wall_s": 18.092846299987286,
+        "update_wall_s": 18.094233100069687
+      },
+      "one_step_prediction": {
+        "time_s": 0.24000000000000002,
+        "state": [
+          2.5814884778319525,
+          0.7466572949190953,
+          -0.9533893291565297,
+          1.0764524834889078,
+          0.4705739218737431,
+          -0.1094782175477835,
+          -4.521184631101441,
+          -5.053402976988738,
+          -8.310884805163962,
+          4.482867352296268,
+          3.33391514334795,
+          3.0408952135674934,
+          8.577862635426742,
+          5.740803726062019,
+          11.934726538223867,
+          16.836619009764505,
+          -2.8493976938504373,
+          -17.70546072096854,
+          -67.12596592480784,
+          -70.1877637183118,
+          -133.5647114540188,
+          7.853121628539954,
+          -23.32235441365874,
+          -56.86309678334603
+        ],
+        "tip_position_m": [
+          0.30725218556717737,
+          0.055767491353719445,
+          0.1615632554464565
+        ],
+        "tip_velocity_m_s": [
+          -0.16608053011078802,
+          -0.19268333043853578,
+          0.39099550182702675
+        ],
+        "frame": "world",
+        "prediction_source": "accepted_plan",
+        "applied_tension_n": [
+          1.197347703597216,
+          4.644296323484993,
+          4.249200299659834,
+          4.649293899791698,
+          3.8198211140651894,
+          8.145818446189429e-05
+        ],
+        "integration": "implicit Euler",
+        "substeps": 1
+      },
+      "one_step_prediction_discrepancy": {
+        "actual_sample_time_s": 0.24,
+        "predicted_time_s": 0.24000000000000002,
+        "actual_minus_prediction_m": [
+          -0.0017883750343840599,
+          0.003867445843329466,
+          0.001353244766142403
+        ],
+        "norm_m": 0.004470648052775611
+      },
+      "retained_plan_evidence": {
+        "initialization_full_plan": "not saved",
+        "best_eligible_intermediate_full_plan": "not saved",
+        "returned_full_plan": "not saved",
+        "recovered_or_regenerated_full_plan": "not saved; recovery disabled",
+        "final_selected_full_plan": "not saved",
+        "saved": [
+          "selected iteration",
+          "constraint violations",
+          "first tension",
+          "one-step predicted state/tip",
+          "timings"
+        ]
+      }
+    },
+    {
+      "command_index": 24,
+      "timestamp_s": 0.24,
+      "timestamp_semantics": "measured/projected current state before integration; command applies over the following control interval",
+      "command_interval_s": [
+        0.24,
+        0.25
+      ],
+      "projected_state": {
+        "q_rad_m": [
+          2.392079728346865,
+          0.850261913743285,
+          -0.8724425800463831,
+          1.0531307874576439,
+          0.5030983682584577,
+          -0.10909052165438557,
+          -4.414596710255678,
+          -4.876969550474236,
+          -8.487775231453675,
+          4.593635765832879,
+          3.3930541757740964,
+          3.0927384964031472
+        ],
+        "qdot_rad_m_s": [
+          0.9777395455670758,
+          19.067714814898096,
+          5.781738916361861,
+          20.122476220791054,
+          -1.2618323013509694,
+          -23.539149578730715,
+          -79.78562774898745,
+          -84.24391855168489,
+          -156.06055950250774,
+          3.4714578716739704,
+          -26.084899798055236,
+          -52.48889830779344
+        ],
+        "measured_initial_state": [
+          2.392079728346865,
+          0.850261913743285,
+          -0.8724425800463831,
+          1.0531307874576439,
+          0.5030983682584577,
+          -0.10909052165438557,
+          -4.414596710255678,
+          -4.876969550474236,
+          -8.487775231453675,
+          4.593635765832879,
+          3.3930541757740964,
+          3.0927384964031472,
+          0.9777395455670758,
+          19.067714814898096,
+          5.781738916361861,
+          20.122476220791054,
+          -1.2618323013509694,
+          -23.539149578730715,
+          -79.78562774898745,
+          -84.24391855168489,
+          -156.06055950250774,
+          3.4714578716739704,
+          -26.084899798055236,
+          -52.48889830779344
+        ],
+        "projection_residual_max_rad_m": 1.6376703906047774
+      },
+      "world_tip_position_m": [
+        0.3054638105327933,
+        0.05963493719704891,
+        0.1629165002125989
+      ],
+      "tip_minus_target_m": [
+        0.015463810532793332,
+        0.024634937197048908,
+        -0.0270834997874011
+      ],
+      "target_error_norm_m": 0.039743245056623515,
+      "instantaneous_gvs_tip_velocity": {
+        "value_m_s": [
+          -0.18987782292265246,
+          -0.2017868858925117,
+          0.40384228654573373
+        ],
+        "frame": "world",
+        "source": "offline evaluation of J_tip(q) qdot from the matching saved configuration and projected state"
+      },
+      "backend_tip_velocity_estimates": [
+        {
+          "kind": "backward_interval_average",
+          "interval_s": [
+            0.23,
+            0.24
+          ],
+          "value_m_s": [
+            -0.15719429110629432,
+            -0.09265533036955324,
+            0.30293480266137596
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        },
+        {
+          "kind": "forward_interval_average",
+          "interval_s": [
+            0.24,
+            0.25
+          ],
+          "value_m_s": [
+            -0.26623250608736027,
+            -0.2909887356870468,
+            0.505059640290811
+          ],
+          "frame": "world",
+          "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+        }
+      ],
+      "previous_applied_tension_n": [
+        1.197347703597216,
+        4.644296323484993,
+        4.249200299659834,
+        4.649293899791698,
+        3.8198211140651894,
+        8.145818446189429e-05
+      ],
+      "applied_first_tension_n": [
+        1.2659379285737633,
+        4.374459299468353,
+        4.483137380390622,
+        4.579611639985762,
+        3.3712395301343068,
+        0.2869959397234452
+      ],
+      "change_from_previous_command_n": [
+        0.06859022497654732,
+        -0.2698370240166401,
+        0.23393708073078834,
+        -0.06968225980593612,
+        -0.44858158393088265,
+        0.28691448153898336
+      ],
+      "selection": {
+        "kind": "optimized_noninitialization",
+        "selected_iteration": 3,
+        "selected_objective": null,
+        "objective_convention": "dimensionless minimization cost; running squared normalized tip error, qdot, tension, and tension variation plus terminal squared normalized tip error and qdot",
+        "objective_availability": "neither initialization nor selected/raw objective values were serialized",
+        "selected_constraint_violation": 1.4015353978292025e-06,
+        "feasibility_tolerance": 1e-05,
+        "selected_feasible": true,
+        "raw_returned_constraint_violation": 0.0004264945869584505,
+        "raw_returned_feasible": false,
+        "plan_accepted": true,
+        "plan_source": "ipopt_selected",
+        "recovery": {
+          "enabled": false,
+          "attempted": false,
+          "selected": false,
+          "wall_s": 0.0
+        },
+        "rejection_or_selection_reason": "positive callback iteration retained as the best eligible feasible plan",
+        "raw_returned_plan_reason": "raw returned iterate failed the 1e-5 delivery-feasibility tolerance"
+      },
+      "termination": {
+        "optimization_status": "feasible_early_stop",
+        "raw_status": "User_Requested_Stop",
+        "policy_stop_reason": "relative_seed_improvement",
+        "stopping_iteration": null,
+        "stopping_iteration_availability": "IPOPT iter_count was not serialized; selected_iteration is not the stopping iteration",
+        "numerically_converged": false
+      },
+      "timing_s": {
+        "warm_preparation_s": 3.1274115000851452,
+        "optimization_solve_s": 5.337951800087467,
+        "plan_validation_s": 0.11057980009354651,
+        "recovery_wall_s": 0.0,
+        "state_preparation_s": 0.0014592001680284739,
+        "controller_boundary_wall_s": 8.613769799936563,
+        "update_wall_s": 8.615235300036147
+      },
+      "one_step_prediction": {
+        "time_s": 0.25,
+        "state": [
+          2.654680447324152,
+          0.8790597973419152,
+          -0.8853726194594537,
+          1.2175905713987976,
+          0.4438344189153799,
+          -0.27977613029855763,
+          -5.397936386574459,
+          -5.804365871964256,
+          -9.528910388079694,
+          4.509275989000951,
+          3.13317560717602,
+          2.6826781602614576,
+          26.26007189772871,
+          2.879788359863019,
+          -1.2930039413070613,
+          16.445978394115365,
+          -5.926394934307776,
+          -17.068560864417204,
+          -98.33396763187817,
+          -92.73963214900212,
+          -104.11351566260187,
+          -8.435977683192784,
+          -25.987856859807536,
+          -41.00603361416894
+        ],
+        "tip_position_m": [
+          0.30511313947129853,
+          0.053697203998454276,
+          0.16527865025402044
+        ],
+        "tip_velocity_m_s": [
+          -0.2556845999743566,
+          -0.322553538730988,
+          0.4885889914070166
+        ],
+        "frame": "world",
+        "prediction_source": "accepted_plan",
+        "applied_tension_n": [
+          1.2659379285737633,
+          4.374459299468353,
+          4.483137380390622,
+          4.579611639985762,
+          3.3712395301343068,
+          0.2869959397234452
+        ],
+        "integration": "implicit Euler",
+        "substeps": 1
+      },
+      "one_step_prediction_discrepancy": {
+        "actual_sample_time_s": 0.25,
+        "predicted_time_s": 0.25,
+        "actual_minus_prediction_m": [
+          -0.0023116539993788265,
+          0.003027845841724164,
+          0.002688446361486574
+        ],
+        "norm_m": 0.004662546352872091
+      },
+      "retained_plan_evidence": {
+        "initialization_full_plan": "not saved",
+        "best_eligible_intermediate_full_plan": "not saved",
+        "returned_full_plan": "not saved",
+        "recovered_or_regenerated_full_plan": "not saved; recovery disabled",
+        "final_selected_full_plan": "not saved",
+        "saved": [
+          "selected iteration",
+          "constraint violations",
+          "first tension",
+          "one-step predicted state/tip",
+          "timings"
+        ]
+      }
+    }
+  ]
+}

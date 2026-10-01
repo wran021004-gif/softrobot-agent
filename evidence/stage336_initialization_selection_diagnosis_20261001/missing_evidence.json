@@ -1,0 +1,11 @@
+{
+  "missing": [
+    "full per-update initialization horizons after state regeneration",
+    "full eligible intermediate iterate vectors and their objective values",
+    "full raw returned iterate vectors and objective values",
+    "full final selected plan horizons",
+    "IPOPT stopping iteration count and callback trace"
+  ],
+  "consequence": "Objectives and full plans cannot be independently recomputed or compared. Scalar selected-iteration and violation fields do not permit plan reconstruction.",
+  "minimal_future_change": "Enable the existing bounded diagnostic trace for designated evidence runs and retain only initial/selected/returned vectors plus objective, violation, iteration, and first command at predeclared timestamps."
+}

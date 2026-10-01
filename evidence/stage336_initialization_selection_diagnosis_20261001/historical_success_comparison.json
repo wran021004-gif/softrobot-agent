@@ -1,0 +1,897 @@
+{
+  "historical_binding": {
+    "candidate_id": "b2_near0p169_far0p129_compliant_s1p05",
+    "execution_id": "7575e2c798fa4b66a388f7e277ba51c9",
+    "source_commit": "63b617cb4b48fc4a3e27fac96c20d780eb5228dc",
+    "configuration_artifact_id": "a9e2ba04110b8417b9ef6282b0385f3f79d532810d6c43e338a5dc8d55eaf5d5"
+  },
+  "current_binding": {
+    "run_id": "gvs-stage336-b3097f85c72a",
+    "candidate_id": "proposal-build",
+    "execution_id": "494deb38d6374deb8f741e96f2430826",
+    "configuration_artifact_id": "803e8fb2cda1fa2035f18c2051cb2cb83c4dabf26b13f9391c2a49e1cc1b4f5c"
+  },
+  "outcomes": {
+    "current": {
+      "official_task_success": false,
+      "terminal_error_m": 0.06672099201814737,
+      "terminal_position_m": [
+        0.2396320565060395,
+        0.042544922777855515,
+        0.2331026122682963
+      ],
+      "terminal_tip_speed_m_s": 0.16436452055040404
+    },
+    "historical_success": {
+      "official_task_success": true,
+      "terminal_error_m": 0.0077268610775768345,
+      "terminal_position_m": [
+        0.2828443611029066,
+        0.03731179289123726,
+        0.19177674638443454
+      ],
+      "terminal_tip_speed_m_s": 0.1422878074819384
+    }
+  },
+  "robot": {
+    "current": {
+      "robot_identity": "ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060",
+      "physics_identity": "c723a7d01c9789b26ba0e445e1e282a003ef9cfd53e6e189f25aa50e59268589",
+      "resolved_basis_identity": "e08a0f38489199b87048714e92cbde026e755b132abb3295f2593311bc8800ec",
+      "components": [
+        {
+          "id": "near",
+          "length_m": 0.15,
+          "young_pa": 7200000.0,
+          "density_kg_m3": 1100.0,
+          "section_parameters": [
+            {
+              "semi_y_m": 0.0095,
+              "semi_z_m": 0.0076
+            }
+          ]
+        },
+        {
+          "id": "mid_guide",
+          "length_m": null,
+          "young_pa": null,
+          "density_kg_m3": null,
+          "section_parameters": []
+        },
+        {
+          "id": "connector",
+          "length_m": null,
+          "young_pa": null,
+          "density_kg_m3": null,
+          "section_parameters": []
+        },
+        {
+          "id": "far",
+          "length_m": 0.11,
+          "young_pa": 5400000.0,
+          "density_kg_m3": 1050.0,
+          "section_parameters": [
+            {
+              "height_z_m": 0.0095,
+              "width_y_m": 0.0133
+            },
+            {
+              "height_z_m": 0.008549999999999999,
+              "width_y_m": 0.0114
+            }
+          ]
+        },
+        {
+          "id": "payload",
+          "length_m": null,
+          "young_pa": null,
+          "density_kg_m3": null,
+          "section_parameters": []
+        }
+      ]
+    },
+    "historical_success": {
+      "robot_identity": "54a96107674329bb3781c39c5d345eedd216c1023a62f651c3d828d303f81bd9",
+      "physics_identity": "86781ac8990ccf4d45e545ce386a2deb1426417f8dd5851a26bc76a908afd52a",
+      "resolved_basis_identity": "89104835cd3b0c59ba211dfc4c751d5ba1f9a74a4f2fa7281b89fd79950b74ee",
+      "components": [
+        {
+          "id": "near",
+          "length_m": 0.169,
+          "young_pa": 7200000.0,
+          "density_kg_m3": 1100.0,
+          "section_parameters": [
+            {
+              "semi_y_m": 0.0105,
+              "semi_z_m": 0.008400000000000001
+            }
+          ]
+        },
+        {
+          "id": "mid_guide",
+          "length_m": null,
+          "young_pa": null,
+          "density_kg_m3": null,
+          "section_parameters": []
+        },
+        {
+          "id": "connector",
+          "length_m": null,
+          "young_pa": null,
+          "density_kg_m3": null,
+          "section_parameters": []
+        },
+        {
+          "id": "far",
+          "length_m": 0.129,
+          "young_pa": 5400000.0,
+          "density_kg_m3": 1050.0,
+          "section_parameters": [
+            {
+              "height_z_m": 0.0105,
+              "width_y_m": 0.014700000000000001
+            },
+            {
+              "height_z_m": 0.00945,
+              "width_y_m": 0.0126
+            }
+          ]
+        },
+        {
+          "id": "payload",
+          "length_m": null,
+          "young_pa": null,
+          "density_kg_m3": null,
+          "section_parameters": []
+        }
+      ]
+    }
+  },
+  "controller": {
+    "current": {
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "version": "6.0.0",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "version": "1.0.0",
+          "data": {
+            "recipe": {
+              "position_error_scale_m": null,
+              "tip_speed_scale_m_s": 0.02,
+              "terminal_tip_speed_weight": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "holding_brake_lead_s": 0.0,
+              "recover_returned_tensions": false,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "feasible_return": {
+                "minimum_s": 5.0,
+                "budget_s": 15.0,
+                "relative_improvement": 0.1
+              },
+              "regenerate_warm_states": true,
+              "terminal_velocity_weight": 0.0001,
+              "max_unusable_updates": 3,
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "rate_scale_rad_m_s": 1000.0,
+              "max_cpu_s": 30.0,
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "horizon": 10,
+              "substeps": 1,
+              "tracking_weight": 1.0,
+              "terminal_weight": 5.0,
+              "velocity_weight": 0.0001,
+              "tension_weight": 0.0001,
+              "variation_weight": 0.001,
+              "max_iterations": 120,
+              "tolerance": 1e-06,
+              "evaluation_threads": 1
+            },
+            "settling": {
+              "window_s": 0.05,
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02
+            },
+            "numerical_source": "bundled_guess"
+          }
+        }
+      },
+      "effective_parameters": {
+        "position_error_scale_m": null,
+        "tip_speed_scale_m_s": 0.02,
+        "terminal_tip_speed_weight": 0.0,
+        "holding_tip_speed_weight": 0.0,
+        "holding_brake_lead_s": 0.0,
+        "recover_returned_tensions": false,
+        "seed_position_tolerance_fraction": 0.5,
+        "seed_speed_limit_m_s": 0.02,
+        "feasible_return": {
+          "minimum_s": 5.0,
+          "budget_s": 15.0,
+          "relative_improvement": 0.1
+        },
+        "regenerate_warm_states": true,
+        "terminal_velocity_weight": 0.0001,
+        "max_unusable_updates": 3,
+        "constraint_jacobian_mode": "reverse",
+        "curvature_scale_rad_m": 10.0,
+        "rate_scale_rad_m_s": 1000.0,
+        "max_cpu_s": 30.0,
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "horizon": 10,
+        "substeps": 1,
+        "tracking_weight": 1.0,
+        "terminal_weight": 5.0,
+        "velocity_weight": 0.0001,
+        "tension_weight": 0.0001,
+        "variation_weight": 0.001,
+        "max_iterations": 120,
+        "tolerance": 1e-06,
+        "evaluation_threads": 1
+      },
+      "timing": {
+        "timestep_s": 0.0005,
+        "control_period_s": 0.01,
+        "sample_period_s": 0.01,
+        "duration_s": 0.35,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ]
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "version": "1.0.0",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "version": "1.1.0",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "version": "1.0.0",
+        "data": {
+          "version": "serial_bending_discretization_v1",
+          "model": "serial_bending_cells_v1",
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell"
+        }
+      },
+      "seed": 17
+    },
+    "historical_success": {
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "version": "6.0.0",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "version": "1.0.0",
+          "data": {
+            "recipe": {
+              "position_error_scale_m": null,
+              "tip_speed_scale_m_s": 0.02,
+              "terminal_tip_speed_weight": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "holding_brake_lead_s": 0.0,
+              "recover_returned_tensions": false,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "feasible_return": {
+                "minimum_s": 5.0,
+                "budget_s": 15.0,
+                "relative_improvement": 0.1
+              },
+              "regenerate_warm_states": true,
+              "terminal_velocity_weight": 0.0001,
+              "max_unusable_updates": 3,
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "rate_scale_rad_m_s": 1000.0,
+              "max_cpu_s": 30.0,
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "horizon": 10,
+              "substeps": 1,
+              "tracking_weight": 1.0,
+              "terminal_weight": 5.0,
+              "velocity_weight": 0.0001,
+              "tension_weight": 0.0001,
+              "variation_weight": 0.001,
+              "max_iterations": 120,
+              "tolerance": 1e-06,
+              "evaluation_threads": 1
+            },
+            "settling": {
+              "window_s": 0.05,
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02
+            },
+            "numerical_source": "bundled_guess"
+          }
+        }
+      },
+      "effective_parameters": {
+        "position_error_scale_m": null,
+        "tip_speed_scale_m_s": 0.02,
+        "terminal_tip_speed_weight": 0.0,
+        "holding_tip_speed_weight": 0.0,
+        "holding_brake_lead_s": 0.0,
+        "recover_returned_tensions": false,
+        "seed_position_tolerance_fraction": 0.5,
+        "seed_speed_limit_m_s": 0.02,
+        "feasible_return": {
+          "minimum_s": 5.0,
+          "budget_s": 15.0,
+          "relative_improvement": 0.1
+        },
+        "regenerate_warm_states": true,
+        "terminal_velocity_weight": 0.0001,
+        "max_unusable_updates": 3,
+        "constraint_jacobian_mode": "reverse",
+        "curvature_scale_rad_m": 10.0,
+        "rate_scale_rad_m_s": 1000.0,
+        "max_cpu_s": 30.0,
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "horizon": 10,
+        "substeps": 1,
+        "tracking_weight": 1.0,
+        "terminal_weight": 5.0,
+        "velocity_weight": 0.0001,
+        "tension_weight": 0.0001,
+        "variation_weight": 0.001,
+        "max_iterations": 120,
+        "tolerance": 1e-06,
+        "evaluation_threads": 1
+      },
+      "timing": {
+        "timestep_s": 0.0005,
+        "control_period_s": 0.01,
+        "sample_period_s": 0.01,
+        "duration_s": 0.35,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ]
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "version": "1.0.0",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "version": "1.1.0",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "version": "1.0.0",
+        "data": {
+          "version": "serial_bending_discretization_v1",
+          "model": "serial_bending_cells_v1",
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell"
+        }
+      },
+      "seed": 17
+    },
+    "declared_equal": true
+  },
+  "preparation": {
+    "current": {
+      "source_kind": "compatible_historical_tensions_only",
+      "reused": true,
+      "nominal_is_current_target_solution": false,
+      "historical_states_reused": false,
+      "physics_identity": "c723a7d01c9789b26ba0e445e1e282a003ef9cfd53e6e189f25aa50e59268589",
+      "resolved_basis_identity": "e08a0f38489199b87048714e92cbde026e755b132abb3295f2593311bc8800ec",
+      "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+      "previous_input_source": "compatible bounded historical initial input",
+      "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use",
+      "historical_source": {
+        "artifact_id": "ef29737728ddd95d0e5da3bde818d910bee86abe04f13bf41521277f7e216d68",
+        "media_type": "application/json"
+      }
+    },
+    "historical_success": {
+      "source_kind": "compatible_historical_tensions_only",
+      "reused": true,
+      "nominal_is_current_target_solution": false,
+      "historical_states_reused": false,
+      "physics_identity": "86781ac8990ccf4d45e545ce386a2deb1426417f8dd5851a26bc76a908afd52a",
+      "resolved_basis_identity": "89104835cd3b0c59ba211dfc4c751d5ba1f9a74a4f2fa7281b89fd79950b74ee",
+      "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+      "previous_input_source": "compatible bounded historical initial input",
+      "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use",
+      "historical_source": {
+        "artifact_id": "ef29737728ddd95d0e5da3bde818d910bee86abe04f13bf41521277f7e216d68",
+        "media_type": "application/json"
+      }
+    }
+  },
+  "first_measured_state": {
+    "current": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "historical_success": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "selection_counts": {
+    "current": {
+      "initialization": 35,
+      "noninitialization": 0
+    },
+    "historical_success": {
+      "initialization": 23,
+      "noninitialization": 12
+    }
+  },
+  "current_commands_constant": true,
+  "historical_first_tension_change": {
+    "command_index": 23,
+    "time_s": 0.23,
+    "delta_n": [
+      -0.5539287822436905,
+      -0.11155634365492872,
+      1.1460436309968314,
+      1.431040287305601,
+      3.0338853543099047,
+      -0.6314487797947322
+    ]
+  },
+  "time_aligned_diagnostics": [
+    {
+      "timestamp_s": 0.22,
+      "phase": "current_state_before_integration",
+      "historical_minus_current_state_norm": 33.164581918298175,
+      "historical_minus_current_tip_m": [
+        0.05511863474575546,
+        0.005241255065097886,
+        -0.052398366410611324
+      ],
+      "current": {
+        "selected_iteration": 0,
+        "selection_kind": "initialization",
+        "target_error_norm_m": 0.04739241140962974,
+        "applied_first_tension_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "tension_change_n": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "one_step_discrepancy_m": 0.0055165456737621315,
+        "instantaneous_gvs_tip_velocity_m_s": [
+          -0.17679747740458013,
+          0.06709385130876974,
+          0.2647601634534257
+        ],
+        "backend_interval_velocities": [
+          {
+            "kind": "backward_interval_average",
+            "interval_s": [
+              0.21,
+              0.22
+            ],
+            "value_m_s": [
+              -0.19475705432346874,
+              0.08659458607799533,
+              0.2766932794023289
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          },
+          {
+            "kind": "forward_interval_average",
+            "interval_s": [
+              0.22,
+              0.23
+            ],
+            "value_m_s": [
+              -0.18359874854297892,
+              0.052736890853043124,
+              0.26299034253813836
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          }
+        ]
+      },
+      "historical_success": {
+        "selected_iteration": 0,
+        "selection_kind": "initialization",
+        "target_error_norm_m": 0.04273964997696582,
+        "applied_first_tension_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "tension_change_n": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "one_step_discrepancy_m": 0.004269272073802614,
+        "instantaneous_gvs_tip_velocity_m_s": [
+          -0.05399573725499749,
+          0.15119995662022084,
+          0.03696286419658489
+        ],
+        "backend_interval_velocities": [
+          {
+            "kind": "backward_interval_average",
+            "interval_s": [
+              0.21,
+              0.22
+            ],
+            "value_m_s": [
+              -0.06173857624135465,
+              0.17143620057227513,
+              0.035286848306553785
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          },
+          {
+            "kind": "forward_interval_average",
+            "interval_s": [
+              0.22,
+              0.23
+            ],
+            "value_m_s": [
+              -0.054033301206413094,
+              0.13757512541801425,
+              0.04290722655211628
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp_s": 0.23,
+      "phase": "current_state_before_integration",
+      "historical_minus_current_state_norm": 31.802497216535944,
+      "historical_minus_current_tip_m": [
+        0.056414289219121116,
+        0.006089637410747598,
+        -0.05459919757047155
+      ],
+      "current": {
+        "selected_iteration": 0,
+        "selection_kind": "initialization",
+        "target_error_norm_m": 0.05029317515287496,
+        "applied_first_tension_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "tension_change_n": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "one_step_discrepancy_m": 0.005626613284377622,
+        "instantaneous_gvs_tip_velocity_m_s": [
+          -0.16568264626371862,
+          0.03440827623222919,
+          0.2509978064425663
+        ],
+        "backend_interval_velocities": [
+          {
+            "kind": "backward_interval_average",
+            "interval_s": [
+              0.22,
+              0.23
+            ],
+            "value_m_s": [
+              -0.18359874854297892,
+              0.052736890853043124,
+              0.26299034253813836
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          },
+          {
+            "kind": "forward_interval_average",
+            "interval_s": [
+              0.23,
+              0.24
+            ],
+            "value_m_s": [
+              -0.17079955456736662,
+              0.01980350439793475,
+              0.24813376331205053
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          }
+        ]
+      },
+      "historical_success": {
+        "selected_iteration": 19,
+        "selection_kind": "optimized_noninitialization",
+        "target_error_norm_m": 0.04301616318884714,
+        "applied_first_tension_n": [
+          1.197347703597216,
+          4.644296323484993,
+          4.249200299659834,
+          4.649293899791698,
+          3.8198211140651894,
+          8.145818446189429e-05
+        ],
+        "tension_change_n": [
+          -0.5539287822436905,
+          -0.11155634365492872,
+          1.1460436309968314,
+          1.431040287305601,
+          3.0338853543099047,
+          -0.6314487797947322
+        ],
+        "one_step_discrepancy_m": 0.004470648052775611,
+        "instantaneous_gvs_tip_velocity_m_s": [
+          -0.04624626886970298,
+          0.11753461477363261,
+          0.04432462557828619
+        ],
+        "backend_interval_velocities": [
+          {
+            "kind": "backward_interval_average",
+            "interval_s": [
+              0.22,
+              0.23
+            ],
+            "value_m_s": [
+              -0.054033301206413094,
+              0.13757512541801425,
+              0.04290722655211628
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          },
+          {
+            "kind": "forward_interval_average",
+            "interval_s": [
+              0.23,
+              0.24
+            ],
+            "value_m_s": [
+              -0.15719429110629432,
+              -0.09265533036955324,
+              0.30293480266137596
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          }
+        ]
+      }
+    },
+    {
+      "timestamp_s": 0.24,
+      "phase": "current_state_before_integration",
+      "historical_minus_current_state_norm": 181.89483109495265,
+      "historical_minus_current_tip_m": [
+        0.05655034185373184,
+        0.00496504906307272,
+        -0.054051187176978294
+      ],
+      "current": {
+        "selected_iteration": 0,
+        "selection_kind": "initialization",
+        "target_error_norm_m": 0.05293641202737071,
+        "applied_first_tension_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "tension_change_n": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "one_step_discrepancy_m": 0.005721665384042109,
+        "instantaneous_gvs_tip_velocity_m_s": [
+          -0.15317190955967425,
+          0.0029089310522810927,
+          0.23613928244250876
+        ],
+        "backend_interval_velocities": [
+          {
+            "kind": "backward_interval_average",
+            "interval_s": [
+              0.23,
+              0.24
+            ],
+            "value_m_s": [
+              -0.17079955456736662,
+              0.01980350439793475,
+              0.24813376331205053
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          },
+          {
+            "kind": "forward_interval_average",
+            "interval_s": [
+              0.24,
+              0.25
+            ],
+            "value_m_s": [
+              -0.15674014824293966,
+              -0.011579074351113206,
+              0.23234472555398436
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          }
+        ]
+      },
+      "historical_success": {
+        "selected_iteration": 3,
+        "selection_kind": "optimized_noninitialization",
+        "target_error_norm_m": 0.039743245056623515,
+        "applied_first_tension_n": [
+          1.2659379285737633,
+          4.374459299468353,
+          4.483137380390622,
+          4.579611639985762,
+          3.3712395301343068,
+          0.2869959397234452
+        ],
+        "tension_change_n": [
+          0.06859022497654732,
+          -0.2698370240166401,
+          0.23393708073078834,
+          -0.06968225980593612,
+          -0.44858158393088265,
+          0.28691448153898336
+        ],
+        "one_step_discrepancy_m": 0.004662546352872091,
+        "instantaneous_gvs_tip_velocity_m_s": [
+          -0.18987782292265246,
+          -0.2017868858925117,
+          0.40384228654573373
+        ],
+        "backend_interval_velocities": [
+          {
+            "kind": "backward_interval_average",
+            "interval_s": [
+              0.23,
+              0.24
+            ],
+            "value_m_s": [
+              -0.15719429110629432,
+              -0.09265533036955324,
+              0.30293480266137596
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          },
+          {
+            "kind": "forward_interval_average",
+            "interval_s": [
+              0.24,
+              0.25
+            ],
+            "value_m_s": [
+              -0.26623250608736027,
+              -0.2909887356870468,
+              0.505059640290811
+            ],
+            "frame": "world",
+            "source": "saved backend tip positions; interval average, not instantaneous GVS J(q)qdot"
+          }
+        ]
+      }
+    }
+  ],
+  "comparison_limit": "Different robot geometry/physics and state trajectories make this an association, not a controlled causal experiment."
+}

@@ -1,0 +1,50 @@
+{
+  "current_commit": "31522c63b0de00409c78e32f82c6b335f99da7a4",
+  "historical_commit": "63b617cb4b48fc4a3e27fac96c20d780eb5228dc",
+  "core_file_sha256_by_commit": {
+    "63b617cb4b48fc4a3e27fac96c20d780eb5228dc": {
+      "extensions/optimization/ipopt.py": "204717ad1820b45359bc0f601baa0afa1fdae39f3ecaae34eec80282d65194a9",
+      "extensions/tendon_family/gvs_trajectory.py": "c786587908c075b20e7c5cb1fd608a1bad746418cbd5742da291af891a686362",
+      "extensions/tendon_family/gvs_nmpc.py": "270082889853ba8d560fa089700e98dd709e8a6ff4b65bb32f315e5a5250f04a",
+      "extensions/tendon_family/gvs_reporting.py": "32158f8c621e7ee6fe971af66bf80ce661db28550db8b20a4ba3d4298a1a6552"
+    },
+    "31522c63b0de00409c78e32f82c6b335f99da7a4": {
+      "extensions/optimization/ipopt.py": "204717ad1820b45359bc0f601baa0afa1fdae39f3ecaae34eec80282d65194a9",
+      "extensions/tendon_family/gvs_trajectory.py": "c786587908c075b20e7c5cb1fd608a1bad746418cbd5742da291af891a686362",
+      "extensions/tendon_family/gvs_nmpc.py": "270082889853ba8d560fa089700e98dd709e8a6ff4b65bb32f315e5a5250f04a",
+      "extensions/tendon_family/gvs_reporting.py": "32158f8c621e7ee6fe971af66bf80ce661db28550db8b20a4ba3d4298a1a6552"
+    }
+  },
+  "core_selection_files_identical": true,
+  "feasibility": {
+    "eligible": "finite iterate with scaled constraint violation <= 1e-5",
+    "acceptance": "status in converged/iteration_limit/feasible_early_stop and selected violation <= 1e-5",
+    "source": "extensions/optimization/ipopt.py:_FeasibleIterate.eval and extensions/tendon_family/gvs_trajectory.py:TrajectoryWorkspace.solve"
+  },
+  "objective": {
+    "direction": "minimize",
+    "definition": "running squared normalized tip error and qdot; squared tension and tension variation; terminal squared normalized tip error and qdot; configured speed weights are zero",
+    "selection_comparison": "strictly lower objective replaces a retained callback candidate; the first callback candidate may replace the synthetic initialization on equality",
+    "source": "extensions/tendon_family/gvs_trajectory.py:GVSTrajectoryAssembler.assemble and extensions/optimization/ipopt.py:_FeasibleIterate.eval"
+  },
+  "early_stop": {
+    "minimum_s": 5.0,
+    "budget_s": 15.0,
+    "relative_improvement": 0.1,
+    "conditions": [
+      "verified_settled_seed",
+      "relative_seed_improvement",
+      "budget_best_feasible"
+    ],
+    "callback_raw_status": "User_Requested_Stop",
+    "mapped_status": "feasible_early_stop when callback requested a stop and selected violation <= 1e-5"
+  },
+  "recovery": "disabled in both executions; no returned-tension reintegration can replace callback selection",
+  "fallback": "an unusable solve holds the last bounded command, but every studied update was accepted and no fallback was used",
+  "field_meanings": {
+    "initialization_selected": "report count where optimization_selected_iteration is -1 or 0",
+    "feasible_early_stop": "accepted independently feasible candidate after intentional callback stop; not convergence",
+    "User_Requested_Stop": "raw IPOPT termination caused by callback policy",
+    "converged_updates": "count of optimization_status == converged; zero does not mean zero accepted plans"
+  }
+}
