@@ -96,7 +96,9 @@ def live():
     audit=read(source/'stage341_audit.json');behavior=read(source/'behavior_audit.json')
     decisions=[dict(request_id=a['request_id'],decision=a.get('decision'),receipt=a.get('receipt')) for a in behavior['actions']]
     for name,value in [('live_outcome',outcome),('live_audit',audit),('live_decisions',dict(run_id=host.run_id,actions=decisions)),
-        ('live_freeze_manifest',read(source/'freeze_manifest.json')),('live_prelaunch_verification',read(source/'prelaunch_verification.json')),
+        ('live_freeze_manifest',read(source/'freeze_manifest.json')),('live_prelaunch_verification',
+            read(source/'prelaunch_verification.json') if (source/'prelaunch_verification.json').exists() else
+            dict(status='not_started',reason='automatic approval review rejected process creation before run-time verification and credential loading')),
         ('live_frozen_input',read(source/'frozen_input.json')),('live_provider_configuration',read(source/'provider_configuration.json'))]:
         atomic_json(DEST/(name+'.json'),value)
     candidates=[]

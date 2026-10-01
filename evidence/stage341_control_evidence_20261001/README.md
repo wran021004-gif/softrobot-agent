@@ -2,6 +2,18 @@
 
 The evidence interfaces use immutable simulation export manifests in the existing SQLite artifact store. Inputs are execution IDs, update indices and snapshot IDs; the public CLI resolves local storage through `evidence/control_evidence_catalog.json`. No diagnostic LLM, worker, external search, actuator travel optimization or tolerance change is introduced.
 
+## Sealed outcome
+
+The single correction passed both gates and is adopted as `controller.gvs_nmpc@7.0.0`; v6 remains available unchanged. The v7 controller shortens the existing horizon only when the official deadline enters it and includes new graph construction in complete-update timing. The fixed Stage 3.40 robot officially reached with **7.837494 mm error**, versus **18.349652 mm** for v6. All task, robot, model, initialization, force, feasibility and solve-budget settings match; the declared changed factor is controller horizon handling. This is one matched observation, not a generalization guarantee.
+
+Settling still failed: final speed was 0.296879 m/s and the final-window maximum was 0.329385 m/s. Mean complete update was 12.357236 s against 0.01 s; all 35 deadlines were missed. Force violation and solver errors were zero. The new run selected 28 noninitialization plans and 7 initialization plans. The reach improvement therefore does not establish settling or real-time feasibility.
+
+The **fresh autonomous-design milestone is blocked and has not passed**. Session `gvs-stage341-0e4c97f35777` was prepared with frozen v7 code, inputs, diagnosis, historical-controller mismatch labels and the requested limits. Automatic approval review rejected process creation before runtime prelaunch verification, credential loading, or provider access. There were **zero provider attempts, mathematical design evaluations, live tool calls and live backend attempts**, and no model-authored delivery. `live_launch_rejection.json` preserves the exact stated reason; the unchanged unlaunched grant has not been reset or replaced.
+
+Offline usage was one recording replay, two local NMPC solves (45.848 s including preparation/analysis), and one fixed-design validation; zero workers. Recorded backend charges were 420.250 s and 438.282 s respectively. Four directly affected tests passed, covering saved extraction, missing history, timestamp/input alignment, manifest ownership, declared baseline/variant conditions and the deadline/warm-prefix behavior. Targeted compilation and `git diff --check` passed.
+
+The smallest next action is explicit user-message authorization for the exact frozen payload and `https://api.deepseek.com`, followed by the same unlaunched session. Do not substitute a replacement session, reset budgets, or treat this fixed-design pass as a fresh model-selected design pass. A diagnostic LLM remains outside this stage.
+
 ## Reproduction
 
 Use the existing `softagent` interpreter. These commands inspect saved evidence without a solver or provider request:
