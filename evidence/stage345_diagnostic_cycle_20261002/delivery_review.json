@@ -1,0 +1,83 @@
+{
+  "classification": "Read-only delivery review, not a new model report or numerical experiment",
+  "source_execution": "5991de53e82747439e87ba8569667e1b",
+  "schema_and_selected_values_validated": true,
+  "prose_not_certified": true,
+  "preserved_report": {
+    "artifact_id": "d09aac60283888393a69eca979512cc512aa6592b3a184336911af662f30bf5f",
+    "media_type": "application/json"
+  },
+  "findings": [
+    {
+      "issue": "Selected two-view coverage does not prove 33 retained predictions are absent",
+      "reference": {
+        "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+        "media_type": "application/octet-stream"
+      },
+      "pointer": "/",
+      "records": 35,
+      "records_with_one_step_prediction": 35
+    },
+    {
+      "issue": "Claim of absent per-channel tension and limit data is unsupported",
+      "reference": {
+        "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+        "media_type": "application/octet-stream"
+      },
+      "example_pointer": "/34/actual_tension_n",
+      "value": [
+        3.1758909392099772,
+        2.757372796476204,
+        1.4216485070827969e-08,
+        0.8929758192138912,
+        0.12734806870748366,
+        -0.0
+      ],
+      "records_with_actual_tension": 35,
+      "force_limit_reference": {
+        "artifact_id": "0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd",
+        "media_type": "application/octet-stream"
+      },
+      "force_limits": [
+        {
+          "pointer": "/tendons/0/force_limit_n",
+          "value": 8.0,
+          "units": "N"
+        },
+        {
+          "pointer": "/tendons/1/force_limit_n",
+          "value": 8.0,
+          "units": "N"
+        },
+        {
+          "pointer": "/tendons/2/force_limit_n",
+          "value": 8.0,
+          "units": "N"
+        },
+        {
+          "pointer": "/tendons/3/force_limit_n",
+          "value": 8.0,
+          "units": "N"
+        },
+        {
+          "pointer": "/tendons/4/force_limit_n",
+          "value": 8.0,
+          "units": "N"
+        },
+        {
+          "pointer": "/tendons/5/force_limit_n",
+          "value": 8.0,
+          "units": "N"
+        }
+      ]
+    },
+    {
+      "issue": "An unexecuted single-pose model probe cannot identify plant/actuator settling timescale or causally attribute the full-run settling failure"
+    }
+  ],
+  "future_single_factor_comparison_justified": false,
+  "reason": "No selected/executed check, consumed feedback, revised report or validated design response",
+  "numerical_evaluations": 0,
+  "physical_improvement": "not evaluated",
+  "baseline_modified": false
+}

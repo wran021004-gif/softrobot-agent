@@ -255,7 +255,9 @@ def encode_chat(model_input, config, naming_scheme=LEGACY_TOOL_NAMING):
     for tool in tools:
         if tool['function']['description'].startswith('design.respond_diagnosis@'):
             payload['messages'][0]['content'] += '\nCall structure (replace every <PLACEHOLDER>; choose a legal combination yourself). '
-            payload['messages'][0]['content'] += 'On correction resend this complete provider tool call, not a fragment: '+encode(call_structure_example(tool))
+            payload['messages'][0]['content'] += ('Invoke the actual named tool through native tool_calls; do not print this wrapper as assistant content. '
+                'The provider transport encodes function.arguments exactly once. After decoding, its nested arguments member must be an object, never a JSON string or another envelope. '
+                'On correction resend this complete provider tool call, not a fragment: ')+encode(call_structure_example(tool))
     if config.get('thinking') is not None: payload['thinking'] = {'type':config['thinking']}
     if config.get('reasoning_effort') is not None: payload['reasoning_effort'] = config['reasoning_effort']
     return payload
@@ -317,7 +319,8 @@ def delivery_instruction(host):
             'adopt accepts within permitted scope; defer postpones pending evidence; reject declines. Adoption does not execute a backend comparison. '
             'Here stop declines verification; the coordinator may still continue the diagnostic check workflow. '
             'When correcting a call, resend the complete outer arguments/reason/tool_version envelope; '
-            'put disposition and next_action inside arguments, never at the top level. ')
+            'put disposition and next_action inside arguments, never at the top level. '
+            'Use native tool_calls, never a JSON wrapper printed in assistant content. The nested arguments value must be an object, never a JSON-encoded string. ')
     return instruction
 
 

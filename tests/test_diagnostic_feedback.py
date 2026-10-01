@@ -232,6 +232,30 @@ class FeedbackTests(TestCase):
         report['fact_selectors']['fixture.speed'][0]['value']=-.2
         with self.assertRaisesRegex(ValueError,'VALUE_MISMATCH'):submit(ctx,DiagnosisSubmission.model_validate(report))
 
+    def test_stage345_observed_native_call_and_double_encoding_failures(self):
+        from tools.platform_models import call_structure_example
+        folder=Path(__file__).resolve().parents[1]/'evidence/stage345_diagnostic_cycle_20261002/artifacts'
+        configure_role(self.host,'design','Respond',report=self.binding,evidence_turn_limit=0)
+        adapter=ReadableDeepSeekAdapter();payload=payload_for(self.host,adapter)
+        self.assertIn('do not print this wrapper as assistant content',payload['messages'][0]['content'])
+        self.assertIn('nested arguments value must be an object',delivery_instruction(self.host))
+        bindings={'design.respond_diagnosis':'1.0.0'}
+        for artifact in ('42230e64d05c2335ac3bd2cbcd0dc3f623e9374898eb9c8a3e05fd1014884a54',
+                'b093082aadc07162e2055b8efce92ae36e2e7e9b966c2d2deb1abadcea6b8471',
+                '4ef7538ce74603c13a55efb34b393d3593853217e726ce5335096de41d0b3e11'):
+            response=ModelResponse.model_validate(json.loads((folder/(artifact+'.json')).read_text(encoding='utf-8')))
+            with self.assertRaises(ToolProtocolError):adapter.decode(response,0,bindings,payload['tools'])
+        tool=payload['tools'][0];example=call_structure_example(tool)
+        envelope=json.loads(example['function']['arguments'])
+        self.assertIsInstance(envelope['arguments'],dict)
+        envelope['arguments']=dict(report=self.binding,disposition='defer',next_action='stop',reasoning='Offline valid call; no decision fabricated for the live run')
+        envelope['reason']='Offline structure regression'
+        example['function']['arguments']=json.dumps(envelope)
+        response=ModelResponse(raw=dict(choices=[dict(finish_reason='tool_calls',message=dict(tool_calls=[example]))]))
+        decision=adapter.decode(response,0,bindings,payload['tools'])
+        self.assertIsInstance(decision['arguments'],dict)
+        self.assertEqual(decision['arguments']['disposition'],'defer')
+
     def test_stage344_fixture_response_combinations_and_continuation(self):
         from schemas.platform_handoff import DesignResponse
         from tools.platform_handoff import respond

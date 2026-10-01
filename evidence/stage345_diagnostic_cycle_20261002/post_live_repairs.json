@@ -1,0 +1,22 @@
+{
+  "classification": "Offline-only clarification after the stopped single attempt; not live-validated",
+  "observed_failures": [
+    "Two JSON wrappers printed as assistant content with no native tool_calls",
+    "Nested domain arguments encoded as a string"
+  ],
+  "changes": [
+    "Explicit native-tool invocation instruction",
+    "Explicit once-only transport encoding and nested-object instruction"
+  ],
+  "checked": {
+    "tests": 1,
+    "passed": 1,
+    "seconds": 2.318,
+    "log": "python.exe : test_stage345_observed_native_call_and_double_encoding_failures (tests.test_diagnostic_feedback.FeedbackTe\r\nsts.test_stage345_observed_native_call_and_double_encoding_failures) ... ok\r\nAt line:2 char:1\r\n+ & 'C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe' -m unittes ...\r\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (test_stage345_o...ailures) ... ok:String) [], RemoteException\r\n    + FullyQualifiedErrorId : NativeCommandError\r\n \r\n\r\n----------------------------------------------------------------------\r\nRan 1 test in 2.318s\r\n\r\nOK\r\n"
+  },
+  "live_validation": false,
+  "budgets_reset": false,
+  "guard_reset": false,
+  "additional_paid_attempts": 0,
+  "frozen_live_implementation": "f5e4afa704233bdf1e02967638e6662186e4d119"
+}
