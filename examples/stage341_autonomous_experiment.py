@@ -51,30 +51,49 @@ def prepare():
     runtime=require_softagent_runtime()
     if (OUTPUT/'freeze_manifest.json').exists():return Host(OUTPUT,read(OUTPUT/'freeze_manifest.json')['run_id'])
     if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True):raise RuntimeError('LIVE_FREEZE_REQUIRES_CLEAN_WORKTREE')
-    if (OUTPUT/'platform.sqlite').exists():raise RuntimeError('EXISTING_UNFROZEN_SESSION_REQUIRES_INSPECTION')
+    existing=Store(OUTPUT)
+    if existing.db.exists():
+        with existing.connect(True) as db:
+            if db.execute('SELECT COUNT(*) FROM sessions').fetchone()[0] or db.execute('SELECT COUNT(*) FROM calls').fetchone()[0]:
+                raise RuntimeError('EXISTING_SESSION_MUST_NOT_BE_RESET')
     diagnosis=read(EVIDENCE/'diagnosis.json')
     if not diagnosis['ready_for_live']:raise RuntimeError('DIAGNOSIS_NOT_READY')
     inp=deepcopy(read(SOURCE/'frozen_input.json'));run='gvs-stage341-'+os.urandom(6).hex();inp['run_id']=run
     budget=dict(model_calls=24,tool_calls=60,backend_solves=3,worker_calls=0,wall_s=3600.)
     inp['policy'].update(budget=budget,timeout_s=1800.,allowed_tools=[],tool_bindings=TOOLS)
     inp['policy']['model'].update(max_turns=24,context_bytes=200000,tool_naming=tool_naming_policy(TOOLS,READABLE_TOOL_NAMING))
+    # Bind the old ledgers against their original v6 scientific conditions.
+    # When adopting v7, explicitly mark the controller mismatch in the import;
+    # these are historical observations, never current-controller outcomes.
+    historical_context=deepcopy(inp)
     adoption=diagnosis['correction']
     if adoption['adopted']:
         inp['policy']['controller']=deepcopy(adoption['controller'])
         for combination in inp['policy']['route']['data']['combinations'].values():
             if combination['controller']['extension_id']=='controller.gvs_nmpc':combination['controller']=deepcopy(adoption['controller'])
-    store=Store(OUTPUT);store.create(dict(project_id=run,grant_id=run,budget=budget,
-        authorization_source='User explicitly authorized one new paid DeepSeek design experiment with frozen context and subsequent evidence, Stage 3.41.'))
+    store=existing
+    if store.db.exists():
+        run=store.config()['project_id'];inp['run_id']=run
+    else:
+        store.create(dict(project_id=run,grant_id=run,budget=budget,
+            authorization_source='User explicitly authorized one new paid DeepSeek design experiment with frozen context and subsequent evidence, Stage 3.41.'))
     protocol,target=protocol_and_target(inp)
     with store.transaction() as db:
         pref=plain(store.put(db,protocol));tref=plain(store.put(db,target));dref=plain(store.put(db,diagnosis))
-    historical=bind_sources(historical_sources(),inp,store)
+    historical=bind_sources(historical_sources(),historical_context,store)
     source_audit=read(SOURCE/'stage340_audit.json');previous=source_audit['evaluated_candidates'][-1]
     index=dict(live_session=source_audit['run_id'],configuration=previous['candidate_facts']['configuration'],
         candidate_id=previous['candidate_id'],profile_report=previous['profile_report'],evaluation=previous['factual_result']['evaluation'])
-    case=bind_failure(SOURCE,inp,index,Store(SOURCE))
+    case=bind_failure(SOURCE,historical_context,index,Store(SOURCE))
     with store.transaction() as db:
-        case['detail_export']=plain(store.put(db,previous));historical['cases'].append(case);href=plain(store.put(db,historical))
+        case['detail_export']=plain(store.put(db,previous));historical['cases'].append(case)
+        if adoption['adopted']:
+            for case in historical['cases']:
+                case['compatibility'].update(scientific_conditions_match=False,
+                    source_conditions_verified=True,material_mismatches=['controller.version'],
+                    source_controller=historical_context['policy']['controller'],current_controller=inp['policy']['controller'],
+                    interpretation='Source facts verified under original v6 conditions; imported v6 outcomes do not validate v7. Robot/task/space comparisons remain unchanged.')
+        href=plain(store.put(db,historical))
     inp['policy']['route']['data'].update(source='User-authorized Stage 3.41',historical_case=href,historical_math=None,
         analysis_protocol=pref,endpoint_target=tref,max_trials=3,math_evaluation_limit=16,
         analysis_required_before_run=True,math_selection_required_before_run=True,stop_on_task_success=True,
