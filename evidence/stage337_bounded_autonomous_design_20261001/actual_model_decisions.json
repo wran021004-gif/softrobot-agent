@@ -1,0 +1,277 @@
+{
+  "run_id": "gvs-stage337-be4419cee8fd",
+  "decisions": [
+    {
+      "request_id": "model-0",
+      "tool_id": "analysis.bounded_endpoint",
+      "reason": "The task guidance explicitly requires reading the compact reconstructed NMPC evidence artifact 07a9fc8b... before selecting a candidate, and using its compact prior-case context for the design decision.",
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 9.077999999979511,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "d141d47c985649058e92ac15a83b62ea",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "fdac25aec0de3146164820d25ba91841510726dba58affb7c2f40f834f470ac4",
+          "media_type": "application/json"
+        },
+        "request_id": "model-0",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-1",
+      "tool_id": "evidence.read",
+      "reason": "The guidance explicitly requires reading the compact reconstructed NMPC evidence 07a9fc8b... before selecting a design; my previous turn was rejected because those read arguments were wrongly sent to analysis.bounded_endpoint. Correcting the call to the evidence.read schema with its single required field, reference.",
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 4.2649999998975545,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "82ef996eea274d97bcfc40627f2fb803",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "67b5d08253d6b27b3eb6da57f0b5e8c9e7c66eaa55ad799d096e18d13d2e44b6",
+          "media_type": "application/json"
+        },
+        "request_id": "model-1",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-2",
+      "tool_id": "route.inspect",
+      "reason": "Refresh the compact route overview to confirm the exact node references, authorized bounds and remaining budget before beginning the build/optimize sequence.",
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 46.906999999890104,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "22bbf56f56e445e69f974e47c8aebad6",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "22a0f3fccb472b9c3723048a2b133e8e4fe99bccb146bff2942a658a3217e56a",
+          "media_type": "application/json"
+        },
+        "request_id": "model-2",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-3",
+      "tool_id": "analysis.bounded_endpoint",
+      "reason": "The task guidance requires reading the compact reconstructed NMPC evidence 07a9fc8b before selecting a design; I need its top-level structure to locate the prior-case context and diagnostics.",
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 16.608999999938533,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "140464fd9ae14822bafbc80c5ef2b26a",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "f74300c1d6303963d1a674b391c1ade2c70844078108d1aa05bd1448b5202766",
+          "media_type": "application/json"
+        },
+        "request_id": "model-3",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-4",
+      "tool_id": "evidence.read",
+      "reason": "The rejected call carried evidence.read's argument fields but was addressed to analysis.bounded_endpoint, which cannot be invoked without linearization artifacts. I correct that by addressing the same fields to evidence.read and following the /cases pointer so I have the compact reconstructed NMPC prior-case context the guidance requires before selecting candidate values.",
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 43.40599999995902,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "91edcedd36864c3abb7f18b0db07313f",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "93ad5ff9f3a3fbb0f3ab31ad206055b9fac11d96afe0103c7bcb972247d63dc0",
+          "media_type": "application/json"
+        },
+        "request_id": "model-4",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-5",
+      "tool_id": null,
+      "reason": null,
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 124.79700000002049,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": "INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls[0].function.name: Expected a registered function name from the supplied tools.",
+        "execution_id": "ef3d6e7efaee46a19a6a230c7f9ff273",
+        "execution_status": "failed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "8b4ded9e9c41dafd00dd15c5577b650027409f2fd5ff7c758206aec55d905768",
+          "media_type": "application/json"
+        },
+        "request_id": "model-5",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-6",
+      "tool_id": null,
+      "reason": null,
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 42.57799999997951,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": "INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls[0].function.name: Expected a registered function name from the supplied tools.",
+        "execution_id": "58c8f9d673004671910cb1bb3525fcd1",
+        "execution_status": "failed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "1bd0c70eee8ea0d6988763fba8cb29efd6a3af7a1a49b89c17180e8eb33b6502",
+          "media_type": "application/json"
+        },
+        "request_id": "model-6",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-7",
+      "tool_id": null,
+      "reason": null,
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 37.45299999997951,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": "INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls[0].function.name: Expected a registered function name from the supplied tools.",
+        "execution_id": "e60ed48ab4af48e6acc091663f93d797",
+        "execution_status": "failed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "ea52cfbc3ef8524f2afdc2ba9bf93813a188c59b85a9b0286ace89b6db7f5a60",
+          "media_type": "application/json"
+        },
+        "request_id": "model-7",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "1.0.0"
+      }
+    }
+  ]
+}
