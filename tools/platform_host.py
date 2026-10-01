@@ -226,7 +226,19 @@ class Host:
             with self.store.transaction() as db:
                 error_ref = self.store.put(db, self._receipt(request, dict(execution_id='not_executed'), 'rejected', str(exc)))
                 self.store.event(db, self.run_id, 'tool', 'rejected', parent=parent, request=request.request_id, caller=self.actor, inputs=[request_ref], outputs=[error_ref], version=request.tool_version)
-            # Preflight rejections have no execution identity or charge.
+            # Opt-in role phases charge rejected model calls too. A depleted
+            # phase cannot borrow its protected downstream allocation.
+            state = self.store.session(self.run_id)['state']
+            if self.actor == 'model' and state.get('role_context', {}).get('phase_budget') is not None:
+                try:
+                    rejected, fresh = self.store.reserve(self.run_id, request.request_id, request_hash,
+                        self.actor, {**zero(), 'tool_calls':1}, parent=parent, inputs=[request_ref])
+                except ValueError:
+                    pass  # Budget rejection itself cannot exceed the ceiling.
+                else:
+                    if fresh:
+                        return self.store.complete(rejected, self._receipt(request, rejected, 'rejected', str(exc)), elapsed=0.)
+            # Historical preflight rejections retain their original accounting.
             return self._receipt(request, dict(execution_id='not_executed'), 'rejected', str(exc))
 
     def _validate_refs(self, value):
@@ -313,6 +325,8 @@ class Host:
             context['batch_observations'] = state.get('batch_observations', [])
             context['recent_actions'] = state.get('recent_actions', [])[-4:]
             context['phase_progress'] = dict(turns_used=state.get('turn',0)-state['role_context'].get('phase_started_turn',0),
+                successful_read_turns=state['role_context'].get('successful_read_turns'),
+                budget=self.store.phase_remaining(self.run_id),
                 evidence_turn_limit=state['role_context'].get('evidence_turn_limit'),
                 instruction='Use supplied content and retained evidence. When the read allowance ends, deliver the current phase using its remaining advertised handoff tool.')
         return context

@@ -267,6 +267,9 @@ def effective_config(host):
     grant = session['state'].get('role_grant')
     if grant:
         remaining.append(grant['budget']['wall_s'] - host.store.remaining(host.run_id)['used']['wall_s'])
+    phase = host.store.phase_remaining(host.run_id)
+    if phase:
+        remaining.append(phase['remaining']['wall_s'])
     config['timeout_s'] = min(config['timeout_s'], *remaining)
     if config['timeout_s'] <= 0:
         raise ValueError('BUDGET_EXHAUSTED: provider wall time')
@@ -284,6 +287,9 @@ def delivery_instruction(host):
     else:
         return 'For normal delivery call route.advance with action="finish". ' if 'route.advance' in granted else 'Use a granted delivery tool. '
     allowed = state.get('role_grant', {}).get('permitted_tools', granted)
+    active = phase_tools(state)
+    if active is not None:
+        allowed = [t for t in allowed if t in active]
     return 'For this phase use ' + ' or '.join(t for t in choices if t in granted and t in allowed) + '; handoff calls must stand alone. '
 
 
@@ -291,7 +297,7 @@ def phase_tools(state):
     role=state.get('role_context',{})
     granted=role.get('phase_tools')
     if granted is None:return None
-    elapsed=state.get('turn',0)-role.get('phase_started_turn',0)
+    elapsed=role.get('successful_read_turns',state.get('turn',0)-role.get('phase_started_turn',0))
     if role.get('evidence_turn_limit') is not None and elapsed>=role['evidence_turn_limit']:
         return [t for t in granted if t not in ('evidence.read','diagnosis.inspect_evidence')]
     return granted
@@ -550,6 +556,13 @@ def run_loop(host, adapter=None):
                     reference=args.get('reference'),pointer=args.get('pointer'),offset=args.get('offset'),
                     status=receipt['execution_status'],output=receipt.get('output'),error=receipt.get('error'))])[-4:]
                 more = bool(batch and batch_index + 1 < len(batch))
+                role = state.get('role_context', {})
+                if 'successful_read_turns' in role:
+                    read_ok = receipt['execution_status']=='completed' and active_decision['tool_id'] in ('evidence.read','diagnosis.inspect_evidence')
+                    read_ok = read_ok or pending.get('successful_read', False)
+                    if not more and read_ok:
+                        role['successful_read_turns'] += 1
+                    pending = {**pending, 'successful_read':read_ok}
                 state['turn'] += int(not more)
                 state['pending'] = {**pending, 'batch_index': batch_index + 1} if more else None
                 if batch:

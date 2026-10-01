@@ -20,6 +20,10 @@ def bind_diagnostic_grant(host,request_reference):
 def configure_role(host,role,instructions,**context):
     with host.store.transaction() as db:
         state=host.store.session(host.run_id,db)['state']
+        if context.get('phase_budget') is not None:
+            context['phase_budget']={**context['phase_budget'], 'started_usage':host.store.remaining(host.run_id,db)['used']}
+            context['successful_read_turns']=0
+            context['phase_started_turn']=state.get('turn',0)
         if role=='design':
             delivery='design.review_verification' if context.get('verification') else ('design.respond_diagnosis' if context.get('report') else 'diagnosis.request')
             context['phase_tools']=['evidence.read',delivery]
@@ -41,10 +45,11 @@ def transfer_recovery(source,destination):
 
 def run_until_handoff(host,kind):
     from tools.platform_models import run_loop
+    previous=host.store.session(host.run_id)['state'].get('handoffs',{}).get(kind)
     run_loop(host)
     session=host.store.session(host.run_id)
     ref=session['state'].get('handoffs',{}).get(kind)
-    if ref is None:raise RuntimeError('EXPECTED_HANDOFF_MISSING: '+kind+' '+session['status']+' '+str(session['state'].get('stop_reason')))
+    if ref is None or ref == previous:raise RuntimeError('EXPECTED_NEW_HANDOFF_MISSING: '+kind+' '+session['status']+' '+str(session['state'].get('stop_reason')))
     return ref
 
 
@@ -61,7 +66,7 @@ def validate_check(store,role,args):
     if plain(args.input.reference)!=reference or args.input.pointer!=f'/{expected_input}/actual_tension_n':raise ValueError('CHECK_CURRENT_VERSUS_PREVIOUS_INPUT_MISMATCH')
     validate_selector(store,args.initial_state);validate_selector(store,args.input)
     feedback=role.get('check_feedback',[])
-    if len(feedback)>=2:raise ValueError('AT_MOST_TWO_DIAGNOSTIC_CHECKS')
+    if len(feedback)>=role.get('max_checks',2):raise ValueError('DIAGNOSTIC_CHECK_LIMIT')
     if feedback and (plain(args.prior_result)!=feedback[-1]['reference'] or not args.additional_need):raise ValueError('ADDITIONAL_CHECK_REQUIRES_RESULT_AND_SPECIFIC_NEED')
     if args.model!='model.gvs@1.0.0' or args.integration!='implicit_euler':raise ValueError('CHECK_NUMERICAL_PROTOCOL_UNSUPPORTED')
     units='local_solves' if args.operation=='local_comparison' else 'prediction_evaluations'
@@ -90,8 +95,19 @@ def execute_check_feedback(diagnostic,executor,reference):
         ref=plain(diagnostic.store.put(db,feedback))
         state=diagnostic.store.session(diagnostic.run_id,db)['state']
         result=diagnostic.store.artifact(receipt['output']) if receipt.get('output') else None
+        if role.get('max_checks') == 1 and result and 'detail' in result:
+            # Keep exact scalar pointers while leaving full trajectories in the
+            # immutable result artifact for inspection outside the inline view.
+            result={**result,'detail':{**result['detail'],'rows':[
+                {k:v for k,v in row.items() if k not in ('trajectory','physical_motion','parameters','verification')}
+                for row in result['detail'].get('rows',[])]}}
         state['role_context'].setdefault('check_feedback',[]).append(dict(reference=ref,**feedback,result_content=result))
         state['role_context']['instructions'] += ' Consume check_feedback now, update competing hypotheses, and submit a revised report citing every feedback reference in check_results. A second check needs the prior result and a specific unresolved need; otherwise submit.'
+        if role.get('max_checks') == 1:
+            state['role_context']['phase_tools']=['diagnosis.submit']
+            if role.get('after_feedback_reservations'):
+                state['role_context']['phase_budget'].update(role['after_feedback_reservations'])
+            state['role_context']['instructions'] += ' The one-check allowance is spent. Only diagnosis.submit is available. Cite result selectors and state whether each checked hypothesis is supported, weakened, or unresolved; no further check is authorized.'
         diagnostic.store.update_state(db,diagnostic.run_id,state,'paused')
         diagnostic.store.event(db,diagnostic.run_id,'check_feedback','available',inputs=[reference],outputs=[ref])
     return ref

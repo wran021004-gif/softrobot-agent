@@ -200,6 +200,25 @@ class Store:
                 occupied[name] = occupied.get(name, 0) + 1
         return dict(limit=limit, used=used, remaining={k: max(0, limit[k] - used[k]) for k in limit}, occupied=occupied)
 
+    def phase_remaining(self, run_id, db=None):
+        """Opt-in phase ceilings and downstream reservations, in the shared ledger."""
+        if db is None:
+            with self.connect(True) as conn:
+                return self.phase_remaining(run_id, conn)
+        state = self.session(run_id, db)['state']
+        phase = state.get('role_context', {}).get('phase_budget')
+        if phase is None:
+            return None
+        project = self.remaining(None, db)['remaining']
+        role = self.remaining(run_id, db)
+        grant = state.get('role_grant', {}).get('budget', role['limit'])
+        used = {k: role['used'][k] - phase['started_usage'][k] for k in project}
+        available = {k: max(0, min(
+            project[k] - phase.get('protect_project', {}).get(k, 0),
+            min(role['remaining'][k], grant[k] - role['used'][k]) - phase.get('protect_role', {}).get(k, 0),
+            phase.get('limit', {}).get(k, float('inf')) - used[k])) for k in project}
+        return dict(**phase, used=used, remaining=available)
+
     def lookup(self, run_id, request_id, db=None):
         if db is None:
             with self.connect(True) as conn:
@@ -216,6 +235,9 @@ class Store:
                     raise ValueError('REQUEST_ID_COLLISION')
                 return old, False
             parent_run = self.session(run_id, db)['snapshot'].get('parent_run_id')
+            phase = self.phase_remaining(run_id, db)
+            if phase and any(cost[k] > phase['remaining'][k] + 1e-9 for k in cost):
+                raise ValueError('BUDGET_EXHAUSTED: active phase / protected downstream capacity')
             role_grant = self.session(run_id, db)['state'].get('role_grant')
             if role_grant:
                 used = self.remaining(run_id, db)['used']

@@ -71,6 +71,10 @@ def submit(ctx,args):
     role=ctx.store.session(ctx.run_id)['state']['role_context']
     if plain(args.request)!=role['request']: raise ValueError('REPORT_REQUEST_LINK_MISMATCH')
     request=ctx.artifact(args.request)
+    if role.get('require_initial_views'):
+        views={v['view'] for v in role.get('evidence_views',[])}
+        if 'prediction' not in views or not views.intersection({'motion','plans'}):
+            raise ValueError('INITIAL_REPORT_REQUIRES_PREDICTION_AND_MOTION_OR_PLAN_VIEW')
     if role.get('previous_report') != plain(args.previous_report):raise ValueError('REPORT_REVISION_LINK_MISMATCH')
     expected=role.get('check_feedback',[])
     if expected and [plain(r) for r in args.check_results] != [f['reference'] for f in expected]:raise ValueError('REPORT_CHECK_FEEDBACK_REQUIRED')

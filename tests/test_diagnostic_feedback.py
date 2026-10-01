@@ -101,6 +101,51 @@ class FeedbackTests(TestCase):
         self.assertEqual(receipt['error'],'TOOL_NOT_IN_ACTIVE_ROLE_PHASE')
         self.assertEqual(h.context()['phase_progress']['turns_used'],2)
 
+    def test_phase_counts_successful_batch_once_not_protocol_correction(self):
+        from tools.platform_models import phase_tools
+        host,request=self.role_host({'evidence.read':'1.0.0','diagnosis.submit':'1.0.0'},turns=2,batch=3)
+        configure_role(host,'diagnostic','Inspect then submit',request=request,binding=self.binding,
+            phase_tools=['evidence.read','diagnosis.submit'],evidence_turn_limit=1,
+            phase_budget=dict(limit=dict(model_calls=2)))
+        outer=self
+        class Replay(ReadableDeepSeekAdapter):
+            def respond(adapter,payload,turn):
+                if turn==0:
+                    return ModelResponse(raw=dict(choices=[dict(finish_reason='tool_calls',message=dict(tool_calls=[]))]))
+                outer.assertEqual(host.context()['phase_progress']['successful_read_turns'],0)
+                return outer.response(payload,['evidence.read','evidence.read'])
+        run_loop(host,Replay())
+        state=self.store.session(host.run_id)['state']
+        self.assertEqual(state['role_context']['successful_read_turns'],1)
+        self.assertEqual(state['protocol_corrections_used'],1)
+        self.assertEqual(self.store.remaining()['used']['model_calls'],2)
+        self.assertEqual(self.store.remaining()['used']['tool_calls'],2)
+        self.assertEqual(phase_tools(state),['diagnosis.submit'])
+        self.assertNotIn('diagnosis.check_request',delivery_instruction(host))
+        host.resume()
+        receipt=Host(self.temp.name,host.run_id,actor='model').invoke(dict(request_id='closed-read',tool_id='evidence.read',
+            tool_version='1.0.0',arguments={'reference':self.binding},reason='Try closed reading'))
+        self.assertEqual(receipt['error'],'TOOL_NOT_IN_ACTIVE_ROLE_PHASE')
+        self.assertEqual(self.store.remaining()['used']['tool_calls'],3)
+
+    def test_phase_protects_attempts_tools_time_and_effective_timeout(self):
+        from tools.platform_models import effective_config
+        from tools.platform_store import zero
+        host,request=self.role_host({'evidence.read':'1.0.0'})
+        configure_role(host,'diagnostic','bounded',request=request,
+            phase_budget=dict(limit=dict(model_calls=1),protect_project=dict(model_calls=1,tool_calls=2,wall_s=20.),
+                protect_role=dict(tool_calls=1,wall_s=30.)))
+        phase=self.store.phase_remaining(host.run_id)
+        self.assertEqual(phase['remaining']['model_calls'],1)
+        self.assertEqual(phase['remaining']['tool_calls'],3)
+        self.assertEqual(effective_config(host)['timeout_s'],30.)
+        for key,value in [('model_calls',2),('tool_calls',4),('wall_s',31.)]:
+            with self.assertRaisesRegex(ValueError,'protected downstream'):
+                self.store.reserve(host.run_id,'too-'+key,'hash','model-transport',{**zero(),key:value})
+        row,_=self.store.reserve(host.run_id,'attempt','hash','model-transport',{**zero(),'model_calls':1,'wall_s':10.})
+        self.assertEqual(self.store.phase_remaining(host.run_id)['remaining']['model_calls'],0)
+        self.assertEqual(effective_config(host)['timeout_s'],20.)
+
     def test_check_feedback_revised_report_link_and_counters(self):
         host,request=self.role_host({'diagnosis.submit':'1.0.0','diagnosis.check_request':'1.0.0'})
         source=self.bound.resolve(self.bound.binding['execution_id']);ref=source['files']['controller_observations.json']
@@ -108,7 +153,7 @@ class FeedbackTests(TestCase):
         with self.store.transaction() as db:
             prior=plain(self.store.put(db,dict(report='prior report preserved')))
             state=self.store.session(host.run_id,db)['state'];state['protocol_corrections_used']=2
-            state['role_context'].update(previous_report=prior,check_execution_enabled=True)
+            state['role_context'].update(previous_report=prior,check_execution_enabled=True,max_checks=1)
             self.store.update_state(db,host.run_id,state)
         args=DiagnosticCheckRequest(check_id='selected-7',operation='prediction_braking',update_id=index,diagnosis_request=request,
             hypotheses=['input limitation','model mismatch'],initial_state=dict(reference=ref,pointer='/7/measured_initial_state',value=updates[index]['measured_initial_state']),
@@ -120,6 +165,8 @@ class FeedbackTests(TestCase):
         feedback=execute_check_feedback(host,executor,check)
         self.assertEqual(called[0]['arguments']['update_id'],7)
         state=self.store.session(host.run_id)['state'];self.assertEqual(state['protocol_corrections_used'],2)
+        self.assertEqual(state['role_context']['phase_tools'],['diagnosis.submit'])
+        self.assertNotIn('diagnosis.check_request',delivery_instruction(host))
         self.assertEqual(state['role_grant']['budget']['wall_s'],60.)
         ctx=SimpleNamespace(store=self.store,run_id=host.run_id,host=SimpleNamespace(actor='model'),artifact=self.store.artifact)
         def save(value,kind):
@@ -131,6 +178,24 @@ class FeedbackTests(TestCase):
         self.assertEqual(self.store.artifact(result.reference)['previous_report'],prior)
         self.assertEqual(self.store.artifact(feedback)['check_request'],check)
         with self.assertRaisesRegex(ValueError,'FEEDBACK_REQUIRED'):submit(ctx,report.model_copy(update={'check_results':[]}))
+        from tools.platform_diagnosis_coordinator import validate_check
+        with self.assertRaisesRegex(ValueError,'CHECK_LIMIT'):validate_check(self.store,state['role_context'],args)
+        from schemas.platform_handoff import DesignResponse
+        from tools.platform_handoff import respond
+        configure_role(self.host,'design','Respond to revised report',report=plain(result.reference),evidence_turn_limit=0)
+        ctx.run_id=self.run
+        response=respond(ctx,DesignResponse(report=result.reference,disposition='defer',reasoning='Failed check leaves uncertainty',next_action='stop'))
+        self.assertEqual(self.store.artifact(response.reference)['report'],plain(result.reference))
+        with self.assertRaisesRegex(ValueError,'DESIGN_REPORT_LINK'):
+            respond(ctx,DesignResponse(report=prior,disposition='defer',reasoning='Stale report',next_action='stop'))
+
+    def test_initial_report_requires_both_view_categories(self):
+        host,request=self.role_host({'diagnosis.submit':'1.0.0'})
+        configure_role(host,'diagnostic','initial',request=request,require_initial_views=True)
+        ctx=SimpleNamespace(store=self.store,run_id=host.run_id,artifact=self.store.artifact)
+        report=DiagnosisSubmission(request=request,report=dict(subject='control',source=self.binding),
+            fact_selectors={},missing_evidence=['Missing views'],recommendations=[])
+        with self.assertRaisesRegex(ValueError,'REQUIRES_PREDICTION'):submit(ctx,report)
 
 
 if __name__=='__main__':main()
