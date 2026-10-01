@@ -8,6 +8,8 @@ from . import optimization as opt
 from . import route
 from .contracts import GVSTrajectoryParameters
 from . import gvs_profile, tracking, candidate_analysis, historical_math, control_evidence
+from . import diagnostic_evidence
+from . import diagnostic_math
 
 CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('route_policy',route.RoutePolicy),
@@ -74,6 +76,18 @@ PROFILE_SOURCES=(*OPT_SOURCES,'extensions/tendon_family/gvs_profile.py','extensi
 MATLAB=tuple('matlab/'+n+'.m' for n in ('tf_geometry','tf_point','tf_routes','tf_terms','tf_control','tf_run','tf_observe','tf_static','tf_view'))
 COMMON=dict(sources=SOURCES,contract_dependencies=tuple((n,v) for n,v,_ in CONTRACTS))
 EXTENSIONS=[
+    Extension('diagnosis.saved_state_check','tool','1.0.0',diagnostic_math.SavedStateCheck,diagnostic_evidence.DiagnosticEvidence,
+        'extensions.tendon_family.diagnostic_math:execute',
+        'Explicit bounded nonlinear prediction/braking or paired one-factor local NMPC experiment from a bound saved state. Charged new numerical work.',
+        sources=(*PROFILE_SOURCES,'extensions/tendon_family/diagnostic_math.py','extensions/tendon_family/diagnostic_evidence.py'),
+        capabilities=dict(category='diagnostics',role='public_tool',route_visible=True,
+            preflight='extensions.tendon_family.diagnostic_math:preflight')),
+    Extension('diagnosis.inspect_evidence','tool','1.0.0',diagnostic_evidence.BoundQuery,diagnostic_evidence.DiagnosticEvidence,
+        'extensions.tendon_family.diagnostic_evidence:inspect_tool',
+        'Read explicitly bound historical evidence: summary, late motion, plans or matched position and velocity predictions; never solves.',
+        sources=(*PROFILE_SOURCES,'extensions/tendon_family/diagnostic_evidence.py'),
+        capabilities=dict(category='diagnostics',role='public_tool',route_visible=True,
+            preflight='extensions.tendon_family.control_evidence:inspection_preflight')),
     Extension('control.inspect_evidence','tool','1.0.0',control_evidence.EvidenceQuery,control_evidence.EvidenceSummary,
         'extensions.tendon_family.control_evidence:inspect_tool',
         'Read sealed execution/update/snapshot evidence, plan quality and aligned one-update predictions. Missing history stays missing; no solve.',**COMMON,

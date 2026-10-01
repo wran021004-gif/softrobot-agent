@@ -141,6 +141,9 @@ class Host:
         try:
             snapshot = self.store.session(self.run_id)
             inp = SessionInput.model_validate(snapshot['snapshot']['input'])
+            role_grant = snapshot['state'].get('role_grant')
+            if role_grant and request.tool_id not in role_grant['permitted_tools']:
+                raise ValueError('TOOL_NOT_IN_DIAGNOSTIC_REQUEST_SCOPE')
             if snapshot['status'] in ('paused', 'stopped', 'needs_input', 'capability_missing', 'failed', 'budget_exhausted'):
                 raise ValueError('SESSION_NOT_RUNNING: explicitly resume before invoking more tools')
             compatible = self.compatibility()
@@ -288,6 +291,10 @@ class Host:
             context['task_provenance'] = dict(reference=context['route']['frozen_input']['reference'],
                 pointer='/input/task',presentation='Original frozen task; snapshot retained')
             context['recent_actions'] = state.get('recent_actions', [])[-4:]
+        if state.get('role_context'):
+            context['role_context'] = state['role_context']
+            context['project_remaining'] = self.store.remaining()
+            context['role_grant'] = state.get('role_grant')
         return context
 
     def model_scope(self):

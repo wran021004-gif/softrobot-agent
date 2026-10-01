@@ -1,4 +1,15 @@
-# Diagnosis Agent contract (no LLM adapter)
+# Diagnosis Agent contract
+
+The optional sequential platform handoff uses the existing model adapter in a
+separate context, sharing the design project's provider, tool and numerical
+budgets. Entrypoints are `diagnosis.request`, `diagnosis.check_request`,
+`diagnosis.submit`, and `design.respond_diagnosis`. The fixed coordinator runs
+the roles in sequence; no workers or independent authorization are created.
+`DiagnosticReport` remains the common facts/attribution foundation. Submission
+also requires exact evidence selectors, missing evidence and scoped advisory
+recommendations. Selector validation establishes reference integrity, not cause.
+The historical `route.advance(action="diagnose")` deterministic operation and
+`DiagnosisOutput` contract remain available unchanged.
 
 Round 3: also read CandidateEvaluation, sensitivity_evidence.json, feedback updates
 and repair decisions with their parent/child hashes. Separate sampled trends from

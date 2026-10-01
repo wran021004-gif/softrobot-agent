@@ -1,0 +1,33 @@
+{
+  "classification": "Offline repairs after failed live attempt; no second live run",
+  "changes": [
+    {
+      "issue": "Default prediction content exceeded the Host inline envelope",
+      "before_content_bytes": 8978,
+      "after_content_bytes": 6961,
+      "correction": "Omit duplicate controller recipe and full projected-state arrays; retain exact state selectors and velocity vectors."
+    },
+    {
+      "issue": "Wrong query result passed as binding produced an unhelpful KeyError",
+      "correction": "Require an explicit imported execution binding and verify source candidate/configuration identity."
+    },
+    {
+      "issue": "Model-requested diagnostic subbudget was not enforced",
+      "requested_provider_attempts": 4,
+      "actual_provider_attempts": 15,
+      "requested_tool_calls": 8,
+      "actual_tool_calls": 10,
+      "correction": "Restrict the diagnostic role before work and enforce its budget in the shared Store reservation path and tool scope in Host."
+    },
+    {
+      "issue": "Fresh local paired metrics lacked explicit displacement reporting",
+      "correction": "Retain matched physical position/velocity/displacement series, input bounds and source selectors."
+    }
+  ],
+  "live_source_manifest": "runs/stage342_diagnostic_cycle_20261001/live_source_snapshot/manifest.json",
+  "unverified": [
+    "New nonlinear/braking tools have not been run on this robot under the scientific ledger.",
+    "No live submission/design-response/final-review phase completed.",
+    "Provider single-tool compliance remains unproven after the compact-view repair."
+  ]
+}

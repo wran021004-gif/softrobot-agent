@@ -1,0 +1,107 @@
+{
+  "status": "incomplete",
+  "stop_reason": "MODEL_PROTOCOL_CORRECTION_TOTAL_LIMIT: INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls: EXACTLY_ONE_TOOL_CALL_REQUIRED: received 3",
+  "project_id": "gvs-stage342-0d83380f594f",
+  "completed_handoffs": {
+    "diagnosis_request": {
+      "artifact_id": "b1ab469865eadc50ddfb41de39105cb68915e49d40a2deec8994113a3c71b913",
+      "media_type": "application/json"
+    }
+  },
+  "diagnostic_report_submitted": false,
+  "design_response_submitted": false,
+  "model_authored_final_review": false,
+  "improvement_adopted": false,
+  "usage": {
+    "project": {
+      "limit": {
+        "backend_solves": 3,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 14,
+        "model_calls": 17,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 117.62000000034459
+      },
+      "remaining": {
+        "backend_solves": 3,
+        "model_calls": 7,
+        "tool_calls": 46,
+        "wall_s": 3482.3799999996554,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "numerical": {
+      "limits": {
+        "local_solves": 6,
+        "prediction_evaluations": 24
+      },
+      "used": {
+        "local_solves": 0,
+        "prediction_evaluations": 0
+      }
+    }
+  },
+  "diagnostic_request_budget": {
+    "backend_solves": 0,
+    "model_calls": 4,
+    "tool_calls": 8,
+    "wall_s": 600.0,
+    "worker_calls": 0
+  },
+  "diagnostic_actual_usage": {
+    "tool_calls": 10,
+    "model_calls": 15,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 102.05800000042655
+  },
+  "diagnostic_subgrant_respected": false,
+  "protocol_corrections_used": 4,
+  "protocol_limits": {
+    "max_consecutive": 2,
+    "max_total": 4
+  },
+  "baseline": {
+    "execution_id": "5991de53e82747439e87ba8569667e1b",
+    "terminal_error_m": 0.007642608585867386,
+    "official_task_success": true,
+    "terminal_tip_speed_m_s": 0.6351726092425104,
+    "sampled_settling": {
+      "available": true,
+      "continuous_time_guarantee": false,
+      "max_error_m": 0.05813810428573256,
+      "max_speed_m_s": 1.5810152739742807,
+      "passed": false,
+      "position_limit_m": 0.01,
+      "speed_limit_m_s": 0.02,
+      "window_s": 0.05
+    },
+    "mean_update_s": 17.075238151415917,
+    "deadline_misses": 35,
+    "real_time_demonstrated": false,
+    "force_bound_violation_n": 0.0,
+    "solver_error_count": 0
+  },
+  "source_preservation": {
+    "original_manifest_verified": true,
+    "original_configuration_verified": true,
+    "execution_owner": "gvs-stage341-0e4c97f35777-0b9932b1a295ddf0",
+    "live_source_snapshot": "runs/stage342_diagnostic_cycle_20261001/live_source_snapshot/manifest.json"
+  },
+  "numerical_validation": "No new scientific numerical evaluations. Mathematical helper unit tests are not robot validation.",
+  "next_parameter_group": "tendon routing and guide lever arms",
+  "prerequisites": [
+    "valid live diagnostic report and explicit design response",
+    "matched controller verification",
+    "model-scoped braking checks at multiple recorded poses"
+  ],
+  "ranking_changed": false,
+  "physical_design_changed": false
+}

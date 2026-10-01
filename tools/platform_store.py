@@ -216,6 +216,11 @@ class Store:
                     raise ValueError('REQUEST_ID_COLLISION')
                 return old, False
             parent_run = self.session(run_id, db)['snapshot'].get('parent_run_id')
+            role_grant = self.session(run_id, db)['state'].get('role_grant')
+            if role_grant:
+                used = self.remaining(run_id, db)['used']
+                if any(cost[k] + used[k] > role_grant['budget'][k] + 1e-9 for k in cost):
+                    raise ValueError('BUDGET_EXHAUSTED: diagnostic request subgrant')
             for scope in ([None, run_id, parent_run] if parent_run else [None, run_id]):
                 remainder = self.remaining(scope, db)['remaining']
                 if any(cost[k] > remainder[k] + 1e-9 for k in cost):

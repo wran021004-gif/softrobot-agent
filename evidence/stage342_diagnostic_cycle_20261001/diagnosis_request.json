@@ -1,0 +1,41 @@
+{
+  "binding": {
+    "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+    "media_type": "application/json"
+  },
+  "budget": {
+    "backend_solves": 0,
+    "model_calls": 4,
+    "tool_calls": 8,
+    "wall_s": 600.0,
+    "worker_calls": 0
+  },
+  "candidate_id": "proposal_compliant_build",
+  "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+  "evidence_manifest": {
+    "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+    "media_type": "application/json"
+  },
+  "execution_id": "5991de53e82747439e87ba8569667e1b",
+  "permitted_tools": [
+    "diagnosis.inspect_evidence",
+    "diagnosis.check_request",
+    "diagnosis.submit",
+    "evidence.read"
+  ],
+  "question": "The official baseline summary shows reach_passed=true with terminal_error_m=0.007642608585867386 (within reach_tolerance_m=0.01) and terminal_speed_m_s=0.6351726092425104, yet sampled_settling_passed=false with late_max_error_m=0.05813810428573256 and late_max_speed_m_s=1.5810152739742807 against limits position_limit_m=0.01 and speed_limit_m_s=0.02 over window_s=0.05. At the same time stopping_counts={Solve_Succeeded:1, User_Requested_Stop:34}, deadline_misses=35, mean_update_s=17.075238151415917, initialization_selected=29 and noninitialization_selected=6. Using only the saved baseline evidence, which candidate mechanisms (e.g. insufficiently informative or unstable warm states across updates, control-loop timing relative to control_period_s=0.01 versus mean_update_s, seed/initialization-dominated selection, premature holds, or tension/rate limits) are supported, which are excluded, and what additional saved evidence would discriminate between the surviving mechanisms? Please avoid adopting a fixed cause and state residual uncertainty.",
+  "scope": [
+    "sampled_settling_failure (late_max_error_m, late_max_speed_m_s vs position_limit_m, speed_limit_m_s, window_s)",
+    "reach_passed=true with terminal_error_m and terminal_speed_m_s",
+    "stopping_counts (Solve_Succeeded vs User_Requested_Stop)",
+    "deadline_misses and mean_update_s relative to control_period_s",
+    "initialization_selected vs noninitialization_selected and full_snapshots_available=false"
+  ],
+  "stopping_conditions": [
+    "A bounded set of candidate mechanisms for the sampled_settling and rate/deadline failures is either supported or excluded by saved baseline evidence",
+    "The bounded diagnostic budget (tool_calls, model_calls, wall_s) is exhausted",
+    "No further saved evidence exists that could discriminate between the surviving candidate mechanisms"
+  ],
+  "subject": "Independent development validation of a serial multi-segment soft arm: secondary performance failure of the compliant-baseline candidate where reach passes but sampled settling, deadline and update-rate criteria fail",
+  "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+}

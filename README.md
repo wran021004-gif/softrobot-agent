@@ -62,6 +62,12 @@ python examples/workbench.py platform check configs/platform/signal_hold/session
 `python examples/observe.py runs/round4/length/0.30623771682/C1 runs/round4/length/0.30623771682/C2`。
 观看与导出动画不启动新仿真；本轮长度对照已结束，不要为查看结果重新运行实验。
 
+Current development status is tracked in [CURRENT_STATUS](docs/CURRENT_STATUS.md).
+Stage 3.42 adds sequential diagnostic handoff tools; its live attempt stopped at
+the protocol-correction limit before report submission or physical verification.
+The successful Stage 3.41 reach result remains the incumbent, with settling and
+real-time operation still failing. See [Stage 3.42](docs/stage342_diagnostic_cycle.md).
+
 The historical closeout implements a persistent bounded campaign with fixed C1/C2 pairs,
 normal trajectories, independent MATLAB reduced mechanics and offline evidence audit.
 See [closeout entry and capability matrix](docs/round3_closeout_tools.md),
