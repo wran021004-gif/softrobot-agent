@@ -394,8 +394,8 @@ def overview(host):
         for build_node in (row for row in nodes if row.get('action')=='build' and row.get('status')=='completed'):
             status=candidate_analysis_status(analysis_ctx,build_node['node_id'])
             try:
-                gate=check_run_eligibility(host,build_node['node_id'])
-                status['run_prerequisites']=dict(satisfied=True,detail=gate)
+                check_run_eligibility(host,build_node['node_id'])
+                status['run_prerequisites']=dict(satisfied=True)
             except ValueError as exc:
                 status['run_prerequisites']=dict(satisfied=False,blocking_error=str(exc),
                     required_next_step=(f"Call analysis.prepare_candidate with source_node={build_node['node_id']!r}, then "

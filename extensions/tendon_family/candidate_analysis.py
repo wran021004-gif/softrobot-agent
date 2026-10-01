@@ -306,13 +306,10 @@ def candidate_analysis_status(ctx,source_node):
     for name,(kind,tool,default) in _COMPONENTS.items():
         row=chain.get(name)
         if registered and registered[1].get(name):
-            components[name]=dict(state='available_attached',available=True,reference=registered[1][name],
-                tool_id=tool,tool_version=versions[name],detail='Registered on this exact build and validated by Route.')
+            components[name]=dict(state='available_attached',available=True,reference=registered[1][name])
             continue
         if row:
-            components[name]=dict(state='available_unattached',
-                available=True,reference=row[0],tool_id=tool,tool_version=versions[name],
-                detail='Valid result exists for this exact scope but is not registered on the build.')
+            components[name]=dict(state='available_unattached',available=True,reference=row[0])
             continue
         incompatible=None
         for selection in reversed(failed_selections):
@@ -331,26 +328,32 @@ def candidate_analysis_status(ctx,source_node):
             incompatible=dict(state='incompatible_evidence_chain',reference=reference,detail='Result exists but does not form the exact upstream evidence chain required for this build.');break
         bundle_component=(bundle[1].get('components',{}).get(name) if bundle else None) or {}
         if bundle_component.get('status')=='failed':
-            components[name]=dict(state='computation_failed',available=False,tool_id=tool,tool_version=versions[name],
+            components[name]=dict(state='computation_failed',available=False,
                 detail=bundle_component.get('detail'),failure=bundle_component.get('failure'))
         elif incompatible:
-            components[name]=dict(available=False,tool_id=tool,tool_version=versions[name],**incompatible)
+            components[name]=dict(available=False,**incompatible)
         elif failed:
-            components[name]=dict(state='computation_failed',available=False,tool_id=tool,tool_version=versions[name],
+            components[name]=dict(state='computation_failed',available=False,
                 detail=failed[-1]['error'],request_id=failed[-1]['request_id'])
         else:
-            components[name]=dict(state='not_performed',available=False,tool_id=tool,tool_version=versions[name],
-                detail='No valid result for this candidate and frozen scope is committed.')
+            components[name]=dict(state='not_performed',available=False)
         missing.append(name+': '+components[name]['state'])
-    return dict(source_node=source_node,build_candidate_id=built['candidate_id'],build_result=node['result'],
+    proposal=built.get('proposal_provenance')
+    if proposal:
+        proposal={key:proposal.get(key) for key in ('optimizer_candidate_id','optimizer_result','proposal_configuration',
+            'scientific_configuration_identity','source_build_node')}
+    result=dict(source_node=source_node,build_candidate_id=built['candidate_id'],build_result=node['result'],
         immutable_configuration=built['configuration'],scientific_configuration_identity=binding['scientific_configuration_identity'],
         protocol=protocol,endpoint_target=target,analysis_scope_identity=scope_identity,components=components,
         bundle=None if bundle is None else bundle[0],registered_report=None if registered is None else registered[0],
-        proposal_provenance=built.get('proposal_provenance'),analysis_complete=all(row['available'] for row in components.values()),
-        missing_or_incompatible=missing,
-        candidate_analysis_operation=dict(tool_id='analysis.prepare_candidate',arguments=dict(source_node=source_node)),
-        registration_operation=dict(tool_id='route.record_analysis',source_node=source_node,
-            required_prior_node_evidence=[node['result']],candidate_analysis_bundle=None if bundle is None else bundle[0]))
+        proposal_provenance=proposal,analysis_complete=all(row['available'] for row in components.values()),
+        missing_or_incompatible=missing)
+    if not result['analysis_complete']:
+        result['candidate_analysis_operation']=dict(tool_id='analysis.prepare_candidate',arguments=dict(source_node=source_node))
+    if registered is None:
+        result['registration_operation']=dict(tool_id='route.record_analysis',source_node=source_node,
+            required_prior_node_evidence=[node['result']],candidate_analysis_bundle=None if bundle is None else bundle[0])
+    return result
 
 
 def evaluate_candidate(ctx,args):

@@ -1,0 +1,561 @@
+{
+  "run_id": "gvs-stage339-464517014f72",
+  "status": "needs_input",
+  "stop_reason": "CONTEXT_LIMIT_REQUIRED_STATE_TOO_LARGE: narrow tools or raise explicit byte limit",
+  "model_selected_candidate": {
+    "candidate_id": "build_compliant_a09627a8a276",
+    "candidate_facts": {
+      "candidate_id": "build_compliant_a09627a8a276",
+      "configuration": {
+        "artifact_id": "bb049ee318c3425b12eb42c35d99a11be13c05a54a127e5a3d7be74cef24f4f2",
+        "media_type": "application/json"
+      },
+      "effective_identity": "e863de187629f28b84263cce90bc30da6822a51f4086e5ea4c015006bcaeb811",
+      "execution_id": "6f5e60346c1f41a5a346c4e852bac59a",
+      "frozen_baseline_identity": "17db9389ea76851097330828d29f7613adad750e517063b5d2cd34265bc67fdc",
+      "multi_category_coverage": false,
+      "owner_run_id": "gvs-stage339-464517014f72-5be7e4744c652759",
+      "parameters": [
+        {
+          "baseline_delta": -0.009999999999999995,
+          "baseline_value": 0.12,
+          "effective_value": 0.11,
+          "path": "components/far/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": -0.010000000000000009,
+          "baseline_value": 0.16,
+          "effective_value": 0.15,
+          "path": "components/near/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": null,
+          "baseline_value": "baseline",
+          "effective_value": "compliant",
+          "path": "design/material_scenario",
+          "unit": null
+        },
+        {
+          "baseline_delta": 0.0,
+          "baseline_value": 1.0,
+          "effective_value": 1.0,
+          "path": "design/section_scale",
+          "unit": "1"
+        }
+      ],
+      "physical_changes": [
+        {
+          "baseline_delta": -0.010000000000000009,
+          "baseline_value": 0.16,
+          "category": "length",
+          "effective_value": 0.15,
+          "path": "components/near/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": -800000.0,
+          "baseline_value": 8000000.0,
+          "category": "material",
+          "effective_value": 7200000.0,
+          "path": "components/near/physics/young_pa",
+          "unit": "Pa"
+        },
+        {
+          "baseline_delta": -0.009999999999999995,
+          "baseline_value": 0.12,
+          "category": "length",
+          "effective_value": 0.11,
+          "path": "components/far/length_m",
+          "unit": "m"
+        },
+        {
+          "baseline_delta": -600000.0,
+          "baseline_value": 6000000.0,
+          "category": "material",
+          "effective_value": 5400000.0,
+          "path": "components/far/physics/young_pa",
+          "unit": "Pa"
+        }
+      ],
+      "physical_summary": {
+        "applicability": {
+          "backends": [
+            "backend.matlab_spatial",
+            "backend.family_mujoco"
+          ],
+          "collision": "section convex hull extrusions; holes filled for collision only; exact polygon/circular area moments; guide box envelope",
+          "compilable": true,
+          "omitted": [
+            "axial stretch",
+            "shear",
+            "material torsion",
+            "friction",
+            "elastic rope",
+            "motor dynamics",
+            "self collision"
+          ],
+          "physics": "serial rigid cells with two principal bending hinges; fixed rigid attachments; straight frictionless tendons"
+        },
+        "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "force_limits_n": {
+          "far_t0": 8.0,
+          "far_t1": 8.0,
+          "far_t2": 8.0,
+          "near_t0": 8.0,
+          "near_t1": 8.0,
+          "near_t2": 8.0
+        },
+        "physics_identity": "0cde31521fd19ab23754a7acacf3e22dd666aec8c94b847248d34b3f677bee1f",
+        "sections": [
+          {
+            "area_range_m2": [
+              0.0002513274122871835,
+              0.0002513274122871835
+            ],
+            "cell_damping_nm_s_rad": [
+              [
+                0.04,
+                0.056
+              ],
+              [
+                0.04,
+                0.056
+              ]
+            ],
+            "cell_inertia_diagonal_kg_m2": [
+              [
+                1.4168582867689968e-07,
+                1.0028880048115918e-07,
+                1.3139056775169812e-07
+              ],
+              [
+                1.4168582867689968e-07,
+                1.0028880048115918e-07,
+                1.3139056775169812e-07
+              ]
+            ],
+            "cell_stiffness_nm_rad": [
+              [
+                2.3162334316386834,
+                3.619114736935443
+              ],
+              [
+                2.3162334316386834,
+                3.619114736935443
+              ]
+            ],
+            "cells": 12,
+            "component": "near",
+            "length_m": 0.15,
+            "mass_kg": 0.04146902302738526,
+            "material": {
+              "bending_ei_nm2": null,
+              "bending_viscosity_nm2_s": [
+                0.0005,
+                0.0007
+              ],
+              "density_kg_m3": 1100.0,
+              "line_density_kg_m": null,
+              "mode": "material",
+              "young_pa": 7200000.0
+            }
+          },
+          {
+            "area_range_m2": [
+              0.00010925347222222221,
+              0.0001385868055555556
+            ],
+            "cell_damping_nm_s_rad": [
+              [
+                0.03272727272727272,
+                0.04363636363636364
+              ],
+              [
+                0.03272727272727272,
+                0.04363636363636364
+              ]
+            ],
+            "cell_inertia_diagonal_kg_m2": [
+              [
+                3.255178147159782e-08,
+                2.0363751623899362e-08,
+                3.0868777350029346e-08
+              ],
+              [
+                1.9958581815805945e-08,
+                1.4527323319862895e-08,
+                2.015803223284184e-08
+              ]
+            ],
+            "cell_stiffness_nm_rad": [
+              [
+                0.6746775784209283,
+                1.317629802320076
+              ],
+              [
+                0.4384633596709277,
+                0.783086677320076
+              ]
+            ],
+            "cells": 12,
+            "component": "far",
+            "length_m": 0.11,
+            "mass_kg": 0.014283366319444445,
+            "material": {
+              "bending_ei_nm2": null,
+              "bending_viscosity_nm2_s": [
+                0.0003,
+                0.0004
+              ],
+              "density_kg_m3": 1050.0,
+              "line_density_kg_m": null,
+              "mode": "material",
+              "young_pa": 5400000.0
+            }
+          }
+        ]
+      },
+      "semantic_provenance": {
+        "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "material_groups": {
+          "far": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          },
+          "near": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          }
+        },
+        "selections": {
+          "design/material_scenario": "compliant",
+          "design/section_scale": 1.0
+        },
+        "source": "Frozen experiment semantic_source; original per-section material parameters",
+        "source_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4"
+      }
+    }
+  },
+  "candidate_analysis": {
+    "source_node": "build_compliant_a09627a8a276",
+    "build_candidate_id": "build_compliant_a09627a8a276",
+    "build_result": {
+      "artifact_id": "d871f3e1112b5734169ad80e213efb68a2d0be70688b198d4914f226772163d5",
+      "media_type": "application/json"
+    },
+    "immutable_configuration": {
+      "artifact_id": "bd1067fa3552b7ada8362a4608200e5e737fa682b05de60666de7a20c7de5375",
+      "media_type": "application/json"
+    },
+    "scientific_configuration_identity": "a09627a8a276f070f93c6e076498e9018fb3d2ecfbe5bc7e87ff2decb704312d",
+    "protocol": {
+      "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+      "media_type": "application/json"
+    },
+    "endpoint_target": {
+      "artifact_id": "d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be",
+      "media_type": "application/json"
+    },
+    "analysis_scope_identity": "beb30aa19f3c00e467f751c8d916ad35bde52badf1a3a5849cca01d739809448",
+    "components": {
+      "linearization": {
+        "state": "available_attached",
+        "available": true,
+        "reference": {
+          "artifact_id": "d04767b8b91af843c7d31d3fc782c9248b609cf3fa99f1649aa1a248f7608b86",
+          "media_type": "application/json"
+        },
+        "tool_id": "analysis.linearize_candidate",
+        "tool_version": "1.0.0",
+        "detail": "Registered on this exact build and validated by Route."
+      },
+      "metrics": {
+        "state": "available_attached",
+        "available": true,
+        "reference": {
+          "artifact_id": "8eeb466ddd80e21152bd5a66d0645fb4b537a1c27b46f8b16097a050caaad9ea",
+          "media_type": "application/json"
+        },
+        "tool_id": "analysis.control_metrics",
+        "tool_version": "2.0.0",
+        "detail": "Registered on this exact build and validated by Route."
+      },
+      "endpoint": {
+        "state": "available_attached",
+        "available": true,
+        "reference": {
+          "artifact_id": "cc3c32d2f68cbb7fe2545afcdde5d8172e57a86203dd8616ccdf7b6e5f3d4d77",
+          "media_type": "application/json"
+        },
+        "tool_id": "analysis.bounded_endpoint",
+        "tool_version": "1.0.0",
+        "detail": "Registered on this exact build and validated by Route."
+      },
+      "screen": {
+        "state": "available_attached",
+        "available": true,
+        "reference": {
+          "artifact_id": "79b981de11051522fcc304fa52975b2b224b002bb1fa4f7bb6a23ec558ad3b77",
+          "media_type": "application/json"
+        },
+        "tool_id": "design.screen",
+        "tool_version": "1.0.0",
+        "detail": "Registered on this exact build and validated by Route."
+      }
+    },
+    "bundle": {
+      "artifact_id": "ddaa0f450792afa9f54e274f4ad5b23b7f0209a6957abd0c2f0eab2d26e1906a",
+      "media_type": "application/json"
+    },
+    "registered_report": {
+      "artifact_id": "f6c02af80038e7f54a8608b168508e4c2c52e1120874508604910085c50fb45e",
+      "media_type": "application/json"
+    },
+    "proposal_provenance": {
+      "build_candidate_id": "build_compliant_a09627a8a276",
+      "material_scenario": "compliant",
+      "optimizer_candidate_id": "math-compliant-a09627a8a276",
+      "optimizer_result": {
+        "artifact_id": "ded1f732612fd3b7c8b268cfc0d1cd03a2bb65671bafadb1d18ed0acd4927b9b",
+        "media_type": "application/json"
+      },
+      "optimizer_source": "current_run",
+      "optimizer_starting_build_node": "seed_baseline",
+      "optimizer_tool": {
+        "id": "design.optimize_math",
+        "version": "1.0.0"
+      },
+      "original_optimizer_owner_run_id": "gvs-stage339-464517014f72",
+      "proposal_configuration": {
+        "artifact_id": "36ce32120faa453c9819d610c968946093ea1b02c99856f2710a23b4122b0277",
+        "media_type": "application/json"
+      },
+      "proposal_parameters": {
+        "components/far/length_m": 0.11,
+        "components/near/length_m": 0.15,
+        "design/section_scale": 1.0
+      },
+      "scientific_configuration_identity": "a09627a8a276f070f93c6e076498e9018fb3d2ecfbe5bc7e87ff2decb704312d",
+      "source_build_node": "build_compliant_a09627a8a276"
+    },
+    "analysis_complete": true,
+    "missing_or_incompatible": [],
+    "candidate_analysis_operation": {
+      "tool_id": "analysis.prepare_candidate",
+      "arguments": {
+        "source_node": "build_compliant_a09627a8a276"
+      }
+    },
+    "registration_operation": {
+      "tool_id": "route.record_analysis",
+      "source_node": "build_compliant_a09627a8a276",
+      "required_prior_node_evidence": [
+        {
+          "artifact_id": "d871f3e1112b5734169ad80e213efb68a2d0be70688b198d4914f226772163d5",
+          "media_type": "application/json"
+        }
+      ],
+      "candidate_analysis_bundle": {
+        "artifact_id": "ddaa0f450792afa9f54e274f4ad5b23b7f0209a6957abd0c2f0eab2d26e1906a",
+        "media_type": "application/json"
+      }
+    },
+    "run_prerequisites": {
+      "satisfied": true,
+      "detail": {
+        "eligible": true,
+        "source_node": "build_compliant_a09627a8a276",
+        "candidate_id": "build_compliant_a09627a8a276",
+        "build_configuration": {
+          "artifact_id": "bd1067fa3552b7ada8362a4608200e5e737fa682b05de60666de7a20c7de5375",
+          "media_type": "application/json"
+        },
+        "scientific_configuration_identity": "a09627a8a276f070f93c6e076498e9018fb3d2ecfbe5bc7e87ff2decb704312d"
+      }
+    }
+  },
+  "backend_execution_and_evaluation_occurred": true,
+  "official_reach": {
+    "accepted_noninitialization_plans": 0,
+    "accepted_plans": 35,
+    "applied_tension_ranges": [
+      {
+        "limit_n": 8.0,
+        "maximum_n": 1.7512764858409064,
+        "minimum_n": 1.7512764858409064,
+        "tendon": "near_t0",
+        "tendon_index": 0
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 4.755852667139922,
+        "minimum_n": 4.755852667139922,
+        "tendon": "near_t1",
+        "tendon_index": 1
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 3.1031566686630025,
+        "minimum_n": 3.1031566686630025,
+        "tendon": "near_t2",
+        "tendon_index": 2
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 3.218253612486097,
+        "minimum_n": 3.218253612486097,
+        "tendon": "far_t0",
+        "tendon_index": 3
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 0.7859357597552847,
+        "minimum_n": 0.7859357597552847,
+        "tendon": "far_t1",
+        "tendon_index": 4
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 0.6315302379791942,
+        "minimum_n": 0.6315302379791942,
+        "tendon": "far_t2",
+        "tendon_index": 5
+      }
+    ],
+    "candidate": {
+      "candidate_id": "build_compliant_a09627a8a276",
+      "configuration": {
+        "artifact_id": "bb049ee318c3425b12eb42c35d99a11be13c05a54a127e5a3d7be74cef24f4f2",
+        "media_type": "application/json"
+      },
+      "execution_id": "6f5e60346c1f41a5a346c4e852bac59a",
+      "owner_run_id": "gvs-stage339-464517014f72-5be7e4744c652759"
+    },
+    "complete": true,
+    "configuration": {
+      "artifact_id": "bb049ee318c3425b12eb42c35d99a11be13c05a54a127e5a3d7be74cef24f4f2",
+      "media_type": "application/json"
+    },
+    "control_period_s": 0.01,
+    "control_updates": 35,
+    "converged_updates": 0,
+    "coordinate_frame": "world",
+    "deadline_misses": 35,
+    "error_convention": "actual_tip minus target",
+    "evaluation": {
+      "artifact_id": "acde82dca4becb364110b98c5e2c98ea299956d6fb545d2c6e6a1f2dfeca07ba",
+      "media_type": "application/json"
+    },
+    "evaluation_validity": "valid",
+    "execution_id": "6f5e60346c1f41a5a346c4e852bac59a",
+    "force_bound_violation_n": 0.0,
+    "hold_last_responses": 0,
+    "initialization_selected": 35,
+    "mean_complete_update_s": 18.404486402862574,
+    "measured_computation_s": 646.3910000000615,
+    "one_step_prediction_evidence": {
+      "artifact_id": "fae2dc0cacde5b9e066d05b7d71ca11e8e6a32303678895c5056f20a9b50f726",
+      "media_type": "application/json"
+    },
+    "one_step_prediction_summary": {
+      "aligned_count": 35,
+      "frame": "world",
+      "maximum_tip_difference_m": 0.004564900830397734,
+      "mean_tip_difference_m": 0.0033810013865672116,
+      "missing": [],
+      "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+    },
+    "real_time_demonstrated": false,
+    "report": {
+      "execution_id": "6f5e60346c1f41a5a346c4e852bac59a",
+      "owner_run_id": "gvs-stage339-464517014f72-5be7e4744c652759",
+      "reference": {
+        "artifact_id": "241555f596d6b7886edaa4455a99a0b0f9a7d91e6ce555fc62af30a84e17d2b3",
+        "media_type": "application/json"
+      },
+      "request_id": "single-profile-report"
+    },
+    "result_type": "free_reach",
+    "sampled_settling": {
+      "available": true,
+      "continuous_time_guarantee": false,
+      "max_error_m": 0.032776618854796144,
+      "max_speed_m_s": 0.17072241795880597,
+      "passed": false,
+      "position_limit_m": 0.01,
+      "speed_limit_m_s": 0.02,
+      "window_s": 0.05
+    },
+    "signed_position_error_m": [
+      -0.02666667909072995,
+      -0.0029857352014447183,
+      0.017756839895082838
+    ],
+    "simulated_duration_s": 0.35000000000000003,
+    "simulation": {
+      "artifact_id": "a4583063317e839c0f7049dae37512c9e151ddca867c0b485ae4a606f2c1f7bb",
+      "media_type": "application/json"
+    },
+    "solver_error_count": 0,
+    "target_position_m": [
+      0.29,
+      0.035,
+      0.19
+    ],
+    "task_accepted": false,
+    "terminal_error_m": 0.0321765714687057,
+    "terminal_position_m": [
+      0.26333332090927003,
+      0.032014264798555285,
+      0.20775683989508284
+    ],
+    "terminal_tip_speed_m_s": 0.1442085121981818,
+    "valid_complete_execution": true
+  },
+  "sampled_settling": {
+    "available": true,
+    "continuous_time_guarantee": false,
+    "max_error_m": 0.032776618854796144,
+    "max_speed_m_s": 0.17072241795880597,
+    "passed": false,
+    "position_limit_m": 0.01,
+    "speed_limit_m_s": 0.02,
+    "window_s": 0.05
+  },
+  "complete_update_timing": {
+    "deadline_misses": 35,
+    "updates": 35,
+    "mean_complete_update_s": 18.404486402862574,
+    "real_time_demonstrated": false
+  },
+  "model_authored_finish": {
+    "completed": false,
+    "explicit_delivery": null,
+    "delivery_status": null
+  },
+  "usage": {
+    "tool_calls": 14,
+    "model_calls": 12,
+    "backend_solves": 1,
+    "worker_calls": 0,
+    "wall_s": 1099.0339999997523
+  },
+  "math_evaluations_new": 12,
+  "within_limits": true
+}

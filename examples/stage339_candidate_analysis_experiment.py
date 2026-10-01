@@ -170,8 +170,9 @@ def outcome(audit_value):
     selected=next((row for row in reversed(evaluated) if row.get('candidate_id')==final.get('candidate_id')),None)
     if selected is None and evaluated:selected=evaluated[-1]
     facts=(selected or {}).get('factual_result');profile=(selected or {}).get('profile_report_summary') or {}
+    selected_candidate=(selected or {}).get('candidate_id') or final.get('candidate_id')
     analysis=next((row for row in reversed(audit_value.get('candidate_analysis_status',[]))
-        if row.get('source_node')==final.get('source_build_node') or row.get('build_candidate_id')==final.get('candidate_id')),None)
+        if row.get('source_node')==final.get('source_build_node') or row.get('build_candidate_id')==selected_candidate),None)
     return dict(run_id=audit_value['run_id'],status=audit_value['status'],stop_reason=audit_value['stop_reason'],
         model_selected_candidate=None if selected is None else dict(candidate_id=selected['candidate_id'],candidate_facts=selected.get('candidate_facts')),
         candidate_analysis=analysis,backend_execution_and_evaluation_occurred=bool(selected),official_reach=facts,

@@ -7,7 +7,7 @@ from uuid import uuid4
 from extensions.tendon_family.route import check_run_eligibility,create
 from schemas.platform_analysis import EndpointTarget,TaskAnalysisProtocol
 from tools.platform_host import Host
-from tools.platform_store import Store,plain
+from tools.platform_store import Store,encode,plain
 
 
 SOURCE=Path('runs/stage333_bounded_recovery_independent_lengths_20260929_114923/resolved_frozen_input.json')
@@ -88,6 +88,7 @@ class CandidateAnalysisBundleTests(unittest.TestCase):
             if row['source_node']=='ordinary-a')
         self.assertTrue(all(row['state']=='available_attached' for row in attached['components'].values()))
         self.assertTrue(attached['run_prerequisites']['satisfied'])
+        self.assertLess(len(encode(attached).encode('utf8')),3500)
 
         second_build=self.build('ordinary-b',{'components/near/length_m':.166,
             'components/far/length_m':.126,'design/section_scale':1.02,

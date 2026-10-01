@@ -1,0 +1,443 @@
+{
+  "run_id": "gvs-stage339-464517014f72",
+  "decisions": [
+    {
+      "request_id": "model-0",
+      "tool_id": "evidence.read",
+      "reason": "Guidance requires reading this compact reconstructed NMPC evidence artifact before selecting a design, to use the compact prior-case context.",
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 7.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "59d7414cdbc84088893b2737b2e0256f",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "84ccbb4f606c8113fb48326f73e7356cd9363f8cbaabefc923d4153c248cf272",
+          "media_type": "application/json"
+        },
+        "request_id": "model-0",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-1",
+      "tool_id": null,
+      "reason": null,
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 15.5,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": "INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls[0].function.arguments.arguments: Input should be an object. Nested domain input for the selected tool. For route.advance, arguments.reason explains the route action and is required separately from outer reason.",
+        "execution_id": "146bef5666f845b79aed189e9a295497",
+        "execution_status": "failed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "3d87409f45d4cb0072540a11fc514bf7e4a797a31811f3c098e8f268e46f065e",
+          "media_type": "application/json"
+        },
+        "request_id": "model-1",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-2",
+      "tool_id": "evidence.read",
+      "reason": "Following the previous root overview of the supplied compact reconstructed NMPC evidence, I now read the /cases subtree to obtain the compact prior-case context that the guidance requires before selecting a design.",
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 17.57799999997951,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "6b3f096d605b45baaecd11714f7aabd7",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "da7a03adec539a40411250f2cc1f3b17ef6382b4eeb8ad9ee532ecb686c882bd",
+          "media_type": "application/json"
+        },
+        "request_id": "model-2",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-3",
+      "tool_id": "evidence.read",
+      "reason": "The guidance explicitly requires reading the compact reconstructed NMPC evidence artifact 07a9fc8b... and using its prior-case context before selecting a design; I have only the /cases overview so far, so I page into the first case entry to obtain the actual compact facts.",
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 8.937999999849126,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "f1d7d6fefe7f45aca9d18b0b155f4303",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "855d4a7384ef7ef03ade3a8695e4dbc995a94d5ac4d58c5f8b7277d57ca1664f",
+          "media_type": "application/json"
+        },
+        "request_id": "model-3",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-4",
+      "tool_id": "evidence.read",
+      "reason": "I already read the first four keys of the reconstructed NMPC case (classification, iteration_trace, label, reconstruction_limit) and need the remaining documented keys of that case before selecting a design, so that the compact prior-case context is fully used rather than partially inferred.",
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 18.203999999910593,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "2cbad8219f114caeb6904a06b63aa0f7",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "7dc16b50181ca7956c5cce2d7b61ae60a8dc7ef11a8c4a25bdd855b1c2f7a8d7",
+          "media_type": "application/json"
+        },
+        "request_id": "model-4",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-5",
+      "tool_id": "route.advance",
+      "reason": "Need an owned completed build to serve as the required source_node for design.optimize_math; building the unchanged baseline is a zero-solve, zero-execution seed that provides that starting configuration.",
+      "arguments": {
+        "node_id": "seed_baseline",
+        "action": "build",
+        "reason": "The route has no owned build node, but design.optimize_math requires an owned completed build as its explicit starting configuration. Constructing the frozen baseline configuration here is solve-free (build validates only, producing no task error or trajectory) and is used purely as a mathematical seed, which the guidance permits; the baseline is neither executed nor evaluated.",
+        "next_step": "Invoke design.optimize_math from this seed build within the authorized near/far length and section-scale bounds over both compliant and stiff material scenarios to obtain candidate proposals."
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 15.952999999979511,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "713cff6dd4c241fab644dd5a52fe3e78",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "181d7d86a9416d46157422300e576dfe7faa9157b7c88698873d889c68376dfd",
+          "media_type": "application/json"
+        },
+        "request_id": "model-5",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-6",
+      "tool_id": "design.optimize_math",
+      "reason": "The route's registered next step is a bounded mathematical design search from the completed seed build seed_baseline, using the frozen protocol and endpoint target. The seeded, zero-backend optimizer explores only the authorized near/far length and section-scale intervals across both compliant and stiff material scenarios, which is cheaper than blind simulation trial-and-error.",
+      "arguments": {
+        "source_node": "seed_baseline"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 6.5,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "f72bcf7731404394bf5d6693139a3882",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "b5eee26ff201fbdf6ce6c4defb16a31e7dc3fc999412ef8bacfe1643fe0ae063",
+          "media_type": "application/json"
+        },
+        "request_id": "model-6",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-7",
+      "tool_id": "evidence.read",
+      "reason": "I need the exact optimizer proposal candidate_ids and their selected parameter values from the completed design.optimize_math result so I can construct one named proposal via design.build_proposal without retyping values.",
+      "arguments": {},
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 5.765999999828637,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "ff0c4379bbdd4261a588fc6c078755d9",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "ce2be379f3a20d5a58a3529e792e48bbeba577e0e144522958f2dd49d9fa4149",
+          "media_type": "application/json"
+        },
+        "request_id": "model-7",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-8",
+      "tool_id": "design.build_proposal",
+      "reason": "Construct the exact selected optimizer proposal so the Route owns an immutable build of the mathematically selected design; the tool copies the proposal configuration verbatim, so no design value is retyped or substituted.",
+      "arguments": {
+        "node_id": "build_compliant_a09627a8a276",
+        "optimizer_candidate_id": "math-compliant-a09627a8a276",
+        "reason": "The frozen lexicographic mathematical selection ranks math-compliant-a09627a8a276 as the compliant-scenario winner: it ties the lowest controller-start frozen local affine exact-ZOH position-residual upper-bound ratio (0.2 of the 0.01 m tolerance) and has the smaller feasible witness normalized input energy (9.82e-5 vs 1.95e-4 for the stiff twin). The design differs from the 0.16/0.12 m baseline in both lengths and uses the nonbaseline compliant material scenario, so it is a fresh covered design rather than the unchanged baseline or a supplied historical configuration.",
+        "next_step": "Construct this exact proposal as a Route build node, then run analysis.prepare_candidate once on it, register the returned bundle with route.record_analysis citing the build result, and only then decide whether one bounded backend validation run is warranted."
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 56.04700000002049,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "cfd2714f4eb3464daa0582e05583c76e",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "4d0594ae06f5b889722179ece578b26f50fdb832e664b940382ed994d9ead342",
+          "media_type": "application/json"
+        },
+        "request_id": "model-8",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-9",
+      "tool_id": "analysis.prepare_candidate",
+      "reason": "The selected optimizer proposal (math-compliant-a09627a8a276: far=0.11 m, near=0.15 m, section_scale=1.0, compliant scenario) has been constructed and validated as node build_compliant_a09627a8a276. The run prerequisites require exactly one candidate-bound analysis bundle for this build under the frozen protocol and endpoint target before any backend execution, so I request the deterministic four-part preparation (linearization, control metrics, bounded endpoint, advisory screen).",
+      "arguments": {
+        "source_node": "build_compliant_a09627a8a276"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 10.219000000040978,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "1d655709cd5b4f3caf09c4a7af4449d1",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "e366bb1b668c6948a32139c04511be0f8cb5c40fda511b79f727daabd839b7b3",
+          "media_type": "application/json"
+        },
+        "request_id": "model-9",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-10",
+      "tool_id": "route.record_analysis",
+      "reason": "Register the completed candidate-analysis bundle against the exact optimizer-proposal build so that its run prerequisite (candidate-bound shared analysis registered before execution) is satisfied, citing the build result as required prior node evidence.",
+      "arguments": {
+        "node_id": "register_analysis_build_compliant_a09627a8a276",
+        "source_node": "build_compliant_a09627a8a276",
+        "candidate_analysis_bundle": {
+          "artifact_id": "ddaa0f450792afa9f54e274f4ad5b23b7f0209a6957abd0c2f0eab2d26e1906a",
+          "media_type": "application/json"
+        },
+        "validation_disposition": "recommended",
+        "reason": "The deterministic candidate-analysis bundle for build_compliant_a09627a8a276 is complete (linearization, metrics, bounded endpoint and screen all available for this exact frozen scope). Its optimizer objective was a controller-start local affine exact-ZOH position residual, and the reported world-x position-control row is identically zero (world_x_position_control_nonzero_count=0, row_linf=0.0), so the screen is degenerate along that axis and cannot by itself predict closed-loop reach. Local-model control use of model.gvs is only WARN with validation unavailable, and the historical fixed-profile evidence is not scope-matched, so physical validation of this exact build is the warranted next step.",
+        "next_step": "After registration, execute one bounded backend validation run of this exact build (route.advance action=run, source_node=build_compliant_a09627a8a276), then read the official evaluation and control-profile results before deciding whether to revise or finish."
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 43.92200000002049,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "e35324cde1e64847be33464f662e7f3c",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "843c7c17c298e3f7ffba27cf85b1292ae2457fb237f98e182d49c473d3138488",
+          "media_type": "application/json"
+        },
+        "request_id": "model-10",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-11",
+      "tool_id": "route.advance",
+      "reason": "Route state shows the math-selected proposal build build_compliant_a09627a8a276 with a registered candidate-bound analysis bundle and satisfied run prerequisites; the Host's next_step directs one bounded backend validation run of this exact build, which is the evidence-led way to test the advisory local screen against simulation.",
+      "arguments": {
+        "node_id": "run_build_compliant_a09627a8a276",
+        "action": "run",
+        "source_node": "build_compliant_a09627a8a276",
+        "reason": "The selected optimizer proposal build build_compliant_a09627a8a276 (near 0.15 m, far 0.11 m, compliant numerical material scenario, section scale 1.0) is a completed build whose candidate-bound four-part analysis bundle is registered (node register_analysis_build_compliant_a09627a8a276), and its run prerequisites are satisfied. The local exact-ZOH screen is advisory only: its straight-start world-x control row is degenerate (nonzero count 0) and its residual-upper-bound reading does not establish global infeasibility, so one charged physical validation run through the frozen candidate_gvs_nmpc combination is warranted before any further design decision.",
+        "next_step": "Read the official evaluation and control-profile report for this run (simulation and evaluation request ids), then decide whether to spend the remaining two backend attempts on a revised covered design or to finish with this exact factual result."
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 55.04700000002049,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "5999f6ec3570438c910637dbb5787f78",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "bdf6f07c39251436df0271c2813def0c8ed67a02a343d096bea78d478a6cd859",
+          "media_type": "application/json"
+        },
+        "request_id": "model-11",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    }
+  ]
+}
