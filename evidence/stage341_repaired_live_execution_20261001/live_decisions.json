@@ -1,0 +1,1119 @@
+{
+  "run_id": "gvs-stage341-0e4c97f35777",
+  "actions": [
+    {
+      "request_id": "model-0",
+      "decision": {
+        "arguments": {
+          "byte_limit": 8192,
+          "limit": 20,
+          "pointer": "",
+          "reference": {
+            "artifact_id": "19d471a841b36a7e7a232789318d5a6490491dd606c5c9db8ef5b449d9e6ca73",
+            "media_type": "application/json"
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "The task guidance requires reading this deterministic recorded control evidence with evidence.read before selecting any candidate, and to use its explicit adoption decision and scope.",
+        "request_id": "model-0-tool",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 3.0939999998081475,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "34230577a17f4bb3859b8a52c003f226",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "cf81a14292d2525210617c2770119314ab0332f5383d2e001d9ca4b9d38a4ad4",
+          "media_type": "application/json"
+        },
+        "request_id": "model-0",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-1",
+      "decision": {
+        "arguments": {
+          "byte_limit": 4096,
+          "limit": 20,
+          "offset": 7,
+          "pointer": "",
+          "reference": {
+            "artifact_id": "19d471a841b36a7e7a232789318d5a6490491dd606c5c9db8ef5b449d9e6ca73",
+            "media_type": "application/json"
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Complete the paged read of the supplied deterministic control-evidence artifact so the explicit adoption decision and its declared scope are fully in context before I select a fresh covered design proposal in the bounded mathematical workflow.",
+        "request_id": "model-1-tool",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 35.10899999993853,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "cfe013027b4b4f138ac42dfa07264c63",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "8afadadc9d72a59e411e8bc2e102935c1ef763ef693ebc9d478137c2063bf72c",
+          "media_type": "application/json"
+        },
+        "request_id": "model-1",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-2",
+      "decision": {
+        "arguments": {
+          "action": "build",
+          "candidate_id": "math_seed_baseline",
+          "combination": "candidate_gvs_nmpc",
+          "next_step": "Invoke design.optimize_math on this seed node over near length [0.15,0.17] m, far length [0.11,0.13] m, section scale [0.95,1.05] and compliant/stiff scenarios, then construct the single selected proposal with design.build_proposal.",
+          "node_id": "baseline_math_seed",
+          "reason": "Workflow requires an owned completed Route build before the mathematical design search. The unchanged baseline is permitted only as a solve-free mathematical seed, and this build performs no solve, no trajectory and no evaluation; it exists so design.optimize_math has an explicit starting configuration (near 0.16 m, far 0.12 m, section scale 1.0) from which to search the authorized bounds."
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Create the solve-free baseline build node that the route workflow requires as the starting configuration for the mathematical design search.",
+        "request_id": "model-2-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 12.765000000130385,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "b22121d750f040629e45f7d228b2b71b",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "a02aa9811ad3c8c339803dc5fa69d2e5df75eff7385108d63eecb4a4d7946fb4",
+          "media_type": "application/json"
+        },
+        "request_id": "model-2",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-3",
+      "decision": {
+        "arguments": {
+          "material_scenarios": [
+            "compliant",
+            "stiff"
+          ],
+          "max_evaluations": 16,
+          "protocol": {
+            "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+            "media_type": "application/json"
+          },
+          "source_node": "baseline_math_seed",
+          "target": {
+            "artifact_id": "d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be",
+            "media_type": "application/json"
+          },
+          "variables": {
+            "components/far/length_m": [
+              0.11,
+              0.13
+            ],
+            "components/near/length_m": [
+              0.15,
+              0.17
+            ],
+            "design/section_scale": [
+              0.95,
+              1.05
+            ]
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Begin the one fresh, bounded, model-led multi-parameter design experiment required by the frozen route. The starting point is the solve-free baseline seed node baseline_math_seed (unchanged baseline is permitted only as a mathematical seed, never executed). The search covers every authorized parameter: near length [0.15,0.17] m, far length [0.11,0.13] m, common section scale [0.95,1.05], and both nonbaseline numerical material scenarios (compliant, stiff), under the frozen protocol and endpoint target. This ordering is used because the recorded deterministic control evidence shows stage 3.40 missed the 10 mm reach tolerance (18.3497 mm), while the frozen straight-start affine design score is degenerate in world-x and omits nonlinear closed-loop progress and braking, so a mathematical proposal can only rank candidates and must be validated physically afterwards.",
+        "request_id": "model-3-tool",
+        "tool_id": "design.optimize_math",
+        "tool_version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 17.266000000061467,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "bdaa7b6358184952bea6f83b318b9c88",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "16bfecbccbda9439aab08757549bea94ce99b69290c224257699314427547a31",
+          "media_type": "application/json"
+        },
+        "request_id": "model-3",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-4",
+      "decision": {
+        "arguments": {
+          "byte_limit": 8192,
+          "limit": 5,
+          "offset": 0,
+          "pointer": "/proposals",
+          "reference": {
+            "artifact_id": "099f0d22908746ef5fc0500039a7f029ba2bb6fba8fffbb799d14521f5c52a09",
+            "media_type": "application/json"
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "I need the exact optimizer proposal candidate_ids and their parameter values from the completed design.optimize_math result so I can construct one exact named proposal via design.build_proposal rather than retyping values.",
+        "request_id": "model-4-tool",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 6.813000000081956,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "c32da2b867e1451f947ee49cae218419",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "045a1bfac0c9b1f3ea0ab341c96683fc1bd7a0bdf0eb36dd5c64722675a0bd29",
+          "media_type": "application/json"
+        },
+        "request_id": "model-4",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-5",
+      "decision": {
+        "arguments": {
+          "next_step": "Call analysis.prepare_candidate exactly once on the constructed proposal node to obtain the complete four-part analysis bundle, then register that bundle with route.record_analysis@2.0.0 citing the build result, and decide whether a single backend validation run is warranted.",
+          "node_id": "proposal_compliant_build",
+          "optimizer_candidate_id": "math-compliant-ead99c9706e4",
+          "optimizer_result": {
+            "artifact_id": "099f0d22908746ef5fc0500039a7f029ba2bb6fba8fffbb799d14521f5c52a09",
+            "media_type": "application/json"
+          },
+          "reason": "The optimizer result reports two tied proposals (compliant and stiff) with identical parameters (far 0.11 m, near 0.15 m, section scale 0.95) and identical primary position residual upper-bound ratio 0.20; the compliant scenario is lexicographically preferable because its feasible-witness normalized input energy (4.368e-05) is lower than the stiff variant (8.464e-05). Constructing this exact named proposal without retyping any design values."
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "The route's frozen workflow requires the single selected mathematical proposal to be constructed exactly from the optimizer result before any candidate analysis or backend run; the selected candidate_id is the compliant-scenario winner with the lowest declared residual-upper-bound ratio and lower feasible-witness input energy.",
+        "request_id": "model-5-tool",
+        "tool_id": "design.build_proposal",
+        "tool_version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 6.4850000001024455,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "c72435907c75498ea78224067fdccee3",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "6787a7d1755f281e7469e41a21252209e5923dddfc45322d5a11fc46ec1d6073",
+          "media_type": "application/json"
+        },
+        "request_id": "model-5",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-6",
+      "decision": {
+        "arguments": {
+          "source_node": "proposal_compliant_build"
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [
+          {
+            "artifact_id": "d0a3e02737f1516fc324830dadfce88536822a3b3b81f2aba8980abe5b6b55a8",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "The optimizer-selected proposal node proposal_compliant_build is a completed build (build result artifact d0a3e02737f1516fc324830dadfce88536822a3b3b81f2aba8980abe5b6b55a8), and its run prerequisites report CANDIDATE_BOUND_SHARED_ANALYSIS_REQUIRED_BEFORE_EXECUTION. Call the bounded four-part preparation exactly once for this exact build so the linearization, control metrics, bounded endpoint analysis and advisory screen are completed or reused under the frozen protocol and endpoint target, without repeating the individual analysis chain and without any design choice or backend solve.",
+        "request_id": "model-6-tool",
+        "tool_id": "analysis.prepare_candidate",
+        "tool_version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 11.547000000020489,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "b37bf821ce4a4a099a6dbd23a7e0dc92",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "469358f70a9935721889ab62c3e87aea8b20c43cf33082afd85ecf7d54386af3",
+          "media_type": "application/json"
+        },
+        "request_id": "model-6",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-7",
+      "decision": {
+        "arguments": {
+          "candidate_analysis_bundle": {
+            "artifact_id": "d3f5c1f686d91f68370e114f6358a5db0ef38fb2a99cb45cef7c2703da16eeca",
+            "media_type": "application/json"
+          },
+          "evidence": [
+            {
+              "artifact_id": "d0a3e02737f1516fc324830dadfce88536822a3b3b81f2aba8980abe5b6b55a8",
+              "media_type": "application/json"
+            }
+          ],
+          "next_step": "Register the bundle, then execute exactly one charged backend validation of proposal_compliant_build through route.advance action=run (source_node=proposal_compliant_build, combination omitted) and read the official evaluation and control-profile result to decide between an honest finish and a specifically justified revision.",
+          "node_id": "record_proposal_compliant_analysis",
+          "reason": "The single analysis.prepare_candidate call on the constructed proposal node already returned the complete four-part candidate-bound bundle (artifact d3f5c1f686d91f68370e114f6358a5db0ef38fb2a99cb45cef7c2703da16eeca) with linearization, control metrics, bounded endpoint analysis and advisory screen all available for the exact built configuration, so it is registered here unchanged rather than recomputed. Provenance is inherited from design.build_proposal for the exact optimizer candidate_id math-compliant-ead99c9706e4 (near 0.15 m, far 0.11 m, section scale 0.95, compliant), which is a fresh covered design distinct from the unchanged baseline and from every supplied historical configuration. The bundle is advisory: its primary quantity is a 2 mm residual upper bound for a frozen straight-start local affine exact-ZOH model whose world-x position-control row is identically zero, so it cannot establish nonlinear closed-loop reach, settling or real-time behaviour and does not prove global infeasibility.",
+          "source_node": "proposal_compliant_build",
+          "validation_disposition": "recommended"
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Register the already-completed candidate-bound analysis bundle against the exact built proposal node and cite its build result, as the route prerequisite requires before any backend execution; zero solves and no new analysis chain.",
+        "request_id": "model-7-tool",
+        "tool_id": "route.record_analysis",
+        "tool_version": "2.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 23.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "21436fca4d7d4debba993df231da352c",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "f8db369808bd49b10d5768347daf91cd67ded38ed1c1985b9a4f92eb5f90442e",
+          "media_type": "application/json"
+        },
+        "request_id": "model-7",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-8",
+      "decision": {
+        "arguments": {
+          "action": "run",
+          "evidence": [
+            {
+              "artifact_id": "d0a3e02737f1516fc324830dadfce88536822a3b3b81f2aba8980abe5b6b55a8",
+              "media_type": "application/json"
+            }
+          ],
+          "next_step": "Read the official evaluation and the control-profile result for this execution; if the reach passes and the sample history is non-degenerate, finish; otherwise decide between an honest failed-reach delivery and one evidence-supported revision within the remaining budget.",
+          "node_id": "run_proposal_compliant",
+          "reason": "The optimizer-derived candidate with the lowest normalized local position-residual upper bound (math-compliant-ead99c9706e4: near 0.15 m, far 0.11 m, section_scale 0.95, compliant scenario) is built and its complete four-part analysis bundle (linearization, metrics, bounded endpoint, screen) is registered against it. Prerequisites are satisfied, so the frozen task now needs exactly one charged backend execution to produce an official reach evaluation and control-profile result. The degenerate straight-start world-x row in the local affine model is only an advisory caveat about that local model, not a global infeasibility proof, so physical validation is warranted.",
+          "source_node": "proposal_compliant_build"
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Execute the one charged backend validation of the registered optimizer proposal build, which is the next required route step.",
+        "request_id": "model-8-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 9.609999999869615,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "38f6122d396842a6b4da1cffdc4c539f",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "604fdb2c9844e3c4a286c41ec026e793b2e9756e55c8446b48dcc2144036213b",
+          "media_type": "application/json"
+        },
+        "request_id": "model-8",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-9",
+      "decision": {
+        "arguments": {
+          "action": "finish",
+          "design_statement": {
+            "candidate_id": "proposal_compliant_build",
+            "configuration": {
+              "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+              "media_type": "application/json"
+            },
+            "execution_id": "5991de53e82747439e87ba8569667e1b",
+            "owner_run_id": "gvs-stage341-0e4c97f35777-0b9932b1a295ddf0",
+            "parameters": [
+              {
+                "baseline_delta": -0.009999999999999995,
+                "baseline_value": 0.12,
+                "effective_value": 0.11,
+                "path": "components/far/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.010000000000000009,
+                "baseline_value": 0.16,
+                "effective_value": 0.15,
+                "path": "components/near/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": null,
+                "baseline_value": "baseline",
+                "effective_value": "compliant",
+                "path": "design/material_scenario",
+                "unit": null
+              },
+              {
+                "baseline_delta": -0.050000000000000044,
+                "baseline_value": 1.0,
+                "effective_value": 0.95,
+                "path": "design/section_scale",
+                "unit": "1"
+              }
+            ],
+            "physical_changes": [
+              {
+                "baseline_delta": -0.010000000000000009,
+                "baseline_value": 0.16,
+                "category": "length",
+                "effective_value": 0.15,
+                "path": "components/near/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.0005000000000000004,
+                "baseline_value": 0.01,
+                "category": "section",
+                "effective_value": 0.0095,
+                "path": "components/near/sections/0/section/parameters/semi_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.0004000000000000002,
+                "baseline_value": 0.008,
+                "category": "section",
+                "effective_value": 0.0076,
+                "path": "components/near/sections/0/section/parameters/semi_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -800000.0,
+                "baseline_value": 8000000.0,
+                "category": "material",
+                "effective_value": 7200000.0,
+                "path": "components/near/physics/young_pa",
+                "unit": "Pa"
+              },
+              {
+                "baseline_delta": -0.009999999999999995,
+                "baseline_value": 0.12,
+                "category": "length",
+                "effective_value": 0.11,
+                "path": "components/far/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.0005000000000000004,
+                "baseline_value": 0.01,
+                "category": "section",
+                "effective_value": 0.0095,
+                "path": "components/far/sections/0/section/parameters/height_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.000700000000000001,
+                "baseline_value": 0.014,
+                "category": "section",
+                "effective_value": 0.0133,
+                "path": "components/far/sections/0/section/parameters/width_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.00045000000000000075,
+                "baseline_value": 0.009,
+                "category": "section",
+                "effective_value": 0.008549999999999999,
+                "path": "components/far/sections/1/section/parameters/height_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.0005999999999999998,
+                "baseline_value": 0.012,
+                "category": "section",
+                "effective_value": 0.0114,
+                "path": "components/far/sections/1/section/parameters/width_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -600000.0,
+                "baseline_value": 6000000.0,
+                "category": "material",
+                "effective_value": 5400000.0,
+                "path": "components/far/physics/young_pa",
+                "unit": "Pa"
+              }
+            ]
+          },
+          "next_step": "Stop search and deliver the accepted contender; retain the documented limitations (sampled settling not satisfied, real-time not demonstrated, single-backend advisory linearization/screen under a degenerate straight-start world-x row) without making global-optimality, robustness or continuous-time-settling claims.",
+          "node_id": "finish_proposal_compliant",
+          "reason": "The only fresh charged backend run in this session evaluated the exact optimizer proposal math-compliant-ead99c9706e4, built as node proposal_compliant_build and analyzed/registered before execution. Its official free-reach evaluation is validity=valid, complete=true, task_accepted=true with terminal_error_m=0.007642608585867386 (< 0.01 m tolerance), a monotone late approach (late error change -0.05050 m over 0.30-0.35 s) and no force-bound violation or solver error. Because the guidance stops backend search after a qualifying fresh covered reach pass, the incumbent is delivered as-is; the unchanged parameters and signed baseline deltas are restated exactly. Separate outcomes are reported honestly: sampled_settling failed (max error 0.058138 m, max speed 1.581015 m/s) and real_time_demonstrated=false with 35 of 35 deadline misses (mean complete update 17.075238 s versus the 0.01 s control period), and 29 of 35 updates selected the initialization plan, so no constant-tension-throughout or real-time claim is made.",
+          "result_statement": {
+            "accepted_noninitialization_plans": 6,
+            "accepted_plans": 35,
+            "applied_tension_ranges": [
+              {
+                "limit_n": 8.0,
+                "maximum_n": 7.990411884680996,
+                "minimum_n": 1.7512764858409064,
+                "tendon": "near_t0",
+                "tendon_index": 0
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 6.086855343352726,
+                "minimum_n": 2.757372796476204,
+                "tendon": "near_t1",
+                "tendon_index": 1
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 3.1031566686630025,
+                "minimum_n": 1.4216485070827969e-08,
+                "tendon": "near_t2",
+                "tendon_index": 2
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 3.218253612486097,
+                "minimum_n": 5.115521779319541e-07,
+                "tendon": "far_t0",
+                "tendon_index": 3
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 5.165423523313249,
+                "minimum_n": 0.12734806870748366,
+                "tendon": "far_t1",
+                "tendon_index": 4
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 6.400860298939372,
+                "minimum_n": -0.0,
+                "tendon": "far_t2",
+                "tendon_index": 5
+              }
+            ],
+            "candidate": {
+              "candidate_id": "proposal_compliant_build",
+              "configuration": {
+                "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+                "media_type": "application/json"
+              },
+              "execution_id": "5991de53e82747439e87ba8569667e1b",
+              "owner_run_id": "gvs-stage341-0e4c97f35777-0b9932b1a295ddf0"
+            },
+            "complete": true,
+            "configuration": {
+              "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+              "media_type": "application/json"
+            },
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "converged_updates": 1,
+            "coordinate_frame": "world",
+            "deadline_misses": 35,
+            "error_convention": "actual_tip minus target",
+            "evaluation": {
+              "artifact_id": "f467c2ea0a66859365ec419dfb26537882709ce577d4adb1738e2c8834170055",
+              "media_type": "application/json"
+            },
+            "evaluation_validity": "valid",
+            "execution_id": "5991de53e82747439e87ba8569667e1b",
+            "force_bound_violation_n": 0.0,
+            "hold_last_responses": 0,
+            "initialization_selected": 29,
+            "mean_complete_update_s": 17.075238151415917,
+            "measured_computation_s": 599.6879999998491,
+            "one_step_prediction_evidence": {
+              "artifact_id": "3d2c01848435ead2e8fca7bf1ef6c54712c850c2ed34af4d20b50ac38a203ba5",
+              "media_type": "application/json"
+            },
+            "one_step_prediction_summary": {
+              "aligned_count": 35,
+              "frame": "world",
+              "maximum_tip_difference_m": 0.0076898869753466255,
+              "mean_tip_difference_m": 0.0038032038653228557,
+              "missing": [],
+              "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+            },
+            "real_time_demonstrated": false,
+            "report": {
+              "execution_id": "5991de53e82747439e87ba8569667e1b",
+              "owner_run_id": "gvs-stage341-0e4c97f35777-0b9932b1a295ddf0",
+              "reference": {
+                "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+                "media_type": "application/json"
+              },
+              "request_id": "single-profile-report"
+            },
+            "result_type": "free_reach",
+            "sampled_settling": {
+              "available": true,
+              "continuous_time_guarantee": false,
+              "max_error_m": 0.05813810428573256,
+              "max_speed_m_s": 1.5810152739742807,
+              "passed": false,
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            },
+            "signed_position_error_m": [
+              -0.007385741011230296,
+              -0.0013174790122655808,
+              -0.0014575818207032132
+            ],
+            "simulated_duration_s": 0.35000000000000003,
+            "simulation": {
+              "artifact_id": "69324bf4f0c5c9baaebb286d41528bcacfc96642a43fcc15be77ecdf82884290",
+              "media_type": "application/json"
+            },
+            "solver_error_count": 0,
+            "target_position_m": [
+              0.29,
+              0.035,
+              0.19
+            ],
+            "task_accepted": true,
+            "terminal_error_m": 0.007642608585867386,
+            "terminal_position_m": [
+              0.2826142589887697,
+              0.03368252098773442,
+              0.1885424181792968
+            ],
+            "terminal_tip_speed_m_s": 0.6351726092425104,
+            "valid_complete_execution": true
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [
+          {
+            "artifact_id": "7ae0ab4d4af1664c180a3c480e199a11da9c2eb516c008221310d42b0c0efce5",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "d0a3e02737f1516fc324830dadfce88536822a3b3b81f2aba8980abe5b6b55a8",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "291f41248852d6a17a3605f2a26e1436a8ee3e207a3f2a4dd1d02ef7d9918eec",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Deliver the session incumbent proposal_compliant_build (execution 5991de53e82747439e87ba8569667e1b, owner run gvs-stage341-0e4c97f35777-0b9932b1a295ddf0), whose official free-reach evaluation is valid and accepted with terminal position error 7.642609 mm against the frozen 10 mm tolerance. The design is a genuinely model-led, multi-category covered change (near and far length, uniform section scale, compliant material scenario) that also improves on the closest supplied historical sample (b2_near0p169_far0p129_compliant_s1p05, 7.726861 mm), so no further physical search is warranted.",
+        "request_id": "model-9-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 26.766000000061467,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "88d3e80b86d24c258315a3aa4b649970",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "a1ca8d025992822035a738aae4f0cf7889e2988314a5d14fef9997956b551657",
+          "media_type": "application/json"
+        },
+        "request_id": "model-9",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-10",
+      "decision": {
+        "arguments": {
+          "action": "finish",
+          "design_statement": {
+            "candidate_id": "proposal_compliant_build",
+            "configuration": {
+              "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+              "media_type": "application/json"
+            },
+            "execution_id": "5991de53e82747439e87ba8569667e1b",
+            "owner_run_id": "gvs-stage341-0e4c97f35777-0b9932b1a295ddf0",
+            "parameters": [
+              {
+                "baseline_delta": -0.009999999999999995,
+                "baseline_value": 0.12,
+                "effective_value": 0.11,
+                "path": "components/far/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.010000000000000009,
+                "baseline_value": 0.16,
+                "effective_value": 0.15,
+                "path": "components/near/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": null,
+                "baseline_value": "baseline",
+                "effective_value": "compliant",
+                "path": "design/material_scenario",
+                "unit": null
+              },
+              {
+                "baseline_delta": -0.050000000000000044,
+                "baseline_value": 1.0,
+                "effective_value": 0.95,
+                "path": "design/section_scale",
+                "unit": "1"
+              }
+            ],
+            "physical_changes": [
+              {
+                "baseline_delta": -0.010000000000000009,
+                "baseline_value": 0.16,
+                "category": "length",
+                "effective_value": 0.15,
+                "path": "components/near/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.0005000000000000004,
+                "baseline_value": 0.01,
+                "category": "section",
+                "effective_value": 0.0095,
+                "path": "components/near/sections/0/section/parameters/semi_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.0004000000000000002,
+                "baseline_value": 0.008,
+                "category": "section",
+                "effective_value": 0.0076,
+                "path": "components/near/sections/0/section/parameters/semi_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -800000.0,
+                "baseline_value": 8000000.0,
+                "category": "material",
+                "effective_value": 7200000.0,
+                "path": "components/near/physics/young_pa",
+                "unit": "Pa"
+              },
+              {
+                "baseline_delta": -0.009999999999999995,
+                "baseline_value": 0.12,
+                "category": "length",
+                "effective_value": 0.11,
+                "path": "components/far/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.0005000000000000004,
+                "baseline_value": 0.01,
+                "category": "section",
+                "effective_value": 0.0095,
+                "path": "components/far/sections/0/section/parameters/height_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.000700000000000001,
+                "baseline_value": 0.014,
+                "category": "section",
+                "effective_value": 0.0133,
+                "path": "components/far/sections/0/section/parameters/width_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.00045000000000000075,
+                "baseline_value": 0.009,
+                "category": "section",
+                "effective_value": 0.008549999999999999,
+                "path": "components/far/sections/1/section/parameters/height_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.0005999999999999998,
+                "baseline_value": 0.012,
+                "category": "section",
+                "effective_value": 0.0114,
+                "path": "components/far/sections/1/section/parameters/width_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -600000.0,
+                "baseline_value": 6000000.0,
+                "category": "material",
+                "effective_value": 5400000.0,
+                "path": "components/far/physics/young_pa",
+                "unit": "Pa"
+              }
+            ]
+          },
+          "evidence": [
+            {
+              "artifact_id": "7ae0ab4d4af1664c180a3c480e199a11da9c2eb516c008221310d42b0c0efce5",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "291f41248852d6a17a3605f2a26e1436a8ee3e207a3f2a4dd1d02ef7d9918eec",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "d0a3e02737f1516fc324830dadfce88536822a3b3b81f2aba8980abe5b6b55a8",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "d3f5c1f686d91f68370e114f6358a5db0ef38fb2a99cb45cef7c2703da16eeca",
+              "media_type": "application/json"
+            }
+          ],
+          "next_step": "Stop: deliver the passing incumbent proposal_compliant_build. Do not spend the remaining backend solves on further search because a fresh covered reach pass already exists. Report separately that sampled settling failed (max error 0.05813810428573256 m, max speed 1.5810152739742807 m/s in the 0.05 s window) and real_time_demonstrated=false with 35 deadline misses (mean complete update 17.075238151415917 s versus 0.01 s control period), while force_bound_violation_n=0.0 and solver_error_count=0.",
+          "node_id": "finish_proposal_compliant_final",
+          "reason": "The fresh covered run of the optimizer-selected proposal already produced a qualifying free-reach pass: task_accepted=true with terminal error 0.007642608585867386 m inside the 0.01 m tolerance at the 0.35 s deadline, evaluator tolerance 0.01 m, task_success=true, simulation backend.family_mujoco, status valid. The parameter-coverage check on this candidate reports length/material/section all true, so it is a genuine multi-parameter design experiment. Simulation remains the validation authority and no further backend search is warranted after a passing graded reach; the remaining 2 backend solves are deliberately unspent. The locally optimal affine screen's degeneracy (world-x position-control row Linf 0.0) did not preclude a nonlinear pass, exactly as the advisory screen was scoped. I now deliver the session-wide incumbent with the required previous-node citations and an exact copy of its factual_result.",
+          "result_statement": {
+            "accepted_noninitialization_plans": 6,
+            "accepted_plans": 35,
+            "applied_tension_ranges": [
+              {
+                "limit_n": 8.0,
+                "maximum_n": 7.990411884680996,
+                "minimum_n": 1.7512764858409064,
+                "tendon": "near_t0",
+                "tendon_index": 0
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 6.086855343352726,
+                "minimum_n": 2.757372796476204,
+                "tendon": "near_t1",
+                "tendon_index": 1
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 3.1031566686630025,
+                "minimum_n": 1.4216485070827969e-08,
+                "tendon": "near_t2",
+                "tendon_index": 2
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 3.218253612486097,
+                "minimum_n": 5.115521779319541e-07,
+                "tendon": "far_t0",
+                "tendon_index": 3
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 5.165423523313249,
+                "minimum_n": 0.12734806870748366,
+                "tendon": "far_t1",
+                "tendon_index": 4
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 6.400860298939372,
+                "minimum_n": -0.0,
+                "tendon": "far_t2",
+                "tendon_index": 5
+              }
+            ],
+            "candidate": {
+              "candidate_id": "proposal_compliant_build",
+              "configuration": {
+                "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+                "media_type": "application/json"
+              },
+              "execution_id": "5991de53e82747439e87ba8569667e1b",
+              "owner_run_id": "gvs-stage341-0e4c97f35777-0b9932b1a295ddf0"
+            },
+            "complete": true,
+            "configuration": {
+              "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+              "media_type": "application/json"
+            },
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "converged_updates": 1,
+            "coordinate_frame": "world",
+            "deadline_misses": 35,
+            "error_convention": "actual_tip minus target",
+            "evaluation": {
+              "artifact_id": "f467c2ea0a66859365ec419dfb26537882709ce577d4adb1738e2c8834170055",
+              "media_type": "application/json"
+            },
+            "evaluation_validity": "valid",
+            "execution_id": "5991de53e82747439e87ba8569667e1b",
+            "force_bound_violation_n": 0.0,
+            "hold_last_responses": 0,
+            "initialization_selected": 29,
+            "mean_complete_update_s": 17.075238151415917,
+            "measured_computation_s": 599.6879999998491,
+            "one_step_prediction_evidence": {
+              "artifact_id": "3d2c01848435ead2e8fca7bf1ef6c54712c850c2ed34af4d20b50ac38a203ba5",
+              "media_type": "application/json"
+            },
+            "one_step_prediction_summary": {
+              "aligned_count": 35,
+              "frame": "world",
+              "maximum_tip_difference_m": 0.0076898869753466255,
+              "mean_tip_difference_m": 0.0038032038653228557,
+              "missing": [],
+              "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+            },
+            "real_time_demonstrated": false,
+            "report": {
+              "execution_id": "5991de53e82747439e87ba8569667e1b",
+              "owner_run_id": "gvs-stage341-0e4c97f35777-0b9932b1a295ddf0",
+              "reference": {
+                "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+                "media_type": "application/json"
+              },
+              "request_id": "single-profile-report"
+            },
+            "result_type": "free_reach",
+            "sampled_settling": {
+              "available": true,
+              "continuous_time_guarantee": false,
+              "max_error_m": 0.05813810428573256,
+              "max_speed_m_s": 1.5810152739742807,
+              "passed": false,
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            },
+            "signed_position_error_m": [
+              -0.007385741011230296,
+              -0.0013174790122655808,
+              -0.0014575818207032132
+            ],
+            "simulated_duration_s": 0.35000000000000003,
+            "simulation": {
+              "artifact_id": "69324bf4f0c5c9baaebb286d41528bcacfc96642a43fcc15be77ecdf82884290",
+              "media_type": "application/json"
+            },
+            "solver_error_count": 0,
+            "target_position_m": [
+              0.29,
+              0.035,
+              0.19
+            ],
+            "task_accepted": true,
+            "terminal_error_m": 0.007642608585867386,
+            "terminal_position_m": [
+              0.2826142589887697,
+              0.03368252098773442,
+              0.1885424181792968
+            ],
+            "terminal_tip_speed_m_s": 0.6351726092425104,
+            "valid_complete_execution": true
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Deliver the session-wide incumbent proposal_compliant_build, whose fresh covered run already passed the frozen free-reach task inside tolerance, and cite the previous node results so the earlier ROUTE_EVIDENCE_REQUIRED failure is corrected.",
+        "request_id": "model-10-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 20.04700000002049,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "8043bf2f203d47e193cc6c5b799ec7a6",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "b18c3d29575aa80d7017f2bad5ef32cba17817130dca5d1d690d3cfb4284f7a7",
+          "media_type": "application/json"
+        },
+        "request_id": "model-10",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      }
+    }
+  ]
+}

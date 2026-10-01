@@ -1,0 +1,130 @@
+{
+  "run_id": "gvs-stage341-0e4c97f35777",
+  "repair": {
+    "applied": true,
+    "only_input_difference": "/policy/allowed_tools",
+    "normalization_exact": true,
+    "manifest_fields": [
+      "/session_input_identity",
+      "/files/frozen_input.json"
+    ],
+    "record": "repair_record.json",
+    "originals": "preserved_originals/",
+    "original_hashes_verified": true
+  },
+  "prelaunch": {
+    "checked_at": "2026-10-01T19:43:27.734578+08:00",
+    "checks": {
+      "runtime": true,
+      "files": true,
+      "implementation": true,
+      "compatibility": true,
+      "session_input": true,
+      "provider_payload": true
+    },
+    "passed": true,
+    "before_credentials": true,
+    "before_provider": true,
+    "before_backend": true
+  },
+  "fresh_autonomous_design_reach": {
+    "passed": true,
+    "valid_complete_execution": true,
+    "terminal_error_m": 0.007642608585867386,
+    "tolerance_m": 0.01,
+    "execution_id": "5991de53e82747439e87ba8569667e1b",
+    "evaluation": {
+      "artifact_id": "f467c2ea0a66859365ec419dfb26537882709ce577d4adb1738e2c8834170055",
+      "media_type": "application/json"
+    },
+    "force_bound_violation_n": 0.0,
+    "solver_errors": 0
+  },
+  "settling": {
+    "available": true,
+    "continuous_time_guarantee": false,
+    "max_error_m": 0.05813810428573256,
+    "max_speed_m_s": 1.5810152739742807,
+    "passed": false,
+    "position_limit_m": 0.01,
+    "speed_limit_m_s": 0.02,
+    "window_s": 0.05
+  },
+  "terminal_tip_speed_m_s": 0.6351726092425104,
+  "timing": {
+    "deadline_misses": 35,
+    "updates": 35,
+    "mean_complete_update_s": 17.075238151415917,
+    "real_time_demonstrated": false
+  },
+  "parameter_coverage": {
+    "eligible": true,
+    "checks": {
+      "length": true,
+      "material": true,
+      "section": true
+    },
+    "parameters": {
+      "components/far/length_m": 0.11,
+      "components/near/length_m": 0.15,
+      "design/section_scale": 0.95
+    },
+    "material_scenario": "compliant",
+    "fresh_under_frozen_eligibility_rules": true,
+    "scope": "New current-session mathematical search and backend execution. No claim that these physical parameter values have never appeared in older studies."
+  },
+  "provenance": {
+    "exact_evaluated_proposal_verified": true,
+    "optimizer_source": "current_run",
+    "optimizer_candidate_id": "math-compliant-ead99c9706e4",
+    "optimizer_result": {
+      "artifact_id": "099f0d22908746ef5fc0500039a7f029ba2bb6fba8fffbb799d14521f5c52a09",
+      "media_type": "application/json"
+    },
+    "scientific_configuration_identity": "ead99c9706e4375c7774b5196d8b5eebcb35a46522f6719c4d8177b2f94ed79e",
+    "controller": "controller.gvs_nmpc@7.0.0",
+    "design_statement_check": {
+      "accepted": true,
+      "mismatches": [],
+      "status": "matched"
+    },
+    "result_statement_check": {
+      "accepted": true,
+      "mismatched_fields": [],
+      "scope": "Typed claims only; free-text reasoning requires separate review"
+    }
+  },
+  "model_authored_completion": {
+    "completed": true,
+    "explicit_delivery": true,
+    "delivery_status": "evaluated"
+  },
+  "usage": {
+    "tool_calls": 14,
+    "model_calls": 11,
+    "backend_solves": 1,
+    "worker_calls": 0,
+    "wall_s": 1019.563000000082
+  },
+  "mathematical_evaluations": 16,
+  "within_limits": true,
+  "backend_search_stopped_after_first_qualifying_pass": true,
+  "historical_fixed_design_validation": {
+    "execution_id": "83796acafa72407492689c1275f9f460",
+    "terminal_error_m": 0.00783749400000044,
+    "included_in_fresh_autonomous_result": false,
+    "scope": "Previously completed fixed-design validation; no repeat performed."
+  },
+  "interpretation_limits": [
+    "One fresh simulation reach pass; sampled settling and real-time feasibility failed.",
+    "The affine residual is an advisory feasible-witness bound. The model-authored phrase locally optimal does not establish local or global optimality.",
+    "Length, section and material coverage is verified relative to the frozen baseline; robustness and physical hardware validity remain untested."
+  ],
+  "evidence_storage": {
+    "compact_export": "evidence\\stage341_repaired_live_execution_20261001",
+    "raw_artifacts": "live_raw_artifacts.json",
+    "large_raw_files_remain_local": true,
+    "credentials_exported": false,
+    "original_prelaunch_and_rejection_exports_unchanged": true
+  }
+}
