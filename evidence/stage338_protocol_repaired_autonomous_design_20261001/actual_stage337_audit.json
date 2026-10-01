@@ -1,0 +1,139 @@
+{
+  "run_id": "gvs-stage337-97162901bdcb",
+  "status": "failed",
+  "stop_reason": "BOUNDED_REPAIR_LIMIT",
+  "route_nodes": [
+    {
+      "node_id": "start_b1",
+      "action": "build",
+      "status": "completed",
+      "result": {
+        "artifact_id": "23e6f75785207210a737137917d14756c8c23ac713141e29fa1925724c8b0347",
+        "media_type": "application/json"
+      },
+      "selection": {
+        "action": "build",
+        "candidate_id": null,
+        "changes": {
+          "components/far/length_m": 0.1285,
+          "components/near/length_m": 0.1685,
+          "design/material_scenario": "compliant",
+          "design/section_scale": 1.05
+        },
+        "combination": "candidate_gvs_nmpc",
+        "design_statement": null,
+        "evidence": [],
+        "max_trials": 1,
+        "next_step": "Linearize the completed build, compute continuous-model metrics and the bounded-endpoint witness, screen them, then run the bounded mathematical optimization before any backend attempt.",
+        "node_id": "start_b1",
+        "reason": "Construct a fresh, non-baseline, non-historical starting build to anchor the required linearize/metrics/endpoint/screen/optimize pipeline. Values chosen near the best supplied historical region (compliant, scale 1.05, near-far=0.04) but off the exact historical grid: near 0.1685 (unused), far 0.1285 (unused), so no supplied historical case is reproduced. Build only; no solve.",
+        "result_statement": null,
+        "source_node": null,
+        "variables": {}
+      }
+    },
+    {
+      "node_id": "bp1_math_compliant",
+      "action": "build",
+      "status": "completed",
+      "result": {
+        "artifact_id": "0cb92292b03f7dfcf5962f0eedb0ac51eb2a6a193ee4f9c42c657d629843f66f",
+        "media_type": "application/json"
+      },
+      "selection": {
+        "next_step": "Record the candidate-bound analysis plus this selected optimizer candidate against the constructed build, then spend one charged backend attempt on it and read the official evaluation/profile facts.",
+        "node_id": "bp1_math_compliant",
+        "optimizer_candidate_id": "math-compliant-e63d9960aa49",
+        "optimizer_result": {
+          "artifact_id": "ce7023b470b37ce8c9f2765f7886c91a382d93362ea590ccab4b478337c48800",
+          "media_type": "application/json"
+        },
+        "reason": "The route requires an exactly constructed optimizer selection before any backend attempt. Both scenario proposals tie on the primary local residual upper bound (0.015 m, 1.5x the 0.01 m tolerance) and rest on a degenerate controller-start affine model whose world-x control row is identically zero, so the local model cannot discriminate them; the compliant proposal is taken because every historical compliant s1.05 run in the 0.165-0.17 m near / 0.125-0.13 m far region produced accepted non-initialization plans and the only historically accepted reach (0.00773 m) was compliant, while the stiff variant produced none."
+      }
+    },
+    {
+      "node_id": "rec_analysis_bp1_math_compliant_v2",
+      "action": "analyze",
+      "status": "failed",
+      "error": "ROUTE_ANALYSIS_REFERENCE_REQUIRED: fields=['endpoint', 'screen']",
+      "selection": {
+        "endpoint": null,
+        "evidence": [
+          {
+            "artifact_id": "0cb92292b03f7dfcf5962f0eedb0ac51eb2a6a193ee4f9c42c657d629843f66f",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "23e6f75785207210a737137917d14756c8c23ac713141e29fa1925724c8b0347",
+            "media_type": "application/json"
+          }
+        ],
+        "historical_math_binding": null,
+        "linearization": {
+          "artifact_id": "3ca21891d09777b9e36886d50914e77354e0262d0a50611e75411ef213780b92",
+          "media_type": "application/json"
+        },
+        "math_optimization": {
+          "artifact_id": "ce7023b470b37ce8c9f2765f7886c91a382d93362ea590ccab4b478337c48800",
+          "media_type": "application/json"
+        },
+        "metrics": {
+          "artifact_id": "6fdb7c90207ac4d93b37007c3e895f8487f1cd75b54b70a5c28fc4aefde3420b",
+          "media_type": "application/json"
+        },
+        "next_step": "If the analysis records successfully, spend one charged backend attempt on bp1_math_compliant with route.advance action=run, then read the official evaluation and control-profile facts before deciding whether to finish or revise.",
+        "node_id": "rec_analysis_bp1_math_compliant_v2",
+        "reason": "The optimizer proposal build bp1_math_compliant is complete, and its candidate-bound controller-start local linearization and control metrics are available; attaching them together with the selected proposal math-compliant-e63d9960aa49 records the advisory pre-run analysis on the exact immutable build configuration.",
+        "screen": null,
+        "selected_optimizer_candidate_id": "math-compliant-e63d9960aa49",
+        "source_node": "bp1_math_compliant",
+        "validation_disposition": "recommended"
+      }
+    },
+    {
+      "node_id": "run_bp1_math_compliant",
+      "action": "run",
+      "status": "failed",
+      "error": "CANDIDATE_BOUND_SHARED_ANALYSIS_REQUIRED_BEFORE_EXECUTION",
+      "selection": {
+        "action": "run",
+        "candidate_id": null,
+        "changes": {},
+        "combination": null,
+        "design_statement": null,
+        "evidence": [
+          {
+            "artifact_id": "0cb92292b03f7dfcf5962f0eedb0ac51eb2a6a193ee4f9c42c657d629843f66f",
+            "media_type": "application/json"
+          }
+        ],
+        "max_trials": 1,
+        "next_step": "Read the official evaluation and control-profile facts for this run; then finish through route.advance so that design_statement restates candidate_facts (with baseline deltas) and result_statement copies the exact factual_result.",
+        "node_id": "run_bp1_math_compliant",
+        "reason": "The session has exactly one completed fresh build (bp1_math_compliant: near 0.1585 m, far 0.1185 m, section scale 1.05, compliant), constructed from the optimizer-selected proposal math-compliant-e63d9960aa49 with automatic provenance. It is a covered, non-historical design. The route next_step prescribes spending one charged backend attempt on it, and no evaluated candidate exists yet, so a run is required before any finish can deliver a valid evaluation.",
+        "result_statement": null,
+        "source_node": "bp1_math_compliant",
+        "variables": {}
+      }
+    }
+  ],
+  "evaluated_candidates": [],
+  "final": {
+    "candidate_id": null,
+    "crosscheck_status": "not_reviewed",
+    "delivery_status": "incomplete",
+    "evaluated": false,
+    "explicit_delivery": false,
+    "selection_basis": "Host terminal summary of session-wide incumbent; not an explicit model delivery",
+    "stop_reason": "BOUNDED_REPAIR_LIMIT"
+  },
+  "usage": {
+    "tool_calls": 22,
+    "model_calls": 23,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 905.4660000009462
+  },
+  "math_evaluations_new": 12,
+  "within_limits": true
+}

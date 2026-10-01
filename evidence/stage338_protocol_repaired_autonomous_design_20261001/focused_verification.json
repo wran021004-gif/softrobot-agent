@@ -1,0 +1,50 @@
+{
+  "implementation_commit": "81ebc8aabefdf36c5375066f8ca4d8944cd60ae1",
+  "interpreter": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+  "thread_environment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "checks": [
+    {
+      "command_scope": "tests.test_provider_tool_naming",
+      "tests_run": 3,
+      "status": "passed",
+      "coverage": [
+        "readable declaration/decode/Host round trip",
+        "unknown advertised-name rejection without execution",
+        "mismatched evidence arguments sent to endpoint analysis rejected without execution",
+        "correction includes returned name, exact valid names, and required domain arguments",
+        "legacy hashed declaration/decode behavior",
+        "deterministic readable-name collision resolution"
+      ]
+    },
+    {
+      "command_scope": "selected existing protocol recovery checks",
+      "tests_run": 2,
+      "status": "passed",
+      "coverage": [
+        "existing count-correction provider payload",
+        "legacy model serialization and correction budget"
+      ]
+    },
+    {
+      "command_scope": "targeted Python compilation",
+      "status": "passed",
+      "files": [
+        "tools/platform_models.py",
+        "schemas/platform.py",
+        "extensions/platform/manifest.py",
+        "examples/stage337_autonomous_design_experiment.py",
+        "tests/test_provider_tool_naming.py"
+      ]
+    }
+  ],
+  "excluded": [
+    "full test suite",
+    "mathematical benchmark reruns",
+    "simulation or backend plumbing checks",
+    "workers"
+  ]
+}

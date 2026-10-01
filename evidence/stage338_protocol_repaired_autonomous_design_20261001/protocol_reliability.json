@@ -1,0 +1,67 @@
+{
+  "run_id": "gvs-stage337-97162901bdcb",
+  "adapter": "deepseek@2.0.0",
+  "naming_policy": {
+    "scheme": "readable_v1",
+    "mapping_identity": "0846de5651b0b24dd9a04831a3d1e0e6aacb6cc65b098d4a870661508423b274"
+  },
+  "advertised_names": [
+    "analysis_bounded_endpoint",
+    "analysis_compare_candidates",
+    "analysis_control_metrics",
+    "analysis_gvs_candidate_evaluate",
+    "analysis_linearize_candidate",
+    "control_profile_describe",
+    "control_profile_report",
+    "design_build_proposal",
+    "design_optimize_math",
+    "design_screen",
+    "evidence_read",
+    "route_advance",
+    "route_inspect",
+    "route_record_analysis",
+    "session_control"
+  ],
+  "provider_attempts": 23,
+  "responses_with_unadvertised_names": 0,
+  "responses_with_wrong_name_argument_association": 0,
+  "protocol_corrections": [
+    {
+      "request_id": "model-4",
+      "returned_names": [
+        "analysis_control_metrics",
+        "analysis_bounded_endpoint"
+      ],
+      "error": "EXACTLY_ONE_TOOL_CALL_REQUIRED: received 2",
+      "calls_executed": 0,
+      "correction_succeeded_on": "model-5",
+      "consecutive_counter_reset": true
+    }
+  ],
+  "completed_name_examples": {
+    "evidence_read": "evidence.read",
+    "route_advance": "route.advance",
+    "route_inspect": "route.inspect",
+    "analysis_bounded_endpoint": "analysis.bounded_endpoint",
+    "design_build_proposal": "design.build_proposal",
+    "route_record_analysis": "route.record_analysis"
+  },
+  "workflow_failures_after_decoding": [
+    {
+      "request_id": "model-20",
+      "name": "route_record_analysis",
+      "error": "ROUTE_EVIDENCE_REQUIRED: cite a previous node result"
+    },
+    {
+      "request_id": "model-21",
+      "name": "route_record_analysis",
+      "error": "ROUTE_ANALYSIS_REFERENCE_REQUIRED: fields=['endpoint', 'screen']"
+    },
+    {
+      "request_id": "model-22",
+      "name": "route_advance",
+      "error": "CANDIDATE_BOUND_SHARED_ANALYSIS_REQUIRED_BEFORE_EXECUTION"
+    }
+  ],
+  "conclusion": "Readable name selection and name/argument association were reliable in the live session. The terminal failure was Route evidence linkage under the unchanged bounded repair limit, not provider-name decoding."
+}
