@@ -92,7 +92,9 @@ def configure(root,run_id,budget,created_by):
     index=dict(live_session=read(SOURCE)['run_id'],configuration=previous['candidate_facts']['configuration'],
         candidate_id=previous['candidate_id'],profile_report=previous['profile_report'],
         evaluation=previous['factual_result']['evaluation'])
-    prior['cases'].append(bind_failure(SOURCE.parent,inp,index,Store(SOURCE.parent)))
+    case=bind_failure(SOURCE.parent,inp,index,Store(SOURCE.parent))
+    with store.transaction() as db:case['detail_export']=plain(store.put(db,previous))
+    prior['cases'].append(case)
     with store.transaction() as db:href=plain(store.put(db,prior))
     inp['policy']['route']['data'].update(source=created_by,historical_case=href,historical_math=None,max_trials=3,
         analysis_protocol=pref,endpoint_target=tref,analysis_required_before_run=True,math_evaluation_limit=16,
@@ -113,10 +115,39 @@ def prepare(root):
     if (root/'workflow.json').is_file():return Host(root,read(root/'workflow.json')['run_id'])
     if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True):
         raise RuntimeError('LIVE_FREEZE_REQUIRES_CLEAN_WORKTREE')
-    run_id='gvs-stage340-'+os.urandom(6).hex();budget=dict(model_calls=24,tool_calls=60,backend_solves=3,worker_calls=0,wall_s=3600.)
+    budget=dict(model_calls=24,tool_calls=60,backend_solves=3,worker_calls=0,wall_s=3600.)
     commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
-    host,protocol,target,diagnostic,dref,prior,href=configure(root,run_id,budget,
-        'User-authorized Stage 3.40 candidate-analysis autonomous DeepSeek experiment at '+commit+'.')
+    if (root/'platform.sqlite').exists():
+        # Complete only the known interrupted, entirely unlaunched preparation.
+        # Never migrate a frozen or attempted experiment and never reset a ledger.
+        store=Store(root)
+        with store.connect(True) as db:ids=[row[0] for row in db.execute('SELECT run_id FROM sessions')]
+        if len(ids)!=1 or (root/'freeze_manifest.json').exists():raise RuntimeError('PREPARATION_NOT_REPAIRABLE')
+        run_id=ids[0];host=Host(root,run_id);session=store.session(run_id)
+        if any(store.remaining(run_id)['used'].values()):raise RuntimeError('ATTEMPTED_SESSION_IS_IMMUTABLE')
+        snapshot=deepcopy(session['snapshot']);inp=snapshot['input'];route=inp['policy']['route']['data']
+        original_reference=route['historical_case'];prior=store.artifact(original_reference)
+        missing=[c for c in prior['cases'] if 'detail_export' not in c]
+        if len(missing)!=1 or missing[0]['source_session_id']!=read(SOURCE)['run_id']:
+            raise RuntimeError('UNEXPECTED_PREPARATION_FAILURE')
+        previous=read(SOURCE.parent/'stage339_audit.json')['evaluated_candidates'][-1]
+        with store.transaction() as db:
+            missing[0]['detail_export']=plain(store.put(db,previous));href=plain(store.put(db,prior))
+            route['historical_case']=href;snapshot['input_identity']=digest(inp);snapshot['project_commit']=commit
+            ref=store.put(db,snapshot)
+            store.event(db,run_id,'unlaunched_preparation_repair','completed',
+                inputs=[original_reference],outputs=[href,ref],caller='local-human')
+            db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(ref.artifact_id,run_id))
+        protocol=store.artifact(route['analysis_protocol']);target=store.artifact(route['endpoint_target'])
+        diagnostic=read(EVIDENCE/'diagnosis.json')
+        with store.transaction() as db:dref=plain(store.put(db,diagnostic))
+        atomic_json(root/'preparation_repair.json',dict(reason='Missing Stage 3.39 historical detail_export before freeze',
+            session_id_preserved=run_id,original_reference=original_reference,repaired_reference=href,
+            counters_preserved=store.remaining(run_id)['used'],no_frozen_session_resumed=True))
+    else:
+        run_id='gvs-stage340-'+os.urandom(6).hex()
+        host,protocol,target,diagnostic,dref,prior,href=configure(root,run_id,budget,
+            'User-authorized Stage 3.40 candidate-analysis autonomous DeepSeek experiment at '+commit+'.')
     inp=host.store.session(run_id)['snapshot']['input'];payload=payload_for(host,ReadableDeepSeekAdapter())
     values=dict(frozen_input=inp,analysis_protocol=plain(protocol),endpoint_target=plain(target),
         diagnostic_evidence=diagnostic,historical_case=dict(reference=href,content=prior),runtime_identity=runtime,
