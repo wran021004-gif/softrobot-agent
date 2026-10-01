@@ -2,6 +2,7 @@
 import copy
 import json
 import os
+import re
 import time
 from pydantic import Field, ValidationError
 from schemas.common import Contract
@@ -45,7 +46,7 @@ class OfflineAdapter:
         self.decisions = decisions if isinstance(decisions, list) else []
 
     def encode(self, model_input, config):
-        return encode_chat(model_input, config)
+        return encode_chat(model_input, config, LEGACY_TOOL_NAMING)
 
     def decode(self, response, turn, bindings):
         return response.raw
@@ -69,6 +70,7 @@ class OfflineAdapter:
 class DeepSeekAdapter:
     adapter_id = 'deepseek'
     supports_images = False
+    tool_naming_scheme = 'legacy_hashed_v1'
 
     def __init__(self, parameters=None):
         pass
@@ -76,7 +78,7 @@ class DeepSeekAdapter:
     def encode(self, model_input, config):
         self.timeout_s = config['timeout_s']
         self.base_url = config.get('base_url','https://api.deepseek.com')
-        return encode_chat(model_input, config)
+        return encode_chat(model_input, config, self.tool_naming_scheme)
 
     def respond(self, payload, turn):
         from tools.model_transports.deepseek import request_completion
@@ -85,7 +87,7 @@ class DeepSeekAdapter:
             raise ValueError('MODEL_KEY_MISSING')
         return request_completion(dict(base_url=self.base_url, timeout_s=self.timeout_s), payload, key)
 
-    def decode(self, response, turn, bindings):
+    def decode(self, response, turn, bindings, advertised_tools=None):
         def require(value, kind, path, expected):
             if not isinstance(value, kind):
                 raise ToolProtocolError([dict(path=path, expected=expected)])
@@ -107,9 +109,18 @@ class DeepSeekAdapter:
             raise ToolProtocolError([dict(path=path+'.type', expected='Expected the string "function".')])
         call = require(item.get('function'), dict, path+'.function', 'Expected an object with name and JSON-encoded arguments.')
         path += '.function'
-        names = {provider_name(name): name for name in bindings}
+        mapping = provider_name_map(bindings, self.tool_naming_scheme)
+        names, structures = _advertised_decoder_map(mapping, advertised_tools)
         if not isinstance(call.get('name'), str) or call['name'] not in names:
-            raise ToolProtocolError([dict(path=path+'.name', expected='Expected a registered function name from the supplied tools.')])
+            returned = repr(call.get('name'))
+            valid = '; '.join(name+'(required: '+(', '.join(structures[name]) if structures[name] else 'none')+')'
+                for name in sorted(names))
+            distinction = (' evidence_read reads a saved artifact using reference/pointer paging; '
+                'analysis_bounded_endpoint computes endpoint diagnostics from models, protocol and target and is not an evidence reader.'
+                if 'evidence_read' in names and 'analysis_bounded_endpoint' in names else '')
+            raise ToolProtocolError([dict(path=path+'.name', expected=(
+                'Returned unadvertised function name '+returned+'. Use exactly one advertised name with its nested domain arguments: '
+                +valid+'.'+distinction))])
         encoded = require(call.get('arguments'), str, path+'.arguments',
             'Expected a JSON-encoded object with arguments, reason and tool_version; evidence is optional.')
         try:
@@ -130,12 +141,80 @@ class DeepSeekAdapter:
         return dict(request_id=f'model-{turn}-tool', tool_id=name, **plain(envelope))
 
 
-def provider_name(name):
-    # Provider restrictions never redefine the public identity; hash avoids collisions.
-    return 'tool_' + digest(name)[:40]
+class ReadableDeepSeekAdapter(DeepSeekAdapter):
+    """New-session adapter; v1 remains the sealed hashed-name compatibility path."""
+    tool_naming_scheme = 'readable_v1'
 
 
-def encode_chat(model_input, config):
+LEGACY_TOOL_NAMING = 'legacy_hashed_v1'
+READABLE_TOOL_NAMING = 'readable_v1'
+
+
+def _readable_name(name):
+    value=re.sub(r'[^A-Za-z0-9_]+','_',name).strip('_').lower()
+    return value or 'tool'
+
+
+def provider_name_map(names, scheme=LEGACY_TOOL_NAMING):
+    """Create one deterministic canonical-ID -> advertised-name mapping."""
+    identities=sorted(set(names))
+    if scheme==LEGACY_TOOL_NAMING:
+        mapping={name:'tool_'+digest(name)[:40] for name in identities}
+    elif scheme==READABLE_TOOL_NAMING:
+        groups={}
+        for name in identities:groups.setdefault(_readable_name(name),[]).append(name)
+        mapping={}
+        for base,members in sorted(groups.items()):
+            if len(members)==1:
+                mapping[members[0]]=base[:64]
+                continue
+            used=set()
+            for index,name in enumerate(sorted(members),1):
+                candidate=base[:55]+'_'+digest(name)[:8]
+                if candidate in used:candidate=base[:52]+'_'+digest(name)[:8]+'_'+str(index)
+                used.add(candidate);mapping[name]=candidate
+    else:
+        raise ValueError('UNKNOWN_PROVIDER_TOOL_NAMING_SCHEME: '+str(scheme))
+    if len(mapping)!=len(identities) or len(set(mapping.values()))!=len(mapping):
+        raise ValueError('PROVIDER_TOOL_NAME_COLLISION: '+repr(mapping))
+    return mapping
+
+
+def tool_naming_policy(names, scheme=READABLE_TOOL_NAMING):
+    mapping=provider_name_map(names,scheme)
+    return dict(scheme=scheme,mapping_identity=digest(dict(scheme=scheme,mapping=mapping)))
+
+
+def provider_name(name, scheme=LEGACY_TOOL_NAMING):
+    return provider_name_map([name],scheme)[name]
+
+
+def _advertised_decoder_map(mapping, advertised_tools):
+    reverse={value:key for key,value in mapping.items()}
+    if advertised_tools is None:
+        return reverse,{name:[] for name in reverse}
+    names={};structures={}
+    for row in advertised_tools:
+        function=row.get('function',{}) if isinstance(row,dict) else {}
+        provider=function.get('name')
+        canonical=reverse.get(provider)
+        if canonical is None:
+            raise ValueError('ADVERTISED_TOOL_MAPPING_MISMATCH: '+repr(provider))
+        domain=function.get('parameters',{}).get('properties',{}).get('arguments',{})
+        names[provider]=canonical;structures[provider]=list(domain.get('required',[]))
+    if len(names)!=len(advertised_tools):raise ValueError('DUPLICATE_ADVERTISED_TOOL_NAME')
+    return names,structures
+
+
+def encode_chat(model_input, config, naming_scheme=LEGACY_TOOL_NAMING):
+    bindings=model_input.context['policy']['tool_bindings']
+    mapping=provider_name_map(bindings,naming_scheme)
+    expected_policy=tool_naming_policy(bindings,naming_scheme)
+    frozen_policy=config.get('tool_naming')
+    if naming_scheme==READABLE_TOOL_NAMING and frozen_policy!=expected_policy:
+        raise ValueError('PROVIDER_TOOL_NAMING_POLICY_MISMATCH: expected '+repr(expected_policy))
+    if frozen_policy is not None and frozen_policy!=expected_policy:
+        raise ValueError('PROVIDER_TOOL_NAMING_POLICY_MISMATCH: expected '+repr(expected_policy))
     tools = []
     for d in model_input.tools:
         # Keep transport metadata outside tool arguments (tools can own 'reason').
@@ -151,8 +230,13 @@ def encode_chat(model_input, config):
         schema['properties']['tool_version']['const'] = d['version']
         if definitions:
             schema.setdefault('$defs', {}).update(definitions)
-        tools.append(dict(type='function', function=dict(name=provider_name(d['extension_id']),
-            description=d['extension_id'] + '@' + d['version'] + ': ' + d['description'], parameters=schema)))
+        note=''
+        if d['extension_id']=='evidence.read':
+            note=' Reads stored evidence only; it never performs endpoint analysis.'
+        elif d['extension_id']=='analysis.bounded_endpoint':
+            note=' Computes from models, protocol and target; it does not accept evidence reference/pointer paging.'
+        tools.append(dict(type='function', function=dict(name=mapping[d['extension_id']],
+            description=d['extension_id'] + '@' + d['version'] + ': ' + d['description']+note, parameters=schema)))
     payload = dict(model=config['model'], messages=[dict(role='system', content=model_input.content[0].text),
         dict(role='user', content=encode(model_input.context))], tools=tools, max_tokens=config.get('max_tokens',2000), stream=False)
     if config.get('thinking') is not None: payload['thinking'] = {'type':config['thinking']}
@@ -169,7 +253,7 @@ def effective_config(host):
     return config
 
 
-def length_without_action(response, bindings):
+def length_without_action(response, bindings, adapter=None, advertised_tools=None):
     """Inspect completeness only. Never decode reasoning or execute truncated output."""
     message=response.raw['choices'][0].get('message',{})
     if message.get('content'): return False
@@ -177,7 +261,7 @@ def length_without_action(response, bindings):
     complete=response.model_copy(deep=True)
     complete.raw['choices'][0]['finish_reason']=None
     try:
-        DeepSeekAdapter().decode(complete,0,bindings)
+        (adapter or DeepSeekAdapter()).decode(complete,0,bindings,advertised_tools)
     except ToolProtocolError:
         return True
     return False
@@ -331,7 +415,7 @@ def run_loop(host, adapter=None):
                                     request=request_id, execution=row['execution_id'], inputs=[input_ref], outputs=[raw_ref], version=definition.version)
                             if response.status != 'completed':
                                 raise ValueError(response.error or response.status)
-                            decoded = adapter.decode(response, state['turn'], session['snapshot']['input']['policy']['tool_bindings'])
+                            decoded = adapter.decode(response, state['turn'], session['snapshot']['input']['policy']['tool_bindings'],payload.get('tools'))
                             decision = plain(strategy.decide(decoded, host.context()))
                             with host.store.transaction() as db:
                                 decision_ref = host.store.put(db, decision)
@@ -354,7 +438,7 @@ def run_loop(host, adapter=None):
                             if isinstance(exc, ModelLengthTruncationError):
                                 failure.update(length_truncated=True, finish_reason='length')
                                 failure['without_usable_action']=length_without_action(response,
-                                    session['snapshot']['input']['policy']['tool_bindings'])
+                                    session['snapshot']['input']['policy']['tool_bindings'],adapter,payload.get('tools'))
                             if isinstance(exc, ToolProtocolError):
                                 failure['protocol_errors'] = exc.issues
                             if isinstance(exc, ToolCallCountError):

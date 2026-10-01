@@ -21,7 +21,8 @@ from extensions.tendon_family.route import check_run_eligibility,create
 from schemas.platform import ModelResponse
 from schemas.platform_analysis import EndpointTarget,TaskAnalysisProtocol
 from tools.platform_host import Host
-from tools.platform_models import DeepSeekAdapter,payload_for,provider_name
+from tools.platform_models import (READABLE_TOOL_NAMING,ReadableDeepSeekAdapter,payload_for,
+    provider_name_map,tool_naming_policy)
 from tools.platform_store import Store,plain
 from tools.runtime_identity import require_softagent_runtime
 from tools.state_io import atomic_json,digest,read
@@ -134,6 +135,8 @@ def configure(root,run_id,budget,created_by,*,include_prior=True):
     inp=deepcopy(read(SOURCE));inp['run_id']=run_id
     inp['policy']['budget']=budget;inp['policy']['timeout_s']=1800.;inp['policy']['allowed_tools']=[]
     inp['policy']['tool_bindings']=dict(TOOLS);inp['policy']['model']['max_turns']=24
+    inp['policy']['model']['adapter_version']='2.0.0'
+    inp['policy']['model']['tool_naming']=tool_naming_policy(TOOLS,READABLE_TOOL_NAMING)
     store=Store(root);store.create(dict(project_id=run_id,grant_id=run_id,authorization_source=created_by,budget=budget))
     protocol,target=protocol_and_target(inp)
     diagnostic=diagnostic_evidence()
@@ -153,12 +156,14 @@ def configure(root,run_id,budget,created_by,*,include_prior=True):
 
 
 def fixture_call(host,turn,tool,arguments):
-    payload=payload_for(host,DeepSeekAdapter());bindings=host.store.session(host.run_id)['snapshot']['input']['policy']['tool_bindings']
-    advertised=next(row['function'] for row in payload['tools'] if row['function']['name']==provider_name(tool))
+    adapter=ReadableDeepSeekAdapter();payload=payload_for(host,adapter)
+    bindings=host.store.session(host.run_id)['snapshot']['input']['policy']['tool_bindings']
+    names=provider_name_map(bindings,READABLE_TOOL_NAMING)
+    advertised=next(row['function'] for row in payload['tools'] if row['function']['name']==names[tool])
     raw=dict(choices=[dict(index=0,finish_reason='tool_calls',message=dict(role='assistant',content=None,
         tool_calls=[dict(id='fixture-'+str(turn),type='function',function=dict(name=advertised['name'],
             arguments=json.dumps(dict(arguments=arguments,reason='Offline schema/linkage fixture only.',tool_version=bindings[tool]))))]))])
-    decoded=DeepSeekAdapter().decode(ModelResponse(raw=raw),turn,bindings)
+    decoded=adapter.decode(ModelResponse(raw=raw),turn,bindings,payload['tools'])
     return host.invoke(decoded),payload
 
 
@@ -200,7 +205,7 @@ def offline(root,evidence):
     gate=check_run_eligibility(host,'fixture-proposal')
     advertised={row['function']['name'] for row in payload['tools']}
     result=dict(status='passed',runtime=runtime,scripted_fixture_not_live_model_choice=True,
-        diagnostic_reference=dref,public_schemas_present=all(provider_name(name) in advertised for name in
+        diagnostic_reference=dref,public_schemas_present=all(provider_name_map(TOOLS,READABLE_TOOL_NAMING)[name] in advertised for name in
             ('design.optimize_math','design.build_proposal','route.record_analysis','route.advance')),
         automatic_proposal_binding=report_value['math_selection_trace']['matches_proposal'],
         optimizer_candidate_id=proposal['candidate_id'],gate=gate,usage=host.store.remaining(host.run_id)['used'],
@@ -227,7 +232,7 @@ def prepare(root):
     commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     host,protocol,target,diagnostic,dref,prior,href=configure(root,run_id,budget,
         'User-authorized one fresh Stage 3.37 bounded autonomous DeepSeek multi-parameter design experiment at '+commit+'.')
-    inp=host.store.session(run_id)['snapshot']['input'];payload=payload_for(host,DeepSeekAdapter())
+    inp=host.store.session(run_id)['snapshot']['input'];payload=payload_for(host,ReadableDeepSeekAdapter())
     values=dict(frozen_input=inp,analysis_protocol=plain(protocol),endpoint_target=plain(target),
         diagnostic_evidence=diagnostic,historical_case=dict(reference=href,content=prior),runtime_identity=runtime,
         experiment_prompt=dict(guidance=inp['policy']['route']['data']['guidance']),provider_tools=payload['tools'],
@@ -251,7 +256,7 @@ def verify_prelaunch(root,host):
     for name,expected in freeze['files'].items():
         actual[name]=sha256(root/name) if (root/name).is_file() else None
         if actual[name]!=expected:failures.append('frozen_file:'+name)
-    snapshot=host.store.session(host.run_id)['snapshot'];payload=payload_for(host,DeepSeekAdapter())
+    snapshot=host.store.session(host.run_id)['snapshot'];payload=payload_for(host,ReadableDeepSeekAdapter())
     checks=dict(run_id=freeze['run_id']==host.run_id,runtime=runtime==read(root/'runtime_identity.json'),
         session_input=snapshot['input']==read(root/'frozen_input.json'),
         session_input_identity=snapshot['input_identity']==digest(snapshot['input'])==freeze['session_input_identity'],

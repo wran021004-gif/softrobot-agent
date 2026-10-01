@@ -43,6 +43,9 @@ EXTENSIONS = [
     Extension('deepseek', 'model_adapter', '1.0.0', Empty, ModelResponse,
         'tools.platform_models:DeepSeekAdapter', 'Existing text/tool model service transport',
         sources=('tools/platform_models.py', 'tools/model_transports/deepseek.py'), capabilities=dict(real_requests=True, text=True, images=False, timeout='network request deadline', cancellation='between requests')),
+    Extension('deepseek', 'model_adapter', '2.0.0', Empty, ModelResponse,
+        'tools.platform_models:ReadableDeepSeekAdapter', 'Text/tool model service transport with frozen readable provider function names',
+        sources=('tools/platform_models.py', 'tools/model_transports/deepseek.py'), capabilities=dict(real_requests=True, text=True, images=False, timeout='network request deadline', cancellation='between requests')),
     Extension('strategy.tool', 'strategy', '1.0.0', Empty, ToolRequest,
         'tools.platform_models:ToolStrategy', 'One typed tool request per decision', sources=('tools/platform_models.py',)),
 ]

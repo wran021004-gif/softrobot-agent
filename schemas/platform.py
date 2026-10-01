@@ -166,6 +166,12 @@ class ModelProtocolRecovery(Contract):
     max_consecutive: int = Field(ge=0)
 
 
+class ModelToolNaming(Contract):
+    """Frozen provider-name policy for one model session."""
+    scheme: Literal['legacy_hashed_v1','readable_v1']
+    mapping_identity: str = Field(pattern=r'^[0-9a-f]{64}$')
+
+
 class ModelConfig(Contract):
     adapter: Identifier = 'offline'
     adapter_version: str = '1.0.0'
@@ -178,6 +184,7 @@ class ModelConfig(Contract):
     reasoning_effort: Literal['low','high','max'] | None = None
     length_recovery: ModelLengthRecovery | None = None
     protocol_recovery: ModelProtocolRecovery | None = None
+    tool_naming: ModelToolNaming | None = None
     max_tokens: int = Field(default=2000,ge=1)
     supports_tools: Literal[True] = True
     supports_text: Literal[True] = True
@@ -192,7 +199,7 @@ class ModelConfig(Contract):
     @model_serializer(mode='wrap')
     def serialize_optional_model_settings(self, handler):
         data=handler(self)
-        for key in ('reasoning_effort','length_recovery','protocol_recovery'):
+        for key in ('reasoning_effort','length_recovery','protocol_recovery','tool_naming'):
             if data.get(key) is None: data.pop(key,None)
         return data
 
