@@ -80,6 +80,8 @@ class MatlabBackend:
         self.timings['backend_call']=time.perf_counter()-start
         with gzip.open(folder/'trajectory.json.gz','wt',encoding='utf8') as stream: json.dump(rows,stream,allow_nan=False)
         atomic_json(folder/'controller_observations.json',observations)
+        if getattr(self.controller,'control_snapshots',None):
+            atomic_json(folder/'control_snapshots.json',self.controller.control_snapshots)
         command_fields=('requested_tension_n','desired_tension_n','predicted_tension_n','tension_tracking_error_n',
             'force_limit_saturated','actuator_saturated','tension_command_unrealizable')
         atomic_json(folder/'actual_commands.json',[dict(time_s=r['solver_time_s'],

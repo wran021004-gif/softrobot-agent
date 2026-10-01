@@ -1,0 +1,216 @@
+{
+  "schema_version": "1.0.0",
+  "protocol": {
+    "schema_version": "1.0.0",
+    "request": {
+      "execution_id": "199e9dd6528f4b39963d9571598d290a",
+      "snapshot_id": "a58d1c80fb8192a78cc3bcdd0bc8fc5e90d9e3e12890adf463dad620caa50a0e",
+      "changed_factor": "truncate_horizon_at_deadline",
+      "max_local_solves": 2,
+      "max_preparation_and_solving_s": 300.0
+    },
+    "source_manifest": {
+      "artifact_id": "bdc0d13010baf7d6d31b7e7a6495f4ce35d6187eced5647e067926c28fc02f3b",
+      "media_type": "application/json"
+    },
+    "ownership": {
+      "execution_id": "199e9dd6528f4b39963d9571598d290a",
+      "snapshot_id": "a58d1c80fb8192a78cc3bcdd0bc8fc5e90d9e3e12890adf463dad620caa50a0e",
+      "owner_run_id": "gvs-stage341-recording-98480fffc9a2"
+    },
+    "baseline_horizon": 10,
+    "variant_horizon": 1,
+    "acceptance": {
+      "finite_inputs": true,
+      "independent_feasibility_max_scaled": 1e-05,
+      "deadline_error_improvement_m": 0.0001,
+      "complete_pair_limit_s": 300.0,
+      "max_cpu_s_per_solve": 30.0,
+      "max_iterations": 120,
+      "shared_evaluator": "Euclidean world-tip error at official deadline, in m; speed separately in m/s",
+      "objectives": "Different horizon objectives; never compare their scalar costs across variants",
+      "first_command": "Report separately, never a quality gate"
+    },
+    "fixed_conditions": [
+      "robot",
+      "task",
+      "projected initial state",
+      "previous applied input",
+      "retained warm prefix",
+      "dynamics",
+      "residual scaling",
+      "bounds",
+      "solve budgets",
+      "selection logic"
+    ],
+    "classification": "Two new local solves from one recorded snapshot; not a historical replay or closed-loop result"
+  },
+  "rows": [
+    {
+      "role": "baseline",
+      "horizon": 10,
+      "metrics": {
+        "deadline": {
+          "time_s": 0.35000000000000003,
+          "position_error_m": 0.015930070179911975,
+          "tip_velocity_m_s": [
+            0.05770032568168388,
+            -0.07631537271162252,
+            -0.1188597321182766
+          ],
+          "tip_speed_m_s": 0.15258112470130347
+        },
+        "deadline_status": "within_recorded_horizon",
+        "terminal": {
+          "time_s": 0.44000000000000006,
+          "position_error_m": 0.013693525129402319,
+          "tip_velocity_m_s": [
+            0.05246330909349383,
+            -0.053532549310845806,
+            -0.20736907597598128
+          ],
+          "tip_speed_m_s": 0.22049958346420953
+        },
+        "first_step": {
+          "time_s": 0.35000000000000003,
+          "position_error_m": 0.015930070179911975,
+          "tip_velocity_m_s": [
+            0.05770032568168388,
+            -0.07631537271162252,
+            -0.1188597321182766
+          ],
+          "tip_speed_m_s": 0.15258112470130347
+        },
+        "horizon_interval_s": [
+          0.34,
+          0.44000000000000006
+        ],
+        "first_input_n": [
+          4.288330421742658,
+          4.743135878457816,
+          1.8217675799841095,
+          2.9752280556623854,
+          1.966754186008023,
+          1.7229850835487037
+        ],
+        "input_min_n": [
+          4.184824466315064,
+          4.651869809300046,
+          1.8217675799841095,
+          2.8664290168806983,
+          1.966754186008023,
+          1.7229850835487037
+        ],
+        "input_max_n": [
+          4.288330421742658,
+          4.743135878457816,
+          1.9775653666428217,
+          2.9752280556623854,
+          1.995049114626251,
+          1.8100411198502488
+        ]
+      },
+      "independent_verification": {
+        "objective": 9.598943275361506,
+        "scaled_violation": 1.9363178595244168e-10,
+        "feasible": true
+      },
+      "selected_iteration": 0,
+      "stopping_reason": "budget_best_feasible",
+      "raw_status": "User_Requested_Stop",
+      "complete_local_update_s": 26.78350770007819,
+      "graph_construction_s": 1.5755280999001116,
+      "first_command_change_from_initialization_n": 0.0,
+      "reference": {
+        "artifact_id": "19f266b0cd081448457dd898f7acf72ccb6a82c3a5b8359be214e469262d4665",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "role": "variant",
+      "horizon": 1,
+      "metrics": {
+        "deadline": {
+          "time_s": 0.35000000000000003,
+          "position_error_m": 0.012902801358913547,
+          "tip_velocity_m_s": [
+            0.2422613389260784,
+            -0.28704919513306537,
+            -0.44671078607991477
+          ],
+          "tip_speed_m_s": 0.5836422904184825
+        },
+        "deadline_status": "within_recorded_horizon",
+        "terminal": {
+          "time_s": 0.35000000000000003,
+          "position_error_m": 0.012902801358913547,
+          "tip_velocity_m_s": [
+            0.2422613389260784,
+            -0.28704919513306537,
+            -0.44671078607991477
+          ],
+          "tip_speed_m_s": 0.5836422904184825
+        },
+        "first_step": {
+          "time_s": 0.35000000000000003,
+          "position_error_m": 0.012902801358913547,
+          "tip_velocity_m_s": [
+            0.2422613389260784,
+            -0.28704919513306537,
+            -0.44671078607991477
+          ],
+          "tip_speed_m_s": 0.5836422904184825
+        },
+        "horizon_interval_s": [
+          0.34,
+          0.35000000000000003
+        ],
+        "first_input_n": [
+          5.805128817391185,
+          7.956252726325187,
+          7.99994011352462,
+          0.26006897299865545,
+          1.1582225213720378,
+          1.5819900477303879
+        ],
+        "input_min_n": [
+          5.805128817391185,
+          7.956252726325187,
+          7.99994011352462,
+          0.26006897299865545,
+          1.1582225213720378,
+          1.5819900477303879
+        ],
+        "input_max_n": [
+          5.805128817391185,
+          7.956252726325187,
+          7.99994011352462,
+          0.26006897299865545,
+          1.1582225213720378,
+          1.5819900477303879
+        ]
+      },
+      "independent_verification": {
+        "objective": 10.222637639860027,
+        "scaled_violation": 8.969796324101442e-06,
+        "feasible": true
+      },
+      "selected_iteration": 38,
+      "stopping_reason": "relative_seed_improvement",
+      "raw_status": "User_Requested_Stop",
+      "complete_local_update_s": 16.572363399900496,
+      "graph_construction_s": 0.06032510008662939,
+      "first_command_change_from_initialization_n": 6.178172533540511,
+      "reference": {
+        "artifact_id": "95e4fc7b992cf74451a555402e1e99fcfbb4965e0be6b06042d882b6a0419177",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "local_gate_passed": true,
+  "shared_deadline_error_improvement_m": 0.0030272688209984286,
+  "total_preparation_solving_analysis_s": 45.44859360018745,
+  "new_local_solves": 2,
+  "first_command_difference_n": 6.178172533540511,
+  "interpretation": "One snapshot comparison only; no physical unreachability or closed-loop claim; no cross-objective scalar ranking."
+}

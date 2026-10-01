@@ -248,6 +248,12 @@ class TrajectoryWorkspace:
         for j,value in enumerate(measured_x):self.problem.variables[f'x/0/{j}']['bounds']=[float(value)/self.state_scales[j]]*2
         for t,value in zip(self.tendons,previous_u): self.problem.variables['previous_u/'+t]['bounds']=[float(value)]*2
         source=warm if warm is not None else self.last
+        # Recording is opt-in and never feeds values back into preparation/selection.
+        recording = None
+        if self.solver.diagnostic_trace:
+            from copy import deepcopy
+            recording = dict(warm_source='explicit' if warm is not None else 'previous_selected',
+                warm_before_preparation=None if source is None else deepcopy({k:source[k] for k in ('states','tensions')}))
         tails=[]
         if source is not None:
             X=np.asarray(source['states']);U=np.asarray(source['tensions']);s=0 if warm is not None else self.parameters.substeps
@@ -332,6 +338,8 @@ class TrajectoryWorkspace:
         # Command acceptance remains the separate, stricter feasibility check.
         if result.status in ('converged','iteration_limit','feasible_early_stop'):self.last=output
         output['update_wall_s']=time.perf_counter()-update_start
+        if recording is not None:
+            output['recording'] = recording
         return output
 
     def _recover_returned(self,result,measured_x):

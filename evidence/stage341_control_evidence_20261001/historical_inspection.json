@@ -1,0 +1,410 @@
+{
+  "schema_version": "1.0.0",
+  "ownership": {
+    "execution_id": "f9b8c232a576465ab5ef1ca92658faad",
+    "owner_run_id": "gvs-stage340-46894a55d13d-2edc6421d68bfe51",
+    "candidate_id": "proposal_compliant_cfg"
+  },
+  "identities": {
+    "execution_scope": {
+      "robot": {
+        "family": "tendon_robot_family",
+        "identity": "0edfa2f3c10d37cbb0e899e67f9c7601d2572a176b9769c792021e7f7fe5187a"
+      },
+      "task": {
+        "family": "task.reach",
+        "identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
+        "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+        "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+        "timing": {
+          "timestep_s": 0.0005,
+          "control_period_s": 0.01,
+          "sample_period_s": 0.01,
+          "duration_s": 0.35,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ]
+        },
+        "initializer": "84010ebcd288b9ed77f60ee839bc9bba4322b84b3a361cc6fa04145303009d31"
+      },
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "version": "1.1.0",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "version": "1.0.0",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "version": "1.0.0",
+        "data": {
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        }
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "version": "6.0.0",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "version": "1.0.0",
+          "data": {
+            "numerical_source": "bundled_guess",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.0,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": false,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.0,
+              "terminal_velocity_weight": 0.0001,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.0001
+            },
+            "settling": {
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            }
+          }
+        }
+      },
+      "seed": 17
+    },
+    "configuration": {
+      "artifact_id": "e59a6fd3f2fd548b860748bbbdc0a21e29222aa88ce91e503302ca5913e544bd",
+      "media_type": "application/json"
+    }
+  },
+  "observations": {
+    "updates": [
+      {
+        "update_id": 0,
+        "time_s": 0.0,
+        "selection": {
+          "plan_accepted": true,
+          "optimization_selected_iteration": 0,
+          "optimization_raw_status": "User_Requested_Stop",
+          "policy_stop_reason": "budget_best_feasible"
+        },
+        "timing_s": {
+          "update_wall_s": 29.242902499856427,
+          "state_preparation_s": 0.004093799972906709,
+          "warm_preparation_s": 9.24912349996157,
+          "optimization_solve_s": 15.500332900090143,
+          "plan_validation_s": 0.08498599985614419,
+          "snapshot_capture_wall_s": null
+        },
+        "projection_residual_rad_m": 0.0,
+        "actual_input_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "snapshot_id": null
+      },
+      {
+        "update_id": 4,
+        "time_s": 0.04,
+        "selection": {
+          "plan_accepted": true,
+          "optimization_selected_iteration": 17,
+          "optimization_raw_status": "User_Requested_Stop",
+          "policy_stop_reason": "relative_seed_improvement"
+        },
+        "timing_s": {
+          "update_wall_s": 17.517057500081137,
+          "state_preparation_s": 0.00138369994238019,
+          "warm_preparation_s": 2.5311846998520195,
+          "optimization_solve_s": 14.86313489987515,
+          "plan_validation_s": 0.07779260003007948,
+          "snapshot_capture_wall_s": null
+        },
+        "projection_residual_rad_m": 0.15256006506710906,
+        "actual_input_n": [
+          4.342901791882378,
+          6.106120701617398,
+          0.0021933601970730472,
+          5.446162377718157,
+          0.8170593419061278,
+          0.5821549946698927
+        ],
+        "snapshot_id": null
+      },
+      {
+        "update_id": 34,
+        "time_s": 0.34,
+        "selection": {
+          "plan_accepted": true,
+          "optimization_selected_iteration": 0,
+          "optimization_raw_status": "User_Requested_Stop",
+          "policy_stop_reason": "budget_best_feasible"
+        },
+        "timing_s": {
+          "update_wall_s": 18.36414849990979,
+          "state_preparation_s": 0.001340900082141161,
+          "warm_preparation_s": 2.499652599915862,
+          "optimization_solve_s": 15.742403500014916,
+          "plan_validation_s": 0.08001739997416735,
+          "snapshot_capture_wall_s": null
+        },
+        "projection_residual_rad_m": 1.4678893235692199,
+        "actual_input_n": [
+          4.288330421742658,
+          4.743135878457816,
+          1.8217675799841095,
+          2.9752280556623854,
+          1.966754186008023,
+          1.7229850835487037
+        ],
+        "snapshot_id": null
+      }
+    ],
+    "total_updates": 35,
+    "initialization_selected": 9,
+    "aligned_intervals": [
+      {
+        "start_s": 0.0,
+        "end_s": 0.01,
+        "frame": "world",
+        "applied_input_difference_n": 0.0,
+        "applied_tension_n": [
+          1.7512764858409064,
+          4.755852667139922,
+          3.1031566686630025,
+          3.218253612486097,
+          0.7859357597552847,
+          0.6315302379791942
+        ],
+        "predicted_tip_m": [
+          0.2879057969840276,
+          0.0014995541140055881,
+          0.15164143332000016
+        ],
+        "measured_tip_m": [
+          0.28792226403873306,
+          0.0013250537840108056,
+          0.1513119358009471
+        ],
+        "tip_difference_m": 0.00037321594837450955,
+        "update_id": 0,
+        "start_error_m": 0.05318834458788882,
+        "predicted_next_error_m": 0.050971023126640716,
+        "actual_next_error_m": 0.05133308193401742,
+        "actual_error_change_m": -0.0018552626538713979,
+        "definition": "Euclidean world-tip difference at t+period under matching recorded interval input; negative error change is progress",
+        "projected_state_difference": {
+          "curvature_linf_rad_m": 0.1434323608917418,
+          "rate_linf_rad_m_s": 14.2912200940745,
+          "classification": "recorded projected states, not full backend-state error"
+        }
+      },
+      {
+        "start_s": 0.04,
+        "end_s": 0.05,
+        "frame": "world",
+        "applied_input_difference_n": 0.0,
+        "applied_tension_n": [
+          4.342901791882378,
+          6.106120701617398,
+          0.0021933601970730472,
+          5.446162377718157,
+          0.8170593419061278,
+          0.5821549946698927
+        ],
+        "predicted_tip_m": [
+          0.28417284471527,
+          0.012492441273279177,
+          0.16296395816674353
+        ],
+        "measured_tip_m": [
+          0.2840345401549142,
+          0.012364204295626373,
+          0.16269727098542314
+        ],
+        "tip_difference_m": 0.0003266418934144099,
+        "update_id": 4,
+        "start_error_m": 0.04159223774618712,
+        "predicted_next_error_m": 0.035658007467590465,
+        "actual_next_error_m": 0.03596393985615158,
+        "actual_error_change_m": -0.005628297890035543,
+        "definition": "Euclidean world-tip difference at t+period under matching recorded interval input; negative error change is progress",
+        "projected_state_difference": {
+          "curvature_linf_rad_m": 0.12468579065174179,
+          "rate_linf_rad_m_s": 11.873299770048348,
+          "classification": "recorded projected states, not full backend-state error"
+        }
+      },
+      {
+        "start_s": 0.34,
+        "end_s": 0.35000000000000003,
+        "frame": "world",
+        "applied_input_difference_n": 0.0,
+        "applied_tension_n": [
+          4.288330421742658,
+          4.743135878457816,
+          1.8217675799841095,
+          2.9752280556623854,
+          1.966754186008023,
+          1.7229850835487037
+        ],
+        "predicted_tip_m": [
+          0.2754590056859666,
+          0.03714369394742388,
+          0.19614257247054911
+        ],
+        "measured_tip_m": [
+          0.27435863249513154,
+          0.03866455444038071,
+          0.1988672653048974
+        ],
+        "tip_difference_m": 0.0033087442995333297,
+        "update_id": 34,
+        "start_error_m": 0.019557235858863858,
+        "predicted_next_error_m": 0.015930070179911975,
+        "actual_next_error_m": 0.018349652058180982,
+        "actual_error_change_m": -0.0012075838006828758,
+        "definition": "Euclidean world-tip difference at t+period under matching recorded interval input; negative error change is progress",
+        "projected_state_difference": {
+          "status": "missing",
+          "reason": "next projected state unavailable; endpoint comparison remains available"
+        }
+      }
+    ]
+  },
+  "references": {
+    "manifest": {
+      "artifact_id": "35b76a9b56de8f6c78ab4e733e262c344dd667abcd176eec98712debd9a33cc8",
+      "media_type": "application/json"
+    },
+    "files": {
+      "actual_commands.json": {
+        "artifact_id": "43cf7c9e33c15d58a0275be05a0422771336e8e822be8f0a29c3ce0b6bdc3e13",
+        "media_type": "application/octet-stream"
+      },
+      "compiled_physics.json": {
+        "artifact_id": "aad8a4bc01b1c4e66fd9f8b0a012154b45664e2bcadab10367b005d343615bdc",
+        "media_type": "application/octet-stream"
+      },
+      "control_spec.json": {
+        "artifact_id": "11a63c66ccdbcd8a4db391550e8ad3b1f8a1995e745e26e120026062b80febbd",
+        "media_type": "application/octet-stream"
+      },
+      "controller_observations.json": {
+        "artifact_id": "c849183df44d2c6d3fa72fbac8788e0a85a105de4fb51d20fc2c7e0ed3c989e5",
+        "media_type": "application/octet-stream"
+      },
+      "dynamics_execution.json": {
+        "artifact_id": "cc1a84dd1af99bacb73da26503126fd6466ba47a98b3914ea1845d4744ff18d6",
+        "media_type": "application/octet-stream"
+      },
+      "experiment_scene.json": {
+        "artifact_id": "ba556f0fb31cf27e7121a341f4538d7a48cf12e5dc89fe7acebc5ac5e317fc87",
+        "media_type": "application/octet-stream"
+      },
+      "experiment_spec.json": {
+        "artifact_id": "1f74e2a6aa9004b8bb07dce0e6d0258654a6d6fcd747a0a3e756eb3ae2cd7f90",
+        "media_type": "application/octet-stream"
+      },
+      "model_discretization.json": {
+        "artifact_id": "78cd2ec722dc09ccd1cc0080958ba4a2d67b52c6d46c170c28c86c86637258ba",
+        "media_type": "application/octet-stream"
+      },
+      "nmpc_updates.json": {
+        "artifact_id": "f948ae8407b52b7bde82aa520b88c956667c1325e2384b51435fb8c80691dad7",
+        "media_type": "application/octet-stream"
+      },
+      "resolved_physics.json": {
+        "artifact_id": "6847317623871ce558746a695e19d3f311372d93a02ca539ac1f8c471a2be40d",
+        "media_type": "application/octet-stream"
+      },
+      "result.json": {
+        "artifact_id": "0b6af78e36ebcf1c6bef98dfb12309e0e79ea8e8f9f480183b7aa9e15fb8408d",
+        "media_type": "application/octet-stream"
+      },
+      "robot.xml": {
+        "artifact_id": "0f224771d007abcf8fdd2ddbe4b7f2a359dda2d1adf7117d5347969bc8cb30ca",
+        "media_type": "application/octet-stream"
+      },
+      "robot_description.json": {
+        "artifact_id": "4b7f5ab74f38fea6dfb53e1363a6a463620a134aee851ab5b4ca1759e2be9396",
+        "media_type": "application/octet-stream"
+      },
+      "solver_configuration.json": {
+        "artifact_id": "c7a9f804d5e3f799d274c47a74131d868aee6f20221e9b545283d2fc054f9737",
+        "media_type": "application/octet-stream"
+      },
+      "trajectory.json.gz": {
+        "artifact_id": "ef31d19e34f3fc709efdb3ead367d00dd2a7fe9f20a0d6870219645db4ccf366",
+        "media_type": "application/octet-stream"
+      }
+    }
+  },
+  "capabilities": {
+    "available": [
+      "saved_execution",
+      "selected_update",
+      "aligned_one_step"
+    ],
+    "missing": [
+      "update:0:complete_warm_and_plans",
+      "update:4:complete_warm_and_plans",
+      "update:34:complete_warm_and_plans"
+    ],
+    "unsupported": [
+      "causal_identification",
+      "historical_unrecorded_horizons"
+    ]
+  },
+  "comparability": {
+    "frame": "world",
+    "prediction": "same update, next sample, same actually executed input only",
+    "deadline_s": 0.35,
+    "full_state": "Projected GVS state; endpoint and projection residuals are separate"
+  },
+  "classification": "recorded quantities summarized; no new solve or reconstructed history"
+}

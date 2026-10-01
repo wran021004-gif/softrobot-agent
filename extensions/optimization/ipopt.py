@@ -73,6 +73,7 @@ class _FeasibleIterate(ca.Callback):
         self.stop_reason=None;self.stop_s=None
         self.trace=[] if trace else None
         self.checkpoints={} if trace else None
+        self.diagnostic_callback_s=0.
 
     def eval(self,args):
         elapsed=time.perf_counter()-self.start
@@ -80,6 +81,7 @@ class _FeasibleIterate(ca.Callback):
         x=np.asarray(items['x']).ravel();g=np.asarray(items['g']).ravel();objective=float(items['f'])
         violation=_violation(x,g,*self.bounds)
         if self.trace is not None:
+            trace_start=time.perf_counter()
             self.trace.append(dict(iteration=self.iteration,elapsed_s=elapsed,objective=objective,
                 scaled_violation=violation,eligible=bool(np.isfinite(np.r_[x,g,objective]).all() and violation<=1e-5)))
             finite=bool(np.isfinite(np.r_[x,g,objective]).all())
@@ -93,6 +95,7 @@ class _FeasibleIterate(ca.Callback):
                 prior=self.checkpoints.get('least_infeasible_noninitialization')
                 if prior is None or violation<prior['scaled_violation']:
                     self.checkpoints['least_infeasible_noninitialization']=candidate
+            self.diagnostic_callback_s+=time.perf_counter()-trace_start
         self.latest=None
         if np.isfinite(np.r_[x,g,objective]).all() and violation<=1e-5:
             candidate=dict(x=x.copy(),objective=objective,iteration=self.iteration,
@@ -346,6 +349,7 @@ class IpoptSolver:
             'constraint_derivative':'CasADi exact AD ('+self.parameters.constraint_jacobian_mode+')',
         }
         if self.diagnostic_trace:
+            diagnostic_start=time.perf_counter()
             self.last_diagnostics['iteration_trace']=None if selector is None else selector.trace
             self.last_diagnostics['diagnostic_plans']=dict(initial=list(x0),selected=values.tolist(),returned=returned_values.tolist())
             points=[]
@@ -372,6 +376,8 @@ class IpoptSolver:
                 retain('checkpoint_'+str(index+1),candidate['x'],candidate['iteration'],
                     candidate['elapsed_s'],candidate['roles'])
             self.last_diagnostics['retained_diagnostic_points']=points
+            self.last_diagnostics['diagnostic_verification_s']=time.perf_counter()-diagnostic_start
+            self.last_diagnostics['diagnostic_callback_s']=0. if selector is None else selector.diagnostic_callback_s
         self.last_returned_optimum = dict(zip(bundle.variable_order,returned_values.tolist()))
         return OptimizationResult(
             status=status,

@@ -7,7 +7,7 @@ from . import legacy_scientific
 from . import optimization as opt
 from . import route
 from .contracts import GVSTrajectoryParameters
-from . import gvs_profile, tracking, candidate_analysis, historical_math
+from . import gvs_profile, tracking, candidate_analysis, historical_math, control_evidence
 
 CONTRACTS=[('family.'+name,'1.0.0',schema) for name,schema in [
     ('route_policy',route.RoutePolicy),
@@ -60,7 +60,7 @@ CONTRACTS += [
     ('family.gvs_lqr_control', '1.0.0', c.GVSLQRControl),
 ]
 SOURCES=tuple('extensions/tendon_family/'+n+'.py' for n in ('contracts','compiler','sections','geometry','legacy','scene','control','gvs_structure','gvs_basis','gvs_projection','gvs_lqr','gvs_sampled','gvs_trajectory','gvs_nmpc','model_applicability','execution','backends','signals','candidate','design_decisions','candidate_comparison','historical_failure','diagnostics','delivery_facts','preparation','mjcf','saved','tracking','candidate_analysis','historical_math','manifest','optimization','crosscheck','route'))+(
-    'tools/optimization_interfaces.py','tools/platform_search.py',
+    'extensions/tendon_family/control_evidence.py','tools/optimization_interfaces.py','tools/platform_search.py',
     'tools/platform_tools.py','tools/platform_tasks.py','schemas/platform_operations.py','tools/design_compiler.py',
     'tools/matlab_tools.py','tools/state_io.py','extensions/experiment_dynamics/contracts.py',
     'extensions/experiment_dynamics/physics.py','extensions/robot_domain/contracts.py',
@@ -74,6 +74,16 @@ PROFILE_SOURCES=(*OPT_SOURCES,'extensions/tendon_family/gvs_profile.py','extensi
 MATLAB=tuple('matlab/'+n+'.m' for n in ('tf_geometry','tf_point','tf_routes','tf_terms','tf_control','tf_run','tf_observe','tf_static','tf_view'))
 COMMON=dict(sources=SOURCES,contract_dependencies=tuple((n,v) for n,v,_ in CONTRACTS))
 EXTENSIONS=[
+    Extension('control.inspect_evidence','tool','1.0.0',control_evidence.EvidenceQuery,control_evidence.EvidenceSummary,
+        'extensions.tendon_family.control_evidence:inspect_tool',
+        'Read sealed execution/update/snapshot evidence, plan quality and aligned one-update predictions. Missing history stays missing; no solve.',**COMMON,
+        capabilities=dict(category='diagnostics',role='public_tool',route_visible=True,
+            preflight='extensions.tendon_family.control_evidence:inspection_preflight')),
+    Extension('control.compare_evidence','tool','1.0.0',control_evidence.ExecutionComparison,gvs_profile.ProfileOutput,
+        'extensions.tendon_family.control_evidence:compare_tool',
+        'Compare two owned saved executions under declared matching conditions, listing material mismatches. No solve or causal conclusion.',**COMMON,
+        capabilities=dict(category='diagnostics',role='public_tool',route_visible=True,
+            preflight='extensions.tendon_family.control_evidence:inspection_preflight')),
     Extension('route.advance','tool','1.0.0',route.RouteAction,route.RouteResult,
         'extensions.tendon_family.route:advance','Advance one evidence-led action. build constructs and validates only: no solve, score or trajectory. run executes a saved build and evaluates its saved result (one charged backend attempt). optimize searches within variables[path]=[lower_bound, upper_bound], executing and evaluating candidates (up to max_trials charged attempts); bounds are not sample values. diagnose analyzes saved results; crosscheck independently executes the same physical/control configuration on an authorized alternative backend (one charged attempt); video renders saved results; finish delivers a valid evaluation, including an unmet task tolerance. Only run, optimize and crosscheck consume solver budget. source_node and changes semantics are specified in the input schema. Cite previous node result evidence after the first action.',**COMMON,
         capabilities=dict(category='orchestration',role='public_tool',delegated_execution=True,
@@ -632,6 +642,10 @@ EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='control
 EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='controller.gvs_nmpc' and d.version=='4.0.0'),
     version='6.0.0', assets=(gvs_profile.ASSET,'extensions/tendon_family/profiles/multiphysics_reach_experiment_v1.json'),
     description='Candidate-aware free reach with explicit length, uniform section scale and material scope; fixed controller algorithm; fresh execution required for performance evidence.'))
+
+EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='controller.gvs_nmpc' and d.version=='6.0.0'),
+    version='7.0.0',binding='extensions.tendon_family.gvs_nmpc:DeadlineReachNMPCController',
+    description='Candidate-aware reach with horizon truncated at the official task deadline. Unchanged feasibility, physical bounds and solve limits; complete-update cost includes horizon graph construction.'))
 
 from . import candidate_comparison
 EXTENSIONS.append(Extension('analysis.compare_candidates','tool','1.0.0',candidate_comparison.CompareRequest,route.RouteResult,

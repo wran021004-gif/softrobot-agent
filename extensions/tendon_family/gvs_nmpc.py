@@ -25,7 +25,7 @@ def resolve_gvs_nmpc_control(inp,physics):
         from .gvs_profile import candidate_numerical, load_profile
         control=checked_tracking(inp);p=control.recipe
         numerical=candidate_numerical(inp,control,load_profile());point=numerical['nominal']
-    elif inp.policy.controller.version in ('3.0.0','4.0.0','6.0.0'):
+    elif inp.policy.controller.version in ('3.0.0','4.0.0','6.0.0','7.0.0'):
         from .gvs_profile import checked_reach, reach_numerical
         p=checked_reach(inp).recipe
         numerical=reach_numerical(inp)
@@ -55,7 +55,7 @@ def resolve_gvs_nmpc_control(inp,physics):
     if inp.policy.controller.version == '2.0.0':
         plan['profile_id']=profile['profile_id']
         plan['numerical_reference']=profile['numerical_reference']
-    elif inp.policy.controller.version in ('3.0.0','4.0.0','5.0.0','6.0.0'):
+    elif inp.policy.controller.version in ('3.0.0','4.0.0','5.0.0','6.0.0','7.0.0'):
         plan['reference']['kind']='numerical_guess_metadata_not_current_target_equilibrium'
         plan['reference'].pop('target_world_m')
         plan['reference']['provenance']=numerical['provenance']
@@ -93,9 +93,14 @@ class GVSNMPCController:
         # It remains only an optimization guess, never a fallback command.
         self.workspace.last=self.seed
         self.observations=[];self.last={};self.u=None;self.unusable_updates=0;self.stop_requested=False
+        self.control_snapshots=[]
+        from .control_evidence import RECORD_UPDATE_IDS
+        self.record_update_ids=RECORD_UPDATE_IDS.get()
 
     def command(self,t,geometry,q,v):
         start=time.perf_counter();x=np.r_[q,v];error=None;solved=None
+        update_id=len(self.observations)
+        self.workspace.solver.diagnostic_trace=update_id in self.record_update_ids
         try:
             solved=self.workspace.solve(x,self.previous,warm=self.seed,elapsed_s=t)
             success=solved['accepted']
@@ -142,6 +147,14 @@ class GVSNMPCController:
         self.observations.append(dict(time_s=t,phase='current_state_before_integration',
             tip_position_m=geometry['tip'].tolist(),gvs_q=list(q),gvs_qdot=list(v),
             measured_initial_state=x.tolist(),graph_construction_s=self.workspace.graph_s,**self.last))
+        if self.workspace.solver.diagnostic_trace and solved is not None:
+            from .control_evidence import capture_snapshot
+            capture_start=time.perf_counter()
+            snapshot=capture_snapshot(self.workspace,solved,update_id,t,command,geometry)
+            snapshot['capture_wall_s']=time.perf_counter()-capture_start
+            self.control_snapshots.append(snapshot)
+            self.observations[-1]['control_snapshot_id']=snapshot['snapshot_id']
+            self.observations[-1]['snapshot_capture_wall_s']=snapshot['capture_wall_s']
         # Prediction evaluation and observation construction are operational work.
         elapsed=time.perf_counter()-start
         self.last.update(update_wall_s=elapsed,deadline_missed=elapsed>self.period_s)
@@ -178,3 +191,40 @@ class TrackingNMPCController(ReachNMPCController):
         from .tracking import TrackingControl
         self.control=TrackingControl.model_validate(parameters)
         GVSNMPCController.__init__(self,self.control.recipe,period_s)
+
+
+def deadline_horizon(duration_s, time_s, period_s, maximum):
+    remaining=(duration_s-time_s)/period_s
+    if not np.isfinite(remaining) or abs(remaining-round(remaining))>1e-7 or round(remaining)<1:
+        raise ValueError('DEADLINE_HORIZON_REQUIRES_ALIGNED_PREDEADLINE_UPDATE')
+    return min(maximum,round(remaining))
+
+
+class DeadlineReachNMPCController(ReachNMPCController):
+    """v7: shrink the prediction horizon when the official deadline enters it.
+
+    Same transcription, objective weights, bounds, stopping and selection rules.
+    The terminal objective moves to the actual deadline; settling is separate.
+    Graph construction remains part of complete-update timing.
+    """
+    def command(self,t,geometry,q,v):
+        start=time.perf_counter()
+        horizon=deadline_horizon(self.workspace.duration,t,self.period_s,self.parameters.horizon)
+        if horizon!=self.workspace.parameters.horizon:
+            old=self.workspace;source=self.seed if self.seed is not None else old.last
+            shift=0 if self.seed is not None else self.parameters.substeps
+            seed=None if source is None else dict(
+                states=source['states'][shift:shift+horizon*self.parameters.substeps+1],
+                tensions=source['tensions'][int(bool(shift)):int(bool(shift))+horizon])
+            parameters=self.parameters.model_copy(update={'horizon':horizon})
+            self.workspace=TrajectoryWorkspace(TaskDefinition.model_validate(self.plan['task']),
+                RobotDescription.model_validate(self.plan['robot']),parameters,
+                old.nominal_x,old.nominal_u,settling=self.plan.get('settling'))
+            self.seed=seed;self.workspace.last=seed
+        construction_s=time.perf_counter()-start
+        command=super().command(t,geometry,q,v)
+        elapsed=time.perf_counter()-start
+        timing=dict(update_wall_s=elapsed,deadline_missed=elapsed>self.period_s,
+            effective_horizon=horizon,deadline_horizon_preparation_s=construction_s)
+        self.last.update(timing);self.observations[-1].update(timing)
+        return command

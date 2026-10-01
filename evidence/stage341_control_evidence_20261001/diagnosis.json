@@ -1,0 +1,171 @@
+{
+  "schema_version": "1.0.0",
+  "kind": "deterministic_control_evidence_diagnosis",
+  "ready_for_live": true,
+  "source_execution": "f9b8c232a576465ab5ef1ca92658faad",
+  "recording_execution": "199e9dd6528f4b39963d9571598d290a",
+  "references": {
+    "historical_manifest": {
+      "artifact_id": "35b76a9b56de8f6c78ab4e733e262c344dd667abcd176eec98712debd9a33cc8",
+      "media_type": "application/json"
+    },
+    "recording_manifest": {
+      "artifact_id": "bdc0d13010baf7d6d31b7e7a6495f4ce35d6187eced5647e067926c28fc02f3b",
+      "media_type": "application/json"
+    },
+    "snapshots": {
+      "artifact_id": "7cb57831df39d63b88d8e01f47f0d7a3eec8247b344af7408c3e383f68b9d4f2",
+      "media_type": "application/octet-stream"
+    },
+    "snapshot_ids": [
+      "c44d02410846a9768c6d375c3a6bf9bdd052e633e8627be91d7b2e24b492f446",
+      "92131ad79778968eb3aad891aec6dcd79e37841fdb8a8736848177141666c8e6",
+      "a58d1c80fb8192a78cc3bcdd0bc8fc5e90d9e3e12890adf463dad620caa50a0e"
+    ],
+    "local_comparison": "runs\\control_comparisons\\a58d1c80fb8192a78cc3bcdd0bc8fc5e90d9e3e12890adf463dad620caa50a0e\\result.json",
+    "fixed_design_execution": "83796acafa72407492689c1275f9f460"
+  },
+  "observations": [
+    "Stage 3.40 officially missed reach: 18.349652 mm versus 10 mm. It selected 26 noninitialization plans and 9 initialization plans; no constant-tension-throughout claim applies.",
+    "At t=0.00 the retained initialization is feasible. Returned objective 5.6701 versus 27.9769 is lower but scaled violation 0.000385886 exceeds 1e-5; useful feasible improvement was not delivered at that update.",
+    "At t=0.04 selected objective 3.65432 versus initialization 16.43270 is independently feasible (2.35932e-6). Predicted error 7.66761 mm at t=0.14 accompanies 0.35877 m/s speed. The official t=0.35 deadline lies outside this horizon.",
+    "At t=0.34 selected initialization predicts 15.930070 mm error and 0.15258 m/s at t=0.35. Its horizon ends at t=0.44 with 13.693525 mm error. Returned plan predicts 8.336734 mm at t=0.44, but remains infeasible (0.017215765) and predicts 15.188747 mm at the actual deadline.",
+    "The aligned t=0.34 to 0.35 prediction uses the actual applied input. The Euclidean tip discrepancy is 3.308744 mm; predicted target error 15.930070 mm versus actual 18.349652 mm. These are distinct norms, not additive error components.",
+    "Late actual error falls by 5.817383 mm over 0.30 to 0.35 s while terminal speed is 0.15568 m/s; sampled settling fails. High speed alone does not prove that inadequate braking caused the reach miss.",
+    "No applied force-bound violation and no historical upper-force proximity were recorded. One early optimized input was near zero. This does not rule out unilateral-input limitations for other useful plans.",
+    "The frozen affine design score omits nonlinear closed-loop progress and braking and has zero straight-start world-x input row. Its approximately 2 mm local bound is advisory under its own witness, not contradicted as a mathematical bound by backend error."
+  ],
+  "supported_interpretation": [
+    "Both selected-plan deadline insufficiency and same-input prediction discrepancy are observed; prediction mismatch alone cannot explain the failure because the selected plan already predicts a miss.",
+    "Feasible improvement is sometimes found, but not at all retained updates within the unchanged stopping limits. Infeasible lower objectives cannot be treated as executable successes.",
+    "The tested deadline truncation improves the shared local deadline error by 3.027269 mm, while increasing predicted speed and approaching upper force bounds; the tradeoff is explicit.",
+    "Derivative evaluation dominates portions of solve time in retained statistics. That locates computation cost without identifying the cause of terminal error."
+  ],
+  "unresolved": [
+    "Relative causal contributions of state projection, reduced-model dynamics and integration error in the one-step discrepancy.",
+    "Whether longer-horizon or better-conditioned feasible search could find better plans under the same time budget.",
+    "Braking/settling performance, input limitations across alternative plans, and robustness across designs remain unproven.",
+    "A ranking improvement of the affine design score has not been tested; controller evidence is not a design-ranking validation."
+  ],
+  "correction": {
+    "changed_factor": "horizon truncates at the official deadline; other recipe fields, physical problem and solve/feasibility limits unchanged",
+    "local_gate_passed": true,
+    "adopted": true,
+    "local_shared_deadline_error_improvement_m": 0.0030272688209984286,
+    "local_shared_tip_speeds_m_s": [
+      0.15258112470130347,
+      0.5836422904184825
+    ],
+    "fixed_design_terminal_error_m": 0.00783749400000044,
+    "baseline_terminal_error_m": 0.018349652058180982,
+    "fixed_design_official_reach": true,
+    "fixed_design_settling": {
+      "available": true,
+      "continuous_time_guarantee": false,
+      "max_error_m": 0.017032214096987876,
+      "max_speed_m_s": 0.3293853268239414,
+      "passed": false,
+      "position_limit_m": 0.01,
+      "speed_limit_m_s": 0.02,
+      "window_s": 0.05
+    },
+    "fixed_design_real_time": false,
+    "controller": {
+      "extension_id": "controller.gvs_nmpc",
+      "parameters": {
+        "contract": "family.gvs_reach_control",
+        "data": {
+          "numerical_source": "bundled_guess",
+          "recipe": {
+            "basis": {
+              "strategy": "structural_linear"
+            },
+            "constraint_jacobian_mode": "reverse",
+            "curvature_scale_rad_m": 10.0,
+            "evaluation_threads": 1,
+            "feasible_return": {
+              "budget_s": 15.0,
+              "minimum_s": 5.0,
+              "relative_improvement": 0.1
+            },
+            "holding_brake_lead_s": 0.0,
+            "holding_tip_speed_weight": 0.0,
+            "horizon": 10,
+            "max_cpu_s": 30.0,
+            "max_iterations": 120,
+            "max_unusable_updates": 3,
+            "position_error_scale_m": null,
+            "rate_scale_rad_m_s": 1000.0,
+            "recover_returned_tensions": false,
+            "regenerate_warm_states": true,
+            "seed_position_tolerance_fraction": 0.5,
+            "seed_speed_limit_m_s": 0.02,
+            "substeps": 1,
+            "tension_weight": 0.0001,
+            "terminal_tip_speed_weight": 0.0,
+            "terminal_velocity_weight": 0.0001,
+            "terminal_weight": 5.0,
+            "tip_speed_scale_m_s": 0.02,
+            "tolerance": 1e-06,
+            "tracking_weight": 1.0,
+            "variation_weight": 0.001,
+            "velocity_weight": 0.0001
+          },
+          "settling": {
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          }
+        },
+        "version": "1.0.0"
+      },
+      "version": "7.0.0"
+    },
+    "scope": "One local snapshot pair and one fixed-design closed-loop comparison. No robustness or generalization claim."
+  },
+  "recording_overhead": {
+    "measured_components": [
+      {
+        "update_id": 0,
+        "snapshot_id": "c44d02410846a9768c6d375c3a6bf9bdd052e633e8627be91d7b2e24b492f446",
+        "capture_s": 0.024010600056499243,
+        "bounded_verification_s": 0.0864792000502348,
+        "callback_recording_s": 0.0008529997430741787
+      },
+      {
+        "update_id": 4,
+        "snapshot_id": "92131ad79778968eb3aad891aec6dcd79e37841fdb8a8736848177141666c8e6",
+        "capture_s": 0.02221209998242557,
+        "bounded_verification_s": 0.07771290000528097,
+        "callback_recording_s": 0.0007895994931459427
+      },
+      {
+        "update_id": 34,
+        "snapshot_id": "a58d1c80fb8192a78cc3bcdd0bc8fc5e90d9e3e12890adf463dad620caa50a0e",
+        "capture_s": 0.022555700037628412,
+        "bounded_verification_s": 0.08014999981969595,
+        "callback_recording_s": 0.0008288996759802103
+      }
+    ],
+    "total_measured_s": 0.3155919988639653,
+    "limitation": "Direct measured capture, bounded verification and callback overhead only; warm-horizon copy and serialization were not separately timed. Cross-run timing difference is not an overhead estimate.",
+    "actual_command_artifact_identical": true
+  },
+  "replay_reporting": {
+    "status": "reservation_rejected_no_official_replay_evaluation",
+    "rejections": [
+      "DEPENDENCIES_CHANGED: restored exact frozen source and verified compatible before retry",
+      "BUDGET_EXHAUSTED: project; 1500 s reservation exceeds 1379.75 s remaining; no budget change or reset"
+    ],
+    "interpretation": "Sealed arrays support read-only inspection; no official replay evaluation is claimed. No reset, replacement replay or rejection bypass."
+  },
+  "usage": {
+    "recording_replays": 1,
+    "local_nmpc_solves": 2,
+    "local_preparation_solving_s": 45.847953899996355,
+    "fixed_design_validations": 1,
+    "offline_charged_and_local_s": 904.3799538998865,
+    "workers": 0
+  },
+  "next_discriminating_comparison": "Use the fresh autonomous workflow to test whether an eligible exact mathematical proposal reaches under the frozen adopted controller. If reach remains unmet, separate projected-start offset from one-step integration/dynamics discrepancy using saved input/state references before another physical search."
+}
