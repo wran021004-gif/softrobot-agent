@@ -89,6 +89,18 @@ class FeedbackTests(TestCase):
         host,_=self.role_host({'diagnosis.submit':'1.0.0','diagnosis.check_request':'1.0.0'})
         self.assertIn('diagnosis.submit',delivery_instruction(host));self.assertNotIn('route',delivery_instruction(host))
 
+    def test_design_read_allowance_preserves_delivery_capacity(self):
+        configure_role(self.host,'design','Use the supplied summary and deliver',summary_content={'reach_passed':True},evidence_turn_limit=2)
+        with self.store.transaction() as db:
+            state=self.store.session(self.run,db)['state'];state['turn']=2
+            self.store.update_state(db,self.run,state,'running')
+        payload=payload_for(self.host,ReadableDeepSeekAdapter())
+        self.assertEqual([t['function']['name'] for t in payload['tools']],['diagnosis_request'])
+        h=Host(self.temp.name,self.run,actor='model')
+        receipt=h.invoke(dict(request_id='late-read',tool_id='evidence.read',tool_version='1.0.0',arguments={'reference':self.binding},reason='test phase limit'))
+        self.assertEqual(receipt['error'],'TOOL_NOT_IN_ACTIVE_ROLE_PHASE')
+        self.assertEqual(h.context()['phase_progress']['turns_used'],2)
+
     def test_check_feedback_revised_report_link_and_counters(self):
         host,request=self.role_host({'diagnosis.submit':'1.0.0','diagnosis.check_request':'1.0.0'})
         source=self.bound.resolve(self.bound.binding['execution_id']);ref=source['files']['controller_observations.json']

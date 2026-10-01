@@ -23,6 +23,7 @@ def configure_role(host,role,instructions,**context):
         if role=='design':
             delivery='design.review_verification' if context.get('verification') else ('design.respond_diagnosis' if context.get('report') else 'diagnosis.request')
             context['phase_tools']=['evidence.read',delivery]
+            context['phase_started_turn']=state.get('turn',0)
         state['role_context']=dict(role=role,instructions=instructions,**context)
         host.store.update_state(db,host.run_id,state)
         host.store.event(db,host.run_id,'role_context','configured',outputs=[host.store.put(db,state['role_context'])])

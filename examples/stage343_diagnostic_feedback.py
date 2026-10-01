@@ -111,8 +111,8 @@ def prepare():
         'Inspect the supplied factual baseline summary and official profile if needed. Request diagnosis of the secondary-performance failures '
         'through diagnosis.request using the exact supplied identities and binding. Ask an open evidence-based question; no predetermined cause. '
         'The coordinator then hands control to a separate diagnostic context. Use the supplied diagnostic_allocation maximum as the realistic grant, or narrow within its minimum. Reserve the supplied capacity for subsequent design response and final review. Do not prewrite a cause.',
-        binding=binding,identities=identities,summary=evidence['output'],official_profile=pref,
-        diagnostic_tools=list(DIAGNOSTIC),protocol=protocol,
+        binding=binding,identities=identities,summary=evidence['output'],summary_content=store.artifact(evidence['output']),official_profile=pref,
+        diagnostic_tools=list(DIAGNOSTIC),protocol=protocol,evidence_turn_limit=2,
         diagnostic_allocation=dict(maximum=dict(model_calls=14,tool_calls=32,backend_solves=0,worker_calls=0,wall_s=1200.),
             minimum=dict(model_calls=10,tool_calls=14,wall_s=600.),reserved_for_design=dict(model_calls=6,tool_calls=8,wall_s=300.)))
     freeze=dict(project_id=project,hosts={k:v.run_id for k,v in hosts.items()},binding=binding,identities=identities,
@@ -136,7 +136,7 @@ def design_response(design, diagnostic, freeze, report, label):
         'Adoption authorizes one bounded matched verification, not incorporation into the baseline. '
         'Choose a single recommendation only when justified. A saved-evidence response is followed by a diagnostic check phase; '
         'a recommendation may be deferred pending that check. No physical design changes or tuning.',
-        report=report,report_content=design.store.artifact(report),binding=freeze['binding'],protocol=freeze['protocol'])
+        report=report,report_content=design.store.artifact(report),binding=freeze['binding'],protocol=freeze['protocol'],evidence_turn_limit=0)
     response=run_until_handoff(design,'design_response')
     atomic_json(OUTPUT/(label+'.json'),design.store.artifact(response))
     return response
@@ -227,7 +227,7 @@ def run():
         'Read the verification evidence and finish with design.review_verification. Judge the predeclared gate. '
         'Report reach, sampled settling and computation separately. A failed variant cannot replace the successful baseline. '
         'Distinguish completed workflow, mathematical validation and physical improvement. List unresolved gaps and prerequisites.',
-        response=response,verification=verification,verification_content=store.artifact(verification),report=report,protocol=freeze['protocol'])
+        response=response,verification=verification,verification_content=store.artifact(verification),report=report,protocol=freeze['protocol'],evidence_turn_limit=0)
     print('ROLE design final review',flush=True)
     review=run_until_handoff(design,'final_review');atomic_json(OUTPUT/'final_review.json',store.artifact(review))
     export();print('CYCLE_COMPLETE',flush=True)

@@ -287,6 +287,16 @@ def delivery_instruction(host):
     return 'For this phase use ' + ' or '.join(t for t in choices if t in granted and t in allowed) + '; handoff calls must stand alone. '
 
 
+def phase_tools(state):
+    role=state.get('role_context',{})
+    granted=role.get('phase_tools')
+    if granted is None:return None
+    elapsed=state.get('turn',0)-role.get('phase_started_turn',0)
+    if role.get('evidence_turn_limit') is not None and elapsed>=role['evidence_turn_limit']:
+        return [t for t in granted if t not in ('evidence.read','diagnosis.inspect_evidence')]
+    return granted
+
+
 def length_without_action(response, bindings, adapter=None, advertised_tools=None):
     """Inspect completeness only. Never decode reasoning or execute truncated output."""
     message=response.raw['choices'][0].get('message',{})
@@ -313,8 +323,9 @@ def input_for(host):
         and ('route' not in context or d['extension_id'] in route_core or d['capabilities'].get('route_visible',False))]
     if context.get('role_grant'):
         definitions=[d for d in definitions if d['extension_id'] in context['role_grant']['permitted_tools']]
-    if context.get('role_context', {}).get('phase_tools'):
-        definitions=[d for d in definitions if d['extension_id'] in context['role_context']['phase_tools']]
+    active_tools=phase_tools(host.store.session(host.run_id)['state'])
+    if active_tools is not None:
+        definitions=[d for d in definitions if d['extension_id'] in active_tools]
     from extensions.tendon_family.route import task_result_schema
     for d in definitions:
         if d['extension_id']=='route.advance':

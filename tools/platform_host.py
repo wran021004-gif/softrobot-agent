@@ -144,8 +144,9 @@ class Host:
             role_grant = snapshot['state'].get('role_grant')
             if role_grant and request.tool_id not in role_grant['permitted_tools']:
                 raise ValueError('TOOL_NOT_IN_DIAGNOSTIC_REQUEST_SCOPE')
-            phase_tools=snapshot['state'].get('role_context',{}).get('phase_tools')
-            if self.actor=='model' and phase_tools and request.tool_id not in phase_tools:
+            from tools.platform_models import phase_tools
+            active_tools=phase_tools(snapshot['state'])
+            if self.actor=='model' and active_tools is not None and request.tool_id not in active_tools:
                 raise ValueError('TOOL_NOT_IN_ACTIVE_ROLE_PHASE')
             if snapshot['status'] in ('paused', 'stopped', 'needs_input', 'capability_missing', 'failed', 'budget_exhausted'):
                 raise ValueError('SESSION_NOT_RUNNING: explicitly resume before invoking more tools')
@@ -310,6 +311,10 @@ class Host:
             context['correction_budget'] = dict(limits=allowance,total_used=state.get('protocol_corrections_used',0),
                 consecutive_used=state.get('protocol_corrections_consecutive',0))
             context['batch_observations'] = state.get('batch_observations', [])
+            context['recent_actions'] = state.get('recent_actions', [])[-4:]
+            context['phase_progress'] = dict(turns_used=state.get('turn',0)-state['role_context'].get('phase_started_turn',0),
+                evidence_turn_limit=state['role_context'].get('evidence_turn_limit'),
+                instruction='Use supplied content and retained evidence. When the read allowance ends, deliver the current phase using its remaining advertised handoff tool.')
         return context
 
     def model_scope(self):

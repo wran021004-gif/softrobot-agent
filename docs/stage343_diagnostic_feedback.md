@@ -1,5 +1,66 @@
 # Stage 3.43: bounded diagnostic feedback
 
+The live attempt **failed before the initial diagnosis request**. Implementation
+commit `e99f00c` made ten real DeepSeek calls, all decoded legally: eight two-read
+batches, one single read, and one three-read batch. The resulting twenty evidence
+reads exhausted the frozen ten-call design allocation. Stop reason:
+`BUDGET_EXHAUSTED: session`. The project still had fourteen provider attempts,
+but the design allocation and one-shot guard were not reset or replaced.
+
+There is no design-authored diagnosis request, diagnostic report, design
+response, selected check, feedback consumed by a model, local comparison,
+backend variant, adoption decision, or final model review in this attempt.
+Those phases are incomplete; no report references are fabricated. The actual
+decisions, receipts and provider payload/response references are retained in
+the compact evidence and original local SQLite artifact store.
+
+The live run validates bounded sequential read batching, separate receipts and
+enforcement of the design budget. Effective timeout shrinking under a subgrant,
+role transitions, selector validation and check-feedback-report linkage passed
+offline checks; they did not receive live validation here. The model repeatedly
+paged the binding and full profile despite supplied identities and summary
+references. This is a handoff failure, not scientific evidence about the robot.
+No causal robot hypothesis was established or ruled out by the new run.
+
+After retaining the failure, an offline repair in the current implementation
+inlines the existing deterministic summary, exposes recent actions and phase
+progress, and adds an opt-in design evidence-turn allowance. Two initial read
+turns are followed by a delivery-only tool phase; design responses and final
+review receive immutable report/result content directly. Host enforces the same
+subset it advertises. Older contexts without this option retain their evidence
+tools. This repair has **not** been tested with another paid attempt. The exact
+live source snapshot remains under the new run directory.
+
+Usage: **10/24 provider attempts, 21/60 tools** (including one initial summary
+inspection), **0/2 backend attempts, 0/6 local solves, 0/24 prediction/braking
+evaluations, 124.484/3600 charged seconds, 0 workers**. No protocol correction
+was needed. The successful Stage 3.41 baseline remains unchanged:
+
+| Outcome | Baseline retained |
+| --- | --- |
+| Reach | Pass: 0.0076426086 m, tolerance 0.01 m |
+| Sampled settling | Fail: late maximum error 0.0581381043 m; speed 1.581015274 m/s |
+| Terminal tip speed | 0.635172609 m/s |
+| Computation | Mean update 17.075238 s; 35/35 deadline misses; real time unproven |
+| Force violations / solver errors | 0 / 0 |
+
+The final prelaunch focused run passed 19 tests in 74.754 s. A separate affected
+legacy correction check passed in a five-test run (four overlapping tests).
+The post-live repair passed five focused tests in 25.560 s, including the new
+read-allowance test. No scientific work is hidden in these tests. The previous
+Stage 3.42 aggregate of 22 tests with 10 failures and 6 errors was inspected;
+its individual combined traceback log was not retained in the stage files.
+The relevant protocol wording regression was reproduced and fixed. The broad
+historical route-fixture suite remains uncertified and was not rerun.
+
+All 116 recorded Stage 3.41/3.42 source/evidence files were verified byte-for-byte
+unchanged. Compact evidence is sealed against staged Git blob bytes. The next
+physical parameter group remains tendon routing/guide lever arms, unopened:
+prerequisites are a successful live handoff, consumed discriminating-check
+feedback, matched controller/backend verification, and model-scoped braking
+evidence at multiple operating points. No mathematical capability gained new
+scientific validation in this attempt.
+
 This is a new experiment with its own frozen project ledger and one-shot guard.
 Stage 3.41 remains the physical baseline; Stage 3.42's failed attempt is preserved.
 The entrypoint is `examples/stage343_diagnostic_feedback.py` (`prepare`, `run`,

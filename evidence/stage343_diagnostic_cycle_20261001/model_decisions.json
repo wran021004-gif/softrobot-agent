@@ -1,0 +1,475 @@
+[
+  {
+    "run_id": "gvs-stage343-d3d1d8844012-design",
+    "decision": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 40,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the supplied factual baseline summary binding to ground the diagnostic question in saved evidence.",
+          "request_id": "model-0-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 40,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the official profile to align the diagnostic question with the frozen protocol, improvement thresholds and stopping conditions.",
+          "request_id": "model-0-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    "reference": {
+      "artifact_id": "f3e08436f4d50e0b0164f23e7eaf362617252206e8d0d6306f55b99e710ba44b",
+      "media_type": "application/json"
+    }
+  },
+  {
+    "run_id": "gvs-stage343-d3d1d8844012-design",
+    "decision": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 20,
+            "offset": 6,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Continue reading the factual baseline summary from offset 6 to capture the remaining half of its 12 items before scoping a diagnosis.",
+          "request_id": "model-1-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 20,
+            "offset": 0,
+            "pointer": "/detail",
+            "reference": {
+              "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the official profile detail keys (61 items) to identify which stored fields describe reach pass and sampled-settling failure without asserting a cause.",
+          "request_id": "model-1-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    "reference": {
+      "artifact_id": "d255e9090f0947042c5d32e9cfc5d24be093885bc01e10b7f624980f44d5473a",
+      "media_type": "application/json"
+    }
+  },
+  {
+    "run_id": "gvs-stage343-d3d1d8844012-design",
+    "decision": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "limit": 12,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the binding evidence record (12 items) to ground the diagnostic question in the saved baseline facts.",
+          "request_id": "model-2-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "limit": 51,
+            "offset": 10,
+            "pointer": "/detail",
+            "reference": {
+              "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the official profile /detail beyond the first 10 items to see remaining baseline metrics relevant to the secondary-performance failure.",
+          "request_id": "model-2-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    "reference": {
+      "artifact_id": "8321b51aa8c24c944aa89837852fe6ec0c400bb582daea13c1ae72affba21618",
+      "media_type": "application/json"
+    }
+  },
+  {
+    "run_id": "gvs-stage343-d3d1d8844012-design",
+    "decision": {
+      "arguments": {
+        "byte_limit": 6144,
+        "limit": 26,
+        "offset": 35,
+        "pointer": "/detail",
+        "reference": {
+          "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+          "media_type": "application/json"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "I need the remainder of the official baseline profile detail (items 35-60) to ground an open, evidence-based diagnostic question without pre-writing a cause.",
+      "request_id": "model-3-tool",
+      "tool_id": "evidence.read",
+      "tool_version": "1.0.0"
+    },
+    "reference": {
+      "artifact_id": "6147ec57c4937c6c0b678b562325b4f4545ebcfa2c1dc26bc6ea33e4929be26b",
+      "media_type": "application/json"
+    }
+  },
+  {
+    "run_id": "gvs-stage343-d3d1d8844012-design",
+    "decision": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 40,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the supplied evidence manifest to confirm which saved evidence exists for this execution before requesting an open diagnosis of the secondary settling failures.",
+          "request_id": "model-4-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 40,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the official profile root overview to see the full field structure (sampled settlement, motion, controller recipe) so the diagnostic question is grounded in the saved evidence rather than assumptions.",
+          "request_id": "model-4-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    "reference": {
+      "artifact_id": "35462d8731d56319acf522f039c735216388e9a09e760ed6d3fc98e389da5c88",
+      "media_type": "application/json"
+    }
+  },
+  {
+    "run_id": "gvs-stage343-d3d1d8844012-design",
+    "decision": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "limit": 25,
+            "offset": 0,
+            "pointer": "/detail",
+            "reference": {
+              "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the official profile baseline summary to ground the diagnosis request in factual, saved evidence rather than assumptions.",
+          "request_id": "model-5-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 20,
+            "offset": 0,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the supplied binding artifact to confirm the exact identity fields the diagnosis request must carry.",
+          "request_id": "model-5-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    "reference": {
+      "artifact_id": "79de30192f0e6d74dd9ccb4bb5fc10417336dfe522b26c228864c7f77c71b17e",
+      "media_type": "application/json"
+    }
+  },
+  {
+    "run_id": "gvs-stage343-d3d1d8844012-design",
+    "decision": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "limit": 24,
+            "offset": 12,
+            "pointer": "/detail",
+            "reference": {
+              "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the next page of the official profile detail to inspect the recorded baseline summary fields for this run before requesting a diagnosis.",
+          "request_id": "model-6-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "limit": 25,
+            "offset": 36,
+            "pointer": "/detail",
+            "reference": {
+              "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the final page of the official profile detail to complete the factual baseline picture for this candidate before requesting a diagnosis.",
+          "request_id": "model-6-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    "reference": {
+      "artifact_id": "10176b4934bae36570726082962990b13767db0c20e6f229c836c1b4921b6b13",
+      "media_type": "application/json"
+    }
+  },
+  {
+    "run_id": "gvs-stage343-d3d1d8844012-design",
+    "decision": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "limit": 40,
+            "offset": 0,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Reading the supplied factual baseline summary artifact for the candidate's reach and sampled-settling outcomes before requesting diagnosis.",
+          "request_id": "model-7-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "limit": 40,
+            "offset": 0,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Reading the binding artifact to confirm the exact supplied identities and manifest needed for the diagnosis request.",
+          "request_id": "model-7-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    "reference": {
+      "artifact_id": "2fa057778685f938b6323731dcaa2afade90dcd7164fb990883453db8aa54e24",
+      "media_type": "application/json"
+    }
+  },
+  {
+    "run_id": "gvs-stage343-d3d1d8844012-design",
+    "decision": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 20,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the root of the supplied official profile to see its recorded structure (motion, states, tensions, settling) so the diagnostic question can be scoped accurately without presupposing a cause.",
+          "request_id": "model-8-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 20,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the evidence manifest to enumerate what immutable artifacts the diagnostic context may inspect, so the requested scope and permitted tools match available evidence.",
+          "request_id": "model-8-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    "reference": {
+      "artifact_id": "d9691ab19e50b6489ddfd2f5811050bacb9f005e0226351cf169a0ee392def2d",
+      "media_type": "application/json"
+    }
+  },
+  {
+    "run_id": "gvs-stage343-d3d1d8844012-design",
+    "decision": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the supplied factual baseline summary referenced by role_context.summary to ground the diagnosis question in the actual recorded facts rather than assumptions.",
+          "request_id": "model-9-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "pointer": "/detail",
+            "reference": {
+              "artifact_id": "cfb603a3f3e7c2a36f47194c08dd0418a983d863dee9decc33a1760574f94877",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the official profile detail (61 items) which defines the reference evaluation conditions, so the diagnosis is framed against the official reference rather than the summary alone.",
+          "request_id": "model-9-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "pointer": "",
+            "reference": {
+              "artifact_id": "53d2f34471cc1e730b458f534dbc4e72487f94b5c47a4a778d61c525da312973",
+              "media_type": "application/octet-stream"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Read the run result file from the evidence manifest to see the recorded reach and sampled-settling outcomes that constitute the secondary-performance failure.",
+          "request_id": "model-9-tool-2",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    },
+    "reference": {
+      "artifact_id": "dac668f414b481e0e597f2640acbff90a3ff91d83fe073995703de2a64eab0a1",
+      "media_type": "application/json"
+    }
+  }
+]
