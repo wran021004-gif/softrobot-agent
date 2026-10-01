@@ -1,0 +1,232 @@
+{
+  "build_result": {
+    "artifact_id": "b16348e648877fd934beef9f0cb27435f4e8720a3da671689bea905301808fd2",
+    "media_type": "application/json"
+  },
+  "proposal_provenance": {
+    "build_candidate_id": "proposal_compliant_cfg",
+    "material_scenario": "compliant",
+    "optimizer_candidate_id": "math-compliant-e048cb4bc578",
+    "optimizer_result": {
+      "artifact_id": "f0fc76ca4b09846c621fc5b85e85f9dee0df259821dd6e846172e71e55433e42",
+      "media_type": "application/json"
+    },
+    "optimizer_source": "current_run",
+    "optimizer_starting_build_node": "seed_baseline_cfg",
+    "optimizer_tool": {
+      "id": "design.optimize_math",
+      "version": "1.0.0"
+    },
+    "original_optimizer_owner_run_id": "gvs-stage340-46894a55d13d",
+    "proposal_configuration": {
+      "artifact_id": "bd75e5dcf723921ca75bb664468f21ee72966c3d533201f3416f6b76bf45c74c",
+      "media_type": "application/json"
+    },
+    "proposal_parameters": {
+      "components/far/length_m": 0.11,
+      "components/near/length_m": 0.15,
+      "design/section_scale": 0.99
+    },
+    "scientific_configuration_identity": "e048cb4bc578507e31ff6c84f79ea91126fe4e73d5e89b0552dfa28d73c2bff8",
+    "source_build_node": "proposal_compliant_cfg"
+  },
+  "selected_evaluated_row": {
+    "backend_executed": false,
+    "build_identity": "8454aae746605feb1428892261bcc3d35c8067f17889b36b077b5a1976742f41",
+    "cache_hit": false,
+    "candidate_binding": {
+      "candidate_id": "math-compliant-e048cb4bc578",
+      "configuration": {
+        "artifact_id": "bd75e5dcf723921ca75bb664468f21ee72966c3d533201f3416f6b76bf45c74c",
+        "media_type": "application/json"
+      },
+      "control_period_s": 0.01,
+      "effective_configuration_identity": "bd75e5dcf723921ca75bb664468f21ee72966c3d533201f3416f6b76bf45c74c",
+      "model": "model.gvs@1.0.0",
+      "owner_run_id": "gvs-stage340-46894a55d13d",
+      "physics_timestep_s": 0.0005,
+      "robot_identity": "0edfa2f3c10d37cbb0e899e67f9c7601d2572a176b9769c792021e7f7fe5187a",
+      "scientific_configuration_identity": "e048cb4bc578507e31ff6c84f79ea91126fe4e73d5e89b0552dfa28d73c2bff8",
+      "source_node": "design.optimize_math:seed_baseline_cfg",
+      "target_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "task_duration_s": 0.35,
+      "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
+      "tendon_order": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1",
+        "far_t2"
+      ],
+      "tension_bounds_n": [
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ]
+      ]
+    },
+    "candidate_id": "math-compliant-e048cb4bc578",
+    "configuration": {
+      "artifact_id": "bd75e5dcf723921ca75bb664468f21ee72966c3d533201f3416f6b76bf45c74c",
+      "media_type": "application/json"
+    },
+    "controller_start_endpoint": {
+      "artifact_id": "881353425ffa819c80be3a643233da5753e89255e10d3b77313ee46a8b18ac75",
+      "media_type": "application/json"
+    },
+    "coverage": {
+      "checks": {
+        "length": true,
+        "material": true,
+        "section": true
+      },
+      "eligible": true,
+      "required": true
+    },
+    "endpoint_summary": {
+      "certificate": null,
+      "checks": {
+        "finite": true,
+        "lower_bounds": true,
+        "position": true,
+        "speed": true,
+        "upper_bounds": true
+      },
+      "position_error_m": 0.010000000040138233,
+      "question": "position_only",
+      "sampled_horizon": {
+        "effective_s": 0.35000000000000003,
+        "period_s": 0.01,
+        "requested_s": 0.35,
+        "step_count": 35
+      },
+      "status": "feasible_in_local_model",
+      "tip_speed_m_s": 0.05815057865024575
+    },
+    "evaluation_index": 9,
+    "historical_duplicate": false,
+    "linearization": {
+      "artifact_id": "7695a7830c033115537c1829eeab09181cb03f573274edae643e6a085dd62ea8",
+      "media_type": "application/json"
+    },
+    "material_scenario": "compliant",
+    "nmpc_solved": false,
+    "objective": {
+      "applicability": "controller-start frozen local affine exact-ZOH model",
+      "candidate_residual_m": 0.0019999999999999463,
+      "feasible_witness_normalized_input_energy": 8.262966593824451e-05,
+      "matrix_evidence": {
+        "world_x_position_control_nonzero_count": 0,
+        "world_x_position_control_row_linf": 0.0,
+        "world_x_position_control_row_shape": [
+          210
+        ]
+      },
+      "position_residual_upper_bound_ratio": 0.19999999999999463,
+      "position_tolerance_m": 0.01,
+      "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+      "scope": "position endpoint only; terminal braking and other sampled configurations are not objective terms",
+      "status": "feasible_in_local_model"
+    },
+    "parameters": {
+      "components/far/length_m": 0.11,
+      "components/near/length_m": 0.15,
+      "design/section_scale": 0.99
+    },
+    "producer_request_id": "model-4-tool",
+    "provider_called": false,
+    "scientific_configuration_identity": "e048cb4bc578507e31ff6c84f79ea91126fe4e73d5e89b0552dfa28d73c2bff8",
+    "unavailable_constructions": [
+      null,
+      null,
+      "target_equilibrium",
+      "halfway_waypoint"
+    ]
+  },
+  "registered_analysis": {
+    "artifact_id": "01a7e19ca0025a527afbd5ea4f2835553c5bd502c8a4e23e74f128757e26d515",
+    "media_type": "application/json"
+  },
+  "candidate_analysis_bundle": {
+    "artifact_id": "6473ba36f30790a0be41c5485d2183ba58298babca8ff13837ac44e5c0a6a7fe",
+    "media_type": "application/json"
+  },
+  "math_selection_trace": {
+    "build_candidate_id": "proposal_compliant_cfg",
+    "historical_computation": false,
+    "matches_proposal": true,
+    "optimizer_candidate_id": "math-compliant-e048cb4bc578",
+    "optimizer_configuration": {
+      "artifact_id": "bd75e5dcf723921ca75bb664468f21ee72966c3d533201f3416f6b76bf45c74c",
+      "media_type": "application/json"
+    },
+    "optimizer_objective": {
+      "applicability": "controller-start frozen local affine exact-ZOH model",
+      "candidate_residual_m": 0.0019999999999999463,
+      "feasible_witness_normalized_input_energy": 8.262966593824451e-05,
+      "matrix_evidence": {
+        "world_x_position_control_nonzero_count": 0,
+        "world_x_position_control_row_linf": 0.0,
+        "world_x_position_control_row_shape": [
+          210
+        ]
+      },
+      "position_residual_upper_bound_ratio": 0.19999999999999463,
+      "position_tolerance_m": 0.01,
+      "residual_role": "upper bound on the bounded minimum; not an infeasibility proof",
+      "scope": "position endpoint only; terminal braking and other sampled configurations are not objective terms",
+      "status": "feasible_in_local_model"
+    },
+    "optimizer_result": {
+      "artifact_id": "f0fc76ca4b09846c621fc5b85e85f9dee0df259821dd6e846172e71e55433e42",
+      "media_type": "application/json"
+    },
+    "optimizer_starting_build": {
+      "artifact_id": "b1eff1ebca4bc0a1a8e50529c41eb77190e2a15a25bd64832b59317f0247c900",
+      "media_type": "application/json"
+    },
+    "proposal_configuration": {
+      "artifact_id": "bd75e5dcf723921ca75bb664468f21ee72966c3d533201f3416f6b76bf45c74c",
+      "media_type": "application/json"
+    },
+    "provenance_inherited_from_build": true,
+    "required": true,
+    "scientific_configuration_identity": "e048cb4bc578507e31ff6c84f79ea91126fe4e73d5e89b0552dfa28d73c2bff8",
+    "source_build_node": "proposal_compliant_cfg"
+  },
+  "optimizer_limitations": [
+    "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+    "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+    "Numerical agreement is implementation verification, not physical model validation.",
+    "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+    "The objective can favor geometric alignment at the straight controller-start configuration; it does not predict nonlinear bending, closed-loop reach, settling, real-time performance, or global optimality.",
+    "Terminal braking and other sampled configurations are not aggregated into this optimization objective.",
+    "Candidate residuals are upper bounds; only explicit separating-direction records may certify local infeasibility.",
+    "Scenario winners and ties are bounded-search proposals, not global optima."
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "run_id": "gvs-stage340-46894a55d13d",
+  "model_authored_workflow_complete": true,
+  "multi_category_coverage": true,
+  "valid_complete_backend_execution": true,
+  "reach_success": false,
+  "sampled_settling": false,
+  "real_time_demonstrated": false,
+  "controller_changed": false,
+  "controller": "controller.gvs_nmpc@6.0.0",
+  "backend_attempts": 1,
+  "all_initialization_constant_tension_stop_triggered": false,
+  "initialization_selected": 9,
+  "accepted_noninitialization_plans": 26,
+  "constant_applied_tensions": false,
+  "exact_design_statement_check": {
+    "accepted": true,
+    "mismatches": [],
+    "status": "matched"
+  },
+  "exact_result_statement_check": {
+    "accepted": true,
+    "mismatched_fields": [],
+    "scope": "Typed claims only; free-text reasoning requires separate review"
+  },
+  "provider_received_exact_official_result_before_finish": true,
+  "provider_authored_finish_reference": {
+    "artifact_id": "247f37e035692527e8c538c40f2852aa3bb8fc7d3d87c45a6cb0d63374c101ef",
+    "media_type": "application/json"
+  },
+  "maximum_serialized_provider_request_bytes": 158145,
+  "post_backend_finish_request_bytes": 158145,
+  "within_limits": true,
+  "usage": {
+    "tool_calls": 14,
+    "model_calls": 11,
+    "backend_solves": 1,
+    "worker_calls": 0,
+    "wall_s": 845.3110000002198
+  },
+  "new_math_evaluations": 12,
+  "prose_review": "The model calls its 0.002 m local residual bound contradicted by the 0.01835 m nonlinear result. That bound applies only inside the frozen affine model: the observed gap does not invalidate the local bound or prove that further model-led search is impossible. The model voluntarily finished; no success or constant-initialization stop was triggered.",
+  "next_action": "In a separately authorized fixed-design study, retain complete warm-start horizons and compare initialization-selected versus improved feasible updates; no further experiment was executed here."
+}

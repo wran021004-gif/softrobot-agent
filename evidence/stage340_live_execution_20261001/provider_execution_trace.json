@@ -1,0 +1,1444 @@
+{
+  "run_id": "gvs-stage340-46894a55d13d",
+  "actions": [
+    {
+      "request_id": "model-0",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 3.375,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "71580350d90c497d921fe324ae0c4f47",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "62f27a825c980deecd2a6b1c9802b41db019aeac7cd20cf0219a37e10d54c674",
+          "media_type": "application/json"
+        },
+        "request_id": "model-0",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "byte_limit": 8192,
+          "limit": 20,
+          "offset": 0,
+          "pointer": "",
+          "reference": {
+            "artifact_id": "ec9b6c87d2ba0794dee8185c1a4816e1d3032c832002cefa7c2cd09beace5b06",
+            "media_type": "application/json"
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Reading the explicitly required compact reconstructed NMPC evidence artifact before selecting any design, to ground the choice in prior-case context rather than guesswork.",
+        "request_id": "model-0-tool",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-1",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 7.655999999959022,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "ed810be59c93474dbecbd38ad8346787",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "82cac39f11f46089ce0597b39c23078a07935c7946862fe72e0e27cabf749324",
+          "media_type": "application/json"
+        },
+        "request_id": "model-1",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "byte_limit": 8192,
+          "limit": 20,
+          "offset": 3,
+          "pointer": "",
+          "reference": {
+            "artifact_id": "ec9b6c87d2ba0794dee8185c1a4816e1d3032c832002cefa7c2cd09beace5b06",
+            "media_type": "application/json"
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Continue paging the saved vector-equation and timing diagnosis for the frozen GVS NMPC controller so the design choice is grounded in the reconstructed evidence rather than assumptions.",
+        "request_id": "model-1-tool",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-2",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 13.640000000130385,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "1a4d483c31b549dca190b9c5677da929",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "ba921e44bf486df4db7f144ff81cd325726860f9ede2d30f281e00cbd4a3e67e",
+          "media_type": "application/json"
+        },
+        "request_id": "model-2",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "action": "build",
+          "combination": "candidate_gvs_nmpc",
+          "next_step": "Invoke design.optimize_math from this seed within the authorized bounds for components/near/length_m, components/far/length_m and design/section_scale, over compliant and stiff material scenarios, then inspect its proposals.",
+          "node_id": "seed_baseline_cfg",
+          "reason": "The route has no completed build node, and design.optimize_math requires an owned completed build as its explicit starting configuration. The reconstructed NMPC diagnosis (artifact ec9b6c87) supports no controller change, so the frozen controller recipe stays untouched. Building the unchanged 0.16/0.12 m baseline as a solve-free seed supplies that starting configuration without executing the baseline or any historical configuration."
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Constructing a zero-solve seed build is the prerequisite for design.optimize_math, which needs an owned completed build as its starting configuration; no Route node exists yet.",
+        "request_id": "model-2-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-3",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 13.219000000040978,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "075a0efd86824dd481e30575bb606901",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "85a23e4c4e1486e1a484f340e26e80cb7a85e39d04588d62e26dafcaff0ca4c5",
+          "media_type": "application/json"
+        },
+        "request_id": "model-3",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "byte_limit": 8192,
+          "limit": 20,
+          "offset": 0,
+          "pointer": "",
+          "reference": {
+            "artifact_id": "ec9b6c87d2ba0794dee8185c1a4816e1d3032c832002cefa7c2cd09beace5b06",
+            "media_type": "application/json"
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "The frozen guidance requires reading the compact reconstructed NMPC diagnostic evidence before selecting any design, so I read the saved artifact to use its prior-case context on solver behavior, tension usage and timing.",
+        "request_id": "model-3-tool",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-4",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 6.141000000061467,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "6de431f3f7ae41ee8727e91308bc2603",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "2c21046404c27da427abb08f178bf407bd78ad2b3e6ca3b4cc2f273637a00efe",
+          "media_type": "application/json"
+        },
+        "request_id": "model-4",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "material_scenarios": [
+            "compliant",
+            "stiff"
+          ],
+          "max_evaluations": 12,
+          "protocol": {
+            "artifact_id": "5e359e664b02328597da94e6e47e21a8bae32cfb32679a0b58eb3b8c348ff7fb",
+            "media_type": "application/json"
+          },
+          "source_node": "seed_baseline_cfg",
+          "target": {
+            "artifact_id": "d98fcda3f23c62bb76fb238d0364c11d76adddcdf7212371f6d8aeff2ea856be",
+            "media_type": "application/json"
+          },
+          "variables": {
+            "components/far/length_m": [
+              0.11,
+              0.13
+            ],
+            "components/near/length_m": [
+              0.15,
+              0.17
+            ],
+            "design/section_scale": [
+              0.95,
+              1.05
+            ]
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Begin the required fresh multi-parameter design experiment: search near length, far length and common section scale within the authorized bounds under both compliant and stiff material scenarios, scored by the frozen controller-start local exact-ZOH position residual objective. This is a zero-backend mathematical search that can reduce expensive simulation trial-and-error.",
+        "request_id": "model-4-tool",
+        "tool_id": "design.optimize_math",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-5",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 6.25,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "2b2b67a0660b4601b00d5fa0edaaf671",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "94a831f64c7d14bab34fff3767d3babb102beaaa0ab79c5fa9a2b261fe086ce6",
+          "media_type": "application/json"
+        },
+        "request_id": "model-5",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "byte_limit": 8192,
+          "limit": 10,
+          "pointer": "/proposals",
+          "reference": {
+            "artifact_id": "f0fc76ca4b09846c621fc5b85e85f9dee0df259821dd6e846172e71e55433e42",
+            "media_type": "application/json"
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "The completed design.optimize_math result already exists for the seed build; I need its exact proposal candidate_ids and parameters to select one proposal for construction rather than retyping any values.",
+        "request_id": "model-5-tool",
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-6",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 57.90600000019185,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "1b62aef5bfc444a5ac3b06411d102465",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "1f83fb214d6e13bfdb3f855a5292acd59eaa80567eefe92aa58c8a5d57dde125",
+          "media_type": "application/json"
+        },
+        "request_id": "model-6",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "next_step": "Run analysis.prepare_candidate exactly once on this proposal build to obtain the candidate-bound linearization, control metrics, bounded endpoint analysis and advisory screen, then register that bundle with route.record_analysis@2.0.0 citing the build result.",
+          "node_id": "proposal_compliant_cfg",
+          "optimizer_candidate_id": "math-compliant-e048cb4bc578",
+          "optimizer_result": {
+            "artifact_id": "f0fc76ca4b09846c621fc5b85e85f9dee0df259821dd6e846172e71e55433e42",
+            "media_type": "application/json"
+          },
+          "reason": "Both returned proposals tie on the primary objective (position-residual upper-bound ratio 0.2, i.e. 0.002 m against the 0.01 m tolerance) at identical near/far lengths and section scale; the compliant-scenario proposal has the lower feasible witness normalized input energy (8.263e-05 vs 1.682e-04), which is the declared lexicographic tie-break. Selecting it by its exact candidate_id rather than retyping parameters keeps the build bound to the optimizer result."
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [
+          {
+            "artifact_id": "c4bdc9ee1411c3dd22d5b2399147cb437a72b1b3d91fe04d95407ee23e2eef63",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "f0fc76ca4b09846c621fc5b85e85f9dee0df259821dd6e846172e71e55433e42",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Construct the single exact optimizer-selected proposal so the frozen workflow can proceed to candidate analysis; the proposal is chosen, not retyped, so the build inherits the optimizer's exact effective configuration and provenance.",
+        "request_id": "model-6-tool",
+        "tool_id": "design.build_proposal",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-7",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 14.125,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "7611fa816d34413389940106b55ae84c",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "b4324fff45f93daeffe64f07c29b486c00e83c04df65a3dad935f5255b73e52e",
+          "media_type": "application/json"
+        },
+        "request_id": "model-7",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "source_node": "proposal_compliant_cfg"
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "The completed build proposal_compliant_cfg (optimizer candidate math-compliant-e048cb4bc578: near 0.15 m, far 0.11 m, section scale 0.99, compliant) has no candidate-bound linearization, metrics, bounded endpoint analysis or screen yet. Running prepare_candidate exactly once deterministically completes or reuses those four components under the frozen protocol and endpoint target, without any design choice or backend solve.",
+        "request_id": "model-7-tool",
+        "tool_id": "analysis.prepare_candidate",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-8",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 7.390000000130385,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "66eb4cb0b7f341ac8267ac39f412ec8e",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "d7e4d73fc5064add4c0f57bdb69083c86100fd8af86abd400c805d7884878f49",
+          "media_type": "application/json"
+        },
+        "request_id": "model-8",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "candidate_analysis_bundle": {
+            "artifact_id": "6473ba36f30790a0be41c5485d2183ba58298babca8ff13837ac44e5c0a6a7fe",
+            "media_type": "application/json"
+          },
+          "evidence": [
+            {
+              "artifact_id": "b16348e648877fd934beef9f0cb27435f4e8720a3da671689bea905301808fd2",
+              "media_type": "application/json"
+            }
+          ],
+          "next_step": "If registration succeeds, execute one charged backend run of proposal_compliant_cfg via route.advance action=run and read the official evaluation result, then decide whether to finish or revise within the remaining budget.",
+          "node_id": "record_proposal_compliant_analysis",
+          "reason": "analysis.prepare_candidate already produced a complete candidate-bound bundle for the built optimizer proposal math-compliant-e048cb4bc578 (linearization, metrics, bounded endpoint analysis, screen all available). The bundle is registered here against the exact build node so the run prerequisite CANDIDATE_BOUND_SHARED_ANALYSIS_REQUIRED is satisfied with inherited optimizer provenance; the bundle is advisory and used no backend solve.",
+          "source_node": "proposal_compliant_cfg",
+          "validation_disposition": "recommended"
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "The workflow call order requires registering the completed prepare_candidate bundle on the proposal build before any execution; this is the recorded next_step in the route overview and satisfies the run prerequisite without a backend solve.",
+        "request_id": "model-8-tool",
+        "tool_id": "route.record_analysis",
+        "tool_version": "2.0.0"
+      }
+    },
+    {
+      "request_id": "model-9",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 54.625,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "b56fe14442aa4db8be2e6d9b2eb63011",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "098893cf1c67cd25ec6040e78904a65127375c1cf96e2cba7208c4835f454425",
+          "media_type": "application/json"
+        },
+        "request_id": "model-9",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "action": "run",
+          "evidence": [
+            {
+              "artifact_id": "b16348e648877fd934beef9f0cb27435f4e8720a3da671689bea905301808fd2",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "01a7e19ca0025a527afbd5ea4f2835553c5bd502c8a4e23e74f128757e26d515",
+              "media_type": "application/json"
+            }
+          ],
+          "next_step": "Read the official evaluation and control-profile results of this run. If the tip reaches within the 0.01 m tolerance and the sampled objectives hold, retain it as the incumbent; otherwise inspect initialization selection and plan behaviour and decide whether the remaining budget supports one bounded design revision before finishing.",
+          "node_id": "run_proposal_compliant_cfg",
+          "reason": "The exact optimizer-selected compliant proposal (near 0.15 m, far 0.11 m, section_scale 0.99, compliant material scenario) is a completed validated build, its four-part candidate-analysis bundle is registered under the frozen protocol and target, and its run prerequisites are satisfied. The local screen is advisory only: the zero world-x straight-start control row cannot itself establish global infeasibility, and skipping validation on that basis is not authorized. One charged backend run is therefore warranted to obtain the official free-reach evaluation of this fresh, non-baseline multi-category design.",
+          "source_node": "proposal_compliant_cfg"
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Executing the registered fresh proposal is the warranted next route action: the build and its analysis bundle are complete and run prerequisites are satisfied, and physical simulation (not the advisory local screen) is the validation authority for free reach.",
+        "request_id": "model-9-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-10",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 50.73399999993853,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "0af4fdd45e7244cea71dc11cc3f5590e",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "247f37e035692527e8c538c40f2852aa3bb8fc7d3d87c45a6cb0d63374c101ef",
+          "media_type": "application/json"
+        },
+        "request_id": "model-10",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "2.0.0"
+      },
+      "decision": {
+        "arguments": {
+          "action": "finish",
+          "design_statement": {
+            "candidate_id": "proposal_compliant_cfg",
+            "configuration": {
+              "artifact_id": "e59a6fd3f2fd548b860748bbbdc0a21e29222aa88ce91e503302ca5913e544bd",
+              "media_type": "application/json"
+            },
+            "effective_identity": "983111945899719ab737de8d2e9893f0078f7db18fee45b9593e39680f354ac0",
+            "execution_id": "f9b8c232a576465ab5ef1ca92658faad",
+            "frozen_baseline_identity": "5e869452427adbb945e61596f2e529e154783e480dd19b4f1948f3aa6b15d45f",
+            "multi_category_coverage": true,
+            "owner_run_id": "gvs-stage340-46894a55d13d-2edc6421d68bfe51",
+            "parameters": [
+              {
+                "baseline_delta": -0.009999999999999995,
+                "baseline_value": 0.12,
+                "effective_value": 0.11,
+                "path": "components/far/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.010000000000000009,
+                "baseline_value": 0.16,
+                "effective_value": 0.15,
+                "path": "components/near/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": null,
+                "baseline_value": "baseline",
+                "effective_value": "compliant",
+                "path": "design/material_scenario",
+                "unit": null
+              },
+              {
+                "baseline_delta": -0.010000000000000009,
+                "baseline_value": 1.0,
+                "effective_value": 0.99,
+                "path": "design/section_scale",
+                "unit": "1"
+              }
+            ],
+            "physical_changes": [
+              {
+                "baseline_delta": -0.010000000000000009,
+                "baseline_value": 0.16,
+                "category": "length",
+                "effective_value": 0.15,
+                "path": "components/near/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -9.99999999999994e-05,
+                "baseline_value": 0.01,
+                "category": "section",
+                "effective_value": 0.0099,
+                "path": "components/near/sections/0/section/parameters/semi_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -8.000000000000021e-05,
+                "baseline_value": 0.008,
+                "category": "section",
+                "effective_value": 0.00792,
+                "path": "components/near/sections/0/section/parameters/semi_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -800000.0,
+                "baseline_value": 8000000.0,
+                "category": "material",
+                "effective_value": 7200000.0,
+                "path": "components/near/physics/young_pa",
+                "unit": "Pa"
+              },
+              {
+                "baseline_delta": -0.009999999999999995,
+                "baseline_value": 0.12,
+                "category": "length",
+                "effective_value": 0.11,
+                "path": "components/far/length_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -9.99999999999994e-05,
+                "baseline_value": 0.01,
+                "category": "section",
+                "effective_value": 0.0099,
+                "path": "components/far/sections/0/section/parameters/height_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.0001399999999999995,
+                "baseline_value": 0.014,
+                "category": "section",
+                "effective_value": 0.01386,
+                "path": "components/far/sections/0/section/parameters/width_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -8.99999999999998e-05,
+                "baseline_value": 0.009,
+                "category": "section",
+                "effective_value": 0.00891,
+                "path": "components/far/sections/1/section/parameters/height_z_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -0.00012000000000000031,
+                "baseline_value": 0.012,
+                "category": "section",
+                "effective_value": 0.01188,
+                "path": "components/far/sections/1/section/parameters/width_y_m",
+                "unit": "m"
+              },
+              {
+                "baseline_delta": -600000.0,
+                "baseline_value": 6000000.0,
+                "category": "material",
+                "effective_value": 5400000.0,
+                "path": "components/far/physics/young_pa",
+                "unit": "Pa"
+              }
+            ]
+          },
+          "evidence": [
+            {
+              "artifact_id": "4ab05f50a044dce269d7cd550593580b413eeb1d68b27e07f43d09a388ad9d49",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "01a7e19ca0025a527afbd5ea4f2835553c5bd502c8a4e23e74f128757e26d515",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "b16348e648877fd934beef9f0cb27435f4e8720a3da671689bea905301808fd2",
+              "media_type": "application/json"
+            }
+          ],
+          "next_step": "Deliver this valid, complete free-reach evaluation as the session result; no further physical search, since the executed covered design is the fresh sample and the degenerate straight-start world-x local model cannot justify another selection.",
+          "node_id": "finish_proposal_compliant_cfg",
+          "reason": "The required fresh, bounded, covered multi-parameter experiment has been completed and evaluated: the optimizer-selected proposal (near 0.15 m, far 0.11 m, section_scale 0.99, compliant) was built, candidate-bound linearization/metrics/endpoint/screen prepared, registered with optimizer provenance, and executed once through the frozen protocol. The official evaluation is valid and complete but task-accepted=false: terminal error 0.018349652058180982 m against the 0.01 m tolerance, sampled settling not passed (max_error 0.024167 m, max_speed 0.156 m/s), and real-time not demonstrated (35/35 deadline misses, mean complete update 11.93 s at 0.01 s control period). The local screen is advisory and here structurally uninformative: its world-x position-control row is identically zero and its residual upper bound of 0.002 m is contradicted by the measured 0.0183 m, so no further optimizer-led selection would be genuinely model-led; the remaining budget is reserved for review and finish. Deliver the valid failed reach honestly with exact candidate facts.",
+          "result_statement": {
+            "accepted_noninitialization_plans": 26,
+            "accepted_plans": 35,
+            "applied_tension_ranges": [
+              {
+                "limit_n": 8.0,
+                "maximum_n": 5.371501403753153,
+                "minimum_n": 1.7512764858409064,
+                "tendon": "near_t0",
+                "tendon_index": 0
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 6.211455062620312,
+                "minimum_n": 4.198479741667914,
+                "tendon": "near_t1",
+                "tendon_index": 1
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 3.1031566686630025,
+                "minimum_n": 0.0021933601970730472,
+                "tendon": "near_t2",
+                "tendon_index": 2
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 5.446162377718157,
+                "minimum_n": 1.8633182494557172,
+                "tendon": "far_t0",
+                "tendon_index": 3
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 2.73870894169384,
+                "minimum_n": 0.7859357597552847,
+                "tendon": "far_t1",
+                "tendon_index": 4
+              },
+              {
+                "limit_n": 8.0,
+                "maximum_n": 2.3434624430356634,
+                "minimum_n": 0.5821549946698927,
+                "tendon": "far_t2",
+                "tendon_index": 5
+              }
+            ],
+            "candidate": {
+              "candidate_id": "proposal_compliant_cfg",
+              "configuration": {
+                "artifact_id": "e59a6fd3f2fd548b860748bbbdc0a21e29222aa88ce91e503302ca5913e544bd",
+                "media_type": "application/json"
+              },
+              "execution_id": "f9b8c232a576465ab5ef1ca92658faad",
+              "owner_run_id": "gvs-stage340-46894a55d13d-2edc6421d68bfe51"
+            },
+            "complete": true,
+            "configuration": {
+              "artifact_id": "e59a6fd3f2fd548b860748bbbdc0a21e29222aa88ce91e503302ca5913e544bd",
+              "media_type": "application/json"
+            },
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "converged_updates": 0,
+            "coordinate_frame": "world",
+            "deadline_misses": 35,
+            "error_convention": "actual_tip minus target",
+            "evaluation": {
+              "artifact_id": "004dec626de3fc145f6276c7b9d41e2eb7280a74b6d9d6fc0d58871616641643",
+              "media_type": "application/json"
+            },
+            "evaluation_validity": "valid",
+            "execution_id": "f9b8c232a576465ab5ef1ca92658faad",
+            "force_bound_violation_n": 0.0,
+            "hold_last_responses": 0,
+            "initialization_selected": 9,
+            "mean_complete_update_s": 11.927797351424982,
+            "measured_computation_s": 419.81199999991804,
+            "one_step_prediction_evidence": {
+              "artifact_id": "e52e707b860444046feb52212eb0dca1cc406b0c68f1b67b08d6f5259e003b65",
+              "media_type": "application/json"
+            },
+            "one_step_prediction_summary": {
+              "aligned_count": 35,
+              "frame": "world",
+              "maximum_tip_difference_m": 0.003619131687847621,
+              "mean_tip_difference_m": 0.0028735886568891826,
+              "missing": [],
+              "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+            },
+            "real_time_demonstrated": false,
+            "report": {
+              "execution_id": "f9b8c232a576465ab5ef1ca92658faad",
+              "owner_run_id": "gvs-stage340-46894a55d13d-2edc6421d68bfe51",
+              "reference": {
+                "artifact_id": "e3bf0b49870cd30fcd6cc41bec76a1b17eb1e90f82631e135c0561d97b74616a",
+                "media_type": "application/json"
+              },
+              "request_id": "single-profile-report"
+            },
+            "result_type": "free_reach",
+            "sampled_settling": {
+              "available": true,
+              "continuous_time_guarantee": false,
+              "max_error_m": 0.02416703546281375,
+              "max_speed_m_s": 0.15568023512281687,
+              "passed": false,
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            },
+            "signed_position_error_m": [
+              -0.015641367504868442,
+              0.0036645544403807045,
+              0.008867265304897398
+            ],
+            "simulated_duration_s": 0.35000000000000003,
+            "simulation": {
+              "artifact_id": "0ebba470147cdaa3cab9e352c596cf7300012c00930ceea4911cb92ea6ef77e5",
+              "media_type": "application/json"
+            },
+            "solver_error_count": 0,
+            "target_position_m": [
+              0.29,
+              0.035,
+              0.19
+            ],
+            "task_accepted": false,
+            "terminal_error_m": 0.018349652058180982,
+            "terminal_position_m": [
+              0.27435863249513154,
+              0.03866455444038071,
+              0.1988672653048974
+            ],
+            "terminal_tip_speed_m_s": 0.15568023512281687,
+            "valid_complete_execution": true
+          }
+        },
+        "cache": "reuse",
+        "contract_version": "1.0.0",
+        "evidence": [],
+        "reason": "Deliver the session incumbent proposal_compliant_cfg, whose single fresh covered execution is valid and complete but does not satisfy the 0.01 m reach tolerance; restate exact candidate facts and copy the factual free-reach result.",
+        "request_id": "model-10-tool",
+        "tool_id": "route.advance",
+        "tool_version": "1.0.0"
+      }
+    }
+  ],
+  "responses": [
+    {
+      "request_id": "model-0",
+      "reference": {
+        "artifact_id": "65619eb3bf2117fb07ad792b881bdca744ce9bba97a92d2036f625ca61736a4d",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "5e1780f2-e75c-48d7-a1db-dd3e110e796a",
+      "usage": {
+        "completion_tokens": 403,
+        "completion_tokens_details": {
+          "reasoning_tokens": 208
+        },
+        "prompt_cache_hit_tokens": 12672,
+        "prompt_cache_miss_tokens": 18187,
+        "prompt_tokens": 30859,
+        "prompt_tokens_details": {
+          "cached_tokens": 12672
+        },
+        "total_tokens": 31262
+      }
+    },
+    {
+      "request_id": "model-1",
+      "reference": {
+        "artifact_id": "8d359b2383198ebd813553915feaa1894213ee58252d6f034c7496e706d85aaa",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "2284c708-9e57-40c8-b583-b345cb7d33e4",
+      "usage": {
+        "completion_tokens": 1325,
+        "completion_tokens_details": {
+          "reasoning_tokens": 1123
+        },
+        "prompt_cache_hit_tokens": 12544,
+        "prompt_cache_miss_tokens": 19645,
+        "prompt_tokens": 32189,
+        "prompt_tokens_details": {
+          "cached_tokens": 12544
+        },
+        "total_tokens": 33514
+      }
+    },
+    {
+      "request_id": "model-2",
+      "reference": {
+        "artifact_id": "0659f97b1257c617a3a9adcd01d08d8392bbd5eec6bb6159af65bcfb2fe285cc",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "07f85dfb-af02-41bc-b30b-52a9b348e5a4",
+      "usage": {
+        "completion_tokens": 2555,
+        "completion_tokens_details": {
+          "reasoning_tokens": 2213
+        },
+        "prompt_cache_hit_tokens": 12544,
+        "prompt_cache_miss_tokens": 19941,
+        "prompt_tokens": 32485,
+        "prompt_tokens_details": {
+          "cached_tokens": 12544
+        },
+        "total_tokens": 35040
+      }
+    },
+    {
+      "request_id": "model-3",
+      "reference": {
+        "artifact_id": "f7d8b7d991d4bfc3cf2a8b57f252748a15a8083f11e999770741ac64a7c2d1bc",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "043bd420-460b-4302-a192-64a81ea69d08",
+      "usage": {
+        "completion_tokens": 2462,
+        "completion_tokens_details": {
+          "reasoning_tokens": 2251
+        },
+        "prompt_cache_hit_tokens": 12544,
+        "prompt_cache_miss_tokens": 24460,
+        "prompt_tokens": 37004,
+        "prompt_tokens_details": {
+          "cached_tokens": 12544
+        },
+        "total_tokens": 39466
+      }
+    },
+    {
+      "request_id": "model-4",
+      "reference": {
+        "artifact_id": "6ef16f062cd45cb4e09cb79381078a8faafe227bfbcf8e476a1bc959a97f080b",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "9ccd25d6-b926-4524-aeb3-e41544ec2a05",
+      "usage": {
+        "completion_tokens": 785,
+        "completion_tokens_details": {
+          "reasoning_tokens": 417
+        },
+        "prompt_cache_hit_tokens": 12544,
+        "prompt_cache_miss_tokens": 22959,
+        "prompt_tokens": 35503,
+        "prompt_tokens_details": {
+          "cached_tokens": 12544
+        },
+        "total_tokens": 36288
+      }
+    },
+    {
+      "request_id": "model-5",
+      "reference": {
+        "artifact_id": "0b21a1d24a110d05bf06e295f79a45652c472d92f8ed2bb80aa508bec3f7553e",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "40e9e149-f196-4363-9e74-794b1f4e9f54",
+      "usage": {
+        "completion_tokens": 633,
+        "completion_tokens_details": {
+          "reasoning_tokens": 448
+        },
+        "prompt_cache_hit_tokens": 12544,
+        "prompt_cache_miss_tokens": 22913,
+        "prompt_tokens": 35457,
+        "prompt_tokens_details": {
+          "cached_tokens": 12544
+        },
+        "total_tokens": 36090
+      }
+    },
+    {
+      "request_id": "model-6",
+      "reference": {
+        "artifact_id": "edda623acf67cd8fd5f63c397d1525eb86b5e50750209e092ecc999d6f31316a",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "3000c4c6-8229-4514-aad6-8e17295b12b8",
+      "usage": {
+        "completion_tokens": 11996,
+        "completion_tokens_details": {
+          "reasoning_tokens": 11424
+        },
+        "prompt_cache_hit_tokens": 12544,
+        "prompt_cache_miss_tokens": 24278,
+        "prompt_tokens": 36822,
+        "prompt_tokens_details": {
+          "cached_tokens": 12544
+        },
+        "total_tokens": 48818
+      }
+    },
+    {
+      "request_id": "model-7",
+      "reference": {
+        "artifact_id": "2a4cf6bafe1ac1b132044663733ffc5bc2cac56943045b72c54784c5a6ee048e",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "5a3ac5eb-955a-4846-aea2-76ed8988b3d2",
+      "usage": {
+        "completion_tokens": 2523,
+        "completion_tokens_details": {
+          "reasoning_tokens": 2291
+        },
+        "prompt_cache_hit_tokens": 12544,
+        "prompt_cache_miss_tokens": 25676,
+        "prompt_tokens": 38220,
+        "prompt_tokens_details": {
+          "cached_tokens": 12544
+        },
+        "total_tokens": 40743
+      }
+    },
+    {
+      "request_id": "model-8",
+      "reference": {
+        "artifact_id": "9c3bb0cc7c31a1cb391971fe43d5a4a9f4f4cc39bff46c5976bb3254beb37e62",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "77418b82-64e9-49ff-8cbe-b43592806948",
+      "usage": {
+        "completion_tokens": 1139,
+        "completion_tokens_details": {
+          "reasoning_tokens": 719
+        },
+        "prompt_cache_hit_tokens": 12544,
+        "prompt_cache_miss_tokens": 26056,
+        "prompt_tokens": 38600,
+        "prompt_tokens_details": {
+          "cached_tokens": 12544
+        },
+        "total_tokens": 39739
+      }
+    },
+    {
+      "request_id": "model-9",
+      "reference": {
+        "artifact_id": "b6fed3dc555d13f4ac09e3c51e56ba9fd3b61173e9c571bd5ed4c52143763815",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "e689c038-187c-43b0-9ac4-a2e412d765f3",
+      "usage": {
+        "completion_tokens": 11466,
+        "completion_tokens_details": {
+          "reasoning_tokens": 10971
+        },
+        "prompt_cache_hit_tokens": 12544,
+        "prompt_cache_miss_tokens": 25736,
+        "prompt_tokens": 38280,
+        "prompt_tokens_details": {
+          "cached_tokens": 12544
+        },
+        "total_tokens": 49746
+      }
+    },
+    {
+      "request_id": "model-10",
+      "reference": {
+        "artifact_id": "838433b232ebbf41e7984bfe5f9a30e93e4b98582667e8bce68a66dc2aaaddbb",
+        "media_type": "application/json"
+      },
+      "model": "deepseek-flash",
+      "provider_id": "cb4cd32a-faad-4e83-89b1-b3ddae734da7",
+      "usage": {
+        "completion_tokens": 12648,
+        "completion_tokens_details": {
+          "reasoning_tokens": 9620
+        },
+        "prompt_cache_hit_tokens": 12544,
+        "prompt_cache_miss_tokens": 33341,
+        "prompt_tokens": 45885,
+        "prompt_tokens_details": {
+          "cached_tokens": 12544
+        },
+        "total_tokens": 58533
+      }
+    }
+  ],
+  "requests": [
+    {
+      "request_id": "model-0",
+      "reference": {
+        "artifact_id": "737cc4fa6dbdc0e9803d6ac190da107db4ea87bd376ec441a12fb5c4605ef87b",
+        "media_type": "application/json"
+      },
+      "serialized_bytes": 110682,
+      "context_limit_bytes": 200000,
+      "selected_candidate": null,
+      "has_official_result": false,
+      "incumbent_result_delivered": false,
+      "exact_registered_tool_names": [
+        "analysis_bounded_endpoint",
+        "analysis_compare_candidates",
+        "analysis_control_metrics",
+        "analysis_gvs_candidate_evaluate",
+        "analysis_linearize_candidate",
+        "analysis_prepare_candidate",
+        "control_profile_describe",
+        "control_profile_report",
+        "design_build_proposal",
+        "design_optimize_math",
+        "design_screen",
+        "evidence_read",
+        "route_advance",
+        "route_inspect",
+        "route_record_analysis",
+        "session_control"
+      ]
+    },
+    {
+      "request_id": "model-1",
+      "reference": {
+        "artifact_id": "63638ea707389df68623d3c41e1277bbc95881036693c1d033924555944cfe16",
+        "media_type": "application/json"
+      },
+      "serialized_bytes": 115429,
+      "context_limit_bytes": 200000,
+      "selected_candidate": null,
+      "has_official_result": false,
+      "incumbent_result_delivered": false,
+      "exact_registered_tool_names": [
+        "analysis_bounded_endpoint",
+        "analysis_compare_candidates",
+        "analysis_control_metrics",
+        "analysis_gvs_candidate_evaluate",
+        "analysis_linearize_candidate",
+        "analysis_prepare_candidate",
+        "control_profile_describe",
+        "control_profile_report",
+        "design_build_proposal",
+        "design_optimize_math",
+        "design_screen",
+        "evidence_read",
+        "route_advance",
+        "route_inspect",
+        "route_record_analysis",
+        "session_control"
+      ]
+    },
+    {
+      "request_id": "model-2",
+      "reference": {
+        "artifact_id": "431ee5ebf8db84754221bb819c5bab0ae09fe173fca2918382b8b171ffa7b675",
+        "media_type": "application/json"
+      },
+      "serialized_bytes": 115867,
+      "context_limit_bytes": 200000,
+      "selected_candidate": null,
+      "has_official_result": false,
+      "incumbent_result_delivered": false,
+      "exact_registered_tool_names": [
+        "analysis_bounded_endpoint",
+        "analysis_compare_candidates",
+        "analysis_control_metrics",
+        "analysis_gvs_candidate_evaluate",
+        "analysis_linearize_candidate",
+        "analysis_prepare_candidate",
+        "control_profile_describe",
+        "control_profile_report",
+        "design_build_proposal",
+        "design_optimize_math",
+        "design_screen",
+        "evidence_read",
+        "route_advance",
+        "route_inspect",
+        "route_record_analysis",
+        "session_control"
+      ]
+    },
+    {
+      "request_id": "model-3",
+      "reference": {
+        "artifact_id": "d77c393ae0a1d323a517b6154b46f0b9ec5e6a35bb900a1b303e87a2fd1dc183",
+        "media_type": "application/json"
+      },
+      "serialized_bytes": 130123,
+      "context_limit_bytes": 200000,
+      "selected_candidate": "seed_baseline_cfg",
+      "has_official_result": false,
+      "incumbent_result_delivered": false,
+      "exact_registered_tool_names": [
+        "analysis_bounded_endpoint",
+        "analysis_compare_candidates",
+        "analysis_control_metrics",
+        "analysis_gvs_candidate_evaluate",
+        "analysis_linearize_candidate",
+        "analysis_prepare_candidate",
+        "control_profile_describe",
+        "control_profile_report",
+        "design_build_proposal",
+        "design_optimize_math",
+        "design_screen",
+        "evidence_read",
+        "route_advance",
+        "route_inspect",
+        "route_record_analysis",
+        "session_control"
+      ]
+    },
+    {
+      "request_id": "model-4",
+      "reference": {
+        "artifact_id": "3544964792691ae446868af995c6b45462f2b70499529cc4749d794d23b3dc3c",
+        "media_type": "application/json"
+      },
+      "serialized_bytes": 125731,
+      "context_limit_bytes": 200000,
+      "selected_candidate": "seed_baseline_cfg",
+      "has_official_result": false,
+      "incumbent_result_delivered": false,
+      "exact_registered_tool_names": [
+        "analysis_bounded_endpoint",
+        "analysis_compare_candidates",
+        "analysis_control_metrics",
+        "analysis_gvs_candidate_evaluate",
+        "analysis_linearize_candidate",
+        "analysis_prepare_candidate",
+        "control_profile_describe",
+        "control_profile_report",
+        "design_build_proposal",
+        "design_optimize_math",
+        "design_screen",
+        "evidence_read",
+        "route_advance",
+        "route_inspect",
+        "route_record_analysis",
+        "session_control"
+      ]
+    },
+    {
+      "request_id": "model-5",
+      "reference": {
+        "artifact_id": "6122638fd330d0ad7adccee01bd717c6aca637c1837932fb4ab76bd5be841f08",
+        "media_type": "application/json"
+      },
+      "serialized_bytes": 125565,
+      "context_limit_bytes": 200000,
+      "selected_candidate": "seed_baseline_cfg",
+      "has_official_result": false,
+      "incumbent_result_delivered": false,
+      "exact_registered_tool_names": [
+        "analysis_bounded_endpoint",
+        "analysis_compare_candidates",
+        "analysis_control_metrics",
+        "analysis_gvs_candidate_evaluate",
+        "analysis_linearize_candidate",
+        "analysis_prepare_candidate",
+        "control_profile_describe",
+        "control_profile_report",
+        "design_build_proposal",
+        "design_optimize_math",
+        "design_screen",
+        "evidence_read",
+        "route_advance",
+        "route_inspect",
+        "route_record_analysis",
+        "session_control"
+      ]
+    },
+    {
+      "request_id": "model-6",
+      "reference": {
+        "artifact_id": "b5d6ded735f1ac55e94fc71f518ada968c52ba933d62baa2ed5a85fa1254ad8a",
+        "media_type": "application/json"
+      },
+      "serialized_bytes": 130476,
+      "context_limit_bytes": 200000,
+      "selected_candidate": "seed_baseline_cfg",
+      "has_official_result": false,
+      "incumbent_result_delivered": false,
+      "exact_registered_tool_names": [
+        "analysis_bounded_endpoint",
+        "analysis_compare_candidates",
+        "analysis_control_metrics",
+        "analysis_gvs_candidate_evaluate",
+        "analysis_linearize_candidate",
+        "analysis_prepare_candidate",
+        "control_profile_describe",
+        "control_profile_report",
+        "design_build_proposal",
+        "design_optimize_math",
+        "design_screen",
+        "evidence_read",
+        "route_advance",
+        "route_inspect",
+        "route_record_analysis",
+        "session_control"
+      ]
+    },
+    {
+      "request_id": "model-7",
+      "reference": {
+        "artifact_id": "d867cd4d3408335e8dae983408131850b6facd5126dda6b2a065d90b58319ec9",
+        "media_type": "application/json"
+      },
+      "serialized_bytes": 134777,
+      "context_limit_bytes": 200000,
+      "selected_candidate": "proposal_compliant_cfg",
+      "has_official_result": false,
+      "incumbent_result_delivered": false,
+      "exact_registered_tool_names": [
+        "analysis_bounded_endpoint",
+        "analysis_compare_candidates",
+        "analysis_control_metrics",
+        "analysis_gvs_candidate_evaluate",
+        "analysis_linearize_candidate",
+        "analysis_prepare_candidate",
+        "control_profile_describe",
+        "control_profile_report",
+        "design_build_proposal",
+        "design_optimize_math",
+        "design_screen",
+        "evidence_read",
+        "route_advance",
+        "route_inspect",
+        "route_record_analysis",
+        "session_control"
+      ]
+    },
+    {
+      "request_id": "model-8",
+      "reference": {
+        "artifact_id": "fbac259d12c8eaeb531f16f88ebc3576b7d0007ee65a3a7b385703d425df1340",
+        "media_type": "application/json"
+      },
+      "serialized_bytes": 135961,
+      "context_limit_bytes": 200000,
+      "selected_candidate": "proposal_compliant_cfg",
+      "has_official_result": false,
+      "incumbent_result_delivered": false,
+      "exact_registered_tool_names": [
+        "analysis_bounded_endpoint",
+        "analysis_compare_candidates",
+        "analysis_control_metrics",
+        "analysis_gvs_candidate_evaluate",
+        "analysis_linearize_candidate",
+        "analysis_prepare_candidate",
+        "control_profile_describe",
+        "control_profile_report",
+        "design_build_proposal",
+        "design_optimize_math",
+        "design_screen",
+        "evidence_read",
+        "route_advance",
+        "route_inspect",
+        "route_record_analysis",
+        "session_control"
+      ]
+    },
+    {
+      "request_id": "model-9",
+      "reference": {
+        "artifact_id": "4e6bb8f30520d9ab58df68e04e4c019687c4ec2d5b9952ae43dce3b4744cfd55",
+        "media_type": "application/json"
+      },
+      "serialized_bytes": 134630,
+      "context_limit_bytes": 200000,
+      "selected_candidate": "proposal_compliant_cfg",
+      "has_official_result": false,
+      "incumbent_result_delivered": false,
+      "exact_registered_tool_names": [
+        "analysis_bounded_endpoint",
+        "analysis_compare_candidates",
+        "analysis_control_metrics",
+        "analysis_gvs_candidate_evaluate",
+        "analysis_linearize_candidate",
+        "analysis_prepare_candidate",
+        "control_profile_describe",
+        "control_profile_report",
+        "design_build_proposal",
+        "design_optimize_math",
+        "design_screen",
+        "evidence_read",
+        "route_advance",
+        "route_inspect",
+        "route_record_analysis",
+        "session_control"
+      ]
+    },
+    {
+      "request_id": "model-10",
+      "reference": {
+        "artifact_id": "3b3be2d5b3e63e90b0ed309dd70cbe9918eb4667c832551d97da6298f2d343d1",
+        "media_type": "application/json"
+      },
+      "serialized_bytes": 158145,
+      "context_limit_bytes": 200000,
+      "selected_candidate": "proposal_compliant_cfg",
+      "has_official_result": true,
+      "incumbent_result_delivered": true,
+      "exact_registered_tool_names": [
+        "analysis_bounded_endpoint",
+        "analysis_compare_candidates",
+        "analysis_control_metrics",
+        "analysis_gvs_candidate_evaluate",
+        "analysis_linearize_candidate",
+        "analysis_prepare_candidate",
+        "control_profile_describe",
+        "control_profile_report",
+        "design_build_proposal",
+        "design_optimize_math",
+        "design_screen",
+        "evidence_read",
+        "route_advance",
+        "route_inspect",
+        "route_record_analysis",
+        "session_control"
+      ]
+    }
+  ],
+  "finish_raw_response": {
+    "artifact_id": "838433b232ebbf41e7984bfe5f9a30e93e4b98582667e8bce68a66dc2aaaddbb",
+    "media_type": "application/json"
+  },
+  "finish_decision": {
+    "artifact_id": "247f37e035692527e8c538c40f2852aa3bb8fc7d3d87c45a6cb0d63374c101ef",
+    "media_type": "application/json"
+  },
+  "model_authored_delivery": "The required fresh, bounded, covered multi-parameter experiment has been completed and evaluated: the optimizer-selected proposal (near 0.15 m, far 0.11 m, section_scale 0.99, compliant) was built, candidate-bound linearization/metrics/endpoint/screen prepared, registered with optimizer provenance, and executed once through the frozen protocol. The official evaluation is valid and complete but task-accepted=false: terminal error 0.018349652058180982 m against the 0.01 m tolerance, sampled settling not passed (max_error 0.024167 m, max_speed 0.156 m/s), and real-time not demonstrated (35/35 deadline misses, mean complete update 11.93 s at 0.01 s control period). The local screen is advisory and here structurally uninformative: its world-x position-control row is identically zero and its residual upper bound of 0.002 m is contradicted by the measured 0.0183 m, so no further optimizer-led selection would be genuinely model-led; the remaining budget is reserved for review and finish. Deliver the valid failed reach honestly with exact candidate facts.",
+  "protocol_corrections": 0
+}
