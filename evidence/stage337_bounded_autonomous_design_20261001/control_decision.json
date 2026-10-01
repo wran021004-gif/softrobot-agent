@@ -1,0 +1,25 @@
+{
+  "outcome": "B",
+  "controller_changed": false,
+  "controller_lineage": "controller.gvs_nmpc@6.0.0",
+  "paired_verification_solves": 0,
+  "decision": "Keep the controller unchanged and document observed applicability and unresolved limitations.",
+  "evidence": [
+    "All three reconstructed initial plans were feasible and dynamically consistent at the 1e-5 threshold.",
+    "Objective improvement occurred only on iterates whose dynamics equality residual remained above 1e-5; initial-state consistency and variable bounds remained exact.",
+    "The current 0.23 s least-infeasible checkpoint had scaled dynamics residual 0.0003215983575130185, over 32 times the delivery threshold.",
+    "The historical 0.23 s reconstruction did not reproduce the original delivered iteration-19 plan because the full historical warm horizon was not retained."
+  ],
+  "unresolved": [
+    "The saved evidence does not isolate whether warm-start quality, nonlinear conditioning, scaling interactions, or the finite solver budget prevents a useful feasible noninitialization plan.",
+    "The reconstructed single updates do not establish intrinsic design infeasibility or closed-loop performance."
+  ],
+  "nonchanges": [
+    "initialization",
+    "objective weights",
+    "integration",
+    "feasibility tolerance",
+    "returned-plan recovery",
+    "stopping budget"
+  ]
+}

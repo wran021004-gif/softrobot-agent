@@ -30,6 +30,28 @@ def _violation(x,g,lbx,ubx,lbg,ubg):
         np.max(np.maximum(np.asarray(lbg)-g,g-np.asarray(ubg)),initial=0.)))
 
 
+def _named_residual_summary(x,g,lbx,ubx,lbg,ubg,variable_order,constraint_order):
+    """Compact diagnostic grouping without another model evaluation."""
+    x=np.asarray(x,dtype=float).ravel();g=np.asarray(g,dtype=float).ravel()
+    variable=np.maximum(np.maximum(np.asarray(lbx)-x,x-np.asarray(ubx)),0.)
+    constraint=np.maximum(np.maximum(np.asarray(lbg)-g,g-np.asarray(ubg)),0.)
+
+    def group(names,values,indices):
+        if not indices:return dict(max_scaled_residual=0.,violations_over_1e_5=0,worst=None)
+        index=max(indices,key=lambda i:values[i]);value=float(values[index])
+        return dict(max_scaled_residual=value,
+            violations_over_1e_5=sum(float(values[i])>1e-5 for i in indices),
+            worst=dict(name=names[index],scaled_residual=value))
+
+    initial=[i for i,name in enumerate(variable_order) if name.startswith('x/0/')]
+    dynamics=[i for i,name in enumerate(constraint_order) if name.startswith('dynamics')]
+    return dict(
+        initial_state_consistency=group(variable_order,variable,initial),
+        dynamics_equalities=group(constraint_order,constraint,dynamics),
+        variable_bounds=group(variable_order,variable,list(range(len(variable_order)))),
+    )
+
+
 class _FeasibleIterate(ca.Callback):
     """Retain an iterate of this solve, never a plan from another initial state."""
     def __init__(self,nx,ng):
@@ -50,6 +72,7 @@ class _FeasibleIterate(ca.Callback):
         self.policy=policy;self.seed_objective=seed_objective;self.seed_settled=seed_settled
         self.stop_reason=None;self.stop_s=None
         self.trace=[] if trace else None
+        self.checkpoints={} if trace else None
 
     def eval(self,args):
         elapsed=time.perf_counter()-self.start
@@ -59,6 +82,17 @@ class _FeasibleIterate(ca.Callback):
         if self.trace is not None:
             self.trace.append(dict(iteration=self.iteration,elapsed_s=elapsed,objective=objective,
                 scaled_violation=violation,eligible=bool(np.isfinite(np.r_[x,g,objective]).all() and violation<=1e-5)))
+            finite=bool(np.isfinite(np.r_[x,g,objective]).all())
+            if self.iteration>0 and finite and violation>1e-5:
+                candidate=dict(x=x.copy(),objective=objective,iteration=self.iteration,
+                    elapsed_s=elapsed,scaled_violation=violation)
+                if self.seed_objective is not None and objective<self.seed_objective:
+                    prior=self.checkpoints.get('best_lower_objective_infeasible')
+                    if prior is None or objective<prior['objective']:
+                        self.checkpoints['best_lower_objective_infeasible']=candidate
+                prior=self.checkpoints.get('least_infeasible_noninitialization')
+                if prior is None or violation<prior['scaled_violation']:
+                    self.checkpoints['least_infeasible_noninitialization']=candidate
         self.latest=None
         if np.isfinite(np.r_[x,g,objective]).all() and violation<=1e-5:
             candidate=dict(x=x.copy(),objective=objective,iteration=self.iteration,
@@ -314,6 +348,30 @@ class IpoptSolver:
         if self.diagnostic_trace:
             self.last_diagnostics['iteration_trace']=None if selector is None else selector.trace
             self.last_diagnostics['diagnostic_plans']=dict(initial=list(x0),selected=values.tolist(),returned=returned_values.tolist())
+            points=[]
+            def retain(label,vector,iteration,elapsed_s=None,roles=None):
+                objective,g,error=verify(vector)
+                points.append(dict(label=label,roles=roles or [label],iteration=iteration,
+                    elapsed_s=elapsed_s,objective=objective,scaled_violation=error,
+                    feasible_at_1e_5=bool(error<=1e-5 and np.isfinite(np.r_[vector,g,objective]).all()),
+                    named_residuals=_named_residual_summary(vector,g,lbx,ubx,lbg,ubg,
+                        bundle.variable_order,bundle.constraint_order),vector=np.asarray(vector).tolist()))
+            retain('initial',x0,-1,0.)
+            retain('selected',values,selected_iteration,
+                None if selected_candidate is None else selected_candidate.get('elapsed_s'))
+            retain('returned',returned_values,int(stats.get('iter_count',0)),solve_s)
+            extras=[]
+            if selector is not None and selector.checkpoints is not None:
+                for role in ('best_lower_objective_infeasible','least_infeasible_noninitialization'):
+                    candidate=selector.checkpoints.get(role)
+                    if candidate is None:continue
+                    duplicate=next((row for row in extras if np.array_equal(row['x'],candidate['x'])),None)
+                    if duplicate is not None:duplicate['roles'].append(role)
+                    else:extras.append(dict(candidate,roles=[role]))
+            for index,candidate in enumerate(extras):
+                retain('checkpoint_'+str(index+1),candidate['x'],candidate['iteration'],
+                    candidate['elapsed_s'],candidate['roles'])
+            self.last_diagnostics['retained_diagnostic_points']=points
         self.last_returned_optimum = dict(zip(bundle.variable_order,returned_values.tolist()))
         return OptimizationResult(
             status=status,

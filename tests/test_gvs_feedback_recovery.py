@@ -20,6 +20,12 @@ class FeedbackRecoveryTests(unittest.TestCase):
         self.assertEqual(result.status,'converged')
         self.assertTrue(solver.last_diagnostics['iteration_trace'])
         self.assertEqual(set(solver.last_diagnostics['diagnostic_plans']),{'initial','selected','returned'})
+        points=solver.last_diagnostics['retained_diagnostic_points']
+        self.assertEqual([p['label'] for p in points[:3]],['initial','selected','returned'])
+        self.assertLessEqual(len(points),5)
+        self.assertEqual(set(points[0]['named_residuals']),{
+            'initial_state_consistency','dynamics_equalities','variable_bounds'})
+        self.assertEqual(points[0]['named_residuals']['dynamics_equalities']['worst']['name'],'dynamics')
         self.assertFalse(solver.evaluate_candidate(problem,dict(x=.25,u=.6))['feasible'])
         self.assertTrue(solver.evaluate_candidate(problem,dict(x=.36,u=.6))['feasible'])
         # Exact dynamics alone cannot authorize an out-of-bounds tension.
