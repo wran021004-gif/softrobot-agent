@@ -63,6 +63,10 @@ class RouteAnalysisAction(Contract):
     next_step: str = Field(min_length=1)
 
 
+class RouteAnalysisActionV2(RouteAnalysisAction):
+    candidate_analysis_bundle: EvidenceRef | None = Field(default=None, description='Owned completed analysis.prepare_candidate result for source_node. Component references are resolved from this bundle; explicit component references, when supplied, must match it.')
+
+
 class ProposalBuildAction(Contract):
     node_id: Identifier = Field(description='Unique Route construction node identifier.')
     optimizer_result: EvidenceRef = Field(description='Exact mathematical optimizer result containing the selected proposal.')
@@ -170,8 +174,8 @@ def view(host):
             math_evaluations_used=ledger['used'],math_evaluations_remaining=ledger['remaining'],
             math_selection_required_before_run=spec.math_selection_required_before_run,
             call_order=['design.build_proposal','analysis.bind_historical_math','route.record_analysis']
-                if spec.historical_math else ['analysis.linearize_candidate','analysis.control_metrics','analysis.bounded_endpoint',
-                    'design.screen','design.optimize_math','route.record_analysis'],
+                if spec.historical_math else ['design.optimize_math','design.build_proposal','analysis.prepare_candidate',
+                    'route.record_analysis'],
             historical_math=plain(spec.historical_math) if spec.historical_math else None,
             optimizer_scope=('Primary: official-tolerance-normalized position residual upper bound from the controller-start '
                 'frozen local affine exact-ZOH model. Secondary: normalized input energy of a position-feasible witness. '
@@ -381,10 +385,28 @@ def overview(host):
         limitations=full['limitations'])
     if full.get('analysis_workflow'):
         projection['analysis_workflow']=full['analysis_workflow']
+        from types import SimpleNamespace
+        from .candidate_analysis import candidate_analysis_status
+        session=host.store.session(host.run_id)
+        analysis_ctx=SimpleNamespace(host=host,store=host.store,reg=host.reg,run_id=host.run_id,
+            input=inp,snapshot=session['snapshot'],artifact=host.store.artifact)
+        statuses=[]
+        for build_node in (row for row in nodes if row.get('action')=='build' and row.get('status')=='completed'):
+            status=candidate_analysis_status(analysis_ctx,build_node['node_id'])
+            try:
+                gate=check_run_eligibility(host,build_node['node_id'])
+                status['run_prerequisites']=dict(satisfied=True,detail=gate)
+            except ValueError as exc:
+                status['run_prerequisites']=dict(satisfied=False,blocking_error=str(exc),
+                    required_next_step=(f"Call analysis.prepare_candidate with source_node={build_node['node_id']!r}, then "
+                        'register its bundle with route.record_analysis@2.0.0 and cite the build result.'))
+            statuses.append(status)
+        projection['candidate_analysis_status']=statuses
         projection['available_actions']['build_proposal']='Construct one exact named optimizer proposal without retyping its configuration; zero solves.'
         if full['analysis_workflow'].get('historical_math'):
             projection['available_actions']['bind_historical_math']='Bind frozen named historical references to the exact proposal build; zero new mathematics and zero solves.'
-        projection['available_actions']['record_analysis']='Attach exact shared analysis/optimizer evidence for a completed build; advisory and zero backend solves.'
+        projection['available_actions']['record_analysis']='Register an exact candidate-analysis bundle (or legacy explicit/historical chain) on a completed build; advisory and zero backend solves.'
+        projection['available_actions']['prepare_candidate']='Complete or reuse the exact candidate-bound four-part analysis bundle for source_node; zero backend solves and no design choice.'
     if route.get('final',{}):
         final=route['final']
         if final.get('configuration') and final.get('simulation'):
@@ -662,9 +684,13 @@ def _built_run_inputs(ctx,args,route):
         for item in route['nodes']:
             if item.get('action')=='analyze' and item.get('status')=='completed' and item.get('result'):
                 report=ctx.store.artifact(item['result'])
-                if report.get('build_configuration')==built['configuration']: reports.append(report)
+                if (report.get('build_configuration')==built['configuration']
+                        and report.get('source_build_node')==args.source_node
+                        and report.get('build_candidate_id')==built['candidate_id']): reports.append(report)
         if not reports:
-            raise ValueError('CANDIDATE_BOUND_SHARED_ANALYSIS_REQUIRED_BEFORE_EXECUTION')
+            raise ValueError(f"CANDIDATE_BOUND_SHARED_ANALYSIS_REQUIRED_BEFORE_EXECUTION: candidate={candidate!r}; "
+                f"source_node={args.source_node!r}; required_operation=analysis.prepare_candidate(source_node={args.source_node!r}) "
+                'then route.record_analysis@2.0.0 with candidate_analysis_bundle and the build result in evidence')
         if policy(ctx.input).math_selection_required_before_run and not any(r.get('math_selection_trace',{}).get('matches_proposal') for r in reports):
             raise ValueError('MATH_OPTIMIZER_PROPOSAL_MATCH_REQUIRED_BEFORE_EXECUTION')
     prior=policy(ctx.input).historical_case
@@ -910,9 +936,42 @@ def record_analysis(ctx,args):
     try:
         build_node,built=source_node(ctx,args,route)
         if build_node['action']!='build': raise ValueError('ANALYSIS_REQUIRES_BUILD_SOURCE_NODE')
-        expected=built['configuration'];historical=None
+        expected=built['configuration'];historical=None;bundle=None
         refs={name:plain(getattr(args,name)) if getattr(args,name) else None
             for name in ('linearization','metrics','endpoint','screen')}
+        bundle_ref=plain(getattr(args,'candidate_analysis_bundle',None)) if getattr(args,'candidate_analysis_bundle',None) else None
+        if bundle_ref and args.historical_math_binding:
+            raise ValueError('ROUTE_ANALYSIS_BUNDLE_AND_HISTORICAL_BINDING_CONFLICT')
+        if bundle_ref:
+            import json
+            owned=False
+            with ctx.store.connect(True) as db:
+                for row in db.execute('SELECT receipt FROM calls WHERE run_id=? AND receipt IS NOT NULL',(ctx.run_id,)):
+                    receipt=json.loads(row['receipt'])
+                    if (receipt.get('tool_id')=='analysis.prepare_candidate'
+                            and receipt.get('execution_status')=='completed' and receipt.get('output')==bundle_ref):
+                        owned=True;break
+            if not owned:
+                raise ValueError('ROUTE_CANDIDATE_ANALYSIS_BUNDLE_OWNED_TOOL_RESULT_REQUIRED: field=candidate_analysis_bundle; submitted='+repr(bundle_ref))
+            bundle=ctx.artifact(bundle_ref)
+            from .candidate_analysis import candidate_analysis_scope
+            _,binding,bundle_protocol,bundle_target,_,_,scope_identity=candidate_analysis_scope(ctx,args.source_node)
+            if (bundle.get('kind')!='candidate_analysis_bundle' or not bundle.get('complete')
+                    or bundle.get('source_node')!=args.source_node
+                    or bundle.get('build_candidate_id')!=built['candidate_id']
+                    or bundle.get('configuration')!=expected
+                    or bundle.get('scientific_configuration_identity')!=binding['scientific_configuration_identity']
+                    or bundle.get('analysis_scope_identity')!=scope_identity):
+                raise ValueError(f"ROUTE_CANDIDATE_ANALYSIS_BUNDLE_BUILD_OR_SCOPE_MISMATCH: candidate={built['candidate_id']!r}; source_node={args.source_node!r}")
+            if bundle.get('protocol')!=bundle_protocol or bundle.get('target')!=bundle_target:
+                raise ValueError(f"ROUTE_CANDIDATE_ANALYSIS_BUNDLE_PROTOCOL_OR_TARGET_MISMATCH: candidate={built['candidate_id']!r}; source_node={args.source_node!r}")
+            for name in refs:
+                inherited=(bundle.get('components',{}).get(name) or {}).get('reference')
+                if inherited is None:
+                    raise ValueError(f"ROUTE_CANDIDATE_ANALYSIS_BUNDLE_COMPONENT_REQUIRED: candidate={built['candidate_id']!r}; component={name!r}; required_operation=analysis.prepare_candidate(source_node={args.source_node!r})")
+                if refs[name] is not None and refs[name]!=inherited:
+                    raise ValueError(f'ROUTE_CANDIDATE_ANALYSIS_BUNDLE_REFERENCE_CONFLICT: field={name}; submitted={refs[name]!r}; bundle_original={inherited!r}')
+                refs[name]=inherited
         if args.historical_math_binding:
             import json
             owned=False
@@ -937,15 +996,19 @@ def record_analysis(ctx,args):
                 refs[name]=inherited
         missing=[name for name,value in refs.items() if value is None]
         if missing:
-            raise ValueError('ROUTE_ANALYSIS_REFERENCE_REQUIRED: fields='+repr(missing))
+            raise ValueError(f"ROUTE_ANALYSIS_REFERENCE_REQUIRED: candidate={built['candidate_id']!r}; fields={missing!r}; "
+                f"required_operation=analysis.prepare_candidate(source_node={args.source_node!r})")
         linear=ctx.artifact(refs['linearization']);metrics=ctx.artifact(refs['metrics'])
         endpoint=ctx.artifact(refs['endpoint']);screen=ctx.artifact(refs['screen'])
         for result,kind in ((linear,'candidate_linearization'),(metrics,'control_metrics'),
                 (endpoint,'bounded_endpoint'),(screen,'design_screen')):
-            wrong_configuration=(historical is None and result.get('bindings') and
-                any(b['configuration']!=expected for b in result['bindings']))
-            if result.get('kind')!=kind or not result.get('bindings') or wrong_configuration:
-                raise ValueError('ROUTE_ANALYSIS_CANDIDATE_BINDING_MISMATCH: '+kind)
+            wrong_binding=(historical is None and result.get('bindings') and any(
+                b.get('configuration')!=expected
+                or (b.get('candidate_id') is not None and b.get('candidate_id')!=built['candidate_id'])
+                or (b.get('source_node') is not None and b.get('source_node')!=args.source_node)
+                for b in result['bindings']))
+            if result.get('kind')!=kind or not result.get('bindings') or wrong_binding:
+                raise ValueError(f"ROUTE_ANALYSIS_CANDIDATE_BINDING_MISMATCH: candidate={built['candidate_id']!r}; component={kind!r}; source_node={args.source_node!r}; required_operation=analysis.prepare_candidate(source_node={args.source_node!r})")
         if screen['evidence']!=[refs['linearization'],refs['metrics'],refs['endpoint']]:
             raise ValueError('ROUTE_SCREEN_EVIDENCE_CHAIN_MISMATCH')
         if screen['protocol']!=plain(spec.analysis_protocol) or endpoint['protocol']!=plain(spec.analysis_protocol):
@@ -1049,6 +1112,7 @@ def record_analysis(ctx,args):
             hard_rejection=False,screen_priority=report['priority_reasoning'],
             advisory_scope='Shared local mathematics informs prioritization only; execution remains the physical validation authority.',
             actual_solves=0,simulated=False,evaluated=False)
+        if bundle_ref: out['candidate_analysis_bundle']=bundle_ref
     except Exception as exc:
         node.update(status='failed',error=str(exc));route['current']=None;_save(ctx,route,'failed');raise
     with ctx.store.transaction() as db: ref=ctx.store.put(db,out)

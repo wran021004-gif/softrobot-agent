@@ -162,6 +162,40 @@ class DesignScreenRequest(Contract):
     endpoint: EvidenceRef
 
 
+class CandidateAnalysisRequest(Contract):
+    source_node: str = Field(description='Owned completed Route build. The frozen Route protocol and endpoint target are resolved by the Host.')
+
+
+class CandidateAnalysisComponent(Contract):
+    tool_id: str
+    tool_version: str
+    status: Literal['computed','reused','failed','not_performed']
+    reference: EvidenceRef | None = None
+    failure: EvidenceRef | None = None
+    detail: str | None = None
+
+
+class CandidateAnalysisBundle(Contract):
+    kind: Literal['candidate_analysis_bundle'] = 'candidate_analysis_bundle'
+    source_node: str
+    build_candidate_id: str
+    build_result: EvidenceRef
+    configuration: EvidenceRef
+    scientific_configuration_identity: str
+    analysis_scope_identity: str
+    protocol: EvidenceRef
+    target: EvidenceRef
+    binding: dict
+    model: dict
+    dependency_identities: dict[str, dict | str | None]
+    components: dict[Literal['linearization','metrics','endpoint','screen'], CandidateAnalysisComponent]
+    evidence: list[EvidenceRef]
+    advisory_findings: dict
+    limitations: list[str]
+    proposal_provenance: dict | None = None
+    complete: bool
+
+
 class MathOptimizeRequest(Contract):
     source_node: str = Field(description='Owned completed Route build supplying the explicit starting configuration.')
     protocol: EvidenceRef

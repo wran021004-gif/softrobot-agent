@@ -2,7 +2,7 @@
 from tools.platform_registry import Extension
 from schemas.platform_analysis import (MetricsRequest, LinearizeRequest, SavedLinearizeRequestV2, SavedCaseRequest, CompareRequest,
     CandidateLinearizeRequest, BoundedEndpointRequest, DesignScreenRequest, MathOptimizeRequest,
-    MathOptimizationResult, AnalysisResult)
+    MathOptimizationResult, AnalysisResult, CandidateAnalysisRequest, CandidateAnalysisBundle)
 from extensions.tendon_family.manifest import GVS_SOURCES
 
 CONTRACTS=[]
@@ -40,6 +40,11 @@ for name,schema,binding,description,deps in (
         side_effects='artifact_store',cache=True,capabilities=caps))
 
 EXTENSIONS.extend([
+    Extension('analysis.prepare_candidate','tool','1.0.0',CandidateAnalysisRequest,CandidateAnalysisBundle,
+        'extensions.tendon_family.candidate_analysis:prepare_candidate',
+        'Prepare the complete candidate-bound linearization, control metrics, bounded endpoint analysis and advisory screen for one completed build under the frozen Route protocol and target. Reuses an exact matching chain and computes only missing components; no design choice, provider request, NMPC or backend solve.',
+        sources=SOURCES,dependencies=('numpy','scipy','casadi'),side_effects='artifact_store',cache=False,
+        capabilities=dict(category='analysis',role='public_tool',route_visible=True,backend_solves=0)),
     Extension('analysis.linearize_candidate','tool','1.0.0',CandidateLinearizeRequest,AnalysisResult,
         'extensions.tendon_family.math_analysis:linearize_candidate',
         'Configuration-only position/velocity local models for an explicit owned completed build node',
