@@ -185,6 +185,7 @@ class ModelConfig(Contract):
     length_recovery: ModelLengthRecovery | None = None
     protocol_recovery: ModelProtocolRecovery | None = None
     tool_naming: ModelToolNaming | None = None
+    readonly_batch_limit: int | None = Field(default=None, ge=2, le=3)
     max_tokens: int = Field(default=2000,ge=1)
     supports_tools: Literal[True] = True
     supports_text: Literal[True] = True
@@ -199,7 +200,7 @@ class ModelConfig(Contract):
     @model_serializer(mode='wrap')
     def serialize_optional_model_settings(self, handler):
         data=handler(self)
-        for key in ('reasoning_effort','length_recovery','protocol_recovery','tool_naming'):
+        for key in ('reasoning_effort','length_recovery','protocol_recovery','tool_naming','readonly_batch_limit'):
             if data.get(key) is None: data.pop(key,None)
         return data
 

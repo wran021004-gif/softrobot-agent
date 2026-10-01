@@ -163,6 +163,7 @@ def local_pair(ctx,args,reader,source,updates):
         ref=ctx.save_artifact(dict(snapshot=snap,independent_verification=checked,parameters=p),'local_control_snapshot')
         rows.append(dict(label=label,parameters=p,metrics=metrics,physical_motion=physical_motion,
             input_bounds_satisfied=bool(np.all(inputs>=-1e-8)&np.all(inputs<=limits+1e-8)),
+            lower_input_margin_n=inputs.min(axis=0).tolist(),upper_input_margin_n=(limits-inputs.max(axis=0)).tolist(),
             verification=checked,reference=plain(ref),
             selected_iteration=solved['diagnostics']['selected_feasible_iteration'],
             stop_reason=solved['diagnostics']['policy_stop_reason'],complete_cost_s=time.perf_counter()-wall))

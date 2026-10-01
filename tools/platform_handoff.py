@@ -23,6 +23,7 @@ def transition(ctx, kind, value):
     with ctx.store.transaction() as db:
         state=ctx.store.session(ctx.run_id,db)['state']
         state.setdefault('handoffs',{})[kind]=plain(ref)
+        state.setdefault('handoff_history',[]).append(dict(kind=kind,reference=plain(ref)))
         ctx.store.update_state(db,ctx.run_id,state,'paused')
         ctx.store.event(db,ctx.run_id,'role_transition',kind,outputs=[ref],caller=ctx.host.actor)
     return HandoffResult(reference=ref,status=kind)
@@ -42,6 +43,13 @@ def request(ctx,args):
     if not set(args.permitted_tools)<=set(role['diagnostic_tools']): raise ValueError('DIAGNOSTIC_TOOL_SCOPE_EXCEEDED')
     if any(v>ctx.store.config()['budget'][k] for k,v in plain(args.budget).items()):
         raise ValueError('DIAGNOSTIC_BUDGET_EXCEEDS_PROJECT')
+    allocation=role.get('diagnostic_allocation')
+    if allocation:
+        budget=plain(args.budget)
+        if any(v>allocation['maximum'][k] for k,v in budget.items()):raise ValueError('DIAGNOSTIC_BUDGET_EXCEEDS_PREAUTHORIZED_ALLOCATION')
+        if any(budget[k]<v for k,v in allocation['minimum'].items()):raise ValueError('DIAGNOSTIC_GRANT_CANNOT_ACCOMMODATE_DECLARED_WORKFLOW')
+        remaining=ctx.store.remaining()['remaining']
+        if any(budget[k]+allocation.get('reserved_for_design',{}).get(k,0)>remaining[k] for k in budget):raise ValueError('DIAGNOSTIC_GRANT_LEAVES_NO_DESIGN_REVIEW_CAPACITY')
     return transition(ctx,'diagnosis_request',args)
 
 
@@ -50,6 +58,10 @@ def check(ctx,args):
     role=ctx.store.session(ctx.run_id)['state']['role_context']
     if plain(args.diagnosis_request)!=role['request']: raise ValueError('CHECK_REQUEST_LINK_MISMATCH')
     validate_selector(ctx.store,args.initial_state);validate_selector(ctx.store,args.input)
+    if role.get('check_execution_enabled'):
+        from tools.platform_diagnosis_coordinator import validate_check
+        validate_check(ctx.store, role, args)
+        return transition(ctx,'diagnostic_check',args)
     ref=ctx.save_artifact(args,'diagnostic_check_request')
     return HandoffResult(reference=ref,status='advisory_check_requested_no_execution')
 
@@ -59,6 +71,9 @@ def submit(ctx,args):
     role=ctx.store.session(ctx.run_id)['state']['role_context']
     if plain(args.request)!=role['request']: raise ValueError('REPORT_REQUEST_LINK_MISMATCH')
     request=ctx.artifact(args.request)
+    if role.get('previous_report') != plain(args.previous_report):raise ValueError('REPORT_REVISION_LINK_MISMATCH')
+    expected=role.get('check_feedback',[])
+    if expected and [plain(r) for r in args.check_results] != [f['reference'] for f in expected]:raise ValueError('REPORT_CHECK_FEEDBACK_REQUIRED')
     if plain(args.report.source)!=request['binding']: raise ValueError('REPORT_SUBJECT_BINDING_MISMATCH')
     if set(args.fact_selectors)!={f.fact_id for f in args.report.facts}: raise ValueError('EVERY_FACT_REQUIRES_SELECTORS')
     for fact in args.report.facts:

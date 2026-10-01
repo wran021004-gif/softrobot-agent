@@ -28,6 +28,14 @@ class EvidenceSelector(Contract):
 
 
 class DiagnosticCheckRequest(Contract):
+    check_id: str | None = None
+    operation: Literal['prediction_braking','local_comparison'] | None = None
+    update_id: int | None = Field(default=None, ge=1)
+    integration_step_s: float = Field(default=.002, gt=0, le=.01)
+    changed_parameter: Literal['terminal_tip_speed_weight','holding_tip_speed_weight'] | None = None
+    changed_value: float | None = Field(default=None, ge=.0001, le=1.)
+    prior_result: EvidenceRef | None = None
+    additional_need: str | None = None
     diagnosis_request: EvidenceRef
     hypotheses: list[str] = Field(min_length=2)
     initial_state: EvidenceSelector
@@ -52,6 +60,7 @@ class Recommendation(Contract):
 
 
 class DiagnosisSubmission(Contract):
+    previous_report: EvidenceRef | None = None
     request: EvidenceRef
     report: DiagnosticReport
     fact_selectors: dict[str, list[EvidenceSelector]]

@@ -144,6 +144,9 @@ class Host:
             role_grant = snapshot['state'].get('role_grant')
             if role_grant and request.tool_id not in role_grant['permitted_tools']:
                 raise ValueError('TOOL_NOT_IN_DIAGNOSTIC_REQUEST_SCOPE')
+            phase_tools=snapshot['state'].get('role_context',{}).get('phase_tools')
+            if self.actor=='model' and phase_tools and request.tool_id not in phase_tools:
+                raise ValueError('TOOL_NOT_IN_ACTIVE_ROLE_PHASE')
             if snapshot['status'] in ('paused', 'stopped', 'needs_input', 'capability_missing', 'failed', 'budget_exhausted'):
                 raise ValueError('SESSION_NOT_RUNNING: explicitly resume before invoking more tools')
             compatible = self.compatibility()
@@ -295,6 +298,18 @@ class Host:
             context['role_context'] = state['role_context']
             context['project_remaining'] = self.store.remaining()
             context['role_grant'] = state.get('role_grant')
+            used = context['remaining']['used']
+            limit = state.get('role_grant', {}).get('budget', context['remaining']['limit'])
+            context['role_budget'] = dict(limit=limit, used=used, remaining={k:max(0, v-used[k]) for k,v in limit.items()})
+            with self.store.connect(True) as db:
+                row = db.execute("SELECT value FROM meta WHERE key='diagnostic_work'").fetchone()
+            if row:
+                work = json.loads(row['value'])
+                context['numerical_budget'] = {**work, 'remaining':{k:v-work['used'][k] for k,v in work['limits'].items()}}
+            allowance = inp['policy']['model'].get('protocol_recovery') or dict(max_total=1,max_consecutive=1)
+            context['correction_budget'] = dict(limits=allowance,total_used=state.get('protocol_corrections_used',0),
+                consecutive_used=state.get('protocol_corrections_consecutive',0))
+            context['batch_observations'] = state.get('batch_observations', [])
         return context
 
     def model_scope(self):
