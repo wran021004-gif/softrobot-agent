@@ -113,6 +113,18 @@ def candidate_facts(baseline, configuration, reference, candidate_id, owner_run_
         owner_run_id=owner_run_id, execution_id=execution_id, parameters=parameters)
 
 
+def experiment_coverage(facts):
+    """Fixed multi-category experiment rule, derived from effective facts."""
+    values={row['path']:row['effective_value'] for row in facts['parameters']}
+    checks=dict(length=any(isinstance(values.get(path),(int,float)) and
+        abs(values[path]-baseline)>=.001-1e-12 for path,baseline in
+        (('components/near/length_m',.16),('components/far/length_m',.12))),
+        section=isinstance(values.get('design/section_scale'),(int,float)) and
+            abs(values['design/section_scale']-1.)>=.01-1e-12,
+        material=values.get('design/material_scenario') in ('compliant','stiff'))
+    return dict(required=True,eligible=all(checks.values()),checks=checks)
+
+
 def check_design_statement(facts, statement):
     """Structured interpretation only; a prose review remains independently required."""
     if statement is None:

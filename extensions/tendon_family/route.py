@@ -28,6 +28,8 @@ class RoutePolicy(Contract):
     math_evaluation_limit: int = Field(default=24,ge=0,le=24)
     math_selection_required_before_run: bool = False
     stop_on_task_success: bool = False
+    multi_category_coverage_required: bool = False
+    stop_on_constant_initialization: bool = False
     guidance: str = 'Select a legal combination and structure; evaluate, inspect evidence, then continue, adjust or finish. Reserve a solve for independent review when useful.'
 
 
@@ -173,6 +175,7 @@ def view(host):
             required_before_run=spec.analysis_required_before_run,math_evaluation_limit=spec.math_evaluation_limit,
             math_evaluations_used=ledger['used'],math_evaluations_remaining=ledger['remaining'],
             math_selection_required_before_run=spec.math_selection_required_before_run,
+            multi_category_coverage_required=spec.multi_category_coverage_required,
             call_order=['design.build_proposal','analysis.bind_historical_math','route.record_analysis']
                 if spec.historical_math else ['design.optimize_math','design.build_proposal','analysis.prepare_candidate',
                     'route.record_analysis'],
@@ -341,6 +344,9 @@ def overview(host):
     if selected_node and summary.get('candidate_id'):
         result=host.store.artifact(selected_node['result'])
         summary['candidate_facts']=trial_facts(host.store, inp, result.get('best') or result)
+        if policy(inp).multi_category_coverage_required:
+            from .candidate import experiment_coverage
+            summary['coverage']=experiment_coverage(summary['candidate_facts'])
         facts=bound_result_facts(host.store,result.get('best') or result,summary['candidate_facts'])
         if facts is not None:summary['factual_result']=facts
     incumbent=deepcopy(route.get('incumbent'))
@@ -466,6 +472,8 @@ def control_profiles(host,inp,combinations):
 
 def preflight(inp,args,reg):
     spec=policy(inp)
+    if spec.multi_category_coverage_required and args.action in ('optimize','crosscheck'):
+        raise ValueError('COVERED_EXPERIMENT_REQUIRES_PROPOSAL_BUILD_AND_RUN')
     if inp.task.family=='task.tracking' and args.action in ('optimize','crosscheck'):
         raise ValueError('TRACKING_ROUTE_REQUIRES_EXPLICIT_ANALYZED_BUILD_AND_RUN')
     if args.max_trials>spec.max_trials: raise ValueError('ROUTE_TRIAL_LIMIT')
@@ -677,6 +685,20 @@ def _built_run_inputs(ctx,args,route):
     candidate=built['candidate_id']
     if args.candidate_id and args.candidate_id!=candidate: raise ValueError('CANDIDATE_SELECTION_MISMATCH')
     inp=ctx.store.artifact(built['configuration'])
+    if policy(ctx.input).multi_category_coverage_required:
+        from .candidate import candidate_facts,experiment_coverage
+        coverage=experiment_coverage(candidate_facts(ctx.input,inp,built['configuration'],candidate))
+        if not coverage['eligible']:
+            raise ValueError('MULTI_CATEGORY_COVERAGE_REQUIRED: '+str(coverage['checks']))
+    if policy(ctx.input).stop_on_constant_initialization:
+        for previous in route['nodes']:
+            if previous.get('action')=='run' and previous.get('status')=='completed':
+                facts=ctx.store.artifact(previous['result']).get('factual_result') or {}
+                ranges=facts.get('applied_tension_ranges',[])
+                if (facts.get('valid_complete_execution') and facts.get('control_updates',0)>0
+                        and facts.get('initialization_selected')==facts['control_updates']
+                        and len(ranges)==6 and all(r['minimum_n']==r['maximum_n'] for r in ranges)):
+                    raise ValueError('CONSTANT_INITIALIZATION_STOP_POLICY: deliver the valid run; no blind design retries')
     if policy(ctx.input).stop_on_task_success and (route.get('incumbent') or {}).get('evaluation',{}).get('task_success') is True:
         raise ValueError('TASK_SUCCESS_STOP_POLICY: finish the passing incumbent')
     if policy(ctx.input).analysis_required_before_run:

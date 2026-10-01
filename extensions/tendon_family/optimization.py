@@ -136,6 +136,33 @@ def optimize(root, value, *, parent_run_id=None, parent_event_id=None, starting_
     return outcome
 
 
+def covered_search_start(initial,bounds):
+    """Project a search seed onto the experiment domain before any evaluation.
+
+    Keep the existing coordinate method; this only supplies an eligible start.
+    Equal-distance projections choose the lower value deterministically.
+    """
+    result=dict(initial)
+    def choices(path,baseline,delta):
+        lo,hi=bounds[path]
+        return [v for v in (lo,hi,baseline-delta,baseline+delta)
+            if lo<=v<=hi and abs(v-baseline)>=delta-1e-12]
+    section='design/section_scale'
+    if section not in result:raise ValueError('COVERAGE_SEARCH_REQUIRES_SECTION_VARIABLE')
+    if abs(result[section]-1.)<.01-1e-12:
+        options=choices(section,1.,.01)
+        if not options:raise ValueError('COVERAGE_SEARCH_HAS_NO_ELIGIBLE_SECTION')
+        result[section]=min(options,key=lambda v:(abs(v-result[section]),v))
+    lengths=[(path,base) for path,base in (('components/near/length_m',.16),
+        ('components/far/length_m',.12)) if path in result]
+    if not any(abs(result[path]-base)>=.001-1e-12 for path,base in lengths):
+        options=[(abs(v-result[path])/(bounds[path][1]-bounds[path][0]),path,v)
+            for path,base in lengths for v in choices(path,base,.001)]
+        if not options:raise ValueError('COVERAGE_SEARCH_HAS_NO_ELIGIBLE_LENGTH')
+        _,path,value=min(options);result[path]=value
+    return result
+
+
 def optimize_math(ctx,args):
     """Deterministic configuration-only search; never calls NMPC or a backend."""
     from copy import deepcopy
@@ -208,6 +235,14 @@ def optimize_math(ctx,args):
             start.policy.candidate_builder.parameters.data['semantic_decisions'][path]['baseline_value'])
         for path in args.variables}
     parameter_space=ParameterSpace(list(args.variables),args.variables)
+    coverage_required=route_data.get('multi_category_coverage_required',False)
+    historical_parameters=[]
+    if coverage_required and route_data.get('historical_case'):
+        from .historical_failure import cases
+        historical_parameters=[{r['path']:r['effective_value'] for r in c['candidate_facts']['parameters']}
+            for c in cases(ctx.artifact(route_data['historical_case']))]
+    if coverage_required:
+        initial=covered_search_start(initial,args.variables)
     initial_vector=parameter_space.encode(initial)
     evaluations=[];seen=set();new_evaluations=0;cache_hits=0
     states={scenario:dict(best=list(initial_vector),best_key=None,iteration=0)
@@ -285,6 +320,11 @@ def optimize_math(ctx,args):
                 unavailable_constructions=[r.get('name') for r in linear.records[1:] if not r.get('available',False)],
                 cache_hit=False,producer_request_id=ctx.request.request_id,
                 backend_executed=False,nmpc_solved=False,provider_called=False)
+            if coverage_required:
+                from .candidate import candidate_facts,experiment_coverage
+                facts=candidate_facts(ctx.input,compiled,configuration,candidate_id)
+                row['coverage']=experiment_coverage(facts)
+                row['historical_duplicate']={r['path']:r['effective_value'] for r in facts['parameters']} in historical_parameters
             finish_evaluation(identity,row,'completed');new_evaluations+=1
         except Exception as exc:
             finish_evaluation(identity,{},'failed',exc);raise
@@ -322,7 +362,9 @@ def optimize_math(ctx,args):
             (math.isinf(ka[1]) and math.isinf(kb[1])) or abs(ka[1]-kb[1])<=p.endpoint_check_atol)
     proposals=[]
     for scenario in args.material_scenarios:
-        rows=[row for row in evaluations if row['material_scenario']==scenario]
+        rows=[row for row in evaluations if row['material_scenario']==scenario and
+            (not coverage_required or (row.get('coverage',{}).get('eligible') and not row.get('historical_duplicate')))]
+        if not rows:continue
         best=min(rows,key=lambda row:key_for(row['objective']))
         tied_rows=[row for row in rows if tied(row,best)]
         proposals.append(dict(material_scenario=scenario,candidate_id=best['candidate_id'],
@@ -354,6 +396,7 @@ def optimize_math(ctx,args):
         bounds=args.variables,material_scenarios=args.material_scenarios,evaluations=evaluations,proposals=proposals,
         provenance=dict(method='bounded_coordinate_pattern_local_v1',deterministic=True,seed=None,
             requested_new_evaluation_cap=args.max_evaluations,new_evaluations_this_call=new_evaluations,
+            coverage_required=coverage_required,evaluated_start_parameters=initial,
             cache_hits_this_call=cache_hits,returned_scientific_configurations=len(evaluations),iterations=attempts,
             cumulative_evaluation_limit=ledger['limit'],cumulative_evaluations_used=ledger['used'],
             cumulative_evaluations_remaining=ledger['remaining'],failed_evaluations_counted=sum(

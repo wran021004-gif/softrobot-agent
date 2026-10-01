@@ -7,7 +7,15 @@ from schemas import platform_operations as c
 
 
 def simulation_preflight(inp, arguments, reg):
+    route=inp.policy.route.data if inp.policy.route else {}
+    if route.get('multi_category_coverage_required') and 'route.advance' in inp.policy.tool_bindings:
+        raise ValueError('COVERED_EXPERIMENT_REQUIRES_ROUTE_RUN')
     candidate = _candidate(inp, arguments.changes, reg)
+    if route.get('multi_category_coverage_required'):
+        from extensions.tendon_family.candidate import candidate_facts,experiment_coverage
+        facts=candidate_facts(inp,plain(candidate),dict(artifact_id=digest(plain(candidate))),arguments.candidate_id)
+        if not experiment_coverage(facts)['eligible']:
+            raise ValueError('MULTI_CATEGORY_COVERAGE_REQUIRED')
     backend, parameters = reg.bind(candidate.policy.backend, 'backend')
     _, control = reg.bind(candidate.policy.controller, 'controller')
     backend.resolve().check(candidate, parameters, control)
