@@ -57,10 +57,10 @@ EXTENSIONS = [replace(d, capabilities={**d.capabilities,
 
 from schemas import platform_handoff as handoff
 for name, schema, function, description in (
-    ('diagnosis.request',handoff.DiagnosisRequest,'request','Request an optional separate diagnostic model context after inspecting a saved result.'),
+    ('diagnosis.request',handoff.DiagnosisRequest,'request','Request a separate diagnostic context: distinguish evidence reading from an explicit saved_state_check numerical grant. Production changes and backend execution require separate authority.'),
     ('diagnosis.check_request',handoff.DiagnosticCheckRequest,'check','Submit a typed discriminating check; enabled feedback sessions yield to the fixed coordinator. Other sessions save an advisory request.'),
     ('diagnosis.submit',handoff.DiagnosisSubmission,'submit','Submit evidence-selected deterministic facts separately from attribution. Selector validation does not establish causality.'),
-    ('design.respond_diagnosis',handoff.DesignResponse,'respond','Adopt, defer or reject one diagnosis recommendation; fixed coordinator executes authorized work.'),
+    ('design.respond_diagnosis',handoff.DesignResponse,'respond','Record adopt (accept named recommendation), defer (pending evidence), or reject. defer/reject requires next_action=stop; bounded_verification requires named adoption. stop declines recommendation verification, not independent diagnostic continuation. No backend comparison executes automatically.'),
     ('design.review_verification',handoff.DiagnosticReview,'review','Review actual verification against frozen gates and decide whether to retain the modification.'),
 ):
     CONTRACTS.append(('platform.'+name.replace('.','_'),'1.0.0',schema))

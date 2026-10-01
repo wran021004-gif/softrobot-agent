@@ -40,6 +40,9 @@ def request(ctx,args):
     for name in ('candidate_id','execution_id','task_identity','controller_identity','evidence_manifest'):
         if plain(getattr(args,name))!=b[name]: raise ValueError('DIAGNOSIS_SOURCE_IDENTITY_MISMATCH: '+name)
     role=ctx.store.session(ctx.run_id)['state']['role_context']
+    if role.get('protocol',{}).get('saved_state_check') is not None:
+        from tools.platform_diagnosis_coordinator import validate_request_scope
+        validate_request_scope(args,role['protocol'])
     if not set(args.permitted_tools)<=set(role['diagnostic_tools']): raise ValueError('DIAGNOSTIC_TOOL_SCOPE_EXCEEDED')
     if any(v>ctx.store.config()['budget'][k] for k,v in plain(args.budget).items()):
         raise ValueError('DIAGNOSTIC_BUDGET_EXCEEDS_PROJECT')
@@ -86,6 +89,11 @@ def submit(ctx,args):
         for selector in selectors:
             if plain(selector.reference) not in [plain(r) for r in fact.evidence]: raise ValueError('FACT_EVIDENCE_LINK_MISMATCH')
             validate_selector(ctx.store,selector)
+    for feedback in expected:
+        if feedback['receipt']['execution_status']=='completed' and feedback.get('result'):
+            if not any(plain(s.reference)==feedback['result'] and isinstance(s.value,(float,int)) and not isinstance(s.value,bool)
+                    for selectors in args.fact_selectors.values() for s in selectors):
+                raise ValueError('REVISED_REPORT_REQUIRES_NUMERICAL_RESULT_SELECTOR: cite at least one relevant numeric value from the executed result artifact, with its exact JSON pointer, and explain model/horizon limits.')
     binding=ctx.artifact(request['binding'])
     for r in args.recommendations:
         if plain(r.configuration_scope)!=binding['configuration']: raise ValueError('RECOMMENDATION_CONFIGURATION_MISMATCH')
@@ -98,9 +106,13 @@ def respond(ctx,args):
     if plain(args.report)!=role.get('report'): raise ValueError('DESIGN_REPORT_LINK_MISMATCH')
     report=ctx.artifact(args.report)
     if args.recommendation_id is not None and args.recommendation_id not in [r['recommendation_id'] for r in report['recommendations']]:
-        raise ValueError('UNKNOWN_RECOMMENDATION')
+        raise ValueError('UNKNOWN_RECOMMENDATION: arguments.recommendation_id must name an ID in this report; defer/reject may omit it with next_action=stop.')
     if args.next_action=='bounded_verification' and (args.disposition!='adopt' or args.recommendation_id is None):
-        raise ValueError('VERIFICATION_REQUIRES_EXPLICIT_ADOPTION')
+        raise ValueError('VERIFICATION_REQUIRES_EXPLICIT_ADOPTION: incompatible arguments.disposition='+args.disposition+
+            ' and arguments.next_action=bounded_verification. Keep defer/reject and use next_action=stop, or explicitly adopt a valid named recommendation if justified. '
+            'stop does not terminate the independently authorized diagnostic check phase. Resubmit the complete provider envelope with all domain fields inside arguments.')
+    if args.disposition=='adopt' and args.recommendation_id is None:
+        raise ValueError('ADOPTION_REQUIRES_NAMED_RECOMMENDATION: supply arguments.recommendation_id from this report, or defer/reject with next_action=stop. Resubmit the complete envelope.')
     return transition(ctx,'design_response',args)
 
 

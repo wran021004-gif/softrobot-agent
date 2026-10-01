@@ -2,6 +2,39 @@
 from tools.platform_store import plain
 
 
+def validate_request_scope(request, protocol):
+    """The new request must itself carry the frozen numerical authorization."""
+    from schemas.platform_handoff import SavedStateScope
+    scope=request.saved_state_check
+    if scope is None:
+        raise ValueError('SAVED_STATE_SCOPE_REQUIRED: separate retained-evidence reading from one saved-state numerical check in saved_state_check and scope; production changes and backend execution remain excluded.')
+    frozen=SavedStateScope.model_validate(protocol['saved_state_check'])
+    for name in ('model','horizon_s','integration','integration_step_s','configuration_scope','max_checks'):
+        if getattr(scope,name)!=getattr(frozen,name):raise ValueError('REQUEST_CHECK_SCOPE_MISMATCH: '+name)
+    if not set(scope.operations)<=set(frozen.operations):raise ValueError('REQUEST_CHECK_OPERATION_OUTSIDE_FROZEN_SCOPE')
+    if scope.max_wall_s>frozen.max_wall_s:raise ValueError('REQUEST_CHECK_TIME_EXCEEDS_FROZEN_SCOPE')
+    if set(scope.numerical_limits)!=set(frozen.numerical_limits) or any(
+            v<0 or v>frozen.numerical_limits[k] for k,v in scope.numerical_limits.items()):
+        raise ValueError('REQUEST_NUMERICAL_LIMITS_OUTSIDE_FROZEN_SCOPE')
+    for operation in scope.operations:
+        units='local_solves' if operation=='local_comparison' else 'prediction_evaluations'
+        if scope.numerical_limits[units]<2:raise ValueError('REQUEST_NUMERICAL_LIMIT_INSUFFICIENT_FOR_PAIR')
+    required={'diagnosis.inspect_evidence','diagnosis.check_request','diagnosis.submit','evidence.read'}
+    if not required<=set(request.permitted_tools):raise ValueError('REQUEST_TOOLS_CANNOT_COMPLETE_SAVED_STATE_WORKFLOW')
+    if request.budget.backend_solves or request.budget.worker_calls:raise ValueError('REQUEST_BACKENDS_AND_WORKERS_EXCLUDED')
+
+
+def adopted_check_parameter(store, report_reference, response_reference):
+    """Disposition never gates independent checking; only matched local pairs need adoption."""
+    response=store.artifact(response_reference)
+    if response['report']!=plain(report_reference):raise ValueError('DESIGN_REPORT_LINK_MISMATCH')
+    if response['disposition']!='adopt' or response['next_action']!='bounded_verification':return None
+    recommendation=next(r for r in store.artifact(report_reference)['recommendations']
+        if r['recommendation_id']==response['recommendation_id'])
+    if recommendation['action']!='control_parameter':return None
+    return dict(parameter=recommendation['parameter'],value=recommendation['value'])
+
+
 def bind_diagnostic_grant(host,request_reference):
     """A request may narrow a frozen grant; it cannot expand it."""
     from schemas.platform_handoff import DiagnosisRequest
@@ -58,6 +91,32 @@ def validate_check(store,role,args):
     from extensions.tendon_family.diagnostic_evidence import BoundReader
     from extensions.tendon_family.diagnostic_math import SavedStateCheck
     from tools.platform_handoff import validate_selector
+    from schemas.platform_handoff import DiagnosisRequest
+    if plain(args.diagnosis_request)!=role['request']:raise ValueError('CHECK_REQUEST_LINK_MISMATCH')
+    request=DiagnosisRequest.model_validate(store.artifact(role['request']))
+    if plain(request.binding)!=role['binding']:raise ValueError('CHECK_REQUEST_BINDING_MISMATCH')
+    # Historical read-only requests confer no numerical authority, even when an
+    # executor has its own tool binding. Never broaden the saved request here.
+    scope=request.saved_state_check
+    if scope is None:raise ValueError('SAVED_STATE_SCOPE_REQUIRED: this request authorizes no numerical check')
+    if role.get('protocol',{}).get('saved_state_check') is not None:
+        validate_request_scope(request,role['protocol'])
+    if 'diagnosis.check_request' not in request.permitted_tools:raise ValueError('CHECK_TOOL_NOT_IN_REQUEST_SCOPE')
+    if args.operation not in scope.operations:raise ValueError('CHECK_OPERATION_NOT_IN_REQUEST_SCOPE')
+    for name in ('model','horizon_s','integration','integration_step_s'):
+        if getattr(args,name)!=getattr(scope,name):raise ValueError('CHECK_OUTSIDE_REQUEST_SCOPE: '+name)
+    if set(args.work_limits)-{'wall_s','local_solves','prediction_evaluations'}:
+        raise ValueError('CHECK_UNKNOWN_WORK_LIMIT')
+    if not 0<args.work_limits.get('wall_s',0)<=scope.max_wall_s:raise ValueError('CHECK_TIME_OUTSIDE_REQUEST_SCOPE')
+    units='local_solves' if args.operation=='local_comparison' else 'prediction_evaluations'
+    if not 2<=args.work_limits.get(units,0)<=scope.numerical_limits[units]:
+        raise ValueError('CHECK_NUMERICAL_UNITS_OUTSIDE_REQUEST_SCOPE: '+units+' must explicitly cover the pair within the request grant')
+    import json
+    with store.connect(True) as db:
+        row=db.execute("SELECT value FROM meta WHERE key='diagnostic_work'").fetchone()
+    if row is None:raise ValueError('FROZEN_DIAGNOSTIC_ALLOCATION_REQUIRED')
+    work=json.loads(row[0])
+    if work['used'][units]+2>work['limits'][units]:raise ValueError('DIAGNOSTIC_WORK_LIMIT_EXHAUSTED')
     if not args.check_id or args.operation is None or args.update_id is None:raise ValueError('TYPED_CHECK_ID_OPERATION_UPDATE_REQUIRED')
     reader=BoundReader(store,role['binding']);source=reader.resolve(reader.binding['execution_id'])
     reference=source['files']['controller_observations.json']
@@ -66,7 +125,7 @@ def validate_check(store,role,args):
     if plain(args.input.reference)!=reference or args.input.pointer!=f'/{expected_input}/actual_tension_n':raise ValueError('CHECK_CURRENT_VERSUS_PREVIOUS_INPUT_MISMATCH')
     validate_selector(store,args.initial_state);validate_selector(store,args.input)
     feedback=role.get('check_feedback',[])
-    if len(feedback)>=role.get('max_checks',2):raise ValueError('DIAGNOSTIC_CHECK_LIMIT')
+    if len(feedback)>=min(role.get('max_checks',2),scope.max_checks):raise ValueError('DIAGNOSTIC_CHECK_LIMIT')
     if feedback and (plain(args.prior_result)!=feedback[-1]['reference'] or not args.additional_need):raise ValueError('ADDITIONAL_CHECK_REQUIRES_RESULT_AND_SPECIFIC_NEED')
     if args.model!='model.gvs@1.0.0' or args.integration!='implicit_euler':raise ValueError('CHECK_NUMERICAL_PROTOCOL_UNSUPPORTED')
     units='local_solves' if args.operation=='local_comparison' else 'prediction_evaluations'
@@ -75,6 +134,13 @@ def validate_check(store,role,args):
         adopted=role.get('adopted_parameter')
         if adopted!={'parameter':args.changed_parameter,'value':args.changed_value}:
             raise ValueError('LOCAL_PAIR_REQUIRES_MATCHED_DESIGN_ADOPTION_FIRST')
+        update=store.artifact(reference)[args.update_id]
+        config=source['configuration']
+        horizon=update.get('effective_horizon',config['policy']['controller']['parameters']['data']['recipe']['horizon'])
+        if abs(horizon*config['task']['timing']['control_period_s']-args.horizon_s)>1e-9:
+            raise ValueError('LOCAL_PAIR_SAVED_PLAN_HORIZON_MISMATCH: select a saved update whose effective plan horizon matches the declared request horizon')
+    elif args.changed_parameter is not None or args.changed_value is not None:
+        raise ValueError('PREDICTION_CHECK_DOES_NOT_CHANGE_CONTROLLER_PARAMETERS')
     return SavedStateCheck(binding=role['binding'],update_id=args.update_id,operation=args.operation,
         horizon_s=args.horizon_s,integration_step_s=args.integration_step_s,
         max_wall_s=args.work_limits.get('wall_s',180.),changed_parameter=args.changed_parameter,changed_value=args.changed_value)

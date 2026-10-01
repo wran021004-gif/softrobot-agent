@@ -252,9 +252,29 @@ def encode_chat(model_input, config, naming_scheme=LEGACY_TOOL_NAMING):
             description=d['extension_id'] + '@' + d['version'] + ': ' + d['description']+note, parameters=schema)))
     payload = dict(model=config['model'], messages=[dict(role='system', content=model_input.content[0].text),
         dict(role='user', content=encode(model_input.context))], tools=tools, max_tokens=config.get('max_tokens',2000), stream=False)
+    for tool in tools:
+        if tool['function']['description'].startswith('design.respond_diagnosis@'):
+            payload['messages'][0]['content'] += '\nCall structure (replace every <PLACEHOLDER>; choose a legal combination yourself). '
+            payload['messages'][0]['content'] += 'On correction resend this complete provider tool call, not a fragment: '+encode(call_structure_example(tool))
     if config.get('thinking') is not None: payload['thinking'] = {'type':config['thinking']}
     if config.get('reasoning_effort') is not None: payload['reasoning_effort'] = config['reasoning_effort']
     return payload
+
+
+def call_structure_example(tool):
+    """Derive field names, nesting, enums and version from the advertised schema."""
+    schema=tool['function']['parameters']
+    def example(node):
+        if '$ref' in node:return example(schema['$defs'][node['$ref'].split('/')[-1]])
+        if 'const' in node:return node['const']
+        if 'anyOf' in node:return example(next(n for n in node['anyOf'] if n.get('type')!='null'))
+        if 'enum' in node:return '<CHOOSE: '+' | '.join(node['enum'])+'>'
+        if node.get('type')=='object':
+            keys=list(node.get('required',[]))
+            if 'recommendation_id' in node.get('properties',{}):keys.append('recommendation_id')
+            return {k:example(node['properties'][k]) for k in keys}
+        return '<REPLACE: '+node.get('title',node.get('type','value'))+'>'
+    return dict(type='function',function=dict(name=tool['function']['name'],arguments=encode(example(schema))))
 
 
 def effective_config(host):
@@ -294,6 +314,7 @@ def delivery_instruction(host):
     if 'design.respond_diagnosis' in choices:
         instruction += ('For design.respond_diagnosis, disposition=defer or reject requires next_action=stop. '
             'Only adopt with a named recommendation permits bounded_verification. '
+            'adopt accepts within permitted scope; defer postpones pending evidence; reject declines. Adoption does not execute a backend comparison. '
             'Here stop declines verification; the coordinator may still continue the diagnostic check workflow. '
             'When correcting a call, resend the complete outer arguments/reason/tool_version envelope; '
             'put disposition and next_action inside arguments, never at the top level. ')
@@ -623,7 +644,7 @@ def _argument_rejection(host, decision, receipt, config):
             stop = False
             if exhausted: state['argument_limit_correction_used'] = True
             state['protocol_correction'] = dict(type='tool_arguments', request_id=receipt['request_id'],
-                requirement=receipt['error']+' The rejected call did not execute. Correct only the arguments using the supplied schema. All counters and limits remain in force.')
+                requirement=receipt['error']+' The rejected call did not execute. Correct the invalid fields using the supplied schema and resubmit the complete provider tool-call envelope, with domain fields inside arguments. '+delivery_instruction(host)+' All counters and limits remain in force.')
             request_ref = host.store.put(db, decision)
             rejection_ref = host.store.put(db, receipt)
             correction_ref = host.store.put(db, state['protocol_correction'])
