@@ -1,0 +1,135 @@
+{
+  "classification": "Read-only review; all raw submissions remain unchanged. Rejected revisions are not accepted workflow delivery.",
+  "rubric": {
+    "version": "1.0.0",
+    "reviewer": "Primary implementation assistant; no additional paid reviewer model",
+    "blinding": "Review exported report_XX files without the organization key where practical. The implementer knows run order, so this is label masking rather than independent blind assessment.",
+    "criteria": [
+      {
+        "id": "facts",
+        "question": "Do numeric claims agree with the exact bound source or check artifact, including units and time/state scope?"
+      },
+      {
+        "id": "gaps",
+        "question": "Does the report distinguish not displayed, not retained, and unavailable calculation/query capability? In particular, it must not claim missing predictions, tensions, or force limits merely from a sampled view."
+      },
+      {
+        "id": "attribution",
+        "question": "Are hypotheses separated from observations, with no dominant causal explanation inferred from one execution or one short projected-model probe?"
+      },
+      {
+        "id": "check_value",
+        "question": "Does the report explain how actual check results support, weaken or leave hypotheses unresolved and change or limit the next decision, including failure or inconclusiveness?"
+      },
+      {
+        "id": "limits",
+        "question": "Does it identify model, saved/projected state, input, integration/horizon and absent closed-loop validation limits?"
+      },
+      {
+        "id": "decision",
+        "question": "Is the final recommendation disposition consistent with its independent action and the evidence, without claiming physical improvement?"
+      }
+    ],
+    "ratings": [
+      "supported",
+      "minor_issue",
+      "substantive_issue",
+      "not_assessable"
+    ],
+    "requirements": "Each issue requires a report excerpt or field path, exact source reference where applicable, and practical consequence. Schema/selector acceptance alone does not certify prose. No global ranking or significance inference on this one case."
+  },
+  "blinding": "Label masking only; implementer knows the pilot identity. No paid reviewer.",
+  "validation": [
+    {
+      "request_id": "model-2-tool",
+      "accepted": true,
+      "selector_count": 22,
+      "selector_errors": [],
+      "gap_contradictions": [],
+      "feedback_linkage": "not applicable"
+    },
+    {
+      "request_id": "model-7-tool",
+      "accepted": false,
+      "selector_count": 55,
+      "selector_errors": [],
+      "gap_contradictions": [],
+      "feedback_linkage": "rejected: numerical result and request cited instead of feedback"
+    },
+    {
+      "request_id": "model-8-tool",
+      "accepted": false,
+      "selector_count": 45,
+      "selector_errors": [],
+      "gap_contradictions": [],
+      "feedback_linkage": "rejected: numerical result and request cited instead of feedback"
+    },
+    {
+      "request_id": "model-9-tool",
+      "accepted": false,
+      "selector_count": 47,
+      "selector_errors": [],
+      "gap_contradictions": [],
+      "feedback_linkage": "rejected: numerical result and request cited instead of feedback"
+    }
+  ],
+  "ratings": {
+    "facts": "minor_issue",
+    "gaps": "minor_issue",
+    "attribution": "minor_issue",
+    "check_value": "supported",
+    "limits": "supported",
+    "decision": "not_assessable"
+  },
+  "findings": [
+    {
+      "id": "feedback_identity",
+      "severity": "workflow_blocker",
+      "paths": [
+        "rejected_revision_1/check_results",
+        "rejected_revision_2/check_results",
+        "rejected_revision_3/check_results"
+      ],
+      "expected": "5a49e5d1af837eb2d130ef9e8d31c4503d9ea9defe316d30f5c4fc3f43af228e",
+      "submitted": [
+        "4c25aef38cfb1613562637ec9aa567d9a6ee16d1076870253a3a737f32061f9b",
+        "78645578cb95862c93c94d49e4fa59cd4c4bf96c3799d6467dc2cbb0a5007980"
+      ],
+      "consequence": "Three consecutive accepted native submissions failed business linkage; no accepted revision or final design decision."
+    },
+    {
+      "id": "unread_horizon_is_not_incapability",
+      "severity": "minor_issue",
+      "path": "initial/recommendations/1/rationale",
+      "evidence": "Source controller has control_period_s=0.01 and retained effective_horizon per update; plans can expose it. Missing a read does not prove local_comparison nonexecutable.",
+      "consequence": "Deferral is permissible, but the claimed absence of a step-size mapping is too strong."
+    },
+    {
+      "id": "unretained_tail_wording",
+      "severity": "minor_issue",
+      "path": "initial/report/attribution/0/reason",
+      "quote": "confined to the sampled settling criteria and the non-retained tail of the record",
+      "evidence": "source.backend_motion retains 35 samples from 0.01 to 0.35 s. Behavior beyond the run duration is unobserved, not an observed failure.",
+      "consequence": "No structured gap declaration contradicts retained status, but surrounding prose still needs review."
+    },
+    {
+      "id": "materiality_not_equivalence",
+      "severity": "minor_issue",
+      "path": "rejected_revision_1/report/attribution/0/reason",
+      "evidence": "Speed difference 0.002547878649689972 m/s and position difference 0.006007739008423478 m are below model-chosen thresholds; inputs and endpoint velocity directions differ.",
+      "consequence": "Supports failure to meet the declared materiality criterion, not physical equivalence or a mechanism causing local insensitivity. The four broader hypotheses were not independently manipulated."
+    },
+    {
+      "id": "narrative_numeric_typo",
+      "severity": "minor_issue",
+      "path": "rejected_revision_1/recommendations/2/rationale",
+      "quote": "0.6129798468326005-adjacent 0.6129798468327005",
+      "evidence": "Exact braking endpoint speed is 0.6129798468327005 m/s; selected numeric values are correct.",
+      "consequence": "One narrative typo; no changed scientific threshold or numerical-selector mismatch."
+    }
+  ],
+  "check_interpretation": "Rejected revisions did interpret the actual speed/position outputs, retain reduced-model/state/input/horizon/integration limits, avoid claiming hardware braking, and defer changes. They are evidence of attempted feedback consumption, not completion; no final response exists.",
+  "causal_review": "No established dominant cause claimed. The draft explicitly separates synchronous wall time from physical delay and warns against ranking raw cost weights. Local-insensitivity/equivalence wording is stronger than the narrow measurement supports.",
+  "comparison": "Not started because the live feedback gate failed; no organizational superiority claim.",
+  "physical_improvement": "Not evaluated"
+}

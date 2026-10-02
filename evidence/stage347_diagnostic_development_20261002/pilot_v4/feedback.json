@@ -1,0 +1,74 @@
+{
+  "check_id": "saved-state-check",
+  "check_request": {
+    "artifact_id": "78645578cb95862c93c94d49e4fa59cd4c4bf96c3799d6467dc2cbb0a5007980",
+    "media_type": "application/json"
+  },
+  "diagnosis_request": {
+    "artifact_id": "3e2eee8890f9ae2df14b1a8f324258e911dd40ecc5c46da9d0f4b95b1854cae7",
+    "media_type": "application/json"
+  },
+  "discriminating_observations": [
+    "Endpoint tip speed difference (m/s) between the recorded-input rollout and the braking-box rollout at the same saved state: a difference beyond 0.02 m/s supports H1; a difference within that scale supports H2.",
+    "Endpoint tip position difference (m) between the two rollouts: a difference beyond 0.01 m supports H1; a difference within that scale supports H2.",
+    "Sign/direction of the endpoint speed change (whether the braking-box arm lowers endpoint speed relative to the recorded arm), reported as a local measurement only."
+  ],
+  "hypotheses": [
+    "H1 (local input sensitivity): at update 34's saved projected GVS state, over the fixed 0.01 s implicit-Euler horizon the held recorded applied tension (/34/actual_tension_n = [3.1758909392099772, 2.757372796476204, 1.4216485070827969e-08, 0.8929758192138912, 0.12734806870748366, -0.0] N, all within the 8 N per-channel limits) and an instantaneous braking-box input predict materially different local endpoints (endpoint tip speed differs by more than 0.02 m/s or endpoint tip position by more than 0.01 m), so the applied input is locally separable at the 10 ms scale.",
+    "H2 (local input insensitivity): the two inputs predict effectively the same local endpoint over 0.01 s, because the saved projected state and short horizon dominate; in that case objective_weighting, seed_or_iteration_plan_selection, horizon_or_deadline_effects and backend_model_mismatch all predict the same local result and this check cannot separate them at all."
+  ],
+  "local_question": "At the saved projected GVS state recorded for update 34, over the fixed 0.01 s implicit-Euler horizon (integration_step_s 0.002), does the held recorded applied tension and an instantaneous braking-box input predict materially different local endpoint tip speed/position, or the same local endpoint?",
+  "protocol": {
+    "binding": {
+      "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+      "media_type": "application/json"
+    },
+    "changed_parameter": null,
+    "changed_value": null,
+    "horizon_s": 0.01,
+    "integration_step_s": 0.002,
+    "max_wall_s": 300.0,
+    "operation": "prediction_braking",
+    "update_id": 34
+  },
+  "receipt": {
+    "analysis_status": "not_assessed",
+    "cache_hit": false,
+    "caller": "local-human",
+    "charged": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 1,
+      "wall_s": 11.030999999959022,
+      "worker_calls": 0
+    },
+    "contract_version": "1.2.0",
+    "error": null,
+    "execution_id": "651067d3ea204cdfbcf26a513ffc772a",
+    "execution_status": "completed",
+    "original_execution_id": null,
+    "output": {
+      "artifact_id": "4c25aef38cfb1613562637ec9aa567d9a6ee16d1076870253a3a737f32061f9b",
+      "media_type": "application/json"
+    },
+    "request_id": "check-saved-state-check",
+    "result_contract": "DiagnosticEvidence",
+    "result_version": "1.0.0",
+    "solver_status": "not_run",
+    "task_success": null,
+    "tool_id": "diagnosis.saved_state_check",
+    "tool_version": "1.0.0"
+  },
+  "result": {
+    "artifact_id": "4c25aef38cfb1613562637ec9aa567d9a6ee16d1076870253a3a737f32061f9b",
+    "media_type": "application/json"
+  },
+  "unresolved": [
+    "If both arms predict the same local endpoint (H2), this check cannot separate objective_weighting, seed_or_iteration_plan_selection, horizon_or_deadline_effects and backend_model_mismatch; they remain mutually indistinguishable with these tools in either outcome.",
+    "A 0.01 s projected-model probe cannot explain a settling failure measured over window_s 0.05 inside a 0.35 s record (late_max_speed_m_s 1.5810152739742807, late_max_error_m 0.05813810428573256, terminal_speed_m_s 0.6351726092425104); no dominant-cause claim follows from this measurement.",
+    "cost-term importance cannot be ranked: retained recipe weights (terminal_tip_speed_weight 0.0, holding_tip_speed_weight 0.0, velocity_weight 0.0001, terminal_velocity_weight 0.0001, tip_speed_scale_m_s 0.02) are raw magnitudes without per-term contributions or scaling, and this operation adopts no weight change.",
+    "deadline/seed candidates are not resolved here: deadline_misses 35 with mean_update_s 17.075238151415917 vs control_period_s 0.01, stopping_counts 34 User_Requested_Stop / 1 Solve_Succeeded, initialization_selected 29 vs noninitialization_selected 6; per-update series (one_step_prediction, measured_initial_state, actual_tension_n, optimization_selected_iteration, optimization_raw_status) for ids other than 34 were retained but not read within the two-turn evidence limit, and control_snapshots.json full warm plans and optimizer iteration traces are not retained.",
+    "local_comparison is reported not executable this phase: no per-update effective_horizon value was read, so no saved effective horizon matching horizon_s 0.01 is confirmed; the retained recipe horizon 10 exposes no step-size mapping.",
+    "The motion view is a sample of the final settling window; absence of a signal in a sampled view is not evidence of absence, and full-trajectory velocity queries are not exposed."
+  ]
+}
