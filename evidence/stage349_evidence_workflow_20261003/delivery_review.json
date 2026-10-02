@@ -1,0 +1,56 @@
+{
+  "reviewer": "Primary implementer, organization labels known; not independent blind review",
+  "scope": "Preserved initial-report validation drafts and execution receipts; no accepted initial report, check, or scientific intervention",
+  "raw_product_policy": "Raw provider outputs and resolved submissions remain unchanged. Findings below are separate annotations.",
+  "citation_review": {
+    "status": "All 56 expanded exact selectors match immutable source values in the separate offline audit",
+    "first_draft": {"facts": 4, "selectors": 24, "mismatches": 0},
+    "corrected_draft": {"facts": 4, "selectors": 32, "mismatches": 0},
+    "qualification": "Live calls failed availability validation before selector validation. Exact source matches do not establish accepted report delivery or certify surrounding prose. Selector count is not a quality score."
+  },
+  "availability_review": {
+    "host_defect": "The live contract had inventory-entry statuses but no structured coverage subset. The first report called earlier motion not_displayed and the correction called prediction updates 0-26 not_read. The host rejected these at whole-entry scope, although the model explicitly described subsets in prose. This is an interface granularity defect, not evidence that the model claimed the successful queries never occurred.",
+    "read_receipts": "Prediction and plans queries selected updates 27-34; motion returned six final-window samples from 0.30 through 0.35000000000000003 s. Prediction also returned measured backend endpoints at 0.28 and 0.29000000000000004 s.",
+    "host_inventory_gap": "The initial inventory/ledger under-advertised measured endpoint motion available through the prediction query. Offline repair records that cross-view coverage and supports explicit update/time subsets.",
+    "model_limitation": "Both drafts emphasize the motion view and underuse the successful prediction comparison. The corrected draft's blanket statement that pre-window behavior is not observed overlooks returned measured endpoint information."
+  },
+  "prose_findings": [
+    {
+      "severity": "substantive_issue",
+      "source": "model-4-tool report/limitations/1 and report/attribution/1",
+      "claim": "Pre-window convergence behavior is not observed / only the final window is displayed.",
+      "evidence": "Successful prediction result d85c1813fe37b0ca0d76d5e0430abfc1f551793cdde66446ca16014c82b68498, /detail/evidence/observations/aligned_intervals/0 and /1: measured positions, endpoint speeds and actual next errors at 0.28 and 0.29000000000000004 s. The later provider contexts still displayed some update-27/28 catalog facts.",
+      "assessment": "Full earlier coverage was not read, but some earlier samples were successfully queried. A claim of no earlier observation is too broad. This does not establish overshoot, a limit cycle, or a dominant cause."
+    },
+    {
+      "severity": "substantive_issue",
+      "source": "model-3-tool recommendations/0 and model-4-tool recommendations/0",
+      "claim": "A bounded projected-state check could distinguish residual-motion/overshoot from slow settling.",
+      "assessment": "No distinct local outcome predictions are given for those trajectory-level hypotheses. A 10 ms probe can test local sensitivity; it does not by itself distinguish complete settling histories or identify their causes. No check was actually selected or executed."
+    },
+    {
+      "severity": "minor_issue",
+      "source": "model-4-tool report/attribution/2",
+      "claim": "No error sign change is observable.",
+      "assessment": "The stated error is a nonnegative Euclidean norm. Overshoot analysis needs signed components or geometric trajectory reasoning, not a sign change of this norm."
+    },
+    {
+      "severity": "minor_issue",
+      "source": "Both drafts' residual-motion interpretation",
+      "claim": "Terminal speed is about thirty times the configured speed limit.",
+      "assessment": "The underlying speed and limit are retrieved, but the ratio was not cited to a recorded computation/result. This does not satisfy the requested provenance rule for derived numerical claims; the host did not fabricate a ratio artifact to repair the model report."
+    }
+  ],
+  "positive_findings": [
+    "Both drafts separate terminal reach from sampled holding-window position/speed failure and computational performance.",
+    "The corrected draft locates effective horizon in controller evidence and recipe horizon in controller.parameters.data.recipe.",
+    "Both retain competing hypotheses, uncertainty, single-case limits and the distinction between synchronous compute delay and simulated time.",
+    "No physical improvement, causal identification, controller adoption, or check outcome was fabricated."
+  ],
+  "comparative_review": {
+    "formal_runs": 0,
+    "organization_masked_copies": "Not applicable: no formal comparison products exist",
+    "single_context_live_feedback": "Not observed in Stage 3.49; fixtures are not live evidence",
+    "conclusion": "No organizational comparison or superiority claim is supported."
+  }
+}

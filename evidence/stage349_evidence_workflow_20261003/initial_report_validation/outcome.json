@@ -1,0 +1,265 @@
+{
+  "schema_version": "1.0.0",
+  "status": "incomplete",
+  "stop_reason": "PHASE_INCOMPLETE initial: BUDGET_EXHAUSTED: active phase / protected downstream capacity",
+  "mode": "dual_context",
+  "pilot": false,
+  "minimal": false,
+  "classification": "partial initial-report capability validation",
+  "chain": {
+    "request": {
+      "artifact_id": "60608a086a59708131ae8c8fc4efe3643f4a0039757c2d2f5c39af9481577f14",
+      "media_type": "application/json"
+    }
+  },
+  "feedback_complete": false,
+  "numerical_check_status": null,
+  "usage": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 8,
+      "tool_calls": 20,
+      "wall_s": 1200.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 7,
+      "model_calls": 6,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 155.6269999993965
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 2,
+      "tool_calls": 13,
+      "wall_s": 1044.3730000006035,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "numerical_work": {
+    "limits": {
+      "local_solves": 0,
+      "prediction_evaluations": 0
+    },
+    "used": {
+      "local_solves": 0,
+      "prediction_evaluations": 0
+    }
+  },
+  "provider_usage": [
+    {
+      "completion_tokens": 1432,
+      "completion_tokens_details": {
+        "reasoning_tokens": 941
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 10807,
+      "prompt_tokens": 10807,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 12239
+    },
+    {
+      "completion_tokens": 442,
+      "completion_tokens_details": {
+        "reasoning_tokens": 212
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 12757,
+      "prompt_tokens": 13013,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "total_tokens": 13455
+    },
+    {
+      "completion_tokens": 2858,
+      "completion_tokens_details": {
+        "reasoning_tokens": 2741
+      },
+      "prompt_cache_hit_tokens": 2944,
+      "prompt_cache_miss_tokens": 10312,
+      "prompt_tokens": 13256,
+      "prompt_tokens_details": {
+        "cached_tokens": 2944
+      },
+      "total_tokens": 16114
+    },
+    {
+      "completion_tokens": 1918,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1784
+      },
+      "prompt_cache_hit_tokens": 2944,
+      "prompt_cache_miss_tokens": 38755,
+      "prompt_tokens": 41699,
+      "prompt_tokens_details": {
+        "cached_tokens": 2944
+      },
+      "total_tokens": 43617
+    },
+    {
+      "completion_tokens": 18530,
+      "completion_tokens_details": {
+        "reasoning_tokens": 15970
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 47905,
+      "prompt_tokens": 48161,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "total_tokens": 66691
+    },
+    {
+      "completion_tokens": 10190,
+      "completion_tokens_details": {
+        "reasoning_tokens": 7822
+      },
+      "prompt_cache_hit_tokens": 6912,
+      "prompt_cache_miss_tokens": 39713,
+      "prompt_tokens": 46625,
+      "prompt_tokens_details": {
+        "cached_tokens": 6912
+      },
+      "total_tokens": 56815
+    }
+  ],
+  "monetary_cost": null,
+  "elapsed_s": 171.23399999993853,
+  "protocol_corrections": 1,
+  "recovery": {
+    "design": {
+      "version": "2.0.0",
+      "scope": "workflow shared across phases and contexts",
+      "protocol": {
+        "category": "native_schema_or_envelope",
+        "limits": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "total_used": 0,
+        "consecutive_used": 0,
+        "total_remaining": 4,
+        "consecutive_remaining": 2,
+        "reset": "Completed business call resets consecutive only; decoding alone does not."
+      },
+      "business": {
+        "category": "accepted_call_execution_rejected_or_failed",
+        "limit": 2,
+        "consecutive_failures": 0,
+        "total_failures": 0,
+        "remaining_repairs": 2,
+        "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+        "reset": "Completed business call resets consecutive; phase/context switch does not.",
+        "feedback": null
+      },
+      "transport": {
+        "category": "provider_transport_failure",
+        "automatic_retry": false
+      },
+      "length": {
+        "category": "truncated_without_usable_action",
+        "limit": 1,
+        "used": 0,
+        "configuration": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        }
+      },
+      "stop_reason": null
+    },
+    "diagnostic": {
+      "version": "2.0.0",
+      "scope": "workflow shared across phases and contexts",
+      "protocol": {
+        "category": "native_schema_or_envelope",
+        "limits": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "total_used": 1,
+        "consecutive_used": 0,
+        "total_remaining": 3,
+        "consecutive_remaining": 2,
+        "reset": "Completed business call resets consecutive only; decoding alone does not."
+      },
+      "business": {
+        "category": "accepted_call_execution_rejected_or_failed",
+        "limit": 2,
+        "consecutive_failures": 2,
+        "total_failures": 2,
+        "remaining_repairs": 0,
+        "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+        "reset": "Completed business call resets consecutive; phase/context switch does not.",
+        "feedback": {
+          "category": "accepted_call_execution_rejected_or_failed",
+          "error": "GAP_CONTRADICTS_READ_LEDGER: source.one_step_predictions successfully queried or explicitly handed over; use queried and specify unread coverage in needed/basis",
+          "requirement": "Correct the business input or evidence linkage using the retained result; resubmit the native call within the same allowance."
+        }
+      },
+      "transport": {
+        "category": "provider_transport_failure",
+        "automatic_retry": false
+      },
+      "length": {
+        "category": "truncated_without_usable_action",
+        "limit": 1,
+        "used": 0,
+        "configuration": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        }
+      },
+      "stop_reason": "BUDGET_EXHAUSTED: active phase / protected downstream capacity"
+    },
+    "executor": {
+      "version": "2.0.0",
+      "scope": "workflow shared across phases and contexts",
+      "protocol": {
+        "category": "native_schema_or_envelope",
+        "limits": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "total_used": 0,
+        "consecutive_used": 0,
+        "total_remaining": 4,
+        "consecutive_remaining": 2,
+        "reset": "Completed business call resets consecutive only; decoding alone does not."
+      },
+      "business": {
+        "category": "accepted_call_execution_rejected_or_failed",
+        "limit": 2,
+        "consecutive_failures": 0,
+        "total_failures": 0,
+        "remaining_repairs": 2,
+        "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+        "reset": "Completed business call resets consecutive; phase/context switch does not.",
+        "feedback": null
+      },
+      "transport": {
+        "category": "provider_transport_failure",
+        "automatic_retry": false
+      },
+      "length": {
+        "category": "truncated_without_usable_action",
+        "limit": 1,
+        "used": 0,
+        "configuration": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        }
+      },
+      "stop_reason": null
+    }
+  },
+  "physical_improvement": "not evaluated",
+  "source_preserved": true
+}

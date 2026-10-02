@@ -1,0 +1,41 @@
+{
+  "binding": {
+    "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+    "media_type": "application/json"
+  },
+  "budget": {
+    "backend_solves": 0,
+    "model_calls": 8,
+    "tool_calls": 20,
+    "wall_s": 1200.0,
+    "worker_calls": 0
+  },
+  "candidate_id": "proposal_compliant_build",
+  "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+  "evidence_manifest": {
+    "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+    "media_type": "application/json"
+  },
+  "execution_id": "5991de53e82747439e87ba8569667e1b",
+  "permitted_tools": [
+    "diagnosis.inspect_evidence",
+    "diagnosis.check_request",
+    "diagnosis.submit",
+    "evidence.read"
+  ],
+  "question": "Why does the tip fail the configured final-window settling criteria (position_limit_m = 0.01, speed_limit_m_s = 0.02, window_s = 0.05) even though terminal reach passed (terminal_error_m = 0.00764 < reach_tolerance_m = 0.01), given that the recorded run shows terminal_speed_m_s = 0.635, late_max_speed_m_s = 1.581, late_max_error_m = 0.058, sampled_settling_passed = false, and 35/35 updates flagged as deadline misses against a 0.01 s control period with mean_update_s = 17.08 s? Which retained, non-numerical observations could distinguish a residual-motion/overshoot shortfall from a slow-settling one, without presuming a dominant cause?",
+  "saved_state_check": null,
+  "scope": [
+    "Retained-evidence review only: common inventory and summary plus the retained source.one_step_predictions, source.applied_tensions, source.saved_projected_states, source.plan_selection, source.solver_status, source.controller_horizon, and source.backend_motion (derived motion view) records for update_ids 0..34.",
+    "Explicitly exclude all numerical work this run: no saved-state prediction evaluations, no local_comparison, no prediction_braking, no backend solves, and no worker calls.",
+    "Exclude any production, controller, or configuration changes; this is read-only characterization of the settling shortfall.",
+    "Treat single-execution and single-model observations as non-causal; do not select or execute numerical checks in this phase."
+  ],
+  "stopping_conditions": [
+    "Stop once the final-window position/speed shortfall relative to the settling criteria is characterized from retained evidence and a set of candidate hypotheses is listed without ranking.",
+    "Stop if a needed record or view is not retained or not exposed by an available query, and record that as not_retained or unavailable through a named capability.",
+    "Stop when the phase retained-evidence read allowance is reached."
+  ],
+  "subject": "control",
+  "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+}
