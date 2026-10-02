@@ -242,6 +242,7 @@ class DiagnosticWorkflow:
                 'Use the current fact_catalog; the host resolves selectors, report.source and recommendation configuration_scope.').replace(
                 'at least one relevant exact numeric fact selector from its result artifact','at least one relevant numeric fact handle from the actual result artifact').replace(
                 'not_read, not_retained or retained_unavailable','not_displayed, not_read, queried, not_retained or retained_unavailable')
+            instruction+=' Availability status applies to the entire inventory entry unless you supply update_ids (controller updates) or time_range_s (sampled backend motion). For a partially read entry, use queried and describe missing coverage, or explicitly scope a not_read/not_displayed declaration to the unread subset.'
         if self.initial_only:
             instruction+=' Partial initial-report capability validation only: no check selection/execution, backend, or workers. Request scope must exclude numerical work in this run.'
         if self.pilot and phase=='response_initial':instruction+=' This development pilot requires one genuine check and report revision to validate feedback capability. Select a justified check action; retain your own disposition and engineering conclusion.'

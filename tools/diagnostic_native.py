@@ -103,7 +103,7 @@ class BoundSavedStateAdapter(FlatDiagnosticAdapter):
             schema['properties']['fact_handles']=dict(type='object',additionalProperties=dict(type='array',items=dict(type='string'),minItems=1),
                 description='Map every report fact_id to selected handles from this context fact_catalog. Rounded prose is allowed; host resolves exact sources.')
             schema['required'].append('fact_handles')
-            for definition,fields in [('DiagnosticFact',('evidence','observed')),('DiagnosticReport',('source',)),('Recommendation',('configuration_scope',))]:
+            for definition,fields in [('DiagnosticFact',('evidence','observed')),('DiagnosticReport',('source','gates')),('Recommendation',('configuration_scope',))]:
                 node=schema['$defs'][definition]
                 for field in fields:
                     node['properties'].pop(field,None)
@@ -112,7 +112,7 @@ class BoundSavedStateAdapter(FlatDiagnosticAdapter):
         if self.fact_state.get('fact_scope'):
             payload['messages'][0]['content']=payload['messages'][0]['content'].replace(
                 'Facts require exact reference/pointer/value selectors.',
-                'Select fact_handles for your own concise factual statements. Do not supply fact_selectors, fact evidence/observed, report source or recommendation configuration_scope; the host expands exact internal references. Rounded prose is allowed. Derived numbers require a retrieved computation result; do not invent a derived numerical fact.')
+                'Select fact_handles for your own concise factual statements. Do not supply fact_selectors, fact evidence/observed, report source/gates or recommendation configuration_scope; report threshold observations as facts with handles. The host expands exact internal references. Rounded prose is allowed. Derived numbers require a retrieved computation result; do not invent a derived numerical fact.')
             payload['messages'][0]['content']+=' Availability is distinct from reading: consult your read_ledger, selected coverage and explicit handoffs. Not currently displayed does not mean never queried. Shared model errors need not cancel, and small differences do not prove input or causal-hypothesis equivalence.'
         schema=self.schemas.get('diagnosis.check_request')
         if schema:
@@ -131,6 +131,7 @@ class BoundSavedStateAdapter(FlatDiagnosticAdapter):
         selectors=resolve_handles(self.fact_state,args.pop('fact_handles',None))
         report=args.get('report',{})
         if 'source' in report:raise ValueError('report.source is host-bound; remove it')
+        if 'gates' in report:raise ValueError('report.gates is superseded by facts with fact_handles; state threshold observations as cited facts')
         report['source']=self.binding
         for fact in report.get('facts',[]):
             if 'evidence' in fact or 'observed' in fact:raise ValueError('Fact evidence/observed is superseded by fact_handles; remove it')

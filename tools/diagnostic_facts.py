@@ -83,12 +83,15 @@ def record_read(host, invocation, receipt):
                 inventory=role.get('inventory',{}).get('entries',[])
                 row['inventory_ids']=[e['inventory_id'] for e in inventory if e.get('reference')==value['source'] and
                     (not value['pointer'] or any(s in value['pointer'] for s in e.get('signals',[])))]
+                parts=value['pointer'].strip('/').split('/')
+                if value['kind']=='content' and parts[0].isdigit():row['coverage']['update_ids']=[int(parts[0])]
             else:
                 detail=value['detail'];obs=detail.get('evidence',{}).get('observations',{})
                 row['coverage']['update_ids']=[r['update_id'] for r in obs.get('updates',[])]
                 motion=detail.get('late_motion',[])
-                if motion:row['coverage'].update(sample_count=len(motion),time_coverage_s=[motion[0]['time_s'],motion[-1]['time_s']])
-                ids=dict(prediction=['one_step_predictions'],plans=['applied_tensions','plan_selection','solver_status','controller_horizon'],motion=['backend_motion'])
+                sample_times=[m['time_s'] for m in motion] or [r['end_s'] for r in obs.get('aligned_intervals',[]) if r.get('measured_tip_m') is not None]
+                if sample_times:row['coverage'].update(sample_count=len(sample_times),sample_times_s=sample_times,time_coverage_s=[min(sample_times),max(sample_times)])
+                ids=dict(prediction=['one_step_predictions','backend_motion','applied_tensions','plan_selection','solver_status','controller_horizon'],plans=['applied_tensions','plan_selection','solver_status','controller_horizon'],motion=['backend_motion'])
                 row['inventory_ids']=['source.'+x for x in ids.get(args['view'],[])]
                 row['handles']=catalog_value(state,receipt['output'],value)
         ledger.append(row)

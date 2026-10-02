@@ -50,6 +50,7 @@ class Stage349Tests(TestCase):
         adapter=BoundSavedStateAdapter();payload=payload_for(h,adapter)
         schema=next(t['function']['parameters'] for t in payload['tools'] if t['function']['name']=='diagnosis_submit')
         self.assertNotIn('fact_selectors',schema['properties']);self.assertNotIn('evidence',schema['$defs']['DiagnosticFact']['properties'])
+        self.assertNotIn('gates',schema['$defs']['DiagnosticReport']['properties'])
         business=dict(report=dict(subject='control',facts=[dict(fact_id='fact',statement='Rounded prose, approximately 0.01 m.')]),fact_handles={'fact':[handle]},missing_evidence=[],recommendations=[])
         decoded=adapter.decode(ModelResponse(raw=native('diagnosis.submit',business)),0,{'diagnosis.submit':'2.0.0'},payload['tools'])
         args=InventoryDiagnosisSubmission.model_validate(decoded['arguments'])
@@ -96,3 +97,20 @@ class Stage349Tests(TestCase):
         self.assertEqual(w.freeze['numerical_limits'],dict(local_solves=0,prediction_evaluations=0))
         self.assertNotIn('diagnosis.saved_state_check',w.store.session(w.hosts['executor'].run_id)['snapshot']['input']['policy']['tool_bindings'])
         self.assertIsNone(w.fixed('request')['diagnosis.request']['saved_state_check'])
+
+    def test_partial_coverage_gaps_distinguish_unread_subsets_offline(self):
+        # Directly supported by the two rejected live products; no replay or relabeling.
+        inventory=dict(entries=[dict(inventory_id='source.one_step_predictions',retained=True,total_records=35),
+            dict(inventory_id='source.backend_motion',retained=True,time_coverage_s=[.01,.35000000000000003],sample_times_s=[i/100 for i in range(1,36)])])
+        ledger=[dict(status='completed',inventory_ids=['source.one_step_predictions','source.backend_motion'],handles=['prediction'],coverage=dict(update_ids=list(range(27,35)),sample_times_s=[i/100 for i in range(28,36)])),
+            dict(status='completed',inventory_ids=['source.backend_motion'],handles=['motion'],coverage=dict(sample_times_s=[i/100 for i in range(30,36)],time_coverage_s=[.3,.35000000000000003]))]
+        def gap(identity,status,**scope):
+            return InventoryGap(inventory_id=identity,status=status,needed='Selected missing coverage',basis='Fixture receipt',**scope)
+        validate_gaps([gap('source.one_step_predictions','not_read',update_ids=list(range(27))),
+            gap('source.backend_motion','not_displayed',time_range_s=[.01,.27])],inventory,ledger,['prediction','motion'])
+        for g in [gap('source.one_step_predictions','not_read'),
+                  gap('source.one_step_predictions','not_read',update_ids=[26,27]),
+                  gap('source.one_step_predictions','queried',update_ids=[26,27]),
+                  gap('source.backend_motion','not_displayed',time_range_s=[.01,.29]),
+                  gap('source.backend_motion','not_displayed',time_range_s=[.29,.31])]:
+            with self.subTest(g=g),self.assertRaises(ValueError):validate_gaps([g],inventory,ledger,['prediction','motion'])

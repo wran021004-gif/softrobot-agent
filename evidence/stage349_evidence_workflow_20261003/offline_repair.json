@@ -1,0 +1,24 @@
+{
+  "classification": "Post-failure offline repair; not live validated",
+  "live_run_implementation": "a2d0042",
+  "stop_gate_preserved": true,
+  "replacement_runs": 0,
+  "observed_defects": [
+    "The live gap validator interpreted statuses at whole-inventory-entry granularity. Rejected reports described earlier subsets in prose, but the schema had no structured update/time scope.",
+    "The prediction query returns measured backend endpoint motion as well as predictions, but the initial read ledger classified it only as a prediction read.",
+    "Optional report.gates still exposed duplicate reference and exact numeric fields; both live drafts copied those fields despite using handles for facts."
+  ],
+  "repairs": [
+    "InventoryGap now permits explicit update_ids or sampled backend time_range_s. Whole-entry contradictions still reject; unread subsets are compared against execution-derived selected coverage.",
+    "Prediction receipts now retain measured endpoint sample times and label the backend-motion and controller fields actually returned. Inventory advertises measured endpoint access through the existing prediction query, including before the final settling window.",
+    "Raw controller-page reads retain the selected update ID. Sampled time scopes use actual retained sample timestamps rather than assuming continuous coverage between the first and last query samples.",
+    "Native reports express threshold observations as facts with fact_handles; duplicate report.gates fields are removed from the model interface and rejected if supplied. Internal report contracts remain available unchanged."
+  ],
+  "focused_verification": [
+    "test_partial_coverage_gaps_distinguish_unread_subsets_offline: passed, including rejection of ranges containing already queried prediction endpoints",
+    "test_handles_exact_scoped_and_mandatory_numeric_result: passed after native gate-field removal",
+    "test_receipts_failed_raw_read_and_explicit_handoff: passed after coverage receipt changes",
+    "git diff --check: passed"
+  ],
+  "preservation": "No historical source, live raw product, counter, launch guard, frozen schema, or original failure was rewritten. These fixtures do not establish an accepted live report or complete diagnostic workflow."
+}
