@@ -8,6 +8,9 @@ from tools.platform_registry import registry
 
 
 class FlatDiagnosticAdapter(ReadableDeepSeekAdapter):
+    def resolve_business(self, name, args):
+        return args
+
     def encode(self, model_input, config):
         self.timeout_s=config['timeout_s'];self.base_url=config['base_url']
         self.readonly_batch_limit=config.get('readonly_batch_limit',1)
@@ -60,7 +63,7 @@ class FlatDiagnosticAdapter(ReadableDeepSeekAdapter):
                 unknown=set(args)-self.schemas[name]['properties'].keys()
                 if unknown:raise ValueError('Remove unknown or host-bound fields: '+', '.join(sorted(unknown)))
                 if len(calls)>1 and name not in ('evidence.read','diagnosis.inspect_evidence'):raise ValueError('Only evidence reads can be batched')
-                resolved={**args,**deepcopy(self.fixed.get(name,{}))}
+                resolved={**self.resolve_business(name,args),**deepcopy(self.fixed.get(name,{}))}
                 domain=registry().get(name,bindings[name],'tool').input_schema.model_validate(resolved,strict=True)
                 decisions.append(dict(request_id=f'model-{turn}-tool'+(f'-{i}' if len(calls)>1 else ''),
                     tool_id=name,tool_version=bindings[name],arguments=plain(domain),
@@ -83,10 +86,34 @@ class BoundSavedStateAdapter(FlatDiagnosticAdapter):
         from tools.platform_store import Store
         self.store=Store(model_input.context['role_context']['native_store_root'])
         self.binding=model_input.context['role_context']['binding']
+        self.context_id=model_input.context['role_context'].get('memory_identity')
+        self.fact_state=self.store.session(self.context_id)['state'] if self.context_id else {}
+        if self.fact_state.get('fact_scope'):
+            from tools.diagnostic_facts import context_view
+            model_input=model_input.model_copy(deep=True)
+            model_input.context['role_context'].update(context_view(self.fact_state))
         payload=super().encode(model_input,config)
         context=json.loads(payload['messages'][1]['content'])
         context['role_context'].pop('native_store_root',None)
         payload['messages'][1]['content']=encode(context)
+        schema=self.schemas.get('diagnosis.submit')
+        if schema and self.fact_state.get('fact_scope'):
+            schema['properties'].pop('fact_selectors')
+            schema['required'].remove('fact_selectors')
+            schema['properties']['fact_handles']=dict(type='object',additionalProperties=dict(type='array',items=dict(type='string'),minItems=1),
+                description='Map every report fact_id to selected handles from this context fact_catalog. Rounded prose is allowed; host resolves exact sources.')
+            schema['required'].append('fact_handles')
+            for definition,fields in [('DiagnosticFact',('evidence','observed')),('DiagnosticReport',('source',)),('Recommendation',('configuration_scope',))]:
+                node=schema['$defs'][definition]
+                for field in fields:
+                    node['properties'].pop(field,None)
+                    if field in node.get('required',[]):node['required'].remove(field)
+            schema['$defs'].pop('EvidenceSelector',None)
+        if self.fact_state.get('fact_scope'):
+            payload['messages'][0]['content']=payload['messages'][0]['content'].replace(
+                'Facts require exact reference/pointer/value selectors.',
+                'Select fact_handles for your own concise factual statements. Do not supply fact_selectors, fact evidence/observed, report source or recommendation configuration_scope; the host expands exact internal references. Rounded prose is allowed. Derived numbers require a retrieved computation result; do not invent a derived numerical fact.')
+            payload['messages'][0]['content']+=' Availability is distinct from reading: consult your read_ledger, selected coverage and explicit handoffs. Not currently displayed does not mean never queried. Shared model errors need not cancel, and small differences do not prove input or causal-hypothesis equivalence.'
         schema=self.schemas.get('diagnosis.check_request')
         if schema:
             for key in ('initial_state','input'):
@@ -96,6 +123,24 @@ class BoundSavedStateAdapter(FlatDiagnosticAdapter):
                 if key not in schema['required']:schema['required'].append(key)
             payload['messages'][0]['content']+=' For a saved-state check, choose operation and update_id. The host binds that update\'s exact measured state and the operation-defined applied/previous input from immutable evidence; do not copy state vectors or provide replacement selectors.'
         return payload
+
+    def resolve_business(self,name,args):
+        if name!='diagnosis.submit' or not self.fact_state.get('fact_scope'):return args
+        from tools.diagnostic_facts import resolve_handles
+        args=deepcopy(args)
+        selectors=resolve_handles(self.fact_state,args.pop('fact_handles',None))
+        report=args.get('report',{})
+        if 'source' in report:raise ValueError('report.source is host-bound; remove it')
+        report['source']=self.binding
+        for fact in report.get('facts',[]):
+            if 'evidence' in fact or 'observed' in fact:raise ValueError('Fact evidence/observed is superseded by fact_handles; remove it')
+            refs=[s['reference'] for s in selectors.get(fact['fact_id'],[])]
+            fact['evidence']=list({r['artifact_id']:r for r in refs}.values())
+        for recommendation in args.get('recommendations',[]):
+            if 'configuration_scope' in recommendation:raise ValueError('recommendation configuration_scope is host-bound; remove it')
+            recommendation['configuration_scope']=self.store.artifact(self.binding)['configuration']
+        args['fact_selectors']=selectors
+        return args
 
     def decode(self,response,turn,bindings,advertised_tools=None):
         from extensions.tendon_family.diagnostic_evidence import BoundReader

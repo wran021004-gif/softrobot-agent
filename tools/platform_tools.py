@@ -173,7 +173,14 @@ def retain_evidence(pages, page, attribution=None):
 
 
 def read_evidence(ctx, args):
-    value = ctx.artifact(args.reference)
+    if 'gzip' in args.reference.media_type:
+        raise ValueError('COMPRESSED_MOTION_REQUIRES_DERIVED_QUERY: use diagnosis.inspect_evidence(view="motion"); this raw JSON access failure does not mean motion evidence is unavailable')
+    try:
+        value = ctx.artifact(args.reference)
+    except UnicodeDecodeError:
+        if ctx.store.artifact(args.reference,raw=True).startswith(b'\x1f\x8b'):
+            raise ValueError('COMPRESSED_MOTION_REQUIRES_DERIVED_QUERY: use diagnosis.inspect_evidence(view="motion"); failed raw access does not invalidate the retained motion capability') from None
+        raise
     # Only identities carried by the original document, never the current candidate.
     attribution={k:value[k] for k in ('candidate_id','owner_run_id','run_id','execution_id','source_execution_id','configuration')
                  if isinstance(value,dict) and k in value}

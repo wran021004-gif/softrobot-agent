@@ -134,7 +134,7 @@ def inspect(reader,binding,args):
         for item in evidence['observations']['updates']:
             u=updates[item['update_id']]
             item.update(requested_input_n=u.get('requested_tension_n'),returned_constraint_violation=u.get('optimization_returned_violation'),
-                selected_constraint_violation=u.get('optimization_constraint_violation'))
+                selected_constraint_violation=u.get('optimization_constraint_violation'),effective_horizon=u.get('effective_horizon'))
         detail['evidence']={k:evidence[k] for k in ('observations','capabilities','ownership')}
         # The exact controller is already in the summary view and configuration.
         # Keep a default two-update prediction directly readable in the 8 KiB

@@ -23,6 +23,12 @@ def evidence_inventory(reader, source):
             raw_query=dict(tool='evidence.read',pointer='/{update_id}/'+key),
             coverage='complete retained record inventory; derived queries select samples',
             missing_update_ids=[i for i,u in enumerate(updates) if u.get(key) is None]))
+    rows.append(dict(type='controller_horizon',reference=source['files']['controller_observations.json'],
+        record_count=sum(u.get('effective_horizon') is not None for u in updates),total_records=len(updates),
+        signals=['effective_horizon'],units='control intervals',
+        query=dict(tool='diagnosis.inspect_evidence',view='plans'),
+        raw_query=dict(tool='evidence.read',pointer='/{update_id}/effective_horizon'),
+        coverage='Per-update effective horizon; configured horizon is in summary controller.parameters.data.recipe.horizon'))
     rows.append(dict(type='force_limits',reference=source['files']['resolved_physics.json'],
         record_count=len(physics['tendons']),signals=['entity','force_limit_n'],units='N',
         values=[dict(pointer=f'/tendons/{i}/force_limit_n',value=t['force_limit_n']) for i,t in enumerate(physics['tendons'])],
@@ -31,6 +37,7 @@ def evidence_inventory(reader, source):
         time_coverage_s=[motion[0]['time_s'],motion[-1]['time_s']],
         signals=sorted(motion[0]),units='s; rad; rad/s; m',frame='world tip; serial backend joint coordinates',
         timestamps='sampled post-step execution times',query=dict(tool='diagnosis.inspect_evidence',view='motion'),
+        raw_access='gzip bytes cannot be read as JSON via evidence.read; use the derived motion view',
         coverage='sampled trajectory; motion query displays final settling window',
         capability_gap='Arbitrary full-trajectory velocity query is not exposed; retained raw q/qdot and robot.xml support the existing final-window reconstruction.'))
     snapshots='control_snapshots.json' in source['files']
@@ -44,10 +51,10 @@ def evidence_inventory(reader, source):
         missing_data=[] if snapshots else ['Full historical warm plans and optimizer iteration traces are not retained as control_snapshots.json.'],
         capability_gaps=['No closed-loop counterfactual replay or causal attribution tool. Full trajectories are not in every request.',
             'Existing numerical checks use a projected GVS state and bounded horizon, not a full backend replay.'],
-        claim_policy='Distinguish not displayed in current query, not retained, and retained but not accessible/computable. A sampled view does not prove absence.')
+        claim_policy='Use inventory plus your receipt ledger: not_displayed, not_read in this context, queried with stated coverage, not_retained, or retained_unavailable through a named capability. A sampled view or failed raw gzip read does not prove absence.')
 
 
-def validate_gaps(gaps, inventory):
+def validate_gaps(gaps, inventory, ledger=None, displayed_handles=None):
     entries={row['inventory_id']:row for row in inventory['entries']}
     for gap in gaps:
         if gap.inventory_id is None:
@@ -57,5 +64,15 @@ def validate_gaps(gaps, inventory):
         if row is None:raise ValueError('UNKNOWN_INVENTORY_ID: use a listed ID or source plus basis')
         if gap.status=='not_retained' and row['retained']:
             raise ValueError('GAP_CONTRADICTS_INVENTORY: '+gap.inventory_id+' is retained; use not_read or retained_unavailable and name the missing capability')
-        if gap.status in ('not_read','retained_unavailable') and not row['retained']:
+        if gap.status in ('not_read','queried','not_displayed','retained_unavailable') and not row['retained']:
             raise ValueError('GAP_CONTRADICTS_INVENTORY: '+gap.inventory_id+' is not retained')
+        if ledger is not None:
+            reads=[r for r in ledger if r['status']=='completed' and gap.inventory_id in r['inventory_ids']]
+            if gap.status=='not_read' and reads:
+                raise ValueError('GAP_CONTRADICTS_READ_LEDGER: '+gap.inventory_id+' successfully queried or explicitly handed over; use queried and specify unread coverage in needed/basis')
+            if gap.status=='queried' and not reads:
+                raise ValueError('GAP_WITHOUT_READ_RECEIPT: '+gap.inventory_id+'; use not_read or perform the supported query')
+            if gap.status=='not_displayed' and any(set(r['handles']) & set(displayed_handles or []) for r in reads):
+                raise ValueError('GAP_CONTENT_DISPLAYED: '+gap.inventory_id+' has facts currently displayed in the catalog; use queried and describe any missing coverage')
+            if gap.status=='retained_unavailable' and not row.get('capability_gap'):
+                raise ValueError('GAP_CAPABILITY_AVAILABLE: '+gap.inventory_id+' has supported access '+str(row.get('query'))+'; name genuinely unlisted evidence separately')

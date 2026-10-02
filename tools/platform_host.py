@@ -109,6 +109,8 @@ class Host:
                 state = self.store.session(self.run_id, db)['state']
                 state['last_receipt'] = receipt
                 self.store.update_state(db, self.run_id, state)
+            from tools.diagnostic_facts import record_read
+            record_read(self, value, receipt)
             return receipt
 
     def _invoke(self, value, *, parent=None):
@@ -244,7 +246,8 @@ class Host:
     def _validate_refs(self, value):
         if isinstance(value, dict):
             if 'artifact_id' in value:
-                self.store.artifact(EvidenceRef.model_validate(value))
+                # Integrity checking must not decode valid binary evidence as UTF-8.
+                self.store.artifact(EvidenceRef.model_validate(value),raw=True)
             else:
                 for item in value.values():
                     self._validate_refs(item)
@@ -358,7 +361,14 @@ class Host:
                 summary='Navigation overview, not original evidence. Read child pointers from this source using evidence.read.',
                 entries=evidence_overview(content,'',0,12),bytes=size)
             observation=observation.model_copy(update=dict(content=content,truncated=True))
-        return plain(observation)
+        result=plain(observation)
+        state=self.store.session(self.run_id)['state']
+        if state.get('fact_scope') and receipt.get('output'):
+            entry=next((r for r in state.get('read_ledger',[]) if r.get('execution_id')==receipt.get('execution_id')),None)
+            if entry:
+                result['fact_handles']=entry['handles']
+                result['catalog_location']='role_context.fact_catalog; exact source mappings retained by host'
+        return result
 
     def run(self, adapter=None):
         from tools.platform_models import run_loop

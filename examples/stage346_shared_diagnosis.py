@@ -31,6 +31,13 @@ def require_feedback(directory):
     return outcome
 
 
+def require_initial(directory):
+    outcome=read(directory/'outcome.json')
+    if outcome['status']!='completed' or 'initial_report' not in outcome['chain']:
+        raise ValueError('INITIAL_REPORT_CAPABILITY_NOT_ESTABLISHED: '+str(directory))
+    return outcome
+
+
 def main(action,configuration=None,credential=None):
     global BASE,EVIDENCE,EXPERIMENT
     if configuration:
@@ -43,7 +50,9 @@ def main(action,configuration=None,credential=None):
     if action=='continue-feedback':
         return launch(EXPERIMENT['suffix_label'],'dual_context',runtime,suffix=True)
     if action=='minimal':return launch('minimal','dual_context',runtime,minimal=True)
+    if action=='validate-initial':return launch(EXPERIMENT['initial_label'],'dual_context',runtime,initial_only=True)
     if action=='pilot':
+        if EXPERIMENT.get('initial_label'):require_initial(BASE/EXPERIMENT['initial_label'])
         if EXPERIMENT.get('suffix_label'):require_feedback(BASE/EXPERIMENT['suffix_label'])
         if read(Path(EXPERIMENT.get('minimal_outcome',BASE/'minimal/outcome.json')))['status']!='completed':raise ValueError('MINIMAL_NATIVE_VALIDATION_REQUIRED')
         return launch(EXPERIMENT.get('pilot_label','pilot'),'dual_context',runtime,pilot=True)
@@ -53,7 +62,17 @@ def main(action,configuration=None,credential=None):
     if freeze_path.exists():raise ValueError('PAIRED_COMPARISON_ALREADY_STARTED: no replacement runs')
     freeze=read(pilot_directory/'freeze.json')
     if implementation()['files']!=freeze['implementation']['files']:raise ValueError('PILOT_IMPLEMENTATION_CHANGED: fresh validation required')
-    frozen=dict(source_manifest=freeze['source_manifest'],inventory=freeze['inventory'],implementation=implementation(),
+    from tools.platform_store import Store
+    pilot_store=Store(pilot_directory);native_schemas={};validated_prompts={}
+    for run_id in freeze['hosts'].values():
+        for event in pilot_store.events(run_id):
+            if event['kind']!='model_request':continue
+            payload=pilot_store.artifact(event['inputs'][0])
+            for tool in payload.get('tools',[]):native_schemas[tool['function']['name']]=tool['function']
+            context=json.loads(payload['messages'][1]['content'])['role_context']
+            validated_prompts[context['phase']]=dict(system=payload['messages'][0]['content'],instructions=context['instructions'])
+    frozen=dict(source_manifest=freeze['source_manifest'],inventory=freeze['inventory'],implementation=implementation(),fact_policy=freeze['fact_policy'],
+        native_schemas=native_schemas,validated_prompts=validated_prompts,
         adapter_version=freeze['provider_configuration']['adapter_version'],provider=freeze['provider_configuration'],instructions=INSTRUCTIONS,phases=PHASES,
         memory=MEMORY,limits=LIMITS,scope=SCOPE,permissions=PERMISSIONS,capabilities=CAPABILITIES,recovery=freeze['recovery'],experiment=EXPERIMENT,
         tool_schemas={k:registry().get(k,v,'tool').input_schema.model_json_schema() for k,v in TOOLS.items()},
@@ -75,7 +94,8 @@ def main(action,configuration=None,credential=None):
         if any(s in reason for s in ('FROZEN_','SOURCE_SUMMARY_FAILED','MODEL_ADAPTER_POLICY_MISMATCH')):break
     aggregate={k:0 for k in ('model_calls','tool_calls','backend_solves','worker_calls','wall_s')}
     suffix=[read(BASE/EXPERIMENT['suffix_label']/'outcome.json')] if EXPERIMENT.get('suffix_label') else []
-    for result in [*suffix,pilot,*outcomes]:
+    validation=[read(BASE/EXPERIMENT['initial_label']/'outcome.json')] if EXPERIMENT.get('initial_label') else []
+    for result in [*validation,*suffix,pilot,*outcomes]:
         for k,v in result['usage']['used'].items():aggregate[k]+=v
     atomic_json(EVIDENCE/'workload_usage.json',dict(used=aggregate,limits=EXPERIMENT.get('overall_limits',dict(model_calls=120,tool_calls=300,wall_s=18000.,backend_solves=0,worker_calls=0))))
     # Blinding removes organization/session labels but preserves evidence hashes and scientific text.
@@ -89,7 +109,7 @@ def main(action,configuration=None,credential=None):
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['minimal','continue-feedback','pilot','compare'])
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['minimal','continue-feedback','validate-initial','pilot','compare'])
     parser.add_argument('--configuration',type=Path)
     parser.add_argument('--credential',type=Path)
     args=parser.parse_args();main(args.action,args.configuration,args.credential)

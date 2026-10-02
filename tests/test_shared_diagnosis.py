@@ -103,10 +103,16 @@ class SharedWorkflowTests(TestCase):
                             feedback=role.get('check_feedback',[])
                             ref=feedback[0]['result'] if feedback else w.summary
                             ptr='/detail/fixture_value' if feedback else '/detail/summary/deadline_misses';value=-.1 if feedback else 35
-                            return native('diagnosis.submit',dict(report=dict(subject='control',source=w.binding,facts=[dict(fact_id='observation',statement='Fixture observation',evidence=[ref])],
+                            submission=dict(report=dict(subject='control',source=w.binding,facts=[dict(fact_id='observation',statement='Fixture observation',evidence=[ref])],
                                 attribution=[dict(cause='hypothesis',status='insufficient_evidence',fact_ids=['observation'],reason='Local fixture weakens broad attribution; full settling remains unresolved.')],
                                 limitations=['Projected model, saved state/input and 10 ms horizon only; fixture not science']),
-                                fact_selectors={'observation':[dict(reference=ref,pointer=ptr,value=value)]},missing_evidence=[],recommendations=[]))
+                                fact_selectors={'observation':[dict(reference=ref,pointer=ptr,value=value)]},missing_evidence=[],recommendations=[])
+                            if 'fact_catalog' in role:
+                                state=w.store.session(role['memory_identity'])['state']
+                                handle=next(k for k,v in state['fact_catalog'].items() if v['selector']==dict(reference=ref,pointer=ptr,value=value))
+                                submission.pop('fact_selectors');submission['fact_handles']={'observation':[handle]}
+                                submission['report'].pop('source');submission['report']['facts'][0].pop('evidence')
+                            return native('diagnosis.submit',submission)
                         if phase.startswith('response'):return native('design.respond_diagnosis',dict(disposition='defer',reasoning='Unresolved evidence',next_action='finish' if finish or phase=='response_final' else 'request_check'))
                         return native('diagnosis.check_request',dict(operation='prediction_braking',update_id=34,
                             local_question='Can local endpoint speed decrease?',discriminating_observations=['endpoint speed difference'],unresolved=['closed-loop cause'],

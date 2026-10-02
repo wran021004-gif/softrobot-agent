@@ -13,6 +13,7 @@ from tools.platform_host import Host
 from tools.platform_models import run_loop, tool_naming_policy, READABLE_TOOL_NAMING
 from tools.platform_diagnosis_coordinator import configure_role, transfer_recovery, execute_check_feedback, recovery_status
 from tools.diagnostic_inventory import evidence_inventory
+from tools.diagnostic_facts import POLICY as FACT_POLICY, handover
 from tools.state_io import read, atomic_json
 from extensions.tendon_family.control_evidence import ControlEvidence
 from extensions.tendon_family.diagnostic_evidence import import_execution, BoundReader
@@ -64,11 +65,11 @@ def save(store,value):
 
 
 def implementation():
-    paths=['tools/diagnostic_workflow.py','tools/diagnostic_native.py','tools/diagnostic_inventory.py',
+    paths=['tools/diagnostic_workflow.py','tools/diagnostic_native.py','tools/diagnostic_inventory.py','tools/diagnostic_facts.py',
         'tools/platform_models.py','tools/platform_handoff.py','tools/platform_diagnosis_coordinator.py',
         'tools/platform_host.py','tools/platform_store.py','schemas/platform_handoff.py','schemas/platform_diagnostics.py',
         'extensions/platform/manifest.py','extensions/tendon_family/diagnostic_evidence.py','extensions/tendon_family/diagnostic_math.py',
-        'tools/model_transports/deepseek.py','examples/stage346_shared_diagnosis.py','examples/stage348_experiment.json',
+        'tools/model_transports/deepseek.py','examples/stage346_shared_diagnosis.py','examples/stage348_experiment.json','examples/stage349_experiment.json',
         'tools/diagnostic_improvement.py','tools/platform_tools.py','extensions/tendon_family/candidate.py',
         'examples/gvs_design_input.py','examples/gvs_nmpc_route_experiment.py','tasks/reach_free/task.yaml']
     return dict(commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
@@ -76,10 +77,11 @@ def implementation():
 
 
 class DiagnosticWorkflow:
-    def __init__(self, directory, mode, *, pilot=False, minimal=False, suffix=False, experiment=None):
+    def __init__(self, directory, mode, *, pilot=False, minimal=False, suffix=False, initial_only=False, experiment=None):
         if mode not in ('single_context','dual_context'):raise ValueError('UNKNOWN_ORGANIZATION_MODE')
         self.directory=Path(directory);self.mode=mode;self.pilot=pilot;self.minimal=minimal
         self.suffix=suffix
+        self.initial_only=initial_only
         self.store=Store(directory);self.chain={};self.previous=None
         self.experiment=deepcopy(experiment or {})
         self.source=Path(self.experiment.get('source_store',SOURCE))
@@ -94,15 +96,16 @@ class DiagnosticWorkflow:
         reader=ControlEvidence(Store(self.source));source=reader.resolve(self.execution)
         if self.experiment.get('source_manifest',source['manifest'])!=source['manifest']:raise ValueError('FROZEN_SOURCE_MANIFEST_MISMATCH')
         self.project=self.experiment.get('project_prefix','gvs-stage346')+'-'+uuid4().hex[:12]
-        limits=SUFFIX_LIMITS if self.suffix else (dict(model_calls=3,tool_calls=3,backend_solves=0,worker_calls=0,wall_s=300.) if self.minimal else LIMITS)
-        numerical={k:0 for k in NUMERICAL} if self.suffix else NUMERICAL
+        limits=SUFFIX_LIMITS if self.suffix or self.initial_only else (dict(model_calls=3,tool_calls=3,backend_solves=0,worker_calls=0,wall_s=300.) if self.minimal else LIMITS)
+        numerical={k:0 for k in NUMERICAL} if self.suffix or self.initial_only else NUMERICAL
+        self.limits=limits
         self.store.create(dict(project_id=self.project,grant_id=self.project,budget=limits,
             authorization_source=self.experiment.get('authorization_source','User-authorized sequential Stage 3.46 native validation, pilot and two matched pairs; necessary context/evidence transmission to DeepSeek; no backend simulations/workers or push.')))
         self.hosts={}
         for role in (['shared'] if self.mode=='single_context' else ['design','diagnostic'])+['executor']:
             host=Host(self.directory,self.project+'-'+role);inp=deepcopy(source['configuration']);inp['run_id']=host.run_id
             bindings={'diagnosis.inspect_evidence':'1.0.0','diagnosis.saved_state_check':'1.0.0'} if role=='executor' else TOOLS
-            if self.suffix and role=='executor':bindings={'diagnosis.inspect_evidence':'1.0.0'}
+            if (self.suffix or self.initial_only) and role=='executor':bindings={'diagnosis.inspect_evidence':'1.0.0'}
             inp['policy'].update(route=None,budget={**limits,'model_calls':0 if role=='executor' else limits['model_calls']},
                 timeout_s=900. if role=='executor' else 30.,allowed_tools=[],tool_bindings=bindings)
             provider=read(Path(self.experiment.get('provider_freeze',ROOT/'evidence/stage346_shared_diagnosis_20261002/pilot/freeze.json')))['provider_configuration']
@@ -110,6 +113,12 @@ class DiagnosticWorkflow:
                 'tool_naming':tool_naming_policy(bindings,READABLE_TOOL_NAMING)}
             host.create(inp);self.hosts[role]=host
         self.binding=import_execution(reader,self.execution,self.store,self.hosts['executor'].run_id,source['manifest'])
+        if self.experiment.get('fact_handles'):
+            with self.store.transaction() as db:
+                for host in self.hosts.values():
+                    state=self.store.session(host.run_id,db)['state']
+                    state['fact_scope']=dict(project=self.project,binding=self.binding)
+                    self.store.update_state(db,host.run_id,state)
         with self.store.transaction() as db:
             db.execute("INSERT INTO meta VALUES ('diagnostic_work',?)",(encode(dict(limits=numerical,used={k:0 for k in NUMERICAL})),))
         executor=self.hosts['executor'];executor.resume()
@@ -121,11 +130,11 @@ class DiagnosticWorkflow:
         b=self.store.artifact(self.binding)
         self.identities={k:b[k] for k in ('candidate_id','execution_id','task_identity','controller_identity','evidence_manifest','configuration')}
         if self.suffix:self.import_feedback_suffix()
-        self.freeze=dict(schema_version='1.0.0',project_id=self.project,mode=self.mode,pilot=self.pilot,minimal=self.minimal,suffix=self.suffix,
+        self.freeze=dict(schema_version='1.0.0',project_id=self.project,mode=self.mode,pilot=self.pilot,minimal=self.minimal,suffix=self.suffix,initial_only=self.initial_only,
             hosts={k:h.run_id for k,h in self.hosts.items()},binding=self.binding,identities=self.identities,summary=self.summary,
             inventory=self.inventory,inventory_reference=self.inventory_ref,source_manifest=source['manifest'],
             implementation=implementation(),runtime=runtime,provider_configuration=self.store.session(self.host('design').run_id)['snapshot']['input']['policy']['model'],
-            limits=limits,numerical_limits=numerical,scope=SCOPE,memory_policy=MEMORY,phase_budgets=PHASES,
+            limits=limits,numerical_limits=numerical,scope=SCOPE,memory_policy=MEMORY,fact_policy=FACT_POLICY,phase_budgets=PHASES,
             stage_instructions=INSTRUCTIONS,permissions=PERMISSIONS,capabilities=CAPABILITIES,experiment=self.experiment,
             recovery=recovery_status({},self.store.session(self.host('design').run_id)['snapshot']['input']['policy']['model']),
             host_provider_configurations={k:self.store.session(h.run_id)['snapshot']['input']['policy']['model'] for k,h in self.hosts.items()},
@@ -196,7 +205,7 @@ class DiagnosticWorkflow:
             fixed['diagnosis.request']=dict(subject='control',binding=self.binding,
                 **{k:self.identities[k] for k in ('candidate_id','execution_id','task_identity','controller_identity','evidence_manifest')},
                 permitted_tools=['diagnosis.inspect_evidence','diagnosis.check_request','diagnosis.submit','evidence.read'],
-                budget=LIMITS,saved_state_check=SCOPE)
+                budget=self.limits,saved_state_check=None if self.initial_only else SCOPE)
         if phase in ('initial','revision'):
             fixed['diagnosis.submit']=dict(request=self.chain['request'],previous_report=self.chain.get('initial_report') if phase=='revision' else None,
                 check_results=[self.chain['feedback']] if phase=='revision' else [])
@@ -218,13 +227,36 @@ class DiagnosticWorkflow:
             phase_budget=PHASES[phase],phase_tools=PERMISSIONS[phase],native_fixed=self.fixed(phase),native_store_root=str(self.directory),
             evidence_turn_limit=2 if phase in ('request','initial','check') else 0)
         if self.minimal:common['phase_budget']=dict(limit=dict(model_calls=3,tool_calls=3,wall_s=300.))
+        if self.initial_only:
+            common['protocol']={}
+            common['phase_budget']=(dict(limit=dict(model_calls=3),protect_project=dict(model_calls=5,tool_calls=10,wall_s=600.))
+                if phase=='request' else dict(limit=dict(model_calls=5)))
         if 'request' in self.chain:common.update(request=self.chain['request'],request_content=self.store.artifact(self.chain['request']))
         if phase.startswith('response'):
             report=self.chain['revised_report' if phase=='response_final' else 'initial_report']
             common.update(report=report,report_content=self.store.artifact(report),final_response=phase=='response_final')
         instruction=INSTRUCTIONS[phase]
+        if self.experiment.get('fact_handles'):
+            instruction=instruction.replace('2-4 exact selected facts','2-4 facts selected using fact_handles').replace(
+                'Fact selectors point into original query result artifacts (e.g. /detail/summary/terminal_speed_m_s), not observation envelopes. report.source is the supplied binding; recommendation configuration_scope is identities.configuration.',
+                'Use the current fact_catalog; the host resolves selectors, report.source and recommendation configuration_scope.').replace(
+                'at least one relevant exact numeric fact selector from its result artifact','at least one relevant numeric fact handle from the actual result artifact').replace(
+                'not_read, not_retained or retained_unavailable','not_displayed, not_read, queried, not_retained or retained_unavailable')
+        if self.initial_only:
+            instruction+=' Partial initial-report capability validation only: no check selection/execution, backend, or workers. Request scope must exclude numerical work in this run.'
         if self.pilot and phase=='response_initial':instruction+=' This development pilot requires one genuine check and report revision to validate feedback capability. Select a justified check action; retain your own disposition and engineering conclusion.'
         configure_role(host,role,instruction,**{**common,**extra})
+        if self.experiment.get('fact_handles'):
+            handover(host,self.summary,self.store.artifact(self.summary),origin=dict(context=self.hosts['executor'].run_id,receipt='inventory-summary'),kind='common_summary')
+            # Transfer only the accepted report's cited facts, not the other role's query history.
+            report=common.get('report_content') or extra.get('previous_report_content')
+            report_ref=common.get('report') or extra.get('previous_report')
+            if report and report_ref:
+                selectors=[s for rows in report.get('fact_selectors',{}).values() for s in rows]
+                handover(host,report_ref,report,origin=dict(kind='accepted_report',reference=report_ref),kind='report_facts',selectors=selectors)
+            for feedback in extra.get('check_feedback',[]):
+                if feedback.get('result_content') is not None:
+                    handover(host,feedback['result'],feedback['result_content'],origin=dict(feedback=feedback['reference'],receipt=feedback['receipt']),kind='numerical_result')
         before=self.store.session(host.run_id)['state'].get('handoffs',{}).get(kind)
         print('PHASE',self.directory.name,phase,flush=True)
         run_loop(host)
@@ -267,6 +299,10 @@ class DiagnosticWorkflow:
                 self.phase('request','diagnosis_request','request')
                 self.phase('initial','diagnosis_report','initial_report',require_initial_views=True,
                     scheduling='Synchronous controller calls complete before fixed-count backend steps; wall deadline misses do not inject physical delay into simulated time.')
+                if self.initial_only:
+                    status='completed';reason='Accepted initial report; partial capability validation only, no check or complete diagnostic workflow.'
+                    self.export(status,reason,time.monotonic()-started)
+                    return read(self.directory/'outcome.json')
                 self.phase('response_initial','design_response','initial_response')
                 response=self.store.artifact(self.chain['initial_response'])
                 if response['next_action']=='finish':
@@ -317,7 +353,7 @@ class DiagnosticWorkflow:
         for ref in self.chain.values():include(ref)
         if feedback:include(feedback.get('result'))
         outcome=dict(schema_version='1.0.0',status=status,stop_reason=reason,mode=self.mode,pilot=self.pilot,minimal=self.minimal,
-            classification='cross-run continuation using preserved real numerical feedback' if self.suffix else 'fresh workflow',
+            classification='partial initial-report capability validation' if self.initial_only else ('cross-run continuation using preserved real numerical feedback' if self.suffix else 'fresh workflow'),
             chain=self.chain,feedback_complete=all(k in self.chain for k in ('check','feedback','revised_report','final_response')),
             numerical_check_status=feedback['receipt']['execution_status'] if feedback else None,
             usage=self.store.remaining(),numerical_work=work,provider_usage=usage_rows,monetary_cost=None,elapsed_s=elapsed,
@@ -327,6 +363,8 @@ class DiagnosticWorkflow:
         atomic_json(self.directory/'outcome.json',outcome)
         for path in self.directory.glob('*.json'):atomic_json(destination/path.name,read(path))
         for name,value in [('events',events),('receipts',receipts),('raw_calls',raw),('resolved_calls',resolved)]:atomic_json(destination/(name+'.json'),value)
+        atomic_json(destination/'evidence_contexts.json',{k:{field:self.store.session(h.run_id)['state'].get(field)
+            for field in ('fact_scope','fact_catalog','read_ledger')} for k,h in self.hosts.items()})
         for ref in refs.values():(artifacts/(ref['artifact_id']+'.json')).write_bytes(self.store.artifact(ref,raw=True))
         atomic_json(destination/'sha256_manifest.json',{p.relative_to(destination).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
             for p in sorted(destination.rglob('*.json')) if p.name!='sha256_manifest.json'})

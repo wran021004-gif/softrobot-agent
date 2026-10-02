@@ -75,7 +75,12 @@ def submit(ctx,args):
     from schemas.platform_handoff import InventoryDiagnosisSubmission
     if isinstance(args,InventoryDiagnosisSubmission):
         from tools.diagnostic_inventory import validate_gaps
-        validate_gaps(args.missing_evidence,role['inventory'])
+        state=ctx.store.session(ctx.run_id)['state']
+        if state.get('fact_scope'):
+            from tools.diagnostic_facts import context_view
+            view=context_view(state)
+            validate_gaps(args.missing_evidence,role['inventory'],view['read_ledger'],[f['handle'] for f in view['fact_catalog']])
+        else:validate_gaps(args.missing_evidence,role['inventory'])
     if plain(args.request)!=role['request']: raise ValueError('REPORT_REQUEST_LINK_MISMATCH')
     request=ctx.artifact(args.request)
     if role.get('require_initial_views'):
@@ -98,6 +103,7 @@ def submit(ctx,args):
     for feedback in expected:
         if feedback['receipt']['execution_status']=='completed' and feedback.get('result'):
             if not any(plain(s.reference)==feedback['result'] and isinstance(s.value,(float,int)) and not isinstance(s.value,bool)
+                    and s.pointer.rsplit('/',1)[-1] not in ('update_id','time_s','horizon_s','integration_step_s','complete_cost_s','computation_s','new_local_solves')
                     for selectors in args.fact_selectors.values() for s in selectors):
                 raise ValueError('REVISED_REPORT_REQUIRES_NUMERICAL_RESULT_SELECTOR: cite at least one relevant numeric value from the executed result artifact, with its exact JSON pointer, and explain model/horizon limits.')
     binding=ctx.artifact(request['binding'])
