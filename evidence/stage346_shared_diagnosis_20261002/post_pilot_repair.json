@@ -1,0 +1,23 @@
+{
+  "classification": "Offline-only versioned interface repair; no replacement pilot or additional paid call",
+  "live_adapter": "deepseek@3.0.0",
+  "repaired_adapter": "deepseek@4.0.0",
+  "pilot_stop": "PHASE_INCOMPLETE check: BOUNDED_REPAIR_LIMIT",
+  "failed_check_submissions": [
+    {"request_id": "model-6-tool", "error": "FACT_SELECTOR_VALUE_MISMATCH", "measured_state_values_required": 24, "values_submitted": 4},
+    {"request_id": "model-7-tool", "error": "CHECK_STATE_BINDING_MISMATCH", "state_pointer": "/34/one_step_prediction/state", "required_pointer": "/34/measured_initial_state"},
+    {"request_id": "model-8-tool", "error": "FACT_SELECTOR_VALUE_MISMATCH", "measured_state_values_required": 24, "values_submitted": 4}
+  ],
+  "evidence_paging": "Measured state was read at offsets 0 and 20. The second batch added three retained pages, evicting the first twenty-value page under the unchanged three-page memory policy. The first and third submissions copied only four values. This was an interface/working-memory burden, not an unavailable saved state.",
+  "repair": "The model chooses operation and update_id. Host resolves immutable measured_initial_state and current actual_tension_n for prediction_braking, or previous actual_tension_n for local_comparison. Native inputs cannot replace selectors or vectors. Resolved full invocations retain exact provenance. The unchanged executor still checks request scope, subject, values, adoption and saved horizon.",
+  "focused_verification": {
+    "tests": ["SharedWorkflowTests.test_host_binds_exact_state_and_operation_defined_input", "SharedWorkflowTests.test_shared_flow_feedback_memory_permissions_inventory_and_accounting"],
+    "status": "passed",
+    "duration_s": 122.190,
+    "scope": "Both operations' exact host bindings, invalid/overriding inputs, and both organization modes with fixture feedback and genuine finish branches. Provider and numerical result fixtures; no new scientific evaluation."
+  },
+  "counters_reset": false,
+  "pilot_restarted": false,
+  "live_feedback_capability_established": false,
+  "formal_paired_runs_executed": 0
+}

@@ -71,3 +71,49 @@ class FlatDiagnosticAdapter(ReadableDeepSeekAdapter):
             message=str(exc)
             if isinstance(exc,ValidationError):message='; '.join('.'.join(map(str,e['loc']))+': '+e['msg'] for e in exc.errors(include_input=False))
             raise ToolProtocolError([dict(path='business_parameters',expected=message)]) from None
+
+
+class BoundSavedStateAdapter(FlatDiagnosticAdapter):
+    """Version 4: a chosen update/operation determines exact immutable selectors.
+
+    The model selects the analysis inputs by identity, not by copying vectors
+    from paged evidence. The unchanged executor still validates every value.
+    """
+    def encode(self,model_input,config):
+        from tools.platform_store import Store
+        self.store=Store(model_input.context['role_context']['native_store_root'])
+        self.binding=model_input.context['role_context']['binding']
+        payload=super().encode(model_input,config)
+        context=json.loads(payload['messages'][1]['content'])
+        context['role_context'].pop('native_store_root',None)
+        payload['messages'][1]['content']=encode(context)
+        schema=self.schemas.get('diagnosis.check_request')
+        if schema:
+            for key in ('initial_state','input'):
+                schema['properties'].pop(key)
+                schema['required'].remove(key)
+            for key in ('operation','update_id'):
+                if key not in schema['required']:schema['required'].append(key)
+            payload['messages'][0]['content']+=' For a saved-state check, choose operation and update_id. The host binds that update\'s exact measured state and the operation-defined applied/previous input from immutable evidence; do not copy state vectors or provide replacement selectors.'
+        return payload
+
+    def decode(self,response,turn,bindings,advertised_tools=None):
+        from extensions.tendon_family.diagnostic_evidence import BoundReader
+        try:
+            calls=response.raw['choices'][0]['message'].get('tool_calls') or []
+            if len(calls)==1 and calls[0].get('function',{}).get('name')=='diagnosis_check_request':
+                args=json.loads(calls[0]['function']['arguments'])
+                if not isinstance(args,dict):raise ValueError('Business parameters must be an object')
+                index=args.get('update_id');operation=args.get('operation')
+                if type(index) is not int or index<1:raise ValueError('Choose an integer update_id >= 1')
+                if operation not in ('prediction_braking','local_comparison'):raise ValueError('Choose prediction_braking or local_comparison')
+                reader=BoundReader(self.store,self.binding);source=reader.resolve(reader.binding['execution_id'])
+                reference=source['files']['controller_observations.json'];updates=self.store.artifact(reference)
+                if index>=len(updates):raise ValueError('update_id must select a retained update')
+                input_index=index-1 if operation=='local_comparison' else index
+                self.fixed['diagnosis.check_request'].update(
+                    initial_state=dict(reference=reference,pointer=f'/{index}/measured_initial_state',value=updates[index]['measured_initial_state']),
+                    input=dict(reference=reference,pointer=f'/{input_index}/actual_tension_n',value=updates[input_index]['actual_tension_n']))
+        except (KeyError,TypeError,ValueError,IndexError) as exc:
+            raise ToolProtocolError([dict(path='business_parameters',expected=str(exc))]) from None
+        return super().decode(response,turn,bindings,advertised_tools)

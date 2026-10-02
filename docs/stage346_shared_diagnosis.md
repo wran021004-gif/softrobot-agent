@@ -16,6 +16,23 @@ internal invocations through the existing event/receipt ledger. Invalid
 native calls and unknown fields receive bounded corrections. Ordinary prose
 is never an executable decision. Legacy adapter versions remain available.
 
+The development pilot exposed a remaining burden in version 3: copying a
+24-value measured state through evidence pages. After a subsequent read batch
+evicted its first 20 values, the model submitted the remaining four values,
+then a predicted state, then four measured values again. All three were
+correctly rejected by the unchanged executor; the six-attempt check phase and
+bounded repair limit ended the pilot before any numerical execution.
+
+The runner now defaults to `deepseek@4.0.0`. The model still chooses the
+operation and update ID. The host resolves the exact measured state and
+current applied input (prediction/braking) or previous applied input (local
+comparison) from immutable evidence. The model cannot supply replacement
+selectors or vectors. The full internal invocation is recorded, and the
+existing scope/adoption/horizon/value validators still run. Version 4 is an
+offline-validated repair; the preserved paid runs used version 3. No fresh
+pilot or comparison was launched after the original pilot exhausted its
+check-phase allowance.
+
 `design.respond_diagnosis@2.0.0` separates disposition (`adopt`, `defer`,
 `reject`) from action (`request_check`, `verify_adopted_change`, `finish`).
 Finish ends the workflow before checking. Adoption alone executes nothing.
@@ -58,3 +75,11 @@ are in `tests/test_shared_diagnosis.py`; numerical/provider fixtures in those
 tests establish implementation behavior, not physical or diagnostic results.
 Live evidence and the final evaluation belong under
 `evidence/stage346_shared_diagnosis_20261002`.
+
+The minimal native validation succeeded with a model-selected `reject +
+finish` response. It used two attempts, including a preserved network failure
+and one explicit continuation within the same ledger; transport retry policy
+was unchanged. The full dual-context pilot completed the request, initial
+report and design response, but no check, revision or final response. Formal
+paired runs were therefore blocked by the required feedback-capability gate.
+There is no live single-context result or comparative diagnostic conclusion.

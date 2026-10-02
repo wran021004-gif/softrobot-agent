@@ -60,6 +60,10 @@ EXTENSIONS.append(Extension('deepseek','model_adapter','3.0.0',Empty,ModelRespon
     'tools.diagnostic_native:FlatDiagnosticAdapter','Flat business arguments for the shared diagnostic workflow',
     sources=('tools/diagnostic_native.py','tools/platform_models.py','tools/model_transports/deepseek.py'),
     capabilities=dict(real_requests=True,text=True,images=False,timeout='network request deadline',cancellation='between requests')))
+EXTENSIONS.append(Extension('deepseek','model_adapter','4.0.0',Empty,ModelResponse,
+    'tools.diagnostic_native:BoundSavedStateAdapter','Flat diagnostic decisions with host-bound saved state/input for the model-selected update',
+    sources=('tools/diagnostic_native.py','tools/platform_models.py','tools/model_transports/deepseek.py','extensions/tendon_family/diagnostic_evidence.py'),
+    capabilities=dict(real_requests=True,text=True,images=False,timeout='network request deadline',cancellation='between requests')))
 EXTENSIONS.append(Extension('design.respond_diagnosis','tool','2.0.0',handoff.WorkflowDesignResponse,handoff.HandoffResult,
     'tools.platform_handoff:respond_workflow','Record recommendation disposition and independent next workflow action. finish ends workflow; adoption alone executes nothing.',
     sources=('schemas/platform_handoff.py','tools/platform_handoff.py'),

@@ -35,7 +35,7 @@ def main(action):
     if freeze_path.exists():raise ValueError('PAIRED_COMPARISON_ALREADY_STARTED: no replacement runs')
     freeze=read(BASE/'pilot/freeze.json')
     frozen=dict(source_manifest=freeze['source_manifest'],inventory=freeze['inventory'],implementation=implementation(),
-        adapter_version='3.0.0',provider=freeze['provider_configuration'],instructions=INSTRUCTIONS,phases=PHASES,
+        adapter_version=freeze['provider_configuration']['adapter_version'],provider=freeze['provider_configuration'],instructions=INSTRUCTIONS,phases=PHASES,
         memory=MEMORY,limits=LIMITS,scope=SCOPE,permissions=PERMISSIONS,recovery=freeze['recovery'],
         tool_schemas={k:registry().get(k,v,'tool').input_schema.model_json_schema() for k,v in TOOLS.items()},
         measures=freeze['outcomes'],order=['single_context','dual_context','dual_context','single_context'],

@@ -9,7 +9,7 @@ from unittest import TestCase, main
 from unittest.mock import patch
 from schemas.platform import ModelResponse
 from schemas.platform_handoff import WorkflowDesignResponse
-from tools.diagnostic_native import FlatDiagnosticAdapter
+from tools.diagnostic_native import FlatDiagnosticAdapter, BoundSavedStateAdapter
 from tools.diagnostic_workflow import DiagnosticWorkflow, ROOT, PERMISSIONS, PHASES, save
 from tools.platform_diagnosis_coordinator import configure_role
 from tools.platform_models import payload_for, ToolProtocolError
@@ -57,6 +57,30 @@ class SharedWorkflowTests(TestCase):
                         with self.assertRaisesRegex(ValueError,'EXACT_CONTROL'):respond_workflow(ctx,args)
                     else:self.assertEqual(respond_workflow(ctx,args),'accepted')
 
+    def test_host_binds_exact_state_and_operation_defined_input(self):
+        w=self.workflow();h=w.host('diagnostic');w.chain['request']=w.summary
+        configure_role(h,'diagnostic','fixture',binding=w.binding,native_store_root=str(w.directory),
+            native_fixed=w.fixed('check'),phase_tools=['diagnosis.check_request'])
+        adapter=BoundSavedStateAdapter();payload=payload_for(h,adapter)
+        self.assertNotIn('native_store_root',payload['messages'][1]['content'])
+        schema=payload['tools'][0]['function']['parameters']
+        self.assertNotIn('initial_state',schema['properties']);self.assertNotIn('input',schema['properties'])
+        reference=w.inventory['entries'][0]['reference'];updates=w.store.artifact(reference)
+        business=dict(check_id='fixture',operation='prediction_braking',update_id=34,hypotheses=['a','b'],
+            fixed_conditions=['state'],metrics=['speed'],work_limits=dict(wall_s=60,prediction_evaluations=2),acceptance_criteria=['local only'])
+        for operation,index in [('prediction_braking',34),('local_comparison',33)]:
+            args={**business,'operation':operation}
+            decoded=adapter.decode(ModelResponse(raw=native('diagnosis.check_request',args)),0,{'diagnosis.check_request':'1.0.0'},payload['tools'])
+            fixed=decoded['arguments']
+            self.assertEqual(fixed['initial_state']['value'],updates[34]['measured_initial_state'])
+            self.assertEqual(len(fixed['initial_state']['value']),24)
+            self.assertEqual(fixed['input']['value'],updates[index]['actual_tension_n'])
+            self.assertEqual(fixed['input']['pointer'],f'/{index}/actual_tension_n')
+            self.assertEqual(fixed['model'],'model.gvs@1.0.0');self.assertEqual(fixed['horizon_s'],.01)
+        for change in (dict(update_id=35),dict(initial_state={'value':[0]}),dict(input={'value':[8]*6})):
+            with self.subTest(change=change),self.assertRaises(ToolProtocolError):
+                adapter.decode(ModelResponse(raw=native('diagnosis.check_request',{**business,**change})),0,{'diagnosis.check_request':'1.0.0'},payload['tools'])
+
     def test_shared_flow_feedback_memory_permissions_inventory_and_accounting(self):
         totals=[]
         for mode in ('single_context','dual_context'):
@@ -84,8 +108,7 @@ class SharedWorkflowTests(TestCase):
                                 fact_selectors={'observation':[dict(reference=ref,pointer=ptr,value=value)]},missing_evidence=[],recommendations=[],check_results=[f['reference'] for f in feedback]))
                         if phase.startswith('response'):return native('design.respond_diagnosis',dict(disposition='defer',reasoning='Unresolved evidence',next_action='finish' if finish or phase=='response_final' else 'request_check'))
                         return native('diagnosis.check_request',dict(check_id='fixture',operation='prediction_braking',update_id=34,
-                            hypotheses=['local input sensitivity','model mismatch'],initial_state=dict(reference=state_ref,pointer='/34/measured_initial_state',value=updates[34]['measured_initial_state']),
-                            input=dict(reference=state_ref,pointer='/34/actual_tension_n',value=updates[34]['actual_tension_n']),fixed_conditions=['state and model'],
+                            hypotheses=['local input sensitivity','model mismatch'],fixed_conditions=['state and model'],
                             metrics=['speed'],work_limits=dict(wall_s=60,prediction_evaluations=2),acceptance_criteria=['Local sensitivity only']))
                     def export(status,reason,elapsed):atomic_json(w.directory/'outcome.json',dict(status=status,stop_reason=reason))
                     with patch.object(FlatDiagnosticAdapter,'respond',respond),patch('extensions.tendon_family.diagnostic_math.execute',return_value=dict(detail=dict(fixture_value=-.1,rows=[]))),patch.object(w,'export',export):
