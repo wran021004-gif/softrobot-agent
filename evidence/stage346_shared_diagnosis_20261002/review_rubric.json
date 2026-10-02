@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "reviewer": "Primary implementation assistant; no additional paid reviewer model",
+  "blinding": "Review exported report_XX files without the organization key where practical. The implementer knows run order, so this is label masking rather than independent blind assessment.",
+  "criteria": [
+    {"id": "facts", "question": "Do numeric claims agree with the exact bound source or check artifact, including units and time/state scope?"},
+    {"id": "gaps", "question": "Does the report distinguish not displayed, not retained, and unavailable calculation/query capability? In particular, it must not claim missing predictions, tensions, or force limits merely from a sampled view."},
+    {"id": "attribution", "question": "Are hypotheses separated from observations, with no dominant causal explanation inferred from one execution or one short projected-model probe?"},
+    {"id": "check_value", "question": "Does the report explain how actual check results support, weaken or leave hypotheses unresolved and change or limit the next decision, including failure or inconclusiveness?"},
+    {"id": "limits", "question": "Does it identify model, saved/projected state, input, integration/horizon and absent closed-loop validation limits?"},
+    {"id": "decision", "question": "Is the final recommendation disposition consistent with its independent action and the evidence, without claiming physical improvement?"}
+  ],
+  "ratings": ["supported", "minor_issue", "substantive_issue", "not_assessable"],
+  "requirements": "Each issue requires a report excerpt or field path, exact source reference where applicable, and practical consequence. Schema/selector acceptance alone does not certify prose. No global ranking or significance inference on this one case."
+}
