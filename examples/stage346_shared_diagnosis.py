@@ -20,6 +20,17 @@ def launch(label,mode,runtime,**options):
     return run.run()
 
 
+def require_feedback(directory):
+    outcome=read(directory/'outcome.json')
+    if outcome['status']!='completed' or not outcome['feedback_complete'] or outcome['numerical_check_status']!='completed':
+        raise ValueError('LIVE_FEEDBACK_CAPABILITY_NOT_ESTABLISHED: '+str(directory))
+    # Acceptance enforces exact selectors; scientific prose is a separate review.
+    report=read(directory/'revised_report.json');response=read(directory/'final_response.json')
+    if not report['report'].get('attribution') or not report['report'].get('limitations') or not response['reasoning']:
+        raise ValueError('FEEDBACK_INTERPRETATION_REQUIRED')
+    return outcome
+
+
 def main(action,configuration=None,credential=None):
     global BASE,EVIDENCE,EXPERIMENT
     if configuration:
@@ -29,17 +40,19 @@ def main(action,configuration=None,credential=None):
     from examples.gvs_nmpc_route_experiment import load_credential
     load_credential(credential or Path.home()/'.codex/.env')
     EVIDENCE.mkdir(parents=True,exist_ok=True)
+    if action=='continue-feedback':
+        return launch(EXPERIMENT['suffix_label'],'dual_context',runtime,suffix=True)
     if action=='minimal':return launch('minimal','dual_context',runtime,minimal=True)
     if action=='pilot':
+        if EXPERIMENT.get('suffix_label'):require_feedback(BASE/EXPERIMENT['suffix_label'])
         if read(Path(EXPERIMENT.get('minimal_outcome',BASE/'minimal/outcome.json')))['status']!='completed':raise ValueError('MINIMAL_NATIVE_VALIDATION_REQUIRED')
         return launch(EXPERIMENT.get('pilot_label','pilot'),'dual_context',runtime,pilot=True)
     pilot_directory=BASE/EXPERIMENT.get('pilot_label','pilot')
-    pilot=read(pilot_directory/'outcome.json')
-    if not pilot['feedback_complete'] or pilot['numerical_check_status']!='completed':
-        raise ValueError('LIVE_FEEDBACK_CAPABILITY_NOT_ESTABLISHED: comparisons prohibited')
+    pilot=require_feedback(pilot_directory)
     freeze_path=EVIDENCE/'paired_freeze.json'
     if freeze_path.exists():raise ValueError('PAIRED_COMPARISON_ALREADY_STARTED: no replacement runs')
     freeze=read(pilot_directory/'freeze.json')
+    if implementation()['files']!=freeze['implementation']['files']:raise ValueError('PILOT_IMPLEMENTATION_CHANGED: fresh validation required')
     frozen=dict(source_manifest=freeze['source_manifest'],inventory=freeze['inventory'],implementation=implementation(),
         adapter_version=freeze['provider_configuration']['adapter_version'],provider=freeze['provider_configuration'],instructions=INSTRUCTIONS,phases=PHASES,
         memory=MEMORY,limits=LIMITS,scope=SCOPE,permissions=PERMISSIONS,capabilities=CAPABILITIES,recovery=freeze['recovery'],experiment=EXPERIMENT,
@@ -61,21 +74,22 @@ def main(action,configuration=None,credential=None):
         reason=outcomes[-1]['stop_reason'] or ''
         if any(s in reason for s in ('FROZEN_','SOURCE_SUMMARY_FAILED','MODEL_ADAPTER_POLICY_MISMATCH')):break
     aggregate={k:0 for k in ('model_calls','tool_calls','backend_solves','worker_calls','wall_s')}
-    for result in [pilot,*outcomes]:
+    suffix=[read(BASE/EXPERIMENT['suffix_label']/'outcome.json')] if EXPERIMENT.get('suffix_label') else []
+    for result in [*suffix,pilot,*outcomes]:
         for k,v in result['usage']['used'].items():aggregate[k]+=v
-    atomic_json(EVIDENCE/'workload_usage.json',dict(used=aggregate,limits=dict(model_calls=152,tool_calls=400,wall_s=25200.,backend_solves=3,worker_calls=0)))
+    atomic_json(EVIDENCE/'workload_usage.json',dict(used=aggregate,limits=EXPERIMENT.get('overall_limits',dict(model_calls=120,tool_calls=300,wall_s=18000.,backend_solves=0,worker_calls=0))))
     # Blinding removes organization/session labels but preserves evidence hashes and scientific text.
     for i,result in enumerate(outcomes):
         label=f'report_{i+1:02d}'
         source=BASE/f"{EXPERIMENT.get('comparison_label','pair')}{(i+2)//2}_{result['mode']}"
-        reports={k:read(source/(k+'.json')) for k in ('initial_report','revised_report') if (source/(k+'.json')).exists()}
+        reports={k:read(source/(k+'.json')) for k in ('initial_report','revised_report','initial_response','final_response') if (source/(k+'.json')).exists()}
         atomic_json(EVIDENCE/'anonymous'/f'{label}.json',reports)
     atomic_json(EVIDENCE/'anonymous_key.json',{f'report_{i+1:02d}':dict(mode=r['mode'],pair=(i+2)//2) for i,r in enumerate(outcomes)})
     return outcomes
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['minimal','pilot','compare'])
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['minimal','continue-feedback','pilot','compare'])
     parser.add_argument('--configuration',type=Path)
     parser.add_argument('--credential',type=Path)
     args=parser.parse_args();main(args.action,args.configuration,args.credential)

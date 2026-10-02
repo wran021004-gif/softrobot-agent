@@ -22,6 +22,7 @@ SOURCE=ROOT/'runs/stage341_autonomous_20261001'
 EXECUTION='5991de53e82747439e87ba8569667e1b'
 LIMITS=dict(model_calls=24,tool_calls=60,backend_solves=0,worker_calls=0,wall_s=3600.)
 NUMERICAL=dict(local_solves=6,prediction_evaluations=24)
+SUFFIX_LIMITS=dict(model_calls=8,tool_calls=20,backend_solves=0,worker_calls=0,wall_s=1200.)
 TOOLS={n:'1.0.0' for n in ('diagnosis.request','diagnosis.inspect_evidence','diagnosis.check_request','diagnosis.submit','evidence.read')}
 TOOLS['design.respond_diagnosis']='2.0.0'
 TOOLS.update({'diagnosis.submit':'2.0.0','diagnosis.check_request':'2.0.0'})
@@ -51,7 +52,7 @@ INSTRUCTIONS=dict(
     initial='Read at least one prediction view and one motion or plans view. At most two successful reading turns; independent views can be batched. Then submit a concise initial report with 2-4 exact selected facts, competing hypotheses, explicit gaps and recommendations. Fact selectors point into original query result artifacts (e.g. /detail/summary/terminal_speed_m_s), not observation envelopes. report.source is the supplied binding; recommendation configuration_scope is identities.configuration. Recommendations may defer pending a check. Do not execute or select a numerical check in this phase.',
     response_initial='Read the initial report. Choose adopt, defer or reject yourself and independently choose request_check, verify_adopted_change or finish. defer + request_check is valid. Rejecting a recommendation need not end diagnosis. finish ends all workflow work. verify_adopted_change requires adoption of the exact existing parameter/value and only a temporary saved-state comparison. Adoption alone executes nothing. Explain the evidence basis.',
     check='Select one discriminating check based on unresolved hypotheses. Inspect retained evidence as needed to choose the operation and update_id. The host binds the chosen update\'s exact measured_initial_state and operation-defined input from the inventory controller file; do not copy vectors. prediction_braking uses current actual_tension_n; local_comparison uses previous actual_tension_n and requires the exact adopted parameter/value and a saved effective plan horizon of 0.01 s. prediction_braking compares held recorded input with an instantaneous braking box solution and requires no adoption. Choose update_id >= 1, hypotheses, fixed conditions, metrics, acceptance criteria and work_limits (wall_s <= 300; prediction_evaluations=2 or local_solves=2). Host fixes model.gvs@1.0.0, implicit Euler, 0.002 s step and 0.01 s horizon. At most two successful reading turns, then select the check. Do not overextend a local probe to the entire settling failure.',
-    revision='Consume actual check_feedback and revise the previous report. Cite the feedback in check_results and at least one relevant exact numeric selector from its result artifact when execution completed. Explain which hypotheses are supported, weakened or unresolved and how the result changes or limits the next decision. Identify model, projected-state, input, integration and horizon limits. Failed or inconclusive checks permit honest delivery. No further check is authorized.',
+    revision='Consume actual check_feedback and revise the previous report. The host links the immutable feedback envelope; do not supply check_results. Supply at least one relevant exact numeric fact selector from its result artifact when execution completed, and your interpretation. Explain which hypotheses are supported, weakened or unresolved and how the result changes or limits the next decision. Identify model, projected-state, input, integration and horizon limits. Failed or inconclusive checks permit honest delivery. No further check is authorized.',
     response_final='Read the revised report and actual feedback. Record your final recommendation disposition and reasoning. The one-check allowance is spent; next_action must be finish. Physical improvement was not evaluated.')
 INSTRUCTIONS['initial']+=' Availability gaps must use inventory IDs and not_read, not_retained or retained_unavailable; identify needed information/capability and basis. Unlisted evidence uses source plus explicit basis. Full sampled backend q/qdot is retained, even though motion shows the final window. Raw weight magnitudes do not establish cost-term importance without actual contributions/scaling.'
 INSTRUCTIONS['check']+=' State local_question, competing hypotheses, discriminating_observations and unresolved questions. If hypotheses predict the same result, explicitly say this check cannot separate them. Select a question the stated capability can answer; no dominant-cause claim.'
@@ -67,15 +68,18 @@ def implementation():
         'tools/platform_models.py','tools/platform_handoff.py','tools/platform_diagnosis_coordinator.py',
         'tools/platform_host.py','tools/platform_store.py','schemas/platform_handoff.py','schemas/platform_diagnostics.py',
         'extensions/platform/manifest.py','extensions/tendon_family/diagnostic_evidence.py','extensions/tendon_family/diagnostic_math.py',
-        'tools/model_transports/deepseek.py','examples/stage346_shared_diagnosis.py','examples/stage347_experiment.json']
+        'tools/model_transports/deepseek.py','examples/stage346_shared_diagnosis.py','examples/stage348_experiment.json',
+        'tools/diagnostic_improvement.py','tools/platform_tools.py','extensions/tendon_family/candidate.py',
+        'examples/gvs_design_input.py','examples/gvs_nmpc_route_experiment.py','tasks/reach_free/task.yaml']
     return dict(commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         files={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths})
 
 
 class DiagnosticWorkflow:
-    def __init__(self, directory, mode, *, pilot=False, minimal=False, experiment=None):
+    def __init__(self, directory, mode, *, pilot=False, minimal=False, suffix=False, experiment=None):
         if mode not in ('single_context','dual_context'):raise ValueError('UNKNOWN_ORGANIZATION_MODE')
         self.directory=Path(directory);self.mode=mode;self.pilot=pilot;self.minimal=minimal
+        self.suffix=suffix
         self.store=Store(directory);self.chain={};self.previous=None
         self.experiment=deepcopy(experiment or {})
         self.source=Path(self.experiment.get('source_store',SOURCE))
@@ -90,13 +94,15 @@ class DiagnosticWorkflow:
         reader=ControlEvidence(Store(self.source));source=reader.resolve(self.execution)
         if self.experiment.get('source_manifest',source['manifest'])!=source['manifest']:raise ValueError('FROZEN_SOURCE_MANIFEST_MISMATCH')
         self.project=self.experiment.get('project_prefix','gvs-stage346')+'-'+uuid4().hex[:12]
-        limits=dict(model_calls=3,tool_calls=3,backend_solves=0,worker_calls=0,wall_s=300.) if self.minimal else LIMITS
+        limits=SUFFIX_LIMITS if self.suffix else (dict(model_calls=3,tool_calls=3,backend_solves=0,worker_calls=0,wall_s=300.) if self.minimal else LIMITS)
+        numerical={k:0 for k in NUMERICAL} if self.suffix else NUMERICAL
         self.store.create(dict(project_id=self.project,grant_id=self.project,budget=limits,
             authorization_source=self.experiment.get('authorization_source','User-authorized sequential Stage 3.46 native validation, pilot and two matched pairs; necessary context/evidence transmission to DeepSeek; no backend simulations/workers or push.')))
         self.hosts={}
         for role in (['shared'] if self.mode=='single_context' else ['design','diagnostic'])+['executor']:
             host=Host(self.directory,self.project+'-'+role);inp=deepcopy(source['configuration']);inp['run_id']=host.run_id
             bindings={'diagnosis.inspect_evidence':'1.0.0','diagnosis.saved_state_check':'1.0.0'} if role=='executor' else TOOLS
+            if self.suffix and role=='executor':bindings={'diagnosis.inspect_evidence':'1.0.0'}
             inp['policy'].update(route=None,budget={**limits,'model_calls':0 if role=='executor' else limits['model_calls']},
                 timeout_s=900. if role=='executor' else 30.,allowed_tools=[],tool_bindings=bindings)
             provider=read(Path(self.experiment.get('provider_freeze',ROOT/'evidence/stage346_shared_diagnosis_20261002/pilot/freeze.json')))['provider_configuration']
@@ -105,7 +111,7 @@ class DiagnosticWorkflow:
             host.create(inp);self.hosts[role]=host
         self.binding=import_execution(reader,self.execution,self.store,self.hosts['executor'].run_id,source['manifest'])
         with self.store.transaction() as db:
-            db.execute("INSERT INTO meta VALUES ('diagnostic_work',?)",(encode(dict(limits=NUMERICAL,used={k:0 for k in NUMERICAL})),))
+            db.execute("INSERT INTO meta VALUES ('diagnostic_work',?)",(encode(dict(limits=numerical,used={k:0 for k in NUMERICAL})),))
         executor=self.hosts['executor'];executor.resume()
         receipt=executor.invoke(dict(request_id='inventory-summary',tool_id='diagnosis.inspect_evidence',tool_version='1.0.0',
             arguments=dict(binding=self.binding,view='summary'),reason='Read preserved source summary',cache='new'))
@@ -114,11 +120,12 @@ class DiagnosticWorkflow:
         self.inventory_ref=save(self.store,self.inventory)
         b=self.store.artifact(self.binding)
         self.identities={k:b[k] for k in ('candidate_id','execution_id','task_identity','controller_identity','evidence_manifest','configuration')}
-        self.freeze=dict(schema_version='1.0.0',project_id=self.project,mode=self.mode,pilot=self.pilot,minimal=self.minimal,
+        if self.suffix:self.import_feedback_suffix()
+        self.freeze=dict(schema_version='1.0.0',project_id=self.project,mode=self.mode,pilot=self.pilot,minimal=self.minimal,suffix=self.suffix,
             hosts={k:h.run_id for k,h in self.hosts.items()},binding=self.binding,identities=self.identities,summary=self.summary,
             inventory=self.inventory,inventory_reference=self.inventory_ref,source_manifest=source['manifest'],
             implementation=implementation(),runtime=runtime,provider_configuration=self.store.session(self.host('design').run_id)['snapshot']['input']['policy']['model'],
-            limits=limits,numerical_limits=NUMERICAL,scope=SCOPE,memory_policy=MEMORY,phase_budgets=PHASES,
+            limits=limits,numerical_limits=numerical,scope=SCOPE,memory_policy=MEMORY,phase_budgets=PHASES,
             stage_instructions=INSTRUCTIONS,permissions=PERMISSIONS,capabilities=CAPABILITIES,experiment=self.experiment,
             recovery=recovery_status({},self.store.session(self.host('design').run_id)['snapshot']['input']['policy']['model']),
             host_provider_configurations={k:self.store.session(h.run_id)['snapshot']['input']['policy']['model'] for k,h in self.hosts.items()},
@@ -126,6 +133,60 @@ class DiagnosticWorkflow:
             outcomes=['workflow completion','exact selector validation','prose review','check usefulness','usage','physical improvement not evaluated'])
         atomic_json(self.directory/'freeze.json',self.freeze)
         return self.freeze
+
+    def import_feedback_suffix(self):
+        """Import a verified artifact closure; never copy sessions or their ledger."""
+        old_root=Path(self.experiment['continuation_store']);old=Store(old_root)
+        outcome=read(old_root/'outcome.json');chain=outcome['chain']
+        saved_chain=read(old_root/'chain.json')
+        if any(chain[k]!=v for k,v in saved_chain.items()):raise ValueError('CONTINUATION_CHAIN_MISMATCH')
+        expected=self.experiment['continuation_feedback']
+        if chain['feedback']!=expected:raise ValueError('CONTINUATION_FEEDBACK_MISMATCH')
+        feedback=old.artifact(expected)
+        if feedback!=read(old_root/'feedback.json'):raise ValueError('CONTINUATION_EXPORT_MISMATCH')
+        if feedback['receipt']['execution_status']!='completed' or feedback['result']!=self.experiment['continuation_result']:
+            raise ValueError('CONTINUATION_COMPLETED_RESULT_REQUIRED')
+        if feedback['receipt']['execution_id']!=self.experiment['continuation_execution']:raise ValueError('CONTINUATION_EXECUTION_MISMATCH')
+        request=old.artifact(chain['request'])
+        if request['binding']!=self.binding or request['execution_id']!=self.execution:raise ValueError('CONTINUATION_SOURCE_MISMATCH')
+        if feedback['check_request']!=chain['check'] or feedback['diagnosis_request']!=chain['request']:
+            raise ValueError('CONTINUATION_LINK_MISMATCH')
+        exported=self.experiment['continuation_exports']
+        seen={}
+        def collect(value):
+            if isinstance(value,dict):
+                if set(value)=={'artifact_id','media_type'}:
+                    key=value['artifact_id']
+                    if key in seen:return
+                    body=old.artifact(value,raw=True);seen[key]=(value,body)
+                    if value['media_type']=='application/json':collect(json.loads(body))
+                else:
+                    for child in value.values():collect(child)
+            elif isinstance(value,list):
+                for child in value:collect(child)
+        self.chain={k:chain[k] for k in ('request','initial_report','initial_response','check','feedback')}
+        for ref in self.chain.values():collect(ref)
+        for ref in (expected,feedback['result']):
+            if read(Path(exported)/'artifacts'/(ref['artifact_id']+'.json'))!=old.artifact(ref):raise ValueError('CONTINUATION_ARTIFACT_EXPORT_MISMATCH')
+        with self.store.transaction() as db:
+            for ref,body in seen.values():
+                if plain(self.store.put(db,body,ref['media_type']))!=ref:raise ValueError('IMPORT_HASH_MISMATCH')
+            provenance=dict(classification='cross-run continuation using preserved real numerical feedback',
+                original_store=str(old_root),original_status=outcome['status'],original_stop_reason=outcome['stop_reason'],
+                historical_usage=outcome['usage'],historical_numerical_work=outcome['numerical_work'],
+                numerical_execution=feedback['receipt']['execution_id'],chain=self.chain,imported_references=[r for r,b in seen.values()],
+                new_phases=['revision','response_final'],fresh_authorization=True,
+                memory='Fresh structured memories with explicit preserved handoffs; no historical rejected drafts or transcript replay.')
+            ref=self.store.put(db,provenance)
+            self.store.event(db,self.host('diagnostic').run_id,'cross_run_continuation','imported',inputs=list(self.chain.values()),outputs=[ref])
+        atomic_json(self.directory/'continuation_provenance.json',provenance)
+        for key,ref in self.chain.items():atomic_json(self.directory/(key+'.json'),self.store.artifact(ref))
+        atomic_json(self.directory/'chain.json',self.chain)
+
+    def finish_feedback(self,retained):
+        self.phase('revision','diagnosis_report','revised_report',previous_report=self.chain['initial_report'],
+            previous_report_content=self.store.artifact(self.chain['initial_report']),check_feedback=retained,max_checks=1)
+        self.phase('response_final','design_response','final_response',check_feedback=retained)
 
     def host(self,role):return self.hosts['shared' if self.mode=='single_context' else role]
 
@@ -189,7 +250,13 @@ class DiagnosticWorkflow:
         self.validate_frozen_configuration()
         atomic_json(guard,dict(started=datetime.now(timezone.utc).isoformat()))
         try:
-            if self.minimal:
+            if self.suffix:
+                from tools.platform_diagnosis_coordinator import feedback_content
+                feedback=self.store.artifact(self.chain['feedback'])
+                self.finish_feedback([dict(reference=self.chain['feedback'],**feedback,
+                    result_content=feedback_content(self.store,feedback['result']))])
+                status='completed';reason='Cross-run preserved feedback consumed; accepted revision and final decision.'
+            elif self.minimal:
                 report=read(ROOT/'evidence/stage345_diagnostic_cycle_20261002/saved_diagnosis_report.json')
                 self.chain['initial_report']=save(self.store,report)
                 self.phase('response_initial','design_response','initial_response',
@@ -220,9 +287,7 @@ class DiagnosticWorkflow:
                     feedback=execute_check_feedback(diagnostic,executor,self.chain['check']);self.chain['feedback']=feedback
                     atomic_json(self.directory/'feedback.json',self.store.artifact(feedback))
                     retained=self.store.session(diagnostic.run_id)['state']['role_context']['check_feedback']
-                    self.phase('revision','diagnosis_report','revised_report',previous_report=self.chain['initial_report'],
-                        previous_report_content=self.store.artifact(self.chain['initial_report']),check_feedback=retained,max_checks=1)
-                    self.phase('response_final','design_response','final_response',check_feedback=retained)
+                    self.finish_feedback(retained)
                     status='completed';reason='Check feedback consumed, revised report and final decision delivered.'
         except Exception as exc:
             reason=str(exc);atomic_json(self.directory/'workflow_failure.json',dict(type=type(exc).__name__,message=reason))
@@ -249,7 +314,10 @@ class DiagnosticWorkflow:
                     r=json.loads(row[0]);receipts.append(r);include(r.get('output'))
         with self.store.connect(True) as db:work=json.loads(db.execute("SELECT value FROM meta WHERE key='diagnostic_work'").fetchone()[0])
         feedback=self.store.artifact(self.chain['feedback']) if self.chain.get('feedback') else None
+        for ref in self.chain.values():include(ref)
+        if feedback:include(feedback.get('result'))
         outcome=dict(schema_version='1.0.0',status=status,stop_reason=reason,mode=self.mode,pilot=self.pilot,minimal=self.minimal,
+            classification='cross-run continuation using preserved real numerical feedback' if self.suffix else 'fresh workflow',
             chain=self.chain,feedback_complete=all(k in self.chain for k in ('check','feedback','revised_report','final_response')),
             numerical_check_status=feedback['receipt']['execution_status'] if feedback else None,
             usage=self.store.remaining(),numerical_work=work,provider_usage=usage_rows,monetary_cost=None,elapsed_s=elapsed,

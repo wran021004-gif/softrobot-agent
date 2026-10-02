@@ -167,6 +167,16 @@ def validate_check(store,role,args):
         max_wall_s=args.work_limits.get('wall_s',180.),changed_parameter=args.changed_parameter,changed_value=args.changed_value)
 
 
+def feedback_content(store,reference):
+    """Same scalar view for fresh feedback and an explicit cross-run import."""
+    result=store.artifact(reference) if reference else None
+    if result and 'detail' in result:
+        result={**result,'detail':{**result['detail'],'rows':[
+            {k:v for k,v in row.items() if k not in ('physical_motion','parameters','verification')}
+            for row in result['detail'].get('rows',[])]}}
+    return result
+
+
 def execute_check_feedback(diagnostic,executor,reference):
     """Execute one model-selected check and resume the same diagnostic grant."""
     from schemas.platform_handoff import DiagnosticCheckRequest,ScopedDiagnosticCheckRequest
@@ -185,15 +195,10 @@ def execute_check_feedback(diagnostic,executor,reference):
             feedback.update(local_question=args.local_question,discriminating_observations=args.discriminating_observations,unresolved=args.unresolved)
         ref=plain(diagnostic.store.put(db,feedback))
         state=diagnostic.store.session(diagnostic.run_id,db)['state']
-        result=diagnostic.store.artifact(receipt['output']) if receipt.get('output') else None
-        if role.get('max_checks') == 1 and result and 'detail' in result:
-            # Keep exact scalar pointers while leaving full trajectories in the
-            # immutable result artifact for inspection outside the inline view.
-            result={**result,'detail':{**result['detail'],'rows':[
-                {k:v for k,v in row.items() if k not in ('physical_motion','parameters','verification')}
-                for row in result['detail'].get('rows',[])]}}
+        result=feedback_content(diagnostic.store,receipt.get('output')) if role.get('max_checks')==1 else (
+            diagnostic.store.artifact(receipt['output']) if receipt.get('output') else None)
         state['role_context'].setdefault('check_feedback',[]).append(dict(reference=ref,**feedback,result_content=result))
-        state['role_context']['instructions'] += ' Consume check_feedback now, update competing hypotheses, and submit a revised report citing every feedback reference in check_results. A second check needs the prior result and a specific unresolved need; otherwise submit.'
+        state['role_context']['instructions'] += ' Consume check_feedback now and update competing hypotheses. The shared native workflow host links feedback; supply exact numerical fact selectors and interpretation. A second check needs the prior result and a specific unresolved need; otherwise submit.'
         if role.get('max_checks') == 1:
             state['role_context']['phase_tools']=['diagnosis.submit']
             if role.get('after_feedback_reservations'):
