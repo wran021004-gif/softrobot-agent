@@ -137,7 +137,8 @@ class DiagnosticWorkflow:
                 permitted_tools=['diagnosis.inspect_evidence','diagnosis.check_request','diagnosis.submit','evidence.read'],
                 budget=LIMITS,saved_state_check=SCOPE)
         if phase in ('initial','revision'):
-            fixed['diagnosis.submit']=dict(request=self.chain['request'],previous_report=self.chain.get('initial_report') if phase=='revision' else None)
+            fixed['diagnosis.submit']=dict(request=self.chain['request'],previous_report=self.chain.get('initial_report') if phase=='revision' else None,
+                check_results=[self.chain['feedback']] if phase=='revision' else [])
         if phase.startswith('response'):
             fixed['design.respond_diagnosis']=dict(report=self.chain['revised_report' if phase=='response_final' else 'initial_report'])
         if phase=='check':fixed['diagnosis.check_request']=dict(check_id='saved-state-check',diagnosis_request=self.chain['request'],model=SCOPE['model'],

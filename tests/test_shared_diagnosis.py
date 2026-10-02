@@ -106,7 +106,7 @@ class SharedWorkflowTests(TestCase):
                             return native('diagnosis.submit',dict(report=dict(subject='control',source=w.binding,facts=[dict(fact_id='observation',statement='Fixture observation',evidence=[ref])],
                                 attribution=[dict(cause='hypothesis',status='insufficient_evidence',fact_ids=['observation'],reason='Local fixture weakens broad attribution; full settling remains unresolved.')],
                                 limitations=['Projected model, saved state/input and 10 ms horizon only; fixture not science']),
-                                fact_selectors={'observation':[dict(reference=ref,pointer=ptr,value=value)]},missing_evidence=[],recommendations=[],check_results=[f['reference'] for f in feedback]))
+                                fact_selectors={'observation':[dict(reference=ref,pointer=ptr,value=value)]},missing_evidence=[],recommendations=[]))
                         if phase.startswith('response'):return native('design.respond_diagnosis',dict(disposition='defer',reasoning='Unresolved evidence',next_action='finish' if finish or phase=='response_final' else 'request_check'))
                         return native('diagnosis.check_request',dict(operation='prediction_braking',update_id=34,
                             local_question='Can local endpoint speed decrease?',discriminating_observations=['endpoint speed difference'],unresolved=['closed-loop cause'],
@@ -141,6 +141,27 @@ class SharedWorkflowTests(TestCase):
             gap(source='hardware encoder measurement',status='not_retained')],w.inventory)
         with self.assertRaisesRegex(ValueError,'GAP_SOURCE_REQUIRED'):
             validate_gaps([gap(status='not_retained')],w.inventory)
+
+    def test_revision_feedback_identity_is_host_bound_and_numeric_citation_still_required(self):
+        from tools.platform_handoff import submit
+        from schemas.platform_handoff import InventoryDiagnosisSubmission
+        w=self.workflow();h=w.host('diagnostic')
+        w.chain.update(request=save(w.store,dict(binding=w.binding)),initial_report=w.summary,
+            feedback=save(w.store,dict(result=w.summary)))
+        feedback=dict(reference=w.chain['feedback'],receipt=dict(execution_status='completed'),result=w.summary)
+        configure_role(h,'diagnostic','fixture',binding=w.binding,request=w.chain['request'],inventory=w.inventory,
+            previous_report=w.chain['initial_report'],check_feedback=[feedback],native_store_root=str(w.directory),
+            native_fixed=w.fixed('revision'),phase_tools=['diagnosis.submit'])
+        adapter=BoundSavedStateAdapter();payload=payload_for(h,adapter)
+        self.assertNotIn('check_results',payload['tools'][0]['function']['parameters']['properties'])
+        args=dict(report=dict(subject='control',source=w.binding,facts=[]),fact_selectors={},missing_evidence=[],recommendations=[])
+        d=adapter.decode(ModelResponse(raw=native('diagnosis.submit',args)),0,{'diagnosis.submit':'2.0.0'},payload['tools'])
+        self.assertEqual(d['arguments']['check_results'],[w.chain['feedback']])
+        with self.assertRaises(ToolProtocolError):
+            adapter.decode(ModelResponse(raw=native('diagnosis.submit',{**args,'check_results':[w.summary]})),0,{'diagnosis.submit':'2.0.0'},payload['tools'])
+        ctx=SimpleNamespace(store=w.store,run_id=h.run_id,artifact=w.store.artifact)
+        with self.assertRaisesRegex(ValueError,'REVISED_REPORT_REQUIRES_NUMERICAL_RESULT_SELECTOR'):
+            submit(ctx,InventoryDiagnosisSubmission.model_validate(d['arguments']))
 
     def test_recovery_transfers_and_provider_freeze(self):
         from tools.platform_diagnosis_coordinator import transfer_recovery,recovery_status

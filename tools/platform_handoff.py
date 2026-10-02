@@ -84,7 +84,9 @@ def submit(ctx,args):
             raise ValueError('INITIAL_REPORT_REQUIRES_PREDICTION_AND_MOTION_OR_PLAN_VIEW')
     if role.get('previous_report') != plain(args.previous_report):raise ValueError('REPORT_REVISION_LINK_MISMATCH')
     expected=role.get('check_feedback',[])
-    if expected and [plain(r) for r in args.check_results] != [f['reference'] for f in expected]:raise ValueError('REPORT_CHECK_FEEDBACK_REQUIRED')
+    if expected and [plain(r) for r in args.check_results] != [f['reference'] for f in expected]:
+        raise ValueError('REPORT_CHECK_FEEDBACK_REQUIRED: check_results must contain only the feedback artifact IDs '+
+            ', '.join(f['reference']['artifact_id'] for f in expected)+'; numerical result references belong in fact_selectors, not check_results.')
     if plain(args.report.source)!=request['binding']: raise ValueError('REPORT_SUBJECT_BINDING_MISMATCH')
     if set(args.fact_selectors)!={f.fact_id for f in args.report.facts}: raise ValueError('EVERY_FACT_REQUIRES_SELECTORS')
     for fact in args.report.facts:

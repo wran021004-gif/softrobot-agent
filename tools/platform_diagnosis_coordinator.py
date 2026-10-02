@@ -127,7 +127,7 @@ def validate_check(store,role,args):
     for name in ('model','horizon_s','integration','integration_step_s'):
         if getattr(args,name)!=getattr(scope,name):raise ValueError('CHECK_OUTSIDE_REQUEST_SCOPE: '+name)
     if set(args.work_limits)-{'wall_s','local_solves','prediction_evaluations'}:
-        raise ValueError('CHECK_UNKNOWN_WORK_LIMIT')
+        raise ValueError('CHECK_UNKNOWN_WORK_LIMIT: use only wall_s, local_solves and prediction_evaluations; backend/worker limits are host-bound, not work_limits fields')
     if not 0<args.work_limits.get('wall_s',0)<=scope.max_wall_s:raise ValueError('CHECK_TIME_OUTSIDE_REQUEST_SCOPE')
     units='local_solves' if args.operation=='local_comparison' else 'prediction_evaluations'
     if not 2<=args.work_limits.get(units,0)<=scope.numerical_limits[units]:

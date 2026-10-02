@@ -1,0 +1,24 @@
+{
+  "classification": "Offline-only repair supported by preserved live failures; no replacement pilot",
+  "live_implementation_commit": "f0eca42",
+  "live_adapter": "deepseek@4.0.0",
+  "stop_reason": "PHASE_INCOMPLETE revision: BOUNDED_REPAIR_LIMIT",
+  "successful_live_steps": ["model-authored diagnostic request", "initial report", "reject + request_check design response", "model-selected prediction_braking at update 34", "exact host-resolved state/current input", "successful numerical execution", "feedback delivered to diagnostic context"],
+  "uncompleted_live_steps": ["accepted revised report", "final design response"],
+  "failure": "All three revision submissions used the numerical-result and check-request references in check_results instead of the feedback-envelope reference. Both initial attempts and two repairs were charged. Zero protocol corrections were used.",
+  "repair": "The shared phase runner now binds check_results to the immutable feedback reference, just as it already binds request and previous_report. The field is removed from native business arguments; replacement references are rejected. Models still author all scientific facts, exact numerical result selectors, hypotheses, recommendations and interpretation. Existing independent numerical-citation and scope validation remains active.",
+  "feedback_changes": "Legacy linkage errors now identify the expected feedback artifact and distinguish fact_selectors; work-limit errors list the three legal fields.",
+  "contracts": "Existing v2 internal business contracts and adapter v4 remain unchanged. This is an additional host-fixed identity binding under the same adapter mechanism; historical versions remain readable.",
+  "focused_verification": {
+    "status": "passed",
+    "tests": ["SharedWorkflowTests.test_revision_feedback_identity_is_host_bound_and_numeric_citation_still_required", "SharedWorkflowTests.test_shared_flow_feedback_memory_permissions_inventory_and_accounting"],
+    "duration_s": 122.695,
+    "scope": "Exact host feedback binding, replacement rejection, continued rejection of missing result citation; both memory organizations with feedback and finish fixture branches. Fixtures are not live scientific results."
+  },
+  "pilot_restarted": false,
+  "counters_reset": false,
+  "additional_paid_requests": 0,
+  "formal_comparison_runs": 0,
+  "physical_campaign_executions": 0,
+  "live_sources": "pilot_v4/live_sources retains the 16 exact files matching the live freeze before this repair."
+}
