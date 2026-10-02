@@ -1,0 +1,1579 @@
+[
+  {
+    "run_id": "gvs-stage346-4618e0e3d584-design",
+    "reference": {
+      "artifact_id": "05eb9093a0fa0799598e5d6179166a98608326b9742a5603bdef317dcf99bc8b",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "binding": {
+          "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+          "media_type": "application/json"
+        },
+        "budget": {
+          "backend_solves": 0,
+          "model_calls": 24,
+          "tool_calls": 60,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "candidate_id": "proposal_compliant_build",
+        "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+        "evidence_manifest": {
+          "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+          "media_type": "application/json"
+        },
+        "execution_id": "5991de53e82747439e87ba8569667e1b",
+        "permitted_tools": [
+          "diagnosis.inspect_evidence",
+          "diagnosis.check_request",
+          "diagnosis.submit",
+          "evidence.read"
+        ],
+        "question": "In execution 5991de53e82747439e87ba8569667e1b (owner_run_id gvs-stage341-0e4c97f35777-0b9932b1a295ddf0, controller.gvs_nmpc v7.0.0), reach_passed is true with terminal_error_m = 0.007642608585867386 (below reach_tolerance_m = 0.01) and terminal_speed_m_s = 0.6351726092425104, yet sampled_settling_passed is false with late_max_error_m = 0.05813810428573256 and late_max_speed_m_s = 1.5810152739742807 against settling_criteria {position_limit_m: 0.01, speed_limit_m_s: 0.02, window_s: 0.05}, while deadline_misses = 35 of 35 and mean_update_s = 17.075238151415917. What distinguishes the mechanism by which the controller terminates on the terminal/reach objective while residual motion persists in the settling window — e.g., terminal-objective weighting versus horizon truncation versus solver non-convergence across updates versus deadline-induced update timing versus plan selection (initialization_selected = 29, noninitialization_selected = 6; stopping_counts Solve_Succeeded = 1, User_Requested_Stop = 34) versus unmodeled plant/passive effects — using only retained signals, with no predetermined root cause?",
+        "saved_state_check": {
+          "configuration_scope": "saved_state_or_temporary_analysis",
+          "horizon_s": 0.01,
+          "integration": "implicit_euler",
+          "integration_step_s": 0.002,
+          "max_checks": 1,
+          "max_wall_s": 300.0,
+          "model": "model.gvs@1.0.0",
+          "numerical_limits": {
+            "local_solves": 6,
+            "prediction_evaluations": 24
+          },
+          "operations": [
+            "prediction_braking",
+            "local_comparison"
+          ]
+        },
+        "scope": [
+          "Retained-evidence reads of the complete 35-record inventory referenced by manifest 47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d and inventory 9e84a5dcdec98acbb83718a72ed5cc11e023601c7b8ff8f25bdc223141ac17f9: one_step_predictions (reference b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770, pointer template /{update_id}/one_step_prediction, update_ids 0..34), applied_tensions (same reference, /{update_id}/actual_tension_n), saved_projected_states (/{update_id}/measured_initial_state, units rad/m; rad/(m*s)), plan_selection (/{update_id}/optimization_selected_iteration), solver_status (/{update_id}/optimization_raw_status), force_limits (reference 0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd, /tendons/0..5/force_limit_n = 8.0 N), and the sampled backend_motion trajectory (reference 8665c9eb0ebe506e281863969240de828087ac8c214265363a536c530c8d500a, time_coverage_s 0.01..0.35000000000000003, frame world tip / serial backend joint coordinates) restricted to its displayed final settling window; plus summary e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf and configuration 79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0, including the recipe fields (horizon 10, max_iterations 120, terminal_weight 5.0, terminal_velocity_weight 0.0001, intent-consistent weights, holding_brake_lead_s 0.0, tension_weight 0.0001, variation_weight 0.001) and settling block, and the deadline/timing signals (deadline_missed, deadline_horizon_preparation_s, controller_boundary_wall_s, update_wall_s, engine_time_s, effective_horizon, prediction_timing).",
+          "Numerical saved-state work only within the host-supplied grant protocol.saved_state_check (model.gvs@1.0.0, implicit_euler, horizon_s 0.01, integration_step_s 0.002, configuration_scope saved_state_or_temporary_analysis, operations prediction_braking and local_comparison, max_checks 1, max_wall_s 300.0, numerical_limits local_solves 6 / prediction_evaluations 24). Boundary to respect: a 0.01 s projected-model probe yields at most a local one-step consistency check on projected GVS coordinates and cannot by itself account for a failure spanning the 0.05 s settling window; its result may only support or disfavor a hypothesis, not establish the cause.",
+          "Excluded from this scope: any production or configuration change, any backend execution or backend solve (backend_solves remaining is 0), closed-loop counterfactual replay, and causal attribution runs. Full historical warm plans and optimizer iteration traces are not retained as control_snapshots.json, and arbitrary full-trajectory velocity query is not exposed (only the final settling window is displayed).",
+          "Claim discipline for outputs: distinguish (a) not displayed in the current query, (b) not retained in the inventory (e.g., per-update warm plans, iteration traces, full q/qdot history outside the final window), and (c) retained but not accessible/computable with current tools. Absence in a sampled or paged view is not proof of absence; any selectors cited must be exact reference/pointer/value selectors, and a valid selector does not certify surrounding prose or establish causality, since a single execution comparison cannot establish a dominant cause."
+        ],
+        "stopping_conditions": [
+          "Stop and return findings once at least two candidate mechanisms for the reach-passed/settling-failed split have been compared against retained signals, or once the retained signals at the specified pointers have been read out and no further discrimination is possible from them.",
+          "Stop if the required discriminating evidence proves not retained (per-update warm plans, optimizer iteration traces, full q/qdot trajectory outside the displayed final window) or not computable with the available tools, and report that limitation explicitly rather than substituting inference.",
+          "Stop if additional reads would require exceeding the evidence turn limit, the phase budget, or the boundaries of the supplied saved-state grant; do not extend into production changes, backend execution, or closed-loop replay.",
+          "Stop if the bounded 0.01 s saved-state check reports a local inconsistency only, and report it as localized to one step with no claim about the 0.05 s settling window."
+        ],
+        "subject": "control",
+        "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-0-tool",
+      "tool_id": "diagnosis.request",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage346-4618e0e3d584-design",
+    "reference": {
+      "artifact_id": "4fccdcec2d71f984037c0b047aa9c3ab11c45bc435d55797c6c18462f690f73a",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "disposition": "adopt",
+        "next_action": "request_check",
+        "reasoning": "Scope and identity check. Subject execution 5991de53e82747439e87ba8569667e1b (owner_run_id gvs-stage341-0e4c97f35777-0b9932b1a295ddf0, controller.gvs_nmpc v7.0.0), configuration artifact 79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0, binding ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8. The recommendation rec_probe_terminal_braking (action \"defer\") is adopted: it defers any weight/horizon edit and instead exercises the one host-granted bounded saved-state check (protocol.saved_state_check: model.gvs@1.0.0, implicit_euler, horizon_s 0.01, integration_step_s 0.002, operations prediction_braking + local_comparison, max_checks 1, max_wall_s 300.0, local_solves 6 / prediction_evaluations 24), which is exactly the still-unspent grant in numerical_budget.remaining (local_solves 6, prediction_evaluations 24).\n\nEvidence basis for adopting rather than editing. Exact selectors from summary e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf: /detail/summary/reach_passed = true, /detail/summary/terminal_error_m = 0.007642608585867386 vs /detail/summary/reach_tolerance_m = 0.01 (F1), so the split is not a terminal position miss; /detail/summary/sampled_settling_passed = false with /detail/summary/late_max_error_m = 0.05813810428573256 and /detail/summary/late_max_speed_m_s = 1.5810152739742807 against /detail/summary/settling_criteria/speed_limit_m_s = 0.02 and /detail/summary/settling_criteria/window_s = 0.05 (F2); /detail/summary/controller/parameters/data/recipe/terminal_weight = 5.0 with terminal_velocity_weight = 0.0001 and terminal_tip_speed_weight = 0.0 (F3); and /detail/summary/deadline_misses = 35, /detail/summary/stopping_counts/Solve_Succeeded = 1, /detail/summary/stopping_counts/User_Requested_Stop = 34, /detail/summary/initialization_selected = 29 vs /detail/summary/noninitialization_selected = 6 (F4). These leave at least three live mechanisms for the reach-pass / settling-fail split — terminal-objective weighting that does not penalize residual speed, deadline-induced fallback to warm/initialization plans, and horizon truncation (horizon 10 at control_period_s 0.01 s ≈ 0.1 s, comparable to the 0.05 s settling window) — and the retained summary signals alone cannot separate them. A parameter or weight edit now would be un-attributed and outside the asserted scope, and the referenced capabilities (per-update warm plans / optimizer iteration traces as control_snapshots.json, full q/qdot outside the final displayed window, closed-loop counterfactual replay) are not retained or not computable, per inventory 9e84a5dcdec98acbb83718a72ed5cc11e023601c7b8ff8f25bdc223141ac17f9.\n\nWhat adoption does and does not claim. Adopting rec_probe_terminal_braking asserts only that the bounded saved-state comparison should be run before any attribution or edit; adoption alone executes nothing. I explicitly do not assert that the 0.01 s projected-model probe can explain the 0.05 s settling failure — it can at most return a local one-step consistency result on the terminal projected state and may only support or disfavor a hypothesis, never establish the cause (single execution, no causal-attribution tool). Deferring the remaining parameter recommendations is consistent with this adoption: no value change is being approved in this phase.",
+        "recommendation_id": "rec_probe_terminal_braking",
+        "report": {
+          "artifact_id": "ebdc8794fc1054edb04f776c6043f356b5dd2f7a66e3ddf07fcb51384f02837a",
+          "media_type": "application/json"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-1-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "2.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage346-4618e0e3d584-diagnostic",
+    "reference": {
+      "artifact_id": "cde9190a80a29a1afbe6949355edc308f7764a9aa35d3ade522882f1e3b8864f",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "batch": [
+        {
+          "arguments": {
+            "binding": {
+              "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+              "media_type": "application/json"
+            },
+            "update_ids": [
+              0,
+              1,
+              2,
+              16,
+              17,
+              30,
+              32,
+              34
+            ],
+            "view": "prediction"
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-0-tool-0",
+          "tool_id": "diagnosis.inspect_evidence",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "binding": {
+              "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+              "media_type": "application/json"
+            },
+            "update_ids": [
+              0,
+              1,
+              2,
+              16,
+              17,
+              30,
+              32,
+              34
+            ],
+            "view": "plans"
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-0-tool-1",
+          "tool_id": "diagnosis.inspect_evidence",
+          "tool_version": "1.0.0"
+        }
+      ]
+    }
+  },
+  {
+    "run_id": "gvs-stage346-4618e0e3d584-diagnostic",
+    "reference": {
+      "artifact_id": "e87f2a2f592b403772310a9f5b0ff795dd7ba89473defeea47dab6790b711cf2",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "limit": 20,
+            "offset": 0,
+            "pointer": "/detail",
+            "reference": {
+              "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-1-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "limit": 20,
+            "offset": 0,
+            "pointer": "/detail",
+            "reference": {
+              "artifact_id": "f34c6ccf0f06f90ab6afc058322532c7ebf6487b62348af82d138bda58feec7e",
+              "media_type": "application/json"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-1-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    }
+  },
+  {
+    "run_id": "gvs-stage346-4618e0e3d584-diagnostic",
+    "reference": {
+      "artifact_id": "3e3265fd470d16665944550d23c248b04f6b8b6dcaf245d397683e828250b64a",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "check_results": [],
+        "fact_selectors": {
+          "fact.config_recipe": [
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/terminal_weight",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 5.0
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/terminal_velocity_weight",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 0.0001
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/velocity_weight",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 0.0001
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/horizon",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 10
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/holding_brake_lead_s",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 0.0
+            },
+            {
+              "pointer": "/tendons/0/force_limit_n",
+              "reference": {
+                "artifact_id": "0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd",
+                "media_type": "application/octet-stream"
+              },
+              "value": 8.0
+            }
+          ],
+          "fact.deadline_timing": [
+            {
+              "pointer": "/detail/summary/deadline_misses",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 35
+            },
+            {
+              "pointer": "/detail/summary/mean_update_s",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 17.075238151415917
+            },
+            {
+              "pointer": "/detail/summary/control_period_s",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            }
+          ],
+          "fact.plan_solver_counts": [
+            {
+              "pointer": "/detail/summary/initialization_selected",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 29
+            },
+            {
+              "pointer": "/detail/summary/noninitialization_selected",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 6
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/Solve_Succeeded",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 1
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/User_Requested_Stop",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 34
+            }
+          ],
+          "fact.reach_settling_split": [
+            {
+              "pointer": "/detail/summary/terminal_error_m",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 0.007642608585867386
+            },
+            {
+              "pointer": "/detail/summary/terminal_speed_m_s",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 0.6351726092425104
+            },
+            {
+              "pointer": "/detail/summary/reach_passed",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/detail/summary/reach_tolerance_m",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/sampled_settling_passed",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/detail/summary/late_max_error_m",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 0.05813810428573256
+            },
+            {
+              "pointer": "/detail/summary/late_max_speed_m_s",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 1.5810152739742807
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/speed_limit_m_s",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 0.02
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/position_limit_m",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/window_s",
+              "reference": {
+                "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                "media_type": "application/json"
+              },
+              "value": 0.05
+            }
+          ]
+        },
+        "missing_evidence": [
+          "Per-update optimization_raw_status and optimization_selected_iteration values (retained in inventory b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770 at /{update_id}/optimization_raw_status and /{update_id}/optimization_selected_iteration) were not displayed in the returned overview page; a targeted read of those pointers is required to test the solver-nonconvergence hypothesis.",
+          "Per-update timing breakdown (deadline_missed, deadline_horizon_preparation_s, controller_boundary_wall_s, update_wall_s, engine_time_s, effective_horizon, prediction_timing) from the sampled backend_motion inventory 8665c9eb0ebe506e281863969240de828087ac8c214265363a536c530c8d500a was not displayed; needed to test the deadline-induced update-timing hypothesis.",
+          "Sampled one_step_predictions, actual_tension_n, measured_initial_state and the sampled backend_motion tip/qvel samples were not displayed beyond the overview page (/detail returned 1 of 4 items), so per-update prediction-versus-applied-tension and state evidence is unavailable in this phase.",
+          "Per-update warm plans and optimizer iteration traces are not retained (missing control_snapshots.json) and arbitrary full-trajectory velocity query outside the displayed final settling window is not exposed; therefore cost-term dominance and mid-trajectory speed history are retained-but-not-computable with current tools.",
+          "No closed-loop counterfactual replay or causal attribution tool is available (capability gap), and backend_solves remaining is 0, so no mechanism can be confirmed as dominant."
+        ],
+        "previous_report": null,
+        "recommendations": [
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+              "media_type": "application/json"
+            },
+            "parameter": null,
+            "rationale": "Defer any causal conclusion until the already-retained per-update solver and plan-selection signals are read out: /{update_id}/optimization_raw_status and /{update_id}/optimization_selected_iteration in inventory b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770 for update_ids 0..34 (max 8 ids per query), which separate solver-nonconvergence from plan-selection effects without any backend solve.",
+            "recommendation_id": "rec.read_retained_per_update_solver_status",
+            "value": null
+          },
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+              "media_type": "application/json"
+            },
+            "parameter": null,
+            "rationale": "Defer any terminal-weighting or horizon-truncation claim: the bounded 0.01 s projected-model saved-state probe covers one step and cannot account for a failure spanning the 0.05 s settling window. Only a full-trajectory or closed-loop comparison could test dominance of the terminal term (terminal_weight 5.0) over the velocity terms (0.0001); no such comparison is available in this phase.",
+            "recommendation_id": "rec.defer_until_settling_window_evidence",
+            "value": null
+          },
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+              "media_type": "application/json"
+            },
+            "parameter": null,
+            "rationale": "Defer the deadline-induced update-timing hypothesis: deadline_misses 35 and mean_update_s 17.075238151415917 are observed, but host scheduling is synchronous and wall deadline misses do not inject physical delay into simulated time, so the mechanism needs the per-update timing breakdown and plan-source fields from inventory 8665c9eb0ebe506e281863969240de828087ac8c214265363a536c530c8d500a before it can be advanced or excluded.",
+            "recommendation_id": "rec.defer_deadline_mechanism_pending_timing_breakdown",
+            "value": null
+          }
+        ],
+        "report": {
+          "attribution": [
+            {
+              "cause": "terminal_objective_weighting_terminates_on_reach_with_residual_speed",
+              "fact_ids": [
+                "fact.reach_settling_split",
+                "fact.config_recipe"
+              ],
+              "reason": "Consistent with the observed split: the cost recipe scales terminal position with terminal_weight 5.0 while velocity terms are weighted at 0.0001 (terminal_velocity_weight, velocity_weight) and terminal_tip_speed_weight is 0.0, and the run passes reach while terminal_speed_m_s 0.6351726092425104 is 31.76x the settling speed limit. Discrimination is not possible from retained signals: no per-update optimizer iteration trace or cost decomposition is retained, so dominance of the terminal term over speed damping cannot be shown.",
+              "status": "possible"
+            },
+            {
+              "cause": "horizon_truncation_mismatch_with_settling_window",
+              "fact_ids": [
+                "fact.config_recipe",
+                "fact.reach_settling_split"
+              ],
+              "reason": "The sampled backend_motion inventory exposes only the final settling window (time_coverage_s 0.01..0.35000000000000003) and arbitrary full-trajectory velocity query is not exposed; the 0.10 s nominal horizon (10 steps x 0.01 s control period) exceeds the 0.05 s settling window, which disfavors simple truncation short of the window but does not exclude a terminal-only formulation. No retained signal distinguishes these.",
+              "status": "insufficient_evidence"
+            },
+            {
+              "cause": "solver_nonconvergence_across_updates",
+              "fact_ids": [
+                "fact.plan_solver_counts"
+              ],
+              "reason": "Only aggregate counts are displayed (Solve_Succeeded 1, User_Requested_Stop 34, initialization_selected 29, noninitialization_selected 6). Per-update optimization_raw_status and optimization_selected_iteration are retained in inventory b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770 but were not displayed, so the per-update convergence sequence cannot be read here; per-update warm plans and iteration traces are explicitly not retained as control_snapshots.json.",
+              "status": "insufficient_evidence"
+            },
+            {
+              "cause": "deadline_induced_update_timing",
+              "fact_ids": [
+                "fact.deadline_timing"
+              ],
+              "reason": "deadline_misses 35 and mean_update_s 17.075238151415917 are observed, but the request states scheduling is synchronous and wall deadline misses do not inject physical delay into simulated time, so wall timing alone cannot explain simulated residual motion; the per-update timing fields needed to test a fallback/late-plan mechanism are listed in inventory 8665c9eb0ebe506e281863969240de828087ac8c214265363a536c530c8d500a but were not displayed.",
+              "status": "insufficient_evidence"
+            },
+            {
+              "cause": "unmodeled_plant_or_passive_effects",
+              "fact_ids": [
+                "fact.config_recipe"
+              ],
+              "reason": "signals solver_qfrc_passive_nm, external_torque_nm, gvs_projection_residual_max_rad_m, tension_tracking_error_n and force_limit_saturated exist in the sampled backend_motion inventory but their values were not displayed in the returned overview page; no retained value in this phase supports or disfavors unmodeled plant/passive behaviour.",
+              "status": "insufficient_evidence"
+            }
+          ],
+          "facts": [
+            {
+              "evidence": [
+                {
+                  "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "fact.reach_settling_split",
+              "observed": {
+                "name": "terminal_speed_m_s",
+                "units": "m/s",
+                "value": 0.6351726092425104
+              },
+              "statement": "In execution 5991de53e82747439e87ba8569667e1b the terminal/reach objective is observed satisfied (reach_passed true, terminal_error_m 0.007642608585867386 below reach_tolerance_m 0.01) with terminal_speed_m_s 0.6351726092425104, while sampled_settling_passed is false with late_max_error_m 0.05813810428573256 and late_max_speed_m_s 1.5810152739742807 against settling_criteria position_limit_m 0.01 / speed_limit_m_s 0.02 / window_s 0.05. Terminal speed is 31.76x the settling speed limit and late max speed is 79.05x it; the observed terminal error is inside the settling position limit while the observed late max error is 5.81x it."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "9e84a5dcdec98acbb83718a72ed5cc11e023601c7b8ff8f25bdc223141ac17f9",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "fact.deadline_timing",
+              "observed": {
+                "name": "mean_update_s",
+                "units": "s",
+                "value": 17.075238151415917
+              },
+              "statement": "All 35 retained updates are recorded as deadline misses (deadline_misses 35) with mean_update_s 17.075238151415917 s versus control_period_s 0.01; the per-update timing breakdown (deadline_missed, deadline_horizon_preparation_s, controller_boundary_wall_s, update_wall_s, engine_time_s, effective_horizon, prediction_timing) is listed as retained signals in the sampled backend_motion inventory but is not displayed in the returned /detail overview page."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "fact.plan_solver_counts",
+              "observed": {
+                "contract": "diagnosis.plan_solver_selection_counts",
+                "data": {
+                  "initialization_selected": 29,
+                  "noninitialization_selected": 6,
+                  "retained_update_records": 35,
+                  "stopping_counts_Solve_Succeeded": 1,
+                  "stopping_counts_User_Requested_Stop": 34
+                },
+                "version": "1.0.0"
+              },
+              "statement": "Across the 35 retained updates the plan selection counts are initialization_selected 29 and noninitialization_selected 6, and the stopping counts are Solve_Succeeded 1 and User_Requested_Stop 34. Per-update optimization_selected_iteration and optimization_raw_status values are in the retained inventory (b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770) but are not displayed in the returned overview page, so the per-update solver-convergence sequence is not shown here."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd",
+                  "media_type": "application/octet-stream"
+                }
+              ],
+              "fact_id": "fact.config_recipe",
+              "observed": {
+                "contract": "diagnosis.controller_recipe",
+                "data": {
+                  "control_period_s": 0.01,
+                  "force_limit_n_per_tendon": 8.0,
+                  "holding_brake_lead_s": 0.0,
+                  "horizon": 10,
+                  "max_iterations": 120,
+                  "settling_position_limit_m": 0.01,
+                  "settling_speed_limit_m_s": 0.02,
+                  "settling_window_s": 0.05,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.0,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "version": "1.0.0"
+              },
+              "statement": "Configuration 79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0 (controller.gvs_nmpc v7.0.0) carries recipe horizon 10, max_iterations 120, terminal_weight 5.0, terminal_velocity_weight 0.0001, terminal_tip_speed_weight 0.0, tracking_weight 1.0, velocity_weight 0.0001, tension_weight 0.0001, variation_weight 0.001, holding_brake_lead_s 0.0, tip_speed_scale_m_s 0.02, and a settling block position_limit_m 0.01 / speed_limit_m_s 0.02 / window_s 0.05; the tendon force limits are 8.0 N on each of the six tendons. With control_period_s 0.01 the nominal 10-step horizon spans 0.10 s, which bracketed the 0.05 s settling window."
+            }
+          ],
+          "gates": [
+            {
+              "evidence": [
+                {
+                  "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                  "media_type": "application/json"
+                }
+              ],
+              "expected": {
+                "name": "reach_tolerance_m",
+                "units": "m",
+                "value": 0.01
+              },
+              "gate_id": "reach_objective",
+              "observed": {
+                "name": "terminal_error_m",
+                "units": "m",
+                "value": 0.007642608585867386
+              },
+              "reason": "reach_passed true; terminal_error_m 0.007642608585867386 is inside reach_tolerance_m 0.01.",
+              "status": "passed"
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                  "media_type": "application/json"
+                }
+              ],
+              "expected": {
+                "name": "speed_limit_m_s",
+                "units": "m/s",
+                "value": 0.02
+              },
+              "gate_id": "sampled_settling",
+              "observed": {
+                "name": "late_max_speed_m_s",
+                "units": "m/s",
+                "value": 1.5810152739742807
+              },
+              "reason": "sampled_settling_passed false; late_max_speed_m_s 1.5810152739742807 exceeds speed_limit_m_s 0.02 and late_max_error_m 0.05813810428573256 exceeds position_limit_m 0.01 over window_s 0.05.",
+              "status": "failed"
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "1cadb23ce25cba0df8ffbcd2c0bb81ad43de0c58286b23471aea55309c250b19",
+                  "media_type": "application/json"
+                }
+              ],
+              "expected": null,
+              "gate_id": "deadline_adherence",
+              "observed": {
+                "name": "deadline_misses",
+                "units": "count",
+                "value": 35.0
+              },
+              "reason": "deadline_misses 35 against 35 retained updates; mean_update_s 17.075238151415917 versus control_period_s 0.01. Host scheduling states synchronous controller calls complete before fixed-count backend steps, so this is a wall-clock observation.",
+              "status": "failed"
+            }
+          ],
+          "limitations": [
+            "Single execution (5991de53e82747439e87ba8569667e1b) and no closed-loop counterfactual replay; a single comparison cannot establish a dominant cause or causality.",
+            "Returned pages were overview-level (/detail with one item of four); the itemised /detail/evidence content, per-update values, and the sampled final-window motion samples were not displayed, so absence in these views is not proof of absence.",
+            "Per-update warm plans and optimizer iteration traces are not retained (missing control_snapshots.json); full q/qdot history outside the displayed final settling window is retained-but-not-computable with the current tools.",
+            "Boundary respected: a 0.01 s projected-model probe covers at most one step and cannot by itself account for a failure spanning the 0.05 s settling window; no numerical check was executed or selected in this phase."
+          ],
+          "recommended_actions": [],
+          "source": {
+            "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+            "media_type": "application/json"
+          },
+          "subject": "control"
+        },
+        "request": {
+          "artifact_id": "5a9e92129514a9eaa6c457f255653a96d528b3a6949fb1d2d736d9aab38512ee",
+          "media_type": "application/json"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-2-tool",
+      "tool_id": "diagnosis.submit",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage346-4618e0e3d584-diagnostic",
+    "reference": {
+      "artifact_id": "40fc665969da3682e5a4f912ed1e3ccc616c990bfdd9a65af03cc01aab7d38a8",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "check_results": [],
+        "fact_selectors": {
+          "F1_reach_pass_with_terminal_speed": [
+            {
+              "pointer": "/detail/summary/reach_passed",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/detail/summary/terminal_error_m",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.007642608585867386
+            },
+            {
+              "pointer": "/detail/summary/reach_tolerance_m",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/terminal_speed_m_s",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.6351726092425104
+            }
+          ],
+          "F2_sampled_settling_failure": [
+            {
+              "pointer": "/detail/summary/sampled_settling_passed",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/detail/summary/late_max_error_m",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.05813810428573256
+            },
+            {
+              "pointer": "/detail/summary/late_max_speed_m_s",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 1.5810152739742807
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/position_limit_m",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/speed_limit_m_s",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.02
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/window_s",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.05
+            }
+          ],
+          "F3_recipe_weights": [
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/terminal_weight",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 5.0
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/tracking_weight",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 1.0
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/terminal_velocity_weight",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.0001
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/terminal_tip_speed_weight",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.0
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/holding_tip_speed_weight",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.0
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/velocity_weight",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.0001
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/variation_weight",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.001
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/horizon",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 10
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/max_iterations",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 120
+            }
+          ],
+          "F4_deadline_solver_plan_selection": [
+            {
+              "pointer": "/detail/summary/deadline_misses",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 35
+            },
+            {
+              "pointer": "/detail/summary/mean_update_s",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 17.075238151415917
+            },
+            {
+              "pointer": "/detail/summary/control_period_s",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/Solve_Succeeded",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 1
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/User_Requested_Stop",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 34
+            },
+            {
+              "pointer": "/detail/summary/initialization_selected",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 29
+            },
+            {
+              "pointer": "/detail/summary/noninitialization_selected",
+              "reference": {
+                "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                "media_type": "application/json"
+              },
+              "value": 6
+            }
+          ]
+        },
+        "missing_evidence": [
+          "Per-update warm plans and optimizer iteration traces are not retained as control_snapshots.json.",
+          "Full q/qdot trajectory outside the displayed final settling window is not exposed; only the final window is sampled, so intermediate-speed evolution is not available.",
+          "No closed-loop counterfactual replay or causal attribution tool exists; a 0.01 s projected-model probe cannot explain a 0.05 s settling failure.",
+          "Per-update deadline_missed and optimization_raw_status values (retained in the backend_motion signal set) were not read out in this phase; only summary counts are displayed."
+        ],
+        "previous_report": null,
+        "recommendations": [
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+              "media_type": "application/json"
+            },
+            "parameter": null,
+            "rationale": "Before attributing residual motion, run the granted bounded saved-state prediction_braking / local_comparison probe (model.gvs@1.0.0, implicit_euler, horizon_s 0.01, integration_step_s 0.002) on the terminal projected state to test one-step consistency; defer any weight change until then.",
+            "recommendation_id": "rec_probe_terminal_braking",
+            "value": null
+          },
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+              "media_type": "application/json"
+            },
+            "parameter": null,
+            "rationale": "Do not change terminal_weight/terminal_velocity_weight/horizon yet: terminal-objective weighting competes with deadline-induced plan fallback, and one execution of retained summary signals cannot separate them.",
+            "recommendation_id": "rec_defer_weight_change",
+            "value": null
+          },
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+              "media_type": "application/json"
+            },
+            "parameter": null,
+            "rationale": "Defer settling conclusions until per-update optimization_raw_status/deadline_missed and full q/qdot trajectory are instrumented, since warm plans and iteration traces are not retained.",
+            "recommendation_id": "rec_request_instrumentation",
+            "value": null
+          }
+        ],
+        "report": {
+          "attribution": [
+            {
+              "cause": "terminal_objective_weighting",
+              "fact_ids": [
+                "F1_reach_pass_with_terminal_speed",
+                "F2_sampled_settling_failure",
+                "F3_recipe_weights"
+              ],
+              "reason": "Recipe penalizes terminal position (terminal_weight 5.0) while terminal speed terms are negligible (terminal_velocity_weight 0.0001, terminal_tip_speed_weight 0.0, holding_tip_speed_weight 0.0). Consistent with a position tolerance met at terminal_speed 0.635 m/s while the settling speed limit 0.02 m/s is exceeded, but a single execution cannot separate this from timing/plan-fallback mechanisms.",
+              "status": "possible"
+            },
+            {
+              "cause": "deadline_induced_solver_termination",
+              "fact_ids": [
+                "F4_deadline_solver_plan_selection"
+              ],
+              "reason": "35/35 deadline misses with mean_update_s ~17 s vs control_period_s 0.01 s and 34/35 User_Requested_Stop (only 1 Solve_Succeeded) is consistent with solver effort being cut short. The host states wall deadline misses do not inject physical delay into simulated time, so any effect must act through stale/fallback plans rather than physical delay.",
+              "status": "possible"
+            },
+            {
+              "cause": "initialization_plan_fallback",
+              "fact_ids": [
+                "F4_deadline_solver_plan_selection"
+              ],
+              "reason": "29/35 updates selected the initialization plan, so most applied inputs may derive from warm/initial plans rather than converged noninitialization plans; per-update optimization_raw_status was not read out this phase.",
+              "status": "possible"
+            },
+            {
+              "cause": "solver_nonconvergence_across_updates",
+              "fact_ids": [
+                "F4_deadline_solver_plan_selection"
+              ],
+              "reason": "stopping_counts Solve_Succeeded = 1 vs User_Requested_Stop = 34 indicates the solver rarely converged within budget across updates, consistent with deadline-bounded returns of suboptimal plans feeding the plant.",
+              "status": "possible"
+            },
+            {
+              "cause": "horizon_truncation",
+              "fact_ids": [
+                "F3_recipe_weights"
+              ],
+              "reason": "horizon = 10 at control_period_s 0.01 s covers ~0.1 s, comparable to the 0.05 s settling window; the plan may not anticipate full braking. Not discriminated by the retained summary signals.",
+              "status": "possible"
+            },
+            {
+              "cause": "unmodeled_plant_or_passive_effects",
+              "fact_ids": [],
+              "reason": "No retained signal isolates plant/passive dynamics; there is no closed-loop replay, and a 0.01 s projected-model probe cannot cover the 0.05 s settling window (capability gap stated in the inventory).",
+              "status": "insufficient_evidence"
+            },
+            {
+              "cause": "terminal_reach_failure",
+              "fact_ids": [
+                "F1_reach_pass_with_terminal_speed"
+              ],
+              "reason": "reach_passed = true with terminal_error_m 0.0076426 < reach_tolerance_m 0.01, so the observed split is not a terminal position miss.",
+              "status": "ruled_out"
+            }
+          ],
+          "facts": [
+            {
+              "evidence": [
+                {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "F1_reach_pass_with_terminal_speed",
+              "observed": null,
+              "statement": "In execution 5991de53e82747439e87ba8569667e1b the reach objective passed (reach_passed = true) with terminal_error_m = 0.007642608585867386 below reach_tolerance_m = 0.01, while the same sample reports terminal_speed_m_s = 0.6351726092425104, roughly 32x the settling speed_limit_m_s = 0.02."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "F2_sampled_settling_failure",
+              "observed": null,
+              "statement": "The sampled settling check failed (sampled_settling_passed = false) with late_max_error_m = 0.05813810428573256 and late_max_speed_m_s = 1.5810152739742807, against settling_criteria {position_limit_m 0.01, speed_limit_m_s 0.02, window_s 0.05}."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "F3_recipe_weights",
+              "observed": null,
+              "statement": "The retained controller recipe weights terminal position heavily (terminal_weight = 5.0, tracking_weight = 1.0) with negligible speed/variation penalties (terminal_velocity_weight = 0.0001, terminal_tip_speed_weight = 0.0, holding_tip_speed_weight = 0.0, velocity_weight = 0.0001, variation_weight = 0.001), horizon = 10, max_iterations = 120."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "F4_deadline_solver_plan_selection",
+              "observed": null,
+              "statement": "All 35 controller updates missed their deadline (deadline_misses = 35) with mean_update_s = 17.075238151415917 versus control_period_s = 0.01; stopping_counts report Solve_Succeeded = 1 and User_Requested_Stop = 34, and plan selection was initialization_selected = 29, noninitialization_selected = 6."
+            }
+          ],
+          "gates": [
+            {
+              "evidence": [
+                {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                }
+              ],
+              "expected": {
+                "name": "reach_tolerance_m",
+                "units": "m",
+                "value": 0.01
+              },
+              "gate_id": "reach_gate",
+              "observed": {
+                "name": "terminal_error_m",
+                "units": "m",
+                "value": 0.007642608585867386
+              },
+              "reason": null,
+              "status": "passed"
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                }
+              ],
+              "expected": {
+                "name": "speed_limit_m_s",
+                "units": "m/s",
+                "value": 0.02
+              },
+              "gate_id": "settling_gate",
+              "observed": {
+                "name": "late_max_speed_m_s",
+                "units": "m/s",
+                "value": 1.5810152739742807
+              },
+              "reason": null,
+              "status": "failed"
+            }
+          ],
+          "limitations": [
+            "Single execution with no closed-loop counterfactual replay; no dominant cause can be established.",
+            "selectors cite values in the original summary query-result artifact e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf; a valid selector does not certify surrounding prose or establish causality.",
+            "Wall deadline misses are documented not to inject physical delay into simulated time, so mean_update_s = 17.075 does not directly explain the physical settling error.",
+            "Per-update deadline_missed / optimization_raw_status records are retained (backend_motion signals) but were not read out in this phase; only summary counts are displayed.",
+            "Any 0.01 s projected-model probe is localized to one step and cannot by itself account for a failure spanning the 0.05 s settling window."
+          ],
+          "recommended_actions": [
+            "Defer weight/horizon changes pending a bounded saved-state prediction_braking local-comparison probe on the terminal projected state.",
+            "Discriminate deadline-induced plan fallback from terminal-objective weighting by reading per-update optimization_raw_status and deadline_missed before attributing.",
+            "Request instrumentation of full q/qdot outside the displayed final settling window, since warm plans and iteration traces are not retained."
+          ],
+          "source": {
+            "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+            "media_type": "application/json"
+          },
+          "subject": "control"
+        },
+        "request": {
+          "artifact_id": "5a9e92129514a9eaa6c457f255653a96d528b3a6949fb1d2d736d9aab38512ee",
+          "media_type": "application/json"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-3-tool",
+      "tool_id": "diagnosis.submit",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage346-4618e0e3d584-diagnostic",
+    "reference": {
+      "artifact_id": "4301ef9faca4720d5c92efad68bf7ddbcf9eaef717d390c256c0aa0b7f871443",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 8192,
+            "limit": 20,
+            "offset": 0,
+            "pointer": "/34/measured_initial_state",
+            "reference": {
+              "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+              "media_type": "application/octet-stream"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-4-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 2048,
+            "limit": 20,
+            "offset": 0,
+            "pointer": "/34/actual_tension_n",
+            "reference": {
+              "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+              "media_type": "application/octet-stream"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-4-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 2048,
+            "limit": 20,
+            "offset": 0,
+            "pointer": "/34/optimization_raw_status",
+            "reference": {
+              "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+              "media_type": "application/octet-stream"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-4-tool-2",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    }
+  },
+  {
+    "run_id": "gvs-stage346-4618e0e3d584-diagnostic",
+    "reference": {
+      "artifact_id": "79831f62edc2f82d03c952f0d34d3c4893be3c4dce42b0ec91ba4518d8550bed",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "batch": [
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 20,
+            "offset": 20,
+            "pointer": "/34/measured_initial_state",
+            "reference": {
+              "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+              "media_type": "application/octet-stream"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-5-tool-0",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 20,
+            "offset": 0,
+            "pointer": "/34/one_step_prediction",
+            "reference": {
+              "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+              "media_type": "application/octet-stream"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-5-tool-1",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "byte_limit": 4096,
+            "limit": 20,
+            "offset": 0,
+            "pointer": "/34/optimization_selected_iteration",
+            "reference": {
+              "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+              "media_type": "application/octet-stream"
+            }
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-5-tool-2",
+          "tool_id": "evidence.read",
+          "tool_version": "1.0.0"
+        }
+      ]
+    }
+  },
+  {
+    "run_id": "gvs-stage346-4618e0e3d584-diagnostic",
+    "reference": {
+      "artifact_id": "2a9406389e0e1f9e536d16df49833cc2349662cc5459447f988f888b3d8b159d",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "acceptance_criteria": [
+          "Return a reportable local comparison at update 34: the recorded held tension and an instantaneous braking-box tension on the same saved projected state, both with units, plus the resulting projected tip-speed magnitudes, within the 0.01 s / 0.002 s-step horizon and inside the granted check limits.",
+          "The result must be stated as supporting or disfavoring at least one named hypothesis (H1 no braking action in held input; H2 braking commanded but speed not reduced; H3 braking infeasible under the 8.0 N limits), not as a root cause.",
+          "Any saturation at the 8.0 N per-channel limits must be reported explicitly with the affected channel indices.",
+          "If the saved state or held input needed for the probe is not retained or not computable, the check must return an explicit not-retained / not-computable status instead of an inferred cause.",
+          "The output must be labeled as a localized one-step consistency result on projected GVS coordinates that cannot by itself explain the 0.05 s settling-window failure (sampled_settling_passed = false, late_max_speed_m_s = 1.5810152739742807 against speed_limit_m_s = 0.02)."
+        ],
+        "additional_need": "Provenance and read-limit disclosure, not a new read request. The phase's two successful reading turns are spent (evidence_turn_limit 2, turns_used 2), so this selector set is limited to what was actually displayed. (a) /34/measured_initial_state was paged: offset 20 returned items 20..23 of 24 (artifact a8c4291c5603931e312df3aa6079c45097ec484d78ac738a9a2f0f996fd4e6e4); the cited value is exactly those four returned elements and the remaining items 0..19 were not displayed in this phase - the host should resolve the full 24-element saved state from the referenced artifact at that pointer. (b) /34/actual_tension_n was not read directly; the six-element value cited agrees element-for-element with applied_tension_n displayed at /34/one_step_prediction (artifact 37241ac302cef5bc1e11b154b2d7888a3a73bfd276e4233ffb8af95be3bf8e67, time_s 0.35), cited above as prior_result. (c) /34/optimization_selected_iteration = 31 was read (artifact 552a87f2422b250c1030919a8dbd029186918dcd73fb215ebcbb3cbb436a5a0b); per-update optimization_raw_status and deadline_missed values were not read out this phase, so the deadline-induced fallback mechanism (H4 territory) is not part of this check's discriminating set. No further retained evidence reads are available within this phase; if the probe requires a fuller state than items 20..23, report that as not-computable with the current tools rather than substituting inference.",
+        "changed_factor": null,
+        "changed_parameter": null,
+        "changed_value": null,
+        "check_id": "rec_probe_terminal_braking",
+        "diagnosis_request": {
+          "artifact_id": "5a9e92129514a9eaa6c457f255653a96d528b3a6949fb1d2d736d9aab38512ee",
+          "media_type": "application/json"
+        },
+        "fixed_conditions": [
+          "model.gvs@1.0.0, implicit Euler integration, integration step 0.002 s, horizon 0.01 s (5 steps), host-granted saved_state_or_temporary_analysis scope",
+          "update_id 34 only: the saved projected GVS initial state at /34/measured_initial_state is held fixed; the recorded held input at /34/actual_tension_n is held constant across the probe",
+          "six tendon channels, world-frame tip vectors, per-channel force limit 8.0 N",
+          "no production or configuration change; no backend execution or backend solve; no closed-loop counterfactual replay; results localized to one 0.002 s-step / 0.01 s-horizon probe",
+          "single execution (5991de53e82747439e87ba8569667e1b): the probe cannot span the 0.05 s settling window and cannot establish a dominant cause"
+        ],
+        "horizon_s": 0.01,
+        "hypotheses": [
+          "H1_no_braking_action_in_held_input: at the terminal update 34 the recorded held tension contains no braking box action (e.g., the one channel with tension ~1.42e-08 N is effectively slack and no channel opposes the residual tip motion), so residual tip speed persists because the terminal objective/plan never commands deceleration - consistent with negligible terminal_tip_speed_weight/holding_tip_speed_weight and a 0.1 s horizon.",
+          "H2_braking_commanded_but_projected_speed_not_reduced: a braking box solution does differ from the recorded held tension, yet the one-step projected tip speed under the held input is not materially reduced over the 0.01 s probe, which would point to commanded-but-ineffective authority (actuation/passive or model mismatch) rather than to objective weighting.",
+          "H3_braking_requires_tension_infeasible_under_limits: the braking box solution saturates one or more channels at the 8.0 N force limits (reference 0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd, /tendons/0..5/force_limit_n = 8.0), so residual motion is not attributable to the weighting scheme alone but to per-channel force limits within the probe step."
+        ],
+        "initial_state": {
+          "pointer": "/34/measured_initial_state",
+          "reference": {
+            "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+            "media_type": "application/octet-stream"
+          },
+          "value": [
+            -41.51248864122173,
+            -81.80185081376304,
+            -34.1922189442125,
+            -11.086129243904658
+          ]
+        },
+        "input": {
+          "pointer": "/34/actual_tension_n",
+          "reference": {
+            "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+            "media_type": "application/octet-stream"
+          },
+          "value": [
+            3.1758909392099772,
+            2.757372796476204,
+            1.4216485070827969e-08,
+            0.8929758192138912,
+            0.12734806870748366,
+            0.0
+          ]
+        },
+        "integration": "implicit_euler",
+        "integration_step_s": 0.002,
+        "metrics": [
+          "per-channel braking-box tension (N) at update 34 versus the recorded held tension [3.1758909392099772, 2.757372796476204, 1.4216485070827969e-08, 0.8929758192138912, 0.12734806870748366, 0.0] N, with signed element-wise differences",
+          "number of channels clamped at the 8.0 N force limit by the braking-box solution",
+          "projected tip speed magnitude (m/s) at the probe endpoint under the held input versus under the braking-box input, referenced to tip_velocity_m_s [0.11780454302749989, -0.172658750393797, -0.6044581307259784] m/s (magnitude ~0.639 m/s) from /34/one_step_prediction",
+          "projected tip position drift (m) over the probe, referenced to tip_position_m [0.2827107902820434, 0.033137127101759, 0.18749659051322978] m and terminal_error_m 0.007642608585867386 against reach_tolerance_m 0.01 m",
+          "one-step version/consistency status of the probe (applied model, integration, substeps, horizon actually used)"
+        ],
+        "model": "model.gvs@1.0.0",
+        "operation": "prediction_braking",
+        "prior_result": {
+          "artifact_id": "37241ac302cef5bc1e11b154b2d7888a3a73bfd276e4233ffb8af95be3bf8e67",
+          "media_type": "application/json"
+        },
+        "update_id": 34,
+        "work_limits": {
+          "local_solves": 2.0,
+          "max_checks": 1.0,
+          "prediction_evaluations": 2.0,
+          "wall_s": 300.0
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-6-tool",
+      "tool_id": "diagnosis.check_request",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage346-4618e0e3d584-diagnostic",
+    "reference": {
+      "artifact_id": "70e11895eb0a03dee2f834bb74681b82e6fb4c6ac82073541fadb07acb07575a",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "acceptance_criteria": [
+          "The result is discriminating only if the per-tendon deviation between the recorded held input and the instantaneous braking-box solution is reported with exact reference/pointer/value selectors from artifact b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770.",
+          "Report the outcome as localized to one 0.01 s projected step on the saved state at update 34; it may only support or disfavor the listed hypotheses and must not be extended to explain the 0.05 s sampled settling failure.",
+          "If the per-tendon deviation is within the reported numerical tolerance, report the probe as inconclusive for these mechanisms rather than attributing a cause."
+        ],
+        "additional_need": "Selectors cite the exactly-read retained projected state and held input for update 34 from artifact b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770; /34/measured_initial_state and /34/actual_tension_n were not fully read out (the state read was a partial page), so the retained projected state and recorded held input were cited from the update-34 one_step_prediction record instead.",
+        "changed_factor": null,
+        "changed_parameter": null,
+        "changed_value": null,
+        "check_id": "probe_braking_u34",
+        "diagnosis_request": {
+          "artifact_id": "5a9e92129514a9eaa6c457f255653a96d528b3a6949fb1d2d736d9aab38512ee",
+          "media_type": "application/json"
+        },
+        "fixed_conditions": [
+          "model.gvs@1.0.0, implicit Euler integration, integration_step_s = 0.002, horizon_s = 0.01",
+          "control_period_s = 0.01; controller.gvs_nmpc v7.0.0, execution 5991de53e82747439e87ba8569667e1b",
+          "update_id = 34; saved evidence artifact b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770; frame = world for tension vectors",
+          "tendon force_limit_n = 8.0 for tendons 0..5 (reference 0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd)",
+          "configuration_scope = saved_state_or_temporary_analysis; no adoption and no production change"
+        ],
+        "horizon_s": 0.01,
+        "hypotheses": [
+          "terminal_objective_weighting: with terminal_weight=5.0 and terminal_tip_speed_weight=0.0 / terminal_velocity_weight=0.0001, the accepted plan need not drive terminal tip speed below the 0.02 m/s settling limit; the recorded held input at update 34 should then sit far from an instantaneous full-braking box for the projected terminal state.",
+          "horizon_truncation: horizon=10 at control_period_s=0.01 s spans only ~0.1 s of plan, so braking authority inside the horizon can be exhausted before a 0.05 s settling window ends; the recorded held input should look like a partial (not full) braking effort.",
+          "deadline_and_plan_fallback: 35/35 deadline misses with stopping_counts Solve_Succeeded=1 / User_Requested_Stop=34 and initialization_selected=29 vs noninitialization_selected=6 implies inputs are often taken from initialization/warm plans, so the recorded held input need not be the braking-consistent optimum."
+        ],
+        "initial_state": {
+          "pointer": "/34/one_step_prediction/state",
+          "reference": {
+            "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+            "media_type": "application/octet-stream"
+          },
+          "value": [
+            -0.7139452776065445,
+            -1.2955664368861126,
+            -2.155878817688955,
+            1.4835864659737161,
+            0.9826041976433942,
+            0.5061624067208925,
+            0.29692953449344567,
+            0.8999397684844275,
+            -1.2452028586213972,
+            0.15711889377539773,
+            -0.2235577131700092,
+            0.4781276078047717,
+            31.02498096599131,
+            12.941979685741549,
+            16.28118324048904,
+            -11.238969652274344,
+            -5.7788688160149695,
+            1.438131977455852,
+            21.879922327214604,
+            -12.765470828290065,
+            -13.705310583728396,
+            -9.07367968873886,
+            8.001904691635373,
+            10.453704185250414
+          ]
+        },
+        "input": {
+          "pointer": "/34/one_step_prediction/applied_tension_n",
+          "reference": {
+            "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+            "media_type": "application/octet-stream"
+          },
+          "value": [
+            3.1758909392099772,
+            2.757372796476204,
+            1.4216485070827969e-08,
+            0.8929758192138912,
+            0.12734806870748366,
+            0.0
+          ]
+        },
+        "integration": "implicit_euler",
+        "integration_step_s": 0.002,
+        "metrics": [
+          "per-tendon |recorded held input (N) - instantaneous braking-box solution (N)| for tendons 0..5",
+          "braking-box solution saturation against the 8.0 N tendon force limit",
+          "sign and magnitude of the one-step state change implied by the recorded held input versus the braking-box input at the same projected state"
+        ],
+        "model": "model.gvs@1.0.0",
+        "operation": "prediction_braking",
+        "prior_result": null,
+        "update_id": 34,
+        "work_limits": {
+          "prediction_evaluations": 2.0,
+          "wall_s": 300.0
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-7-tool",
+      "tool_id": "diagnosis.check_request",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage346-4618e0e3d584-diagnostic",
+    "reference": {
+      "artifact_id": "f52292cfdf41a736666e6a57580b5061f9a72165803449f1a91afaad295f355d",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "acceptance_criteria": [
+          "Returns the held recorded tension vector at /34/actual_tension_n and the instantaneous braking-box tension vector for the state at /34/measured_initial_state, both integrated with model.gvs@1.0.0 implicit Euler at 0.002 s over a 0.01 s horizon.",
+          "Reports the held-vs-braking per-tendon tension differences (N) and the resulting projected terminal tip-speed change (m/s) over the probe horizon.",
+          "Flags any candidate tension exceeding the 8.0 N force limit (reference 0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd, /tendons/0..5/force_limit_n = 8.0).",
+          "States the outcome as a local one-step consistency signal only, disfavoring H_weighting if the held input is close to the braking-box solution and leaving H_weighting/H_deadline_fallback live if it is not, with no claim about the 0.05 s settling window or a dominant cause."
+        ],
+        "additional_need": null,
+        "changed_factor": null,
+        "changed_parameter": null,
+        "changed_value": null,
+        "check_id": "check_u34_terminal_braking",
+        "diagnosis_request": {
+          "artifact_id": "5a9e92129514a9eaa6c457f255653a96d528b3a6949fb1d2d736d9aab38512ee",
+          "media_type": "application/json"
+        },
+        "fixed_conditions": [
+          "model: model.gvs@1.0.0",
+          "integration: implicit_euler, integration_step_s 0.002, probe horizon_s 0.01, substeps 1",
+          "configuration_scope: saved_state_or_temporary_analysis (no production/configuration change, no backend solve)",
+          "update_id 34; projected GVS state fixed at /34/measured_initial_state, world tip frame",
+          "controller recipe and settling criteria unchanged: terminal_weight 5.0, terminal_tip_speed_weight 0.0, horizon 10, control_period_s 0.01, settling speed_limit_m_s 0.02, window_s 0.05"
+        ],
+        "horizon_s": 0.01,
+        "hypotheses": [
+          "H_weighting: The terminal/reach objective is dominated by terminal position (terminal_weight 5.0) while terminal speed terms are negligible (terminal_tip_speed_weight 0.0, holding_tip_speed_weight 0.0, terminal_velocity_weight 0.0001, velocity_weight 0.0001), so the input held over update 34 is a position-correction servo rather than a braking input, and the recorded held tension at /34/actual_tension_n should differ markedly from the instantaneous braking-box solution.",
+          "H_deadline_fallback: With deadline_misses 35/35, initialization_selected 29 vs noninitialization_selected 6 and stopping_counts Solve_Succeeded 1 vs User_Requested_Stop 34, the input held over update 34 is a warm/initialization fallback rather than a converged braking plan; if so the held input and the braking-box solution should be mutually inconsistent at the same projected state.",
+          "H_horizon_truncation: horizon 10 at control_period_s 0.01 s covers roughly 0.1 s, possibly too short to anticipate full braking; a one-step braking-box comparison is at best a local consistency signal and cannot by itself resolve this mechanism."
+        ],
+        "initial_state": {
+          "pointer": "/34/measured_initial_state",
+          "reference": {
+            "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+            "media_type": "application/octet-stream"
+          },
+          "value": [
+            -41.51248864122173,
+            -81.80185081376304,
+            -34.1922189442125,
+            -11.086129243904658
+          ]
+        },
+        "input": {
+          "pointer": "/34/actual_tension_n",
+          "reference": {
+            "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+            "media_type": "application/octet-stream"
+          },
+          "value": [
+            3.1758909392099772,
+            2.757372796476204,
+            1.4216485070827969e-08,
+            0.8929758192138912,
+            0.12734806870748366,
+            0.0
+          ]
+        },
+        "integration": "implicit_euler",
+        "integration_step_s": 0.002,
+        "metrics": [
+          "held_recorded_input_tension_n",
+          "braking_box_tension_n",
+          "per_tendon_tension_difference_n",
+          "projected_tip_speed_m_s",
+          "projected_tip_speed_change_m_s",
+          "force_limit_margin_n"
+        ],
+        "model": "model.gvs@1.0.0",
+        "operation": "prediction_braking",
+        "prior_result": {
+          "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+          "media_type": "application/json"
+        },
+        "update_id": 34,
+        "work_limits": {
+          "prediction_evaluations": 2.0,
+          "wall_s": 300.0
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-8-tool",
+      "tool_id": "diagnosis.check_request",
+      "tool_version": "1.0.0"
+    }
+  }
+]

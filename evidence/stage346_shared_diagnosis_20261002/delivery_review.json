@@ -1,0 +1,49 @@
+{
+  "classification": "Read-only review under review_rubric.json; original model products remain unchanged",
+  "reviewed_report": "anonymous/development_report_01.json",
+  "blinding_limit": "Organization labels are absent from the exported report filename, but the implementer knows this is the development pilot. No independent blind paired comparison occurred.",
+  "schema_and_selected_numeric_values": "Accepted initial-report selectors matched exact immutable values. No incorrect accepted numeric selector was found. This does not certify surrounding prose.",
+  "ratings": {
+    "facts": "supported",
+    "gaps": "substantive_issue",
+    "attribution": "minor_issue",
+    "check_value": "not_assessable",
+    "limits": "supported",
+    "decision": "not_assessable"
+  },
+  "findings": [
+    {
+      "id": "retained_trajectory_confused_with_displayed_window",
+      "report_paths": ["/missing_evidence/1", "/report/recommended_actions/2", "/recommendations/2/rationale"],
+      "request_path": "/scope/3",
+      "claim": "The request treats full q/qdot history outside the displayed final window as not retained. The initial report says only the final window is sampled and recommends instrumentation of the full trajectory.",
+      "evidence": {
+        "reference": {"artifact_id": "8665c9eb0ebe506e281863969240de828087ac8c214265363a536c530c8d500a", "media_type": "application/octet-stream"},
+        "filename": "trajectory.json.gz",
+        "records": 35,
+        "time_coverage_s": [0.01, 0.35000000000000003],
+        "signals": ["qpos_rad", "qvel_rad_s", "tip_m"],
+        "inventory_reference": {"artifact_id": "9e84a5dcdec98acbb83718a72ed5cc11e023601c7b8ff8f25bdc223141ac17f9", "media_type": "application/json"}
+      },
+      "assessment": "The full sampled backend trajectory is retained. The current motion query displays the final settling window and lacks an arbitrary full-trajectory velocity query; that is a query/capability gap, not absent recording. Additional instrumentation is not justified merely by this display limit.",
+      "consequence": "The proposed next work could duplicate existing data collection instead of exposing retained data."
+    },
+    {
+      "id": "deadline_to_solver_stop_link_not_established",
+      "report_paths": ["/report/attribution/1", "/report/attribution/3"],
+      "claim": "The report describes deadline-induced solver termination and stale/fallback plans as possible mechanisms.",
+      "evidence": {
+        "reference": {"artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770", "media_type": "application/octet-stream"},
+        "selector_pattern": "/{update_id}/policy_stop_reason",
+        "retained_counts": {"budget_best_feasible": 31, "relative_seed_improvement": 3, "null": 1},
+        "scheduling": "Controller calls complete synchronously before fixed-count backend steps. Deadline misses do not inject physical delay."
+      },
+      "assessment": "The report correctly retains possible rather than proven status and acknowledges no physical delay, but deadline misses plus User_Requested_Stop do not establish that the 10 ms deadline caused solver termination or stale inputs. Retained policy-stop reasons distinguish budget returns and relative improvement. Small raw weight values also do not by themselves establish negligible normalized cost contributions.",
+      "consequence": "These mechanisms remain hypotheses requiring discriminating evidence, not established explanations."
+    }
+  ],
+  "check_usefulness": "Not evaluated: all three check requests failed before execution. No result exists to support, weaken, or resolve the scientific hypotheses.",
+  "minimal_native_validation": "Succeeded as a cross-run protocol unit. The model independently chose reject + finish and corrected historical claims of missing predictions/tensions/limits in its reasoning. This is not a completed diagnostic feedback cycle.",
+  "physical_improvement": "not evaluated",
+  "comparative_claim": "None; no formal paired run or live single-context diagnosis was executed."
+}

@@ -1,0 +1,54 @@
+{
+  "used": {
+    "tool_calls": 20,
+    "model_calls": 13,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 530.4679999991786
+  },
+  "limits": {
+    "model_calls": 123,
+    "tool_calls": 303,
+    "wall_s": 18300.0,
+    "backend_solves": 0,
+    "worker_calls": 0
+  },
+  "numerical_work": {
+    "local_solves": 0,
+    "prediction_evaluations": 0
+  },
+  "runs": [
+    {
+      "run": "minimal",
+      "provider_attempts": 2,
+      "responses_with_usage": 1,
+      "input_tokens": 11697,
+      "completion_tokens_including_reasoning": 18343,
+      "reasoning_tokens": 17491,
+      "cache_hit_tokens": 0,
+      "cache_miss_tokens": 11697,
+      "monetary_cost": null,
+      "charged_s": 94.15500000002794,
+      "active_workflow_elapsed_s": 98.76499999989755,
+      "wall_elapsed_to_last_execution_event_s": 313.11397,
+      "elapsed_definition": "Wall elapsed spans the original live-attempt guard to the last execution event; active elapsed excludes the minimal run's stopped interval during network troubleshooting."
+    },
+    {
+      "run": "pilot",
+      "provider_attempts": 11,
+      "responses_with_usage": 11,
+      "input_tokens": 142013,
+      "completion_tokens_including_reasoning": 91536,
+      "reasoning_tokens": 72106,
+      "cache_hit_tokens": 14720,
+      "cache_miss_tokens": 127293,
+      "monetary_cost": null,
+      "charged_s": 436.31299999915063,
+      "active_workflow_elapsed_s": 462.1400000001304,
+      "wall_elapsed_to_last_execution_event_s": 462.080823,
+      "elapsed_definition": "Wall elapsed spans the original live-attempt guard to the last execution event; active elapsed excludes the minimal run's stopped interval during network troubleshooting."
+    }
+  ],
+  "note": "Minimal includes one sealed network failure and one explicit same-ledger continuation. Unknown provider usage for the network failure is not fabricated as zero monetary cost.",
+  "live_workload_window_s": 800.62251
+}

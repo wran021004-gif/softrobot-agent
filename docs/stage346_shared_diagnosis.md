@@ -83,3 +83,48 @@ was unchanged. The full dual-context pilot completed the request, initial
 report and design response, but no check, revision or final response. Formal
 paired runs were therefore blocked by the required feedback-capability gate.
 There is no live single-context result or comparative diagnostic conclusion.
+
+| Workload | Result | Provider attempts | Tool calls | Charged seconds |
+| --- | --- | ---: | ---: | ---: |
+| Minimal native validation, v3 | Accepted `reject + finish`; cross-run protocol unit | 2 | 2 | 94.155 |
+| Dual-context development pilot, v3 | Stopped in check selection; no executed check or revision | 11 | 18 | 436.313 |
+| Single-context formal runs | Not started; prerequisite failed | 0 | 0 | 0 |
+| Dual-context formal runs | Not started; prerequisite failed | 0 | 0 | 0 |
+
+Total: 13/123 provider attempts, 20/303 tool calls, and 530.468/18,300 charged
+seconds. No numerical checks, short prediction evaluations, local solves,
+backend simulations, or workers executed. Monetary cost was not returned and
+remains unknown. Reported usage totals are 153,710 input tokens, 109,879
+completion tokens including 89,597 reasoning tokens, and 14,720 cache-hit
+tokens; the failed network attempt returned no token usage. Runtime was
+`C:/Users/gugugaga/miniconda3/envs/softagent/python.exe`, Python 3.11.16.
+Wall elapsed to the last execution event was 313.114 seconds for the minimal
+run, including its stopped troubleshooting interval, and 462.081 seconds for
+the pilot. The overall live-workload window was 800.623 seconds.
+
+Seven focused checks passed before live work. Two affected repair checks
+passed afterward, including both modes with feedback/finish fixture paths.
+No full historical suite was run. Neither offline fixtures nor an accepted
+native design response establishes live feedback capability.
+
+The initial pilot report's numeric selectors passed validation, but its
+recommendation to instrument full q/qdot data conflates a query limitation
+with missing recording. Thirty-five sampled trajectory records are retained.
+Its deadline-to-solver-stop explanation remains a hypothesis; retained stop
+reasons distinguish budget-best-feasible returns and relative improvement.
+No executed check exists to assess diagnostic-check usefulness. The masked
+development report and common rubric are preserved, with the limitation that
+the implementer knows the run identity. No paid reviewer was used.
+
+Implementation commits: `0fe602a` (shared runner and v3 interface), `234104e`
+(minimal live validation and preserved network continuation), and `ffd3ebf`
+(offline-validated v4 repair). Entry points are the shared runner, native
+adapter, inventory builder, stage driver, versioned handoff contract and
+focused tests named above. Raw requests/responses, resolved calls, receipts,
+frozen runtime/provider settings, exact live source bytes and report review
+are under `evidence/stage346_shared_diagnosis_20261002`.
+
+All four formal runs remain unexecuted, and no formal paired freeze was
+created because the required live feedback gate failed. The single next step
+is a separately authorized fresh bounded pilot with adapter v4, to establish
+actual check execution and report revision before any paired comparison.
