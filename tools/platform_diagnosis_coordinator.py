@@ -71,9 +71,30 @@ def transfer_recovery(source,destination):
     previous=source.store.session(source.run_id)['state']
     with destination.store.transaction() as db:
         state=destination.store.session(destination.run_id,db)['state']
-        for key in ('protocol_corrections_used','protocol_corrections_consecutive','length_retries_used','argument_limit_correction_used'):
+        for key in ('protocol_corrections_used','protocol_corrections_consecutive','length_retries_used','argument_limit_correction_used','repairs','business_failures_total','business_feedback'):
             if key in previous:state[key]=previous[key]
+            else:state.pop(key,None)
         destination.store.update_state(db,destination.run_id,state)
+
+
+def recovery_status(state, config):
+    limits=config.get('protocol_recovery') or dict(max_total=1,max_consecutive=1)
+    total=state.get('protocol_corrections_used',0);consecutive=state.get('protocol_corrections_consecutive',0)
+    repairs=state.get('repairs',0)
+    return dict(version='2.0.0',scope='workflow shared across phases and contexts',
+        protocol=dict(category='native_schema_or_envelope',limits=limits,total_used=total,
+            consecutive_used=consecutive,total_remaining=max(0,limits['max_total']-total),
+            consecutive_remaining=max(0,limits['max_consecutive']-consecutive),
+            reset='Completed business call resets consecutive only; decoding alone does not.'),
+        business=dict(category='accepted_call_execution_rejected_or_failed',limit=config['max_repairs'],
+            consecutive_failures=repairs,total_failures=state.get('business_failures_total',0),
+            remaining_repairs=max(0,config['max_repairs']-repairs),
+            stop_when='consecutive_failures > limit; two repair opportunities after first failure',
+            reset='Completed business call resets consecutive; phase/context switch does not.',
+            feedback=state.get('business_feedback')),
+        transport=dict(category='provider_transport_failure',automatic_retry=False),
+        length=dict(category='truncated_without_usable_action',limit=1,used=state.get('length_retries_used',0),
+            configuration=config.get('length_recovery')),stop_reason=state.get('stop_reason'))
 
 
 def run_until_handoff(host,kind):
@@ -148,9 +169,11 @@ def validate_check(store,role,args):
 
 def execute_check_feedback(diagnostic,executor,reference):
     """Execute one model-selected check and resume the same diagnostic grant."""
-    from schemas.platform_handoff import DiagnosticCheckRequest
+    from schemas.platform_handoff import DiagnosticCheckRequest,ScopedDiagnosticCheckRequest
     role=diagnostic.store.session(diagnostic.run_id)['state']['role_context']
-    args=DiagnosticCheckRequest.model_validate(diagnostic.store.artifact(reference))
+    value=diagnostic.store.artifact(reference)
+    schema=ScopedDiagnosticCheckRequest if 'local_question' in value else DiagnosticCheckRequest
+    args=schema.model_validate(value)
     numerical=validate_check(diagnostic.store,role,args)
     executor.resume()
     receipt=executor.invoke(dict(request_id='check-'+args.check_id,tool_id='diagnosis.saved_state_check',tool_version='1.0.0',
@@ -158,6 +181,8 @@ def execute_check_feedback(diagnostic,executor,reference):
     with diagnostic.store.transaction() as db:
         feedback=dict(check_request=plain(reference),diagnosis_request=plain(args.diagnosis_request),check_id=args.check_id,
             hypotheses=args.hypotheses,protocol=plain(numerical),receipt=receipt,result=receipt.get('output'))
+        if isinstance(args,ScopedDiagnosticCheckRequest):
+            feedback.update(local_question=args.local_question,discriminating_observations=args.discriminating_observations,unresolved=args.unresolved)
         ref=plain(diagnostic.store.put(db,feedback))
         state=diagnostic.store.session(diagnostic.run_id,db)['state']
         result=diagnostic.store.artifact(receipt['output']) if receipt.get('output') else None
@@ -165,7 +190,7 @@ def execute_check_feedback(diagnostic,executor,reference):
             # Keep exact scalar pointers while leaving full trajectories in the
             # immutable result artifact for inspection outside the inline view.
             result={**result,'detail':{**result['detail'],'rows':[
-                {k:v for k,v in row.items() if k not in ('trajectory','physical_motion','parameters','verification')}
+                {k:v for k,v in row.items() if k not in ('physical_motion','parameters','verification')}
                 for row in result['detail'].get('rows',[])]}}
         state['role_context'].setdefault('check_feedback',[]).append(dict(reference=ref,**feedback,result_content=result))
         state['role_context']['instructions'] += ' Consume check_feedback now, update competing hypotheses, and submit a revised report citing every feedback reference in check_results. A second check needs the prior result and a specific unresolved need; otherwise submit.'

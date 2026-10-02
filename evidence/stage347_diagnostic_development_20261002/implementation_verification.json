@@ -1,0 +1,29 @@
+{
+  "starting_commit": "e4a4c48ae168bb16a74d9638fa4c1e858b9a9c68",
+  "branch": "feat/gvs-dynamics",
+  "starting_worktree": "clean",
+  "runtime": {"executable": "C:/Users/gugugaga/miniconda3/envs/softagent/python.exe", "python": "3.11.16", "environment": "softagent"},
+  "focused_checks": {
+    "passed": [
+      "SharedWorkflowTests.test_dispositions_and_finish_contract",
+      "SharedWorkflowTests.test_flat_resolution_rejects_observed_patterns_and_unknown_fields",
+      "SharedWorkflowTests.test_host_binds_exact_state_and_operation_defined_input",
+      "SharedWorkflowTests.test_inventory_contradictions_and_unlisted_basis",
+      "SharedWorkflowTests.test_recovery_transfers_and_provider_freeze",
+      "SharedWorkflowTests.test_shared_flow_feedback_memory_permissions_inventory_and_accounting",
+      "SharedWorkflowTests.test_accepted_business_rejections_exhaust_only_business_repairs",
+      "FeedbackTests.test_saved_state_request_scope_and_executor_revalidation",
+      "RouteModelProtocol.test_count_correction_success_and_actual_payload"
+    ],
+    "scope": "Offline fixtures establish implementation behavior only; both modes, check/feedback/revision/final linkage, finish, exact host state/input binding, rejected replacements, inventory contradictions, shared recovery, frozen provider guard and existing route protocol.",
+    "repairs_during_verification": ["Coordinator needed explicit v2 request deserialization", "Recovery fixture needed the v4 native store binding"],
+    "environment_note": "Sandbox denied access to newly created temporary test directories; focused tests completed with approved escalation. No dependencies reinstalled."
+  },
+  "recovery": {
+    "protocol": "Four cumulative/two consecutive corrections unchanged; only completed business execution clears consecutive count.",
+    "business": "Two repair opportunities unchanged; third consecutive failed/rejected accepted call stops with BOUNDED_REPAIR_LIMIT. Counter, cumulative failures and feedback now transfer across contexts.",
+    "classification": "Native decode/schema errors use protocol recovery. Calls accepted by native decode but rejected/failed by execution use business repair, including downstream argument rejection. Transport failures stop under the existing provider policy; one existing length recovery remains separate."
+  },
+  "contracts": {"adapter": "deepseek@4.0.0", "diagnosis.submit": "2.0.0", "diagnosis.check_request": "2.0.0", "design.respond_diagnosis": "2.0.0"},
+  "live_status": "Not yet launched at implementation commit"
+}

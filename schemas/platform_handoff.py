@@ -85,6 +85,26 @@ class DiagnosisSubmission(Contract):
     recommendations: list[Recommendation]
 
 
+class InventoryGap(Contract):
+    inventory_id: str | None = None
+    source: str | None = Field(default=None, description='For unlisted evidence, identify the source or evidence sought.')
+    status: Literal['not_read', 'not_retained', 'retained_unavailable']
+    needed: str = Field(min_length=1, description='Specific missing information or query/calculation capability.')
+    basis: str = Field(min_length=1, description='Inventory fact or explicit basis for unlisted evidence; no invented inventory ID.')
+
+
+class InventoryDiagnosisSubmission(DiagnosisSubmission):
+    """Version 2 makes availability declarations reference deterministic inventory."""
+    missing_evidence: list[InventoryGap]
+
+
+class ScopedDiagnosticCheckRequest(DiagnosticCheckRequest):
+    """Version 2 requires a question that the existing local probe can answer."""
+    local_question: str = Field(min_length=1)
+    discriminating_observations: list[str] = Field(min_length=1)
+    unresolved: list[str] = Field(min_length=1, description='Hypotheses this probe cannot separate, and limits independent of outcome.')
+
+
 class DesignResponse(Contract):
     report: EvidenceRef
     disposition: Literal['adopt', 'defer', 'reject'] = Field(description='adopt accepts the named recommendation within its permitted scope; defer postpones pending evidence; reject declines. This does not decide diagnostic continuation.')

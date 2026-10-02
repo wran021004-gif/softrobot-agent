@@ -11,7 +11,7 @@ from uuid import uuid4
 from tools.platform_store import Store, plain, encode
 from tools.platform_host import Host
 from tools.platform_models import run_loop, tool_naming_policy, READABLE_TOOL_NAMING
-from tools.platform_diagnosis_coordinator import configure_role, transfer_recovery, execute_check_feedback
+from tools.platform_diagnosis_coordinator import configure_role, transfer_recovery, execute_check_feedback, recovery_status
 from tools.diagnostic_inventory import evidence_inventory
 from tools.state_io import read, atomic_json
 from extensions.tendon_family.control_evidence import ControlEvidence
@@ -24,6 +24,10 @@ LIMITS=dict(model_calls=24,tool_calls=60,backend_solves=0,worker_calls=0,wall_s=
 NUMERICAL=dict(local_solves=6,prediction_evaluations=24)
 TOOLS={n:'1.0.0' for n in ('diagnosis.request','diagnosis.inspect_evidence','diagnosis.check_request','diagnosis.submit','evidence.read')}
 TOOLS['design.respond_diagnosis']='2.0.0'
+TOOLS.update({'diagnosis.submit':'2.0.0','diagnosis.check_request':'2.0.0'})
+CAPABILITIES=dict(
+    prediction_braking='At one saved projected state, compare recorded input with instantaneous braking-box input over the fixed short horizon. Can measure local endpoint speed/position differences. Cannot separate objective weighting, seed selection, horizon effects or backend-model mismatch when they predict the same result; cannot identify the dominant settling cause.',
+    local_comparison='Compare two local controller solves at the same saved state/previous input/horizon with exactly one adopted weight change. Measures local plan/endpoint differences; does not establish closed-loop settling or causal attribution. Requires a saved effective horizon matching the authorized horizon.')
 SCOPE=dict(operations=['prediction_braking','local_comparison'],model='model.gvs@1.0.0',horizon_s=.01,
     integration='implicit_euler',integration_step_s=.002,max_wall_s=300.,max_checks=1,
     numerical_limits=NUMERICAL,configuration_scope='saved_state_or_temporary_analysis')
@@ -49,6 +53,9 @@ INSTRUCTIONS=dict(
     check='Select one discriminating check based on unresolved hypotheses. Inspect retained evidence as needed to choose the operation and update_id. The host binds the chosen update\'s exact measured_initial_state and operation-defined input from the inventory controller file; do not copy vectors. prediction_braking uses current actual_tension_n; local_comparison uses previous actual_tension_n and requires the exact adopted parameter/value and a saved effective plan horizon of 0.01 s. prediction_braking compares held recorded input with an instantaneous braking box solution and requires no adoption. Choose update_id >= 1, hypotheses, fixed conditions, metrics, acceptance criteria and work_limits (wall_s <= 300; prediction_evaluations=2 or local_solves=2). Host fixes model.gvs@1.0.0, implicit Euler, 0.002 s step and 0.01 s horizon. At most two successful reading turns, then select the check. Do not overextend a local probe to the entire settling failure.',
     revision='Consume actual check_feedback and revise the previous report. Cite the feedback in check_results and at least one relevant exact numeric selector from its result artifact when execution completed. Explain which hypotheses are supported, weakened or unresolved and how the result changes or limits the next decision. Identify model, projected-state, input, integration and horizon limits. Failed or inconclusive checks permit honest delivery. No further check is authorized.',
     response_final='Read the revised report and actual feedback. Record your final recommendation disposition and reasoning. The one-check allowance is spent; next_action must be finish. Physical improvement was not evaluated.')
+INSTRUCTIONS['initial']+=' Availability gaps must use inventory IDs and not_read, not_retained or retained_unavailable; identify needed information/capability and basis. Unlisted evidence uses source plus explicit basis. Full sampled backend q/qdot is retained, even though motion shows the final window. Raw weight magnitudes do not establish cost-term importance without actual contributions/scaling.'
+INSTRUCTIONS['check']+=' State local_question, competing hypotheses, discriminating_observations and unresolved questions. If hypotheses predict the same result, explicitly say this check cannot separate them. Select a question the stated capability can answer; no dominant-cause claim.'
+INSTRUCTIONS['revision']+=' Use inventory-linked gap declarations. Do not infer physical feedback delay from synchronous wall-clock deadline misses or cost importance from raw weights.'
 
 
 def save(store,value):
@@ -60,38 +67,43 @@ def implementation():
         'tools/platform_models.py','tools/platform_handoff.py','tools/platform_diagnosis_coordinator.py',
         'tools/platform_host.py','tools/platform_store.py','schemas/platform_handoff.py','schemas/platform_diagnostics.py',
         'extensions/platform/manifest.py','extensions/tendon_family/diagnostic_evidence.py','extensions/tendon_family/diagnostic_math.py',
-        'tools/model_transports/deepseek.py','examples/stage346_shared_diagnosis.py']
+        'tools/model_transports/deepseek.py','examples/stage346_shared_diagnosis.py','examples/stage347_experiment.json']
     return dict(commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         files={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths})
 
 
 class DiagnosticWorkflow:
-    def __init__(self, directory, mode, *, pilot=False, minimal=False):
+    def __init__(self, directory, mode, *, pilot=False, minimal=False, experiment=None):
         if mode not in ('single_context','dual_context'):raise ValueError('UNKNOWN_ORGANIZATION_MODE')
         self.directory=Path(directory);self.mode=mode;self.pilot=pilot;self.minimal=minimal
         self.store=Store(directory);self.chain={};self.previous=None
+        self.experiment=deepcopy(experiment or {})
+        self.source=Path(self.experiment.get('source_store',SOURCE))
+        self.execution=self.experiment.get('execution_id',EXECUTION)
+        self.export_root=Path(self.experiment.get('evidence_directory',ROOT/'evidence/stage346_shared_diagnosis_20261002'))
 
     def prepare(self,runtime):
         if (self.directory/'freeze.json').exists():raise ValueError('NEW_RUN_DIRECTORY_REQUIRED')
-        if not (SOURCE/'platform.sqlite').exists():
+        if not (self.source/'platform.sqlite').exists():
             manifest=ROOT/'evidence/stage341_repaired_live_execution_20261001/live_outcome.json'
             raise ValueError('SEALED_SOURCE_STORE_UNAVAILABLE; explicit portable outcome: '+str(manifest)+'; no substitution permitted')
-        reader=ControlEvidence(Store(SOURCE));source=reader.resolve(EXECUTION)
-        self.project='gvs-stage346-'+uuid4().hex[:12]
+        reader=ControlEvidence(Store(self.source));source=reader.resolve(self.execution)
+        if self.experiment.get('source_manifest',source['manifest'])!=source['manifest']:raise ValueError('FROZEN_SOURCE_MANIFEST_MISMATCH')
+        self.project=self.experiment.get('project_prefix','gvs-stage346')+'-'+uuid4().hex[:12]
         limits=dict(model_calls=3,tool_calls=3,backend_solves=0,worker_calls=0,wall_s=300.) if self.minimal else LIMITS
         self.store.create(dict(project_id=self.project,grant_id=self.project,budget=limits,
-            authorization_source='User-authorized sequential Stage 3.46 native validation, pilot and two matched pairs; necessary context/evidence transmission to DeepSeek; no backend simulations/workers or push.'))
+            authorization_source=self.experiment.get('authorization_source','User-authorized sequential Stage 3.46 native validation, pilot and two matched pairs; necessary context/evidence transmission to DeepSeek; no backend simulations/workers or push.')))
         self.hosts={}
         for role in (['shared'] if self.mode=='single_context' else ['design','diagnostic'])+['executor']:
             host=Host(self.directory,self.project+'-'+role);inp=deepcopy(source['configuration']);inp['run_id']=host.run_id
             bindings={'diagnosis.inspect_evidence':'1.0.0','diagnosis.saved_state_check':'1.0.0'} if role=='executor' else TOOLS
             inp['policy'].update(route=None,budget={**limits,'model_calls':0 if role=='executor' else limits['model_calls']},
                 timeout_s=900. if role=='executor' else 30.,allowed_tools=[],tool_bindings=bindings)
-            provider=read(ROOT/'evidence/stage345_diagnostic_cycle_20261002/freeze.json')['provider_configuration']
+            provider=read(Path(self.experiment.get('provider_freeze',ROOT/'evidence/stage346_shared_diagnosis_20261002/pilot/freeze.json')))['provider_configuration']
             inp['policy']['model']={**provider,'adapter_version':'4.0.0','max_turns':24,
                 'tool_naming':tool_naming_policy(bindings,READABLE_TOOL_NAMING)}
             host.create(inp);self.hosts[role]=host
-        self.binding=import_execution(reader,EXECUTION,self.store,self.hosts['executor'].run_id,source['manifest'])
+        self.binding=import_execution(reader,self.execution,self.store,self.hosts['executor'].run_id,source['manifest'])
         with self.store.transaction() as db:
             db.execute("INSERT INTO meta VALUES ('diagnostic_work',?)",(encode(dict(limits=NUMERICAL,used={k:0 for k in NUMERICAL})),))
         executor=self.hosts['executor'];executor.resume()
@@ -107,7 +119,10 @@ class DiagnosticWorkflow:
             inventory=self.inventory,inventory_reference=self.inventory_ref,source_manifest=source['manifest'],
             implementation=implementation(),runtime=runtime,provider_configuration=self.store.session(self.host('design').run_id)['snapshot']['input']['policy']['model'],
             limits=limits,numerical_limits=NUMERICAL,scope=SCOPE,memory_policy=MEMORY,phase_budgets=PHASES,
-            stage_instructions=INSTRUCTIONS,permissions=PERMISSIONS,recovery=dict(max_total=4,max_consecutive=2),
+            stage_instructions=INSTRUCTIONS,permissions=PERMISSIONS,capabilities=CAPABILITIES,experiment=self.experiment,
+            recovery=recovery_status({},self.store.session(self.host('design').run_id)['snapshot']['input']['policy']['model']),
+            host_provider_configurations={k:self.store.session(h.run_id)['snapshot']['input']['policy']['model'] for k,h in self.hosts.items()},
+            tool_bindings=TOOLS,review_rubric=read(ROOT/'evidence/stage346_shared_diagnosis_20261002/review_rubric.json'),
             outcomes=['workflow completion','exact selector validation','prose review','check usefulness','usage','physical improvement not evaluated'])
         atomic_json(self.directory/'freeze.json',self.freeze)
         return self.freeze
@@ -125,7 +140,7 @@ class DiagnosticWorkflow:
             fixed['diagnosis.submit']=dict(request=self.chain['request'],previous_report=self.chain.get('initial_report') if phase=='revision' else None)
         if phase.startswith('response'):
             fixed['design.respond_diagnosis']=dict(report=self.chain['revised_report' if phase=='response_final' else 'initial_report'])
-        if phase=='check':fixed['diagnosis.check_request']=dict(diagnosis_request=self.chain['request'],model=SCOPE['model'],
+        if phase=='check':fixed['diagnosis.check_request']=dict(check_id='saved-state-check',diagnosis_request=self.chain['request'],model=SCOPE['model'],
             horizon_s=SCOPE['horizon_s'],integration=SCOPE['integration'],integration_step_s=SCOPE['integration_step_s'])
         return fixed
 
@@ -136,7 +151,7 @@ class DiagnosticWorkflow:
         state=self.store.session(host.run_id)['state']
         common=dict(binding=self.binding,identities=self.identities,summary=self.summary,
             summary_content=self.store.artifact(self.summary),inventory=self.inventory,inventory_reference=self.inventory_ref,
-            protocol=dict(saved_state_check=SCOPE),diagnostic_tools=list(TOOLS),phase=phase,
+            protocol=dict(saved_state_check=SCOPE),capabilities=CAPABILITIES,diagnostic_tools=list(TOOLS),phase=phase,
             memory_identity=host.run_id,working_memory=state.get('workflow_memory',[]),memory_policy=MEMORY,
             phase_budget=PHASES[phase],phase_tools=PERMISSIONS[phase],native_fixed=self.fixed(phase),native_store_root=str(self.directory),
             evidence_turn_limit=2 if phase in ('request','initial','check') else 0)
@@ -170,6 +185,7 @@ class DiagnosticWorkflow:
         guard=self.directory/'live_attempt.json'
         if guard.exists():raise RuntimeError('LIVE_ATTEMPT_ALREADY_STARTED: counters may not be replenished')
         if implementation()['files']!=self.freeze['implementation']['files']:raise ValueError('FROZEN_IMPLEMENTATION_CHANGED')
+        self.validate_frozen_configuration()
         atomic_json(guard,dict(started=datetime.now(timezone.utc).isoformat()))
         try:
             if self.minimal:
@@ -214,7 +230,7 @@ class DiagnosticWorkflow:
         return read(self.directory/'outcome.json')
 
     def export(self,status,reason,elapsed):
-        destination=ROOT/'evidence/stage346_shared_diagnosis_20261002'/self.directory.name
+        destination=self.export_root/self.directory.name
         destination.mkdir(parents=True,exist_ok=True);artifacts=destination/'artifacts';artifacts.mkdir(exist_ok=True)
         events=[];receipts=[];raw=[];resolved=[];usage_rows=[];refs={}
         def include(ref):
@@ -237,7 +253,8 @@ class DiagnosticWorkflow:
             numerical_check_status=feedback['receipt']['execution_status'] if feedback else None,
             usage=self.store.remaining(),numerical_work=work,provider_usage=usage_rows,monetary_cost=None,elapsed_s=elapsed,
             protocol_corrections=max(self.store.session(h.run_id)['state'].get('protocol_corrections_used',0) for h in self.hosts.values()),
-            physical_improvement='not evaluated',source_preserved=ControlEvidence(Store(SOURCE)).resolve(EXECUTION)['manifest']==self.freeze['source_manifest'])
+            recovery={k:recovery_status(self.store.session(h.run_id)['state'],self.store.session(h.run_id)['snapshot']['input']['policy']['model']) for k,h in self.hosts.items()},
+            physical_improvement='not evaluated',source_preserved=ControlEvidence(Store(self.source)).resolve(self.execution)['manifest']==self.freeze['source_manifest'])
         atomic_json(self.directory/'outcome.json',outcome)
         for path in self.directory.glob('*.json'):atomic_json(destination/path.name,read(path))
         for name,value in [('events',events),('receipts',receipts),('raw_calls',raw),('resolved_calls',resolved)]:atomic_json(destination/(name+'.json'),value)
@@ -245,3 +262,10 @@ class DiagnosticWorkflow:
         atomic_json(destination/'sha256_manifest.json',{p.relative_to(destination).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
             for p in sorted(destination.rglob('*.json')) if p.name!='sha256_manifest.json'})
         print('OUTCOME',status,'USAGE',outcome['usage']['used'],flush=True)
+
+    def validate_frozen_configuration(self):
+        for name,host in self.hosts.items():
+            actual=self.store.session(host.run_id)['snapshot']['input']['policy']['model']
+            if actual!=self.freeze['host_provider_configurations'][name]:raise ValueError('FROZEN_PROVIDER_CONFIGURATION_MISMATCH: '+name)
+        for key,value in [('stage_instructions',INSTRUCTIONS),('permissions',PERMISSIONS),('phase_budgets',PHASES),('scope',SCOPE),('memory_policy',MEMORY),('capabilities',CAPABILITIES),('experiment',self.experiment)]:
+            if value!=self.freeze[key]:raise ValueError('FROZEN_CONFIGURATION_MISMATCH: '+key)

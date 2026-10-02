@@ -24,7 +24,7 @@ class FlatDiagnosticAdapter(ReadableDeepSeekAdapter):
                 description=d['description'],parameters=schema)))
         # Only structured working memory and explicit handoff products are sent.
         keys=('role_context','observation','batch_observations','recent_evidence','recent_actions',
-              'project_remaining','numerical_budget','phase_progress','correction_budget','protocol_correction')
+              'project_remaining','numerical_budget','phase_progress','correction_budget','protocol_correction','recovery_status')
         context={k:v for k,v in context.items() if k in keys}
         context['role_context'].pop('native_fixed',None)
         system=('Perform the current diagnostic workflow phase. Invoke a native tool with its business fields directly. '

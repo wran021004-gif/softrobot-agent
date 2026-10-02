@@ -583,6 +583,11 @@ def run_loop(host, adapter=None):
                 state['repeated'] = state.get('repeated', 0) + 1 if repeated else 0
                 state['last_signature'] = signature
                 state['repairs'] = state.get('repairs', 0) + 1 if receipt['execution_status'] in ('failed', 'rejected') else 0
+                if receipt['execution_status'] in ('failed','rejected'):
+                    state['business_failures_total']=state.get('business_failures_total',0)+1
+                    state['business_feedback']=dict(category='accepted_call_execution_rejected_or_failed',
+                        error=receipt.get('error'),requirement='Correct the business input or evidence linkage using the retained result; resubmit the native call within the same allowance.')
+                else:state.pop('business_feedback',None)
                 state['last_receipt'] = receipt
                 args=active_decision.get('arguments',{})
                 state['recent_actions']=(state.get('recent_actions',[])+[dict(
@@ -615,7 +620,7 @@ def run_loop(host, adapter=None):
                 return _stop(host, 'needs_input', 'TOOL_EXECUTION_UNKNOWN')
             if 'BUDGET_EXHAUSTED' in (receipt.get('error') or ''):
                 return _stop(host, 'budget_exhausted', receipt['error'])
-            if receipt['execution_status']=='rejected' and (receipt.get('error') or '').startswith('INVALID_TOOL_ARGUMENTS:'):
+            if config.get('adapter_version') not in ('3.0.0','4.0.0') and receipt['execution_status']=='rejected' and (receipt.get('error') or '').startswith('INVALID_TOOL_ARGUMENTS:'):
                 stopped = _argument_rejection(host, active_decision, receipt, config)
                 if stopped is not None:
                     return stopped

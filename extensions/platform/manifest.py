@@ -68,6 +68,15 @@ EXTENSIONS.append(Extension('design.respond_diagnosis','tool','2.0.0',handoff.Wo
     'tools.platform_handoff:respond_workflow','Record recommendation disposition and independent next workflow action. finish ends workflow; adoption alone executes nothing.',
     sources=('schemas/platform_handoff.py','tools/platform_handoff.py'),
     capabilities=dict(category='diagnostics',role='public_tool',route_visible=True,preflight='tools.platform_handoff:preflight')))
+for name, schema, function in (
+    ('diagnosis.submit',handoff.InventoryDiagnosisSubmission,'submit'),
+    ('diagnosis.check_request',handoff.ScopedDiagnosticCheckRequest,'check'),
+):
+    CONTRACTS.append(('platform.'+name.replace('.','_'),'2.0.0',schema))
+    EXTENSIONS.append(Extension(name,'tool','2.0.0',schema,handoff.HandoffResult,
+        'tools.platform_handoff:'+function,'Inventory-linked gaps and scientifically scoped saved-state questions; no causal certification.',
+        sources=('schemas/platform_handoff.py','tools/platform_handoff.py','tools/diagnostic_inventory.py'),
+        capabilities=dict(category='diagnostics',role='public_tool',route_visible=True,preflight='tools.platform_handoff:preflight')))
 for name, schema, function, description in (
     ('diagnosis.request',handoff.DiagnosisRequest,'request','Request a separate diagnostic context: distinguish evidence reading from an explicit saved_state_check numerical grant. Production changes and backend execution require separate authority.'),
     ('diagnosis.check_request',handoff.DiagnosticCheckRequest,'check','Submit a typed discriminating check; enabled feedback sessions yield to the fixed coordinator. Other sessions save an advisory request.'),

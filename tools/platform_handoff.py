@@ -72,6 +72,10 @@ def check(ctx,args):
 def submit(ctx,args):
     require_role(ctx,'diagnostic')
     role=ctx.store.session(ctx.run_id)['state']['role_context']
+    from schemas.platform_handoff import InventoryDiagnosisSubmission
+    if isinstance(args,InventoryDiagnosisSubmission):
+        from tools.diagnostic_inventory import validate_gaps
+        validate_gaps(args.missing_evidence,role['inventory'])
     if plain(args.request)!=role['request']: raise ValueError('REPORT_REQUEST_LINK_MISMATCH')
     request=ctx.artifact(args.request)
     if role.get('require_initial_views'):

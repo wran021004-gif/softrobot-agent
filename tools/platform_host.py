@@ -309,6 +309,8 @@ class Host:
             context['recent_actions'] = state.get('recent_actions', [])[-4:]
         if state.get('role_context'):
             context['role_context'] = state['role_context']
+            from tools.platform_diagnosis_coordinator import recovery_status
+            context['recovery_status']=recovery_status(state,inp['policy']['model'])
             context['project_remaining'] = self.store.remaining()
             context['role_grant'] = state.get('role_grant')
             used = context['remaining']['used']

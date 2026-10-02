@@ -34,8 +34,28 @@ def evidence_inventory(reader, source):
         coverage='sampled trajectory; motion query displays final settling window',
         capability_gap='Arbitrary full-trajectory velocity query is not exposed; retained raw q/qdot and robot.xml support the existing final-window reconstruction.'))
     snapshots='control_snapshots.json' in source['files']
-    return dict(schema_version='1.0.0',execution_id=source['execution_id'],manifest=source['manifest'],entries=rows,
+    rows.append(dict(type='historical_full_plans',retained=snapshots,
+        signals=['full_warm_plans','optimizer_iteration_traces'],
+        coverage='control_snapshots.json present' if snapshots else 'control_snapshots.json not retained'))
+    for row in rows:
+        row['inventory_id']='source.'+row['type']
+        row.setdefault('retained',row.get('record_count',0)>0)
+    return dict(schema_version='2.0.0',execution_id=source['execution_id'],manifest=source['manifest'],entries=rows,
         missing_data=[] if snapshots else ['Full historical warm plans and optimizer iteration traces are not retained as control_snapshots.json.'],
         capability_gaps=['No closed-loop counterfactual replay or causal attribution tool. Full trajectories are not in every request.',
             'Existing numerical checks use a projected GVS state and bounded horizon, not a full backend replay.'],
         claim_policy='Distinguish not displayed in current query, not retained, and retained but not accessible/computable. A sampled view does not prove absence.')
+
+
+def validate_gaps(gaps, inventory):
+    entries={row['inventory_id']:row for row in inventory['entries']}
+    for gap in gaps:
+        if gap.inventory_id is None:
+            if not gap.source:raise ValueError('GAP_SOURCE_REQUIRED: name unlisted evidence and explicit basis')
+            continue
+        row=entries.get(gap.inventory_id)
+        if row is None:raise ValueError('UNKNOWN_INVENTORY_ID: use a listed ID or source plus basis')
+        if gap.status=='not_retained' and row['retained']:
+            raise ValueError('GAP_CONTRADICTS_INVENTORY: '+gap.inventory_id+' is retained; use not_read or retained_unavailable and name the missing capability')
+        if gap.status in ('not_read','retained_unavailable') and not row['retained']:
+            raise ValueError('GAP_CONTRADICTS_INVENTORY: '+gap.inventory_id+' is not retained')
