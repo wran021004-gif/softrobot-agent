@@ -98,6 +98,15 @@ class HandoffResult(Contract):
     status: str
 
 
+class WorkflowDesignResponse(Contract):
+    """Version 2: recommendation disposition and workflow control are independent."""
+    report: EvidenceRef
+    disposition: Literal['adopt', 'defer', 'reject']
+    recommendation_id: str | None = None
+    reasoning: str = Field(min_length=1)
+    next_action: Literal['request_check', 'verify_adopted_change', 'finish']
+
+
 class DiagnosticReview(Contract):
     response: EvidenceRef
     verification: EvidenceRef

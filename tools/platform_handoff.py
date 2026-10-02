@@ -127,5 +127,19 @@ def review(ctx,args):
     return transition(ctx,'final_review',args)
 
 
+def respond_workflow(ctx,args):
+    require_role(ctx,'design')
+    role=ctx.store.session(ctx.run_id)['state']['role_context']
+    if plain(args.report)!=role.get('report'):raise ValueError('DESIGN_REPORT_LINK_MISMATCH')
+    recommendations=ctx.artifact(args.report)['recommendations']
+    selected=next((r for r in recommendations if r['recommendation_id']==args.recommendation_id),None)
+    if args.recommendation_id is not None and selected is None:raise ValueError('UNKNOWN_RECOMMENDATION')
+    if args.disposition=='adopt' and selected is None:raise ValueError('ADOPTION_REQUIRES_NAMED_RECOMMENDATION')
+    if args.next_action=='verify_adopted_change' and (args.disposition!='adopt' or selected['action']!='control_parameter'):
+        raise ValueError('VERIFICATION_REQUIRES_ADOPTION_OF_EXACT_CONTROL_PARAMETER')
+    if role.get('final_response') and args.next_action!='finish':raise ValueError('CHECK_ALLOWANCE_SPENT: choose finish')
+    return transition(ctx,'design_response',args)
+
+
 def preflight(inp,args,reg):
     return dict(cost=dict(wall_s=5.))

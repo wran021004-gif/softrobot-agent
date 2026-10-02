@@ -56,6 +56,14 @@ EXTENSIONS = [replace(d, capabilities={**d.capabilities,
     'role': 'adapter'}) for d in EXTENSIONS]
 
 from schemas import platform_handoff as handoff
+EXTENSIONS.append(Extension('deepseek','model_adapter','3.0.0',Empty,ModelResponse,
+    'tools.diagnostic_native:FlatDiagnosticAdapter','Flat business arguments for the shared diagnostic workflow',
+    sources=('tools/diagnostic_native.py','tools/platform_models.py','tools/model_transports/deepseek.py'),
+    capabilities=dict(real_requests=True,text=True,images=False,timeout='network request deadline',cancellation='between requests')))
+EXTENSIONS.append(Extension('design.respond_diagnosis','tool','2.0.0',handoff.WorkflowDesignResponse,handoff.HandoffResult,
+    'tools.platform_handoff:respond_workflow','Record recommendation disposition and independent next workflow action. finish ends workflow; adoption alone executes nothing.',
+    sources=('schemas/platform_handoff.py','tools/platform_handoff.py'),
+    capabilities=dict(category='diagnostics',role='public_tool',route_visible=True,preflight='tools.platform_handoff:preflight')))
 for name, schema, function, description in (
     ('diagnosis.request',handoff.DiagnosisRequest,'request','Request a separate diagnostic context: distinguish evidence reading from an explicit saved_state_check numerical grant. Production changes and backend execution require separate authority.'),
     ('diagnosis.check_request',handoff.DiagnosticCheckRequest,'check','Submit a typed discriminating check; enabled feedback sessions yield to the fixed coordinator. Other sessions save an advisory request.'),

@@ -299,6 +299,8 @@ def effective_config(host):
 
 
 def delivery_instruction(host):
+    if host.store.session(host.run_id)['snapshot']['input']['policy']['model'].get('adapter_version')=='3.0.0':
+        return 'Invoke the advertised native tool using business fields directly; correct only the reported invalid fields. No outer metadata or argument envelope. '
     state = host.store.session(host.run_id)['state']
     role = state.get('role_context', {})
     granted = host.store.session(host.run_id)['snapshot']['input']['policy']['tool_bindings']
@@ -636,6 +638,10 @@ def _argument_rejection(host, decision, receipt, config):
     Called after normal turn/repair accounting. No rejected action is executed,
     no domain fields are invented, and a failed correction remains needs_input.
     """
+    if config.get('adapter_version')=='3.0.0':
+        with host.store.transaction() as db:
+            ref=plain(host.store.put(db,dict(error=receipt['error'],protocol_errors=[dict(path='business_parameters',expected=receipt['error'])])))
+        return _model_failure(host,{**receipt,'output':ref},advance_turn=False)
     with host.store.transaction() as db:
         state = host.store.session(host.run_id, db)['state']
         if state.get('route', {}).get('final'):
@@ -659,7 +665,7 @@ def _argument_rejection(host, decision, receipt, config):
     return None
 
 
-def _model_failure(host, receipt):
+def _model_failure(host, receipt, advance_turn=True):
     """Bounded durable corrections, also replayable after receipt commit.
 
     The invalid response is settled once. Advancing the turn atomically with the
@@ -715,14 +721,14 @@ def _model_failure(host, receipt):
                 errors=failure.get('protocol_errors', []),
                 requirement=(problem +
                     'None of those calls was executed. Return exactly one tool call now and wait for its result. '
-                    'Function arguments must be a JSON-encoded object with outer arguments (object), reason (nonempty English string), '
-                    'and tool_version (declared version); evidence is optional. Outer reason is separate from arguments.reason. '
+                    + ('' if config.get('adapter_version')=='3.0.0' else
+                    'Function arguments must be a JSON-encoded object with outer arguments (object), reason (nonempty English string), and tool_version (declared version); evidence is optional. Outer reason is separate from arguments.reason. ')
                     + delivery_instruction(host) +
                     f"After this scheduled correction, remaining allowances: total {limits['max_total']-total-1}, "
                     f"consecutive {limits['max_consecutive']-consecutive-1}. A completed legal tool call resets only consecutive usage."))
             if 'tool_call_count' in failure:
                 state['protocol_correction']['tool_call_count'] = failure['tool_call_count']
-            state['turn'] += 1
+            state['turn'] += int(advance_turn)
             host.store.update_state(db, host.run_id, state)
             ref = host.store.put(db, state['protocol_correction'])
             host.store.event(db, host.run_id, 'model_protocol_correction', 'scheduled',
