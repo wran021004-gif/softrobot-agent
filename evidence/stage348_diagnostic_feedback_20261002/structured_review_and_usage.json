@@ -1,0 +1,259 @@
+{
+  "runs": [
+    {
+      "label": "saved_feedback_suffix",
+      "classification": "cross-run continuation using preserved real numerical feedback",
+      "mode": "dual_context",
+      "status": "completed",
+      "stop_reason": "Cross-run preserved feedback consumed; accepted revision and final decision.",
+      "legal_completion": true,
+      "feedback_path_complete": true,
+      "early_finish": false,
+      "numerical_check_status": "completed",
+      "usage": {
+        "tool_calls": 3,
+        "model_calls": 3,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 166.3609999998007
+      },
+      "tokens": {
+        "completion_tokens": 44121,
+        "prompt_cache_hit_tokens": 5120,
+        "prompt_cache_miss_tokens": 53059,
+        "prompt_tokens": 58179,
+        "total_tokens": 102300
+      },
+      "elapsed_s": 173.625,
+      "numerical_work": {
+        "local_solves": 0,
+        "prediction_evaluations": 0
+      },
+      "protocol_corrections": 1,
+      "provider_failures": [
+        {
+          "tool": "model.deepseek",
+          "request_id": "model-0",
+          "status": "failed",
+          "error": "INVALID_TOOL_CALL_ENVELOPE: business_parameters: report: Value error, DIAGNOSTIC_FACT_NOT_DECLARED"
+        }
+      ],
+      "business_failures": [],
+      "report_validation": [
+        {
+          "request_id": "model-1-tool",
+          "revised": true,
+          "selector_count": 41,
+          "selector_errors": [],
+          "gap_errors": [],
+          "execution_status": "completed"
+        }
+      ],
+      "monetary_cost": null
+    },
+    {
+      "label": "fresh_dual_pilot",
+      "classification": "fresh workflow",
+      "mode": "dual_context",
+      "status": "incomplete",
+      "stop_reason": "PHASE_INCOMPLETE initial: BUDGET_EXHAUSTED: active phase / protected downstream capacity",
+      "legal_completion": false,
+      "feedback_path_complete": false,
+      "early_finish": false,
+      "numerical_check_status": null,
+      "usage": {
+        "tool_calls": 12,
+        "model_calls": 7,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 291.1909999989439
+      },
+      "tokens": {
+        "completion_tokens": 66373,
+        "prompt_cache_hit_tokens": 21888,
+        "prompt_cache_miss_tokens": 63476,
+        "prompt_tokens": 85364,
+        "total_tokens": 151737
+      },
+      "elapsed_s": 310.125,
+      "numerical_work": {
+        "local_solves": 0,
+        "prediction_evaluations": 0
+      },
+      "protocol_corrections": 1,
+      "provider_failures": [
+        {
+          "tool": "model.deepseek",
+          "request_id": "model-3",
+          "status": "failed",
+          "error": "INVALID_TOOL_CALL_ENVELOPE: business_parameters: fact_selectors.fact.update34_predicted_input.2.reference.artifact_id: String should match pattern '^[a-f0-9]{64}$'"
+        }
+      ],
+      "business_failures": [
+        {
+          "tool": "evidence.read",
+          "request_id": "model-0-tool-2",
+          "status": "rejected",
+          "error": "'utf-8' codec can't decode byte 0x8b in position 1: invalid start byte"
+        },
+        {
+          "tool": "diagnosis.submit",
+          "request_id": "model-2-tool",
+          "status": "failed",
+          "error": "'horizon'"
+        },
+        {
+          "tool": "diagnosis.submit",
+          "request_id": "model-4-tool",
+          "status": "failed",
+          "error": "FACT_SELECTOR_VALUE_MISMATCH"
+        }
+      ],
+      "report_validation": [
+        {
+          "request_id": "model-2-tool",
+          "revised": false,
+          "selector_count": 27,
+          "selector_errors": [
+            {
+              "fact": "fact_controller_config",
+              "error": "'horizon'",
+              "submitted": {
+                "pointer": "/detail/summary/controller/parameters/data/horizon",
+                "reference": {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                },
+                "value": 10
+              }
+            },
+            {
+              "fact": "fact_controller_config",
+              "error": "'holding_brake_lead_s'",
+              "submitted": {
+                "pointer": "/detail/summary/controller/parameters/data/holding_brake_lead_s",
+                "reference": {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                },
+                "value": 0.0
+              }
+            },
+            {
+              "fact": "fact_controller_config",
+              "error": "'holding_tip_speed_weight'",
+              "submitted": {
+                "pointer": "/detail/summary/controller/parameters/data/holding_tip_speed_weight",
+                "reference": {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                },
+                "value": 0.0
+              }
+            },
+            {
+              "fact": "fact_controller_config",
+              "error": "'terminal_tip_speed_weight'",
+              "submitted": {
+                "pointer": "/detail/summary/controller/parameters/data/terminal_tip_speed_weight",
+                "reference": {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                },
+                "value": 0.0
+              }
+            },
+            {
+              "fact": "fact_controller_config",
+              "error": "'terminal_velocity_weight'",
+              "submitted": {
+                "pointer": "/detail/summary/controller/parameters/data/terminal_velocity_weight",
+                "reference": {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                },
+                "value": 0.0001
+              }
+            },
+            {
+              "fact": "fact_controller_config",
+              "error": "'regenerate_warm_states'",
+              "submitted": {
+                "pointer": "/detail/summary/controller/parameters/data/regenerate_warm_states",
+                "reference": {
+                  "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+                  "media_type": "application/json"
+                },
+                "value": true
+              }
+            },
+            {
+              "fact": "fact_terminal_update_tensions",
+              "error": "FACT_SELECTOR_VALUE_MISMATCH",
+              "submitted": {
+                "pointer": "/34/one_step_prediction/time_s",
+                "reference": {
+                  "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+                  "media_type": "application/octet-stream"
+                },
+                "value": 0.35
+              },
+              "actual": 0.35000000000000003
+            }
+          ],
+          "gap_errors": [],
+          "execution_status": "failed"
+        },
+        {
+          "request_id": "model-4-tool",
+          "revised": false,
+          "selector_count": 19,
+          "selector_errors": [
+            {
+              "fact": "update34_prediction_sample",
+              "error": "FACT_SELECTOR_VALUE_MISMATCH",
+              "submitted": {
+                "pointer": "/content/time_s",
+                "reference": {
+                  "artifact_id": "37241ac302cef5bc1e11b154b2d7888a3a73bfd276e4233ffb8af95be3bf8e67",
+                  "media_type": "application/json"
+                },
+                "value": 0.35
+              },
+              "actual": 0.35000000000000003
+            }
+          ],
+          "gap_errors": [],
+          "execution_status": "failed"
+        }
+      ],
+      "monetary_cost": null
+    }
+  ],
+  "total_usage": {
+    "model_calls": 10,
+    "tool_calls": 15,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 457.5519999987446
+  },
+  "total_tokens": {
+    "completion_tokens": 110494,
+    "prompt_cache_hit_tokens": 27008,
+    "prompt_cache_miss_tokens": 116535,
+    "prompt_tokens": 143543,
+    "total_tokens": 254037
+  },
+  "limits": {
+    "model_calls": 128,
+    "tool_calls": 320,
+    "wall_s": 19200.0,
+    "backend_solves": 0,
+    "worker_calls": 0
+  },
+  "within_limits": true,
+  "monetary_cost": null,
+  "cost_reason": "Provider supplies tokens but no monetary cost.",
+  "historical_usage": "Excluded from new totals; retained in suffix continuation_provenance.json",
+  "review_limit": "Selector and structured gap checks do not certify scientific prose; delivery_review.json records implementer review."
+}

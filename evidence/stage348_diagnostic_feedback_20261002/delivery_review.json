@@ -1,0 +1,85 @@
+{
+  "reviewer": "Primary implementer; labels known, no independent blind review or paid reviewer",
+  "rubric": "Same six criteria frozen in both run freeze.json files: facts, gaps, attribution, check_value, limits, decision",
+  "raw_products": "All accepted and rejected model products remain unchanged; these are review annotations only.",
+  "suffix": {
+    "capability_gate": "passed",
+    "reference": "suffix_review.json",
+    "facts": "Exact numeric selectors pass; some prose overstates the local inference.",
+    "gaps": "Structured retention statuses pass but prose mislocates effective_horizon and confuses historical reads with currently supplied handoffs.",
+    "attribution": "No dominant cause asserted, but common projection-error cancellation and equivalence of unmanipulated hypotheses are unsupported.",
+    "check_value": "Actual speeds and endpoint positions influence deferral; useful for the declared local threshold comparison, not a closed-loop settling conclusion.",
+    "limits": "Projected state, input, model, integration and horizon scope retained; speed-direction wording is imprecise.",
+    "decision": "Accepted independent defer + finish with evidence basis; no physical intervention."
+  },
+  "fresh_pilot": {
+    "capability_gate": "failed before accepted initial report",
+    "recovery": {
+      "protocol_failures": 1,
+      "protocol_error": "Malformed 64-character artifact ID in the attempted correction (model-3).",
+      "business_failures": 3,
+      "business_errors": ["Design-phase raw evidence.read on gzip bytes rejected by UTF-8 decoder", "Initial report model-2-tool omitted /recipe from six selector paths", "Initial report model-4-tool failed exact timestamp selector equality"],
+      "stop": "The initial phase consumed its five provider attempts (two evidence-reading turns, one rejected report, one protocol-invalid correction, one rejected correction). Remaining project allowance did not replenish the phase.",
+      "post_failure_repair": "None. Errors and budget stop preserved; no live replacement or framework changes."
+    },
+    "structured_citations": {
+      "first_rejected_report": "27 selectors: six missing /recipe path components and one timestamp mismatch",
+      "last_rejected_report": "19 selectors: one timestamp mismatch",
+      "timestamp": {"submitted": 0.35, "actual": 0.35000000000000003, "note": "Scientifically negligible rounding, but the existing exact-selector contract rejects it. Acceptance was not relaxed."},
+      "inventory_retention_contradictions": 0
+    },
+    "findings": [
+      {
+        "severity": "substantive_issue",
+        "path": "last rejected initial report/report/attribution/3 and missing_evidence/1",
+        "quote": "predicted versus measured late-window motion cannot be compared with the available tools",
+        "source": "Completed initial calls model-0-tool-0 prediction (updates 0,1,2,33,34), model-0-tool-1 plans (0,1,33,34), and model-0-tool-2 motion; see exported resolved_calls.json and receipts.json.",
+        "consequence": "One raw gzip read failure does not imply the motion tool is unavailable; the derived motion/prediction queries succeeded."
+      },
+      {
+        "severity": "substantive_issue",
+        "path": "last rejected initial report/missing_evidence/3/basis",
+        "quote": "no plans-view read was executed in this phase",
+        "source": "Completed model-0-tool-1 was diagnosis.inspect_evidence(view=plans).",
+        "consequence": "Unsupported missing-data claim despite structured retained=true status. The report also overlooks the first reading turn while describing only its subsequent two-update raw pages."
+      },
+      {
+        "severity": "substantive_issue",
+        "path": "first rejected initial report/report/attribution/4/reason",
+        "quote": "per-update effective_horizon is only carried in artifact 8665c9eb0ebe506e281863969240de828087ac8c214265363a536c530c8d500a",
+        "source": "That artifact is compressed backend trajectory data; effective_horizon belongs to retained controller update data b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770.",
+        "consequence": "Wrong source location leads to an unsupported capability-gap claim."
+      },
+      {
+        "severity": "minor_issue",
+        "path": "last rejected initial report/report/facts/2/statement",
+        "quote": "At update 34 (time_s=0.35)",
+        "source": "Update 34 starts at 0.34 s; the one-step prediction endpoint timestamp is 0.35000000000000003 s.",
+        "consequence": "Distinguish controller-update time from predicted endpoint time. Numerical-selector mismatch is separately recorded."
+      },
+      {
+        "severity": "minor_issue",
+        "path": "request/question",
+        "quote": "force-limit saturation (tendon 5 saturated at update 34)",
+        "source": "Recorded tendon 5 input at update 34 is zero; the upper force limit is 8 N.",
+        "consequence": "If referring to the lower unilateral bound, say so explicitly; it is not evidence of upper-force saturation."
+      },
+      {
+        "severity": "minor_issue",
+        "path": "last rejected initial report/report/attribution/4/reason",
+        "quote": "rather than carried warm plans",
+        "source": "regenerate_warm_states describes regeneration of state trajectories; the setting alone does not establish that all prior input plans are discarded.",
+        "consequence": "The warm-start hypothesis exceeds what the cited configuration proves."
+      }
+    ],
+    "check_usefulness": "Not assessable: no check selected/executed, feedback, accepted revision or final decision.",
+    "positive_scope": "Drafts distinguish terminal reach from holding failure and keep competing hypotheses. The first draft explicitly respects synchronous simulation scheduling. None is an accepted diagnostic delivery."
+  },
+  "comparison": {
+    "status": "not launched; fresh pilot prerequisite failed",
+    "organization_masked_formal_reports": "Not applicable: zero formal products exist",
+    "single_context_feedback": "Live single-context feedback capability remains unobserved in this experiment; offline fixtures alone do not establish it.",
+    "conclusion": "No single/dual empirical ranking or statistical-significance claim."
+  },
+  "physical_improvement": "Not evaluated; zero new numerical checks, backend simulations, workers or physical variants."
+}

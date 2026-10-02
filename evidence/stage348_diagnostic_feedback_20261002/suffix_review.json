@@ -1,0 +1,20 @@
+{
+  "classification": "Cross-run continuation; not a fresh complete diagnostic workflow",
+  "gate": "passed: accepted revision with exact numerical selectors and hypothesis/limit interpretation, followed by accepted independent defer + finish decision",
+  "numeric_validation": {"selectors": 41, "mismatches": 0, "structured_inventory_retention_contradictions": 0},
+  "recovery": "One protocol/native-schema failure (DIAGNOSTIC_FACT_NOT_DECLARED), then accepted revision and final response; all three provider attempts charged. No business rejection or new numerical execution.",
+  "check_usefulness": "The model used actual endpoint speeds 0.6155277254823904 and 0.6129798468327005 m/s and endpoint positions to compare the historical check's declared thresholds; it deferred changes and retained local model/state/horizon/integration limits. These endpoints do not establish settling or a dominant cause.",
+  "prose_review": {
+    "reviewer": "Implementer; no independent blind review",
+    "scientific_conclusion": "The report consumes real feedback and explains its decision, but accepted schema/selector validation does not remove prose issues below.",
+    "findings": [
+      {"severity": "substantive_issue", "path": "revised_report/recommendations/1/rationale and missing_evidence/6", "quote": "effective_horizon value is retained as a backend_motion signal", "evidence": "Inventory source.backend_motion lists sampled qpos_rad/qvel_rad_s/tip_m/time_s. Effective horizon belongs to controller update evidence, not that trajectory. Summary exposes control_period_s=0.01 and recipe horizon=10.", "consequence": "Wrong evidence location and unsupported missing step-size claim; unread matching horizon is not proof of tool incapability."},
+      {"severity": "substantive_issue", "path": "revised_report/report/attribution/5/reason", "quote": "any common projection error cancels between the arms", "evidence": "Both arms share a projected GVS model, but input-dependent errors are not measured against a counterfactual backend response.", "consequence": "Cannot guarantee error cancellation or identical predictions for four unmanipulated causal hypotheses. The check fails to discriminate them; it does not prove their equivalence."},
+      {"severity": "minor_issue", "path": "revised_report/report/limitations/4", "quote": "speed reverses direction", "evidence": "The scalar speed decreases then increases; vector components also change, but scalar speed has no direction.", "consequence": "Use speed trend reversal or describe the actual vector change precisely."},
+      {"severity": "minor_issue", "path": "revised_report/report/attribution/5 and final_response/reasoning", "quote": "No retained read compares one_step_prediction endpoints", "evidence": "Historical completed prediction query model-0-tool-0 selected updates 28,30,31,32,33,34 and returned 90f7c0d47f80f8ba62f612efa8da4d3efef24f63b12ad1f288ac6e8c7e650f83. The historical initial report itself overlooked that read. The suffix receives explicit handoffs with fresh memory and does not replay every historical query.", "consequence": "Distinguish not supplied in this suffix view from never read historically; final prose 'read-not-retained or not read' is ambiguous."}
+    ]
+  },
+  "proceed_to_fresh_pilot": true,
+  "reason": "Required live suffix capabilities passed. Prose issues are recorded model outcomes, not silently edited products; the pilot starts with fresh memories and original evidence only.",
+  "approval_review": "Initial launch rejected for supposedly absent external-transmission authorization. Explicit user-delegated attachment lines 13 and 26-32 were verified; unchanged command then approved. No live attempt occurred before approval."
+}
