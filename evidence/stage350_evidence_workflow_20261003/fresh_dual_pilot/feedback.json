@@ -1,0 +1,75 @@
+{
+  "check_id": "saved-state-check",
+  "check_request": {
+    "artifact_id": "7e4e45b83beb82e76e7d419d49f081bd6c01a990d92facc50c32ad2cd08646b9",
+    "media_type": "application/json"
+  },
+  "diagnosis_request": {
+    "artifact_id": "15107f3cf63d9fb0daa5d7c0481c2b1ffb1321ec7ef4a7ef77311782f684193a",
+    "media_type": "application/json"
+  },
+  "discriminating_observations": [
+    "If the braking-box endpoint tip speed is materially below the recorded-input endpoint tip speed (beyond numerical noise), the recorded input was not at locally available braking authority at this state and horizon (supports H2).",
+    "If the two endpoint tip speeds are nearly equal, the recorded input is already at, or indistinguishable from, the locally available braking authority for a 0.01 s interval under the 8 N limits (supports H1).",
+    "If the endpoint speed difference is within numerical noise while endpoint position differences also show no consistent ordering, the probe cannot rank the inputs at 0.01 s (supports H3).",
+    "The recorded-vs-braking input norms indicate whether the recorded tensions were anywhere near the recorded per-channel force limits, which is contextual evidence only, not a cause."
+  ],
+  "hypotheses": [
+    "H1 (limited recorded braking authority): at the saved projected state of update 33, the recorded applied tensions already deliver endpoint braking close to the maximum obtainable in one 0.01 s interval under the recorded 8 N per-channel tendon limits, so an instantaneous braking-box input yields an endpoint tip speed and position nearly equal to the recorded input.",
+    "H2 (recorded plan not braking-limited): at the same saved projected state, an instantaneous braking-box input yields a materially lower predicted endpoint tip speed than the recorded applied input, i.e. the recorded input is not at the locally available braking authority for this state and horizon, consistent with a recorded objective that carries no terminal/holding tip-speed penalty.",
+    "H3 (probe insensitive): the two inputs produce endpoint tip speeds that differ only within numerical noise at 0.01 s, so this projected-model probe cannot rank them at all."
+  ],
+  "local_question": "At the single saved projected state of controller update 33 (t = 0.33 s, the retained late-window state at the highest recorded late tip speed), does an instantaneous braking-box input produce a lower predicted endpoint tip speed and world-tip position error over the fixed 0.01 s projected horizon than the recorded applied input, and by how much?",
+  "protocol": {
+    "binding": {
+      "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+      "media_type": "application/json"
+    },
+    "changed_parameter": null,
+    "changed_value": null,
+    "horizon_s": 0.01,
+    "integration_step_s": 0.002,
+    "max_wall_s": 120.0,
+    "operation": "prediction_braking",
+    "update_id": 33
+  },
+  "receipt": {
+    "analysis_status": "not_assessed",
+    "cache_hit": false,
+    "caller": "local-human",
+    "charged": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 1,
+      "wall_s": 11.5,
+      "worker_calls": 0
+    },
+    "contract_version": "1.2.0",
+    "error": null,
+    "execution_id": "e8c4552fe7fa4fbeacddb557c8a27457",
+    "execution_status": "completed",
+    "original_execution_id": null,
+    "output": {
+      "artifact_id": "88628acb092698f98c6d0207e01dfe71efc2189778a32d563e2b59ac1691ea42",
+      "media_type": "application/json"
+    },
+    "request_id": "check-saved-state-check",
+    "result_contract": "DiagnosticEvidence",
+    "result_version": "1.0.0",
+    "solver_status": "not_run",
+    "task_success": null,
+    "tool_id": "diagnosis.saved_state_check",
+    "tool_version": "1.0.0"
+  },
+  "result": {
+    "artifact_id": "88628acb092698f98c6d0207e01dfe71efc2189778a32d563e2b59ac1691ea42",
+    "media_type": "application/json"
+  },
+  "unresolved": [
+    "This projection-braking comparison cannot establish closed-loop settling behaviour or a dominant cause, and a 0.01 s projected-model probe cannot explain the entire settling failure.",
+    "Objective weighting (terminal_tip_speed_weight and holding_tip_speed_weight recorded 0.0, holding_brake_lead_s 0.0, velocity/terminal_velocity weights 1e-4, tip_speed_scale_m_s 0.02), plan-selection/warm-start behaviour (initialization_selected 29 vs noninitialization_selected 6, regenerate_warm_states true, feasible_return budget 15 s / relative improvement 0.1), and effective-horizon truncation (2 intervals at update 33, 1 at update 34 vs configured horizon 10) are not separable by this check if they predict the same endpoint difference.",
+    "Backend-model mismatch between the projected GVS state and the full serial-backend response is not represented by this short-horizon probe, and the endpoint prediction does not measure full-state agreement.",
+    "Wall-clock solver/deadline degradation (mean update 17.0752 s, 35 deadline misses, 34 User_Requested_Stop vs 1 Solve_Succeeded, max_cpu_s 30.0) is a recorded wall-timing property; this probe cannot measure its effect on physical tip motion and retained notes state wall misses do not inject physical delay into simulated time.",
+    "Historical optimizer iterations, per-iteration objective contributions and full warm plans are not retained (source.historical_full_plans retained=false; full_snapshots_available false), so no retained signal here can attribute the residual tip speed."
+  ]
+}

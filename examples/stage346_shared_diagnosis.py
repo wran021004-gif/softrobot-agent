@@ -96,7 +96,8 @@ def main(action,configuration=None,credential=None):
     aggregate={k:0 for k in ('model_calls','tool_calls','backend_solves','worker_calls','wall_s')}
     suffix=[read(BASE/EXPERIMENT['suffix_label']/'outcome.json')] if EXPERIMENT.get('suffix_label') else []
     validation=[read(BASE/EXPERIMENT['initial_label']/'outcome.json')] if EXPERIMENT.get('initial_label') else []
-    for result in [*validation,*suffix,pilot,*outcomes]:
+    development=[read(BASE/label/'outcome.json') for label in EXPERIMENT.get('development_runs',[])]
+    for result in [*validation,*suffix,*development,pilot,*outcomes]:
         for k,v in result['usage']['used'].items():aggregate[k]+=v
     atomic_json(EVIDENCE/'workload_usage.json',dict(used=aggregate,limits=EXPERIMENT.get('overall_limits',dict(model_calls=120,tool_calls=300,wall_s=18000.,backend_solves=0,worker_calls=0))))
     # Blinding removes organization/session labels but preserves evidence hashes and scientific text.

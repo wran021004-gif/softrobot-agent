@@ -95,6 +95,16 @@ class BoundSavedStateAdapter(FlatDiagnosticAdapter):
         payload=super().encode(model_input,config)
         context=json.loads(payload['messages'][1]['content'])
         context['role_context'].pop('native_store_root',None)
+        if self.fact_state.get('fact_scope'):
+            # Membership arrays duplicate catalog handles, sometimes twice per
+            # receipt. Keep exact arrays in the host ledger for validation;
+            # model presentation retains every receipt, scope and display count.
+            for row in context['role_context']['read_ledger']:
+                for key in ('handles','displayed_handles'):
+                    row[key+'_count']=len(row.pop(key))
+            for observation in [context.get('observation'),*context.get('batch_observations',[])]:
+                if observation and 'fact_handles' in observation:
+                    observation['fact_handle_count']=len(observation.pop('fact_handles'))
         payload['messages'][1]['content']=encode(context)
         schema=self.schemas.get('diagnosis.submit')
         if schema and self.fact_state.get('fact_scope'):

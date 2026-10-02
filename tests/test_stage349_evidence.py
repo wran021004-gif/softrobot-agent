@@ -62,7 +62,8 @@ class Stage349Tests(TestCase):
         args=args.model_copy(update=dict(check_results=[EvidenceSelector.model_validate(dict(reference=result,pointer='',value=None)).reference]))
         with self.assertRaisesRegex(ValueError,'NUMERICAL_RESULT_SELECTOR'):submit(ctx,args)
         handover(h,result,w.store.artifact(result),origin='executed check fixture',kind='numerical_result')
-        state=w.store.session(h.run_id)['state'];numeric=next(k for k,v in state['fact_catalog'].items() if v['selector']['reference']==result)
+        state=w.store.session(h.run_id)['state'];numeric=next(k for k,v in state['fact_catalog'].items()
+            if v['selector']['reference']==result and v['selector']['pointer']=='/detail/endpoint_speed_m_s')
         s=resolve_handles(state,{'fact':[numeric]})
         body=args.model_dump(mode='json');body['fact_selectors']=s;body['report']['facts'][0]['evidence']=[result]
         with patch('tools.platform_handoff.transition',return_value='accepted'):self.assertEqual(submit(ctx,InventoryDiagnosisSubmission.model_validate(body)),'accepted')

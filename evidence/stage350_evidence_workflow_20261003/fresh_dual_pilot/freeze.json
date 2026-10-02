@@ -1,0 +1,879 @@
+{
+  "schema_version": "1.0.0",
+  "project_id": "gvs-stage350-15b8f9dc500b",
+  "mode": "dual_context",
+  "pilot": true,
+  "minimal": false,
+  "suffix": false,
+  "initial_only": false,
+  "hosts": {
+    "design": "gvs-stage350-15b8f9dc500b-design",
+    "diagnostic": "gvs-stage350-15b8f9dc500b-diagnostic",
+    "executor": "gvs-stage350-15b8f9dc500b-executor"
+  },
+  "binding": {
+    "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+    "media_type": "application/json"
+  },
+  "identities": {
+    "candidate_id": "proposal_compliant_build",
+    "execution_id": "5991de53e82747439e87ba8569667e1b",
+    "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
+    "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+    "evidence_manifest": {
+      "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+      "media_type": "application/json"
+    },
+    "configuration": {
+      "artifact_id": "79466ac2e3bc95e0daaa29938f7812842c02d383bc9b12b2af9fe98da81323f0",
+      "media_type": "application/json"
+    }
+  },
+  "summary": {
+    "artifact_id": "e87b0e850c6982c4a61827f93598bb6e3b1a46ce7d95cd1b3ebaaf218f4fcfbf",
+    "media_type": "application/json"
+  },
+  "inventory": {
+    "schema_version": "2.0.0",
+    "execution_id": "5991de53e82747439e87ba8569667e1b",
+    "manifest": {
+      "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+      "media_type": "application/json"
+    },
+    "entries": [
+      {
+        "type": "one_step_predictions",
+        "reference": {
+          "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+          "media_type": "application/octet-stream"
+        },
+        "record_count": 35,
+        "total_records": 35,
+        "time_coverage_s": [
+          0.0,
+          0.34
+        ],
+        "signals": [
+          "one_step_prediction"
+        ],
+        "units": "m; m/s",
+        "frame": "world for tip vectors; projected GVS coordinates for state",
+        "timestamps": "controller start time; prediction endpoint is next execution timestamp",
+        "query": {
+          "tool": "diagnosis.inspect_evidence",
+          "view": "prediction",
+          "update_ids": "0..34",
+          "max_ids_per_query": 8
+        },
+        "raw_query": {
+          "tool": "evidence.read",
+          "pointer": "/{update_id}/one_step_prediction"
+        },
+        "coverage": "complete retained record inventory; derived queries select samples",
+        "missing_update_ids": [],
+        "inventory_id": "source.one_step_predictions",
+        "retained": true
+      },
+      {
+        "type": "applied_tensions",
+        "reference": {
+          "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+          "media_type": "application/octet-stream"
+        },
+        "record_count": 35,
+        "total_records": 35,
+        "time_coverage_s": [
+          0.0,
+          0.34
+        ],
+        "signals": [
+          "actual_tension_n"
+        ],
+        "units": "N",
+        "frame": "world for tip vectors; projected GVS coordinates for state",
+        "timestamps": "controller start time; prediction endpoint is next execution timestamp",
+        "query": {
+          "tool": "diagnosis.inspect_evidence",
+          "view": "plans",
+          "update_ids": "0..34",
+          "max_ids_per_query": 8
+        },
+        "raw_query": {
+          "tool": "evidence.read",
+          "pointer": "/{update_id}/actual_tension_n"
+        },
+        "coverage": "complete retained record inventory; derived queries select samples",
+        "missing_update_ids": [],
+        "inventory_id": "source.applied_tensions",
+        "retained": true
+      },
+      {
+        "type": "saved_projected_states",
+        "reference": {
+          "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+          "media_type": "application/octet-stream"
+        },
+        "record_count": 35,
+        "total_records": 35,
+        "time_coverage_s": [
+          0.0,
+          0.34
+        ],
+        "signals": [
+          "measured_initial_state"
+        ],
+        "units": "rad/m; rad/(m*s)",
+        "frame": "world for tip vectors; projected GVS coordinates for state",
+        "timestamps": "controller start time; prediction endpoint is next execution timestamp",
+        "query": {
+          "tool": "diagnosis.inspect_evidence",
+          "view": "plans",
+          "update_ids": "0..34",
+          "max_ids_per_query": 8
+        },
+        "raw_query": {
+          "tool": "evidence.read",
+          "pointer": "/{update_id}/measured_initial_state"
+        },
+        "coverage": "complete retained record inventory; derived queries select samples",
+        "missing_update_ids": [],
+        "inventory_id": "source.saved_projected_states",
+        "retained": true
+      },
+      {
+        "type": "plan_selection",
+        "reference": {
+          "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+          "media_type": "application/octet-stream"
+        },
+        "record_count": 35,
+        "total_records": 35,
+        "time_coverage_s": [
+          0.0,
+          0.34
+        ],
+        "signals": [
+          "optimization_selected_iteration"
+        ],
+        "units": "iteration index",
+        "frame": "world for tip vectors; projected GVS coordinates for state",
+        "timestamps": "controller start time; prediction endpoint is next execution timestamp",
+        "query": {
+          "tool": "diagnosis.inspect_evidence",
+          "view": "plans",
+          "update_ids": "0..34",
+          "max_ids_per_query": 8
+        },
+        "raw_query": {
+          "tool": "evidence.read",
+          "pointer": "/{update_id}/optimization_selected_iteration"
+        },
+        "coverage": "complete retained record inventory; derived queries select samples",
+        "missing_update_ids": [],
+        "inventory_id": "source.plan_selection",
+        "retained": true
+      },
+      {
+        "type": "solver_status",
+        "reference": {
+          "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+          "media_type": "application/octet-stream"
+        },
+        "record_count": 35,
+        "total_records": 35,
+        "time_coverage_s": [
+          0.0,
+          0.34
+        ],
+        "signals": [
+          "optimization_raw_status"
+        ],
+        "units": "status string",
+        "frame": "world for tip vectors; projected GVS coordinates for state",
+        "timestamps": "controller start time; prediction endpoint is next execution timestamp",
+        "query": {
+          "tool": "diagnosis.inspect_evidence",
+          "view": "plans",
+          "update_ids": "0..34",
+          "max_ids_per_query": 8
+        },
+        "raw_query": {
+          "tool": "evidence.read",
+          "pointer": "/{update_id}/optimization_raw_status"
+        },
+        "coverage": "complete retained record inventory; derived queries select samples",
+        "missing_update_ids": [],
+        "inventory_id": "source.solver_status",
+        "retained": true
+      },
+      {
+        "type": "controller_horizon",
+        "reference": {
+          "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+          "media_type": "application/octet-stream"
+        },
+        "record_count": 35,
+        "total_records": 35,
+        "signals": [
+          "effective_horizon"
+        ],
+        "units": "control intervals",
+        "query": {
+          "tool": "diagnosis.inspect_evidence",
+          "view": "plans"
+        },
+        "raw_query": {
+          "tool": "evidence.read",
+          "pointer": "/{update_id}/effective_horizon"
+        },
+        "coverage": "Per-update effective horizon; configured horizon is in summary controller.parameters.data.recipe.horizon",
+        "inventory_id": "source.controller_horizon",
+        "retained": true
+      },
+      {
+        "type": "force_limits",
+        "reference": {
+          "artifact_id": "0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd",
+          "media_type": "application/octet-stream"
+        },
+        "record_count": 6,
+        "signals": [
+          "entity",
+          "force_limit_n"
+        ],
+        "units": "N",
+        "values": [
+          {
+            "pointer": "/tendons/0/force_limit_n",
+            "value": 8.0
+          },
+          {
+            "pointer": "/tendons/1/force_limit_n",
+            "value": 8.0
+          },
+          {
+            "pointer": "/tendons/2/force_limit_n",
+            "value": 8.0
+          },
+          {
+            "pointer": "/tendons/3/force_limit_n",
+            "value": 8.0
+          },
+          {
+            "pointer": "/tendons/4/force_limit_n",
+            "value": 8.0
+          },
+          {
+            "pointer": "/tendons/5/force_limit_n",
+            "value": 8.0
+          }
+        ],
+        "query": {
+          "tool": "evidence.read",
+          "pointer": "/tendons"
+        },
+        "coverage": "complete channel list",
+        "inventory_id": "source.force_limits",
+        "retained": true
+      },
+      {
+        "type": "backend_motion",
+        "reference": {
+          "artifact_id": "8665c9eb0ebe506e281863969240de828087ac8c214265363a536c530c8d500a",
+          "media_type": "application/octet-stream"
+        },
+        "record_count": 35,
+        "time_coverage_s": [
+          0.01,
+          0.35000000000000003
+        ],
+        "sample_times_s": [
+          0.01,
+          0.02,
+          0.03,
+          0.04,
+          0.05,
+          0.06,
+          0.07,
+          0.08,
+          0.09,
+          0.1,
+          0.11,
+          0.12,
+          0.13,
+          0.14,
+          0.15,
+          0.16,
+          0.17,
+          0.18,
+          0.19,
+          0.2,
+          0.21,
+          0.22,
+          0.23,
+          0.24,
+          0.25,
+          0.26,
+          0.27,
+          0.28,
+          0.29,
+          0.3,
+          0.31,
+          0.32,
+          0.33,
+          0.34,
+          0.35000000000000003
+        ],
+        "signals": [
+          "body_positions_m",
+          "body_rotations",
+          "controller_boundary_wall_s",
+          "deadline_horizon_preparation_s",
+          "deadline_missed",
+          "desired_tension_n",
+          "effective_horizon",
+          "engine_time_s",
+          "external_torque_nm",
+          "failure_response_used",
+          "feasibility_recovery",
+          "feasible_suboptimal_update",
+          "feedback",
+          "force_limit_saturated",
+          "gvs_projection_residual_max_rad_m",
+          "one_step_prediction",
+          "optimization_constraint_violation",
+          "optimization_nonconverged",
+          "optimization_raw_status",
+          "optimization_returned_violation",
+          "optimization_selected_iteration",
+          "optimization_solve_s",
+          "optimization_status",
+          "plan_accepted",
+          "plan_source",
+          "plan_validation_s",
+          "policy_stop_reason",
+          "predicted_tension_n",
+          "prediction_timing",
+          "qpos_rad",
+          "qvel_rad_s",
+          "recovery_integration_s",
+          "recovery_validation_s",
+          "recovery_wall_s",
+          "requested_tension_n",
+          "solver_construction_s",
+          "solver_error",
+          "solver_failed",
+          "solver_qfrc_actuator_nm",
+          "solver_qfrc_passive_nm",
+          "solver_tendon_length_m",
+          "solver_time_s",
+          "state_preparation_s",
+          "stop_requested",
+          "tendon_length_change_m",
+          "tendon_length_m",
+          "tendon_length_rate_m_s",
+          "tendon_routes_m",
+          "tension_n",
+          "tension_tracking_error_n",
+          "time_s",
+          "tip_m",
+          "unusable_updates",
+          "update_wall_s",
+          "warm_preparation_s"
+        ],
+        "units": "s; rad; rad/s; m",
+        "frame": "world tip; serial backend joint coordinates",
+        "timestamps": "sampled post-step execution times",
+        "query": {
+          "tool": "diagnosis.inspect_evidence",
+          "view": "motion"
+        },
+        "raw_access": "gzip bytes cannot be read as JSON via evidence.read; use the derived motion view",
+        "endpoint_query": {
+          "tool": "diagnosis.inspect_evidence",
+          "view": "prediction",
+          "update_ids": "Chosen controller updates, at most 8 per query",
+          "meaning": "Includes measured backend position/velocity at each matched next timestamp; controller-update time is different"
+        },
+        "coverage": "sampled trajectory; motion query displays final settling window",
+        "capability_gap": "motion displays the final window; prediction can query other matched endpoint samples in batches. No continuous-time reconstruction or closed-loop counterfactual replay.",
+        "inventory_id": "source.backend_motion",
+        "retained": true
+      },
+      {
+        "type": "historical_full_plans",
+        "retained": false,
+        "signals": [
+          "full_warm_plans",
+          "optimizer_iteration_traces"
+        ],
+        "coverage": "control_snapshots.json not retained",
+        "inventory_id": "source.historical_full_plans"
+      }
+    ],
+    "missing_data": [
+      "Full historical warm plans and optimizer iteration traces are not retained as control_snapshots.json."
+    ],
+    "capability_gaps": [
+      "No closed-loop counterfactual replay or causal attribution tool. Full trajectories are not in every request.",
+      "Existing numerical checks use a projected GVS state and bounded horizon, not a full backend replay."
+    ],
+    "claim_policy": "Use inventory plus your receipt ledger: not_displayed, not_read in this context, queried with stated coverage, not_retained, or retained_unavailable through a named capability. A sampled view or failed raw gzip read does not prove absence."
+  },
+  "inventory_reference": {
+    "artifact_id": "f1a0ecce7576ac96bf1adbfd52a0591008f3feec0e6c68fb3466e2d0f1078068",
+    "media_type": "application/json"
+  },
+  "source_manifest": {
+    "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+    "media_type": "application/json"
+  },
+  "implementation": {
+    "commit": "7b3c2902a626e20380a1af8b8849a4e3c3bd3dba",
+    "files": {
+      "tools/diagnostic_workflow.py": "afa9f80b7425bd6871929fa11747aeeb3a056284e883f04aa553e96b803ba463",
+      "tools/diagnostic_native.py": "20d3ccbde076d4f44929380f2dd07c8cd650ef2806f10f82cf7588f2f88bf5c1",
+      "tools/diagnostic_inventory.py": "5cf0f0bf3b922699f2f6bbbaae15704698bba73326baaa0daae630f1f558a58f",
+      "tools/diagnostic_facts.py": "596bb1135323989c81165456e3db783c0a466601f0c72f8c2902cd359bb2f524",
+      "tools/platform_models.py": "f6c37cb11e48e96e064892f5e399aa15c730d669eecd017a635c78d44e1c7bfa",
+      "tools/platform_handoff.py": "09cade29a1ed94c27cfbad9b25fa2dcbb2797c65442c332ceaba2706a7ae56a7",
+      "tools/platform_diagnosis_coordinator.py": "e81225ed2e72e4a9b09bb3be6b1bdb8d7260a06bae665978efabf276a6952c4e",
+      "tools/platform_host.py": "02eea2d0cdb5d6238ae3876e5483b48214fa29b3328ea1117c2d16b2fc6f2562",
+      "tools/platform_store.py": "151e6b21271665c2f9788ba6a9abf9565e1440c1102ba5c0d9f62572421ce547",
+      "schemas/platform_handoff.py": "12e6700053c82545f94cffe9f4c8e877df936d27784246e5cccbd28273f2c48f",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "e537115df4246ec7205a9660f909b86a76296aa39a0adac9075e016931cd43bd",
+      "extensions/tendon_family/diagnostic_evidence.py": "6fa010ebec6d7edd52e447cdd91f01ddaaf7d1e617bd466ec7d3d96af18e9b7d",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "887483a5d3340b72dfb11c2a0e654ce01d80df56c3e4360263d7b86eb96dc724",
+      "examples/stage346_shared_diagnosis.py": "0056d5cda8f27c13e20d7d69668ef59de2c87969bcc8a5bf6d72eb214a251823",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "b2865befc809d3b599d8fb6d18f13301bc1e1c25e1d91bc1dfdb72185833af10",
+      "tools/platform_tools.py": "270d4ec234df0dcdbc835fd3e78f29af2e512a00b0a18a3c14a2dab94f9324b2",
+      "extensions/tendon_family/candidate.py": "ab0f66c32bc596b1f093a322683d49b525a33984d9515243d5c47c8958770df3",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88"
+    }
+  },
+  "runtime": {
+    "sys_executable": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+    "python_version": "3.11.16",
+    "environment_prefix": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent"
+  },
+  "provider_configuration": {
+    "adapter": "deepseek",
+    "adapter_version": "4.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 200000,
+    "length_recovery": {
+      "enabled": true,
+      "max_tokens": 131072,
+      "timeout_s": 900.0
+    },
+    "max_no_progress": 3,
+    "max_repairs": 2,
+    "max_tokens": 65536,
+    "max_turns": 24,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 2,
+      "max_total": 4
+    },
+    "readonly_batch_limit": 3,
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0,
+    "tool_naming": {
+      "mapping_identity": "0b55f810f8a11a93356d34a7038ded6391f26de4265078355cc5cab6502548cb",
+      "scheme": "readable_v1"
+    }
+  },
+  "limits": {
+    "model_calls": 24,
+    "tool_calls": 60,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 3600.0
+  },
+  "numerical_limits": {
+    "local_solves": 6,
+    "prediction_evaluations": 24
+  },
+  "scope": {
+    "operations": [
+      "prediction_braking",
+      "local_comparison"
+    ],
+    "model": "model.gvs@1.0.0",
+    "horizon_s": 0.01,
+    "integration": "implicit_euler",
+    "integration_step_s": 0.002,
+    "max_wall_s": 300.0,
+    "max_checks": 1,
+    "numerical_limits": {
+      "local_solves": 6,
+      "prediction_evaluations": 24
+    },
+    "configuration_scope": "saved_state_or_temporary_analysis"
+  },
+  "memory_policy": {
+    "policy": "Reconstruct system instructions plus structured state; no chronological conversation replay.",
+    "context_bytes": 200000,
+    "products": 8,
+    "product_bytes": 12000,
+    "total_product_bytes": 48000,
+    "retention": "Own accepted handoff products FIFO; oversized products retain reference only. Existing recent evidence pages and last four actions stay within their original host limits. Phase changes preserve these in the same context.",
+    "separation": "single_context shares one memory across phases; dual_context keeps one per role and receives explicit current request/report/response/feedback handoffs.",
+    "cross_run_experience": false
+  },
+  "fact_policy": {
+    "version": "1.0.0",
+    "handle": "f + first 12 SHA256 digits of project/binding/selector",
+    "scope": "Current project, source binding, and context receipt or explicit handoff",
+    "values": "Retrieved scalar leaves and short scalar vectors; no invented derived values",
+    "memory": "Context-local full ledger; compact catalog, no trajectories or cross-role memory merge"
+  },
+  "phase_budgets": {
+    "request": {
+      "limit": {
+        "model_calls": 3
+      },
+      "protect_project": {
+        "model_calls": 21,
+        "tool_calls": 40,
+        "wall_s": 2400.0
+      }
+    },
+    "initial": {
+      "limit": {
+        "model_calls": 5
+      },
+      "protect_project": {
+        "model_calls": 16,
+        "tool_calls": 30,
+        "wall_s": 1800.0
+      }
+    },
+    "response_initial": {
+      "limit": {
+        "model_calls": 3,
+        "wall_s": 300.0
+      },
+      "protect_project": {
+        "model_calls": 13,
+        "tool_calls": 20,
+        "wall_s": 1200.0
+      }
+    },
+    "check": {
+      "limit": {
+        "model_calls": 6
+      },
+      "protect_project": {
+        "model_calls": 7,
+        "tool_calls": 10,
+        "wall_s": 700.0
+      }
+    },
+    "revision": {
+      "limit": {
+        "model_calls": 4
+      },
+      "protect_project": {
+        "model_calls": 3,
+        "tool_calls": 3,
+        "wall_s": 300.0
+      }
+    },
+    "response_final": {
+      "limit": {
+        "model_calls": 3,
+        "wall_s": 300.0
+      }
+    }
+  },
+  "stage_instructions": {
+    "request": "Inspect the common inventory and summary. Formulate an open diagnostic question about failed secondary performance despite successful terminal reach. Author scope and stopping conditions. No predetermined root cause. Host supplies the saved-state grant and subject identity.",
+    "initial": "Read at least one prediction view and one motion or plans view. At most two successful reading turns; independent views can be batched. Then submit a concise initial report with 2-4 exact selected facts, competing hypotheses, explicit gaps and recommendations. Fact selectors point into original query result artifacts (e.g. /detail/summary/terminal_speed_m_s), not observation envelopes. report.source is the supplied binding; recommendation configuration_scope is identities.configuration. Recommendations may defer pending a check. Do not execute or select a numerical check in this phase. Availability gaps must use inventory IDs and not_read, not_retained or retained_unavailable; identify needed information/capability and basis. Unlisted evidence uses source plus explicit basis. Full sampled backend q/qdot is retained, even though motion shows the final window. Raw weight magnitudes do not establish cost-term importance without actual contributions/scaling.",
+    "response_initial": "Read the initial report. Choose adopt, defer or reject yourself and independently choose request_check, verify_adopted_change or finish. defer + request_check is valid. Rejecting a recommendation need not end diagnosis. finish ends all workflow work. verify_adopted_change requires adoption of the exact existing parameter/value and only a temporary saved-state comparison. Adoption alone executes nothing. Explain the evidence basis.",
+    "check": "Select one discriminating check based on unresolved hypotheses. Inspect retained evidence as needed to choose the operation and update_id. The host binds the chosen update's exact measured_initial_state and operation-defined input from the inventory controller file; do not copy vectors. prediction_braking uses current actual_tension_n; local_comparison uses previous actual_tension_n and requires the exact adopted parameter/value and a saved effective plan horizon of 0.01 s. prediction_braking compares held recorded input with an instantaneous braking box solution and requires no adoption. Choose update_id >= 1, hypotheses, fixed conditions, metrics, acceptance criteria and work_limits (wall_s <= 300; prediction_evaluations=2 or local_solves=2). Host fixes model.gvs@1.0.0, implicit Euler, 0.002 s step and 0.01 s horizon. At most two successful reading turns, then select the check. Do not overextend a local probe to the entire settling failure. State local_question, competing hypotheses, discriminating_observations and unresolved questions. If hypotheses predict the same result, explicitly say this check cannot separate them. Select a question the stated capability can answer; no dominant-cause claim.",
+    "revision": "Consume actual check_feedback and revise the previous report. The host links the immutable feedback envelope; do not supply check_results. Supply at least one relevant exact numeric fact selector from its result artifact when execution completed, and your interpretation. Explain which hypotheses are supported, weakened or unresolved and how the result changes or limits the next decision. Identify model, projected-state, input, integration and horizon limits. Failed or inconclusive checks permit honest delivery. No further check is authorized. Use inventory-linked gap declarations. Do not infer physical feedback delay from synchronous wall-clock deadline misses or cost importance from raw weights.",
+    "response_final": "Read the revised report and actual feedback. Record your final recommendation disposition and reasoning. The one-check allowance is spent; next_action must be finish. Physical improvement was not evaluated."
+  },
+  "permissions": {
+    "request": [
+      "evidence.read",
+      "diagnosis.request"
+    ],
+    "initial": [
+      "diagnosis.inspect_evidence",
+      "evidence.read",
+      "diagnosis.submit"
+    ],
+    "response_initial": [
+      "design.respond_diagnosis"
+    ],
+    "check": [
+      "evidence.read",
+      "diagnosis.inspect_evidence",
+      "diagnosis.check_request"
+    ],
+    "revision": [
+      "diagnosis.submit"
+    ],
+    "response_final": [
+      "design.respond_diagnosis"
+    ]
+  },
+  "capabilities": {
+    "prediction_braking": "At one saved projected state, compare recorded input with instantaneous braking-box input over the fixed short horizon. Can measure local endpoint speed/position differences. Cannot separate objective weighting, seed selection, horizon effects or backend-model mismatch when they predict the same result; cannot identify the dominant settling cause.",
+    "local_comparison": "Compare two local controller solves at the same saved state/previous input/horizon with exactly one adopted weight change. Measures local plan/endpoint differences; does not establish closed-loop settling or causal attribution. Requires a saved effective horizon matching the authorized horizon."
+  },
+  "experiment": {
+    "project_prefix": "gvs-stage350",
+    "run_directory": "D:/softrobot-agent/runs/stage350_evidence_workflow_20261003",
+    "evidence_directory": "D:/softrobot-agent/evidence/stage350_evidence_workflow_20261003",
+    "source_store": "D:/softrobot-agent/runs/stage341_autonomous_20261001",
+    "execution_id": "5991de53e82747439e87ba8569667e1b",
+    "source_manifest": {
+      "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+      "media_type": "application/json"
+    },
+    "provider_freeze": "D:/softrobot-agent/evidence/stage346_shared_diagnosis_20261002/pilot/freeze.json",
+    "minimal_outcome": "D:/softrobot-agent/evidence/stage346_shared_diagnosis_20261002/minimal/outcome.json",
+    "fact_handles": true,
+    "initial_label": "initial_report_validation",
+    "pilot_label": "fresh_dual_pilot",
+    "comparison_label": "pair",
+    "development_repair_runs_max": 1,
+    "overall_limits": {
+      "model_calls": 152,
+      "tool_calls": 380,
+      "wall_s": 22800.0,
+      "backend_solves": 0,
+      "worker_calls": 0
+    },
+    "physical_campaign_limits": {
+      "model_calls": 48,
+      "tool_calls": 130,
+      "wall_s": 10800.0,
+      "backend_solves": 3,
+      "worker_calls": 0
+    },
+    "overall_stage_limits": {
+      "model_calls": 200,
+      "tool_calls": 510,
+      "wall_s": 33600.0,
+      "backend_solves": 3,
+      "worker_calls": 0
+    },
+    "authorization_source": "User-authorized Stage 3.50 attachment cc9bbe99-1ff6-45a6-8b27-31bcfbd3d2de: paid DeepSeek calls and necessary task-evidence transmission to https://api.deepseek.com; one fresh initial-report validation (8 attempts/20 tools/1200 charged seconds; no numerical/backend/worker work), followed only after acceptance by a fresh complete dual-context pilot and four frozen matched diagnostic runs (each 24/60/3600; at most one check, six local solves/24 prediction evaluations; no backend/workers). One additional development run across Steps 1-2 is authorized only for a preserved demonstrated host/interface defect after focused offline repair; use a new run/freeze and the original phase ceilings, retaining all costs and failures. Model errors alone never authorize replacement. Conditional improvement integration after diagnostic comparison delivery, followed by a separate physical freeze and deterministic baseline (0 provider/10 tools/3600 seconds) then fresh single_context and dual_context improvement runs (each 24/60/3600, at most one candidate execution). Only the three existing geometry grant variables are editable. At most three complete backend executions overall, zero workers. Overall 200 attempts/510 tools/33600 charged seconds. Preserve source identities, raw outputs, statuses, counters and guards. Commit on feat/gvs-dynamics; do not push."
+  },
+  "recovery": {
+    "version": "2.0.0",
+    "scope": "workflow shared across phases and contexts",
+    "protocol": {
+      "category": "native_schema_or_envelope",
+      "limits": {
+        "max_consecutive": 2,
+        "max_total": 4
+      },
+      "total_used": 0,
+      "consecutive_used": 0,
+      "total_remaining": 4,
+      "consecutive_remaining": 2,
+      "reset": "Completed business call resets consecutive only; decoding alone does not."
+    },
+    "business": {
+      "category": "accepted_call_execution_rejected_or_failed",
+      "limit": 2,
+      "consecutive_failures": 0,
+      "total_failures": 0,
+      "remaining_repairs": 2,
+      "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+      "reset": "Completed business call resets consecutive; phase/context switch does not.",
+      "feedback": null
+    },
+    "transport": {
+      "category": "provider_transport_failure",
+      "automatic_retry": false
+    },
+    "length": {
+      "category": "truncated_without_usable_action",
+      "limit": 1,
+      "used": 0,
+      "configuration": {
+        "enabled": true,
+        "max_tokens": 131072,
+        "timeout_s": 900.0
+      }
+    },
+    "stop_reason": null
+  },
+  "host_provider_configurations": {
+    "design": {
+      "adapter": "deepseek",
+      "adapter_version": "4.0.0",
+      "base_url": "https://api.deepseek.com",
+      "context_bytes": 200000,
+      "length_recovery": {
+        "enabled": true,
+        "max_tokens": 131072,
+        "timeout_s": 900.0
+      },
+      "max_no_progress": 3,
+      "max_repairs": 2,
+      "max_tokens": 65536,
+      "max_turns": 24,
+      "model": "deepseek-flash",
+      "parameters": {},
+      "protocol_recovery": {
+        "max_consecutive": 2,
+        "max_total": 4
+      },
+      "readonly_batch_limit": 3,
+      "reasoning_effort": "high",
+      "strategy": "strategy.tool",
+      "strategy_version": "1.0.0",
+      "supports_images": false,
+      "supports_text": true,
+      "supports_tools": true,
+      "thinking": "enabled",
+      "timeout_s": 600.0,
+      "tool_naming": {
+        "mapping_identity": "0b55f810f8a11a93356d34a7038ded6391f26de4265078355cc5cab6502548cb",
+        "scheme": "readable_v1"
+      }
+    },
+    "diagnostic": {
+      "adapter": "deepseek",
+      "adapter_version": "4.0.0",
+      "base_url": "https://api.deepseek.com",
+      "context_bytes": 200000,
+      "length_recovery": {
+        "enabled": true,
+        "max_tokens": 131072,
+        "timeout_s": 900.0
+      },
+      "max_no_progress": 3,
+      "max_repairs": 2,
+      "max_tokens": 65536,
+      "max_turns": 24,
+      "model": "deepseek-flash",
+      "parameters": {},
+      "protocol_recovery": {
+        "max_consecutive": 2,
+        "max_total": 4
+      },
+      "readonly_batch_limit": 3,
+      "reasoning_effort": "high",
+      "strategy": "strategy.tool",
+      "strategy_version": "1.0.0",
+      "supports_images": false,
+      "supports_text": true,
+      "supports_tools": true,
+      "thinking": "enabled",
+      "timeout_s": 600.0,
+      "tool_naming": {
+        "mapping_identity": "0b55f810f8a11a93356d34a7038ded6391f26de4265078355cc5cab6502548cb",
+        "scheme": "readable_v1"
+      }
+    },
+    "executor": {
+      "adapter": "deepseek",
+      "adapter_version": "4.0.0",
+      "base_url": "https://api.deepseek.com",
+      "context_bytes": 200000,
+      "length_recovery": {
+        "enabled": true,
+        "max_tokens": 131072,
+        "timeout_s": 900.0
+      },
+      "max_no_progress": 3,
+      "max_repairs": 2,
+      "max_tokens": 65536,
+      "max_turns": 24,
+      "model": "deepseek-flash",
+      "parameters": {},
+      "protocol_recovery": {
+        "max_consecutive": 2,
+        "max_total": 4
+      },
+      "readonly_batch_limit": 3,
+      "reasoning_effort": "high",
+      "strategy": "strategy.tool",
+      "strategy_version": "1.0.0",
+      "supports_images": false,
+      "supports_text": true,
+      "supports_tools": true,
+      "thinking": "enabled",
+      "timeout_s": 600.0,
+      "tool_naming": {
+        "mapping_identity": "2395cbbed5691053b3e319c325a0472c459756442fc47d0932330fd2e2e85926",
+        "scheme": "readable_v1"
+      }
+    }
+  },
+  "tool_bindings": {
+    "diagnosis.request": "1.0.0",
+    "diagnosis.inspect_evidence": "1.0.0",
+    "diagnosis.check_request": "2.0.0",
+    "diagnosis.submit": "2.0.0",
+    "evidence.read": "1.0.0",
+    "design.respond_diagnosis": "2.0.0"
+  },
+  "review_rubric": {
+    "version": "1.0.0",
+    "reviewer": "Primary implementation assistant; no additional paid reviewer model",
+    "blinding": "Review exported report_XX files without the organization key where practical. The implementer knows run order, so this is label masking rather than independent blind assessment.",
+    "criteria": [
+      {
+        "id": "facts",
+        "question": "Do numeric claims agree with the exact bound source or check artifact, including units and time/state scope?"
+      },
+      {
+        "id": "gaps",
+        "question": "Does the report distinguish not displayed, not retained, and unavailable calculation/query capability? In particular, it must not claim missing predictions, tensions, or force limits merely from a sampled view."
+      },
+      {
+        "id": "attribution",
+        "question": "Are hypotheses separated from observations, with no dominant causal explanation inferred from one execution or one short projected-model probe?"
+      },
+      {
+        "id": "check_value",
+        "question": "Does the report explain how actual check results support, weaken or leave hypotheses unresolved and change or limit the next decision, including failure or inconclusiveness?"
+      },
+      {
+        "id": "limits",
+        "question": "Does it identify model, saved/projected state, input, integration/horizon and absent closed-loop validation limits?"
+      },
+      {
+        "id": "decision",
+        "question": "Is the final recommendation disposition consistent with its independent action and the evidence, without claiming physical improvement?"
+      }
+    ],
+    "ratings": [
+      "supported",
+      "minor_issue",
+      "substantive_issue",
+      "not_assessable"
+    ],
+    "requirements": "Each issue requires a report excerpt or field path, exact source reference where applicable, and practical consequence. Schema/selector acceptance alone does not certify prose. No global ranking or significance inference on this one case."
+  },
+  "outcomes": [
+    "workflow completion",
+    "exact selector validation",
+    "prose review",
+    "check usefulness",
+    "usage",
+    "physical improvement not evaluated"
+  ]
+}
