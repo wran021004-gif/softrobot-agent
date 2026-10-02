@@ -1,0 +1,50 @@
+{
+  "reviewer": "Primary implementer; not independent blind review",
+  "classification": "Initial-report capability validation only",
+  "gate": "passed",
+  "accepted_request": true,
+  "accepted_initial_report": true,
+  "accepted_report": "c6966290c1b512775f607e08b74c9da2ab9429d53bcd0b1d9beb13dbc500f046",
+  "exact_source_validation": {"accepted_facts": 11, "accepted_selectors": 74, "mismatches": 0, "rejected_draft_selectors": 42, "rejected_draft_mismatches": 0},
+  "coverage_validation": {
+    "live_validator": "Accepted corrected entry-level queried declarations and wholly unread/absent entries using receipt-derived coverage.",
+    "preserved_failed_submission": "model-2-tool declared backend_motion not_read over 0.01-0.35 s while describing unreturned channels in prose; this structured range includes queried motion. Model corrected within the same phase allowance using queried declarations. No additional development run or framework repair was used.",
+    "prediction_update_ids": [0, 1, 4, 5, 8, 9, 12, 13, 16, 17, 20, 21, 24, 25, 28, 29],
+    "plans_update_ids": [0, 2, 4, 6, 8, 12, 16, 20, 24, 28, 29, 30, 31, 32, 33, 34],
+    "motion_view": "Six retained final-window samples from 0.30 to 0.35000000000000003 s; prediction views additionally returned measured endpoints only at their matched timestamps.",
+    "limitation": "This run exercised successful correction to entry-level queried declarations. Acceptance does not certify free-text coverage counts or establish live acceptance of every possible explicit unread subset. Focused offline fixtures cover mixed scopes and retained timestamps."
+  },
+  "prose_findings": [
+    {
+      "severity": "substantive_issue",
+      "field": "/missing_evidence/0/needed",
+      "claim": "sampled reads cover 23 of 35 controller update_ids",
+      "assessment": "The prediction receipts cover 16 distinct update IDs. The 23-ID union includes plans-only reads, which do not supply one-step prediction comparisons. The structured queried status is valid, but this prose overstates prediction coverage.",
+      "source": "initial_report_validation/evidence_contexts.json diagnostic.read_ledger; prediction results abb631effa6db53d804bab5891d5be0fce5ad6e40666bba90b2ca19252cd2963 and 2ba71912f81e36e474e590a653e58dd90afadc8c496772ba92f9e2b18e4bb096"
+    },
+    {
+      "severity": "substantive_issue",
+      "field": "/report/attribution/1/reason",
+      "claim": "sampled selection fields carry inconsistent index/update_id labels",
+      "assessment": "No such source inconsistency is established. Array offsets index the selected result rows; update_id identifies the original controller update. For example updates/7 in result 9f82e96df515e538083f467ac77bd5d52fffcaf73b1486b9a03aa34f98f8088f is update_id 34 with selected iteration 31. Treating these different indices as inconsistent unnecessarily discounts valid evidence."
+    },
+    {
+      "severity": "minor_issue",
+      "field": "/report/attribution/5",
+      "assessment": "Synchronous scheduling excludes automatic injection of computation time as physical feedback delay. The ruled_out label should be limited to that mechanism; computational budgets can still influence selected plans. No general causal exclusion of all computation-related effects is supported."
+    },
+    {
+      "severity": "minor_issue",
+      "field": "/report/facts and /report/limitations",
+      "assessment": "Eleven facts and 74 selectors exceed the requested usual 2-4 key facts; the limitations array is empty although limitations appear in attribution and recommendations. Citation volume is not treated as a quality score."
+    }
+  ],
+  "positive_findings": [
+    "Terminal reach, sampled settling and computation are explicitly distinguished.",
+    "No numerical check, backend execution, physical change, or task improvement is claimed.",
+    "Raw objective weights are not used to establish cost-term importance, and one-step comparisons are not treated as complete causal identification.",
+    "All cited exact values resolve to immutable sources; report.gates was absent from native business arguments and only the internal default empty list remains."
+  ],
+  "usage": {"provider_attempts": 5, "tool_calls": 9, "charged_seconds": 318.87399999960326, "backend_executions": 0, "local_solves": 0, "prediction_evaluations": 0, "workers": 0},
+  "next_gate": "Fresh dual-context pilot with original source evidence and fresh memories; this report and review must not enter its context."
+}

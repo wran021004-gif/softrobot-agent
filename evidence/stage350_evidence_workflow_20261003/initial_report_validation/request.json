@@ -1,0 +1,48 @@
+{
+  "binding": {
+    "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+    "media_type": "application/json"
+  },
+  "budget": {
+    "backend_solves": 0,
+    "model_calls": 8,
+    "tool_calls": 20,
+    "wall_s": 1200.0,
+    "worker_calls": 0
+  },
+  "candidate_id": "proposal_compliant_build",
+  "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+  "evidence_manifest": {
+    "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+    "media_type": "application/json"
+  },
+  "execution_id": "5991de53e82747439e87ba8569667e1b",
+  "permitted_tools": [
+    "diagnosis.inspect_evidence",
+    "diagnosis.check_request",
+    "diagnosis.submit",
+    "evidence.read"
+  ],
+  "question": "In this single closed-loop execution (execution_id 5991de53e82747439e87ba8569667e1b, controller.gvs_nmpc 7.0.0, contract family.gvs_reach_control), terminal reach is reported achieved while the secondary settling requirement is reported failed. Reach side: reach_passed true, reach_tolerance_m 0.01, terminal_error_m 0.007642608585867386, terminal_speed_m_s 0.6351726092425104. Settling side: sampled_settling_passed false, settling_criteria/settling parameters position_limit_m 0.01, speed_limit_m_s 0.02, window_s 0.05, with late_max_error_m 0.05813810428573256 and late_max_speed_m_s 1.5810152739742807. Context from the same record: complete true, control_period_s 0.01, mean_update_s 17.075238151415917, deadline_misses 35, stopping_counts User_Requested_Stop 34 and Solve_Succeeded 1, initialization_selected 29 and noninitialization_selected 6, full_snapshots_available false, and a summary-declared limitation that a single execution and model comparisons do not establish a dominant cause, plus that no historical optimizer iterations or full warm plans are reconstructed.\n\nOpen question: using only the retained inventory (35 controller updates spanning 0.0–0.34 s of controller-start/execution timestamps and the sampled backend motion spanning 0.01–0.35 s of post-step execution times), what explains the divergence between achieving terminal reach and failing the settling window, and which candidate explanations can the retained records actually discriminate? Candidate families to test for discriminating evidence — not asserted causes and not an exhaustive list: (a) actuation/limit side, e.g. tension tracking or saturation against per-tendon force limits; (b) planner/solver degradation across updates, e.g. nonconvergence, unusable updates, suboptimal feasibility recovery, plan source or accepted/unaccepted plan status, selected iteration index, and per-update effective horizon versus the configured horizon of 10; (c) timing/latency mismatch between control period and per-update wall time, deadline-miss flags, prediction timing and preparation timings; (d) recorded controller objective/settling configuration permitting late-speed drift, e.g. holding_tip_speed_weight 0.0, terminal_tip_speed_weight 0.0, holding_brake_lead_s 0.0, tip_speed_scale_m_s 0.02, terminal_weight 5.0, terminal_velocity_weight 0.0001, velocity_weight 0.0001, numerical_source 'bundled_guess'; (e) projection/model mismatch, e.g. per-sample GVS projection residual and divergence between one-step predictions and measured backend endpoint positions/velocities. Report which of (a)–(e), or any unenumerated alternative, the retained evidence supports, weakly distinguishes, or cannot distinguish, and state explicitly where evidence is absent rather than merely not displayed. Note the frame difference that must be respected when combining sources: world-frame tip vectors, projected GVS coordinates for the saved states and controller-side predictions, and serial backend joint coordinates for motion.",
+  "saved_state_check": null,
+  "scope": [
+    "Retained-evidence reading only, from the already-supplied inventory and summary: source.one_step_predictions, source.applied_tensions, source.saved_projected_states, source.plan_selection, source.solver_status, source.controller_horizon, source.force_limits, and source.backend_motion via its derived motion view and batched endpoint queries.",
+    "Entry-level coverage: the seven listed entries are reported as complete retained record inventories with 35 records each and no missing update_ids; treat them as available in full unless a query is scoped to a subset, in which case state 'queried with stated coverage'.",
+    "source.backend_motion raw access is gzip bytes that cannot be read as JSON via evidence.read; raw gzip unreadability is not evidence of absence and must not be reported as such. Use only the derived motion view (which displays the final settling window) and batched endpoint queries (at most 8 update_ids per query).",
+    "source.historical_full_plans (full warm plans, optimizer iteration traces) is not retained: control_snapshots.json is listed as not retained and full_snapshots_available false; declare it not_retained for all updates rather than not_read or not_displayed.",
+    "Excluded in this run: all numerical work. No saved-state numerical grant is requested or used, no prediction_braking or local_comparison operations, no integration, no prediction evaluations, no local solves, no backend solves, and no worker calls.",
+    "Excluded in this run: check selection or execution, production or configuration changes, controller parameter edits, and any re-run or replay of the execution.",
+    "Any claim that would require a closed-loop counterfactual replay, continuous-time reconstruction, or a full backend replay is out of scope and must be reported as not computable with the current tools, since the inventory states no such capability exists.",
+    "Availability vocabulary to use strictly: not_displayed, not_read in this context, queried with stated coverage, not_retained, retained_unavailable through a named capability. A sampled view or an unreadable raw container does not prove absence.",
+    "Signals are to be interpreted in their recorded units/frames (N; rad/m and rad/(m*s) for projected GVS state; s and rad and rad/s and m for backend motion), and per-update effective_horizon is a per-update quantity distinct from the configured horizon 10."
+  ],
+  "stopping_conditions": [
+    "Stop when each candidate explanation family is labeled supported, weakly distinguished, or not distinguishable, with the specific retained records or fields cited, or explicitly declared unavailable with the correct availability category.",
+    "Stop when the settling-versus-reach divergence can be bounded from retained evidence (e.g. late-window error/speed magnitude and timing relative to terminal reach) without asserting a dominant cause.",
+    "Stop if any requested step would require numerical work, a saved-state numerical grant, backend execution, workers, check execution, or a production/configuration change: report the step as out of scope and continue with retained-evidence reading only.",
+    "Stop when the set of 35-update entries in scope has been read or sampled to the extent needed and further reads would only repeat already-queried records.",
+    "Stop when the phase read allowance or advertised handoff budget is reached, and deliver the phase product with the strongest retained-evidence assessment plus an explicit list of what remains not_read, not_displayed, not_retained, or not computable."
+  ],
+  "subject": "control",
+  "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+}

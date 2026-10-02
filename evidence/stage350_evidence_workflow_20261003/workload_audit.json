@@ -1,0 +1,108 @@
+{
+  "runs": [
+    {
+      "label": "initial_report_validation",
+      "mode": "dual_context",
+      "status": "completed",
+      "stop_reason": "Accepted initial report; partial capability validation only, no check or complete diagnostic workflow.",
+      "classification": "partial initial-report capability validation",
+      "feedback_complete": false,
+      "numerical_check_status": null,
+      "used": {
+        "tool_calls": 9,
+        "model_calls": 5,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 318.87399999960326
+      },
+      "limits": {
+        "backend_solves": 0,
+        "model_calls": 8,
+        "tool_calls": 20,
+        "wall_s": 1200.0,
+        "worker_calls": 0
+      },
+      "elapsed_s": 331.75,
+      "numerical_work": {
+        "local_solves": 0,
+        "prediction_evaluations": 0
+      },
+      "tokens": {
+        "prompt_tokens": 193748,
+        "completion_tokens": 71324,
+        "total_tokens": 265072
+      },
+      "attempts_by_phase": {
+        "request": 1,
+        "initial": 4
+      },
+      "accepted_reports": [
+        {
+          "product": "initial_report",
+          "reference": {
+            "artifact_id": "c6966290c1b512775f607e08b74c9da2ab9429d53bcd0b1d9beb13dbc500f046",
+            "media_type": "application/json"
+          },
+          "facts": 11,
+          "selectors": 74,
+          "exact_mismatches": 0,
+          "availability": "Accepted by live receipt-ledger validator"
+        }
+      ],
+      "draft_citations": [
+        {
+          "phase": "initial",
+          "role": "diagnostic",
+          "request_id": "model-2-tool",
+          "facts": 5,
+          "selectors": 42,
+          "errors": []
+        },
+        {
+          "phase": "initial",
+          "role": "diagnostic",
+          "request_id": "model-3-tool",
+          "facts": 11,
+          "selectors": 74,
+          "errors": []
+        }
+      ],
+      "failed_tool_receipts": [
+        {
+          "tool": "diagnosis.submit",
+          "request": "model-2-tool",
+          "status": "failed",
+          "error": "GAP_CONTRADICTS_READ_LEDGER: source.backend_motion includes queried coverage; use queried for the entry, or explicit update_ids/time_range_s for an unread subset"
+        }
+      ],
+      "protocol_corrections": 0,
+      "monetary_cost": null
+    }
+  ],
+  "used": {
+    "model_calls": 5,
+    "tool_calls": 9,
+    "wall_s": 318.87399999960326,
+    "backend_solves": 0,
+    "worker_calls": 0
+  },
+  "limits": {
+    "model_calls": 200,
+    "tool_calls": 510,
+    "wall_s": 33600.0,
+    "backend_solves": 3,
+    "worker_calls": 0
+  },
+  "tokens": {
+    "prompt_tokens": 193748,
+    "completion_tokens": 71324,
+    "total_tokens": 265072
+  },
+  "numerical_work": {
+    "local_solves": 0,
+    "prediction_evaluations": 0
+  },
+  "elapsed_workflow_s": 331.75,
+  "monetary_cost": null,
+  "qualification": "Exact-source and receipt checks only. Scientific prose requires separate implementer review; counts are not quality scores. Historical stages excluded."
+}
