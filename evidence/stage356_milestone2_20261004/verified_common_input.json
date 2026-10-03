@@ -1,0 +1,236 @@
+{
+  "version": "1.0.0",
+  "historical_store": "D:\\softrobot-agent\\runs\\stage354_milestone0_20261003\\single_context",
+  "source_report": {
+    "artifact_id": "9aeeec50f73c1f803cc12a325a0066369a3fda49407c296d1ed2b492d6bb68fd",
+    "media_type": "application/json"
+  },
+  "feedback": {
+    "artifact_id": "9826b45f904ae0f4d5f2aea0d8e0124470546b3e300d098486d114531ec55f25",
+    "media_type": "application/json"
+  },
+  "subject": {
+    "candidate_id": "improvement-96f0ade35119",
+    "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+    "configuration": {
+      "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+      "media_type": "application/json"
+    },
+    "execution_id": "087adee8e8a24fe88e5c85fe89e638c8"
+  },
+  "baseline": {
+    "candidate_id": "baseline-replay",
+    "configuration": {
+      "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+      "media_type": "application/json"
+    },
+    "execution_id": "cf997605885642759ee33920e2c9e2ef",
+    "owner_run_id": "gvs-stage351-baseline-executor"
+  },
+  "subject_manifest": {
+    "artifact_id": "ddc75cc7e50b013cec6c524a58ebd059542c2efd50081c63fb8be18bcdd020a2",
+    "media_type": "application/json"
+  },
+  "baseline_manifest": {
+    "artifact_id": "a9702d58bea0f18bfe2d0bbbc23aa924cf980041237865033642a56d03e31b16",
+    "media_type": "application/json"
+  },
+  "task": {
+    "identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
+    "task_id": "family-multisegment-dev",
+    "family": "task.reach",
+    "configuration": {
+      "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+      "media_type": "application/json"
+    },
+    "execution_model": {
+      "extension_id": "model.serial_bending_cells",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "acceptance_contract": "platform.acceptance_definition@1.0.0"
+  },
+  "acceptance": {
+    "contract": "platform.acceptance_definition",
+    "version": "1.0.0",
+    "terminal": {
+      "value": 0.01,
+      "unit": "m",
+      "definition": "Euclidean world tip position error at the final execution sample; sealed evaluate.reach is the outcome authority.",
+      "source": {
+        "reference": {
+          "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+          "media_type": "application/json"
+        },
+        "pointer": "/effective/task/evaluator/parameters/data/tolerance_m"
+      }
+    },
+    "holding": {
+      "duration": {
+        "value": 0.05,
+        "unit": "s",
+        "definition": "Final closed interval [task duration - window, task duration].",
+        "source": {
+          "reference": {
+            "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/policy/controller/parameters/data/settling/window_s"
+        }
+      },
+      "interval_s": [
+        0.3,
+        0.35
+      ],
+      "position": {
+        "value": 0.01,
+        "unit": "m",
+        "definition": "Maximum sampled world tip position error in the final interval.",
+        "source": {
+          "reference": {
+            "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/policy/controller/parameters/data/settling/position_limit_m"
+        }
+      },
+      "speed": {
+        "value": 0.02,
+        "unit": "m/s",
+        "definition": "Maximum sampled world tip translational speed norm in the final interval.",
+        "source": {
+          "reference": {
+            "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/policy/controller/parameters/data/settling/speed_limit_m_s"
+        }
+      },
+      "coverage": {
+        "expected_sample_count": 6,
+        "definition": "Both endpoints, timestamps aligned to task sample_period_s; missing samples are unavailable, never a pass.",
+        "recorded_available": true,
+        "source": {
+          "reference": {
+            "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+            "media_type": "application/json"
+          },
+          "pointer": "/detail/sampled_settling/available"
+        }
+      },
+      "continuous_time_guarantee": false
+    },
+    "speed": {
+      "definition": "Euclidean norm of tip-site translational Jacobian times recorded backend qvel, reconstructed with sealed robot.xml and qpos; no finite differencing",
+      "unit": "m/s",
+      "frame": "world",
+      "implementation": "extensions/tendon_family/gvs_reporting.py::reconstruct_motion",
+      "source": {
+        "reference": {
+          "artifact_id": "fd8feca5c235cf9b824c07e1933adb2ea8e5427708843b1a3590611563196e57",
+          "media_type": "application/json"
+        },
+        "pointer": "/*/tip_speed_m_s"
+      }
+    },
+    "timing": {
+      "control_period": {
+        "value": 0.01,
+        "unit": "s",
+        "definition": "Simulated control spacing; synchronous wall overruns do not imply skipped applied updates or injected actuator delay.",
+        "source": {
+          "reference": {
+            "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/task/timing/control_period_s"
+        }
+      },
+      "sample_period": {
+        "value": 0.01,
+        "unit": "s",
+        "definition": "Retained backend sampling interval.",
+        "source": {
+          "reference": {
+            "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/task/timing/sample_period_s"
+        }
+      },
+      "duration": {
+        "value": 0.35,
+        "unit": "s",
+        "definition": "Simulated task horizon, separate from computation wall time.",
+        "source": {
+          "reference": {
+            "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/task/timing/duration_s"
+        }
+      },
+      "interpretation": "Applied updates, initialization selections, simulated duration and measured wall time are separate facts."
+    },
+    "comparison": {
+      "policy": {
+        "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+        "objective": "Raw scalar objectives under different weights are not ranked.",
+        "physical_metrics": [
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+        "tolerance": 1e-09,
+        "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+        "version": "1.0.0"
+      },
+      "source": "sealed campaign_comparison.ranking_rule",
+      "applicable": true
+    },
+    "historical_contract": null,
+    "missing": []
+  },
+  "provider_freeze": "D:\\softrobot-agent\\evidence\\stage354_milestone0_20261003\\single_context\\freeze.json",
+  "old_usage": {
+    "limit": {
+      "backend_solves": 1,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 3600.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 12,
+      "model_calls": 9,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 852.3110000002198
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 15,
+      "tool_calls": 48,
+      "wall_s": 2747.68899999978,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "classification": "Same immutable accepted source products and science for both fresh organizations; historical costs excluded."
+}

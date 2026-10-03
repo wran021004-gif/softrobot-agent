@@ -100,3 +100,28 @@ numerical, simulation, evaluation and profile machinery under a new grant,
 followed by frozen physical comparison and evidence-dependent revision. The
 coordinate method's candidate ask/tell capability alone supplies no holding
 ranking or execution authority. This stage does not implement that batch runner.
+
+## Delivery status
+
+Milestone 2 is **incomplete**. Implementation commit `cddba26` passes 22 unique
+focused checks (latest result per check, including preserved affected reruns).
+The engineering fixture completes the actual check/revision/plan/final tool path,
+and the dual fixture validates fresh payloads, shared ceilings and role isolation.
+These are engineering results, not model-authored live diagnostic products.
+
+Automatic approval review rejected the attempted single-context launch before
+process creation because it did not recognize authorization in the attachment
+for repository-derived evidence transmission to `https://api.deepseek.com` using
+credentials. A direct confirmation is pending. Neither organization has started;
+both live gates remain unmet. No transport request, model failure or campaign
+attempt was consumed, and no run or grant has been replaced/reset. The complete
+live pair remains to be performed after that transfer is approved.
+
+Per organization, new provider attempts, tools, local solves, prediction
+evaluations, charged time, workflow elapsed time, reported tokens and protocol
+corrections are all zero. Backend simulations and workers/subagents are zero.
+Reported token usage is absent because there is no provider response. Monetary
+cost remains unknown; historical costs are retained separately in the verified
+source bundle. Offline verification durations and engineering failures are in the
+check logs and are not charged workflow time. No organizational comparison or
+new scientific diagnostic conclusion is claimed. Nothing was pushed.
