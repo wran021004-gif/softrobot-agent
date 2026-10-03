@@ -58,6 +58,26 @@ EXTENSIONS = [replace(d, capabilities={**d.capabilities,
 from schemas import platform_handoff as handoff
 from tools.diagnostic_improvement import ImprovementDecision
 from schemas.diagnostic_revision import FinalDesignResponse
+EXTENSIONS.append(Extension('deepseek','model_adapter','6.0.0',Empty,ModelResponse,
+    'tools.diagnostic_reference_adapter:EvidenceDrivenAdapter','Recorded diagnostic checks, evidence-dependent revisions and future batch plans using the existing host.',
+    sources=('tools/diagnostic_reference_adapter.py','tools/diagnostic_handoff.py','tools/platform_search.py'),
+    capabilities=dict(real_requests=True,text=True,images=False,timeout='network request deadline',cancellation='between requests')))
+from schemas.diagnostic_revision import CheckedRevision
+for name,schema,binding in (
+    ('design.assess_diagnosis',handoff.WorkflowDesignResponse,'tools.platform_handoff:respond_workflow'),
+    ('diagnosis.propose_check',handoff.CheckProposal,'tools.diagnostic_handoff:propose_check'),
+    ('diagnosis.revise_assessment',CheckedRevision,'tools.diagnostic_handoff:revise_assessment'),
+    ('design.submit_search_plan',handoff.SearchBatchPlan,'tools.platform_search:submit_batch_plan'),
+):
+    CONTRACTS.append(('platform.'+name.replace('.','_'),'1.0.0',schema))
+    EXTENSIONS.append(Extension(name,'tool','1.0.0',schema,handoff.HandoffResult,binding,
+        'Evidence-driven milestone handoff. No production execution or search batch authorization.',
+        sources=('schemas/platform_handoff.py','schemas/diagnostic_revision.py','tools/diagnostic_handoff.py','tools/platform_search.py'),
+        capabilities=dict(category='diagnostics',role='public_tool',route_visible=True,preflight='tools.platform_handoff:preflight')))
+EXTENSIONS.append(Extension('design.respond_diagnosis','tool','4.0.0',FinalDesignResponse,handoff.HandoffResult,
+    'tools.diagnostic_handoff:final_decision','Final decision requiring the accepted revision and valid future batch plan.',
+    sources=('tools/diagnostic_handoff.py','schemas/diagnostic_revision.py'),
+    capabilities=dict(category='diagnostics',role='public_tool',route_visible=True,preflight='tools.platform_handoff:preflight')))
 EXTENSIONS.append(Extension('deepseek','model_adapter','5.0.0',Empty,ModelResponse,
     'tools.diagnostic_reference_adapter:ScopedReferenceAdapter','Scoped exact aliases and concise revisions over existing handoff contracts',
     sources=('tools/diagnostic_reference_adapter.py','tools/diagnostic_revision.py','schemas/diagnostic_revision.py','tools/diagnostic_native.py','tools/platform_models.py','tools/model_transports/deepseek.py'),

@@ -65,7 +65,9 @@ def save(store,value):
 
 
 def implementation():
-    paths=['tools/diagnostic_reference_adapter.py','tools/diagnostic_revision.py','schemas/diagnostic_revision.py','tools/diagnostic_workflow.py','tools/diagnostic_native.py','tools/diagnostic_inventory.py','tools/diagnostic_facts.py',
+    paths=['tools/diagnostic_handoff.py','tools/platform_search.py','tools/working_state.py','schemas/working_state.py',
+        'examples/stage356_milestone2.py','tests/test_stage356_milestone2.py',
+        'tools/diagnostic_reference_adapter.py','tools/diagnostic_revision.py','schemas/diagnostic_revision.py','tools/diagnostic_workflow.py','tools/diagnostic_native.py','tools/diagnostic_inventory.py','tools/diagnostic_facts.py',
         'tools/platform_models.py','tools/platform_handoff.py','tools/platform_diagnosis_coordinator.py',
         'tools/platform_host.py','tools/platform_store.py','schemas/platform_handoff.py','schemas/platform_diagnostics.py',
         'extensions/platform/manifest.py','extensions/tendon_family/diagnostic_evidence.py','extensions/tendon_family/diagnostic_math.py',
@@ -398,3 +400,119 @@ class DiagnosticWorkflow:
             if actual!=self.freeze['host_provider_configurations'][name]:raise ValueError('FROZEN_PROVIDER_CONFIGURATION_MISMATCH: '+name)
         for key,value in [('stage_instructions',self.instructions),('permissions',self.permissions),('phase_budgets',self.phases),('scope',self.scope),('memory_policy',{**MEMORY,'context_bytes':self.experiment.get('context_bytes',MEMORY['context_bytes'])}),('capabilities',self.capabilities),('experiment',self.experiment)]:
             if value!=self.freeze[key]:raise ValueError('FROZEN_CONFIGURATION_MISMATCH: '+key)
+
+
+class EvidenceDrivenWorkflow(DiagnosticWorkflow):
+    """Milestone 2 phases on the existing sequential host and shared ledger."""
+    limits=dict(model_calls=24,tool_calls=60,backend_solves=0,worker_calls=0,wall_s=1800.)
+    numerical_limits=dict(local_solves=2,prediction_evaluations=2)
+    scope={**SCOPE,'max_wall_s':180.,'numerical_limits':numerical_limits}
+    tools={**TOOLS,'design.respond_diagnosis':'4.0.0','design.assess_diagnosis':'1.0.0',
+        'diagnosis.propose_check':'1.0.0','diagnosis.revise_assessment':'1.0.0','design.submit_search_plan':'1.0.0'}
+    permissions=dict(initial=['diagnosis.submit'],response_initial=['design.assess_diagnosis'],
+        check=['diagnosis.propose_check'],revision=['diagnosis.revise_assessment'],
+        improvement=['design.submit_search_plan'],response_final=['design.respond_diagnosis'])
+    phases=dict(initial=dict(limit=dict(model_calls=4),protect_project=dict(model_calls=14,tool_calls=12,wall_s=900.)),
+        response_initial=dict(limit=dict(model_calls=3),protect_project=dict(model_calls=11,tool_calls=10,wall_s=800.)),
+        check=dict(limit=dict(model_calls=5),protect_project=dict(model_calls=6,tool_calls=6,wall_s=600.)),
+        revision=dict(limit=dict(model_calls=4),protect_project=dict(model_calls=4,tool_calls=4,wall_s=300.)),
+        improvement=dict(limit=dict(model_calls=4),protect_project=dict(model_calls=2,tool_calls=2,wall_s=150.)),
+        response_final=dict(limit=dict(model_calls=4)))
+    capabilities={**CAPABILITIES,'evidence_query':'One model-selected archived prediction, plans or motion query with explicit coverage. The proposal precedes the query; newly read details may distinguish an assessment without numerical work.'}
+    instructions=dict(
+        initial='Use the common accepted historical report, current candidate feedback, summary and honest inventory. Author a concise initial assessment as diagnosis.submit, using exact F aliases for 2-4 facts. Author hypotheses with meaningful identifiers, explicit uncertainty and advisory recommendations; do not impose a dominant cause. No query yet. All supplied historical values are already known; selected prediction/plan detail has not been inspected in this fresh context. Do not call existing supplied results missing. No fixed hypothesis count.',
+        response_initial='Use design.assess_diagnosis to respond to the accepted initial assessment. Select your recommendation disposition independently. This milestone requires a recorded check, then revision and a future plan; next_action=request_check is appropriate. Adoption of an exact existing control_parameter recommendation can enable local_comparison; it changes no production candidate. You may defer and choose an archived query or prediction_braking. Do not select a check here.',
+        check='Record a CheckProposal through diagnosis.propose_check before obtaining its result. Identify a meaningful declared question, checked assessment IDs from the accepted report, evidence relationships with relevance to those IDs, missing detail, expected outcomes/effects and why they distinguish your question. A relationship must concern its named hypothesis. Terminal reach success is compatible with holding speed failure; do not fabricate contradicting evidence. Prefer an archived evidence_query when retained details can answer the question. Choose prediction/plans and explicit update_ids (at most 8), or motion for the final holding window. Specify units, work_limits={wall_s: at most 180, tool_calls:1}, limits and stopping conditions. Numerical operations require one eligible update ID, null view, and local_solves:2 or prediction_evaluations:2; max_checks=1 shared across operations. Numerical local_comparison additionally requires exact prior design adoption and matching saved horizon. Do not truncate horizons. No production changes/backend solves.',
+        revision='Submit a CheckedRevision through diagnosis.revise_assessment using 1-6 new unique facts with exact result aliases. Address every checked assessment by identifier and mark retained, weakened, rejected or unresolved; supporting_fact_ids name report fact IDs, never aliases. At least one new result detail beyond initial supplied summaries must be linked to an assessment. Interpret the received result and its supplied coverage against the proposed question and expected observations; explain the change, remaining uncertainty and resolving evidence. An unresolved interpretation is valid. Inherited facts are host-preserved. Separate applied updates from optimized selections, wall deadlines from simulated steps, termination from convergence, terminal reach from holding, and projected predictions from measured motion.',
+        improvement='Author one future SearchBatchPlan through design.submit_search_plan from the accepted revision and performed check. Cite exact F aliases including a result alias; choose your scientific promise and rationale. Variables are only control/recipe/terminal_tip_speed_weight and control/recipe/holding_tip_speed_weight within existing granted bounds. Saved starting values must lie within domains. Domains use zero or >=0.0001; a coordinate step must avoid forbidden tiny positives. Use installed method search.family_coordinate@1.0.0, max_candidates 1..12 and step (0,1]. This method supplies candidate ask/tell only; future evaluation and frozen comparison are required. fixed_controller is controller.gvs_nmpc@7.0.0. fixed_conditions must include robot,task,acceptance,controller_implementation,other_numerical_settings. objectives include joint_reach_holding_acceptance,terminal_error_m,holding_max_error_m,holding_max_speed_m_s (optional complete_update_s). constraints include frozen_acceptance,force_bounds,finite_valid_execution. verification includes candidate.apply,simulation.run,evaluation.run,control.profile_report,bound_comparison,diagnostic_revision. Planned budget: backend_solves=max_candidates, tool_calls>=4*max_candidates, wall_s>=990*max_candidates, workers=0; state provider attempts if needed. Include hypothesis, weakening observations, fidelity limits and explicit stopping conditions. Local/raw weighted costs cannot be final physical ranking. A validated plan requires a future grant; this stage executes no batch and promotes no candidate.',
+        response_final='Read the accepted revision, performed check interpretation and validated future search plan. Author your final recommendation disposition and separate candidate_disposition/selected_candidate using the exact historical evidence. next_action=finish. Explain diagnostic value and remaining uncertainty; a future plan is not an execution grant or evidence of physical improvement. Do not infer causal truth from validated citations.')
+
+    def fixed(self,phase):
+        fixed=super().fixed(phase)
+        if phase=='response_initial':
+            fixed.pop('design.respond_diagnosis',None)
+            fixed['design.assess_diagnosis']=dict(report=self.chain['initial_report'])
+        return fixed
+
+    def phase(self,phase,kind,key,**extra):
+        extra.update(source_report=self.common['source_report'],source_record=self.source_record,
+            source_report_content=self.store.artifact(self.common['source_report']),
+            historical_feedback=self.common['feedback'],improvement_feedback_content=self.historical_feedback,
+            numerical_eligibility=self.eligibility,common_scientific_input=self.common,
+            previous_report=self.chain.get('revised_report') if phase in ('improvement','response_final') else self.chain.get('initial_report'))
+        if extra.get('previous_report'):extra['previous_report_content']=self.store.artifact(extra['previous_report'])
+        if phase=='response_initial':extra['delivery_tool']='design.assess_diagnosis'
+        if phase=='improvement':extra['delivery_tool']='design.submit_search_plan'
+        if self.chain.get('feedback'):extra.update(result_feedback=self.chain['feedback'],proposal=self.chain['check'],
+            performed_check=self.store.artifact(self.chain['check'])['proposal'],received_result=self.store.artifact(self.chain['feedback']))
+        if phase=='response_final':
+            extra.update(experiment_plan=self.chain['search_plan'],search_plan_content=self.store.artifact(self.chain['search_plan']),
+                check_feedback=[dict(reference=self.common['feedback'])])
+        for role in ('diagnostic','design'):
+            host=self.host(role)
+            handover(host,self.common['feedback'],self.historical_feedback,origin=dict(kind='verified_historical_feedback'),kind='campaign_comparison')
+            handover(host,self.common['source_report'],self.store.artifact(self.common['source_report']),origin=dict(kind='verified_accepted_source'),
+                kind='accepted_source_report',selectors=[s for rows in self.store.artifact(self.common['source_report'])['fact_selectors'].values() for s in rows])
+        return super().phase(phase,kind,key,**extra)
+
+    def run(self):
+        started=time.monotonic();status='incomplete';reason=None;guard=self.directory/'live_attempt.json'
+        if guard.exists():raise ValueError('LIVE_ATTEMPT_ALREADY_STARTED: never reset counters')
+        if implementation()!=self.freeze['implementation']:raise ValueError('FROZEN_IMPLEMENTATION_CHANGED')
+        self.validate_frozen_configuration()
+        atomic_json(guard,dict(started=datetime.now(timezone.utc).isoformat()))
+        try:
+            self.phase('initial','diagnosis_report','initial_report')
+            self.phase('response_initial','design_response','initial_response')
+            response=self.store.artifact(self.chain['initial_response'])
+            if response['next_action']=='finish':raise ValueError('MILESTONE2_UNMET: model stopped before the required check')
+            adopted=None
+            if response['disposition']=='adopt':
+                rec=next(r for r in self.store.artifact(self.chain['initial_report'])['recommendations'] if r['recommendation_id']==response['recommendation_id'])
+                if rec['action']=='control_parameter':adopted=dict(parameter=rec['parameter'],value=rec['value'])
+            self.phase('check','diagnostic_check','check',adopted_parameter=adopted,max_checks=1,check_feedback=[])
+            check=self.store.artifact(self.chain['check']);proposal=check['proposal'];executor=self.hosts['executor']
+            if response['next_action']=='verify_adopted_change' and proposal['operation']!='local_comparison':raise ValueError('VERIFY_ACTION_REQUIRES_MATCHED_LOCAL_COMPARISON')
+            configure_role(executor,'executor','Execute the recorded model-selected check only.',
+                phase_tools=['diagnosis.inspect_evidence','diagnosis.saved_state_check'],
+                phase_budget=dict(limit=dict(tool_calls=1,wall_s=180.),protect_project=dict(model_calls=6,tool_calls=6,wall_s=600.)))
+            executor.resume()
+            numerical=check.get('numerical')
+            invocation=dict(request_id='milestone2-selected-check',tool_id='diagnosis.saved_state_check' if numerical else 'diagnosis.inspect_evidence',
+                tool_version='1.0.0',arguments=numerical or dict(binding=self.binding,view=proposal['view'],update_ids=proposal['update_ids']),
+                reason='Obtain the result of the previously accepted model-authored proposal.',evidence=[self.chain['check']],cache='new')
+            receipt=executor.invoke(invocation)
+            from tools.diagnostic_facts import record_read
+            if not numerical:record_read(self.host('diagnostic'),invocation,receipt)
+            state=self.store.session(self.host('diagnostic').run_id)['state']
+            coverage=state.get('read_ledger',[])[-1].get('coverage') if not numerical else dict(update_ids=proposal['update_ids'],horizon_s=.01,integration_step_s=.002,model='model.gvs@1.0.0')
+            feedback=dict(proposal=self.chain['check'],previous_assessment=self.chain['initial_report'],receipt=receipt,result=receipt.get('output'),
+                kind='newly_computed_local_evidence' if numerical else 'newly_read_historical_evidence',coverage=coverage,
+                execution_id=self.execution,binding=self.binding,diagnosis_request=self.chain['request'])
+            self.chain['feedback']=save(self.store,feedback)
+            atomic_json(self.directory/'feedback.json',feedback)
+            if receipt['execution_status']!='completed':raise ValueError('MILESTONE2_CHECK_FAILED: '+str(receipt.get('error')))
+            content=self.store.artifact(receipt['output'])
+            for role in ('diagnostic','design'):
+                handover(self.host(role),receipt['output'],content,origin=dict(proposal=self.chain['check'],receipt=receipt),kind='selected_check_result')
+            retained=[dict(reference=self.chain['feedback'],**feedback,result_content=content)]
+            self.phase('revision','diagnosis_report','revised_report',check_feedback=retained)
+            # Consume a second handoff from the accepted revision, preserving
+            # relationships and binding the new result receipt and report chain.
+            from tools.working_state import project_working_state
+            from tools.diagnostic_handoff import bind_handoff
+            diagnostic=self.host('diagnostic');role=dict(self.store.session(diagnostic.run_id)['state']['role_context'],previous_report=self.chain['revised_report'])
+            assessments=deepcopy(check['handoff']['assessments'])
+            revised=self.store.artifact(self.chain['revised_report'])
+            for assessment,key in zip(assessments,proposal['assessment_ids']):
+                row=next(r for r in revised['report']['attribution'] if r['cause']==key)
+                assessment.update(statement=key+': '+row['reason'],previous_assessment=self.chain['initial_report'],changed_by=[self.chain['feedback']])
+            handoff=bind_handoff(self.store,project_working_state(self.store,diagnostic.run_id),role,assessments,check['handoff']['check'],check_result=self.chain['feedback'])
+            self.chain['revised_handoff']=save(self.store,handoff)
+            self.phase('improvement','search_batch_plan','search_plan')
+            self.phase('response_final','design_response','final_response')
+            status='completed';reason='Accepted host-bound diagnostic products, recorded check, evidence-dependent revision, valid future batch plan and model final decision.'
+        except Exception as exc:
+            reason=str(exc);atomic_json(self.directory/'workflow_failure.json',dict(type=type(exc).__name__,message=reason));print('STOP',reason,flush=True)
+        self.export(status,reason,time.monotonic()-started)
+        return read(self.directory/'outcome.json')

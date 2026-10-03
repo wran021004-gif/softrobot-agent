@@ -106,7 +106,7 @@ than inferred from installed controller support.
 `GVSTrajectoryParameters` accepts finite nonnegative values; the demonstrated
 reach builder permits zero or `[0.0001, 1]`, intersected with the current grant.
 Controllers `gvs_nmpc` 3/4/6/7 support these reach settings; the saved campaign uses
-6.0.0. The actual speed scale is read from the candidate recipe; it does not alter
+7.0.0. The actual speed scale is read from the candidate recipe; it does not alter
 acceptance limits. Candidate identity/content, actual_diff, controller plan,
 candidate-specific `TrajectoryWorkspace` graph/solver, regenerated warm states,
 execution records and bound evaluation/profile/comparison must be reconstructed.

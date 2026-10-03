@@ -299,7 +299,7 @@ def effective_config(host):
 
 
 def delivery_instruction(host):
-    if host.store.session(host.run_id)['snapshot']['input']['policy']['model'].get('adapter_version') in ('3.0.0','4.0.0','5.0.0'):
+    if host.store.session(host.run_id)['snapshot']['input']['policy']['model'].get('adapter_version') in ('3.0.0','4.0.0','5.0.0','6.0.0'):
         return 'Invoke the advertised native tool using business fields directly; correct only the reported invalid fields. No outer metadata or argument envelope. '
     state = host.store.session(host.run_id)['state']
     role = state.get('role_context', {})
@@ -627,7 +627,7 @@ def run_loop(host, adapter=None):
                 return _stop(host, 'needs_input', 'TOOL_EXECUTION_UNKNOWN')
             if 'BUDGET_EXHAUSTED' in (receipt.get('error') or ''):
                 return _stop(host, 'budget_exhausted', receipt['error'])
-            if config.get('adapter_version') not in ('3.0.0','4.0.0','5.0.0') and receipt['execution_status']=='rejected' and (receipt.get('error') or '').startswith('INVALID_TOOL_ARGUMENTS:'):
+            if config.get('adapter_version') not in ('3.0.0','4.0.0','5.0.0','6.0.0') and receipt['execution_status']=='rejected' and (receipt.get('error') or '').startswith('INVALID_TOOL_ARGUMENTS:'):
                 stopped = _argument_rejection(host, active_decision, receipt, config)
                 if stopped is not None:
                     return stopped
@@ -650,7 +650,7 @@ def _argument_rejection(host, decision, receipt, config):
     Called after normal turn/repair accounting. No rejected action is executed,
     no domain fields are invented, and a failed correction remains needs_input.
     """
-    if config.get('adapter_version') in ('3.0.0','4.0.0','5.0.0'):
+    if config.get('adapter_version') in ('3.0.0','4.0.0','5.0.0','6.0.0'):
         with host.store.transaction() as db:
             ref=plain(host.store.put(db,dict(error=receipt['error'],protocol_errors=[dict(path='business_parameters',expected=receipt['error'])])))
         return _model_failure(host,{**receipt,'output':ref},advance_turn=False)
@@ -733,7 +733,7 @@ def _model_failure(host, receipt, advance_turn=True):
                 errors=failure.get('protocol_errors', []),
                 requirement=(problem +
                     'None of those calls was executed. Return exactly one tool call now and wait for its result. '
-                    + ('' if config.get('adapter_version') in ('3.0.0','4.0.0','5.0.0') else
+                    + ('' if config.get('adapter_version') in ('3.0.0','4.0.0','5.0.0','6.0.0') else
                     'Function arguments must be a JSON-encoded object with outer arguments (object), reason (nonempty English string), and tool_version (declared version); evidence is optional. Outer reason is separate from arguments.reason. ')
                     + delivery_instruction(host) +
                     f"After this scheduled correction, remaining allowances: total {limits['max_total']-total-1}, "

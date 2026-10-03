@@ -148,3 +148,59 @@ class DiagnosticReview(Contract):
     unresolved: list[str]
     next_parameter_group: str
     prerequisites: list[str]
+
+
+class AssessmentEvidence(Contract):
+    assessment_id: str = Field(min_length=1)
+    relationship: Literal['supporting', 'contradicting']
+    references: list[str] = Field(min_length=1, description='Exact current-context F aliases.')
+    relevance: str = Field(min_length=1)
+
+
+class ExpectedObservation(Contract):
+    assessment_id: str = Field(min_length=1)
+    observation: str = Field(min_length=1)
+    effect: Literal['retain', 'weaken', 'reject', 'unresolved']
+
+
+class CheckProposal(Contract):
+    """Recorded before a retained-evidence query or the existing numerical request."""
+    contract: Literal['platform.diagnostic_check_proposal'] = 'platform.diagnostic_check_proposal'
+    version: Literal['1.0.0'] = '1.0.0'
+    question: str = Field(min_length=1)
+    assessment_ids: list[str] = Field(min_length=1)
+    relationships: list[AssessmentEvidence] = Field(min_length=1)
+    missing_information: list[str] = Field(min_length=1)
+    operation: Literal['evidence_query', 'prediction_braking', 'local_comparison']
+    view: Literal['prediction', 'plans', 'motion'] | None = None
+    update_ids: list[int] = Field(default_factory=list, max_length=8)
+    units: list[str] = Field(min_length=1)
+    expected: list[ExpectedObservation] = Field(min_length=1)
+    distinguishes: str = Field(min_length=1)
+    limitations: list[str] = Field(min_length=1)
+    work_limits: dict[str, float]
+    stopping_conditions: list[str] = Field(min_length=1)
+    changed_parameter: Literal['terminal_tip_speed_weight', 'holding_tip_speed_weight'] | None = None
+    changed_value: float | None = Field(default=None, ge=.0001, le=1.)
+
+
+class SearchBatchPlan(Contract):
+    contract: Literal['platform.search_batch_plan'] = 'platform.search_batch_plan'
+    version: Literal['1.0.0'] = '1.0.0'
+    hypothesis: str = Field(min_length=1)
+    evidence: list[str] = Field(min_length=1)
+    weakening_observations: list[str] = Field(min_length=1)
+    variables: dict[str, list[float]] = Field(description='Exact builder paths mapped to [lower, upper] numeric bounds.')
+    fixed_conditions: list[str] = Field(min_length=1)
+    fixed_controller: str = Field(description='Exact extension_id@version, fixed implementation.')
+    objectives: list[str] = Field(min_length=1)
+    constraints: list[str] = Field(min_length=1)
+    method: str = Field(description='Registered search extension_id@version.')
+    max_candidates: int = Field(ge=1, le=12)
+    step: float = Field(gt=0, le=1)
+    planned_budget: Budget
+    fidelity_limits: list[str] = Field(min_length=1)
+    verification: list[str] = Field(min_length=1)
+    stopping_conditions: list[str] = Field(min_length=1)
+    scientific_promise: Literal['promising', 'uncertain', 'unlikely']
+    rationale: str = Field(min_length=1)

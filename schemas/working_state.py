@@ -85,6 +85,8 @@ class DiagnosticAssessment(Contract):
     contradicting: list[EvidenceSelector] = Field(default_factory=list)
     previous_assessment: EvidenceRef | None = None
     changed_by: list[EvidenceRef] = Field(default_factory=list)
+    supporting_relevance: list[str] = Field(default_factory=list)
+    contradicting_relevance: list[str] = Field(default_factory=list)
 
 
 class DiscriminatingCheck(Contract):

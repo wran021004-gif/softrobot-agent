@@ -4,6 +4,97 @@ from tools.platform_store import plain
 from tools.state_io import digest
 
 
+def validate_batch_plan(store, view, proposal):
+    """Validate one future batch against installed ask/tell and candidate paths.
+
+    No search proposal, solve, simulation, grant or selection is executed here.
+    """
+    from copy import deepcopy
+    from schemas.platform_handoff import SearchBatchPlan
+    from tools.platform_registry import registry
+    from tools.platform_tools import _candidate
+    from extensions.tendon_family.optimization import SearchParameters,CoordinateSearch
+    from tools.diagnostic_revision import resolve_aliases
+    plan=SearchBatchPlan.model_validate(proposal);reg=registry()
+    state=store.session(view.run_id)['state'];role=state['role_context']
+    from tools.diagnostic_handoff import accepted_product
+    accepted_product(store,role['previous_report'],'diagnosis_report')
+    selectors=resolve_aliases(state,{'plan':plan.evidence})['plan']
+    feedback=store.artifact(role['result_feedback'])
+    if not any(s['reference']==feedback['result'] for s in selectors):raise ValueError('PLAN_REQUIRES_PERFORMED_CHECK_EVIDENCE')
+    candidate=view.latest_tested
+    effective=store.artifact(candidate['configuration'])['effective']
+    controller=effective['policy']['controller'];identity=controller['extension_id']+'@'+controller['version']
+    if plan.fixed_controller!=identity:raise ValueError('PLAN_FIXED_CONTROLLER_MISMATCH: '+identity)
+    if plan.method!='search.family_coordinate@1.0.0':raise ValueError('PLAN_METHOD_UNAVAILABLE: supported search.family_coordinate@1.0.0 (candidate ask/tell only)')
+    definition=reg.get('search.family_coordinate','1.0.0','search')
+    if not reg.inspect(definition,{'search.family_coordinate':'1.0.0'})['executable']:raise ValueError('PLAN_METHOD_NOT_INSTALLED')
+    mappings={r['parameter']:r for r in view.parameter_impacts['mapped']}
+    if not plan.variables or set(plan.variables)-mappings.keys():raise ValueError('PLAN_VARIABLE_PATHS: only demonstrated speed-weight builder paths')
+    initial={}
+    for path,domain in plan.variables.items():
+        if len(domain)!=2:raise ValueError('PLAN_DOMAIN_REQUIRES_TWO_BOUNDS: '+path)
+        lo,hi=domain
+        row=mappings[path];bounds=row['granted_range'];spec=row['builder_spec']
+        if not row['authorized_parameter'] or not row['implementation_supported']:raise ValueError('PLAN_BUILDER_PARAMETER_UNSUPPORTED: '+path)
+        if not bounds[0]<=lo<hi<=bounds[1] or not spec['bounds'][0]<=lo<hi<=spec['bounds'][1]:raise ValueError('PLAN_DOMAIN_OUTSIDE_BUILDER_GRANT: '+path)
+        if 0<lo<.0001 or hi<.0001:raise ValueError('PLAN_DOMAIN_CONTAINS_ILLEGAL_BOUNDARY_WEIGHT: zero or >=0.0001 required')
+        initial[path]=row['current_value']
+        if not lo<=initial[path]<=hi:raise ValueError('PLAN_START_OUTSIDE_DOMAIN: saved candidate value must be included for existing coordinate method: '+path)
+        # Coordinate search visits this bounded lattice; a zero lower bound
+        # excludes (0,0.0001) through the builder, and the reachable lattice
+        # must never propose such a value. No numerical candidate is evaluated.
+        width=hi-lo
+        for origin in (lo,hi,initial[path]):
+            for k in range(-plan.max_candidates,plan.max_candidates+1):
+                v=min(hi,max(lo,origin+k*plan.step*width))
+                if 1e-12<v<.0001-1e-12:raise ValueError('PLAN_COORDINATE_STEP_CAN_PROPOSE_ILLEGAL_SMALL_WEIGHT: increase domain/step or use positive lower bound')
+        # Build both boundary configurations without constructing any workspace.
+        for endpoint in (lo,hi):
+            changed=plain(_candidate(SessionInput.model_validate(effective),{path:endpoint},reg))
+            if changed['robot']!=effective['robot'] or changed['task']!=effective['task']:raise ValueError('PLAN_FIXED_ROBOT_TASK_CHANGED')
+    CoordinateSearch(SearchParameters(initial=initial,bounds=plan.variables,max_trials=plan.max_candidates,step=plan.step))
+    required_fixed={'robot','task','acceptance','controller_implementation','other_numerical_settings'}
+    if not required_fixed<=set(plan.fixed_conditions):raise ValueError('PLAN_FIXED_CONDITIONS_REQUIRED: '+', '.join(sorted(required_fixed)))
+    required_objectives={'joint_reach_holding_acceptance','terminal_error_m','holding_max_error_m','holding_max_speed_m_s'}
+    if not required_objectives<=set(plan.objectives) or set(plan.objectives)-required_objectives-{'complete_update_s'}:raise ValueError('PLAN_PHYSICAL_OBJECTIVES_REQUIRED: '+', '.join(sorted(required_objectives)))
+    if not {'frozen_acceptance','force_bounds','finite_valid_execution'}<=set(plan.constraints):raise ValueError('PLAN_CONSTRAINTS_REQUIRED: frozen_acceptance, force_bounds, finite_valid_execution')
+    required_verification={'candidate.apply','simulation.run','evaluation.run','control.profile_report','bound_comparison','diagnostic_revision'}
+    if not required_verification<=set(plan.verification):raise ValueError('PLAN_FRESH_VERIFICATION_REQUIRED: '+', '.join(sorted(required_verification)))
+    budget=plain(plan.planned_budget);count=plan.max_candidates
+    if budget['backend_solves']!=count or budget['tool_calls']<count*4 or budget['worker_calls']!=0 or budget['wall_s']<count*990:
+        raise ValueError('PLAN_COSTS_INSUFFICIENT: backend_solves=max_candidates, tool_calls>=4 per candidate, wall_s>=990 per candidate, workers=0')
+    fixed=deepcopy(effective)
+    for path in plan.variables:fixed['policy']['controller']['parameters']['data']['recipe'][path.rsplit('/',1)[-1]]='<batch variable>'
+    from tools.settling_campaign import RANKING
+    return dict(plan=plain(plan),structurally_operationally_valid=True,scientific_promise=plan.scientific_promise,
+        semantic_status='Model-authored promise and causal reasoning are separate from operational validation.',
+        execution_authorized=False,requires_future_grant=True,baseline_replaced=False,candidate_promoted=False,
+        bindings=dict(task=view.task,acceptance=view.acceptance,baseline=view.baseline,subject=candidate,
+            controller=controller,dynamics_model=view.task['execution_model'],source_report=role['source_report'],
+            revised_assessment=role['previous_report'],check_feedback=role['result_feedback'],evidence_selectors=selectors,
+            fixed_configuration_identity=digest(fixed),fixed_configuration=fixed),
+        batch_semantics='One plan for the batch. Existing coordinate ask/tell proposes bounded candidates; no batch runner implemented in this stage.',
+        screening=dict(local_screening='none',raw_weighted_objectives_are_physical_ranking=False),
+        final_comparison_policy=RANKING,required_fresh_steps=sorted(required_verification),
+        cost_floor_per_candidate_s=dict(simulation=900,evaluation=30,profile=60),
+        execution_requirements=['Future grant binding this immutable plan, candidate/work limits and capabilities.',
+            'Existing search proposal method alone supplies no holding ranking or deployment authority; fresh sealed profiles and frozen physical comparison are required.',
+            'Candidate-specific graph/solver and regenerated warm states; old plans and measurements remain bound to original identities.'])
+
+
+def submit_batch_plan(ctx,args):
+    from tools.platform_handoff import require_role,transition
+    from tools.working_state import project_working_state
+    require_role(ctx,'design')
+    result=validate_batch_plan(ctx.store,project_working_state(ctx.store,ctx.run_id),args)
+    accepted=transition(ctx,'search_batch_plan',result)
+    with ctx.store.transaction() as db:
+        state=ctx.store.session(ctx.run_id,db)['state'];state['experiment_plan']=plain(accepted.reference)
+        ctx.store.update_state(db,ctx.run_id,state)
+    return accepted
+
+
 def score(evaluation, objectives):
     evaluation = EvaluationResult.model_validate(evaluation)
     if len(objectives) != 1:

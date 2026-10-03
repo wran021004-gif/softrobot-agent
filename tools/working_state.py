@@ -92,7 +92,7 @@ def project_working_state(store, run_id):
         active=phase_tools(state);bindings=inp['policy']['tool_bindings'];grant=state.get('role_grant')
         reg=registry();actions=[]
         relevant=set(bindings)|{'simulation.run','evaluation.run','control.profile_report','diagnosis.saved_state_check'}
-        scheme='readable_v1' if inp['policy']['model'].get('adapter_version') in ('3.0.0','4.0.0','5.0.0') else 'legacy_hashed_v1'
+        scheme='readable_v1' if inp['policy']['model'].get('adapter_version') in ('3.0.0','4.0.0','5.0.0','6.0.0') else 'legacy_hashed_v1'
         native_names=provider_name_map(bindings,scheme)
         for name in sorted(relevant):
             version=bindings.get(name);reasons=[]

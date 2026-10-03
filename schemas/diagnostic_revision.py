@@ -29,6 +29,14 @@ class CompactRevision(Contract):
     rationale: str = Field(min_length=1)
 
 
+class CheckedRevision(CompactRevision):
+    """Host binds result IDs/coverage; author interprets the declared distinction."""
+    result_interpretation: str = Field(min_length=1)
+    expected_observations_interpretation: str = Field(min_length=1)
+    remaining_uncertainty: list[str] = Field(min_length=1)
+    resolving_evidence: list[str] = Field(min_length=1)
+
+
 class FieldCorrection(Contract):
     operation: Literal['replace', 'remove'] = 'replace'
     path: str = Field(description='Exact existing-field JSON pointer relative to draft.arguments, e.g. /new_facts/0/references. The explicit draft-root spelling /arguments/new_facts/0/references is also supported. No guessed paths.')

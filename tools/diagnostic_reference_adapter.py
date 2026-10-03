@@ -160,3 +160,49 @@ class ScopedReferenceAdapter(BoundSavedStateAdapter):
             raise ToolProtocolError([dict(path='.'.join(map(str,e['loc'])),submitted=e.get('input'),expected=e['msg']) for e in exc.errors()]) from None
         except (KeyError,IndexError,TypeError,ValueError) as exc:
             raise ToolProtocolError([dict(path='business_parameters',expected=str(exc))]) from None
+
+
+class EvidenceDrivenAdapter(ScopedReferenceAdapter):
+    """V6 uses the existing aliases, draft correction and native transport loop."""
+    def encode(self,model_input,config):
+        from schemas.platform_handoff import CheckProposal,SearchBatchPlan,WorkflowDesignResponse
+        from schemas.diagnostic_revision import CheckedRevision,without
+        payload=super().encode(model_input,config)
+        for name,schema in [('diagnosis.propose_check',CheckProposal),('diagnosis.revise_assessment',CheckedRevision),
+                            ('design.submit_search_plan',SearchBatchPlan),
+                            ('design.assess_diagnosis',without(WorkflowDesignResponse,{'report'}))]:
+            if name in self.schemas:self.wire[name]=schema
+        if self.phase=='response_initial':self.wire['design.respond_diagnosis']=without(WorkflowDesignResponse,{'report'})
+        for tool in payload['tools']:
+            name=self.advertised[tool['function']['name']]
+            if name not in self.wire:continue
+            schema=self.wire[name].model_json_schema();patch=Corrections.model_json_schema()
+            tool['function']['parameters']=dict(type='object',anyOf=[{k:v for k,v in schema.items() if k!='$defs'},
+                {k:v for k,v in patch.items() if k!='$defs'}],**{'$defs':{**schema.get('$defs',{}),**patch.get('$defs',{})}})
+        context=json.loads(payload['messages'][1]['content']);view=context['role_context']
+        instruction=self.role['instructions']
+        for native,internal in self.advertised.items():instruction=instruction.replace(internal,native)
+        view['instructions']=instruction
+        view['additional_evidence']='Initial content is honestly supplied. In the check phase, record your proposed distinction before the host obtains the selected result. Use exact current-context aliases; do not copy identity hashes.'
+        payload['messages'][1]['content']=encode(context)
+        return payload
+
+    def resolve_business(self,name,args):
+        if name not in ('diagnosis.propose_check','diagnosis.revise_assessment','design.submit_search_plan','design.assess_diagnosis') and not (
+                name=='design.respond_diagnosis' and self.phase=='response_initial'):
+            return super().resolve_business(name,args)
+        if set(args)=={'corrections'}:
+            draft=self.fact_state.get('unaccepted_draft')
+            if not draft or draft['phase']!=self.phase or draft['tool']!=name:raise ValueError('NO_CURRENT_UNACCEPTED_DRAFT')
+            args=correct(draft['arguments'],args)
+        errors=[]
+        try:self.wire[name].model_validate(args,strict=True)
+        except ValidationError as exc:errors += [dict(path='.'.join(map(str,e['loc'])),submitted=e.get('input'),expected=e['msg']) for e in exc.errors()]
+        selections={}
+        if name=='diagnosis.propose_check':selections={str(i):r.get('references') for i,r in enumerate(args.get('relationships',[]))}
+        elif name=='diagnosis.revise_assessment':selections={str(i):r.get('references') for i,r in enumerate(args.get('new_facts',[]))}
+        elif name=='design.submit_search_plan':selections={'evidence':args.get('evidence')}
+        errors+=alias_errors(self.fact_state,selections)
+        self.retain(name,args,errors)
+        if errors:raise ToolProtocolError(errors)
+        return args
