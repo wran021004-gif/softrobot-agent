@@ -1,0 +1,106 @@
+{
+  "type": "shared_executor_reservation_seam",
+  "formal_run": "pair2_single_context",
+  "status": "No further live launch or framework repair; last scheduled run preserves actual incomplete evaluation feedback",
+  "simulation": {
+    "contract_version": "1.2.0",
+    "request_id": "complete-simulation",
+    "execution_id": "157bca3a5fb541eeb35171225dc34d05",
+    "caller": "improvement-executor",
+    "tool_id": "simulation.run",
+    "tool_version": "1.0.0",
+    "result_contract": "BackendResult",
+    "result_version": "1.0.0",
+    "execution_status": "completed",
+    "solver_status": "completed",
+    "analysis_status": "not_assessed",
+    "task_success": null,
+    "output": {
+      "artifact_id": "54bd35343d20f1929c52fc5c28579c9517d10d50483ed98e9856d74bd090d839",
+      "media_type": "application/json"
+    },
+    "error": null,
+    "cache_hit": false,
+    "original_execution_id": "157bca3a5fb541eeb35171225dc34d05",
+    "charged": {
+      "tool_calls": 1,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 702.7660000000615
+    }
+  },
+  "evaluation_rejection": {
+    "request_id": "complete-evaluation",
+    "execution_id": "not_executed",
+    "caller": "improvement-executor",
+    "tool_id": "evaluation.run",
+    "tool_version": "1.0.0",
+    "execution_status": "rejected",
+    "error": "BUDGET_EXHAUSTED: active phase / protected downstream capacity",
+    "charged": {
+      "tool_calls": 0,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    }
+  },
+  "executor_timeout_s": 900.0,
+  "executor_phase_budget": {
+    "limit": {
+      "tool_calls": 3,
+      "wall_s": 1600.0
+    },
+    "protect_project": {
+      "model_calls": 7,
+      "tool_calls": 7,
+      "wall_s": 600.0
+    },
+    "started_usage": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    }
+  },
+  "phase_remaining": {
+    "limit": {
+      "tool_calls": 3,
+      "wall_s": 1600.0
+    },
+    "protect_project": {
+      "model_calls": 7,
+      "tool_calls": 7,
+      "wall_s": 600.0
+    },
+    "started_usage": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "backend_solves": 1,
+      "model_calls": 0,
+      "tool_calls": 1,
+      "wall_s": 702.7660000000615,
+      "worker_calls": 0
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 2,
+      "wall_s": 897.2339999999385,
+      "worker_calls": 0
+    }
+  },
+  "configured_phase_wall_s": 1600.0,
+  "simulation_charged_wall_s": 702.7660000000615,
+  "phase_wall_after_simulation_s": 897.2339999999385,
+  "interpretation": "The existing evaluation and profile calls inherit a 900-second reservation. A complete simulation exceeding 700 seconds leaves less than that reservation in the frozen 1600-second executor phase even when substantial total run budget remains. This seam is shared by both organizations; the last formal run demonstrated it. No budget counter, guard or phase limit is changed.",
+  "comparison_limitation": "All four formal launches have terminal outcomes, but the last candidate lacks official evaluation/profile. A complete matched four-run physical comparison is not established.",
+  "development_repair_allowance_remaining": 0
+}

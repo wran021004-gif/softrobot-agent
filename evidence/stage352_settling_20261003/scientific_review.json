@@ -1,0 +1,132 @@
+{
+  "review_type": "Organization-masked implementer review; not independent blind review.",
+  "method": "Read the existing masked product copies, compare selected statements with sealed source evidence, and retain annotations separately from raw accepted products. The implementer knows run order and is not an independent blinded reviewer.",
+  "raw_products_unchanged": true,
+  "reviewed_copies": [
+    "masked_review/case_1.json",
+    "revalidation/masked_review/case_1.json",
+    "revalidation/masked_review/case_2.json",
+    "revalidation/masked_review/case_3.json",
+    "revalidation/masked_review/case_4.json",
+    "revalidation/masked_review/case_5.json"
+  ],
+  "rubric": {
+    "selected_coverage_and_ranges": "Full final holding window contains six retained samples, 0.30 through 0.35 s. Terminal position is inside its limit for the baseline; holding maximum position and every sampled holding speed are outside their limits. Selected prediction reads are batches and do not establish full-state or future-plan agreement.",
+    "prediction_returned_measured_motion": "Reports generally distinguish retained matched next-timestamp, applied-input comparisons of projected GVS first-step endpoints against measured serial-backend motion. These are available selected comparisons, not future-plan replay or causal counterfactual evidence.",
+    "timing": "All evaluated simulations apply 35 updates over 0.35 simulated seconds. Wall-clock deadline misses do not imply skipped simulated updates or actuator delay. Terminal 0.35 s is distinct from holding-window entry 0.30 s.",
+    "causal_language": "A bounded hypothesis can justify the authorized experiment. Observations and single-case changes do not prove a dominant mechanism; raw weight magnitudes, plan-selection counts and projection-coordinate residuals need careful interpretation.",
+    "feedback_influence": "Evaluated revisions acknowledge the candidate's physical worsening and final recommendations retain/defer candidate adoption. The last case defers an effectiveness judgment because evaluation/profile are absent. No favorable complete optimization result is claimed."
+  },
+  "positive_findings": [
+    {
+      "copy": "revalidation/masked_review/case_1.json",
+      "finding": "Revised report cites actual candidate evaluation/profile measurements; final response declines candidate adoption after physical worsening. The workflow capability gate is supported despite task failure."
+    },
+    {
+      "copy": "revalidation/masked_review/case_2.json",
+      "finding": "Revised report and final response use actual worse candidate metrics, preserve reach versus holding criteria, and defer adoption."
+    },
+    {
+      "copy": "revalidation/masked_review/case_3.json",
+      "finding": "No accepted diagnosis or improvement product exists; the protocol failure is preserved as an outcome, not converted into a scientific decision."
+    },
+    {
+      "copy": "revalidation/masked_review/case_4.json",
+      "finding": "Final response adopts the report's retain-baseline recommendation, not the changed controller; source metrics still show physical worsening. The optional local request was unavailable and executed zero solves."
+    },
+    {
+      "copy": "revalidation/masked_review/case_5.json",
+      "finding": "Revision and final response explicitly state that simulation completed but evaluation was rejected and campaign_comparison is null. Baseline values are not presented as candidate measurements; physical effectiveness remains unassessed."
+    },
+    {
+      "copy": "masked_review/case_1.json",
+      "finding": "The primary pilot's complete evaluation/profile and worse result are retained; its missing revision is attributed to the actual context overflow rather than a scientific success."
+    }
+  ],
+  "annotations": [
+    {
+      "copy": "masked_review/case_1.json",
+      "root": "primary",
+      "severity": "substantive_issue",
+      "pointer": "/products/initial_report/report/attribution/2",
+      "issue": "Wall-clock staleness is proposed as a holding cause despite synchronous fixed-count simulation; no mechanism injecting simulated delay is established.",
+      "source": "The frozen task executes 35 control updates over 0.35 s regardless of measured wall-clock overruns."
+    },
+    {
+      "copy": "masked_review/case_1.json",
+      "root": "primary",
+      "severity": "substantive_issue",
+      "pointer": "/products/improvement_decision/decision/rationale",
+      "issue": "The claim that chosen speed penalties are material but not dominant over tracking compares raw weights without cost-contribution evidence.",
+      "source": "Speed and position terms use different scaling and terminal versus integration-weighted scheduling."
+    },
+    {
+      "copy": "masked_review/case_1.json",
+      "root": "revalidation",
+      "severity": "substantive_issue",
+      "pointer": "/products/revised_report/report/attribution/1/reason",
+      "issue": "Uses 0.04778599698437965 m as the upper holding error from retained rows while discussing the full six-sample window; the sealed full-window maximum is 0.05813810428573256 m.",
+      "source": "Baseline profile f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc, sampled_settling.max_error_m."
+    },
+    {
+      "copy": "masked_review/case_2.json",
+      "root": "revalidation",
+      "severity": "substantive_issue",
+      "pointer": "/products/revised_report/report/attribution/4/reason",
+      "issue": "Projection residuals in rad/m and rad/(m*s) are described as large relative to settling scales in m and m/s; this comparison requires a kinematic mapping.",
+      "source": "The source records projection-coordinate residuals, not full backend tracking errors."
+    },
+    {
+      "copy": "masked_review/case_4.json",
+      "root": "revalidation",
+      "severity": "substantive_issue",
+      "pointer": "/products/initial_report/report/facts/1/statement",
+      "issue": "Claims no sampled instant satisfies either the position or speed limit; the terminal position error 0.007642608585867386 m satisfies the 0.01 m position limit. No sample satisfies speed, so joint failure is still correct.",
+      "source": "Baseline profile sampled_settling and campaign_metrics terminal_error_m."
+    },
+    {
+      "copy": "masked_review/case_4.json",
+      "root": "revalidation",
+      "severity": "substantive_issue",
+      "pointer": "/products/initial_report/report/attribution/1",
+      "issue": "Conflates six noninitialization plan selections with few applied updates and proposes overrun-limited motion. Baseline accepted/executed 35 updates; initialization-selected plans also apply control.",
+      "source": "Baseline factual_result accepted_plans=35, control_updates=35, initialization_selected=29, accepted_noninitialization_plans=6."
+    },
+    {
+      "copy": "masked_review/case_4.json",
+      "root": "revalidation",
+      "severity": "substantive_issue",
+      "pointer": "/products/improvement_decision/decision/rationale",
+      "issue": "Treats terminal speed as window-entry speed and terminal position residual as reach margin; these are different timestamps and quantities.",
+      "source": "Terminal is 0.35 s; window starts at 0.30 s. Terminal error is 0.007642608585867386 m against a 0.01 m tolerance."
+    },
+    {
+      "copy": "masked_review/case_4.json",
+      "root": "revalidation",
+      "severity": "substantive_issue",
+      "pointer": "/products/revised_report/report/facts/7/statement",
+      "issue": "Treats initialization_selected counts 32 versus 29 as changed experimental initialization. These are optimizer-plan selection outcomes; task initializer, seed and numerical policies were frozen.",
+      "source": "Candidate and baseline execution_scope/task/seed identities; only the two allowed weight fields differ."
+    },
+    {
+      "copy": "masked_review/case_4.json",
+      "root": "revalidation",
+      "severity": "substantive_issue",
+      "pointer": "/products/revised_report/report/attribution/1",
+      "issue": "Cause label says raising weights removes the miss and status is supported, while its reason states the measured change worsened outcomes; the label/status contradict the prose and source.",
+      "source": "Frozen compare_results classification physical_pareto_worsening."
+    },
+    {
+      "copy": "masked_review/case_5.json",
+      "root": "revalidation",
+      "severity": "substantive_issue",
+      "pointer": "/products/improvement_decision/decision/rationale",
+      "issue": "Calling holding weight 0.01 modest relative to terminal_weight does not establish cost balance under different scaling and integration factors.",
+      "source": "Weight magnitude alone is not a cost-contribution measurement; actual candidate outcome must decide."
+    }
+  ],
+  "substantive_issue_count": 10,
+  "source_agreement_certifies_prose": false,
+  "overall": "Exact source selectors pass, but scientific prose has substantive errors. The annotations qualify coverage, timing and causal interpretation without rewriting accepted products.",
+  "comparative_limit": "Four scheduled outcomes on one case are exploratory. One formal run stops on model protocol errors and another on a shared host reservation defect; a complete matched four-run physical comparison and universal organizational superiority are not established."
+}

@@ -1,0 +1,1601 @@
+{
+  "implementation": {
+    "commit": "07b72ac11f0ab09ccac544b1ca7fe7b943a452c2",
+    "files": {
+      "tools/diagnostic_workflow.py": "ccfd7bfcd1639e8558aa22fb04cca4d406ea9fc6d13f652a33cfb1d52edb51f0",
+      "tools/diagnostic_native.py": "1ee656c5dd5bbf49f0f9418000e576599c7e86106795ca8910992375eff068d4",
+      "tools/diagnostic_inventory.py": "5cf0f0bf3b922699f2f6bbbaae15704698bba73326baaa0daae630f1f558a58f",
+      "tools/diagnostic_facts.py": "27c194e8c1b8028e0584e83529f273801af78a17a91f691dce60ba4cc02ae59c",
+      "tools/platform_models.py": "f6c37cb11e48e96e064892f5e399aa15c730d669eecd017a635c78d44e1c7bfa",
+      "tools/platform_handoff.py": "09cade29a1ed94c27cfbad9b25fa2dcbb2797c65442c332ceaba2706a7ae56a7",
+      "tools/platform_diagnosis_coordinator.py": "ae8c0554d0303a76ae6a55eeb7d849f3df63fe27e1fa8a04cbd1f995358b736a",
+      "tools/platform_host.py": "02eea2d0cdb5d6238ae3876e5483b48214fa29b3328ea1117c2d16b2fc6f2562",
+      "tools/platform_store.py": "151e6b21271665c2f9788ba6a9abf9565e1440c1102ba5c0d9f62572421ce547",
+      "schemas/platform_handoff.py": "12e6700053c82545f94cffe9f4c8e877df936d27784246e5cccbd28273f2c48f",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "8931562841b618d0002ae7fc70fe76e76c165d07254827fbef2c17b630ecd03b",
+      "extensions/tendon_family/diagnostic_evidence.py": "0e7aa9b13f38a8ec72de2a35661038f5150e5c4fad850eb7715deb64f2dbe7c8",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "0df3a9f900b8c3c8efd7f72a99c9ff4524eca0826f5c5e2e904bdda9a2e5607c",
+      "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "6e93a900955c9c5e1e82cb1c34760dbbb56cbec073eed2096a72074d80f936f4",
+      "tools/platform_tools.py": "270d4ec234df0dcdbc835fd3e78f29af2e512a00b0a18a3c14a2dab94f9324b2",
+      "extensions/tendon_family/candidate.py": "e5a551c5fc2dbe060ee21c1e2130a2d8a98da1954518b8150518fe8a8693fb97",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88",
+      "tools/settling_campaign.py": "9b310972b4ce29a3e8079a091678f04c829c8a7df1ce6e34d7762d0bd43d0f36",
+      "tools/improvement_workflow.py": "9f20a0743d3352ab479f417b61be22141265fe797e6368f04eca02c165ec2bd9",
+      "examples/stage351_settling_campaign.py": "be5986afe752ca9279226e816032440f25596d3c275869b680aa63385e0eedd5",
+      "examples/stage351_experiment.json": "17dd84064d859f2190ec713c6190e30b0a0345d14812cbd6066269b54a81ad23",
+      "tests/test_stage351_settling.py": "54870cdf5fe1604bc96fe91087ae3e6836eb11064ea5340a942642b7eae17c8e",
+      "extensions/tendon_family/contracts.py": "d0eead4c5d27649168215d1604f1307ebd896e77ff24dd5f39a27aa052f9191c",
+      "extensions/tendon_family/gvs_profile.py": "2860f671093c665e1bc1840b92a42f33b3735767873cb9035acfdc43e2ff9711",
+      "extensions/tendon_family/gvs_trajectory.py": "a58c6ba4fa4a36965a37f927d2904df6a5b5e7601c33892abac17e3b789b53f5",
+      "extensions/tendon_family/control_evidence.py": "33ec2df6395aad0cdde13bce258462c1ed02e312fd44043861237a37431cab7e",
+      "extensions/tendon_family/delivery_facts.py": "d65a4821b009413409afbe5aa90d4b5f67d87e4052eb56c63bb4311cfa5a149b",
+      "extensions/tendon_family/backends.py": "cfadd684c3519ed58e17f3ea78cf33c5094e2260f0b485d291f00ba895d3bf49",
+      "examples/stage350_delivery_audit.py": "726e31b03d191e1f6894d0006195f486caeb69e2d5dedde536072cabac70d387",
+      "extensions/tendon_family/compiler.py": "898b7673c08fbcae2e7f76596635c82a9c5af4ade3d89b4f59043ae23617c0c7",
+      "extensions/tendon_family/execution.py": "6c777153e0a6a5760c20ccaf6ea5a0862afab187ff49667394a1aad1fb1b7fca",
+      "extensions/tendon_family/gvs.py": "698e77db5ba90a5bc192333d2692aa8e748601924e427ba44987537e706c5c0d",
+      "extensions/tendon_family/gvs_casadi.py": "c1cdd5a03863b9de8a471d93f9dd203959c0e55ad72573312d8ed6e71455e94c",
+      "extensions/tendon_family/gvs_basis.py": "8fc3f4256ea9161a90cb3ca8361b81d0488b860b89fc0127d3a4eff31c0ec5a7",
+      "extensions/optimization/ipopt.py": "9df6502db4a9d60d5f36d484b5eff851c6e9052a9fc006725402bc50268b290a",
+      "extensions/tendon_family/profiles/gvs_nmpc_free_reach_v1.json": "af9972b12db12f796af6ffff0fea2f92845c58e2d1be3438675bbc5f8f03aba0",
+      "examples/stage352_settling_campaign.py": "bba3e7e025fec6af2c9a62c3fcefb9e0c183aaa9c6ca6ceba5f10edfcc5075b1",
+      "examples/stage352_experiment.json": "924c692e2ffef4d79b3c2a3b0eaeb34c78d541fefc868f9a37126a3d74692c9f",
+      "examples/stage352_preflight.py": "a1d74c313c9e37c053624fe0b3ca248c47e8ce7ae7fce91c9d46bde24b02bd21",
+      "tests/test_stage352_transport.py": "02fe3290651cc8e030cd4eac43caa35a1571de50fc1d8049639a9d5441f2f375",
+      "tests/test_stage352_reuse.py": "6b7a6d66fbd20d46ad85019a53fcc755409588abd3b99f2026b60d27670ed3c4",
+      "tests/test_stage352_context.py": "d8433017daa302d3a1f6b0ecf45b0c1ba5b66d4320119c7fc5bef375655aaa81",
+      "examples/stage352_revalidation.json": "4357497918618ccd9c70ffabcec5ea6424c7470d8c7123e29da54b0dddd55f43"
+    }
+  },
+  "runtime": {
+    "sys_executable": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+    "python_version": "3.11.16",
+    "environment_prefix": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent"
+  },
+  "configuration": {
+    "project_prefix": "gvs-stage352",
+    "run_directory": "D:/softrobot-agent/runs/stage352_settling_revalidation_20261003",
+    "evidence_directory": "D:/softrobot-agent/evidence/stage352_settling_20261003/revalidation",
+    "source_store": "D:/softrobot-agent/runs/stage351_settling_20261003/baseline",
+    "execution_id": "cf997605885642759ee33920e2c9e2ef",
+    "configuration_artifact": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+    "evaluation_artifact": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+    "profile_artifact": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+    "provider_freeze": "D:/softrobot-agent/evidence/stage346_shared_diagnosis_20261002/pilot/freeze.json",
+    "fact_handles": true,
+    "overall_limits": {
+      "model_calls": 146,
+      "tool_calls": 370,
+      "wall_s": 21900.0,
+      "backend_solves": 6,
+      "worker_calls": 0
+    },
+    "formal_order": [
+      [
+        1,
+        "single_context"
+      ],
+      [
+        1,
+        "dual_context"
+      ],
+      [
+        2,
+        "dual_context"
+      ],
+      [
+        2,
+        "single_context"
+      ]
+    ],
+    "authorization_source": "User Stage 3.52 attachment a8a52759-166a-478d-a90f-c861d6a737af: paid DeepSeek calls and necessary evidence transmission authorized. Small preflight <=2 attempts/5 tools/180 seconds/zero numerical executions; prior Stage 3.51 baseline reuse <=0 attempts/5 tools/120 seconds/zero new baseline simulations. Fresh dual-context pilot then four matched runs each <=24 attempts/60 tools/3600 seconds/one changed-candidate complete backend/zero workers. Optional one local pair, two solves/300 seconds charged within each run. Exactly terminal_tip_speed_weight and holding_tip_speed_weight editable in [0,1], new positives >=0.0001; all other science frozen. Formal runs gated on real changed-candidate execution, valid feedback, accepted revision and final decision. One fresh development repair run only for demonstrated preserved host/interface defect, never network/model/task failure. Overall <=146 attempts/370 tools/21900 seconds/six complete candidate backends/zero new baseline backends/zero workers. Preserve Stage 3.51 records, costs, ownership and identities; fresh Stage 3.52 paths and memories, frozen reversed pair order, no cross-run experience, no replacement formal runs. Commit feat/gvs-dynamics; no push.",
+    "prior_stage352_run_directory": "D:/softrobot-agent/runs/stage352_settling_20261003",
+    "preflight_evidence_directory": "D:/softrobot-agent/evidence/stage352_settling_20261003",
+    "reused_baseline_record": "D:/softrobot-agent/evidence/stage352_settling_20261003/baseline_reuse.json",
+    "reused_baseline_record_sha256": "a955519de68c094a66106489977d73df9b31fdb28a6abc77e15070b3648b4d20",
+    "development_repair": "Only authorized fresh host-defect revalidation. Primary revision payload measured 201297 bytes under cap 200000; compact displayed fact catalog without changing stored mappings, receipt history, scientific scope, handoff contents or provider settings."
+  },
+  "ranking": {
+    "version": "1.0.0",
+    "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+    "physical_metrics": [
+      "terminal_error_m",
+      "holding_max_error_m",
+      "holding_max_speed_m_s"
+    ],
+    "tolerance": 1e-09,
+    "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+    "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+    "objective": "Raw scalar objectives under different weights are not ranked."
+  },
+  "memory_policy": {
+    "policy": "Reconstruct system instructions plus structured state; no chronological conversation replay.",
+    "context_bytes": 200000,
+    "products": 8,
+    "product_bytes": 12000,
+    "total_product_bytes": 48000,
+    "retention": "Own accepted handoff products FIFO; oversized products retain reference only. Existing recent evidence pages and last four actions stay within their original host limits. Phase changes preserve these in the same context.",
+    "separation": "single_context shares one memory across phases; dual_context keeps one per role and receives explicit current request/report/response/feedback handoffs.",
+    "cross_run_experience": false
+  },
+  "provider": {
+    "adapter": "deepseek",
+    "adapter_version": "4.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 200000,
+    "length_recovery": {
+      "enabled": true,
+      "max_tokens": 131072,
+      "timeout_s": 900.0
+    },
+    "max_no_progress": 3,
+    "max_repairs": 2,
+    "max_tokens": 65536,
+    "max_turns": 24,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 2,
+      "max_total": 4
+    },
+    "readonly_batch_limit": 3,
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0,
+    "tool_naming": {
+      "mapping_identity": "0b55f810f8a11a93356d34a7038ded6391f26de4265078355cc5cab6502548cb",
+      "scheme": "readable_v1"
+    }
+  },
+  "instructions": {
+    "request": "Inspect common baseline inventory and summary. Formulate an open question about terminal reach, sampled holding position, sampled holding speed and computation. This diagnostic request covers reading/reporting only; a separate improvement decision can propose one bounded controller-weight experiment. No predetermined cause or winning weight.",
+    "initial": "Read at least one prediction view and one motion or plans view. At most two successful reading turns; independent views can be batched. Then submit a concise initial report with 2-4 exact selected facts, competing hypotheses, explicit gaps and recommendations. Fact selectors point into original query result artifacts (e.g. /detail/summary/terminal_speed_m_s), not observation envelopes. report.source is the supplied binding; recommendation configuration_scope is identities.configuration. Recommendations may defer pending a check. Do not execute or select a numerical check in this phase. Availability gaps must use inventory IDs and not_read, not_retained or retained_unavailable; identify needed information/capability and basis. Unlisted evidence uses source plus explicit basis. Full sampled backend q/qdot is retained, even though motion shows the final window. Raw weight magnitudes do not establish cost-term importance without actual contributions/scaling. Diagnose the new common baseline. Only terminal_tip_speed_weight and holding_tip_speed_weight may later change under the explicit control grant. A reasonable testable hypothesis is enough to justify bounded exploration; proof of the dominant cause is not required. No geometry or material changes.",
+    "response_initial": "Read the initial report. Choose adopt, defer or reject yourself and independently choose request_check, verify_adopted_change or finish. defer + request_check is valid. Rejecting a recommendation need not end diagnosis. finish ends all workflow work. verify_adopted_change requires adoption of the exact existing parameter/value and only a temporary saved-state comparison. Adoption alone executes nothing. Explain the evidence basis.",
+    "check": "Select one discriminating check based on unresolved hypotheses. Inspect retained evidence as needed to choose the operation and update_id. The host binds the chosen update's exact measured_initial_state and operation-defined input from the inventory controller file; do not copy vectors. prediction_braking uses current actual_tension_n; local_comparison uses previous actual_tension_n and requires the exact adopted parameter/value and a saved effective plan horizon of 0.01 s. prediction_braking compares held recorded input with an instantaneous braking box solution and requires no adoption. Choose update_id >= 1, hypotheses, fixed conditions, metrics, acceptance criteria and work_limits (wall_s <= 300; prediction_evaluations=2 or local_solves=2). Host fixes model.gvs@1.0.0, implicit Euler, 0.002 s step and 0.01 s horizon. At most two successful reading turns, then select the check. Do not overextend a local probe to the entire settling failure. State local_question, competing hypotheses, discriminating_observations and unresolved questions. If hypotheses predict the same result, explicitly say this check cannot separate them. Select a question the stated capability can answer; no dominant-cause claim.",
+    "revision": "Revise the accepted initial diagnosis using the actual improvement_feedback_content and any sealed complete-execution feedback. If a candidate executed, cite a relevant numeric handle from its actual profile result and compare it with the baseline. If no candidate executed, report the recorded decision or exact validation failure without inventing measurements. Separate reach, sampled holding position/speed, computation and workflow completion. No further candidate or saved-state check is authorized. Explain unresolved mechanisms and specific grant gaps. Use campaign_comparison for exact candidate-minus-baseline arithmetic and frozen classification. Distinguish official reach-only task_success from joint reach-plus-holding success. State how actual measurements strengthen or weaken the hypothesis and change the final decision. A lower speed with worse position is a trade-off.",
+    "response_final": "Read the revised report and actual improvement feedback. Choose final recommendation disposition and finish. Adoption here accepts a report recommendation; it never replaces the baseline or launches work. Claim physical improvement only from a complete accepted evaluation compared with the replayed baseline; reach-plus-holding requires both frozen conditions. Defer/reject without execution is a completed decision workflow, not a successful design. This is control-only exploration, not robot-structure optimization. Apply the frozen campaign comparison and distinguish joint acceptance from successful workflow completion. No real-time, continuous-time or hardware claim.",
+    "improvement": "Read the accepted diagnosis and supplied two-path control grant. Independently select whether to change one or both weights and their values: adopt with a nonempty effective delta, or defer/reject with empty changes for a specific evidence, feasibility, scope or budget reason. Missing proof of causality alone does not prohibit this bounded experiment. State a concrete hypothesis, why the weight is relevant, expected effects separately on reach, holding position, holding speed and computation, possible adverse effects, and observations that would weaken the hypothesis. Both bounds are [0,1]; newly positive values must be >=0.0001. All other scientific fields are fixed. Preserve terminal speed cost as a single terminal scaled squared-speed term, and holding speed cost as an integration-step-weighted sum at scheduled holding nodes; scale and scheduling remain unchanged. Do not compare raw scalar objectives across weights. Optionally request local_comparison for one selected positive changed parameter and a legal saved update (effective horizon 0.01 s). The pair is advisory, at most two solves and 300 charged seconds. Unavailable/inconclusive local screening permits the complete experiment. Do not select a developer-prescribed value or force adoption."
+  },
+  "permissions": {
+    "request": [
+      "evidence.read",
+      "diagnosis.request"
+    ],
+    "initial": [
+      "diagnosis.inspect_evidence",
+      "evidence.read",
+      "diagnosis.submit"
+    ],
+    "response_initial": [
+      "design.respond_diagnosis"
+    ],
+    "check": [
+      "evidence.read",
+      "diagnosis.inspect_evidence",
+      "diagnosis.check_request"
+    ],
+    "revision": [
+      "diagnosis.submit"
+    ],
+    "response_final": [
+      "design.respond_diagnosis"
+    ],
+    "improvement": [
+      "design.decide_improvement"
+    ]
+  },
+  "phases": {
+    "request": {
+      "limit": {
+        "model_calls": 3
+      },
+      "protect_project": {
+        "model_calls": 21,
+        "tool_calls": 40,
+        "wall_s": 2400.0
+      }
+    },
+    "initial": {
+      "limit": {
+        "model_calls": 5
+      },
+      "protect_project": {
+        "model_calls": 16,
+        "tool_calls": 30,
+        "wall_s": 1800.0
+      }
+    },
+    "response_initial": {
+      "limit": {
+        "model_calls": 3,
+        "wall_s": 300.0
+      },
+      "protect_project": {
+        "model_calls": 13,
+        "tool_calls": 20,
+        "wall_s": 1200.0
+      }
+    },
+    "check": {
+      "limit": {
+        "model_calls": 6
+      },
+      "protect_project": {
+        "model_calls": 7,
+        "tool_calls": 10,
+        "wall_s": 700.0
+      }
+    },
+    "revision": {
+      "limit": {
+        "model_calls": 4
+      },
+      "protect_project": {
+        "model_calls": 3,
+        "tool_calls": 3,
+        "wall_s": 300.0
+      }
+    },
+    "response_final": {
+      "limit": {
+        "model_calls": 3,
+        "wall_s": 300.0
+      }
+    },
+    "improvement": {
+      "limit": {
+        "model_calls": 3,
+        "wall_s": 300.0
+      },
+      "protect_project": {
+        "model_calls": 7,
+        "tool_calls": 10,
+        "wall_s": 1600.0
+      }
+    }
+  },
+  "capabilities": {
+    "complete_execution": "At most one model-selected changed candidate, complete simulation, unchanged reach evaluation and sampled holding/profile feedback.",
+    "local_comparison": "Optional one paired local comparison, two solves, <=300 charged seconds, at a saved baseline update with effective horizon 0.01 s; select one changed positive weight. Existing previous-input cold seed and integration retained. Unavailable/inconclusive screening does not prohibit a justified complete experiment."
+  },
+  "numerical_limits": {
+    "local_solves": 2,
+    "prediction_evaluations": 0
+  },
+  "limits": {
+    "baseline": {
+      "model_calls": 0,
+      "tool_calls": 10,
+      "wall_s": 3600.0,
+      "backend_solves": 1,
+      "worker_calls": 0
+    },
+    "organization": {
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 3600.0,
+      "backend_solves": 1,
+      "worker_calls": 0
+    }
+  },
+  "tool_schemas": {
+    "diagnosis.request": {
+      "$defs": {
+        "Budget": {
+          "additionalProperties": false,
+          "properties": {
+            "tool_calls": {
+              "minimum": 0,
+              "title": "Tool Calls",
+              "type": "integer"
+            },
+            "model_calls": {
+              "minimum": 0,
+              "title": "Model Calls",
+              "type": "integer"
+            },
+            "backend_solves": {
+              "minimum": 0,
+              "title": "Backend Solves",
+              "type": "integer"
+            },
+            "worker_calls": {
+              "minimum": 0,
+              "title": "Worker Calls",
+              "type": "integer"
+            },
+            "wall_s": {
+              "minimum": 0,
+              "title": "Wall S",
+              "type": "number"
+            }
+          },
+          "required": [
+            "tool_calls",
+            "model_calls",
+            "backend_solves",
+            "worker_calls",
+            "wall_s"
+          ],
+          "title": "Budget",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "SavedStateScope": {
+          "additionalProperties": false,
+          "description": "Explicit numerical authorization, separate from retained-evidence reading.",
+          "properties": {
+            "operations": {
+              "items": {
+                "enum": [
+                  "prediction_braking",
+                  "local_comparison"
+                ],
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Operations",
+              "type": "array"
+            },
+            "model": {
+              "const": "model.gvs@1.0.0",
+              "default": "model.gvs@1.0.0",
+              "title": "Model",
+              "type": "string"
+            },
+            "horizon_s": {
+              "exclusiveMinimum": 0,
+              "maximum": 0.02,
+              "title": "Horizon S",
+              "type": "number"
+            },
+            "integration": {
+              "const": "implicit_euler",
+              "default": "implicit_euler",
+              "title": "Integration",
+              "type": "string"
+            },
+            "integration_step_s": {
+              "exclusiveMinimum": 0,
+              "maximum": 0.01,
+              "title": "Integration Step S",
+              "type": "number"
+            },
+            "max_wall_s": {
+              "exclusiveMinimum": 0,
+              "maximum": 300.0,
+              "title": "Max Wall S",
+              "type": "number"
+            },
+            "max_checks": {
+              "const": 1,
+              "default": 1,
+              "title": "Max Checks",
+              "type": "integer"
+            },
+            "numerical_limits": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "description": "Maximum numerical units within this request; bounded by the frozen project grant.",
+              "propertyNames": {
+                "enum": [
+                  "local_solves",
+                  "prediction_evaluations"
+                ]
+              },
+              "title": "Numerical Limits",
+              "type": "object"
+            },
+            "configuration_scope": {
+              "const": "saved_state_or_temporary_analysis",
+              "default": "saved_state_or_temporary_analysis",
+              "title": "Configuration Scope",
+              "type": "string"
+            }
+          },
+          "required": [
+            "operations",
+            "horizon_s",
+            "integration_step_s",
+            "max_wall_s",
+            "numerical_limits"
+          ],
+          "title": "SavedStateScope",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "subject": {
+          "title": "Subject",
+          "type": "string"
+        },
+        "binding": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "candidate_id": {
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "execution_id": {
+          "title": "Execution Id",
+          "type": "string"
+        },
+        "task_identity": {
+          "title": "Task Identity",
+          "type": "string"
+        },
+        "controller_identity": {
+          "title": "Controller Identity",
+          "type": "string"
+        },
+        "evidence_manifest": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "permitted_tools": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Permitted Tools",
+          "type": "array"
+        },
+        "scope": {
+          "description": "Distinguish retained-evidence reads, explicitly authorized saved-state numerical work, and excluded production changes/backend execution.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Scope",
+          "type": "array"
+        },
+        "saved_state_check": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SavedStateScope"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Explicit saved-state numerical grant bound to this request execution and binding. Null authorizes no numerical execution. Probes never modify production or baseline; local_comparison additionally requires matched design adoption."
+        },
+        "budget": {
+          "$ref": "#/$defs/Budget"
+        },
+        "stopping_conditions": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Stopping Conditions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "question",
+        "subject",
+        "binding",
+        "candidate_id",
+        "execution_id",
+        "task_identity",
+        "controller_identity",
+        "evidence_manifest",
+        "permitted_tools",
+        "scope",
+        "budget",
+        "stopping_conditions"
+      ],
+      "title": "DiagnosisRequest",
+      "type": "object"
+    },
+    "diagnosis.inspect_evidence": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "binding": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "view": {
+          "description": "summary, motion, prediction, plans, or comparable",
+          "title": "View",
+          "type": "string"
+        },
+        "update_ids": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 8,
+          "title": "Update Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "binding",
+        "view"
+      ],
+      "title": "BoundQuery",
+      "type": "object"
+    },
+    "diagnosis.check_request": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "EvidenceSelector": {
+          "additionalProperties": false,
+          "properties": {
+            "reference": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "pointer": {
+              "title": "Pointer",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value"
+            }
+          },
+          "required": [
+            "reference",
+            "pointer",
+            "value"
+          ],
+          "title": "EvidenceSelector",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Version 2 requires a question that the existing local probe can answer.",
+      "properties": {
+        "check_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Check Id"
+        },
+        "operation": {
+          "anyOf": [
+            {
+              "enum": [
+                "prediction_braking",
+                "local_comparison"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operation"
+        },
+        "update_id": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Update Id"
+        },
+        "integration_step_s": {
+          "default": 0.002,
+          "exclusiveMinimum": 0,
+          "maximum": 0.01,
+          "title": "Integration Step S",
+          "type": "number"
+        },
+        "changed_parameter": {
+          "anyOf": [
+            {
+              "enum": [
+                "terminal_tip_speed_weight",
+                "holding_tip_speed_weight"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Changed Parameter"
+        },
+        "changed_value": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0001,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Changed Value"
+        },
+        "prior_result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "additional_need": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Additional Need"
+        },
+        "diagnosis_request": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "hypotheses": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2,
+          "title": "Hypotheses",
+          "type": "array"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/EvidenceSelector"
+        },
+        "input": {
+          "$ref": "#/$defs/EvidenceSelector"
+        },
+        "fixed_conditions": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Fixed Conditions",
+          "type": "array"
+        },
+        "changed_factor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Changed Factor"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "horizon_s": {
+          "exclusiveMinimum": 0,
+          "maximum": 0.1,
+          "title": "Horizon S",
+          "type": "number"
+        },
+        "integration": {
+          "title": "Integration",
+          "type": "string"
+        },
+        "metrics": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "work_limits": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Work Limits",
+          "type": "object"
+        },
+        "acceptance_criteria": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Acceptance Criteria",
+          "type": "array"
+        },
+        "local_question": {
+          "minLength": 1,
+          "title": "Local Question",
+          "type": "string"
+        },
+        "discriminating_observations": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Discriminating Observations",
+          "type": "array"
+        },
+        "unresolved": {
+          "description": "Hypotheses this probe cannot separate, and limits independent of outcome.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Unresolved",
+          "type": "array"
+        }
+      },
+      "required": [
+        "diagnosis_request",
+        "hypotheses",
+        "initial_state",
+        "input",
+        "fixed_conditions",
+        "model",
+        "horizon_s",
+        "integration",
+        "metrics",
+        "work_limits",
+        "acceptance_criteria",
+        "local_question",
+        "discriminating_observations",
+        "unresolved"
+      ],
+      "title": "ScopedDiagnosticCheckRequest",
+      "type": "object"
+    },
+    "diagnosis.submit": {
+      "$defs": {
+        "DiagnosticAttribution": {
+          "additionalProperties": false,
+          "description": "Reasoning over facts; ruled_out is explicit, not a missing hypothesis.",
+          "properties": {
+            "cause": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Cause",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "supported",
+                "possible",
+                "insufficient_evidence",
+                "ruled_out"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "fact_ids": {
+              "items": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+                "type": "string"
+              },
+              "title": "Fact Ids",
+              "type": "array"
+            },
+            "reason": {
+              "minLength": 1,
+              "title": "Reason",
+              "type": "string"
+            }
+          },
+          "required": [
+            "cause",
+            "status",
+            "reason"
+          ],
+          "title": "DiagnosticAttribution",
+          "type": "object"
+        },
+        "DiagnosticFact": {
+          "additionalProperties": false,
+          "description": "Produced by deterministic tools; statements report observations, not causes.",
+          "properties": {
+            "fact_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Fact Id",
+              "type": "string"
+            },
+            "statement": {
+              "minLength": 1,
+              "title": "Statement",
+              "type": "string"
+            },
+            "evidence": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "minItems": 1,
+              "title": "Evidence",
+              "type": "array"
+            },
+            "observed": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Metric"
+                },
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Observed"
+            }
+          },
+          "required": [
+            "fact_id",
+            "statement",
+            "evidence"
+          ],
+          "title": "DiagnosticFact",
+          "type": "object"
+        },
+        "DiagnosticReport": {
+          "additionalProperties": false,
+          "description": "Persistable handoff; facts remain distinct from LLM/human attribution.\n\nsubject is an extensible category, source identifies the diagnosed artifact.\nRecommendations are advisory text, never executable actions or authorization.",
+          "properties": {
+            "subject": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Subject",
+              "type": "string"
+            },
+            "source": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "facts": {
+              "items": {
+                "$ref": "#/$defs/DiagnosticFact"
+              },
+              "title": "Facts",
+              "type": "array"
+            },
+            "attribution": {
+              "items": {
+                "$ref": "#/$defs/DiagnosticAttribution"
+              },
+              "title": "Attribution",
+              "type": "array"
+            },
+            "gates": {
+              "items": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/GateResult"
+                  },
+                  {
+                    "$ref": "#/$defs/EvidenceRef"
+                  }
+                ]
+              },
+              "title": "Gates",
+              "type": "array"
+            },
+            "recommended_actions": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Recommended Actions",
+              "type": "array"
+            },
+            "limitations": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Limitations",
+              "type": "array"
+            }
+          },
+          "required": [
+            "subject",
+            "source"
+          ],
+          "title": "DiagnosticReport",
+          "type": "object"
+        },
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        },
+        "EvidenceSelector": {
+          "additionalProperties": false,
+          "properties": {
+            "reference": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "pointer": {
+              "title": "Pointer",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value"
+            }
+          },
+          "required": [
+            "reference",
+            "pointer",
+            "value"
+          ],
+          "title": "EvidenceSelector",
+          "type": "object"
+        },
+        "GateResult": {
+          "additionalProperties": false,
+          "description": "Failed means observed failure; ungradable means insufficient usable evidence.\n\nMissing/nonfinite measurements are never fabricated as numeric zero. A\nregistered observation payload can describe nonfiniteness without JSON NaN.",
+          "properties": {
+            "gate_id": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Gate Id",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "passed",
+                "failed",
+                "ungradable"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "evidence": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Evidence",
+              "type": "array"
+            },
+            "observed": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Metric"
+                },
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Observed"
+            },
+            "expected": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Metric"
+                },
+                {
+                  "$ref": "#/$defs/Payload"
+                },
+                {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Expected"
+            },
+            "reason": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Reason"
+            }
+          },
+          "required": [
+            "gate_id",
+            "status"
+          ],
+          "title": "GateResult",
+          "type": "object"
+        },
+        "InventoryGap": {
+          "additionalProperties": false,
+          "properties": {
+            "inventory_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Inventory Id"
+            },
+            "source": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "For unlisted evidence, identify the source or evidence sought.",
+              "title": "Source"
+            },
+            "status": {
+              "enum": [
+                "not_displayed",
+                "not_read",
+                "queried",
+                "not_retained",
+                "retained_unavailable"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "needed": {
+              "description": "Specific missing information or query/calculation capability.",
+              "minLength": 1,
+              "title": "Needed",
+              "type": "string"
+            },
+            "basis": {
+              "description": "Inventory fact or explicit basis for unlisted evidence; no invented inventory ID.",
+              "minLength": 1,
+              "title": "Basis",
+              "type": "string"
+            },
+            "update_ids": {
+              "anyOf": [
+                {
+                  "items": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "maxItems": 35,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Optional explicit subset of controller update IDs. Without coverage fields status applies to the entire inventory entry; describe remaining coverage in needed/basis.",
+              "title": "Update Ids"
+            },
+            "time_range_s": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Optional inclusive sampled backend-motion time range [start,end]. This is sampled coverage, not a continuous-time claim.",
+              "title": "Time Range S"
+            }
+          },
+          "required": [
+            "status",
+            "needed",
+            "basis"
+          ],
+          "title": "InventoryGap",
+          "type": "object"
+        },
+        "Metric": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Name",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value",
+              "type": "number"
+            },
+            "units": {
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "value",
+            "units"
+          ],
+          "title": "Metric",
+          "type": "object"
+        },
+        "Payload": {
+          "additionalProperties": false,
+          "properties": {
+            "contract": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$",
+              "title": "Contract",
+              "type": "string"
+            },
+            "version": {
+              "default": "1.0.0",
+              "title": "Version",
+              "type": "string"
+            },
+            "data": {
+              "additionalProperties": true,
+              "title": "Data",
+              "type": "object"
+            }
+          },
+          "required": [
+            "contract",
+            "data"
+          ],
+          "title": "Payload",
+          "type": "object"
+        },
+        "Recommendation": {
+          "additionalProperties": false,
+          "properties": {
+            "recommendation_id": {
+              "title": "Recommendation Id",
+              "type": "string"
+            },
+            "action": {
+              "enum": [
+                "control_parameter",
+                "defer"
+              ],
+              "title": "Action",
+              "type": "string"
+            },
+            "parameter": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Parameter"
+            },
+            "value": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Value"
+            },
+            "rationale": {
+              "title": "Rationale",
+              "type": "string"
+            },
+            "configuration_scope": {
+              "$ref": "#/$defs/EvidenceRef"
+            }
+          },
+          "required": [
+            "recommendation_id",
+            "action",
+            "rationale",
+            "configuration_scope"
+          ],
+          "title": "Recommendation",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Version 2 makes availability declarations reference deterministic inventory.",
+      "properties": {
+        "previous_report": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "report": {
+          "$ref": "#/$defs/DiagnosticReport"
+        },
+        "fact_selectors": {
+          "additionalProperties": {
+            "items": {
+              "$ref": "#/$defs/EvidenceSelector"
+            },
+            "type": "array"
+          },
+          "title": "Fact Selectors",
+          "type": "object"
+        },
+        "missing_evidence": {
+          "items": {
+            "$ref": "#/$defs/InventoryGap"
+          },
+          "title": "Missing Evidence",
+          "type": "array"
+        },
+        "check_results": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Check Results",
+          "type": "array"
+        },
+        "recommendations": {
+          "items": {
+            "$ref": "#/$defs/Recommendation"
+          },
+          "title": "Recommendations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "request",
+        "report",
+        "fact_selectors",
+        "missing_evidence",
+        "recommendations"
+      ],
+      "title": "InventoryDiagnosisSubmission",
+      "type": "object"
+    },
+    "evidence.read": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "$ref": "#/$defs/EvidenceRef",
+          "description": "Existing immutable evidence reference, not a node_id. A build has no evaluation or trajectory to read."
+        },
+        "pointer": {
+          "default": "",
+          "description": "JSON Pointer into original evidence, e.g. /detail or /signals/0/values. Empty reads the root. Oversized nested content returns a labeled overview with valid child pointers; follow those pointers using the same source reference.",
+          "title": "Pointer",
+          "type": "string"
+        },
+        "offset": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "limit": {
+          "default": 20,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "byte_limit": {
+          "default": 4096,
+          "description": "Requested content byte cap; response and observation envelopes also count toward the inline limit. Pages may be smaller. Follow next_offset at the same pointer.",
+          "maximum": 8192,
+          "minimum": 128,
+          "title": "Byte Limit",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "reference"
+      ],
+      "title": "ReadEvidence",
+      "type": "object"
+    },
+    "design.respond_diagnosis": {
+      "$defs": {
+        "EvidenceRef": {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_id": {
+              "pattern": "^[a-f0-9]{64}$",
+              "title": "Artifact Id",
+              "type": "string"
+            },
+            "media_type": {
+              "default": "application/json",
+              "title": "Media Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "artifact_id"
+          ],
+          "title": "EvidenceRef",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Version 2: recommendation disposition and workflow control are independent.",
+      "properties": {
+        "report": {
+          "$ref": "#/$defs/EvidenceRef"
+        },
+        "disposition": {
+          "enum": [
+            "adopt",
+            "defer",
+            "reject"
+          ],
+          "title": "Disposition",
+          "type": "string"
+        },
+        "recommendation_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recommendation Id"
+        },
+        "reasoning": {
+          "minLength": 1,
+          "title": "Reasoning",
+          "type": "string"
+        },
+        "next_action": {
+          "enum": [
+            "request_check",
+            "verify_adopted_change",
+            "finish"
+          ],
+          "title": "Next Action",
+          "type": "string"
+        }
+      },
+      "required": [
+        "report",
+        "disposition",
+        "reasoning",
+        "next_action"
+      ],
+      "title": "WorkflowDesignResponse",
+      "type": "object"
+    },
+    "design.decide_improvement": {
+      "$defs": {
+        "LocalImprovementComparison": {
+          "additionalProperties": false,
+          "properties": {
+            "update_id": {
+              "description": "Saved baseline controller update; effective plan horizon must be 0.01 s.",
+              "minimum": 1,
+              "title": "Update Id",
+              "type": "integer"
+            },
+            "parameter": {
+              "enum": [
+                "terminal_tip_speed_weight",
+                "holding_tip_speed_weight"
+              ],
+              "title": "Parameter",
+              "type": "string"
+            }
+          },
+          "required": [
+            "update_id",
+            "parameter"
+          ],
+          "title": "LocalImprovementComparison",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Flat model-authored business fields; host owns all source identities.",
+      "properties": {
+        "disposition": {
+          "enum": [
+            "adopt",
+            "defer",
+            "reject"
+          ],
+          "title": "Disposition",
+          "type": "string"
+        },
+        "changes": {
+          "additionalProperties": true,
+          "description": "Only paths/values allowed by the existing candidate builder grant.",
+          "title": "Changes",
+          "type": "object"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "expected_measurable_effect": {
+          "minLength": 1,
+          "title": "Expected Measurable Effect",
+          "type": "string"
+        },
+        "local_comparison": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LocalImprovementComparison"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional only when the supplied campaign grant permits it: compare baseline against one selected changed positive weight at a legal saved state. No sweep; omit if unnecessary."
+        }
+      },
+      "required": [
+        "disposition",
+        "rationale",
+        "expected_measurable_effect"
+      ],
+      "title": "ImprovementDecision",
+      "type": "object"
+    }
+  },
+  "created": "2026-10-03T08:53:51.975880+00:00"
+}

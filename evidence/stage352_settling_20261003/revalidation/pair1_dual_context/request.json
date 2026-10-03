@@ -1,0 +1,41 @@
+{
+  "binding": {
+    "artifact_id": "1dd73248d41264c770a567618f0243cf1d34a152e9ce9123b8764a29343961ed",
+    "media_type": "application/json"
+  },
+  "budget": {
+    "backend_solves": 0,
+    "model_calls": 24,
+    "tool_calls": 60,
+    "wall_s": 3600.0,
+    "worker_calls": 0
+  },
+  "candidate_id": "baseline-replay",
+  "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+  "evidence_manifest": {
+    "artifact_id": "a9702d58bea0f18bfe2d0bbbc23aa924cf980041237865033642a56d03e31b16",
+    "media_type": "application/json"
+  },
+  "execution_id": "cf997605885642759ee33920e2c9e2ef",
+  "permitted_tools": [
+    "diagnosis.inspect_evidence",
+    "diagnosis.submit",
+    "evidence.read"
+  ],
+  "question": "For the retained baseline execution (execution_id cf997605885642759ee33920e2c9e2ef; 35 controller updates; control period 0.01 s; mean_update_s ~17.263 s; deadline_misses 35; stopping counts Solve_Succeeded 1 / User_Requested_Stop 34), what does the retained evidence show about (a) terminal reach relative to the reach tolerance, (b) the sampled final holding-window position error and speed relative to the settling limits, and (c) the computation and solver-status signals (per-update wall time, deadline-missed flags, solver status and selected iteration)? Where does coverage end such that the sampled holding position and speed failure cannot be attributed to any single cause?",
+  "saved_state_check": null,
+  "scope": [
+    "Retained-evidence reads only: evidence.read on the baseline state artifact (96414b9a...) and diagnosis.inspect_evidence derived views (prediction, plans, motion) over update_ids 0..34 across inventory ids source.one_step_predictions, source.applied_tensions, source.saved_projected_states, source.plan_selection, source.solver_status, source.controller_horizon, source.backend_motion, source.force_limits.",
+    "Reporting only: characterize terminal reach pass/fail vs reach_tolerance_m 0.01; sampled final holding-window position error (min 0.00764 m, max 0.05814 m over 6 rows) and speed (min 0.635 m/s, max 1.581 m/s) vs settling limits; and computation signals (mean_update_s 17.263 s, deadline_misses 35, stopping counts) with stated coverage.",
+    "Excluded: no production controller or weight change, no backend solve, no closed-loop counterfactual replay, and no saved-state numerical probe or local comparison.",
+    "No predetermined cause and no chosen or winning weight in this request."
+  ],
+  "stopping_conditions": [
+    "Terminal reach status reported relative to reach_tolerance_m 0.01 with the source of that judgement stated.",
+    "Sampled holding-window position error and speed reported vs settling limits with explicit coverage (6 selected rows, times 0.30-0.35 s) and the stated limitation that these are selected rows only, not whole-trajectory ranges.",
+    "Computation signals (per-update wall time, deadline misses, solver status/selected iteration) reported with coverage; unread or unretained subsets (e.g., historical full plans and optimizer iteration traces) labeled not_read or not_retained.",
+    "No causal attribution asserted and no improvement configuration recommended within this reading/reporting request."
+  ],
+  "subject": "control",
+  "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+}

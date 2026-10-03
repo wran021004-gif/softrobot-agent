@@ -1,0 +1,40 @@
+{
+  "binding": {
+    "artifact_id": "1dd73248d41264c770a567618f0243cf1d34a152e9ce9123b8764a29343961ed",
+    "media_type": "application/json"
+  },
+  "budget": {
+    "backend_solves": 0,
+    "model_calls": 24,
+    "tool_calls": 60,
+    "wall_s": 3600.0,
+    "worker_calls": 0
+  },
+  "candidate_id": "baseline-replay",
+  "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+  "evidence_manifest": {
+    "artifact_id": "a9702d58bea0f18bfe2d0bbbc23aa924cf980041237865033642a56d03e31b16",
+    "media_type": "application/json"
+  },
+  "execution_id": "cf997605885642759ee33920e2c9e2ef",
+  "permitted_tools": [
+    "diagnosis.inspect_evidence",
+    "diagnosis.submit",
+    "evidence.read"
+  ],
+  "question": "For the baseline execution cf997605885642759ee33920e2c9e2ef: reach passed and the terminal position error (0.007642608585867386 m) is within the 0.01 m position tolerance, yet the sampled final holding window shows position error spanning 0.007642608585867386–0.05813810428573256 m and speed spanning 0.6351726092425104–1.5810152739742807 m/s against a 0.02 m/s limit (sampled holding position and speed both failed). Per-update computation also stands out: mean_update_s = 17.26331904856488 s versus a 0.01 s control period, with 35 deadline misses. What does the retained evidence establish about terminal reach, sampled holding-window position, sampled holding-window speed, and update computation for this run, and which of these relationships — including any that might connect holding-window position/speed behavior to update computation or to plan-selection/optimizer status — remain unestablished or not computable with the current tools? Keep any causal explanation open rather than presupposing a dominant cause.",
+  "saved_state_check": null,
+  "scope": [
+    "Retained-evidence reading and reporting only, scoped to execution cf997605885642759ee33920e2c9e2ef and its retained inventory (source.one_step_predictions, source.applied_tensions, source.saved_projected_states, source.plan_selection, source.solver_status, source.controller_horizon, source.force_limits, source.backend_motion).",
+    "Reporting terminal reach, sampled holding position/speed, and update-computation observations with their stated coverage (selected samples; not whole-trajectory ranges or causal evidence).",
+    "This request excludes production changes and any backend execution or closed-loop counterfactual replay.",
+    "No saved-state numerical prediction/braking or local_comparison work is authorized or requested here; comparisons are limited to associating already-retained samples and program-derived summaries."
+  ],
+  "stopping_conditions": [
+    "Terminal reach, sampled holding-window position error, sampled holding-window speed, and update-computation observations are each reported with their coverage (selected samples vs whole trajectory) and their source references.",
+    "Each candidate relationship is labeled established-by-retained-evidence, not displayed/not retained, or not computable with the current tools, without asserting a dominant cause.",
+    "The request is closed once it is stated whether any position/speed-vs-computation or optimizer-status link is supported, unsupported, or not computable with retained evidence and allowed tools."
+  ],
+  "subject": "control",
+  "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+}

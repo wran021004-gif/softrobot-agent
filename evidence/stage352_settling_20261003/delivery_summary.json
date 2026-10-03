@@ -1,0 +1,2352 @@
+{
+  "status": "Delivered all four scheduled outcomes; complete matched physical comparison not established",
+  "implementation_commits": [
+    "0cb1f4a",
+    "07b72ac"
+  ],
+  "formal_implementation_commit": "07b72ac11f0ab09ccac544b1ca7fe7b943a452c2",
+  "offline_delivery_script": "examples/stage352_delivery_audit.py; created only after all live runs terminated; outside live freeze",
+  "communication": {
+    "validated": true,
+    "preflight": {
+      "attempts": [
+        {
+          "number": 1,
+          "started": "2026-10-03T08:18:16.053200+00:00",
+          "timeout_s": 85.0,
+          "corrective_action_or_transient_check": null,
+          "request": {
+            "model": "deepseek-flash",
+            "messages": [
+              {
+                "role": "user",
+                "content": "Reply briefly with: Connection verified."
+              }
+            ],
+            "max_tokens": 65536,
+            "thinking": {
+              "type": "enabled"
+            },
+            "reasoning_effort": "high",
+            "stream": false
+          },
+          "provider_configuration": {
+            "adapter": "deepseek",
+            "adapter_version": "3.0.0",
+            "base_url": "https://api.deepseek.com",
+            "context_bytes": 200000,
+            "length_recovery": {
+              "enabled": true,
+              "max_tokens": 131072,
+              "timeout_s": 900.0
+            },
+            "max_no_progress": 3,
+            "max_repairs": 2,
+            "max_tokens": 65536,
+            "max_turns": 24,
+            "model": "deepseek-flash",
+            "parameters": {},
+            "protocol_recovery": {
+              "max_consecutive": 2,
+              "max_total": 4
+            },
+            "readonly_batch_limit": 3,
+            "reasoning_effort": "high",
+            "strategy": "strategy.tool",
+            "strategy_version": "1.0.0",
+            "supports_images": false,
+            "supports_text": true,
+            "supports_tools": true,
+            "thinking": "enabled",
+            "timeout_s": 85.0,
+            "tool_naming": {
+              "mapping_identity": "0b55f810f8a11a93356d34a7038ded6391f26de4265078355cc5cab6502548cb",
+              "scheme": "readable_v1"
+            }
+          },
+          "adapter_version": "4.0.0",
+          "status": "failed",
+          "response": null,
+          "provider_usage": null,
+          "error": "DEEPSEEK_NETWORK_ERROR",
+          "exception_type": "RuntimeError",
+          "provider_response": {
+            "failure_details": {
+              "exception_type": "URLError",
+              "reason_type": "ConnectionRefusedError",
+              "os_error_number": 10061,
+              "windows_error_number": 10061,
+              "category": "connection",
+              "elapsed_s": 2.0630000000819564,
+              "endpoint_hostname": "api.deepseek.com",
+              "reason_message": "[WinError 10061] 由于目标计算机积极拒绝，无法连接。"
+            }
+          },
+          "elapsed_s": 2.0630000000819564,
+          "charged_wall_s": 2.0630000000819564
+        },
+        {
+          "number": 2,
+          "started": "2026-10-03T08:19:30.096935+00:00",
+          "timeout_s": 85.0,
+          "corrective_action_or_transient_check": "Primary process used sandbox-injected localhost proxies at 127.0.0.1:9 and received WinError 10061. Check through host networking outside the sandbox boundary once, retaining provider/model/thinking/reasoning/TLS settings and inherited host proxy policy.",
+          "request": {
+            "model": "deepseek-flash",
+            "messages": [
+              {
+                "role": "user",
+                "content": "Reply briefly with: Connection verified."
+              }
+            ],
+            "max_tokens": 65536,
+            "thinking": {
+              "type": "enabled"
+            },
+            "reasoning_effort": "high",
+            "stream": false
+          },
+          "provider_configuration": {
+            "adapter": "deepseek",
+            "adapter_version": "3.0.0",
+            "base_url": "https://api.deepseek.com",
+            "context_bytes": 200000,
+            "length_recovery": {
+              "enabled": true,
+              "max_tokens": 131072,
+              "timeout_s": 900.0
+            },
+            "max_no_progress": 3,
+            "max_repairs": 2,
+            "max_tokens": 65536,
+            "max_turns": 24,
+            "model": "deepseek-flash",
+            "parameters": {},
+            "protocol_recovery": {
+              "max_consecutive": 2,
+              "max_total": 4
+            },
+            "readonly_batch_limit": 3,
+            "reasoning_effort": "high",
+            "strategy": "strategy.tool",
+            "strategy_version": "1.0.0",
+            "supports_images": false,
+            "supports_text": true,
+            "supports_tools": true,
+            "thinking": "enabled",
+            "timeout_s": 85.0,
+            "tool_naming": {
+              "mapping_identity": "0b55f810f8a11a93356d34a7038ded6391f26de4265078355cc5cab6502548cb",
+              "scheme": "readable_v1"
+            }
+          },
+          "adapter_version": "4.0.0",
+          "status": "completed",
+          "response": {
+            "id": "305fd524-587c-4302-9dd0-4ce8e3950ff3",
+            "object": "chat.completion",
+            "created": 1791015568,
+            "model": "deepseek-flash",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "Connection verified.",
+                  "reasoning_content": "The user wants a brief reply: \"Connection verified.\" Just output that."
+                },
+                "logprobs": null,
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 37,
+              "completion_tokens": 19,
+              "total_tokens": 56,
+              "prompt_tokens_details": {
+                "cached_tokens": 0
+              },
+              "completion_tokens_details": {
+                "reasoning_tokens": 15
+              },
+              "prompt_cache_hit_tokens": 0,
+              "prompt_cache_miss_tokens": 37
+            },
+            "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669"
+          },
+          "provider_usage": {
+            "prompt_tokens": 37,
+            "completion_tokens": 19,
+            "total_tokens": 56,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 15
+            },
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 37
+          },
+          "error": null,
+          "elapsed_s": 3.1879999998491257,
+          "charged_wall_s": 3.1879999998491257
+        }
+      ],
+      "limits": {
+        "model_calls": 2,
+        "tool_calls": 5,
+        "wall_s": 180.0,
+        "backend_solves": 0,
+        "worker_calls": 0
+      },
+      "classification": "Connectivity validation only; never experiment memory",
+      "monetary_cost": null,
+      "status": "completed",
+      "communication_validated": true,
+      "used": {
+        "model_calls": 2,
+        "tool_calls": 3,
+        "wall_s": 6.244820499931082,
+        "backend_solves": 0,
+        "worker_calls": 0
+      },
+      "cost_note": "One conservative tool charge per direct preflight request; failed attempts count. Missing provider usage and monetary cost are unknown. One additional sanitized proxy inspection is charged; raw attempt records are preserved.",
+      "connection_boundary_check": "preflight_network_boundary_check.json"
+    },
+    "historical_stage351_failure_cause": "Unknown: old transport did not retain subtype/reason"
+  },
+  "reused_baseline": {
+    "classification": "Reused prior-stage baseline; no new backend execution",
+    "source_store": "D:/softrobot-agent/runs/stage351_settling_20261003/baseline",
+    "manifest": {
+      "artifact_id": "a9702d58bea0f18bfe2d0bbbc23aa924cf980041237865033642a56d03e31b16",
+      "media_type": "application/json"
+    },
+    "owner": "gvs-stage351-baseline-executor",
+    "metrics": {
+      "source": {
+        "execution_id": "cf997605885642759ee33920e2c9e2ef",
+        "configuration": {
+          "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+          "media_type": "application/json"
+        },
+        "evaluation": {
+          "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+          "media_type": "application/json"
+        },
+        "simulation": {
+          "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+          "media_type": "application/json"
+        }
+      },
+      "coverage": {
+        "terminal": "last execution sample",
+        "holding": "all retained samples in final 0.05 s",
+        "continuous_time_guarantee": false
+      },
+      "valid_complete_execution": true,
+      "official_reach_task_success": true,
+      "terminal_error_m": 0.007642608585867386,
+      "holding_max_error_m": 0.05813810428573256,
+      "holding_max_speed_m_s": 1.5810152739742807,
+      "terminal_reach_passed": true,
+      "holding_position_passed": false,
+      "holding_speed_passed": false,
+      "joint_reach_holding_passed": false,
+      "mean_complete_update_s": 17.26331904856488,
+      "deadline_misses": 35,
+      "control_updates": 35,
+      "control_period_s": 0.01,
+      "real_time_demonstrated": false,
+      "solver_error_count": 0,
+      "force_bound_violation_n": 0.0
+    },
+    "original_baseline_usage": {
+      "tool_calls": 3,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 610.155999999959
+    },
+    "new_verification_import_usage": {
+      "tool_calls": 1,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 3.140000000130385
+    },
+    "new_baseline_backend_executions": 0,
+    "closure_artifacts_verified": 20
+  },
+  "development_repair": {
+    "reason": "Primary revision failed before provider dispatch: 201297 required bytes exceeds fixed 200000 cap",
+    "repair": "Reduce displayed fact-catalog subset only; preserve exact host mappings, receipt ledger, full handoffs and separate memories",
+    "verification": {
+      "status": "passed",
+      "before_bytes": 201297,
+      "after_bytes": 196234,
+      "context_cap": 200000,
+      "catalog_presentation": {
+        "catalog_budget_bytes": 70000,
+        "catalogued_handles": 1839,
+        "displayed_handles": 341,
+        "priority": "Current explicit feedback acceptance and computation measurements, then existing recency order.",
+        "scope": "Displayed subset of this context; all exact mappings and receipt history remain in the host store."
+      },
+      "checks": [
+        "Actual preserved revision fits; exact source/receipt mappings unchanged; all four candidate measures resolvable",
+        "Largest permitted structured working memory fits without dropping handoff content",
+        "Existing Stage 3.50 compaction regression remains passed"
+      ],
+      "commands": [
+        "python -m unittest tests.test_stage352_context tests.test_stage350_context -v",
+        "python -m unittest tests.test_stage352_context -v"
+      ],
+      "earlier_offline_failure": "First compaction retained recency only and omitted a candidate holding-error handle; corrected before fresh validation by preserving current explicit-feedback acceptance and computation handles first.",
+      "scientific_changes": 0,
+      "provider_attempts": 0,
+      "backend_executions": 0,
+      "workers": 0
+    },
+    "primary_gate": {
+      "passed": false,
+      "checks": {
+        "workflow_completed": false,
+        "feedback_complete": false,
+        "nonempty_model_delta": true,
+        "actual_effective_diff": true,
+        "complete_evaluated_execution": true,
+        "candidate_measurements_cited": false,
+        "accepted_final_decision": false
+      },
+      "task_success_not_required": true
+    },
+    "fresh_revalidation_gate": {
+      "passed": true,
+      "checks": {
+        "workflow_completed": true,
+        "feedback_complete": true,
+        "nonempty_model_delta": true,
+        "actual_effective_diff": true,
+        "complete_evaluated_execution": true,
+        "candidate_measurements_cited": true,
+        "accepted_final_decision": true
+      },
+      "task_success_not_required": true
+    },
+    "fresh_pilots_used": 1,
+    "repair_allowance_remaining": 0
+  },
+  "formal_order": [
+    [
+      1,
+      "single_context"
+    ],
+    [
+      1,
+      "dual_context"
+    ],
+    [
+      2,
+      "dual_context"
+    ],
+    [
+      2,
+      "single_context"
+    ]
+  ],
+  "runs": [
+    {
+      "label": "primary/development_dual",
+      "mode": "dual_context",
+      "workflow_status": "incomplete",
+      "workflow_feedback_complete": false,
+      "stop_reason": "PHASE_INCOMPLETE revision: CONTEXT_LIMIT_REQUIRED_STATE_TOO_LARGE: narrow tools or raise explicit byte limit",
+      "used": {
+        "tool_calls": 12,
+        "model_calls": 7,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 1017.1259999999311
+      },
+      "tokens": {
+        "prompt_tokens": 216865,
+        "completion_tokens": 86061,
+        "total_tokens": 302926
+      },
+      "monetary_cost": null,
+      "numerical_work": {
+        "limits": {
+          "local_solves": 2,
+          "prediction_evaluations": 0
+        },
+        "used": {
+          "local_solves": 0,
+          "prediction_evaluations": 0
+        }
+      },
+      "model_response_failures": 1,
+      "archive_integrity": {
+        "files": 128,
+        "artifacts": 112,
+        "mismatches": 0,
+        "unresolved_references": 0
+      },
+      "selected_weights": {
+        "terminal_tip_speed_weight": 0.01,
+        "holding_tip_speed_weight": 0.05
+      },
+      "actual_diff": [
+        {
+          "pointer": "/policy/controller/parameters/data/recipe/holding_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.05
+        },
+        {
+          "pointer": "/policy/controller/parameters/data/recipe/terminal_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        }
+      ],
+      "simulation_completed": true,
+      "official_evaluation_available": true,
+      "joint_task_success": false,
+      "campaign_metrics": {
+        "source": {
+          "execution_id": "47e0851bc4e2440aad33aa2171579386",
+          "configuration": {
+            "artifact_id": "504a0272909ee7f957f03f1d24818c2f4dd187670dfaae3dee50dcf4c7f915ee",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "a24c61bede9bee75b79c878e72fe84bd13222150bb769ecb4fa76253e2c94457",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "97da011fa50c8109391ecf27d82e2d2f1c40e4eeec16e5fd1357e9b458fabf93",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "56fec2fe75315154dfbcd22cc90bed3f30ba23d63d68d990a7227c63c3df7479",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": false,
+        "terminal_error_m": 0.02626070695091535,
+        "holding_max_error_m": 0.06521673847872775,
+        "holding_max_speed_m_s": 2.1649613305606934,
+        "terminal_reach_passed": false,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 18.020344754288505,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "campaign_comparison": {
+        "baseline": {
+          "source": {
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.007642608585867386,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "47e0851bc4e2440aad33aa2171579386",
+            "configuration": {
+              "artifact_id": "504a0272909ee7f957f03f1d24818c2f4dd187670dfaae3dee50dcf4c7f915ee",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "a24c61bede9bee75b79c878e72fe84bd13222150bb769ecb4fa76253e2c94457",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "97da011fa50c8109391ecf27d82e2d2f1c40e4eeec16e5fd1357e9b458fabf93",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "56fec2fe75315154dfbcd22cc90bed3f30ba23d63d68d990a7227c63c3df7479",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": false,
+          "terminal_error_m": 0.02626070695091535,
+          "holding_max_error_m": 0.06521673847872775,
+          "holding_max_speed_m_s": 2.1649613305606934,
+          "terminal_reach_passed": false,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 18.020344754288505,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": 0.018618098365047964,
+          "holding_max_error_m": 0.00707863419299519,
+          "holding_max_speed_m_s": 0.5839460565864127,
+          "mean_complete_update_s": 0.757025705723624,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "physical_pareto_worsening",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      },
+      "final_response": null,
+      "model_authored_decision": {
+        "disposition": "adopt",
+        "changes": {
+          "control/recipe/holding_tip_speed_weight": 0.05,
+          "control/recipe/terminal_tip_speed_weight": 0.01
+        },
+        "rationale": "Bounded experiment on the accepted diagnosis: the retained baseline (execution cf997605885642759ee33920e2c9e2ef, controller.gvs_nmpc 7.0.0, parameters 1.0.0, numerical_source bundled_guess) records reach_passed = true with terminal_error_m 0.007642608585867386 m inside reach_tolerance_m 0.01 m, but holding_speed_passed = false over the six recorded final-window samples (speed_m_s 0.6351726092425104 to 1.5810152739742807 m/s, terminal_speed_m_s 0.6351726092425104 m/s) and holding_position_passed = false over the same window, against settling_criteria speed_limit_m_s 0.02 m/s and position_limit_m 0.01 m. The recipe records terminal_tip_speed_weight = 0.0 and holding_tip_speed_weight = 0.0 with tip_speed_scale_m_s = 0.02 m/s, i.e. both tip-speed penalties are currently disabled, which is the testable candidate identified in the diagnosis (status \"possible\"; raw weight magnitudes do not establish relative cost-term importance and no causality is claimed). Hypothesis to test: a small positive penalty on squared tip speed will add a cost incentive against residual holding-window motion that the position/velocity terms alone did not remove. I select both weights positive because the failure evidence is split between window motion across the whole window (holding term, whose support is the nodes at/after the settling-window start) and the final-node speed (terminal term, a single scaled squared-speed term); the holding value is set larger (0.05 vs 0.01) because its support covers the failing window rather than one node. Values are deliberately small relative to tip_speed_scale_m_s = 0.02 m/s, so that with observed ~0.6-1.6 m/s speeds the added term is material but not dominant over tracking_weight 1.0 and terminal_weight 5.0. Structure is preserved exactly as instructed: terminal speed cost stays a single terminal scaled squared-speed term, holding speed cost stays an integration-step-weighted sum at the scheduled holding nodes, and both the scaling (tip_speed_scale_m_s) and the node scheduling (settling window_s = 0.05 s) are unchanged. No local_comparison is requested: this phase has no evidence read allowance, displayed per-update effective_horizon values for the retained records are 2, 4, 6, 7 and 10 control intervals, and no saved baseline update whose effective plan horizon is 0.01 s is displayed, so a legal saved state cannot be identified from what I may consult; the grant states unavailable/inconclusive screening does not prohibit the complete experiment, so the single complete changed candidate is requested instead.",
+        "expected_measurable_effect": "Expected recordable effects of the complete experiment versus the baseline record, stated separately and without causal attribution. Terminal reach: expected approximately unchanged; if the added tip-speed cost trades away position authority, terminal_error_m could drift upward toward the recorded 0.01 m reach tolerance, so reach_passed = true should be re-checked as an acceptance guard. Sampled holding position: ambiguous directionally; the same six-sample final-window statistics (error_m range 0.007642608585867386-0.05813810428573256 m in the baseline) may contract if residual motion was driving position wander, or may widen if relative down-weighting of tracking increases drift. Sampled holding speed: this is the primary target - expect holding-window speed_m_s range and terminal_speed_m_s to move below the baseline 0.6351726092425104-1.5810152739742807 m/s band; full attainment of the 0.02 m/s settling speed limit within one complete run is not expected, so a reportable partial reduction is a useful outcome. Computation: expected neutral-to-slightly-worse; adding nonzero quadratic tip-speed terms can add solver work, and with mean_update_s 17.26331904856488 s against control_period_s 0.01 s, deadline_misses 35 of 35 update_count and stopping_counts User_Requested_Stop 34 / Solve_Succeeded 1, the run may still stop on budget rather than tolerance, so no solve-time improvement is predicted. Possible adverse effects to watch: terminal_error_m regressing past reach_tolerance_m; larger cost magnitude worsening solver conditioning, iteration count or deadline misses; and the holding term contributing nothing on plans whose effective horizon does not reach the configured settling-window start, which would leave the enlarged holding cost inert and make a null speed result uninformative. Observations that would weaken the hypothesis: a complete run whose holding-window and terminal speeds stay in the baseline band while deadline misses or solve times rise; a pattern of budget-limited stops (budget_best_feasible-type) with no speed or position change; a terminal reach regression with no speed benefit; or any future local screening at a saved update showing no change in projected terminal/holding speed at the changed weight.",
+        "local_comparison": null
+      },
+      "preparation_configuration": {
+        "artifact_id": "ff4f5d5cbd35b2d71b6afa6a36fb86e8759f97b21f5c5e42a83f230ce7879b91",
+        "media_type": "application/json"
+      },
+      "simulation_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-simulation",
+        "execution_id": "47e0851bc4e2440aad33aa2171579386",
+        "caller": "improvement-executor",
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "completed",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "56fec2fe75315154dfbcd22cc90bed3f30ba23d63d68d990a7227c63c3df7479",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": "47e0851bc4e2440aad33aa2171579386",
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 634.7180000001099
+        }
+      },
+      "execution_id": "47e0851bc4e2440aad33aa2171579386",
+      "executed_configuration": {
+        "artifact_id": "504a0272909ee7f957f03f1d24818c2f4dd187670dfaae3dee50dcf4c7f915ee",
+        "media_type": "application/json"
+      },
+      "execution_manifest": {
+        "artifact_id": "b1b58b455c7deb0361db91dd3b1fe45b1c5c7a7b6f6ff6b04235eb19f5aecee7",
+        "media_type": "application/json"
+      },
+      "execution_owner": "gvs-stage352-4dbf436aada9-candidate",
+      "scientific_scope_diff": [
+        {
+          "pointer": "/controller/parameters/data/recipe/holding_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.05
+        },
+        {
+          "pointer": "/controller/parameters/data/recipe/terminal_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        }
+      ],
+      "evaluation_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-evaluation",
+        "execution_id": "c3c737b6102c40eabccd312cbd5ce9b5",
+        "caller": "improvement-executor",
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "valid",
+        "task_success": false,
+        "output": {
+          "artifact_id": "a24c61bede9bee75b79c878e72fe84bd13222150bb769ecb4fa76253e2c94457",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.7659999998286366
+        }
+      },
+      "profile_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-profile",
+        "execution_id": "4a51e40c91fa4a71aab11b668515c3c5",
+        "caller": "improvement-executor",
+        "tool_id": "control.profile_report",
+        "tool_version": "1.0.0",
+        "result_contract": "ProfileOutput",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "97da011fa50c8109391ecf27d82e2d2f1c40e4eeec16e5fd1357e9b458fabf93",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 2.077999999979511
+        }
+      },
+      "result_classification": "physical_pareto_worsening"
+    },
+    {
+      "label": "revalidation/development_dual",
+      "mode": "dual_context",
+      "workflow_status": "completed",
+      "workflow_feedback_complete": true,
+      "stop_reason": "Separate improvement decision, actual disposition/execution feedback, accepted revision and final delivery.",
+      "used": {
+        "tool_calls": 17,
+        "model_calls": 9,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 1094.4399999997113
+      },
+      "tokens": {
+        "prompt_tokens": 295908,
+        "completion_tokens": 85042,
+        "total_tokens": 380950
+      },
+      "monetary_cost": null,
+      "numerical_work": {
+        "limits": {
+          "local_solves": 2,
+          "prediction_evaluations": 0
+        },
+        "used": {
+          "local_solves": 0,
+          "prediction_evaluations": 0
+        }
+      },
+      "model_response_failures": 0,
+      "archive_integrity": {
+        "files": 149,
+        "artifacts": 132,
+        "mismatches": 0,
+        "unresolved_references": 0
+      },
+      "selected_weights": {
+        "terminal_tip_speed_weight": 0.01,
+        "holding_tip_speed_weight": 0.01
+      },
+      "actual_diff": [
+        {
+          "pointer": "/policy/controller/parameters/data/recipe/holding_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        },
+        {
+          "pointer": "/policy/controller/parameters/data/recipe/terminal_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        }
+      ],
+      "simulation_completed": true,
+      "official_evaluation_available": true,
+      "joint_task_success": false,
+      "campaign_metrics": {
+        "source": {
+          "execution_id": "1fe15537e00c41d58001d2d510c09b5f",
+          "configuration": {
+            "artifact_id": "6c52f8ef7fd7d229e4b173ba2425499743d1d768493b1678fde33a52ea013ce0",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "a4adc3bf92fcc5eff5d3bd04c9ffdecc9738685031c21f4fe2feed187b23598d",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "445892dc487ce346fd7931b5f3fba1283e76649fd23d0254b8ee45cb3640e8ad",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "16589b5e7c66bedc999babb5a7e743b31d7a7729065dea3d4a22bf1ebc33ec20",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": false,
+        "terminal_error_m": 0.025441949885583803,
+        "holding_max_error_m": 0.06521673847872775,
+        "holding_max_speed_m_s": 2.2241210494240513,
+        "terminal_reach_passed": false,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 19.755050088565,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "campaign_comparison": {
+        "baseline": {
+          "source": {
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.007642608585867386,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "1fe15537e00c41d58001d2d510c09b5f",
+            "configuration": {
+              "artifact_id": "6c52f8ef7fd7d229e4b173ba2425499743d1d768493b1678fde33a52ea013ce0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "a4adc3bf92fcc5eff5d3bd04c9ffdecc9738685031c21f4fe2feed187b23598d",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "445892dc487ce346fd7931b5f3fba1283e76649fd23d0254b8ee45cb3640e8ad",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "16589b5e7c66bedc999babb5a7e743b31d7a7729065dea3d4a22bf1ebc33ec20",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": false,
+          "terminal_error_m": 0.025441949885583803,
+          "holding_max_error_m": 0.06521673847872775,
+          "holding_max_speed_m_s": 2.2241210494240513,
+          "terminal_reach_passed": false,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 19.755050088565,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": 0.017799341299716415,
+          "holding_max_error_m": 0.00707863419299519,
+          "holding_max_speed_m_s": 0.6431057754497707,
+          "mean_complete_update_s": 2.4917310400001185,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "physical_pareto_worsening",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      },
+      "final_response": {
+        "disposition": "defer",
+        "next_action": "finish",
+        "reasoning": "Deferral, not adoption. The single authorized control change (holding_tip_speed_weight raised from the recorded baseline 0.0 [fe5f206322c2f] to 0.01 [ffa86380899d7], with terminal_tip_speed_weight also set positive [fdb85d027047b]) executed as a complete, valid run (complete true [fff684fc661de]; evaluation_validity 'valid' [ff37e5e0576b6]; solver_error_count 0 [ff1ac3503e552]; no force-bound violation [f008bb9364acd]; status 'evaluated' [fdd292670d74f]). It nevertheless lost the baseline's reach-only success (candidate terminal reach passed false [fb2196608130b] versus baseline official reach-task success true [ffee5636d7761]) and moved the ranked physical metrics in the worse direction: candidate holding-window maximum error 0.06521673847872775 m [fb551b0074893] with candidate-minus-baseline delta +0.00707863419299519 m [fd95239e6261c], and candidate sampled-settling maximum speed 2.2241210494240513 m/s [ffc6930742d22] versus the baseline holding-window maximum 1.5810152739742807 m/s [ff296c4b0c654]. Across both runs the 0.01 m position limit [f96748bb61be2], the 0.02 m/s speed limit [fec74be98dd03] and the 0.05 s settling window [fd898a5a0c311] remain unmet (sampled settling not passed [ff9225bf3aa43]; real-time not demonstrated [ff9345a5f7bef]), and the 10 ms control period [fd007fcdf7be2] is still missed on all 35 updates in each run [fc09ef600a821]. Those limits are reported as threshold observations, not as causes. No causal attribution is available: control_snapshots.json (full warm plans, optimizer iteration traces) is not retained, the candidate has no per-update inventory in this context, and a bounded projected-model probe of at most 0.01 s effective horizon cannot explain an entire settling failure, so any link between the computation record and the holding-window excursions stays at temporal co-occurrence. A valid completed workflow is therefore distinct from demonstrated design improvement, and no further parameter value or candidate is authorized.",
+        "recommendation_id": "defer-after-pareto-worsening-candidate",
+        "report": {
+          "artifact_id": "04743ee63b3db01fae3c00a808a751c8283a16a49f48e59c73d44fc4b4fe6963",
+          "media_type": "application/json"
+        }
+      },
+      "model_authored_decision": {
+        "disposition": "adopt",
+        "changes": {
+          "control/recipe/holding_tip_speed_weight": 0.01,
+          "control/recipe/terminal_tip_speed_weight": 0.01
+        },
+        "rationale": "Accepted diagnosis (bound baseline-replay inventory, 35 retained updates, single execution): terminal reach is recorded as passed with terminal tip error 0.007642608585867386 m against the 0.01 m reach tolerance [fff8ec664f4de, f12f1083f9849], but terminal tip speed is recorded 0.6351726092425104 m/s [ffad04d70b19c] and the final holding window (6 selected samples, t 0.3-0.35 s [fa54c1ae23d4d, f5cdbebaa75dc]) records tip speed 0.6351726092425104-1.5810152739742807 m/s [f952823a6555c, ff296c4b0c654] against the 0.02 m/s settling speed limit [f4ab3008c7e24], with holding position and sampled settling both recorded as failed [f5ba2ab7e1107, f641da2506e2e]. The retained recipe records terminal_tip_speed_weight = 0.0 [f43a886f15dbe] and holding_tip_speed_weight = 0.0 [f7264b775e0bb], so the objective that produced this record contains no tip-speed cost term at all. Hypothesis: the recorded deviation is concentrated in tip speed, and an absent tip-speed penalty is a plausible contributor to that deviation, so positive values on these two terms should drive the sampled tip-speed band toward the 0.02 m/s settling limit. Relevance of this weight to this observation: these are the only two editable handles acting on squared tip speed, they are currently exactly zero so any positive value is an effective delta, and tip_speed_scale_m_s = 0.02 m/s, scheduling and structure remain unchanged. Expected effects, stated separately: holding speed (primary) - the scheduled holding-node sum should lower window tip speed below its current 0.635-1.581 m/s band; terminal reach - possible small degradation, since a terminal braking term can move the final approach while the terminal position margin under the 0.01 m tolerance is limited; holding position - secondary, plausibly improved if reduced speed reduces overshoot, but could be unchanged; computation - the objective gains terms and may raise iterations/nonconvexity, and nothing in the retained record indicates per-update wall time (already ~17 s against a 0.01 s control period [fb97841323574, ff74842fa741e, fc06e64bbb5d7]) would improve. Value selection is by mechanism only, since raw weight magnitudes are not calibrated against cost contributions or scaling; 0.01 on each weight is a bounded first choice, not a computed optimum, and no raw scalar objective will be compared across weights. Possible adverse effects: eroded reach margin, worse solve cost or deadline behaviour, and, with no causal attribution available, a null result cannot be read as proof that the term is irrelevant. Observations that would weaken the hypothesis: holding-window tip speed still ~0.6-1.6 m/s after the change; reach error crossing 0.01 m; terminal tip speed still far above 0.02 m/s; or deadline misses and per-update wall times materially worse than the baseline record. All other scientific fields remain fixed. A local 0.01 s projected-model comparison is omitted, not because it is unavailable but because a <=10 ms horizon probe cannot represent the 0.05 s settling window or closed-loop settling, so it would test neither the failing window quantity nor this hypothesis.",
+        "expected_measurable_effect": "On the next complete execution of the single changed candidate, compared with baseline-replay: the final holding-window tip speed (scheduled 0.05 s window, same 0.02 m/s speed limit) differs measurably from the recorded 0.6351726092425104-1.5810152739742807 m/s band, reported separately from terminal reach (terminal tip error against the 0.01 m tolerance), holding-window position error (0.01 m limit), and computation (per-update wall time and deadline misses). A reduction, an increase, or no measurable change are each informative for this bounded experiment.",
+        "local_comparison": null
+      },
+      "preparation_configuration": {
+        "artifact_id": "5a4abe1cd27781c597f266158ccdc3aa456e16d1f4ee207c778060d2723beb32",
+        "media_type": "application/json"
+      },
+      "simulation_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-simulation",
+        "execution_id": "1fe15537e00c41d58001d2d510c09b5f",
+        "caller": "improvement-executor",
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "completed",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "16589b5e7c66bedc999babb5a7e743b31d7a7729065dea3d4a22bf1ebc33ec20",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": "1fe15537e00c41d58001d2d510c09b5f",
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 697.5
+        }
+      },
+      "execution_id": "1fe15537e00c41d58001d2d510c09b5f",
+      "executed_configuration": {
+        "artifact_id": "6c52f8ef7fd7d229e4b173ba2425499743d1d768493b1678fde33a52ea013ce0",
+        "media_type": "application/json"
+      },
+      "execution_manifest": {
+        "artifact_id": "3d2e8bd245d8f7ffcc45c2edd42d5b4e28cd1d743507a48fa640edbfe075243f",
+        "media_type": "application/json"
+      },
+      "execution_owner": "gvs-stage352-31a089c86f00-candidate",
+      "scientific_scope_diff": [
+        {
+          "pointer": "/controller/parameters/data/recipe/holding_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        },
+        {
+          "pointer": "/controller/parameters/data/recipe/terminal_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        }
+      ],
+      "evaluation_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-evaluation",
+        "execution_id": "5bf9651e3bb74b0bb4fd726ad64429a1",
+        "caller": "improvement-executor",
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "valid",
+        "task_success": false,
+        "output": {
+          "artifact_id": "a4adc3bf92fcc5eff5d3bd04c9ffdecc9738685031c21f4fe2feed187b23598d",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.7349999998696148
+        }
+      },
+      "profile_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-profile",
+        "execution_id": "6e1be19d3024462089cfd7f4695fe27c",
+        "caller": "improvement-executor",
+        "tool_id": "control.profile_report",
+        "tool_version": "1.0.0",
+        "result_contract": "ProfileOutput",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "445892dc487ce346fd7931b5f3fba1283e76649fd23d0254b8ee45cb3640e8ad",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 2.077999999979511
+        }
+      },
+      "result_classification": "physical_pareto_worsening"
+    },
+    {
+      "label": "pair1_single_context",
+      "mode": "single_context",
+      "workflow_status": "incomplete",
+      "workflow_feedback_complete": false,
+      "stop_reason": "PHASE_INCOMPLETE initial: MODEL_PROTOCOL_CORRECTION_BUDGET_EXHAUSTED: BUDGET_EXHAUSTED: active phase / protected downstream capacity",
+      "used": {
+        "tool_calls": 7,
+        "model_calls": 7,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 230.3909999995958
+      },
+      "tokens": {
+        "prompt_tokens": 221415,
+        "completion_tokens": 50674,
+        "total_tokens": 272089
+      },
+      "monetary_cost": null,
+      "numerical_work": {
+        "limits": {
+          "local_solves": 2,
+          "prediction_evaluations": 0
+        },
+        "used": {
+          "local_solves": 0,
+          "prediction_evaluations": 0
+        }
+      },
+      "model_response_failures": 3,
+      "archive_integrity": {
+        "files": 84,
+        "artifacts": 71,
+        "mismatches": 0,
+        "unresolved_references": 0
+      },
+      "selected_weights": null,
+      "actual_diff": [],
+      "simulation_completed": false,
+      "official_evaluation_available": false,
+      "joint_task_success": null,
+      "campaign_metrics": null,
+      "campaign_comparison": null,
+      "final_response": null,
+      "result_classification": "model_protocol_failure_before_candidate"
+    },
+    {
+      "label": "pair1_dual_context",
+      "mode": "dual_context",
+      "workflow_status": "completed",
+      "workflow_feedback_complete": true,
+      "stop_reason": "Separate improvement decision, actual disposition/execution feedback, accepted revision and final delivery.",
+      "used": {
+        "tool_calls": 12,
+        "model_calls": 6,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 898.3910000000615
+      },
+      "tokens": {
+        "prompt_tokens": 187159,
+        "completion_tokens": 46393,
+        "total_tokens": 233552
+      },
+      "monetary_cost": null,
+      "numerical_work": {
+        "limits": {
+          "local_solves": 2,
+          "prediction_evaluations": 0
+        },
+        "used": {
+          "local_solves": 0,
+          "prediction_evaluations": 0
+        }
+      },
+      "model_response_failures": 0,
+      "archive_integrity": {
+        "files": 129,
+        "artifacts": 112,
+        "mismatches": 0,
+        "unresolved_references": 0
+      },
+      "selected_weights": {
+        "terminal_tip_speed_weight": 0.01,
+        "holding_tip_speed_weight": 0.1
+      },
+      "actual_diff": [
+        {
+          "pointer": "/policy/controller/parameters/data/recipe/holding_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.1
+        },
+        {
+          "pointer": "/policy/controller/parameters/data/recipe/terminal_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        }
+      ],
+      "simulation_completed": true,
+      "official_evaluation_available": true,
+      "joint_task_success": false,
+      "campaign_metrics": {
+        "source": {
+          "execution_id": "5105b4ffc1c9468980a13d1bd288f787",
+          "configuration": {
+            "artifact_id": "b33d1b3999726183ae81d15af6e188a18db1e0f89f4cb0a636482486da4f5a21",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "626f386375d77069fd11f102034a2fe11ffb1d3b85c0064136c39a1e8349d53f",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "c8253efb254a9f8aa87b3f757a8484cc68943403ef9a648949fbddb0eea6d740",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "13c7668853c231aea58645dd32258cf056c5989fe803aa4509f0937479fff93c",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": false,
+        "terminal_error_m": 0.027092171705332548,
+        "holding_max_error_m": 0.06521673847872775,
+        "holding_max_speed_m_s": 2.1318913950159732,
+        "terminal_reach_passed": false,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 19.114354482851923,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "campaign_comparison": {
+        "baseline": {
+          "source": {
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.007642608585867386,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "5105b4ffc1c9468980a13d1bd288f787",
+            "configuration": {
+              "artifact_id": "b33d1b3999726183ae81d15af6e188a18db1e0f89f4cb0a636482486da4f5a21",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "626f386375d77069fd11f102034a2fe11ffb1d3b85c0064136c39a1e8349d53f",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "c8253efb254a9f8aa87b3f757a8484cc68943403ef9a648949fbddb0eea6d740",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "13c7668853c231aea58645dd32258cf056c5989fe803aa4509f0937479fff93c",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": false,
+          "terminal_error_m": 0.027092171705332548,
+          "holding_max_error_m": 0.06521673847872775,
+          "holding_max_speed_m_s": 2.1318913950159732,
+          "terminal_reach_passed": false,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 19.114354482851923,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": 0.019449563119465163,
+          "holding_max_error_m": 0.00707863419299519,
+          "holding_max_speed_m_s": 0.5508761210416926,
+          "mean_complete_update_s": 1.8510354342870414,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "physical_pareto_worsening",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      },
+      "final_response": {
+        "disposition": "defer",
+        "next_action": "finish",
+        "reasoning": "The only executed candidate (improvement-9245a22c5ff5: holding_tip_speed_weight 0.0 -> 0.1 and terminal_tip_speed_weight 0.0 -> 0.01) is a complete, valid, solver-error-free execution compared against the frozen baseline replay under the sealed ranking rule and is classified physical_pareto_worsening: terminal world-tip error +0.019449563119465163 m (0.0271 m, past the 0.01 m tolerance, so official reach-only success is lost where the baseline had it at 0.0076 m), holding max error +0.00707863419299519 m, holding max speed +0.5508761210416926 m/s, mean complete update time +1.8510354342870414 s, with deadline_misses delta 0 and no physical metric improving. Nothing in that sealed paired comparison supports adopting these weight values, and no alternative value was tested, so changing the control weights now would be an unsupported change and the disposition is defer. Both runs remain far above the 0.01 s control period (17.263 s vs 19.114 s mean per-update wall time, 35 misses each) and real_time_demonstrated is false, so no real-time, continuous-time or hardware claim follows either way; wall-clock misses are computation signals that do not establish skipped simulated updates. The sampled holding failure is also not attributable to any single cause with the retained coverage: the holding-window summary is 6 selected rows at 0.30-0.35 s (position error 0.007642608585867386-0.05813810428573256 m vs the 0.01 m limit, tip speed 0.6351726092425104-1.5810152739742807 m/s vs the 0.02 m/s limit, holding_position_passed and holding_speed_passed both false), earlier sampled baseline motion (0.01-0.29 s), candidate per-sample motion/timing, and historical warm plans/iteration traces are not read or not retained (control_snapshots.json has retained=false), and no closed-loop counterfactual replay or causal-attribution capability exists; recorded projected-state differences are explicitly recorded projected states, not full backend-state error, so they cannot be converted into a backend tracking error or a causal statement. Reach-only success is reported separately from joint reach-plus-holding: the baseline passes the former and fails the latter. Deferring without execution here is a completed decision workflow, not a successful design, and adoption would execute nothing regardless.",
+        "recommendation_id": "defer-weight-change",
+        "report": {
+          "artifact_id": "b756e1d5d85dc2bd21e01f4f32d88d84782c54379780a386d6f945d2ae64199d",
+          "media_type": "application/json"
+        }
+      },
+      "model_authored_decision": {
+        "disposition": "adopt",
+        "changes": {
+          "control/recipe/holding_tip_speed_weight": 0.1,
+          "control/recipe/terminal_tip_speed_weight": 0.01
+        },
+        "rationale": "Accepted diagnosis for execution cf997605885642759ee33920e2c9e2ef: terminal reach passes (terminal error 0.007642608585867386 m below the 0.01 m reach tolerance; reach_passed true), while the sampled settling check fails - the 6 selected holding-window rows at 0.30-0.35 s span position error 0.007642608585867386-0.05813810428573256 m against the 0.01 m limit and tip speed 0.6351726092425104-1.5810152739742807 m/s against the 0.02 m/s limit (holding_position_passed false, holding_speed_passed false), with terminal tip speed 0.6351726092425104 m/s. The retained recipe sets both editable tip-speed terms to zero (holding_tip_speed_weight 0.0, terminal_tip_speed_weight 0.0) while tip_speed_scale_m_s is 0.02, so normalized squared world tip speed carries no cost at the scheduled holding nodes or at the terminal node. Concrete hypothesis: with zero tip-speed cost the optimizer has no incentive to shed tip speed before or during the holding window, so a bounded positive tip-speed cost will lower holding-window and terminal tip speed while preserving the reach solution. This is one bounded candidate: terminal_tip_speed_weight 0.0 -> 0.01 as the single terminal scaled squared-speed term, and holding_tip_speed_weight 0.0 -> 0.1 as the integration-step-weighted sum at the scheduled holding nodes (a larger per-second value is selected because each holding node contributes in proportion to the integration step, whereas the terminal term is one node). Scale, scheduling and all other recipe fields are unchanged; no raw scalar objectives are compared across weights. Expected effects stated separately: holding speed should fall from the recorded 0.635-1.581 m/s band toward the 0.02 m/s limit and holding position error toward 0.01 m if the speed excess is overshoot-driven; terminal reach error should remain below the 0.01 m tolerance; computation may show a different iteration/stopping profile (baseline mean_update_s 17.263 s, 35 deadline misses, stopping counts Solve_Succeeded 1 / User_Requested_Stop 34), noting wall-clock misses are computation signals that do not inject simulated delay. Possible adverse effects: a tip-speed penalty can trade against position and push terminal error past the tolerance that currently passes with limited margin, can enlarge holding position error, and can add iterations and wall time on a run already far above the 0.01 s control period. Observations that would weaken the hypothesis: holding-window speed remaining in the 0.635-1.581 m/s band while reach degrades, terminal speed unchanged with terminal error rising, or more unusable/nonconverged updates without speed change - then tip-speed cost is not the settling limiter and attention belongs on solver stopping and plan quality. Known coverage limits (6 selected rows only; earlier sampled motion and warm-plan/iteration traces not read/not retained; no counterfactual replay) mean this execution can support or weaken, not prove, the hypothesis; absence of causal proof does not prohibit this bounded test. local_comparison is omitted: the read allowance for this phase is zero and no legal saved baseline update with effective horizon 0.01 s is established from retained evidence, and inconclusive screening does not prohibit the complete experiment.",
+        "expected_measurable_effect": "Complete execution with the changed weights should report, from the same retained checks: (a) sampled final holding-window tip-speed minimum and maximum below the current 0.6351726092425104-1.5810152739742807 m/s band relative to the 0.02 m/s settling limit; (b) terminal tip speed below the current 0.6351726092425104 m/s; (c) terminal reach error still below the 0.01 m reach tolerance, with holding-window position error reported against the 0.01 m limit; and (d) the same deadline-miss, solver-status and selected-iteration reporting so computation can be compared with the baseline (mean_update_s 17.263 s, 35 deadline misses, Solve_Succeeded 1 / User_Requested_Stop 34). A result in which holding-window speed stays in the current band, or terminal reach error exceeds 0.01 m, would measurably weaken the hypothesis.",
+        "local_comparison": null
+      },
+      "preparation_configuration": {
+        "artifact_id": "9dca446d8406817fc2b67b6b3a24e9461f3609e080f7867e124ddaa603e34cbf",
+        "media_type": "application/json"
+      },
+      "simulation_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-simulation",
+        "execution_id": "5105b4ffc1c9468980a13d1bd288f787",
+        "caller": "improvement-executor",
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "completed",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "13c7668853c231aea58645dd32258cf056c5989fe803aa4509f0937479fff93c",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": "5105b4ffc1c9468980a13d1bd288f787",
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 672.9220000000205
+        }
+      },
+      "execution_id": "5105b4ffc1c9468980a13d1bd288f787",
+      "executed_configuration": {
+        "artifact_id": "b33d1b3999726183ae81d15af6e188a18db1e0f89f4cb0a636482486da4f5a21",
+        "media_type": "application/json"
+      },
+      "execution_manifest": {
+        "artifact_id": "a3f740e0382b2887fa86405d713882312712113ce72562ee5c546c3c8aa8f652",
+        "media_type": "application/json"
+      },
+      "execution_owner": "gvs-stage352-a538f90b59ef-candidate",
+      "scientific_scope_diff": [
+        {
+          "pointer": "/controller/parameters/data/recipe/holding_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.1
+        },
+        {
+          "pointer": "/controller/parameters/data/recipe/terminal_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        }
+      ],
+      "evaluation_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-evaluation",
+        "execution_id": "3f56d5cce5564a8f981ac40e1f3cd02b",
+        "caller": "improvement-executor",
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "valid",
+        "task_success": false,
+        "output": {
+          "artifact_id": "626f386375d77069fd11f102034a2fe11ffb1d3b85c0064136c39a1e8349d53f",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.75
+        }
+      },
+      "profile_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-profile",
+        "execution_id": "efd78aa344c14ee2946475b9d0c39332",
+        "caller": "improvement-executor",
+        "tool_id": "control.profile_report",
+        "tool_version": "1.0.0",
+        "result_contract": "ProfileOutput",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "c8253efb254a9f8aa87b3f757a8484cc68943403ef9a648949fbddb0eea6d740",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 2.030999999959022
+        }
+      },
+      "result_classification": "physical_pareto_worsening"
+    },
+    {
+      "label": "pair2_dual_context",
+      "mode": "dual_context",
+      "workflow_status": "completed",
+      "workflow_feedback_complete": true,
+      "stop_reason": "Separate improvement decision, actual disposition/execution feedback, accepted revision and final delivery.",
+      "used": {
+        "tool_calls": 14,
+        "model_calls": 8,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 1100.7369999997318
+      },
+      "tokens": {
+        "prompt_tokens": 283965,
+        "completion_tokens": 89525,
+        "total_tokens": 373490
+      },
+      "monetary_cost": null,
+      "numerical_work": {
+        "limits": {
+          "local_solves": 2,
+          "prediction_evaluations": 0
+        },
+        "used": {
+          "local_solves": 0,
+          "prediction_evaluations": 0
+        }
+      },
+      "model_response_failures": 1,
+      "archive_integrity": {
+        "files": 143,
+        "artifacts": 126,
+        "mismatches": 0,
+        "unresolved_references": 0
+      },
+      "selected_weights": {
+        "terminal_tip_speed_weight": 0.01,
+        "holding_tip_speed_weight": 0.01
+      },
+      "actual_diff": [
+        {
+          "pointer": "/policy/controller/parameters/data/recipe/holding_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        },
+        {
+          "pointer": "/policy/controller/parameters/data/recipe/terminal_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        }
+      ],
+      "simulation_completed": true,
+      "official_evaluation_available": true,
+      "joint_task_success": false,
+      "campaign_metrics": {
+        "source": {
+          "execution_id": "dc92d065f2f74500802e4d524d6645a7",
+          "configuration": {
+            "artifact_id": "a5acc002e204a843adffb4dee895a0e14fad5411224a171ec4e32335e14230cb",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "313a2f69d4f8fa90ccfb318bbff74f1c604ceae65eab0d6c9cfce224bbb34a34",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "133289363a855bbb3fbfeeb9b0a58d0824857be29c88b4d7bd040d7aacd8f078",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "480460c535527a2bea41d012055c46a7cbf2665ce78c1f62a1397a4a437d76e7",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": false,
+        "terminal_error_m": 0.025441949885583803,
+        "holding_max_error_m": 0.06521673847872775,
+        "holding_max_speed_m_s": 2.2241210494240513,
+        "terminal_reach_passed": false,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 19.704804714276854,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "campaign_comparison": {
+        "baseline": {
+          "source": {
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.007642608585867386,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "dc92d065f2f74500802e4d524d6645a7",
+            "configuration": {
+              "artifact_id": "a5acc002e204a843adffb4dee895a0e14fad5411224a171ec4e32335e14230cb",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "313a2f69d4f8fa90ccfb318bbff74f1c604ceae65eab0d6c9cfce224bbb34a34",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "133289363a855bbb3fbfeeb9b0a58d0824857be29c88b4d7bd040d7aacd8f078",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "480460c535527a2bea41d012055c46a7cbf2665ce78c1f62a1397a4a437d76e7",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": false,
+          "terminal_error_m": 0.025441949885583803,
+          "holding_max_error_m": 0.06521673847872775,
+          "holding_max_speed_m_s": 2.2241210494240513,
+          "terminal_reach_passed": false,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 19.704804714276854,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": 0.017799341299716415,
+          "holding_max_error_m": 0.00707863419299519,
+          "holding_max_speed_m_s": 0.6431057754497707,
+          "mean_complete_update_s": 2.441485665711973,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "physical_pareto_worsening",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      },
+      "final_response": {
+        "disposition": "adopt",
+        "next_action": "finish",
+        "reasoning": "Adopting the report recommendation \"retain_baseline_weights_no_adoption\": the one authorized bounded experiment is a measured failure under the frozen campaign comparison, so the executed weight change must not be carried forward.\n\nBasis (complete accepted pair): candidate improvement-b2034534c646, execution dc92d065f2f74500802e4d524d6645a7, evaluation validity valid and complete, whose only effective changes were holding_tip_speed_weight and terminal_tip_speed_weight 0.0 -> 0.01. The candidate loses the reach pass the baseline held: candidate terminal_reach_passed=false [fd25ecb316a71] vs baseline true [f9b62cf5c760b], candidate official_reach_task_success=false [fab68cf8617ee], candidate terminal_error_m 0.025442 m [fce76d5b268ad] vs baseline 0.0076426 m [fd3a8bf5df23b], i.e. outside the 0.01 m reach tolerance. Holding still fails and is worse: baseline holding_position_passed=false [fe14a467a41f7] and joint_reach_holding_passed=false [fcca534323073]; candidate sampled settling max error 0.065217 m [fa19946e38ac5] vs baseline final-window max 0.058138 m [f96ad44b1fe5f], and the program-derived candidate-minus-baseline holding_max_speed_m_s is +0.643106 m/s [f9d72dc33c94e], with the baseline window already spanning 0.635-1.581 m/s [fdad3b4c317ee, fd52e841c473a] against the 0.02 m/s limit [fb71d8e3e3cdb]. Computation also worsened: candidate-minus-baseline mean_complete_update_s +2.4415 s [fb5514a65ad91], with deadline misses unchanged at 35 [fce1e8aa8726f, f9a041221be81].\n\nSo no retained signal supports a physical benefit from the change, and one clear regression (lost reach) plus holding and computation worsening argue against it. This disposition only accepts the report recommendation; it replaces no baseline and launches no work. Attribution remains under-constrained: one valid pair with differing recorded initialization selection (32 vs 29), no closed-loop counterfactual replay, full warm plans and optimizer iteration traces not retained (not_retained, not absence), and one-step projected comparisons (35 matched endpoints, candidate mean tip difference 0.0042 m [fd6c01bf0abaf, fe09dc3ffea9d]) are bounded probes that cannot explain the whole holding failure. Workflow completes here; no further candidate, check, or parameter change is selected.",
+        "recommendation_id": "retain_baseline_weights_no_adoption",
+        "report": {
+          "artifact_id": "2c4361725201557c4f2f20bd2327cc32ebf5fbeb14d2faae97b2f024935f1ac4",
+          "media_type": "application/json"
+        }
+      },
+      "model_authored_decision": {
+        "disposition": "adopt",
+        "changes": {
+          "control/recipe/holding_tip_speed_weight": 0.01,
+          "control/recipe/terminal_tip_speed_weight": 0.01
+        },
+        "rationale": "Bounded two-weight experiment, adopted because the diagnosed dominant supported observation is a speed failure and the two exposed tip-speed penalties are both at legacy zero. Baseline cf997605885642759ee33920e2c9e2ef reaches (reach_passed true, terminal_error_m 0.0076426 m below the 0.01 m tolerance) but fails to hold (holding_position_passed, holding_speed_passed, joint_reach_holding_passed all false); across all 6 recorded final-window samples (0.30-0.35 s) sampled speed spans 0.6352-1.5810 m/s against the 0.02 m/s limit and sampled error spans 0.0076426-0.0581381 m against the 0.01 m limit, with terminal_speed_m_s 0.6352 m/s and late_max_speed_m_s 1.5810 m/s. The recipe currently records terminal_tip_speed_weight 0.0 and holding_tip_speed_weight 0.0, so the legacy plan carries no explicit tip-speed objective. Hypothesis: enabling a modest positive weight on squared normalized tip speed at the plan terminal node (terminal_tip_speed_weight) and on nodes at/after the configured settling-window start (holding_tip_speed_weight) makes the optimizer favour plans that decelerate the tip before and within the holding window, lowering sampled holding speed while keeping reach. Why these weights: they are the only exposed knobs and they encode exactly the failed quantity (tip speed); the tip both enters the window already moving (terminal speed 0.6352 m/s) and moves within it (up to 1.5810 m/s), so a single weight would leave one regime uncosted. Scale (tip_speed_scale_m_s 0.02) and scheduling are left unchanged: the terminal term remains a single scaled squared-speed term and the holding term remains an integration-step-weighted node sum. Expected effects: (reach) should stay passing given the 0.0076426 m margin, though a terminal speed/position trade-off could erode it; (holding position) indirect improvement if the tip settles, reducing the 0.0581381 m peak; (holding speed) primary target, expected below the 0.635-1.581 m/s range toward the 0.02 m/s limit; (computation) the holding term is a cheap node-weighted sum so cost is expected roughly unchanged, but the run already averaged 17.263319 s per update against a 0.01 s period with 35/35 deadline misses and only 6 noninitialization updates applied, so overrun may dominate the closed-loop outcome and the trial may be inconclusive rather than decisive. Values kept modestly positive and equal (0.01 each) because raw weight magnitude does not establish cost-term importance without retained cost contributions, and normalized squared tip speeds at these speeds are already O(1e3). Possible adverse effects: a weight that dominates the objective could command aggressive braking or overshoot, degrade reach above the 0.01 m tolerance, or change solver usability/update count. Observations that would weaken the hypothesis: a re-run still showing holding-window speeds far above 0.02 m/s with terminal speed still near 0.635 m/s; again only ~6 applied updates, indicating overrun masks the weight; terminal_error exceeding 0.01 m; or no measurable difference between the two weights because few holding nodes are scheduled. No dominant cause and no winning value is presumed; this is a bounded, reversible trial and a single execution cannot establish causality.",
+        "expected_measurable_effect": "In a re-run of the same task with terminal_tip_speed_weight and holding_tip_speed_weight raised from 0.0 to 0.01 (all other fields fixed), expect the sampled final-holding-window (0.30-0.35 s) speed range to fall below the baseline 0.6352-1.5810 m/s toward the 0.02 m/s settling limit and the peak sampled error to fall below the baseline 0.0581381 m, with reach_passed remaining true (terminal_error_m still <= 0.01 m) and mean_update_s / applied-update count roughly unchanged. A terminal_speed_m_s still near 0.6352 m/s, holding-window speeds still well above 0.02 m/s, or another overrun-limited run with only ~6 applied updates would indicate the change did not measurably help or that the overrun dominates the outcome.",
+        "local_comparison": {
+          "update_id": 1,
+          "parameter": "terminal_tip_speed_weight"
+        }
+      },
+      "preparation_configuration": {
+        "artifact_id": "0722da45327899afe4205e68f3b71cf681df5bc25d1296e100dfe9aa7b5b0632",
+        "media_type": "application/json"
+      },
+      "simulation_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-simulation",
+        "execution_id": "dc92d065f2f74500802e4d524d6645a7",
+        "caller": "improvement-executor",
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "completed",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "480460c535527a2bea41d012055c46a7cbf2665ce78c1f62a1397a4a437d76e7",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": "dc92d065f2f74500802e4d524d6645a7",
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 693.0
+        }
+      },
+      "execution_id": "dc92d065f2f74500802e4d524d6645a7",
+      "executed_configuration": {
+        "artifact_id": "a5acc002e204a843adffb4dee895a0e14fad5411224a171ec4e32335e14230cb",
+        "media_type": "application/json"
+      },
+      "execution_manifest": {
+        "artifact_id": "d76ba7e0bc59c574a6aab6b72385069c82f780c69740b249cae85c80afdb2d6b",
+        "media_type": "application/json"
+      },
+      "execution_owner": "gvs-stage352-8c2c0ffa0ba1-candidate",
+      "scientific_scope_diff": [
+        {
+          "pointer": "/controller/parameters/data/recipe/holding_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        },
+        {
+          "pointer": "/controller/parameters/data/recipe/terminal_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        }
+      ],
+      "evaluation_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-evaluation",
+        "execution_id": "4417e30078524bc4a258d8abb002035b",
+        "caller": "improvement-executor",
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "valid",
+        "task_success": false,
+        "output": {
+          "artifact_id": "313a2f69d4f8fa90ccfb318bbff74f1c604ceae65eab0d6c9cfce224bbb34a34",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.781999999890104
+        }
+      },
+      "profile_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-profile",
+        "execution_id": "1a0ac3be9c30493581743d545d1d90cc",
+        "caller": "improvement-executor",
+        "tool_id": "control.profile_report",
+        "tool_version": "1.0.0",
+        "result_contract": "ProfileOutput",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "133289363a855bbb3fbfeeb9b0a58d0824857be29c88b4d7bd040d7aacd8f078",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 2.0620000001508743
+        }
+      },
+      "result_classification": "physical_pareto_worsening"
+    },
+    {
+      "label": "pair2_single_context",
+      "mode": "single_context",
+      "workflow_status": "completed",
+      "workflow_feedback_complete": true,
+      "stop_reason": "Separate improvement decision, actual disposition/execution feedback, accepted revision and final delivery.",
+      "used": {
+        "tool_calls": 15,
+        "model_calls": 10,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 1290.1110000000335
+      },
+      "tokens": {
+        "prompt_tokens": 367686,
+        "completion_tokens": 130916,
+        "total_tokens": 498602
+      },
+      "monetary_cost": null,
+      "numerical_work": {
+        "limits": {
+          "local_solves": 2,
+          "prediction_evaluations": 0
+        },
+        "used": {
+          "local_solves": 0,
+          "prediction_evaluations": 0
+        }
+      },
+      "model_response_failures": 1,
+      "archive_integrity": {
+        "files": 141,
+        "artifacts": 124,
+        "mismatches": 0,
+        "unresolved_references": 0
+      },
+      "selected_weights": {
+        "terminal_tip_speed_weight": 0.0,
+        "holding_tip_speed_weight": 0.01
+      },
+      "actual_diff": [
+        {
+          "pointer": "/policy/controller/parameters/data/recipe/holding_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        }
+      ],
+      "simulation_completed": true,
+      "official_evaluation_available": false,
+      "joint_task_success": null,
+      "campaign_metrics": null,
+      "campaign_comparison": null,
+      "final_response": {
+        "disposition": "adopt",
+        "next_action": "finish",
+        "reasoning": "I accept the report's defer recommendation for control/recipe/holding_tip_speed_weight = 0.01; it is the only disposition consistent with the retained records. The measurement attempt is execution_incomplete: simulation.run completed while evaluation.run was rejected with BUDGET_EXHAUSTED (execution_id 'not_executed'), the feedback result and receipt are null and campaign_comparison is null, so no candidate reach, holding or computation profile exists. No physical improvement can be claimed — that requires a complete accepted evaluation compared with the replayed baseline, and the frozen campaign comparison holds nothing; adoption here accepts a recommendation and executes nothing. The replayed baseline stands: terminal error 0.007642608585867386 m (fde228b5bec0b) with terminal tip speed 0.6351726092425104 m/s (fdbbe7d50bd95), which equals the holding-window speed minimum, while holding_speed_passed = false (fd5f30aa45a3c), sampled_settling_passed = false (ff242011aec01) and joint_reach_holding_passed = false (fdc5a1946a13b) — reach-only success and joint reach-plus-holding success differ, and holding-window speeds span 0.6351726092425104-1.5810152739742807 m/s (fdbbe7d50bd95, fdb04654f7a4d) against the 0.02 m/s limit (febbe3c381492) over six rows (fef7418388d11), so the residual-tip-speed explanation remains 'possible', not established. Terminal reach is a single instant inside the 0.01 m tolerance and is not the full trajectory; holding position error spans 0.007642608585867386-0.05813810428573256 m (fdec9f653d4e3) over those same six sampled rows. Computation stays separate from the outcome: mean update 17.26331904856488 s (fe20c6e02e39c) against a 0.01 s control period (ff6c271837f30), with deadline_misses 35 (fd5fd22eac74c) over 35 updates (ff14a609506b4); cataloged per-update solve times are ~15.0-15.67 s at several distinct updates (fe7552761be5d, fe3de17c1b95a, fd8d0cb9f1f27), so synchronous wall overruns occurred, and synchronous wall overruns do not by themselves establish skipped simulated updates or any causal link to the holding result; no real-time, continuous-time or hardware claim is made. The second recommendation defer-further-weight-tuning is consistent with this: no further weight changes should be stacked on an unmeasured one, and no legal local-comparison state (effective horizon 0.01 s) was identified among cataloged horizons (ff29bf76b7f8c, fee3004478d8b, ffa220c53c325). Stated gaps stand: source.saved_projected_states was not read in this context, full warm plans and optimizer iteration traces are not retained (fea8fa543910d), and there is no closed-loop counterfactual replay or causal attribution capability, so no dominant cause is established. This completes a decision workflow, not a successful design; it is control-only exploration, not robot-structure optimization.",
+        "recommendation_id": "defer-until-candidate-profile",
+        "report": {
+          "artifact_id": "ab987f833e9238b49720e9dc6c9a4f6654d87141249a0a385a1ac7e7a1942c3e",
+          "media_type": "application/json"
+        }
+      },
+      "model_authored_decision": {
+        "disposition": "adopt",
+        "changes": {
+          "control/recipe/holding_tip_speed_weight": 0.01
+        },
+        "rationale": "Accepted diagnosis (possible, bounded): the failing sampled criterion includes holding-window tip speed — across all six recorded rows of the 0.30–0.35 s window every sampled tip speed exceeds the 0.02 m/s limit (0.635–1.581 m/s), while the smallest sampled position error (0.00764 m) is inside the 0.01 m limit and the largest (0.05814 m) is not; terminal reach passes at 0.0076 m against the 0.01 m tolerance. The saved recipe shows holding_tip_speed_weight = 0.0, so the holding window currently carries no tip-speed cost at all. Hypothesis: the settling failure includes residual tip speed inside the settling window, and adding a nonzero per-second squared spatial tip-speed cost at nodes at/after the window start makes the optimizer prefer settling-window trajectories that are slower at the tip, which is directly the criterion that fails. Weight relevance: holding_tip_speed_weight is defined on exactly those nodes, and explicit settling settings are present (settling window 0.05 s with position limit 0.01 m and speed limit 0.02 m/s), satisfying the parameter's requirement. I select the holding weight alone rather than also changing terminal_tip_speed_weight: terminal reach already passes, the terminal instant lies inside the penalized holding window anyway, and changing both at once would confound the one model-selected complete experiment the grant allows. Value 0.01: clearly effective (above the 0.0001 minimum for a new positive selection) and well below the 1.0 bound, deliberately modest relative to the configured terminal_weight so that a directional effect can be seen without saturating the trade-off, leaving room for a later bounded increase if the effect is right but too small. Coverage and limits: this rests on six holding rows plus batched endpoint samples and run-level scalars, not a trajectory-wide characterization; trajectory-wide holding co-variation was not displayed; the diagnosis rates the residual-tip-motion explanation only 'possible' and the one-step-projection explanation 'insufficient_evidence'; no closed-loop counterfactual replay or causal attribution capability exists, so this is a bounded test of a stated hypothesis, not an adoption of a proven cause. Observations that would weaken the hypothesis: unchanged or higher holding-window tip speeds; new or larger holding position errors; terminal error leaving the 0.01 m tolerance; sampled holding speed falling only for one row while others stay far above the limit; or a material rise in update wall time, deadline misses or unusable updates. Local comparison deliberately omitted: the grant requires a legal saved baseline update with effective horizon 0.01 s, and no such update is identified in the displayed evidence (cataloged per-update effective horizons are 5, 7 and 10 control intervals at a 0.01 s control period), so no legal paired state can be nominated.",
+        "expected_measurable_effect": "Reach: terminal tip position error should remain at or below the recorded 0.01 m tolerance (baseline 0.0076 m); any increase past tolerance is an adverse result and would be reported as reach degradation. Holding position: the six sampled 0.30–0.35 s tip position errors should not grow and ideally all fall inside the 0.01 m limit (baseline range 0.00764–0.05814 m). Holding speed: the six sampled holding-window tip speeds should fall toward or below the 0.02 m/s limit (baseline 0.635–1.581 m/s); a consistent reduction that still stays above the limit counts only as directionally consistent, not as a passed criterion. Computation: mean update duration, deadline_misses and per-update optimization solve time should be compared with the baseline records (mean update about 17.26 s against a 0.01 s control period, 35 of 35 deadline misses, and solver-status counts of 1 success versus 34 user-requested stops at the 15 s feasible-return budget); because nearly all solves terminated on that budget rather than on convergence, I expect wall time to stay budget-limited rather than scale with the added cost, but an increase in update wall time, deadline misses, unusable updates, or constraint violation would be a measurable adverse effect. Full historical warm plans and optimizer iteration traces are not retained, so per-iteration cost attribution cannot be checked.",
+        "local_comparison": null
+      },
+      "preparation_configuration": {
+        "artifact_id": "514a274275b3b5eb3afafd3443ec7e9e762932b3f7c41a7d9663b51332c60f33",
+        "media_type": "application/json"
+      },
+      "simulation_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-simulation",
+        "execution_id": "157bca3a5fb541eeb35171225dc34d05",
+        "caller": "improvement-executor",
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "completed",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "54bd35343d20f1929c52fc5c28579c9517d10d50483ed98e9856d74bd090d839",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": "157bca3a5fb541eeb35171225dc34d05",
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 702.7660000000615
+        }
+      },
+      "execution_id": "157bca3a5fb541eeb35171225dc34d05",
+      "executed_configuration": {
+        "artifact_id": "569622a16890b0484fd6fbfcb4e39ce29f47a4b0b7ca09d92f15ab3ab24ebdbd",
+        "media_type": "application/json"
+      },
+      "execution_manifest": {
+        "artifact_id": "36836e1f23c22247042cf9a6b4a5f5e54acef5ad9f863e756968e21cbd860bce",
+        "media_type": "application/json"
+      },
+      "execution_owner": "gvs-stage352-ee1a0f3ef805-candidate",
+      "scientific_scope_diff": [
+        {
+          "pointer": "/controller/parameters/data/recipe/holding_tip_speed_weight",
+          "before": 0.0,
+          "after": 0.01
+        }
+      ],
+      "result_classification": "simulation_completed_evaluation_blocked",
+      "evaluation_receipt": {
+        "request_id": "complete-evaluation",
+        "execution_id": "not_executed",
+        "caller": "improvement-executor",
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0",
+        "execution_status": "rejected",
+        "error": "BUDGET_EXHAUSTED: active phase / protected downstream capacity",
+        "charged": {
+          "tool_calls": 0,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        }
+      }
+    }
+  ],
+  "usage": {
+    "runs": [
+      {
+        "label": "development_dual",
+        "limit": {
+          "backend_solves": 1,
+          "model_calls": 24,
+          "tool_calls": 60,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 17,
+          "model_calls": 9,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 1094.4399999997113
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 15,
+          "tool_calls": 43,
+          "wall_s": 2505.5600000002887,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      {
+        "label": "pair1_dual_context",
+        "limit": {
+          "backend_solves": 1,
+          "model_calls": 24,
+          "tool_calls": 60,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 12,
+          "model_calls": 6,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 898.3910000000615
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 18,
+          "tool_calls": 48,
+          "wall_s": 2701.6089999999385,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      {
+        "label": "pair1_single_context",
+        "limit": {
+          "backend_solves": 1,
+          "model_calls": 24,
+          "tool_calls": 60,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 7,
+          "model_calls": 7,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 230.3909999995958
+        },
+        "remaining": {
+          "backend_solves": 1,
+          "model_calls": 17,
+          "tool_calls": 53,
+          "wall_s": 3369.609000000404,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      {
+        "label": "pair2_dual_context",
+        "limit": {
+          "backend_solves": 1,
+          "model_calls": 24,
+          "tool_calls": 60,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 14,
+          "model_calls": 8,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 1100.7369999997318
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 16,
+          "tool_calls": 46,
+          "wall_s": 2499.263000000268,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      {
+        "label": "pair2_single_context",
+        "limit": {
+          "backend_solves": 1,
+          "model_calls": 24,
+          "tool_calls": 60,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 15,
+          "model_calls": 10,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 1290.1110000000335
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 14,
+          "tool_calls": 45,
+          "wall_s": 2309.8889999999665,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      {
+        "label": "preserved_primary/baseline_import",
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 5,
+          "wall_s": 120.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.0309999999590218
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 4,
+          "wall_s": 118.96900000004098,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      {
+        "label": "preserved_primary/development_dual",
+        "limit": {
+          "backend_solves": 1,
+          "model_calls": 24,
+          "tool_calls": 60,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 12,
+          "model_calls": 7,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 1017.1259999999311
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 17,
+          "tool_calls": 48,
+          "wall_s": 2582.874000000069,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      {
+        "label": "preserved_primary/baseline_import_overhead",
+        "used": {
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 2.1090000001713634,
+          "backend_solves": 0,
+          "worker_calls": 0
+        }
+      },
+      {
+        "label": "communication_preflight",
+        "used": {
+          "model_calls": 2,
+          "tool_calls": 3,
+          "wall_s": 6.244820499931082,
+          "backend_solves": 0,
+          "worker_calls": 0
+        }
+      },
+      {
+        "label": "baseline_import_overhead",
+        "used": {
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "backend_solves": 0,
+          "worker_calls": 0
+        }
+      }
+    ],
+    "used": {
+      "model_calls": 49,
+      "tool_calls": 81,
+      "wall_s": 5640.580820499126,
+      "backend_solves": 5,
+      "worker_calls": 0
+    },
+    "limits": {
+      "model_calls": 146,
+      "tool_calls": 370,
+      "wall_s": 21900.0,
+      "backend_solves": 6,
+      "worker_calls": 0
+    },
+    "remaining": {
+      "model_calls": 97,
+      "tool_calls": 289,
+      "wall_s": 16259.419179500874,
+      "backend_solves": 1,
+      "worker_calls": 0
+    },
+    "historical_stages": "Stage 3.51 execution and failed pilot costs excluded; prior baseline cost recorded separately.",
+    "monetary_cost": null
+  },
+  "reported_tokens": {
+    "prompt_tokens": 1573035,
+    "completion_tokens": 488630,
+    "total_tokens": 2061665
+  },
+  "token_qualification": "Provider-reported usage from every raw response plus successful preflight; failed connection tokens and monetary charges remain unknown",
+  "monetary_cost": null,
+  "numerical_work": {
+    "local_solves": 0,
+    "prediction_evaluations": 0
+  },
+  "workers": 0,
+  "optimization_demonstrated": false,
+  "evaluated_candidates": 4,
+  "completed_changed_candidate_simulations": 5,
+  "evaluated_candidate_joint_successes": 0,
+  "unevaluated_candidate_joint_success": null,
+  "scientific_review": {
+    "path": "scientific_review.json",
+    "sha256": "3fe4199b9c1d1870fb95783714a71b93b9cedd07424607ac84f672e3e8c13f81",
+    "type": "Organization-masked implementer review; not independent blind review.",
+    "substantive_issues": 10,
+    "source_agreement_certifies_prose": false
+  },
+  "shared_defect": {
+    "type": "shared_executor_reservation_seam",
+    "formal_run": "pair2_single_context",
+    "status": "No further live launch or framework repair; last scheduled run preserves actual incomplete evaluation feedback",
+    "simulation": {
+      "contract_version": "1.2.0",
+      "request_id": "complete-simulation",
+      "execution_id": "157bca3a5fb541eeb35171225dc34d05",
+      "caller": "improvement-executor",
+      "tool_id": "simulation.run",
+      "tool_version": "1.0.0",
+      "result_contract": "BackendResult",
+      "result_version": "1.0.0",
+      "execution_status": "completed",
+      "solver_status": "completed",
+      "analysis_status": "not_assessed",
+      "task_success": null,
+      "output": {
+        "artifact_id": "54bd35343d20f1929c52fc5c28579c9517d10d50483ed98e9856d74bd090d839",
+        "media_type": "application/json"
+      },
+      "error": null,
+      "cache_hit": false,
+      "original_execution_id": "157bca3a5fb541eeb35171225dc34d05",
+      "charged": {
+        "tool_calls": 1,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 702.7660000000615
+      }
+    },
+    "evaluation_rejection": {
+      "request_id": "complete-evaluation",
+      "execution_id": "not_executed",
+      "caller": "improvement-executor",
+      "tool_id": "evaluation.run",
+      "tool_version": "1.0.0",
+      "execution_status": "rejected",
+      "error": "BUDGET_EXHAUSTED: active phase / protected downstream capacity",
+      "charged": {
+        "tool_calls": 0,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 0.0
+      }
+    },
+    "executor_timeout_s": 900.0,
+    "executor_phase_budget": {
+      "limit": {
+        "tool_calls": 3,
+        "wall_s": 1600.0
+      },
+      "protect_project": {
+        "model_calls": 7,
+        "tool_calls": 7,
+        "wall_s": 600.0
+      },
+      "started_usage": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 0,
+        "wall_s": 0.0,
+        "worker_calls": 0
+      }
+    },
+    "phase_remaining": {
+      "limit": {
+        "tool_calls": 3,
+        "wall_s": 1600.0
+      },
+      "protect_project": {
+        "model_calls": 7,
+        "tool_calls": 7,
+        "wall_s": 600.0
+      },
+      "started_usage": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 0,
+        "wall_s": 0.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "backend_solves": 1,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 702.7660000000615,
+        "worker_calls": 0
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 2,
+        "wall_s": 897.2339999999385,
+        "worker_calls": 0
+      }
+    },
+    "configured_phase_wall_s": 1600.0,
+    "simulation_charged_wall_s": 702.7660000000615,
+    "phase_wall_after_simulation_s": 897.2339999999385,
+    "interpretation": "The existing evaluation and profile calls inherit a 900-second reservation. A complete simulation exceeding 700 seconds leaves less than that reservation in the frozen 1600-second executor phase even when substantial total run budget remains. This seam is shared by both organizations; the last formal run demonstrated it. No budget counter, guard or phase limit is changed.",
+    "comparison_limitation": "All four formal launches have terminal outcomes, but the last candidate lacks official evaluation/profile. A complete matched four-run physical comparison is not established.",
+    "development_repair_allowance_remaining": 0
+  },
+  "formal_status_qualification": "The preserved formal_status completed flag counts four terminal scheduled outcomes, not four valid evaluated candidates",
+  "historical_stage351_usage": {
+    "runs": [
+      {
+        "label": "baseline",
+        "limit": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 10,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 3,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 610.155999999959
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 7,
+          "wall_s": 2989.844000000041,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      {
+        "label": "development_dual",
+        "limit": {
+          "backend_solves": 1,
+          "model_calls": 24,
+          "tool_calls": 60,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 1,
+          "model_calls": 1,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 6.125999999931082
+        },
+        "remaining": {
+          "backend_solves": 1,
+          "model_calls": 23,
+          "tool_calls": 59,
+          "wall_s": 3593.874000000069,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      }
+    ],
+    "used": {
+      "model_calls": 1,
+      "tool_calls": 4,
+      "wall_s": 616.2819999998901,
+      "backend_solves": 1,
+      "worker_calls": 0
+    },
+    "limits": {
+      "model_calls": 144,
+      "tool_calls": 370,
+      "wall_s": 25200.0,
+      "backend_solves": 7,
+      "worker_calls": 0
+    },
+    "remaining": {
+      "model_calls": 143,
+      "tool_calls": 366,
+      "wall_s": 24583.71800000011,
+      "backend_solves": 6,
+      "worker_calls": 0
+    },
+    "historical_stages": "Excluded; unchanged source observations only.",
+    "monetary_cost": null
+  },
+  "next_limitation": "Post-simulation evaluation/profile reservation must fit the frozen executor phase. Separately, sampled joint settling remains unmet and report handles/prose need reliable coverage and timing interpretation",
+  "comparative_limit": "One case, two exploratory pairs, one protocol failure and one shared host defect: no universal organizational superiority, statistical significance or complete matched physical comparison",
+  "verification": {
+    "accepted_source_selectors": 391,
+    "exact_source_mismatches": 0,
+    "pending_calls": 0,
+    "frozen_archive_checks": {
+      ".": {
+        "files": 48,
+        "archived_hash_mismatches": 0
+      },
+      "revalidation": {
+        "files": 50,
+        "archived_hash_mismatches": 0
+      }
+    },
+    "current_formal_implementation_hash_mismatches": 0,
+    "allowed_delta_and_scientific_scope_checks_passed": true,
+    "matched_provider_prompt_permissions_memory_recovery_phase_and_numerical_freeze_checks_passed": true,
+    "source_bound_fact_and_existing_comparison_checks_passed": true,
+    "portable_unresolved_references": 0,
+    "no_new_live_calls_from_delivery": true
+  }
+}
