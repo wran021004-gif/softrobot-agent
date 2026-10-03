@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "before_bytes": 201297,
+  "after_bytes": 196234,
+  "context_cap": 200000,
+  "catalog_presentation": {
+    "catalog_budget_bytes": 70000,
+    "catalogued_handles": 1839,
+    "displayed_handles": 341,
+    "priority": "Current explicit feedback acceptance and computation measurements, then existing recency order.",
+    "scope": "Displayed subset of this context; all exact mappings and receipt history remain in the host store."
+  },
+  "checks": [
+    "Actual preserved revision fits; exact source/receipt mappings unchanged; all four candidate measures resolvable",
+    "Largest permitted structured working memory fits without dropping handoff content",
+    "Existing Stage 3.50 compaction regression remains passed"
+  ],
+  "commands": [
+    "python -m unittest tests.test_stage352_context tests.test_stage350_context -v",
+    "python -m unittest tests.test_stage352_context -v"
+  ],
+  "earlier_offline_failure": "First compaction retained recency only and omitted a candidate holding-error handle; corrected before fresh validation by preserving current explicit-feedback acceptance and computation handles first.",
+  "scientific_changes": 0,
+  "provider_attempts": 0,
+  "backend_executions": 0,
+  "workers": 0
+}

@@ -140,31 +140,6 @@ class BoundSavedStateAdapter(FlatDiagnosticAdapter):
             for key in ('operation','update_id'):
                 if key not in schema['required']:schema['required'].append(key)
             payload['messages'][0]['content']+=' For a saved-state check, choose operation and update_id. The host binds that update\'s exact measured state and the operation-defined applied/previous input from immutable evidence; do not copy state vectors or provide replacement selectors.'
-        if self.fact_state.get('fact_scope'):
-            # Catalog presentation yields to required same-context handoffs.
-            # Exact mappings and receipt history stay in the host store.
-            from tools.diagnostic_facts import context_view
-            catalog_bytes=75000
-            feedback_refs={f['result']['artifact_id'] for f in context['role_context'].get('check_feedback',[]) if f.get('result')}
-            metric_fields={'terminal_error_m','mean_update_s','deadline_misses','solver_error_count','force_bound_violation_n',
-                'valid_complete_execution','official_task_success','evaluation_validity','real_time_demonstrated',
-                'updates','initialization_selected','accepted_noninitialization_plans','tension_range_n'}
-            priority=[h for h,row in self.fact_state.get('fact_catalog',{}).items()
-                if row['selector']['reference']['artifact_id'] in feedback_refs and
-                (row['selector']['pointer'].startswith('/detail/sampled_settling/') or
-                 row['selector']['pointer'] in {'/detail/'+field for field in metric_fields})]
-            while len(encode(payload).encode('utf8'))>config['context_bytes'] and catalog_bytes:
-                catalog_bytes=max(0,catalog_bytes-5000)
-                view=context_view(self.fact_state,max_catalog_bytes=catalog_bytes,priority_handles=priority)
-                for row in view['read_ledger']:
-                    for key in ('handles','displayed_handles'):
-                        row[key+'_count']=len(row.pop(key))
-                view['fact_catalog_presentation']=dict(catalogued_handles=len(self.fact_state.get('fact_catalog',{})),
-                    displayed_handles=len(view['fact_catalog']),catalog_budget_bytes=catalog_bytes,
-                    priority='Current explicit feedback acceptance and computation measurements, then existing recency order.',
-                    scope='Displayed subset of this context; all exact mappings and receipt history remain in the host store.')
-                context['role_context'].update(view)
-                payload['messages'][1]['content']=encode(context)
         return payload
 
     def resolve_business(self,name,args):

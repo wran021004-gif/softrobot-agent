@@ -117,15 +117,13 @@ def handover(host, reference, content, *, origin, kind, selectors=None, inventor
         host.store.event(db,host.run_id,'evidence_handoff','transferred',inputs=[reference],outputs=[host.store.put(db,row)])
 
 
-def context_view(state, *, max_catalog_bytes=75000, priority_handles=()):
+def context_view(state):
     rows=[{k:v for k,v in row.items() if k!='selector'} for row in state.get('fact_catalog',{}).values()]
     # Catalog is bounded independently of trajectories. All mappings remain in the store.
     selected=[];size=0
-    priority=set(priority_handles)
-    ordered=[r for r in reversed(rows) if r['handle'] in priority]+[r for r in reversed(rows) if r['handle'] not in priority]
-    for row in ordered:
+    for row in reversed(rows):
         n=len(encode(row).encode())
-        if size+n>max_catalog_bytes:continue
+        if size+n>75000:continue
         selected.append(row);size+=n
     shown={r['handle'] for r in selected}
     ledger=[]

@@ -24,8 +24,7 @@ from examples import stage351_settling_campaign as campaign
 CONFIG=ROOT/'examples/stage352_experiment.json'
 REUSE_LIMITS=dict(model_calls=0,tool_calls=5,wall_s=120.,backend_solves=0,worker_calls=0)
 EXTRA=['examples/stage352_settling_campaign.py','examples/stage352_experiment.json',
-       'examples/stage352_preflight.py','tests/test_stage352_transport.py','tests/test_stage352_reuse.py',
-       'tests/test_stage352_context.py','examples/stage352_revalidation.json']
+       'examples/stage352_preflight.py','tests/test_stage352_transport.py','tests/test_stage352_reuse.py']
 _usage=campaign.usage
 
 
@@ -68,16 +67,6 @@ def verify_baseline(config):
 def reuse_baseline(config,runtime,freeze):
     export=Path(config['evidence_directory']);path=export/'baseline_reuse.json'
     if path.exists():return read(path)
-    if config.get('reused_baseline_record'):
-        prior=Path(config['reused_baseline_record'])
-        if hashlib.sha256(prior.read_bytes()).hexdigest()!=config['reused_baseline_record_sha256']:
-            raise ValueError('VERIFIED_BASELINE_REUSE_RECORD_CHANGED')
-        result=read(prior)
-        if result['result']['execution_id']!=config['execution_id'] or result['source_store']!=config['source_store']:
-            raise ValueError('VERIFIED_BASELINE_REUSE_IDENTITY_CHANGED')
-        result={**result,'reused_record':str(prior),'new_usage':dict(model_calls=0,tool_calls=0,wall_s=0.,backend_solves=0,worker_calls=0),
-                'import_overhead_s':0.,'classification':'Same verified prior-stage baseline; fresh workflow imports its evidence closure'}
-        atomic_json(path,result);return result
     started=time.monotonic();verified=verify_baseline(config);source=verified['source']
     directory=Path(config['run_directory'])/'baseline_import'
     if directory.exists():raise ValueError('BASELINE_IMPORT_ALREADY_STARTED_PRESERVE_RECORDS')
@@ -114,14 +103,7 @@ def reuse_baseline(config,runtime,freeze):
 
 def usage(config):
     value=_usage(config);export=Path(config['evidence_directory']);rows=value['runs']
-    prior_directory=config.get('prior_stage352_run_directory')
-    if prior_directory:
-        for db in sorted(Path(prior_directory).glob('*/platform.sqlite')):
-            rows.append(dict(label='preserved_primary/'+db.parent.name,**Store(db.parent).remaining()))
-        prior=read(Path(config['reused_baseline_record']))
-        rows.append(dict(label='preserved_primary/baseline_import_overhead',used=dict(model_calls=0,tool_calls=0,
-            wall_s=prior['import_overhead_s'],backend_solves=0,worker_calls=0)))
-    path=Path(config.get('preflight_evidence_directory',str(export)))/'preflight.json'
+    path=export/'preflight.json'
     if path.exists():rows.append(dict(label='communication_preflight',used=read(path)['used']))
     path=export/'baseline_reuse.json'
     if path.exists():rows.append(dict(label='baseline_import_overhead',used=dict(model_calls=0,tool_calls=0,
@@ -133,17 +115,16 @@ def usage(config):
     atomic_json(export/'cumulative_usage.json',value);return value
 
 
-def setup(configuration=CONFIG):
-    campaign.CONFIG=configuration
+def setup():
+    campaign.CONFIG=CONFIG
     for filename in EXTRA:
         if filename not in campaign.EXTRA_FILES:campaign.EXTRA_FILES.append(filename)
     campaign.usage=usage
 
 
-def main(action,credential,configuration=CONFIG):
-    setup(configuration);config=read(configuration);export=Path(config['evidence_directory'])
-    preflight=Path(config.get('preflight_evidence_directory',str(export)))/'preflight.json'
-    if action!='audit' and not read(preflight)['communication_validated']:
+def main(action,credential):
+    setup();config=read(CONFIG);export=Path(config['evidence_directory'])
+    if action!='audit' and not read(export/'preflight.json')['communication_validated']:
         raise ValueError('LIVE_COMMUNICATION_PREFLIGHT_REQUIRED')
     return campaign.main(action,credential,baseline_loader=reuse_baseline)
 
@@ -152,5 +133,4 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action',choices=['baseline','pilot','campaign','audit'])
     parser.add_argument('--credential',type=Path)
-    parser.add_argument('--config',type=Path,default=CONFIG)
-    args=parser.parse_args();main(args.action,args.credential,args.config)
+    args=parser.parse_args();main(args.action,args.credential)
