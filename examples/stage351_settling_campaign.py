@@ -115,7 +115,7 @@ def audit(config):
     return result
 
 
-def main(action,credential):
+def main(action,credential,*,baseline_loader=None):
     config=read(CONFIG);base=Path(config['run_directory']);export=Path(config['evidence_directory'])
     if action=='audit':return audit(config)
     from tools.runtime_identity import require_softagent_runtime
@@ -138,12 +138,13 @@ def main(action,credential):
         atomic_json(freeze_path,freeze)
         for filename in current['files']:
             path=export/'validated_implementation'/filename;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((ROOT/filename).read_bytes())
-    original=baseline(config,runtime,freeze)
+    original=(baseline_loader or baseline)(config,runtime,freeze)
     if action=='baseline' or not original['gate_passed']:return original
     from examples.gvs_nmpc_route_experiment import load_credential
     load_credential(credential)
-    replay=ControlEvidence(Store(base/'baseline')).resolve(original['result']['execution_id'])
-    experiment={**config,'source_store':str(base/'baseline'),'execution_id':original['result']['execution_id'],
+    baseline_store=original.get('source_store',str(base/'baseline'))
+    replay=ControlEvidence(Store(baseline_store)).resolve(original['result']['execution_id'])
+    experiment={**config,'source_store':str(baseline_store),'execution_id':original['result']['execution_id'],
         'source_manifest':replay['manifest'],'baseline_facts':original['result']['factual_result']}
     pilot=base/'development_dual'
     def launch(directory,mode,pilot_run=False):

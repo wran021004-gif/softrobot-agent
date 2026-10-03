@@ -1,0 +1,105 @@
+{
+  "number": 2,
+  "started": "2026-10-03T08:19:30.096935+00:00",
+  "timeout_s": 85.0,
+  "corrective_action_or_transient_check": "Primary process used sandbox-injected localhost proxies at 127.0.0.1:9 and received WinError 10061. Check through host networking outside the sandbox boundary once, retaining provider/model/thinking/reasoning/TLS settings and inherited host proxy policy.",
+  "request": {
+    "model": "deepseek-flash",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Reply briefly with: Connection verified."
+      }
+    ],
+    "max_tokens": 65536,
+    "thinking": {
+      "type": "enabled"
+    },
+    "reasoning_effort": "high",
+    "stream": false
+  },
+  "provider_configuration": {
+    "adapter": "deepseek",
+    "adapter_version": "3.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 200000,
+    "length_recovery": {
+      "enabled": true,
+      "max_tokens": 131072,
+      "timeout_s": 900.0
+    },
+    "max_no_progress": 3,
+    "max_repairs": 2,
+    "max_tokens": 65536,
+    "max_turns": 24,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 2,
+      "max_total": 4
+    },
+    "readonly_batch_limit": 3,
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 85.0,
+    "tool_naming": {
+      "mapping_identity": "0b55f810f8a11a93356d34a7038ded6391f26de4265078355cc5cab6502548cb",
+      "scheme": "readable_v1"
+    }
+  },
+  "adapter_version": "4.0.0",
+  "status": "completed",
+  "response": {
+    "id": "305fd524-587c-4302-9dd0-4ce8e3950ff3",
+    "object": "chat.completion",
+    "created": 1791015568,
+    "model": "deepseek-flash",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Connection verified.",
+          "reasoning_content": "The user wants a brief reply: \"Connection verified.\" Just output that."
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 37,
+      "completion_tokens": 19,
+      "total_tokens": 56,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 15
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 37
+    },
+    "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669"
+  },
+  "provider_usage": {
+    "prompt_tokens": 37,
+    "completion_tokens": 19,
+    "total_tokens": 56,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 15
+    },
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 37
+  },
+  "error": null,
+  "elapsed_s": 3.1879999998491257,
+  "charged_wall_s": 3.1879999998491257
+}
