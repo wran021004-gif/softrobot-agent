@@ -139,3 +139,17 @@ class CompletionTests(TestCase):
             if key in inp.context['role_context']:self.assertEqual(role[key],inp.context['role_context'][key])
         self.assertEqual(config['max_tokens'],65536)
         self.assertLess(size+8192+config['length_recovery']['max_tokens'],1000000)
+
+    def test_stage353_configuration_prepares_both_organizations(self):
+        from tools.settling_campaign import SettlingWorkflow
+        from tools.platform_models import payload_for
+        for mode in ('single_context','dual_context'):
+            config={**self.config,'evidence_directory':str(Path(self.temp.name)/'exports')}
+            w=SettlingWorkflow(Path(self.temp.name)/mode,mode,experiment=config)
+            w.prepare({'test_fixture':True})
+            for role in ('design','diagnostic'):
+                model=w.store.session(w.host(role).run_id)['snapshot']['input']['policy']['model']
+                self.assertEqual(model['context_bytes'],400000)
+                self.assertEqual(model['context_guard'],config['context_guard'])
+                self.assertEqual(model['parameters'],{})
+            w.validate_frozen_configuration()

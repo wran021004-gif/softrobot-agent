@@ -81,12 +81,15 @@ def live(config,mode,credential):
         atomic_json(export/'baseline_verification.json',dict(execution_id=config['execution_id'],hashes=verified['artifact_hashes'],
             historical_usage=verified['historical_usage'],new_backend_executions=0))
     directory=Path(config['run_directory'])/mode
-    if directory.exists():raise ValueError('PRESERVE_EXISTING_RUN: use its saved work; no replacement launch')
+    resume_preparation=directory.exists()
+    if resume_preparation:
+        with Store(directory).connect(True) as db:
+            if db.execute('SELECT COUNT(*) FROM sessions').fetchone()[0]:raise ValueError('PRESERVE_EXISTING_RUN: use its saved work; no replacement launch')
     from examples.gvs_nmpc_route_experiment import load_credential
     load_credential(credential)
     experiment={**config,'source_manifest':verified['source']['manifest'],'baseline_facts':verified['result']['factual_result']}
     workflow=SettlingWorkflow(directory,mode,experiment=experiment)
-    workflow.prepare(require_softagent_runtime());outcome=workflow.run()
+    workflow.prepare(require_softagent_runtime(),resume_preparation=resume_preparation);outcome=workflow.run()
     export_closure(directory,export/mode,[Path(config['source_store'])])
     audit=audit_run(directory);audit['acceptance']=capability_gate(directory)
     audit['request_sizes']=[]

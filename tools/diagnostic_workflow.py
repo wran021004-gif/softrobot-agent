@@ -96,7 +96,7 @@ class DiagnosticWorkflow:
         self.execution=self.experiment.get('execution_id',EXECUTION)
         self.export_root=Path(self.experiment.get('evidence_directory',ROOT/'evidence/stage346_shared_diagnosis_20261002'))
 
-    def prepare(self,runtime):
+    def prepare(self,runtime,*,resume_preparation=False):
         if (self.directory/'freeze.json').exists():raise ValueError('NEW_RUN_DIRECTORY_REQUIRED')
         if not (self.source/'platform.sqlite').exists():
             manifest=ROOT/'evidence/stage341_repaired_live_execution_20261001/live_outcome.json'
@@ -107,8 +107,17 @@ class DiagnosticWorkflow:
         limits=SUFFIX_LIMITS if self.suffix or self.initial_only else (dict(model_calls=3,tool_calls=3,backend_solves=0,worker_calls=0,wall_s=300.) if self.minimal else self.limits)
         numerical={k:0 for k in NUMERICAL} if self.suffix or self.initial_only else self.numerical_limits
         self.limits=limits
-        self.store.create(dict(project_id=self.project,grant_id=self.project,budget=limits,
-            authorization_source=self.experiment.get('authorization_source','User-authorized sequential Stage 3.46 native validation, pilot and two matched pairs; necessary context/evidence transmission to DeepSeek; no backend simulations/workers or push.')))
+        if resume_preparation and self.store.db.exists():
+            with self.store.connect(True) as db:
+                if db.execute('SELECT COUNT(*) FROM sessions').fetchone()[0]:raise ValueError('PARTIAL_SESSIONS_REQUIRE_RECONCILIATION')
+            if self.store.remaining()['used']!={'model_calls':0,'tool_calls':0,'backend_solves':0,'worker_calls':0,'wall_s':0.}:
+                raise ValueError('PREPARATION_ALREADY_CHARGED')
+            prior=self.store.config()
+            if prior['budget']!=limits:raise ValueError('PREPARATION_BUDGET_MISMATCH')
+            self.project=prior['project_id']
+        else:
+            self.store.create(dict(project_id=self.project,grant_id=self.project,budget=limits,
+                authorization_source=self.experiment.get('authorization_source','User-authorized sequential Stage 3.46 native validation, pilot and two matched pairs; necessary context/evidence transmission to DeepSeek; no backend simulations/workers or push.')))
         self.hosts={}
         for role in (['shared'] if self.mode=='single_context' else ['design','diagnostic'])+['executor']:
             host=Host(self.directory,self.project+'-'+role);inp=deepcopy(source['configuration']);inp['run_id']=host.run_id
@@ -122,7 +131,7 @@ class DiagnosticWorkflow:
             if 'context_bytes' in self.experiment:
                 inp['policy']['model']['context_bytes']=self.experiment['context_bytes']
             if 'context_guard' in self.experiment:
-                inp['policy']['model']['parameters']['context_guard']=self.experiment['context_guard']
+                inp['policy']['model']['context_guard']=self.experiment['context_guard']
             host.create(inp);self.hosts[role]=host
         self.binding=import_execution(reader,self.execution,self.store,self.hosts['executor'].run_id,source['manifest'])
         if self.experiment.get('fact_handles'):

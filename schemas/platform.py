@@ -195,12 +195,13 @@ class ModelConfig(Contract):
     max_repairs: int = Field(default=2, ge=0, le=10)
     max_no_progress: int = Field(default=3, ge=1, le=20)
     context_bytes: int = Field(default=64000, ge=4000)
+    context_guard: dict | None = None
 
     # Optional additions must not change identities of older frozen snapshots.
     @model_serializer(mode='wrap')
     def serialize_optional_model_settings(self, handler):
         data=handler(self)
-        for key in ('reasoning_effort','length_recovery','protocol_recovery','tool_naming','readonly_batch_limit'):
+        for key in ('reasoning_effort','length_recovery','protocol_recovery','tool_naming','readonly_batch_limit','context_guard'):
             if data.get(key) is None: data.pop(key,None)
         return data
 
