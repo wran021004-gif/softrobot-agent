@@ -156,6 +156,8 @@ class WorkingStateTests(TestCase):
         self.assertIsNone(missing['holding']['duration']['value'])
         self.assertTrue(missing['missing'])
         self.assertEqual(config,original)
+        snapshot_definition=resolve_acceptance(dict(input=config['effective']),ref)
+        self.assertEqual(snapshot_definition['terminal']['source']['pointer'],'/input/task/evaluator/parameters/data/tolerance_m')
 
     def test_feedback_and_comparison_use_resolver(self):
         from tools.diagnostic_revision import comparison_view
@@ -175,6 +177,8 @@ class WorkingStateTests(TestCase):
         self.assertAlmostEqual(changed['holding']['interval_s'][0],.25)
         self.assertEqual(changed['holding']['position_limit_m'],.2)
         self.assertEqual(changed['holding']['speed_limit_m_s'],2.)
+        self.assertEqual(changed['acceptance_definition']['terminal']['source'],dict(
+            reference=result['configuration'],pointer='/effective/task/evaluator/parameters/data/tolerance_m'))
 
     def test_two_parameter_builder_mapping(self):
         from tools.platform_tools import _candidate

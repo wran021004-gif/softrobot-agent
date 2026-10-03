@@ -10,7 +10,7 @@ RANKING = dict(version='1.0.0',rule='Joint acceptance first; otherwise component
 
 def resolve_acceptance(configuration, reference=None, *, profile=None, profile_reference=None, comparison=None):
     value = plain(configuration)
-    effective = value.get('effective', value)
+    effective = value.get('effective', value.get('input', value))
     task = effective['task']; controller = effective['policy']['controller']
     timing = task['timing']; evaluator = task['evaluator']
     missing = []
@@ -19,7 +19,7 @@ def resolve_acceptance(configuration, reference=None, *, profile=None, profile_r
             missing.append(pointer)
         return dict(value=value, unit=unit, definition=definition,
                     source=dict(reference=authority, pointer=pointer))
-    prefix = '/effective' if 'effective' in value else ''
+    prefix = '/effective' if 'effective' in value else '/input' if 'input' in value else ''
     tolerance = evaluator['parameters']['data'].get('tolerance_m') if evaluator['extension_id']=='evaluate.reach' else None
     settling = controller['parameters']['data'].get('settling')
     historical = None

@@ -60,8 +60,12 @@ def project_working_state(store, run_id):
                 latest=dict(candidate_id=stage['candidate_id'],configuration=stage['configuration'],
                             execution_id=stage['source_execution_id'],owner_run_id=stage['source_owner'])
         config_ref=(latest or baseline or {}).get('configuration')
-        configuration=store.artifact(config_ref,db=db) if config_ref else inp
-        effective=configuration.get('effective',configuration)
+        if config_ref:
+            configuration=store.artifact(config_ref,db=db)
+        else:
+            config_ref=dict(artifact_id=db.execute('SELECT snapshot FROM sessions WHERE run_id=?',(run_id,)).fetchone()[0],media_type='application/json')
+            configuration=snapshot
+        effective=configuration.get('effective',configuration.get('input',configuration))
         from extensions.tendon_family.gvs_profile import execution_scope
         scope=execution_scope(effective) if effective['policy'].get('dynamics_model') else None
         profile_ref=result.get('receipts',{}).get('profile',{}).get('output')

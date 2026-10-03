@@ -20,7 +20,7 @@ def structured_feedback(store, result, source):
     detail=store.artifact(result['receipts']['profile']['output'])['detail']
     motion=store.artifact(detail['motion']);timing=source['configuration']['task']['timing']
     from tools.acceptance_definitions import resolve_acceptance
-    definitions=resolve_acceptance(source['configuration'],result['configuration'],profile=detail,
+    definitions=resolve_acceptance(dict(effective=source['configuration']),result['configuration'],profile=detail,
         profile_reference=result['receipts']['profile']['output'])
     if definitions['missing']:raise ValueError('ACCEPTANCE_DEFINITION_MISSING: '+str(definitions['missing']))
     duration=definitions['holding']['duration']['value'];position_limit=definitions['holding']['position']['value']
