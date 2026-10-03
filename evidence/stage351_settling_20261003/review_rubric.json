@@ -1,0 +1,27 @@
+{
+  "reviewer": "Primary implementer; organization-masked copies are not independent blind review.",
+  "criteria": [
+    "Use program-derived numerical ranges over declared coverage; do not extrapolate selected endpoints.",
+    "Prediction-query measured backend endpoints count as queried motion; plans-only reads do not count as prediction.",
+    "Not displayed is distinct from not queried or not retained.",
+    "Terminal reach, holding position and holding speed are separate; joint success requires all three.",
+    "Synchronous wall-clock overruns do not imply skipped simulated updates.",
+    "Hypotheses can justify bounded exploration without causal proof; exact source agreement does not validate causal prose.",
+    "No evidence for a beneficial geometry change is distinct from geometry having no effect.",
+    "Actual candidate measurements must support revised diagnosis and final decision.",
+    "Different objective scalar values cannot rank different weight settings."
+  ],
+  "ranking": {
+    "version": "1.0.0",
+    "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+    "physical_metrics": [
+      "terminal_error_m",
+      "holding_max_error_m",
+      "holding_max_speed_m_s"
+    ],
+    "tolerance": 1e-09,
+    "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+    "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+    "objective": "Raw scalar objectives under different weights are not ranked."
+  }
+}
