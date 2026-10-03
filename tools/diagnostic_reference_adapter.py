@@ -32,7 +32,7 @@ class ScopedReferenceAdapter(BoundSavedStateAdapter):
         draft=self.fact_state.get('unaccepted_draft')
         if draft and draft['phase']==self.phase:view['unaccepted_draft']=draft
         if self.phase=='revision':
-            view['instructions']='Submit a CompactRevision: changes to named previous hypotheses/recommendations, 1-6 new cited facts, any new limitations, recommendation and rationale. Inherited facts and provenance are host-preserved. Use at least one candidate profile numeric alias from comparison_view. Explain actual candidate-minus-baseline outcomes separately for reach, holding position, holding speed and computation. Only submission is available.'
+            view['instructions']='Submit a CompactRevision: changes to named previous hypotheses/recommendations, 1-6 new cited facts, any new limitations, recommendation and rationale. Inherited facts and provenance are host-preserved. new_facts.references uses F aliases; changes.supporting_fact_ids uses report fact_id strings, never aliases. Cite at least one alias from comparison_view.required_candidate_profile_references in new_facts.references; comparison-only citations cannot satisfy the candidate profile requirement. Explain actual candidate-minus-baseline outcomes separately for reach, holding position, holding speed and computation. Only submission is available. Correction paths are relative to draft.arguments (e.g. /new_facts/0/references), or explicitly start /arguments/.'
         elif self.phase=='response_final':
             view['instructions']='Read the accepted revision and actual comparison. Author your final recommendation disposition and separately choose candidate_disposition and selected_candidate (baseline, candidate, none). retain_baseline requires baseline; adopt_candidate requires candidate; defer_selection/reject_all require none. next_action must be finish. Justify using the candidate feedback. No further execution.'
         view['gap_guidance']='Unavailable data uses not_retained with source; unread data uses not_read with inventory_id. Missing capability uses capability_unavailable and basis, no invented source. Unauthorized further work uses execution_unauthorized and basis.'
@@ -90,7 +90,18 @@ class ScopedReferenceAdapter(BoundSavedStateAdapter):
                         errors.append(dict(path=f'changes.{i}.identifier',submitted=change.identifier,expected='Select each previous assessment at most once: '+', '.join(sorted(available))))
                     seen.add(key)
                     for j,ref in enumerate(change.supporting_fact_ids):
-                        if ref not in all_ids:errors.append(dict(path=f'changes.{i}.supporting_fact_ids.{j}',submitted=ref,expected='Select a declared inherited or new fact_id.'))
+                        if ref not in all_ids:errors.append(dict(path=f'changes.{i}.supporting_fact_ids.{j}',submitted=ref,expected='Use report fact_id, not evidence alias. Available: '+', '.join(sorted(all_ids))))
+                aliases=ensure_aliases(self.fact_state)['aliases'];catalog=self.fact_state['fact_catalog']
+                for feedback in self.role.get('check_feedback',[]):
+                    if feedback['receipt']['execution_status']!='completed' or not feedback.get('result'):continue
+                    numeric={alias for alias,h in aliases.items() if catalog[h]['selector']['reference']==feedback['result']
+                        and isinstance(catalog[h]['value'],(int,float)) and not isinstance(catalog[h]['value'],bool)
+                        and catalog[h]['selector']['pointer'].rsplit('/',1)[-1] not in ('update_id','time_s','horizon_s','integration_step_s','complete_cost_s','computation_s','new_local_solves')}
+                    if not any(ref in numeric for fact in parsed.new_facts for ref in fact.references):
+                        preferred=(comparison_view(self.role,self.fact_state) or {}).get('required_candidate_profile_references',{})
+                        available={a:dict(field=catalog[aliases[a]]['field'],value=catalog[aliases[a]]['value']) for a in sorted(numeric) if a in preferred}
+                        errors.append(dict(path='new_facts.references',submitted=[f.references for f in parsed.new_facts],
+                            expected='At least one direct candidate profile numeric citation is required; comparison aliases alone are insufficient.',available_aliases=available))
             if parsed and self.phase!='revision':
                 from tools.diagnostic_inventory import validate_gaps
                 for i,gap in enumerate(parsed.missing_evidence):

@@ -9,11 +9,15 @@ from schemas.diagnostic_revision import CompactRevision, Corrections
 
 def ensure_aliases(state):
     scope=state['fact_scope']
-    table=state.setdefault('reference_interface',dict(version='1.0.0',scope=deepcopy(scope),aliases={}))
+    table=state.setdefault('reference_interface',dict(version='1.1.0',alias_format='decimal',scope=deepcopy(scope),aliases={}))
     if table['scope']!=scope:raise ValueError('REFERENCE_SCOPE_CHANGED')
     aliases=table['aliases'];known=set(aliases.values())
     if len(known)!=len(aliases) or known-set(state['fact_catalog']):raise ValueError('AMBIGUOUS_OR_MISSING_ALIAS_BINDING')
-    for handle in sorted(set(state['fact_catalog'])-known):aliases['F%03d'%(len(aliases)+1)]=handle
+    for handle in sorted(set(state['fact_catalog'])-known):
+        # New scopes avoid insignificant zero transcription. Existing tables
+        # keep their original spelling forever, including saved v1 F001 scopes.
+        alias=('F%d' if table.get('alias_format')=='decimal' else 'F%03d')%(len(aliases)+1)
+        aliases[alias]=handle
     return table
 
 
@@ -25,7 +29,8 @@ def alias_errors(state, selections, prefix='fact_handles'):
             errors.append(dict(path=prefix+'.'+key,submitted=refs,expected='Nonempty list of exact scope aliases'));continue
         for i,ref in enumerate(refs):
             if not isinstance(ref,str) or ref not in aliases:
-                errors.append(dict(path=f'{prefix}.{key}.{i}',submitted=ref,expected='Unknown or out-of-scope alias. Copy an exact alias from the supplied reference_view; no lookup is required.'))
+                path=f'new_facts.{key}.references.{i}' if prefix=='new_facts.references' else f'{prefix}.{key}.{i}'
+                errors.append(dict(path=path,submitted=ref,expected='Unknown or out-of-scope alias. Copy an exact alias from the supplied reference_view; no lookup is required.'))
     return errors
 
 
@@ -39,8 +44,11 @@ def resolve_aliases(state, selections):
 def correct(draft, corrections):
     value=deepcopy(draft)
     for change in Corrections.model_validate(corrections).corrections:
-        if not change.path.startswith('/') or change.path=='/':raise ValueError('EXISTING_FIELD_POINTER_REQUIRED')
-        parent_path,_,key=change.path.rpartition('/');parent=pointer(value,parent_path)
+        path=change.path.removeprefix('/arguments') if change.path.startswith('/arguments/') else change.path
+        if not path.startswith('/') or path=='/':raise ValueError('EXISTING_FIELD_POINTER_REQUIRED')
+        parent_path,_,key=path.rpartition('/')
+        try:parent=pointer(value,parent_path)
+        except (KeyError,IndexError,TypeError,ValueError):raise ValueError('CORRECTION_FIELD_MISSING: '+change.path) from None
         key=key.replace('~1','/').replace('~0','~')
         if isinstance(parent,list):
             if not key.isdigit() or int(key)>=len(parent):raise ValueError('CORRECTION_FIELD_MISSING: '+change.path)
@@ -101,7 +109,11 @@ def comparison_view(role, state):
         if p.startswith('/campaign_comparison/') or (row['selector']['reference']==profile and
             (p.startswith('/detail/sampled_settling/') or p in {'/detail/terminal_error_m','/detail/mean_update_s','/detail/evaluation_validity'})):
             fields[reverse[h]]=dict(field=row['field'],value=row['value'],units=row['units'])
-    return dict(comparison=comparison,identities=dict(baseline=feedback['baseline_facts']['candidate'],candidate=(result.get('factual_result') or {}).get('candidate')),
+    required={a:dict(field=state['fact_catalog'][h]['field'],value=state['fact_catalog'][h]['value'])
+        for a,h in aliases.items() if state['fact_catalog'][h]['selector']['reference']==profile
+        and state['fact_catalog'][h]['selector']['pointer'] in ('/detail/terminal_error_m','/detail/sampled_settling/max_error_m','/detail/sampled_settling/max_speed_m_s','/detail/mean_update_s')}
+    return dict(comparison=comparison,required_candidate_profile_references=required,
+        identities=dict(baseline=feedback['baseline_facts']['candidate'],candidate=(result.get('factual_result') or {}).get('candidate')),
         actual_parameter_changes=(role.get('preparation_content') or {}).get('actual_diff',
         (result.get('design_statement') or {}).get('parameters',[])),references=fields,
         thresholds=dict(terminal_error_m=.01,holding_max_error_m=.01,holding_max_speed_m_s=.02,holding_window_s=.05),

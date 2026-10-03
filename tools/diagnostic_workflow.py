@@ -386,7 +386,7 @@ class DiagnosticWorkflow:
         for path in self.directory.glob('*.json'):atomic_json(destination/path.name,read(path))
         for name,value in [('events',events),('receipts',receipts),('raw_calls',raw),('resolved_calls',resolved)]:atomic_json(destination/(name+'.json'),value)
         atomic_json(destination/'evidence_contexts.json',{k:{field:self.store.session(h.run_id)['state'].get(field)
-            for field in ('fact_scope','fact_catalog','read_ledger')} for k,h in self.hosts.items()})
+            for field in ('fact_scope','fact_catalog','reference_interface','read_ledger')} for k,h in self.hosts.items()})
         for ref in refs.values():(artifacts/(ref['artifact_id']+'.json')).write_bytes(self.store.artifact(ref,raw=True))
         atomic_json(destination/'sha256_manifest.json',{p.relative_to(destination).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
             for p in sorted(destination.rglob('*.json')) if p.name!='sha256_manifest.json'})

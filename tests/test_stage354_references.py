@@ -28,9 +28,12 @@ class ReferenceTests(TestCase):
         state=self.state();original=deepcopy(ensure_aliases(state))
         state['fact_catalog']=dict(reversed(list(state['fact_catalog'].items())))
         self.assertEqual(ensure_aliases(state),original)
-        restored=json.loads(json.dumps(state));self.assertEqual(resolve_aliases(restored,{'x':['F001']}),{'x':[state['fact_catalog']['full-one']['selector']]})
+        restored=json.loads(json.dumps(state));self.assertEqual(resolve_aliases(restored,{'x':['F1']}),{'x':[state['fact_catalog']['full-one']['selector']]})
         restored['fact_catalog']['third']=dict(state['fact_catalog']['full-two'],handle='third')
-        self.assertEqual(ensure_aliases(restored)['aliases']['F001'],'full-one')
+        self.assertEqual(ensure_aliases(restored)['aliases']['F1'],'full-one')
+        legacy=self.state();legacy['reference_interface']=dict(version='1.0.0',scope=legacy['fact_scope'],aliases={'F001':'full-one'})
+        self.assertEqual(ensure_aliases(legacy)['aliases'],{'F001':'full-one','F002':'full-two'})
+        self.assertTrue(alias_errors(legacy,{'x':['F1']}))
         self.assertEqual(len(alias_errors(restored,{'x':['F000','F999'],'y':['full-one']})),3)
         other=self.state('other');other['fact_catalog']={};self.assertTrue(alias_errors(other,{'x':['F001']}))
         restored['fact_scope']={'project':'other'}
@@ -41,6 +44,8 @@ class ReferenceTests(TestCase):
         fixed=correct(draft,{'corrections':[{'path':'/report/facts/0/references/0','value':'F001'}]})
         expected=deepcopy(draft);expected['report']['facts'][0]['references']=['F001'];self.assertEqual(fixed,expected)
         self.assertEqual(draft['report']['facts'][0]['references'],['bad'])
+        explicit=correct(draft,{'corrections':[{'path':'/arguments/report/facts/0/references/0','value':'F001'}]})
+        self.assertEqual(explicit,fixed)
         with self.assertRaisesRegex(ValueError,'MISSING'):correct(draft,{'corrections':[{'path':'/invented','value':1}]})
 
     def test_capability_authorization_and_missing_data(self):
@@ -138,3 +143,60 @@ class SavedSuffixTests(TestCase):
         result=a.decode(response,0,bindings,payload['tools']);self.assertEqual(result['tool_id'],'diagnosis.submit')
         response.raw['choices'][0]['message']['tool_calls'][0]['function']['name']='diagnosis.submit'
         with self.assertRaises(ToolProtocolError):a.decode(response,0,bindings,payload['tools'])
+
+    def test_missing_profile_reference_is_one_actionable_preflight_error(self):
+        a,_=self.adapter();draft=self.revision(a)
+        alias=next(k for k,h in ensure_aliases(a.fact_state)['aliases'].items()
+            if a.fact_state['fact_catalog'][h]['selector']['pointer']=='/campaign_comparison/candidate/terminal_error_m')
+        draft['new_facts'][0]['references']=[alias]
+        with self.assertRaises(ToolProtocolError) as caught:a.resolve_business('diagnosis.submit',draft)
+        problem=next(e for e in caught.exception.issues if e['path']=='new_facts.references')
+        self.assertTrue(problem['available_aliases'])
+        for ref in problem['available_aliases']:
+            self.assertEqual(resolve_aliases(a.fact_state,{'x':[ref]})['x'][0]['reference'],self.feedback['result'])
+
+    def test_preserved_dual_draft_root_patch_offline_only(self):
+        # Regression of the actual paid failure, never mutate or resume its store.
+        from tools.platform_store import Store
+        from types import SimpleNamespace
+        directory=ROOT/'runs/stage354_milestone0_20261003/suffix_dual_context'
+        if not (directory/'outcome.json').exists():self.skipTest('Paid failure fixture not yet available')
+        store=Store(directory);freeze=read(directory/'freeze.json');identity=freeze['hosts']['diagnostic']
+        state=store.session(identity)['state'];before=deepcopy(state)
+        a=ScopedReferenceAdapter();a.fact_state=deepcopy(state);a.role=a.fact_state['role_context'];a.phase='revision'
+        a.wire={'diagnosis.submit':CompactRevision};a.fixed=a.role['native_fixed'];a.store=store
+        event=next(e for e in store.events(identity) if e['kind']=='model_raw_response' and e['request_id']=='model-3')
+        raw=store.artifact(event['outputs'][0])['raw'];args=json.loads(raw['choices'][0]['message']['tool_calls'][0]['function']['arguments'])
+        self.assertTrue(all(c['path'].startswith('/arguments/') for c in args['corrections']))
+        with patch.object(a,'retain'):
+            result=a.resolve_business('diagnosis.submit',args)
+        validated=InventoryDiagnosisSubmission.model_validate(result)
+        from tools.platform_handoff import submit
+        ctx=SimpleNamespace(store=store,run_id=identity,artifact=store.artifact)
+        with patch('tools.platform_handoff.transition',return_value='offline-valid'):
+            self.assertEqual(submit(ctx,validated),'offline-valid')
+        self.assertEqual(store.session(identity)['state'],before)
+
+    def test_z_pending_tool_can_complete_without_replenishing_model_limit(self):
+        from tools.platform_models import run_loop
+        from tools.platform_store import zero
+        a,payload=self.adapter();host=self.w.host('diagnostic');draft=self.revision(a)
+        arguments={**a.resolve_business('diagnosis.submit',draft),**a.fixed['diagnosis.submit']}
+        cost={**zero(),'model_calls':4,'wall_s':1.}
+        row,_=host.store.reserve(host.run_id,'offline-four-provider-attempts','fixture','fixture',cost)
+        host.store.complete(row,dict(request_id='offline-four-provider-attempts',execution_id=row['execution_id'],caller='fixture',
+            tool_id='fixture.provider',tool_version='1.0.0',execution_status='completed',charged=zero()),elapsed=1.)
+        before=host.store.remaining()['used'];phase=host.store.phase_remaining(host.run_id)
+        self.assertEqual(phase['remaining']['model_calls'],0)
+        with host.store.transaction() as db:
+            state=host.store.session(host.run_id,db)['state'];state.update(turn=4,protocol_corrections_used=2,protocol_corrections_consecutive=2)
+            state['pending']=dict(decision=dict(request_id='model-3-tool',tool_id='diagnosis.submit',tool_version='2.0.0',
+                arguments=arguments,reason='Offline saved-response normalization fixture',evidence=[]),parent=row['parent_id'],input=self.w.chain['initial_report'])
+            host.store.update_state(db,host.run_id,state,'paused')
+        a.respond=lambda *args: self.fail('No fifth revision provider call is permitted')
+        run_loop(host,a)
+        after=host.store.remaining()['used'];self.assertEqual(after['model_calls'],before['model_calls'])
+        self.assertEqual(after['tool_calls'],before['tool_calls']+1)
+        state=host.store.session(host.run_id)['state'];self.assertIn('diagnosis_report',state['handoffs'])
+        self.assertEqual(state['protocol_corrections_used'],2);self.assertEqual(state['protocol_corrections_consecutive'],0)
+        self.assertEqual(host.store.phase_remaining(host.run_id)['limit'],phase['limit'])

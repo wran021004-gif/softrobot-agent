@@ -17,7 +17,7 @@ class AssessmentChange(Contract):
     kind: Literal['hypothesis', 'recommendation']
     identifier: str
     disposition: Literal['retained', 'weakened', 'rejected', 'unresolved']
-    supporting_fact_ids: list[str] = Field(min_length=1)
+    supporting_fact_ids: list[str] = Field(min_length=1, description='Report fact_id values (inherited or declared in new_facts), not F evidence aliases.')
     reason: str = Field(min_length=1)
 
 
@@ -31,7 +31,7 @@ class CompactRevision(Contract):
 
 class FieldCorrection(Contract):
     operation: Literal['replace', 'remove'] = 'replace'
-    path: str = Field(description='Exact JSON pointer into the supplied unaccepted draft; existing fields only.')
+    path: str = Field(description='Exact existing-field JSON pointer relative to draft.arguments, e.g. /new_facts/0/references. The explicit draft-root spelling /arguments/new_facts/0/references is also supported. No guessed paths.')
     value: object = None
 
 
