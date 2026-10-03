@@ -4,6 +4,9 @@ import math
 from .contracts import Design, Discretization, BuildRequest, BuildResult
 from .compiler import normalize_inputs, resolve, Unsupported
 
+REACH_WEIGHT_PATHS = ('control/recipe/terminal_tip_speed_weight',
+                      'control/recipe/holding_tip_speed_weight')
+
 
 def canonical_path(path):
     parts = path.split('/')
@@ -25,7 +28,12 @@ def authorize(inp, space, changes):
         if spec is None and not normalized.startswith('model/'):
             spec = space.parameters.get(key)  # Legacy physical/discretization aliases.
         if spec is None: raise ValueError('PARAMETER_NOT_AUTHORIZED: '+key)
+        if normalized in REACH_WEIGHT_PATHS and inp is not None and key not in inp.policy.editable:
+            raise ValueError('PARAMETER_NOT_AUTHORIZED: '+key)
         check_value(key, value, spec, inp.policy.editable if inp is not None else {})
+        if normalized in REACH_WEIGHT_PATHS:
+            if not 0 <= value <= 1 or 0 < value < .0001:
+                raise ValueError('REACH_WEIGHT_REQUIRES_ZERO_OR_0001_TO_1: '+key)
 
 
 def check_value(key, value, spec, task_bounds):
@@ -243,6 +251,14 @@ def apply(inp, parameters, changes):
     control=control_type.model_validate(inp.policy.controller.parameters.data).model_dump(mode='json')
     for path,value in changes.items():
         if path.startswith('control/'):
+            if control_type is ReachControl and path in REACH_WEIGHT_PATHS:
+                if path not in inp.policy.editable or path not in parameters.control_parameters:
+                    raise ValueError('PARAMETER_NOT_AUTHORIZED: '+path)
+                check_value(path,value,parameters.control_parameters[path],inp.policy.editable)
+                if not 0 <= value <= 1 or 0 < value < .0001:
+                    raise ValueError('REACH_WEIGHT_REQUIRES_ZERO_OR_0001_TO_1: '+path)
+                control['recipe'][path.rsplit('/',1)[1]]=value
+                continue
             key=path.removeprefix('control/')
             allowed=(('curvature_weight','state_rate_weight','tendon_tension_weight')
                 if control_type is GVSLQRControl else ('feedback_gain','damping','max_joint_update_rad','ramp_s'))

@@ -10,12 +10,19 @@ from tools.platform_tools import _candidate
 from tools.state_io import digest
 
 
+class LocalImprovementComparison(Contract):
+    update_id: int = Field(ge=1,description='Saved baseline controller update; effective plan horizon must be 0.01 s.')
+    parameter: Literal['terminal_tip_speed_weight','holding_tip_speed_weight']
+
+
 class ImprovementDecision(Contract):
     """Flat model-authored business fields; host owns all source identities."""
     disposition: Literal['adopt','defer','reject']
     changes: dict[str, object] = Field(default_factory=dict, description='Only paths/values allowed by the existing candidate builder grant.')
     rationale: str = Field(min_length=1)
     expected_measurable_effect: str = Field(min_length=1)
+    local_comparison: LocalImprovementComparison | None = Field(default=None,
+        description='Optional only when the supplied campaign grant permits it: compare baseline against one selected changed positive weight at a legal saved state. No sweep; omit if unnecessary.')
 
 
 class ImprovementPreparation(Contract):
@@ -54,6 +61,7 @@ def prepare_improvement(host, report_reference, decision):
         source_report=report_reference,source_configuration=binding['configuration'],decision=decision)
     if decision.disposition!='adopt':
         if decision.changes:raise ValueError('DEFER_OR_REJECT_CANNOT_PREPARE_CHANGES')
+        if decision.local_comparison:raise ValueError('LOCAL_PAIR_REQUIRES_ADOPTED_DELTA')
         return result
     if not decision.changes:raise ValueError('ADOPT_REQUIRES_EXPLICIT_DELTA')
     # The family builder can support choice dimensions beyond the session's
@@ -63,6 +71,11 @@ def prepare_improvement(host, report_reference, decision):
     candidate=_candidate(baseline,decision.changes,registry())
     differences=actual_diff(plain(baseline),plain(candidate))
     if not differences:raise ValueError('EFFECTIVE_CHANGE_REQUIRED')
+    from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
+    if set(baseline.policy.editable)<=set(REACH_WEIGHT_PATHS):
+        permitted={'/policy/controller/parameters/data/'+p.removeprefix('control/') for p in decision.changes}
+        if any(row['pointer'] not in permitted for row in differences):
+            raise ValueError('CONTROL_ONLY_CANDIDATE_CHANGED_FROZEN_FIELDS')
     identity='improvement-'+uuid4().hex[:12]
     prepared=CandidateInput(candidate_id=identity,baseline_identity=digest(plain(baseline)),
         builder=baseline.policy.candidate_builder.extension_id,builder_version=baseline.policy.candidate_builder.version,

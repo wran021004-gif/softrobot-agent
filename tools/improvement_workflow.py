@@ -50,6 +50,14 @@ class ImprovementWorkflow(DiagnosticWorkflow):
                 permitted_tools=['diagnosis.inspect_evidence','diagnosis.submit','evidence.read'])
         return fixed
 
+    def comparison(self, baseline, result):
+        return None
+
+    def screen_improvement(self, intent):
+        if intent['decision'].get('local_comparison'):
+            raise ValueError('LOCAL_COMPARISON_NOT_GRANTED')
+        return None
+
     def run(self):
         started=time.monotonic();status='incomplete';reason=None
         guard=self.directory/'live_attempt.json'
@@ -57,7 +65,7 @@ class ImprovementWorkflow(DiagnosticWorkflow):
         if implementation()['files']!=self.freeze['implementation']['files']:raise ValueError('FROZEN_IMPLEMENTATION_CHANGED')
         self.validate_frozen_configuration()
         atomic_json(guard,dict(started=datetime.now(timezone.utc).isoformat()))
-        self.preparation=None;self.complete_result=None;self.validation_gap=None
+        self.preparation=None;self.complete_result=None;self.validation_gap=None;self.local_screen=None
         try:
             self.phase('request','diagnosis_request','request')
             self.phase('initial','diagnosis_report','initial_report',require_initial_views=True,
@@ -67,8 +75,9 @@ class ImprovementWorkflow(DiagnosticWorkflow):
             baseline=SessionInput.model_validate(self.store.artifact(source['configuration'])['effective'])
             space=plain(baseline.policy.candidate_builder.parameters)['data']
             grant={key:spec for key,spec in space['parameters'].items() if key in baseline.policy.editable}
+            controls={key:spec for key,spec in space.get('control_parameters',{}).items() if key in baseline.policy.editable}
             self.phase('improvement','improvement_decision','improvement_decision',report=report,report_content=self.store.artifact(report),
-                delivery_tool='design.decide_improvement',editable_scope=dict(editable=plain(baseline.policy.editable),parameters=grant,control_parameters={}),
+                delivery_tool='design.decide_improvement',editable_scope=dict(editable=plain(baseline.policy.editable),parameters=grant,control_parameters=controls),
                 previous_report=report,previous_report_content=self.store.artifact(report))
             intent=self.store.artifact(self.chain['improvement_decision'])
             try:self.preparation=prepare_improvement(self.host('design'),report,intent['decision'])
@@ -76,6 +85,7 @@ class ImprovementWorkflow(DiagnosticWorkflow):
             if self.preparation:
                 self.chain['preparation']=save(self.store,self.preparation)
                 if self.preparation.status=='prepared_no_execution':
+                    self.local_screen=self.screen_improvement(intent)
                     candidate=self.store.artifact(self.preparation.configuration)
                     executor=execution_host(self.store,self.project+'-candidate',candidate['effective'],
                         dict(model_calls=0,tool_calls=10,wall_s=1600.,backend_solves=1,worker_calls=0))
@@ -83,6 +93,11 @@ class ImprovementWorkflow(DiagnosticWorkflow):
                     configure_role(executor,'executor','One complete candidate and fixed evaluation/profile',
                         phase_budget=dict(limit=dict(tool_calls=3,wall_s=1600.),protect_project=dict(model_calls=7,tool_calls=7,wall_s=600.)))
                     self.complete_result=complete_execution(executor,baseline,self.preparation.candidate_id)
+                    executed=self.store.artifact(self.complete_result['configuration']) if self.complete_result.get('configuration') else None
+                    if executed and execution_scope(executed['effective'])!=execution_scope(candidate['effective']):
+                        raise ValueError('PREPARED_EXECUTED_SCIENTIFIC_SCOPE_MISMATCH')
+                    self.complete_result['preparation_configuration']=plain(self.preparation.configuration)
+                    self.complete_result['source_report']=plain(report)
             result=self.complete_result
             feedback=dict(kind='complete_improvement_feedback',source_report=report,source_execution=source['execution_id'],
                 decision=self.chain['improvement_decision'],preparation=self.chain.get('preparation'),validation_gap=self.validation_gap,
@@ -90,12 +105,18 @@ class ImprovementWorkflow(DiagnosticWorkflow):
                 status=result['status'] if result else ('delta_rejected' if self.validation_gap else 'no_change_selected'),
                 result=result['receipts']['profile']['output'] if result and result['status']=='evaluated' else None,
                 receipt=result['receipts'].get('profile') if result else None)
+            feedback['campaign_comparison']=self.comparison(self.experiment['baseline_facts'],result)
+            feedback['local_screen']=self.local_screen
             self.chain['feedback']=save(self.store,feedback)
             atomic_json(self.directory/'feedback.json',feedback)
             retained=[]
             if feedback['result']:
                 retained=[dict(reference=self.chain['feedback'],result=feedback['result'],receipt=feedback['receipt'],
                     result_content=self.store.artifact(feedback['result']))]
+            if feedback['campaign_comparison']:
+                from tools.diagnostic_facts import handover
+                for role in ('diagnostic','design'):
+                    handover(self.host(role),self.chain['feedback'],feedback,origin=dict(kind='complete_execution_feedback'),kind='campaign_comparison')
             self.phase('revision','diagnosis_report','revised_report',previous_report=report,previous_report_content=self.store.artifact(report),
                 check_feedback=retained,improvement_feedback_content=feedback)
             self.phase('response_final','design_response','final_response',check_feedback=retained,improvement_feedback_content=feedback)

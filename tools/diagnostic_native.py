@@ -124,6 +124,14 @@ class BoundSavedStateAdapter(FlatDiagnosticAdapter):
                 'Facts require exact reference/pointer/value selectors.',
                 'Select fact_handles for your own concise factual statements. Do not supply fact_selectors, fact evidence/observed, report source/gates or recommendation configuration_scope; report threshold observations as facts with handles. The host expands exact internal references. Rounded prose is allowed. Derived numbers require a retrieved computation result; do not invent a derived numerical fact.')
             payload['messages'][0]['content']+=' Availability is distinct from reading: consult your read_ledger, selected coverage and explicit handoffs. Not currently displayed does not mean never queried. Shared model errors need not cancel, and small differences do not prove input or causal-hypothesis equivalence.'
+            payload['messages'][0]['content']+=' Use program-derived summaries for counts, ranges and comparisons, with their stated coverage. Selected endpoints are not the full trajectory. Prediction queries also return measured backend endpoints; plans-only queries are not prediction reads. Separate terminal reach, holding-window position, holding-window speed and computation. Synchronous wall overruns do not establish skipped simulated updates. Lack of evidence for a beneficial geometry change does not establish that geometry cannot affect settling or computation.'
+        schema=self.schemas.get('design.decide_improvement')
+        grant=context['role_context'].get('editable_scope',{}).get('control_parameters',{})
+        if schema and grant:
+            schema['properties']['changes']=dict(type='object',additionalProperties=False,properties={
+                path:dict(type='number',minimum=spec['bounds'][0],maximum=spec['bounds'][1],
+                    description=spec.get('description','')+' New positive selections must be at least 0.0001; an effective delta is required.')
+                for path,spec in grant.items()})
         schema=self.schemas.get('diagnosis.check_request')
         if schema:
             for key in ('initial_state','input'):
