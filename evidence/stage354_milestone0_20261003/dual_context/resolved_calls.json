@@ -1,0 +1,1616 @@
+[
+  {
+    "run_id": "gvs-stage354-68b86eee4963-design",
+    "reference": {
+      "artifact_id": "6df71aa3230e69e37fcd9fbc05ffb28a3b0ae85687d39596ff1e28c6e6a52afb",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "binding": {
+          "artifact_id": "1dd73248d41264c770a567618f0243cf1d34a152e9ce9123b8764a29343961ed",
+          "media_type": "application/json"
+        },
+        "budget": {
+          "backend_solves": 0,
+          "model_calls": 24,
+          "tool_calls": 60,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "candidate_id": "baseline-replay",
+        "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+        "evidence_manifest": {
+          "artifact_id": "a9702d58bea0f18bfe2d0bbbc23aa924cf980041237865033642a56d03e31b16",
+          "media_type": "application/json"
+        },
+        "execution_id": "cf997605885642759ee33920e2c9e2ef",
+        "permitted_tools": [
+          "diagnosis.inspect_evidence",
+          "diagnosis.submit",
+          "evidence.read"
+        ],
+        "question": "Open question over the single retained baseline execution (execution_id cf997605885642759ee33920e2c9e2ef; summary artifact c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0): What is the recorded relation among (a) terminal reach — reach_passed F40 = true with terminal_error_m F48 = 0.007642608585867386 m inside reach_tolerance_m F13 = 0.01 m; (b) sampled holding position — holding_position_passed F50 = false with late_max_error_m F10 = 0.05813810428573256 m and holding_window error_m range [F2 = 0.007642608585867386, F46 = 0.05813810428573256] m over F21 = 6 rows (F38 = 6), versus settling position_limit_m F61 = 0.01 m; (c) sampled holding speed — holding_speed_passed F51 = false with late_max_speed_m_s F6 = 1.5810152739742807 m/s and holding_window speed_m_s range [F20 = 0.6351726092425104, F27 = 1.5810152739742807] m/s over F35 = 6 rows, versus settling speed_limit_m_s F62 = 0.02 m/s and terminal_speed_m_s F30 = 0.6351726092425104 m/s; and (d) computation — mean_update_s F56 = 17.26331904856488 s against control_period_s F69 = 0.01 s, deadline_misses F16 = 35, stopping_counts Solve_Succeeded F18 = 1 / User_Requested_Stop F68 = 34, max_cpu_s F33 = 30.0 s, horizon F41 = 10, numerical_source F7 = bundled_guess. The question is descriptive and comparative: which retained sampled signals jointly describe the passed-reach / failed-holding-and-settling pattern (F9 = false, F45 = false), and what recorded computation facts coincide with it. No predetermined cause and no predetermined winning weight; single execution and model comparisons do not establish a dominant cause (F14, F31).",
+        "saved_state_check": null,
+        "scope": [
+          "Retained-evidence reads (reading/reporting only, no solve): the complete one-step and plan inventory in artifact 96414b9a157bcac119039a821d6623ee08dd6a0ea3c03fb13eb46487a981e5f4 — source.one_step_predictions (35 records, update_ids 0..34, view prediction), source.applied_tensions (F12 = /{update_id}/actual_tension_n), source.saved_projected_states (F39 = /{update_id}/measured_initial_state), source.plan_selection, source.solver_status, source.controller_horizon (effective_horizon; configured horizon F41 = 10).",
+          "Retained-evidence reads, sampled backend motion: source.backend_motion artifact 4c8dbe91ec952662322fe903c865e7ab9e844e636e972b74f05735cb584d69d1, sampled post-step times 0.01..0.35 s, derived motion/prediction endpoint views at chosen controller updates (at most 8 per query); holding-window coverage F63 = [0.3,0.31,0.32,0.33,0.34,0.35] s, F66 = all recorded samples in final holding window, F60 = selected rows only.",
+          "Retained-evidence reads, static limits/config: source.force_limits artifact 0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd (6 tendons, force_limit_n = 8.0 each); configuration artifact af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0 and manifest a9702d58bea0f18bfe2d0bbbc23aa924cf980041237865033642a56d03e31b16 (weights F34/F15/F32/F70/F23/F64/F4, scales F59/F19/F26, seed F5/F43, settling F71/F37).",
+          "Explicitly authorized saved-state numerical work (separate from reading; bounded and optional): at most one paired local_comparison at a saved baseline update, two local_solves, <= 300 charged seconds, effective horizon 0.01 s, implicit_euler integration step <= 0.01 s, selecting exactly one changed positive controller weight; authorized operations prediction_braking and local_comparison. Numerical grants: local_solves = 2 (2 remaining), prediction_evaluations = 0 (none authorized) — no additional prediction evaluation may be requested or performed.",
+          "Excluded: production changes and backend execution (not authorized); full closed-loop counterfactual replay and causal attribution (capability gap, no such tool); full historical warm plans and optimizer iteration traces (source.historical_full_plans retained = false, control_snapshots.json not retained; F3 = full_snapshots_available false; F31). An inconclusive or unavailable local comparison does not itself prohibit a later justified complete experiment."
+        ],
+        "stopping_conditions": [
+          "Stop when the open question is answered from retained evidence alone: report reach F40/F48/F13 alongside holding position F50/F10/F46/F2/F61 and holding speed F51/F6/F27/F20/F62/F35, plus computation F56/F69/F16/F68/F18/F33/F41/F7, and the holding-window coverage/interpretation qualifiers F63/F66/F60/F38/F21.",
+          "Stop and declare not_retained with source for any requested signal absent from the inventory: full historical warm plans / optimizer iteration traces (source.historical_full_plans retained = false) and full_snapshots_available F3 = false.",
+          "Stop and declare not_read with inventory_id for any inventory entry not actually queried in this context; declare not_displayed, queried with stated coverage, or not_retained for partial coverage. A sampled motion view or a failed raw gzip read does not prove absence.",
+          "Stop and declare capability_unavailable with basis for closed-loop counterfactual replay or causal attribution, and for whole-trajectory ranges beyond the selected final holding window (F60).",
+          "Stop and declare execution_unauthorized with basis before any production change, backend execution, or numerical work exceeding the granted budget (local_solves > 2, prediction_evaluations > 0, horizon > 0.01 s, charged time > 300 s) or changing more than one weight.",
+          "Do not conclude a dominant cause or a winning weight from a single execution or from model comparisons (F14, F31); report only recorded coincident facts."
+        ],
+        "subject": "control",
+        "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-0-tool",
+      "tool_id": "diagnosis.request",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage354-68b86eee4963-design",
+    "reference": {
+      "artifact_id": "dd0ffd5d1b4c030691da1552da07840eef4cafb2087044333400bb986d51eb7b",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "changes": {
+          "control/recipe/holding_tip_speed_weight": 0.05
+        },
+        "disposition": "adopt",
+        "expected_measurable_effect": "After the changed controller (control/recipe/holding_tip_speed_weight = 0.05; terminal_tip_speed_weight unchanged at 0.0) is executed end-to-end in a complete simulation with unchanged reach evaluation and sampled holding/profile feedback, the final holding-window samples (F78 = 0.30-0.35 s, F81 = all recorded samples in final holding window, 6 rows F35/F38) should show sampled speed_m_s below the baseline range [F20 = 0.6351726092425104, F27 = 1.5810152739742807] m/s and closer to settling speed_limit_m_s = 0.02 m/s (F49), potentially flipping holding_speed_passed (F63) true, while terminal reach (F40; terminal_error_m F47 = 0.007642608585867386 m vs reach_tolerance_m F13 = 0.01 m) and holding position (late_max_error_m F10 = 0.05813810428573256 m vs position_limit_m F36 = 0.01 m) are re-measured in the same units and limits; mean_update_s (F44 = 17.26331904856488 s vs control_period_s F48 = 0.01 s) and deadline_misses (F16 = 35) are re-checked and should not increase materially. All reported quantities stay in the retained baseline units and limits; no raw scalar objective comparison across weights is made.",
+        "local_comparison": null,
+        "rationale": "Hypothesis (testable, explicitly not causal): the retained holding-speed failure is associated with holding_tip_speed_weight = 0.0 (F86) together with terminal_tip_speed_weight = 0.0 (F32). With no cost on tip speed at or after the scheduled settling-window start, the retained baseline keeps sampled tip speed in the final window at [F20 = 0.6351726092425104, F27 = 1.5810152739742807] m/s over 6 rows (F35, F38; window coverage F78 = 0.30-0.35 s, F81 = all recorded samples in final holding window) against settling speed_limit_m_s = 0.02 m/s (F49; F68), with terminal_speed_m_s = 0.6351726092425104 m/s (F30) and holding_speed_passed = false (F63), while reach passed (F40) with terminal_error_m = 0.007642608585867386 m (F47) inside reach_tolerance_m = 0.01 m (F13). Relevance: the editable holding term is precisely a per-second weight on squared spatial tip speed at nodes at or after the configured settling-window start, and the failed quantity is sampled spatial tip speed at those same nodes; the configuration supplies the explicit settling settings this term requires (window_s = 0.05, F65/F87; position_limit_m = 0.01, F36/F76; speed_limit_m_s = 0.02, F49/F68) and horizon = 10 (F43). Selection: adopt exactly one changed weight, control/recipe/holding_tip_speed_weight 0.0 -> 0.05 (legal: bounds [0,1], new positive >= 0.0001, nonempty effective delta). A moderate value is chosen because the observed violation is roughly 30-80x the limit (F20, F27 vs F49) and no computed cost-contribution scaling is retained (F31), so a near-minimum weight risks a null experiment while a large weight risks dominating the cost; the admissible range is [0,1] and no developer-prescribed value is used. terminal_tip_speed_weight is left at 0.0 (F32) so this bounded first experiment changes one variable only, avoiding confounding and a possible trade-off against the currently passing reach; the terminal speed cost remains a single terminal scaled squared-speed term with tip_speed_scale_m_s = 0.02 m/s (F32, F73), and the holding speed cost remains an integration-step-weighted sum at the scheduled holding nodes (F37, F65, F87) with scale and scheduling unchanged. All other fields are fixed. Expected effects, stated separately and hedged: (1) holding speed - primary target; the holding-window speed_m_s samples (F78, F35, F38) should move down from [F20, F27] toward 0.02 m/s (F49); (2) reach - should be retained at least as good as the retained pass (F40, F47 vs F13), though penalising speed at settling nodes can trade off position; (3) holding position - late_max_error_m (F10 = 0.05813810428573256 m; window maximum F57) versus 0.01 m (F36, F76) is the secondary quantity and could improve or worsen; (4) computation - mean_update_s (F44 = 17.26331904856488 s) versus control_period_s = 0.01 s (F48), deadline_misses (F16 = 35 of 35), stopping_counts (F18 = 1 Solve_Succeeded / F84 = 34 User_Requested_Stop), max_cpu_s = 30.0 s (F33) and max_iterations = 120 (F90) are expected to stay within the same order, since adding one quadratic term does not materially change solver size, but no budget change is assumed. Possible adverse effects: a heavier holding-speed penalty can reduce achievable tip motion and worsen holding position error (F10) or terminal error (F47); near the 0.05 s settling window (F65) the added term interacts with tracking_weight = 1.0 (F23), terminal_weight = 5.0 (F34), velocity_weight = 0.0001 (F79), terminal_velocity_weight = 0.0001 (F15), variation_weight = 0.001 (F4) and tension_weight = 0.0001 (F24); with near-deadline solves (F44 vs F48, F16) a heavier nonlinear cost could shift optimizer truncation behaviour (F18, F84, F69), and any torque consequence is bounded by force_limit_n = 8.0 N per tendon over 6 tendons. Observations that would weaken the hypothesis: a completed run with unchanged or higher holding-window speed (F20, F27, F78); a worsened holding position (F10) or reach (F47 vs F13); an unchanged terminal_speed_m_s (F30); or no measurable change in solver stopping/truncation behaviour, which would point toward the retained solver budget (F44, F16, F18, F84) rather than the absent speed weight. Boundaries: single retained execution with full_snapshots_available = false (F3); no closed-loop counterfactual replay or causal attribution and no retained warm plans or iteration traces (F14, F31); this is a bounded testable hypothesis, not a dominant-cause claim, and raw scalar objective values are not compared across weights - only the same retained sampled units and limits as the baseline. local_comparison omitted: source.controller_horizon was not queried in this context, so no saved baseline update with a verified effective horizon of 0.01 s can be named without guessing an update_id; per the grant, an unavailable or inconclusive screen does not prohibit this justified complete experiment."
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-2-tool",
+      "tool_id": "design.decide_improvement",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage354-68b86eee4963-design",
+    "reference": {
+      "artifact_id": "29db61804e8180cbf14007676a329975d44e4940700ad8c395058c79c14a5e38",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "defer_selection",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+          "media_type": "application/json"
+        },
+        "next_action": "finish",
+        "reasoning": "Recommendation disposition (kept separate from candidate selection): the diagnostic revision recommendation is upheld as \"defer\" — no controller-weight change is adopted now, and the earlier deferrals of rec-holding-tip-speed-weight and rec-terminal-tip-speed-weight stand (terminal_tip_speed_weight was never changed from 0.0, so it was not tested). I accept the diagnostic recommendation's guidance to not advance improvement-744833040049 and to defer controller-candidate selection; I draw no causal inference from citation validity.\n\nSealed candidate-vs-baseline facts (comparison_view / F references): the sealed classification is physical_tradeoff (F630), under the rule \"Joint acceptance first; otherwise componentwise physical comparison.\" (F969) with \"Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.\" (F620) and raw scalar objectives under different weights not ranked (F349, F435). Joint acceptance is not met: joint_reach_holding_passed is false in both candidate (F964) and baseline (F374) because sampled holding still fails. Componentwise physical metrics:\n- Reach: both pass; candidate terminal_error_m = 0.00869890424761182 m (F455) vs baseline 0.007642608585867386 m (F228), delta +0.001056295661744434 m (F464) — slightly worse but still inside the 0.01 m tolerance; official_reach_task_success true in both (F851, F624).\n- Holding position: candidate 0.05650455971948983 m (F903) vs baseline 0.05813810428573256 m (F452), delta -0.001633544566242727 m (F104) — improved, but both remain above position_limit_m = 0.01 m (F199) with holding_position_passed false (F617).\n- Holding speed: candidate 1.1750052670100422 m/s (F272) vs baseline 1.5810152739742807 m/s (F508), delta -0.4060100069642385 m/s (F157) — improved (largest recorded reduction), but both remain far above speed_limit_m_s = 0.02 m/s (F983) with holding_speed_passed false (F664).\n- Computation: candidate mean_complete_update_s = 17.714294602841672 s (F506) vs baseline 17.26331904856488 s (F212), delta +0.45097555427679126 s (F390) — slightly slower; deadline_misses 35 in both (F106, F947; delta 0 F234) against control_period_s 0.01 s; solver_error_count 0 both (F604, F290). Candidate and baseline are both valid complete executions (F372, F330) with zero force-bound violation (F497, F142).\n\nConclusion: the candidate is a physical tradeoff — it improves holding error and holding speed yet worsens terminal reach and computation, and neither holding metric is brought inside its limit, so joint reach-and-holding acceptance is not achieved and the candidate is not an overall improvement (F620). Raw objective scalars are not ranked (F349, F493 tolerance 1e-09). Accordingly I do not adopt the candidate.\n\nCandidate selection (separate from recommendation acceptance): defer_selection with selected_candidate = none. The baseline itself does not meet joint reach-and-holding acceptance (F374 false), so it is not affirmed as an accepted configuration, and the well-supported route is to defer the controller-candidate decision rather than retain (F969 joint acceptance first). Per the recommendation, further bounded work would keep exactly one changed positive tip-speed weight with unchanged reach/holding evaluation. No dominant cause is established (two complete executions differing in exactly one weight; no closed-loop counterfactual replay/causal-attribution capability). No further execution is authorized; next_action = finish.",
+        "recommendation_id": "revision_recommendation",
+        "report": {
+          "artifact_id": "3e7810e87bf49db9fcc06fffded9b9ffb297eb054c5fac1d2c7a5207fd110303",
+          "media_type": "application/json"
+        },
+        "selected_candidate": null
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-3-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage354-68b86eee4963-diagnostic",
+    "reference": {
+      "artifact_id": "c0f2cc14b4946c190f1338881d94c10afca02ec84890ed057d3a1a53a9565b76",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "batch": [
+        {
+          "arguments": {
+            "binding": {
+              "artifact_id": "1dd73248d41264c770a567618f0243cf1d34a152e9ce9123b8764a29343961ed",
+              "media_type": "application/json"
+            },
+            "update_ids": [
+              0,
+              5,
+              10,
+              15,
+              20,
+              25,
+              30,
+              34
+            ],
+            "view": "prediction"
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+          "request_id": "model-0-tool-0",
+          "tool_id": "diagnosis.inspect_evidence",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "binding": {
+              "artifact_id": "1dd73248d41264c770a567618f0243cf1d34a152e9ce9123b8764a29343961ed",
+              "media_type": "application/json"
+            },
+            "update_ids": [],
+            "view": "motion"
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+          "request_id": "model-0-tool-1",
+          "tool_id": "diagnosis.inspect_evidence",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "binding": {
+              "artifact_id": "1dd73248d41264c770a567618f0243cf1d34a152e9ce9123b8764a29343961ed",
+              "media_type": "application/json"
+            },
+            "update_ids": [
+              0,
+              10,
+              20,
+              29,
+              30,
+              34
+            ],
+            "view": "plans"
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+          "request_id": "model-0-tool-2",
+          "tool_id": "diagnosis.inspect_evidence",
+          "tool_version": "1.0.0"
+        }
+      ]
+    }
+  },
+  {
+    "run_id": "gvs-stage354-68b86eee4963-diagnostic",
+    "reference": {
+      "artifact_id": "0bfba75413ae6d683efbd5e53c035058ec497b4d40df89c82acd45e25f0982ef",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "check_results": [],
+        "fact_selectors": {
+          "computation_coincident": [
+            {
+              "pointer": "/detail/summary/mean_update_s",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 17.26331904856488
+            },
+            {
+              "pointer": "/detail/summary/control_period_s",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/deadline_misses",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 35
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/Solve_Succeeded",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 1
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/User_Requested_Stop",
+              "reference": {
+                "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                "media_type": "application/json"
+              },
+              "value": 34
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/horizon",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 10
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/numerical_source",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": "bundled_guess"
+            }
+          ],
+          "holding_position_failed": [
+            {
+              "pointer": "/detail/summary/holding_position_passed",
+              "reference": {
+                "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/detail/summary/holding_window_summary/ranges/error_m/maximum",
+              "reference": {
+                "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                "media_type": "application/json"
+              },
+              "value": 0.05813810428573256
+            },
+            {
+              "pointer": "/detail/summary/holding_window_summary/ranges/error_m/count",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 6
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/position_limit_m",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/sampled_settling_passed",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/detail/summary/joint_reach_holding_passed",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "holding_speed_failed": [
+            {
+              "pointer": "/detail/summary/holding_speed_passed",
+              "reference": {
+                "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/detail/summary/late_max_speed_m_s",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 1.5810152739742807
+            },
+            {
+              "pointer": "/detail/summary/holding_window_summary/ranges/speed_m_s/minimum",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 0.6351726092425104
+            },
+            {
+              "pointer": "/detail/summary/holding_window_summary/ranges/speed_m_s/count",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 6
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/speed_limit_m_s",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 0.02
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/7/velocity/measured_speed_m_s",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 0.6351726092425104
+            }
+          ],
+          "reach_terminal_passed": [
+            {
+              "pointer": "/detail/summary/reach_passed",
+              "reference": {
+                "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/detail/summary/terminal_error_m",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 0.007642608585867386
+            },
+            {
+              "pointer": "/detail/summary/reach_tolerance_m",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            }
+          ]
+        },
+        "missing_evidence": [
+          {
+            "basis": "Derived motion view displayed only the final holding-window samples 0.3-0.35 s (F503, F637); matched one-step endpoint comparisons exist only at updates 0,5,10,15,20,25,30,34 (F427).",
+            "inventory_id": "source.backend_motion",
+            "needed": "Whole-trajectory tip motion plus the full sampled backend signals (qpos/qvel, tendon length/rate, deadline/saturation flags) outside the selected final holding window.",
+            "source": null,
+            "status": "queried",
+            "time_range_s": [
+              0.3,
+              0.35
+            ],
+            "update_ids": null
+          },
+          {
+            "basis": "Prediction view queried only 8 sampled update_ids; selected rows only, not whole-trajectory ranges (F437).",
+            "inventory_id": "source.one_step_predictions",
+            "needed": "Prediction rows for the remaining 27 updates to characterise whole-trajectory prediction-versus-measured error.",
+            "source": null,
+            "status": "queried",
+            "time_range_s": null,
+            "update_ids": [
+              0,
+              5,
+              10,
+              15,
+              20,
+              25,
+              30,
+              34
+            ]
+          },
+          {
+            "basis": "Only derived projected_state_difference summaries were displayed (F491, F518); the raw projected-state pointer was not read in this context.",
+            "inventory_id": "source.saved_projected_states",
+            "needed": "Raw recorded projected GVS states per update (/{update_id}/measured_initial_state).",
+            "source": null,
+            "status": "not_read",
+            "time_range_s": null,
+            "update_ids": null
+          },
+          {
+            "basis": "Inventory lists 6 tendons at force_limit_n = 8.0 N, but this entry was not queried in this context.",
+            "inventory_id": "source.force_limits",
+            "needed": "Per-tendon force limits versus sampled tension headroom to check force saturation.",
+            "source": null,
+            "status": "not_read",
+            "time_range_s": null,
+            "update_ids": null
+          },
+          {
+            "basis": "Inventory entry retained = false; control_snapshots.json not retained; F388; capabilities missing update:0/10/20/29/30/34:complete_warm_and_plans.",
+            "inventory_id": "source.historical_full_plans",
+            "needed": "Full historical warm plans and optimizer iteration traces (e.g. updates 0,10,20,29,30,34).",
+            "source": null,
+            "status": "not_retained",
+            "time_range_s": null,
+            "update_ids": null
+          },
+          {
+            "basis": "Inventory capability_gaps; capabilities.unsupported[0] = causal_identification (F669).",
+            "inventory_id": null,
+            "needed": "A tool to replay the closed loop under a changed weight to test whether a controller change causes the failed holding.",
+            "source": "Closed-loop counterfactual replay / causal-attribution capability",
+            "status": "capability_unavailable",
+            "time_range_s": null,
+            "update_ids": null
+          }
+        ],
+        "previous_report": null,
+        "recommendations": [
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "parameter": "holding_tip_speed_weight",
+            "rationale": "holding_tip_speed_weight = 0.0 (F479) coincides with failed sampled holding speed (F451 = 1.581 m/s, F497 = 0.635 m/s) against speed_limit_m_s = 0.02 m/s (F429). Propose a bounded paired local_comparison at a saved baseline update before any change; defer controller selection pending that check (no dominant cause or winning weight established).",
+            "recommendation_id": "rec-holding-tip-speed-weight",
+            "value": null
+          },
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "parameter": "terminal_tip_speed_weight",
+            "rationale": "terminal_tip_speed_weight = 0.0 (F543) with terminal_speed_m_s = 0.635 m/s (F513) is non-negligible though reach passed (F390, F415); a secondary candidate only if the holding-speed hypothesis is unsupported. Defer.",
+            "recommendation_id": "rec-terminal-tip-speed-weight",
+            "value": null
+          }
+        ],
+        "report": {
+          "attribution": [
+            {
+              "cause": "reach_passed_holding_failed_pattern",
+              "fact_ids": [
+                "reach_terminal_passed",
+                "holding_position_failed",
+                "holding_speed_failed"
+              ],
+              "reason": "Recorded coincidence only: reach_passed = true (F390) with terminal_error_m = 0.0076 m inside tolerance 0.01 m (F415, F587), while the final holding window records holding_position_passed = false (F499) with error up to 0.0581 m (F484) and holding_speed_passed = false (F511) with speed 0.635-1.581 m/s (F497, F451) against limits 0.01 m / 0.02 m (F431, F429). Descriptive, not causal.",
+              "status": "supported"
+            },
+            {
+              "cause": "zero_tip_speed_cost_weights",
+              "fact_ids": [
+                "holding_speed_failed"
+              ],
+              "reason": "Both grantable tip-speed weights are zero (holding_tip_speed_weight F479 = 0.0, terminal_tip_speed_weight F543 = 0.0) while sampled holding speed stays 0.635-1.581 m/s (F451, F513); a testable hypothesis only, since raw weight magnitudes do not establish cost-term importance without actual contributions/scaling.",
+              "status": "possible"
+            },
+            {
+              "cause": "per_update_solver_budget_truncation",
+              "fact_ids": [
+                "computation_coincident"
+              ],
+              "reason": "34 of 35 updates stopped by User_Requested_Stop (F648) with only 1 Solve_Succeeded (F406) and mean_update_s 17.26 s versus 0.01 s control period (F403, F421); consistent with budgeted-best-feasible truncation but association is not proof.",
+              "status": "possible"
+            },
+            {
+              "cause": "seed_projection_residual",
+              "fact_ids": [
+                "computation_coincident"
+              ],
+              "reason": "Large recorded GVS projection residuals (F386 = 0.777 at update 10, F411 = 1.327 at update 15, F466 = 1.827 at update 20) with numerical_source = bundled_guess (F721); association only.",
+              "status": "possible"
+            },
+            {
+              "cause": "reach_tolerance_violation",
+              "fact_ids": [
+                "reach_terminal_passed"
+              ],
+              "reason": "reach_passed = true (F390) with terminal_error_m = 0.0076 m inside reach_tolerance_m = 0.01 m (F415, F587): terminal reach did not fail.",
+              "status": "ruled_out"
+            },
+            {
+              "cause": "dominant_cause",
+              "fact_ids": [],
+              "reason": "Single retained execution; no closed-loop counterfactual replay (capability gap, F669) and no retained warm plans/iteration traces (F388); no dominant cause can be identified.",
+              "status": "insufficient_evidence"
+            }
+          ],
+          "facts": [
+            {
+              "evidence": [
+                {
+                  "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "reach_terminal_passed",
+              "observed": null,
+              "statement": "Terminal reach passed: reach_passed = true (F390) with terminal_error_m = 0.007642608585867386 m (F415) inside reach_tolerance_m = 0.01 m (F587)."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "holding_position_failed",
+              "observed": null,
+              "statement": "Sampled holding position failed: holding_position_passed = false (F499); the final-window error_m over 6 rows (F522) reaches 0.05813810428573256 m (F484), above settling position_limit_m = 0.01 m (F431); sampled_settling_passed = false (F645) and joint_reach_holding_passed = false (F395)."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "holding_speed_failed",
+              "observed": null,
+              "statement": "Sampled holding speed failed: holding_speed_passed = false (F511); the final-window speed_m_s over 6 rows (F393) ranges [0.6351726092425104, 1.5810152739742807] m/s (F497, F451), far above settling speed_limit_m_s = 0.02 m/s (F429); terminal_speed_m_s = 0.6351726092425104 m/s (F513)."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "computation_coincident",
+              "observed": null,
+              "statement": "Recorded computation: mean_update_s = 17.26331904856488 s (F403) versus control_period_s = 0.01 s (F421); deadline_misses = 35 of 35 updates (F448); stopping_counts Solve_Succeeded = 1 (F406) / User_Requested_Stop = 34 (F648); configured horizon = 10 (F400); numerical_source = bundled_guess (F721)."
+            }
+          ],
+          "gates": [],
+          "limitations": [
+            "Holding-window figures are selected rows only (F582; F389) over 6 samples at 0.3-0.35 s (F503, F637); they are not whole-trajectory ranges.",
+            "Full historical warm plans and optimizer iteration traces are not retained (F388); full_snapshots_available is false.",
+            "Single execution and model comparisons do not establish a dominant cause (F631).",
+            "Raw weight magnitudes (F479, F543) do not establish cost-term importance without actual contributions/scaling.",
+            "One-step comparisons are projected GVS prediction versus full serial-backend endpoint, not full-state agreement (F532, F491)."
+          ],
+          "recommended_actions": [
+            "Do not change controller weights in this phase; defer controller-candidate selection to a later phase.",
+            "If a bounded check is taken, run the authorized paired local_comparison at a saved baseline update with exactly one changed positive tip-speed weight."
+          ],
+          "source": {
+            "artifact_id": "1dd73248d41264c770a567618f0243cf1d34a152e9ce9123b8764a29343961ed",
+            "media_type": "application/json"
+          },
+          "subject": "baseline-reach-holding-pattern"
+        },
+        "request": {
+          "artifact_id": "2dbbdcb330201b36000f66c7239e58558f334b03a3c1ae9971b74d16d450b932",
+          "media_type": "application/json"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-1-tool",
+      "tool_id": "diagnosis.submit",
+      "tool_version": "2.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage354-68b86eee4963-diagnostic",
+    "reference": {
+      "artifact_id": "55a65b82f6d5b106905cd950f2d559359b0eec68855a0081e8390aa76c447a3b",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "check_results": [
+          {
+            "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+            "media_type": "application/json"
+          }
+        ],
+        "fact_selectors": {
+          "applied_parameter_change": [
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/holding_tip_speed_weight",
+              "reference": {
+                "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                "media_type": "application/json"
+              },
+              "value": 0.0
+            },
+            {
+              "pointer": "/detail/numerical_preparation/current_scope/controller/parameters/data/recipe/holding_tip_speed_weight",
+              "reference": {
+                "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                "media_type": "application/json"
+              },
+              "value": 0.05
+            },
+            {
+              "pointer": "/detail/numerical_preparation/execution_scope/controller/parameters/data/recipe/terminal_tip_speed_weight",
+              "reference": {
+                "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                "media_type": "application/json"
+              },
+              "value": 0.0
+            }
+          ],
+          "candidate_comparison_classification": [
+            {
+              "pointer": "/campaign_comparison/classification",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": "physical_tradeoff"
+            },
+            {
+              "pointer": "/campaign_comparison/ranking_rule/rule",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": "Joint acceptance first; otherwise componentwise physical comparison."
+            },
+            {
+              "pointer": "/campaign_comparison/ranking_rule/objective",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": "Raw scalar objectives under different weights are not ranked."
+            },
+            {
+              "pointer": "/campaign_comparison/ranking_rule/tradeoff",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement."
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/joint_reach_holding_passed",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/joint_reach_holding_passed",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/valid_complete_execution",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/valid_complete_execution",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/force_bound_violation_n",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0.0
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/force_bound_violation_n",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0.0
+            },
+            {
+              "pointer": "/detail/sampled_settling/passed",
+              "reference": {
+                "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "candidate_computation_outcome": [
+            {
+              "pointer": "/detail/mean_update_s",
+              "reference": {
+                "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                "media_type": "application/json"
+              },
+              "value": 17.714294602841672
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/mean_complete_update_s",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 17.714294602841672
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/mean_complete_update_s",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 17.26331904856488
+            },
+            {
+              "pointer": "/campaign_comparison/candidate_minus_baseline/mean_complete_update_s",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0.45097555427679126
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/deadline_misses",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 35
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/deadline_misses",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 35
+            },
+            {
+              "pointer": "/campaign_comparison/candidate_minus_baseline/deadline_misses",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/control_period_s",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/control_period_s",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/solver_error_count",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/solver_error_count",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0
+            }
+          ],
+          "candidate_holding_position_outcome": [
+            {
+              "pointer": "/detail/sampled_settling/max_error_m",
+              "reference": {
+                "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                "media_type": "application/json"
+              },
+              "value": 0.05650455971948983
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/holding_max_error_m",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0.05650455971948983
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/holding_max_error_m",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0.05813810428573256
+            },
+            {
+              "pointer": "/campaign_comparison/candidate_minus_baseline/holding_max_error_m",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": -0.001633544566242727
+            },
+            {
+              "pointer": "/detail/sampled_settling/position_limit_m",
+              "reference": {
+                "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/holding_position_passed",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/holding_position_passed",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "candidate_holding_speed_outcome": [
+            {
+              "pointer": "/detail/sampled_settling/max_speed_m_s",
+              "reference": {
+                "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                "media_type": "application/json"
+              },
+              "value": 1.1750052670100422
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 1.1750052670100422
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 1.5810152739742807
+            },
+            {
+              "pointer": "/campaign_comparison/candidate_minus_baseline/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": -0.4060100069642385
+            },
+            {
+              "pointer": "/detail/sampled_settling/speed_limit_m_s",
+              "reference": {
+                "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                "media_type": "application/json"
+              },
+              "value": 0.02
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/holding_speed_passed",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/holding_speed_passed",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "candidate_reach_outcome": [
+            {
+              "pointer": "/detail/terminal_error_m",
+              "reference": {
+                "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                "media_type": "application/json"
+              },
+              "value": 0.00869890424761182
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/terminal_error_m",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0.00869890424761182
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/terminal_error_m",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0.007642608585867386
+            },
+            {
+              "pointer": "/campaign_comparison/candidate_minus_baseline/terminal_error_m",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": 0.001056295661744434
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/terminal_reach_passed",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/campaign_comparison/candidate/official_reach_task_success",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/terminal_reach_passed",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/campaign_comparison/baseline/official_reach_task_success",
+              "reference": {
+                "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                "media_type": "application/json"
+              },
+              "value": true
+            }
+          ],
+          "computation_coincident": [
+            {
+              "pointer": "/detail/summary/mean_update_s",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 17.26331904856488
+            },
+            {
+              "pointer": "/detail/summary/control_period_s",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/deadline_misses",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 35
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/Solve_Succeeded",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 1
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/User_Requested_Stop",
+              "reference": {
+                "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                "media_type": "application/json"
+              },
+              "value": 34
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/horizon",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 10
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/numerical_source",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": "bundled_guess"
+            }
+          ],
+          "holding_position_failed": [
+            {
+              "pointer": "/detail/summary/holding_position_passed",
+              "reference": {
+                "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/detail/summary/holding_window_summary/ranges/error_m/maximum",
+              "reference": {
+                "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                "media_type": "application/json"
+              },
+              "value": 0.05813810428573256
+            },
+            {
+              "pointer": "/detail/summary/holding_window_summary/ranges/error_m/count",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 6
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/position_limit_m",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/sampled_settling_passed",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/detail/summary/joint_reach_holding_passed",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "holding_speed_failed": [
+            {
+              "pointer": "/detail/summary/holding_speed_passed",
+              "reference": {
+                "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/detail/summary/late_max_speed_m_s",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 1.5810152739742807
+            },
+            {
+              "pointer": "/detail/summary/holding_window_summary/ranges/speed_m_s/minimum",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 0.6351726092425104
+            },
+            {
+              "pointer": "/detail/summary/holding_window_summary/ranges/speed_m_s/count",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 6
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/speed_limit_m_s",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 0.02
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/7/velocity/measured_speed_m_s",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 0.6351726092425104
+            }
+          ],
+          "reach_terminal_passed": [
+            {
+              "pointer": "/detail/summary/reach_passed",
+              "reference": {
+                "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/detail/summary/terminal_error_m",
+              "reference": {
+                "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                "media_type": "application/json"
+              },
+              "value": 0.007642608585867386
+            },
+            {
+              "pointer": "/detail/summary/reach_tolerance_m",
+              "reference": {
+                "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            }
+          ]
+        },
+        "missing_evidence": [
+          {
+            "basis": "Derived motion view displayed only the final holding-window samples 0.3-0.35 s (F503, F637); matched one-step endpoint comparisons exist only at updates 0,5,10,15,20,25,30,34 (F427).",
+            "inventory_id": "source.backend_motion",
+            "needed": "Whole-trajectory tip motion plus the full sampled backend signals (qpos/qvel, tendon length/rate, deadline/saturation flags) outside the selected final holding window.",
+            "source": null,
+            "status": "queried",
+            "time_range_s": [
+              0.3,
+              0.35
+            ],
+            "update_ids": null
+          },
+          {
+            "basis": "Prediction view queried only 8 sampled update_ids; selected rows only, not whole-trajectory ranges (F437).",
+            "inventory_id": "source.one_step_predictions",
+            "needed": "Prediction rows for the remaining 27 updates to characterise whole-trajectory prediction-versus-measured error.",
+            "source": null,
+            "status": "queried",
+            "time_range_s": null,
+            "update_ids": [
+              0,
+              5,
+              10,
+              15,
+              20,
+              25,
+              30,
+              34
+            ]
+          },
+          {
+            "basis": "Only derived projected_state_difference summaries were displayed (F491, F518); the raw projected-state pointer was not read in this context.",
+            "inventory_id": "source.saved_projected_states",
+            "needed": "Raw recorded projected GVS states per update (/{update_id}/measured_initial_state).",
+            "source": null,
+            "status": "not_read",
+            "time_range_s": null,
+            "update_ids": null
+          },
+          {
+            "basis": "Inventory lists 6 tendons at force_limit_n = 8.0 N, but this entry was not queried in this context.",
+            "inventory_id": "source.force_limits",
+            "needed": "Per-tendon force limits versus sampled tension headroom to check force saturation.",
+            "source": null,
+            "status": "not_read",
+            "time_range_s": null,
+            "update_ids": null
+          },
+          {
+            "basis": "Inventory entry retained = false; control_snapshots.json not retained; F388; capabilities missing update:0/10/20/29/30/34:complete_warm_and_plans.",
+            "inventory_id": "source.historical_full_plans",
+            "needed": "Full historical warm plans and optimizer iteration traces (e.g. updates 0,10,20,29,30,34).",
+            "source": null,
+            "status": "not_retained",
+            "time_range_s": null,
+            "update_ids": null
+          },
+          {
+            "basis": "Inventory capability_gaps; capabilities.unsupported[0] = causal_identification (F669).",
+            "inventory_id": null,
+            "needed": "A tool to replay the closed loop under a changed weight to test whether a controller change causes the failed holding.",
+            "source": "Closed-loop counterfactual replay / causal-attribution capability",
+            "status": "capability_unavailable",
+            "time_range_s": null,
+            "update_ids": null
+          }
+        ],
+        "previous_report": {
+          "artifact_id": "f0bd17ddc970fe7ca19432552803082dd7aa83b3a28593ad21b3333040ae0a5e",
+          "media_type": "application/json"
+        },
+        "recommendations": [
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "parameter": "holding_tip_speed_weight",
+            "rationale": "retained: The authorized single-weight experiment was executed and yielded a physical trade-off with holding still failing (position 0.05650455971948983 m > 0.01 m; speed 1.1750052670100422 m/s > 0.02 m/s) and joint_reach_holding_passed false, so the earlier 'do not select; defer' recommendation is retained; diagnostic recommendation acceptance is kept separate from selecting a controller candidate.",
+            "recommendation_id": "rec-holding-tip-speed-weight",
+            "value": null
+          },
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "parameter": "terminal_tip_speed_weight",
+            "rationale": "retained: terminal_tip_speed_weight was left unchanged at 0.0 in the executed experiment, so this secondary recommendation was not tested and stands deferred.",
+            "recommendation_id": "rec-terminal-tip-speed-weight",
+            "value": null
+          },
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "parameter": null,
+            "rationale": "Accept the diagnostic recommendation separately from candidate selection: do NOT advance improvement-744833804049 as the controller candidate. The sealed candidate-vs-baseline comparison is a physical_tradeoff - reach stays passed but slightly worse (+0.001056295661744434 m terminal error), holding position (0.05650455971948983 m vs 0.01 m) and holding speed (1.1750052670100422 m/s vs 0.02 m/s) improve only marginally and still fail, and computation is slightly slower (+0.45097555427679126 s mean update) with 35/35 deadline misses in both - so joint_reach_holding_passed remains false. Retain both prior parameters as deferred. If further improvement work is authorized, keep exactly one changed positive weight per experiment with unchanged reach/holding evaluation; no controller candidate may be selected until joint reach-and-holding acceptance is met. Two complete executions now differ in exactly one controller weight (holding_tip_speed_weight 0.0 -> 0.05). Reported separately per physical dimension: (reach) baseline terminal_error_m 0.007642608585867386 m vs candidate 0.00869890424761182 m, delta +0.001056295661744434 m; terminal reach passed in both, candidate slightly worse. (holding position) baseline holding-window max error 0.05813810428573256 m vs candidate 0.05650455971948983 m, delta -0.001633544566242727 m; both above the 0.01 m limit, holding_position_passed false in both. (holding speed) baseline max speed 1.5810152739742807 m/s vs candidate 1.1750052670100422 m/s, delta -0.4060100069642385 m/s; both far above the 0.02 m/s limit, holding_speed_passed false in both. (computation) baseline mean update 17.26331904856488 s vs candidate 17.714294602841672 s, delta +0.45097555427679126 s; deadline_misses 35 and solver_error_count 0 in both. The sealed classification is physical_tradeoff; ranking is componentwise physical comparison with joint acceptance first, and raw objective scalars under different weights are not ranked. Accordingly the zero-tip-speed-weight hypothesis is weakened (the changed weight moved holding speed in the expected direction but did not resolve the failure and coincided with slightly worse reach/computation), reach-tolerance-violation stays rejected, the budget-truncation coincidence stays retained/untested, the reach-passed/holding-failed descriptive pattern is retained, and no dominant cause is established. Diagnostic recommendation acceptance is handled separately from selecting a controller candidate, and no causal inference is drawn from citation validity.",
+            "recommendation_id": "revision_recommendation",
+            "value": null
+          }
+        ],
+        "report": {
+          "attribution": [
+            {
+              "cause": "reach_passed_holding_failed_pattern",
+              "fact_ids": [
+                "reach_terminal_passed",
+                "holding_position_failed",
+                "holding_speed_failed",
+                "candidate_reach_outcome",
+                "candidate_holding_position_outcome",
+                "candidate_holding_speed_outcome"
+              ],
+              "reason": "The descriptive pattern repeats in the candidate execution: reach passed (terminal error 0.00869890424761182 m < 0.01 m) while holding position failed (0.05650455971948983 m > 0.01 m) and holding speed failed (1.1750052670100422 m/s > 0.02 m/s), with joint_reach_holding_passed false.",
+              "status": "supported"
+            },
+            {
+              "cause": "zero_tip_speed_cost_weights",
+              "fact_ids": [
+                "holding_speed_failed",
+                "candidate_holding_speed_outcome",
+                "candidate_comparison_classification",
+                "candidate_reach_outcome"
+              ],
+              "reason": "The executed one-weight change holding_tip_speed_weight 0.0 -> 0.05 coincided with the largest recorded holding-speed reduction (candidate 1.1750052670100422 m/s vs baseline 1.5810152739742807 m/s; candidate_holding_speed_outcome), consistent with the proposed direction, but holding_speed_passed stayed false, holding position still fails, terminal error and mean update rose, and the sealed comparison is classified physical_tradeoff (candidate_comparison_classification, candidate_reach_outcome). The directional association survives, yet the weight alone is not shown to resolve the holding-speed failure; no causal claim is made.",
+              "status": "possible"
+            },
+            {
+              "cause": "per_update_solver_budget_truncation",
+              "fact_ids": [
+                "computation_coincident",
+                "candidate_computation_outcome"
+              ],
+              "reason": "Only one cost weight changed; deadline_misses stayed 35 of 35 in both executions and candidate mean update rose slightly (delta +0.45097555427679126 s) with solver_error_count 0 in both, so the budget/truncation coincidence is unchanged and still possible; this experiment did not test it.",
+              "status": "possible"
+            },
+            {
+              "cause": "seed_projection_residual",
+              "fact_ids": [
+                "computation_coincident",
+                "candidate_computation_outcome"
+              ],
+              "reason": "A single cost-weight change does not alter the seed/projection path; the bundled_guess seed and recorded projection residuals persist, so this coincident hypothesis remains untested and possible.",
+              "status": "possible"
+            },
+            {
+              "cause": "reach_tolerance_violation",
+              "fact_ids": [
+                "reach_terminal_passed",
+                "candidate_reach_outcome"
+              ],
+              "reason": "Baseline terminal_error_m 0.007642608585867386 m and candidate 0.00869890424761182 m are both inside the 0.01 m reach tolerance, so terminal reach did not fail in either execution; the reach-tolerance-violation hypothesis remains rejected.",
+              "status": "ruled_out"
+            },
+            {
+              "cause": "dominant_cause",
+              "fact_ids": [
+                "candidate_comparison_classification"
+              ],
+              "reason": "Two complete executions differing in exactly one weight both fail joint reach-and-holding and the sealed classification is physical_tradeoff; no closed-loop counterfactual replay or causal-identification capability exists, so no dominant cause is established.",
+              "status": "insufficient_evidence"
+            }
+          ],
+          "facts": [
+            {
+              "evidence": [
+                {
+                  "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "reach_terminal_passed",
+              "observed": null,
+              "statement": "Terminal reach passed: reach_passed = true (F390) with terminal_error_m = 0.007642608585867386 m (F415) inside reach_tolerance_m = 0.01 m (F587)."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "holding_position_failed",
+              "observed": null,
+              "statement": "Sampled holding position failed: holding_position_passed = false (F499); the final-window error_m over 6 rows (F522) reaches 0.05813810428573256 m (F484), above settling position_limit_m = 0.01 m (F431); sampled_settling_passed = false (F645) and joint_reach_holding_passed = false (F395)."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "holding_speed_failed",
+              "observed": null,
+              "statement": "Sampled holding speed failed: holding_speed_passed = false (F511); the final-window speed_m_s over 6 rows (F393) ranges [0.6351726092425104, 1.5810152739742807] m/s (F497, F451), far above settling speed_limit_m_s = 0.02 m/s (F429); terminal_speed_m_s = 0.6351726092425104 m/s (F513)."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "2c6c59da33155ec901eab46552734302ee73451ba3df3f86de5dc9b1f5b22018",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "computation_coincident",
+              "observed": null,
+              "statement": "Recorded computation: mean_update_s = 17.26331904856488 s (F403) versus control_period_s = 0.01 s (F421); deadline_misses = 35 of 35 updates (F448); stopping_counts Solve_Succeeded = 1 (F406) / User_Requested_Stop = 34 (F648); configured horizon = 10 (F400); numerical_source = bundled_guess (F721)."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "candidate_reach_outcome",
+              "observed": null,
+              "statement": "Candidate vs baseline reach: candidate terminal_error_m = 0.00869890424761182 m (F1070, F651) vs baseline terminal_error_m = 0.007642608585867386 m (F237), delta = +0.001056295661744434 m (F667); both inside the 0.01 m reach tolerance, with candidate terminal_reach_passed = true (F944) and official_reach_task_success = true (F1361), baseline terminal_reach_passed = true (F1366) and official_reach_task_success = true (F968). Reach stayed passed but slightly worse for the candidate."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "candidate_holding_position_outcome",
+              "observed": null,
+              "statement": "Candidate vs baseline holding position: candidate holding-window sampled maximum error = 0.05650455971948983 m (F108, F1451) vs baseline 0.05813810428573256 m (F644), delta = -0.001633544566242727 m (F30); both remain above the settling position_limit_m = 0.01 m (F197), with candidate holding_position_passed = false (F954) and baseline holding_position_passed = false (F525)."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "candidate_holding_speed_outcome",
+              "observed": null,
+              "statement": "Candidate vs baseline holding speed: candidate holding-window sampled maximum speed = 1.1750052670100422 m/s (F139, F322) vs baseline 1.5810152739742807 m/s (F741), delta = -0.4060100069642385 m/s (F136); both remain above the settling speed_limit_m_s = 0.02 m/s (F1601), with candidate holding_speed_passed = false (F1041) and baseline holding_speed_passed = false (F310)."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "candidate_computation_outcome",
+              "observed": null,
+              "statement": "Candidate vs baseline computation: candidate mean_complete_update_s = 17.714294602841672 s (F967, F738) vs baseline 17.26331904856488 s (F211), delta = +0.45097555427679126 s (F526); deadline_misses = 35 in both (F34 candidate, F1534 baseline), delta = 0 (F249), against control_period_s = 0.01 s (F519, F1095); solver_error_count = 0 in both (F932, F354)."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "candidate_comparison_classification",
+              "observed": null,
+              "statement": "Sealed comparison classification = 'physical_tradeoff' (F979): ranking is componentwise physical comparison with joint acceptance first (F1580), raw scalar objectives under different weights are not ranked (F455), and any improvement accompanied by worsening is a trade-off (F963); candidate and baseline joint_reach_holding_passed are both false (F1575, F502), both are valid complete executions (F495, F422) with zero force-bound violation (F718, F105), and sampled_settling passed = false (F220)."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "65e62fe738294d41fbceda838f7d89e689c4c90e4dc8c65e1550a3a2bea980ae",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "applied_parameter_change",
+              "observed": null,
+              "statement": "The executed candidate differs from the baseline in exactly one controller weight: holding_tip_speed_weight 0.0 (baseline recorded value F1548) -> 0.05 (candidate current-scope value F1370); terminal_tip_speed_weight is unchanged at 0.0 (F1628)."
+            }
+          ],
+          "gates": [],
+          "limitations": [
+            "Holding-window figures are selected rows only (F582; F389) over 6 samples at 0.3-0.35 s (F503, F637); they are not whole-trajectory ranges.",
+            "Full historical warm plans and optimizer iteration traces are not retained (F388); full_snapshots_available is false.",
+            "Single execution and model comparisons do not establish a dominant cause (F631).",
+            "Raw weight magnitudes (F479, F543) do not establish cost-term importance without actual contributions/scaling.",
+            "One-step comparisons are projected GVS prediction versus full serial-backend endpoint, not full-state agreement (F532, F491).",
+            "Two complete single executions differing in one weight still do not establish a dominant cause.",
+            "Candidate profile values and comparison deltas are sealed arithmetic; source agreement does not certify causality.",
+            "Holding-window quantities cover only the retained final-window samples (0.3-0.35 s), not whole-trajectory ranges.",
+            "No closed-loop counterfactual replay or causal-identification capability exists; full historical warm plans and optimizer iteration traces remain not retained."
+          ],
+          "recommended_actions": [
+            "Do not change controller weights in this phase; defer controller-candidate selection to a later phase.",
+            "If a bounded check is taken, run the authorized paired local_comparison at a saved baseline update with exactly one changed positive tip-speed weight.",
+            "hypothesis zero_tip_speed_cost_weights: weakened. The executed one-weight change holding_tip_speed_weight 0.0 -> 0.05 coincided with the largest recorded holding-speed reduction (candidate 1.1750052670100422 m/s vs baseline 1.5810152739742807 m/s; candidate_holding_speed_outcome), consistent with the proposed direction, but holding_speed_passed stayed false, holding position still fails, terminal error and mean update rose, and the sealed comparison is classified physical_tradeoff (candidate_comparison_classification, candidate_reach_outcome). The directional association survives, yet the weight alone is not shown to resolve the holding-speed failure; no causal claim is made.",
+            "hypothesis reach_tolerance_violation: rejected. Baseline terminal_error_m 0.007642608585867386 m and candidate 0.00869890424761182 m are both inside the 0.01 m reach tolerance, so terminal reach did not fail in either execution; the reach-tolerance-violation hypothesis remains rejected.",
+            "hypothesis per_update_solver_budget_truncation: retained. Only one cost weight changed; deadline_misses stayed 35 of 35 in both executions and candidate mean update rose slightly (delta +0.45097555427679126 s) with solver_error_count 0 in both, so the budget/truncation coincidence is unchanged and still possible; this experiment did not test it.",
+            "hypothesis reach_passed_holding_failed_pattern: retained. The descriptive pattern repeats in the candidate execution: reach passed (terminal error 0.00869890424761182 m < 0.01 m) while holding position failed (0.05650455971948983 m > 0.01 m) and holding speed failed (1.1750052670100422 m/s > 0.02 m/s), with joint_reach_holding_passed false.",
+            "hypothesis seed_projection_residual: retained. A single cost-weight change does not alter the seed/projection path; the bundled_guess seed and recorded projection residuals persist, so this coincident hypothesis remains untested and possible.",
+            "hypothesis dominant_cause: unresolved. Two complete executions differing in exactly one weight both fail joint reach-and-holding and the sealed classification is physical_tradeoff; no closed-loop counterfactual replay or causal-identification capability exists, so no dominant cause is established.",
+            "recommendation rec-holding-tip-speed-weight: retained. The authorized single-weight experiment was executed and yielded a physical trade-off with holding still failing (position 0.05650455971948983 m > 0.01 m; speed 1.1750052670100422 m/s > 0.02 m/s) and joint_reach_holding_passed false, so the earlier 'do not select; defer' recommendation is retained; diagnostic recommendation acceptance is kept separate from selecting a controller candidate.",
+            "recommendation rec-terminal-tip-speed-weight: retained. terminal_tip_speed_weight was left unchanged at 0.0 in the executed experiment, so this secondary recommendation was not tested and stands deferred.",
+            "Accept the diagnostic recommendation separately from candidate selection: do NOT advance improvement-744833804049 as the controller candidate. The sealed candidate-vs-baseline comparison is a physical_tradeoff - reach stays passed but slightly worse (+0.001056295661744434 m terminal error), holding position (0.05650455971948983 m vs 0.01 m) and holding speed (1.1750052670100422 m/s vs 0.02 m/s) improve only marginally and still fail, and computation is slightly slower (+0.45097555427679126 s mean update) with 35/35 deadline misses in both - so joint_reach_holding_passed remains false. Retain both prior parameters as deferred. If further improvement work is authorized, keep exactly one changed positive weight per experiment with unchanged reach/holding evaluation; no controller candidate may be selected until joint reach-and-holding acceptance is met. Two complete executions now differ in exactly one controller weight (holding_tip_speed_weight 0.0 -> 0.05). Reported separately per physical dimension: (reach) baseline terminal_error_m 0.007642608585867386 m vs candidate 0.00869890424761182 m, delta +0.001056295661744434 m; terminal reach passed in both, candidate slightly worse. (holding position) baseline holding-window max error 0.05813810428573256 m vs candidate 0.05650455971948983 m, delta -0.001633544566242727 m; both above the 0.01 m limit, holding_position_passed false in both. (holding speed) baseline max speed 1.5810152739742807 m/s vs candidate 1.1750052670100422 m/s, delta -0.4060100069642385 m/s; both far above the 0.02 m/s limit, holding_speed_passed false in both. (computation) baseline mean update 17.26331904856488 s vs candidate 17.714294602841672 s, delta +0.45097555427679126 s; deadline_misses 35 and solver_error_count 0 in both. The sealed classification is physical_tradeoff; ranking is componentwise physical comparison with joint acceptance first, and raw objective scalars under different weights are not ranked. Accordingly the zero-tip-speed-weight hypothesis is weakened (the changed weight moved holding speed in the expected direction but did not resolve the failure and coincided with slightly worse reach/computation), reach-tolerance-violation stays rejected, the budget-truncation coincidence stays retained/untested, the reach-passed/holding-failed descriptive pattern is retained, and no dominant cause is established. Diagnostic recommendation acceptance is handled separately from selecting a controller candidate, and no causal inference is drawn from citation validity."
+          ],
+          "source": {
+            "artifact_id": "1dd73248d41264c770a567618f0243cf1d34a152e9ce9123b8764a29343961ed",
+            "media_type": "application/json"
+          },
+          "subject": "baseline-reach-holding-pattern"
+        },
+        "request": {
+          "artifact_id": "2dbbdcb330201b36000f66c7239e58558f334b03a3c1ae9971b74d16d450b932",
+          "media_type": "application/json"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-2-tool",
+      "tool_id": "diagnosis.submit",
+      "tool_version": "2.0.0"
+    }
+  }
+]

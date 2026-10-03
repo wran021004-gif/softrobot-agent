@@ -1,0 +1,205 @@
+{
+  "schema_version": "1.0.0",
+  "status": "completed",
+  "stop_reason": "Accepted diagnostic revision and model-authored final candidate disposition from sealed historical feedback.",
+  "mode": "single_context",
+  "pilot": false,
+  "minimal": false,
+  "classification": "supplementary saved-evidence suffix",
+  "chain": {
+    "request": {
+      "artifact_id": "3e1be38a93153eadae32d0221d1eb428add6d7e6bafc9fe031a58097b823ed18",
+      "media_type": "application/json"
+    },
+    "initial_report": {
+      "artifact_id": "36ce3d654c80174dd02570a7b07118901b962f555fdb53eaeaae2d0f70cf478c",
+      "media_type": "application/json"
+    },
+    "improvement_decision": {
+      "artifact_id": "4652e8e2deb8d5b2093b9eff4f8ee1a94c9c968c5885205f68b812c3baaf11c3",
+      "media_type": "application/json"
+    },
+    "preparation": {
+      "artifact_id": "a2aad3bea08dd9974349f3c27997d5f30517d97a9b5725d9803735f9ee4200e3",
+      "media_type": "application/json"
+    },
+    "feedback": {
+      "artifact_id": "3727970a3ebc45fb76845def68916285e49f155a55bf5aaf2ebe509fe4895961",
+      "media_type": "application/json"
+    },
+    "revised_report": {
+      "artifact_id": "04b87e3e6df14a37a352c590c5f652dfe63393bd1d39e0af17b700434a85cc9b",
+      "media_type": "application/json"
+    },
+    "final_response": {
+      "artifact_id": "d1cbddaf624bae98ace7b885db4f8d6ad45ee9dfce799b24977ae8a76cfc7449",
+      "media_type": "application/json"
+    }
+  },
+  "feedback_complete": true,
+  "numerical_check_status": "completed",
+  "usage": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 8,
+      "tool_calls": 20,
+      "wall_s": 600.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 3,
+      "model_calls": 3,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 75.21899999980815
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 5,
+      "tool_calls": 17,
+      "wall_s": 524.7810000001919,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "numerical_work": {
+    "limits": {
+      "local_solves": 0,
+      "prediction_evaluations": 0
+    },
+    "used": {
+      "local_solves": 0,
+      "prediction_evaluations": 0
+    }
+  },
+  "provider_usage": [
+    {
+      "completion_tokens": 5479,
+      "completion_tokens_details": {
+        "reasoning_tokens": 3569
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 51803,
+      "prompt_tokens": 51803,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 57282
+    },
+    {
+      "completion_tokens": 1910,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1629
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 53371,
+      "prompt_tokens": 54267,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 56177
+    },
+    {
+      "completion_tokens": 8390,
+      "completion_tokens_details": {
+        "reasoning_tokens": 7640
+      },
+      "prompt_cache_hit_tokens": 128,
+      "prompt_cache_miss_tokens": 56940,
+      "prompt_tokens": 57068,
+      "prompt_tokens_details": {
+        "cached_tokens": 128
+      },
+      "total_tokens": 65458
+    }
+  ],
+  "monetary_cost": null,
+  "elapsed_s": 82.84399999980815,
+  "protocol_corrections": 1,
+  "recovery": {
+    "shared": {
+      "version": "2.0.0",
+      "scope": "workflow shared across phases and contexts",
+      "protocol": {
+        "category": "native_schema_or_envelope",
+        "limits": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "total_used": 1,
+        "consecutive_used": 0,
+        "total_remaining": 3,
+        "consecutive_remaining": 2,
+        "reset": "Completed business call resets consecutive only; decoding alone does not."
+      },
+      "business": {
+        "category": "accepted_call_execution_rejected_or_failed",
+        "limit": 2,
+        "consecutive_failures": 0,
+        "total_failures": 0,
+        "remaining_repairs": 2,
+        "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+        "reset": "Completed business call resets consecutive; phase/context switch does not.",
+        "feedback": null
+      },
+      "transport": {
+        "category": "provider_transport_failure",
+        "automatic_retry": false
+      },
+      "length": {
+        "category": "truncated_without_usable_action",
+        "limit": 1,
+        "used": 0,
+        "configuration": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        }
+      },
+      "stop_reason": null
+    },
+    "executor": {
+      "version": "2.0.0",
+      "scope": "workflow shared across phases and contexts",
+      "protocol": {
+        "category": "native_schema_or_envelope",
+        "limits": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "total_used": 0,
+        "consecutive_used": 0,
+        "total_remaining": 4,
+        "consecutive_remaining": 2,
+        "reset": "Completed business call resets consecutive only; decoding alone does not."
+      },
+      "business": {
+        "category": "accepted_call_execution_rejected_or_failed",
+        "limit": 2,
+        "consecutive_failures": 0,
+        "total_failures": 0,
+        "remaining_repairs": 2,
+        "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+        "reset": "Completed business call resets consecutive; phase/context switch does not.",
+        "feedback": null
+      },
+      "transport": {
+        "category": "provider_transport_failure",
+        "automatic_retry": false
+      },
+      "length": {
+        "category": "truncated_without_usable_action",
+        "limit": 1,
+        "used": 0,
+        "configuration": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        }
+      },
+      "stop_reason": null
+    }
+  },
+  "physical_improvement": "not evaluated",
+  "source_preserved": true
+}

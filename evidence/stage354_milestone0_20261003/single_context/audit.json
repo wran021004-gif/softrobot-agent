@@ -1,0 +1,726 @@
+{
+  "label": "single_context",
+  "status": "completed",
+  "reason": "Separate improvement decision, actual disposition/execution feedback, accepted revision and final delivery.",
+  "used": {
+    "tool_calls": 12,
+    "model_calls": 9,
+    "backend_solves": 1,
+    "worker_calls": 0,
+    "wall_s": 852.3110000002198
+  },
+  "limits": {
+    "backend_solves": 1,
+    "model_calls": 24,
+    "tool_calls": 60,
+    "wall_s": 3600.0,
+    "worker_calls": 0
+  },
+  "pending": [],
+  "attempts_by_phase": {
+    "request": 1,
+    "initial": 5,
+    "improvement": 1,
+    "revision": 1,
+    "response_final": 1
+  },
+  "token_usage_records": 9,
+  "tokens": {
+    "prompt_tokens": 317438,
+    "completion_tokens": 45575,
+    "total_tokens": 363013
+  },
+  "monetary_cost": null,
+  "token_qualification": "Reported usage only; a failed transport may return no usage.",
+  "accepted_reports": [
+    {
+      "key": "initial_report",
+      "reference": {
+        "artifact_id": "cf95a2951ea643bc1b0f181c3221b287692174f984dbb251dd74f6b714ef3b5c",
+        "media_type": "application/json"
+      },
+      "facts": 4,
+      "exact_selectors": 29,
+      "exact_mismatches": 0,
+      "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+    },
+    {
+      "key": "revised_report",
+      "reference": {
+        "artifact_id": "9aeeec50f73c1f803cc12a325a0066369a3fda49407c296d1ed2b492d6bb68fd",
+        "media_type": "application/json"
+      },
+      "facts": 9,
+      "exact_selectors": 55,
+      "exact_mismatches": 0,
+      "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+    }
+  ],
+  "failed_receipts": [
+    {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "model-transport",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 4.266000000061467,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": "INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls: EXACTLY_ONE_TOOL_CALL_REQUIRED: received 5",
+      "execution_id": "83ece25165fc4b98ae3b7537603c9780",
+      "execution_status": "failed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "2b537fd0fa1b9d83a2bf8c195bba139808d94718daec6b20ddfd255789782827",
+        "media_type": "application/json"
+      },
+      "request_id": "model-1",
+      "result_contract": null,
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "model.deepseek",
+      "tool_version": "5.0.0"
+    },
+    {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "model-transport",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 34.98399999993853,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": "INVALID_TOOL_CALL_ENVELOPE: missing_evidence.5: GAP_WITHOUT_READ_RECEIPT: source.saved_projected_states; use not_read or perform the supported query",
+      "execution_id": "52109e58755843b08e29f2b9f01d6d91",
+      "execution_status": "failed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "75b454686daf64d8b2ae3d832eff1f965b40be701acf00ca3cd330e8c94543da",
+        "media_type": "application/json"
+      },
+      "request_id": "model-4",
+      "result_contract": null,
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "model.deepseek",
+      "tool_version": "5.0.0"
+    }
+  ],
+  "model_failures": [],
+  "decision": {
+    "decision": {
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.05
+      },
+      "disposition": "adopt",
+      "expected_measurable_effect": "With holding_tip_speed_weight 0.0 -> 0.05 the complete simulation should show a measurably lower sampled final-window world-tip speed, ideally below the 0.02 m/s settling limit (baseline maximum 1.5810152739742807 m/s, F51; minimum 0.6351726092425104 m/s, F766) so holding_speed_passed flips to true, while terminal_error_m stays <= 0.01 m (baseline 0.007642608585867386 m, F14) and the sampled holding position error does not worsen. If the penalty changes nothing, the applied tension sequence (F576/F666/F527) and optimization_selected_iteration should be essentially unchanged, indicating the binding constraint is the solve budget rather than the missing tip-speed cost.",
+      "local_comparison": null,
+      "rationale": "Diagnostic recommendations rec-defer-hold-speed-weight-comparison and rec-defer-causal-replay are recorded, not accepted as governing: both deferred solely because no saved-state check was authorized in the diagnostic phase and causality was unproven. This improvement phase explicitly grants one bounded complete experiment and states that missing causal proof alone does not prohibit it, so I select the candidate independently of those deferrals. Hypothesis: the hold-window tip-speed blow-up (sampled 0.6351726092425104-1.5810152739742807 m/s vs speed_limit_m_s=0.02, F13/F51/F37) is at least partly because no active tip-speed penalty shapes the settling nodes (holding_tip_speed_weight=0.0, F66/F733), so the applied input can stay near the seed plan (optimization_selected_iteration=0 at the displayed non-final updates, F659/F756/F673/F696). The holding term is the relevant lever because it penalizes nodes at/after the configured settling-window start (window_s=0.05, F65), i.e. the exact interval that fails, whereas a terminal-only term would touch one node; the terminal node is already inside that window, so terminal_tip_speed_weight is left at 0.0 and the single terminal scaled squared-speed term is preserved unchanged. Changing only holding_tip_speed_weight keeps the experiment unconfounded. Expected effects, stated separately: (reach) terminal_error_m=0.007642608585867386 m (F14) must stay within reach_tolerance_m=0.01 m (F42); slower arrival could help or, if braking is too aggressive, delay reach past tolerance; (holding position) lower speed should reduce overshoot/oscillation, so the 0.05813810428573256 m peak (F69) may shrink; (holding speed) the direct target: the normalized quantity (v/0.02)^2 is ~6e3-6e4 at baseline and should be driven down, with the goal of holding_speed_passed becoming true; (computation) an extra cost term can lengthen solves and worsen the already marginal budget (mean_update_s=17.26331904856488 s per 0.01 s period, deadline_misses=35, User_Requested_Stop=34, F55/F38/F9), risking further seed retention. Adverse effects: over-braking delaying reach below tolerance, tendon force-limit (8.0 N) saturation, added iterations/infeasibility; and, if the solver keeps returning the seed, the applied tension sequence may not change at all. Observations that would weaken the hypothesis: final-window speed unchanged with selected_iteration still 0 (binding constraint is solver/budget, not the missing penalty); reach failing while speed improves (speed traded for reach); or no measurable change in any sampled metric. Value 0.05: a moderate per-second weight inside [0,1] chosen so the integration-step-weighted holding sum is a meaningful but not dominant fraction of the tracking cost; no raw scalar objective is compared across weights. No local_comparison is requested: no saved baseline update with the required effective plan horizon of 0.01 s is evident (recorded effective_horizon is 10 or 5, F540/F470/F667), and local screening is optional and advisory."
+    },
+    "source_report": {
+      "artifact_id": "cf95a2951ea643bc1b0f181c3221b287692174f984dbb251dd74f6b714ef3b5c",
+      "media_type": "application/json"
+    }
+  },
+  "workflow_feedback_complete": true,
+  "candidate_executed": true,
+  "validation_gap": null,
+  "execution": {
+    "status": "evaluated",
+    "receipts": {
+      "simulation": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-simulation",
+        "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+        "caller": "improvement-executor",
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "completed",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 625.6870000001509
+        }
+      },
+      "evaluation": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-evaluation",
+        "execution_id": "2cb7369608d94bdc8119a0910c4ec726",
+        "caller": "improvement-executor",
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "valid",
+        "task_success": true,
+        "output": {
+          "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.0309999999590218
+        }
+      },
+      "profile": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-profile",
+        "execution_id": "49cd1c15c43f491f991b0e35f9d35bc6",
+        "caller": "improvement-executor",
+        "tool_id": "control.profile_report",
+        "tool_version": "1.0.0",
+        "result_contract": "ProfileOutput",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.1410000000614673
+        }
+      }
+    },
+    "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+    "configuration": {
+      "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+      "media_type": "application/json"
+    },
+    "design_statement": {
+      "candidate_id": "improvement-96f0ade35119",
+      "configuration": {
+        "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+        "media_type": "application/json"
+      },
+      "frozen_baseline_identity": "c34fbf67259bf74179e037f03339122ce38a1f247924d12b88162a8134c94dc7",
+      "effective_identity": "2769e9622f2ec1d65be9a3f41b43e218dc8e654dc99caf6ec6583efa72d66e7d",
+      "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+      "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "parameters": [
+        {
+          "path": "control/recipe/holding_tip_speed_weight",
+          "baseline_value": 0.0,
+          "effective_value": 0.05,
+          "baseline_delta": 0.05,
+          "unit": "1"
+        },
+        {
+          "path": "control/recipe/terminal_tip_speed_weight",
+          "baseline_value": 0.0,
+          "effective_value": 0.0,
+          "baseline_delta": 0.0,
+          "unit": "1"
+        }
+      ]
+    },
+    "factual_result": {
+      "result_type": "free_reach",
+      "candidate": {
+        "candidate_id": "improvement-96f0ade35119",
+        "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+        "configuration": {
+          "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+          "media_type": "application/json"
+        },
+        "execution_id": "087adee8e8a24fe88e5c85fe89e638c8"
+      },
+      "configuration": {
+        "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+        "media_type": "application/json"
+      },
+      "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "simulation": {
+        "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+        "media_type": "application/json"
+      },
+      "report": {
+        "reference": {
+          "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+          "media_type": "application/json"
+        },
+        "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+        "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+        "request_id": "complete-profile"
+      },
+      "task_accepted": true,
+      "evaluation_validity": "valid",
+      "complete": true,
+      "valid_complete_execution": true,
+      "target_position_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "terminal_position_m": [
+        0.2816059931228584,
+        0.03551833190671227,
+        0.19222326689583205
+      ],
+      "signed_position_error_m": [
+        -0.008394006877141591,
+        0.0005183319067122646,
+        0.002223266895832049
+      ],
+      "error_convention": "actual_tip minus target",
+      "coordinate_frame": "world",
+      "terminal_error_m": 0.00869890424761182,
+      "terminal_tip_speed_m_s": 0.7736319051526312,
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.05650455971948983,
+        "max_speed_m_s": 1.1750052670100422,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "control_updates": 35,
+      "accepted_plans": 35,
+      "initialization_selected": 29,
+      "accepted_noninitialization_plans": 6,
+      "converged_updates": 0,
+      "solver_error_count": 0,
+      "hold_last_responses": 0,
+      "applied_tension_ranges": [
+        {
+          "tendon": "near_t0",
+          "tendon_index": 0,
+          "minimum_n": 1.4749693269771889,
+          "maximum_n": 7.999998299677138,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "near_t1",
+          "tendon_index": 1,
+          "minimum_n": 0.7462395679809365,
+          "maximum_n": 7.971101900799905,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "near_t2",
+          "tendon_index": 2,
+          "minimum_n": -0.0,
+          "maximum_n": 3.1031566686630025,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t0",
+          "tendon_index": 3,
+          "minimum_n": 9.64023692634927e-06,
+          "maximum_n": 7.95958597479067,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t1",
+          "tendon_index": 4,
+          "minimum_n": 0.7859357597552847,
+          "maximum_n": 6.861223279053087,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t2",
+          "tendon_index": 5,
+          "minimum_n": 0.6315302379791942,
+          "maximum_n": 7.3991583536481516,
+          "limit_n": 8.0
+        }
+      ],
+      "force_bound_violation_n": 0.0,
+      "one_step_prediction_summary": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_tip_difference_m": 0.008736401356980448,
+        "mean_tip_difference_m": 0.0038155345179042557,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+      },
+      "one_step_prediction_evidence": {
+        "artifact_id": "5930824f7d4f6706b584b09c26c23e7ef20796fbf140a5f0b624aba40ce8edb2",
+        "media_type": "application/json"
+      },
+      "simulated_duration_s": 0.35000000000000003,
+      "measured_computation_s": 625.6870000001509,
+      "mean_complete_update_s": 17.77877309145406,
+      "control_period_s": 0.01,
+      "deadline_misses": 35,
+      "real_time_demonstrated": false
+    },
+    "profile_report": {
+      "reference": {
+        "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+        "media_type": "application/json"
+      },
+      "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+      "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "request_id": "complete-profile"
+    },
+    "evaluation_data": {
+      "candidate_id": "improvement-96f0ade35119",
+      "comparison_identity": "946e2ba613e8cb56c53882446066eabde4bff862d571424ca1c21395a4390fd5",
+      "constraints": [
+        {
+          "limit": 0.01,
+          "name": "task_bound",
+          "observed": 0.00869890424761182,
+          "satisfied": true,
+          "units": "m"
+        }
+      ],
+      "contract_version": "1.2.0",
+      "evaluator": "evaluate.reach",
+      "evaluator_version": "1.0.0",
+      "metrics": [
+        {
+          "name": "position_error",
+          "units": "m",
+          "value": 0.00869890424761182
+        }
+      ],
+      "original_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "reason": null,
+      "source": {
+        "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+        "media_type": "application/json"
+      },
+      "source_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "task_success": true,
+      "validity": "valid"
+    },
+    "completion_stages": {
+      "simulation": {
+        "candidate_id": "improvement-96f0ade35119",
+        "configuration": {
+          "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+        "source_owner": "gvs-stage354-aa097c784425-candidate",
+        "operation": "simulation.run",
+        "version": "1.0.0",
+        "status": "completed",
+        "receipt": {
+          "contract_version": "1.2.0",
+          "request_id": "complete-simulation",
+          "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+          "caller": "improvement-executor",
+          "tool_id": "simulation.run",
+          "tool_version": "1.0.0",
+          "result_contract": "BackendResult",
+          "result_version": "1.0.0",
+          "execution_status": "completed",
+          "solver_status": "completed",
+          "analysis_status": "not_assessed",
+          "task_success": null,
+          "output": {
+            "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 1,
+            "worker_calls": 0,
+            "wall_s": 625.6870000001509
+          }
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "charged_usage": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 625.6870000001509
+        },
+        "accounting_scope": "current_store"
+      },
+      "evaluation": {
+        "candidate_id": "improvement-96f0ade35119",
+        "configuration": {
+          "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+        "source_owner": "gvs-stage354-aa097c784425-candidate",
+        "operation": "evaluation.run",
+        "version": "1.0.0",
+        "status": "completed",
+        "receipt": {
+          "contract_version": "1.2.0",
+          "request_id": "complete-evaluation",
+          "execution_id": "2cb7369608d94bdc8119a0910c4ec726",
+          "caller": "improvement-executor",
+          "tool_id": "evaluation.run",
+          "tool_version": "1.0.0",
+          "result_contract": "EvaluationResult",
+          "result_version": "1.2.0",
+          "execution_status": "completed",
+          "solver_status": "not_run",
+          "analysis_status": "valid",
+          "task_success": true,
+          "output": {
+            "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": null,
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 1.0309999999590218
+          }
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "charged_usage": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.0309999999590218
+        },
+        "accounting_scope": "current_store"
+      },
+      "profile": {
+        "candidate_id": "improvement-96f0ade35119",
+        "configuration": {
+          "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+        "source_owner": "gvs-stage354-aa097c784425-candidate",
+        "operation": "control.profile_report",
+        "version": "1.0.0",
+        "status": "completed",
+        "receipt": {
+          "contract_version": "1.2.0",
+          "request_id": "complete-profile",
+          "execution_id": "49cd1c15c43f491f991b0e35f9d35bc6",
+          "caller": "improvement-executor",
+          "tool_id": "control.profile_report",
+          "tool_version": "1.0.0",
+          "result_contract": "ProfileOutput",
+          "result_version": "1.0.0",
+          "execution_status": "completed",
+          "solver_status": "not_run",
+          "analysis_status": "not_assessed",
+          "task_success": null,
+          "output": {
+            "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+            "media_type": "application/json"
+          },
+          "error": null,
+          "cache_hit": false,
+          "original_execution_id": null,
+          "charged": {
+            "tool_calls": 1,
+            "model_calls": 0,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 1.1410000000614673
+          }
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "charged_usage": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.1410000000614673
+        },
+        "accounting_scope": "current_store"
+      }
+    },
+    "profile_producer_run_id": "gvs-stage354-aa097c784425-candidate",
+    "structured_feedback": {
+      "completion": {
+        "simulation": "completed",
+        "evaluation": "completed",
+        "profile": "completed"
+      },
+      "source_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "source_owner": "gvs-stage354-aa097c784425-candidate",
+      "configuration": {
+        "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+        "media_type": "application/json"
+      },
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "terminal": {
+        "error_m": 0.00869890424761182,
+        "limit_m": 0.01,
+        "passed": true
+      },
+      "holding": {
+        "interval_s": [
+          0.3,
+          0.35
+        ],
+        "sample_times_s": [
+          0.3,
+          0.31,
+          0.32,
+          0.33,
+          0.34,
+          0.35000000000000003
+        ],
+        "sample_count": 6,
+        "coverage_complete": true,
+        "max_position_error_m": 0.05650455971948983,
+        "position_limit_m": 0.01,
+        "position_passed": false,
+        "max_speed_m_s": 1.1750052670100422,
+        "speed_limit_m_s": 0.02,
+        "speed_passed": false,
+        "speed_definition": "Euclidean norm of tip-site translational Jacobian times recorded backend qvel, reconstructed with sealed robot.xml and qpos; no finite differencing",
+        "speed_units": "m/s",
+        "frame": "world",
+        "continuous_time_guarantee": false
+      },
+      "actual_applied_control_updates": 35,
+      "initialization_selected": 29,
+      "newly_optimized_selected": 6,
+      "simulated_duration_s": 0.35000000000000003,
+      "simulation_wall_s": 625.6870000001509,
+      "deadline_misses": 35,
+      "mean_complete_update_s": 17.77877309145406,
+      "reach_only_success": true,
+      "joint_reach_holding_success": false,
+      "evidence": {
+        "simulation": {
+          "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+          "media_type": "application/json"
+        },
+        "evaluation": {
+          "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+          "media_type": "application/json"
+        },
+        "motion": {
+          "artifact_id": "fd8feca5c235cf9b824c07e1933adb2ea8e5427708843b1a3590611563196e57",
+          "media_type": "application/json"
+        },
+        "manifest": {
+          "artifact_id": "ddc75cc7e50b013cec6c524a58ebd059542c2efd50081c63fb8be18bcdd020a2",
+          "media_type": "application/json"
+        },
+        "commands": {
+          "artifact_id": "5fd19c00b966461f9e3699e98eee025adf9a4f1635d8378ab83c95f602b51bef",
+          "media_type": "application/octet-stream"
+        }
+      },
+      "missing_data": [],
+      "timing_qualification": "Initialization-selected plans apply control. Synchronous wall overruns do not establish skipped updates or simulated actuator delay."
+    },
+    "preparation_configuration": {
+      "artifact_id": "54bc71f69fd35ce498ce014eea85c8ee9a90d56915b4fdf24da5a04cd9533b57",
+      "media_type": "application/json"
+    },
+    "source_report": {
+      "artifact_id": "cf95a2951ea643bc1b0f181c3221b287692174f984dbb251dd74f6b714ef3b5c",
+      "media_type": "application/json"
+    }
+  },
+  "improvement_measured": true,
+  "comparison": {
+    "definition": "candidate minus replayed baseline; offline arithmetic from sealed factual results, not a model claim",
+    "baseline_execution": "cf997605885642759ee33920e2c9e2ef",
+    "candidate_execution": "087adee8e8a24fe88e5c85fe89e638c8",
+    "terminal_error_delta_m": 0.001056295661744434,
+    "holding_max_error_delta_m": -0.001633544566242727,
+    "holding_max_speed_delta_m_s": -0.4060100069642385,
+    "mean_complete_update_delta_s": 0.5154540428891785,
+    "reach_plus_holding_passed": false
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "binding": {
+    "artifact_id": "1dd73248d41264c770a567618f0243cf1d34a152e9ce9123b8764a29343961ed",
+    "media_type": "application/json"
+  },
+  "budget": {
+    "backend_solves": 0,
+    "model_calls": 24,
+    "tool_calls": 60,
+    "wall_s": 3600.0,
+    "worker_calls": 0
+  },
+  "candidate_id": "baseline-replay",
+  "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+  "evidence_manifest": {
+    "artifact_id": "a9702d58bea0f18bfe2d0bbbc23aa924cf980041237865033642a56d03e31b16",
+    "media_type": "application/json"
+  },
+  "execution_id": "cf997605885642759ee33920e2c9e2ef",
+  "permitted_tools": [
+    "diagnosis.inspect_evidence",
+    "diagnosis.submit",
+    "evidence.read"
+  ],
+  "question": "Baseline replay cf997605885642759ee33920e2c9e2ef (controller.gvs_nmpc 7.0.0, controller identity 8f837eb4…be38, candidate baseline-replay) is a single complete execution with 35 controller updates. Open question, reading/reporting only: how do four separately observed facts sit next to each other — (a) terminal reach inside tolerance at end of run, (b) the sampled final holding window failing the position criterion, (c) the same sampled final holding window failing the speed criterion, and (d) computation load (mean update time, deadline misses)? Specifically: with reach_passed true (f5c4bfaf70d31) and terminal_error_m 0.0076426 m (fcb979e866da6) below the 0.01 m reach tolerance (f3834ea295fbc), while holding_position_passed is false (f8d748c8f831a) with a holding-window error maximum of 0.0581381 m (f432ea0129b97) and holding_speed_passed is false (fa1daa92aa2a8) with holding-window speeds 0.6351726–1.5810153 m/s (fe0e01ea28ce0, fda80c000cd60) against a 0.02 m/s speed limit (ffb1646ded597), and mean_update_s 17.2633 s (f9a95df66c188) with 35 deadline misses over 35 updates (f537116e33c17, fc346e9d815b6): what does the retained record support stating about terminal reach versus sampled holding-window position and speed as distinct terminal-versus-holding observations, and about the computation readings' own coverage? What is explicitly not supported: any claim that a 10 ms projected-model probe, a shared-model error, or synchronous wall overruns explain the settling failure or establish skipped simulated updates, and any causal or dominance claim from this single execution. No predetermined cause and no winning weight are assumed; a bounded controller-weight experiment is a separate decision, not part of this request.",
+  "saved_state_check": null,
+  "scope": [
+    "Retained-evidence reading and reporting only: common summary/detail handoff (artifact c2861981…dfd0 / summary c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0) plus inventory-reference reading (85245e7b…3333b) of the listed entries source.backend_motion, source.one_step_predictions, source.applied_tensions, source.saved_projected_states, source.plan_selection, source.solver_status, source.controller_horizon, source.force_limits; source.historical_full_plans is retained=false (full_warm_plans, optimizer_iteration_traces).",
+    "Excluded from this request: production/controller changes, backend execution, and any explicit numerical saved-state grant. No local_solves or prediction_evaluations are requested here; no prediction read is needed to answer a reading/reporting question.",
+    "Coverage distinctions to honor: the final holding window is all recorded samples there = 6 rows at 0.30–0.35 s (fecdfb8087195, fa1660e613df7, ffc94495c3135), i.e. selected rows only and not whole-trajectory ranges; backend motion is a sampled trajectory (record_count 35, 0.01–0.35 s) whose raw gzip bytes are not readable as JSON via evidence.read and must be consulted as the derived motion/prediction views; full trajectories are not in every request.",
+    "Statement hygiene: reach_passed and holding_position_passed / holding_speed_passed / sampled_settling_passed / joint_reach_holding_passed are reported as recorded booleans (f5c4bfaf70d31, f8d748c8f831a, fa1daa92aa2a8, f5c234facf7da, f2c8a3fb9baa9) with no causal interpretation; the summary's own limitations note that a single execution and model comparisons do not establish a dominant cause (f836338b710d8) and that no historical optimizer iterations or full warm plans are reconstructed (f87339847769d)."
+  ],
+  "stopping_conditions": [
+    "Reported observations keep terminal reach (f5c4bfaf70d31, fcb979e866da6, f3834ea295fbc), sampling coverage, and the two separate holding criteria — position (f8d748c8f831a, f432ea0129b97) and speed (fa1daa92aa2a8, fda80c000cd60, ffb1646ded597) — distinct; holding-window position is not merged with holding-window speed and neither is merged with terminal reach.",
+    "Computation is reported with its own coverage and units: mean_update_s 17.2633 s (f9a95df66c188), control_period_s 0.01 s (f09662686a998), deadline_misses 35 over update_count 35 (f537116e33c17, fc346e9d815b6); synchronous wall overruns are not described as skipped simulated updates and mean update time is not described as settling error.",
+    "Absent coverage is named as not_retained or not_displayed rather than as evidence of absent behavior: full trajectories/selected endpoints only, historical warm plans and optimizer iteration traces not retained (control_snapshots.json), and the 10 ms projected-model probe plus bounded horizon numerical check are capability gaps, not explanations of the settling failure.",
+    "No causal attribution, no dominant-cause statement, and no geometry or weight-change claim is asserted; the report closes with the reading question answered or an explicit statement that retained evidence cannot answer it, leaving any bounded controller-weight experiment to a separate improvement decision."
+  ],
+  "subject": "control",
+  "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+}

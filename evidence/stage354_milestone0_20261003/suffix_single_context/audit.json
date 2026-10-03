@@ -1,0 +1,87 @@
+{
+  "label": "suffix_single_context",
+  "status": "completed",
+  "reason": "Accepted diagnostic revision and model-authored final candidate disposition from sealed historical feedback.",
+  "used": {
+    "tool_calls": 3,
+    "model_calls": 3,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 75.21899999980815
+  },
+  "limits": {
+    "backend_solves": 0,
+    "model_calls": 8,
+    "tool_calls": 20,
+    "wall_s": 600.0,
+    "worker_calls": 0
+  },
+  "pending": [],
+  "attempts_by_phase": {
+    "revision": 2,
+    "response_final": 1
+  },
+  "token_usage_records": 3,
+  "tokens": {
+    "prompt_tokens": 163138,
+    "completion_tokens": 15779,
+    "total_tokens": 178917
+  },
+  "monetary_cost": null,
+  "token_qualification": "Reported usage only; a failed transport may return no usage.",
+  "accepted_reports": [
+    {
+      "key": "initial_report",
+      "reference": {
+        "artifact_id": "36ce3d654c80174dd02570a7b07118901b962f555fdb53eaeaae2d0f70cf478c",
+        "media_type": "application/json"
+      },
+      "facts": 4,
+      "exact_selectors": 20,
+      "exact_mismatches": 0,
+      "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+    },
+    {
+      "key": "revised_report",
+      "reference": {
+        "artifact_id": "04b87e3e6df14a37a352c590c5f652dfe63393bd1d39e0af17b700434a85cc9b",
+        "media_type": "application/json"
+      },
+      "facts": 9,
+      "exact_selectors": 52,
+      "exact_mismatches": 0,
+      "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+    }
+  ],
+  "failed_receipts": [
+    {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "model-transport",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 24.063000000081956,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": "INVALID_TOOL_CALL_ENVELOPE: new_facts.references.0.1: Unknown or out-of-scope alias. Copy an exact alias from the supplied reference_view; no lookup is required.; new_facts.references.1.0: Unknown or out-of-scope alias. Copy an exact alias from the supplied reference_view; no lookup is required.; new_facts.references.2.4: Unknown or out-of-scope alias. Copy an exact alias from the supplied reference_view; no lookup is required.; new_facts.references.3.4: Unknown or out-of-scope alias. Copy an exact alias from the supplied reference_view; no lookup is required.",
+      "execution_id": "df5979b1ac844154a7b7da7c259f5713",
+      "execution_status": "failed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "3d1770d9b9597eb2642b62b19f2846e64cc4afb812bfffe756a6fe4f47d2d8ed",
+        "media_type": "application/json"
+      },
+      "request_id": "model-0",
+      "result_contract": null,
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "model.deepseek",
+      "tool_version": "5.0.0"
+    }
+  ],
+  "model_failures": []
+}

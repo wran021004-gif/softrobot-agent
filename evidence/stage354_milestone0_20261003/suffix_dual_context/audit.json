@@ -1,0 +1,165 @@
+{
+  "label": "suffix_dual_context",
+  "status": "completed",
+  "reason": "Saved model-authored correction recovered after host decoder repair, then accepted final decision; original failures and ceilings retained.",
+  "used": {
+    "tool_calls": 5,
+    "model_calls": 5,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 217.4840000004042
+  },
+  "limits": {
+    "backend_solves": 0,
+    "model_calls": 8,
+    "tool_calls": 20,
+    "wall_s": 600.0,
+    "worker_calls": 0
+  },
+  "pending": [],
+  "attempts_by_phase": {
+    "response_final": 1,
+    "revision": 4
+  },
+  "token_usage_records": 5,
+  "tokens": {
+    "prompt_tokens": 279987,
+    "completion_tokens": 53101,
+    "total_tokens": 333088
+  },
+  "monetary_cost": null,
+  "token_qualification": "Reported usage only; a failed transport may return no usage.",
+  "accepted_reports": [
+    {
+      "key": "initial_report",
+      "reference": {
+        "artifact_id": "aac26d137b8ed87c06d37c3ade5d0a1f42915c7ff3e50c0da3a4226306374091",
+        "media_type": "application/json"
+      },
+      "facts": 4,
+      "exact_selectors": 34,
+      "exact_mismatches": 0,
+      "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+    },
+    {
+      "key": "revised_report",
+      "reference": {
+        "artifact_id": "d3ec42d245906325f7c99fb5d54ef0d52d5d55324bf3ba3966ce05678c8af680",
+        "media_type": "application/json"
+      },
+      "facts": 8,
+      "exact_selectors": 80,
+      "exact_mismatches": 0,
+      "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+    }
+  ],
+  "failed_receipts": [
+    {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "model-transport",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 31.875,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": "INVALID_TOOL_CALL_ENVELOPE: new_facts.references.2.3: Unknown or out-of-scope alias. Copy an exact alias from the supplied reference_view; no lookup is required.; new_facts.references.2.5: Unknown or out-of-scope alias. Copy an exact alias from the supplied reference_view; no lookup is required.; new_facts.references.3.5: Unknown or out-of-scope alias. Copy an exact alias from the supplied reference_view; no lookup is required.; new_facts.references.3.9: Unknown or out-of-scope alias. Copy an exact alias from the supplied reference_view; no lookup is required.; changes.0.supporting_fact_ids.0: Select a declared inherited or new fact_id.; changes.0.supporting_fact_ids.1: Select a declared inherited or new fact_id.; changes.0.supporting_fact_ids.2: Select a declared inherited or new fact_id.; changes.0.supporting_fact_ids.3: Select a declared inherited or new fact_id.; changes.0.supporting_fact_ids.4: Select a declared inherited or new fact_id.; changes.1.supporting_fact_ids.0: Select a declared inherited or new fact_id.; changes.1.supporting_fact_ids.1: Select a declared inherited or new fact_id.; changes.1.supporting_fact_ids.2: Select a declared inherited or new fact_id.; changes.2.supporting_fact_ids.0: Select a declared inherited or new fact_id.; changes.2.supporting_fact_ids.1: Select a declared inherited or new fact_id.; changes.3.supporting_fact_ids.0: Select a declared inherited or new fact_id.; changes.3.supporting_fact_ids.1: Select a declared inherited or new fact_id.; changes.3.supporting_fact_ids.2: Select a declared inherited or new fact_id.; changes.4.supporting_fact_ids.0: Select a declared inherited or new fact_id.; changes.4.supporting_fact_ids.1: Select a declared inherited or new fact_id.; changes.4.supporting_fact_ids.2: Select a declared inherited or new fact_id.; changes.5.supporting_fact_ids.0: Select a declared inherited or new fact_id.; changes.5.supporting_fact_ids.1: Select a declared inherited or new fact_id.; changes.5.supporting_fact_ids.2: Select a declared inherited or new fact_id.; changes.6.supporting_fact_ids.0: Select a declared inherited or new fact_id.; changes.6.supporting_fact_ids.1: Select a declared inherited or new fact_id.; changes.6.supporting_fact_ids.2: Select a declared inherited or new fact_id.; changes.7.supporting_fact_ids.0: Select a declared inherited or new fact_id.; changes.7.supporting_fact_ids.1: Select a declared inherited or new fact_id.; changes.7.supporting_fact_ids.2: Select a declared inherited or new fact_id.",
+      "execution_id": "a3cee44bd25e4e8797f5d639e25f219d",
+      "execution_status": "failed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "762c3caad7e3958c863bbbf280af8293760967725245646f32805c702a84fdf9",
+        "media_type": "application/json"
+      },
+      "request_id": "model-0",
+      "result_contract": null,
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "model.deepseek",
+      "tool_version": "5.0.0"
+    },
+    {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "model",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 1.125,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": "REVISED_REPORT_REQUIRES_NUMERICAL_RESULT_SELECTOR: cite at least one relevant numeric value from the executed result artifact, with its exact JSON pointer, and explain model/horizon limits.",
+      "execution_id": "20821b1e73a3436080449516fce17a33",
+      "execution_status": "failed",
+      "original_execution_id": null,
+      "output": null,
+      "request_id": "model-1-tool",
+      "result_contract": null,
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "diagnosis.submit",
+      "tool_version": "2.0.0"
+    },
+    {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "model",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 1,
+        "wall_s": 1.125,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": "REVISED_REPORT_REQUIRES_NUMERICAL_RESULT_SELECTOR: cite at least one relevant numeric value from the executed result artifact, with its exact JSON pointer, and explain model/horizon limits.",
+      "execution_id": "9ba981309ea845acae16571a79879f5e",
+      "execution_status": "failed",
+      "original_execution_id": null,
+      "output": null,
+      "request_id": "model-2-tool",
+      "result_contract": null,
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "diagnosis.submit",
+      "tool_version": "2.0.0"
+    },
+    {
+      "analysis_status": "not_assessed",
+      "cache_hit": false,
+      "caller": "model-transport",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 55.78100000019185,
+        "worker_calls": 0
+      },
+      "contract_version": "1.2.0",
+      "error": "INVALID_TOOL_CALL_ENVELOPE: business_parameters: 'arguments'",
+      "execution_id": "8ae8a28538dc48a6a313a98e366de1ac",
+      "execution_status": "failed",
+      "original_execution_id": null,
+      "output": {
+        "artifact_id": "6ec9b73fdaed89093af15fa7351bca87842510dab4632a76b4657ab4ab13dd2a",
+        "media_type": "application/json"
+      },
+      "request_id": "model-3",
+      "result_contract": null,
+      "result_version": "1.0.0",
+      "solver_status": "not_run",
+      "task_success": null,
+      "tool_id": "model.deepseek",
+      "tool_version": "5.0.0"
+    }
+  ],
+  "model_failures": []
+}
