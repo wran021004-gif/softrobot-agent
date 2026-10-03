@@ -58,7 +58,7 @@ def configure_role(host,role,instructions,**context):
             context['successful_read_turns']=0
             context['phase_started_turn']=state.get('turn',0)
         if role=='design':
-            delivery='design.review_verification' if context.get('verification') else ('design.respond_diagnosis' if context.get('report') else 'diagnosis.request')
+            delivery=context.get('delivery_tool') or ('design.review_verification' if context.get('verification') else ('design.respond_diagnosis' if context.get('report') else 'diagnosis.request'))
             context['phase_tools']=['evidence.read',delivery]
             context['phase_started_turn']=state.get('turn',0)
         state['role_context']=dict(role=role,instructions=instructions,**context)

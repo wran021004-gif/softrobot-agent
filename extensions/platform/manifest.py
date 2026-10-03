@@ -56,6 +56,11 @@ EXTENSIONS = [replace(d, capabilities={**d.capabilities,
     'role': 'adapter'}) for d in EXTENSIONS]
 
 from schemas import platform_handoff as handoff
+from tools.diagnostic_improvement import ImprovementDecision
+EXTENSIONS.append(Extension('design.decide_improvement','tool','1.0.0',ImprovementDecision,handoff.HandoffResult,
+    'tools.diagnostic_improvement:decide','Record separate improvement intent from an accepted diagnosis. No build or simulation executes through this decision.',
+    sources=('tools/diagnostic_improvement.py','tools/platform_handoff.py'),
+    capabilities=dict(category='diagnostics',role='public_tool',route_visible=True,preflight='tools.platform_handoff:preflight')))
 EXTENSIONS.append(Extension('deepseek','model_adapter','3.0.0',Empty,ModelResponse,
     'tools.diagnostic_native:FlatDiagnosticAdapter','Flat business arguments for the shared diagnostic workflow',
     sources=('tools/diagnostic_native.py','tools/platform_models.py','tools/model_transports/deepseek.py'),

@@ -77,6 +77,14 @@ def implementation():
 
 
 class DiagnosticWorkflow:
+    limits = LIMITS
+    tools = TOOLS
+    scope = SCOPE
+    capabilities = CAPABILITIES
+    instructions = INSTRUCTIONS
+    permissions = PERMISSIONS
+    phases = PHASES
+    numerical_limits = NUMERICAL
     def __init__(self, directory, mode, *, pilot=False, minimal=False, suffix=False, initial_only=False, experiment=None):
         if mode not in ('single_context','dual_context'):raise ValueError('UNKNOWN_ORGANIZATION_MODE')
         self.directory=Path(directory);self.mode=mode;self.pilot=pilot;self.minimal=minimal
@@ -96,15 +104,15 @@ class DiagnosticWorkflow:
         reader=ControlEvidence(Store(self.source));source=reader.resolve(self.execution)
         if self.experiment.get('source_manifest',source['manifest'])!=source['manifest']:raise ValueError('FROZEN_SOURCE_MANIFEST_MISMATCH')
         self.project=self.experiment.get('project_prefix','gvs-stage346')+'-'+uuid4().hex[:12]
-        limits=SUFFIX_LIMITS if self.suffix or self.initial_only else (dict(model_calls=3,tool_calls=3,backend_solves=0,worker_calls=0,wall_s=300.) if self.minimal else LIMITS)
-        numerical={k:0 for k in NUMERICAL} if self.suffix or self.initial_only else NUMERICAL
+        limits=SUFFIX_LIMITS if self.suffix or self.initial_only else (dict(model_calls=3,tool_calls=3,backend_solves=0,worker_calls=0,wall_s=300.) if self.minimal else self.limits)
+        numerical={k:0 for k in NUMERICAL} if self.suffix or self.initial_only else self.numerical_limits
         self.limits=limits
         self.store.create(dict(project_id=self.project,grant_id=self.project,budget=limits,
             authorization_source=self.experiment.get('authorization_source','User-authorized sequential Stage 3.46 native validation, pilot and two matched pairs; necessary context/evidence transmission to DeepSeek; no backend simulations/workers or push.')))
         self.hosts={}
         for role in (['shared'] if self.mode=='single_context' else ['design','diagnostic'])+['executor']:
             host=Host(self.directory,self.project+'-'+role);inp=deepcopy(source['configuration']);inp['run_id']=host.run_id
-            bindings={'diagnosis.inspect_evidence':'1.0.0','diagnosis.saved_state_check':'1.0.0'} if role=='executor' else TOOLS
+            bindings={'diagnosis.inspect_evidence':'1.0.0','diagnosis.saved_state_check':'1.0.0'} if role=='executor' else self.tools
             if (self.suffix or self.initial_only) and role=='executor':bindings={'diagnosis.inspect_evidence':'1.0.0'}
             inp['policy'].update(route=None,budget={**limits,'model_calls':0 if role=='executor' else limits['model_calls']},
                 timeout_s=900. if role=='executor' else 30.,allowed_tools=[],tool_bindings=bindings)
@@ -134,11 +142,11 @@ class DiagnosticWorkflow:
             hosts={k:h.run_id for k,h in self.hosts.items()},binding=self.binding,identities=self.identities,summary=self.summary,
             inventory=self.inventory,inventory_reference=self.inventory_ref,source_manifest=source['manifest'],
             implementation=implementation(),runtime=runtime,provider_configuration=self.store.session(self.host('design').run_id)['snapshot']['input']['policy']['model'],
-            limits=limits,numerical_limits=numerical,scope=SCOPE,memory_policy=MEMORY,fact_policy=FACT_POLICY,phase_budgets=PHASES,
-            stage_instructions=INSTRUCTIONS,permissions=PERMISSIONS,capabilities=CAPABILITIES,experiment=self.experiment,
+            limits=limits,numerical_limits=numerical,scope=self.scope,memory_policy=MEMORY,fact_policy=FACT_POLICY,phase_budgets=self.phases,
+            stage_instructions=self.instructions,permissions=self.permissions,capabilities=self.capabilities,experiment=self.experiment,
             recovery=recovery_status({},self.store.session(self.host('design').run_id)['snapshot']['input']['policy']['model']),
             host_provider_configurations={k:self.store.session(h.run_id)['snapshot']['input']['policy']['model'] for k,h in self.hosts.items()},
-            tool_bindings=TOOLS,review_rubric=read(ROOT/'evidence/stage346_shared_diagnosis_20261002/review_rubric.json'),
+            tool_bindings=self.tools,review_rubric=read(ROOT/'evidence/stage346_shared_diagnosis_20261002/review_rubric.json'),
             outcomes=['workflow completion','exact selector validation','prose review','check usefulness','usage','physical improvement not evaluated'])
         atomic_json(self.directory/'freeze.json',self.freeze)
         return self.freeze
@@ -216,15 +224,15 @@ class DiagnosticWorkflow:
         return fixed
 
     def phase(self,phase,kind,key,**extra):
-        role='design' if phase in ('request','response_initial','response_final') else 'diagnostic'
+        role='design' if phase in ('request','response_initial','response_final','improvement') else 'diagnostic'
         host=self.host(role)
         if self.previous is not None and host.run_id!=self.previous.run_id:transfer_recovery(self.previous,host)
         state=self.store.session(host.run_id)['state']
         common=dict(binding=self.binding,identities=self.identities,summary=self.summary,
             summary_content=self.store.artifact(self.summary),inventory=self.inventory,inventory_reference=self.inventory_ref,
-            protocol=dict(saved_state_check=SCOPE),capabilities=CAPABILITIES,diagnostic_tools=list(TOOLS),phase=phase,
+            protocol=dict(saved_state_check=self.scope) if self.scope else {},capabilities=self.capabilities,diagnostic_tools=list(self.tools),phase=phase,
             memory_identity=host.run_id,working_memory=state.get('workflow_memory',[]),memory_policy=MEMORY,
-            phase_budget=PHASES[phase],phase_tools=PERMISSIONS[phase],native_fixed=self.fixed(phase),native_store_root=str(self.directory),
+            phase_budget=self.phases[phase],phase_tools=self.permissions[phase],native_fixed=self.fixed(phase),native_store_root=str(self.directory),
             evidence_turn_limit=2 if phase in ('request','initial','check') else 0)
         if self.minimal:common['phase_budget']=dict(limit=dict(model_calls=3,tool_calls=3,wall_s=300.))
         if self.initial_only:
@@ -235,7 +243,7 @@ class DiagnosticWorkflow:
         if phase.startswith('response'):
             report=self.chain['revised_report' if phase=='response_final' else 'initial_report']
             common.update(report=report,report_content=self.store.artifact(report),final_response=phase=='response_final')
-        instruction=INSTRUCTIONS[phase]
+        instruction=self.instructions[phase]
         if self.experiment.get('fact_handles'):
             instruction=instruction.replace('2-4 exact selected facts','2-4 facts selected using fact_handles').replace(
                 'Fact selectors point into original query result artifacts (e.g. /detail/summary/terminal_speed_m_s), not observation envelopes. report.source is the supplied binding; recommendation configuration_scope is identities.configuration.',
@@ -356,7 +364,7 @@ class DiagnosticWorkflow:
         outcome=dict(schema_version='1.0.0',status=status,stop_reason=reason,mode=self.mode,pilot=self.pilot,minimal=self.minimal,
             classification='partial initial-report capability validation' if self.initial_only else ('cross-run continuation using preserved real numerical feedback' if self.suffix else 'fresh workflow'),
             chain=self.chain,feedback_complete=all(k in self.chain for k in ('check','feedback','revised_report','final_response')),
-            numerical_check_status=feedback['receipt']['execution_status'] if feedback else None,
+            numerical_check_status=(feedback.get('receipt') or {}).get('execution_status') if feedback else None,
             usage=self.store.remaining(),numerical_work=work,provider_usage=usage_rows,monetary_cost=None,elapsed_s=elapsed,
             protocol_corrections=max(self.store.session(h.run_id)['state'].get('protocol_corrections_used',0) for h in self.hosts.values()),
             recovery={k:recovery_status(self.store.session(h.run_id)['state'],self.store.session(h.run_id)['snapshot']['input']['policy']['model']) for k,h in self.hosts.items()},
@@ -375,5 +383,5 @@ class DiagnosticWorkflow:
         for name,host in self.hosts.items():
             actual=self.store.session(host.run_id)['snapshot']['input']['policy']['model']
             if actual!=self.freeze['host_provider_configurations'][name]:raise ValueError('FROZEN_PROVIDER_CONFIGURATION_MISMATCH: '+name)
-        for key,value in [('stage_instructions',INSTRUCTIONS),('permissions',PERMISSIONS),('phase_budgets',PHASES),('scope',SCOPE),('memory_policy',MEMORY),('capabilities',CAPABILITIES),('experiment',self.experiment)]:
+        for key,value in [('stage_instructions',self.instructions),('permissions',self.permissions),('phase_budgets',self.phases),('scope',self.scope),('memory_policy',MEMORY),('capabilities',self.capabilities),('experiment',self.experiment)]:
             if value!=self.freeze[key]:raise ValueError('FROZEN_CONFIGURATION_MISMATCH: '+key)
