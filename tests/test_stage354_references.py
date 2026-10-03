@@ -101,7 +101,11 @@ class SavedSuffixTests(TestCase):
         with patch('tools.platform_handoff.transition',return_value='accepted'):
             self.assertEqual(submit(ctx,validated),'accepted')
         context=json.loads(payload['messages'][1]['content'])['role_context']
-        self.assertIn('comparison_view',context);self.assertNotIn('diagnosis.submit',payload['messages'][1]['content'])
+        self.assertIn('comparison_view',context)
+        # The working-state observation retains canonical registry IDs; native
+        # invocation instructions and advertised function names still agree.
+        self.assertNotIn('diagnosis.submit',context['instructions'])
+        self.assertIn('diagnosis_submit',{t['function']['name'] for t in payload['tools']})
         self.assertNotIn('query the needed evidence',payload['messages'][1]['content'])
         self.assertLess(len(json.dumps(payload).encode()),400000)
 

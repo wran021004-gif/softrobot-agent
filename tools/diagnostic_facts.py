@@ -95,6 +95,9 @@ def record_read(host, invocation, receipt):
                 row['inventory_ids']=['source.'+x for x in ids.get(args['view'],[])]
                 row['handles']=catalog_value(state,receipt['output'],value)
         ledger.append(row)
+        if state.get('fact_scope'):
+            from tools.diagnostic_revision import ensure_aliases
+            ensure_aliases(state)
         host.store.update_state(db,host.run_id,state)
         host.store.event(db,host.run_id,'evidence_read_ledger',row['status'],outputs=[host.store.put(db,row)])
 
@@ -113,7 +116,10 @@ def handover(host, reference, content, *, origin, kind, selectors=None, inventor
             method='explicit_handoff',view=kind,result=reference,status='completed',error=None,
             handles=handles,inventory_ids=list(inventory_ids),coverage='Only explicitly transferred content/selectors',
             provenance=origin)
-        ledger.append(row);host.store.update_state(db,host.run_id,state)
+        ledger.append(row)
+        from tools.diagnostic_revision import ensure_aliases
+        ensure_aliases(state)
+        host.store.update_state(db,host.run_id,state)
         host.store.event(db,host.run_id,'evidence_handoff','transferred',inputs=[reference],outputs=[host.store.put(db,row)])
 
 

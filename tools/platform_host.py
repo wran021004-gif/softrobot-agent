@@ -341,6 +341,8 @@ class Host:
                 budget=self.store.phase_remaining(self.run_id),
                 evidence_turn_limit=state['role_context'].get('evidence_turn_limit'),
                 instruction='Use supplied content and retained evidence. When the read allowance ends, deliver the current phase using its remaining advertised handoff tool.')
+        from tools.working_state import project_working_state
+        context['working_state'] = plain(project_working_state(self.store, self.run_id))
         return context
 
     def model_scope(self):

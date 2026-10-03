@@ -19,10 +19,16 @@ def structured_feedback(store, result, source):
     from extensions.tendon_family.control_evidence import ControlEvidence
     detail=store.artifact(result['receipts']['profile']['output'])['detail']
     motion=store.artifact(detail['motion']);timing=source['configuration']['task']['timing']
-    end=timing['duration_s'];start=end-.05;period=timing['sample_period_s']
+    from tools.acceptance_definitions import resolve_acceptance
+    definitions=resolve_acceptance(source['configuration'],result['configuration'],profile=detail,
+        profile_reference=result['receipts']['profile']['output'])
+    if definitions['missing']:raise ValueError('ACCEPTANCE_DEFINITION_MISSING: '+str(definitions['missing']))
+    duration=definitions['holding']['duration']['value'];position_limit=definitions['holding']['position']['value']
+    speed_limit=definitions['holding']['speed']['value'];terminal_limit=definitions['terminal']['value']
+    end=timing['duration_s'];start=end-duration;period=timing['sample_period_s']
     window=[r for r in motion if start-1e-9<=r['time_s']<=end+1e-9]
     times=[r['time_s'] for r in window]
-    expected=[start+i*period for i in range(round(.05/period)+1)]
+    expected=[start+i*period for i in range(round(duration/period)+1)]
     coverage=len(times)==len(expected) and all(abs(a-b)<1e-8 for a,b in zip(times,expected))
     position=max((r['tip_error_m'] for r in window),default=None)
     speed=max((r['tip_speed_m_s'] for r in window),default=None)
@@ -30,17 +36,18 @@ def structured_feedback(store, result, source):
     reach=result['evaluation_data']['task_success'];valid=result['evaluation_data']['validity']=='valid'
     return dict(completion={k:'completed' for k,_ in STAGES},source_execution_id=source['execution_id'],
         source_owner=source['owner'],configuration=result['configuration'],evaluator=source['configuration']['task']['evaluator'],
-        terminal=dict(error_m=detail['terminal_error_m'],limit_m=.01,passed=reach),
+        acceptance_definition=definitions,
+        terminal=dict(error_m=detail['terminal_error_m'],limit_m=terminal_limit,passed=reach),
         holding=dict(interval_s=[start,end],sample_times_s=times,sample_count=len(times),coverage_complete=coverage,
-            max_position_error_m=position,position_limit_m=.01,position_passed=position<=.01 if coverage else None,
-            max_speed_m_s=speed,speed_limit_m_s=.02,speed_passed=speed<=.02 if coverage else None,
+            max_position_error_m=position,position_limit_m=position_limit,position_passed=position<=position_limit if coverage else None,
+            max_speed_m_s=speed,speed_limit_m_s=speed_limit,speed_passed=speed<=speed_limit if coverage else None,
             speed_definition='Euclidean norm of tip-site translational Jacobian times recorded backend qvel, reconstructed with sealed robot.xml and qpos; no finite differencing',
             speed_units='m/s',frame='world',continuous_time_guarantee=False),
         actual_applied_control_updates=len(commands) if commands is not None else None,
         initialization_selected=detail['initialization_selected'],newly_optimized_selected=detail['accepted_noninitialization_plans'],
         simulated_duration_s=detail['last_valid_time_s'],simulation_wall_s=detail['simulation_wall_s'],
         deadline_misses=detail['deadline_misses'],mean_complete_update_s=detail['mean_update_s'],
-        reach_only_success=reach,joint_reach_holding_success=bool(valid and reach and coverage and position<=.01 and speed<=.02),
+        reach_only_success=reach,joint_reach_holding_success=bool(valid and reach and coverage and position<=position_limit and speed<=speed_limit),
         evidence=dict(simulation=result['receipts']['simulation']['output'],evaluation=result['receipts']['evaluation']['output'],
             profile=result['receipts']['profile']['output'],motion=detail['motion'],manifest=source['manifest'],
             commands=source['files'].get('actual_commands.json')),
@@ -110,7 +117,7 @@ def import_completed_simulation(host, source_store, execution_id):
         current=dependency_identity(host.reg.get(binding['extension_id'],binding['version']))
         # Explicit infrastructure migration; the evaluator binding, scientific
         # source, contracts, runtime and packages must remain identical.
-        infrastructure={'schemas/platform.py','tools/platform_host.py'}
+        infrastructure={'schemas/platform.py','tools/platform_host.py','tools/platform_store.py'}
         changes=[p for p,h in historical['sources'].items() if current['sources'].get(p)!=h]
         if set(changes)-infrastructure or any(historical[k]!=current[k] for k in
                 ('version','python','packages','input_schema','output_schema','declaration')):

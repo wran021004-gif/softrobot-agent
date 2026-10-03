@@ -10,11 +10,7 @@ from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
 from extensions.tendon_family.contracts import GVSTrajectoryParameters
 from extensions.tendon_family.gvs_profile import execution_scope
 
-RANKING = dict(version='1.0.0',rule='Joint acceptance first; otherwise componentwise physical comparison.',
-    physical_metrics=['terminal_error_m','holding_max_error_m','holding_max_speed_m_s'],
-    tolerance=1e-9,tradeoff='Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.',
-    computation='Reported separately; never substitutes for reach or holding acceptance.',
-    objective='Raw scalar objectives under different weights are not ranked.')
+from tools.acceptance_definitions import RANKING
 
 
 def control_grant(effective):
@@ -38,15 +34,16 @@ def control_grant(effective):
 
 def campaign_metrics(facts):
     settling=facts['sampled_settling']
-    if (settling['position_limit_m'],settling['speed_limit_m_s'],settling['window_s'])!=(.01,.02,.05):
-        raise ValueError('CAMPAIGN_SOURCE_LIMITS_CHANGED')
-    reach=facts['terminal_error_m']<=.01
+    if any(settling.get(k) is None for k in ('position_limit_m','speed_limit_m_s','window_s')):
+        raise ValueError('CAMPAIGN_SOURCE_LIMITS_MISSING')
+    # Official frozen reach result, never a second threshold/default evaluator.
+    reach=facts['task_accepted']
     position=settling['max_error_m']<=settling['position_limit_m']
     speed=settling['max_speed_m_s']<=settling['speed_limit_m_s']
     valid=facts['evaluation_validity']=='valid' and facts['valid_complete_execution']
     return dict(source=dict(execution_id=facts['execution_id'],configuration=facts['configuration'],
             evaluation=facts['evaluation'],profile=facts['report']['reference'],simulation=facts['simulation']),
-        coverage=dict(terminal='last execution sample',holding='all retained samples in final 0.05 s',continuous_time_guarantee=False),
+        coverage=dict(terminal='last execution sample',holding=f"all retained samples in final {settling['window_s']} s",continuous_time_guarantee=False),
         valid_complete_execution=valid,official_reach_task_success=facts['task_accepted'],
         terminal_error_m=facts['terminal_error_m'],holding_max_error_m=settling['max_error_m'],holding_max_speed_m_s=settling['max_speed_m_s'],
         terminal_reach_passed=reach,holding_position_passed=position,holding_speed_passed=speed,

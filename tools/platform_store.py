@@ -226,6 +226,29 @@ class Store:
         row = db.execute('SELECT * FROM calls WHERE run_id=? AND request_id=?', (run_id, request_id)).fetchone()
         return dict(row) if row else None
 
+    def spendable(self, run_id, db=None):
+        """The same capacity checks used by reserve, including downstream protection.
+
+        Unsealed reservations are already charged at reserved cost by remaining;
+        they must not be subtracted a second time.
+        """
+        if db is None:
+            with self.connect(True) as conn:
+                return self.spendable(run_id, conn)
+        session = self.session(run_id, db)
+        phase = self.phase_remaining(run_id, db)
+        limits = [('active phase / protected downstream capacity', phase['remaining'])] if phase else []
+        grant = session['state'].get('role_grant')
+        if grant:
+            used = self.remaining(run_id, db)['used']
+            limits.append(('diagnostic request subgrant', {k:v-used[k] for k,v in grant['budget'].items()}))
+        parent = session['snapshot'].get('parent_run_id')
+        for scope in ([None, run_id, parent] if parent else [None, run_id]):
+            limits.append(('project' if scope is None else 'session', self.remaining(scope, db)['remaining']))
+        return dict(remaining={k:max(0,min(values[k] for _,values in limits)) for k in zero()},
+                    constraints=[dict(scope=name,remaining=values) for name,values in limits],
+                    reservations='Running/unknown calls are charged at reservation until sealed; included once in ledger usage.')
+
     def reserve(self, run_id, request_id, request_hash, caller, cost, resources=(), cache_key=None, parent=None, inputs=(), kind='tool', version=VERSION):
         Budget.model_validate(cost)
         with self.transaction() as db:
@@ -235,18 +258,9 @@ class Store:
                     raise ValueError('REQUEST_ID_COLLISION')
                 return old, False
             parent_run = self.session(run_id, db)['snapshot'].get('parent_run_id')
-            phase = self.phase_remaining(run_id, db)
-            if phase and any(cost[k] > phase['remaining'][k] + 1e-9 for k in cost):
-                raise ValueError('BUDGET_EXHAUSTED: active phase / protected downstream capacity')
-            role_grant = self.session(run_id, db)['state'].get('role_grant')
-            if role_grant:
-                used = self.remaining(run_id, db)['used']
-                if any(cost[k] + used[k] > role_grant['budget'][k] + 1e-9 for k in cost):
-                    raise ValueError('BUDGET_EXHAUSTED: diagnostic request subgrant')
-            for scope in ([None, run_id, parent_run] if parent_run else [None, run_id]):
-                remainder = self.remaining(scope, db)['remaining']
-                if any(cost[k] > remainder[k] + 1e-9 for k in cost):
-                    raise ValueError('BUDGET_EXHAUSTED: ' + ('project' if scope is None else 'session'))
+            for constraint in self.spendable(run_id, db)['constraints']:
+                if any(cost[k] > constraint['remaining'][k] + 1e-9 for k in cost):
+                    raise ValueError('BUDGET_EXHAUSTED: ' + constraint['scope'])
             available = self.config(db)['exclusive_resources']
             occupied = self.remaining(None, db)['occupied']
             for resource in resources:

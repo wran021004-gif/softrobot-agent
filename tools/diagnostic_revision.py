@@ -100,6 +100,9 @@ def materialize(initial, revision, state):
 def comparison_view(role, state):
     feedback=role.get('improvement_feedback_content')
     if not feedback:return None
+    from tools.acceptance_definitions import feedback_acceptance
+    from tools.platform_store import Store
+    definitions=feedback_acceptance(Store(role['native_store_root']),feedback)
     aliases=ensure_aliases(state)['aliases'];reverse={v:k for k,v in aliases.items()}
     result=feedback.get('execution') or {};profile=result.get('receipts',{}).get('profile',{}).get('output')
     comparison=feedback.get('campaign_comparison')
@@ -116,5 +119,9 @@ def comparison_view(role, state):
         identities=dict(baseline=feedback['baseline_facts']['candidate'],candidate=(result.get('factual_result') or {}).get('candidate')),
         actual_parameter_changes=(role.get('preparation_content') or {}).get('actual_diff',
         (result.get('design_statement') or {}).get('parameters',[])),references=fields,
-        thresholds=dict(terminal_error_m=.01,holding_max_error_m=.01,holding_max_speed_m_s=.02,holding_window_s=.05),
+        thresholds=dict(terminal_error_m=definitions['terminal']['value'],
+            holding_max_error_m=definitions['holding']['position']['value'],
+            holding_max_speed_m_s=definitions['holding']['speed']['value'],
+            holding_window_s=definitions['holding']['duration']['value']) if definitions else None,
+        acceptance_definition=definitions,
         note='Sealed evaluation/profile arithmetic. Candidate profile references are required for new measured facts. Citations do not establish causality.')
