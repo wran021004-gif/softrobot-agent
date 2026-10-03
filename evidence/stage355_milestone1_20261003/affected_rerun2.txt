@@ -1,0 +1,50 @@
+test_inspection_provider_and_no_mutation (tests.test_stage355_working_state.WorkingStateTests.test_inspection_provider_and_no_mutation) ... ok
+test_unsealed_operation_and_unauthorized_installed_capability (tests.test_stage355_working_state.WorkingStateTests.test_unsealed_operation_and_unauthorized_installed_capability) ... ERROR
+test_saved_materialization_and_exact_profile (tests.test_stage354_references.SavedSuffixTests.test_saved_materialization_and_exact_profile) ... ok
+test_continuation_after_simulation_evaluation_and_repeat (tests.test_stage353_completion.CompletionTests.test_continuation_after_simulation_evaluation_and_repeat) ... ok
+test_historical_boundary_and_real_insufficient_budget (tests.test_stage353_completion.CompletionTests.test_historical_boundary_and_real_insufficient_budget) ... ok
+test_identity_integrity_and_version_refusal (tests.test_stage353_completion.CompletionTests.test_identity_integrity_and_version_refusal) ... ok
+test_normal_and_resumed_saved_bytes_agree (tests.test_stage353_completion.CompletionTests.test_normal_and_resumed_saved_bytes_agree) ... ERROR
+
+======================================================================
+ERROR: test_unsealed_operation_and_unauthorized_installed_capability (tests.test_stage355_working_state.WorkingStateTests.test_unsealed_operation_and_unauthorized_installed_capability)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\shutil.py", line 632, in _rmtree_unsafe
+    os.unlink(fullname)
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'D:\\softrobot-agent\\runs\\tmpkd60rz97\\platform.sqlite'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\softrobot-agent\tests\test_stage355_working_state.py", line 199, in test_unsealed_operation_and_unauthorized_installed_capability
+    with TemporaryDirectory(dir=ROOT/'runs') as directory:
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\tempfile.py", line 943, in __exit__
+    self.cleanup()
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\tempfile.py", line 947, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\tempfile.py", line 929, in _rmtree
+    _shutil.rmtree(name, onerror=onerror)
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\shutil.py", line 787, in rmtree
+    return _rmtree_unsafe(path, onerror)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\shutil.py", line 634, in _rmtree_unsafe
+    onerror(os.unlink, fullname, sys.exc_info())
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\tempfile.py", line 893, in onerror
+    _os.unlink(path)
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'D:\\softrobot-agent\\runs\\tmpkd60rz97\\platform.sqlite'
+
+======================================================================
+ERROR: test_normal_and_resumed_saved_bytes_agree (tests.test_stage353_completion.CompletionTests.test_normal_and_resumed_saved_bytes_agree)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\tests\test_stage353_completion.py", line 113, in test_normal_and_resumed_saved_bytes_agree
+    with patch('extensions.tendon_family.gvs_profile.prepare_execution'),patch.object(MujocoBackend,'compile'),\
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\unittest\mock.py", line 1537, in __enter__
+    raise InvalidSpecError(
+unittest.mock.InvalidSpecError: Cannot autospec attr 'run' from target 'MujocoBackend' as it has already been mocked out. [target=<class 'extensions.tendon_family.backends.MujocoBackend'>, attr=<MagicMock name='run' id='1863478333456'>]
+
+----------------------------------------------------------------------
+Ran 7 tests in 58.109s
+
+FAILED (errors=2)

@@ -1,0 +1,225 @@
+{
+  "contract": "platform.diagnostic_handoff",
+  "version": "1.0.0",
+  "provenance": "engineering_fixture",
+  "working_state": {
+    "run_id": "gvs-stage354-68b86eee4963-design",
+    "contract": "platform.working_state",
+    "version": "1.0.0"
+  },
+  "scope": {
+    "task": {
+      "identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
+      "task_id": "family-multisegment-dev",
+      "family": "task.reach",
+      "configuration": {
+        "artifact_id": "de59ed53bfe2d2540ab91dcccfde881ea49ffcc5e48f57687ed231b24febe4cc",
+        "media_type": "application/json"
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "acceptance_contract": "platform.acceptance_definition@1.0.0"
+    },
+    "candidate": {
+      "candidate_id": "improvement-744833804049",
+      "configuration": {
+        "artifact_id": "de59ed53bfe2d2540ab91dcccfde881ea49ffcc5e48f57687ed231b24febe4cc",
+        "media_type": "application/json"
+      },
+      "execution_id": "19a42d190e7c4f3e9338fe9a40845876",
+      "owner_run_id": "gvs-stage354-68b86eee4963-candidate"
+    },
+    "model": {
+      "extension_id": "model.serial_bending_cells",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "controller": {
+      "extension_id": "controller.gvs_nmpc",
+      "version": "7.0.0"
+    },
+    "context_id": "gvs-stage354-68b86eee4963-design",
+    "evidence_scope": {
+      "binding": {
+        "artifact_id": "1dd73248d41264c770a567618f0243cf1d34a152e9ce9123b8764a29343961ed",
+        "media_type": "application/json"
+      },
+      "project": "gvs-stage354-68b86eee4963"
+    }
+  },
+  "unmet_criterion": "Joint reach/holding acceptance remains false; terminal reach passed.",
+  "assessments": [
+    {
+      "kind": "observation",
+      "statement": "The saved candidate failed holding speed while passing terminal reach.",
+      "supporting": [
+        {
+          "reference": {
+            "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+            "media_type": "application/json"
+          },
+          "pointer": "/campaign_comparison/candidate/holding_max_speed_m_s",
+          "value": 1.1750052670100422
+        },
+        {
+          "reference": {
+            "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+            "media_type": "application/json"
+          },
+          "pointer": "/campaign_comparison/candidate/joint_reach_holding_passed",
+          "value": false
+        }
+      ],
+      "contradicting": [
+        {
+          "reference": {
+            "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+            "media_type": "application/json"
+          },
+          "pointer": "/campaign_comparison/candidate/terminal_reach_passed",
+          "value": true
+        }
+      ],
+      "previous_assessment": null,
+      "changed_by": []
+    },
+    {
+      "kind": "hypothesis",
+      "statement": "Holding-speed cost may affect motion, but this one-weight comparison does not identify a dominant cause.",
+      "supporting": [
+        {
+          "reference": {
+            "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+            "media_type": "application/json"
+          },
+          "pointer": "/campaign_comparison/candidate/holding_max_speed_m_s",
+          "value": 1.1750052670100422
+        },
+        {
+          "reference": {
+            "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+            "media_type": "application/json"
+          },
+          "pointer": "/campaign_comparison/candidate/joint_reach_holding_passed",
+          "value": false
+        }
+      ],
+      "contradicting": [
+        {
+          "reference": {
+            "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+            "media_type": "application/json"
+          },
+          "pointer": "/campaign_comparison/candidate/terminal_reach_passed",
+          "value": true
+        }
+      ],
+      "previous_assessment": {
+        "artifact_id": "f0bd17ddc970fe7ca19432552803082dd7aa83b3a28593ad21b3333040ae0a5e",
+        "media_type": "application/json"
+      },
+      "changed_by": [
+        {
+          "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    {
+      "kind": "unresolved_question",
+      "statement": "Would a separately authorized bounded comparison preserve reach while reducing holding speed sufficiently?",
+      "supporting": [],
+      "contradicting": [],
+      "previous_assessment": null,
+      "changed_by": []
+    }
+  ],
+  "check": {
+    "proposal": "Future bounded one-weight experiment with fixed task, robot and evaluation; this fixture executes nothing.",
+    "expected_observations": [
+      "Holding speed decreases and joint acceptance is gained without terminal reach failure."
+    ],
+    "weakening_observations": [
+      "Speed remains outside its limit or terminal reach worsens beyond tolerance."
+    ],
+    "capability": "simulation.run + evaluation.run + control.profile_report",
+    "authorization": "Unavailable in this offline stage; requires a new explicit search-batch grant and phase bindings.",
+    "budget": {
+      "required_reservations_s": {
+        "simulation": 900,
+        "evaluation": 30,
+        "profile": 60
+      },
+      "current_spendable": {
+        "remaining": {
+          "tool_calls": 48,
+          "model_calls": 2,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 238.03200000012293
+        },
+        "constraints": [
+          {
+            "scope": "active phase / protected downstream capacity",
+            "remaining": {
+              "backend_solves": 0,
+              "model_calls": 2,
+              "tool_calls": 48,
+              "wall_s": 238.03200000012293,
+              "worker_calls": 0
+            }
+          },
+          {
+            "scope": "project",
+            "remaining": {
+              "backend_solves": 0,
+              "model_calls": 17,
+              "tool_calls": 48,
+              "wall_s": 2638.7390000002924,
+              "worker_calls": 0
+            }
+          },
+          {
+            "scope": "session",
+            "remaining": {
+              "backend_solves": 1,
+              "model_calls": 20,
+              "tool_calls": 57,
+              "wall_s": 3423.377000000095,
+              "worker_calls": 0
+            }
+          }
+        ],
+        "reservations": "Running/unknown calls are charged at reservation until sealed; included once in ledger usage."
+      },
+      "backend_solves_required": 1
+    },
+    "proceed_if": "New sealed joint acceptance and comparison support the hypothesis under the approved batch plan.",
+    "revise_if": "Directional changes occur but acceptance remains unmet or contradicting evidence grows.",
+    "stop_if": "Grant/budget absent, unresolved operation, or approved batch stopping condition is met."
+  },
+  "search_plan": null,
+  "causal_status": "unproven"
+}

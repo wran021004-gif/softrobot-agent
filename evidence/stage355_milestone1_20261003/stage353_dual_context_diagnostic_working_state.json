@@ -1,0 +1,818 @@
+{
+  "contract": "platform.working_state",
+  "version": "1.0.0",
+  "run_id": "gvs-stage353-82bf39d25598-diagnostic",
+  "task": {
+    "identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041",
+    "task_id": "family-multisegment-dev",
+    "family": "task.reach",
+    "configuration": {
+      "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+      "media_type": "application/json"
+    },
+    "execution_model": {
+      "extension_id": "model.serial_bending_cells",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "data": {},
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "acceptance_contract": "platform.acceptance_definition@1.0.0"
+  },
+  "workflow": {
+    "session_status": "failed",
+    "role": "diagnostic",
+    "phase": "revision",
+    "computation_complete": true,
+    "delivery_complete": false,
+    "execution_validity": "valid",
+    "physical_acceptance": {
+      "terminal": true,
+      "joint": false
+    }
+  },
+  "baseline": {
+    "candidate_id": "baseline-replay",
+    "configuration": {
+      "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+      "media_type": "application/json"
+    },
+    "execution_id": "cf997605885642759ee33920e2c9e2ef",
+    "owner_run_id": "gvs-stage351-baseline-executor"
+  },
+  "proposed": {
+    "reference": {
+      "artifact_id": "a5b858fc9e61cd85b9ff3504fd84ce71b093c79b644758aeb418d8aa615bc0ee",
+      "media_type": "application/json"
+    },
+    "decision": {
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.01
+      },
+      "disposition": "adopt",
+      "expected_measurable_effect": "In a complete simulation with holding_tip_speed_weight changed 0.0 -> 0.01, the primary expected measurable effect is a reduction in sampled holding-window tip speed relative to the baseline window (baseline speed_m_s range 0.635173-1.581015 m/s, limit 0.02 m/s), and a possible secondary reduction in sampled late-window position error (baseline max 0.0581381 m vs limit 0.01 m), with terminal reach expected to remain passing (baseline terminal_error_m 0.00764261 m vs reach_tolerance_m 0.01 m). Computation-side measurements (deadline_misses, Solve_Succeeded/User_Requested_Stop counts, per-update solve and wall times) are watched but not expected to be the treatment benefit. Comparison is against measured baseline reach/holding/computation endpoints only, never against raw scalar objective values across weights, and any reported comparison covers selected rows, not the whole trajectory.",
+      "local_comparison": null,
+      "rationale": "Hypothesis (bounded, single-variable test of the accepted diagnosis's 'possible' residual-tip-speed hypothesis): the baseline recipe leaves holding_tip_speed_weight at 0.0 (f633d6b86e119), so the optimizer carries no penalty on tip speed at nodes inside the configured settling window; the sampled holding window then shows residual tip speed (0.635173-1.581015 m/s, s = f78dabd8c8235/fdd8ee8afdf0d) far above speed_limit_m_s 0.02 (f5c0ff5680b58) and holding position error up to 0.0581381 m (fc5aed31ccc41) above position_limit_m 0.01 (fabec6428bae8), with holding_speed_passed = false (f95aa741050f1) and holding_position_passed = false (f81cf29aebe30). Relevance: this is the editable term that is scheduled on the holding window itself, i.e. exactly the region where both sampled failures were recorded (f69c083ab366d window_s 0.05, f2352e6338bcb sample_times_s 0.30-0.35). Setting it to a small positive probe value 0.01 supplies an integration-step-weighted spatial speed cost at scheduled holding nodes; terminal_tip_speed_weight is deliberately left at 0.0 (f2032318339b5) so any observed change is not confounded across two weights. Scale (tip_speed_scale_m_s 0.02, f22737f2107a8) and holding-node scheduling are unchanged; terminal speed cost remains a single terminal scaled squared-speed term. Expected effects stated separately - reach: terminal_error_m 0.00764261 m currently sits inside reach_tolerance_m 0.01 (f58eda76ea2c8, f2b4ef4a321f5), so reach_passed = true (fe8da39ca02a9) is expected to hold, but the added holding speed cost can perturb the final approach and is a genuine risk to the reach margin. Holding position: effect is indirect (the term penalizes speed, not position); it may suppress overshoot/oscillation that inflates late-window error, but could also increase lag and leave error above 0.01 m. Holding speed: primary intended target; expect sampled holding-window speed to fall relative to baseline toward the 0.02 m/s criterion. Computation: adding a nonzero cost term can change solver conditioning, selected iteration and wall time; baseline already reports deadline_misses 35 (f40b7c1486430), Solve_Succeeded 1 / User_Requested_Stop 34 (fe1f44408b02f, fc52eb2019e4c) and mean_update_s 17.2633 s (fb8eadeb9fd64) against control_period_s 0.01 s (fc080a63d2e09), so this is an adverse-effect watch item rather than an expected benefit. Possible adverse effects: degraded reach margin, no holding-speed reduction, or worse solve/wall time and deadline-miss behaviour. Observations that would weaken the hypothesis: sampled holding-window speed remaining near the baseline 0.6-1.6 m/s despite the positive weight; reach beginning to fail (terminal_error_m >= 0.01 m); or materially worse per-update computation without any holding-speed gain. Provenance and limits: this is a bounded, non-causal improvement intent derived from the accepted diagnosis; an unproven causal mechanism is not required for the bounded experiment, but a single execution plus configuration values do not establish cause, and full warm plans / optimizer iteration traces are not retained. Raw scalar objective values are not compared across weights; only measured reach, holding-position, holding-speed and computation endpoints are compared at the same coverage as the baseline. No local paired comparison is requested because no displayed saved update has an effective plan horizon of 0.01 s (displayed effective_horizon values are 4, 9 and 10 control intervals: fe2fc6f5398a5, fe79be685385a, fe49299a5134a), so a legal comparison state cannot be identified from current evidence."
+    }
+  },
+  "prepared": {
+    "reference": {
+      "artifact_id": "b3193b2cbbc9483dd216ed4cc54e99bf8b4ce897eb3d6d8e3c8a058b7ea9002d",
+      "media_type": "application/json"
+    },
+    "candidate_id": "improvement-7a36cd1a7c0d",
+    "configuration": {
+      "artifact_id": "62ccf42c50d4348ffbd0174092c248e2659c63d98ab5b8c5c243d5100cddb78b",
+      "media_type": "application/json"
+    },
+    "status": "prepared_no_execution",
+    "actual_diff": [
+      {
+        "after": 0.01,
+        "before": 0.0,
+        "pointer": "/policy/controller/parameters/data/recipe/holding_tip_speed_weight"
+      }
+    ],
+    "executed_configuration": {
+      "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+      "media_type": "application/json"
+    },
+    "execution_link": {
+      "artifact_id": "62ccf42c50d4348ffbd0174092c248e2659c63d98ab5b8c5c243d5100cddb78b",
+      "media_type": "application/json"
+    },
+    "scientific_scope_matches_execution": true
+  },
+  "latest_tested": {
+    "candidate_id": "improvement-7a36cd1a7c0d",
+    "configuration": {
+      "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+      "media_type": "application/json"
+    },
+    "execution_id": "4f5df885e88b40888fe653663129d27e",
+    "owner_run_id": "gvs-stage353-82bf39d25598-candidate"
+  },
+  "selection": {
+    "recorded": false,
+    "selected_candidate": null,
+    "candidate_disposition": null,
+    "recommendation_disposition": null
+  },
+  "products": {
+    "initial_report": {
+      "artifact_id": "aac26d137b8ed87c06d37c3ade5d0a1f42915c7ff3e50c0da3a4226306374091",
+      "media_type": "application/json"
+    },
+    "accepted_revision": null,
+    "feedback": {
+      "artifact_id": "8909a9ec0c8113b60afaf45e8c5e8ce0db85cbdfe822f70cfff24b6048acdfad",
+      "media_type": "application/json"
+    },
+    "final_decision": null,
+    "unaccepted_draft": null
+  },
+  "operations": {
+    "pending": null,
+    "unresolved": [],
+    "completed_stages": {
+      "evaluation": {
+        "status": "completed",
+        "operation": "evaluation.run",
+        "source_execution_id": "4f5df885e88b40888fe653663129d27e",
+        "configuration": {
+          "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+          "media_type": "application/json"
+        },
+        "output": {
+          "artifact_id": "c843f0a4d6e08e56ae0047d3c7c23d79a757011c57246e0fc724f02ed789920c",
+          "media_type": "application/json"
+        }
+      },
+      "profile": {
+        "status": "completed",
+        "operation": "control.profile_report",
+        "source_execution_id": "4f5df885e88b40888fe653663129d27e",
+        "configuration": {
+          "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+          "media_type": "application/json"
+        },
+        "output": {
+          "artifact_id": "6b50c6f4f69227078175aa2428310ad5056b90f5cbefb47fd46b39b5ac3048b8",
+          "media_type": "application/json"
+        }
+      },
+      "simulation": {
+        "status": "completed",
+        "operation": "simulation.run",
+        "source_execution_id": "4f5df885e88b40888fe653663129d27e",
+        "configuration": {
+          "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+          "media_type": "application/json"
+        },
+        "output": {
+          "artifact_id": "358bdec0d7970a5e925b3233d99d6fba2cd7064eaded40e8cb08378c11c3c995",
+          "media_type": "application/json"
+        }
+      }
+    }
+  },
+  "evidence": {
+    "context_id": "gvs-stage353-82bf39d25598-diagnostic",
+    "scope": {
+      "binding": {
+        "artifact_id": "1dd73248d41264c770a567618f0243cf1d34a152e9ce9123b8764a29343961ed",
+        "media_type": "application/json"
+      },
+      "project": "gvs-stage353-82bf39d25598"
+    },
+    "permitted_references": [
+      {
+        "artifact_id": "aa2b6d118eb8bfb95aea3cec344121f797cf436c3f3f8970df034943c5f45119",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "1971382f56458825d3900dff237359182b944c224f918a45be019da80559742a",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "fb8bf19f631736cb2772c099400be668d938b88e4337ce593376a4f9be28713e",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "8909a9ec0c8113b60afaf45e8c5e8ce0db85cbdfe822f70cfff24b6048acdfad",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "6b50c6f4f69227078175aa2428310ad5056b90f5cbefb47fd46b39b5ac3048b8",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "adac68339138513d035bf4ed8330f9337ff24b6da27f5a417839971a6187e3f3",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "733e2cb98d785162fa56dcba6f3a0154b9a3e3660eeef74fe1de53893e59f7e1",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "61c98cbd8dceb5951bc02a7cd6711769fa81c2d09b22e3177e825b252877941f",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "c2861981cfe5381b0caa80af0dcbcdb00fff41ccb00e5658808bf1d2f8e2dfd0",
+        "media_type": "application/json"
+      }
+    ],
+    "catalog_location": "Current context fact_catalog/reference_view; exact selectors remain in the host.",
+    "catalog_count": 2928,
+    "alias_count": 0,
+    "compatibility": "legacy_long_handles",
+    "interface_version": null,
+    "availability": "not_read: retained inventory not queried; not_displayed: retained facts outside current page; not_retained: absent evidence; capability_unavailable and execution_unauthorized are separate action reasons"
+  },
+  "budgets": {
+    "project": {
+      "limit": {
+        "backend_solves": 1,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 14,
+        "model_calls": 9,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 1192.0160000002943
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 15,
+        "tool_calls": 46,
+        "wall_s": 2407.9839999997057,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "role": {
+      "limit": {
+        "backend_solves": 1,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 8,
+        "model_calls": 7,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 515.3430000001099
+      },
+      "remaining": {
+        "backend_solves": 1,
+        "model_calls": 17,
+        "tool_calls": 52,
+        "wall_s": 3084.65699999989,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "role_grant": null,
+    "phase": {
+      "limit": {
+        "model_calls": 4
+      },
+      "protect_project": {
+        "model_calls": 3,
+        "tool_calls": 3,
+        "wall_s": 300.0
+      },
+      "started_usage": {
+        "backend_solves": 0,
+        "model_calls": 3,
+        "tool_calls": 7,
+        "wall_s": 124.13999999989755,
+        "worker_calls": 0
+      },
+      "used": {
+        "backend_solves": 0,
+        "model_calls": 4,
+        "tool_calls": 1,
+        "wall_s": 391.20300000021234,
+        "worker_calls": 0
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 43,
+        "wall_s": 2107.9839999997057,
+        "worker_calls": 0
+      }
+    },
+    "spendable": {
+      "remaining": {
+        "tool_calls": 43,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 2107.9839999997057
+      },
+      "constraints": [
+        {
+          "scope": "active phase / protected downstream capacity",
+          "remaining": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 43,
+            "wall_s": 2107.9839999997057,
+            "worker_calls": 0
+          }
+        },
+        {
+          "scope": "project",
+          "remaining": {
+            "backend_solves": 0,
+            "model_calls": 15,
+            "tool_calls": 46,
+            "wall_s": 2407.9839999997057,
+            "worker_calls": 0
+          }
+        },
+        {
+          "scope": "session",
+          "remaining": {
+            "backend_solves": 1,
+            "model_calls": 17,
+            "tool_calls": 52,
+            "wall_s": 3084.65699999989,
+            "worker_calls": 0
+          }
+        }
+      ],
+      "reservations": "Running/unknown calls are charged at reservation until sealed; included once in ledger usage."
+    },
+    "numerical": {
+      "limits": {
+        "local_solves": 2,
+        "prediction_evaluations": 0
+      },
+      "used": {
+        "local_solves": 0,
+        "prediction_evaluations": 0
+      }
+    }
+  },
+  "recovery": {
+    "version": "2.0.0",
+    "scope": "workflow shared across phases and contexts",
+    "protocol": {
+      "category": "native_schema_or_envelope",
+      "limits": {
+        "max_consecutive": 2,
+        "max_total": 4
+      },
+      "total_used": 2,
+      "consecutive_used": 2,
+      "total_remaining": 2,
+      "consecutive_remaining": 0,
+      "reset": "Completed business call resets consecutive only; decoding alone does not."
+    },
+    "business": {
+      "category": "accepted_call_execution_rejected_or_failed",
+      "limit": 2,
+      "consecutive_failures": 1,
+      "total_failures": 1,
+      "remaining_repairs": 1,
+      "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+      "reset": "Completed business call resets consecutive; phase/context switch does not.",
+      "feedback": {
+        "category": "accepted_call_execution_rejected_or_failed",
+        "error": "GAP_SOURCE_REQUIRED: name unlisted evidence and explicit basis",
+        "requirement": "Correct the business input or evidence linkage using the retained result; resubmit the native call within the same allowance."
+      }
+    },
+    "transport": {
+      "category": "provider_transport_failure",
+      "automatic_retry": false
+    },
+    "length": {
+      "category": "truncated_without_usable_action",
+      "limit": 1,
+      "used": 0,
+      "configuration": {
+        "enabled": true,
+        "max_tokens": 131072,
+        "timeout_s": 900.0
+      }
+    },
+    "stop_reason": "MODEL_PROTOCOL_CORRECTION_CONSECUTIVE_LIMIT: INVALID_TOOL_CALL_ENVELOPE: business_parameters: UNKNOWN_OR_OUT_OF_SCOPE_FACT_HANDLE ffa8e71187d4b: copy a handle from this context fact_catalog or query the needed evidence"
+  },
+  "actions": [
+    {
+      "tool": "control.profile_report",
+      "native_function": null,
+      "version": null,
+      "installed": true,
+      "permitted": false,
+      "reasons": [
+        "execution_unauthorized: no frozen tool binding",
+        "execution_unauthorized: outside active phase/read allowance",
+        "session_not_running: explicit validated host resume required"
+      ],
+      "validation": "Arguments, exact evidence bindings and preflight costs still require the existing host."
+    },
+    {
+      "tool": "design.decide_improvement",
+      "native_function": "design_decide_improvement",
+      "version": "1.0.0",
+      "installed": true,
+      "permitted": false,
+      "reasons": [
+        "execution_unauthorized: outside active phase/read allowance",
+        "session_not_running: explicit validated host resume required"
+      ],
+      "validation": "Arguments, exact evidence bindings and preflight costs still require the existing host."
+    },
+    {
+      "tool": "design.respond_diagnosis",
+      "native_function": "design_respond_diagnosis",
+      "version": "2.0.0",
+      "installed": true,
+      "permitted": false,
+      "reasons": [
+        "execution_unauthorized: outside active phase/read allowance",
+        "session_not_running: explicit validated host resume required"
+      ],
+      "validation": "Arguments, exact evidence bindings and preflight costs still require the existing host."
+    },
+    {
+      "tool": "diagnosis.check_request",
+      "native_function": "diagnosis_check_request",
+      "version": "2.0.0",
+      "installed": true,
+      "permitted": false,
+      "reasons": [
+        "execution_unauthorized: outside active phase/read allowance",
+        "session_not_running: explicit validated host resume required"
+      ],
+      "validation": "Arguments, exact evidence bindings and preflight costs still require the existing host."
+    },
+    {
+      "tool": "diagnosis.inspect_evidence",
+      "native_function": "diagnosis_inspect_evidence",
+      "version": "1.0.0",
+      "installed": true,
+      "permitted": false,
+      "reasons": [
+        "execution_unauthorized: outside active phase/read allowance",
+        "session_not_running: explicit validated host resume required"
+      ],
+      "validation": "Arguments, exact evidence bindings and preflight costs still require the existing host."
+    },
+    {
+      "tool": "diagnosis.request",
+      "native_function": "diagnosis_request",
+      "version": "1.0.0",
+      "installed": true,
+      "permitted": false,
+      "reasons": [
+        "execution_unauthorized: outside active phase/read allowance",
+        "session_not_running: explicit validated host resume required"
+      ],
+      "validation": "Arguments, exact evidence bindings and preflight costs still require the existing host."
+    },
+    {
+      "tool": "diagnosis.saved_state_check",
+      "native_function": null,
+      "version": null,
+      "installed": true,
+      "permitted": false,
+      "reasons": [
+        "execution_unauthorized: no frozen tool binding",
+        "execution_unauthorized: outside active phase/read allowance",
+        "session_not_running: explicit validated host resume required",
+        "execution_unauthorized: no saved-state numerical request scope"
+      ],
+      "validation": "Arguments, exact evidence bindings and preflight costs still require the existing host."
+    },
+    {
+      "tool": "diagnosis.submit",
+      "native_function": "diagnosis_submit",
+      "version": "2.0.0",
+      "installed": true,
+      "permitted": false,
+      "reasons": [
+        "session_not_running: explicit validated host resume required"
+      ],
+      "validation": "Arguments, exact evidence bindings and preflight costs still require the existing host."
+    },
+    {
+      "tool": "evaluation.run",
+      "native_function": null,
+      "version": null,
+      "installed": true,
+      "permitted": false,
+      "reasons": [
+        "execution_unauthorized: no frozen tool binding",
+        "execution_unauthorized: outside active phase/read allowance",
+        "session_not_running: explicit validated host resume required"
+      ],
+      "validation": "Arguments, exact evidence bindings and preflight costs still require the existing host."
+    },
+    {
+      "tool": "evidence.read",
+      "native_function": "evidence_read",
+      "version": "1.0.0",
+      "installed": true,
+      "permitted": false,
+      "reasons": [
+        "execution_unauthorized: outside active phase/read allowance",
+        "session_not_running: explicit validated host resume required"
+      ],
+      "validation": "Arguments, exact evidence bindings and preflight costs still require the existing host."
+    },
+    {
+      "tool": "simulation.run",
+      "native_function": null,
+      "version": null,
+      "installed": true,
+      "permitted": false,
+      "reasons": [
+        "execution_unauthorized: no frozen tool binding",
+        "execution_unauthorized: outside active phase/read allowance",
+        "session_not_running: explicit validated host resume required",
+        "budget_exhausted: backend_solves (fresh execution)"
+      ],
+      "validation": "Arguments, exact evidence bindings and preflight costs still require the existing host."
+    }
+  ],
+  "acceptance": {
+    "contract": "platform.acceptance_definition",
+    "version": "1.0.0",
+    "terminal": {
+      "value": 0.01,
+      "unit": "m",
+      "definition": "Euclidean world tip position error at the final execution sample; sealed evaluate.reach is the outcome authority.",
+      "source": {
+        "reference": {
+          "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+          "media_type": "application/json"
+        },
+        "pointer": "/effective/task/evaluator/parameters/data/tolerance_m"
+      }
+    },
+    "holding": {
+      "duration": {
+        "value": 0.05,
+        "unit": "s",
+        "definition": "Final closed interval [task duration - window, task duration].",
+        "source": {
+          "reference": {
+            "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/policy/controller/parameters/data/settling/window_s"
+        }
+      },
+      "interval_s": [
+        0.3,
+        0.35
+      ],
+      "position": {
+        "value": 0.01,
+        "unit": "m",
+        "definition": "Maximum sampled world tip position error in the final interval.",
+        "source": {
+          "reference": {
+            "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/policy/controller/parameters/data/settling/position_limit_m"
+        }
+      },
+      "speed": {
+        "value": 0.02,
+        "unit": "m/s",
+        "definition": "Maximum sampled world tip translational speed norm in the final interval.",
+        "source": {
+          "reference": {
+            "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/policy/controller/parameters/data/settling/speed_limit_m_s"
+        }
+      },
+      "coverage": {
+        "expected_sample_count": 6,
+        "definition": "Both endpoints, timestamps aligned to task sample_period_s; missing samples are unavailable, never a pass.",
+        "recorded_available": true,
+        "source": {
+          "reference": {
+            "artifact_id": "6b50c6f4f69227078175aa2428310ad5056b90f5cbefb47fd46b39b5ac3048b8",
+            "media_type": "application/json"
+          },
+          "pointer": "/detail/sampled_settling/available"
+        }
+      },
+      "continuous_time_guarantee": false
+    },
+    "speed": {
+      "definition": "Euclidean norm of tip-site translational Jacobian times recorded backend qvel, reconstructed with sealed robot.xml and qpos; no finite differencing",
+      "unit": "m/s",
+      "frame": "world",
+      "implementation": "extensions/tendon_family/gvs_reporting.py::reconstruct_motion",
+      "source": {
+        "reference": {
+          "artifact_id": "a0971c152089eff84630009192125a98784905fd9ba3c179ed7484ea36345e27",
+          "media_type": "application/json"
+        },
+        "pointer": "/*/tip_speed_m_s"
+      }
+    },
+    "timing": {
+      "control_period": {
+        "value": 0.01,
+        "unit": "s",
+        "definition": "Simulated control spacing; synchronous wall overruns do not imply skipped applied updates or injected actuator delay.",
+        "source": {
+          "reference": {
+            "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/task/timing/control_period_s"
+        }
+      },
+      "sample_period": {
+        "value": 0.01,
+        "unit": "s",
+        "definition": "Retained backend sampling interval.",
+        "source": {
+          "reference": {
+            "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/task/timing/sample_period_s"
+        }
+      },
+      "duration": {
+        "value": 0.35,
+        "unit": "s",
+        "definition": "Simulated task horizon, separate from computation wall time.",
+        "source": {
+          "reference": {
+            "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/task/timing/duration_s"
+        }
+      },
+      "interpretation": "Applied updates, initialization selections, simulated duration and measured wall time are separate facts."
+    },
+    "comparison": {
+      "policy": {
+        "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+        "objective": "Raw scalar objectives under different weights are not ranked.",
+        "physical_metrics": [
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+        "tolerance": 1e-09,
+        "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+        "version": "1.0.0"
+      },
+      "source": "sealed campaign_comparison.ranking_rule",
+      "applicable": true
+    },
+    "historical_contract": null,
+    "missing": []
+  },
+  "parameter_impacts": {
+    "version": "1.0.0",
+    "mapped": [
+      {
+        "parameter": "control/recipe/terminal_tip_speed_weight",
+        "meaning": "Dimensionless terminal weight on squared world tip speed / tip_speed_scale_m_s. Zero preserves legacy cost.",
+        "scaling": {
+          "speed_scale_m_s": 0.02,
+          "semantics": "Squared world tip speed divided by speed scale squared; terminal node cost."
+        },
+        "legal_domain": "Schema nonnegative finite; reach builder requires zero or [0.0001, 1].",
+        "granted_range": [
+          0.0,
+          1.0
+        ],
+        "builder_spec": {
+          "bounds": [
+            0.0,
+            1.0
+          ],
+          "description": "Dimensionless terminal weight on squared world tip speed / tip_speed_scale_m_s. Zero preserves legacy cost.",
+          "type": "number",
+          "unit": "1"
+        },
+        "authorized_parameter": true,
+        "implementation_supported": true,
+        "controller": {
+          "extension_id": "controller.gvs_nmpc",
+          "version": "7.0.0"
+        },
+        "candidate_builder": "candidate.family",
+        "effective_pointer": "/effective/policy/controller/parameters/data/recipe/terminal_tip_speed_weight",
+        "source": {
+          "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+          "media_type": "application/json"
+        },
+        "current_value": 0.0,
+        "reusable": [
+          "Fixed task/goal/evaluator/timing and robot definition",
+          "Compatible historical tensions as numerical guesses only; states regenerated under candidate dynamics"
+        ],
+        "reconstruct": [
+          "CandidateInput effective controller and content identity",
+          "Candidate-specific controller plan and TrajectoryWorkspace symbolic graph/solver",
+          "Warm states from measured candidate initial state; execution manifests and receipts"
+        ],
+        "cannot_rebind": [
+          "Previous candidate trajectories, local linearizations, endpoint analyses, optimized controller plans, evaluations, profiles and comparisons"
+        ],
+        "fresh_steps": [
+          "Validated candidate preparation and actual_diff",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "Bound comparison and diagnostic revision"
+        ],
+        "evidence_rule": "Historical evidence stays valid for its original candidate; a changed effective configuration needs new exact bindings.",
+        "references": [
+          "extensions/tendon_family/candidate.py::apply",
+          "tools/diagnostic_improvement.py::prepare_improvement",
+          "extensions/tendon_family/gvs_profile.py::prepare_execution",
+          "extensions/tendon_family/gvs_nmpc.py::GVSNMPCController.configure",
+          "extensions/tendon_family/gvs_trajectory.py::TrajectoryWorkspace"
+        ]
+      },
+      {
+        "parameter": "control/recipe/holding_tip_speed_weight",
+        "meaning": "Per-second squared spatial speed weight on nodes at/after the configured task settling-window start. Requires explicit settling settings.",
+        "scaling": {
+          "speed_scale_m_s": 0.02,
+          "semantics": "Squared normalized world tip speed integrated over holding-cost nodes; per-second weight."
+        },
+        "legal_domain": "Schema nonnegative finite; reach builder requires zero or [0.0001, 1].",
+        "granted_range": [
+          0.0,
+          1.0
+        ],
+        "builder_spec": {
+          "bounds": [
+            0.0,
+            1.0
+          ],
+          "description": "Per-second squared spatial speed weight on nodes at/after the configured task settling-window start. Requires explicit settling settings.",
+          "type": "number",
+          "unit": "1"
+        },
+        "authorized_parameter": true,
+        "implementation_supported": true,
+        "controller": {
+          "extension_id": "controller.gvs_nmpc",
+          "version": "7.0.0"
+        },
+        "candidate_builder": "candidate.family",
+        "effective_pointer": "/effective/policy/controller/parameters/data/recipe/holding_tip_speed_weight",
+        "source": {
+          "artifact_id": "17f457f1646648ad08b2b891de7f08627d20ad221e8c6b7ecce1b2778ea2a2cc",
+          "media_type": "application/json"
+        },
+        "current_value": 0.01,
+        "reusable": [
+          "Fixed task/goal/evaluator/timing and robot definition",
+          "Compatible historical tensions as numerical guesses only; states regenerated under candidate dynamics"
+        ],
+        "reconstruct": [
+          "CandidateInput effective controller and content identity",
+          "Candidate-specific controller plan and TrajectoryWorkspace symbolic graph/solver",
+          "Warm states from measured candidate initial state; execution manifests and receipts"
+        ],
+        "cannot_rebind": [
+          "Previous candidate trajectories, local linearizations, endpoint analyses, optimized controller plans, evaluations, profiles and comparisons"
+        ],
+        "fresh_steps": [
+          "Validated candidate preparation and actual_diff",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "Bound comparison and diagnostic revision"
+        ],
+        "evidence_rule": "Historical evidence stays valid for its original candidate; a changed effective configuration needs new exact bindings.",
+        "references": [
+          "extensions/tendon_family/candidate.py::apply",
+          "tools/diagnostic_improvement.py::prepare_improvement",
+          "extensions/tendon_family/gvs_profile.py::prepare_execution",
+          "extensions/tendon_family/gvs_nmpc.py::GVSNMPCController.configure",
+          "extensions/tendon_family/gvs_trajectory.py::TrajectoryWorkspace"
+        ]
+      }
+    ],
+    "unmapped": "All other parameter dependencies, including geometry/material/model changes.",
+    "authorization": "Installed controller support and parameter grants do not authorize an execution; working_state.actions and existing host rules apply."
+  },
+  "experiment_plan": null
+}
