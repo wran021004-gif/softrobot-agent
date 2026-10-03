@@ -1,0 +1,40 @@
+{
+  "product": "report_01.json",
+  "reviewer": "Primary implementer; organization-masked copy, run ordering known; not independent blind review",
+  "workflow": "Accepted initial report, real check, feedback, accepted revision and final finish. Final adoption names a defer recommendation and executes no change.",
+  "check_value": "The model selected update 34 and used the recorded versus braking-box endpoint speeds (0.6155277254823904 and 0.6129798468327005 m/s) to reinforce deferral. It did not claim complete simulation or physical improvement.",
+  "findings": [
+    {
+      "severity": "substantive_issue",
+      "field": "revised_report /report/attribution small_local_braking_authority_at_update_34_over_10ms; final_response /reasoning",
+      "assessment": "A small speed difference under two held inputs does not establish small achievable endpoint braking authority or rule out an under-braked command. The box input optimizes instantaneous deceleration, not endpoint speed over 10 ms; no endpoint optimum or equivalence bound was computed."
+    },
+    {
+      "severity": "substantive_issue",
+      "field": "revised_report /report/facts/0; final_response /reasoning",
+      "claim": "about 0.0025 m/s ... not a new computation",
+      "assessment": "This arithmetic difference is derived, even though both original values are retrieved. No inter-arm speed-difference computation artifact is cited. The report should state the original values or cite a recorded computation under the requested provenance rule."
+    },
+    {
+      "severity": "substantive_issue",
+      "field": "initial_report /missing_evidence/0; revised_report /report/limitations/4",
+      "assessment": "The unread approach-phase claim includes 0.28 and 0.29 s, whose measured endpoints were returned by prediction reads for updates 27 and 28. Structured queried declarations can pass while this prose remains too broad."
+    },
+    {
+      "severity": "substantive_issue",
+      "field": "initial_report and revised_report /report/attribution/0",
+      "assessment": "The description of window failure says position error was already inside 0.01 m while discussing the whole 0.05 s window. The cited 0.30 s error is 0.05813810428573256 m and even 0.34 s is 0.0100658278018921 m. Terminal position acceptance must not imply window-wide position tracking. Maximum and terminal speed alone also do not prove a condition at every sampled point, although the retained complete window does fail throughout."
+    },
+    {
+      "severity": "minor_issue",
+      "field": "revised_report /report/facts/2; final_response /reasoning",
+      "assessment": "Absence of the recorded-input endpoint error from the displayed catalog is narrower than absence from the supplied numerical feedback. The full rollout result retains the 0.01 s endpoint. The stated catalog limitation should not be generalized to evidence absence."
+    }
+  ],
+  "positive_findings": [
+    "Final judgment uses actual numeric feedback and distinguishes the projected local check from closed-loop execution.",
+    "Explicit unread prediction subsets and retained historical-plan gaps are represented separately.",
+    "Synchronous wall time is not treated as injected physical feedback delay; no physical success is claimed."
+  ],
+  "citation_review": "Exact-source audit recorded separately in workload_audit.json; scientific findings do not change raw products or acceptance."
+}

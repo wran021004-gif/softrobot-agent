@@ -1,0 +1,33 @@
+{
+  "product": "report_04.json",
+  "reviewer": "Primary implementer; organization-masked copy, run order known; not independent blind review",
+  "citation_review": "Exact reference/pointer/value audit in workload_audit.json; accepted coverage declarations do not validate surrounding prose.",
+  "workflow": "Completed real check at update 33, accepted revision and final adopt of a defer recommendation; no physical action.",
+  "positive_findings": [
+    "Distinguishes accepted reach from failed sampled position and speed holding conditions.",
+    "Uses actual check feedback to maintain deferral and leaves alternative mechanisms unresolved.",
+    "Names array-index to update-ID mapping and bounds the projected-model inference."
+  ],
+  "findings": [
+    {
+      "severity": "substantive_issue",
+      "field": "revised_report fact_check_endpoint_position",
+      "assessment": "Braking-box displacement 0.005559344630308817 m is travel from its own initial position, not the distance between the two input endpoints. Using it to describe a small inter-arm endpoint difference is unsupported."
+    },
+    {
+      "severity": "minor_issue",
+      "field": "revised_report missing_evidence/limitations",
+      "assessment": "The blanket description of motion as only 0.30-0.35 s omits measured 0.28 and 0.29 s endpoints returned by prediction queries."
+    },
+    {
+      "severity": "minor_issue",
+      "field": "revised_report input limit",
+      "assessment": "Says neither rollout represents a held-input strategy although both hold their inputs fixed. It can correctly exclude a validated closed-loop strategy."
+    },
+    {
+      "severity": "minor_issue",
+      "field": "revision attribution",
+      "assessment": "A lower endpoint speed under the tested alternative establishes a local alternative, not globally maximal endpoint braking. No equivalence or optimal endpoint bound was computed."
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "reviewer": "Primary implementer; not independent blind review",
+  "run": "fresh_dual_pilot",
+  "workflow": "Incomplete: actual check succeeded and feedback was persisted, but context overflow prevented revision-provider delivery. No accepted revised report or final decision.",
+  "interface": {"initial_report_accepted": true, "facts": 4, "selectors": 31, "exact_mismatches": 0, "failed_tool_submissions": 0},
+  "prose_findings": [
+    {
+      "severity": "substantive_issue",
+      "field": "initial_report /missing_evidence/7/needed",
+      "claim": "Sampled backend motion before t=0.30 s (0.01-0.29 s, 29 samples) was not read",
+      "assessment": "The prediction query for updates 27-34 returned measured endpoints at 0.28 and 0.29000000000000004 s. The structured queried final-window declaration passed, but the prose incorrectly describes all earlier samples as unread. Cross-view receipts already contain those timestamps."
+    },
+    {
+      "severity": "minor_issue",
+      "field": "initial_report /report/attribution/2/reason",
+      "assessment": "No explicit terminal-speed penalty is too broad: terminal_velocity_weight is nonzero. The supported observation is zero direct terminal/holding tip-speed weights, without establishing the importance of generalized-velocity costs."
+    },
+    {
+      "severity": "substantive_issue",
+      "field": "check /hypotheses/0 and initial_response /reasoning",
+      "assessment": "Instantaneous braking-box input maximizes instantaneous velocity-direction deceleration; it does not establish the globally minimum endpoint speed over 10 ms. Likewise prediction_braking and a weight-changing local_comparison are distinct probes, not equivalent operations. The accepted check executes only prediction_braking."
+    }
+  ],
+  "actual_numerical_result": {
+    "reference": "88628acb092698f98c6d0207e01dfe71efc2189778a32d563e2b59ac1691ea42",
+    "update_id": 33,
+    "horizon_s": 0.01,
+    "integration_step_s": 0.002,
+    "recorded_input_endpoint": {"pointer": "/detail/rows/0/trajectory/5", "speed_m_s": 0.6851514257340946, "error_m": 0.009842592258858245},
+    "braking_box_endpoint": {"pointer": "/detail/rows/1/trajectory/5", "speed_m_s": 0.5827480226234343, "error_m": 0.013956085646877654},
+    "qualification": "The probe has a lower predicted endpoint speed and higher endpoint position error under the braking input. This is retained local projected-model evidence; no revised model judgment consumed it, and no complete backend improvement or causal identification follows."
+  },
+  "preservation": "Review annotations only; no change to accepted or rejected products, numerical result, status or counters. No content from this review enters fresh revalidation."
+}

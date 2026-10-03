@@ -1,0 +1,60 @@
+{
+  "binding": {
+    "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+    "media_type": "application/json"
+  },
+  "budget": {
+    "backend_solves": 0,
+    "model_calls": 24,
+    "tool_calls": 60,
+    "wall_s": 3600.0,
+    "worker_calls": 0
+  },
+  "candidate_id": "proposal_compliant_build",
+  "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+  "evidence_manifest": {
+    "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+    "media_type": "application/json"
+  },
+  "execution_id": "5991de53e82747439e87ba8569667e1b",
+  "permitted_tools": [
+    "diagnosis.inspect_evidence",
+    "diagnosis.check_request",
+    "diagnosis.submit",
+    "evidence.read"
+  ],
+  "question": "Given that the single retained execution reports terminal reach success (reach_passed=true; terminal_error_m≈0.00764 m within the 0.01 m reach tolerance) while sampled settling fails (sampled_settling_passed=false; late_max_speed_m_s≈1.581 and late_max_error_m≈0.058 against settling limits speed 0.02 m/s and position 0.01 m over a 0.05 s window), and all 35 retained control updates missed their DeadlineMissed horizons with mean_update_s≈17.08 s against a 0.01 s control period: which candidate local mechanisms are actually distinguishable using the retained per-update records (saved projected states, applied and requested tensions, one-step predictions, plan-selection iterations, effective horizon, solver status, and the sampled backend-motion view), and specifically — at the final saved projected states — can a bounded local_comparison of one adopted weight change, or a prediction_braking comparison of recorded input versus instantaneous braking-box input, separate objective weighting, seed/initialization selection, horizon truncation, or backend-model mismatch, or do these predict the same local result and leave the residual tip motion (speed vs position) unattributed? This is an open question; no dominant settling cause is assumed.",
+  "saved_state_check": {
+    "configuration_scope": "saved_state_or_temporary_analysis",
+    "horizon_s": 0.01,
+    "integration": "implicit_euler",
+    "integration_step_s": 0.002,
+    "max_checks": 1,
+    "max_wall_s": 300.0,
+    "model": "model.gvs@1.0.0",
+    "numerical_limits": {
+      "local_solves": 6,
+      "prediction_evaluations": 24
+    },
+    "operations": [
+      "prediction_braking",
+      "local_comparison"
+    ]
+  },
+  "scope": [
+    "Retained-evidence reads of the complete saved-record inventories for this execution (35 records each): source.saved_projected_states (/measured_initial_state), source.one_step_predictions (/one_step_prediction), source.applied_tensions (/actual_tension_n), source.plan_selection (/optimization_selected_iteration), source.solver_status (/optimization_raw_status), source.controller_horizon (/effective_horizon), plus the derived motion/plans/prediction views and the retained source.force_limits channel list.",
+    "The recovered common summary and inventory handoff (artifact e87b0e85...) already transferred to this design context, including the settling criteria, recipe weights, and outcome flags.",
+    "Explicitly authorized saved-state numerical work only: prediction_braking at one saved projected state over the fixed short bounded horizon, and local_comparison of two local controller solves at the same saved state/previous input/horizon with exactly one adopted weight change, using the host-supplied saved-state grant (horizon_s 0.01, integration_step_s 0.002, implicit_euler, model.gvs@1.0.0). These measure only local plan/endpoint differences at a saved state.",
+    "Excluded: any production configuration change, backend re-execution, closed-loop counterfactual replay, or causal-attribution claim; reconstruction of non-retained control_snapshots.json (full warm plans and optimizer iteration traces); any inference from a sampled view or a failed raw-gzip read that a signal is absent.",
+    "Distinguish availability states explicitly: not_displayed (present but not yet shown), not_read in this design context, queried with stated coverage, not_retained (control_snapshots.json), and retained_unavailable via a named capability."
+  ],
+  "stopping_conditions": [
+    "All 35 retained records for each consulted signal are read once, or the read/turn allowance is exhausted, with coverage recorded per signal.",
+    "Any candidate local check is abandoned if it requires non-retained artifacts (full warm plans, optimizer iteration traces) or a closed-loop replay that the available capabilities do not provide.",
+    "If prediction_braking and/or local_comparison results cannot distinguish objective weighting, seed/initialization selection, effective-horizon truncation, or backend-model mismatch — i.e., they predict the same local endpoint — the ambiguity is recorded and no dominant settling cause is asserted.",
+    "No production change, backend execution, or configuration recommendation is emitted from this phase; only a scoped diagnostic question and the set of checkable retained comparisons.",
+    "If the required read allowance (evidence turn limit) closes before the scoped comparisons can be framed, stop and hand off with the unmet coverage stated."
+  ],
+  "subject": "control",
+  "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+}

@@ -1,249 +1,41 @@
 {
+  "status": "delivered",
+  "formal_order": [
+    "single_context",
+    "dual_context",
+    "dual_context",
+    "single_context"
+  ],
+  "freeze_implementation": {
+    "commit": "461f2063f0b4b357e5d8c4d674978e2c8436513e",
+    "files": {
+      "tools/diagnostic_workflow.py": "afa9f80b7425bd6871929fa11747aeeb3a056284e883f04aa553e96b803ba463",
+      "tools/diagnostic_native.py": "1f70510455bbe421db063c49ca359b0ce2a86cc2ce70b8dfbea5b78085030195",
+      "tools/diagnostic_inventory.py": "5cf0f0bf3b922699f2f6bbbaae15704698bba73326baaa0daae630f1f558a58f",
+      "tools/diagnostic_facts.py": "596bb1135323989c81165456e3db783c0a466601f0c72f8c2902cd359bb2f524",
+      "tools/platform_models.py": "f6c37cb11e48e96e064892f5e399aa15c730d669eecd017a635c78d44e1c7bfa",
+      "tools/platform_handoff.py": "09cade29a1ed94c27cfbad9b25fa2dcbb2797c65442c332ceaba2706a7ae56a7",
+      "tools/platform_diagnosis_coordinator.py": "e81225ed2e72e4a9b09bb3be6b1bdb8d7260a06bae665978efabf276a6952c4e",
+      "tools/platform_host.py": "02eea2d0cdb5d6238ae3876e5483b48214fa29b3328ea1117c2d16b2fc6f2562",
+      "tools/platform_store.py": "151e6b21271665c2f9788ba6a9abf9565e1440c1102ba5c0d9f62572421ce547",
+      "schemas/platform_handoff.py": "12e6700053c82545f94cffe9f4c8e877df936d27784246e5cccbd28273f2c48f",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "e537115df4246ec7205a9660f909b86a76296aa39a0adac9075e016931cd43bd",
+      "extensions/tendon_family/diagnostic_evidence.py": "6fa010ebec6d7edd52e447cdd91f01ddaaf7d1e617bd466ec7d3d96af18e9b7d",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "887483a5d3340b72dfb11c2a0e654ce01d80df56c3e4360263d7b86eb96dc724",
+      "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "b2865befc809d3b599d8fb6d18f13301bc1e1c25e1d91bc1dfdb72185833af10",
+      "tools/platform_tools.py": "270d4ec234df0dcdbc835fd3e78f29af2e512a00b0a18a3c14a2dab94f9324b2",
+      "extensions/tendon_family/candidate.py": "ab0f66c32bc596b1f093a322683d49b525a33984d9515243d5c47c8958770df3",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88"
+    }
+  },
   "runs": [
-    {
-      "label": "fresh_dual_pilot",
-      "mode": "dual_context",
-      "status": "incomplete",
-      "stop_reason": "PHASE_INCOMPLETE revision: CONTEXT_LIMIT_REQUIRED_STATE_TOO_LARGE: narrow tools or raise explicit byte limit",
-      "classification": "fresh workflow",
-      "feedback_complete": false,
-      "numerical_check_status": "completed",
-      "used": {
-        "tool_calls": 9,
-        "model_calls": 5,
-        "backend_solves": 0,
-        "worker_calls": 0,
-        "wall_s": 228.11199999926612
-      },
-      "limits": {
-        "backend_solves": 0,
-        "model_calls": 24,
-        "tool_calls": 60,
-        "wall_s": 3600.0,
-        "worker_calls": 0
-      },
-      "elapsed_s": 246.5779999999795,
-      "numerical_work": {
-        "local_solves": 0,
-        "prediction_evaluations": 2
-      },
-      "tokens": {
-        "prompt_tokens": 159167,
-        "completion_tokens": 47368,
-        "total_tokens": 206535
-      },
-      "attempts_by_phase": {
-        "request": 1,
-        "response_initial": 1,
-        "initial": 2,
-        "check": 1
-      },
-      "accepted_reports": [
-        {
-          "product": "initial_report",
-          "reference": {
-            "artifact_id": "b1075f75080aa73ac8ec191e5059ec4b0c309727b7e77e196572ef6ff7efba72",
-            "media_type": "application/json"
-          },
-          "facts": 4,
-          "selectors": 31,
-          "exact_mismatches": 0,
-          "availability": "Accepted by live receipt-ledger validator"
-        }
-      ],
-      "draft_citations": [
-        {
-          "phase": "initial",
-          "role": "diagnostic",
-          "request_id": "model-1-tool",
-          "facts": 4,
-          "selectors": 31,
-          "errors": []
-        }
-      ],
-      "failed_tool_receipts": [],
-      "protocol_corrections": 0,
-      "monetary_cost": null
-    },
-    {
-      "label": "fresh_dual_revalidation",
-      "mode": "dual_context",
-      "status": "completed",
-      "stop_reason": "Check feedback consumed, revised report and final decision delivered.",
-      "classification": "fresh workflow",
-      "feedback_complete": true,
-      "numerical_check_status": "completed",
-      "used": {
-        "tool_calls": 15,
-        "model_calls": 9,
-        "backend_solves": 0,
-        "worker_calls": 0,
-        "wall_s": 449.93800000008196
-      },
-      "limits": {
-        "backend_solves": 0,
-        "model_calls": 24,
-        "tool_calls": 60,
-        "wall_s": 3600.0,
-        "worker_calls": 0
-      },
-      "elapsed_s": 477.9529999999795,
-      "numerical_work": {
-        "local_solves": 0,
-        "prediction_evaluations": 2
-      },
-      "tokens": {
-        "prompt_tokens": 305777,
-        "completion_tokens": 99062,
-        "total_tokens": 404839
-      },
-      "attempts_by_phase": {
-        "request": 1,
-        "response_initial": 1,
-        "response_final": 1,
-        "initial": 3,
-        "check": 1,
-        "revision": 2
-      },
-      "accepted_reports": [
-        {
-          "product": "initial_report",
-          "reference": {
-            "artifact_id": "9bccca967726445aa51bca5cd2a2ab8a9b8248198c8b822cec9511fd6fb3344a",
-            "media_type": "application/json"
-          },
-          "facts": 4,
-          "selectors": 51,
-          "exact_mismatches": 0,
-          "availability": "Accepted by live receipt-ledger validator"
-        },
-        {
-          "product": "revised_report",
-          "reference": {
-            "artifact_id": "3615af672744575dd7c68451934beb726f4525b7afbdcabc2d097651cb3e63e5",
-            "media_type": "application/json"
-          },
-          "facts": 6,
-          "selectors": 73,
-          "exact_mismatches": 0,
-          "availability": "Accepted by live receipt-ledger validator"
-        }
-      ],
-      "draft_citations": [
-        {
-          "phase": "initial",
-          "role": "diagnostic",
-          "request_id": "model-2-tool",
-          "facts": 4,
-          "selectors": 51,
-          "errors": []
-        },
-        {
-          "phase": "revision",
-          "role": "diagnostic",
-          "request_id": "model-4-tool",
-          "facts": 6,
-          "selectors": 70,
-          "errors": []
-        },
-        {
-          "phase": "revision",
-          "role": "diagnostic",
-          "request_id": "model-5-tool",
-          "facts": 6,
-          "selectors": 73,
-          "errors": []
-        }
-      ],
-      "failed_tool_receipts": [
-        {
-          "tool": "diagnosis.submit",
-          "request": "model-4-tool",
-          "status": "failed",
-          "error": "GAP_CONTRADICTS_READ_LEDGER: source.backend_motion includes queried coverage; use queried for the entry, or explicit update_ids/time_range_s for an unread subset"
-        }
-      ],
-      "protocol_corrections": 0,
-      "monetary_cost": null
-    },
-    {
-      "label": "initial_report_validation",
-      "mode": "dual_context",
-      "status": "completed",
-      "stop_reason": "Accepted initial report; partial capability validation only, no check or complete diagnostic workflow.",
-      "classification": "partial initial-report capability validation",
-      "feedback_complete": false,
-      "numerical_check_status": null,
-      "used": {
-        "tool_calls": 9,
-        "model_calls": 5,
-        "backend_solves": 0,
-        "worker_calls": 0,
-        "wall_s": 318.87399999960326
-      },
-      "limits": {
-        "backend_solves": 0,
-        "model_calls": 8,
-        "tool_calls": 20,
-        "wall_s": 1200.0,
-        "worker_calls": 0
-      },
-      "elapsed_s": 331.75,
-      "numerical_work": {
-        "local_solves": 0,
-        "prediction_evaluations": 0
-      },
-      "tokens": {
-        "prompt_tokens": 193748,
-        "completion_tokens": 71324,
-        "total_tokens": 265072
-      },
-      "attempts_by_phase": {
-        "request": 1,
-        "initial": 4
-      },
-      "accepted_reports": [
-        {
-          "product": "initial_report",
-          "reference": {
-            "artifact_id": "c6966290c1b512775f607e08b74c9da2ab9429d53bcd0b1d9beb13dbc500f046",
-            "media_type": "application/json"
-          },
-          "facts": 11,
-          "selectors": 74,
-          "exact_mismatches": 0,
-          "availability": "Accepted by live receipt-ledger validator"
-        }
-      ],
-      "draft_citations": [
-        {
-          "phase": "initial",
-          "role": "diagnostic",
-          "request_id": "model-2-tool",
-          "facts": 5,
-          "selectors": 42,
-          "errors": []
-        },
-        {
-          "phase": "initial",
-          "role": "diagnostic",
-          "request_id": "model-3-tool",
-          "facts": 11,
-          "selectors": 74,
-          "errors": []
-        }
-      ],
-      "failed_tool_receipts": [
-        {
-          "tool": "diagnosis.submit",
-          "request": "model-2-tool",
-          "status": "failed",
-          "error": "GAP_CONTRADICTS_READ_LEDGER: source.backend_motion includes queried coverage; use queried for the entry, or explicit update_ids/time_range_s for an unread subset"
-        }
-      ],
-      "protocol_corrections": 0,
-      "monetary_cost": null
-    },
     {
       "label": "pair1_dual_context",
       "mode": "dual_context",
@@ -694,30 +486,24 @@
       "monetary_cost": null
     }
   ],
-  "used": {
+  "exact_citation_mismatches": 0,
+  "review_files": [
+    "anonymous/review_01.json",
+    "anonymous/review_02.json",
+    "anonymous/review_03.json",
+    "anonymous/review_04.json"
+  ],
+  "conclusion": "Three legal workflows with actual feedback revision; one transport failure before checking. Both organizations demonstrated the capability on this case. Exploratory four-run one-case evidence cannot establish organizational superiority. Numeric citation validity and live coverage acceptance do not certify scientific prose.",
+  "all_diagnostic_usage": {
     "model_calls": 57,
     "tool_calls": 85,
     "wall_s": 3136.408999997657,
     "backend_solves": 0,
     "worker_calls": 0
   },
-  "limits": {
-    "model_calls": 200,
-    "tool_calls": 510,
-    "wall_s": 33600.0,
-    "backend_solves": 3,
-    "worker_calls": 0
-  },
-  "tokens": {
-    "prompt_tokens": 1931818,
-    "completion_tokens": 708141,
-    "total_tokens": 2639959
-  },
   "numerical_work": {
     "local_solves": 0,
     "prediction_evaluations": 10
   },
-  "elapsed_workflow_s": 3299.1250000004657,
-  "monetary_cost": null,
-  "qualification": "Exact-source and receipt checks only. Scientific prose requires separate implementer review; counts are not quality scores. Historical stages excluded."
+  "physical_improvement": "not evaluated; proceed to separately frozen integration campaign"
 }

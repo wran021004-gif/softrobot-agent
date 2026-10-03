@@ -1,0 +1,104 @@
+{
+  "acceptance_criteria": [
+    "Both endpoint evaluations return under the fixed settings for update 32 within wall_s 300 and prediction_evaluations 2.",
+    "The result reports endpoint tip speed for the recorded input and for the braking-box input plus their difference, and the endpoint position difference.",
+    "Materially lower braking-box endpoint speed at this state is reported as local braking authority being available; near-equal endpoint speeds are reported as locally bounded braking authority; neither outcome is reported as a dominant or causal settling explanation."
+  ],
+  "additional_need": "Both projected endpoint speeds under matched settings, and whether the braking-box per-tendon force limits bind at this saved state.",
+  "changed_factor": null,
+  "changed_parameter": null,
+  "changed_value": null,
+  "check_id": "saved-state-check",
+  "diagnosis_request": {
+    "artifact_id": "b5f02adc4a259172c9f82eaf7a327a07356f7f3311791c0a76ea593ca66e81f9",
+    "media_type": "application/json"
+  },
+  "discriminating_observations": [
+    "Sign and magnitude of (recorded-input endpoint speed - braking-box endpoint speed) at this single saved state.",
+    "Whether the braking-box endpoint speed falls below the 0.02 m/s settling speed limit over this one 0.01 s step.",
+    "Endpoint position shift between the two arms, to check the braking box is not merely trading speed reduction for a large position penalty."
+  ],
+  "fixed_conditions": [
+    "model.gvs@1.0.0, implicit_euler integration, integration step 0.002 s, horizon 0.01 s (host-fixed)",
+    "saved projected measured_initial_state bound to update 32 only; state vectors not restated here",
+    "recorded applied input = update 32 actual_tension_n, used as the comparison arm with no substitution",
+    "no configuration-parameter adoption or change",
+    "single execution scope; no backend re-execution and no closed-loop replay"
+  ],
+  "horizon_s": 0.01,
+  "hypotheses": [
+    "H1_unused_local_braking: the recorded applied input for update 32 leaves locally available braking authority unused, so the braking-box input yields a materially lower projected endpoint tip speed at this saved state.",
+    "H2_locally_bounded_braking: braking authority at this saved state is locally bounded (per-tendon force limits, geometry, or projected-model limits), so the braking-box input yields an endpoint tip speed close to the recorded input's.",
+    "H3_same_local_endpoint_from_different_mechanisms: if the two endpoints differ, objective weighting (terminal/holding tip-speed weights recorded as 0.0) and solver early-stop plan quality both predict the same local outcome and cannot be separated by this probe."
+  ],
+  "initial_state": {
+    "pointer": "/32/measured_initial_state",
+    "reference": {
+      "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+      "media_type": "application/octet-stream"
+    },
+    "value": [
+      0.015849345958335474,
+      -1.515078439552154,
+      -3.1896243042463377,
+      0.7156616352264595,
+      0.8850724805426687,
+      0.8182633854100898,
+      -4.075436072043781,
+      -1.7557677195850339,
+      -2.719781869515328,
+      3.578384388882004,
+      2.146836541761811,
+      2.2793463351100898,
+      -70.77796728046975,
+      -14.801997710809498,
+      24.438808794238202,
+      48.44994358530924,
+      18.03805775945771,
+      -5.598102455276373,
+      271.67259279971785,
+      249.50657094260967,
+      237.79767156926414,
+      -186.49764616669927,
+      -160.44956552749903,
+      -142.75357026724052
+    ]
+  },
+  "input": {
+    "pointer": "/32/actual_tension_n",
+    "reference": {
+      "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+      "media_type": "application/octet-stream"
+    },
+    "value": [
+      6.991578354461397,
+      4.311625416055354,
+      8.607121990789255e-05,
+      5.115521779319541e-07,
+      5.165423523313249,
+      5.561519201872209
+    ]
+  },
+  "integration": "implicit_euler",
+  "integration_step_s": 0.002,
+  "local_question": "At the saved projected state bound to update 32 (t=0.32 s, the sampled late interval with the fastest reconstructed tip speed, measured_speed 1.5810 m/s), does an instantaneous braking-box input over the host-fixed 0.01 s horizon yield a lower projected endpoint tip speed than the recorded applied input for that same update?",
+  "metrics": [
+    "projected endpoint tip speed under the recorded applied input (m/s)",
+    "projected endpoint tip speed under the instantaneous braking-box input (m/s)",
+    "endpoint tip speed difference, recorded minus braking-box (m/s)",
+    "projected endpoint tip position difference (m)"
+  ],
+  "model": "model.gvs@1.0.0",
+  "operation": "prediction_braking",
+  "prior_result": null,
+  "unresolved": [
+    "This probe cannot separate objective weighting (recorded terminal_tip_speed_weight and holding_tip_speed_weight 0.0) from solver early-stop plan quality when both predict the same local endpoint.",
+    "This probe cannot test projected-GVS versus backend-model mismatch, because both arms are evaluated with the projected model.",
+    "Independent limit of outcome: a single 0.01 s saved-state comparison cannot explain, rank, or attribute the whole closed-loop settling failure, and no closed-loop counterfactual replay or causal-attribution capability is available in this inventory."
+  ],
+  "update_id": 32,
+  "work_limits": {
+    "prediction_evaluations": 2.0,
+    "wall_s": 300.0
+  }
+}

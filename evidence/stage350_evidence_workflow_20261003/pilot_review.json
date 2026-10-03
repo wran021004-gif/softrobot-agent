@@ -1,0 +1,43 @@
+{
+  "run": "fresh_dual_revalidation",
+  "reviewer": "Primary implementer; not independent blind review",
+  "complete_workflow_gate": "passed",
+  "events_verified": ["accepted request", "accepted initial report", "accepted reject + request_check response", "accepted prediction_braking selection at update 30", "successful actual numerical execution", "feedback sent in revision provider context", "accepted revised report citing numeric result handles", "accepted final adopt + finish response"],
+  "feedback_delivery_payload_bytes": 177525,
+  "context_cap_bytes": 200000,
+  "final_disposition_meaning": "adopt names defer-parameter-change, a defer recommendation. This adopts a decision to withhold changes; it executes no physical or controller intervention.",
+  "check_result": "165d00590f530566c0a2d69e2350293dd8ed5e0c8a8b0b95c4692d18addaf215",
+  "result_evidence": {
+    "recorded_endpoint": {"pointer": "/detail/rows/0/trajectory/5", "speed_m_s": 1.2672029439263852, "error_m": 0.04279441723019574},
+    "braking_endpoint": {"pointer": "/detail/rows/1/trajectory/5", "speed_m_s": 1.054834298531494, "error_m": 0.055359303934489394},
+    "scope": "0.01 s at saved projected update 30; implicit Euler with 0.002 s step; local predicted response only"
+  },
+  "judgment_influence": "Initial design rejected postponement of the authorized probe; the revised report supports a nonzero local input-response difference, leaves global cause unresolved, and the final decision adopts deferral of parameter changes. This is real feedback revision, not physical improvement.",
+  "coverage_recovery": "One revised submission failed because its not_read motion range 0.01-0.29 s overlapped prediction-returned measured endpoints. The model corrected within the same phase allowance. The accepted revision also uses an explicit not_read prediction subset 0-18, which passed receipt validation.",
+  "scientific_findings": [
+    {
+      "severity": "substantive_issue",
+      "field": "revised_report /report/facts/2 and /report/attribution/2",
+      "assessment": "Calling update-22/23/27 measured endpoints late-window samples is incorrect: their matched endpoints are 0.23/0.24/0.28 s, before the sampled 0.30-0.35 s holding window. Individual cited values are exact; their prose time classification is wrong."
+    },
+    {
+      "severity": "substantive_issue",
+      "field": "revised_report /report/limitations/3; final_response /reasoning",
+      "assessment": "The blanket unread-before-about-0.30-s wording overlooks measured endpoints returned by prediction reads at 0.20-0.29 s. The corrected structured gap basis explicitly records these reads, but limitations and final prose retain the broader claim. Unreturned force/tracking channels remain a separate field-coverage issue."
+    },
+    {
+      "severity": "substantive_issue",
+      "field": "revised_report /report/attribution/0 and /1",
+      "assessment": "Comparing displacement differences directly with scaled integration step residuals does not establish endpoint numerical resolution. Comparing displacements at 0.008 and 0.010 s is also not the stated matched endpoint-speed criterion. The retained result does supply unequal endpoint speeds and distinct inputs, but neither establishes global endpoint braking optimality or cancels shared model error."
+    },
+    {
+      "severity": "minor_issue",
+      "field": "revised_report /report/facts/0; final_response /reasoning",
+      "assessment": "The input-box solution is analytic; the trajectories are numerical implicit-Euler rollouts. Calling them two analytic rollouts is inaccurate."
+    }
+  ],
+  "citation_and_availability": "All accepted selectors were rechecked against immutable sources with zero mismatches. Live receipt validation accepted corrected coverage. This does not certify the scientific prose.",
+  "usage": {"model_calls": 9, "tool_calls": 15, "wall_s": 449.93800000008196, "local_solves": 0, "prediction_evaluations": 2, "backend_solves": 0, "worker_calls": 0},
+  "repair_allowance": "The one additional development run is used. No further development replacement is authorized.",
+  "next_gate": "Four frozen exploratory comparisons using this implementation, with model failures and early finishes preserved."
+}

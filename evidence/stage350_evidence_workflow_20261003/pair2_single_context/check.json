@@ -1,0 +1,105 @@
+{
+  "acceptance_criteria": [
+    "Both the recorded-input and braking-box rollouts complete at the fixed 0.01 s horizon with model.gvs@1.0.0 and 0.002 s implicit-Euler steps, returning endpoint tip speed and position without solver error at the update-33 saved state.",
+    "The endpoint tip speed difference (recorded input minus braking box) is reported with units and is compared against the 0.02 m/s settling speed limit; the endpoint tip position difference is compared against the 0.01 m settling position limit.",
+    "The result is reported strictly as a bounded local single-state, single-horizon comparison and is not extended to closed-loop settling or a dominant cause."
+  ],
+  "additional_need": null,
+  "changed_factor": null,
+  "changed_parameter": null,
+  "changed_value": null,
+  "check_id": "saved-state-check",
+  "diagnosis_request": {
+    "artifact_id": "b78ce3381d2e061f7ba38c802766f7453a9724e74011cc5fe9325877f39e2f22",
+    "media_type": "application/json"
+  },
+  "discriminating_observations": [
+    "Whether the recorded-input endpoint tip speed lies markedly above versus near the braking-box endpoint tip speed at the same state, input magnitude context, and 0.01 s horizon.",
+    "The magnitude of the recorded-minus-braking endpoint tip speed difference and whether the recorded endpoint speed is far above 0.02 m/s.",
+    "Whether the recorded-minus-braking endpoint tip position difference is small relative to the 0.01 m position limit (little local steering difference despite a speed difference)."
+  ],
+  "fixed_conditions": [
+    "Model model.gvs@1.0.0, implicit Euler, fixed integration step 0.002 s, fixed short horizon 0.01 s.",
+    "Saved projected measured_initial_state of update 33 and its recorded applied tension (actual_tension_n) held fixed; the comparison swaps only the input, not the state.",
+    "No control-parameter adoption; project remains proposal_compliant_build with the frozen configuration artifact; no backend execution and no closed-loop replay.",
+    "Exactly one saved-state check at one state, within max_checks 1 and max_wall_s 300."
+  ],
+  "horizon_s": 0.01,
+  "hypotheses": [
+    "The recorded applied tension at this sampled late state already commands near-maximal braking, so its 0.01 s endpoint tip speed is close to the braking-box endpoint and the residual late tip speed is not explained by a non-braking command at this state.",
+    "The recorded applied tension leaves a 0.01 s endpoint tip speed well above the instantaneous braking-box endpoint, i.e. the applied command under-brakes at this high-speed late state."
+  ],
+  "initial_state": {
+    "pointer": "/33/measured_initial_state",
+    "reference": {
+      "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+      "media_type": "application/octet-stream"
+    },
+    "value": [
+      -0.6931094194296222,
+      -1.5783491249547499,
+      -2.7246085242254523,
+      1.2621583588830545,
+      1.0477529178596288,
+      0.6740179459220488,
+      -1.619188289427628,
+      0.3879242363540931,
+      -0.7792442972026552,
+      1.6244993587594154,
+      0.40711996270484685,
+      0.5579489090044283,
+      -57.58025838732594,
+      -4.696022058905707,
+      38.138622938016944,
+      56.078167531433884,
+      13.646641484141654,
+      -20.244074153454065,
+      245.05129688466474,
+      200.63019586577795,
+      190.10671134678398,
+      -204.06771008441166,
+      -173.70597650260248,
+      -168.16953418251813
+    ]
+  },
+  "input": {
+    "pointer": "/33/actual_tension_n",
+    "reference": {
+      "artifact_id": "b59be99a8308a48d4b44c69af4296d51c3b13241679c4b7a6c22ee601d69f770",
+      "media_type": "application/octet-stream"
+    },
+    "value": [
+      5.661220351760543,
+      3.988726293001102,
+      5.0287952725384195e-05,
+      1.4347363175658354,
+      1.0812420082241823,
+      0.003992529299500661
+    ]
+  },
+  "integration": "implicit_euler",
+  "integration_step_s": 0.002,
+  "local_question": "At the saved projected measured_initial_state of controller update 33 (start t=0.33 s, inside the 0.05 s settling window, the highest late-window tip speed, 1.5810152739742807 m/s), does the recorded applied tension (actual_tension_n) produce a 0.01 s endpoint tip speed/position that differs from an instantaneous braking-box input at the same state and previous input, and by how much?",
+  "metrics": [
+    "Endpoint tip speed at the fixed 0.01 s horizon for the recorded input and for the instantaneous braking-box input, m/s.",
+    "Endpoint tip position (and tip error) at the fixed 0.01 s horizon for the recorded input and for the braking-box input, m.",
+    "Recorded-minus-braking endpoint tip speed difference, m/s.",
+    "Recorded-minus-braking endpoint tip position difference, m.",
+    "Comparison of the recorded-input endpoint tip speed against the 0.02 m/s settling speed limit."
+  ],
+  "model": "model.gvs@1.0.0",
+  "operation": "prediction_braking",
+  "prior_result": null,
+  "unresolved": [
+    "If weak terminal/velocity/tip-speed weighting (terminal_tip_speed_weight 0.0, holding_tip_speed_weight 0.0, terminal_velocity_weight 0.0001, velocity_weight 0.0001) and solver stop-short (34 User_Requested_Stop vs 1 Solve_Succeeded, effective horizon 3 at update 32) both predict the recorded input under-brakes, this single-state, single-horizon comparison cannot separate those mechanisms.",
+    "Projected-GVS versus recorded serial-backend endpoint mismatch (matched world-tip differences ~0.006-0.008 m at updates 27 and 29) cannot be separated from a command-braking effect if both predict the same local endpoint result at this state.",
+    "A 0.01 s projected-model probe at one saved state cannot establish closed-loop settling behavior or a dominant cause; retained limitations state that single execution and model comparisons do not establish a dominant cause.",
+    "Historical optimizer iterations and full warm plans are not retained (source.historical_full_plans retained=false), so cost-term contributions and seed selection remain unmeasured and outside this check.",
+    "Force-limit proximity on the tendon channels (e.g. applied 7.990411884680996 N against the 8.0 N limit at update 30) is not resolved by this check."
+  ],
+  "update_id": 33,
+  "work_limits": {
+    "prediction_evaluations": 2.0,
+    "wall_s": 300.0
+  }
+}

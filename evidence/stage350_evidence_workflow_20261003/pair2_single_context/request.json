@@ -1,0 +1,58 @@
+{
+  "binding": {
+    "artifact_id": "ea748be0c188dbe8b0ddfefe9ecc07e2837d67bde563b61ed448de080f670ab8",
+    "media_type": "application/json"
+  },
+  "budget": {
+    "backend_solves": 0,
+    "model_calls": 24,
+    "tool_calls": 60,
+    "wall_s": 3600.0,
+    "worker_calls": 0
+  },
+  "candidate_id": "proposal_compliant_build",
+  "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+  "evidence_manifest": {
+    "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+    "media_type": "application/json"
+  },
+  "execution_id": "5991de53e82747439e87ba8569667e1b",
+  "permitted_tools": [
+    "diagnosis.inspect_evidence",
+    "diagnosis.check_request",
+    "diagnosis.submit",
+    "evidence.read"
+  ],
+  "question": "Why did this run fail the settling criterion while terminal reach passed? Observed in the handed-over common summary: terminal_error_m = 0.00764 m is within the 0.01 m reach tolerance and reach_passed = true, but sampled_settling_passed = false, with terminal_speed_m_s = 0.635 and late_max_speed_m_s = 1.581 against the 0.02 m/s settling speed limit and late_max_error_m = 0.058 m against the 0.01 m position limit over the 0.05 s settling window. The same run records stopping_counts = {User_Requested_Stop: 34, Solve_Succeeded: 1}, deadline_misses = 35, and mean_update_s = 17.08 s versus a 0.01 s control period; initialization_selected = 29, noninitialization_selected = 6. Which candidate explanations of the settling failure are and are not supported by the retained inventory (one-step predictions, applied tensions, saved projected states, plan selection, solver status, per-update effective horizon, tendon force limits, and the sampled backend motion view), and what bounded local endpoint speed/position difference does a single authorized short-horizon check reveal at one saved projected state? Keep all hypotheses open — e.g. terminal/velocity/weighting effects, solver non-convergence (34 non-Solve_Succeeded selections), horizon, and backend-model mismatch are candidates to be distinguished or left unresolved, not assumed.",
+  "saved_state_check": {
+    "configuration_scope": "saved_state_or_temporary_analysis",
+    "horizon_s": 0.01,
+    "integration": "implicit_euler",
+    "integration_step_s": 0.002,
+    "max_checks": 1,
+    "max_wall_s": 300.0,
+    "model": "model.gvs@1.0.0",
+    "numerical_limits": {
+      "local_solves": 6,
+      "prediction_evaluations": 24
+    },
+    "operations": [
+      "prediction_braking",
+      "local_comparison"
+    ]
+  },
+  "scope": [
+    "Read the complete retained inventory already itemized in the handed-over inventory: source.one_step_predictions, source.applied_tensions, source.saved_projected_states, source.plan_selection, source.solver_status, and source.controller_horizon (all record_count 35, updates 0..34), plus source.force_limits; report only what these retained signals state, with stated coverage, in world-frame tip vectors and projected GVS state coordinates.",
+    "For source.backend_motion, use the derived motion view (raw gzip bytes are not JSON-readable via evidence.read) and, if needed, matched prediction endpoint samples (at most 8 chosen controller update ids per query) to read measured backend position/velocity at the matched next timestamp; the final settling window is what motion displays.",
+    "At exactly one saved projected state, execute at most one authorized saved-state numerical check (prediction_braking and/or local_comparison) strictly within the frozen grant: model.gvs@1.0.0, implicit_euler, horizon_s 0.01, integration_step_s 0.002, max_checks 1, max_wall_s 300, local_solves<=6, prediction_evaluations<=24 — solely to measure the local endpoint speed/position difference at that state.",
+    "Excluded: production changes or backend execution; closed-loop counterfactual replay; full historical warm plans or optimizer iteration traces (source.historical_full_plans is not retained); and any claim of a dominant or settled root cause."
+  ],
+  "stopping_conditions": [
+    "Stop when the answer states what the retained evidence does and does not support about the settling failure, keeps the causal hypotheses explicitly open, and reports any numeric result only as the bounded local single-state comparison it is.",
+    "Stop if progress would require closed-loop counterfactual replay, backend execution, or non-retained warm plans/iteration traces.",
+    "Stop when the read allowance (2 evidence turns) is used or when the single authorized saved-state check is spent; do not exceed the frozen numerical budget (local_solves 6, prediction_evaluations 24) or the authorized 0.01 s horizon and 0.002 s integration step.",
+    "Do not conclude a dominant cause: a 0.01 s projected-model probe and single-execution comparisons cannot establish one, and the retained limitations state that single execution and model comparisons do not establish a dominant cause."
+  ],
+  "subject": "control",
+  "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+}
