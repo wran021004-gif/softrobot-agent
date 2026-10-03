@@ -60,6 +60,9 @@ def evidence_inventory(reader, source):
 def validate_gaps(gaps, inventory, ledger=None, displayed_handles=None):
     entries={row['inventory_id']:row for row in inventory['entries']}
     for gap in gaps:
+        if gap.status in ('capability_unavailable','execution_unauthorized'):
+            if gap.inventory_id is not None:raise ValueError('CAPABILITY_OR_AUTHORIZATION_GAP_IS_NOT_AN_INVENTORY_AVAILABILITY_CLAIM')
+            continue
         if gap.inventory_id is None:
             if not gap.source:raise ValueError('GAP_SOURCE_REQUIRED: name unlisted evidence and explicit basis')
             continue

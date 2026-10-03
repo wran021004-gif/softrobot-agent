@@ -65,7 +65,7 @@ def save(store,value):
 
 
 def implementation():
-    paths=['tools/diagnostic_workflow.py','tools/diagnostic_native.py','tools/diagnostic_inventory.py','tools/diagnostic_facts.py',
+    paths=['tools/diagnostic_reference_adapter.py','tools/diagnostic_revision.py','schemas/diagnostic_revision.py','tools/diagnostic_workflow.py','tools/diagnostic_native.py','tools/diagnostic_inventory.py','tools/diagnostic_facts.py',
         'tools/platform_models.py','tools/platform_handoff.py','tools/platform_diagnosis_coordinator.py',
         'tools/platform_host.py','tools/platform_store.py','schemas/platform_handoff.py','schemas/platform_diagnostics.py',
         'extensions/platform/manifest.py','extensions/tendon_family/diagnostic_evidence.py','extensions/tendon_family/diagnostic_math.py',
@@ -126,7 +126,7 @@ class DiagnosticWorkflow:
             inp['policy'].update(route=None,budget={**limits,'model_calls':0 if role=='executor' else limits['model_calls']},
                 timeout_s=900. if role=='executor' else 30.,allowed_tools=[],tool_bindings=bindings)
             provider=read(Path(self.experiment.get('provider_freeze',ROOT/'evidence/stage346_shared_diagnosis_20261002/pilot/freeze.json')))['provider_configuration']
-            inp['policy']['model']={**provider,'adapter_version':'4.0.0','max_turns':24,
+            inp['policy']['model']={**provider,'adapter_version':self.experiment.get('adapter_version','4.0.0'),'max_turns':24,
                 'tool_naming':tool_naming_policy(bindings,READABLE_TOOL_NAMING)}
             if 'context_bytes' in self.experiment:
                 inp['policy']['model']['context_bytes']=self.experiment['context_bytes']

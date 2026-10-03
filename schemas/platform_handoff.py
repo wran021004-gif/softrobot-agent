@@ -88,7 +88,7 @@ class DiagnosisSubmission(Contract):
 class InventoryGap(Contract):
     inventory_id: str | None = None
     source: str | None = Field(default=None, description='For unlisted evidence, identify the source or evidence sought.')
-    status: Literal['not_displayed', 'not_read', 'queried', 'not_retained', 'retained_unavailable']
+    status: Literal['not_displayed', 'not_read', 'queried', 'not_retained', 'retained_unavailable', 'capability_unavailable', 'execution_unauthorized']
     needed: str = Field(min_length=1, description='Specific missing information or query/calculation capability.')
     basis: str = Field(min_length=1, description='Inventory fact or explicit basis for unlisted evidence; no invented inventory ID.')
     update_ids: list[Annotated[int, Field(ge=0)]] | None = Field(default=None, min_length=1, max_length=35,

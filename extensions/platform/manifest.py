@@ -57,6 +57,15 @@ EXTENSIONS = [replace(d, capabilities={**d.capabilities,
 
 from schemas import platform_handoff as handoff
 from tools.diagnostic_improvement import ImprovementDecision
+from schemas.diagnostic_revision import FinalDesignResponse
+EXTENSIONS.append(Extension('deepseek','model_adapter','5.0.0',Empty,ModelResponse,
+    'tools.diagnostic_reference_adapter:ScopedReferenceAdapter','Scoped exact aliases and concise revisions over existing handoff contracts',
+    sources=('tools/diagnostic_reference_adapter.py','tools/diagnostic_revision.py','schemas/diagnostic_revision.py','tools/diagnostic_native.py','tools/platform_models.py','tools/model_transports/deepseek.py'),
+    capabilities=dict(real_requests=True,text=True,images=False,timeout='network request deadline',cancellation='between requests')))
+EXTENSIONS.append(Extension('design.respond_diagnosis','tool','3.0.0',FinalDesignResponse,handoff.HandoffResult,
+    'tools.platform_handoff:respond_workflow','Final recommendation disposition and explicit candidate selection bound to sealed feedback.',
+    sources=('schemas/diagnostic_revision.py','tools/platform_handoff.py'),
+    capabilities=dict(category='diagnostics',role='public_tool',route_visible=True,preflight='tools.platform_handoff:preflight')))
 EXTENSIONS.append(Extension('design.decide_improvement','tool','1.0.0',ImprovementDecision,handoff.HandoffResult,
     'tools.diagnostic_improvement:decide','Record separate improvement intent from an accepted diagnosis. No build or simulation executes through this decision.',
     sources=('tools/diagnostic_improvement.py','tools/platform_handoff.py'),

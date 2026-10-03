@@ -76,11 +76,17 @@ def submit(ctx,args):
     if isinstance(args,InventoryDiagnosisSubmission):
         from tools.diagnostic_inventory import validate_gaps
         state=ctx.store.session(ctx.run_id)['state']
+        gaps=args.missing_evidence
+        if state.get('reference_interface') and role.get('previous_report'):
+            # These declarations retain the accepted report's historical reading
+            # scope. Only newly authored declarations claim current availability.
+            inherited=ctx.artifact(role['previous_report']).get('missing_evidence',[])
+            gaps=[g for g in gaps if plain(g) not in inherited]
         if state.get('fact_scope'):
             from tools.diagnostic_facts import context_view
             view=context_view(state)
-            validate_gaps(args.missing_evidence,role['inventory'],view['read_ledger'],[f['handle'] for f in view['fact_catalog']])
-        else:validate_gaps(args.missing_evidence,role['inventory'])
+            validate_gaps(gaps,role['inventory'],view['read_ledger'],[f['handle'] for f in view['fact_catalog']])
+        else:validate_gaps(gaps,role['inventory'])
     if plain(args.request)!=role['request']: raise ValueError('REPORT_REQUEST_LINK_MISMATCH')
     request=ctx.artifact(args.request)
     if role.get('require_initial_views'):
@@ -150,6 +156,16 @@ def respond_workflow(ctx,args):
     if args.next_action=='verify_adopted_change' and (args.disposition!='adopt' or selected['action']!='control_parameter'):
         raise ValueError('VERIFICATION_REQUIRES_ADOPTION_OF_EXACT_CONTROL_PARAMETER')
     if role.get('final_response') and args.next_action!='finish':raise ValueError('CHECK_ALLOWANCE_SPENT: choose finish')
+    from schemas.diagnostic_revision import FinalDesignResponse
+    if isinstance(args,FinalDesignResponse):
+        feedback=role['improvement_feedback_content']
+        if plain(args.feedback)!=role['check_feedback'][0]['reference']:raise ValueError('FINAL_FEEDBACK_BINDING_MISMATCH')
+        if args.candidate_disposition in ('defer_selection','reject_all'):
+            expected=None
+        else:
+            facts=feedback['baseline_facts'] if args.candidate_disposition=='retain_baseline' else feedback['execution']['factual_result']
+            expected=facts['candidate']
+        if args.selected_candidate!=expected:raise ValueError('FINAL_CANDIDATE_BINDING_MISMATCH')
     return transition(ctx,'design_response',args)
 
 
