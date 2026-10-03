@@ -205,6 +205,11 @@ class ModelConfig(Contract):
         return data
 
 
+class OperationAllowance(Contract):
+    timeout_s: float = Field(gt=0)
+    reserve_s: float = Field(gt=0)
+
+
 class ExperimentPolicy(Contract):
     policy_id: Identifier
     editable: dict[str, tuple[float, float]] = Field(default_factory=dict)
@@ -224,8 +229,15 @@ class ExperimentPolicy(Contract):
     tool_bindings: dict[Identifier, str] = Field(default_factory=dict)
     budget: Budget
     timeout_s: float = Field(gt=0)
+    operation_allowances: dict[Identifier, OperationAllowance] = Field(default_factory=dict)
     allow_development_skills: bool = False
     recovery: Literal['sealed_or_unknown_no_replay'] = 'sealed_or_unknown_no_replay'
+
+    @model_serializer(mode='wrap')
+    def serialize_operation_allowances(self, handler):
+        data=handler(self)
+        if not data['operation_allowances']:data.pop('operation_allowances')
+        return data
 
 
 class ProjectConfig(Contract):

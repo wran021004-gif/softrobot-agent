@@ -20,6 +20,8 @@ class InvocationContext:
         self.run_id, self.row, self.request = host.run_id, row, request
         self.snapshot = self.store.session(self.run_id)['snapshot']
         self.input = SessionInput.model_validate(self.snapshot['input'])
+        allowance=self.input.policy.operation_allowances.get(request.tool_id)
+        self.timeout_s=allowance.timeout_s if allowance else self.input.policy.timeout_s
         self.folder = host.folder / 'executions' / row['execution_id']
         self.folder.mkdir(parents=True, exist_ok=False)
 
@@ -170,7 +172,8 @@ class Host:
             key = digest(dict(tool=request.tool_id, version=request.tool_version, arguments=plain(arguments),
                 evidence=[plain(r) for r in request.evidence], input=snapshot['snapshot']['input_identity'], dependencies=dependency_identity(definition)))
             cached = self.store.cache(self.run_id, key) if definition.cache and request.cache == 'reuse' else None
-            cost = {**zero(), 'tool_calls': 1, 'wall_s': inp.policy.timeout_s}
+            allowance=inp.policy.operation_allowances.get(request.tool_id)
+            cost = {**zero(), 'tool_calls': 1, 'wall_s': allowance.reserve_s if allowance else inp.policy.timeout_s}
             resources = list(definition.resources)
             # Each implementation supplies a preflight hook through its declaration;
             # no software/tool-name routing in the loop or accounting core.
@@ -217,6 +220,10 @@ class Host:
                 fields['original_execution_id'] = result_execution['original_execution_id']
             receipt = self._receipt(request, row, 'completed', **fields)
             elapsed = 0. if definition.capabilities.get('delegated_execution') else time.monotonic() - started
+            # Synchronous Python tools cannot be safely preempted. Seal their
+            # returned output and actual overrun; never call an overrun free.
+            if allowance and elapsed>allowance.timeout_s:
+                receipt.update(execution_status='failed',error='OPERATION_TIMEOUT_EXCEEDED_AFTER_RETURN')
             return self.store.complete(row, receipt, data, elapsed, result_execution=result_execution)
         except Exception as exc:
             if row:

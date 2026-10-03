@@ -119,6 +119,10 @@ class DiagnosticWorkflow:
             provider=read(Path(self.experiment.get('provider_freeze',ROOT/'evidence/stage346_shared_diagnosis_20261002/pilot/freeze.json')))['provider_configuration']
             inp['policy']['model']={**provider,'adapter_version':'4.0.0','max_turns':24,
                 'tool_naming':tool_naming_policy(bindings,READABLE_TOOL_NAMING)}
+            if 'context_bytes' in self.experiment:
+                inp['policy']['model']['context_bytes']=self.experiment['context_bytes']
+            if 'context_guard' in self.experiment:
+                inp['policy']['model']['parameters']['context_guard']=self.experiment['context_guard']
             host.create(inp);self.hosts[role]=host
         self.binding=import_execution(reader,self.execution,self.store,self.hosts['executor'].run_id,source['manifest'])
         if self.experiment.get('fact_handles'):
@@ -142,7 +146,7 @@ class DiagnosticWorkflow:
             hosts={k:h.run_id for k,h in self.hosts.items()},binding=self.binding,identities=self.identities,summary=self.summary,
             inventory=self.inventory,inventory_reference=self.inventory_ref,source_manifest=source['manifest'],
             implementation=implementation(),runtime=runtime,provider_configuration=self.store.session(self.host('design').run_id)['snapshot']['input']['policy']['model'],
-            limits=limits,numerical_limits=numerical,scope=self.scope,memory_policy=MEMORY,fact_policy=FACT_POLICY,phase_budgets=self.phases,
+            limits=limits,numerical_limits=numerical,scope=self.scope,memory_policy={**MEMORY,'context_bytes':self.experiment.get('context_bytes',MEMORY['context_bytes'])},fact_policy=FACT_POLICY,phase_budgets=self.phases,
             stage_instructions=self.instructions,permissions=self.permissions,capabilities=self.capabilities,experiment=self.experiment,
             recovery=recovery_status({},self.store.session(self.host('design').run_id)['snapshot']['input']['policy']['model']),
             host_provider_configurations={k:self.store.session(h.run_id)['snapshot']['input']['policy']['model'] for k,h in self.hosts.items()},
@@ -383,5 +387,5 @@ class DiagnosticWorkflow:
         for name,host in self.hosts.items():
             actual=self.store.session(host.run_id)['snapshot']['input']['policy']['model']
             if actual!=self.freeze['host_provider_configurations'][name]:raise ValueError('FROZEN_PROVIDER_CONFIGURATION_MISMATCH: '+name)
-        for key,value in [('stage_instructions',self.instructions),('permissions',self.permissions),('phase_budgets',self.phases),('scope',self.scope),('memory_policy',MEMORY),('capabilities',self.capabilities),('experiment',self.experiment)]:
+        for key,value in [('stage_instructions',self.instructions),('permissions',self.permissions),('phase_budgets',self.phases),('scope',self.scope),('memory_policy',{**MEMORY,'context_bytes':self.experiment.get('context_bytes',MEMORY['context_bytes'])}),('capabilities',self.capabilities),('experiment',self.experiment)]:
             if value!=self.freeze[key]:raise ValueError('FROZEN_CONFIGURATION_MISMATCH: '+key)

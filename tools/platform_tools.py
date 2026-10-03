@@ -97,7 +97,7 @@ def simulate(ctx, args):
             prepare(ctx, controller, inp)
         backend.compile(inp, ctx.reg)
         backend.initialize(Payload.model_validate(ctx.snapshot['initial']), controller)
-        result = backend.run(folder=ctx.folder / 'backend', timeout_s=inp.policy.timeout_s)
+        result = backend.run(folder=ctx.folder / 'backend', timeout_s=ctx.timeout_s)
         ctx.reg.parse(result.data)
         ctx.reg.parse(result.initial_state)
         with ctx.store.transaction() as db:

@@ -1,0 +1,56 @@
+{
+  "project_prefix": "gvs-stage353",
+  "run_directory": "D:/softrobot-agent/runs/stage353_milestone0_20261003",
+  "evidence_directory": "D:/softrobot-agent/evidence/stage353_milestone0_20261003",
+  "source_store": "D:/softrobot-agent/runs/stage351_settling_20261003/baseline",
+  "execution_id": "cf997605885642759ee33920e2c9e2ef",
+  "configuration_artifact": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+  "evaluation_artifact": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+  "profile_artifact": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+  "provider_freeze": "D:/softrobot-agent/evidence/stage352_settling_20261003/revalidation/pair2_single_context/freeze.json",
+  "fact_handles": true,
+  "overall_limits": {
+    "model_calls": 48,
+    "tool_calls": 120,
+    "wall_s": 7200.0,
+    "backend_solves": 2,
+    "worker_calls": 0
+  },
+  "formal_order": [
+    "single_context",
+    "dual_context"
+  ],
+  "authorization_source": "User Milestone 0 request: implementation, saved-data post-hoc continuation, one fresh single-context and one fresh dual-context check each <=24 provider attempts/60 tools/3600 charged seconds/one new candidate simulation/zero workers. Preserve all Stage 3.52 scientific grants/settings except 400000-byte context cap and execution operation budgets. Commit locally, do not push.",
+  "context_bytes": 400000,
+  "context_guard": {
+    "context_limit_tokens": 1000000,
+    "framing_headroom_tokens": 8192,
+    "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+    "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "verified_date": "2026-10-03"
+  },
+  "operation_allowances": {
+    "simulation.run": {
+      "timeout_s": 900.0,
+      "reserve_s": 900.0
+    },
+    "evaluation.run": {
+      "timeout_s": 30.0,
+      "reserve_s": 30.0
+    },
+    "control.profile_report": {
+      "timeout_s": 60.0,
+      "reserve_s": 60.0
+    }
+  },
+  "historical_store": "D:/softrobot-agent/runs/stage352_settling_revalidation_20261003/pair2_single_context",
+  "historical_execution": "157bca3a5fb541eeb35171225dc34d05",
+  "budget_rationale": {
+    "saved_baseline_evaluation_s": 1.0,
+    "saved_baseline_profile_s": 1.1410000000614673,
+    "executor_phase_s": 1600.0,
+    "protected_feedback_s": 600.0,
+    "reservation_sum_s": 990.0,
+    "timeout_semantics": "Backend receives its timeout; synchronous Python evaluation/profile use after-return timeout checks, seal actual elapsed charge and retained output on overrun. No unsafe thread termination."
+  }
+}

@@ -135,29 +135,7 @@ def decide(ctx,args):
     return transition(ctx,'improvement_decision',dict(source_report=role['report'],decision=plain(args)))
 
 
-def complete_execution(host, baseline, candidate_id):
-    """Same registered calls as route.run_built; no alternative simulator or evaluator."""
-    from extensions.tendon_family.candidate import candidate_facts
-    from extensions.tendon_family.delivery_facts import bound_result_facts
-    host.resume()
-    receipts={}
-    for key,tool,args in [('simulation','simulation.run',dict(candidate_id=candidate_id,changes={})),
-            ('evaluation','evaluation.run',None),('profile','control.profile_report',None)]:
-        if key=='evaluation':args=dict(result=receipts['simulation']['output'],execution_id=receipts['simulation']['execution_id'])
-        if key=='profile':args=dict(simulation_request_id='complete-simulation',evaluation_request_id='complete-evaluation')
-        receipt=host.invoke(dict(request_id='complete-'+key,tool_id=tool,tool_version='1.0.0',arguments=args,reason='Authorized single complete execution and fixed evaluation/profile',cache='new'))
-        receipts[key]=receipt
-        if receipt['execution_status']!='completed':return dict(status='execution_incomplete',receipts=receipts)
-    sim=receipts['simulation'];ev=receipts['evaluation'];profile=receipts['profile']
-    metadata=host.store.session(host.run_id)['state']['result_executions'][sim['execution_id']]
-    configuration=metadata['candidate_input']
-    facts=candidate_facts(baseline,host.store.artifact(configuration),configuration,candidate_id,host.run_id,sim['execution_id'])
-    binding=dict(reference=profile['output'],owner_run_id=host.run_id,execution_id=sim['execution_id'],request_id='complete-profile')
-    result=bound_result_facts(host.store,dict(profile_report=binding,evaluation=ev['output'],simulation=sim),facts)
-    evaluation=host.store.artifact(ev['output']);detail=host.store.artifact(profile['output'])['detail']
-    if evaluation['source_execution_id']!=sim['execution_id'] or detail['execution_id']!=sim['execution_id']:
-        raise ValueError('COMPLETE_EXECUTION_IDENTITY_MISMATCH')
-    if detail['official_task_success']!=evaluation['task_success'] or detail['evaluation_validity']!=evaluation['validity']:
-        raise ValueError('COMPLETE_EVALUATION_INCONSISTENT')
-    return dict(status='evaluated',receipts=receipts,execution_id=sim['execution_id'],configuration=configuration,
-        design_statement=facts,factual_result=result,profile_report=binding,evaluation_data=evaluation)
+def complete_execution(host, baseline, candidate_id, **kwargs):
+    """Shared recorded simulation/evaluation/profile continuation."""
+    from tools.execution_completion import complete_execution as complete
+    return complete(host,baseline,candidate_id,**kwargs)

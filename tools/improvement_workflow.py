@@ -19,9 +19,10 @@ MODE_LIMITS=dict(model_calls=24,tool_calls=60,wall_s=3600.,backend_solves=1,work
 BASELINE_LIMITS=dict(model_calls=0,tool_calls=10,wall_s=3600.,backend_solves=1,worker_calls=0)
 
 
-def execution_host(store, run_id, effective, limits, *, parent=None):
+def execution_host(store, run_id, effective, limits, *, parent=None, operation_allowances=None):
     inp=deepcopy(plain(effective));inp['run_id']=run_id
     inp['policy'].update(route=None,search=None,budget=limits,timeout_s=900.,allowed_tools=[],tool_bindings=EXECUTION_TOOLS)
+    if operation_allowances:inp['policy']['operation_allowances']=operation_allowances
     if execution_scope(inp)!=execution_scope(effective):raise ValueError('EXECUTION_SCIENTIFIC_SCOPE_CHANGED')
     host=Host(store.root,run_id,actor='improvement-executor')
     host.create(inp,parent_run_id=parent)
@@ -88,7 +89,8 @@ class ImprovementWorkflow(DiagnosticWorkflow):
                     self.local_screen=self.screen_improvement(intent)
                     candidate=self.store.artifact(self.preparation.configuration)
                     executor=execution_host(self.store,self.project+'-candidate',candidate['effective'],
-                        dict(model_calls=0,tool_calls=10,wall_s=1600.,backend_solves=1,worker_calls=0))
+                        dict(model_calls=0,tool_calls=10,wall_s=1600.,backend_solves=1,worker_calls=0),
+                        operation_allowances=self.experiment.get('operation_allowances'))
                     self.hosts['candidate_executor']=executor
                     configure_role(executor,'executor','One complete candidate and fixed evaluation/profile',
                         phase_budget=dict(limit=dict(tool_calls=3,wall_s=1600.),protect_project=dict(model_calls=7,tool_calls=7,wall_s=600.)))

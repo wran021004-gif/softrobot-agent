@@ -192,8 +192,8 @@ def report(ctx,args):
     from .gvs_profile import ProfileOutput
     checked_control(ctx.input)
     def receipt(request,tool):
-        row=ctx.store.lookup(ctx.run_id,request)
-        value=json.loads(row['receipt']) if row and row['receipt'] else None
+        from tools.execution_completion import completed_receipt
+        value=completed_receipt(ctx.store,ctx.run_id,request)
         if value is None or value['tool_id']!=tool or value['execution_status']!='completed':
             raise ValueError('SEALED_COMPLETED_RECEIPT_REQUIRED: '+request)
         return value
@@ -214,6 +214,11 @@ def report(ctx,args):
                     value=ctx.artifact(ref)
                     if isinstance(value,dict) and 'files' in value and value.get('result')==sim['output']:
                         bundle=value
+    imported=ctx.store.session(ctx.run_id)['state'].get('completion_import')
+    if bundle is None and imported:
+        from .diagnostic_evidence import BoundReader
+        source=BoundReader(ctx.store,imported['binding']).resolve(sim['execution_id'])
+        bundle=ctx.artifact(source['manifest'])
     if bundle is None:raise ValueError('SEALED_BACKEND_EXPORTS_REQUIRED')
     files={f['filename']:ctx.store.artifact(f['reference'],raw=True) for f in bundle['files']}
     rows=json.loads(gzip.decompress(files['trajectory.json.gz']))

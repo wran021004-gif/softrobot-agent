@@ -425,6 +425,13 @@ def payload_for(host, adapter=None):
         payload = adapter.encode(model_input, config)
     if len(encode(payload).encode('utf8')) > config['context_bytes']:
         raise ValueError('CONTEXT_LIMIT_REQUIRED_STATE_TOO_LARGE: narrow tools or raise explicit byte limit')
+    guard=config.get('parameters',{}).get('context_guard')
+    if guard:
+        # Conservative estimate: one token per serialized UTF-8 byte plus
+        # explicit framing headroom. This is not a tokenizer measurement.
+        estimate=len(encode(payload).encode('utf8'))+guard['framing_headroom_tokens']
+        if estimate+payload['max_tokens']>guard['context_limit_tokens']:
+            raise ValueError('PROVIDER_CONTEXT_HEADROOM_EXHAUSTED')
     return payload
 
 
