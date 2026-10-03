@@ -70,11 +70,19 @@ Neither adopted the changed candidate. Both suffix decisions used their actual
 historical worsening and retained the baseline.
 
 Exact citations do not validate every scientific sentence. The archived dual
-revision contains one mistyped candidate name in recommendation prose; structured
+final decision contains one mistyped candidate name in its reasoning; structured
 feedback binding and its explicit final no-selection decision are correct. This
 was retained and documented, not silently edited. Sampled holding is not a
 continuous-time guarantee, and these single runs do not establish causality or
 organizational superiority.
+
+Stage 3.55 amended the review metadata after checking the sealed dual records:
+the actual prepared/executed candidate and revised report use
+`improvement-744833804049`; `final_response.reasoning` instead says
+`improvement-744833040049`. The Stage 3.55 request described those names in
+reverse. The review now records the verified direction, fields and exact source
+references. Only `scientific_review.json` and its parent checksum entry changed;
+original model products, receipts, decisions and measurements remain intact.
 
 Detailed evidence: [delivery summary](../evidence/stage354_milestone0_20261003/delivery_summary.json),
 [scientific review](../evidence/stage354_milestone0_20261003/scientific_review.json),

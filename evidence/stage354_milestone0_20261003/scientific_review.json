@@ -7,7 +7,40 @@
     "single_context": "retain_baseline",
     "dual_context": "defer_selection"
   },
-  "prose_findings": [],
+  "prose_findings": [
+    {
+      "run": "dual_context",
+      "affected_fields": [
+        "final_response.reasoning",
+        "resolved_calls.arguments.reasoning",
+        "raw_calls.raw.choices[0].message.tool_calls[0].function.arguments (reasoning)"
+      ],
+      "submitted_candidate_name": "improvement-744833040049",
+      "correct_bound_identity": {
+        "candidate_id": "improvement-744833804049",
+        "configuration": {
+          "artifact_id": "de59ed53bfe2d2540ab91dcccfde881ea49ffcc5e48f57687ed231b24febe4cc",
+          "media_type": "application/json"
+        },
+        "execution_id": "19a42d190e7c4f3e9338fe9a40845876",
+        "owner_run_id": "gvs-stage354-68b86eee4963-candidate"
+      },
+      "source_reference": {
+        "artifact_id": "c44f79eaf08b0bf46a87046d17266f9bf4bb56d085206a7579829a2d24ac05b8",
+        "media_type": "application/json"
+      },
+      "feedback_reference": {
+        "artifact_id": "603dfd309a61dfd836cc5c07559e96e228a972934c5d0db7c48a21b19d05fa99",
+        "media_type": "application/json"
+      },
+      "revised_report_reference": {
+        "artifact_id": "3e7810e87bf49db9fcc06fffded9b9ffb297eb054c5fac1d2c7a5207fd110303",
+        "media_type": "application/json"
+      },
+      "explanation": "Archived final decision prose transposes the candidate name. The revised report names the bound candidate correctly. Structured report/feedback bindings and defer_selection with selected_candidate=null remain valid. Original artifacts and outcomes are unchanged.",
+      "request_discrepancy": "The request described the two names in reverse and located the typo in revised-report prose; sealed records establish the locations and direction recorded here."
+    }
+  ],
   "physical_result": "Both fresh candidates: reach passes, holding position and speed fail; componentwise tradeoff; real-time not demonstrated.",
   "original_assessment_revision": "Suffixes use actual worsening to decline candidate adoption. Fresh revisions acknowledge measured holding improvement, worse reach/computation and remaining joint failure; dominant-cause claims remain unresolved."
 }
