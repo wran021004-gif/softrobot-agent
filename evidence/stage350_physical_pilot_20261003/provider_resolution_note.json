@@ -1,0 +1,44 @@
+{
+  "scope": "Metadata clarification only; no implementation, freeze, provider setting or live request changed.",
+  "template_field": "campaign_freeze.provider contains the historical Stage 3.46 base template (adapter 3.0.0). The frozen DiagnosticWorkflow.prepare implementation explicitly resolves adapter 4.0.0 and computes readable tool naming for the physical tool bindings before each host is created.",
+  "effective_provider": {
+    "adapter": "deepseek",
+    "adapter_version": "4.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 200000,
+    "length_recovery": {
+      "enabled": true,
+      "max_tokens": 131072,
+      "timeout_s": 900.0
+    },
+    "max_no_progress": 3,
+    "max_repairs": 2,
+    "max_tokens": 65536,
+    "max_turns": 24,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 2,
+      "max_total": 4
+    },
+    "readonly_batch_limit": 3,
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0,
+    "tool_naming": {
+      "mapping_identity": "873cb1bbe5bb68ba832af73b867e136ba37b53f27b9d99957f00cb9343abf3a5",
+      "scheme": "readable_v1"
+    }
+  },
+  "actual_configuration_records": "Each organization freeze.host_provider_configurations and every model request contain the resolved configuration; validate_frozen_configuration checks them before live work.",
+  "differences_from_template": [
+    "adapter_version overridden to 4.0.0 by pre-campaign frozen implementation",
+    "tool_naming.mapping_identity recomputed for the same physical tool set in both organizations"
+  ],
+  "interpretation": "The generic campaign provider field is a template, not the fully resolved provider policy. This ambiguity is retained and clarified here, not retrospectively overwritten. Effective provider/model/limits match the user-authorized settings."
+}

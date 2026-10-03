@@ -56,6 +56,10 @@ def prepare_improvement(host, report_reference, decision):
         if decision.changes:raise ValueError('DEFER_OR_REJECT_CANNOT_PREPARE_CHANGES')
         return result
     if not decision.changes:raise ValueError('ADOPT_REQUIRES_EXPLICIT_DELTA')
+    # The family builder can support choice dimensions beyond the session's
+    # explicit numeric edit grant. Capability is not improvement authorization.
+    outside=set(decision.changes)-set(baseline.policy.editable)
+    if outside:raise ValueError('PARAMETER_NOT_AUTHORIZED_IN_IMPROVEMENT_GRANT: '+', '.join(sorted(outside)))
     candidate=_candidate(baseline,decision.changes,registry())
     differences=actual_diff(plain(baseline),plain(candidate))
     if not differences:raise ValueError('EFFECTIVE_CHANGE_REQUIRED')

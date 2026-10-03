@@ -10,7 +10,7 @@ from tools.diagnostic_workflow import DiagnosticWorkflow, ROOT, TOOLS, INSTRUCTI
 from tools.diagnostic_improvement import prepare_improvement, transfer_accepted_report, complete_execution
 from tools.platform_diagnosis_coordinator import configure_role
 from tools.platform_host import Host
-from tools.platform_store import plain
+from tools.platform_store import Store, plain
 from tools.state_io import read, atomic_json
 from extensions.tendon_family.gvs_profile import execution_scope
 
@@ -65,9 +65,10 @@ class ImprovementWorkflow(DiagnosticWorkflow):
             report=self.chain['initial_report'];transfer_accepted_report(self.host('diagnostic'),self.host('design'),report)
             source=self.store.artifact(self.store.artifact(report)['report']['source'])
             baseline=SessionInput.model_validate(self.store.artifact(source['configuration'])['effective'])
-            grant=plain(baseline.policy.candidate_builder.parameters)['data']
+            space=plain(baseline.policy.candidate_builder.parameters)['data']
+            grant={key:spec for key,spec in space['parameters'].items() if key in baseline.policy.editable}
             self.phase('improvement','improvement_decision','improvement_decision',report=report,report_content=self.store.artifact(report),
-                delivery_tool='design.decide_improvement',editable_scope=dict(editable=plain(baseline.policy.editable),candidate_builder=grant),
+                delivery_tool='design.decide_improvement',editable_scope=dict(editable=plain(baseline.policy.editable),parameters=grant,control_parameters={}),
                 previous_report=report,previous_report_content=self.store.artifact(report))
             intent=self.store.artifact(self.chain['improvement_decision'])
             try:self.preparation=prepare_improvement(self.host('design'),report,intent['decision'])
@@ -115,22 +116,31 @@ class ImprovementWorkflow(DiagnosticWorkflow):
         atomic_json(self.directory/'outcome.json',outcome)
         destination=self.export_root/self.directory.name;atomic_json(destination/'outcome.json',outcome)
         # Include complete receipts, raw backend exports and every causal JSON artifact.
-        archive_store(self.store,destination)
+        archive_store(self.store,destination,source_stores=[self.source])
 
 
-def archive_store(store,destination):
+def archive_store(store,destination,*,source_stores=()):
     """Portable sealed evidence, including execution blobs, without rewriting products."""
     destination=Path(destination);destination.mkdir(parents=True,exist_ok=True)
     with store.connect(True) as db:ids=[r[0] for r in db.execute('SELECT run_id FROM sessions')]
     events=[event for run in ids for event in store.events(run)]
-    refs={};external={}
+    refs={};external={};owners={}
+    available=[store,*[Store(path) for path in source_stores]]
     def collect(ref):
         ref=plain(ref)
         if ref['artifact_id'] in refs:return
         if ref['artifact_id'] in external:return
-        try:body=store.artifact(ref,raw=True)
-        except (FileNotFoundError,KeyError) as exc:
-            external[ref['artifact_id']]=dict(reference=ref,reason=str(exc));return
+        for source in available:
+            with source.connect(True) as db:
+                exists=db.execute('SELECT 1 FROM artifacts WHERE id=?',(ref['artifact_id'],)).fetchone()
+            if exists:
+                # Resolve absent cross-store references, but never hide corrupt
+                # or media-mismatched content already present in a known store.
+                body=source.artifact(ref,raw=True)
+                owners[ref['artifact_id']]=str(source.root)
+                break
+        else:
+            external[ref['artifact_id']]=dict(reference=ref,reason='Not present in the explicitly named export stores');return
         refs[ref['artifact_id']]=(ref,body)
         if ref['media_type']=='application/json':
             import json
@@ -149,5 +159,6 @@ def archive_store(store,destination):
         (folder/(key+('.json' if ref['media_type']=='application/json' else '.blob'))).write_bytes(body)
     atomic_json(destination/'events.json',events)
     atomic_json(destination/'external_references.json',list(external.values()))
+    atomic_json(destination/'artifact_owners.json',owners)
     atomic_json(destination/'sha256_manifest.json',{p.relative_to(destination).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(destination.rglob('*')) if p.is_file() and p.name!='sha256_manifest.json'})

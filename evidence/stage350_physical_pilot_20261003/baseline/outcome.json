@@ -1,0 +1,602 @@
+{
+  "status": "completed",
+  "gate_passed": true,
+  "gate_reason": "Consistent valid complete baseline and fixed evaluation/profile; task acceptance is not a launch requirement.",
+  "result": {
+    "status": "evaluated",
+    "receipts": {
+      "simulation": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-simulation",
+        "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+        "caller": "improvement-executor",
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "completed",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "9d56ce6bf207f79d57d239fc9e951fae84ebd33ca256b7cd0de8770ac4e026f5",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 609.4529999999795
+        }
+      },
+      "evaluation": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-evaluation",
+        "execution_id": "1d6df61150ba496d8af699050bc64493",
+        "caller": "improvement-executor",
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "valid",
+        "task_success": true,
+        "output": {
+          "artifact_id": "56e93bb7995cd3870fbb6b9fafa9dc6a88f2e4d5900e1ce81b41dbe2c4bc32c0",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.0
+        }
+      },
+      "profile": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-profile",
+        "execution_id": "34797a135d1a43c29a9415a34dabae79",
+        "caller": "improvement-executor",
+        "tool_id": "control.profile_report",
+        "tool_version": "1.0.0",
+        "result_contract": "ProfileOutput",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "7e0c52e0ee6dd8e9124078f3c13fc969dda3c85b4ffd54f061b7bd6709ee7520",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.125
+        }
+      }
+    },
+    "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+    "configuration": {
+      "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+      "media_type": "application/json"
+    },
+    "design_statement": {
+      "physical_changes": [
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.16,
+          "effective_value": 0.15,
+          "baseline_delta": -0.010000000000000009,
+          "unit": "m",
+          "category": "length"
+        },
+        {
+          "path": "components/near/sections/0/section/parameters/semi_y_m",
+          "baseline_value": 0.01,
+          "effective_value": 0.0095,
+          "baseline_delta": -0.0005000000000000004,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/near/sections/0/section/parameters/semi_z_m",
+          "baseline_value": 0.008,
+          "effective_value": 0.0076,
+          "baseline_delta": -0.0004000000000000002,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/near/physics/young_pa",
+          "baseline_value": 8000000.0,
+          "effective_value": 7200000.0,
+          "baseline_delta": -800000.0,
+          "unit": "Pa",
+          "category": "material"
+        },
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.12,
+          "effective_value": 0.11,
+          "baseline_delta": -0.009999999999999995,
+          "unit": "m",
+          "category": "length"
+        },
+        {
+          "path": "components/far/sections/0/section/parameters/height_z_m",
+          "baseline_value": 0.01,
+          "effective_value": 0.0095,
+          "baseline_delta": -0.0005000000000000004,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/far/sections/0/section/parameters/width_y_m",
+          "baseline_value": 0.014,
+          "effective_value": 0.0133,
+          "baseline_delta": -0.000700000000000001,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/far/sections/1/section/parameters/height_z_m",
+          "baseline_value": 0.009,
+          "effective_value": 0.008549999999999999,
+          "baseline_delta": -0.00045000000000000075,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/far/sections/1/section/parameters/width_y_m",
+          "baseline_value": 0.012,
+          "effective_value": 0.0114,
+          "baseline_delta": -0.0005999999999999998,
+          "unit": "m",
+          "category": "section"
+        },
+        {
+          "path": "components/far/physics/young_pa",
+          "baseline_value": 6000000.0,
+          "effective_value": 5400000.0,
+          "baseline_delta": -600000.0,
+          "unit": "Pa",
+          "category": "material"
+        }
+      ],
+      "semantic_provenance": {
+        "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "material_groups": {
+          "far": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          },
+          "near": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          }
+        },
+        "selections": {
+          "design/material_scenario": "compliant",
+          "design/section_scale": 0.95
+        },
+        "source": "Frozen experiment semantic_source; original per-section material parameters",
+        "source_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4"
+      },
+      "physical_summary": {
+        "physics_identity": "c723a7d01c9789b26ba0e445e1e282a003ef9cfd53e6e189f25aa50e59268589",
+        "sections": [
+          {
+            "component": "near",
+            "length_m": 0.15,
+            "material": {
+              "bending_ei_nm2": null,
+              "bending_viscosity_nm2_s": [
+                0.0005,
+                0.0007
+              ],
+              "density_kg_m3": 1100.0,
+              "line_density_kg_m": null,
+              "mode": "material",
+              "young_pa": 7200000.0
+            },
+            "mass_kg": 0.0374257932822152,
+            "cells": 12,
+            "area_range_m2": [
+              0.00022682298958918306,
+              0.00022682298958918306
+            ],
+            "cell_inertia_diagonal_kg_m2": [
+              [
+                1.1540399299376402e-07,
+                8.564528930755817e-08,
+                1.1097787313545761e-07
+              ],
+              [
+                1.1540399299376402e-07,
+                8.564528930755817e-08,
+                1.1097787313545761e-07
+              ]
+            ],
+            "cell_stiffness_nm_rad": [
+              [
+                1.8865866065286547,
+                2.9477915727010235
+              ],
+              [
+                1.8865866065286547,
+                2.9477915727010235
+              ]
+            ],
+            "cell_damping_nm_s_rad": [
+              [
+                0.04,
+                0.056
+              ],
+              [
+                0.04,
+                0.056
+              ]
+            ]
+          },
+          {
+            "component": "far",
+            "length_m": 0.11,
+            "material": {
+              "bending_ei_nm2": null,
+              "bending_viscosity_nm2_s": [
+                0.0003,
+                0.0004
+              ],
+              "density_kg_m3": 1050.0,
+              "line_density_kg_m": null,
+              "mode": "material",
+              "young_pa": 5400000.0
+            },
+            "mass_kg": 0.012890738103298613,
+            "cells": 12,
+            "area_range_m2": [
+              9.860125868055555e-05,
+              0.0001250745920138889
+            ],
+            "cell_inertia_diagonal_kg_m2": [
+              [
+                2.651362945725062e-08,
+                1.7408297483880295e-08,
+                2.5964706594223954e-08
+              ],
+              [
+                1.625638963011029e-08,
+                1.2480527663054697e-08,
+                1.7066775264606748e-08
+              ]
+            ],
+            "cell_stiffness_nm_rad": [
+              [
+                0.549529104358711,
+                1.0732177091759663
+              ],
+              [
+                0.3571311468479687,
+                0.6378289929689349
+              ]
+            ],
+            "cell_damping_nm_s_rad": [
+              [
+                0.03272727272727272,
+                0.04363636363636364
+              ],
+              [
+                0.03272727272727272,
+                0.04363636363636364
+              ]
+            ]
+          }
+        ],
+        "force_limits_n": {
+          "near_t0": 8.0,
+          "near_t1": 8.0,
+          "near_t2": 8.0,
+          "far_t0": 8.0,
+          "far_t1": 8.0,
+          "far_t2": 8.0
+        },
+        "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "applicability": {
+          "compilable": true,
+          "backends": [
+            "backend.matlab_spatial",
+            "backend.family_mujoco"
+          ],
+          "physics": "serial rigid cells with two principal bending hinges; fixed rigid attachments; straight frictionless tendons",
+          "omitted": [
+            "axial stretch",
+            "shear",
+            "material torsion",
+            "friction",
+            "elastic rope",
+            "motor dynamics",
+            "self collision"
+          ],
+          "collision": "section convex hull extrusions; holes filled for collision only; exact polygon/circular area moments; guide box envelope"
+        }
+      },
+      "multi_category_coverage": false,
+      "candidate_id": "baseline-replay",
+      "configuration": {
+        "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+        "media_type": "application/json"
+      },
+      "frozen_baseline_identity": "56f1bacd236d3405c335a959de838cfba12deba9faa01de69560b83369383213",
+      "effective_identity": "19d3fdd1d282d20016fb297d01a09c70ded6817a1277ab6be343e4b79a0afff7",
+      "owner_run_id": "gvs-stage350-baseline-executor",
+      "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+      "parameters": [
+        {
+          "path": "components/far/length_m",
+          "baseline_value": 0.11,
+          "effective_value": 0.11,
+          "baseline_delta": 0.0,
+          "unit": "m"
+        },
+        {
+          "path": "components/near/length_m",
+          "baseline_value": 0.15,
+          "effective_value": 0.15,
+          "baseline_delta": 0.0,
+          "unit": "m"
+        },
+        {
+          "path": "design/material_scenario",
+          "baseline_value": "compliant",
+          "effective_value": "compliant",
+          "baseline_delta": null,
+          "unit": null
+        },
+        {
+          "path": "design/section_scale",
+          "baseline_value": 0.95,
+          "effective_value": 0.95,
+          "baseline_delta": 0.0,
+          "unit": "1"
+        }
+      ]
+    },
+    "factual_result": {
+      "result_type": "free_reach",
+      "candidate": {
+        "candidate_id": "baseline-replay",
+        "owner_run_id": "gvs-stage350-baseline-executor",
+        "configuration": {
+          "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+          "media_type": "application/json"
+        },
+        "execution_id": "4e358bd36ab54be3afd5003f36ff8110"
+      },
+      "configuration": {
+        "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+        "media_type": "application/json"
+      },
+      "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+      "simulation": {
+        "artifact_id": "9d56ce6bf207f79d57d239fc9e951fae84ebd33ca256b7cd0de8770ac4e026f5",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "artifact_id": "56e93bb7995cd3870fbb6b9fafa9dc6a88f2e4d5900e1ce81b41dbe2c4bc32c0",
+        "media_type": "application/json"
+      },
+      "report": {
+        "reference": {
+          "artifact_id": "7e0c52e0ee6dd8e9124078f3c13fc969dda3c85b4ffd54f061b7bd6709ee7520",
+          "media_type": "application/json"
+        },
+        "owner_run_id": "gvs-stage350-baseline-executor",
+        "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+        "request_id": "complete-profile"
+      },
+      "task_accepted": true,
+      "evaluation_validity": "valid",
+      "complete": true,
+      "valid_complete_execution": true,
+      "target_position_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "terminal_position_m": [
+        0.2826142589887697,
+        0.03368252098773442,
+        0.1885424181792968
+      ],
+      "signed_position_error_m": [
+        -0.007385741011230296,
+        -0.0013174790122655808,
+        -0.0014575818207032132
+      ],
+      "error_convention": "actual_tip minus target",
+      "coordinate_frame": "world",
+      "terminal_error_m": 0.007642608585867386,
+      "terminal_tip_speed_m_s": 0.6351726092425104,
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.05813810428573256,
+        "max_speed_m_s": 1.5810152739742807,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "control_updates": 35,
+      "accepted_plans": 35,
+      "initialization_selected": 29,
+      "accepted_noninitialization_plans": 6,
+      "converged_updates": 1,
+      "solver_error_count": 0,
+      "hold_last_responses": 0,
+      "applied_tension_ranges": [
+        {
+          "tendon": "near_t0",
+          "tendon_index": 0,
+          "minimum_n": 1.7512764858409064,
+          "maximum_n": 7.990411884680996,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "near_t1",
+          "tendon_index": 1,
+          "minimum_n": 2.757372796476204,
+          "maximum_n": 6.086855343352726,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "near_t2",
+          "tendon_index": 2,
+          "minimum_n": 1.4216485070827969e-08,
+          "maximum_n": 3.1031566686630025,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t0",
+          "tendon_index": 3,
+          "minimum_n": 5.115521779319541e-07,
+          "maximum_n": 3.218253612486097,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t1",
+          "tendon_index": 4,
+          "minimum_n": 0.12734806870748366,
+          "maximum_n": 5.165423523313249,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t2",
+          "tendon_index": 5,
+          "minimum_n": -0.0,
+          "maximum_n": 6.400860298939372,
+          "limit_n": 8.0
+        }
+      ],
+      "force_bound_violation_n": 0.0,
+      "one_step_prediction_summary": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_tip_difference_m": 0.0076898869753466255,
+        "mean_tip_difference_m": 0.0038032038653228557,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+      },
+      "one_step_prediction_evidence": {
+        "artifact_id": "3d2c01848435ead2e8fca7bf1ef6c54712c850c2ed34af4d20b50ac38a203ba5",
+        "media_type": "application/json"
+      },
+      "simulated_duration_s": 0.35000000000000003,
+      "measured_computation_s": 609.4529999999795,
+      "mean_complete_update_s": 17.303696897140306,
+      "control_period_s": 0.01,
+      "deadline_misses": 35,
+      "real_time_demonstrated": false
+    },
+    "profile_report": {
+      "reference": {
+        "artifact_id": "7e0c52e0ee6dd8e9124078f3c13fc969dda3c85b4ffd54f061b7bd6709ee7520",
+        "media_type": "application/json"
+      },
+      "owner_run_id": "gvs-stage350-baseline-executor",
+      "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+      "request_id": "complete-profile"
+    },
+    "evaluation_data": {
+      "candidate_id": "baseline-replay",
+      "comparison_identity": "4a3c6a450df8c631119c0e72ecb8a02e3f59a1e74073f752db6f8553147be7ae",
+      "constraints": [
+        {
+          "limit": 0.01,
+          "name": "task_bound",
+          "observed": 0.007642608585867386,
+          "satisfied": true,
+          "units": "m"
+        }
+      ],
+      "contract_version": "1.2.0",
+      "evaluator": "evaluate.reach",
+      "evaluator_version": "1.0.0",
+      "metrics": [
+        {
+          "name": "position_error",
+          "units": "m",
+          "value": 0.007642608585867386
+        }
+      ],
+      "original_execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+      "reason": null,
+      "source": {
+        "artifact_id": "9d56ce6bf207f79d57d239fc9e951fae84ebd33ca256b7cd0de8770ac4e026f5",
+        "media_type": "application/json"
+      },
+      "source_execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+      "task_success": true,
+      "validity": "valid"
+    }
+  },
+  "usage": {
+    "limit": {
+      "backend_solves": 1,
+      "model_calls": 0,
+      "tool_calls": 10,
+      "wall_s": 3600.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 3,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 611.5779999999795
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 7,
+      "wall_s": 2988.4220000000205,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "provider_usage": [],
+  "runtime": {
+    "sys_executable": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+    "python_version": "3.11.16",
+    "environment_prefix": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "category": "host_portable_export_failure_after_terminal_workflow",
+  "run": "single_context",
+  "completed_workflow": true,
+  "pending_calls": 0,
+  "original_runner_session": 22056,
+  "original_runner_exit": 1,
+  "missing_local_reference": "56e93bb7995cd3870fbb6b9fafa9dc6a88f2e4d5900e1ce81b41dbe2c4bc32c0",
+  "resolved_owner": "baseline store; sealed evaluation of execution 4e358bd36ab54be3afd5003f36ff8110",
+  "cause": "archive_store recursively assumed every baseline_facts reference belongs to the organization store. import_execution imports configuration/backend evidence but the baseline evaluation/profile references remain in the explicitly named baseline store. Required execution identities are resolved; this is an export closure issue, not a failed model decision or corrupt baseline.",
+  "recovery": "Use existing campaign continuation: terminal baseline and single_context outcome files are skipped; launch only the unstarted dual_context under unchanged file freeze. Resolve cross-store export closure offline without modifying live stores, code, prompts, accepted products or counters.",
+  "implementation_unchanged": true,
+  "usage_at_interruption": {
+    "diagnostic_used": {
+      "model_calls": 57,
+      "tool_calls": 85,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 3136.408999997657
+    },
+    "physical_runs": [
+      {
+        "label": "baseline",
+        "limit": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 10,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 3,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 611.5779999999795
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 7,
+          "wall_s": 2988.4220000000205,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      {
+        "label": "single_context",
+        "limit": {
+          "backend_solves": 1,
+          "model_calls": 24,
+          "tool_calls": 60,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 13,
+          "model_calls": 10,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 498.76599999913014
+        },
+        "remaining": {
+          "backend_solves": 1,
+          "model_calls": 14,
+          "tool_calls": 47,
+          "wall_s": 3101.23400000087,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      }
+    ],
+    "physical_used": {
+      "model_calls": 10,
+      "tool_calls": 16,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 1110.3439999991097
+    },
+    "used": {
+      "model_calls": 67,
+      "tool_calls": 101,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 4246.752999996766
+    },
+    "limits": {
+      "model_calls": 200,
+      "tool_calls": 510,
+      "wall_s": 33600.0,
+      "backend_solves": 3,
+      "worker_calls": 0
+    },
+    "remaining": {
+      "model_calls": 133,
+      "tool_calls": 409,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 29353.247000003234
+    },
+    "monetary_cost": null
+  }
+}

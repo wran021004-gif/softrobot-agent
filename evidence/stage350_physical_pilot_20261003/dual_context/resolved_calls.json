@@ -1,0 +1,1517 @@
+[
+  {
+    "run_id": "gvs-stage350-physical-f98c9e8012bd-design",
+    "reference": {
+      "artifact_id": "fe47594782297f630972982eded5672b27a1e1de6507307d91f319fdbf5c0022",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "binding": {
+          "artifact_id": "70961033fbf13e4cb4dd54dd9271d977af5361a7d654e725d72d29ec62eb10b4",
+          "media_type": "application/json"
+        },
+        "budget": {
+          "backend_solves": 0,
+          "model_calls": 24,
+          "tool_calls": 60,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "candidate_id": "baseline-replay",
+        "controller_identity": "8f837eb45a3016c38bc7f4b4913de5b8e26e5fb64b1446437f285e04a6b9be38",
+        "evidence_manifest": {
+          "artifact_id": "4f0d95b4cc51d3bd4dcec3de74ffd64af081f6f51de9950727a0bffe5123a3ae",
+          "media_type": "application/json"
+        },
+        "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+        "permitted_tools": [
+          "diagnosis.inspect_evidence",
+          "diagnosis.submit",
+          "evidence.read"
+        ],
+        "question": "Open diagnostic question on the baseline replay (execution 4e358bd36ab54be3afd5003f36ff8110): the summary reports reach_passed = true with terminal_error_m 0.00764 m below reach_tolerance_m 0.01 m (handles f9b10abd95f4f, fd0407340762b), yet sampled_settling_passed = false (fc5b0de5671bc) and terminal_speed_m_s 0.635 m/s is far above the settling speed_limit_m_s 0.02 m/s (f7f96eef8a315, f6c63688b547f). (1) Within the final sampled settle window of 0.05 s (window_s f528b132fd805 / ff969064e0f03, position_limit_m 0.01 m ffb114fdfd606 / ff5fd6c07106d, speed_limit_m_s 0.02 m/s f6c63688b547f / fd8b94071611d), which measured backend tip positions and speeds exceed the limits, and how large is the exceedance? (2) How does the sampled holding position/speed profile in that window compare with the recorded late_max_error_m 0.0581 m and late_max_speed_m_s 1.5810 m/s (f5a78f2ff99df, f69887e2a8ae5), and are the one-step predictions at the last controller updates consistent with the measured tip motion at the matched endpoints (view prediction)? (3) In the computation record, what do deadline_misses = 35, mean_update_s = 17.30 s against control_period_s = 0.01 s and configured recipe horizon = 10 (f4247d77f9243, f12f519656d7c, fdcd580c300c1, f3abe564a036e) indicate about whether each update's plan was computed and applied within its interval, and does the per-update effective_horizon trace agree with the configured horizon? (4) Do the stopping counts (Solve_Succeeded 1 vs User_Requested_Stop 34; fdadd8fe6513d, f07ea946b5201) and initialization_selected 29 / noninitialization_selected 6 (fed20e2cfb7d5, f03f310fff089) indicate early or non-warm-started planning rather than a full 35-update optimized run? Treat all four as recorded observations; do not attribute a dominant cause. State explicitly whether each referenced channel was not displayed, not read in this context, not retained, or unavailable through a named capability.",
+        "saved_state_check": null,
+        "scope": [
+          "Retained-evidence reads only: source.* inventory entries (35 records, controller updates 0..34; one_step_predictions, applied_tensions, saved_projected_states, plan_selection, solver_status, controller_horizon, backend_motion derived views) plus the common baseline replay summary and configured controller parameters.",
+          "Report and observation only: no saved-state numerical work, no local solves or prediction evaluations (numerical_budget local_solves 0, prediction_evaluations 0).",
+          "Excluded: production configuration changes and backend execution; complete_execution capability is not exercised here (defer/reject leaves that allowance unused).",
+          "Frame note: tip vectors in world frame, projected GVS coordinates for state; a sampled view does not establish absence of unread subsets."
+        ],
+        "stopping_conditions": [
+          "Stop when the sampled backend tip position/speed profile across the final 0.05 s settle window has been read for the latest controller updates and its limit exceedances are stated as observed amounts.",
+          "Stop when the terminal reach result and the sampled settling result are reported as recorded, without asserting a dominant cause or a causal link between timing and residual motion.",
+          "Stop when solver-status, plan-selection, and effective_horizon records are reported as recorded, and any unread or unretained channel is labeled not_displayed, not_read in this context, not_retained, or unavailable through a named capability.",
+          "Stop if answering would require saved-state numerical checks, closed-loop counterfactual replay, or historical full plans/optimizer traces that the inventory marks as not retained (control_snapshots.json)."
+        ],
+        "subject": "control",
+        "task_identity": "24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041"
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-0-tool",
+      "tool_id": "diagnosis.request",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage350-physical-f98c9e8012bd-design",
+    "reference": {
+      "artifact_id": "889d24be7e62c257f7e190dc25ec535b1990a65213899b855729aec10bd059dd",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "changes": {},
+        "disposition": "defer",
+        "expected_measurable_effect": "Reach: no change expected — reach already passed (fa2df53ca3437) with terminal error 0.00764 m inside the 0.01 m tolerance (f9b10abd95f4f, fd0407340762b). Sampled holding: no change expected under this decision — recorded settle-window tip speeds (e.g. 1.4769184551353305 m/s and 0.6351726092425104 m/s, f69887e2a8ae5, f7f96eef8a315) are expected to remain far above the 0.02 m/s limit (f6c63688b547f) and sampled_settling_passed (fc5b0de5671bc) to remain false, because no parameter is changed. Computation: no change expected in mean_update_s 17.30 s (f12f519656d7c), deadline_misses 35 (f4247d77f9243) or per-update effective horizon, which are governed by controller/recipe settings outside this grant; the effect of any future authorized geometry candidate on these quantities is unquantified by the current evidence.",
+        "rationale": "Accepted diagnosis records sampled_settling_passed false (fc5b0de5671bc) with terminal_speed_m_s 0.635 m/s (f7f96eef8a315) far above speed_limit_m_s 0.02 m/s (f6c63688b547f), while reach_passed true (fa2df53ca3437) with terminal_error_m 0.00764 m (f9b10abd95f4f) inside reach_tolerance_m 0.01 m (fd0407340762b); reach_geometry_failure is ruled out, so no geometry-linked cause is supported. The remaining candidate contributors — reduced effective_horizon 1-7 versus configured recipe.horizon 10 (fd45cb2a843b4, f3abe564a036e), 34 User_Requested_Stop vs 1 Solve_Succeeded (f07ea946b5201, fdadd8fe6513d) alongside initialization_selected 29 vs noninitialization_selected 6 (fed20e2cfb7d5, f03f310fff089), wall-time misses against mean_update_s 17.30 s (f12f519656d7c) at control_period_s 0.01 s (fdcd580c300c1), and the bounded-horizon projected one-step probe — are controller, timing and retention factors outside the near/far length and section_scale grant. No closed-loop counterfactual replay exists (named capability gap) and full warm plans and optimizer iteration traces are not retained (f2d3a0144633d, full_snapshots_available f4e1e82ea1469), so any geometry delta on near length, far length or section_scale would be an unsupported guess rather than a justified change; a geometry change is deliberately not forced to consume the single-candidate execution allowance (fb00225d189d3). This defers intent only and leaves that allowance unused."
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-1-tool",
+      "tool_id": "design.decide_improvement",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage350-physical-f98c9e8012bd-design",
+    "reference": {
+      "artifact_id": "879e5510f7f0dbdcd40b4ed8c8f1a4d86c5014c5a08fbd7a432db938934eadab",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "disposition": "defer",
+        "next_action": "finish",
+        "reasoning": "Adopt no change; the recommended course (defer) is the only one the produced evidence supports. Recorded baseline: reach_passed true (fa2df53ca3437) with terminal_error_m 0.007642608585867386 m (f9b10abd95f4f) inside reach_tolerance_m 0.01 m (fd0407340762b), while sampled_settling_passed is false (fc5b0de5671bc) with terminal_speed_m_s 0.6351726092425104 m/s (f7f96eef8a315) far above the settling speed_limit_m_s 0.02 m/s (f6c63688b547f). Computing record is consistent with budget-truncated planning rather than a converged run: deadline_misses 35 (f4247d77f9243) and mean_update_s 17.303696897140306 s (f12f519656d7c) against control_period_s 0.01 s (fdcd580c300c1), stopping counts User_Requested_Stop 34 (f07ea946b5201) versus Solve_Succeeded 1 (fdadd8fe6513d), initialization_selected 29 (fed20e2cfb7d5) versus noninitialization_selected 6 (f03f310fff089). The improvement feedback for this execution is recorded as complete_improvement_feedback with status no_change_selected and null execution/result (retained handoff, not a current catalog handle), so no candidate profile and no candidate-versus-baseline comparison exists; full warm plans and optimizer iteration traces are not retained (f2d3a0144633d; full_snapshots_available false, f4e1e82ea1469) and no closed-loop counterfactual replay capability exists, so timing, effective-horizon, seeding and projected-model hypotheses stay undiscriminated and no dominant cause is established (fb00225d189d3). No physical improvement can be claimed without a complete accepted evaluation compared with the replayed baseline, and reach-plus-holding would require both frozen conditions. Deferral launches nothing and leaves the single-candidate execution allowance unused; request_check is not warranted because no check is authorized here and verify_adopted_change has no adopted change to inspect, so the workflow ends.",
+        "recommendation_id": "defer-no-candidate-executed",
+        "report": {
+          "artifact_id": "c6b12cfe2262a665e4fb99a823a4ab38c5045d2d83892844d9fac7864bd74f99",
+          "media_type": "application/json"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-2-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "2.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage350-physical-f98c9e8012bd-diagnostic",
+    "reference": {
+      "artifact_id": "e18ac69e7b157b1a85f6d3aab595ed7f1a9a2e7ab0ee9258d35c1757157ce2eb",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "batch": [
+        {
+          "arguments": {
+            "binding": {
+              "artifact_id": "70961033fbf13e4cb4dd54dd9271d977af5361a7d654e725d72d29ec62eb10b4",
+              "media_type": "application/json"
+            },
+            "update_ids": [],
+            "view": "motion"
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-0-tool-0",
+          "tool_id": "diagnosis.inspect_evidence",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "binding": {
+              "artifact_id": "70961033fbf13e4cb4dd54dd9271d977af5361a7d654e725d72d29ec62eb10b4",
+              "media_type": "application/json"
+            },
+            "update_ids": [
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "view": "prediction"
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-0-tool-1",
+          "tool_id": "diagnosis.inspect_evidence",
+          "tool_version": "1.0.0"
+        },
+        {
+          "arguments": {
+            "binding": {
+              "artifact_id": "70961033fbf13e4cb4dd54dd9271d977af5361a7d654e725d72d29ec62eb10b4",
+              "media_type": "application/json"
+            },
+            "update_ids": [
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "view": "plans"
+          },
+          "cache": "reuse",
+          "contract_version": "1.0.0",
+          "evidence": [],
+          "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+          "request_id": "model-0-tool-2",
+          "tool_id": "diagnosis.inspect_evidence",
+          "tool_version": "1.0.0"
+        }
+      ]
+    }
+  },
+  {
+    "run_id": "gvs-stage350-physical-f98c9e8012bd-diagnostic",
+    "reference": {
+      "artifact_id": "52c44ae136546e396509b24608c764e68a4e96b0c3a6a4e21fb4ee7b2f2ce8cb",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "check_results": [],
+        "fact_selectors": {
+          "effective_horizon_and_selection_mode": [
+            {
+              "pointer": "/detail/evidence/observations/updates/1/effective_horizon",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 7
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/2/effective_horizon",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 6
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/3/effective_horizon",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 5
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/4/effective_horizon",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 4
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/6/effective_horizon",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 2
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/7/effective_horizon",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 1
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/horizon",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": 10
+            },
+            {
+              "pointer": "/detail/evidence/observations/initialization_selected",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 29
+            },
+            {
+              "pointer": "/detail/summary/noninitialization_selected",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": 6
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/0/selection/optimization_selected_iteration",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/6/selection/optimization_selected_iteration",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 64
+            }
+          ],
+          "prediction_endpoint_agreement": [
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/3/predicted_next_error_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.04162771013275348
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/3/actual_next_error_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.04778599698437965
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/7/predicted_next_error_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.007929056236766449
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/7/actual_next_error_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.007642608585867386
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/1/velocity/vector_difference_norm_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.021386880777076088
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/4/velocity/vector_difference_norm_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.12414427543983646
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/5/velocity/vector_difference_norm_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.10241202341919153
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/1/projected_state_difference/classification",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": "recorded projected states, not full backend-state error"
+            }
+          ],
+          "settling_window_profile": [
+            {
+              "pointer": "/detail/summary/late_max_error_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.05813810428573256
+            },
+            {
+              "pointer": "/detail/summary/terminal_error_m",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": 0.007642608585867386
+            },
+            {
+              "pointer": "/detail/summary/terminal_speed_m_s",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": 0.6351726092425104
+            },
+            {
+              "pointer": "/detail/late_motion/2/speed_m_s",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": 1.4769184551353305
+            },
+            {
+              "pointer": "/detail/late_motion/4/speed_m_s",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": 0.7758084264853817
+            },
+            {
+              "pointer": "/detail/late_motion/5/speed_m_s",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": 0.6351726092425104
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/3/velocity/measured_speed_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 1.32948286853263
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/4/velocity/measured_speed_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 1.4769184551353305
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/position_limit_m",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/speed_limit_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.02
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/settling/window_s",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": 0.05
+            },
+            {
+              "pointer": "/detail/summary/sampled_settling_passed",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "update_wall_time_and_solve_status": [
+            {
+              "pointer": "/detail/evidence/observations/updates/0/timing_s/update_wall_s",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 17.861911399988458
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/1/timing_s/update_wall_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 17.26270700013265
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/2/timing_s/update_wall_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 13.314411500003189
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/3/timing_s/update_wall_s",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 9.267872299998999
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/4/timing_s/update_wall_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 6.678847400005907
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/5/timing_s/update_wall_s",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 16.064472400117666
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/7/timing_s/update_wall_s",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 3.6398846998345107
+            },
+            {
+              "pointer": "/detail/summary/mean_update_s",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 17.303696897140306
+            },
+            {
+              "pointer": "/detail/summary/control_period_s",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/User_Requested_Stop",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 34
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/Solve_Succeeded",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": 1
+            }
+          ]
+        },
+        "missing_evidence": [
+          {
+            "basis": "inventory.missing_data: control_snapshots.json not retained; summary full_snapshots_available false.",
+            "inventory_id": "source.historical_full_plans",
+            "needed": "Full warm plans and optimizer iteration traces to assess whether initialization-seeded, truncated plans contributed to the residual holding speed.",
+            "source": null,
+            "status": "not_retained",
+            "time_range_s": null,
+            "update_ids": null
+          },
+          {
+            "basis": "read_ledger plans view covered update_ids 27-34 only.",
+            "inventory_id": "source.controller_horizon",
+            "needed": "Per-update effective_horizon for controller updates 0-26 to test whether the reduced horizon is a run-wide pattern; updates 27-34 were read (values 7,6,5,4,2,1).",
+            "source": null,
+            "status": "queried",
+            "time_range_s": null,
+            "update_ids": [
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ]
+          },
+          {
+            "basis": "read_ledger motion view returned 6 samples t = 0.30-0.35 s; full sampled q/qdot retained (35 records).",
+            "inventory_id": "source.backend_motion",
+            "needed": "Sampled backend tip position/speed over t = 0.01-0.29 s to characterize the approach instead of only the final window; only t = 0.30-0.35 s was displayed.",
+            "source": null,
+            "status": "queried",
+            "time_range_s": [
+              0.3,
+              0.35
+            ],
+            "update_ids": null
+          },
+          {
+            "basis": "read_ledger prediction view covered update_ids 27-34 only.",
+            "inventory_id": "source.one_step_predictions",
+            "needed": "One-step prediction and matched measured endpoints for controller updates 0-26 to extend the prediction-versus-measured comparison; updates 27-34 were read.",
+            "source": null,
+            "status": "queried",
+            "time_range_s": null,
+            "update_ids": [
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ]
+          },
+          {
+            "basis": "inventory.capability_gaps: no closed-loop counterfactual replay or causal attribution tool; existing checks use a projected GVS state and bounded horizon, not a full backend replay.",
+            "inventory_id": null,
+            "needed": "A counterfactual replay capability to test whether timing, effective horizon, or warm-start changes explain the residual tip speed.",
+            "source": "closed-loop counterfactual replay / causal attribution capability",
+            "status": "not_retained",
+            "time_range_s": null,
+            "update_ids": null
+          }
+        ],
+        "previous_report": null,
+        "recommendations": [
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+              "media_type": "application/json"
+            },
+            "parameter": null,
+            "rationale": "Historical full warm plans and optimizer iteration traces are not retained and no closed-loop counterfactual replay exists, so no specific parameter change is justified; defer any change until iteration-level evidence is available.",
+            "recommendation_id": "defer-pending-warmplan-retention",
+            "value": null
+          },
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+              "media_type": "application/json"
+            },
+            "parameter": null,
+            "rationale": "Controller weights are outside the physical grant for this phase, and the residual speed could reflect timing, horizon, warm-start, or model factors; defer any settling/tip-speed weighting change pending a saved-state check.",
+            "recommendation_id": "defer-weight-change-outside-grant",
+            "value": null
+          }
+        ],
+        "report": {
+          "attribution": [
+            {
+              "cause": "settling_speed_limit_exceeded",
+              "fact_ids": [
+                "settling_window_profile"
+              ],
+              "reason": "In the final 0.05 s window recorded tip speeds stayed roughly 0.64-1.58 m/s versus the 0.02 m/s settling speed limit while position error fell below the 0.01 m tolerance only at the last sample, so the sampled settle failed on the speed criterion.",
+              "status": "supported"
+            },
+            {
+              "cause": "update_wall_time_exceeds_control_period",
+              "fact_ids": [
+                "update_wall_time_and_solve_status"
+              ],
+              "reason": "Mean update wall time 17.30 s against a 0.01 s control period shows plans were not computed within a single control interval, but the scheduling note states synchronous calls finish before fixed backend steps and wall-clock misses do not inject simulated delay, and a single execution cannot establish a causal contribution to residual motion.",
+              "status": "insufficient_evidence"
+            },
+            {
+              "cause": "reduced_effective_horizon",
+              "fact_ids": [
+                "effective_horizon_and_selection_mode"
+              ],
+              "reason": "Recorded effective_horizon values late in the run (1-7) were below the configured horizon 10, which could limit terminal speed regulation, but no counterfactual replay exists to test the contribution.",
+              "status": "possible"
+            },
+            {
+              "cause": "cold_started_or_prematurely_stopped_plans",
+              "fact_ids": [
+                "effective_horizon_and_selection_mode",
+                "update_wall_time_and_solve_status"
+              ],
+              "reason": "initialization_selected 29 versus noninitialization_selected 6 and 34/35 selections recording 'User_Requested_Stop' indicate mostly initialization-seeded, budget-truncated plans rather than converged warm solves; their contribution to residual tip speed is not established.",
+              "status": "possible"
+            },
+            {
+              "cause": "reach_geometry_failure",
+              "fact_ids": [
+                "settling_window_profile"
+              ],
+              "reason": "reach_passed is recorded true and terminal error 0.007642608585867386 m is below reach_tolerance_m 0.01 m, so reach did not fail.",
+              "status": "ruled_out"
+            },
+            {
+              "cause": "one_step_projection_model_mismatch",
+              "fact_ids": [
+                "prediction_endpoint_agreement"
+              ],
+              "reason": "Predicted versus measured endpoint velocities differ by up to about 0.12 m/s, but the projection is a bounded-horizon projected GVS state probe and cannot by itself explain the whole settling failure, and input/causal equivalence is not proven.",
+              "status": "possible"
+            }
+          ],
+          "facts": [
+            {
+              "evidence": [
+                {
+                  "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "settling_window_profile",
+              "observed": null,
+              "statement": "Within the sampled final settling window (t = 0.30-0.35 s; settling.window_s 0.05), recorded measured backend tip speed stayed far above the settling speed_limit_m_s 0.02 - measured_speed_m_s 1.32948286853263 (t=0.31), 1.4769184551353305 (t=0.32), 0.7758084264853817 (t=0.34) and 0.6351726092425104 (t=0.35) - while recorded tip error fell from late_max_error_m 0.05813810428573256 m to terminal_error_m 0.007642608585867386 m (reaching below position_limit_m 0.01 m only at t=0.35); sampled_settling_passed is recorded false despite terminal_speed_m_s 0.6351726092425104 m/s."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "prediction_endpoint_agreement",
+              "observed": null,
+              "statement": "At matched one-step endpoints for updates 27-34 the recorded projected predictions were close to but not equal to measured tip motion: predicted_next_error_m 0.04162771013275348 vs actual_next_error_m 0.04778599698437965 (update 30) and 0.007929056236766449 vs 0.007642608585867386 (update 34); recorded velocity vector_difference_norm_m_s ranged 0.021386880777076088 to 0.12414427543983646 across the recorded intervals, and the projected-state comparison is labeled 'recorded projected states, not full backend-state error'."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "update_wall_time_and_solve_status",
+              "observed": null,
+              "statement": "Recorded per-update wall times were 17.861911399988458 s (update 27), 17.26270700013265 s (28), 13.314411500003189 s (29), 9.267872299998999 s (30), 6.678847400005907 s (31), 16.064472400117666 s (32) and 3.6398846998345107 s (34), against mean_update_s 17.303696897140306 s and control_period_s 0.01 s, with optimization_solve_s reaching 15.342012400040403 s (27), 15.021668300032616 s (28), 15.111183400033042 s (32), 15.076749800005928 s (33); the summary records 34 'User_Requested_Stop' versus 1 'Solve_Succeeded' selections."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "effective_horizon_and_selection_mode",
+              "observed": null,
+              "statement": "The recorded per-update effective_horizon for the late updates was 7 (update 28), 6 (29), 5 (30), 4 (31), 2 (33) and 1 (34) control intervals, all below the configured recipe.horizon 10; the run records initialization_selected 29 and noninitialization_selected 6, with selection.optimization_selected_iteration 0 for updates 27-28 and 64 for update 33."
+            }
+          ],
+          "gates": [],
+          "limitations": [
+            "Only the final settling window (t = 0.30-0.35 s, 6 motion samples) was read from the motion view; earlier backend samples (t = 0.01-0.29 s) are retained but were not read in this context.",
+            "Only controller updates 27-34 were read from the prediction and plans views; updates 0-26 were not read here.",
+            "Full historical warm plans and optimizer iteration traces are not retained (control_snapshots.json), so iteration-level behavior cannot be inspected.",
+            "No closed-loop counterfactual replay or causal attribution capability exists; single execution and model comparisons do not establish a dominant cause.",
+            "The handed-off summary values deadline_misses 35 and late_max_speed_m_s (1.5810152739742807) are recorded but no matching fact handle was selected from the current catalog.",
+            "Frames: tip vectors are world frame; projected-state differences are recorded GVS coordinates, not full backend-state error; raw controller weight magnitudes do not establish cost-term importance without actual contributions/scaling.",
+            "Scheduling note: synchronous calls finish before fixed backend steps and wall-clock deadline misses do not inject simulated delay; timing is a recorded observation only."
+          ],
+          "recommended_actions": [
+            "If authorized in a later phase, evaluate via a saved-state numerical check whether a terminal tip-speed-related control term or a longer effective horizon improves the holding speed; no check is selected or executed here.",
+            "Restore retention of full warm plans and optimizer iteration traces (control_snapshots.json) so iteration-level diagnosis becomes possible.",
+            "Extend evidence coverage to sampled backend motion before t = 0.30 s and to effective_horizon for updates 0-26 before drawing any global profile conclusion.",
+            "Treat the recorded reach success and sampled settling failure as coexisting observations, not as a proven causal chain."
+          ],
+          "source": {
+            "artifact_id": "70961033fbf13e4cb4dd54dd9271d977af5361a7d654e725d72d29ec62eb10b4",
+            "media_type": "application/json"
+          },
+          "subject": "control"
+        },
+        "request": {
+          "artifact_id": "b683adf256ba2840fbc580e187e965a8c1939a370cdb4d9f382237b68ae2bf11",
+          "media_type": "application/json"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-1-tool",
+      "tool_id": "diagnosis.submit",
+      "tool_version": "2.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage350-physical-f98c9e8012bd-diagnostic",
+    "reference": {
+      "artifact_id": "8839df81e4ce79a8d9258e31b1a21117ea6e632b908ab5995a86c3bd78f6c522",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "check_results": [
+          {
+            "artifact_id": "3d299b46b822fa9261f7f3f04b465bb4d7863bb440fcb70a13484debb393cbc1",
+            "media_type": "application/json"
+          }
+        ],
+        "fact_selectors": {
+          "computation_timing_and_selection": [
+            {
+              "pointer": "/detail/summary/mean_update_s",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 17.303696897140306
+            },
+            {
+              "pointer": "/detail/summary/control_period_s",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/0/timing_s/update_wall_s",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 17.861911399988458
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/7/timing_s/update_wall_s",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 3.6398846998345107
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/1/timing_s/optimization_solve_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 15.021668300032616
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/5/timing_s/optimization_solve_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 15.111183400033042
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/Solve_Succeeded",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": 1
+            },
+            {
+              "pointer": "/detail/summary/stopping_counts/User_Requested_Stop",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 34
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/5/selection/optimization_raw_status",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": "User_Requested_Stop"
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/1/selection/policy_stop_reason",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": "budget_best_feasible"
+            }
+          ],
+          "effective_horizon_and_seeding": [
+            {
+              "pointer": "/detail/evidence/observations/updates/1/effective_horizon",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 7
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/2/effective_horizon",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 6
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/3/effective_horizon",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 5
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/4/effective_horizon",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 4
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/6/effective_horizon",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 2
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/7/effective_horizon",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 1
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/recipe/horizon",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": 10
+            },
+            {
+              "pointer": "/detail/summary/initialization_selected",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": 29
+            },
+            {
+              "pointer": "/detail/summary/noninitialization_selected",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": 6
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/1/selection/optimization_selected_iteration",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 0
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/6/selection/optimization_selected_iteration",
+              "reference": {
+                "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                "media_type": "application/json"
+              },
+              "value": 64
+            }
+          ],
+          "prediction_endpoint_comparison": [
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/3/predicted_next_error_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.04162771013275348
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/3/actual_next_error_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.04778599698437965
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/7/predicted_next_error_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.007929056236766449
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/7/actual_next_error_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.007642608585867386
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/0/tip_difference_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.0059230819406683064
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/1/tip_difference_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.005965298760330236
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/3/tip_difference_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.006240614340723002
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/5/tip_difference_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.0033608919551699626
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/1/velocity/vector_difference_norm_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.021386880777076088
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/4/velocity/vector_difference_norm_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.12414427543983646
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/5/velocity/vector_difference_norm_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.10241202341919153
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/1/projected_state_difference/classification",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": "recorded projected states, not full backend-state error"
+            }
+          ],
+          "reach_outcome": [
+            {
+              "pointer": "/detail/summary/reach_passed",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/detail/summary/reach_tolerance_m",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/terminal_error_m",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": 0.007642608585867386
+            },
+            {
+              "pointer": "/detail/late_motion/5/position_m",
+              "reference": {
+                "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                "media_type": "application/json"
+              },
+              "value": [
+                0.2826142589887697,
+                0.03368252098773442,
+                0.1885424181792968
+              ]
+            }
+          ],
+          "sampled_settle_window_profile": [
+            {
+              "pointer": "/detail/summary/controller/parameters/data/settling/window_s",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": 0.05
+            },
+            {
+              "pointer": "/detail/summary/settling_criteria/position_limit_m",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": 0.01
+            },
+            {
+              "pointer": "/detail/summary/controller/parameters/data/settling/speed_limit_m_s",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": 0.02
+            },
+            {
+              "pointer": "/detail/summary/sampled_settling_passed",
+              "reference": {
+                "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/detail/summary/late_max_error_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.05813810428573256
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/3/velocity/measured_speed_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 1.32948286853263
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/4/velocity/measured_speed_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 1.4769184551353305
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/6/velocity/measured_speed_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.7758084264853817
+            },
+            {
+              "pointer": "/detail/evidence/observations/aligned_intervals/7/velocity/measured_speed_m_s",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 0.6351726092425104
+            }
+          ],
+          "solved_plan_residual_records": [
+            {
+              "pointer": "/detail/evidence/observations/updates/3/returned_constraint_violation",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 9.380295274037664e-06
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/3/selected_constraint_violation",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 9.380295274037664e-06
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/0/projection_residual_rad_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 2.425166546899848
+            },
+            {
+              "pointer": "/detail/evidence/observations/updates/7/projection_residual_rad_m",
+              "reference": {
+                "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                "media_type": "application/json"
+              },
+              "value": 2.3741307545542503
+            }
+          ]
+        },
+        "missing_evidence": [
+          {
+            "basis": "inventory.missing_data: control_snapshots.json not retained; summary full_snapshots_available false (handle ff958921ff137).",
+            "inventory_id": "source.historical_full_plans",
+            "needed": "Full warm plans and optimizer iteration traces to judge whether initialization-seeded, budget-truncated plans contributed to the residual holding speed.",
+            "source": null,
+            "status": "not_retained",
+            "time_range_s": null,
+            "update_ids": null
+          },
+          {
+            "basis": "read_ledger plans view covered update_ids 27-34 only.",
+            "inventory_id": "source.controller_horizon",
+            "needed": "Per-update effective_horizon for controller updates 0-26 was not read in this context; values 7, 6, 5, 4, 2 and 1 were read for updates 28-34, so the reduced-horizon pattern cannot be called run-wide.",
+            "source": null,
+            "status": "queried",
+            "time_range_s": null,
+            "update_ids": [
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ]
+          },
+          {
+            "basis": "read_ledger motion view coverage: sample_times_s [0.30, 0.35000000000000003], 6 samples, while the inventory retains 35 samples for t = 0.01-0.35 s.",
+            "inventory_id": "source.backend_motion",
+            "needed": "Sampled backend tip position and speed for t = 0.01-0.29 s to characterize the approach rather than only the final window; only the six samples t = 0.30-0.35 s were displayed.",
+            "source": null,
+            "status": "queried",
+            "time_range_s": [
+              0.3,
+              0.35000000000000003
+            ],
+            "update_ids": null
+          },
+          {
+            "basis": "read_ledger prediction view covered update_ids 27-34 only.",
+            "inventory_id": "source.one_step_predictions",
+            "needed": "One-step prediction and matched measured endpoint records for controller updates 0-26 to extend the prediction-versus-measured comparison.",
+            "source": null,
+            "status": "queried",
+            "time_range_s": null,
+            "update_ids": [
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ]
+          },
+          {
+            "basis": "inventory.capability_gaps: no closed-loop counterfactual replay or causal attribution tool; existing numerical checks use a projected GVS state and bounded horizon, not a full backend replay.",
+            "inventory_id": null,
+            "needed": "A counterfactual replay or causal-attribution capability to test whether timing, effective horizon, warm-start seeding or the projected model explains the residual tip speed.",
+            "source": "closed-loop counterfactual replay / causal attribution capability",
+            "status": "retained_unavailable",
+            "time_range_s": null,
+            "update_ids": null
+          },
+          {
+            "basis": "These fields appear in the retained handed-off common summary and in improvement_feedback_content of this context, but no matching fact_handle is present in the current fact_catalog.",
+            "inventory_id": null,
+            "needed": "Catalog handles for recorded scalars so they can be cited as report facts: summary deadline_misses 35 and late_max_speed_m_s 1.5810152739742807 m/s, plus improvement-feedback fields measured_computation_s, applied_tension_ranges, one_step_prediction_summary, signed_position_error_m, force_bound_violation_n and the no_change_selected decision.",
+            "source": "common summary detail.summary.deadline_misses / late_max_speed_m_s and complete_improvement_feedback scalar fields",
+            "status": "not_displayed",
+            "time_range_s": null,
+            "update_ids": null
+          }
+        ],
+        "previous_report": {
+          "artifact_id": "6e63e182caddc9ee0b518e9cf612e13f3a1f1a1a8206b4e7ef2d222c2eb9d6f8",
+          "media_type": "application/json"
+        },
+        "recommendations": [
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+              "media_type": "application/json"
+            },
+            "parameter": null,
+            "rationale": "The improvement feedback for this execution is recorded as complete_improvement_feedback with status no_change_selected (a decision artifact is referenced, while execution and result are null and validation_gap is null), so no candidate profile was produced and no candidate-versus-baseline comparison exists; a control-parameter change is not supported by the produced evidence, and adoption would execute nothing.",
+            "recommendation_id": "defer-no-candidate-executed",
+            "value": null
+          },
+          {
+            "action": "defer",
+            "configuration_scope": {
+              "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+              "media_type": "application/json"
+            },
+            "parameter": null,
+            "rationale": "Full warm plans and optimizer iteration traces are not retained (control_snapshots.json), no closed-loop counterfactual replay exists, and no further candidate or saved-state check is authorized in this phase, so the timing, effective-horizon, seeding and projected-model hypotheses cannot be discriminated; defer any change until iteration-level evidence and an authorized saved-state check are available.",
+            "recommendation_id": "defer-pending-warm-plan-retention",
+            "value": null
+          }
+        ],
+        "report": {
+          "attribution": [
+            {
+              "cause": "settling_speed_limit_exceeded",
+              "fact_ids": [
+                "sampled_settle_window_profile"
+              ],
+              "reason": "Recorded measured tip speeds within the sampled 0.05 s settle window stayed roughly 0.64-1.48 m/s against the 0.02 m/s settling speed limit while position error only crossed the 0.01 m limit at the last sample, so the sampled settle failure is recorded on the speed criterion; this is a threshold observation, not a causal explanation.",
+              "status": "supported"
+            },
+            {
+              "cause": "reach_geometry_failure",
+              "fact_ids": [
+                "reach_outcome"
+              ],
+              "reason": "reach_passed is recorded true with terminal_error_m 0.007642608585867386 m below reach_tolerance_m 0.01 m, so the recorded reach task did not fail.",
+              "status": "ruled_out"
+            },
+            {
+              "cause": "update_wall_time_exceeds_control_period",
+              "fact_ids": [
+                "computation_timing_and_selection"
+              ],
+              "reason": "Wall times up to about 17.86 s against a 0.01 s control period, with 34 of 35 selections recorded as User_Requested_Stop, show plans were not produced inside one control interval in wall-clock terms, but the scheduling note states wall-clock misses do not inject simulated delay, a single execution cannot establish a causal contribution, and no counterfactual replay exists to test it.",
+              "status": "insufficient_evidence"
+            },
+            {
+              "cause": "reduced_effective_horizon",
+              "fact_ids": [
+                "effective_horizon_and_seeding"
+              ],
+              "reason": "Recorded effective horizons at the late updates (1-7 control intervals) are below the configured horizon 10, which could limit terminal speed regulation, but the contribution is untested.",
+              "status": "possible"
+            },
+            {
+              "cause": "initialization_seeded_or_budget_truncated_plans",
+              "fact_ids": [
+                "effective_horizon_and_seeding",
+                "computation_timing_and_selection"
+              ],
+              "reason": "initialization_selected 29 versus noninitialization_selected 6 with 34/35 User_Requested_Stop selections indicates mostly initialisation-seeded, budget-truncated plans rather than converged warm solves; their contribution to residual holding speed is not established.",
+              "status": "possible"
+            },
+            {
+              "cause": "one_step_projection_model_mismatch",
+              "fact_ids": [
+                "prediction_endpoint_comparison"
+              ],
+              "reason": "Predicted versus measured endpoint errors and velocities differ by up to about 0.12 m/s, but this is a bounded-horizon projected-state one-step probe that cannot by itself explain the whole sampled settle failure, and it does not establish model or input equivalence.",
+              "status": "possible"
+            }
+          ],
+          "facts": [
+            {
+              "evidence": [
+                {
+                  "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "reach_outcome",
+              "observed": null,
+              "statement": "Recorded reach result: reach_passed true with reach_tolerance_m 0.01 m and terminal_error_m 0.007642608585867386 m; the last sampled world-frame tip position was [0.2826142589887697, 0.03368252098773442, 0.1885424181792968] m, and no reach failure is recorded."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "sampled_settle_window_profile",
+              "observed": null,
+              "statement": "In the sampled final settle window (settling.window_s 0.05, t = 0.30-0.35 s) the recorded measured backend tip speeds were 1.32948286853263 m/s, 1.4769184551353305 m/s, 0.7758084264853817 m/s and 0.6351726092425104 m/s at the recorded late samples, all above the settling speed_limit_m_s 0.02 m/s; recorded tip error fell from late_max_error_m 0.05813810428573256 m to terminal_error_m 0.007642608585867386 m, crossing below position_limit_m 0.01 m only at the last sample, and sampled_settling_passed is recorded false."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "prediction_endpoint_comparison",
+              "observed": null,
+              "statement": "At matched one-step endpoints the recorded projected predictions differed from measured tip motion: predicted_next_error_m 0.04162771013275348 vs actual_next_error_m 0.04778599698437965, and 0.007929056236766449 vs 0.007642608585867386; recorded tip differences were 0.0059230819406683064, 0.005965298760330236, 0.006240614340723002 and 0.0033608919551699626 m on the recorded intervals, velocity vector_difference_norm_m_s ranged 0.021386880777076088 to 0.12414427543983646, and the comparison is labeled 'recorded projected states, not full backend-state error'."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "b7723225688acbc866c86225339e52e6b07049b1dee07ce94f503c5bdee817ce",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "computation_timing_and_selection",
+              "observed": null,
+              "statement": "Recorded per-update wall times reached 17.861911399988458 s (update 27) down to 3.6398846998345107 s (update 34) against control_period_s 0.01 s and mean_update_s 17.303696897140306 s, with optimization_solve_s 15.021668300032616 s (update 28) and 15.111183400033042 s (update 32); plan-selection records are 1 Solve_Succeeded against 34 User_Requested_Stop, with raw status recorded as User_Requested_Stop and policy_stop_reason budget_best_feasible at the recorded updates."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "3bbee35883944f15a9d16241cead9a608a25a427fb20b4b3135930a742cbb04e",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "400c08e19c3afd03f4d32f0762fb81f2e7d9ca02a993d83a3196731feaaff24e",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "effective_horizon_and_seeding",
+              "observed": null,
+              "statement": "Recorded effective_horizon was 7 (update 28), 6 (29), 5 (30), 4 (31), 2 (33) and 1 (34) control intervals, all below the configured recipe.horizon 10; initialization_selected is 29 versus noninitialization_selected 6, with optimization_selected_iteration 0 recorded at update 28 and 64 at update 33."
+            },
+            {
+              "evidence": [
+                {
+                  "artifact_id": "571826dac0eb4aea62830400513dfafe58680a16cd1bc1ac013f8f29499f3bc5",
+                  "media_type": "application/json"
+                }
+              ],
+              "fact_id": "solved_plan_residual_records",
+              "observed": null,
+              "statement": "Recorded plan-quality signals: returned_constraint_violation and selected_constraint_violation for update 30 are both 9.380295274037664e-06, and projection_residual_rad_m was 2.425166546899848 (update 27) and 2.3741307545542503 (update 34); these are recorded residual magnitudes, not a full backend-state or input-equivalence check."
+            }
+          ],
+          "gates": [],
+          "limitations": [
+            "Revision input: the improvement feedback for this execution is recorded as kind complete_improvement_feedback with status no_change_selected (decision artifact referenced; execution and result null; validation_gap null), so no candidate profile was produced and no candidate-versus-baseline numeric comparison is possible here.",
+            "No further candidate or saved-state check is authorized in this phase, so no new local solve, prediction evaluation or counterfactual measurement was produced by this revision.",
+            "Only the final six backend-motion samples (t = 0.30-0.35 s) were displayed in this context; samples for t = 0.01-0.29 s are retained but were not read here.",
+            "Only controller updates 27-34 were read from the prediction and plans views; updates 0-26 were not read here, so effective_horizon coverage is partial (updates 28-34).",
+            "Full historical warm plans and optimizer iteration traces are not retained (control_snapshots.json; full_snapshots_available false), so iteration-level behavior cannot be inspected.",
+            "No closed-loop counterfactual replay or causal-attribution capability exists; single-execution and model comparisons do not establish a dominant cause.",
+            "Handed-off summary/feedback scalars deadline_misses 35, late_max_speed_m_s 1.5810152739742807 m/s, measured_computation_s about 609.45 s, applied tension ranges within the 8 N channel limits, one_step_prediction_summary mean/max tip difference, signed_position_error_m and force_bound_violation_n 0.0 are recorded in the retained handoff but have no matching handle in the current fact catalog, so they are described here rather than cited as report facts.",
+            "Timing is a recorded observation only: wall-clock deadline misses do not inject simulated delay per the scheduling note, and no causal link from timing to residual motion is asserted.",
+            "Frames and scope: tip vectors are world frame; projected-state differences are recorded GVS coordinates, not full backend-state error; raw controller weight magnitudes do not establish cost-term importance; sampled views do not prove absence of unread subsets."
+          ],
+          "recommended_actions": [
+            "Treat the recorded decision (complete_improvement_feedback status no_change_selected, execution/result null) as leaving the execution allowance unused; no control-parameter change is supported by measurements produced in this run.",
+            "If later authorized, test via a saved-state numerical check whether effective-horizon length, warm-start seeding, or a terminal tip-speed-related control term changes the holding speed; no check is selected or executed here.",
+            "Restore retention of full warm plans and optimizer iteration traces (control_snapshots.json) and add a closed-loop counterfactual replay capability to discriminate the timing, horizon, seeding and projection hypotheses.",
+            "Extend reads to sampled backend motion before t = 0.30 s and to effective_horizon for controller updates 0-26 before drawing any run-wide profile conclusion.",
+            "Report the recorded reach success and the sampled settle failure as coexisting observations, not as a proven causal chain."
+          ],
+          "source": {
+            "artifact_id": "70961033fbf13e4cb4dd54dd9271d977af5361a7d654e725d72d29ec62eb10b4",
+            "media_type": "application/json"
+          },
+          "subject": "control"
+        },
+        "request": {
+          "artifact_id": "b683adf256ba2840fbc580e187e965a8c1939a370cdb4d9f382237b68ae2bf11",
+          "media_type": "application/json"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model business decision resolved by flat diagnostic adapter v3.",
+      "request_id": "model-2-tool",
+      "tool_id": "diagnosis.submit",
+      "tool_version": "2.0.0"
+    }
+  }
+]

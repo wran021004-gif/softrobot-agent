@@ -1,0 +1,314 @@
+{
+  "implementation": {
+    "commit": "b6a7d467b276238bfd794006982dc1fbfdbeca8f",
+    "files": {
+      "tools/diagnostic_workflow.py": "ccfd7bfcd1639e8558aa22fb04cca4d406ea9fc6d13f652a33cfb1d52edb51f0",
+      "tools/diagnostic_native.py": "1f70510455bbe421db063c49ca359b0ce2a86cc2ce70b8dfbea5b78085030195",
+      "tools/diagnostic_inventory.py": "5cf0f0bf3b922699f2f6bbbaae15704698bba73326baaa0daae630f1f558a58f",
+      "tools/diagnostic_facts.py": "596bb1135323989c81165456e3db783c0a466601f0c72f8c2902cd359bb2f524",
+      "tools/platform_models.py": "f6c37cb11e48e96e064892f5e399aa15c730d669eecd017a635c78d44e1c7bfa",
+      "tools/platform_handoff.py": "09cade29a1ed94c27cfbad9b25fa2dcbb2797c65442c332ceaba2706a7ae56a7",
+      "tools/platform_diagnosis_coordinator.py": "ae8c0554d0303a76ae6a55eeb7d849f3df63fe27e1fa8a04cbd1f995358b736a",
+      "tools/platform_host.py": "02eea2d0cdb5d6238ae3876e5483b48214fa29b3328ea1117c2d16b2fc6f2562",
+      "tools/platform_store.py": "151e6b21271665c2f9788ba6a9abf9565e1440c1102ba5c0d9f62572421ce547",
+      "schemas/platform_handoff.py": "12e6700053c82545f94cffe9f4c8e877df936d27784246e5cccbd28273f2c48f",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "8931562841b618d0002ae7fc70fe76e76c165d07254827fbef2c17b630ecd03b",
+      "extensions/tendon_family/diagnostic_evidence.py": "6fa010ebec6d7edd52e447cdd91f01ddaaf7d1e617bd466ec7d3d96af18e9b7d",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "887483a5d3340b72dfb11c2a0e654ce01d80df56c3e4360263d7b86eb96dc724",
+      "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "0ed49d536df8ad301fd24662d5402ce6a4361808468f65bf37acce2bc92a8cba",
+      "tools/platform_tools.py": "270d4ec234df0dcdbc835fd3e78f29af2e512a00b0a18a3c14a2dab94f9324b2",
+      "extensions/tendon_family/candidate.py": "ab0f66c32bc596b1f093a322683d49b525a33984d9515243d5c47c8958770df3",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88",
+      "tools/improvement_workflow.py": "5b7e9d1be9112db49f4f8bb603ee724ebf5a0daeaef7b9e1f7063cde10ccf75b",
+      "examples/stage350_physical_pilot.py": "6e54aa2104873c478a3aefba5b020690f61856208dacfa1109a2d2e44cae4e82",
+      "tests/test_stage350_improvement.py": "e85cc41dbb46650563179d3114d1c6bd483fed79c9695f9c4bc2edff9f1ed018",
+      "examples/stage350_experiment.json": "ed64805a7fe19ba14633138e5fbfff5d8898a1f6b2d862cd2eb86ffd5bc06c42"
+    }
+  },
+  "runtime": {
+    "sys_executable": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+    "python_version": "3.11.16",
+    "environment_prefix": "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent"
+  },
+  "source_store": "D:/softrobot-agent/runs/stage341_autonomous_20261001",
+  "source_execution": "5991de53e82747439e87ba8569667e1b",
+  "source_manifest": {
+    "artifact_id": "47d1bd276dc85b770c03804d89da6f0e55076122d88761e97d59cc9bbff1fb2d",
+    "media_type": "application/json"
+  },
+  "provider": {
+    "adapter": "deepseek",
+    "adapter_version": "3.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 200000,
+    "length_recovery": {
+      "enabled": true,
+      "max_tokens": 131072,
+      "timeout_s": 900.0
+    },
+    "max_no_progress": 3,
+    "max_repairs": 2,
+    "max_tokens": 65536,
+    "max_turns": 24,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 2,
+      "max_total": 4
+    },
+    "readonly_batch_limit": 3,
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0,
+    "tool_naming": {
+      "mapping_identity": "0b55f810f8a11a93356d34a7038ded6391f26de4265078355cc5cab6502548cb",
+      "scheme": "readable_v1"
+    }
+  },
+  "order": [
+    "baseline",
+    "single_context",
+    "dual_context"
+  ],
+  "limits": {
+    "baseline": {
+      "model_calls": 0,
+      "tool_calls": 10,
+      "wall_s": 3600.0,
+      "backend_solves": 1,
+      "worker_calls": 0
+    },
+    "organization": {
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 3600.0,
+      "backend_solves": 1,
+      "worker_calls": 0
+    }
+  },
+  "stage_limits": {
+    "model_calls": 200,
+    "tool_calls": 510,
+    "wall_s": 33600.0,
+    "backend_solves": 3,
+    "worker_calls": 0
+  },
+  "physical_limits": {
+    "model_calls": 48,
+    "tool_calls": 130,
+    "wall_s": 10800.0,
+    "backend_solves": 3,
+    "worker_calls": 0
+  },
+  "baseline_gate": "Valid complete execution, valid evaluation, consistent source/execution/profile identities. Task success is not required.",
+  "instructions": {
+    "request": "Inspect the common baseline replay inventory and summary. Formulate an open diagnostic question about terminal reach, sampled holding position/speed, and computation. This request authorizes evidence reading and reports only; a separate later improvement decision may select one geometry delta under the preserved grant. No saved-state checks in this pilot. Do not assume the baseline passed.",
+    "initial": "Read at least one prediction view and one motion or plans view. At most two successful reading turns; independent views can be batched. Then submit a concise initial report with 2-4 exact selected facts, competing hypotheses, explicit gaps and recommendations. Fact selectors point into original query result artifacts (e.g. /detail/summary/terminal_speed_m_s), not observation envelopes. report.source is the supplied binding; recommendation configuration_scope is identities.configuration. Recommendations may defer pending a check. Do not execute or select a numerical check in this phase. Availability gaps must use inventory IDs and not_read, not_retained or retained_unavailable; identify needed information/capability and basis. Unlisted evidence uses source plus explicit basis. Full sampled backend q/qdot is retained, even though motion shows the final window. Raw weight magnitudes do not establish cost-term importance without actual contributions/scaling. Diagnose this baseline replay. Geometry recommendations can be described in recommended_actions; schema recommendations may use defer when no authorized change is justified. Controller weights are outside the physical grant.",
+    "response_initial": "Read the initial report. Choose adopt, defer or reject yourself and independently choose request_check, verify_adopted_change or finish. defer + request_check is valid. Rejecting a recommendation need not end diagnosis. finish ends all workflow work. verify_adopted_change requires adoption of the exact existing parameter/value and only a temporary saved-state comparison. Adoption alone executes nothing. Explain the evidence basis.",
+    "check": "Select one discriminating check based on unresolved hypotheses. Inspect retained evidence as needed to choose the operation and update_id. The host binds the chosen update's exact measured_initial_state and operation-defined input from the inventory controller file; do not copy vectors. prediction_braking uses current actual_tension_n; local_comparison uses previous actual_tension_n and requires the exact adopted parameter/value and a saved effective plan horizon of 0.01 s. prediction_braking compares held recorded input with an instantaneous braking box solution and requires no adoption. Choose update_id >= 1, hypotheses, fixed conditions, metrics, acceptance criteria and work_limits (wall_s <= 300; prediction_evaluations=2 or local_solves=2). Host fixes model.gvs@1.0.0, implicit Euler, 0.002 s step and 0.01 s horizon. At most two successful reading turns, then select the check. Do not overextend a local probe to the entire settling failure. State local_question, competing hypotheses, discriminating_observations and unresolved questions. If hypotheses predict the same result, explicitly say this check cannot separate them. Select a question the stated capability can answer; no dominant-cause claim.",
+    "revision": "Revise the accepted initial diagnosis using the actual improvement_feedback_content and any sealed complete-execution feedback. If a candidate executed, cite a relevant numeric handle from its actual profile result and compare it with the baseline. If no candidate executed, report the recorded decision or exact validation failure without inventing measurements. Separate reach, sampled holding position/speed, computation and workflow completion. No further candidate or saved-state check is authorized. Explain unresolved mechanisms and specific grant gaps.",
+    "response_final": "Read the revised report and actual improvement feedback. Choose final recommendation disposition and finish. Adoption here accepts a report recommendation; it never replaces the baseline or launches work. Claim physical improvement only from a complete accepted evaluation compared with the replayed baseline; reach-plus-holding requires both frozen conditions. Defer/reject without execution is a completed decision workflow, not a successful design.",
+    "improvement": "Read the accepted diagnosis. Make a separate native ImprovementDecision: adopt with an explicit justified delta, or defer/reject with empty changes. Use only the supplied original three-variable geometry grant. Controller weights, materials, force limits and task changes are not authorized. Do not force a geometry change to consume the allowance. State expected measurable effects separately for reach, sampled holding, and computation; uncertainty is allowed. The decision records intent only; the host subsequently validates/builds and may execute exactly one candidate. Unsupported recommendations remain specific future grant/integration work."
+  },
+  "phases": {
+    "request": {
+      "limit": {
+        "model_calls": 3
+      },
+      "protect_project": {
+        "model_calls": 21,
+        "tool_calls": 40,
+        "wall_s": 2400.0
+      }
+    },
+    "initial": {
+      "limit": {
+        "model_calls": 5
+      },
+      "protect_project": {
+        "model_calls": 16,
+        "tool_calls": 30,
+        "wall_s": 1800.0
+      }
+    },
+    "response_initial": {
+      "limit": {
+        "model_calls": 3,
+        "wall_s": 300.0
+      },
+      "protect_project": {
+        "model_calls": 13,
+        "tool_calls": 20,
+        "wall_s": 1200.0
+      }
+    },
+    "check": {
+      "limit": {
+        "model_calls": 6
+      },
+      "protect_project": {
+        "model_calls": 7,
+        "tool_calls": 10,
+        "wall_s": 700.0
+      }
+    },
+    "revision": {
+      "limit": {
+        "model_calls": 4
+      },
+      "protect_project": {
+        "model_calls": 3,
+        "tool_calls": 3,
+        "wall_s": 300.0
+      }
+    },
+    "response_final": {
+      "limit": {
+        "model_calls": 3,
+        "wall_s": 300.0
+      }
+    },
+    "improvement": {
+      "limit": {
+        "model_calls": 3,
+        "wall_s": 300.0
+      },
+      "protect_project": {
+        "model_calls": 7,
+        "tool_calls": 10,
+        "wall_s": 1600.0
+      }
+    }
+  },
+  "permissions": {
+    "request": [
+      "evidence.read",
+      "diagnosis.request"
+    ],
+    "initial": [
+      "diagnosis.inspect_evidence",
+      "evidence.read",
+      "diagnosis.submit"
+    ],
+    "response_initial": [
+      "design.respond_diagnosis"
+    ],
+    "check": [
+      "evidence.read",
+      "diagnosis.inspect_evidence",
+      "diagnosis.check_request"
+    ],
+    "revision": [
+      "diagnosis.submit"
+    ],
+    "response_final": [
+      "design.respond_diagnosis"
+    ],
+    "improvement": [
+      "design.decide_improvement"
+    ]
+  },
+  "tool_bindings": {
+    "diagnosis.request": "1.0.0",
+    "diagnosis.inspect_evidence": "1.0.0",
+    "diagnosis.check_request": "2.0.0",
+    "diagnosis.submit": "2.0.0",
+    "evidence.read": "1.0.0",
+    "design.respond_diagnosis": "2.0.0",
+    "design.decide_improvement": "1.0.0"
+  },
+  "scope": "Original three geometry variables only, zero control parameters, one candidate per organization.",
+  "comparison": "Fresh independent memories; identical replayed baseline. No cross-mode conclusions. Integration pilot, not organizational superiority.",
+  "focused_check": {
+    "status": "passed",
+    "test": "python -m unittest tests.test_stage350_improvement -v",
+    "elapsed_s": 122.415,
+    "implementation_files": {
+      "tools/diagnostic_workflow.py": "ccfd7bfcd1639e8558aa22fb04cca4d406ea9fc6d13f652a33cfb1d52edb51f0",
+      "tools/diagnostic_native.py": "1f70510455bbe421db063c49ca359b0ce2a86cc2ce70b8dfbea5b78085030195",
+      "tools/diagnostic_inventory.py": "5cf0f0bf3b922699f2f6bbbaae15704698bba73326baaa0daae630f1f558a58f",
+      "tools/diagnostic_facts.py": "596bb1135323989c81165456e3db783c0a466601f0c72f8c2902cd359bb2f524",
+      "tools/platform_models.py": "f6c37cb11e48e96e064892f5e399aa15c730d669eecd017a635c78d44e1c7bfa",
+      "tools/platform_handoff.py": "09cade29a1ed94c27cfbad9b25fa2dcbb2797c65442c332ceaba2706a7ae56a7",
+      "tools/platform_diagnosis_coordinator.py": "ae8c0554d0303a76ae6a55eeb7d849f3df63fe27e1fa8a04cbd1f995358b736a",
+      "tools/platform_host.py": "02eea2d0cdb5d6238ae3876e5483b48214fa29b3328ea1117c2d16b2fc6f2562",
+      "tools/platform_store.py": "151e6b21271665c2f9788ba6a9abf9565e1440c1102ba5c0d9f62572421ce547",
+      "schemas/platform_handoff.py": "12e6700053c82545f94cffe9f4c8e877df936d27784246e5cccbd28273f2c48f",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "8931562841b618d0002ae7fc70fe76e76c165d07254827fbef2c17b630ecd03b",
+      "extensions/tendon_family/diagnostic_evidence.py": "6fa010ebec6d7edd52e447cdd91f01ddaaf7d1e617bd466ec7d3d96af18e9b7d",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "887483a5d3340b72dfb11c2a0e654ce01d80df56c3e4360263d7b86eb96dc724",
+      "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "0ed49d536df8ad301fd24662d5402ce6a4361808468f65bf37acce2bc92a8cba",
+      "tools/platform_tools.py": "270d4ec234df0dcdbc835fd3e78f29af2e512a00b0a18a3c14a2dab94f9324b2",
+      "extensions/tendon_family/candidate.py": "ab0f66c32bc596b1f093a322683d49b525a33984d9515243d5c47c8958770df3",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88",
+      "tools/improvement_workflow.py": "5b7e9d1be9112db49f4f8bb603ee724ebf5a0daeaef7b9e1f7063cde10ccf75b",
+      "examples/stage350_physical_pilot.py": "6e54aa2104873c478a3aefba5b020690f61856208dacfa1109a2d2e44cae4e82",
+      "tests/test_stage350_improvement.py": "e85cc41dbb46650563179d3114d1c6bd483fed79c9695f9c4bc2edff9f1ed018",
+      "examples/stage350_experiment.json": "ed64805a7fe19ba14633138e5fbfff5d8898a1f6b2d862cd2eb86ffd5bc06c42"
+    },
+    "cases": [
+      "single_context adopt with registered builder/simulation/evaluation/profile and numeric feedback revision",
+      "dual_context same path with explicit acceptance provenance",
+      "dual_context defer with zero backend calls",
+      "artifact-only report rejected; unauthorized controller weight delta rejected"
+    ],
+    "scope": "Scripted native responses and mocked backend returning historical bytes. No real provider requests, backend solves or new physical evidence. Real registered host tool/evaluation/profile and provenance logic executed.",
+    "earlier_attempt": {
+      "elapsed_s": 86.744,
+      "status": "failed",
+      "findings": [
+        "SessionInput requires a model configuration even when provider allowance is zero; retained frozen source model settings.",
+        "Portable export confused JSON-schema properties with artifact references; now requires string identity and media type."
+      ]
+    },
+    "grant": "Original three geometry dimensions only; controller/task/material/actuator grants unchanged."
+  },
+  "diagnostic_freeze": {
+    "commit": "461f2063f0b4b357e5d8c4d674978e2c8436513e",
+    "files": {
+      "tools/diagnostic_workflow.py": "afa9f80b7425bd6871929fa11747aeeb3a056284e883f04aa553e96b803ba463",
+      "tools/diagnostic_native.py": "1f70510455bbe421db063c49ca359b0ce2a86cc2ce70b8dfbea5b78085030195",
+      "tools/diagnostic_inventory.py": "5cf0f0bf3b922699f2f6bbbaae15704698bba73326baaa0daae630f1f558a58f",
+      "tools/diagnostic_facts.py": "596bb1135323989c81165456e3db783c0a466601f0c72f8c2902cd359bb2f524",
+      "tools/platform_models.py": "f6c37cb11e48e96e064892f5e399aa15c730d669eecd017a635c78d44e1c7bfa",
+      "tools/platform_handoff.py": "09cade29a1ed94c27cfbad9b25fa2dcbb2797c65442c332ceaba2706a7ae56a7",
+      "tools/platform_diagnosis_coordinator.py": "e81225ed2e72e4a9b09bb3be6b1bdb8d7260a06bae665978efabf276a6952c4e",
+      "tools/platform_host.py": "02eea2d0cdb5d6238ae3876e5483b48214fa29b3328ea1117c2d16b2fc6f2562",
+      "tools/platform_store.py": "151e6b21271665c2f9788ba6a9abf9565e1440c1102ba5c0d9f62572421ce547",
+      "schemas/platform_handoff.py": "12e6700053c82545f94cffe9f4c8e877df936d27784246e5cccbd28273f2c48f",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "e537115df4246ec7205a9660f909b86a76296aa39a0adac9075e016931cd43bd",
+      "extensions/tendon_family/diagnostic_evidence.py": "6fa010ebec6d7edd52e447cdd91f01ddaaf7d1e617bd466ec7d3d96af18e9b7d",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "887483a5d3340b72dfb11c2a0e654ce01d80df56c3e4360263d7b86eb96dc724",
+      "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "b2865befc809d3b599d8fb6d18f13301bc1e1c25e1d91bc1dfdb72185833af10",
+      "tools/platform_tools.py": "270d4ec234df0dcdbc835fd3e78f29af2e512a00b0a18a3c14a2dab94f9324b2",
+      "extensions/tendon_family/candidate.py": "ab0f66c32bc596b1f093a322683d49b525a33984d9515243d5c47c8958770df3",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88"
+    }
+  }
+}

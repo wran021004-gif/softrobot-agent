@@ -1,0 +1,38 @@
+{
+  "status": "Final accepted report and decision reviewed",
+  "reviewer": "Primary implementer; not independent blind review",
+  "workflow": "Own accepted diagnosis, explicit acceptance-provenance handoff, separate defer/empty delta, no-execution feedback, accepted revision and final response. No candidate executed. Portable export failed afterward and requires offline cross-store closure.",
+  "positive_findings": [
+    "Keeps wall-clock overruns separate from simulated physical delay.",
+    "Acknowledges no post-change measurements and leaves geometry effect unquantified.",
+    "Preserves hypothesis uncertainty and names unretained optimizer traces separately."
+  ],
+  "findings": [
+    {
+      "severity": "substantive_issue",
+      "field": "initial and revised prediction_endpoint_comparison",
+      "assessment": "The claimed velocity-difference range 0.021386880777076088 to 0.12414427543983646 m/s is not the range of the eight displayed intervals. Their actual minimum and maximum are 0.018534244890083693 and 0.1534294782532689 m/s. The selected values are exact, but the range claim omits other displayed values."
+    },
+    {
+      "severity": "substantive_issue",
+      "field": "revision limitations/backend_motion gap",
+      "assessment": "The claim that only 0.30-0.35 s motion was displayed overlooks measured 0.28 and 0.29 s endpoints returned by the prediction query. Scoped queried declarations passing the validator do not validate this broader unread prose."
+    },
+    {
+      "severity": "minor_issue",
+      "field": "revision settling attribution",
+      "assessment": "The reported roughly 0.64-1.48 m/s range excludes the 1.5810152739742807 m/s sample present in handed-over feedback. The description is defensible only as a range of the cited subset, not the whole settling window."
+    },
+    {
+      "severity": "minor_issue",
+      "field": "settling attribution",
+      "assessment": "Speed failure is established, but the holding window also fails its position condition. It should not be presented as exclusively a speed failure."
+    },
+    {
+      "severity": "minor_issue",
+      "field": "improvement decision rationale",
+      "assessment": "Reach acceptance rules out a recorded reach failure; it does not rule out geometry influencing settling, controller behavior or computational effort. Deferral for insufficient evidence is narrower and supported."
+    }
+  ],
+  "citation_review": "Exact selectors and live coverage acceptance are recorded separately in final_audit.json; raw outputs unchanged."
+}

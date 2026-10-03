@@ -1,0 +1,1667 @@
+{
+  "diagnostic": [
+    {
+      "label": "fresh_dual_pilot",
+      "status": "incomplete",
+      "reason": "PHASE_INCOMPLETE revision: CONTEXT_LIMIT_REQUIRED_STATE_TOO_LARGE: narrow tools or raise explicit byte limit",
+      "used": {
+        "tool_calls": 9,
+        "model_calls": 5,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 228.11199999926612
+      },
+      "limits": {
+        "backend_solves": 0,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "pending": [],
+      "attempts_by_phase": {
+        "request": 1,
+        "response_initial": 1,
+        "initial": 2,
+        "check": 1
+      },
+      "token_usage_records": 5,
+      "tokens": {
+        "prompt_tokens": 159167,
+        "completion_tokens": 47368,
+        "total_tokens": 206535
+      },
+      "monetary_cost": null,
+      "token_qualification": "Reported usage only; a failed transport may return no usage.",
+      "accepted_reports": [
+        {
+          "key": "initial_report",
+          "reference": {
+            "artifact_id": "b1075f75080aa73ac8ec191e5059ec4b0c309727b7e77e196572ef6ff7efba72",
+            "media_type": "application/json"
+          },
+          "facts": 4,
+          "exact_selectors": 31,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        }
+      ],
+      "failed_receipts": [],
+      "model_failures": []
+    },
+    {
+      "label": "fresh_dual_revalidation",
+      "status": "completed",
+      "reason": "Check feedback consumed, revised report and final decision delivered.",
+      "used": {
+        "tool_calls": 15,
+        "model_calls": 9,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 449.93800000008196
+      },
+      "limits": {
+        "backend_solves": 0,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "pending": [],
+      "attempts_by_phase": {
+        "request": 1,
+        "response_initial": 1,
+        "response_final": 1,
+        "initial": 3,
+        "check": 1,
+        "revision": 2
+      },
+      "token_usage_records": 9,
+      "tokens": {
+        "prompt_tokens": 305777,
+        "completion_tokens": 99062,
+        "total_tokens": 404839
+      },
+      "monetary_cost": null,
+      "token_qualification": "Reported usage only; a failed transport may return no usage.",
+      "accepted_reports": [
+        {
+          "key": "initial_report",
+          "reference": {
+            "artifact_id": "9bccca967726445aa51bca5cd2a2ab8a9b8248198c8b822cec9511fd6fb3344a",
+            "media_type": "application/json"
+          },
+          "facts": 4,
+          "exact_selectors": 51,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        },
+        {
+          "key": "revised_report",
+          "reference": {
+            "artifact_id": "3615af672744575dd7c68451934beb726f4525b7afbdcabc2d097651cb3e63e5",
+            "media_type": "application/json"
+          },
+          "facts": 6,
+          "exact_selectors": 73,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        }
+      ],
+      "failed_receipts": [
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.1880000000819564,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "GAP_CONTRADICTS_READ_LEDGER: source.backend_motion includes queried coverage; use queried for the entry, or explicit update_ids/time_range_s for an unread subset",
+          "execution_id": "7967fca4152d4a1f8fd1a3ec12218d48",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": null,
+          "request_id": "model-4-tool",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "diagnosis.submit",
+          "tool_version": "2.0.0"
+        }
+      ],
+      "model_failures": []
+    },
+    {
+      "label": "initial_report_validation",
+      "status": "completed",
+      "reason": "Accepted initial report; partial capability validation only, no check or complete diagnostic workflow.",
+      "used": {
+        "tool_calls": 9,
+        "model_calls": 5,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 318.87399999960326
+      },
+      "limits": {
+        "backend_solves": 0,
+        "model_calls": 8,
+        "tool_calls": 20,
+        "wall_s": 1200.0,
+        "worker_calls": 0
+      },
+      "pending": [],
+      "attempts_by_phase": {
+        "request": 1,
+        "initial": 4
+      },
+      "token_usage_records": 5,
+      "tokens": {
+        "prompt_tokens": 193748,
+        "completion_tokens": 71324,
+        "total_tokens": 265072
+      },
+      "monetary_cost": null,
+      "token_qualification": "Reported usage only; a failed transport may return no usage.",
+      "accepted_reports": [
+        {
+          "key": "initial_report",
+          "reference": {
+            "artifact_id": "c6966290c1b512775f607e08b74c9da2ab9429d53bcd0b1d9beb13dbc500f046",
+            "media_type": "application/json"
+          },
+          "facts": 11,
+          "exact_selectors": 74,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        }
+      ],
+      "failed_receipts": [
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.1400000001303852,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "GAP_CONTRADICTS_READ_LEDGER: source.backend_motion includes queried coverage; use queried for the entry, or explicit update_ids/time_range_s for an unread subset",
+          "execution_id": "bd9f6dc9f9eb41719ff694327abb857e",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": null,
+          "request_id": "model-2-tool",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "diagnosis.submit",
+          "tool_version": "2.0.0"
+        }
+      ],
+      "model_failures": []
+    },
+    {
+      "label": "pair1_dual_context",
+      "status": "incomplete",
+      "reason": "PHASE_INCOMPLETE check: DEEPSEEK_NETWORK_ERROR",
+      "used": {
+        "tool_calls": 10,
+        "model_calls": 6,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 124.09399999957532
+      },
+      "limits": {
+        "backend_solves": 0,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "pending": [],
+      "attempts_by_phase": {
+        "request": 2,
+        "response_initial": 1,
+        "initial": 2,
+        "check": 1
+      },
+      "token_usage_records": 5,
+      "tokens": {
+        "prompt_tokens": 94810,
+        "completion_tokens": 23687,
+        "total_tokens": 118497
+      },
+      "monetary_cost": null,
+      "token_qualification": "Reported usage only; a failed transport may return no usage.",
+      "accepted_reports": [
+        {
+          "key": "initial_report",
+          "reference": {
+            "artifact_id": "b3230af6fdd6e08051b78cea43923a7668a8f7748aa4b78afed9e680c5a9ca34",
+            "media_type": "application/json"
+          },
+          "facts": 4,
+          "exact_selectors": 26,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        }
+      ],
+      "failed_receipts": [
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model-transport",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 1,
+            "tool_calls": 0,
+            "wall_s": 5.047000000020489,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "DEEPSEEK_NETWORK_ERROR",
+          "execution_id": "e38b87465db4439f8f102db4106b763e",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": {
+            "artifact_id": "a26fdb9b2da6c0ba04a566cee384b26821eb5f1159b38cf1fa00e4729a00a1f8",
+            "media_type": "application/json"
+          },
+          "request_id": "model-2",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "model.deepseek",
+          "tool_version": "4.0.0"
+        }
+      ],
+      "model_failures": []
+    },
+    {
+      "label": "pair1_single_context",
+      "status": "completed",
+      "reason": "Check feedback consumed, revised report and final decision delivered.",
+      "used": {
+        "tool_calls": 13,
+        "model_calls": 10,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 556.4040000003297
+      },
+      "limits": {
+        "backend_solves": 0,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "pending": [],
+      "attempts_by_phase": {
+        "request": 1,
+        "initial": 3,
+        "response_initial": 1,
+        "check": 1,
+        "revision": 3,
+        "response_final": 1
+      },
+      "token_usage_records": 10,
+      "tokens": {
+        "prompt_tokens": 396317,
+        "completion_tokens": 128530,
+        "total_tokens": 524847
+      },
+      "monetary_cost": null,
+      "token_qualification": "Reported usage only; a failed transport may return no usage.",
+      "accepted_reports": [
+        {
+          "key": "initial_report",
+          "reference": {
+            "artifact_id": "fc1f0cbcc6877dc58a4f2954cc0fbe385da8085412fbe8ddb8cc5ffc1c6786f2",
+            "media_type": "application/json"
+          },
+          "facts": 4,
+          "exact_selectors": 47,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        },
+        {
+          "key": "revised_report",
+          "reference": {
+            "artifact_id": "8a4cbd46666fb41ad594f18cc25b71daa414dba9fba730fe9e79e6025c6d69e6",
+            "media_type": "application/json"
+          },
+          "facts": 6,
+          "exact_selectors": 39,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        }
+      ],
+      "failed_receipts": [
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.0630000000819564,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "GAP_CONTRADICTS_READ_LEDGER: source.backend_motion includes queried coverage; use queried for the entry, or explicit update_ids/time_range_s for an unread subset",
+          "execution_id": "e37222d9c9334a35b9f7a0c0a3b8b862",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": null,
+          "request_id": "model-2-tool",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "diagnosis.submit",
+          "tool_version": "2.0.0"
+        },
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.077999999979511,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "GAP_SOURCE_REQUIRED: name unlisted evidence and explicit basis",
+          "execution_id": "d2f8d59824774b79a95937e384969f72",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": null,
+          "request_id": "model-6-tool",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "diagnosis.submit",
+          "tool_version": "2.0.0"
+        },
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model-transport",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 1,
+            "tool_calls": 0,
+            "wall_s": 81.0,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "INVALID_TOOL_CALL_ENVELOPE: business_parameters: UNKNOWN_OR_OUT_OF_SCOPE_FACT_HANDLE ffe67debfcfa48: copy a handle from this context fact_catalog or query the needed evidence",
+          "execution_id": "7204f0582d544baca430f10a5e3c7103",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": {
+            "artifact_id": "f13ea96c90c81ec9dbd9573efe0ddb891311f95a98c0ab9d00c4329851d4d4c9",
+            "media_type": "application/json"
+          },
+          "request_id": "model-7",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "model.deepseek",
+          "tool_version": "4.0.0"
+        }
+      ],
+      "model_failures": []
+    },
+    {
+      "label": "pair2_dual_context",
+      "status": "completed",
+      "reason": "Check feedback consumed, revised report and final decision delivered.",
+      "used": {
+        "tool_calls": 16,
+        "model_calls": 13,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 908.8439999988768
+      },
+      "limits": {
+        "backend_solves": 0,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "pending": [],
+      "attempts_by_phase": {
+        "request": 1,
+        "response_initial": 1,
+        "response_final": 1,
+        "initial": 4,
+        "check": 2,
+        "revision": 4
+      },
+      "token_usage_records": 13,
+      "tokens": {
+        "prompt_tokens": 458849,
+        "completion_tokens": 214073,
+        "total_tokens": 672922
+      },
+      "monetary_cost": null,
+      "token_qualification": "Reported usage only; a failed transport may return no usage.",
+      "accepted_reports": [
+        {
+          "key": "initial_report",
+          "reference": {
+            "artifact_id": "30f92bfa82adbf1164cc60fd2250c2893ac8b3960ea5dee108ffe7fc50616df5",
+            "media_type": "application/json"
+          },
+          "facts": 4,
+          "exact_selectors": 29,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        },
+        {
+          "key": "revised_report",
+          "reference": {
+            "artifact_id": "07bdce780d0716409faedf2df17c2ea3f5e8df6cbee1ec572bd2d2e9570b4cb5",
+            "media_type": "application/json"
+          },
+          "facts": 7,
+          "exact_selectors": 57,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        }
+      ],
+      "failed_receipts": [
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.1100000001024455,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "GAP_CONTENT_DISPLAYED: source.backend_motion has facts currently displayed in the catalog; use queried and describe any missing coverage",
+          "execution_id": "53f060b214c242cb90cf868a0bc8ff39",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": null,
+          "request_id": "model-1-tool",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "diagnosis.submit",
+          "tool_version": "2.0.0"
+        },
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model-transport",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 1,
+            "tool_calls": 0,
+            "wall_s": 98.40599999995902,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls: EXACTLY_ONE_TOOL_CALL_REQUIRED: received 0",
+          "execution_id": "0ecb93494f8e42088349e105c7ee0df5",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": {
+            "artifact_id": "659780ba4590a52f3a8b2beefcc7c8de978e7c4c2ef1d3d8a575c8f64af886e8",
+            "media_type": "application/json"
+          },
+          "request_id": "model-2",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "model.deepseek",
+          "tool_version": "4.0.0"
+        },
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.093000000109896,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "GAP_WITHOUT_READ_RECEIPT: source.backend_motion; use not_read or perform the supported query",
+          "execution_id": "35fa2c5cf3c94f50a3d8a2457352603a",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": null,
+          "request_id": "model-6-tool",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "diagnosis.submit",
+          "tool_version": "2.0.0"
+        },
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.0939999998081475,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "GAP_CONTRADICTS_READ_LEDGER: source.backend_motion includes queried coverage; use queried for the entry, or explicit update_ids/time_range_s for an unread subset",
+          "execution_id": "ee3fac0b24e54858924acadb6a5acf7b",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": null,
+          "request_id": "model-7-tool",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "diagnosis.submit",
+          "tool_version": "2.0.0"
+        },
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model-transport",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 1,
+            "tool_calls": 0,
+            "wall_s": 112.63999999989755,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "INVALID_TOOL_CALL_ENVELOPE: business_parameters: UNKNOWN_OR_OUT_OF_SCOPE_FACT_HANDLE fc97a73fa2f9a: copy a handle from this context fact_catalog or query the needed evidence",
+          "execution_id": "1cfd8206efcc49bcbd1670c26fc1adaa",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": {
+            "artifact_id": "44186230ba9f8a69d9bf767e0eee2e46b9ba529a3306d17ea6e3a784551eebb5",
+            "media_type": "application/json"
+          },
+          "request_id": "model-8",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "model.deepseek",
+          "tool_version": "4.0.0"
+        }
+      ],
+      "model_failures": []
+    },
+    {
+      "label": "pair2_single_context",
+      "status": "completed",
+      "reason": "Check feedback consumed, revised report and final decision delivered.",
+      "used": {
+        "tool_calls": 13,
+        "model_calls": 9,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 550.1429999999236
+      },
+      "limits": {
+        "backend_solves": 0,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "pending": [],
+      "attempts_by_phase": {
+        "request": 1,
+        "initial": 3,
+        "response_initial": 1,
+        "check": 1,
+        "revision": 2,
+        "response_final": 1
+      },
+      "token_usage_records": 9,
+      "tokens": {
+        "prompt_tokens": 323150,
+        "completion_tokens": 124097,
+        "total_tokens": 447247
+      },
+      "monetary_cost": null,
+      "token_qualification": "Reported usage only; a failed transport may return no usage.",
+      "accepted_reports": [
+        {
+          "key": "initial_report",
+          "reference": {
+            "artifact_id": "640bbcdbc1a820d69730815f8120eba06522222ff4c88bc411adb45ed39c5de3",
+            "media_type": "application/json"
+          },
+          "facts": 4,
+          "exact_selectors": 20,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        },
+        {
+          "key": "revised_report",
+          "reference": {
+            "artifact_id": "7878381a39373c1b06a4180e4805367955e44ae77fd51cf38f8ad240fc7b4d55",
+            "media_type": "application/json"
+          },
+          "facts": 10,
+          "exact_selectors": 42,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        }
+      ],
+      "failed_receipts": [
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.047000000020489,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "GAP_WITHOUT_READ_RECEIPT: source.saved_projected_states; use not_read or perform the supported query",
+          "execution_id": "c1160ad36a684cb881eba0cde0b303f8",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": null,
+          "request_id": "model-2-tool",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "diagnosis.submit",
+          "tool_version": "2.0.0"
+        },
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.1409999998286366,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "GAP_WITHOUT_READ_RECEIPT: source.saved_projected_states; use not_read or perform the supported query",
+          "execution_id": "1a1b061366d84415859122f8d89212b3",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": null,
+          "request_id": "model-6-tool",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "diagnosis.submit",
+          "tool_version": "2.0.0"
+        }
+      ],
+      "model_failures": []
+    }
+  ],
+  "physical": [
+    {
+      "label": "baseline",
+      "status": "completed",
+      "reason": "Consistent valid complete baseline and fixed evaluation/profile; task acceptance is not a launch requirement.",
+      "used": {
+        "tool_calls": 3,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 611.5779999999795
+      },
+      "limits": {
+        "backend_solves": 1,
+        "model_calls": 0,
+        "tool_calls": 10,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "pending": [],
+      "attempts_by_phase": {},
+      "token_usage_records": 0,
+      "tokens": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      },
+      "monetary_cost": null,
+      "token_qualification": "Reported usage only; a failed transport may return no usage.",
+      "accepted_reports": [],
+      "failed_receipts": [],
+      "model_failures": [],
+      "gate_passed": true,
+      "execution": {
+        "status": "evaluated",
+        "receipts": {
+          "simulation": {
+            "contract_version": "1.2.0",
+            "request_id": "complete-simulation",
+            "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+            "caller": "improvement-executor",
+            "tool_id": "simulation.run",
+            "tool_version": "1.0.0",
+            "result_contract": "BackendResult",
+            "result_version": "1.0.0",
+            "execution_status": "completed",
+            "solver_status": "completed",
+            "analysis_status": "not_assessed",
+            "task_success": null,
+            "output": {
+              "artifact_id": "9d56ce6bf207f79d57d239fc9e951fae84ebd33ca256b7cd0de8770ac4e026f5",
+              "media_type": "application/json"
+            },
+            "error": null,
+            "cache_hit": false,
+            "original_execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+            "charged": {
+              "tool_calls": 1,
+              "model_calls": 0,
+              "backend_solves": 1,
+              "worker_calls": 0,
+              "wall_s": 609.4529999999795
+            }
+          },
+          "evaluation": {
+            "contract_version": "1.2.0",
+            "request_id": "complete-evaluation",
+            "execution_id": "1d6df61150ba496d8af699050bc64493",
+            "caller": "improvement-executor",
+            "tool_id": "evaluation.run",
+            "tool_version": "1.0.0",
+            "result_contract": "EvaluationResult",
+            "result_version": "1.2.0",
+            "execution_status": "completed",
+            "solver_status": "not_run",
+            "analysis_status": "valid",
+            "task_success": true,
+            "output": {
+              "artifact_id": "56e93bb7995cd3870fbb6b9fafa9dc6a88f2e4d5900e1ce81b41dbe2c4bc32c0",
+              "media_type": "application/json"
+            },
+            "error": null,
+            "cache_hit": false,
+            "original_execution_id": null,
+            "charged": {
+              "tool_calls": 1,
+              "model_calls": 0,
+              "backend_solves": 0,
+              "worker_calls": 0,
+              "wall_s": 1.0
+            }
+          },
+          "profile": {
+            "contract_version": "1.2.0",
+            "request_id": "complete-profile",
+            "execution_id": "34797a135d1a43c29a9415a34dabae79",
+            "caller": "improvement-executor",
+            "tool_id": "control.profile_report",
+            "tool_version": "1.0.0",
+            "result_contract": "ProfileOutput",
+            "result_version": "1.0.0",
+            "execution_status": "completed",
+            "solver_status": "not_run",
+            "analysis_status": "not_assessed",
+            "task_success": null,
+            "output": {
+              "artifact_id": "7e0c52e0ee6dd8e9124078f3c13fc969dda3c85b4ffd54f061b7bd6709ee7520",
+              "media_type": "application/json"
+            },
+            "error": null,
+            "cache_hit": false,
+            "original_execution_id": null,
+            "charged": {
+              "tool_calls": 1,
+              "model_calls": 0,
+              "backend_solves": 0,
+              "worker_calls": 0,
+              "wall_s": 1.125
+            }
+          }
+        },
+        "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+        "configuration": {
+          "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+          "media_type": "application/json"
+        },
+        "design_statement": {
+          "physical_changes": [
+            {
+              "path": "components/near/length_m",
+              "baseline_value": 0.16,
+              "effective_value": 0.15,
+              "baseline_delta": -0.010000000000000009,
+              "unit": "m",
+              "category": "length"
+            },
+            {
+              "path": "components/near/sections/0/section/parameters/semi_y_m",
+              "baseline_value": 0.01,
+              "effective_value": 0.0095,
+              "baseline_delta": -0.0005000000000000004,
+              "unit": "m",
+              "category": "section"
+            },
+            {
+              "path": "components/near/sections/0/section/parameters/semi_z_m",
+              "baseline_value": 0.008,
+              "effective_value": 0.0076,
+              "baseline_delta": -0.0004000000000000002,
+              "unit": "m",
+              "category": "section"
+            },
+            {
+              "path": "components/near/physics/young_pa",
+              "baseline_value": 8000000.0,
+              "effective_value": 7200000.0,
+              "baseline_delta": -800000.0,
+              "unit": "Pa",
+              "category": "material"
+            },
+            {
+              "path": "components/far/length_m",
+              "baseline_value": 0.12,
+              "effective_value": 0.11,
+              "baseline_delta": -0.009999999999999995,
+              "unit": "m",
+              "category": "length"
+            },
+            {
+              "path": "components/far/sections/0/section/parameters/height_z_m",
+              "baseline_value": 0.01,
+              "effective_value": 0.0095,
+              "baseline_delta": -0.0005000000000000004,
+              "unit": "m",
+              "category": "section"
+            },
+            {
+              "path": "components/far/sections/0/section/parameters/width_y_m",
+              "baseline_value": 0.014,
+              "effective_value": 0.0133,
+              "baseline_delta": -0.000700000000000001,
+              "unit": "m",
+              "category": "section"
+            },
+            {
+              "path": "components/far/sections/1/section/parameters/height_z_m",
+              "baseline_value": 0.009,
+              "effective_value": 0.008549999999999999,
+              "baseline_delta": -0.00045000000000000075,
+              "unit": "m",
+              "category": "section"
+            },
+            {
+              "path": "components/far/sections/1/section/parameters/width_y_m",
+              "baseline_value": 0.012,
+              "effective_value": 0.0114,
+              "baseline_delta": -0.0005999999999999998,
+              "unit": "m",
+              "category": "section"
+            },
+            {
+              "path": "components/far/physics/young_pa",
+              "baseline_value": 6000000.0,
+              "effective_value": 5400000.0,
+              "baseline_delta": -600000.0,
+              "unit": "Pa",
+              "category": "material"
+            }
+          ],
+          "semantic_provenance": {
+            "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+            "material_groups": {
+              "far": {
+                "bending_ei_nm2": null,
+                "bending_viscosity_nm2_s": [
+                  0.0003,
+                  0.0004
+                ],
+                "density_kg_m3": 1050.0,
+                "line_density_kg_m": null,
+                "mode": "material",
+                "young_pa": 5400000.0
+              },
+              "near": {
+                "bending_ei_nm2": null,
+                "bending_viscosity_nm2_s": [
+                  0.0005,
+                  0.0007
+                ],
+                "density_kg_m3": 1100.0,
+                "line_density_kg_m": null,
+                "mode": "material",
+                "young_pa": 7200000.0
+              }
+            },
+            "selections": {
+              "design/material_scenario": "compliant",
+              "design/section_scale": 0.95
+            },
+            "source": "Frozen experiment semantic_source; original per-section material parameters",
+            "source_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4"
+          },
+          "physical_summary": {
+            "physics_identity": "c723a7d01c9789b26ba0e445e1e282a003ef9cfd53e6e189f25aa50e59268589",
+            "sections": [
+              {
+                "component": "near",
+                "length_m": 0.15,
+                "material": {
+                  "bending_ei_nm2": null,
+                  "bending_viscosity_nm2_s": [
+                    0.0005,
+                    0.0007
+                  ],
+                  "density_kg_m3": 1100.0,
+                  "line_density_kg_m": null,
+                  "mode": "material",
+                  "young_pa": 7200000.0
+                },
+                "mass_kg": 0.0374257932822152,
+                "cells": 12,
+                "area_range_m2": [
+                  0.00022682298958918306,
+                  0.00022682298958918306
+                ],
+                "cell_inertia_diagonal_kg_m2": [
+                  [
+                    1.1540399299376402e-07,
+                    8.564528930755817e-08,
+                    1.1097787313545761e-07
+                  ],
+                  [
+                    1.1540399299376402e-07,
+                    8.564528930755817e-08,
+                    1.1097787313545761e-07
+                  ]
+                ],
+                "cell_stiffness_nm_rad": [
+                  [
+                    1.8865866065286547,
+                    2.9477915727010235
+                  ],
+                  [
+                    1.8865866065286547,
+                    2.9477915727010235
+                  ]
+                ],
+                "cell_damping_nm_s_rad": [
+                  [
+                    0.04,
+                    0.056
+                  ],
+                  [
+                    0.04,
+                    0.056
+                  ]
+                ]
+              },
+              {
+                "component": "far",
+                "length_m": 0.11,
+                "material": {
+                  "bending_ei_nm2": null,
+                  "bending_viscosity_nm2_s": [
+                    0.0003,
+                    0.0004
+                  ],
+                  "density_kg_m3": 1050.0,
+                  "line_density_kg_m": null,
+                  "mode": "material",
+                  "young_pa": 5400000.0
+                },
+                "mass_kg": 0.012890738103298613,
+                "cells": 12,
+                "area_range_m2": [
+                  9.860125868055555e-05,
+                  0.0001250745920138889
+                ],
+                "cell_inertia_diagonal_kg_m2": [
+                  [
+                    2.651362945725062e-08,
+                    1.7408297483880295e-08,
+                    2.5964706594223954e-08
+                  ],
+                  [
+                    1.625638963011029e-08,
+                    1.2480527663054697e-08,
+                    1.7066775264606748e-08
+                  ]
+                ],
+                "cell_stiffness_nm_rad": [
+                  [
+                    0.549529104358711,
+                    1.0732177091759663
+                  ],
+                  [
+                    0.3571311468479687,
+                    0.6378289929689349
+                  ]
+                ],
+                "cell_damping_nm_s_rad": [
+                  [
+                    0.03272727272727272,
+                    0.04363636363636364
+                  ],
+                  [
+                    0.03272727272727272,
+                    0.04363636363636364
+                  ]
+                ]
+              }
+            ],
+            "force_limits_n": {
+              "near_t0": 8.0,
+              "near_t1": 8.0,
+              "near_t2": 8.0,
+              "far_t0": 8.0,
+              "far_t1": 8.0,
+              "far_t2": 8.0
+            },
+            "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+            "applicability": {
+              "compilable": true,
+              "backends": [
+                "backend.matlab_spatial",
+                "backend.family_mujoco"
+              ],
+              "physics": "serial rigid cells with two principal bending hinges; fixed rigid attachments; straight frictionless tendons",
+              "omitted": [
+                "axial stretch",
+                "shear",
+                "material torsion",
+                "friction",
+                "elastic rope",
+                "motor dynamics",
+                "self collision"
+              ],
+              "collision": "section convex hull extrusions; holes filled for collision only; exact polygon/circular area moments; guide box envelope"
+            }
+          },
+          "multi_category_coverage": false,
+          "candidate_id": "baseline-replay",
+          "configuration": {
+            "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+            "media_type": "application/json"
+          },
+          "frozen_baseline_identity": "56f1bacd236d3405c335a959de838cfba12deba9faa01de69560b83369383213",
+          "effective_identity": "19d3fdd1d282d20016fb297d01a09c70ded6817a1277ab6be343e4b79a0afff7",
+          "owner_run_id": "gvs-stage350-baseline-executor",
+          "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+          "parameters": [
+            {
+              "path": "components/far/length_m",
+              "baseline_value": 0.11,
+              "effective_value": 0.11,
+              "baseline_delta": 0.0,
+              "unit": "m"
+            },
+            {
+              "path": "components/near/length_m",
+              "baseline_value": 0.15,
+              "effective_value": 0.15,
+              "baseline_delta": 0.0,
+              "unit": "m"
+            },
+            {
+              "path": "design/material_scenario",
+              "baseline_value": "compliant",
+              "effective_value": "compliant",
+              "baseline_delta": null,
+              "unit": null
+            },
+            {
+              "path": "design/section_scale",
+              "baseline_value": 0.95,
+              "effective_value": 0.95,
+              "baseline_delta": 0.0,
+              "unit": "1"
+            }
+          ]
+        },
+        "factual_result": {
+          "result_type": "free_reach",
+          "candidate": {
+            "candidate_id": "baseline-replay",
+            "owner_run_id": "gvs-stage350-baseline-executor",
+            "configuration": {
+              "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+              "media_type": "application/json"
+            },
+            "execution_id": "4e358bd36ab54be3afd5003f36ff8110"
+          },
+          "configuration": {
+            "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+            "media_type": "application/json"
+          },
+          "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+          "simulation": {
+            "artifact_id": "9d56ce6bf207f79d57d239fc9e951fae84ebd33ca256b7cd0de8770ac4e026f5",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "56e93bb7995cd3870fbb6b9fafa9dc6a88f2e4d5900e1ce81b41dbe2c4bc32c0",
+            "media_type": "application/json"
+          },
+          "report": {
+            "reference": {
+              "artifact_id": "7e0c52e0ee6dd8e9124078f3c13fc969dda3c85b4ffd54f061b7bd6709ee7520",
+              "media_type": "application/json"
+            },
+            "owner_run_id": "gvs-stage350-baseline-executor",
+            "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+            "request_id": "complete-profile"
+          },
+          "task_accepted": true,
+          "evaluation_validity": "valid",
+          "complete": true,
+          "valid_complete_execution": true,
+          "target_position_m": [
+            0.29,
+            0.035,
+            0.19
+          ],
+          "terminal_position_m": [
+            0.2826142589887697,
+            0.03368252098773442,
+            0.1885424181792968
+          ],
+          "signed_position_error_m": [
+            -0.007385741011230296,
+            -0.0013174790122655808,
+            -0.0014575818207032132
+          ],
+          "error_convention": "actual_tip minus target",
+          "coordinate_frame": "world",
+          "terminal_error_m": 0.007642608585867386,
+          "terminal_tip_speed_m_s": 0.6351726092425104,
+          "sampled_settling": {
+            "available": true,
+            "continuous_time_guarantee": false,
+            "max_error_m": 0.05813810428573256,
+            "max_speed_m_s": 1.5810152739742807,
+            "passed": false,
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "control_updates": 35,
+          "accepted_plans": 35,
+          "initialization_selected": 29,
+          "accepted_noninitialization_plans": 6,
+          "converged_updates": 1,
+          "solver_error_count": 0,
+          "hold_last_responses": 0,
+          "applied_tension_ranges": [
+            {
+              "tendon": "near_t0",
+              "tendon_index": 0,
+              "minimum_n": 1.7512764858409064,
+              "maximum_n": 7.990411884680996,
+              "limit_n": 8.0
+            },
+            {
+              "tendon": "near_t1",
+              "tendon_index": 1,
+              "minimum_n": 2.757372796476204,
+              "maximum_n": 6.086855343352726,
+              "limit_n": 8.0
+            },
+            {
+              "tendon": "near_t2",
+              "tendon_index": 2,
+              "minimum_n": 1.4216485070827969e-08,
+              "maximum_n": 3.1031566686630025,
+              "limit_n": 8.0
+            },
+            {
+              "tendon": "far_t0",
+              "tendon_index": 3,
+              "minimum_n": 5.115521779319541e-07,
+              "maximum_n": 3.218253612486097,
+              "limit_n": 8.0
+            },
+            {
+              "tendon": "far_t1",
+              "tendon_index": 4,
+              "minimum_n": 0.12734806870748366,
+              "maximum_n": 5.165423523313249,
+              "limit_n": 8.0
+            },
+            {
+              "tendon": "far_t2",
+              "tendon_index": 5,
+              "minimum_n": -0.0,
+              "maximum_n": 6.400860298939372,
+              "limit_n": 8.0
+            }
+          ],
+          "force_bound_violation_n": 0.0,
+          "one_step_prediction_summary": {
+            "aligned_count": 35,
+            "frame": "world",
+            "maximum_tip_difference_m": 0.0076898869753466255,
+            "mean_tip_difference_m": 0.0038032038653228557,
+            "missing": [],
+            "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+          },
+          "one_step_prediction_evidence": {
+            "artifact_id": "3d2c01848435ead2e8fca7bf1ef6c54712c850c2ed34af4d20b50ac38a203ba5",
+            "media_type": "application/json"
+          },
+          "simulated_duration_s": 0.35000000000000003,
+          "measured_computation_s": 609.4529999999795,
+          "mean_complete_update_s": 17.303696897140306,
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "real_time_demonstrated": false
+        },
+        "profile_report": {
+          "reference": {
+            "artifact_id": "7e0c52e0ee6dd8e9124078f3c13fc969dda3c85b4ffd54f061b7bd6709ee7520",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage350-baseline-executor",
+          "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+          "request_id": "complete-profile"
+        },
+        "evaluation_data": {
+          "candidate_id": "baseline-replay",
+          "comparison_identity": "4a3c6a450df8c631119c0e72ecb8a02e3f59a1e74073f752db6f8553147be7ae",
+          "constraints": [
+            {
+              "limit": 0.01,
+              "name": "task_bound",
+              "observed": 0.007642608585867386,
+              "satisfied": true,
+              "units": "m"
+            }
+          ],
+          "contract_version": "1.2.0",
+          "evaluator": "evaluate.reach",
+          "evaluator_version": "1.0.0",
+          "metrics": [
+            {
+              "name": "position_error",
+              "units": "m",
+              "value": 0.007642608585867386
+            }
+          ],
+          "original_execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+          "reason": null,
+          "source": {
+            "artifact_id": "9d56ce6bf207f79d57d239fc9e951fae84ebd33ca256b7cd0de8770ac4e026f5",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+          "task_success": true,
+          "validity": "valid"
+        }
+      }
+    },
+    {
+      "label": "dual_context",
+      "status": "completed",
+      "reason": "Separate improvement decision, actual disposition/execution feedback, accepted revision and final delivery.",
+      "used": {
+        "tool_calls": 9,
+        "model_calls": 6,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 215.59400000050664
+      },
+      "limits": {
+        "backend_solves": 1,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "pending": [],
+      "attempts_by_phase": {
+        "request": 1,
+        "improvement": 1,
+        "response_final": 1,
+        "initial": 2,
+        "revision": 1
+      },
+      "token_usage_records": 6,
+      "tokens": {
+        "prompt_tokens": 158207,
+        "completion_tokens": 49946,
+        "total_tokens": 208153
+      },
+      "monetary_cost": null,
+      "token_qualification": "Reported usage only; a failed transport may return no usage.",
+      "accepted_reports": [
+        {
+          "key": "initial_report",
+          "reference": {
+            "artifact_id": "6e63e182caddc9ee0b518e9cf612e13f3a1f1a1a8206b4e7ef2d222c2eb9d6f8",
+            "media_type": "application/json"
+          },
+          "facts": 4,
+          "exact_selectors": 42,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        },
+        {
+          "key": "revised_report",
+          "reference": {
+            "artifact_id": "c6b12cfe2262a665e4fb99a823a4ab38c5045d2d83892844d9fac7864bd74f99",
+            "media_type": "application/json"
+          },
+          "facts": 6,
+          "exact_selectors": 50,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        }
+      ],
+      "failed_receipts": [],
+      "model_failures": [],
+      "decision": {
+        "decision": {
+          "changes": {},
+          "disposition": "defer",
+          "expected_measurable_effect": "Reach: no change expected — reach already passed (fa2df53ca3437) with terminal error 0.00764 m inside the 0.01 m tolerance (f9b10abd95f4f, fd0407340762b). Sampled holding: no change expected under this decision — recorded settle-window tip speeds (e.g. 1.4769184551353305 m/s and 0.6351726092425104 m/s, f69887e2a8ae5, f7f96eef8a315) are expected to remain far above the 0.02 m/s limit (f6c63688b547f) and sampled_settling_passed (fc5b0de5671bc) to remain false, because no parameter is changed. Computation: no change expected in mean_update_s 17.30 s (f12f519656d7c), deadline_misses 35 (f4247d77f9243) or per-update effective horizon, which are governed by controller/recipe settings outside this grant; the effect of any future authorized geometry candidate on these quantities is unquantified by the current evidence.",
+          "rationale": "Accepted diagnosis records sampled_settling_passed false (fc5b0de5671bc) with terminal_speed_m_s 0.635 m/s (f7f96eef8a315) far above speed_limit_m_s 0.02 m/s (f6c63688b547f), while reach_passed true (fa2df53ca3437) with terminal_error_m 0.00764 m (f9b10abd95f4f) inside reach_tolerance_m 0.01 m (fd0407340762b); reach_geometry_failure is ruled out, so no geometry-linked cause is supported. The remaining candidate contributors — reduced effective_horizon 1-7 versus configured recipe.horizon 10 (fd45cb2a843b4, f3abe564a036e), 34 User_Requested_Stop vs 1 Solve_Succeeded (f07ea946b5201, fdadd8fe6513d) alongside initialization_selected 29 vs noninitialization_selected 6 (fed20e2cfb7d5, f03f310fff089), wall-time misses against mean_update_s 17.30 s (f12f519656d7c) at control_period_s 0.01 s (fdcd580c300c1), and the bounded-horizon projected one-step probe — are controller, timing and retention factors outside the near/far length and section_scale grant. No closed-loop counterfactual replay exists (named capability gap) and full warm plans and optimizer iteration traces are not retained (f2d3a0144633d, full_snapshots_available f4e1e82ea1469), so any geometry delta on near length, far length or section_scale would be an unsupported guess rather than a justified change; a geometry change is deliberately not forced to consume the single-candidate execution allowance (fb00225d189d3). This defers intent only and leaves that allowance unused."
+        },
+        "source_report": {
+          "artifact_id": "6e63e182caddc9ee0b518e9cf612e13f3a1f1a1a8206b4e7ef2d222c2eb9d6f8",
+          "media_type": "application/json"
+        }
+      },
+      "workflow_feedback_complete": true,
+      "candidate_executed": false,
+      "validation_gap": null,
+      "execution": null,
+      "improvement_measured": false
+    },
+    {
+      "label": "single_context",
+      "status": "completed",
+      "reason": "Separate improvement decision, actual disposition/execution feedback, accepted revision and final delivery.",
+      "used": {
+        "tool_calls": 13,
+        "model_calls": 10,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 498.76599999913014
+      },
+      "limits": {
+        "backend_solves": 1,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 3600.0,
+        "worker_calls": 0
+      },
+      "pending": [],
+      "attempts_by_phase": {
+        "request": 1,
+        "initial": 3,
+        "improvement": 1,
+        "revision": 4,
+        "response_final": 1
+      },
+      "token_usage_records": 10,
+      "tokens": {
+        "prompt_tokens": 354851,
+        "completion_tokens": 109600,
+        "total_tokens": 464451
+      },
+      "monetary_cost": null,
+      "token_qualification": "Reported usage only; a failed transport may return no usage.",
+      "accepted_reports": [
+        {
+          "key": "initial_report",
+          "reference": {
+            "artifact_id": "3de90be9006686c75ca2a52efb90a801eba42b499ca3f8227a5fc613c4001c3c",
+            "media_type": "application/json"
+          },
+          "facts": 4,
+          "exact_selectors": 22,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        },
+        {
+          "key": "revised_report",
+          "reference": {
+            "artifact_id": "1d570a8256f661cabd4657397b0e6ceffbed8207282d6e61fdca7d68f449841a",
+            "media_type": "application/json"
+          },
+          "facts": 5,
+          "exact_selectors": 33,
+          "exact_mismatches": 0,
+          "coverage": "Accepted by existing live inventory/read-ledger validator; prose is reviewed separately."
+        }
+      ],
+      "failed_receipts": [
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.2349999998696148,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "GAP_WITHOUT_READ_RECEIPT: source.backend_motion; use not_read or perform the supported query",
+          "execution_id": "c2707c17c0c74489acdc1ac7046745aa",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": null,
+          "request_id": "model-5-tool",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "diagnosis.submit",
+          "tool_version": "2.0.0"
+        },
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.25,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "GAP_CONTRADICTS_READ_LEDGER: source.backend_motion includes queried coverage; use queried for the entry, or explicit update_ids/time_range_s for an unread subset",
+          "execution_id": "5ab00b61211c4c4d80041b98da68096d",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": null,
+          "request_id": "model-6-tool",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "diagnosis.submit",
+          "tool_version": "2.0.0"
+        },
+        {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "model-transport",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 1,
+            "tool_calls": 0,
+            "wall_s": 84.73500000010245,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": "INVALID_TOOL_CALL_ENVELOPE: business_parameters: UNKNOWN_OR_OUT_OF_SCOPE_FACT_HANDLE ffe090cc70159: copy a handle from this context fact_catalog or query the needed evidence",
+          "execution_id": "c9234774c6a54306b35d4ab4f6fefbf9",
+          "execution_status": "failed",
+          "original_execution_id": null,
+          "output": {
+            "artifact_id": "deb17d9292551082ffc93b2f2b48883e933dd3e3429d13179413a001a5310127",
+            "media_type": "application/json"
+          },
+          "request_id": "model-7",
+          "result_contract": null,
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "model.deepseek",
+          "tool_version": "4.0.0"
+        }
+      ],
+      "model_failures": [],
+      "decision": {
+        "decision": {
+          "changes": {},
+          "disposition": "defer",
+          "expected_measurable_effect": "None: a defer executes nothing, so no geometry candidate is built, no backend solve is consumed, and the single execution allowance remains unused. Reach: no expected change - terminal_error_m stays at the recorded 0.00764 m, already inside the 0.01 m position limit. Sampled holding: no expected change - the failing speed criterion (late-window maximum 1.5810 m/s versus the 0.02 m/s limit over the 0.05 s window) is untouched by any granted geometry value, and no granted variable is linked by retained evidence to that excursion. Computation: no expected change - mean_update_s 17.303696897140306 s versus control_period_s 0.01 s, deadline_misses 35 and the User_Requested_Stop-dominated solver statuses are unaffected by arm length or section scale. Uncertainty: if a change were later authorized under an expanded grant, the sign and magnitude of its effect on any of these three quantities cannot be predicted from the retained records, and no derived numerical projection is offered here.",
+          "rationale": "The accepted diagnosis (report 3de90be9..., execution 4e358bd36ab54be3afd5003f36ff8110) leaves every candidate relationship at \"possible\"/\"insufficient_evidence\" and rules out only a reach-tolerance violation: reach_passed=true with terminal_error_m 0.00764 m inside the 0.01 m limit, while sampled holding fails on speed - late-window maximum speed 1.5810 m/s against the 0.02 m/s limit over the 0.05 s window, with residual terminal speed 0.6352 m/s. The observations aligned with the failing criterion are computational and controller-side: mean_update_s 17.303696897140306 s against control_period_s 0.01 s, deadline_misses 35, stopping_counts User_Requested_Stop 34 versus Solve_Succeeded 1, initialization_selected 29 of 35 updates, and sampled effective_horizon values of 9 and 2 against a configured horizon of 10. The only recipe terms that would directly target tip-speed damping (holding and terminal tip-speed weights, recorded as 0.0) are controller parameters, and controller weights, materials, force limits and task changes are not authorized in this phase. No retained record ties components/near/length_m, components/far/length_m, design/section_scale or design/material_scenario to the holding-window speed excursion, and historical full warm plans and optimizer iteration traces are not retained (source.historical_full_plans retained=false). A single execution without closed-loop counterfactual replay cannot separate run-to-run variation from a systematic effect, so proposing a geometry delta solely to spend the one permitted candidate build would be an unsupported change; the intent is deferred with empty changes, and the specific unsupported future work is controller-side (tip-speed weighting in the holding/terminal cost, solver-return and effective-horizon budget) rather than geometry."
+        },
+        "source_report": {
+          "artifact_id": "3de90be9006686c75ca2a52efb90a801eba42b499ca3f8227a5fc613c4001c3c",
+          "media_type": "application/json"
+        }
+      },
+      "workflow_feedback_complete": true,
+      "candidate_executed": false,
+      "validation_gap": null,
+      "execution": null,
+      "improvement_measured": false
+    }
+  ],
+  "used": {
+    "model_calls": 73,
+    "tool_calls": 110,
+    "wall_s": 4462.346999997273,
+    "backend_solves": 1,
+    "worker_calls": 0
+  },
+  "limits": {
+    "model_calls": 200,
+    "tool_calls": 510,
+    "wall_s": 33600.0,
+    "backend_solves": 3,
+    "worker_calls": 0
+  },
+  "remaining": {
+    "model_calls": 127,
+    "tool_calls": 400,
+    "wall_s": 29137.653000002727,
+    "backend_solves": 2,
+    "worker_calls": 0
+  },
+  "tokens": {
+    "prompt_tokens": 2444876,
+    "completion_tokens": 867687,
+    "total_tokens": 3312563
+  },
+  "monetary_cost": null,
+  "scope": "Every original Stage 3.50 run exactly once. Mocked integration fixtures excluded from live campaign usage. No historical-stage costs included. Failed requests retained; provider-reported tokens may be incomplete.",
+  "diagnostic_freeze": {
+    "commit": "461f2063f0b4b357e5d8c4d674978e2c8436513e",
+    "files": {
+      "tools/diagnostic_workflow.py": "afa9f80b7425bd6871929fa11747aeeb3a056284e883f04aa553e96b803ba463",
+      "tools/diagnostic_native.py": "1f70510455bbe421db063c49ca359b0ce2a86cc2ce70b8dfbea5b78085030195",
+      "tools/diagnostic_inventory.py": "5cf0f0bf3b922699f2f6bbbaae15704698bba73326baaa0daae630f1f558a58f",
+      "tools/diagnostic_facts.py": "596bb1135323989c81165456e3db783c0a466601f0c72f8c2902cd359bb2f524",
+      "tools/platform_models.py": "f6c37cb11e48e96e064892f5e399aa15c730d669eecd017a635c78d44e1c7bfa",
+      "tools/platform_handoff.py": "09cade29a1ed94c27cfbad9b25fa2dcbb2797c65442c332ceaba2706a7ae56a7",
+      "tools/platform_diagnosis_coordinator.py": "e81225ed2e72e4a9b09bb3be6b1bdb8d7260a06bae665978efabf276a6952c4e",
+      "tools/platform_host.py": "02eea2d0cdb5d6238ae3876e5483b48214fa29b3328ea1117c2d16b2fc6f2562",
+      "tools/platform_store.py": "151e6b21271665c2f9788ba6a9abf9565e1440c1102ba5c0d9f62572421ce547",
+      "schemas/platform_handoff.py": "12e6700053c82545f94cffe9f4c8e877df936d27784246e5cccbd28273f2c48f",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "e537115df4246ec7205a9660f909b86a76296aa39a0adac9075e016931cd43bd",
+      "extensions/tendon_family/diagnostic_evidence.py": "6fa010ebec6d7edd52e447cdd91f01ddaaf7d1e617bd466ec7d3d96af18e9b7d",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "887483a5d3340b72dfb11c2a0e654ce01d80df56c3e4360263d7b86eb96dc724",
+      "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "b2865befc809d3b599d8fb6d18f13301bc1e1c25e1d91bc1dfdb72185833af10",
+      "tools/platform_tools.py": "270d4ec234df0dcdbc835fd3e78f29af2e512a00b0a18a3c14a2dab94f9324b2",
+      "extensions/tendon_family/candidate.py": "ab0f66c32bc596b1f093a322683d49b525a33984d9515243d5c47c8958770df3",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88"
+    }
+  },
+  "physical_freeze": {
+    "commit": "b6a7d467b276238bfd794006982dc1fbfdbeca8f",
+    "files": {
+      "tools/diagnostic_workflow.py": "ccfd7bfcd1639e8558aa22fb04cca4d406ea9fc6d13f652a33cfb1d52edb51f0",
+      "tools/diagnostic_native.py": "1f70510455bbe421db063c49ca359b0ce2a86cc2ce70b8dfbea5b78085030195",
+      "tools/diagnostic_inventory.py": "5cf0f0bf3b922699f2f6bbbaae15704698bba73326baaa0daae630f1f558a58f",
+      "tools/diagnostic_facts.py": "596bb1135323989c81165456e3db783c0a466601f0c72f8c2902cd359bb2f524",
+      "tools/platform_models.py": "f6c37cb11e48e96e064892f5e399aa15c730d669eecd017a635c78d44e1c7bfa",
+      "tools/platform_handoff.py": "09cade29a1ed94c27cfbad9b25fa2dcbb2797c65442c332ceaba2706a7ae56a7",
+      "tools/platform_diagnosis_coordinator.py": "ae8c0554d0303a76ae6a55eeb7d849f3df63fe27e1fa8a04cbd1f995358b736a",
+      "tools/platform_host.py": "02eea2d0cdb5d6238ae3876e5483b48214fa29b3328ea1117c2d16b2fc6f2562",
+      "tools/platform_store.py": "151e6b21271665c2f9788ba6a9abf9565e1440c1102ba5c0d9f62572421ce547",
+      "schemas/platform_handoff.py": "12e6700053c82545f94cffe9f4c8e877df936d27784246e5cccbd28273f2c48f",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "8931562841b618d0002ae7fc70fe76e76c165d07254827fbef2c17b630ecd03b",
+      "extensions/tendon_family/diagnostic_evidence.py": "6fa010ebec6d7edd52e447cdd91f01ddaaf7d1e617bd466ec7d3d96af18e9b7d",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "887483a5d3340b72dfb11c2a0e654ce01d80df56c3e4360263d7b86eb96dc724",
+      "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "0ed49d536df8ad301fd24662d5402ce6a4361808468f65bf37acce2bc92a8cba",
+      "tools/platform_tools.py": "270d4ec234df0dcdbc835fd3e78f29af2e512a00b0a18a3c14a2dab94f9324b2",
+      "extensions/tendon_family/candidate.py": "ab0f66c32bc596b1f093a322683d49b525a33984d9515243d5c47c8958770df3",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88",
+      "tools/improvement_workflow.py": "5b7e9d1be9112db49f4f8bb603ee724ebf5a0daeaef7b9e1f7063cde10ccf75b",
+      "examples/stage350_physical_pilot.py": "6e54aa2104873c478a3aefba5b020690f61856208dacfa1109a2d2e44cae4e82",
+      "tests/test_stage350_improvement.py": "e85cc41dbb46650563179d3114d1c6bd483fed79c9695f9c4bc2edff9f1ed018",
+      "examples/stage350_experiment.json": "ed64805a7fe19ba14633138e5fbfff5d8898a1f6b2d862cd2eb86ffd5bc06c42"
+    }
+  }
+}

@@ -1,0 +1,456 @@
+{
+  "schema_version": "1.0.0",
+  "status": "completed",
+  "stop_reason": "Separate improvement decision, actual disposition/execution feedback, accepted revision and final delivery.",
+  "mode": "dual_context",
+  "pilot": false,
+  "minimal": false,
+  "classification": "fresh physical improvement integration pilot",
+  "chain": {
+    "request": {
+      "artifact_id": "b683adf256ba2840fbc580e187e965a8c1939a370cdb4d9f382237b68ae2bf11",
+      "media_type": "application/json"
+    },
+    "initial_report": {
+      "artifact_id": "6e63e182caddc9ee0b518e9cf612e13f3a1f1a1a8206b4e7ef2d222c2eb9d6f8",
+      "media_type": "application/json"
+    },
+    "improvement_decision": {
+      "artifact_id": "e7f6ca9660c51b148ed6fc5837fbace6325f5faf92ba8338b5b4286fda2160c7",
+      "media_type": "application/json"
+    },
+    "preparation": {
+      "artifact_id": "92f6c1f2a886d61a38c1b04327fe2a9fea59c2a810f7495f13ec0fc10ae438da",
+      "media_type": "application/json"
+    },
+    "feedback": {
+      "artifact_id": "3d299b46b822fa9261f7f3f04b465bb4d7863bb440fcb70a13484debb393cbc1",
+      "media_type": "application/json"
+    },
+    "revised_report": {
+      "artifact_id": "c6b12cfe2262a665e4fb99a823a4ab38c5045d2d83892844d9fac7864bd74f99",
+      "media_type": "application/json"
+    },
+    "final_response": {
+      "artifact_id": "eb8d3d4d966ce362909e0f37323ae0d974cb951a09517e68c5c051be47fdf4fe",
+      "media_type": "application/json"
+    }
+  },
+  "feedback_complete": true,
+  "numerical_check_status": null,
+  "usage": {
+    "limit": {
+      "backend_solves": 1,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 3600.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 9,
+      "model_calls": 6,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 215.59400000050664
+    },
+    "remaining": {
+      "backend_solves": 1,
+      "model_calls": 18,
+      "tool_calls": 51,
+      "wall_s": 3384.4059999994934,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "numerical_work": {
+    "limits": {
+      "local_solves": 0,
+      "prediction_evaluations": 0
+    },
+    "used": {
+      "local_solves": 0,
+      "prediction_evaluations": 0
+    }
+  },
+  "provider_usage": [
+    {
+      "completion_tokens": 2602,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1620
+      },
+      "prompt_cache_hit_tokens": 1792,
+      "prompt_cache_miss_tokens": 8127,
+      "prompt_tokens": 9919,
+      "prompt_tokens_details": {
+        "cached_tokens": 1792
+      },
+      "total_tokens": 12521
+    },
+    {
+      "completion_tokens": 2805,
+      "completion_tokens_details": {
+        "reasoning_tokens": 2043
+      },
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 30082,
+      "prompt_tokens": 30594,
+      "prompt_tokens_details": {
+        "cached_tokens": 512
+      },
+      "total_tokens": 33399
+    },
+    {
+      "completion_tokens": 3023,
+      "completion_tokens_details": {
+        "reasoning_tokens": 2421
+      },
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 25170,
+      "prompt_tokens": 25810,
+      "prompt_tokens_details": {
+        "cached_tokens": 640
+      },
+      "total_tokens": 28833
+    },
+    {
+      "completion_tokens": 493,
+      "completion_tokens_details": {
+        "reasoning_tokens": 274
+      },
+      "prompt_cache_hit_tokens": 3200,
+      "prompt_cache_miss_tokens": 9593,
+      "prompt_tokens": 12793,
+      "prompt_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "total_tokens": 13286
+    },
+    {
+      "completion_tokens": 20719,
+      "completion_tokens_details": {
+        "reasoning_tokens": 17843
+      },
+      "prompt_cache_hit_tokens": 4608,
+      "prompt_cache_miss_tokens": 32168,
+      "prompt_tokens": 36776,
+      "prompt_tokens_details": {
+        "cached_tokens": 4608
+      },
+      "total_tokens": 57495
+    },
+    {
+      "completion_tokens": 20304,
+      "completion_tokens_details": {
+        "reasoning_tokens": 16508
+      },
+      "prompt_cache_hit_tokens": 3072,
+      "prompt_cache_miss_tokens": 39243,
+      "prompt_tokens": 42315,
+      "prompt_tokens_details": {
+        "cached_tokens": 3072
+      },
+      "total_tokens": 62619
+    }
+  ],
+  "monetary_cost": null,
+  "elapsed_s": 235.28099999995902,
+  "protocol_corrections": 0,
+  "recovery": {
+    "design": {
+      "version": "2.0.0",
+      "scope": "workflow shared across phases and contexts",
+      "protocol": {
+        "category": "native_schema_or_envelope",
+        "limits": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "total_used": 0,
+        "consecutive_used": 0,
+        "total_remaining": 4,
+        "consecutive_remaining": 2,
+        "reset": "Completed business call resets consecutive only; decoding alone does not."
+      },
+      "business": {
+        "category": "accepted_call_execution_rejected_or_failed",
+        "limit": 2,
+        "consecutive_failures": 0,
+        "total_failures": 0,
+        "remaining_repairs": 2,
+        "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+        "reset": "Completed business call resets consecutive; phase/context switch does not.",
+        "feedback": null
+      },
+      "transport": {
+        "category": "provider_transport_failure",
+        "automatic_retry": false
+      },
+      "length": {
+        "category": "truncated_without_usable_action",
+        "limit": 1,
+        "used": 0,
+        "configuration": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        }
+      },
+      "stop_reason": null
+    },
+    "diagnostic": {
+      "version": "2.0.0",
+      "scope": "workflow shared across phases and contexts",
+      "protocol": {
+        "category": "native_schema_or_envelope",
+        "limits": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "total_used": 0,
+        "consecutive_used": 0,
+        "total_remaining": 4,
+        "consecutive_remaining": 2,
+        "reset": "Completed business call resets consecutive only; decoding alone does not."
+      },
+      "business": {
+        "category": "accepted_call_execution_rejected_or_failed",
+        "limit": 2,
+        "consecutive_failures": 0,
+        "total_failures": 0,
+        "remaining_repairs": 2,
+        "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+        "reset": "Completed business call resets consecutive; phase/context switch does not.",
+        "feedback": null
+      },
+      "transport": {
+        "category": "provider_transport_failure",
+        "automatic_retry": false
+      },
+      "length": {
+        "category": "truncated_without_usable_action",
+        "limit": 1,
+        "used": 0,
+        "configuration": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        }
+      },
+      "stop_reason": null
+    },
+    "executor": {
+      "version": "2.0.0",
+      "scope": "workflow shared across phases and contexts",
+      "protocol": {
+        "category": "native_schema_or_envelope",
+        "limits": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "total_used": 0,
+        "consecutive_used": 0,
+        "total_remaining": 4,
+        "consecutive_remaining": 2,
+        "reset": "Completed business call resets consecutive only; decoding alone does not."
+      },
+      "business": {
+        "category": "accepted_call_execution_rejected_or_failed",
+        "limit": 2,
+        "consecutive_failures": 0,
+        "total_failures": 0,
+        "remaining_repairs": 2,
+        "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+        "reset": "Completed business call resets consecutive; phase/context switch does not.",
+        "feedback": null
+      },
+      "transport": {
+        "category": "provider_transport_failure",
+        "automatic_retry": false
+      },
+      "length": {
+        "category": "truncated_without_usable_action",
+        "limit": 1,
+        "used": 0,
+        "configuration": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        }
+      },
+      "stop_reason": null
+    }
+  },
+  "physical_improvement": {
+    "preparation": {
+      "status": "no_change_selected",
+      "source_execution": "4e358bd36ab54be3afd5003f36ff8110",
+      "source_report": {
+        "artifact_id": "6e63e182caddc9ee0b518e9cf612e13f3a1f1a1a8206b4e7ef2d222c2eb9d6f8",
+        "media_type": "application/json"
+      },
+      "source_configuration": {
+        "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+        "media_type": "application/json"
+      },
+      "decision": {
+        "disposition": "defer",
+        "changes": {},
+        "rationale": "Accepted diagnosis records sampled_settling_passed false (fc5b0de5671bc) with terminal_speed_m_s 0.635 m/s (f7f96eef8a315) far above speed_limit_m_s 0.02 m/s (f6c63688b547f), while reach_passed true (fa2df53ca3437) with terminal_error_m 0.00764 m (f9b10abd95f4f) inside reach_tolerance_m 0.01 m (fd0407340762b); reach_geometry_failure is ruled out, so no geometry-linked cause is supported. The remaining candidate contributors — reduced effective_horizon 1-7 versus configured recipe.horizon 10 (fd45cb2a843b4, f3abe564a036e), 34 User_Requested_Stop vs 1 Solve_Succeeded (f07ea946b5201, fdadd8fe6513d) alongside initialization_selected 29 vs noninitialization_selected 6 (fed20e2cfb7d5, f03f310fff089), wall-time misses against mean_update_s 17.30 s (f12f519656d7c) at control_period_s 0.01 s (fdcd580c300c1), and the bounded-horizon projected one-step probe — are controller, timing and retention factors outside the near/far length and section_scale grant. No closed-loop counterfactual replay exists (named capability gap) and full warm plans and optimizer iteration traces are not retained (f2d3a0144633d, full_snapshots_available f4e1e82ea1469), so any geometry delta on near length, far length or section_scale would be an unsupported guess rather than a justified change; a geometry change is deliberately not forced to consume the single-candidate execution allowance (fb00225d189d3). This defers intent only and leaves that allowance unused.",
+        "expected_measurable_effect": "Reach: no change expected — reach already passed (fa2df53ca3437) with terminal error 0.00764 m inside the 0.01 m tolerance (f9b10abd95f4f, fd0407340762b). Sampled holding: no change expected under this decision — recorded settle-window tip speeds (e.g. 1.4769184551353305 m/s and 0.6351726092425104 m/s, f69887e2a8ae5, f7f96eef8a315) are expected to remain far above the 0.02 m/s limit (f6c63688b547f) and sampled_settling_passed (fc5b0de5671bc) to remain false, because no parameter is changed. Computation: no change expected in mean_update_s 17.30 s (f12f519656d7c), deadline_misses 35 (f4247d77f9243) or per-update effective horizon, which are governed by controller/recipe settings outside this grant; the effect of any future authorized geometry candidate on these quantities is unquantified by the current evidence."
+      },
+      "candidate_id": null,
+      "configuration": null,
+      "actual_diff": [],
+      "execution_receipt": null,
+      "evaluation_receipt": null,
+      "feedback": null,
+      "final_delivery": null,
+      "reporting_dimensions": [
+        "terminal_reach",
+        "holding_window_position_and_speed",
+        "complete_update_computation"
+      ]
+    },
+    "validation_gap": null,
+    "complete_execution": null,
+    "baseline_facts": {
+      "result_type": "free_reach",
+      "candidate": {
+        "candidate_id": "baseline-replay",
+        "owner_run_id": "gvs-stage350-baseline-executor",
+        "configuration": {
+          "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+          "media_type": "application/json"
+        },
+        "execution_id": "4e358bd36ab54be3afd5003f36ff8110"
+      },
+      "configuration": {
+        "artifact_id": "6bc6d6d26253579003afc31da973cd08d8cfb2bc50a30b1034c247e515cdf2e4",
+        "media_type": "application/json"
+      },
+      "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+      "simulation": {
+        "artifact_id": "9d56ce6bf207f79d57d239fc9e951fae84ebd33ca256b7cd0de8770ac4e026f5",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "artifact_id": "56e93bb7995cd3870fbb6b9fafa9dc6a88f2e4d5900e1ce81b41dbe2c4bc32c0",
+        "media_type": "application/json"
+      },
+      "report": {
+        "reference": {
+          "artifact_id": "7e0c52e0ee6dd8e9124078f3c13fc969dda3c85b4ffd54f061b7bd6709ee7520",
+          "media_type": "application/json"
+        },
+        "owner_run_id": "gvs-stage350-baseline-executor",
+        "execution_id": "4e358bd36ab54be3afd5003f36ff8110",
+        "request_id": "complete-profile"
+      },
+      "task_accepted": true,
+      "evaluation_validity": "valid",
+      "complete": true,
+      "valid_complete_execution": true,
+      "target_position_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "terminal_position_m": [
+        0.2826142589887697,
+        0.03368252098773442,
+        0.1885424181792968
+      ],
+      "signed_position_error_m": [
+        -0.007385741011230296,
+        -0.0013174790122655808,
+        -0.0014575818207032132
+      ],
+      "error_convention": "actual_tip minus target",
+      "coordinate_frame": "world",
+      "terminal_error_m": 0.007642608585867386,
+      "terminal_tip_speed_m_s": 0.6351726092425104,
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.05813810428573256,
+        "max_speed_m_s": 1.5810152739742807,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "control_updates": 35,
+      "accepted_plans": 35,
+      "initialization_selected": 29,
+      "accepted_noninitialization_plans": 6,
+      "converged_updates": 1,
+      "solver_error_count": 0,
+      "hold_last_responses": 0,
+      "applied_tension_ranges": [
+        {
+          "tendon": "near_t0",
+          "tendon_index": 0,
+          "minimum_n": 1.7512764858409064,
+          "maximum_n": 7.990411884680996,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "near_t1",
+          "tendon_index": 1,
+          "minimum_n": 2.757372796476204,
+          "maximum_n": 6.086855343352726,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "near_t2",
+          "tendon_index": 2,
+          "minimum_n": 1.4216485070827969e-08,
+          "maximum_n": 3.1031566686630025,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t0",
+          "tendon_index": 3,
+          "minimum_n": 5.115521779319541e-07,
+          "maximum_n": 3.218253612486097,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t1",
+          "tendon_index": 4,
+          "minimum_n": 0.12734806870748366,
+          "maximum_n": 5.165423523313249,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t2",
+          "tendon_index": 5,
+          "minimum_n": -0.0,
+          "maximum_n": 6.400860298939372,
+          "limit_n": 8.0
+        }
+      ],
+      "force_bound_violation_n": 0.0,
+      "one_step_prediction_summary": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_tip_difference_m": 0.0076898869753466255,
+        "mean_tip_difference_m": 0.0038032038653228557,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+      },
+      "one_step_prediction_evidence": {
+        "artifact_id": "3d2c01848435ead2e8fca7bf1ef6c54712c850c2ed34af4d20b50ac38a203ba5",
+        "media_type": "application/json"
+      },
+      "simulated_duration_s": 0.35000000000000003,
+      "measured_computation_s": 609.4529999999795,
+      "mean_complete_update_s": 17.303696897140306,
+      "control_period_s": 0.01,
+      "deadline_misses": 35,
+      "real_time_demonstrated": false
+    },
+    "candidate_executed": false
+  },
+  "source_preserved": true
+}
