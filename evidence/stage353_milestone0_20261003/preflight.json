@@ -1,0 +1,203 @@
+{
+  "attempts": [
+    {
+      "number": 1,
+      "started": "2026-10-03T11:45:12.743540+00:00",
+      "timeout_s": 85.0,
+      "corrective_action_or_transient_check": null,
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Reply briefly with: Connection verified."
+          }
+        ],
+        "max_tokens": 65536,
+        "thinking": {
+          "type": "enabled"
+        },
+        "reasoning_effort": "high",
+        "stream": false
+      },
+      "provider_configuration": {
+        "adapter": "deepseek",
+        "adapter_version": "4.0.0",
+        "base_url": "https://api.deepseek.com",
+        "context_bytes": 200000,
+        "length_recovery": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        },
+        "max_no_progress": 3,
+        "max_repairs": 2,
+        "max_tokens": 65536,
+        "max_turns": 24,
+        "model": "deepseek-flash",
+        "parameters": {},
+        "protocol_recovery": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "readonly_batch_limit": 3,
+        "reasoning_effort": "high",
+        "strategy": "strategy.tool",
+        "strategy_version": "1.0.0",
+        "supports_images": false,
+        "supports_text": true,
+        "supports_tools": true,
+        "thinking": "enabled",
+        "timeout_s": 85.0,
+        "tool_naming": {
+          "mapping_identity": "873cb1bbe5bb68ba832af73b867e136ba37b53f27b9d99957f00cb9343abf3a5",
+          "scheme": "readable_v1"
+        }
+      },
+      "adapter_version": "4.0.0",
+      "status": "failed",
+      "response": null,
+      "provider_usage": null,
+      "error": "DEEPSEEK_NETWORK_ERROR",
+      "exception_type": "RuntimeError",
+      "provider_response": {
+        "failure_details": {
+          "exception_type": "URLError",
+          "reason_type": "ConnectionRefusedError",
+          "os_error_number": 10061,
+          "windows_error_number": 10061,
+          "category": "connection",
+          "elapsed_s": 2.030999999959022,
+          "endpoint_hostname": "api.deepseek.com",
+          "reason_message": "[WinError 10061] 由于目标计算机积极拒绝，无法连接。"
+        }
+      },
+      "elapsed_s": 2.030999999959022,
+      "charged_wall_s": 2.030999999959022
+    },
+    {
+      "number": 2,
+      "started": "2026-10-03T11:46:46.794030+00:00",
+      "timeout_s": 85.0,
+      "corrective_action_or_transient_check": "First attempt failed with ConnectionRefusedError WinError 10061; inspected sandbox proxy endpoints 127.0.0.1:9. Host-network retry, unchanged TLS. Payload verified in preflight_attempt_1.json: only Reply briefly with: Connection verified.; no repository or retained experimental data.",
+      "request": {
+        "model": "deepseek-flash",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Reply briefly with: Connection verified."
+          }
+        ],
+        "max_tokens": 65536,
+        "thinking": {
+          "type": "enabled"
+        },
+        "reasoning_effort": "high",
+        "stream": false
+      },
+      "provider_configuration": {
+        "adapter": "deepseek",
+        "adapter_version": "4.0.0",
+        "base_url": "https://api.deepseek.com",
+        "context_bytes": 200000,
+        "length_recovery": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        },
+        "max_no_progress": 3,
+        "max_repairs": 2,
+        "max_tokens": 65536,
+        "max_turns": 24,
+        "model": "deepseek-flash",
+        "parameters": {},
+        "protocol_recovery": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "readonly_batch_limit": 3,
+        "reasoning_effort": "high",
+        "strategy": "strategy.tool",
+        "strategy_version": "1.0.0",
+        "supports_images": false,
+        "supports_text": true,
+        "supports_tools": true,
+        "thinking": "enabled",
+        "timeout_s": 85.0,
+        "tool_naming": {
+          "mapping_identity": "873cb1bbe5bb68ba832af73b867e136ba37b53f27b9d99957f00cb9343abf3a5",
+          "scheme": "readable_v1"
+        }
+      },
+      "adapter_version": "4.0.0",
+      "status": "completed",
+      "response": {
+        "id": "de3f3c61-11b5-4c2f-b0a7-b6b115421d72",
+        "object": "chat.completion",
+        "created": 1791028005,
+        "model": "deepseek-flash",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Connection verified.",
+              "reasoning_content": "The user wants a brief reply: \"Connection verified.\" I should just reply with that."
+            },
+            "logprobs": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 37,
+          "completion_tokens": 22,
+          "total_tokens": 59,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 18
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 37
+        },
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669"
+      },
+      "provider_usage": {
+        "prompt_tokens": 37,
+        "completion_tokens": 22,
+        "total_tokens": 59,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 18
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 37
+      },
+      "error": null,
+      "elapsed_s": 1.0149999998975545,
+      "charged_wall_s": 1.0149999998975545
+    }
+  ],
+  "limits": {
+    "model_calls": 2,
+    "tool_calls": 5,
+    "wall_s": 180.0,
+    "backend_solves": 0,
+    "worker_calls": 0
+  },
+  "classification": "Connectivity validation only; never experiment memory",
+  "monetary_cost": null,
+  "status": "completed",
+  "communication_validated": true,
+  "used": {
+    "model_calls": 2,
+    "tool_calls": 2,
+    "wall_s": 3.0459999998565763,
+    "backend_solves": 0,
+    "worker_calls": 0
+  },
+  "cost_note": "One conservative tool charge per direct preflight request; failed attempts count. Missing provider usage and monetary cost are unknown."
+}

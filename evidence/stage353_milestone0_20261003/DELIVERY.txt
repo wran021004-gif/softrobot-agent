@@ -1,0 +1,34 @@
+Stage 3.53 / Milestone 0 delivery
+Execution-reliability acceptance: NOT PASSED
+Context cap: 400,000 canonical request bytes in both organizations; actual HTTP body sizes retained separately. Output settings unchanged: 65,536 tokens, existing length recovery 131,072.
+Simulation/evaluation/profile each have their own timeout and reservation: 900/30/60 seconds. Executor phase 1,600 seconds; downstream feedback protection 600 seconds. Actual execution usage remains charged.
+Continuation reuses verified sealed simulation/evaluation/profile receipts without duplicate execution or accounting. Unsealed reservations remain unresolved. This is not universal exactly-once execution.
+Focused suite: existing workflow/context checks plus interruption, budget boundary/refusal, metric equivalence and identity/integrity checks. A test-only mock assertion was corrected; affected tests passed. Nine affected checks passed after the prelaunch context-configuration repair, including both organization preparations.
+One prelaunch host defect was repaired before any provider or backend work; original empty run grant retained. Both live runs used e6fb86f2277df9f222bd7c7143ee2044ed924a00.
+
+Post-hoc evaluation of a previously completed Stage 3.52 simulation.
+Stage 3.52 scheduled evaluation remains incomplete; this supplement does not complete its matched comparison.
+Terminal/holding position thresholds: 10 mm. Holding speed threshold: 0.02 m/s. All reported holding windows have six retained samples from 0.30 to 0.35 seconds; no continuous-time guarantee.
+Case | terminal error mm | holding max error mm | holding max speed m/s | reach | joint reach+holding
+historical | 17.758552 | 65.216738 | 2.402299 | False | False
+single_context | 10.611030 | 63.443800 | 1.668871 | False | False
+dual_context | 8.104100 | 63.443800 | 1.823404 | True | False
+Speed is the world-frame norm of the tip translational Jacobian times recorded backend qvel. All three executions applied 35 controls and missed 35 computation deadlines; initialization-selected plans still apply control. Simulated duration is 0.35 seconds.
+
+single_context: incomplete. PHASE_INCOMPLETE revision: MODEL_PROTOCOL_CORRECTION_TOTAL_LIMIT: INVALID_TOOL_CALL_ENVELOPE: business_parameters: UNKNOWN_OR_OUT_OF_SCOPE_FACT_HANDLE feaf1fb1182a: copy a handle from this context fact_catalog or query the needed evidence
+Final decision: Not reached.
+Usage: 1 new backend execution; 10 provider attempts; 12 tool calls; 1042.389 charged seconds; 1068.578 workflow elapsed seconds; 410289 reported tokens.
+Physical comparison: physical_pareto_worsening.
+dual_context: incomplete. PHASE_INCOMPLETE revision: MODEL_PROTOCOL_CORRECTION_CONSECUTIVE_LIMIT: INVALID_TOOL_CALL_ENVELOPE: business_parameters: UNKNOWN_OR_OUT_OF_SCOPE_FACT_HANDLE ffa8e71187d4b: copy a handle from this context fact_catalog or query the needed evidence
+Final decision: Not reached.
+Usage: 1 new backend execution; 9 provider attempts; 14 tool calls; 1192.016 charged seconds; 1219.359 workflow elapsed seconds; 479387 reported tokens.
+Physical comparison: physical_pareto_worsening.
+
+Total including preflight and post-hoc work: 2 new backend executions; 21 provider attempts; 31 tool calls; 2239.623 charged seconds; 889735 reported tokens. Zero workers/subagents.
+Preflight separately: 2 attempts, 3.046 seconds; first connection refused by sandbox proxy, second host-network request succeeded with TLS preserved.
+Post-hoc work separately: 3 tool calls, 2.172 charged seconds; zero new simulations/model calls. Historical simulation wall cost is preserved, not charged again.
+Monetary cost: unknown. Failed-connection token usage: unknown. Setup/export overhead is outside the operation ledger; workflow elapsed is reported separately.
+Next milestone: Blocked on accepted model revision and final decision under the bounded recovery policy. Do not reset limits or launch replacement runs.
+Physical improvement and real-time feasibility are not established. These are engineering checks, not a statistical comparison.
+Implementation commits: 5fd27d8 and e6fb86f2277df9f222bd7c7143ee2044ed924a00. Evidence is committed separately. No push.
+Detailed facts, costs, provenance, requests and acceptance checks: delivery_summary.json and organization audit files.
