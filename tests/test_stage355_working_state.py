@@ -84,6 +84,7 @@ class WorkingStateTests(TestCase):
                 self.assertTrue(view.workflow['computation_complete'])
                 self.assertEqual(view.workflow['delivery_complete'],stage=='stage354')
                 self.assertIsNotNone(view.latest_tested)
+                self.assertIsNone(view.experiment_plan)
                 self.assertEqual(view.latest_tested['configuration'],view.prepared['executed_configuration'])
                 self.assertTrue(view.prepared['scientific_scope_matches_execution'])
                 self.assertNotEqual(view.prepared['configuration'],view.latest_tested['configuration'])

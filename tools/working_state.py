@@ -132,7 +132,12 @@ def project_working_state(store, run_id):
                 if prepared_configuration and latest and scope else None)
         proposed_ref=next((ref for kind,ref in reversed(products) if kind=='improvement_decision'),None)
         proposed=store.artifact(proposed_ref,db=db).get('decision') if proposed_ref else None
-        plan=inp['policy'].get('search')
+        # policy.search is an installed search-method binding, not an authored
+        # experiment plan. Only an explicitly retained plan reference qualifies.
+        plan=role.get('experiment_plan') or state.get('experiment_plan')
+        if plan:
+            plan=plain(EvidenceRef.model_validate(plan))
+            store.artifact(plan,db=db)
         work_row=db.execute("SELECT value FROM meta WHERE key='diagnostic_work'").fetchone()
         return WorkingState(run_id=run_id,
             task=dict(identity=role.get('identities',{}).get('task_identity') or (scope or {}).get('task',{}).get('identity'),
@@ -165,4 +170,4 @@ def project_working_state(store, run_id):
                 numerical=json.loads(work_row[0]) if work_row else None),
             recovery=recovery_status(state,inp['policy']['model']),actions=actions,acceptance=acceptance,
             parameter_impacts=parameter_impacts(effective,reference=config_ref),
-            experiment_plan=dict(source='snapshot.input.policy.search',plan=plan) if plan else None)
+            experiment_plan=dict(reference=plan,source='role_context.experiment_plan' if role.get('experiment_plan') else 'state.experiment_plan') if plan else None)
