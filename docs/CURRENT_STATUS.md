@@ -1,6 +1,49 @@
 # Current development status - Milestones 4 and 5, 2026-10-05
 
-The latest [two-capability preparation/development stage](milestone5_preparation.md)
+The latest [bounded recovery and history diagnosis](milestone5_recovery_diagnostic.md)
+is **completed and stopped with its research handoff still blocked**. Automatic
+approval review again rejected the DeepSeek transmission despite the attachment's
+explicit authorization; direct chat confirmation was requested. The one provider
+attempt failed with a network error. No accepted recovery selection or final
+model interpretation exists; engineering evidence does not substitute for them.
+
+Recovery admission validates completed request/receipt bindings before reserving
+outstanding work: both previews and six reference integrations are reused, with
+zero new reservations for them. Normal/blocked protocol construction shares
+finalization with implementation hashes and actual accepted decision bindings;
+missing research completion defaults to false. The preparation ledger, protocol,
+seal and rejection are unchanged; the new revision links to them.
+
+Matching each original historical preview to its own backend shows .0540802 m/s
+vector error already at .01 s and command separation at .02 s, preceding the
+two previews' mutual separation at .20 s. Fourteen short propagations at holding
+entry reproduce saved coarse endpoints and support local successive-resolution
+comparisons. Coarse-to-fine vector effects are .000124/.000127 m/s; state effects
+.01239/.01272, input effects .03396/.02131, and residuals .00682/.00730 m/s.
+Terms oppose/cancel; these are ordered differences, not causal percentages.
+
+The engineering primary action is retain local diagnosis and defer screening.
+Next targeted investigation is the shared first .00-.01 interval under identical
+initial state/input; it remains unexecuted. No production change, complete
+preview, backend step or simulation ran. The reset-clock .075/.15 future pair
+remains provisional. Conditional public reservation recalculates to 5830 s;
+no grant exists and readiness is false. Milestones 2-4 closed, Milestone 5 open,
+incumbent `batch-ebbeadbdaca10732-0` / `91c3ba1b01d6499fb26df8f95409401b` retained.
+
+New-stage usage: 1 failed provider attempt, 4 workflow calls, 0 backend attempts,
+287.484 charged seconds, 0 controller attempts, 14 integrations. Cumulative:
+37/71/6, 4458.552 seconds, 79 controller attempts, 35 integrations and 210
+historical backend updates. Two failed local calls, transport failure, platform
+rejection and export repair are preserved; completed work was reused without
+duplicate charges. Five focused checks passed; no workers/subagents or push.
+
+See [latest delivery](../evidence/milestone5_recovery_20261005/delivery.json),
+[linked deferred protocol](../evidence/milestone5_recovery_20261005/protocol.json),
+and [separate readiness dimensions](../evidence/milestone5_recovery_20261005/readiness.json).
+
+## Completed predecessor preparation
+
+The predecessor [two-capability preparation/development stage](milestone5_preparation.md)
 is **completed and stopped with a blocked research handoff**. Both interfaces and
 sealing points are implemented. Two saved-checkpoint scenarios and a provisional
 historical .075/.15 recipe pair are concretely registered; future execution is
