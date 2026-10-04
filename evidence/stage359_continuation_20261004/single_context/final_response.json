@@ -1,0 +1,63 @@
+{
+  "candidate_disposition": "retain_baseline",
+  "disposition": "reject",
+  "feedback": {
+    "artifact_id": "4632a5a58978ba2e53310a0eb98d0e7984ce16d9f9118f731bacaceae9157eff",
+    "media_type": "application/json"
+  },
+  "next_action": "finish",
+  "next_research": {
+    "bounded_check": "One fresh complete backend run with control/recipe/holding_tip_speed_weight = 0.05 and control/recipe/terminal_tip_speed_weight = 0.05 (predecessor value), all other stack elements frozen.",
+    "evidence": [
+      "50618bf2: terminal_tip_speed_weight 0.05 -> holding_max_speed_m_s 0.03557, terminal_error_m 0.00819",
+      "44dbf3bc: terminal_tip_speed_weight 0.1 -> holding_max_speed_m_s 0.04868 (+0.01311 vs predecessor), joint_reach_holding_passed false",
+      "cf997605 retained baseline: holding_max_speed_m_s 1.5810, holding_max_error_m 0.05814"
+    ],
+    "expected_observations": [
+      "Supporting: holding_max_speed_m_s below predecessor 0.03557, holding_max_error_m still <= 0.01, terminal_reach_passed true",
+      "Weakening: holding_max_speed_m_s at or above 0.03557, or holding/terminal acceptance lost"
+    ],
+    "fixed_conditions": [
+      "frozen stack and source plan bc1f58ac54026d97",
+      "control_period_s 0.01 with 35 control updates",
+      "acceptance: terminal_error_m <= 0.01, holding_max_error_m <= 0.01, holding_max_speed_m_s <= 0.02, window 0.05 s",
+      "coverage/derivation conventions unchanged"
+    ],
+    "limitations": [
+      "Single tested point; no dominant-cause or parameter-range ineffectiveness claim",
+      "No continuous-time, real-time or hardware claim; sampling and coverage conventions bound generalization"
+    ],
+    "proposed_budget": {
+      "backend_solves": 1,
+      "model_calls": 1,
+      "tool_calls": 6,
+      "wall_s": 900.0,
+      "worker_calls": 0
+    },
+    "proposed_variables": {
+      "control/recipe/holding_tip_speed_weight": "0.05",
+      "control/recipe/terminal_tip_speed_weight": "0.05"
+    },
+    "route": "continue_weight_combinations",
+    "stopping_conditions": [
+      "Stop after the single run; if joint_reach_holding_passed true, stop and consider adoption",
+      "If holding_max_speed_m_s does not fall below 0.03557, stop raising holding_tip_speed_weight and report the observed adverse/non-monotone step"
+    ],
+    "unresolved_question": "On the frozen stack, does a positive control/recipe/holding_tip_speed_weight (never positive-tested; joint_positive_weight_tested false) reduce sampled final-window holding maximum world-tip speed toward 0.02 while terminal reach is retained, or does the adverse terminal-weight step (0.05 -> 0.1) reflect a non-monotone weight response?"
+  },
+  "reasoning": "Rows: retained baseline cf997605 (holding_max_error_m 0.05814, holding_max_speed_m_s 1.5810, terminal_error_m 0.00764, both holding checks false); immediate predecessor 50618bf2 (holding_max_error_m 0.00828 pass, holding_max_speed_m_s 0.03557 fail, terminal_error_m 0.00819 pass, joint false); completed candidate batch-bc1f58ac54026d97-0 / execution 44dbf3bc (change control/recipe/terminal_tip_speed_weight -> 0.1; holding_max_error_m 0.00833 pass, holding_max_speed_m_s 0.04868 fail, terminal_error_m 0.00812 pass, joint false).\n\nHypothesis status: weakened. The predicted further reduction of sampled final-window holding maximum world-tip speed did not occur: against the immediate predecessor the candidate raised holding_max_speed_m_s by +0.01311 (0.03557 -> 0.04868), i.e. away from the 0.02 criterion, while holding_max_error_m rose +5.53e-05 and terminal_error_m fell -6.34e-05. Reach retention is supported (terminal_error_m 0.00812 <= 0.01, terminal_reach_passed true). Acceptance is not reached: holding_speed_passed false, joint_reach_holding_passed false; only the holding-position component passes. Against the retained baseline the candidate is a large physical trade-off (holding_max_error_m -0.04981, holding_max_speed_m_s -1.532, terminal_error_m +0.00048): improvements and a slight worsening coexist, classified physical_tradeoff both ways, so no overall improvement and raw scalar objectives were not ranked.\n\nScope: one tested point on one value. It neither identifies a dominant cause of the reach/holding outcome nor shows ineffectiveness across a parameter range. A small position error does not certify holding-speed prediction, and late-horizon shortening alone identifies no cause. Continuous-time, real-time and hardware behaviour remain untested.\n\nDisposition: reject the recommendation as stated at this tested point; the configuration is not adopted. Retain the retained baseline as the standing reference because no candidate reached joint acceptance. The tested change is not selected.",
+  "recommendation_id": null,
+  "report": {
+    "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+    "media_type": "application/json"
+  },
+  "selected_candidate": {
+    "candidate_id": "baseline-replay",
+    "configuration": {
+      "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+      "media_type": "application/json"
+    },
+    "execution_id": "cf997605885642759ee33920e2c9e2ef",
+    "owner_run_id": "gvs-stage351-baseline-executor"
+  }
+}

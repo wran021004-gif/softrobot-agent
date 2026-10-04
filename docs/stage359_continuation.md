@@ -1,5 +1,11 @@
 # First cross-batch continuation preparation toward Milestone 4
 
+Current status: Milestone 3 closed after the separately authorized compact
+interpretation cycle. One Stage 3.59 cross-batch result is complete under the
+frozen implementation e5d2251. Its current-result interpretation is accurate;
+the next research proposal failed source/budget review, so further live work
+stopped. Milestone 4 remains open. The earlier preparation record follows below.
+
 Stage 3.59 is **offline preparation only**. Milestone 3 remains open after its
 one bounded correction failed the semantic gate. No Stage 3.59 live run,
 model-authored executable plan, accepted method, proposal sequence, candidate
@@ -128,3 +134,61 @@ slots for interpretation. The plan must reconcile the earlier advisory budget
 and saved-state wording with a full fixed-initializer backend evaluation. Unknown
 work is never replayed. The final decision uses a compact source-bound packet
 and proposes exactly one further direction, which is not executed.
+
+The live model authored immutable plan
+bc1f58ac54026d97dcb6155d3ccd15f5a82cc7a53184b69d0b014827004b2816:
+Route A, exactly one finite point (holding 0, terminal 0.10), one intended
+new complete result, no sweep, full fixed-initializer backend execution.
+The 8/20/4200-second planned capacity resolved the predecessor's advisory
+budget ambiguity. All five compatible records were verified and registered;
+two were eligible for exact result reuse under fixed holding zero. None matched
+the proposed 0.10 point, so actual reuse and duplicates were both zero.
+There was one proposal, one backend attempt, one evaluation and one profile;
+normal stopping was pilot_target_complete at the one-result target.
+
+Execution 44dbf3bc2964402e9f6af6a93c0f8d7d recorded:
+
+| Metric | New 0/0.10 | New minus 0/0.05 predecessor | New minus retained 0/0 |
+|---|---:|---:|---:|
+| Terminal error (m) | 0.00812354088231156 | -0.00006335022526580622 | +0.0004809322964441729 |
+| Holding max error (m) | 0.008330389554335758 | +0.00005526618877802619 | -0.0498077147313968 |
+| Holding max speed (m/s) | 0.04867573420025064 | +0.013108426508909393 | -1.53233953977403 |
+| Mean complete update (s) | 17.049473634282393 | +0.17302101432744976 | -0.21384541428248838 |
+
+Reach and holding position pass; holding speed and joint acceptance fail. Both
+comparisons are physical_tradeoff, not overall improvement. All 35 updates miss
+the 0.01-second deadline, with zero solver errors and zero force-bound violations.
+Selections are 15 initialization and 20 positive-iteration updates. The tested
+higher terminal weight weakens the hypothesis of further holding-speed reduction
+while supporting reach retention at this point. No causal or range claim follows.
+
+The final model response accurately interprets those metrics and both comparisons,
+retains the exact original baseline and proposes one 0.05/0.05 joint check. Its
+next-route review fails: “holding ... never positive-tested” conflicts with the
+three earlier holding-only results (only joint-positive is untested), and the
+proposed 900-second budget is 90 seconds below the existing execution reservations
+before planning/interpretation/delivery. The variable map also lists terminal as
+proposed rather than clearly fixed to the predecessor's 0.05, and recommendation
+rejection is not linked to a diagnostic recommendation. The review preserves
+these issues without rewriting model judgment. No additional model correction,
+physical batch or proposed next direction was executed. The final compact payload
+was 22,147 bytes; its source/required-instruction check passed. It supplied both
+references and the joint flag but omitted earlier holding-only rows, which can
+contribute to loss of scope; this limitation is recorded without refusal attribution.
+
+Stage 3.59 charged 2 provider attempts, 8 workflow calls, 1 backend, zero workers,
+690.469000000041 seconds and 110,429 reported provider tokens. Planning cost
+61.82799999997951 seconds; all four execution stages cost 602.188000000082 seconds.
+There were zero protocol recoveries, separate local solves, prediction evaluations
+or current unresolved reservations. The inherited numerical_check_status in the
+raw outcome describes the imported historical check; current numerical work is
+zero. Unused capacity is reported as accounting, not a second campaign grant.
+The historical unknown 900-second reservation remains separate and unreplayed.
+
+Milestone 4 still needs an accurate and operationally coherent next-route decision,
+then separately authorized evidence for the later structure/control alternation
+and its validation. This first continuation demonstrates the shared executor's
+finite proposal, verified references, both comparisons and bounded stopping; it
+does not close Milestone 4 or achieve physical joint acceptance. The raw final
+response, source-bound review, receipts, accounting, executed runner and checksums
+are preserved in evidence/stage359_continuation_20261004.

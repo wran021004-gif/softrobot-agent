@@ -1,0 +1,221 @@
+[
+  {
+    "run_id": "gvs-stage359-1e9a4e779db9-shared",
+    "reference": {
+      "artifact_id": "31442324f1a245ddbcf68ef0e83f391026e96b58f425992a8ab8172c2c3c0ff6",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidates": [
+          {
+            "control/recipe/terminal_tip_speed_weight": 0.1
+          }
+        ],
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F1684",
+          "F489",
+          "F1017",
+          "F971",
+          "F1018",
+          "F1001",
+          "F997",
+          "F1631",
+          "F1068",
+          "F1649",
+          "F972",
+          "F926",
+          "F963",
+          "F947",
+          "F969",
+          "F1066",
+          "F1041",
+          "F1032",
+          "F1043",
+          "F943",
+          "F1742",
+          "F1047",
+          "F1069",
+          "F1054",
+          "F1063",
+          "F170",
+          "F147",
+          "F151",
+          "F172",
+          "F178",
+          "F168",
+          "F145",
+          "F146",
+          "F177",
+          "F1724",
+          "F1072",
+          "F1682",
+          "F1656",
+          "F527",
+          "F516",
+          "F488",
+          "F548",
+          "F526",
+          "F547",
+          "F529"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "Exactly one point is tested (terminal_tip_speed_weight 0.10, holding 0.0) on one frozen stack; whatever it records describes that tested candidate only and establishes neither a continuous range nor effectiveness/ineffectiveness across the weight domain.",
+          "A single complete closed-loop backend run plus comparison against the retained baseline and the 0/0.05 predecessor is not a counterfactual replay; no weight or mechanism can be identified as the dominant cause of the reach/holding outcome.",
+          "Sampled holding evidence covers only the final 0.05 s (6 samples) with continuous_time_guarantee false; wall deadline misses and simulated steps stay separate, and an overrun does not imply skipped applied updates or injected actuator delay.",
+          "One-step position predictions do not certify holding-window tip speed, and world tip frames, projected GVS state and serial backend joint coordinates remain distinct.",
+          "The five supplied completed records (0/0, 0.05/0.0, holding-only 0.10, holding-only 0.30, 0/0.05) remain references from their own candidates and cannot be rebound to the new effective configuration; the planned 0.10 terminal / 0.0 holding configuration has no prior run."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "Route A, one point: on the frozen stack with control/recipe/holding_tip_speed_weight fixed at 0.0, a fresh complete backend run at control/recipe/terminal_tip_speed_weight = 0.10 (immediate predecessor 0.05, execution 50618bf2) is predicted to move the sampled final-window holding maximum world-tip speed further toward the task criterion (speed_limit_m_s 0.02, position_limit_m 0.01, window 0.05 s) while terminal reach is retained (terminal_error_m <= 0.01 m, terminal_reach_passed true). The record will either show a further reduction of sampled hold speed with reach retained, or show reach loss / no further reduction; a single tested point does not by itself identify a dominant cause of the reach/holding outcome.",
+        "max_backend_attempts": 1,
+        "max_candidates": 1,
+        "method": "search.family_explicit@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 1,
+          "model_calls": 8,
+          "tool_calls": 20,
+          "wall_s": 4200.0,
+          "worker_calls": 0
+        },
+        "rationale": "Immutable plan linked to predecessor_decision f7b6f5945761dff9ee45e97a6f8927bd3160ea6f3a391889df63f1bda05109cb and predecessor_plan 43a6daab7e3c1ce6db033408eea6e087a95e3cd2f3acf86f1b66205c4554e128. Follows the accepted model decision: Route A (F548 route continue_weight_combinations), only control/recipe/terminal_tip_speed_weight varies, control/recipe/holding_tip_speed_weight fixed at 0.0 (F489); retained baseline 0/0 (cf997605...), immediate predecessor 0/0.05 (50618bf2..., recorded terminal weight 0.05, F1684). Intended new complete results: exactly ONE changed configuration (terminal 0.10), declared before launch: the accepted bounded check names a single point (F516 'stop after the single 0.10 point'), the predecessor's decision intends one new complete result, 0.10 is the smallest increment beyond the completed 0.05 point and no step size for a larger move is evidenced, so a second point would be an unevidenced sweep; one point preserves the 2-backend grant and the >=600 s interpretation reserve. The configuration terminal 0.10 with holding 0.0 has not been executed (the supplied records are 0/0, 0.05/0.0, holding-only 0.10, holding-only 0.30, 0/0.05), so no result may be reused and a fresh complete backend run using the Task initializer and warm-start policy is required; all five records stay references only. Fixed science: robot, task, acceptance, evaluate.reach@1.0.0, model.serial_bending_cells, controller.gvs_nmpc@7.0.0, timing (control period 0.01 s F1656, duration 0.35 s), solver budget (max_iterations 120, max_cpu_s 30), horizon 10 and initialization/warm-start policy; no local solve, no saved-state replay, no paid query, no new diagnostic. Evidence: predecessor summary (terminal error 0.008186891107577365 m F1017 with terminal_reach_passed true F971 and official success F1018; holding max error 0.008275123365557732 m F997/F1631; holding_speed_passed false F1068; validity valid F1001; initialization_selected 17 F1649; deadline_misses 35 F972; mean complete update 16.876452619954943 s F926; simulation wall 592.5 s F963); sealed comparisons (predecessor-minus-baseline terminal +0.0005442825217099791 m F947 and holding max error -0.049862980920174826 m F969, classification physical_tradeoff F1066, candidate joint_reach_holding_passed false F1041, baseline F1032, baseline holding max speed 1.5810152739742807 m/s F1043/F943; older 0.05/0.0 candidate holding max speed 1.1750052670100422 m/s F1742, baseline holding max error 0.05813810428573256 m F1047/F1069, deadline_misses 35 both F1054/F1063); and the performed plans-view check result (artifact 0013c7bd..., one tool, update_ids 0,8,16,24,28,30,32,34) with aliases F170, F147, F151, F172, F178, F168, F145, F146, F177, F1724/F1072, F1682, F527 showing compute-budget termination and late horizon truncation as controller-side plan records. Those records and the sealed arithmetic are not causal evidence; no dominant cause is established and this submission claims no physical improvement and no range-level effect. Budget: the predecessor's advisory 1200 s allocation is rejected as a total workflow cap (990 s per backend attempt = 900 simulation + 30 evaluation F526 + 60 profile F547, plus >=600 s interpretation and planning/recovery/delivery); planned_budget declares the full separate Stage 3.59 grant (8 model, 20 tool, 4200 s, backend_solves = max_backend_attempts = 1, workers 0), satisfying model_calls >= 5, tool_calls >= 4*1+7 = 11, wall_s >= 990*1+600 = 1590, backend_solves = max_backend_attempts and worker_calls = 0; the proposal cap is 4 (F529) and only one proposal is used. Recommendation acceptance (F488 retain_baseline, both diagnostic deferrals) is kept separate from controller-candidate selection: no candidate is selected as an overall improvement here.",
+        "scientific_promise": "uncertain",
+        "step": null,
+        "stopping_conditions": [
+          "Stop normally when target_changed_configurations = 1 distinct changed configuration (terminal_tip_speed_weight 0.10, holding fixed 0.0) has a complete simulation, sealed evaluation and profile, or when the single explicit proposal is consumed.",
+          "Stop on material failure: solver error count > 0, invalid or incomplete execution, backend error, or a candidate that cannot be prepared and validated; do not substitute another point mid-run.",
+          "No mid-run early reach test exists: joint acceptance is assessed only after the complete evaluation and profile, so a terminal-reach failure observed afterwards ends the batch normally and only describes the tested 0.10 point.",
+          "Stop if remaining delivery capacity falls below the reservations (>= 990 s per backend attempt plus >= 600 s interpretation, with planning/recovery/model/tool slots) needed to deliver a complete result."
+        ],
+        "target_changed_configurations": 1,
+        "variables": {
+          "control/recipe/terminal_tip_speed_weight": [
+            0.0,
+            1.0
+          ]
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "Movement is not acceptance: the immediate predecessor raised terminal_tip_speed_weight 0.0 -> 0.05 and lowered sampled holding max speed from 1.5810152739742807 m/s (F1043, F943) to 0.03556730769134125 m/s, yet holding_speed_passed stays false (F1068) and joint_reach_holding_passed stays false for candidate and baseline (F1041, F1032) with classification physical_tradeoff (F1066); a further reduction at 0.10 need not reach 0.02 m/s.",
+          "Higher tip-speed cost weights elsewhere on this stack lost terminal reach: the holding-only 0.10 point recorded terminal_error_m 0.011558241033380132 m and the 0.30 point 0.018690324120991027 m with terminal_reach_passed false, so the 0.10 terminal point may equally trade reach away; the predecessor's reach margin is thin (terminal 0.008186891107577365 m, F1017, versus tolerance 0.01 m).",
+          "Compute budget is unchanged by the compared weight changes: deadline_misses 35 of 35 updates in both runs of the sealed comparison (F1054, F1063) and 35 in the predecessor profile (F972), User_Requested_Stop 34 (F1724, F1072), and the performed plans-view check records effective_horizon 10 at update 0 (F170) truncated to 5 at update 30 (F147) with update_wall_s 17.096778000006452 s at update 28 (F151) against control_period_s 0.01 (F1656); a weight-only change is not evidenced to alter these.",
+          "Frames and coverage limit inference: sampled hold evidence is 6 final-window samples only (F1682) with no continuous-time guarantee, world tip vectors are reconstructed (F1656-class definitions), and one-step position predictions do not certify holding-window tip speed (F527); the checked plan records F147/F151/F172/F178/F168/F145/F146/F177 are controller-side values, not backend motion."
+        ]
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-0-tool",
+      "tool_id": "design.submit_search_plan",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage359-1e9a4e779db9-shared",
+    "reference": {
+      "artifact_id": "83373d517e4f87faa83aafbf25f7cf4d2c8da50fc7e6ea241b00a95e26f606a1",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "retain_baseline",
+        "disposition": "reject",
+        "feedback": {
+          "artifact_id": "4632a5a58978ba2e53310a0eb98d0e7984ce16d9f9118f731bacaceae9157eff",
+          "media_type": "application/json"
+        },
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "One fresh complete backend run with control/recipe/holding_tip_speed_weight = 0.05 and control/recipe/terminal_tip_speed_weight = 0.05 (predecessor value), all other stack elements frozen.",
+          "evidence": [
+            "50618bf2: terminal_tip_speed_weight 0.05 -> holding_max_speed_m_s 0.03557, terminal_error_m 0.00819",
+            "44dbf3bc: terminal_tip_speed_weight 0.1 -> holding_max_speed_m_s 0.04868 (+0.01311 vs predecessor), joint_reach_holding_passed false",
+            "cf997605 retained baseline: holding_max_speed_m_s 1.5810, holding_max_error_m 0.05814"
+          ],
+          "expected_observations": [
+            "Supporting: holding_max_speed_m_s below predecessor 0.03557, holding_max_error_m still <= 0.01, terminal_reach_passed true",
+            "Weakening: holding_max_speed_m_s at or above 0.03557, or holding/terminal acceptance lost"
+          ],
+          "fixed_conditions": [
+            "frozen stack and source plan bc1f58ac54026d97",
+            "control_period_s 0.01 with 35 control updates",
+            "acceptance: terminal_error_m <= 0.01, holding_max_error_m <= 0.01, holding_max_speed_m_s <= 0.02, window 0.05 s",
+            "coverage/derivation conventions unchanged"
+          ],
+          "limitations": [
+            "Single tested point; no dominant-cause or parameter-range ineffectiveness claim",
+            "No continuous-time, real-time or hardware claim; sampling and coverage conventions bound generalization"
+          ],
+          "proposed_budget": {
+            "backend_solves": 1,
+            "model_calls": 1,
+            "tool_calls": 6,
+            "wall_s": 900.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {
+            "control/recipe/holding_tip_speed_weight": "0.05",
+            "control/recipe/terminal_tip_speed_weight": "0.05"
+          },
+          "route": "continue_weight_combinations",
+          "stopping_conditions": [
+            "Stop after the single run; if joint_reach_holding_passed true, stop and consider adoption",
+            "If holding_max_speed_m_s does not fall below 0.03557, stop raising holding_tip_speed_weight and report the observed adverse/non-monotone step"
+          ],
+          "unresolved_question": "On the frozen stack, does a positive control/recipe/holding_tip_speed_weight (never positive-tested; joint_positive_weight_tested false) reduce sampled final-window holding maximum world-tip speed toward 0.02 while terminal reach is retained, or does the adverse terminal-weight step (0.05 -> 0.1) reflect a non-monotone weight response?"
+        },
+        "reasoning": "Rows: retained baseline cf997605 (holding_max_error_m 0.05814, holding_max_speed_m_s 1.5810, terminal_error_m 0.00764, both holding checks false); immediate predecessor 50618bf2 (holding_max_error_m 0.00828 pass, holding_max_speed_m_s 0.03557 fail, terminal_error_m 0.00819 pass, joint false); completed candidate batch-bc1f58ac54026d97-0 / execution 44dbf3bc (change control/recipe/terminal_tip_speed_weight -> 0.1; holding_max_error_m 0.00833 pass, holding_max_speed_m_s 0.04868 fail, terminal_error_m 0.00812 pass, joint false).\n\nHypothesis status: weakened. The predicted further reduction of sampled final-window holding maximum world-tip speed did not occur: against the immediate predecessor the candidate raised holding_max_speed_m_s by +0.01311 (0.03557 -> 0.04868), i.e. away from the 0.02 criterion, while holding_max_error_m rose +5.53e-05 and terminal_error_m fell -6.34e-05. Reach retention is supported (terminal_error_m 0.00812 <= 0.01, terminal_reach_passed true). Acceptance is not reached: holding_speed_passed false, joint_reach_holding_passed false; only the holding-position component passes. Against the retained baseline the candidate is a large physical trade-off (holding_max_error_m -0.04981, holding_max_speed_m_s -1.532, terminal_error_m +0.00048): improvements and a slight worsening coexist, classified physical_tradeoff both ways, so no overall improvement and raw scalar objectives were not ranked.\n\nScope: one tested point on one value. It neither identifies a dominant cause of the reach/holding outcome nor shows ineffectiveness across a parameter range. A small position error does not certify holding-speed prediction, and late-horizon shortening alone identifies no cause. Continuous-time, real-time and hardware behaviour remain untested.\n\nDisposition: reject the recommendation as stated at this tested point; the configuration is not adopted. Retain the retained baseline as the standing reference because no candidate reached joint acceptance. The tested change is not selected.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "baseline-replay",
+          "configuration": {
+            "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+            "media_type": "application/json"
+          },
+          "execution_id": "cf997605885642759ee33920e2c9e2ef",
+          "owner_run_id": "gvs-stage351-baseline-executor"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-1-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  }
+]
