@@ -384,8 +384,37 @@ def resume_adaptation_interpretation():
     assert_predecessor(w);export(w,status,reason,time.monotonic()-start)
 
 
+def complete_final_semantics():
+    """Complete omitted sequence/pilot interpretation through the research model."""
+    if subprocess.check_output(['git','diff','HEAD','--',*revision()['files']],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
+    from examples.gvs_nmpc_route_experiment import load_credential
+    load_credential(Path(os.environ['SOFTAGENT_CONFIGURATION_PATH']))
+    for key in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):
+        if '127.0.0.1:9' in os.environ.get(key,''):os.environ.pop(key)
+    w=restore();w.current_stage='complete_sequence_semantics';start=time.monotonic();status='incomplete';reason=None
+    old=w.chain['final_response'];assessment=read(w.directory/'pilot_assessment.json')
+    review=dict(prior_response=old,prior_response_preserved=True,complete_sequence_semantic_passed=False,
+        omitted=['Separate structural effect under fixed 0/0.05 recipe.','Frozen pilot forecasts versus outcomes, four unresolved directions and no ordering prediction.','Supported consequence for use of the nondiscriminating local proxy.','Why choose the passing adaptation versus the passing pre-adaptation structure/control pair.'],
+        hypothesis_and_physical_comparisons_accurate=True,selection_is_permitted_tradeoff=True)
+    atomic_json(w.directory/'final_semantic_review.json',review)
+    packet=read(w.directory/'adaptation_decision_packet.json');packet.update(semantic_review=review,pilot_assessment=assessment,
+        frozen_forecast=read(w.directory/'pilot_forecast_seal.json'),structure_results=read(w.directory/'structure_decision_packet.json')['completed_results'],
+        successful_control_reference=prior.campaign_metrics(next(r['facts'] for r in w.historical_results if r['facts']['execution_id']==CONTROL_EXECUTION)))
+    w.instructions={**w.instructions,'response_final':'''Submit one final complete-sequence decision, correcting the omissions in semantic_review. This is the required final deliverable, not a new experiment. Keep next_action=finish, next_research.route=stop with zero budget; no new numerical/backend work. Preserve prior response and forecasts. Use about 450 words in reasoning, in this order: (1) structural effect of near 0.15->0.16 under fixed holding 0 / terminal 0.05 against declared source and retained baseline; (2) adaptation effects for both 0.05 and 0.10 holding points on fixed structure, including joint acceptance loss at 0.10; (3) select any fully evaluated configuration yourself, explicitly justify the choice between passing pre-adaptation 0/0.05 and passing adaptation 0.05/0.05, acknowledging smaller errors versus slightly higher speed and timing as a tradeoff; compare selected outcome also with earlier successful control reference; (4) prospective pilot: zero correct, zero incorrect, four unresolved direction predictions (two metrics x two candidates), no predicted ordering so no ordering match can be established, joint acceptance was unknown; all three local controller attempts selected iteration zero with verified_settled_seed and identical commands, 3 short rollouts; report predictor and full evaluation costs from pilot_assessment. State the supported consequence: retain full evaluation; this saved-state proxy gave no demonstrated direction/ranking capability. Do not call abstention a correct forecast, invent a cause of full-task differences, compare local endpoint speed numerically with maximum holding speed, or rank raw weighted objectives. Report reach/holding/timing separately, with all 35/35 deadline misses and no real-time demonstration. Recommendation disposition is defer with null recommendation_id for hypothesis-only assessment; candidate selection independent. hypothesis_assessment refers to adaptation conjunction, weakened if joint acceptance fails at one tested point. No causal/global/hardware/continuous-time or general screening claims. Author exactly one required next_research with stop/zero budget; future work unexecuted.'''}
+    try:
+        w.phase('response_final','design_response','final_response',decision_packet=packet,decision_packet_reference=save(w.store,packet),
+            batch_result=w.store.artifact(w.chain['batch_summary']),require_research_route=True,require_research_budget=True,research_records=w.historical_results,latest_tested=w.latest_tested,
+            improvement_feedback_content=dict(baseline_facts=w.retained_baseline,execution=None),check_feedback=[dict(reference=w.chain['batch_summary'])],
+            source_report=w.common['source_report'],source_record=w.source_record)
+        atomic_json(w.directory/'complete_sequence_corrected_final_response.json',w.store.artifact(w.chain['final_response']))
+        status='sequence_complete';reason='Accepted model-authored complete-sequence and pilot interpretation supersedes the incomplete final prose; all original evidence preserved.'
+    except Exception as exc:reason=str(exc);print('STOP',reason,flush=True)
+    assert_predecessor(w);export(w,status,reason,time.monotonic()-start)
+
+
 if __name__=='__main__':
     if sys.argv[1]=='resume-structure-interpretation':resume_structure_interpretation()
     elif sys.argv[1]=='correct-structure-semantics':correct_structure_semantics()
     elif sys.argv[1]=='resume-adaptation-interpretation':resume_adaptation_interpretation()
+    elif sys.argv[1]=='complete-final-semantics':complete_final_semantics()
     else:live(sys.argv[1])
