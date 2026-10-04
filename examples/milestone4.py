@@ -129,7 +129,7 @@ def plan(w,stage,count,instructions):
         latest_tested=w.latest_tested,require_source_binding=True,predecessor_decision=w.predecessor_decision,
         planned_backend_count=count)
     record=w.store.artifact(w.chain['search_plan']);p=record['plan']
-    if p['max_backend_attempts']!=count or p['target_changed_configurations']!=count or any(p['planned_budget'][k]>v for k,v in w.store.remaining()['remaining'].items()):
+    if p['max_backend_attempts']!=count or p['target_changed_configurations']!=count or any(p['planned_budget'][k]>v for k,v in packet['budget']['available'].items()):
         raise ValueError('MILESTONE_PHASE_CAP_OR_CUMULATIVE_BUDGET_MISMATCH')
     atomic_json(w.directory/(stage+'_plan.json'),record)
     w.freeze['stage_instructions']=w.instructions
@@ -185,6 +185,90 @@ def export(w,status,reason,elapsed):
         revision=revision()))
 
 
+def restore():
+    """Continue only this ledger, retaining every charge and recovery counter."""
+    freeze=read(RUN/'freeze.json');outcome=read(RUN/'outcome.json')
+    w=MilestoneWorkflow(RUN,freeze['mode'],experiment=freeze['experiment']);w.freeze=freeze
+    w.project=freeze['project_id'];w.hosts={k:Host(RUN,v) for k,v in freeze['hosts'].items()}
+    w.binding=freeze['binding'];w.identities=freeze['identities'];w.summary=freeze['summary']
+    w.inventory=freeze['inventory'];w.inventory_ref=freeze['inventory_reference']
+    w.common=freeze['common_scientific_input'];w.source_record=freeze['source_record'];w.eligibility=freeze['numerical_eligibility']
+    w.chain=outcome['chain'];w.historical_feedback=w.store.artifact(w.common['feedback'])
+    w.historical_results=freeze['historical_results']
+    for stage in ('control','structure','adaptation'):
+        path=RUN/(stage+'_batch_result.json')
+        if not path.exists():continue
+        for row in read(path)['candidates']:
+            if not row.get('execution'):continue
+            facts=row['execution']['factual_result'];cfg=w.store.artifact(facts['configuration'])['effective']
+            from extensions.tendon_family.gvs_profile import execution_scope
+            w.historical_results.append(dict(role='historical_candidate',facts=facts,execution_scope=execution_scope(cfg),source_store=str(RUN),
+                owner_run_id=facts['candidate']['owner_run_id'],execution_id=facts['execution_id'],receipts=row['execution']['receipts'],reuse_reason='Sealed current-campaign result.'))
+    w.retained_baseline=w.historical_results[0]['facts'];w.latest_tested=w.historical_results[-1]['facts']['candidate']
+    w.predecessor_decision=w.chain.get('final_response') or read(prior.RUN/'chain.json')['final_response']
+    w.previous=w.host('design');return w
+
+
+def migrate_planning_host(w,suffix):
+    """Explicit engineering continuation after changed planner dependencies, same project."""
+    old=w.host('design');inp=deepcopy(w.store.session(old.run_id)['snapshot']['input']);inp['run_id']=w.project+'-'+suffix
+    new=Host(RUN,inp['run_id']);new.create(inp);transfer_recovery(old,new)
+    old_state=w.store.session(old.run_id)['state']
+    with w.store.transaction() as db:
+        state=w.store.session(new.run_id,db)['state']
+        for field in ('role_context','fact_scope','fact_catalog','reference_interface','read_ledger'):
+            if field in old_state:state[field]=deepcopy(old_state[field])
+        w.store.update_state(db,new.run_id,state)
+        w.store.event(db,new.run_id,'engineering_continuation','same_campaign',outputs=[w.store.put(db,dict(
+            source_context=old.run_id,project=w.store.config()['project_id'],budgets_reset=False,
+            preserved_corrections=old_state.get('protocol_corrections_used',0),preserved_business_failures=old_state.get('business_failures_total',0),revision=revision()))])
+    w.hosts['shared']=new;w.previous=new;w.freeze['hosts']['shared']=new.run_id
+    w.freeze['host_provider_configurations']['shared']=inp['policy']['model']
+    return new
+
+
+def repair_control():
+    """Revalidate the exact saved model-1 proposal after fixing host accounting."""
+    from examples.gvs_nmpc_route_experiment import load_credential
+    load_credential(Path.home()/'.codex/.env')
+    for name in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):
+        if '127.0.0.1:9' in os.environ.get(name,''):os.environ.pop(name)
+    w=restore();atomic_json(RUN/'control_pre_repair_freeze.json',w.freeze)
+    w.current_stage='control';host=migrate_planning_host(w,'control-engineering1')
+    w.freeze['implementation']=implementation();w.freeze['milestone4_revision']=revision()
+    (RUN/'executed_control_repair_runner.py').write_bytes(Path(__file__).read_bytes())
+    if (RUN/'control_batch_result.json').exists():raise ValueError('DO_NOT_REPLAY_CONTROL_EXECUTION')
+    saved=next(r for r in read(EVIDENCE/'single_context/resolved_calls.json') if r['invocation']['request_id']=='model-1-tool')
+    invocation=deepcopy(saved['invocation']);invocation.update(request_id='revalidate-sealed-model-1-plan',cache='new',
+        reason='Exact unchanged model-authored scientific proposal; revalidate after correcting downstream capacity calculation; prior rejected receipts and charges preserved.')
+    host.resume();receipt=host.invoke(invocation)
+    if receipt['execution_status']!='completed':raise ValueError('REVALIDATION_FAILED: '+str(receipt.get('error')))
+    w.chain['search_plan']=w.store.artifact(receipt['output'])['reference'];record=w.store.artifact(w.chain['search_plan'])
+    atomic_json(RUN/'control_plan.json',record)
+    atomic_json(RUN/'control_prelaunch_review.json',dict(passed=True,model_response=saved['reference'],plan=w.chain['search_plan'],
+        review_method='Shared program validation plus direct agent source/semantic review; no judge service.',
+        exact_point=record['plan']['candidates'],source=record['bindings']['subject'],
+        baseline=w.retained_baseline['candidate'],actual_differences=record['actual_differences'],
+        budget=record['available_capacity'],hypothesis_scoped_to_one_point=True,history_interpretation_accurate=True,
+        earlier_model_statement_bytes_preserved=True))
+    atomic_json(RUN/'control_engineering_intervention.json',dict(source_model_response=saved['reference'],
+        scientific_arguments_unchanged=True,ledger_reset=False,
+        repairs=['Correct downstream budget check to use project/session capacity rather than planning-phase capacity.'],
+        rejected_later_response=dict(reference=read(EVIDENCE/'single_context/resolved_calls.json')[-1]['reference'],
+            reason='Rationale incorrectly says all holding-only positive points fail official reach; 0.05/0 passed. Completed physical failure is usable comparison evidence.'),revision=revision()))
+    # A successfully revalidated business call resets consecutive failure state,
+    # as in the existing provider loop; total failures/corrections stay intact.
+    with w.store.transaction() as db:
+        state=w.store.session(host.run_id,db)['state'];state['repairs']=0;state['protocol_corrections_consecutive']=0
+        state.pop('business_feedback',None);w.store.update_state(db,host.run_id,state)
+    start=time.monotonic();status='incomplete';reason=None
+    try:
+        execute(w,'control',record);status='control_complete';reason='One control result complete; structural stage follows within the original ledger.'
+    except Exception as exc:
+        reason=str(exc);atomic_json(RUN/'control_repair_failure.json',dict(type=type(exc).__name__,message=reason));print('STOP',reason,flush=True)
+    atomic_json(RUN/'freeze.json',w.freeze);export(w,status,reason,time.monotonic()-start)
+
+
 def control_live():
     if RUN.exists():raise ValueError('PRESERVE_EXISTING_CAMPAIGN_NO_REPLACEMENT')
     if subprocess.check_output(['git','diff','HEAD','--',*revision()['files']],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
@@ -204,4 +288,6 @@ def control_live():
     export(w,status,reason,time.monotonic()-start)
 
 
-if __name__=='__main__':control_live()
+if __name__=='__main__':
+    if len(sys.argv)>1 and sys.argv[1]=='repair-control':repair_control()
+    else:control_live()

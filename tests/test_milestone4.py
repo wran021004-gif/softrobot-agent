@@ -57,6 +57,11 @@ class MilestonePlanningTests(TestCase):
                 planned_budget=dict(model_calls=8,tool_calls=20,backend_solves=1,worker_calls=0,wall_s=2500.))
             view=project_working_state(w.store,host.run_id)
             result=validate_batch_plan(w.store,view,proposal)
+            with w.store.transaction() as db:
+                state=w.store.session(host.run_id,db)['state'];state['role_context']['phase_budget']['limit']['model_calls']=2;w.store.update_state(db,host.run_id,state)
+            # Two planning slots do not remove the separately protected four
+            # interpretation slots from the cumulative project grant.
+            self.assertTrue(validate_batch_plan(w.store,project_working_state(w.store,host.run_id),proposal)['available_capacity']['sufficient'])
             self.assertEqual(result['bindings']['subject'],source)
             self.assertNotEqual(source,view.latest_tested)
             self.assertEqual(result['actual_differences'][0]['actual_changes'],[dict(path='control/recipe/holding_tip_speed_weight',before=0.,after=.05)])

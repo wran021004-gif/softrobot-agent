@@ -28,7 +28,7 @@ def validate_batch_plan(store, view, proposal):
         raise ValueError('PLAN_REQUIRES_PERFORMED_CHECK_EVIDENCE: evidence must include an exact result alias, e.g. '+', '.join(available[:8]))
     from tools.study_history import select_source
     from tools.candidate_parameters import fixed_configuration, parameter_value, actual_parameter_changes
-    from tools.batch_budget import budget_capacity, batch_requirement
+    from tools.batch_budget import budget_capacity, batch_requirement, downstream_available
     if role.get('require_source_binding') and (plan.source_candidate is None or plain(plan.predecessor_decision)!=role.get('predecessor_decision')):
         raise ValueError('PLAN_EXPLICIT_SOURCE_AND_PREDECESSOR_REQUIRED')
     candidate=select_source(role.get('research_records',[]),plan.source_candidate,view.latest_tested)
@@ -100,7 +100,9 @@ def validate_batch_plan(store, view, proposal):
     if plan.max_backend_attempts is not None and (plan.max_backend_attempts>plan.max_candidates or
             (plan.target_changed_configurations or 1)>plan.max_backend_attempts):raise ValueError('PLAN_CAPS_INCONSISTENT')
     capacity=budget_capacity(count,budget)
-    available=budget_capacity(count,store.spendable(view.run_id)['remaining'])
+    # Execution and interpretation follow this planning phase. Its local call
+    # limit/protected capacity must not be counted as the downstream grant.
+    available=budget_capacity(count,downstream_available(store,view.run_id),planning={})
     if role.get('require_source_binding') and (not capacity['sufficient'] or not available['sufficient']):
         raise ValueError('PLAN_TOTAL_CAPACITY_INSUFFICIENT: '+str(dict(planned=capacity['shortfalls'],available=available['shortfalls'])))
     fixed=fixed_configuration(effective,plan.variables)

@@ -4,6 +4,11 @@ from tools.execution_completion import EXECUTION_ALLOWANCES
 INTERPRETATION_RESERVE=dict(wall_s=600.,model_calls=4,tool_calls=4)
 
 
+def downstream_available(store,run_id,db=None):
+    project=store.remaining(None,db)['remaining'];session=store.remaining(run_id,db)['remaining']
+    return {k:min(v,session[k]) for k,v in project.items()}
+
+
 def batch_requirement(count, *, interpretation=None, planning=None):
     interpretation=INTERPRETATION_RESERVE if interpretation is None else interpretation
     planning=dict(model_calls=1,tool_calls=1,wall_s=0.) if planning is None else planning

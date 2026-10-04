@@ -21,6 +21,8 @@ def study_history(store, records, *, retained_baseline=None, selected_source=Non
         recipe=effective['policy']['controller']['parameters']['data'].get('recipe',{})
         rows.append(dict(candidate=candidate,configuration_identity=digest(effective),status=status,
             decisions={r['path']:r['effective_value'] for r in decisions['parameters']},
+            physical_structure=[dict(component=c['id'],length_m=c.get('length_m'),sections=c.get('sections'),physics=c.get('physics'))
+                for c in effective['robot']['structure']['data']['components']],
             structure_identity=digest(effective['robot']),
             controller=effective['policy']['controller']['extension_id']+'@'+effective['policy']['controller']['version'],
             weights=dict(holding=recipe.get('holding_tip_speed_weight'),terminal=recipe.get('terminal_tip_speed_weight')),
