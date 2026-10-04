@@ -78,7 +78,8 @@ class PilotPhysicalTests(TestCase):
     def test_sealed_execution_recovery_never_calls_executor(self):
         from types import SimpleNamespace
         sealed=dict(status='completed',fully_evaluated_distinct_changed_configurations=1,candidates=[])
-        store=SimpleNamespace(artifact=lambda ref:sealed)
+        from contextlib import nullcontext
+        store=SimpleNamespace(artifact=lambda ref:sealed,connect=lambda *a:nullcontext(SimpleNamespace(execute=lambda sql:[])))
         candidate=dict(candidate_id='source')
         w=SimpleNamespace(store=store,chain=dict(batch_result={}),historical_results=[dict(facts=dict(candidate=candidate))],host=lambda role:None)
         record=dict(bindings=dict(subject=candidate),plan=dict(target_changed_configurations=1))
@@ -130,3 +131,20 @@ class PilotPhysicalTests(TestCase):
         self.assertEqual(physical_direction(-.001),'improvement')
         self.assertEqual(physical_direction(.001),'worsening')
         self.assertEqual(physical_direction(1e-9),'unresolved')
+
+
+class FinalRecoveryTests(TestCase):
+    def test_actual_complete_payload_and_latest_receipt_identity_offline(self):
+        import json
+        w=run.restore();host=w.host('design');role=w.store.session(host.run_id)['state']['role_context']
+        packet=role['decision_packet'];compact=run.compact_decision_packet(packet,role['decision_packet_reference'])
+        self.assertEqual(compact['completed_results'],packet['completed_results'])
+        for original,projected in zip(packet['history']['rows'],compact['history']['rows']):
+            self.assertEqual(original['metrics'],projected['metrics']);self.assertEqual(original['decisions'],projected['decisions'])
+        payload=payload_for(host,EvidenceDrivenAdapter());context=json.loads(payload['messages'][1]['content'])
+        context['role_context']['decision_packet']=compact;payload['messages'][1]['content']=json.dumps(context)
+        self.assertLess(len(json.dumps(payload).encode()),100000)
+        with w.store.connect(True) as db:
+            latest=db.execute("SELECT run_id FROM calls WHERE request_id='complete-profile' AND status='completed' ORDER BY rowid DESC LIMIT 1").fetchone()[0]
+        self.assertEqual(w.latest_tested['owner_run_id'],latest)
+        self.assertEqual(w.store.artifact(w.chain['pilot_forecast_seal']),read(run.RUN/'pilot_forecast_seal.json'))

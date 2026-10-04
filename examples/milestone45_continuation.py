@@ -42,8 +42,34 @@ def allocation(old):
     return {k:prior.GRANT[k]-old['used'][k] for k in prior.GRANT}
 
 
+def compact_decision_packet(value,reference):
+    packet=deepcopy(value);history=packet['history']
+    keep=('candidate','configuration_identity','status','decisions','structure_identity','weights','metrics')
+    history['rows']=[{k:row[k] for k in keep if k in row} for row in history['rows']]
+    if 'pilot_assessment' in packet:
+        assessment=packet['pilot_assessment']
+        for row in assessment['outcomes']:
+            for field in ('comparison','against_successful_reference'):
+                row[field]={k:v for k,v in row[field].items() if k not in ('baseline','candidate')}
+        pair=assessment.get('observed_complete_pair_comparison')
+        if pair:assessment['observed_complete_pair_comparison']={k:v for k,v in pair.items() if k not in ('baseline','candidate')}
+    if 'frozen_forecast' in packet:
+        packet['frozen_forecast'].pop('revision',None)
+        packet['frozen_forecast'].pop('usage',None)
+    packet['full_packet_reference']=reference
+    return packet
+
+
 class Continuation(prior.MilestoneWorkflow):
     numerical_limits=dict(local_solves=6,prediction_evaluations=12)
+
+    def phase(self,phase,kind,key,**extra):
+        if 'decision_packet' in extra and 'history' in extra['decision_packet']:
+            # Retain identities, exact decisions and all physical/timing metrics.
+            # Repeated detailed meshes/material sections stay in the full sealed
+            # packet referenced by decision_packet_reference.
+            extra['decision_packet']=compact_decision_packet(extra['decision_packet'],extra.get('decision_packet_reference'))
+        return super().phase(phase,kind,key,**extra)
 
     def check_provider_payload(self,host):
         assert_predecessor(self)
@@ -120,7 +146,10 @@ def restore():
     for attr,key in [('binding','binding'),('identities','identities'),('summary','summary'),('inventory','inventory'),
         ('inventory_ref','inventory_reference'),('common','common_scientific_input'),('source_record','source_record'),('eligibility','numerical_eligibility')]:setattr(w,attr,freeze[key])
     w.chain=read(RUN/'chain.json');w.historical_results=freeze['historical_results'];w.retained_baseline=w.historical_results[0]['facts']
-    w.latest_tested=w.historical_results[-1]['facts']['candidate'];w.predecessor_decision=w.chain.get('final_response') or read(ORIGINAL/'chain.json')['final_response']
+    with w.store.connect(True) as db:
+        latest=db.execute("SELECT run_id FROM calls WHERE request_id='complete-profile' AND status='completed' ORDER BY rowid DESC LIMIT 1").fetchone()
+    w.latest_tested=next(r['facts']['candidate'] for r in w.historical_results if r['facts']['candidate']['owner_run_id']==latest['run_id']) if latest else w.historical_results[-1]['facts']['candidate']
+    w.predecessor_decision=w.chain.get('final_response') or read(ORIGINAL/'chain.json')['final_response']
     w.previous=w.host('design');w.historical_feedback=w.store.artifact(w.common['feedback']);assert_predecessor(w)
     return w
 
@@ -333,7 +362,30 @@ def correct_structure_semantics():
     assert_predecessor(w);export(w,status,reason,time.monotonic()-start)
 
 
+def resume_adaptation_interpretation():
+    """Interpret sealed adaptations after compacting the public history view."""
+    if subprocess.check_output(['git','diff','HEAD','--',*revision()['files']],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
+    from examples.gvs_nmpc_route_experiment import load_credential
+    load_credential(Path(os.environ['SOFTAGENT_CONFIGURATION_PATH']))
+    for key in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):
+        if '127.0.0.1:9' in os.environ.get(key,''):os.environ.pop(key)
+    w=restore();w.current_stage='adaptation';start=time.monotonic();status='incomplete';reason=None
+    if (w.directory/'complete_sequence_final_response.json').exists():raise ValueError('COMPLETE_SEQUENCE_ALREADY_SEALED')
+    try:
+        assessment=assess_pilot(w)
+        prior.execute(w,'adaptation',read(w.directory/'adaptation_plan.json'),sealed_result=read(w.directory/'adaptation_batch_result.json'),
+            decision_extra=dict(pilot_assessment=assessment,frozen_forecast=read(w.directory/'pilot_forecast_seal.json'),
+                structure_results=read(w.directory/'structure_decision_packet.json')['completed_results'],
+                forecast_consequence='Local pilot abstained: zero resolved direction/order. All three local attempts stopped at verified_settled_seed, selected iteration zero. Full evaluation remains necessary; no general screening validation.'))
+        atomic_json(w.directory/'complete_sequence_final_response.json',w.store.artifact(w.chain['final_response']))
+        status='sequence_complete';reason='Complete structure/adaptation sequence and pilot assessment interpreted from sealed results; no backend replay.'
+    except Exception as exc:
+        reason=str(exc);atomic_json(w.directory/'adaptation_interpretation_failure.json',dict(type=type(exc).__name__,message=reason));print('STOP',reason,flush=True)
+    assert_predecessor(w);export(w,status,reason,time.monotonic()-start)
+
+
 if __name__=='__main__':
     if sys.argv[1]=='resume-structure-interpretation':resume_structure_interpretation()
     elif sys.argv[1]=='correct-structure-semantics':correct_structure_semantics()
+    elif sys.argv[1]=='resume-adaptation-interpretation':resume_adaptation_interpretation()
     else:live(sys.argv[1])

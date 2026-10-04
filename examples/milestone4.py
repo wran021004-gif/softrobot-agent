@@ -172,7 +172,12 @@ def execute(w,stage,record,*,before_execution=None,decision_extra=None,sealed_re
         if sealed_result!=w.store.artifact(w.chain['batch_result']):raise ValueError('SEALED_STAGE_RESULT_MISMATCH')
         result=sealed_result
     atomic_json(w.directory/(stage+'_batch_result.json'),result)
-    for row in result['candidates']:
+    # Artifact dictionaries are canonicalized by hash, so their iteration order
+    # is not execution chronology. Complete candidates follow receipt sequence.
+    with w.store.connect(True) as db:
+        completion_order={r['run_id']:r['rowid'] for r in db.execute("SELECT rowid,run_id FROM calls WHERE request_id='complete-profile' AND status='completed'")}
+    ordered=sorted(result['candidates'],key=lambda row:completion_order.get(row['candidate_id'],-1))
+    for row in ordered:
         if not row.get('execution'):continue
         facts=row['execution']['factual_result'];configuration=w.store.artifact(facts['configuration'])['effective']
         from extensions.tendon_family.gvs_profile import execution_scope
