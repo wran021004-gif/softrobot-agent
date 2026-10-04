@@ -60,6 +60,10 @@ class MilestoneWorkflow(prior.ContinuationWorkflow):
     instructions={**prior.ContinuationWorkflow.instructions,'improvement':CONTROL_PLAN,'response_final':FINAL}
 
     def check_provider_payload(self,host):
+        role=host.store.session(host.run_id)['state']['role_context']
+        if role['phase']=='response_final':
+            for field in ('improvement_feedback_content','check_feedback','report','native_fixed'):
+                if field not in role:raise ValueError('FINAL_HOST_CONTEXT_MISSING: '+field)
         payload=payload_for(host,EvidenceDrivenAdapter());view=json.loads(payload['messages'][1]['content'])['role_context']
         assert view['instructions'] and ('study_packet' in view or 'decision_packet' in view)
         assert len(json.dumps(payload).encode())<100000
@@ -168,6 +172,7 @@ def execute(w,stage,record):
     packet_ref=save(w.store,packet);atomic_json(w.directory/(stage+'_decision_packet.json'),packet)
     w.phase('response_final','design_response','final_response',decision_packet=packet,decision_packet_reference=packet_ref,
         batch_result=summary,require_research_route=True,research_records=w.historical_results,latest_tested=w.latest_tested,
+        improvement_feedback_content=dict(baseline_facts=w.retained_baseline,execution=None),check_feedback=[dict(reference=w.chain['batch_summary'])],
         source_report=w.common['source_report'],source_record=w.source_record)
     response=w.store.artifact(w.chain['final_response']);atomic_json(w.directory/(stage+'_final_response.json'),response)
     w.predecessor_decision=w.chain['final_response']
@@ -177,6 +182,11 @@ def execute(w,stage,record):
 
 def export(w,status,reason,elapsed):
     w.export(status,reason,elapsed)
+    outcome=read(w.directory/'outcome.json')
+    outcome.update(physical_improvement='Evaluated by sealed current-campaign profiles and separate source/baseline physical vectors; see stage decision packets.',
+        numerical_check_status='Historical performed-check reference only; zero new separate local solves or prediction evaluations.')
+    atomic_json(w.directory/'outcome.json',outcome)
+    atomic_json(EVIDENCE/'single_context/outcome.json',outcome)
     from tools.improvement_workflow import archive_store
     archive_store(w.store,EVIDENCE/'single_context',source_stores=[prior.previous.prior.CONFIRM,*[p for _,p,_ in SOURCES]])
     atomic_json(EVIDENCE/'campaign_status.json',dict(status=status,reason=reason,usage=w.store.remaining(),
@@ -269,6 +279,55 @@ def repair_control():
     atomic_json(RUN/'freeze.json',w.freeze);export(w,status,reason,time.monotonic()-start)
 
 
+def repair_interpretation():
+    """Fix host feedback, seal the unchanged draft, then request scientific correction."""
+    from examples.gvs_nmpc_route_experiment import load_credential
+    load_credential(Path.home()/'.codex/.env')
+    for name in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):
+        if '127.0.0.1:9' in os.environ.get(name,''):os.environ.pop(name)
+    w=restore();w.current_stage='control';host=w.host('design');state=w.store.session(host.run_id)['state']
+    draft=deepcopy(state['unaccepted_draft']);atomic_json(RUN/'control_original_interpretation_draft.json',draft)
+    if (RUN/'control_checkpoint.json').exists():raise ValueError('CONTROL_INTERPRETATION_ALREADY_COMPLETE')
+    with w.store.transaction() as db:
+        state=w.store.session(host.run_id,db)['state']
+        state['role_context'].update(improvement_feedback_content=dict(baseline_facts=w.retained_baseline,execution=None),
+            check_feedback=[dict(reference=w.chain['batch_summary'])])
+        w.store.update_state(db,host.run_id,state)
+    adapter=EvidenceDrivenAdapter();payload_for(host,adapter)
+    arguments=adapter.resolve_business('design.respond_diagnosis',draft['arguments']);arguments.update(adapter.fixed['design.respond_diagnosis'])
+    host.resume();receipt=host.invoke(dict(request_id='seal-saved-interpretation-after-context-repair',tool_id='design.respond_diagnosis',tool_version='3.0.0',
+        arguments=arguments,reason='Seal the unchanged saved model draft after host-only context repair; semantic next-proposal rejection retained separately.',cache='new'))
+    if receipt['execution_status']!='completed':raise ValueError('INTERPRETATION_REVALIDATION_FAILED: '+str(receipt.get('error')))
+    saved=w.store.artifact(receipt['output'])['reference']
+    atomic_json(RUN/'control_rejected_next_proposal_review.json',dict(response=saved,current_result_interpretation_passed=True,
+        next_proposal_passed=False,issues=['1500 seconds/5 tools/1 model for two complete evaluations is below computed execution and interpretation reservations.',
+        'Variable identifiers must use supported canonical builder paths; the first live structural study varies one length only.'],
+        host_context_repaired=True,scientific_draft_unchanged=True,backend_replayed=False))
+    with w.store.transaction() as db:
+        state=w.store.session(host.run_id,db)['state'];state['protocol_corrections_consecutive']=0
+        state.pop('protocol_correction',None);state.pop('unaccepted_draft',None);w.store.update_state(db,host.run_id,state)
+    packet=read(RUN/'control_decision_packet.json');packet.update(prior_response=saved,
+        correction_review=read(RUN/'control_rejected_next_proposal_review.json'),
+        permitted_next_study=dict(max_backend_attempts=1,variables=['components/near/length_m','components/far/length_m'],
+            domains={'components/near/length_m':[.15,.17],'components/far/length_m':[.11,.13]},
+            rule='Choose exactly one length for the later separately validated immutable plan. Freeze controller recipe. Then adapt controller weights on the changed structure; physical failure remains usable evidence.'),
+        budget=budget_capacity(1,w.store.remaining()['remaining']))
+    instructions=FINAL+' Correct the prior next proposal using correction_review and permitted_next_study. Its two-evaluation 1500-second budget is insufficient; use the computed one-result requirement and available capacity. Propose exactly one canonical LENGTH path with a bounded value, not undeclared section/modulus paths. Keep current-result interpretation accurate and adoption independent. Record a next structural question, supporting and weakening observations; this is a research direction, not a physical success claim.'
+    w.instructions={**w.instructions,'response_final':instructions};w.freeze['stage_instructions']=w.instructions
+    start=time.monotonic();status='incomplete';reason=None
+    try:
+        w.phase('response_final','design_response','final_response',decision_packet=packet,decision_packet_reference=save(w.store,packet),
+            batch_result=w.store.artifact(w.chain['batch_summary']),require_research_route=True,
+            improvement_feedback_content=dict(baseline_facts=w.retained_baseline,execution=None),check_feedback=[dict(reference=w.chain['batch_summary'])],
+            source_report=w.common['source_report'],source_record=w.source_record,research_records=w.historical_results,latest_tested=w.latest_tested)
+        response=w.store.artifact(w.chain['final_response']);atomic_json(RUN/'control_final_response.json',response)
+        atomic_json(RUN/'control_checkpoint.json',dict(plan=w.chain['search_plan'],result=w.chain['batch_result'],decision=w.chain['final_response'],usage=w.store.remaining(),revision=revision()))
+        status='control_complete';reason='One complete control result and corrected model interpretation; structural stage follows within same grant.'
+    except Exception as exc:
+        reason=str(exc);atomic_json(RUN/'interpretation_repair_failure.json',dict(type=type(exc).__name__,message=reason));print('STOP',reason,flush=True)
+    atomic_json(RUN/'freeze.json',w.freeze);export(w,status,reason,time.monotonic()-start)
+
+
 def control_live():
     if RUN.exists():raise ValueError('PRESERVE_EXISTING_CAMPAIGN_NO_REPLACEMENT')
     if subprocess.check_output(['git','diff','HEAD','--',*revision()['files']],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
@@ -290,4 +349,5 @@ def control_live():
 
 if __name__=='__main__':
     if len(sys.argv)>1 and sys.argv[1]=='repair-control':repair_control()
+    elif len(sys.argv)>1 and sys.argv[1]=='repair-interpretation':repair_interpretation()
     else:control_live()

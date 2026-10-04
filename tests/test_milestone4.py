@@ -89,3 +89,19 @@ class MilestonePlanningTests(TestCase):
         self.assertTrue(capacity['sufficient'])
         self.assertEqual(sum(capacity['operation_reservations_s'].values()),990.)
         self.assertEqual(budget_capacity(1,dict(model_calls=5,tool_calls=9,backend_solves=1,worker_calls=0,wall_s=900.))['shortfalls']['wall_s'],690.)
+
+    def test_final_context_resolves_source_bound_selection_without_provider(self):
+        w=self.w;w.current_stage='control';packet=dict(scope='offline-wire-fixture')
+        def capture(host):
+            adapter=EvidenceDrivenAdapter();payload_for(host,adapter)
+            args=adapter.resolve_business('design.respond_diagnosis',dict(disposition='defer',recommendation_id=None,
+                reasoning='Offline context handoff check; physical evidence is unchanged.',next_action='finish',
+                candidate_disposition='retain_baseline',selected_candidate='baseline',hypothesis_assessment='unresolved'))
+            self.assertEqual(args['selected_candidate'],w.retained_baseline['candidate'])
+            self.assertEqual(args['feedback'],w.chain['feedback'])
+            raise RuntimeError('FINAL_CONTEXT_CAPTURED')
+        with patch('tools.diagnostic_workflow.run_loop',side_effect=capture):
+            with self.assertRaisesRegex(RuntimeError,'FINAL_CONTEXT_CAPTURED'):
+                w.phase('response_final','design_response','final_response',decision_packet=packet,
+                    improvement_feedback_content=dict(baseline_facts=w.retained_baseline,execution=None),
+                    check_feedback=[dict(reference=w.chain['feedback'])])
