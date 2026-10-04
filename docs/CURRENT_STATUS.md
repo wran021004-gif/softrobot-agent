@@ -1,5 +1,37 @@
 # Current development status - Milestones 4 and 5, 2026-10-05
 
+The latest [two-capability preparation/development stage](milestone5_preparation.md)
+is **completed and stopped with a blocked research handoff**. Both interfaces and
+sealing points are implemented. Two saved-checkpoint scenarios and a provisional
+historical .075/.15 recipe pair are concretely registered; future execution is
+**not ready and not authorized**. The required new-stage DeepSeek pair selection
+and interpretation were rejected by automatic approval review. Engineering
+registration and review do not substitute for model decisions.
+
+Six further integrations support local successive-resolution stability at the
+unchanged 1e-4 m/s tolerance. Backend errors remain .004484/.003984 m/s; the .15
+vector discrepancy worsens and .075 remains false-safe. Two complete independent
+history previews used 70 controller attempts. Their speed gap is 2.658e-6 m/s,
+so ranking abstains; .075 is again false-safe retrospectively. Preview cost
+694.427 s exceeds the historical pair's 605.937 s complete-evaluation cost.
+Useful screening and endpoint accuracy remain unestablished.
+
+New-stage usage is 1 failed provider attempt, 3 workflow calls, 0 backend attempts,
+772.984 charged seconds, 70 controller attempts and 6 standalone integrations.
+Cumulative usage is 36/67/6, 4171.068 seconds, 79 additional controller attempts,
+21 standalone integrations and 210 historical backend updates. Exact receipts
+reconcile; no workers/subagents, stepping, replay or push occurred. The incumbent
+remains `batch-ebbeadbdaca10732-0` / `91c3ba1b01d6499fb26df8f95409401b`, .05/.05,
+controller 7, fixed .16/.11 m, .95/compliant structure. M2–4 closed; M5 open.
+
+See [latest delivery](../evidence/milestone5_preparation_20261005/delivery.json),
+[registered but blocked protocol](../evidence/milestone5_preparation_20261005/protocol.json),
+and [no-execution readiness](../evidence/milestone5_preparation_20261005/readiness.json).
+Each future batch requires a separately authorized 6000 s grant against a 5830 s
+complete reservation. Current preparation grants zero future backend execution.
+
+## Completed predecessor diagnostic stage
+
 The new bounded saved-evidence diagnostic stage is **completed and stopped**.
 The research model selected D: retain local diagnostic use and defer run-ahead
 screening. The Milestone 4 deliverable remains candidate `batch-ebbeadbdaca10732-0`,

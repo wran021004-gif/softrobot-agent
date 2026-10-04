@@ -1,0 +1,142 @@
+{
+  "classification": "Engineering assessment only; no substituted research-model response",
+  "selected_weights": [
+    0.075,
+    0.15
+  ],
+  "pair_selection": "Provisional inherited historical model pair; new-stage selection unresolved",
+  "implementation": "Both numerical interfaces and sealing points implemented",
+  "protocol_registration": "Concrete states, clocks, recipes, rules and budgets registered",
+  "numerical_reference": "Successive-resolution stability at 1e-4 m/s on both development intervals only; not a proven error bound",
+  "backend_accuracy": "Unmet. Finest scalar errors about -.00448445/-.00398404 m/s; .075 remains false-safe; .15 vector error worsens.",
+  "preview_summary": {
+    "predicted": {
+      "candidates": [
+        {
+          "candidate_id": "history075",
+          "metrics": {
+            "holding_max_error_m": 0.0005317893300812299,
+            "holding_max_speed_m_s": 0.008689043741313941,
+            "terminal_error_m": 0.0005317893300812299
+          },
+          "valid": true,
+          "eligibility": "predicted_safe"
+        },
+        {
+          "candidate_id": "history15",
+          "metrics": {
+            "holding_max_error_m": 0.0005307670526264742,
+            "holding_max_speed_m_s": 0.008686385372185612,
+            "terminal_error_m": 0.0005307670526264742
+          },
+          "valid": true,
+          "eligibility": "predicted_safe"
+        }
+      ],
+      "order": null,
+      "status": "abstain",
+      "gap_m_s": -2.658369128329466e-06,
+      "hypothetical_rejection": null,
+      "safety_claim": false,
+      "rules": {
+        "primary_objective": "Lowest sampled maximum holding speed, conditional on predicted terminal and holding position feasibility.",
+        "speed_tie_margin_m_s": 0.0001,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "numerical_speed_tolerance_m_s": 0.0001,
+        "velocity_vector_tolerance_m_s": 0.0001,
+        "direction_neutral_m_s": 0.0001,
+        "local_direction": "Compare predicted change to projected initial speed, observed change to observed initial speed. Absolute change <=1e-4 is neutral; predicted change within numerical uncertainty of +/-1e-4 is indeterminate.",
+        "constraint_handling": "Position or terminal failure makes eligibility unresolved; forecast speed <=.02 is predicted-safe, otherwise predicted-violating. Always evaluate both candidates.",
+        "empirical_allowance": null,
+        "abstention": "Incomplete/nonfinite/infeasible history, position violation, or speed gap <=1e-4: abstain. Resolved history rank is a testable forecast, not a proven safe rejection.",
+        "screening_usefulness": "Universal abstention fails useful screening; report pairwise order errors, resolved coverage, accuracy, false rejection and false-safe counts.",
+        "original_gates": "Accurate local numerics, useful prospective full-task discrimination/order, broader repeatability and real-time operation remain required. No threshold is relaxed.",
+        "readiness_dimensions": [
+          "implementation",
+          "registration",
+          "numerical_stability",
+          "backend_accuracy",
+          "discrimination",
+          "budget_admission",
+          "prospective_execution"
+        ]
+      }
+    },
+    "metrics": [
+      {
+        "holding_max_error_m": 0.0005317893300812299,
+        "holding_max_speed_m_s": 0.008689043741313941,
+        "terminal_error_m": 0.0005317893300812299
+      },
+      {
+        "holding_max_error_m": 0.0005307670526264742,
+        "holding_max_speed_m_s": 0.008686385372185612,
+        "terminal_error_m": 0.0005307670526264742
+      }
+    ],
+    "cost_s": 694.4266482002567,
+    "independent_histories": true,
+    "first_commands": [
+      [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ],
+      [
+        1.7512764858409064,
+        4.755852667139922,
+        3.1031566686630025,
+        3.218253612486097,
+        0.7859357597552847,
+        0.6315302379791942
+      ]
+    ],
+    "iteration_zero_counts": [
+      21,
+      21
+    ],
+    "first_command_difference_update": 20,
+    "historical_observed_order": [
+      "history15",
+      "history075"
+    ],
+    "historical_max_speeds_m_s": [
+      0.023285947509969908,
+      0.012939198456184789
+    ],
+    "ordering_verdict": "unresolved",
+    "qualification": "Retrospective original-initializer comparison only. Future saved-checkpoint episodes are not calculated here.",
+    "retrospective_screening_assessment": {
+      "resolved_coverage": 0,
+      "pairwise_order_verdict": "unresolved",
+      "accuracy_among_resolved": null,
+      "abstained": true,
+      "false_rejection_of_better_or_acceptable": false,
+      "predicted_safe_observed_violating": [
+        "history075"
+      ],
+      "preview_cost_s": 694.4266482002567,
+      "complete_evaluation_cost_s": 605.936999999918,
+      "actual_validation_savings": 0,
+      "ranking_planned_pairs": 1,
+      "ranking_resolved_pairs": 0,
+      "eligibility_planned_candidates": 2,
+      "eligibility_resolved_candidates": 2,
+      "eligibility_resolved_coverage": 1.0,
+      "eligibility_accuracy_among_resolved": 0.5,
+      "hypothetical_future_execution_savings": 0,
+      "actual_order": [
+        "history15",
+        "history075"
+      ],
+      "qualification": "No validated savings, confidence bound or generalization from one pair."
+    }
+  },
+  "readiness": "Not ready for prospective execution: required new-stage research selection/interpretation blocked; screening usefulness unvalidated",
+  "operational_next_action": "finish_stop",
+  "future_executed": false
+}

@@ -1,0 +1,28 @@
+{
+  "focused_tests": 6,
+  "passed": true,
+  "command": "softagent Python -m unittest tests.test_milestone5_preparation",
+  "checks": [
+    "Independent candidate state/input/warm histories",
+    "Task clock and horizon alignment",
+    "Causal current command only",
+    "Both forecasts required; configuration binding; immutable seal before backend reservation",
+    "Local seal before advance",
+    "Abstention and false-safe scoring",
+    "Real Store schema compatibility",
+    "Completed receipt reuse without numerical replay"
+  ],
+  "static_readiness": "readiness.json",
+  "backend_evaluations": 0,
+  "backend_steps": 0,
+  "prospective_numerical_forecasts": 0,
+  "test_environment_intervention": "Sandbox denied temporary SQLite fixture access. Focused local tests passed under normal filesystem permissions; no network or backend work.",
+  "production_default_files_unchanged": [
+    "gvs_nmpc.py",
+    "gvs_trajectory.py",
+    "control_evidence.py",
+    "diagnostic_math.py",
+    "extensions/optimization/ipopt.py",
+    "tools/batch_budget.py"
+  ]
+}

@@ -671,3 +671,7 @@ from . import candidate_comparison
 EXTENSIONS.append(Extension('analysis.compare_candidates','tool','1.0.0',candidate_comparison.CompareRequest,route.RouteResult,
     'extensions.tendon_family.candidate_comparison:compare','Compare owned evaluated candidates, actual physical changes, reach, force utilization, solver behavior and cost; zero solves.',
     **COMMON, capabilities=dict(category='analysis',role='public_tool',route_visible=True,backend_solves=0)))
+
+# Focused development and registered research handoff; no backend capability.
+from .milestone5_preparation import DEFINITION as M5_PREPARATION, RESEARCH as M5_RESEARCH
+EXTENSIONS.extend((M5_PREPARATION,M5_RESEARCH))
