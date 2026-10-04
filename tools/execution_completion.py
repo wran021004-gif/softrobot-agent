@@ -12,6 +12,8 @@ from tools.platform_store import plain, zero
 from tools.state_io import digest
 
 STAGES=(('simulation','simulation.run'),('evaluation','evaluation.run'),('profile','control.profile_report'))
+EXECUTION_ALLOWANCES={name:dict(timeout_s=seconds,reserve_s=seconds) for name,seconds in
+    [('simulation.run',900.),('evaluation.run',30.),('control.profile_report',60.)]}
 
 
 def structured_feedback(store, result, source):

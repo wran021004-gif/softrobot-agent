@@ -191,6 +191,11 @@ class EvidenceDrivenAdapter(ScopedReferenceAdapter):
         for native,internal in self.advertised.items():instruction=instruction.replace(internal,native)
         view['instructions']=instruction
         view['additional_evidence']='Initial content is honestly supplied. In the check phase, record your proposed distinction before the host obtains the selected result. Use exact current-context aliases; do not copy identity hashes.'
+        if self.role.get('study_packet') is not None:
+            view={k:view[k] for k in ('role','phase','instructions','study_packet','unaccepted_draft') if k in view}
+            context={k:context[k] for k in ('protocol_correction','recovery_status','correction_budget','phase_progress') if k in context}
+            context['role_context']=view
+            payload['messages'][0]['content']='Author the current immutable research batch using exactly one advertised native function. Use source-bound public facts in study_packet and follow role_context.instructions. Do not claim physical improvement before execution.'
         if self.role.get('decision_packet') is not None:
             # Opt-in final interpretation: keep numerical authority and required
             # prose together, without duplicating catalogs or raw exports.

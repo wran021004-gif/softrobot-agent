@@ -114,6 +114,10 @@ def prepare(directory=RUN,evidence=EVIDENCE):
 
 
 def final_packet(w,result,summary):
+    from tools.study_history import study_history
+    records=[*w.historical_results,*[dict(facts=r['execution']['factual_result']) for r in result['candidates'] if r.get('execution')]]
+    history=study_history(w.store,records,retained_baseline=w.historical_results[0]['facts']['candidate'],
+        selected_source=w.historical_results[-1]['facts']['candidate'])
     references={r['role']:r for r in w.historical_results if r['role']=='retained_baseline'}
     baseline=w.historical_results[0]['facts'];start=w.historical_results[-1]['facts']
     rows=[]
@@ -132,7 +136,7 @@ def final_packet(w,result,summary):
         retained_baseline=campaign_metrics(baseline),immediate_predecessor=campaign_metrics(start),
         completed_results=rows,counts=counts,acceptance=read(repair.EVIDENCE/'decision_packet.json')['acceptance'],
         accounting=result['accounting'],current_project_usage=w.store.remaining(),
-        joint_positive_weight_tested=False,further_execution_authorized=False,
+        study_history=history,joint_positive_weight_tested=history['joint_positive_weight_tested'],further_execution_authorized=False,
         raw_evidence='Sealed store artifacts and receipts remain available by source reference.')
 
 

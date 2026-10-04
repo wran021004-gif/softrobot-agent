@@ -77,6 +77,7 @@ class WorkingState(Contract):
     parameter_impacts: dict
     experiment_plan: dict | None
     search_batch: dict | None = None
+    research_study: dict | None = None
 
 
 class DiagnosticAssessment(Contract):

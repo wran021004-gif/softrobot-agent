@@ -3,7 +3,7 @@ from copy import deepcopy
 from tools.platform_host import Host
 from tools.platform_store import plain
 from tools.state_io import digest
-from tools.execution_completion import complete_execution
+from tools.execution_completion import complete_execution, EXECUTION_ALLOWANCES
 from extensions.tendon_family.gvs_profile import execution_scope
 
 
@@ -99,8 +99,7 @@ class LiveBatchExecution:
         current=self.host.store.session(self.host.run_id)['snapshot']['input']['policy']
         inp['policy'].update(budget={**current['budget'],'model_calls':0},model=current['model'],route=None,allowed_tools=[],
             tool_bindings={n:'1.0.0' for n in ('simulation.run','evaluation.run','control.profile_report')},
-            operation_allowances={n:dict(timeout_s=s,reserve_s=s) for n,s in
-                [('simulation.run',900.),('evaluation.run',30.),('control.profile_report',60.)]})
+            operation_allowances=deepcopy(EXECUTION_ALLOWANCES))
         if execution_scope(inp)!=execution_scope(prepared['effective']):raise ValueError('BATCH_EXECUTOR_CHANGED_SCIENCE')
         try:session=host.store.session(host.run_id)
         except ValueError:session=host.create(inp)

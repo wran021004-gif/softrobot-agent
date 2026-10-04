@@ -49,7 +49,7 @@ class Corrections(Contract):
 
 
 class NextResearchRoute(Contract):
-    route: Literal['continue_weight_combinations','initialization_selection','prediction_backend_disagreement','holding_control_arrangements','defer']
+    route: Literal['continue_weight_combinations','initialization_selection','prediction_backend_disagreement','holding_control_arrangements','structure_change','controller_adaptation','defer']
     unresolved_question: str = Field(min_length=1)
     evidence: list[str] = Field(min_length=1,description='Execution/artifact identities and exact observations motivating this route.')
     bounded_check: str = Field(min_length=1)
@@ -66,6 +66,7 @@ class FinalDesignResponse(WorkflowDesignResponse):
     selected_candidate: dict | None
     feedback: EvidenceRef
     next_research: NextResearchRoute | None = None
+    hypothesis_assessment: Literal['supported','weakened','rejected','unresolved'] | None = None
 
 
 class WireFinalDecision(Contract):
@@ -76,6 +77,7 @@ class WireFinalDecision(Contract):
     candidate_disposition: Literal['adopt_candidate', 'retain_baseline', 'defer_selection', 'reject_all']
     selected_candidate: str = Field(description='baseline, candidate, none; for a supplied completed batch, an exact evaluated candidate_id may be selected.')
     next_research: NextResearchRoute | None = None
+    hypothesis_assessment: Literal['supported','weakened','rejected','unresolved'] | None = None
 
 
 def without(schema, fields, **replacements):

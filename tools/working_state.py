@@ -59,6 +59,7 @@ def project_working_state(store, run_id):
             if stage:
                 latest=dict(candidate_id=stage['candidate_id'],configuration=stage['configuration'],
                             execution_id=stage['source_execution_id'],owner_run_id=stage['source_owner'])
+        latest=role.get('latest_tested',latest)
         config_ref=(latest or baseline or {}).get('configuration')
         if config_ref:
             configuration=store.artifact(config_ref,db=db)
@@ -139,6 +140,13 @@ def project_working_state(store, run_id):
             plan=plain(EvidenceRef.model_validate(plan))
             store.artifact(plan,db=db)
         work_row=db.execute("SELECT value FROM meta WHERE key='diagnostic_work'").fetchone()
+        from tools.study_history import study_history
+        from tools.batch_budget import budget_capacity
+        research_records=role.get('research_records')
+        research_study=study_history(store,research_records,retained_baseline=baseline,
+            latest_tested=latest,selected_source=role.get('selected_source'),selection=final.get('selected_candidate') if final else None) if research_records is not None else None
+        if research_study is not None:
+            research_study['budget']=budget_capacity(role.get('planned_backend_count',1),spendable['remaining'])
         return WorkingState(run_id=run_id,
             task=dict(identity=role.get('identities',{}).get('task_identity') or (scope or {}).get('task',{}).get('identity'),
                 task_id=effective['task']['task_id'],family=effective['task']['family'],configuration=config_ref,
@@ -171,6 +179,7 @@ def project_working_state(store, run_id):
             recovery=recovery_status(state,inp['policy']['model']),actions=actions,acceptance=acceptance,
             parameter_impacts=parameter_impacts(effective,reference=config_ref),
             experiment_plan=dict(reference=plan,source='role_context.experiment_plan' if role.get('experiment_plan') else 'state.experiment_plan') if plan else None,
+            research_study=research_study,
             search_batch=dict(plan=state['search_batch']['plan'],mode=state['search_batch']['mode'],
                 pending=state['search_batch']['pending'],proposals=len(state['search_batch']['proposals']),
                 distinct_configurations=len(state['search_batch']['configurations']),stop_reason=state['search_batch']['stop_reason'],
