@@ -407,7 +407,12 @@ def structure_live(*,adaptation=False):
     from tools.candidate_parameters import planning_configuration
     inp=planning_configuration(w.store,w.latest_tested,current['policy'])
     inp=structural_input(inp,profile)
-    migrate_planning_host(w,stage+'-planning',input_override=inp)
+    # Execution children intentionally have no model grant. The planning host
+    # uses this project's authorized session ceiling, still bounded by its
+    # cumulative project ledger; this does not grant a replacement campaign.
+    inp['policy']['budget']=deepcopy(GRANT)
+    inp['policy']['model']=deepcopy(current['policy']['model'])
+    migrate_planning_host(w,stage+'-planning-budget',input_override=inp)
     w.freeze['implementation']=implementation();w.freeze['milestone4_revision']=revision()
     atomic_json(RUN/(stage+'_freeze.json'),dict(input=inp,profile=profile,revision=revision(),usage=w.store.remaining(),project=w.project))
     (RUN/('executed_'+stage+'_runner.py')).write_bytes(Path(__file__).read_bytes())
