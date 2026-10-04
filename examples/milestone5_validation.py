@@ -184,16 +184,26 @@ def prediction_protocol(w,record,source):
 
 
 def freeze_forecasts(w,record,source):
-    protocol=prediction_protocol(w,record,source);ref=save(w.store,protocol);atomic_json(RUN/'prediction_protocol.json',protocol)
+    if (RUN/'forecast_seal.json').exists():
+        if w.store.artifact(w.chain['forecast_seal'])!=read(RUN/'forecast_seal.json'):raise ValueError('EXISTING_FORECAST_CHANGED')
+        return
     from tools.platform_registry import registry
     reg=registry();reg.add(DEFINITION)
-    inp=deepcopy(w.store.artifact(source['facts']['configuration'])['effective']);inp['run_id']=w.project+'-numerical'
-    inp['policy'].update(budget={**LIMITS,'model_calls':0},route=None,tool_bindings={DEFINITION.extension_id:DEFINITION.version},allowed_tools=[],timeout_s=600.)
-    inp['policy']['operation_allowances']={DEFINITION.extension_id:dict(timeout_s=600.,reserve_s=600.)}
-    host=Host(RUN,inp['run_id'],reg=reg);host.create(inp);host.resume()
-    receipt=host.invoke(dict(request_id='two-checkpoint-preview',tool_id=DEFINITION.extension_id,tool_version=DEFINITION.version,
-        arguments=dict(protocol=ref),reason='Authorized bounded common cold previews and matched development dynamics diagnosis before both new backends.',cache='new'))
-    atomic_json(RUN/'numerical_receipt.json',receipt)
+    host=Host(RUN,w.project+'-numerical',reg=reg)
+    if (RUN/'numerical_receipt.json').exists():
+        receipt=read(RUN/'numerical_receipt.json')
+        if receipt['execution_status']!='completed':raise ValueError('FAILED_NUMERICAL_ATTEMPT_NOT_REPLAYED')
+        result=w.store.artifact(receipt['output'])['detail'];ref=result['protocol'];protocol=w.store.artifact(ref)
+        if protocol!=read(RUN/'prediction_protocol.json') or protocol['accepted_plan']!=w.chain['search_plan']:raise ValueError('SAVED_PREVIEW_BINDING_CHANGED')
+    else:
+        protocol=prediction_protocol(w,record,source);ref=save(w.store,protocol);atomic_json(RUN/'prediction_protocol.json',protocol)
+        inp=deepcopy(w.store.artifact(source['facts']['configuration'])['effective']);inp['run_id']=host.run_id
+        inp['policy'].update(budget={**LIMITS,'model_calls':0},route=None,tool_bindings={DEFINITION.extension_id:DEFINITION.version},allowed_tools=[],timeout_s=600.)
+        inp['policy']['operation_allowances']={DEFINITION.extension_id:dict(timeout_s=600.,reserve_s=600.)}
+        host.create(inp);host.resume()
+        receipt=host.invoke(dict(request_id='two-checkpoint-preview',tool_id=DEFINITION.extension_id,tool_version=DEFINITION.version,
+            arguments=dict(protocol=ref),reason='Authorized bounded common cold previews and matched development dynamics diagnosis before both new backends.',cache='new'))
+        atomic_json(RUN/'numerical_receipt.json',receipt)
     if receipt['execution_status']!='completed':raise ValueError('NUMERICAL_PREVIEW_FAILED: '+str(receipt.get('error')))
     result=w.store.artifact(receipt['output'])['detail'];atomic_json(RUN/'prediction_numerical.json',result);w.chain['prediction_numerical']=receipt['output']
     w.current_stage='forecast_interpretation'
@@ -208,7 +218,8 @@ def freeze_forecasts(w,record,source):
         source_report=w.common['source_report'],source_record=w.source_record)
     forecast=dict(protocol=ref,numerical=receipt['output'],accepted_plan=w.chain['search_plan'],configurations=protocol['configurations'],
         research_interpretation=w.chain['forecast_interpretation'],
-        numerical_dependencies=w.store.session(host.run_id)['snapshot']['dependencies'],
+        numerical_dependencies_reference=save(w.store,w.store.session(host.run_id)['snapshot']['dependencies']),
+        numerical_dependency_fingerprint=digest(w.store.session(host.run_id)['snapshot']['dependencies']),
         development_executions=DEVELOPMENT,validation_exclusions=DEVELOPMENT,forecasts=result['forecasts'],predicted_speed_order=result['predicted_speed_order'],
         speed_order_forecast=result['speed_order_forecast'],speed_order_rule=protocol['speed_order_rule'],
         acceptance_prediction='unresolved',tolerances=TOLERANCES,predictor_fingerprint=revision(),warm_start=protocol['warm_start'],
@@ -454,17 +465,31 @@ def live():
         if '127.0.0.1:9' in os.environ.get(key,''):os.environ.pop(key)
     if subprocess.check_output(['git','diff','HEAD','--',*FILES],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
     w=restore() if (RUN/'freeze.json').exists() else prepare();start=time.monotonic();status='incomplete';reason=None
-    if w.store.remaining()['used']['model_calls'] or 'search_plan' in w.chain:raise ValueError('DO_NOT_REPLAY_STARTED_VALIDATION')
     try:
         # Existing planner creates its own capacity packet, so add diagnosis and
         # renewed stage ceiling to the actual shared serialized handoff.
-        w.phase('improvement','search_batch_plan','search_plan',**planning_handoff(w))
+        if 'search_plan' not in w.chain:
+            if w.store.remaining()['used']['model_calls']:raise ValueError('NO_ACCEPTED_PLAN_AFTER_PAID_ATTEMPT')
+            w.phase('improvement','search_batch_plan','search_plan',**planning_handoff(w))
+        elif (RUN/'validation_batch_result.json').exists():
+            raise ValueError('FULL_BATCH_SAVED_USE_EVIDENCE_ONLY_INTERPRETATION_RECOVERY')
+        elif w.store.remaining()['used']['backend_solves']:
+            raise ValueError('BACKEND_ATTEMPT_EXISTS_USE_SAVED_RECEIPT_RECOVERY')
+        else:
+            state=w.store.session(w.host('design').run_id)['state']
+            if state.get('stop_reason')=='IncompleteRead(0 bytes read)':
+                previous=w.host('design').run_id
+                shared.migrate_planning_host(w,'forecast-transport-retry1')
+                intervention=dict(prior_context=previous,new_context=w.host('design').run_id,reason='Known failed forecast interpretation transport receipt; same project, no usage or correction reset.',
+                    reuse='Accepted plan and completed six solves/six rollouts; no numerical replay.',settings_changed=False)
+                atomic_json(RUN/'forecast_transport_recovery.json',intervention)
+                w.freeze.setdefault('resume_interventions',[]).append(intervention)
         record=w.store.artifact(w.chain['search_plan']);atomic_json(RUN/'validation_plan.json',record)
         count=record['plan']['max_candidates']
         if record['bindings']['subject']!=w.incumbent['candidate'] or not 1<=count<=2 or record['plan']['max_backend_attempts']!=count or record['plan']['target_changed_configurations']!=count:raise ValueError('VALIDATION_PLAN_SCOPE')
         if any(r['control/recipe/holding_tip_speed_weight'] in (0,.05,.1) for r in record['plan']['candidates']):raise ValueError('DEVELOPMENT_POINT_NOT_VALIDATION')
         required=batch_requirement(count,planning=dict(model_calls=0,tool_calls=0,wall_s=0),preparation_reserve_s=5.)['requirement']
-        required['wall_s']+=600.;required['tool_calls']+=1
+        if not (RUN/'numerical_receipt.json').exists():required['wall_s']+=600.;required['tool_calls']+=1
         remaining=w.store.remaining()['remaining']
         if any(v>remaining[k] for k,v in required.items()):raise ValueError('PREVIEW_EXECUTION_INTERPRETATION_CAPACITY')
         atomic_json(RUN/'prelaunch_review.json',dict(passed=True,plan=w.chain['search_plan'],exact_candidates=record['plan']['candidates'],required=required,available=remaining,
