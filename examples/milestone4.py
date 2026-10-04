@@ -328,24 +328,29 @@ def repair_interpretation():
     atomic_json(RUN/'freeze.json',w.freeze);export(w,status,reason,time.monotonic()-start)
 
 
-def correct_control_comparison():
+def correct_control_comparison(*,budget_only=False):
     from examples.gvs_nmpc_route_experiment import load_credential
     load_credential(Path.home()/'.codex/.env')
     for name in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):
         if '127.0.0.1:9' in os.environ.get(name,''):os.environ.pop(name)
     w=restore();w.current_stage='control';prior_decision=w.chain['final_response']
+    if budget_only:migrate_planning_host(w,'control-final-budget')
     packet=read(RUN/'control_decision_packet.json');packet.update(prior_response=prior_decision,
         review=dict(current_result_interpretation_passed=False,
             material_issue='The prior reasoning says all three physical metrics improve/equal against retained baseline. Terminal error is higher against baseline, even though reach still passes and joint acceptance is gained.',
             minor_wording='0.15 -> 0.16 increases length; preserve numeric point, use accurate direction.',
             next_study=dict(path='components/near/length_m',source_value=.15,proposed_value=.16,max_backend_attempts=1)),
         budget=budget_capacity(1,w.store.remaining()['remaining']))
-    atomic_json(RUN/'control_comparison_review_before_correction.json',packet['review'])
-    w.instructions={**w.instructions,'response_final':FINAL+' Correct only the review material issue using the two named comparison vectors. Explicitly distinguish the slightly HIGHER terminal error versus retained baseline from the improvements versus source; both reference comparisons gain joint acceptance. Keep adoption independent, and retain the numeric one-length next proposal with coherent computed one-result budget and accurate change direction. Do not claim all physical metrics improve against baseline.'}
+    if budget_only:
+        packet['review']=dict(current_result_interpretation_passed=True,next_proposal_passed=False,
+            material_issue='The previous next proposal reverted to 960 seconds/4 tools/1 provider, below the computed one-complete-result requirement. Preserve the now accurate current-result comparison; correct only the next-study budget.',
+            computed_requirement=packet['budget']['requirement'])
+    atomic_json(RUN/('control_next_budget_review.json' if budget_only else 'control_comparison_review_before_correction.json'),packet['review'])
+    w.instructions={**w.instructions,'response_final':FINAL+(' Preserve the now accurate source/baseline interpretation and numeric one-length proposal. Correct next_research.proposed_budget to cover ALL fields of decision_packet.budget.requirement, including planning and protected interpretation. The program will reject insufficient proposed budget. Do not replace the computed requirement by a simulation-only estimate.' if budget_only else ' Correct only the review material issue using the two named comparison vectors. Explicitly distinguish the slightly HIGHER terminal error versus retained baseline from the improvements versus source; both reference comparisons gain joint acceptance. Keep adoption independent, and retain the numeric one-length next proposal with coherent computed one-result budget and accurate change direction. Do not claim all physical metrics improve against baseline.')}
     w.freeze['stage_instructions']=w.instructions;start=time.monotonic();status='incomplete';reason=None
     try:
         w.phase('response_final','design_response','final_response',decision_packet=packet,decision_packet_reference=save(w.store,packet),
-            batch_result=w.store.artifact(w.chain['batch_summary']),require_research_route=True,
+            batch_result=w.store.artifact(w.chain['batch_summary']),require_research_route=True,require_research_budget=True,
             improvement_feedback_content=dict(baseline_facts=w.retained_baseline,execution=None),check_feedback=[dict(reference=w.chain['batch_summary'])],
             source_report=w.common['source_report'],source_record=w.source_record,research_records=w.historical_results,latest_tested=w.latest_tested)
         atomic_json(RUN/'control_final_response.json',w.store.artifact(w.chain['final_response']))
@@ -379,4 +384,5 @@ if __name__=='__main__':
     if len(sys.argv)>1 and sys.argv[1]=='repair-control':repair_control()
     elif len(sys.argv)>1 and sys.argv[1]=='repair-interpretation':repair_interpretation()
     elif len(sys.argv)>1 and sys.argv[1]=='correct-control-comparison':correct_control_comparison()
+    elif len(sys.argv)>1 and sys.argv[1]=='correct-control-next-budget':correct_control_comparison(budget_only=True)
     else:control_live()

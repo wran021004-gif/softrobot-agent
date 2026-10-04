@@ -159,6 +159,10 @@ def respond_workflow(ctx,args):
     from schemas.diagnostic_revision import FinalDesignResponse
     if isinstance(args,FinalDesignResponse):
         if role.get('require_research_route') and args.next_research is None:raise ValueError('FINAL_RESEARCH_ROUTE_REQUIRED')
+        if role.get('require_research_budget') and args.next_research and args.next_research.proposed_budget.backend_solves:
+            from tools.batch_budget import budget_capacity
+            capacity=budget_capacity(args.next_research.proposed_budget.backend_solves,plain(args.next_research.proposed_budget))
+            if not capacity['sufficient']:raise ValueError('NEXT_RESEARCH_BUDGET_INSUFFICIENT: '+str(capacity['requirement']))
         feedback=role['improvement_feedback_content']
         if plain(args.feedback)!=role['check_feedback'][0]['reference']:raise ValueError('FINAL_FEEDBACK_BINDING_MISMATCH')
         if args.candidate_disposition in ('defer_selection','reject_all'):

@@ -99,9 +99,18 @@ class MilestonePlanningTests(TestCase):
                 candidate_disposition='retain_baseline',selected_candidate='baseline',hypothesis_assessment='unresolved'))
             self.assertEqual(args['selected_candidate'],w.retained_baseline['candidate'])
             self.assertEqual(args['feedback'],w.chain['feedback'])
+            from schemas.diagnostic_revision import FinalDesignResponse
+            from tools.platform_handoff import respond_workflow
+            from types import SimpleNamespace
+            args.update(adapter.fixed['design.respond_diagnosis'])
+            args['next_research']=dict(route='structure_change',unresolved_question='One declared length change?',evidence=['offline'],bounded_check='one full result',
+                fixed_conditions=['task'],proposed_variables={'components/near/length_m':'.16'},expected_observations=['acceptance'],
+                proposed_budget=dict(model_calls=1,tool_calls=4,backend_solves=1,worker_calls=0,wall_s=960.),stopping_conditions=['one result'],limitations=['offline'])
+            with self.assertRaisesRegex(ValueError,'NEXT_RESEARCH_BUDGET_INSUFFICIENT'):
+                respond_workflow(SimpleNamespace(store=w.store,run_id=host.run_id,artifact=w.store.artifact),FinalDesignResponse.model_validate(args))
             raise RuntimeError('FINAL_CONTEXT_CAPTURED')
         with patch('tools.diagnostic_workflow.run_loop',side_effect=capture):
             with self.assertRaisesRegex(RuntimeError,'FINAL_CONTEXT_CAPTURED'):
                 w.phase('response_final','design_response','final_response',decision_packet=packet,
                     improvement_feedback_content=dict(baseline_facts=w.retained_baseline,execution=None),
-                    check_feedback=[dict(reference=w.chain['feedback'])])
+                    check_feedback=[dict(reference=w.chain['feedback'])],require_research_budget=True)
