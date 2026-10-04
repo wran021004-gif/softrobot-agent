@@ -1,0 +1,279 @@
+[
+  {
+    "run_id": "gvs-stage357-558a88fea575-shared",
+    "reference": {
+      "artifact_id": "96633d292c45d7f20a507681d8d8c5af764b6a6b7e514550cec17ae650572ff1",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F1324",
+          "F1538",
+          "F1310",
+          "F1745",
+          "F1712",
+          "F1698",
+          "F1541",
+          "F1278",
+          "F1596",
+          "F1465",
+          "F1546",
+          "F1433",
+          "F1341",
+          "F1411",
+          "F1696",
+          "F168",
+          "F169",
+          "F157",
+          "F1740",
+          "F1742",
+          "F2407"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "The coordinate method supplies candidate ask/tell only; no candidate is a result until it has fresh candidate.apply, simulation.run, evaluation.run and control.profile_report, and the frozen comparison is reported separately from raw scalar objectives (F1616).",
+          "Sampled holding coverage is the final 0.05 s only, 6 samples (F1481 candidate, F1670 baseline) with continuous_time_guarantee false (F1514, F1587); no continuous-time settling guarantee can be claimed from this plan's outputs.",
+          "Frames stay distinct: world for tip position/velocity metrics, projected GVS coordinates for controller state, serial backend joint coordinates for q/qdot; applied inputs are simulated backend readbacks, distinct from requested commands and from hardware force measurement.",
+          "Per-update effective_horizon, per-term cost contributions and full warm plans are only partially retained (historical_full_plans not retained); controller-side plan records such as optimization_raw_status and optimization_selected_iteration cover exactly the listed update IDs and are not causal evidence.",
+          "This plan executes no batch and promotes no candidate: it is a milestone handoff requiring a future grant, and local/raw weighted costs cannot serve as final physical ranking."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "A bounded coordinate search over control/recipe/holding_tip_speed_weight and control/recipe/terminal_tip_speed_weight (saved start 0.05 and 0.0 respectively; both domains [0,1]; coordinate step 0.25) can move the sampled final-window holding position error and holding tip speed toward the frozen settling limits (0.01 m, 0.02 m/s) while preserving the already-passing terminal reach (0.01 m), and can test whether a larger hold tip-speed penalty or a nonzero terminal tip-speed penalty changes the recorded reach/holding outcome relative to candidate improvement-96f0ade35119. The recorded single paired change holding_tip_speed_weight 0.0->0.05 reduced sampled hold speed by 0.4060100069642385 m/s (F1596) yet left the candidate at 1.1750052670100422 m/s (F1310) against a 0.02 m/s limit (F1745), so whether any tested weight pair attains joint acceptance is an open, testable question rather than a prediction.",
+        "max_backend_attempts": null,
+        "max_candidates": 6,
+        "method": "search.family_coordinate@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s",
+          "complete_update_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 3,
+          "model_calls": 8,
+          "tool_calls": 24,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "rationale": "Scope and honest framing. This is a future SearchBatchPlan linked to the accepted single-context diagnosis and the factual audit; it authorizes nothing here and promotes no candidate. The plan is uncertain rather than promising because the only executed paired change was a weight-only move whose effect was small relative to the gap: sampled hold speed fell 0.4060100069642385 m/s (F1596) yet stayed at 1.1750052670100422 m/s (F1310) versus 0.02 m/s (F1745), and hold position stayed at 0.05650455971948983 m/s-equivalent error (F1538) versus 0.01 m (F1712), while the sealed comparison is classified physical_tradeoff (F1324) with joint_reach_holding_passed false on both sides (F1278, F1541). It is not 'unlikely' only because one authorized coordinate, control/recipe/terminal_tip_speed_weight, is recorded at 0.0 (F2407) and has never been exercised at nonzero value, so the tested region is genuinely open. No claim of a dominant cause or of ineffectiveness throughout a parameter range is made: the recorded observations cover exactly the listed update IDs, controller-side plan records (e.g. optimization_raw_status User_Requested_Stop at F168, update_wall_s 17.69917060015723 s against a 0.01 s period at F169) are not backend motion, and applied tensions reaching 7.999987676698501 N at update 32 remain inside the 8.0 N limit (F157) — legal near-bound input is not a violation. Raw optimizer termination and controller policy stops are separate facts and neither is treated as the cause of the holding outcome. Observations, hypotheses and proposed tests are kept separate: the observations above motivate the test; they do not pre-decide it.\n\nVariables, domains, start values and step legality. Exactly the two authorized builder paths are varied — control/recipe/holding_tip_speed_weight and control/recipe/terminal_tip_speed_weight — each with the existing granted bounds [0,1], which are legal because each bound is either exactly zero or at least 0.0001. The saved starting values, 0.05 (holding) and 0.0 (terminal, F2407), lie inside their domains. The coordinate step 0.25 lies in (0,1] and, applied from 0.05, yields 0.05, 0.30, 0.55, 0.80 and a bound-clamped 1.00, and from 0.0 yields 0.25, 0.50, 0.75 and 1.00; no generated coordinate is a forbidden tiny positive, and zero is produced only where the saved value already is zero. Proposals include the start configuration itself and may include duplicate points, so at most six candidates are requested and the plan does not treat duplicates as distinct evidence.\n\nFixed conditions and controls. Robot, task, acceptance, controller implementation and other numerical settings are fixed; the controller is controller.gvs_nmpc@7.0.0 and the task/acceptance contract, evaluator tolerance and timing settings are unchanged, so any measured difference is attributed only to the two varied recipe weights within their tested coordinate set. search.family_coordinate@1.0.0 supplies ask/tell candidates only; a bounded future evaluation and the frozen comparison are required before any physical statement is made, and raw weighted objectives under different weights are not ranked (F1616).\n\nBudget and protection. Planned budget is 3 backend solves, 24 tool calls (within 12-60), 8 model calls (at most 16), 0 workers and 3600 s wall (within 2970-7200), with max_backend_attempts=3, target_changed_configurations=2 and failure_policy stop_on_material_failure. Roughly 600 s and four provider/tool slots are deliberately held back for interpretation and delivery, consistent with stopping normally after two distinct changed configurations complete simulation, evaluation and profile. No separate numerical screening and no new baseline are requested; the retained baseline and its sealed comparison stay the comparison basis. A small unsuccessful batch would describe only the tested candidates, not the parameter range.",
+        "scientific_promise": "uncertain",
+        "step": 0.25,
+        "stopping_conditions": [
+          "Stop normally as soon as TWO distinct changed configurations have complete simulation, evaluation and profile, even if joint reach-holding acceptance is reached earlier; do not spend a third configuration.",
+          "Stop immediately on material failure of any candidate stage under failure_policy stop_on_material_failure; the separate max_backend_attempts=3 cap governs new full backend attempts and is never exceeded to repair a failed candidate.",
+          "Stop and report partial coverage if fewer than two distinct changed configurations complete while backend attempts are exhausted at 3.",
+          "Stop with the protected 600 s and four provider/tool slots left unspent for interpretation and delivery; do not begin another configuration once that reserve would be consumed.",
+          "Stop and report a coverage gap rather than inferring absent data if a required artifact (evaluation, profile, bound comparison) is unavailable for a launched configuration."
+        ],
+        "target_changed_configurations": null,
+        "variables": {
+          "control/recipe/holding_tip_speed_weight": [
+            0.0,
+            1.0
+          ],
+          "control/recipe/terminal_tip_speed_weight": [
+            0.0,
+            1.0
+          ]
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "The one paired change actually executed (holding_tip_speed_weight 0.0->0.05) improved sampled hold speed only marginally against the gap: candidate_minus_baseline holding_max_speed_m_s = -0.4060100069642385 m/s (F1596) while the candidate still reads 1.1750052670100422 m/s (F1310) versus the 0.02 m/s limit (F1745), and holding_speed_passed is false (F1541 component context; F1385). Holding-position improvement is also sub-threshold: delta -0.001633544566242727 m (F1465) with candidate 0.05650455971948983 m (F1538) versus the 0.01 m limit (F1712).",
+          "Terminal reach worsened under the recorded change: candidate_minus_baseline terminal_error_m = +0.001056295661744434 m (F1546) with candidate 0.00869890424761182 m (F1698) still inside the 0.01 m tolerance (F1740) and reach_passed true (F1742); a weight-only lever already consumed part of that margin, so it cannot be treated as free.",
+          "The sealed comparison remains a trade-off, not an improvement: classification physical_tradeoff (F1324) with joint_reach_holding_passed false for both baseline (F1278) and candidate (F1541).",
+          "Compute-budget saturation is unaffected by the recorded weight change and remains an untested confounder: deadline_misses is 35 in both runs (F1341 candidate, F1411 baseline) and the delta is 0 (F1696), while mean complete-update time rose by 0.5154540428891785 s (F1433).",
+          "Performed-check plan records keep budget-limited selection in view but are controller-side values, not backend motion or causal evidence: optimization_raw_status is User_Requested_Stop at sampled update 28 (F168) and policy stop is budget-limited while update_wall_s at sampled update 16 is 17.69917060015723 s against the 0.01 s control period (F169); sampled applied tensions reach 7.999987676698501 N at update 32 but never exceed the 8.0 N per-tendon limit (F157), so zero bound violation does not by itself exclude legal near-bound loading.",
+          "The summary records terminal_tip_speed_weight 0.0 (F2407), i.e. the second authorized coordinate has never been exercised at a nonzero value, so its effect on the recorded holding failure is untested rather than known to be ineffective."
+        ]
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-0-tool",
+      "tool_id": "design.submit_search_plan",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage357-558a88fea575-shared",
+    "reference": {
+      "artifact_id": "fe3bf5ed6df818505f7a8aaff407137eb80f53102ff104704338ed2cc317901c",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F160",
+          "F167",
+          "F177",
+          "F157",
+          "F153",
+          "F154",
+          "F1324",
+          "F1728",
+          "F1745",
+          "F1730",
+          "F1712",
+          "F1734",
+          "F1694",
+          "F1541",
+          "F1546",
+          "F1596",
+          "F1465",
+          "F1433",
+          "F1474",
+          "F1558",
+          "F1534",
+          "F1442"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "Only the two granted recipe tip-speed weights are varied; horizon 10, max_iterations 120, settling settings, timing/control period, warm-start and seed policy, robot definition and evaluator are unchanged.",
+          "Physical acceptance and the baseline comparison come only from the frozen sealed evaluator and sealed campaign comparison; local or raw weighted costs are never a final physical ranking.",
+          "The sampled final-window holding metrics cover only the last 0.05 s (6 samples) with continuous_time_guarantee false, and no closed-loop counterfactual replay exists, so trajectories, settling and causality are not established.",
+          "search.family_coordinate@1.0.0 supplies candidate ask/tell only; every changed configuration still requires a fresh simulation.run, evaluation.run and control.profile_report before any comparable fact exists.",
+          "Frames stay distinct: world for tip vectors, projected GVS coordinates for state, serial backend joint coordinates for q/qdot."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "On the frozen task, robot, evaluator and fixed controller controller.gvs_nmpc@7.0.0, raising the recipe tip-speed cost weights — control/recipe/holding_tip_speed_weight above the already-tested 0.05 and/or control/recipe/terminal_tip_speed_weight above the already-tested 0.0 — will lower the sampled final-window holding max world tip speed (tested candidate 1.1750052670100422 m/s, F1728, F1310) relative to that tested candidate while terminal reach stays inside the 0.01 m tolerance and the recorded force bound violation stays 0 N. The claim is scoped to exactly the changed configurations this bounded coordinate batch executes on the shared frozen baseline; it is a local candidate-comparison statement, not a closed-loop causal attribution and not a statement about the whole weight range.",
+        "max_backend_attempts": 3,
+        "max_candidates": 6,
+        "method": "search.family_coordinate@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s",
+          "complete_update_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 3,
+          "model_calls": 4,
+          "tool_calls": 24,
+          "wall_s": 2970.0,
+          "worker_calls": 0
+        },
+        "rationale": "Linked to the accepted single-context diagnosis and the performed plans check; this is the current authorized development pilot plan and executes no batch and promotes no candidate. Observation (performed-check aliases): the tested candidate fails the sampled final holding window while passing terminal reach — holding max error 0.05650455971948983 m (F1730) vs position limit 0.01 m (F1712), holding max speed 1.1750052670100422 m/s (F1728) vs speed limit 0.02 m/s (F1745), terminal error 0.00869890424761182 m (F1734) inside tolerance with terminal_reach_passed true (F1694), joint_reach_holding_passed false (F1541); the sealed comparison remains physical_tradeoff (F1324) with holding improvements (F1465, F1596) offset by terminal-error and computation worsening (F1546, F1433, baseline terminal error F1558); the performed plans view recorded User_Requested_Stop termination (F160) with policy_stop_reason budget_best_feasible (F167) and accepted plans (F177), 6 noninitialization selections over 35 updates (F153, F154), sampled applied tensions up to 7.999987676698501 N at update 32 (F157) with 0 N recorded violation (F1534) on a finite valid execution (F1442). Hypothesis (scope-qualified, explicitly not causal): raising the two tip-speed weights lowers the sampled hold speed relative to the tested candidate without breaking terminal reach or the force bound; it covers only the configurations actually executed, and no dominant-cause or whole-range claim is made. Proposed test: a coordinate batch on exactly the two granted paths with fresh executions and the frozen comparison. The prior step 0.0 -> 0.05 moved the sampled hold speed only 1.5810152739742807 -> 1.1750052670100422 m/s (F1474, F1728), so promise is uncertain. Recommendation/candidate separation: retained diagnostic positions (no closed-loop causal attribution; further weight-only tuning is low-yield on this baseline) are kept as diagnostic views and are independent of selecting the controller candidate; nothing is selected or promoted here. Fixed: robot, task, acceptance, controller_implementation and other_numerical_settings unchanged, fixed_controller controller.gvs_nmpc@7.0.0, method search.family_coordinate@1.0.0. Variables are only control/recipe/holding_tip_speed_weight and control/recipe/terminal_tip_speed_weight with granted bounds [0,1]; saved starting values 0.05 and 0.0 lie in-domain, both domains have nonzero width and include the saved values, and the 0.25 coordinate step stays clear of the forbidden (0, 0.0001) interval (0.05+0.25=0.30, 0.0+0.25=0.25). The proposal list includes the saved start point and duplicates; duplicates are not new backend attempts. Costs restated for the rejected-draft repair: max_backend_attempts=3 with planned backend_solves=3, tool_calls=24 (>=4 per new execution), wall_s=2970 (>=990 per new execution), model_calls=4, worker_calls=0; no separate numerical screening and no new baseline. Stop after two distinct changed configurations complete simulation/evaluation/profile even if joint acceptance occurs earlier, and protect ~600 s and four provider/tool slots for interpretation and delivery. Termination is kept distinct from convergence, applied updates distinct from optimized selections, wall deadlines distinct from simulated steps, and terminal reach distinct from holding. A validated plan still requires a future grant.",
+        "scientific_promise": "uncertain",
+        "step": 0.25,
+        "stopping_conditions": [
+          "Stop normally after TWO distinct changed configurations have completed simulation.run, evaluation.run and control.profile_report, even if joint_reach_holding_acceptance is reached earlier.",
+          "Stop after at most 6 candidate proposals and at most 3 new full backend attempts; stop immediately on a material failure under stop_on_material_failure.",
+          "Stop with no promotion and no selection of any controller candidate; report every unexecuted candidate as not_run and keep ~600 s plus four provider/tool slots for interpretation and delivery.",
+          "Report raw termination status and controller policy stop reason separately, and report zero bound violation separately from legal near-bound input."
+        ],
+        "target_changed_configurations": 2,
+        "variables": {
+          "control/recipe/holding_tip_speed_weight": [
+            0.0,
+            1.0
+          ],
+          "control/recipe/terminal_tip_speed_weight": [
+            0.0,
+            1.0
+          ]
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "A prior paired change (holding_tip_speed_weight 0.0 -> 0.05) reduced the sampled final-window hold max speed only from 1.5810152739742807 m/s (F1474) to 1.1750052670100422 m/s (F1728, F1310), still far above the 0.02 m/s limit (F1745); weight-only leverage on this term was small at that step, so the expected yield of further weight increases is weak to uncertain.",
+          "The same change worsened other physical and cost metrics: terminal error delta +0.001056295661744434 m (F1546) against candidate terminal error 0.00869890424761182 m (F1734), mean complete-update delta +0.5154540428891785 s (F1433) against candidate mean 17.77877309145406 s (F1743), holding error delta -0.001633544566242727 m (F1465), holding speed delta -0.4060100069642385 m/s (F1596); the sealed comparison is classified physical_tradeoff (F1324), so a further increase may again trade one physical metric for another.",
+          "Controller-side plan records from the performed check show termination by User_Requested_Stop (F160) with policy_stop_reason budget_best_feasible (F167) and accepted plans (F177), so the accepted plan at sampled updates may be compute-budget limited rather than weight limited; a weight-only batch cannot separate these explanations.",
+          "Sampled applied tensions reached 7.999987676698501 N at update 32 (F157) near the 8.0 N per-tendon limit while the recorded bound violation is 0 N (F1534); raising speed penalties could push loading closer to that bound, and zero violation does not exclude legal near-bound input.",
+          "Holding coverage is only the final 0.05 s (6 samples) with no continuous-time guarantee, joint_reach_holding_passed is false (F1541), and no closed-loop counterfactual replay or causal-attribution tool exists; a small batch describes only the candidates actually tested."
+        ]
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-1-tool",
+      "tool_id": "design.submit_search_plan",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-stage357-558a88fea575-shared",
+    "reference": {
+      "artifact_id": "7408921b1e5681844cd603d1dd6e5939f7576950738af51a45a9af36dfe05929",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "retain_baseline",
+        "disposition": "adopt",
+        "feedback": {
+          "artifact_id": "c56bde1c0919355452bf8fca7d43f80ff1355a92b848ff2bc9a529d11843c152",
+          "media_type": "application/json"
+        },
+        "next_action": "finish",
+        "reasoning": "Tested-point scope, not a range claim. Of the three planned configurations, exactly one new changed configuration is fully evaluated: batch-2ef6ee45913c43c9-1 (control/recipe/holding_tip_speed_weight=0.3, terminal_tip_speed_weight=0.0). Proposal 0 (holding 0.05 / terminal 0.0 = improvement-96f0ade35119) is reused historical evidence, and proposal 2 (holding 0.0 / terminal 0.0) was never executed — the batch stopped (material_scheduler_failure_retained_baseline_reexecution, candidate batch-2ef6ee45913c43c9-2) with no sealed simulation/evaluation/profile. I therefore do not claim two fully evaluated new candidates.\n\nSealed observations. Baseline-replay passes terminal reach (terminal_error_m 0.007643 < 0.01 m) and fails holding (holding_max_error_m 0.058138 vs 0.01 m; holding_max_speed_m_s 1.581015 vs 0.02 m/s); joint_reach_holding_passed false. Candidate improvement-96f0ade35119 passes reach (0.008699 m), fails holding (0.056505 m; 1.175005 m/s), joint false; against the frozen baseline it is classified physical_tradeoff (holding error -0.001634 m and speed -0.406010 m/s improved; terminal error +0.001056 m worsened). The one new changed candidate batch-2ef6ee45913c43c9-1 fails terminal reach (0.018690 > 0.01 m) and fails holding (0.063444 m; 1.127628 m/s); joint false. No evaluated configuration achieves joint reach+holding success.\n\nInterpretation. No candidate strictly improves (each is a tradeoff, fails reach, or is unresolved) and none joins reach+holding, so no candidate is promotable.\n\nRecommendation vs candidate, kept separate. Recommendation disposition: adopt — I accept the retained diagnostic recommendation to defer causal attribution and defer further weight tuning (recommendation_id rec-defer-weight-tuning), asserting no parameter value and recommending no further weight search and no different diagnostic check now, i.e. no execution is authorized. Candidate selection is a separate axis: candidate_disposition retain_baseline, selected_candidate baseline — the frozen baseline is retained because no evaluated candidate is jointly better, and the pilot's incomplete second attempt supplies no sealed result.\n\nHypotheses with scope. tendon.force_limit_saturation is weakened at the sampled points (max sampled channel 7.999998 N <= 8.0 N per-tendon limit; force_bound_violation_n 0.0), and is only partially tested rather than refuted across the 27 unqueried updates. controller.compute_budget_saturated and solver.termination_limited remain plausible from controller-side plan records (User_Requested_Stop / budget_best_feasible; optimization_selected_iteration 0; effective_horizon truncating 7/5/3/1 over the final interval) but such plan values do not establish a physical cause. hold.tip_speed_penalty_insufficient remains unresolved because no per-term cost contributions are retained. No dominant settling cause is established: a single execution, one paired tradeoff, and closed-loop counterfactual replay is capability_unavailable.\n\nLimitations and independently stated next action. The holding window covers only the final 0.05 s with no continuous-time guarantee and real_time_demonstrated false; the second batch attempt has no sealed result and contributes zero complete new configurations. Recommendation dispositions and candidate selection are separate; the diagnostic deferrals authorize no execution. Proposed next action: finish — no further tuning, check, or backend run is authorized. Raw termination is kept distinct from convergence, wall deadlines from simulated steps, applied updates from optimized selections, and terminal reach from holding. These are observations and derived sealed arithmetic, not causal, statistical, global, real-time or hardware claims.",
+        "recommendation_id": "rec-defer-weight-tuning",
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "baseline-replay",
+          "configuration": {
+            "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+            "media_type": "application/json"
+          },
+          "execution_id": "cf997605885642759ee33920e2c9e2ef",
+          "owner_run_id": "gvs-stage351-baseline-executor"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-2-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  }
+]

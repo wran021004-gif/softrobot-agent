@@ -92,10 +92,10 @@ class LiveIntegrationTests(BatchTests):
             self.assertEqual(workflow.store.remaining()['used']['model_calls'],0)
             self.assertEqual(workflow.store.remaining()['used']['backend_solves'],0)
 
-    def live_fixture(self,directory):
+    def live_fixture(self,directory,*,holding_lower=.05):
         host,old=self.fixture(directory,wall_s=7200.,max_candidates=6,backend_attempts=3,model_calls=16)
         record=host.store.artifact(old);record['plan'].update(max_backend_attempts=3,target_changed_configurations=2,step=.2,
-            variables={'control/recipe/holding_tip_speed_weight':[.05,1.],'control/recipe/terminal_tip_speed_weight':[0.,1.]},
+            variables={'control/recipe/holding_tip_speed_weight':[holding_lower,1.],'control/recipe/terminal_tip_speed_weight':[0.,1.]},
             planned_budget=dict(model_calls=16,tool_calls=24,backend_solves=3,worker_calls=0,wall_s=7200.))
         fixed=deepcopy(self.configuration['effective'])
         for p in record['plan']['variables']:fixed['policy']['controller']['parameters']['data']['recipe'][p.rsplit('/',1)[-1]]='<batch variable>'
@@ -104,8 +104,39 @@ class LiveIntegrationTests(BatchTests):
             ref=plain(host.store.put(db,record));host.store.event(db,host.run_id,'role_transition','search_batch_plan',outputs=[ref])
         # Historical references are fixed; fixture facts retain both identities.
         retained=read(ROOT/'runs/stage354_milestone0_20261003/single_context/feedback.json')['baseline_facts']
+        baseline_store=Store(ROOT/'runs/stage351_settling_20261003/baseline')
+        with host.store.transaction() as db:
+            self.assertEqual(plain(host.store.put(db,baseline_store.artifact(retained['configuration']))),retained['configuration'])
         prepare_offline_batch(host,ref,starting_facts=self.facts,retained_baseline=retained,mode='live')
         return host
+
+    def test_retained_baseline_and_float_roundtrip_never_spend_backend_budget(self):
+        for improves in (False,True):
+            with self.subTest(improves=improves),offline_directory() as directory:
+                host=self.live_fixture(directory,holding_lower=0.);calls=[]
+                def stage(obj,name,candidate):
+                    child=obj.candidate_host(candidate);request='complete-'+name
+                    old=child.store.lookup(child.run_id,request)
+                    if old:return __import__('json').loads(old['receipt'])
+                    if name=='simulation':calls.append(dict(candidate['changes']))
+                    row,_=child.store.reserve(child.run_id,request,digest(candidate),child.actor,
+                        {**zero(),'tool_calls':1,'backend_solves':int(name=='simulation'),'wall_s':dict(simulation=900,evaluation=30,profile=60)[name]})
+                    return child.store.complete(row,dict(request_id=request,execution_id=row['execution_id'],caller=child.actor,
+                        tool_id='offline.test.'+name,tool_version='1.0.0',execution_status='completed',charged=zero()),dict(mode='offline_test_fixture'),.01)
+                def facts(obj,candidate):
+                    f=self.synthetic(.009,.05,.2,candidate['configuration']) if improves else self.synthetic(.03,.08,2.,candidate['configuration'])
+                    f['candidate']['candidate_id']=candidate['candidate_id']
+                    return dict(factual_result=f,configuration=candidate['configuration'],mode='offline_test_fixture')
+                with patch.object(LiveBatchExecution,'stage',stage),patch.object(LiveBatchExecution,'facts',facts):result=run_live_batch(host)
+                self.assertEqual(result['stop_reason'],'pilot_target_complete')
+                self.assertEqual(result['accounting']['new_backend_attempts'],2)
+                self.assertEqual(result['fully_evaluated_distinct_changed_configurations'],2)
+                self.assertEqual(len(calls),2)
+                self.assertTrue(all(not (c['control/recipe/holding_tip_speed_weight']==0. and c['control/recipe/terminal_tip_speed_weight']==0.) for c in calls))
+                self.assertEqual(result['accounting']['retained_baseline_reuse'],0 if improves else 1)
+                if improves:
+                    self.assertTrue(any(p['roundoff_canonicalized'] for p in result['proposals']))
+                    self.assertGreaterEqual(result['accounting']['duplicate_result_reuse'],1)
 
     def test_shared_scheduler_two_comparisons_caps_and_continuation(self):
         with offline_directory() as directory:

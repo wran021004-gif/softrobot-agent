@@ -371,6 +371,7 @@ def offline_batch_result(host):
         accounting=dict(proposals=len(batch['proposals']),distinct_configurations=len(rows),
             reused_evaluations=sum(p.get('reused',False) for p in batch['proposals']),
             historical_start_reuse=sum(p.get('reuse_kind')=='historical_start' for p in batch['proposals']),
+            retained_baseline_reuse=sum(p.get('reuse_kind')=='retained_baseline' for p in batch['proposals']),
             duplicate_result_reuse=sum(p.get('reuse_kind')=='duplicate' for p in batch['proposals']),
             new_backend_attempts=used['backend_solves'],offline_execution_attempts=sum(not r['reused'] and 'simulation' in r['stages'] for r in rows) if batch['mode']=='offline_injected' else 0,
             completed_new_evaluations=sum(not r['reused'] and r.get('feedback') is not None for r in rows),usage=used),
@@ -415,14 +416,30 @@ def _run_batch(host,inject,*,stop_after_stage=None):
     while batch['pending'] or not algorithm.stopped():
         if batch['stop_reason']:break
         if batch['pending'] is None:
-            changes=algorithm.propose();effective=plain(_candidate(SessionInput.model_validate(source),changes,host.reg));identity=digest(effective)
+            changes=algorithm.propose();raw_changes=dict(changes)
+            # A coordinate return to a known point must not create a second
+            # execution just because subtraction changed its last float bit.
+            known=[batch['parameters']['initial'],*[p['changes'] for p in batch['proposals']]]
+            canonicalized=[]
+            for path,value in changes.items():
+                old=next((p[path] for p in known if path in p and abs(p[path]-value)<=1e-12),value)
+                if old!=value:canonicalized.append(path);changes[path]=old
+            if canonicalized:algorithm.state=algorithm.state.model_copy(update=dict(pending=algorithm.space.encode(changes)))
+            effective=plain(_candidate(SessionInput.model_validate(source),changes,host.reg));identity=digest(effective)
             fixed=deepcopy(effective)
             for p in batch['parameters']['bounds']:fixed['policy']['controller']['parameters']['data']['recipe'][p.rsplit('/',1)[-1]]='<batch variable>'
             if digest(fixed)!=record['bindings']['fixed_configuration_identity']:raise ValueError('BATCH_CANDIDATE_CHANGED_FIXED_CONFIGURATION')
-            proposal=dict(index=len(batch['proposals']),changes=changes,identity=identity,reused=False)
+            proposal=dict(index=len(batch['proposals']),changes=changes,optimizer_changes=raw_changes,
+                roundoff_canonicalized=canonicalized,identity=identity,reused=False)
             batch['proposals'].append(proposal);previous=batch['configurations'].get(identity)
             start=batch['starting_facts'] if proposal['index']==0 else None
-            if previous or start:
+            retained=None
+            if not previous and not start and batch.get('retained_baseline'):
+                from extensions.tendon_family.gvs_profile import execution_scope
+                candidate=batch['retained_baseline']
+                original=host.store.artifact(candidate['configuration'])['effective']
+                if execution_scope(effective)==execution_scope(original):retained=candidate
+            if previous or start or retained:
                 if start and not previous:
                     previous=dict(candidate_id=start['candidate']['candidate_id'],configuration=start['configuration'],identity=identity,
                         stages={k:dict(execution_status='historical_reused') for k,_ in stages},reused=True,
@@ -432,7 +449,13 @@ def _run_batch(host,inject,*,stop_after_stage=None):
                         from tools.settling_campaign import compare_results
                         previous['retained_baseline_comparison']=compare_results(batch['retained_baseline'],start)
                     batch['configurations'][identity]=previous
-                proposal.update(reused=True,reused_from=previous['candidate_id'],reuse_kind='historical_start' if start else 'duplicate')
+                if retained:
+                    previous=dict(candidate_id=retained['candidate']['candidate_id'],configuration=retained['configuration'],identity=identity,
+                        changes=changes,stages={k:dict(execution_status='historical_reused') for k,_ in stages},reused=True,
+                        feedback=physical_feedback(batch['starting_facts'],retained,record['bindings']['acceptance']),
+                        retained_baseline_comparison=physical_feedback(retained,retained,record['bindings']['acceptance'])['comparison'])
+                    batch['configurations'][identity]=previous
+                proposal.update(reused=True,reused_from=previous['candidate_id'],reuse_kind='historical_start' if start else 'retained_baseline' if retained else 'duplicate')
                 algorithm.feedback(previous['feedback']['score']);batch['algorithm']=plain(algorithm.save());_save_batch(host,batch);continue
             candidate_id=batch['batch_id']+'-'+str(proposal['index'])
             prepared=CandidateInput(candidate_id=candidate_id,baseline_identity=digest(source),builder=source['policy']['candidate_builder']['extension_id'],

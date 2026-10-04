@@ -72,3 +72,64 @@ model interpretation of the actual batch. Workflow completion, diagnostic value
 and physical improvement are separate results. Its final decision authorizes
 no further execution. No global, statistical, hardware, real-time or
 organizational-superiority conclusion is supported by this small pilot.
+
+## Actual pilot and retained failure
+
+The implementation was frozen at `98416a0`. The model selected both domains
+`[0,1]`, coordinate step `0.25`, six proposals and three backend attempts. Its
+first submission omitted the separate caps, was rejected, and was corrected
+within the same grant. This was one charged business-call failure, not a new
+workflow or a protocol-counter reset.
+
+The start was reused. The first generated changed point (holding `0.30`,
+terminal `0.00`) completed simulation, official evaluation and profile, execution
+`25e26708480848d79bad378b669915e3`. Terminal error was
+`0.018690324120991027 m`, holding maximum error `0.06344380037515782 m`, and
+holding maximum speed `1.1276277677182223 m/s`. It failed reach and both holding
+criteria, with zero force violation and solver errors. It is a physical
+trade-off against both historical references: lower holding speed, worse
+terminal and holding position. Joint acceptance was not achieved.
+
+The second generated point was the retained baseline (both weights zero).
+The scheduler incorrectly started another simulation instead of reusing its
+verified result. The process was stopped after detecting the exact matching
+execution scope. Execution `d06d23180c19424faf5ac6618c779173` has no sealed result;
+its original 900-second reservation and backend-attempt charge remain unknown.
+Three completed optimizer-update records survive; another in-flight request
+cannot be counted exactly. No simulation, evaluation or profile was replayed.
+Partial exports are labelled unsealed and do not supply physical acceptance.
+
+The pilot is **incomplete**: three proposals, three proposed configurations,
+one historical starting-point reuse, zero duplicate-result reuse, two backend
+attempts (one complete and one interrupted/unknown), one completed new
+evaluation/profile, and one fully evaluated changed configuration. The target
+of two is unmet. The third backend allowance was not used.
+
+The model interpreted the stopped batch under its original grant and selected
+the retained baseline. Recommendation adoption accepted diagnostic deferral;
+candidate selection remained a separate axis. Its proposed next action was
+finish, with no additional search/check. The immutable response also contains
+two factual/reasoning errors: it calls the interrupted attempt "never executed"
+and again treats legal near-bound tension as weakening saturation. A separate
+linked audit corrects these; the response is not rewritten or treated as a
+certified scientific conclusion.
+
+Pilot usage: 3 provider attempts, 11 tools, 2 backend attempts, zero workers,
+zero saved-state numerical requests and zero protocol corrections. Ledger wall
+use is `1712.29400000046 s`, including the unresolved `900 s` reservation;
+sealed actual wall charges total `812.29400000046 s`. The complete simulation
+cost `609.0310000001919 s`, evaluation `0.9529999999795109 s` and profile
+`1.0939999998081475 s`. Its 35 controller optimizer requests are inside that
+backend attempt, distinct from saved-state diagnostic solves. Reported tokens
+total 281569 for the pilot and 520987 for the confirmation. Billing cost is
+unknown. The confirmation budget was not transferred.
+
+After stopping, retained-baseline reuse was repaired offline using the exact
+saved execution scope and immutable historical facts. Coordinate round trips
+also restore a previously proposed value when only floating-point roundoff
+differs, retaining the raw proposal and documenting normalization. Focused
+fixtures verify that neither baseline reuse nor a roundoff duplicate spends
+backend budget or counts toward the two new completed configurations. These
+repairs have **offline verification only**; no further paid pilot was launched.
+Live completion of two distinct new configurations remains a future authorized
+task. The original unknown attempt must not be automatically replayed.
