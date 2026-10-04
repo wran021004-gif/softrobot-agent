@@ -1,5 +1,10 @@
 # Milestone 5 initial prospective pilot, 2026-10-04
 
+A later [prediction-validation stage](milestone5_prediction_validation.md)
+completed historical diagnosis and matched-input development analysis, but is
+awaiting external-handoff approval. It has no new prospective outcome. The
+original pilot and its forecasts below remain unchanged.
+
 The first bounded pilot **completed with an inconclusive result**. It demonstrated neither full-task speed-direction prediction nor candidate-order prediction. Milestone 5 remains open; no automatic screening, general reliability, structural screening or controller-family comparison was validated. See [delivery.json](../evidence/milestone45_continuation_20261004/delivery.json) and the [frozen forecast](../evidence/milestone45_continuation_20261004/single_context/pilot_forecast_seal.json).
 
 The pilot reused the existing `TrajectoryWorkspace`, independently checked local plans and `diagnostic_math.NonlinearModel` rollouts, with a small candidate-bound receipt tool. Reference was the evaluated new structure `bebcfd47274940fb88a55ce5a2457c4c`: near/far 0.16/0.11 m, compliant scenario, section scale 0.95, weights 0/0.05. The already accepted immutable adaptation batch contained holding weights 0.05 and 0.10; terminal weight and structure remained fixed. Forecasts did not filter candidates, reorder execution, change acceptance or change physical comparison policy.

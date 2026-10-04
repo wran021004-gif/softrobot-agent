@@ -1,4 +1,30 @@
-# Current development status — Stage 3.42, 2026-10-01
+# Current development status - Milestones 4 and 5, 2026-10-04
+
+Milestones 2, 3, and 4 are closed. Milestone 5 remains open. The accepted
+Milestone 4 deliverable is execution `91c3ba1b01d6499fb26df8f95409401b`,
+candidate `batch-ebbeadbdaca10732-0`: near/far 0.16/0.11 m, section scale 0.95,
+compliant scenario, holding/terminal weights 0.05/0.05, controller 7. Joint
+sampled acceptance passed; mean update was 8.518 s with 35/35 deadline misses.
+The passing 0/0.05 recipe remains a research reference; the adaptation is a
+tradeoff, not dominance. Selected deliverable and latest execution are distinct.
+
+The original Milestone 5 pilot remains sealed and inconclusive. The separately
+authorized later stage completed historical diagnosis and matched-input
+development analysis, but prospective execution is **awaiting external-payload
+approval**. Automatic approval review rejected transmission to the configured
+DeepSeek endpoint. No new provider or backend attempt ran.
+
+Commands first diverge at 0.20 s, tip trajectories at 0.21 s. The 0.10 recipe's
+holding-speed peak occurs at 0.31 s; both passing recipes peak at 0.35 s. The
+observation rule selects 0.20 s and 0.30 s. Six historical matched-input intervals
+agree on speed-change direction, but none meets the numerical endpoint-speed
+tolerance. This is development evidence only, not prospective discrimination.
+
+See [current delivery](../evidence/milestone5_validation_20261004/delivery.json),
+[stage report](milestone5_prediction_validation.md), [Milestone 4](milestone4.md),
+and [original pilot](milestone5.md). No follow-up experiment launches automatically.
+
+## Historical Stage 3.42 status, 2026-10-01
 
 The optional sequential design/diagnostic interfaces, explicit evidence binding,
 matched endpoint-velocity analysis and bounded mathematical tools are implemented.

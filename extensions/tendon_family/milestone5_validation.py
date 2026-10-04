@@ -81,6 +81,11 @@ def diagnose(store,executions,bindings=None):
 
 def execute(ctx,args):
     protocol=ctx.artifact(args.protocol)
+    if protocol['classification']=='matched_development_fidelity':
+        start=time.perf_counter();development=development_fidelity(ctx,protocol)
+        return DiagnosticEvidence(detail=dict(development_local_fidelity=development,classification='development data only',
+            local_solves=0,prediction_rollouts=0,complete_cost_s=time.perf_counter()-start,
+            work='Recorded production predictions and direct projected kinematics; no new solve, integration, or backend step.'))
     if protocol['classification']!='bounded_prediction_validation':raise ValueError('FROZEN_VALIDATION_PROTOCOL_REQUIRED')
     start=time.perf_counter();deadline=start+protocol['limits']['max_wall_s'];rows=[]
     for snapshot in protocol['snapshots']:
@@ -122,6 +127,14 @@ def execute(ctx,args):
     for f in forecasts:
         for key in ('holding_speed_direction','holding_position_direction'):
             if f[key]=='practically_unchanged':f[key]='unresolved'
+    development=(ctx.artifact(protocol['development_fidelity_reference'])['detail']['development_local_fidelity']
+        if protocol.get('development_fidelity_reference') else development_fidelity(ctx,protocol))
+    return DiagnosticEvidence(detail=dict(protocol=plain(args.protocol),rows=rows,forecasts=forecasts,development_local_fidelity=development,
+        predicted_speed_order=None,acceptance_prediction='unresolved',local_solves=len(rows),prediction_rollouts=len(rows),
+        complete_cost_s=time.perf_counter()-start,scope='Candidate-specific production-policy cold previews at two development checkpoints; full task hypotheses remain qualified.'))
+
+
+def development_fidelity(ctx,protocol):
     development=[]
     reader=ImportedReader(ctx.store,protocol['development_bindings'])
     for execution in protocol['development_executions']:
@@ -137,9 +150,7 @@ def execute(ctx,args):
                 projection_speed_difference_m_s=float(np.linalg.norm(velocity))-current['speed_m_s'],score=local_score(prediction,following),
                 classification='development matched recorded production prediction, not prospective validation',
                 state_reference=source['files']['controller_observations.json'],motion_reference=source['files']['trajectory.json.gz']))
-    return DiagnosticEvidence(detail=dict(protocol=plain(args.protocol),rows=rows,forecasts=forecasts,development_local_fidelity=development,
-        predicted_speed_order=None,acceptance_prediction='unresolved',local_solves=len(rows),prediction_rollouts=len(rows),
-        complete_cost_s=time.perf_counter()-start,scope='Candidate-specific production-policy cold previews at two development checkpoints; full task hypotheses remain qualified.'))
+    return development
 
 
 def preflight(inp,args,reg):return dict(cost=dict(wall_s=600.))

@@ -153,6 +153,7 @@ def prediction_protocol(w,record,source):
             state_reference=dict(reference=saved['files']['controller_observations.json'],pointer=f'/{index}/measured_initial_state'),
             previous_input_reference=dict(reference=saved['files']['controller_observations.json'],pointer=f'/{index-1}/actual_tension_n')))
     protocol.update(classification='bounded_prediction_validation',snapshots=snapshots,development_executions=DEVELOPMENT,development_bindings={e:bindings[e] for e in DEVELOPMENT},
+        development_fidelity_reference=w.chain.get('development_fidelity'),
         limits=dict(max_wall_s=600.,max_local_solves=6,max_prediction_rollouts=6),tolerances=TOLERANCES,
         observation_rule=read(RUN/'historical_diagnosis.json')['observation_rule'],
         forecast_rule='Holding-entry candidate plan max speed/error compared with incumbent plan on common projected state; unresolved for sub-tolerance differences; no absolute acceptance forecast.',
@@ -286,6 +287,113 @@ PLAN=shared.COMMON_PLAN.replace('This is ONE shared cumulative campaign: no rese
 Current step: a prospective controller-weight validation on fixed near/far0.16/0.11m,section scale0.95,compliant scenario. Source MUST be the verified passing incumbent execution91c3ba1b01d6499fb26df8f95409401b (holding/terminal0.05/0.05). Vary ONLY control/recipe/holding_tip_speed_weight within the already authorized [0,1] domain; terminal remains0.05. Select ONE or TWO genuinely unevaluated values on this structure;0,0.05,0.10 are excluded development points. Prefer two points if useful but do not force a favorable outcome. Justify exact values and weakening observations. Max backend attempts and completed target equal number of candidates; never exceed2. All candidates receive complete evaluation. Historical 0.05 versus0 differs only slightly;0.10 loses acceptance. These are DEVELOPMENT DATA, never validation cases. Two-checkpoint common cold preview at0.20 and0.30s retains production early stops and horizons10/5; it may abstain. No automatic rejection or screening reliability. Entire completed sequence including both passing research references must be interpreted in final decision. Fixed_conditions include the explicit structure and recipe. Scientific identities, accepted selection, latest execution, pending and completed candidates are distinct. Stop after planned candidates and final interpretation; do not request further experiments.'''
 
 
+def planning_handoff(w):
+    """Prepare the actual native handoff without making a provider request."""
+    from tools.diagnostic_facts import handover
+    check=w.store.artifact(w.chain['feedback']);handover(w.host('design'),check['result'],w.store.artifact(check['result']),origin=dict(kind='accepted_saved_check'),kind='performed_check_result')
+    packet=shared.planning_packet(w,2);packet.update(campaign_limits=LIMITS,primary_reference=w.incumbent['candidate'],
+        accepted_final_selection=w.incumbent['candidate'],diagnosis=read(RUN/'historical_diagnosis.json'),development_exclusions=DEVELOPMENT,
+        extra_preview_reservation=dict(wall_s=600.,tool_calls=1),stage_authorization=AUTHORIZATION)
+    if w.chain.get('development_fidelity'):packet['development_fidelity']=w.store.artifact(w.chain['development_fidelity'])['detail']
+    packet['history']=predecessor.compact_decision_packet(dict(history=packet['history']),None)['history']
+    packet['diagnosis_reference']=save(w.store,packet['diagnosis'])
+    for row in packet['diagnosis']['records']:
+        row.pop('files',None)
+        row['updates']=[o for o in row['updates'] if o['update_id'] in (*CHECKPOINTS,34)]
+    w.instructions={**w.instructions,'improvement':PLAN};w.current_stage='validation'
+    return dict(study_packet=packet,research_records=w.historical_results,latest_tested=w.latest_tested,
+        require_source_binding=True,predecessor_decision=w.predecessor_decision,planned_backend_count=2,
+        allowed_batch_variables=['control/recipe/holding_tip_speed_weight'],max_variable_count=1,
+        required_structure_identity=execution_scope(w.store.artifact(w.incumbent['configuration'])['effective'])['robot']['identity'])
+
+
+def prepare_review():
+    from unittest.mock import patch
+    w=prepare();extra=planning_handoff(w)
+    # Stop immediately before run_loop. This exercises the real serializer and
+    # its guard; no credential loading, network request or fabricated model plan.
+    with patch.object(w,'check_provider_payload',side_effect=RuntimeError('OFFLINE_HANDOFF_SEALED_NO_PROVIDER_REQUEST')):
+        try:w.phase('improvement','search_batch_plan','search_plan',**extra)
+        except RuntimeError as exc:
+            if str(exc)!='OFFLINE_HANDOFF_SEALED_NO_PROVIDER_REQUEST':raise
+    w.check_provider_payload(w.host('design'))
+    atomic_json(RUN/'external_handoff_review.json',dict(destination='https://api.deepseek.com',model='deepseek-flash',
+        payload= 'validation_serialized_handoff.json',data='Robot/task/controller configuration, historical simulation diagnostics, scientific identities, metrics, immutable artifact references, instructions and resource budgets. No credentials.',
+        provider_attempts=0,backend_attempts=0,automatic_approval_rejected=True,
+        rejection_reason='Specific sensitive historical diagnostics/project payload and external model destination lacked established trusted authorization in automatic review.'))
+    export(w,'awaiting_external_payload_approval','Automatic approval review rejected external research handoff; no provider or backend attempt.',0.)
+
+
+def offline_fidelity():
+    w=restore()
+    if 'development_fidelity' in w.chain:raise ValueError('DEVELOPMENT_FIDELITY_ALREADY_SAVED')
+    protocol=dict(classification='matched_development_fidelity',development_executions=DEVELOPMENT,
+        development_bindings={r['facts']['execution_id']:r['binding'] for r in w.historical_results if r['facts']['execution_id'] in DEVELOPMENT},
+        checkpoints=list(CHECKPOINTS),tolerances=TOLERANCES,prospective=False)
+    ref=save(w.store,protocol)
+    from tools.platform_registry import registry
+    reg=registry();reg.add(DEFINITION)
+    inp=deepcopy(w.store.artifact(w.incumbent['configuration'])['effective']);inp['run_id']=w.project+'-offline-fidelity'
+    inp['policy'].update(budget={**LIMITS,'model_calls':0},route=None,tool_bindings={DEFINITION.extension_id:DEFINITION.version},allowed_tools=[],timeout_s=600.)
+    inp['policy']['operation_allowances']={DEFINITION.extension_id:dict(timeout_s=600.,reserve_s=600.)}
+    host=Host(RUN,inp['run_id'],reg=reg);host.create(inp);host.resume()
+    receipt=host.invoke(dict(request_id='matched-development-fidelity',tool_id=DEFINITION.extension_id,tool_version=DEFINITION.version,arguments=dict(protocol=ref),
+        reason='Authorized offline arithmetic and projected kinematics over saved matched-input predictions; zero new solves,rollouts,provider or backend attempts.',cache='new'))
+    atomic_json(RUN/'development_fidelity_receipt.json',receipt)
+    if receipt['execution_status']!='completed':raise ValueError('DEVELOPMENT_FIDELITY_FAILED: '+str(receipt.get('error')))
+    w.chain['development_fidelity']=receipt['output'];atomic_json(RUN/'development_fidelity.json',w.store.artifact(receipt['output'])['detail'])
+    export(w,'awaiting_external_payload_approval','Offline historical diagnosis completed; external provider handoff remains blocked by automatic approval review.',0.)
+
+
+def deliver_blocked():
+    """Evidence-only closeout of completed offline work; no scientific closure."""
+    w=restore();assert_predecessor(w)
+    accounting=read(EVIDENCE/'accounting.json');diagnosis=read(RUN/'historical_diagnosis.json');fidelity=read(RUN/'development_fidelity.json')
+    if accounting['new']['model_calls'] or accounting['new']['backend_solves']:raise ValueError('BLOCKED_DELIVERY_HAS_LIVE_WORK')
+    if 'search_plan' in w.chain or 'forecast_seal' in w.chain:raise ValueError('BLOCKED_DELIVERY_HAS_PROSPECTIVE_PLAN')
+    for name in ('milestone5_validation_console.log','milestone5_validation_offline_console.log','milestone5_validation_fidelity_console.log'):
+        path=ROOT/'runs'/name
+        if path.exists():(EVIDENCE/'single_context'/name).write_bytes(path.read_bytes())
+    errors=[abs(r['score']['endpoint_speed_error_m_s']) for r in fidelity['development_local_fidelity']]
+    delivery=dict(status='awaiting_external_payload_approval',requested_stage_completed=False,offline_diagnosis_completed=True,
+        milestone4_closed=True,milestone5_complete=False,primary_reference=w.incumbent['candidate'],latest_tested=w.latest_tested,
+        accepted_predecessor_selection=w.incumbent['candidate'],development_data=DEVELOPMENT,prospective_validation_data=[],
+        original_pilot_preserved=True,old_forecast_unchanged=True,accounting=accounting,
+        historical_diagnosis=dict(reference='single_context/historical_diagnosis.json',differences=diagnosis['differences'],checkpoints=list(CHECKPOINTS),
+            maxima=[dict(execution_id=r['execution_id'],time_s=r['holding_maximum']['time_s'],speed_m_s=r['holding_maximum']['speed_m_s']) for r in diagnosis['records']]),
+        local_development_fidelity=dict(reference='single_context/development_fidelity.json',matched_intervals=6,
+            correct_speed_change_directions=sum(r['score']['direction_verdict']=='correct' for r in fidelity['development_local_fidelity']),
+            endpoint_within_numerical_tolerance=sum(r['score']['endpoint_within_tolerance'] for r in fidelity['development_local_fidelity']),
+            endpoint_absolute_speed_error_range_m_s=[min(errors),max(errors)],not_prospective=True,independent_repeatability_demonstrated=False),
+        prospective_predictions=None,prospective_results=None,validation_accuracy=None,accepted_research_model_role=None,accepted_model_next_action=None,
+        operational_next_action='Await approval of this specific external research handoff; no new experiment launches automatically.',
+        blocker=dict(action='Launch bounded research-model planning and subsequent stage workflow.',destination='https://api.deepseek.com',model='deepseek-flash',
+            automatic_approval_rejected=True,attempts=1,process_started=False,provider_attempt_charged=False,
+            stated_reason='The script loads provider credentials and sends a research-planning payload containing internal historical diagnostics and project details to an external model destination; no trusted user authorization for that specific sensitive payload and destination is established.',
+            review_payload='single_context/validation_serialized_handoff.json',credentials_in_payload=False),
+        engineering_interventions=['Opt-in actual-input/pre-step observation; production settings preserved.',
+            'Two-checkpoint cold preview and projected-state-aware matched input scoring; no added scientific engine.',
+            'Resolved imported historical evidence through existing BoundReader instead of fabricating local execution ownership.',
+            'Actual serialized handoff exported without provider request after automatic approval rejection.',
+            'Prepared resumable same-stage ledger; preserves all predecessor states, receipts, charges and seals.',
+            'Updated CURRENT_STATUS with Milestone4 closure, Milestone5 open status, and exact access blocker.'],
+        tests=dict(passed=8,scope='Focused alignment, serialized handoff, historical binding, predecessor immutability and evidence-only recovery.',
+            original_failures_preserved_in='offline_verification.json'),additional_solves=0,additional_rollouts=0,
+        no_replays=True,no_workers=True,provider_settings_preserved=True,implementation_checkpoint='8b64aac',revision=revision(),pushed=False)
+    atomic_json(EVIDENCE/'delivery.json',delivery)
+    atomic_json(EVIDENCE/'offline_verification.json',dict(passed=True,test_count=8,
+        command='softagent Python -m unittest tests.test_milestone5_validation tests.test_milestone45.PilotPhysicalTests tests.test_milestone45.FinalRecoveryTests',
+        failures_preserved=[dict(attempt='initial sandboxed tests',reason='Windows sandbox denied temporary SQLite store filesystem access.'),
+            dict(attempt='first escalated tests',reason='Historical imports retain external ownership; local ControlEvidence.resolve required unique local ownership; corrected with BoundReader. Temporary store cleanup also retained a SQLite handle until garbage collection.')],
+        credentials_printed=False,provider_preflight=False,backend_replay=False,predecessor_hash_and_usage_checks=True))
+    folder=EVIDENCE/'implementation'
+    for path in FILES:
+        target=folder/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/path).read_bytes())
+    atomic_json(EVIDENCE/'sha256_manifest.json',{p.relative_to(EVIDENCE).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in sorted(EVIDENCE.rglob('*')) if p.is_file() and p.name!='sha256_manifest.json'})
+    print(json.dumps(dict(status=delivery['status'],usage=accounting,local_development_fidelity=delivery['local_development_fidelity']),indent=2))
+
+
 def live():
     from examples.gvs_nmpc_route_experiment import load_credential
     load_credential(Path(os.environ['SOFTAGENT_CONFIGURATION_PATH']))
@@ -293,26 +401,12 @@ def live():
     for key in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):
         if '127.0.0.1:9' in os.environ.get(key,''):os.environ.pop(key)
     if subprocess.check_output(['git','diff','HEAD','--',*FILES],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
-    w=prepare();start=time.monotonic();status='incomplete';reason=None
+    w=restore() if (RUN/'freeze.json').exists() else prepare();start=time.monotonic();status='incomplete';reason=None
+    if w.store.remaining()['used']['model_calls'] or 'search_plan' in w.chain:raise ValueError('DO_NOT_REPLAY_STARTED_VALIDATION')
     try:
         # Existing planner creates its own capacity packet, so add diagnosis and
         # renewed stage ceiling to the actual shared serialized handoff.
-        w.current_stage='validation'
-        from tools.diagnostic_facts import handover
-        check=w.store.artifact(w.chain['feedback']);handover(w.host('design'),check['result'],w.store.artifact(check['result']),origin=dict(kind='accepted_saved_check'),kind='performed_check_result')
-        packet=shared.planning_packet(w,2);packet.update(campaign_limits=LIMITS,primary_reference=w.incumbent['candidate'],
-            accepted_final_selection=w.incumbent['candidate'],diagnosis=read(RUN/'historical_diagnosis.json'),development_exclusions=DEVELOPMENT,
-            extra_preview_reservation=dict(wall_s=600.,tool_calls=1),stage_authorization=AUTHORIZATION)
-        packet['history']=predecessor.compact_decision_packet(dict(history=packet['history']),None)['history']
-        packet['diagnosis_reference']=save(w.store,packet['diagnosis'])
-        for row in packet['diagnosis']['records']:
-            row.pop('files',None)
-            row['updates']=[o for o in row['updates'] if o['update_id'] in (*CHECKPOINTS,34)]
-        w.instructions={**w.instructions,'improvement':PLAN}
-        w.phase('improvement','search_batch_plan','search_plan',study_packet=packet,research_records=w.historical_results,latest_tested=w.latest_tested,
-            require_source_binding=True,predecessor_decision=w.predecessor_decision,planned_backend_count=2,
-            allowed_batch_variables=['control/recipe/holding_tip_speed_weight'],max_variable_count=1,
-            required_structure_identity=execution_scope(w.store.artifact(w.incumbent['configuration'])['effective'])['robot']['identity'])
+        w.phase('improvement','search_batch_plan','search_plan',**planning_handoff(w))
         record=w.store.artifact(w.chain['search_plan']);atomic_json(RUN/'validation_plan.json',record)
         count=record['plan']['max_candidates']
         if record['bindings']['subject']!=w.incumbent['candidate'] or not 1<=count<=2 or record['plan']['max_backend_attempts']!=count or record['plan']['target_changed_configurations']!=count:raise ValueError('VALIDATION_PLAN_SCOPE')
@@ -348,4 +442,8 @@ def live():
     export(w,status,reason,time.monotonic()-start)
 
 
-if __name__=='__main__':live()
+if __name__=='__main__':
+    if '--prepare-review' in sys.argv:prepare_review()
+    elif '--offline-fidelity' in sys.argv:offline_fidelity()
+    elif '--deliver-blocked' in sys.argv:deliver_blocked()
+    else:live()
