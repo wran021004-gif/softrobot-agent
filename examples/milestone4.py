@@ -71,7 +71,9 @@ class MilestoneWorkflow(prior.ContinuationWorkflow):
         if role['phase']=='response_final':
             for field in ('improvement_feedback_content','check_feedback','report','native_fixed'):
                 if field not in role:raise ValueError('FINAL_HOST_CONTEXT_MISSING: '+field)
-        payload=payload_for(host,EvidenceDrivenAdapter());view=json.loads(payload['messages'][1]['content'])['role_context']
+        adapter=EvidenceDrivenAdapter();payload=payload_for(host,adapter);view=json.loads(payload['messages'][1]['content'])['role_context']
+        expected='design.submit_search_plan' if role['phase']=='improvement' else 'design.respond_diagnosis'
+        if expected not in adapter.advertised.values():raise ValueError('RESEARCH_PAYLOAD_MISSING_HANDOFF_TOOL: '+expected)
         assert view['instructions'] and ('study_packet' in view or 'decision_packet' in view)
         assert len(json.dumps(payload).encode())<100000
         phase=self.current_stage+'_'+view['phase']
@@ -387,12 +389,14 @@ def correct_control_comparison(*,budget_only=False):
 def structure_live(*,adaptation=False):
     """Advance the existing project through the next authorized gate only."""
     from examples.gvs_nmpc_route_experiment import load_credential
-    from tools.structural_study import structural_input
+    from tools.structural_study import research_planning_input
     if subprocess.check_output(['git','diff','HEAD','--',*revision()['files']],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
     load_credential(Path.home()/'.codex/.env')
     for name in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):
         if '127.0.0.1:9' in os.environ.get(name,''):os.environ.pop(name)
     w=restore();stage='adaptation' if adaptation else 'structure'
+    if 'MODEL_PROTOCOL_CORRECTION_TOTAL_LIMIT' in str(w.store.session(w.host('design').run_id)['state'].get('stop_reason')):
+        raise ValueError('CAMPAIGN_RECOVERY_CLOSED: preserve failure, no replacement request or context after correction exhaustion')
     if (RUN/(stage+'_batch_result.json')).exists():raise ValueError('DO_NOT_REPLAY_SEALED_STAGE')
     if adaptation:
         decision=read(RUN/'structure_final_response.json')
@@ -406,12 +410,7 @@ def structure_live(*,adaptation=False):
     # Install the latest evaluated science while preserving this campaign's provider/admin policies.
     from tools.candidate_parameters import planning_configuration
     inp=planning_configuration(w.store,w.latest_tested,current['policy'])
-    inp=structural_input(inp,profile)
-    # Execution children intentionally have no model grant. The planning host
-    # uses this project's authorized session ceiling, still bounded by its
-    # cumulative project ledger; this does not grant a replacement campaign.
-    inp['policy']['budget']=deepcopy(GRANT)
-    inp['policy']['model']=deepcopy(current['policy']['model'])
+    inp=research_planning_input(inp,profile,budget=GRANT,model=w.freeze['provider_configuration'],tool_bindings=w.freeze['tool_bindings'])
     migrate_planning_host(w,stage+'-planning-budget',input_override=inp)
     w.freeze['implementation']=implementation();w.freeze['milestone4_revision']=revision()
     atomic_json(RUN/(stage+'_freeze.json'),dict(input=inp,profile=profile,revision=revision(),usage=w.store.remaining(),project=w.project))

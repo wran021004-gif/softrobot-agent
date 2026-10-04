@@ -67,6 +67,34 @@ class StructuralParameterTests(TestCase):
 
 
 class StructuralBatchTests(TestCase):
+    def test_execution_child_projection_advertises_planning_handoff_before_provider(self):
+        from tests.test_stage356_batch import offline_directory
+        from tools.structural_study import research_planning_input
+        from tools.platform_models import payload_for
+        from tools.diagnostic_reference_adapter import EvidenceDrivenAdapter
+        from extensions.tendon_family.gvs_profile import execution_scope
+        with offline_directory() as tmp:
+            with patch('tools.model_transports.deepseek.request_completion',side_effect=AssertionError('OFFLINE')):
+                w=campaign.prepare(Path(tmp)/'shared')
+                actual=Store(campaign.RUN)
+                tested=read(campaign.RUN/'control_batch_result.json')['candidates'][0]['execution']['factual_result']
+                child=actual.artifact(tested['configuration'])['effective']
+                self.assertEqual(child['policy']['budget']['model_calls'],0)
+                self.assertNotIn('design.submit_search_plan',child['policy']['tool_bindings'])
+                projected=research_planning_input(child,read(PROFILE),budget=campaign.GRANT,
+                    model=w.freeze['provider_configuration'],tool_bindings=w.freeze['tool_bindings'])
+                self.assertEqual(execution_scope(projected),execution_scope(child))
+                campaign.migrate_planning_host(w,'research-policy-offline',input_override=projected)
+                def inspect_only(host):
+                    adapter=EvidenceDrivenAdapter();payload_for(host,adapter)
+                    self.assertIn('design.submit_search_plan',adapter.advertised.values())
+                    raise RuntimeError('OFFLINE_HANDOFF_PRESENT')
+                with patch('tools.diagnostic_workflow.run_loop',side_effect=inspect_only):
+                    with self.assertRaisesRegex(RuntimeError,'OFFLINE_HANDOFF_PRESENT'):
+                        campaign.plan(w,'structure',1,campaign.STRUCTURE_PLAN)
+                self.assertEqual(w.store.remaining()['used']['model_calls'],0)
+                self.assertEqual(w.store.remaining()['used']['backend_solves'],0)
+
     def test_plan_projection_preparation_ownership_and_stale_profile_rejection(self):
         from tests.test_stage356_batch import offline_directory
         with offline_directory() as tmp:
