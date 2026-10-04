@@ -11,11 +11,42 @@
       "command": "python -m unittest tests.test_milestone4_structure.StructuralBatchTests.test_execution_child_projection_advertises_planning_handoff_before_provider",
       "result": "OK",
       "purpose": "Existing actual execution-child regression"
+    },
+    {
+      "command": "python -m unittest tests.test_milestone45.ContinuationTests.test_serialized_structure_final_and_adaptation_handoffs",
+      "tests": 1,
+      "result": "OK",
+      "elapsed_s": 53.643
+    },
+    {
+      "command": "python -m unittest tests.test_milestone45.PilotPhysicalTests",
+      "tests": 3,
+      "result": "OK",
+      "elapsed_s": 0.023,
+      "purpose": "Independent candidate commands, physical prediction/abstention and sealed recovery without backend replay"
+    },
+    {
+      "command": "python -m unittest tests.test_milestone45.FinalRecoveryTests tests.test_milestone45.PilotPhysicalTests",
+      "tests": 4,
+      "result": "OK",
+      "elapsed_s": 3.464,
+      "purpose": "Actual final payload below guard, unchanged forecast and latest identity from receipts"
     }
   ],
   "interventions": [
     "Sandbox denied Python temporary fixture directory access; focused tests ran with authorized escalation.",
     "Extended existing compatibility review to include accepted completed control source dependency hashes.",
     "Corrected offline changed-structure fixture to use existing candidate builder."
-  ]
+  ],
+  "verification_of_delivery": {
+    "milestone4_gates": true,
+    "forecast_before_backend": true,
+    "prepared_and_scientific_identities_match": true,
+    "all_receipt_charges_reconcile": true,
+    "predecessor_state_and_usage_unchanged": true,
+    "latest_separate_from_selection": true,
+    "local_attempts": 3,
+    "prediction_rollouts": 3,
+    "embedded_new_controller_updates": 105
+  }
 }

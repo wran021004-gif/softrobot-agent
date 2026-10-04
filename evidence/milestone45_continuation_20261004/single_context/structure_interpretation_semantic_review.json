@@ -1,0 +1,31 @@
+{
+  "original_response": {
+    "artifact_id": "ee1b135d087dc7488e67fcf87645999299b7f2fd76d4890898a0cbeacc0499e7",
+    "media_type": "application/json"
+  },
+  "original_preserved": true,
+  "semantic_passed": false,
+  "issue": "Reasoning claims clean single-variable attribution is not fully shown because material and section scale are listed in decision fields. Those are fixed values in source and candidate, not changes.",
+  "actual_differences": [
+    {
+      "actual_changes": [
+        {
+          "after": 0.16,
+          "before": 0.15,
+          "path": "components/near/length_m"
+        }
+      ],
+      "proposed": {
+        "components/near/length_m": 0.16
+      },
+      "unchanged_declared_fields": []
+    }
+  ],
+  "fixed_conditions": {
+    "section_scale": 0.95,
+    "material_scenario": "compliant",
+    "holding_weight": 0.0,
+    "terminal_weight": 0.05
+  },
+  "required_correction": "State the observed effect of the single tested near-length change under fixed control. Preserve limited tested-point/simulation scope; do not invent confounding changes. Source and latest are independent roles and can coincide."
+}

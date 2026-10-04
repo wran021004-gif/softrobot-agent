@@ -1,0 +1,377 @@
+{
+  "passed": true,
+  "tool": "design.respond_diagnosis",
+  "actual_schema": {
+    "type": "object",
+    "anyOf": [
+      {
+        "additionalProperties": false,
+        "properties": {
+          "disposition": {
+            "enum": [
+              "adopt",
+              "defer",
+              "reject"
+            ],
+            "title": "Disposition",
+            "type": "string"
+          },
+          "recommendation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recommendation Id"
+          },
+          "reasoning": {
+            "minLength": 1,
+            "title": "Reasoning",
+            "type": "string"
+          },
+          "next_action": {
+            "const": "finish",
+            "title": "Next Action",
+            "type": "string"
+          },
+          "candidate_disposition": {
+            "enum": [
+              "adopt_candidate",
+              "retain_baseline",
+              "defer_selection",
+              "reject_all"
+            ],
+            "title": "Candidate Disposition",
+            "type": "string"
+          },
+          "selected_candidate": {
+            "description": "baseline, candidate, none; for a supplied completed batch, an exact evaluated candidate_id may be selected.",
+            "title": "Selected Candidate",
+            "type": "string"
+          },
+          "next_research": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/NextResearchRoute"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "hypothesis_assessment": {
+            "anyOf": [
+              {
+                "enum": [
+                  "supported",
+                  "weakened",
+                  "rejected",
+                  "unresolved"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Hypothesis Assessment"
+          }
+        },
+        "required": [
+          "disposition",
+          "reasoning",
+          "next_action",
+          "candidate_disposition",
+          "selected_candidate"
+        ],
+        "title": "WireFinalDecision",
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "properties": {
+          "corrections": {
+            "items": {
+              "$ref": "#/$defs/FieldCorrection"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Corrections",
+            "type": "array"
+          }
+        },
+        "required": [
+          "corrections"
+        ],
+        "title": "Corrections",
+        "type": "object"
+      }
+    ],
+    "$defs": {
+      "Budget": {
+        "additionalProperties": false,
+        "properties": {
+          "tool_calls": {
+            "minimum": 0,
+            "title": "Tool Calls",
+            "type": "integer"
+          },
+          "model_calls": {
+            "minimum": 0,
+            "title": "Model Calls",
+            "type": "integer"
+          },
+          "backend_solves": {
+            "minimum": 0,
+            "title": "Backend Solves",
+            "type": "integer"
+          },
+          "worker_calls": {
+            "minimum": 0,
+            "title": "Worker Calls",
+            "type": "integer"
+          },
+          "wall_s": {
+            "minimum": 0,
+            "title": "Wall S",
+            "type": "number"
+          }
+        },
+        "required": [
+          "tool_calls",
+          "model_calls",
+          "backend_solves",
+          "worker_calls",
+          "wall_s"
+        ],
+        "title": "Budget",
+        "type": "object"
+      },
+      "NextResearchRoute": {
+        "additionalProperties": false,
+        "properties": {
+          "route": {
+            "enum": [
+              "continue_weight_combinations",
+              "initialization_selection",
+              "prediction_backend_disagreement",
+              "holding_control_arrangements",
+              "structure_change",
+              "controller_adaptation",
+              "defer",
+              "stop"
+            ],
+            "title": "Route",
+            "type": "string"
+          },
+          "unresolved_question": {
+            "minLength": 1,
+            "title": "Unresolved Question",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Execution/artifact identities and exact observations motivating this route.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          },
+          "bounded_check": {
+            "minLength": 1,
+            "title": "Bounded Check",
+            "type": "string"
+          },
+          "fixed_conditions": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Fixed Conditions",
+            "type": "array"
+          },
+          "proposed_variables": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Proposed Variables",
+            "type": "object"
+          },
+          "expected_observations": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Expected Observations",
+            "type": "array"
+          },
+          "proposed_budget": {
+            "$ref": "#/$defs/Budget"
+          },
+          "stopping_conditions": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Stopping Conditions",
+            "type": "array"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Limitations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "route",
+          "unresolved_question",
+          "evidence",
+          "bounded_check",
+          "fixed_conditions",
+          "expected_observations",
+          "proposed_budget",
+          "stopping_conditions",
+          "limitations"
+        ],
+        "title": "NextResearchRoute",
+        "type": "object"
+      },
+      "FieldCorrection": {
+        "additionalProperties": false,
+        "properties": {
+          "operation": {
+            "default": "replace",
+            "enum": [
+              "replace",
+              "remove"
+            ],
+            "title": "Operation",
+            "type": "string"
+          },
+          "path": {
+            "description": "Exact existing-field JSON pointer relative to draft.arguments, e.g. /new_facts/0/references. The explicit draft-root spelling /arguments/new_facts/0/references is also supported. No guessed paths.",
+            "title": "Path",
+            "type": "string"
+          },
+          "value": {
+            "default": null,
+            "title": "Value"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "FieldCorrection",
+        "type": "object"
+      }
+    }
+  },
+  "usage": {
+    "old": {
+      "tool_calls": 14,
+      "model_calls": 11,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 932.1719999995548
+    },
+    "new": {
+      "tool_calls": 21,
+      "model_calls": 6,
+      "backend_solves": 3,
+      "worker_calls": 0,
+      "wall_s": 1262.7539999985602
+    },
+    "combined": {
+      "tool_calls": 35,
+      "model_calls": 17,
+      "backend_solves": 4,
+      "worker_calls": 0,
+      "wall_s": 2194.925999998115
+    },
+    "limits": {
+      "model_calls": 24,
+      "tool_calls": 60,
+      "backend_solves": 4,
+      "worker_calls": 0,
+      "wall_s": 9000.0
+    }
+  },
+  "revision": {
+    "commit": "4bf10ea0fbd644a917a877989418a8cfc342d68c",
+    "files": {
+      "examples/stage359_continuation.py": "7061c7bb6ea081b7a7beb6f79baa1ba26aa115ba82db2d78733bbf4557030057",
+      "examples/stage359_live_continuation.py": "224ead466e1f724088ef0caaa623ecaf9cb3ba3168a8b59bf8ab3526207c074d",
+      "tests/test_stage359_explicit.py": "31666e7e9ecf2eac79a34506c44673c7f25a4ff9db8098c2b8e91e588a4de04e",
+      "extensions/tendon_family/optimization.py": "3d8b1d5045fa2badb6cfe7360c1e84300b9215148d47430e1b314a5ce08b3d2c",
+      "extensions/tendon_family/manifest.py": "592c417b2bfc1684040e6eef385f32f9a35e1af5c86c393642d98c2b6c4fedea",
+      "tests/test_stage359_continuation.py": "87a33591fdbd35e5e87b040df4315f82236ea84354e5047352bd190a1d100a01",
+      "tools/diagnostic_handoff.py": "1dbd0a46ae072122096ed59e2dbdcbf186951d6130a5a8de0e3952221f34c73f",
+      "tools/platform_search.py": "152c378d0389476f75b437b007b634ec127ea81be6a2dae72d8a853a1b98f57d",
+      "tools/working_state.py": "8eb6bb9e1ebeb2285a9279e2f39b2c869f90d175d3d6ca59f2db6b8fd174da97",
+      "schemas/working_state.py": "97e35dff3b0ce1a28ee5045af948707ac4e20a12068cbedc553641207efab9b2",
+      "examples/stage356_milestone2.py": "5317c5b4c45e475dbdd609082dc014e29fd0e76da9e9074fc2dd45b993b92401",
+      "examples/stage357_live_pilot.py": "79d2f0375b5e83de2467283926b80787b62ea8e93bcbe72b59f66acd62e93ea1",
+      "examples/stage358_confirmation.py": "6a6ae896dfa748c32b2f560ccf0d753d03a6a25e0eac3caa6f810445d72cd586",
+      "examples/stage358_interpretation_repair.py": "33c5c09b46c50c291b50d665dd83596302253befe03c3b7d141ea1247e69948e",
+      "tests/test_stage358_interpretation_repair.py": "4ac8ab31017ea69ebc24fbf0af1707a44b5cee2ad840aa6e02e02a4a51754199",
+      "tests/test_stage358_confirmation.py": "5f846847ba45ce6cb9144448d1d9f2f3b2a7b47bead81d2a6f19ea62fea91a49",
+      "tests/test_stage356_milestone2.py": "accb8f4e05134f243d457c9f3c579d2f246881dc6da0fb7327e5f57d99468f7e",
+      "tests/test_stage356_batch.py": "776a313f320abf9ad9f15bf11757fdc9f67b5b9e1f7979cff2bce4ab50cc9873",
+      "tests/test_stage357_live_batch.py": "3845a794ac118e3a1666aa7be71e57c04b4a2087dded790aa92df9d88032bd5f",
+      "tools/diagnostic_reference_adapter.py": "b9a243382c8599bdbe0a07393ca431bad2b1e6fd36823cdc12b6b4ef8da9223a",
+      "tools/diagnostic_revision.py": "5b618332cf2abe594bbf355c1ca701ffb2d36fce79aff81422d75754fc261c36",
+      "schemas/diagnostic_revision.py": "d6eb3472cbbab2aaa3bb5ab168e734ca61924f06ea232a8d2cd5fc86f12aedec",
+      "tools/diagnostic_workflow.py": "a91e6bb56946dc5e98f707aba2bde1257c026fba829b5d49f7477f9acd9f9f2c",
+      "tools/diagnostic_native.py": "ad007fff7a1c0d139a93db6b715d9ffd0a40631903ee32eab6c20befabb4bc11",
+      "tools/diagnostic_inventory.py": "2178f03ad6e991870a69e9e8986c84336753bcf26f2d617ed02d9a786e2a0651",
+      "tools/diagnostic_facts.py": "5a05214a31816fe3871b7e26d8f9fe86c70083d860eee99e2bb6bf8cd70b0d09",
+      "tools/diagnostic_summary.py": "a88f5d5db01728ddfb5ebd9a43cb0b9f944c2fcb3357bb55e895888ed70e052b",
+      "tools/live_batch_execution.py": "92fa901ac26f344a05a586b03aa8a971d839a846556689c2eade48ffaf5c5160",
+      "extensions/tendon_family/diagnostic_evidence.py": "f14e67c1dc2b201c2114eceb1e5fbb41d94d129299e222b533f1e35f0e43a836",
+      "tools/execution_completion.py": "f597ef1a6a16b2e443cbdcac5b7955dd41cf758bc7d56c53995c629a86d3df80",
+      "tools/platform_models.py": "27a8154de6cdeb43f88348489fbd65a0e7756cfb75bbc0acc58a5beb5e142574",
+      "tools/platform_handoff.py": "4a185dfee831fe21f7207e3706354c44f73bf20976641a554f9b4408cedbf246",
+      "tools/platform_diagnosis_coordinator.py": "ae8c0554d0303a76ae6a55eeb7d849f3df63fe27e1fa8a04cbd1f995358b736a",
+      "tools/platform_host.py": "134123ac29d5279d9480fde5e064771c6ee3702fb185142a496d54a0eeed30fa",
+      "tools/platform_store.py": "1727f687b1dea1ae0cd078ca753edd9d7e9c7ecf9706225fde52af2ddfe8d318",
+      "schemas/platform_handoff.py": "9b434dc87c04051567f925aecb8475df9c585e48b187ab79200afa456aa51c94",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "e5746170e5b0f4a55a2461cefd55f4c872566fbe1fdf4d324b46df1cd08f8996",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "0df3a9f900b8c3c8efd7f72a99c9ff4524eca0826f5c5e2e904bdda9a2e5607c",
+      "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "e9723ef5881f037ff420992a14e6f768a05815fa3f021b05d32a9ea15f7d74c9",
+      "tools/platform_tools.py": "e1815614e5f2fc5a0310e48a0bf0444708685d71189efb90de32919a54e050fa",
+      "extensions/tendon_family/candidate.py": "e5a551c5fc2dbe060ee21c1e2130a2d8a98da1954518b8150518fe8a8693fb97",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88",
+      "examples/milestone4.py": "def0066bd745745a829409fe86761051aabb71b62030d3472c34b48d85705e60",
+      "tools/study_history.py": "c66acdffebdeca1aef2f0e92cabdb82e25e3f2bc4c4da912e85e76dd5afa644c",
+      "tools/batch_budget.py": "11e2a16976a79e896c8d4d61c68ec0466d8994314c7a0c38e0c62985b301f70c",
+      "tools/candidate_parameters.py": "215c257e8eb83352eb54f785d6d200692600e473c575193f8a87c7e3f6dd6753",
+      "tools/parameter_impacts.py": "b420633a704799c5d2f615d836cb58c3b3fa8b47e5d654ba86160e2f3cf7340c",
+      "tests/test_milestone4.py": "07d6a33dc47de3b9cbad4f8e9a11fe9e1f71c7ba47a42a70028025373566e858",
+      "schemas/parameter_domains.py": "53678ba78c43a9c5e7af5f4bb8f48e7117c9b37375f92639a12615f00ded2bf1",
+      "tools/structural_study.py": "9d775d1051b90e7dbaa79980ad7fa3516f52b46606dbdf65fd2b5076b4c1f73e",
+      "tools/optimization_interfaces.py": "6d4c3bc00d5982fb64b04e8a1c855bb443e53142b9d2bdd74a9039bf430bceb7",
+      "tests/test_milestone4_structure.py": "0dd9b1fb9a3fa7eefcd35ce956ab0be70c84d69c38c25e26d18335154de23e89",
+      "extensions/tendon_family/profiles/milestone4_reach_experiment_v1.json": "04e57ec4f44c6e03823ed4a7c376b44db2dd77435dbeead2ca140b93c9e36023",
+      "examples/milestone45_continuation.py": "477a1098df2eebac0df1412c14f80925593a8d2576b1837cf7dca0daa5a35c90",
+      "extensions/tendon_family/milestone5_preview.py": "1da13eff21997b50d7bbb7087668c637905979b591c9b895592c3087037dc59e",
+      "tests/test_milestone45.py": "ea680546bbdb54f0c49eca12a972385b963b10d49d256e79c5a4182aac07f0a2"
+    }
+  }
+}

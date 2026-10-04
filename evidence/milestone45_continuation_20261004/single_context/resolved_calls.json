@@ -1,0 +1,431 @@
+[
+  {
+    "run_id": "gvs-milestone45-continuation-0ba83229042b-structure-to-adaptation",
+    "reference": {
+      "artifact_id": "67dc3d82eb9f4f87c9576957f9211bd92a697ff769e46884f510f2075df7b2cd",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidates": [
+          {
+            "control/recipe/holding_tip_speed_weight": 0.05
+          },
+          {
+            "control/recipe/holding_tip_speed_weight": 0.1
+          }
+        ],
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F1",
+          "F10",
+          "F100"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "Simulation only; no hardware, real-time or continuous-time claims.",
+          "Two tested weight points on a single fixed structure; no generalization across the holding-weight range.",
+          "Zero force-bound violation does not exclude legal near-bound input.",
+          "Small unsuccessful batch would only describe the two tested candidates.",
+          "Deadline misses are raw-termination/policy, distinct from controller policy stops and from acceptance."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "With the structure fixed at the newly evaluated point (structure_identity a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33; components/near/length_m=0.16, components/far/length_m=0.11, design/material_scenario=compliant, design/section_scale=0.95) and control/recipe/terminal_tip_speed_weight held at the source value 0.05, raising control/recipe/holding_tip_speed_weight from the source value 0.0 to the two finite points 0.05 and 0.1 produces a detectable, ordered change in holding_max_speed_m_s across the two previously unevaluated points while joint_reach_holding acceptance and terminal reach remain satisfied on this fixed structure.",
+        "max_backend_attempts": 2,
+        "max_candidates": 2,
+        "method": "search.family_explicit@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 2,
+          "model_calls": 5,
+          "tool_calls": 13,
+          "wall_s": 2590.0,
+          "worker_calls": 0
+        },
+        "predecessor_decision": {
+          "artifact_id": "88d20152a25c68d492f5fbfc6b3ef4cfabadeeed2ff496459682adc4caf57599",
+          "media_type": "application/json"
+        },
+        "rationale": "FINITE ADAPTATION RULE: begin from the exact source candidate batch-e4843b561ebaea27-0 (execution bebcafd47274940fb88a55ce5a2457c4c; configuration artifact 3535b142e00a10ceee822fa9ef5661dac3e5e1ada46c5b9a25ced8d80773574c), which is the newly evaluated structure (structure_identity a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33) already carrying controller/recipe holding_tip_speed_weight 0.0 and terminal_tip_speed_weight 0.05. Freeze structure and all undeclared fields (robot = every undeclared structural field, including components/near/length_m=0.16, components/far/length_m=0.11, near ellipse semi_y 0.0095/semi_z 0.0076, far rectangle sections, design/material_scenario=compliant, design/section_scale=0.95; task; acceptance; controller_implementation controller.gvs_nmpc@7.0.0; other_numerical_settings = control_period_s 0.01, 35 control updates, 0.05 s holding window, unchanged solver/horizon). Vary exactly ONE factor: control/recipe/holding_tip_speed_weight, taken at the finite ordered list {0.05, 0.1}, with control/recipe/terminal_tip_speed_weight frozen at the source value 0.05. Both points are previously unevaluated on this structure and distinct from the source; the one-factor design directly tests the ordering of holding_max_speed_m_s versus holding weight. Only these two permitted paths are touched; candidate objects contain precisely the single varied builder path.\n\nCOMPARISONS: candidate points are compared against (a) the pre-adaptation changed structure = this source (weights 0.0/0.05, joint_reach_holding_passed=true, holding_max_error_m 0.002737, holding_max_speed_m_s 0.012736, terminal_error_m 0.002705); (b) the original research source batch-43a6daab7e3c1ce6-3 (execution 50618bf23b31464ba4f84c55cd26d1ca, 0.15 m structure, holding 0.0/terminal 0.05, holding_max_speed_m_s 0.035567, holding_speed_passed=false); and (c) the retained baseline baseline-replay (execution cf997605885642759ee33920e2c9e2ef, weights 0.0/0.0, joint_reach_holding_passed=false). This is bounded adaptation, not global optimization; local ranking uses candidate-specific solves and does not alter the final physical ranking.\n\nEVIDENCE SCOPE: the only supplied aliases are the performed-check result aliases F1, F10, F100. The stated hypothesis is a proposed test, not an achieved result; no physical improvement is claimed before execution. Observations (source passes; earlier holding-only weights failed on the prior structure), hypotheses (holding weight orders holding speed on this structure) and proposed tests (the two points above) are distinguished. Claims of dominant cause or range-wide ineffectiveness are avoided; scope is the two tested points on one fixed structure under simulation.\n\nBUDGET/COVERAGE: planned_budget.backend_solves equals the phase cap = number of new points (2); max_backend_attempts=2 and target_changed_configurations=2; other limits cover study_packet.budget.requirement (model_calls 5, tool_calls 13, wall_s 2590.0, worker_calls 0) and stay within study_packet.budget.available. One shared cumulative campaign, no reset; historical stopped campaign stays stopped; correction caps preserved. Reused starts/duplicates are recorded separately and consume no invented new-result quota.",
+        "scientific_promise": "uncertain",
+        "source_candidate": {
+          "candidate_id": "batch-e4843b561ebaea27-0",
+          "configuration": {
+            "artifact_id": "3535b142e00a10ceee822fa9ef5661dac3e5e1ada46c5b9a25ced8d80773574c",
+            "media_type": "application/json"
+          },
+          "execution_id": "bebcfd47274940fb88a55ce5a2457c4c",
+          "owner_run_id": "batch-e4843b561ebaea27-0"
+        },
+        "step": null,
+        "stopping_conditions": [
+          "Stop when the planned one-or-two-point batch reaches the declared completed changed-configuration target with sealed evaluations.",
+          "Stop on unknown or material failure, or insufficient delivery capacity.",
+          "Do not stop merely because the source recipe already passes holding.",
+          "Raw termination/deadline-miss counts do not by themselves trigger stop or acceptance."
+        ],
+        "target_changed_configurations": 2,
+        "variables": {
+          "control/recipe/holding_tip_speed_weight": {
+            "bounds": [
+              0.0,
+              0.1
+            ],
+            "kind": "continuous"
+          }
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "On the earlier 0.15 m structure the holding-only branch at weights 0.05, 0.1 and 0.3 all failed holding speed (holding_max_speed_m_s 1.175, 1.363, 1.128 m/s), so added holding weight alone previously did not resolve holding speed; the same weight direction may again fail.",
+          "The source recipe itself already passes (holding 0.0 / terminal 0.05: joint_reach_holding_passed=true, holding_max_error_m 0.002737, holding_max_speed_m_s 0.012736, terminal_error_m 0.002705), so added holding weight may be neutral or harmful (position/terminal tradeoff) rather than improving.",
+          "Zero force_bound_violation_n (0.0 at the source) does not exclude legal near-bound inputs, so force-bounds satisfaction cannot be inferred from the metric alone.",
+          "A two-point batch on one fixed structure under simulation cannot establish monotonic ordering across the whole weight range; termination/deadline-miss counts (35 at source) are a separate raw-termination/policy observation, not acceptance."
+        ]
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-0-tool",
+      "tool_id": "design.submit_search_plan",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone45-continuation-0ba83229042b-structure-to-adaptation",
+    "reference": {
+      "artifact_id": "ead109d680b45f355fe70be7870ffa225d9889d8ca534e6c98d4825465134adb",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "adopt_candidate",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "9333f49d84a968e1396f951f3f0e29febf9088e6fad8396c55e8f8455428406c",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "supported",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "None proposed. Retain the accepted batch as pending; execute no new runs.",
+          "evidence": [
+            "retained_baseline execution cf997605885642759ee33920e2c9e2ef: holding_position_passed=false, holding_speed_passed=false, joint_reach_holding_passed=false",
+            "candidate batch-e4843b561ebaea27-0 execution bebcfd47274940fb88a55ce5a2457c4c: joint_reach_holding_passed=true, valid_complete_execution=true",
+            "pilot_numerical protocol 520e49f8eeb836592cfe902d0152c873f0363f0b20374945dad1fc60cc0ca2c0: local_candidate_minus_reference endpoint_error and endpoint_speed both zero for pending candidates batch-ebbeadbdaca10732-0 and -1"
+          ],
+          "expected_observations": [
+            "No new observations produced by this decision",
+            "Pending batch remains unexecuted"
+          ],
+          "fixed_conditions": [
+            "Controller recipe family and candidate identity from the frozen batch",
+            "Saved projected pilot state and 0.01 s held first command",
+            "Retained baseline execution and evaluation artifacts"
+          ],
+          "limitations": [
+            "Pilot scope is one saved state and one held command, not full-task holding maxima",
+            "Joint acceptance and overall ranking of pending candidates remain unknown",
+            "No real-time, continuous-time, hardware or global-superiority claims"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Stop immediately; no experiment authorized"
+          ],
+          "unresolved_question": "Whether the pending holding_tip_speed_weight candidates (0.05, 0.1) change full-task holding position, holding speed or joint reach+holding relative to the adopted candidate and baseline."
+        },
+        "reasoning": "Completed candidate batch-e4843b561ebaea27-0 (execution bebcfd47…) records terminal_reach_passed=true, holding_position_passed=true, holding_speed_passed=true and joint_reach_holding_passed=true with valid_complete_execution=true; retained baseline (execution cf997605…) passes terminal reach only and fails holding position (0.05814 m), holding speed (1.58102 m/s) and joint acceptance. Terminal reach is thus non-discriminative (both pass). Measured complete-update time favors the candidate (mean 8.34 s vs 17.26 s), yet deadline_misses=35 and real_time_demonstrated=false in both: no real-time claim. Zero force-bound violation in either run does not exclude legal near-bound input. This supports the study hypothesis that the candidate improves joint holding while retaining reach. Pilot_numerical is scoped to a saved projected state and one 0.01 s held candidate-specific first command: the pending weight candidates (0.05, 0.1) reproduce reference endpoint error (8.164e-4 m) and speed (1.0624e-2 m/s) exactly, differing only in guidance objective (0.07606, 0.07614). Local endpoint speed is not full-task holding maximum, so full-task directional and speed ordering remain unresolved; I abstain rather than freeze an order. Diagnostic disposition is defer with recommendation_id=null. Candidate adoption is independent and, on the program-computed joint-acceptance result, selects the completed candidate. The pending batch remains pending; this interpretation neither changes nor filters it.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-e4843b561ebaea27-0",
+          "configuration": {
+            "artifact_id": "3535b142e00a10ceee822fa9ef5661dac3e5e1ada46c5b9a25ced8d80773574c",
+            "media_type": "application/json"
+          },
+          "execution_id": "bebcfd47274940fb88a55ce5a2457c4c",
+          "owner_run_id": "batch-e4843b561ebaea27-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-1-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone45-continuation-0ba83229042b-structure-to-adaptation",
+    "reference": {
+      "artifact_id": "de9ad24892413e4dc95a518efad881531cabf69240e5b55f72a2ec6b0816ad57",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "adopt_candidate",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "7fb2eb727d4f0cfed46bd9477bcf95a8d1118d6a611c20dcfc00159aaff13b88",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "weakened",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "None proposed for this campaign; execute no new runs. Any weight sweep or >0.1 exploration requires a separate model-authored, validated plan.",
+          "evidence": [
+            "candidate batch-ebbeadbdaca10732-0 execution 91c3ba1b01d6499fb26df8f95409401b: joint_reach_holding_passed=true, holding_max_speed_m_s=0.012750",
+            "candidate batch-ebbeadbdaca10732-1 execution 110dc2c9c1d642dcb018664a65c62c30: joint_reach_holding_passed=false, holding_max_speed_m_s=0.022129 (>0.02)",
+            "source batch-e4843b561ebaea27-0 execution bebcfd47274940fb88a55ce5a2457c4c: joint_reach_holding_passed=true, holding_max_speed_m_s=0.012735",
+            "retained baseline execution cf997605885642759ee33920e2c9e2ef: joint_reach_holding_passed=false"
+          ],
+          "expected_observations": [
+            "No new observations produced by this decision; campaign closed"
+          ],
+          "fixed_conditions": [
+            "structure_identity a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33",
+            "control/recipe/terminal_tip_speed_weight = 0.05",
+            "controller recipe family and candidate identity from the frozen batch",
+            "acceptance thresholds: terminal 0.01 m; holding 0.01 m / 0.02 m/s; window 0.05 s"
+          ],
+          "limitations": [
+            "Only two weight points (0.05, 0.1) tested on one fixed structure; no range-wide or global claims",
+            "No real-time, continuous-time or hardware claims; deadline_misses=35 with time-based criteria in all runs",
+            "Zero force-bound violation does not exclude legal near-bound input"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Stop immediately with zero budget; no experiment authorized"
+          ],
+          "unresolved_question": "Whether holding_tip_speed_weight values above 0.1, or the interpolation between 0.05 and 0.1, can change holding_max_speed_m_s while retaining joint reach+holding acceptance on this fixed structure — not testable within this campaign."
+        },
+        "reasoning": "Fixed structure a60999…; terminal_tip_speed_weight held 0.05; two new holding_tip_speed_weight points evaluated (0.05→batch-ebbeadbdaca10732-0, 0.1→batch-ebbeadbdaca10732-1), each against original research source (e30da8…), retained baseline (af649b…) and source (e4843b…). Terminal reach: terminal_reach_passed=true for -0, -1, source and retained baseline — non-discriminative here. Holding: -0 (execution 91c3ba…) passes position 0.002730 m ≤0.01, speed 0.012750 m/s ≤0.02, joint_reach_holding_passed=true; -1 (execution 110dc2…) passes position 0.002811 m but fails speed 0.022129 m/s >0.02, joint=false. Program classification: vs retained baseline joint_acceptance_gained (-0) and physical_pareto_improvement (-1); vs source physical_tradeoff (-0: holding error −6.79e-6 m, speed +1.458e-5 m/s, terminal −7.18e-6 m) and joint_acceptance_lost (-1). Observed holding_max_speed order -0 (0.01275) then -1 (0.02213): a detectable monotone increase. Timing: 8.52 s (-0) / 8.64 s (-1) mean complete-update vs 17.26 s retained baseline; deadline_misses=35 and real_time_demonstrated=false in every run — no real-time claim. force_bound_violation_n=0 in all runs; zero violation does not exclude legal near-bound input. Hypothesis: the ordered speed change is observed and terminal reach retained, but joint acceptance is lost at 0.1, so the stated conjunction is weakened, not supported. This two-point batch describes only the tested candidates; it establishes neither ineffectiveness nor dominance across the weight range. Adoption: -0 is a program-classified joint-acceptance gain over the retained baseline (not a tradeoff), so select it; versus the source it is only a tradeoff, so no dominance is claimed and source/selected-deliverable remain distinct. Diagnostics: defer, recommendation_id=null (hypothesis-only assessment).",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-2-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone45-continuation-0ba83229042b-structure-to-adaptation",
+    "reference": {
+      "artifact_id": "e005670b1d1aec502faa3151fa12655064314ab4a048e27d02e63cb296acc142",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "adopt_candidate",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "7fb2eb727d4f0cfed46bd9477bcf95a8d1118d6a611c20dcfc00159aaff13b88",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "weakened",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "None proposed. Retain the selected configuration and any pending candidates as pending; execute no new runs.",
+          "evidence": [
+            "retained_baseline execution cf997605885642759ee33920e2c9e2ef: holding_position_passed=false, holding_speed_passed=false, joint_reach_holding_passed=false",
+            "source execution 50618bf23b31464ba4f84c55cd26d1ca: joint_reach_holding_passed=false, holding_max_speed 0.035567 m/s",
+            "candidate execution bebcfd47274940fb88a55ce5a2457c4c: joint_reach_holding_passed=true, valid_complete_execution=true",
+            "adaptation execution 91c3ba1b01d6499fb26df8f95409401b: joint_reach_holding_passed=true, holding_max_error 0.002730 m",
+            "adaptation execution 110dc2c9c1d642dcb018664a65c62c30: holding_speed_passed=false, joint_acceptance_lost",
+            "pilot_numerical protocol 520e49f8eeb836592cfe902d0152c873f0363f0b20374945dad1fc60cc0ca2c0: four unresolved direction predictions, no predicted ordering"
+          ],
+          "expected_observations": [
+            "No new observations produced by this decision",
+            "Pending candidates remain unexecuted"
+          ],
+          "fixed_conditions": [
+            "Controller recipe family and candidate identities from the evaluated and frozen batches",
+            "Saved projected pilot state and 0.01 s held first command",
+            "Retained baseline and source executions and their evaluation artifacts"
+          ],
+          "limitations": [
+            "Pilot scope is one saved state and one held command, not full-task holding maxima",
+            "Joint acceptance and overall ranking of pending candidates remain unknown",
+            "No real-time (35/35 deadline misses), continuous-time, hardware or global-superiority claims",
+            "Claims about causes or ineffectiveness across parameter ranges are scoped to the tested candidates only"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Stop immediately; no experiment authorized"
+          ],
+          "unresolved_question": "Whether the pending holding_tip_speed_weight candidates change full-task holding position, holding speed or joint reach+holding relative to the selected configuration and the retained baseline."
+        },
+        "reasoning": "(1) Structural effect. Fixing the recipe at holding 0 / terminal 0.05 and changing the near segment 0.15->0.16 (new structure_identity a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33), completed candidate batch-e4843b561ebaea27-0 (exec bebcfd47274940fb88a55ce5a2457c4c) passes joint reach+holding with holding_max_error 0.002737 m, holding_max_speed 0.012736 m/s, terminal_error 0.002705 m. Against the declared source (exec 50618bf23b31464ba4f84c55cd26d1ca, same recipe, prior structure) it converts a joint failure (speed 0.035567 m/s) into a joint pass: candidate-minus-baseline holding error -0.005538 m, speed -0.022832 m/s, terminal -0.005482 m, classified joint_acceptance_gained. Against the retained baseline (exec cf997605885642759ee33920e2c9e2ef, 0/0 weights) all three physical metrics improve, also joint_acceptance_gained. This is a joint improvement, evidence of the structural effect under the fixed recipe; it is not a tradeoff.\n\n(2) Adaptation. On the fixed structure, holding 0.05 (exec 91c3ba1b01d6499fb26df8f95409401b) passes joint with error 0.002730 m, speed 0.012750 m/s, terminal 0.002698 m; measured against its own 0/0.05 structure baseline it is a small tradeoff (error -6.79e-6 m and terminal -7.18e-6 m improve; speed +1.46e-5 m/s and mean update time +0.175 s worsen). Holding 0.10 (exec 110dc2c9c1d642dcb018664a65c62c30) loses joint acceptance (holding_speed_passed=false, speed 0.022129 m/s) and is joint_acceptance_lost versus that baseline. The adaptation conjunction therefore holds at 0.05 and fails at 0.10, so the hypothesis is weakened.\n\n(3) Selection. Both passing configurations are fully evaluated. I select the adaptation 0.05/0.05 (batch-ebbeadbdaca10732-0) over pre-adaptation 0/0.05 (batch-e4843b561ebaea27-0): marginally smaller holding (0.002730 vs 0.002737 m) and terminal (0.002698 vs 0.002705 m) errors, at the cost of slightly higher holding speed (0.012750 vs 0.012736 m/s) and update time (8.518 vs 8.343 s) - a permitted tradeoff. Against the earlier successful control reference (exec a8382f8a4c6e4ebe921fb72f821b2188, 0.05/0.05, old structure) the selected outcome improves all three physical metrics (error -0.005482, speed -0.005584, terminal -0.005419).\n\n(4) Prospective pilot. Zero correct, zero incorrect, four unresolved direction predictions (holding position and speed x two candidates), no predicted ordering, so no ordering match can be established; joint acceptance was unknown. All three local controller attempts selected iteration zero with verified_settled_seed and identical commands across three short rollouts. Predictor cost 12.27 s (tool-charged 13.39 s); full evaluation 609.30 s (backend receipt 604.73 s). Supported consequence: retain full evaluation; this saved-state proxy demonstrated no direction or ranking capability. Reach, holding and timing are reported separately; all runs record 35/35 deadline misses with real_time_demonstrated=false, so no real-time claim, and zero force-bound violation does not exclude legal near-bound input.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-3-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone45-continuation-0ba83229042b-structure-to-adaptation",
+    "reference": {
+      "artifact_id": "6cc5faed34a1db6c6f2d3f13020874127098f347a55b4a220979518a549754c0",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "adopt_candidate",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "7fb2eb727d4f0cfed46bd9477bcf95a8d1118d6a611c20dcfc00159aaff13b88",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "weakened",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "None proposed. No new run is authorized; both current adaptation candidates already have complete evaluations and none remains pending. Any future check on another recorded braking snapshot would require a separate model-authored plan and new authorization.",
+          "evidence": [
+            "retained_baseline execution cf997605885642759ee33920e2c9e2ef: holding_position_passed=false, holding_speed_passed=false, joint_reach_holding_passed=false (0/0 weights)",
+            "completed candidate execution bebcfd47274940fb88a55ce5a2457c4c (0/0.05, new structure): joint_reach_holding_passed=true, valid_complete_execution=true",
+            "completed candidate execution 91c3ba1b01d6499fb26df8f95409401b (0.05/0.05, new structure): joint_reach_holding_passed=true, holding_max_speed_m_s=0.012750255515948416",
+            "completed candidate execution 110dc2c9c1d642dcb018664a65c62c30 (0.1/0.05, new structure): holding_speed_passed=false, holding_max_speed_m_s=0.022128674933740447, joint_acceptance_lost versus its 0/0.05 structure baseline",
+            "pilot_numerical protocol 520e49f8eeb836592cfe902d0152c873f0363f0b20374945dad1fc60cc0ca2c0: local_candidate_minus_reference endpoint_error and endpoint_speed both zero for the two then-unevaluated points, which subsequently received full evaluations above"
+          ],
+          "expected_observations": [
+            "No new observations produced by this decision; zero proposed budget",
+            "Current evaluated results are as recorded: 0.05/0.05 joint pass, 0.10/0.05 joint failure, 0/0.05 joint pass"
+          ],
+          "fixed_conditions": [
+            "Controller recipe family, candidate identities and the fixed structure a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33",
+            "Retained baseline execution cf997605885642759ee33920e2c9e2ef and its evaluation artifacts",
+            "Completed candidate executions bebcfd47274940fb88a55ce5a2457c4c, 91c3ba1b01d6499fb26df8f95409401b and 110dc2c9c1d642dcb018664a65c62c30"
+          ],
+          "limitations": [
+            "Any claim about another recorded braking snapshot is an unexecuted proposal requiring new authorization, not a result",
+            "The completed pilot used one saved projected state and one 0.01 s held first command, not full-task holding maxima",
+            "The observed weight dependence is established only at the evaluated points 0.05 and 0.10 on the fixed structure; no claim is made about ineffectiveness throughout the parameter range between or beyond them",
+            "No real-time, continuous-time, hardware or global-superiority claims"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Stop immediately; no experiment authorized, zero budget"
+          ],
+          "unresolved_question": "Whether a FUTURE, separately authorized validation on a different recorded braking snapshot (a saved projected state other than the one used in the completed pilot) can distinguish weight-dependent holding behavior; this is an unexecuted proposal, not a description of the current batch. The current status is known: on the fixed structure a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33, holding_tip_speed_weight 0.05 (exec 91c3ba1b01d6499fb26df8f95409401b) passes joint reach+holding while 0.10 (exec 110dc2c9c1d642dcb018664a65c62c30) fails holding speed; both are fully evaluated."
+        },
+        "reasoning": "(1) Structural effect. Fixing the recipe at holding 0 / terminal 0.05 and changing the near segment 0.15->0.16 (new structure_identity a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33), completed candidate batch-e4843b561ebaea27-0 (exec bebcfd47274940fb88a55ce5a2457c4c) passes joint reach+holding with holding_max_error 0.002737 m, holding_max_speed 0.012736 m/s, terminal_error 0.002705 m. Against the declared source (exec 50618bf23b31464ba4f84c55cd26d1ca, same recipe, prior structure) it converts a joint failure (speed 0.035567 m/s) into a joint pass: candidate-minus-baseline holding error -0.005538 m, speed -0.022832 m/s, terminal -0.005482 m, classified joint_acceptance_gained. Against the retained baseline (exec cf997605885642759ee33920e2c9e2ef, 0/0 weights) all three physical metrics improve, also joint_acceptance_gained. This is a joint improvement, evidence of the structural effect under the fixed recipe; it is not a tradeoff.\n\n(2) Adaptation. On the fixed structure, holding 0.05 (exec 91c3ba1b01d6499fb26df8f95409401b) passes joint with error 0.002730 m, speed 0.012750 m/s, terminal 0.002698 m; measured against its own 0/0.05 structure baseline it is a small tradeoff (error -6.79e-6 m and terminal -7.18e-6 m improve; speed +1.46e-5 m/s and mean update time +0.175 s worsen). Holding 0.10 (exec 110dc2c9c1d642dcb018664a65c62c30) loses joint acceptance (holding_speed_passed=false, speed 0.022129 m/s) and is joint_acceptance_lost versus that baseline. The adaptation conjunction therefore holds at 0.05 and fails at 0.10, so the hypothesis is weakened.\n\n(3) Selection. Both passing configurations are fully evaluated. I select the adaptation 0.05/0.05 (batch-ebbeadbdaca10732-0) over pre-adaptation 0/0.05 (batch-e4843b561ebaea27-0): marginally smaller holding (0.002730 vs 0.002737 m) and terminal (0.002698 vs 0.002705 m) errors, at the cost of slightly higher holding speed (0.012750 vs 0.012736 m/s) and update time (8.518 vs 8.343 s) - a permitted tradeoff. Against the earlier successful control reference (exec a8382f8a4c6e4ebe921fb72f821b2188, 0.05/0.05, old structure) the selected outcome improves all three physical metrics (error -0.005482, speed -0.005584, terminal -0.005419).\n\n(4) Prospective pilot. Zero correct, zero incorrect, four unresolved direction predictions (holding position and speed x two candidates), no predicted ordering, so no ordering match can be established; joint acceptance was unknown. All three local controller attempts selected iteration zero with verified_settled_seed and identical commands across three short rollouts. Predictor cost 12.27 s (tool-charged 13.39 s); full evaluation 609.30 s (backend receipt 604.73 s). Supported consequence: retain full evaluation; this saved-state proxy demonstrated no direction or ranking capability. Reach, holding and timing are reported separately; all runs record 35/35 deadline misses with real_time_demonstrated=false, so no real-time claim, and zero force-bound violation does not exclude legal near-bound input.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-4-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  }
+]

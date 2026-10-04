@@ -1,0 +1,1865 @@
+{
+  "rows": [
+    {
+      "candidate": {
+        "candidate_id": "baseline-replay",
+        "owner_run_id": "gvs-stage351-baseline-executor",
+        "configuration": {
+          "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+          "media_type": "application/json"
+        },
+        "execution_id": "cf997605885642759ee33920e2c9e2ef"
+      },
+      "configuration_identity": "c34fbf67259bf74179e037f03339122ce38a1f247924d12b88162a8134c94dc7",
+      "status": "completed_evaluation",
+      "decisions": {
+        "control/recipe/holding_tip_speed_weight": 0.0,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "physical_structure": [
+        {
+          "component": "near",
+          "length_m": 0.15,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          }
+        },
+        {
+          "component": "mid_guide",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "connector",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "far",
+          "length_m": 0.11,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          }
+        },
+        {
+          "component": "payload",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        }
+      ],
+      "structure_identity": "ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060",
+      "controller": "controller.gvs_nmpc@7.0.0",
+      "weights": {
+        "holding": 0.0,
+        "terminal": 0.0
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "cf997605885642759ee33920e2c9e2ef",
+          "configuration": {
+            "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.007642608585867386,
+        "holding_max_error_m": 0.05813810428573256,
+        "holding_max_speed_m_s": 1.5810152739742807,
+        "terminal_reach_passed": true,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.26331904856488,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "references": {
+        "source_store": "D:\\softrobot-agent\\runs\\stage351_settling_20261003\\baseline",
+        "receipts": {
+          "evaluation": {
+            "analysis_status": "valid",
+            "cache_hit": false,
+            "caller": "improvement-executor",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.0,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "cf612446ed8542a9b4efca04ec82679f",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-evaluation",
+            "result_contract": "EvaluationResult",
+            "result_version": "1.2.0",
+            "solver_status": "not_run",
+            "task_success": true,
+            "tool_id": "evaluation.run",
+            "tool_version": "1.0.0"
+          },
+          "profile": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "improvement-executor",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.1410000000614673,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "efba352ae930497cb06e1b8ad30ee47b",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile",
+            "result_contract": "ProfileOutput",
+            "result_version": "1.0.0",
+            "solver_status": "not_run",
+            "task_success": null,
+            "tool_id": "control.profile_report",
+            "tool_version": "1.0.0"
+          },
+          "simulation": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "improvement-executor",
+            "charged": {
+              "backend_solves": 1,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 608.0149999998976,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "execution_status": "completed",
+            "original_execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "output": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-simulation",
+            "result_contract": "BackendResult",
+            "result_version": "1.0.0",
+            "solver_status": "completed",
+            "task_success": null,
+            "tool_id": "simulation.run",
+            "tool_version": "1.0.0"
+          }
+        },
+        "configuration": {
+          "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+          "media_type": "application/json"
+        },
+        "sources": {
+          "reference": {
+            "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage351-baseline-executor",
+          "execution_id": "cf997605885642759ee33920e2c9e2ef",
+          "request_id": "complete-profile"
+        }
+      }
+    },
+    {
+      "candidate": {
+        "candidate_id": "improvement-96f0ade35119",
+        "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+        "configuration": {
+          "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+          "media_type": "application/json"
+        },
+        "execution_id": "087adee8e8a24fe88e5c85fe89e638c8"
+      },
+      "configuration_identity": "2769e9622f2ec1d65be9a3f41b43e218dc8e654dc99caf6ec6583efa72d66e7d",
+      "status": "completed_evaluation",
+      "decisions": {
+        "control/recipe/holding_tip_speed_weight": 0.05,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "physical_structure": [
+        {
+          "component": "near",
+          "length_m": 0.15,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          }
+        },
+        {
+          "component": "mid_guide",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "connector",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "far",
+          "length_m": 0.11,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          }
+        },
+        {
+          "component": "payload",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        }
+      ],
+      "structure_identity": "ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060",
+      "controller": "controller.gvs_nmpc@7.0.0",
+      "weights": {
+        "holding": 0.05,
+        "terminal": 0.0
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+          "configuration": {
+            "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.00869890424761182,
+        "holding_max_error_m": 0.05650455971948983,
+        "holding_max_speed_m_s": 1.1750052670100422,
+        "terminal_reach_passed": true,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.77877309145406,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "references": {
+        "source_store": "D:\\softrobot-agent\\runs\\stage354_milestone0_20261003\\single_context",
+        "receipts": {
+          "evaluation": {
+            "analysis_status": "valid",
+            "cache_hit": false,
+            "caller": "improvement-executor",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.0309999999590218,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "2cb7369608d94bdc8119a0910c4ec726",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-evaluation",
+            "result_contract": "EvaluationResult",
+            "result_version": "1.2.0",
+            "solver_status": "not_run",
+            "task_success": true,
+            "tool_id": "evaluation.run",
+            "tool_version": "1.0.0"
+          },
+          "profile": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "improvement-executor",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.1410000000614673,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "49cd1c15c43f491f991b0e35f9d35bc6",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile",
+            "result_contract": "ProfileOutput",
+            "result_version": "1.0.0",
+            "solver_status": "not_run",
+            "task_success": null,
+            "tool_id": "control.profile_report",
+            "tool_version": "1.0.0"
+          },
+          "simulation": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "improvement-executor",
+            "charged": {
+              "backend_solves": 1,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 625.6870000001509,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "execution_status": "completed",
+            "original_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "output": {
+              "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-simulation",
+            "result_contract": "BackendResult",
+            "result_version": "1.0.0",
+            "solver_status": "completed",
+            "task_success": null,
+            "tool_id": "simulation.run",
+            "tool_version": "1.0.0"
+          }
+        },
+        "configuration": {
+          "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+          "media_type": "application/json"
+        },
+        "sources": {
+          "reference": {
+            "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+          "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+          "request_id": "complete-profile"
+        }
+      }
+    },
+    {
+      "candidate": {
+        "candidate_id": "batch-2ef6ee45913c43c9-1",
+        "owner_run_id": "batch-2ef6ee45913c43c9-1",
+        "configuration": {
+          "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+          "media_type": "application/json"
+        },
+        "execution_id": "25e26708480848d79bad378b669915e3"
+      },
+      "configuration_identity": "b0a03b01d852268239662638d446806522e4986f225d94f02a7f10b42dad7b23",
+      "status": "completed_evaluation",
+      "decisions": {
+        "control/recipe/holding_tip_speed_weight": 0.3,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "physical_structure": [
+        {
+          "component": "near",
+          "length_m": 0.15,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          }
+        },
+        {
+          "component": "mid_guide",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "connector",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "far",
+          "length_m": 0.11,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          }
+        },
+        {
+          "component": "payload",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        }
+      ],
+      "structure_identity": "ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060",
+      "controller": "controller.gvs_nmpc@7.0.0",
+      "weights": {
+        "holding": 0.3,
+        "terminal": 0.0
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "25e26708480848d79bad378b669915e3",
+          "configuration": {
+            "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "ac9f4834c4722feac739fd45378ebbfbee77376cd699318deb29ed177028145b",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "96328da478505dc97a565fab88e5510721d242f0c23e41ce2da503fec9bdc333",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "3d2e58ec5e393e5277b2d134657d6b1a38eba06482647a3dbaaca1ebdf4bacb6",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": false,
+        "terminal_error_m": 0.018690324120991027,
+        "holding_max_error_m": 0.06344380037515782,
+        "holding_max_speed_m_s": 1.1276277677182223,
+        "terminal_reach_passed": false,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.30461485715849,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "references": {
+        "source_store": "D:\\softrobot-agent\\runs\\stage357_pilot_20261004\\single_context",
+        "receipts": {
+          "evaluation": {
+            "analysis_status": "valid",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 0.9529999999795109,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "c0b3be52ad9f47fe884103bba6974e2b",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "ac9f4834c4722feac739fd45378ebbfbee77376cd699318deb29ed177028145b",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-evaluation",
+            "result_contract": "EvaluationResult",
+            "result_version": "1.2.0",
+            "solver_status": "not_run",
+            "task_success": false,
+            "tool_id": "evaluation.run",
+            "tool_version": "1.0.0"
+          },
+          "profile": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.0939999998081475,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "92ace02c0cf3475f8b59959617b7a427",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "96328da478505dc97a565fab88e5510721d242f0c23e41ce2da503fec9bdc333",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile",
+            "result_contract": "ProfileOutput",
+            "result_version": "1.0.0",
+            "solver_status": "not_run",
+            "task_success": null,
+            "tool_id": "control.profile_report",
+            "tool_version": "1.0.0"
+          },
+          "simulation": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 1,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 609.0310000001919,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "25e26708480848d79bad378b669915e3",
+            "execution_status": "completed",
+            "original_execution_id": "25e26708480848d79bad378b669915e3",
+            "output": {
+              "artifact_id": "3d2e58ec5e393e5277b2d134657d6b1a38eba06482647a3dbaaca1ebdf4bacb6",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-simulation",
+            "result_contract": "BackendResult",
+            "result_version": "1.0.0",
+            "solver_status": "completed",
+            "task_success": null,
+            "tool_id": "simulation.run",
+            "tool_version": "1.0.0"
+          }
+        },
+        "configuration": {
+          "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+          "media_type": "application/json"
+        },
+        "sources": {
+          "reference": {
+            "artifact_id": "96328da478505dc97a565fab88e5510721d242f0c23e41ce2da503fec9bdc333",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "batch-2ef6ee45913c43c9-1",
+          "execution_id": "25e26708480848d79bad378b669915e3",
+          "request_id": "complete-profile"
+        }
+      }
+    },
+    {
+      "candidate": {
+        "candidate_id": "batch-43a6daab7e3c1ce6-1",
+        "owner_run_id": "batch-43a6daab7e3c1ce6-1",
+        "configuration": {
+          "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+          "media_type": "application/json"
+        },
+        "execution_id": "22241105b8984e0daae4530963848953"
+      },
+      "configuration_identity": "e538d3312156a2458c0c9379cafcf852f4aa7257b410542bf98328507b69d013",
+      "status": "completed_evaluation",
+      "decisions": {
+        "control/recipe/holding_tip_speed_weight": 0.1,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "physical_structure": [
+        {
+          "component": "near",
+          "length_m": 0.15,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          }
+        },
+        {
+          "component": "mid_guide",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "connector",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "far",
+          "length_m": 0.11,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          }
+        },
+        {
+          "component": "payload",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        }
+      ],
+      "structure_identity": "ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060",
+      "controller": "controller.gvs_nmpc@7.0.0",
+      "weights": {
+        "holding": 0.1,
+        "terminal": 0.0
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "22241105b8984e0daae4530963848953",
+          "configuration": {
+            "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "91fd22c7623c45c4c43e971a226439beebb94be0468700e872fdf413cd58f984",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "6c0a9d1c79d361c88c6b8e71490bb8b7ccf10661ae2998a566404e33923e6d49",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": false,
+        "terminal_error_m": 0.011558241033380132,
+        "holding_max_error_m": 0.06344380037515782,
+        "holding_max_speed_m_s": 1.3632316140443952,
+        "terminal_reach_passed": false,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.39307279428467,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "references": {
+        "source_store": "D:\\softrobot-agent\\runs\\stage358_confirmation_20261004\\single_context",
+        "receipts": {
+          "evaluation": {
+            "analysis_status": "valid",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.047000000020489,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "c6fb979526c6479e8dda239333c5d8cb",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "91fd22c7623c45c4c43e971a226439beebb94be0468700e872fdf413cd58f984",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-evaluation",
+            "result_contract": "EvaluationResult",
+            "result_version": "1.2.0",
+            "solver_status": "not_run",
+            "task_success": false,
+            "tool_id": "evaluation.run",
+            "tool_version": "1.0.0"
+          },
+          "profile": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.1089999999385327,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "a3c30f1e9a5d45cbba4251c6fa9f40e3",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile",
+            "result_contract": "ProfileOutput",
+            "result_version": "1.0.0",
+            "solver_status": "not_run",
+            "task_success": null,
+            "tool_id": "control.profile_report",
+            "tool_version": "1.0.0"
+          },
+          "simulation": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 1,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 612.125,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "22241105b8984e0daae4530963848953",
+            "execution_status": "completed",
+            "original_execution_id": "22241105b8984e0daae4530963848953",
+            "output": {
+              "artifact_id": "6c0a9d1c79d361c88c6b8e71490bb8b7ccf10661ae2998a566404e33923e6d49",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-simulation",
+            "result_contract": "BackendResult",
+            "result_version": "1.0.0",
+            "solver_status": "completed",
+            "task_success": null,
+            "tool_id": "simulation.run",
+            "tool_version": "1.0.0"
+          }
+        },
+        "configuration": {
+          "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+          "media_type": "application/json"
+        },
+        "sources": {
+          "reference": {
+            "artifact_id": "d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "batch-43a6daab7e3c1ce6-1",
+          "execution_id": "22241105b8984e0daae4530963848953",
+          "request_id": "complete-profile"
+        }
+      }
+    },
+    {
+      "candidate": {
+        "candidate_id": "batch-43a6daab7e3c1ce6-3",
+        "owner_run_id": "batch-43a6daab7e3c1ce6-3",
+        "configuration": {
+          "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+          "media_type": "application/json"
+        },
+        "execution_id": "50618bf23b31464ba4f84c55cd26d1ca"
+      },
+      "configuration_identity": "fc1ad19448262788c4b1e3e0a5df0aeee028d11f60fae8add5c1e6ca051e249a",
+      "status": "completed_evaluation",
+      "decisions": {
+        "control/recipe/holding_tip_speed_weight": 0.0,
+        "control/recipe/terminal_tip_speed_weight": 0.05
+      },
+      "physical_structure": [
+        {
+          "component": "near",
+          "length_m": 0.15,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          }
+        },
+        {
+          "component": "mid_guide",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "connector",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "far",
+          "length_m": 0.11,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          }
+        },
+        {
+          "component": "payload",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        }
+      ],
+      "structure_identity": "ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060",
+      "controller": "controller.gvs_nmpc@7.0.0",
+      "weights": {
+        "holding": 0.0,
+        "terminal": 0.05
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+          "configuration": {
+            "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "7abd2e19f80f8c419cb2918561d934a9dc05b254276ebe25174c1c53512dc5c6",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "2e0ddfa47b6e235e2535fcc8da614b4077a0f15623ef65e507b5c0880e710738",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "31303b3a6d07507baa182b4f5929aa0cc77ce674280ee00379efa0a67417a0a3",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.008186891107577365,
+        "holding_max_error_m": 0.008275123365557732,
+        "holding_max_speed_m_s": 0.03556730769134125,
+        "terminal_reach_passed": true,
+        "holding_position_passed": true,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 16.876452619954943,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "references": {
+        "source_store": "D:\\softrobot-agent\\runs\\stage358_confirmation_20261004\\single_context",
+        "receipts": {
+          "evaluation": {
+            "analysis_status": "valid",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 0.9529999999795109,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "b67fe0624642440aa0ce06d52ad6a6ab",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "7abd2e19f80f8c419cb2918561d934a9dc05b254276ebe25174c1c53512dc5c6",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-evaluation",
+            "result_contract": "EvaluationResult",
+            "result_version": "1.2.0",
+            "solver_status": "not_run",
+            "task_success": true,
+            "tool_id": "evaluation.run",
+            "tool_version": "1.0.0"
+          },
+          "profile": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.093000000109896,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "11a5a9ec3f6a4b0797aad8919f2729f0",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "2e0ddfa47b6e235e2535fcc8da614b4077a0f15623ef65e507b5c0880e710738",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile",
+            "result_contract": "ProfileOutput",
+            "result_version": "1.0.0",
+            "solver_status": "not_run",
+            "task_success": null,
+            "tool_id": "control.profile_report",
+            "tool_version": "1.0.0"
+          },
+          "simulation": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 1,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 592.5,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+            "execution_status": "completed",
+            "original_execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+            "output": {
+              "artifact_id": "31303b3a6d07507baa182b4f5929aa0cc77ce674280ee00379efa0a67417a0a3",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-simulation",
+            "result_contract": "BackendResult",
+            "result_version": "1.0.0",
+            "solver_status": "completed",
+            "task_success": null,
+            "tool_id": "simulation.run",
+            "tool_version": "1.0.0"
+          }
+        },
+        "configuration": {
+          "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+          "media_type": "application/json"
+        },
+        "sources": {
+          "reference": {
+            "artifact_id": "2e0ddfa47b6e235e2535fcc8da614b4077a0f15623ef65e507b5c0880e710738",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "batch-43a6daab7e3c1ce6-3",
+          "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+          "request_id": "complete-profile"
+        }
+      }
+    },
+    {
+      "candidate": {
+        "candidate_id": "batch-bc1f58ac54026d97-0",
+        "owner_run_id": "batch-bc1f58ac54026d97-0",
+        "configuration": {
+          "artifact_id": "311433c767db787bb5f4e336c21c34141482aeea3d63fabec65f9ae9096428f1",
+          "media_type": "application/json"
+        },
+        "execution_id": "44dbf3bc2964402e9f6af6a93c0f8d7d"
+      },
+      "configuration_identity": "45f9e7bcdeda7d4163299da19191d06f9ee73d09043f863a23756b8f3189be56",
+      "status": "completed_evaluation",
+      "decisions": {
+        "control/recipe/holding_tip_speed_weight": 0.0,
+        "control/recipe/terminal_tip_speed_weight": 0.1
+      },
+      "physical_structure": [
+        {
+          "component": "near",
+          "length_m": 0.15,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          }
+        },
+        {
+          "component": "mid_guide",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "connector",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "far",
+          "length_m": 0.11,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          }
+        },
+        {
+          "component": "payload",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        }
+      ],
+      "structure_identity": "ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060",
+      "controller": "controller.gvs_nmpc@7.0.0",
+      "weights": {
+        "holding": 0.0,
+        "terminal": 0.1
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "44dbf3bc2964402e9f6af6a93c0f8d7d",
+          "configuration": {
+            "artifact_id": "311433c767db787bb5f4e336c21c34141482aeea3d63fabec65f9ae9096428f1",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "a53bb706ea7c50d9cdf61faf13ca1e140e0fab78a410d3077ec828304b3bda39",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "320e1f9d768e3d92b9b8f6a66f87e990f2890940ba89c67c8b092a0e796fb12b",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "b39c43f3fa1d7e3b538af7424a08ac55a7a4977099e967dee81df33485498d8b",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.00812354088231156,
+        "holding_max_error_m": 0.008330389554335758,
+        "holding_max_speed_m_s": 0.04867573420025064,
+        "terminal_reach_passed": true,
+        "holding_position_passed": true,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.049473634282393,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "references": {
+        "source_store": "D:\\softrobot-agent\\runs\\stage359_continuation_20261004\\single_context",
+        "receipts": {
+          "evaluation": {
+            "analysis_status": "valid",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 0.9690000000409782,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "06396b4c8249471f97408eda5b81fa01",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "a53bb706ea7c50d9cdf61faf13ca1e140e0fab78a410d3077ec828304b3bda39",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-evaluation",
+            "result_contract": "EvaluationResult",
+            "result_version": "1.2.0",
+            "solver_status": "not_run",
+            "task_success": true,
+            "tool_id": "evaluation.run",
+            "tool_version": "1.0.0"
+          },
+          "profile": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.1410000000614673,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "bde57298f5ce41c58a71f8af538c7d83",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "320e1f9d768e3d92b9b8f6a66f87e990f2890940ba89c67c8b092a0e796fb12b",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile",
+            "result_contract": "ProfileOutput",
+            "result_version": "1.0.0",
+            "solver_status": "not_run",
+            "task_success": null,
+            "tool_id": "control.profile_report",
+            "tool_version": "1.0.0"
+          },
+          "simulation": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 1,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 600.0779999999795,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "44dbf3bc2964402e9f6af6a93c0f8d7d",
+            "execution_status": "completed",
+            "original_execution_id": "44dbf3bc2964402e9f6af6a93c0f8d7d",
+            "output": {
+              "artifact_id": "b39c43f3fa1d7e3b538af7424a08ac55a7a4977099e967dee81df33485498d8b",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-simulation",
+            "result_contract": "BackendResult",
+            "result_version": "1.0.0",
+            "solver_status": "completed",
+            "task_success": null,
+            "tool_id": "simulation.run",
+            "tool_version": "1.0.0"
+          }
+        },
+        "configuration": {
+          "artifact_id": "311433c767db787bb5f4e336c21c34141482aeea3d63fabec65f9ae9096428f1",
+          "media_type": "application/json"
+        },
+        "sources": {
+          "reference": {
+            "artifact_id": "320e1f9d768e3d92b9b8f6a66f87e990f2890940ba89c67c8b092a0e796fb12b",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "batch-bc1f58ac54026d97-0",
+          "execution_id": "44dbf3bc2964402e9f6af6a93c0f8d7d",
+          "request_id": "complete-profile"
+        }
+      }
+    },
+    {
+      "candidate": {
+        "candidate_id": "batch-9293a74b063bb9a0-0",
+        "owner_run_id": "batch-9293a74b063bb9a0-0",
+        "configuration": {
+          "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+          "media_type": "application/json"
+        },
+        "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188"
+      },
+      "configuration_identity": "16a7cde2bbd87e497854425b2e7e9be47f4a355c529479916d0d580a609ced12",
+      "status": "completed_evaluation",
+      "decisions": {
+        "control/recipe/holding_tip_speed_weight": 0.05,
+        "control/recipe/terminal_tip_speed_weight": 0.05
+      },
+      "physical_structure": [
+        {
+          "component": "near",
+          "length_m": 0.15,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          }
+        },
+        {
+          "component": "mid_guide",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "connector",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        },
+        {
+          "component": "far",
+          "length_m": 0.11,
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          }
+        },
+        {
+          "component": "payload",
+          "length_m": null,
+          "sections": null,
+          "physics": null
+        }
+      ],
+      "structure_identity": "ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060",
+      "controller": "controller.gvs_nmpc@7.0.0",
+      "weights": {
+        "holding": 0.05,
+        "terminal": 0.05
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+          "configuration": {
+            "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "3610005c77ec7b4bceed35e03143696900ecfb7fc4bb876472bd2af949ddb99f",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "244ae3290530232a5dda1448b046838ef6353fecc4ec2b9f0e9868d24f90105b",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "8ffe18d0b74354d92cd7f4b7d6fcde36b377e174bfb2ec68f3acf96519b531e7",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.008117263030117125,
+        "holding_max_error_m": 0.008211990469035185,
+        "holding_max_speed_m_s": 0.0183345147769523,
+        "terminal_reach_passed": true,
+        "holding_position_passed": true,
+        "holding_speed_passed": true,
+        "joint_reach_holding_passed": true,
+        "mean_complete_update_s": 17.258959311459744,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "references": {
+        "source_store": "D:\\softrobot-agent\\runs\\milestone4_20261004\\single_context",
+        "receipts": {
+          "evaluation": {
+            "analysis_status": "valid",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.0160000000614673,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "082ddec354814630bd0d5bbc4bc80af8",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "3610005c77ec7b4bceed35e03143696900ecfb7fc4bb876472bd2af949ddb99f",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-evaluation",
+            "result_contract": "EvaluationResult",
+            "result_version": "1.2.0",
+            "solver_status": "not_run",
+            "task_success": true,
+            "tool_id": "evaluation.run",
+            "tool_version": "1.0.0"
+          },
+          "profile": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.1410000000614673,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "c515ff464f474dbe91c19f202ad65efc",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "244ae3290530232a5dda1448b046838ef6353fecc4ec2b9f0e9868d24f90105b",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile",
+            "result_contract": "ProfileOutput",
+            "result_version": "1.0.0",
+            "solver_status": "not_run",
+            "task_success": null,
+            "tool_id": "control.profile_report",
+            "tool_version": "1.0.0"
+          },
+          "simulation": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "local-human",
+            "charged": {
+              "backend_solves": 1,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 609.4379999998491,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+            "execution_status": "completed",
+            "original_execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+            "output": {
+              "artifact_id": "8ffe18d0b74354d92cd7f4b7d6fcde36b377e174bfb2ec68f3acf96519b531e7",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-simulation",
+            "result_contract": "BackendResult",
+            "result_version": "1.0.0",
+            "solver_status": "completed",
+            "task_success": null,
+            "tool_id": "simulation.run",
+            "tool_version": "1.0.0"
+          }
+        },
+        "configuration": {
+          "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+          "media_type": "application/json"
+        },
+        "sources": {
+          "reference": {
+            "artifact_id": "244ae3290530232a5dda1448b046838ef6353fecc4ec2b9f0e9868d24f90105b",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "batch-9293a74b063bb9a0-0",
+          "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+          "request_id": "complete-profile"
+        }
+      }
+    }
+  ],
+  "tested_branches": {
+    "zero_zero": [
+      "cf997605885642759ee33920e2c9e2ef"
+    ],
+    "holding_only": [
+      "087adee8e8a24fe88e5c85fe89e638c8",
+      "25e26708480848d79bad378b669915e3",
+      "22241105b8984e0daae4530963848953"
+    ],
+    "terminal_only": [
+      "50618bf23b31464ba4f84c55cd26d1ca",
+      "44dbf3bc2964402e9f6af6a93c0f8d7d"
+    ],
+    "joint_positive": [
+      "a8382f8a4c6e4ebe921fb72f821b2188"
+    ]
+  },
+  "joint_positive_weight_tested": true,
+  "identities": {
+    "retained_baseline": {
+      "candidate_id": "baseline-replay",
+      "owner_run_id": "gvs-stage351-baseline-executor",
+      "configuration": {
+        "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+        "media_type": "application/json"
+      },
+      "execution_id": "cf997605885642759ee33920e2c9e2ef"
+    },
+    "selected_source": null,
+    "latest_tested": {
+      "candidate_id": "batch-9293a74b063bb9a0-0",
+      "owner_run_id": "batch-9293a74b063bb9a0-0",
+      "configuration": {
+        "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+        "media_type": "application/json"
+      },
+      "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188"
+    },
+    "selected_deliverable": null
+  },
+  "qualification": "Completed evaluations, incomplete attempts and unexecuted proposals are distinct; physical failure is completed evidence."
+}
