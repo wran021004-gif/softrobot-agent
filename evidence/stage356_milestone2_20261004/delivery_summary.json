@@ -103,58 +103,74 @@
     "subagents": 0
   },
   "implementation": "Accepted report/working-state handoff, recorded check, exact receipt/result linkage, compact evidence-dependent revision, bounded future-plan validator and final gate on existing host/workflow.",
-  "common_input": "verified_common_input.json",
-  "common_input_live_frozen": false,
+  "common_input": "common_input_freeze.json",
+  "common_input_live_frozen": true,
   "organizations": {
     "single_context": {
-      "status": "not_started",
-      "unmet_gates": [
-        "Live accepted host-bound diagnostic products",
-        "Live meaningful check proposal and completed model-selected check",
-        "Live evidence-dependent revision",
-        "Live validated bounded future batch plan",
-        "Live model-authored final decision"
-      ],
+      "status": "incomplete",
+      "live_gate_passed": false,
+      "stop_reason": "PHASE_INCOMPLETE improvement: BOUNDED_REPAIR_LIMIT",
       "usage": {
-        "provider_attempts": 0,
-        "tool_calls": 0,
+        "provider_attempts": 8,
+        "tool_calls": 10,
         "local_solves": 0,
         "prediction_evaluations": 0,
-        "charged_time_s": 0.0,
-        "workflow_elapsed_s": 0.0,
-        "reported_tokens": null,
-        "protocol_corrections": 0,
+        "charged_time_s": 449.138999999268,
+        "workflow_elapsed_s": 474.01599999982864,
+        "reported_tokens": {
+          "prompt_tokens": 568730,
+          "completion_tokens": 104291,
+          "total_tokens": 673021,
+          "prompt_cache_hit_tokens": 6528,
+          "prompt_cache_miss_tokens": 562202,
+          "reasoning_tokens": 89373
+        },
+        "protocol_corrections": 1,
+        "business_failures": 3,
         "backend_simulations": 0,
         "workers": 0,
         "subagents": 0
-      }
+      },
+      "unmet_gates": [
+        "search_plan",
+        "final_response",
+        "completed"
+      ],
+      "original_outcome": "single_context/outcome.json",
+      "checksum_manifest": "single_context/sha256_manifest.json"
     },
     "dual_context": {
-      "status": "not_started",
-      "unmet_gates": [
-        "Live accepted host-bound diagnostic products",
-        "Live meaningful check proposal and completed model-selected check",
-        "Live evidence-dependent revision",
-        "Live validated bounded future batch plan",
-        "Live model-authored final decision"
-      ],
+      "status": "completed",
+      "live_gate_passed": true,
+      "stop_reason": "Accepted host-bound diagnostic products, recorded check, evidence-dependent revision, valid future batch plan and model final decision.",
       "usage": {
-        "provider_attempts": 0,
-        "tool_calls": 0,
+        "provider_attempts": 8,
+        "tool_calls": 10,
         "local_solves": 0,
         "prediction_evaluations": 0,
-        "charged_time_s": 0.0,
-        "workflow_elapsed_s": 0.0,
-        "reported_tokens": null,
-        "protocol_corrections": 0,
+        "charged_time_s": 484.18400000059046,
+        "workflow_elapsed_s": 513.6089999999385,
+        "reported_tokens": {
+          "prompt_tokens": 586549,
+          "completion_tokens": 108134,
+          "total_tokens": 694683,
+          "prompt_cache_hit_tokens": 9728,
+          "prompt_cache_miss_tokens": 576821,
+          "reasoning_tokens": 94131
+        },
+        "protocol_corrections": 1,
+        "business_failures": 1,
         "backend_simulations": 0,
         "workers": 0,
         "subagents": 0
-      }
+      },
+      "unmet_gates": [],
+      "original_outcome": "dual_context/outcome.json",
+      "checksum_manifest": "dual_context/sha256_manifest.json"
     }
   },
   "approval_block": "approval_block.json",
-  "diagnostic_value": "Offline engineering pipeline demonstrated newly inspected aligned prediction detail and linked interpretation. No live scientific diagnostic conclusion or organizational comparison is available.",
+  "diagnostic_value": "Both checks added actual archived plan detail and supported qualified revisions; dual final decision retained baseline. Scientific caveats are in model_review.json.",
   "engineering_verification": [
     {
       "source": "affected_checks.json",
@@ -201,7 +217,10 @@
   ],
   "historical_costs": "Separate, unchanged old_usage in verified_common_input.json",
   "monetary_cost": null,
-  "milestone2_remaining": "Approve external evidence transfer and run the untouched single/dual pair under the original ceilings.",
+  "milestone2_remaining": "After separate offline interface repair, a newly authorized validation must demonstrate accepted single-context future plan and final decision. No replacement or additional live validation is authorized here.",
   "milestone3_remaining": "Execute validated bounded batches through existing candidate/numerical/evaluation/profile machinery under future execution grants; apply frozen physical comparison and revise diagnosis.",
-  "pushed": false
+  "pushed": false,
+  "live_implementation_commit": "3bc8557ce949fb9942cb52f34bca0dbf0aab3aa6",
+  "model_review": "model_review.json",
+  "approval_status": "Current explicit authorization permitted both original workflows; earlier approval_block.json retained unchanged."
 }

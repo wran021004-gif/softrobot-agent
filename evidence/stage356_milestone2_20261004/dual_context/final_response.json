@@ -1,0 +1,24 @@
+{
+  "candidate_disposition": "retain_baseline",
+  "disposition": "adopt",
+  "feedback": {
+    "artifact_id": "9826b45f904ae0f4d5f2aea0d8e0124470546b3e300d098486d114531ec55f25",
+    "media_type": "application/json"
+  },
+  "next_action": "finish",
+  "reasoning": "Adopt the retained diagnostic recommendation rec-do-not-select-as-overall-improvement, and record it separately from candidate selection. The sealed comparison (artifact 9826b45f904ae0f4d5f2aea0d8e0124470546b3e300d098486d114531ec55f25) classifies the pair as a physical tradeoff (F141) with joint reach+holding acceptance false in both runs (candidate F9, baseline F315): candidate-minus-baseline gives terminal_error_m +0.001056295661744434 m (F307), holding_max_error_m -0.001633544566242727 m (F373), holding_max_speed_m_s -0.4060100069642385 m/s (F388) and mean_complete_update_s +0.5154540428891785 s (F273). Under the seal rule (F241, F229) a physical improvement accompanied by physical worsening is a trade-off, not overall improvement; raw scalar objectives under different weights are not ranked (F313) and computation is reported separately (F419). Both runs still pass terminal reach (candidate F415, F253; terminal_error_m F469 = 0.00869890424761182 m inside the 0.01 m tolerance) while both holding limits fail (holding position F295, holding speed F61), so the candidate is not an overall improvement and I retain the accepted baseline rather than selecting improvement-96f0ade35119. New measured candidate facts use the required candidate-profile references: holding_max_speed_m_s F454 = 1.1750052670100422 m/s (about 59x the 0.02 m/s limit), holding_max_error_m F471 = 0.05650455971948983 m, mean_complete_update_s F458 = 17.77877309145406 s against the 0.01 s control period, terminal_error_m F469 = 0.00869890424761182 m. Diagnostic value of the performed check (distinguishes string recorded before the host returned result a7470ffa6dc4cb722ff1dff64220334838f6545199014923029eee2bc9dd1fb6): the archived plans view over update_ids [24,26,27,28,29,31,32,33] separates plan-level truncation from actuator/force saturation where the retained scalars alone could not. It retains controller.budget_truncated_plan_selection (every sampled update stops by optimization_raw_status = User_Requested_Stop with policy_stop_reason = budget_best_feasible and plan_accepted = true, with selected_iteration 0 early but 94 at update 33, F671) and retains solver.terminal_horizon_truncation as an observed condition qualified as terminal clipping (effective_horizon declines 10 down to 6 and equals the 0.01 s control intervals remaining to the 0.35 s task end), while leaving tendon_force_limit_saturation_driving_hold_speed unresolved because the settling run-up commands channel 0 within about 1e-4 N of the 8 N limit (F702 update 31, F724 update 32) yet force_bound_violation_n stays 0.0 in both runs (F379, F420). Remaining uncertainty: only plan-level records were read (not backend motion), 27 of 35 updates stay not_read rather than inferred absent, the holding window is 6 samples over 0.05 s with no continuous-time guarantee, and no closed-loop counterfactual replay or causal-attribution capability exists, so no mechanism may be asserted as the cause of the sampled holding violation; citations establish arithmetic only, not causality. The future batch plan (artifact bfc44f8eca686f75d7e98c72cd3051a00c83b20520bd9c4018cf5a53aa197c21) is structurally operationally valid but requires_future_grant: it is a bounded falsification test of the low-yield weight-lever claim over holding_tip_speed_weight [0.05,1.0] and terminal_tip_speed_weight [0.0,1.0], not an execution authorization and not evidence of physical improvement, and it selects or promotes no candidate in this stage.",
+  "recommendation_id": "rec-do-not-select-as-overall-improvement",
+  "report": {
+    "artifact_id": "73f4c6aca1442274b428e42beca4fc1de800d0f5766924042680130eb70a1dae",
+    "media_type": "application/json"
+  },
+  "selected_candidate": {
+    "candidate_id": "baseline-replay",
+    "configuration": {
+      "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+      "media_type": "application/json"
+    },
+    "execution_id": "cf997605885642759ee33920e2c9e2ef",
+    "owner_run_id": "gvs-stage351-baseline-executor"
+  }
+}

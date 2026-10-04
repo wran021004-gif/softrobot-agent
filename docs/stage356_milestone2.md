@@ -103,6 +103,33 @@ ranking or execution authority. This stage does not implement that batch runner.
 
 ## Delivery status
 
+The original authorized pair ran on commit `3bc8557` with one matched common
+freeze. Single-context is incomplete: its check and evidence-dependent revision
+were accepted, but search-plan submission exhausted the existing repair allowance
+and no final decision exists. Dual-context completed all automated live gates,
+accepted an unexecuted six-proposal plan and retained the baseline. Milestone 2
+therefore remains **incomplete**. No replacement run or budget reset was made.
+
+The single check weakened persistent horizon truncation; the dual check found
+late near-bound tensions and left their causal role unresolved. Both interpreted
+actual archived plans, not new physical measurements. The review in
+`model_review.json` records factual overstatements as model reasoning failures,
+separately from actionable schema/correction issues. Neither workflow establishes
+a dominant cause, physical improvement or organizational superiority.
+
+Single-context used 8 provider attempts, 10 tools, 449.138999999268 charged seconds
+and 474.01599999982864 workflow seconds; reported tokens total 673021.
+Dual-context used 8 attempts, 10 tools, 484.18400000059046 charged seconds and
+513.6089999999385 workflow seconds; reported tokens total 694683. Both used zero
+local solves, prediction evaluations, backend simulations and workers. Each had
+one protocol correction; business-call failures were three and one respectively.
+Full usage, attempts, accepted products, checksums and review are preserved under
+the Stage 3.56 evidence directory. Monetary cost is unknown. The earlier approval
+rejection remains historical; current explicit authorization permitted both runs.
+
+The following describes the preserved pre-launch delivery, superseded by the
+original live outcomes above.
+
 Milestone 2 is **incomplete**. Implementation commit `cddba26` passes 22 unique
 focused checks (latest result per check, including preserved affected reruns).
 The engineering fixture completes the actual check/revision/plan/final tool path,
