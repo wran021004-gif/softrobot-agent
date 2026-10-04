@@ -189,6 +189,12 @@ def live(mode):
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('action',choices=['verify','single_context','dual_context']);parser.add_argument('tests',nargs='*');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('action',choices=['verify','single_context','dual_context']);parser.add_argument('tests',nargs='*')
+    parser.add_argument('--run-root',type=Path);parser.add_argument('--evidence-root',type=Path);args=parser.parse_args()
+    if bool(args.run_root)!=bool(args.evidence_root):parser.error('Supply both --run-root and --evidence-root')
+    if args.run_root:
+        RUNS=args.run_root.resolve();EXPORT=args.evidence_root.resolve()
+        if RUNS==EXPORT or ROOT not in RUNS.parents or ROOT not in EXPORT.parents:
+            parser.error('Distinct run/evidence roots must be inside the repository')
     if args.action=='verify':verify(args.tests or None)
     else:live(args.action)

@@ -1,0 +1,53 @@
+{
+  "passed": false,
+  "tests_run": 2,
+  "command": [
+    "C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\python.exe",
+    "examples/stage356_milestone2.py",
+    "verify",
+    "tests.test_stage356_milestone2.Milestone2Tests.test_actual_check_revision_plan_and_host_lineage",
+    "tests.test_stage356_batch.BatchTests.test_v6_alias_errors_address_submitted_fields"
+  ],
+  "elapsed_s": 0.7029999999795109,
+  "output": "test_actual_check_revision_plan_and_host_lineage (tests.test_stage356_milestone2.Milestone2Tests.test_actual_check_revision_plan_and_host_lineage) ... ERROR\ntest_v6_alias_errors_address_submitted_fields (tests.test_stage356_batch.BatchTests.test_v6_alias_errors_address_submitted_fields) ... ok\n\n======================================================================\nERROR: test_actual_check_revision_plan_and_host_lineage (tests.test_stage356_milestone2.Milestone2Tests.test_actual_check_revision_plan_and_host_lineage)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"D:\\softrobot-agent\\tests\\test_stage356_milestone2.py\", line 25, in test_actual_check_revision_plan_and_host_lineage\n    workflow=prepare('single_context',Path(directory)/'fixture');host=workflow.host('diagnostic');store=workflow.store\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\softrobot-agent\\examples\\stage356_milestone2.py\", line 120, in prepare\n    workflow.prepare(runtime);import_common(workflow,bundle)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\softrobot-agent\\tools\\diagnostic_workflow.py\", line 121, in prepare\n    self.store.create(dict(project_id=self.project,grant_id=self.project,budget=limits,\n  File \"D:\\softrobot-agent\\tools\\platform_store.py\", line 79, in create\n    self.root.mkdir(parents=True, exist_ok=True)\n  File \"C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\Lib\\pathlib.py\", line 1116, in mkdir\n    os.mkdir(self, mode)\nPermissionError: [WinError 5] 拒绝访问。: 'D:\\\\softrobot-agent\\\\runs\\\\tmptorwqztb\\\\fixture'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\Lib\\shutil.py\", line 612, in _rmtree_unsafe\n    with os.scandir(path) as scandir_it:\n         ^^^^^^^^^^^^^^^^\nPermissionError: [WinError 5] 拒绝访问。: 'D:\\\\softrobot-agent\\\\runs\\\\tmptorwqztb'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"D:\\softrobot-agent\\tests\\test_stage356_milestone2.py\", line 24, in test_actual_check_revision_plan_and_host_lineage\n    with TemporaryDirectory(dir=ROOT/'runs') as directory:\n  File \"C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\Lib\\tempfile.py\", line 943, in __exit__\n    self.cleanup()\n  File \"C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\Lib\\tempfile.py\", line 947, in cleanup\n    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)\n  File \"C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\Lib\\tempfile.py\", line 929, in _rmtree\n    _shutil.rmtree(name, onerror=onerror)\n  File \"C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\Lib\\shutil.py\", line 787, in rmtree\n    return _rmtree_unsafe(path, onerror)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\Lib\\shutil.py\", line 615, in _rmtree_unsafe\n    onerror(os.scandir, path, sys.exc_info())\n  File \"C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\Lib\\tempfile.py\", line 890, in onerror\n    _resetperms(path)\n  File \"C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\Lib\\tempfile.py\", line 287, in _resetperms\n    _dont_follow_symlinks(_os.chmod, path, 0o700)\n  File \"C:\\Users\\gugugaga\\miniconda3\\envs\\softagent\\Lib\\tempfile.py\", line 278, in _dont_follow_symlinks\n    func(path, *args)\nPermissionError: [WinError 5] 拒绝访问。: 'D:\\\\softrobot-agent\\\\runs\\\\tmptorwqztb'\n\n----------------------------------------------------------------------\nRan 2 tests in 0.600s\n\nFAILED (errors=1)\n",
+  "implementation": {
+    "commit": "7b699f8499b9fd753a8f51b3a0b864ca8141ec4a",
+    "files": {
+      "tools/diagnostic_handoff.py": "1dbd0a46ae072122096ed59e2dbdcbf186951d6130a5a8de0e3952221f34c73f",
+      "tools/platform_search.py": "3fa30de3b54dccb2c1151edc5dd2b5a074c7d5ee8a1d943e94dad2462ccccf52",
+      "tools/working_state.py": "cf69b822bff82897d86a8a50bf3660bab8f18a20a4ad11571b7d125370ce16a8",
+      "schemas/working_state.py": "41733f38151ce0d630e07552b358680450876e64cdfb11253286be7f05ba871c",
+      "examples/stage356_milestone2.py": "5317c5b4c45e475dbdd609082dc014e29fd0e76da9e9074fc2dd45b993b92401",
+      "tests/test_stage356_milestone2.py": "accb8f4e05134f243d457c9f3c579d2f246881dc6da0fb7327e5f57d99468f7e",
+      "tools/diagnostic_reference_adapter.py": "d7e86f4eb1249a1b7c722022e59495680398d3d2c12430150cbf4c6834c34456",
+      "tools/diagnostic_revision.py": "5b618332cf2abe594bbf355c1ca701ffb2d36fce79aff81422d75754fc261c36",
+      "schemas/diagnostic_revision.py": "4031819401e5d1466bb600788fedc62ef2c78a4d7f4526ff94c1263a3748c7b1",
+      "tools/diagnostic_workflow.py": "278cb1a88fdeba1776a6ea352269647e6962ca8c1a8bbc8881397a008bd8d1ff",
+      "tools/diagnostic_native.py": "ad007fff7a1c0d139a93db6b715d9ffd0a40631903ee32eab6c20befabb4bc11",
+      "tools/diagnostic_inventory.py": "2178f03ad6e991870a69e9e8986c84336753bcf26f2d617ed02d9a786e2a0651",
+      "tools/diagnostic_facts.py": "748f48168a56038d7e399841911e11f065db69bb0bac89d6205a8294352ce4e4",
+      "tools/platform_models.py": "27a8154de6cdeb43f88348489fbd65a0e7756cfb75bbc0acc58a5beb5e142574",
+      "tools/platform_handoff.py": "55f95c5e4e042435b9080b0ef5cc3edd72d3d32f0a5869c1e013936ae99e0bc9",
+      "tools/platform_diagnosis_coordinator.py": "ae8c0554d0303a76ae6a55eeb7d849f3df63fe27e1fa8a04cbd1f995358b736a",
+      "tools/platform_host.py": "134123ac29d5279d9480fde5e064771c6ee3702fb185142a496d54a0eeed30fa",
+      "tools/platform_store.py": "1727f687b1dea1ae0cd078ca753edd9d7e9c7ecf9706225fde52af2ddfe8d318",
+      "schemas/platform_handoff.py": "beb769db1d2d3180903b1ba83e20da5607bf911f167b8194b4359c1367ac6802",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "e5746170e5b0f4a55a2461cefd55f4c872566fbe1fdf4d324b46df1cd08f8996",
+      "extensions/tendon_family/diagnostic_evidence.py": "0e7aa9b13f38a8ec72de2a35661038f5150e5c4fad850eb7715deb64f2dbe7c8",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "0df3a9f900b8c3c8efd7f72a99c9ff4524eca0826f5c5e2e904bdda9a2e5607c",
+      "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "e9723ef5881f037ff420992a14e6f768a05815fa3f021b05d32a9ea15f7d74c9",
+      "tools/platform_tools.py": "e1815614e5f2fc5a0310e48a0bf0444708685d71189efb90de32919a54e050fa",
+      "extensions/tendon_family/candidate.py": "e5a551c5fc2dbe060ee21c1e2130a2d8a98da1954518b8150518fe8a8693fb97",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88"
+    }
+  },
+  "new_paid_requests": 0,
+  "new_backend_simulations": 0
+}
