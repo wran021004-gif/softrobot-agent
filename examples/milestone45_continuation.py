@@ -396,7 +396,7 @@ def complete_final_semantics(*,future_only=False):
     review=dict(prior_response=old,prior_response_preserved=True,complete_sequence_semantic_passed=False,
         omitted=['Separate structural effect under fixed 0/0.05 recipe.','Frozen pilot forecasts versus outcomes, four unresolved directions and no ordering prediction.','Supported consequence for use of the nondiscriminating local proxy.','Why choose the passing adaptation versus the passing pre-adaptation structure/control pair.'],
         hypothesis_and_physical_comparisons_accurate=True,selection_is_permitted_tradeoff=True)
-    atomic_json(w.directory/'final_semantic_review.json',review)
+    if not future_only:atomic_json(w.directory/'final_semantic_review.json',review)
     packet=read(w.directory/'adaptation_decision_packet.json');packet.update(semantic_review=review,pilot_assessment=assessment,
         frozen_forecast=read(w.directory/'pilot_forecast_seal.json'),structure_results=read(w.directory/'structure_decision_packet.json')['completed_results'],
         successful_control_reference=prior.campaign_metrics(next(r['facts'] for r in w.historical_results if r['facts']['execution_id']==CONTROL_EXECUTION)))
