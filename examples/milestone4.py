@@ -157,11 +157,15 @@ def plan(w,stage,count,instructions):
     return record
 
 
-def execute(w,stage,record):
+def execute(w,stage,record,*,before_execution=None,decision_extra=None):
     host=w.host('design');source=next(r for r in w.historical_results if r['facts']['candidate']==record['bindings']['subject'])
     configure_role(host,'executor','Execute only this immutable model-authored batch.',phase_budget={});host.resume()
     prepare_offline_batch(host,w.chain['search_plan'],mode='live',starting_facts=source['facts'],retained_baseline=w.retained_baseline,historical_results=w.historical_results)
     atomic_json(w.directory/(stage+'_bound_batch.json'),w.store.session(host.run_id)['state']['search_batch'])
+    if before_execution is not None:
+        before_execution(w,record,source)
+        host=w.host('design')
+        configure_role(host,'executor','Execute only this immutable model-authored batch.',phase_budget={});host.resume()
     result=run_live_batch(host);w.chain['batch_result']=save(w.store,result)
     atomic_json(w.directory/(stage+'_batch_result.json'),result)
     for row in result['candidates']:
@@ -190,7 +194,7 @@ def execute(w,stage,record):
         budget=budget_capacity(2 if stage=='structure' else 1,w.store.remaining()['remaining'],preparation_reserve_s=PREPARATION_RESERVE_S),usage=w.store.remaining(),
         acceptance=read(prior.repair.EVIDENCE/'decision_packet.json')['acceptance'],substage=stage,
         next_required_step='structure_change' if stage=='control' else 'controller_adaptation' if stage=='structure' else 'final_decision',
-        further_execution_requires_separate_model_authored_plan=True)
+        further_execution_requires_separate_model_authored_plan=True,**(decision_extra or {}))
     packet_ref=save(w.store,packet);atomic_json(w.directory/(stage+'_decision_packet.json'),packet)
     continuation=FINAL+(' Next required step is controller_adaptation: a bounded one-or-two-point weight batch on this exact new structure, not another physical change. For two points use computed two-result budget, or for one point use shared one-result requirement (1595 s,5 provider,9 tools,1 backend,0 workers). Physical failure alone does not imply impossibility. If you choose stop, say so; the required adaptation gate remains incomplete.' if stage=='structure' else ' The requested campaign evidence is complete after this adaptation. Choose next_research.route=stop and zero proposed_budget for this campaign, with any further study stated only as future work needing new authorization. Select any fully evaluated candidate in history by its exact ID, retain baseline, or none; source and selected deliverable remain distinct.')
     w.instructions={**w.instructions,'response_final':continuation};w.freeze['stage_instructions']=w.instructions
