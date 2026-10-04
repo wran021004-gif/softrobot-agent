@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "test_count": 8,
+  "command": "softagent Python -m unittest tests.test_milestone5_validation tests.test_milestone45.PilotPhysicalTests tests.test_milestone45.FinalRecoveryTests",
+  "failures_preserved": [
+    {
+      "attempt": "initial sandboxed tests",
+      "reason": "Windows sandbox denied temporary SQLite store filesystem access."
+    },
+    {
+      "attempt": "first escalated tests",
+      "reason": "Historical imports retain external ownership; local ControlEvidence.resolve required unique local ownership; corrected with BoundReader. Temporary store cleanup also retained a SQLite handle until garbage collection."
+    }
+  ],
+  "credentials_printed": false,
+  "provider_preflight": false,
+  "backend_replay": false,
+  "predecessor_hash_and_usage_checks": true
+}
