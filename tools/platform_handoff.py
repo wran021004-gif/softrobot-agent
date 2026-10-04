@@ -158,6 +158,7 @@ def respond_workflow(ctx,args):
     if role.get('final_response') and args.next_action!='finish':raise ValueError('CHECK_ALLOWANCE_SPENT: choose finish')
     from schemas.diagnostic_revision import FinalDesignResponse
     if isinstance(args,FinalDesignResponse):
+        if role.get('require_research_route') and args.next_research is None:raise ValueError('FINAL_RESEARCH_ROUTE_REQUIRED')
         feedback=role['improvement_feedback_content']
         if plain(args.feedback)!=role['check_feedback'][0]['reference']:raise ValueError('FINAL_FEEDBACK_BINDING_MISMATCH')
         if args.candidate_disposition in ('defer_selection','reject_all'):
@@ -165,7 +166,7 @@ def respond_workflow(ctx,args):
         else:
             if args.candidate_disposition=='adopt_candidate' and role.get('batch_result'):
                 choices=[c['execution']['factual_result']['candidate'] for c in role['batch_result']['candidates']
-                    if not c['reused'] and c.get('feedback') is not None]
+                    if c.get('execution') and c.get('feedback') is not None]
                 if args.selected_candidate not in choices:raise ValueError('FINAL_BATCH_CANDIDATE_BINDING_MISMATCH')
                 expected=args.selected_candidate
                 facts=None

@@ -128,10 +128,11 @@ class ScopedReferenceAdapter(BoundSavedStateAdapter):
             args['fact_selectors']=selectors;return args
         if name=='design.respond_diagnosis':
             args=deepcopy(args);feedback=self.role['improvement_feedback_content']
+            if self.role.get('require_research_route') and not args.get('next_research'):raise ValueError('FINAL_RESEARCH_ROUTE_REQUIRED')
             choice=args['selected_candidate'];disposition=args['candidate_disposition']
             if self.role.get('batch_result') and disposition=='adopt_candidate':
                 candidates=self.role['batch_result']['candidates']
-                match=next((c for c in candidates if c['candidate_id']==choice and not c['reused'] and c.get('feedback') is not None),None)
+                match=next((c for c in candidates if c['candidate_id']==choice and c.get('execution') and c.get('feedback') is not None),None)
                 if not match:raise ValueError('SELECTED_BATCH_CANDIDATE_HAS_NO_COMPLETE_EVIDENCE')
                 args['selected_candidate']=deepcopy(match['execution']['factual_result']['candidate'])
                 args['feedback']=self.role['check_feedback'][0]['reference'];return args

@@ -5,6 +5,7 @@ from schemas.common import Contract
 from schemas.platform_handoff import InventoryDiagnosisSubmission, WorkflowDesignResponse, Recommendation, InventoryGap
 from schemas.platform_diagnostics import DiagnosticReport, DiagnosticFact
 from schemas.platform import EvidenceRef
+from schemas.platform import Budget
 
 
 class RevisionFact(Contract):
@@ -47,10 +48,24 @@ class Corrections(Contract):
     corrections: list[FieldCorrection] = Field(min_length=1, max_length=20)
 
 
+class NextResearchRoute(Contract):
+    route: Literal['continue_weight_combinations','initialization_selection','prediction_backend_disagreement','holding_control_arrangements','defer']
+    unresolved_question: str = Field(min_length=1)
+    evidence: list[str] = Field(min_length=1,description='Execution/artifact identities and exact observations motivating this route.')
+    bounded_check: str = Field(min_length=1)
+    fixed_conditions: list[str] = Field(min_length=1)
+    proposed_variables: dict[str,str] = Field(default_factory=dict)
+    expected_observations: list[str] = Field(min_length=1)
+    proposed_budget: Budget
+    stopping_conditions: list[str] = Field(min_length=1)
+    limitations: list[str] = Field(min_length=1)
+
+
 class FinalDesignResponse(WorkflowDesignResponse):
     candidate_disposition: Literal['adopt_candidate', 'retain_baseline', 'defer_selection', 'reject_all']
     selected_candidate: dict | None
     feedback: EvidenceRef
+    next_research: NextResearchRoute | None = None
 
 
 class WireFinalDecision(Contract):
@@ -60,6 +75,7 @@ class WireFinalDecision(Contract):
     next_action: Literal['finish']
     candidate_disposition: Literal['adopt_candidate', 'retain_baseline', 'defer_selection', 'reject_all']
     selected_candidate: str = Field(description='baseline, candidate, none; for a supplied completed batch, an exact evaluated candidate_id may be selected.')
+    next_research: NextResearchRoute | None = None
 
 
 def without(schema, fields, **replacements):

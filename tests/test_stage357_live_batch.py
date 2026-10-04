@@ -92,9 +92,9 @@ class LiveIntegrationTests(BatchTests):
             self.assertEqual(workflow.store.remaining()['used']['model_calls'],0)
             self.assertEqual(workflow.store.remaining()['used']['backend_solves'],0)
 
-    def live_fixture(self,directory,*,holding_lower=.05):
+    def live_fixture(self,directory,*,holding_lower=.05,step=.2,historical_results=()):
         host,old=self.fixture(directory,wall_s=7200.,max_candidates=6,backend_attempts=3,model_calls=16)
-        record=host.store.artifact(old);record['plan'].update(max_backend_attempts=3,target_changed_configurations=2,step=.2,
+        record=host.store.artifact(old);record['plan'].update(max_backend_attempts=3,target_changed_configurations=2,step=step,
             variables={'control/recipe/holding_tip_speed_weight':[holding_lower,1.],'control/recipe/terminal_tip_speed_weight':[0.,1.]},
             planned_budget=dict(model_calls=16,tool_calls=24,backend_solves=3,worker_calls=0,wall_s=7200.))
         fixed=deepcopy(self.configuration['effective'])
@@ -107,7 +107,7 @@ class LiveIntegrationTests(BatchTests):
         baseline_store=Store(ROOT/'runs/stage351_settling_20261003/baseline')
         with host.store.transaction() as db:
             self.assertEqual(plain(host.store.put(db,baseline_store.artifact(retained['configuration']))),retained['configuration'])
-        prepare_offline_batch(host,ref,starting_facts=self.facts,retained_baseline=retained,mode='live')
+        prepare_offline_batch(host,ref,starting_facts=self.facts,retained_baseline=retained,mode='live',historical_results=historical_results)
         return host
 
     def test_retained_baseline_and_float_roundtrip_never_spend_backend_budget(self):

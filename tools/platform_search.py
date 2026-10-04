@@ -303,7 +303,7 @@ def _save_batch(host,batch):
         host.store.update_state(db,host.run_id,state)
 
 
-def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_reserve_s=600.,mode='offline_injected',retained_baseline=None):
+def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_reserve_s=600.,mode='offline_injected',retained_baseline=None,historical_results=()):
     """Bind an accepted immutable plan in a separate offline grant, with no live adapter."""
     from copy import deepcopy
     from tools.diagnostic_handoff import accepted_product
@@ -349,10 +349,22 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
     for facts in (starting_facts,retained_baseline):
         if facts and (facts['candidate']['execution_id']!=facts['execution_id'] or facts['candidate']['configuration']!=facts['configuration']):
             raise ValueError('BATCH_REFERENCE_FACT_BINDING_MISMATCH')
+    permitted=[]
+    for saved in historical_results:
+        facts=saved['facts'];original=host.store.artifact(facts['configuration'])['effective']
+        if (saved['execution_id']!=facts['execution_id'] or saved['owner_run_id']!=facts['candidate']['owner_run_id']
+                or saved['execution_scope']!=execution_scope(original)):
+            raise ValueError('BATCH_HISTORICAL_SOURCE_BINDING_MISMATCH')
+        expected=deepcopy(effective)
+        for path in plan.variables:
+            key=path.rsplit('/',1)[-1];expected['policy']['controller']['parameters']['data']['recipe'][key]=original['policy']['controller']['parameters']['data']['recipe'][key]
+        if execution_scope(expected)!=execution_scope(original):raise ValueError('BATCH_HISTORICAL_FIXED_SCIENCE_MISMATCH')
+        permitted.append(saved)
     batch=dict(plan=plan_ref,batch_id='batch-'+plan_ref['artifact_id'][:16],mode=mode,
         parameters=plain(parameters),algorithm=plain(CoordinateSearch(parameters).save()),pending=None,
         proposals=[],configurations={},starting_facts=starting_facts,base_configuration=record['bindings']['subject']['configuration'],
         retained_baseline=retained_baseline,max_backend_attempts=count,target_changed_configurations=plan.target_changed_configurations,
+        historical_results=permitted,
         interpretation_reserve_s=interpretation_reserve_s,usage_start=host.store.remaining()['used'],stop_reason=None,
         grant=host.store.config(),interpretation_reserve=dict(model_calls=4,tool_calls=4))
     _save_batch(host,batch)
@@ -372,6 +384,7 @@ def offline_batch_result(host):
             reused_evaluations=sum(p.get('reused',False) for p in batch['proposals']),
             historical_start_reuse=sum(p.get('reuse_kind')=='historical_start' for p in batch['proposals']),
             retained_baseline_reuse=sum(p.get('reuse_kind')=='retained_baseline' for p in batch['proposals']),
+            other_historical_reuse=sum(p.get('reuse_kind')=='historical_candidate' for p in batch['proposals']),
             duplicate_result_reuse=sum(p.get('reuse_kind')=='duplicate' for p in batch['proposals']),
             new_backend_attempts=used['backend_solves'],offline_execution_attempts=sum(not r['reused'] and 'simulation' in r['stages'] for r in rows) if batch['mode']=='offline_injected' else 0,
             completed_new_evaluations=sum(not r['reused'] and r.get('feedback') is not None for r in rows),usage=used),
@@ -420,6 +433,9 @@ def _run_batch(host,inject,*,stop_after_stage=None):
             # A coordinate return to a known point must not create a second
             # execution just because subtraction changed its last float bit.
             known=[batch['parameters']['initial'],*[p['changes'] for p in batch['proposals']]]
+            for saved in batch.get('historical_results',[]):
+                recipe=host.store.artifact(saved['facts']['configuration'])['effective']['policy']['controller']['parameters']['data']['recipe']
+                known.append({p:recipe[p.rsplit('/',1)[-1]] for p in changes})
             canonicalized=[]
             for path,value in changes.items():
                 old=next((p[path] for p in known if path in p and abs(p[path]-value)<=1e-12),value)
@@ -434,6 +450,19 @@ def _run_batch(host,inject,*,stop_after_stage=None):
             batch['proposals'].append(proposal);previous=batch['configurations'].get(identity)
             start=batch['starting_facts'] if proposal['index']==0 else None
             retained=None
+            historical=None
+            if not previous and batch.get('historical_results'):
+                from extensions.tendon_family.gvs_profile import execution_scope
+                historical=next((r for r in batch['historical_results'] if r['execution_scope']==execution_scope(effective)),None)
+                if historical:
+                    facts=historical['facts']
+                    previous=dict(candidate_id=facts['candidate']['candidate_id'],configuration=facts['configuration'],identity=identity,
+                        changes=changes,stages={k:dict(execution_status='historical_reused') for k,_ in stages},reused=True,
+                        execution_id=facts['execution_id'],historical_source=historical,
+                        feedback=physical_feedback(batch['starting_facts'],facts,record['bindings']['acceptance']))
+                    from tools.settling_campaign import compare_results
+                    previous['retained_baseline_comparison']=compare_results(batch['retained_baseline'],facts)
+                    batch['configurations'][identity]=previous
             if not previous and not start and batch.get('retained_baseline'):
                 from extensions.tendon_family.gvs_profile import execution_scope
                 candidate=batch['retained_baseline']
@@ -455,7 +484,10 @@ def _run_batch(host,inject,*,stop_after_stage=None):
                         feedback=physical_feedback(batch['starting_facts'],retained,record['bindings']['acceptance']),
                         retained_baseline_comparison=physical_feedback(retained,retained,record['bindings']['acceptance'])['comparison'])
                     batch['configurations'][identity]=previous
-                proposal.update(reused=True,reused_from=previous['candidate_id'],reuse_kind='historical_start' if start else 'retained_baseline' if retained else 'duplicate')
+                kind=historical['role'] if historical else 'historical_start' if start else 'retained_baseline' if retained else 'duplicate'
+                proposal.update(reused=True,reused_from=previous['candidate_id'],reuse_kind=kind,
+                    reused_execution_id=previous.get('execution_id'),reuse_reason=historical['reuse_reason'] if historical else 'Known complete result; no new backend attempt.')
+                if batch['mode']=='live':print('BATCH reuse',proposal['index'],kind,changes,flush=True)
                 algorithm.feedback(previous['feedback']['score']);batch['algorithm']=plain(algorithm.save());_save_batch(host,batch);continue
             candidate_id=batch['batch_id']+'-'+str(proposal['index'])
             prepared=CandidateInput(candidate_id=candidate_id,baseline_identity=digest(source),builder=source['policy']['candidate_builder']['extension_id'],
@@ -502,6 +534,7 @@ def _run_batch(host,inject,*,stop_after_stage=None):
                 return offline_batch_result(host)
             if old:receipt=json.loads(old['receipt'])
             elif live and stage!='apply':
+                print('BATCH stage',candidate['candidate_id'],stage,candidate['changes'],flush=True)
                 receipt=inject.stage(stage,deepcopy(candidate))
             else:
                 if host.store.spendable(host.run_id)['remaining']['wall_s']<reserve_s+batch['interpretation_reserve_s']:
@@ -523,6 +556,7 @@ def _run_batch(host,inject,*,stop_after_stage=None):
         if live:
             completed=inject.facts(deepcopy(candidate));facts=completed['factual_result'];row['execution']=completed
             row['executed_configuration']=completed['configuration']
+            row['execution_id']=completed['execution_id'] if 'execution_id' in completed else facts['execution_id']
         else: facts=host.store.artifact(row['stages']['profile']['output'])['result']['factual_result']
         if (not live and (facts['configuration']!=candidate['configuration'] or facts['candidate']['configuration']!=candidate['configuration'])
                 or facts['candidate']['candidate_id']!=candidate['candidate_id']):
