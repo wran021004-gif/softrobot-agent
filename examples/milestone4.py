@@ -157,24 +157,29 @@ def plan(w,stage,count,instructions):
     return record
 
 
-def execute(w,stage,record,*,before_execution=None,decision_extra=None):
+def execute(w,stage,record,*,before_execution=None,decision_extra=None,sealed_result=None):
     host=w.host('design');source=next(r for r in w.historical_results if r['facts']['candidate']==record['bindings']['subject'])
-    configure_role(host,'executor','Execute only this immutable model-authored batch.',phase_budget={});host.resume()
-    prepare_offline_batch(host,w.chain['search_plan'],mode='live',starting_facts=source['facts'],retained_baseline=w.retained_baseline,historical_results=w.historical_results)
-    atomic_json(w.directory/(stage+'_bound_batch.json'),w.store.session(host.run_id)['state']['search_batch'])
-    if before_execution is not None:
-        before_execution(w,record,source)
-        host=w.host('design')
+    if sealed_result is None:
         configure_role(host,'executor','Execute only this immutable model-authored batch.',phase_budget={});host.resume()
-    result=run_live_batch(host);w.chain['batch_result']=save(w.store,result)
+        prepare_offline_batch(host,w.chain['search_plan'],mode='live',starting_facts=source['facts'],retained_baseline=w.retained_baseline,historical_results=w.historical_results)
+        atomic_json(w.directory/(stage+'_bound_batch.json'),w.store.session(host.run_id)['state']['search_batch'])
+        if before_execution is not None:
+            before_execution(w,record,source)
+            host=w.host('design')
+            configure_role(host,'executor','Execute only this immutable model-authored batch.',phase_budget={});host.resume()
+        result=run_live_batch(host);w.chain['batch_result']=save(w.store,result)
+    else:
+        if sealed_result!=w.store.artifact(w.chain['batch_result']):raise ValueError('SEALED_STAGE_RESULT_MISMATCH')
+        result=sealed_result
     atomic_json(w.directory/(stage+'_batch_result.json'),result)
     for row in result['candidates']:
         if not row.get('execution'):continue
         facts=row['execution']['factual_result'];configuration=w.store.artifact(facts['configuration'])['effective']
         from extensions.tendon_family.gvs_profile import execution_scope
-        w.historical_results.append(dict(role='historical_candidate',facts=facts,execution_scope=execution_scope(configuration),
-            source_store=str(w.directory),owner_run_id=facts['candidate']['owner_run_id'],execution_id=facts['execution_id'],receipts=row['execution']['receipts'],
-            reuse_reason='New sealed complete candidate in this cumulative campaign.'))
+        if not any(r['facts']['candidate']==facts['candidate'] for r in w.historical_results):
+            w.historical_results.append(dict(role='historical_candidate',facts=facts,execution_scope=execution_scope(configuration),
+                source_store=str(w.directory),owner_run_id=facts['candidate']['owner_run_id'],execution_id=facts['execution_id'],receipts=row['execution']['receipts'],
+                reuse_reason='New sealed complete candidate in this cumulative campaign.'))
         w.latest_tested=facts['candidate']
     if result['fully_evaluated_distinct_changed_configurations']!=record['plan']['target_changed_configurations'] or result['status']!='completed':
         raise ValueError('MILESTONE_BATCH_INCOMPLETE: '+str(result['stop_reason']))

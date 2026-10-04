@@ -99,6 +99,7 @@ def prepare(directory=RUN):
             predecessor_host=original_host,predecessor_state_identity=digest(original_state),predecessor_usage=usage,
             predecessor_stop_reason=original_state.get('stop_reason'),old_corrections=original_state.get('protocol_corrections_used',0),
             combined_limits=prior.GRANT,continuation_allocation=budget,authorization=AUTHORIZATION),milestone45_revision=revision())
+    w.freeze['confirmation_grant_links']=deepcopy(w.freeze['authorization_link'])
     # Same configured provider science/admin values, with explicitly renewed
     # correction segment only. No transfer/reset of the old terminal context.
     model=deepcopy(old_freeze['provider_configuration']);model['protocol_recovery']=dict(max_total=4,max_consecutive=2)
@@ -184,7 +185,7 @@ def pilot(w,record,source):
         improvement_feedback_content=dict(baseline_facts=w.retained_baseline,execution=None),check_feedback=[dict(reference=w.chain['batch_summary'])],
         source_report=w.common['source_report'],source_record=w.source_record)
     forecast=dict(protocol=ref,numerical=receipt['output'],model_interpretation=w.chain['pilot_forecast'],
-        interpretation=w.store.artifact(w.chain['pilot_forecast']),forecasts=[dict(candidate_id=r['candidate_id'],scientific_identity=r['scientific_identity'],
+        interpretation=w.store.artifact(w.chain['pilot_forecast']),forecasts=[dict(candidate_id=r['candidate_id'],configuration=r['configuration'],scientific_identity=r['scientific_identity'],
             **r['full_task_hypothesis']) for r in result['rows'][1:]],predicted_speed_order=result['predicted_speed_order'],predicted_physical_order=None,
         acceptance_prediction='unknown',sealed_before_backend=True,usage=combined(w),revision=revision())
     w.chain['pilot_forecast_seal']=save(w.store,forecast);atomic_json(w.directory/'pilot_forecast_seal.json',forecast)
@@ -202,6 +203,7 @@ def assess_pilot(w):
     for predicted in forecast['forecasts']:
         row=next(r for r in result['candidates'] if r['candidate_id']==predicted['candidate_id']);facts=row['execution']['factual_result']
         cfg=w.store.artifact(facts['configuration'])['effective']
+        if row['configuration']!=predicted['configuration']:raise ValueError('FORECAST_PREPARED_CONFIGURATION_MISMATCH')
         if digest(execution_scope(cfg))!=predicted['scientific_identity']:raise ValueError('FORECAST_ACTUAL_CONFIGURATION_MISMATCH')
         comparison=prior.compare_results(source,facts);a=prior.campaign_metrics(facts);b=prior.campaign_metrics(source)
         actual=dict(holding_speed_direction=physical_direction(a['holding_max_speed_m_s']-b['holding_max_speed_m_s']),
@@ -214,6 +216,9 @@ def assess_pilot(w):
         speed_order_matched=None if forecast['predicted_speed_order'] is None else forecast['predicted_speed_order']==observed_order,
         overall_order='unresolved: forecast abstained because joint acceptance was unknown',predictor_cost_s=numerical['complete_cost_s'],
         full_backend_receipt_cost_s=sum(r['execution']['receipts']['simulation']['charged']['wall_s'] for r in result['candidates'] if r.get('execution')),
+        full_evaluation_cost_s=sum(stage['charged']['wall_s'] for r in result['candidates'] if r.get('execution') for stage in r['stages'].values()),
+        predictor_tool_charged_s=read(w.directory/'pilot_numerical_receipt.json')['charged']['wall_s'],
+        observed_complete_pair_comparison=prior.compare_results(result['candidates'][0]['execution']['factual_result'],result['candidates'][1]['execution']['factual_result']) if len(outcomes)==2 else None,
         forecast_unchanged=True,scope='Initial same-structure control pilot only; no general screening reliability or automatic rejection validation.')
     atomic_json(w.directory/'pilot_assessment.json',assessment);w.chain['pilot_assessment']=save(w.store,assessment);return assessment
 
@@ -227,7 +232,7 @@ def export(w,status,reason,elapsed):
     with w.store.connect(True) as db:
         rows=[dict(row) for row in db.execute('SELECT run_id,request_id,status,charged,receipt FROM calls')]
     atomic_json(destination/'campaign_receipts.json',[dict(run_id=r['run_id'],receipt=json.loads(r['receipt'])) for r in rows if r['receipt']])
-    atomic_json(destination/'campaign_calls.json',[dict(**r,charged=json.loads(r['charged']),receipt=json.loads(r['receipt']) if r['receipt'] else None) for r in rows])
+    atomic_json(destination/'campaign_calls.json',[{**r,'charged':json.loads(r['charged']),'receipt':json.loads(r['receipt']) if r['receipt'] else None} for r in rows])
     corrections=max(w.store.session(h.run_id)['state'].get('protocol_corrections_used',0) for h in w.hosts.values())
     atomic_json(EVIDENCE/'accounting.json',dict(**combined(w),corrections=dict(old=4,new=corrections,lifetime=4+corrections,new_limit=4,consecutive_limit=2),
         receipt_charge_sum={k:sum(json.loads(r['charged'])[k] for r in rows) for k in prior.GRANT},predecessor_unchanged=True))
@@ -281,4 +286,25 @@ def live(stage):
     assert_predecessor(w);export(w,status,reason,time.monotonic()-start)
 
 
-if __name__=='__main__':live(sys.argv[1])
+def resume_structure_interpretation():
+    """Concrete recovery of the sealed structural result, no backend path."""
+    if subprocess.check_output(['git','diff','HEAD','--',*revision()['files']],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
+    from examples.gvs_nmpc_route_experiment import load_credential
+    load_credential(Path(os.environ['SOFTAGENT_CONFIGURATION_PATH']))
+    for key in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):
+        if '127.0.0.1:9' in os.environ.get(key,''):os.environ.pop(key)
+    w=restore();w.current_stage='structure';w.freeze['confirmation_grant_links']=deepcopy(w.freeze['authorization_link'])
+    record=read(w.directory/'structure_plan.json');result=read(w.directory/'structure_batch_result.json')
+    if (w.directory/'structure_final_response.json').exists():raise ValueError('STRUCTURE_INTERPRETATION_ALREADY_SEALED')
+    start=time.monotonic();status='incomplete';reason=None
+    try:
+        prior.execute(w,'structure',record,sealed_result=result,decision_extra=dict(plan_semantic_review=read(w.directory/'structure_plan_semantic_review.json')))
+        status='structure_complete';reason='Sealed structure interpreted after summary/export host repair; backend not replayed.'
+    except Exception as exc:
+        reason=str(exc);atomic_json(w.directory/'structure_interpretation_failure.json',dict(type=type(exc).__name__,message=reason));print('STOP',reason,flush=True)
+    assert_predecessor(w);export(w,status,reason,time.monotonic()-start)
+
+
+if __name__=='__main__':
+    if sys.argv[1]=='resume-structure-interpretation':resume_structure_interpretation()
+    else:live(sys.argv[1])

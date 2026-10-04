@@ -75,6 +75,21 @@ class ContinuationTests(TestCase):
 
 
 class PilotPhysicalTests(TestCase):
+    def test_sealed_execution_recovery_never_calls_executor(self):
+        from types import SimpleNamespace
+        sealed=dict(status='completed',fully_evaluated_distinct_changed_configurations=1,candidates=[])
+        store=SimpleNamespace(artifact=lambda ref:sealed)
+        candidate=dict(candidate_id='source')
+        w=SimpleNamespace(store=store,chain=dict(batch_result={}),historical_results=[dict(facts=dict(candidate=candidate))],host=lambda role:None)
+        record=dict(bindings=dict(subject=candidate),plan=dict(target_changed_configurations=1))
+        # Stop at summary construction; preceding execution and preparation must
+        # be bypassed while the exact sealed result is checked.
+        with (patch.object(prior,'atomic_json'),patch.object(prior,'run_live_batch',side_effect=AssertionError('BACKEND_REPLAY')),
+            patch.object(prior,'prepare_offline_batch',side_effect=AssertionError('BATCH_REPREPARATION')),
+            patch.object(prior.prior.previous,'compact_summary',side_effect=RuntimeError('SUMMARY_REACHED'))):
+            w.directory=Path('.')
+            with self.assertRaisesRegex(RuntimeError,'SUMMARY_REACHED'):prior.execute(w,'structure',record,sealed_result=sealed)
+
     def test_weight_specific_commands_drive_prospective_rollouts(self):
         from types import SimpleNamespace
         import numpy as np
