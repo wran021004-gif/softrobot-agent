@@ -1,0 +1,282 @@
+{
+  "model": "deepseek-flash",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Perform the current final-decision phase with exactly one advertised native function. English. Use the supplied source-bound program facts; author only interpretation and judgment. Required instructions are in role_context.instructions. Keep the response concise. Diagnostic recommendation disposition, candidate selection and next research route are separate. A valid function call does not certify factual accuracy. No further execution is authorized by this response."
+    },
+    {
+      "role": "user",
+      "content": "{\"correction_budget\":{\"consecutive_used\":0,\"limits\":{\"max_consecutive\":2,\"max_total\":4},\"total_used\":0},\"phase_progress\":{\"budget\":{\"limit\":{\"backend_solves\":0,\"model_calls\":3,\"tool_calls\":4,\"wall_s\":600.0,\"worker_calls\":0},\"remaining\":{\"backend_solves\":0,\"model_calls\":3,\"tool_calls\":4,\"wall_s\":600.0,\"worker_calls\":0},\"started_usage\":{\"backend_solves\":0,\"model_calls\":0,\"tool_calls\":0,\"wall_s\":0.0,\"worker_calls\":0},\"used\":{\"backend_solves\":0,\"model_calls\":0,\"tool_calls\":0,\"wall_s\":0.0,\"worker_calls\":0}},\"evidence_turn_limit\":0,\"instruction\":\"Use supplied content and retained evidence. When the read allowance ends, deliver the current phase using its remaining advertised handoff tool.\",\"successful_read_turns\":0,\"turns_used\":-1},\"recovery_status\":{\"business\":{\"category\":\"accepted_call_execution_rejected_or_failed\",\"consecutive_failures\":0,\"feedback\":null,\"limit\":2,\"remaining_repairs\":2,\"reset\":\"Completed business call resets consecutive; phase/context switch does not.\",\"stop_when\":\"consecutive_failures > limit; two repair opportunities after first failure\",\"total_failures\":0},\"length\":{\"category\":\"truncated_without_usable_action\",\"configuration\":{\"enabled\":true,\"max_tokens\":131072,\"timeout_s\":900.0},\"limit\":1,\"used\":0},\"protocol\":{\"category\":\"native_schema_or_envelope\",\"consecutive_remaining\":2,\"consecutive_used\":0,\"limits\":{\"max_consecutive\":2,\"max_total\":4},\"reset\":\"Completed business call resets consecutive only; decoding alone does not.\",\"total_remaining\":4,\"total_used\":0},\"scope\":\"workflow shared across phases and contexts\",\"stop_reason\":null,\"transport\":{\"automatic_retry\":false,\"category\":\"provider_transport_failure\"},\"version\":\"2.0.0\"},\"role_context\":{\"decision_packet\":{\"acceptance\":{\"holding_max_error_m\":0.01,\"holding_max_speed_m_s\":0.02,\"terminal_error_m\":0.01,\"window_s\":0.05},\"comparisons\":[{\"candidate\":\"retained_baseline\",\"candidate_execution_id\":\"cf997605885642759ee33920e2c9e2ef\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.0,\"holding_max_speed_m_s\":0.0,\"mean_complete_update_s\":0.0,\"terminal_error_m\":0.0},\"classification\":\"physical_equivalent_within_tolerance\",\"reference\":\"retained_baseline\",\"reference_execution_id\":\"cf997605885642759ee33920e2c9e2ef\"},{\"candidate\":\"retained_baseline\",\"candidate_execution_id\":\"cf997605885642759ee33920e2c9e2ef\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.049862980920174826,\"holding_max_speed_m_s\":1.5454479662829395,\"mean_complete_update_s\":0.38686642860993814,\"terminal_error_m\":-0.0005442825217099791},\"classification\":\"physical_tradeoff\",\"reference\":\"immediate_predecessor\",\"reference_execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\"},{\"candidate\":\"retained_baseline\",\"candidate_execution_id\":\"cf997605885642759ee33920e2c9e2ef\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.001633544566242727,\"holding_max_speed_m_s\":0.4060100069642385,\"mean_complete_update_s\":-0.5154540428891785,\"terminal_error_m\":-0.001056295661744434},\"classification\":\"physical_tradeoff\",\"reference\":\"older_search_start\",\"reference_execution_id\":\"087adee8e8a24fe88e5c85fe89e638c8\"},{\"candidate\":\"older_search_start\",\"candidate_execution_id\":\"087adee8e8a24fe88e5c85fe89e638c8\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":-0.001633544566242727,\"holding_max_speed_m_s\":-0.4060100069642385,\"mean_complete_update_s\":0.5154540428891785,\"terminal_error_m\":0.001056295661744434},\"classification\":\"physical_tradeoff\",\"reference\":\"retained_baseline\",\"reference_execution_id\":\"cf997605885642759ee33920e2c9e2ef\"},{\"candidate\":\"older_search_start\",\"candidate_execution_id\":\"087adee8e8a24fe88e5c85fe89e638c8\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.0482294363539321,\"holding_max_speed_m_s\":1.139437959318701,\"mean_complete_update_s\":0.9023204714991166,\"terminal_error_m\":0.0005120131400344549},\"classification\":\"physical_pareto_worsening\",\"reference\":\"immediate_predecessor\",\"reference_execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\"},{\"candidate\":\"older_search_start\",\"candidate_execution_id\":\"087adee8e8a24fe88e5c85fe89e638c8\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.0,\"holding_max_speed_m_s\":0.0,\"mean_complete_update_s\":0.0,\"terminal_error_m\":0.0},\"classification\":\"physical_equivalent_within_tolerance\",\"reference\":\"older_search_start\",\"reference_execution_id\":\"087adee8e8a24fe88e5c85fe89e638c8\"},{\"candidate\":\"prior_candidate\",\"candidate_execution_id\":\"25e26708480848d79bad378b669915e3\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.0053056960894252575,\"holding_max_speed_m_s\":-0.4533875062560584,\"mean_complete_update_s\":0.041295808593609706,\"terminal_error_m\":0.011047715535123641},\"classification\":\"physical_tradeoff\",\"reference\":\"retained_baseline\",\"reference_execution_id\":\"cf997605885642759ee33920e2c9e2ef\"},{\"candidate\":\"prior_candidate\",\"candidate_execution_id\":\"25e26708480848d79bad378b669915e3\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.055168677009600084,\"holding_max_speed_m_s\":1.092060460026881,\"mean_complete_update_s\":0.42816223720354785,\"terminal_error_m\":0.010503433013413662},\"classification\":\"physical_pareto_worsening\",\"reference\":\"immediate_predecessor\",\"reference_execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\"},{\"candidate\":\"prior_candidate\",\"candidate_execution_id\":\"25e26708480848d79bad378b669915e3\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.0069392406556679845,\"holding_max_speed_m_s\":-0.04737749929181989,\"mean_complete_update_s\":-0.4741582342955688,\"terminal_error_m\":0.009991419873379207},\"classification\":\"physical_tradeoff\",\"reference\":\"older_search_start\",\"reference_execution_id\":\"087adee8e8a24fe88e5c85fe89e638c8\"},{\"candidate\":\"holding_only\",\"candidate_execution_id\":\"22241105b8984e0daae4530963848953\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.0053056960894252575,\"holding_max_speed_m_s\":-0.21778365992988546,\"mean_complete_update_s\":0.12975374571978904,\"terminal_error_m\":0.003915632447512746},\"classification\":\"physical_tradeoff\",\"reference\":\"retained_baseline\",\"reference_execution_id\":\"cf997605885642759ee33920e2c9e2ef\"},{\"candidate\":\"holding_only\",\"candidate_execution_id\":\"22241105b8984e0daae4530963848953\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.055168677009600084,\"holding_max_speed_m_s\":1.327664306353054,\"mean_complete_update_s\":0.5166201743297272,\"terminal_error_m\":0.003371349925802767},\"classification\":\"physical_pareto_worsening\",\"reference\":\"immediate_predecessor\",\"reference_execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\"},{\"candidate\":\"holding_only\",\"candidate_execution_id\":\"22241105b8984e0daae4530963848953\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.0069392406556679845,\"holding_max_speed_m_s\":0.18822634703435304,\"mean_complete_update_s\":-0.38570029716938947,\"terminal_error_m\":0.002859336785768312},\"classification\":\"physical_pareto_worsening\",\"reference\":\"older_search_start\",\"reference_execution_id\":\"087adee8e8a24fe88e5c85fe89e638c8\"},{\"candidate\":\"immediate_predecessor\",\"candidate_execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":-0.049862980920174826,\"holding_max_speed_m_s\":-1.5454479662829395,\"mean_complete_update_s\":-0.38686642860993814,\"terminal_error_m\":0.0005442825217099791},\"classification\":\"physical_tradeoff\",\"reference\":\"retained_baseline\",\"reference_execution_id\":\"cf997605885642759ee33920e2c9e2ef\"},{\"candidate\":\"immediate_predecessor\",\"candidate_execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":0.0,\"holding_max_speed_m_s\":0.0,\"mean_complete_update_s\":0.0,\"terminal_error_m\":0.0},\"classification\":\"physical_equivalent_within_tolerance\",\"reference\":\"immediate_predecessor\",\"reference_execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\"},{\"candidate\":\"immediate_predecessor\",\"candidate_execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\",\"candidate_minus_reference\":{\"deadline_misses\":0,\"holding_max_error_m\":-0.0482294363539321,\"holding_max_speed_m_s\":-1.139437959318701,\"mean_complete_update_s\":-0.9023204714991166,\"terminal_error_m\":-0.0005120131400344549},\"classification\":\"physical_pareto_improvement\",\"reference\":\"older_search_start\",\"reference_execution_id\":\"087adee8e8a24fe88e5c85fe89e638c8\"}],\"configurations\":[{\"candidate\":{\"candidate_id\":\"baseline-replay\",\"configuration\":{\"artifact_id\":\"af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0\",\"media_type\":\"application/json\"},\"execution_id\":\"cf997605885642759ee33920e2c9e2ef\",\"owner_run_id\":\"gvs-stage351-baseline-executor\"},\"metrics\":{\"control_period_s\":0.01,\"control_updates\":35,\"coverage\":{\"continuous_time_guarantee\":false,\"holding\":\"all retained samples in final 0.05 s\",\"terminal\":\"last execution sample\"},\"deadline_misses\":35,\"force_bound_violation_n\":0.0,\"holding_max_error_m\":0.05813810428573256,\"holding_max_speed_m_s\":1.5810152739742807,\"holding_position_passed\":false,\"holding_speed_passed\":false,\"joint_reach_holding_passed\":false,\"mean_complete_update_s\":17.26331904856488,\"official_reach_task_success\":true,\"real_time_demonstrated\":false,\"solver_error_count\":0,\"source\":{\"configuration\":{\"artifact_id\":\"af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0\",\"media_type\":\"application/json\"},\"evaluation\":{\"artifact_id\":\"4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda\",\"media_type\":\"application/json\"},\"execution_id\":\"cf997605885642759ee33920e2c9e2ef\",\"profile\":{\"artifact_id\":\"f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc\",\"media_type\":\"application/json\"},\"simulation\":{\"artifact_id\":\"da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98\",\"media_type\":\"application/json\"}},\"terminal_error_m\":0.007642608585867386,\"terminal_reach_passed\":true,\"valid_complete_execution\":true},\"role\":\"retained_baseline\",\"weights\":{\"holding\":0.0,\"terminal\":0.0}},{\"candidate\":{\"candidate_id\":\"improvement-96f0ade35119\",\"configuration\":{\"artifact_id\":\"44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f\",\"media_type\":\"application/json\"},\"execution_id\":\"087adee8e8a24fe88e5c85fe89e638c8\",\"owner_run_id\":\"gvs-stage354-aa097c784425-candidate\"},\"metrics\":{\"control_period_s\":0.01,\"control_updates\":35,\"coverage\":{\"continuous_time_guarantee\":false,\"holding\":\"all retained samples in final 0.05 s\",\"terminal\":\"last execution sample\"},\"deadline_misses\":35,\"force_bound_violation_n\":0.0,\"holding_max_error_m\":0.05650455971948983,\"holding_max_speed_m_s\":1.1750052670100422,\"holding_position_passed\":false,\"holding_speed_passed\":false,\"joint_reach_holding_passed\":false,\"mean_complete_update_s\":17.77877309145406,\"official_reach_task_success\":true,\"real_time_demonstrated\":false,\"solver_error_count\":0,\"source\":{\"configuration\":{\"artifact_id\":\"44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f\",\"media_type\":\"application/json\"},\"evaluation\":{\"artifact_id\":\"27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525\",\"media_type\":\"application/json\"},\"execution_id\":\"087adee8e8a24fe88e5c85fe89e638c8\",\"profile\":{\"artifact_id\":\"c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7\",\"media_type\":\"application/json\"},\"simulation\":{\"artifact_id\":\"397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df\",\"media_type\":\"application/json\"}},\"terminal_error_m\":0.00869890424761182,\"terminal_reach_passed\":true,\"valid_complete_execution\":true},\"role\":\"older_search_start\",\"weights\":{\"holding\":0.05,\"terminal\":0.0}},{\"candidate\":{\"candidate_id\":\"batch-2ef6ee45913c43c9-1\",\"configuration\":{\"artifact_id\":\"9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00\",\"media_type\":\"application/json\"},\"execution_id\":\"25e26708480848d79bad378b669915e3\",\"owner_run_id\":\"batch-2ef6ee45913c43c9-1\"},\"metrics\":{\"control_period_s\":0.01,\"control_updates\":35,\"coverage\":{\"continuous_time_guarantee\":false,\"holding\":\"all retained samples in final 0.05 s\",\"terminal\":\"last execution sample\"},\"deadline_misses\":35,\"force_bound_violation_n\":0.0,\"holding_max_error_m\":0.06344380037515782,\"holding_max_speed_m_s\":1.1276277677182223,\"holding_position_passed\":false,\"holding_speed_passed\":false,\"joint_reach_holding_passed\":false,\"mean_complete_update_s\":17.30461485715849,\"official_reach_task_success\":false,\"real_time_demonstrated\":false,\"solver_error_count\":0,\"source\":{\"configuration\":{\"artifact_id\":\"9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00\",\"media_type\":\"application/json\"},\"evaluation\":{\"artifact_id\":\"ac9f4834c4722feac739fd45378ebbfbee77376cd699318deb29ed177028145b\",\"media_type\":\"application/json\"},\"execution_id\":\"25e26708480848d79bad378b669915e3\",\"profile\":{\"artifact_id\":\"96328da478505dc97a565fab88e5510721d242f0c23e41ce2da503fec9bdc333\",\"media_type\":\"application/json\"},\"simulation\":{\"artifact_id\":\"3d2e58ec5e393e5277b2d134657d6b1a38eba06482647a3dbaaca1ebdf4bacb6\",\"media_type\":\"application/json\"}},\"terminal_error_m\":0.018690324120991027,\"terminal_reach_passed\":false,\"valid_complete_execution\":true},\"role\":\"prior_candidate\",\"weights\":{\"holding\":0.3,\"terminal\":0.0}},{\"candidate\":{\"candidate_id\":\"batch-43a6daab7e3c1ce6-1\",\"configuration\":{\"artifact_id\":\"e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122\",\"media_type\":\"application/json\"},\"execution_id\":\"22241105b8984e0daae4530963848953\",\"owner_run_id\":\"batch-43a6daab7e3c1ce6-1\"},\"metrics\":{\"control_period_s\":0.01,\"control_updates\":35,\"coverage\":{\"continuous_time_guarantee\":false,\"holding\":\"all retained samples in final 0.05 s\",\"terminal\":\"last execution sample\"},\"deadline_misses\":35,\"force_bound_violation_n\":0.0,\"holding_max_error_m\":0.06344380037515782,\"holding_max_speed_m_s\":1.3632316140443952,\"holding_position_passed\":false,\"holding_speed_passed\":false,\"joint_reach_holding_passed\":false,\"mean_complete_update_s\":17.39307279428467,\"official_reach_task_success\":false,\"real_time_demonstrated\":false,\"solver_error_count\":0,\"source\":{\"configuration\":{\"artifact_id\":\"e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122\",\"media_type\":\"application/json\"},\"evaluation\":{\"artifact_id\":\"91fd22c7623c45c4c43e971a226439beebb94be0468700e872fdf413cd58f984\",\"media_type\":\"application/json\"},\"execution_id\":\"22241105b8984e0daae4530963848953\",\"profile\":{\"artifact_id\":\"d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d\",\"media_type\":\"application/json\"},\"simulation\":{\"artifact_id\":\"6c0a9d1c79d361c88c6b8e71490bb8b7ccf10661ae2998a566404e33923e6d49\",\"media_type\":\"application/json\"}},\"terminal_error_m\":0.011558241033380132,\"terminal_reach_passed\":false,\"valid_complete_execution\":true},\"role\":\"holding_only\",\"weights\":{\"holding\":0.1,\"terminal\":0.0}},{\"candidate\":{\"candidate_id\":\"batch-43a6daab7e3c1ce6-3\",\"configuration\":{\"artifact_id\":\"e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014\",\"media_type\":\"application/json\"},\"execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\",\"owner_run_id\":\"batch-43a6daab7e3c1ce6-3\"},\"metrics\":{\"control_period_s\":0.01,\"control_updates\":35,\"coverage\":{\"continuous_time_guarantee\":false,\"holding\":\"all retained samples in final 0.05 s\",\"terminal\":\"last execution sample\"},\"deadline_misses\":35,\"force_bound_violation_n\":0.0,\"holding_max_error_m\":0.008275123365557732,\"holding_max_speed_m_s\":0.03556730769134125,\"holding_position_passed\":true,\"holding_speed_passed\":false,\"joint_reach_holding_passed\":false,\"mean_complete_update_s\":16.876452619954943,\"official_reach_task_success\":true,\"real_time_demonstrated\":false,\"solver_error_count\":0,\"source\":{\"configuration\":{\"artifact_id\":\"e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014\",\"media_type\":\"application/json\"},\"evaluation\":{\"artifact_id\":\"7abd2e19f80f8c419cb2918561d934a9dc05b254276ebe25174c1c53512dc5c6\",\"media_type\":\"application/json\"},\"execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\",\"profile\":{\"artifact_id\":\"2e0ddfa47b6e235e2535fcc8da614b4077a0f15623ef65e507b5c0880e710738\",\"media_type\":\"application/json\"},\"simulation\":{\"artifact_id\":\"31303b3a6d07507baa182b4f5929aa0cc77ce674280ee00379efa0a67417a0a3\",\"media_type\":\"application/json\"}},\"terminal_error_m\":0.008186891107577365,\"terminal_reach_passed\":true,\"valid_complete_execution\":true},\"role\":\"immediate_predecessor\",\"weights\":{\"holding\":0.0,\"terminal\":0.05}}],\"contract\":\"stage358.compact_decision_packet\",\"correction_categories\":{\"decision_critical_qualification\":\"Any stated historical number, reference or claim still must be accurate.\",\"delivery_defect\":{\"description\":\"The runner handed over the linked supplement and its reference, but did not put its full content into role_context. The fact catalog omits strings longer than 180 characters. The sealed provider payload lacks all four additional research-condition instruction strings. This is an engineering delivery defect, not evidence that the model rejected those instructions.\",\"offline_repair\":\"Add the full request and linked supplement content directly to role_context in the authorized runner; preserve the one-attempt guard, original limits and all sealed submitted evidence. No rerun is authorized by this repair.\"},\"material_contradictions\":[{\"criterion\":\"Initialization and positive-iteration selections\",\"expected\":\"Holding-only B: 29 iteration-zero + 1 synthetic = 30 initialization, 5 positive. Terminal-only C: 16 iteration-zero + 1 synthetic = 17 initialization, 18 positive.\",\"observed\":\"point C: 29 iteration_zero, 5 positive iteration, 1 synthetic initialization\",\"passed\":false,\"pointer\":\"/reasoning\",\"source\":\"single_context/batch_summary.json /current_update_facts/*/selected_iterations\"},{\"criterion\":\"Holding-only mean update time references\",\"expected\":\"-0.38570029716938947 s against historical search start; +0.12975374571978904 s against retained baseline\",\"observed\":\"against the retained baseline ... mean_complete_update_s -0.38570029716938947\",\"passed\":false,\"pointer\":\"/reasoning\"}],\"missing_decision_critical_fields\":[{\"criterion\":\"Proposed variables consistent with experiment\",\"expected\":\"Explicit declared changed weights; empty map conflicts with bounded_check\",\"observed\":{},\"passed\":false,\"pointer\":\"/next_research/proposed_variables\"}],\"nonessential_not_repeated\":[\"Terminal tension/margin unless used to justify the decision\",\"Archived dual/single queried update lists unless discussed\",\"Self-comparison and remaining prior-budget numbers unless discussed\"]},\"correction_cycle_caps\":{\"backend_solves\":0,\"model_calls\":3,\"tool_calls\":4,\"wall_s\":600.0,\"worker_calls\":0},\"current_scope\":{\"baseline_execution_id\":\"cf997605885642759ee33920e2c9e2ef\",\"grant\":{\"backend_solves\":2,\"model_calls\":8,\"tool_calls\":20,\"wall_s\":4200.0,\"worker_calls\":0},\"intended_new_results\":\"Model chooses one or two; no forced second execution\",\"legal_positive_minimum\":0.0001,\"permitted_bounds\":[0.0,1.0],\"proposal_cap\":4,\"routes\":{\"A\":{\"fixed_holding\":0.0,\"varied\":\"control/recipe/terminal_tip_speed_weight\"},\"B\":{\"fixed_terminal\":0.05,\"varied\":\"control/recipe/holding_tip_speed_weight\"}},\"start_execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\"},\"diagnostics\":[{\"execution_id\":\"22241105b8984e0daae4530963848953\",\"initialization_selections\":30,\"maximum_applied_tension_n\":8.0,\"maximum_tendon\":\"near_t0\",\"minimum_upper_margin_n\":0.0,\"one_step_position_prediction\":{\"aligned_count\":35,\"frame\":\"world\",\"maximum_tip_difference_m\":0.009181602244904687,\"mean_tip_difference_m\":0.003952144454298828,\"missing\":[],\"scope\":\"Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison\"},\"positive_iteration_selections\":5,\"source\":{\"artifact_id\":\"4238a83d8cb7188c516ef50cb46380105d1090aaa16d6640233e280ceb004bed\",\"media_type\":\"application/json\"},\"source_pointer\":\"/current_update_facts\",\"synthetic_initialization\":1},{\"execution_id\":\"50618bf23b31464ba4f84c55cd26d1ca\",\"initialization_selections\":17,\"maximum_applied_tension_n\":5.934318773865956,\"maximum_tendon\":\"near_t1\",\"minimum_upper_margin_n\":2.0656812261340436,\"one_step_position_prediction\":{\"aligned_count\":35,\"frame\":\"world\",\"maximum_tip_difference_m\":0.0035571638333263787,\"mean_tip_difference_m\":0.0018332243534005656,\"missing\":[],\"scope\":\"Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison\"},\"positive_iteration_selections\":18,\"source\":{\"artifact_id\":\"4238a83d8cb7188c516ef50cb46380105d1090aaa16d6640233e280ceb004bed\",\"media_type\":\"application/json\"},\"source_pointer\":\"/current_update_facts\",\"synthetic_initialization\":1}],\"facts_are_program_generated\":true,\"hypothesis\":\"At the frozen robot, task, evaluator, timing and controller implementation (controller.gvs_nmpc@7.0.0), a nonzero terminal tip-speed weight (control/recipe/terminal_tip_speed_weight > 0), alone or jointly with a small holding tip-speed weight retained near 0.05, may lower the sampled final-window holding tip speed toward the frozen 0.02 m/s criterion while still retaining terminal reach acceptance (terminal_error_m <= 0.01 m). Scope: this is a tested-point claim about the two declared weight coordinates only; the supplied complete 0.30/0.0 result weakens reach-preserving improvement at that single tested point, not across the entire parameter range, and no dominant settling cause is claimed.\",\"joint_positive_weight_tested\":false,\"judgment_is_model_authored\":true,\"original_response\":{\"artifact_id\":\"2c597b92af389ff9a271eec3d997cdfa5f3ba46d48fdb1f727291c749d9ea188\",\"media_type\":\"application/json\"},\"previous_audit\":\"D:\\\\softrobot-agent\\\\evidence\\\\stage358_confirmation_20261004\\\\correction_semantic_review.json\",\"previous_failed_revision\":{\"artifact_id\":\"c03d5cc817adc8b9e588df0651cc097af5ba090362bb9f8f765982d99fec5556\",\"media_type\":\"application/json\"},\"prior_costs\":{\"limit\":{\"backend_solves\":3,\"model_calls\":16,\"tool_calls\":60,\"wall_s\":7200.0,\"worker_calls\":0},\"occupied\":{},\"remaining\":{\"backend_solves\":1,\"model_calls\":13,\"tool_calls\":47,\"wall_s\":5711.971999999369,\"worker_calls\":0},\"used\":{\"backend_solves\":2,\"model_calls\":3,\"tool_calls\":13,\"wall_s\":1488.0280000006314,\"worker_calls\":0}},\"raw_evidence\":\"Available in original stores by the linked artifact references; not duplicated in this packet.\",\"recommendations\":[{\"action\":\"defer\",\"rationale\":\"retained: Causality remains uncertified: the sealed comparison is still physical_tradeoff and the new records are controller-side plan values, while closed-loop counterfactual replay remains capability_unavailable. The deferral of causal attribution still governs, independent of any controller-candidate selection.\",\"recommendation_id\":\"rec-defer-causal-replay\"},{\"action\":\"defer\",\"rationale\":\"retained: The stated precondition — read the compute-budget and solver-termination observations — is now satisfied, and those observations keep budget-driven termination plus late horizon truncation (7,5,3,1) in place, while the sampled hold speed and position still fail by large margins. Deferring further weight-only tuning still governs; no parameter value is asserted.\",\"recommendation_id\":\"rec-defer-weight-tuning\"},{\"action\":\"defer\",\"rationale\":\"Adopt nothing and assert no parameter value. Keep the two diagnostic deferrals separate from controller-candidate selection: do not select improvement-96f0ade35119 as an overall improvement (the sealed comparison remains physical_tradeoff with joint_reach_holding_passed unchanged at false), while accepting rec-defer-causal-replay and rec-defer-weight-tuning as retained. If further diagnosis is authorized without new execution, extend the plans/prediction/motion reads to the 27 unqueried update_ids and query the per-channel force_limit_saturated flag to complete the tension-and-horizon picture; a bounded saved-state check (local_comparison or prediction_braking) remains the appropriate next step only under explicit authorization. The single plans-view check returned exactly the records the question named — effective_horizon, optimization_raw_status, optimization_selected_iteration and applied tensions — for 8 of 35 updates, and its pattern is the one the proposal flagged as retaining the compute-budget and solver-termination explanations: late-run User_Requested_Stop/budget_best_feasible terminations with update_wall_s far above the control period, optimization_selected_iteration far below max_iterations 120, and effective_horizon truncating to 7/5/3/1 precisely over the final holding interval. The same records show sampled per-channel tensions peaking at 7.999998 N, at or below the 8.0 N limit, so the tendon-saturation explanation is weakened while the tip-speed-penalty explanation remains unresolved because no per-term cost contributions are retained. I keep applied updates distinct from optimized selections (29 initialization-selected vs 6 noninitialization-selected), wall deadlines distinct from simulated steps, termination distinct from convergence, and terminal reach distinct from holding. These are controller-side plan values and do not certify a physical cause, so the causal-replay deferral and the weight-tuning deferral are both retained and no candidate is selected.\",\"recommendation_id\":\"revision_recommendation\"}],\"source_batch_summary\":{\"artifact_id\":\"4238a83d8cb7188c516ef50cb46380105d1090aaa16d6640233e280ceb004bed\",\"media_type\":\"application/json\"},\"source_plan\":{\"artifact_id\":\"43a6daab7e3c1ce6db033408eea6e087a95e3cd2f3acf86f1b66205c4554e128\",\"media_type\":\"application/json\"},\"unresolved_historical_reservation_s\":900.0,\"version\":\"1.0.0\"},\"decision_packet_reference\":{\"artifact_id\":\"9d3fc40af548102021909cf5be7432ffa7aa676b2abf51bf27c4df14317d9ad4\",\"media_type\":\"application/json\"},\"instructions\":\"Use decision_packet as the numerical authority. Submit one concise final decision, about 350 words total across its prose fields; cite named fact rows instead of copying all numbers. State which hypothesis clauses are supported, weakened or untested; distinguish moving toward the speed threshold from meeting it. Make recommendation disposition and candidate disposition independently. Select exactly one proposed next continuation route: A varies terminal_tip_speed_weight with holding_tip_speed_weight fixed at zero; B varies holding_tip_speed_weight with terminal_tip_speed_weight fixed at 0.05. Both start at the completed 0/0.05 predecessor; the retained baseline remains 0/0. A justified one-point check is acceptable. Specify proposed_variables with exactly the one varied full builder path and explicit values or coordinate domain/start/step; put the unvaried weight among fixed_conditions. Give one question, a bounded check, evidence, expected supporting/weakening observations, budget and stopping conditions. Proposed budget fits the separate 8-model/20-tool/4200-second/2-backend/zero-worker grant, at most four proposals including starts/duplicates, and reserves at least 600 seconds for interpretation. A proposal is not an execution plan or a launch.\\nCorrect the previous material errors: holding-only has 30 initialization and 5 positive-iteration selections; terminal-only has 17 and 18. Every stated delta must name its correct reference. No joint-positive-weight configuration was tested. Empty proposed variables are a missing decision-critical field. Late-horizon shortening alone establishes no cause and is not a reason to switch direction; a fixed task endpoint naturally shortens remaining horizon. Small one-step position error does not certify holding-speed prediction or exclude relevant mismatch. Read-only associations do not separate causal mechanisms. A few values neither establish a continuous range nor exhaust a coordinate. No real-time, causal, global or hardware claim. Omission of unrelated historical details is acceptable; any number or comparison you state must agree with the packet. Retain prior failures by reference; the missing supplement was an engineering delivery defect, not model refusal. No numerical work, new backend or new evidence query. Use next_action=finish and one advertised design_respond_diagnosis call. No long report.\",\"phase\":\"response_final\",\"role\":\"design\"}}"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "design_respond_diagnosis",
+        "description": "Final recommendation disposition and explicit candidate selection bound to sealed feedback.",
+        "parameters": {
+          "type": "object",
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "disposition": {
+                  "enum": [
+                    "adopt",
+                    "defer",
+                    "reject"
+                  ],
+                  "title": "Disposition",
+                  "type": "string"
+                },
+                "recommendation_id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Recommendation Id"
+                },
+                "reasoning": {
+                  "minLength": 1,
+                  "title": "Reasoning",
+                  "type": "string"
+                },
+                "next_action": {
+                  "const": "finish",
+                  "title": "Next Action",
+                  "type": "string"
+                },
+                "candidate_disposition": {
+                  "enum": [
+                    "adopt_candidate",
+                    "retain_baseline",
+                    "defer_selection",
+                    "reject_all"
+                  ],
+                  "title": "Candidate Disposition",
+                  "type": "string"
+                },
+                "selected_candidate": {
+                  "description": "baseline, candidate, none; for a supplied completed batch, an exact evaluated candidate_id may be selected.",
+                  "title": "Selected Candidate",
+                  "type": "string"
+                },
+                "next_research": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/NextResearchRoute"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "disposition",
+                "reasoning",
+                "next_action",
+                "candidate_disposition",
+                "selected_candidate"
+              ],
+              "title": "WireFinalDecision",
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "corrections": {
+                  "items": {
+                    "$ref": "#/$defs/FieldCorrection"
+                  },
+                  "maxItems": 20,
+                  "minItems": 1,
+                  "title": "Corrections",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "corrections"
+              ],
+              "title": "Corrections",
+              "type": "object"
+            }
+          ],
+          "$defs": {
+            "Budget": {
+              "additionalProperties": false,
+              "properties": {
+                "tool_calls": {
+                  "minimum": 0,
+                  "title": "Tool Calls",
+                  "type": "integer"
+                },
+                "model_calls": {
+                  "minimum": 0,
+                  "title": "Model Calls",
+                  "type": "integer"
+                },
+                "backend_solves": {
+                  "minimum": 0,
+                  "title": "Backend Solves",
+                  "type": "integer"
+                },
+                "worker_calls": {
+                  "minimum": 0,
+                  "title": "Worker Calls",
+                  "type": "integer"
+                },
+                "wall_s": {
+                  "minimum": 0,
+                  "title": "Wall S",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "tool_calls",
+                "model_calls",
+                "backend_solves",
+                "worker_calls",
+                "wall_s"
+              ],
+              "title": "Budget",
+              "type": "object"
+            },
+            "NextResearchRoute": {
+              "additionalProperties": false,
+              "properties": {
+                "route": {
+                  "enum": [
+                    "continue_weight_combinations",
+                    "initialization_selection",
+                    "prediction_backend_disagreement",
+                    "holding_control_arrangements",
+                    "defer"
+                  ],
+                  "title": "Route",
+                  "type": "string"
+                },
+                "unresolved_question": {
+                  "minLength": 1,
+                  "title": "Unresolved Question",
+                  "type": "string"
+                },
+                "evidence": {
+                  "description": "Execution/artifact identities and exact observations motivating this route.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "title": "Evidence",
+                  "type": "array"
+                },
+                "bounded_check": {
+                  "minLength": 1,
+                  "title": "Bounded Check",
+                  "type": "string"
+                },
+                "fixed_conditions": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "title": "Fixed Conditions",
+                  "type": "array"
+                },
+                "proposed_variables": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Proposed Variables",
+                  "type": "object"
+                },
+                "expected_observations": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "title": "Expected Observations",
+                  "type": "array"
+                },
+                "proposed_budget": {
+                  "$ref": "#/$defs/Budget"
+                },
+                "stopping_conditions": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "title": "Stopping Conditions",
+                  "type": "array"
+                },
+                "limitations": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "title": "Limitations",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "route",
+                "unresolved_question",
+                "evidence",
+                "bounded_check",
+                "fixed_conditions",
+                "expected_observations",
+                "proposed_budget",
+                "stopping_conditions",
+                "limitations"
+              ],
+              "title": "NextResearchRoute",
+              "type": "object"
+            },
+            "FieldCorrection": {
+              "additionalProperties": false,
+              "properties": {
+                "operation": {
+                  "default": "replace",
+                  "enum": [
+                    "replace",
+                    "remove"
+                  ],
+                  "title": "Operation",
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Exact existing-field JSON pointer relative to draft.arguments, e.g. /new_facts/0/references. The explicit draft-root spelling /arguments/new_facts/0/references is also supported. No guessed paths.",
+                  "title": "Path",
+                  "type": "string"
+                },
+                "value": {
+                  "default": null,
+                  "title": "Value"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "title": "FieldCorrection",
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "max_tokens": 65536,
+  "stream": false,
+  "thinking": {
+    "type": "enabled"
+  },
+  "reasoning_effort": "high"
+}

@@ -75,6 +75,7 @@ PROFILE_SOURCES=(*OPT_SOURCES,'extensions/tendon_family/gvs_profile.py','extensi
     'tools/platform_skills.py','tools/skill_policy.py','schemas/skill.py')
 MATLAB=tuple('matlab/'+n+'.m' for n in ('tf_geometry','tf_point','tf_routes','tf_terms','tf_control','tf_run','tf_observe','tf_static','tf_view'))
 COMMON=dict(sources=SOURCES,contract_dependencies=tuple((n,v) for n,v,_ in CONTRACTS))
+CONTRACTS += [('family.explicit_search','1.0.0',opt.ExplicitSearchParameters)]
 EXTENSIONS=[
     Extension('diagnosis.saved_state_check','tool','1.0.0',diagnostic_math.SavedStateCheck,diagnostic_evidence.DiagnosticEvidence,
         'extensions.tendon_family.diagnostic_math:execute',
@@ -121,6 +122,11 @@ EXTENSIONS=[
         'extensions.tendon_family.optimization:CoordinateSearch','Bounded coordinate search; first candidate is the starting configuration; jointly tunes design and control',**COMMON,
         capabilities=dict(category='parameter_search',role='adapter',checkpoint='family.search_state',
             public_entry='extensions.tendon_family.optimization:optimize',request_contract='family.optimization_request',
+            numerical_discretization='fixed',trajectory_optimization='unsupported')),
+    Extension('search.family_explicit','search','1.0.0',opt.ExplicitSearchParameters,Payload,
+        'extensions.tendon_family.optimization:ExplicitSearch','Exact finite ordered proposals; feedback ranks results without changing points',
+        **{**COMMON,'contract_dependencies':COMMON['contract_dependencies']+(('family.explicit_search','1.0.0'),)},
+        capabilities=dict(category='parameter_search',role='adapter',checkpoint='family.search_state',
             numerical_discretization='fixed',trajectory_optimization='unsupported')),
     Extension('initialize.family','initializer','1.0.0',c.Initial,Payload,'extensions.tendon_family.scene:initialize',
         'Named initial state; unspecified candidate degrees of freedom start at zero',**COMMON,capabilities=dict(category='scene_assembly',role='adapter')),

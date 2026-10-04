@@ -1,0 +1,697 @@
+{
+  "contract": "stage358.compact_decision_packet",
+  "version": "1.0.0",
+  "source_batch_summary": {
+    "artifact_id": "4238a83d8cb7188c516ef50cb46380105d1090aaa16d6640233e280ceb004bed",
+    "media_type": "application/json"
+  },
+  "source_plan": {
+    "artifact_id": "43a6daab7e3c1ce6db033408eea6e087a95e3cd2f3acf86f1b66205c4554e128",
+    "media_type": "application/json"
+  },
+  "hypothesis": "At the frozen robot, task, evaluator, timing and controller implementation (controller.gvs_nmpc@7.0.0), a nonzero terminal tip-speed weight (control/recipe/terminal_tip_speed_weight > 0), alone or jointly with a small holding tip-speed weight retained near 0.05, may lower the sampled final-window holding tip speed toward the frozen 0.02 m/s criterion while still retaining terminal reach acceptance (terminal_error_m <= 0.01 m). Scope: this is a tested-point claim about the two declared weight coordinates only; the supplied complete 0.30/0.0 result weakens reach-preserving improvement at that single tested point, not across the entire parameter range, and no dominant settling cause is claimed.",
+  "original_response": {
+    "artifact_id": "2c597b92af389ff9a271eec3d997cdfa5f3ba46d48fdb1f727291c749d9ea188",
+    "media_type": "application/json"
+  },
+  "previous_failed_revision": {
+    "artifact_id": "c03d5cc817adc8b9e588df0651cc097af5ba090362bb9f8f765982d99fec5556",
+    "media_type": "application/json"
+  },
+  "previous_audit": "D:\\softrobot-agent\\evidence\\stage358_confirmation_20261004\\correction_semantic_review.json",
+  "configurations": [
+    {
+      "role": "retained_baseline",
+      "candidate": {
+        "candidate_id": "baseline-replay",
+        "owner_run_id": "gvs-stage351-baseline-executor",
+        "configuration": {
+          "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+          "media_type": "application/json"
+        },
+        "execution_id": "cf997605885642759ee33920e2c9e2ef"
+      },
+      "weights": {
+        "holding": 0.0,
+        "terminal": 0.0
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "cf997605885642759ee33920e2c9e2ef",
+          "configuration": {
+            "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.007642608585867386,
+        "holding_max_error_m": 0.05813810428573256,
+        "holding_max_speed_m_s": 1.5810152739742807,
+        "terminal_reach_passed": true,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.26331904856488,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      }
+    },
+    {
+      "role": "older_search_start",
+      "candidate": {
+        "candidate_id": "improvement-96f0ade35119",
+        "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+        "configuration": {
+          "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+          "media_type": "application/json"
+        },
+        "execution_id": "087adee8e8a24fe88e5c85fe89e638c8"
+      },
+      "weights": {
+        "holding": 0.05,
+        "terminal": 0.0
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+          "configuration": {
+            "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.00869890424761182,
+        "holding_max_error_m": 0.05650455971948983,
+        "holding_max_speed_m_s": 1.1750052670100422,
+        "terminal_reach_passed": true,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.77877309145406,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      }
+    },
+    {
+      "role": "prior_candidate",
+      "candidate": {
+        "candidate_id": "batch-2ef6ee45913c43c9-1",
+        "owner_run_id": "batch-2ef6ee45913c43c9-1",
+        "configuration": {
+          "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+          "media_type": "application/json"
+        },
+        "execution_id": "25e26708480848d79bad378b669915e3"
+      },
+      "weights": {
+        "holding": 0.3,
+        "terminal": 0.0
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "25e26708480848d79bad378b669915e3",
+          "configuration": {
+            "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "ac9f4834c4722feac739fd45378ebbfbee77376cd699318deb29ed177028145b",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "96328da478505dc97a565fab88e5510721d242f0c23e41ce2da503fec9bdc333",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "3d2e58ec5e393e5277b2d134657d6b1a38eba06482647a3dbaaca1ebdf4bacb6",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": false,
+        "terminal_error_m": 0.018690324120991027,
+        "holding_max_error_m": 0.06344380037515782,
+        "holding_max_speed_m_s": 1.1276277677182223,
+        "terminal_reach_passed": false,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.30461485715849,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      }
+    },
+    {
+      "role": "holding_only",
+      "candidate": {
+        "candidate_id": "batch-43a6daab7e3c1ce6-1",
+        "owner_run_id": "batch-43a6daab7e3c1ce6-1",
+        "configuration": {
+          "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+          "media_type": "application/json"
+        },
+        "execution_id": "22241105b8984e0daae4530963848953"
+      },
+      "weights": {
+        "holding": 0.1,
+        "terminal": 0.0
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "22241105b8984e0daae4530963848953",
+          "configuration": {
+            "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "91fd22c7623c45c4c43e971a226439beebb94be0468700e872fdf413cd58f984",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "6c0a9d1c79d361c88c6b8e71490bb8b7ccf10661ae2998a566404e33923e6d49",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": false,
+        "terminal_error_m": 0.011558241033380132,
+        "holding_max_error_m": 0.06344380037515782,
+        "holding_max_speed_m_s": 1.3632316140443952,
+        "terminal_reach_passed": false,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.39307279428467,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      }
+    },
+    {
+      "role": "immediate_predecessor",
+      "candidate": {
+        "candidate_id": "batch-43a6daab7e3c1ce6-3",
+        "owner_run_id": "batch-43a6daab7e3c1ce6-3",
+        "configuration": {
+          "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+          "media_type": "application/json"
+        },
+        "execution_id": "50618bf23b31464ba4f84c55cd26d1ca"
+      },
+      "weights": {
+        "holding": 0.0,
+        "terminal": 0.05
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+          "configuration": {
+            "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "7abd2e19f80f8c419cb2918561d934a9dc05b254276ebe25174c1c53512dc5c6",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "2e0ddfa47b6e235e2535fcc8da614b4077a0f15623ef65e507b5c0880e710738",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "31303b3a6d07507baa182b4f5929aa0cc77ce674280ee00379efa0a67417a0a3",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.008186891107577365,
+        "holding_max_error_m": 0.008275123365557732,
+        "holding_max_speed_m_s": 0.03556730769134125,
+        "terminal_reach_passed": true,
+        "holding_position_passed": true,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 16.876452619954943,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "candidate": "retained_baseline",
+      "reference": "retained_baseline",
+      "candidate_execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "reference_execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.0,
+        "holding_max_error_m": 0.0,
+        "holding_max_speed_m_s": 0.0,
+        "mean_complete_update_s": 0.0,
+        "deadline_misses": 0
+      },
+      "classification": "physical_equivalent_within_tolerance"
+    },
+    {
+      "candidate": "retained_baseline",
+      "reference": "immediate_predecessor",
+      "candidate_execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "reference_execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+      "candidate_minus_reference": {
+        "terminal_error_m": -0.0005442825217099791,
+        "holding_max_error_m": 0.049862980920174826,
+        "holding_max_speed_m_s": 1.5454479662829395,
+        "mean_complete_update_s": 0.38686642860993814,
+        "deadline_misses": 0
+      },
+      "classification": "physical_tradeoff"
+    },
+    {
+      "candidate": "retained_baseline",
+      "reference": "older_search_start",
+      "candidate_execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "reference_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "candidate_minus_reference": {
+        "terminal_error_m": -0.001056295661744434,
+        "holding_max_error_m": 0.001633544566242727,
+        "holding_max_speed_m_s": 0.4060100069642385,
+        "mean_complete_update_s": -0.5154540428891785,
+        "deadline_misses": 0
+      },
+      "classification": "physical_tradeoff"
+    },
+    {
+      "candidate": "older_search_start",
+      "reference": "retained_baseline",
+      "candidate_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "reference_execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.001056295661744434,
+        "holding_max_error_m": -0.001633544566242727,
+        "holding_max_speed_m_s": -0.4060100069642385,
+        "mean_complete_update_s": 0.5154540428891785,
+        "deadline_misses": 0
+      },
+      "classification": "physical_tradeoff"
+    },
+    {
+      "candidate": "older_search_start",
+      "reference": "immediate_predecessor",
+      "candidate_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "reference_execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.0005120131400344549,
+        "holding_max_error_m": 0.0482294363539321,
+        "holding_max_speed_m_s": 1.139437959318701,
+        "mean_complete_update_s": 0.9023204714991166,
+        "deadline_misses": 0
+      },
+      "classification": "physical_pareto_worsening"
+    },
+    {
+      "candidate": "older_search_start",
+      "reference": "older_search_start",
+      "candidate_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "reference_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.0,
+        "holding_max_error_m": 0.0,
+        "holding_max_speed_m_s": 0.0,
+        "mean_complete_update_s": 0.0,
+        "deadline_misses": 0
+      },
+      "classification": "physical_equivalent_within_tolerance"
+    },
+    {
+      "candidate": "prior_candidate",
+      "reference": "retained_baseline",
+      "candidate_execution_id": "25e26708480848d79bad378b669915e3",
+      "reference_execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.011047715535123641,
+        "holding_max_error_m": 0.0053056960894252575,
+        "holding_max_speed_m_s": -0.4533875062560584,
+        "mean_complete_update_s": 0.041295808593609706,
+        "deadline_misses": 0
+      },
+      "classification": "physical_tradeoff"
+    },
+    {
+      "candidate": "prior_candidate",
+      "reference": "immediate_predecessor",
+      "candidate_execution_id": "25e26708480848d79bad378b669915e3",
+      "reference_execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.010503433013413662,
+        "holding_max_error_m": 0.055168677009600084,
+        "holding_max_speed_m_s": 1.092060460026881,
+        "mean_complete_update_s": 0.42816223720354785,
+        "deadline_misses": 0
+      },
+      "classification": "physical_pareto_worsening"
+    },
+    {
+      "candidate": "prior_candidate",
+      "reference": "older_search_start",
+      "candidate_execution_id": "25e26708480848d79bad378b669915e3",
+      "reference_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.009991419873379207,
+        "holding_max_error_m": 0.0069392406556679845,
+        "holding_max_speed_m_s": -0.04737749929181989,
+        "mean_complete_update_s": -0.4741582342955688,
+        "deadline_misses": 0
+      },
+      "classification": "physical_tradeoff"
+    },
+    {
+      "candidate": "holding_only",
+      "reference": "retained_baseline",
+      "candidate_execution_id": "22241105b8984e0daae4530963848953",
+      "reference_execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.003915632447512746,
+        "holding_max_error_m": 0.0053056960894252575,
+        "holding_max_speed_m_s": -0.21778365992988546,
+        "mean_complete_update_s": 0.12975374571978904,
+        "deadline_misses": 0
+      },
+      "classification": "physical_tradeoff"
+    },
+    {
+      "candidate": "holding_only",
+      "reference": "immediate_predecessor",
+      "candidate_execution_id": "22241105b8984e0daae4530963848953",
+      "reference_execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.003371349925802767,
+        "holding_max_error_m": 0.055168677009600084,
+        "holding_max_speed_m_s": 1.327664306353054,
+        "mean_complete_update_s": 0.5166201743297272,
+        "deadline_misses": 0
+      },
+      "classification": "physical_pareto_worsening"
+    },
+    {
+      "candidate": "holding_only",
+      "reference": "older_search_start",
+      "candidate_execution_id": "22241105b8984e0daae4530963848953",
+      "reference_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.002859336785768312,
+        "holding_max_error_m": 0.0069392406556679845,
+        "holding_max_speed_m_s": 0.18822634703435304,
+        "mean_complete_update_s": -0.38570029716938947,
+        "deadline_misses": 0
+      },
+      "classification": "physical_pareto_worsening"
+    },
+    {
+      "candidate": "immediate_predecessor",
+      "reference": "retained_baseline",
+      "candidate_execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+      "reference_execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.0005442825217099791,
+        "holding_max_error_m": -0.049862980920174826,
+        "holding_max_speed_m_s": -1.5454479662829395,
+        "mean_complete_update_s": -0.38686642860993814,
+        "deadline_misses": 0
+      },
+      "classification": "physical_tradeoff"
+    },
+    {
+      "candidate": "immediate_predecessor",
+      "reference": "immediate_predecessor",
+      "candidate_execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+      "reference_execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+      "candidate_minus_reference": {
+        "terminal_error_m": 0.0,
+        "holding_max_error_m": 0.0,
+        "holding_max_speed_m_s": 0.0,
+        "mean_complete_update_s": 0.0,
+        "deadline_misses": 0
+      },
+      "classification": "physical_equivalent_within_tolerance"
+    },
+    {
+      "candidate": "immediate_predecessor",
+      "reference": "older_search_start",
+      "candidate_execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+      "reference_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "candidate_minus_reference": {
+        "terminal_error_m": -0.0005120131400344549,
+        "holding_max_error_m": -0.0482294363539321,
+        "holding_max_speed_m_s": -1.139437959318701,
+        "mean_complete_update_s": -0.9023204714991166,
+        "deadline_misses": 0
+      },
+      "classification": "physical_pareto_improvement"
+    }
+  ],
+  "diagnostics": [
+    {
+      "execution_id": "22241105b8984e0daae4530963848953",
+      "source": {
+        "artifact_id": "4238a83d8cb7188c516ef50cb46380105d1090aaa16d6640233e280ceb004bed",
+        "media_type": "application/json"
+      },
+      "source_pointer": "/current_update_facts",
+      "initialization_selections": 30,
+      "synthetic_initialization": 1,
+      "positive_iteration_selections": 5,
+      "maximum_applied_tension_n": 8.0,
+      "maximum_tendon": "near_t0",
+      "minimum_upper_margin_n": 0.0,
+      "one_step_position_prediction": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_tip_difference_m": 0.009181602244904687,
+        "mean_tip_difference_m": 0.003952144454298828,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+      }
+    },
+    {
+      "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+      "source": {
+        "artifact_id": "4238a83d8cb7188c516ef50cb46380105d1090aaa16d6640233e280ceb004bed",
+        "media_type": "application/json"
+      },
+      "source_pointer": "/current_update_facts",
+      "initialization_selections": 17,
+      "synthetic_initialization": 1,
+      "positive_iteration_selections": 18,
+      "maximum_applied_tension_n": 5.934318773865956,
+      "maximum_tendon": "near_t1",
+      "minimum_upper_margin_n": 2.0656812261340436,
+      "one_step_position_prediction": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_tip_difference_m": 0.0035571638333263787,
+        "mean_tip_difference_m": 0.0018332243534005656,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+      }
+    }
+  ],
+  "acceptance": {
+    "terminal_error_m": 0.01,
+    "holding_max_error_m": 0.01,
+    "holding_max_speed_m_s": 0.02,
+    "window_s": 0.05
+  },
+  "correction_categories": {
+    "material_contradictions": [
+      {
+        "criterion": "Initialization and positive-iteration selections",
+        "passed": false,
+        "pointer": "/reasoning",
+        "observed": "point C: 29 iteration_zero, 5 positive iteration, 1 synthetic initialization",
+        "source": "single_context/batch_summary.json /current_update_facts/*/selected_iterations",
+        "expected": "Holding-only B: 29 iteration-zero + 1 synthetic = 30 initialization, 5 positive. Terminal-only C: 16 iteration-zero + 1 synthetic = 17 initialization, 18 positive."
+      },
+      {
+        "criterion": "Holding-only mean update time references",
+        "passed": false,
+        "pointer": "/reasoning",
+        "observed": "against the retained baseline ... mean_complete_update_s -0.38570029716938947",
+        "expected": "-0.38570029716938947 s against historical search start; +0.12975374571978904 s against retained baseline"
+      }
+    ],
+    "missing_decision_critical_fields": [
+      {
+        "criterion": "Proposed variables consistent with experiment",
+        "passed": false,
+        "pointer": "/next_research/proposed_variables",
+        "observed": {},
+        "expected": "Explicit declared changed weights; empty map conflicts with bounded_check"
+      }
+    ],
+    "nonessential_not_repeated": [
+      "Terminal tension/margin unless used to justify the decision",
+      "Archived dual/single queried update lists unless discussed",
+      "Self-comparison and remaining prior-budget numbers unless discussed"
+    ],
+    "decision_critical_qualification": "Any stated historical number, reference or claim still must be accurate.",
+    "delivery_defect": {
+      "description": "The runner handed over the linked supplement and its reference, but did not put its full content into role_context. The fact catalog omits strings longer than 180 characters. The sealed provider payload lacks all four additional research-condition instruction strings. This is an engineering delivery defect, not evidence that the model rejected those instructions.",
+      "offline_repair": "Add the full request and linked supplement content directly to role_context in the authorized runner; preserve the one-attempt guard, original limits and all sealed submitted evidence. No rerun is authorized by this repair."
+    }
+  },
+  "joint_positive_weight_tested": false,
+  "recommendations": [
+    {
+      "recommendation_id": "rec-defer-causal-replay",
+      "action": "defer",
+      "rationale": "retained: Causality remains uncertified: the sealed comparison is still physical_tradeoff and the new records are controller-side plan values, while closed-loop counterfactual replay remains capability_unavailable. The deferral of causal attribution still governs, independent of any controller-candidate selection."
+    },
+    {
+      "recommendation_id": "rec-defer-weight-tuning",
+      "action": "defer",
+      "rationale": "retained: The stated precondition — read the compute-budget and solver-termination observations — is now satisfied, and those observations keep budget-driven termination plus late horizon truncation (7,5,3,1) in place, while the sampled hold speed and position still fail by large margins. Deferring further weight-only tuning still governs; no parameter value is asserted."
+    },
+    {
+      "recommendation_id": "revision_recommendation",
+      "action": "defer",
+      "rationale": "Adopt nothing and assert no parameter value. Keep the two diagnostic deferrals separate from controller-candidate selection: do not select improvement-96f0ade35119 as an overall improvement (the sealed comparison remains physical_tradeoff with joint_reach_holding_passed unchanged at false), while accepting rec-defer-causal-replay and rec-defer-weight-tuning as retained. If further diagnosis is authorized without new execution, extend the plans/prediction/motion reads to the 27 unqueried update_ids and query the per-channel force_limit_saturated flag to complete the tension-and-horizon picture; a bounded saved-state check (local_comparison or prediction_braking) remains the appropriate next step only under explicit authorization. The single plans-view check returned exactly the records the question named — effective_horizon, optimization_raw_status, optimization_selected_iteration and applied tensions — for 8 of 35 updates, and its pattern is the one the proposal flagged as retaining the compute-budget and solver-termination explanations: late-run User_Requested_Stop/budget_best_feasible terminations with update_wall_s far above the control period, optimization_selected_iteration far below max_iterations 120, and effective_horizon truncating to 7/5/3/1 precisely over the final holding interval. The same records show sampled per-channel tensions peaking at 7.999998 N, at or below the 8.0 N limit, so the tendon-saturation explanation is weakened while the tip-speed-penalty explanation remains unresolved because no per-term cost contributions are retained. I keep applied updates distinct from optimized selections (29 initialization-selected vs 6 noninitialization-selected), wall deadlines distinct from simulated steps, termination distinct from convergence, and terminal reach distinct from holding. These are controller-side plan values and do not certify a physical cause, so the causal-replay deferral and the weight-tuning deferral are both retained and no candidate is selected."
+    }
+  ],
+  "current_scope": {
+    "routes": {
+      "A": {
+        "varied": "control/recipe/terminal_tip_speed_weight",
+        "fixed_holding": 0.0
+      },
+      "B": {
+        "varied": "control/recipe/holding_tip_speed_weight",
+        "fixed_terminal": 0.05
+      }
+    },
+    "start_execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+    "baseline_execution_id": "cf997605885642759ee33920e2c9e2ef",
+    "grant": {
+      "model_calls": 8,
+      "tool_calls": 20,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 4200.0
+    },
+    "proposal_cap": 4,
+    "intended_new_results": "Model chooses one or two; no forced second execution",
+    "permitted_bounds": [
+      0.0,
+      1.0
+    ],
+    "legal_positive_minimum": 0.0001
+  },
+  "facts_are_program_generated": true,
+  "judgment_is_model_authored": true,
+  "prior_costs": {
+    "limit": {
+      "backend_solves": 3,
+      "model_calls": 16,
+      "tool_calls": 60,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 13,
+      "model_calls": 3,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 1488.0280000006314
+    },
+    "remaining": {
+      "backend_solves": 1,
+      "model_calls": 13,
+      "tool_calls": 47,
+      "wall_s": 5711.971999999369,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "correction_cycle_caps": {
+    "model_calls": 3,
+    "tool_calls": 4,
+    "wall_s": 600.0,
+    "backend_solves": 0,
+    "worker_calls": 0
+  },
+  "unresolved_historical_reservation_s": 900.0,
+  "raw_evidence": "Available in original stores by the linked artifact references; not duplicated in this packet."
+}

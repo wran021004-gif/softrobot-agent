@@ -100,8 +100,9 @@ class ContinuationTests(LiveIntegrationTests):
                 self.assertEqual(row['retained_baseline_comparison']['baseline']['source']['execution_id'], continuation.SOURCES[0][2])
 
     def test_changed_structure_is_reference_only_and_gate_blocks_launch(self):
-        with self.assertRaisesRegex(ValueError, 'REQUIRES_ACCEPTED_STAGE358'):
-            continuation.require_interpretation_gate()
+        with patch.object(continuation,'read',return_value=dict(passed=False,criteria=dict(accurate_model_interpretation_and_final_decision=False))):
+            with self.assertRaisesRegex(ValueError, 'REQUIRES_ACCEPTED_STAGE358'):
+                continuation.require_interpretation_gate()
         with offline_directory() as directory:
             host, ref, history = self.terminal_fixture(directory)
             bad = deepcopy(history[-1])

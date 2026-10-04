@@ -1,0 +1,38 @@
+{
+  "material_contradictions": [
+    {
+      "criterion": "Initialization and positive-iteration selections",
+      "passed": false,
+      "pointer": "/reasoning",
+      "observed": "point C: 29 iteration_zero, 5 positive iteration, 1 synthetic initialization",
+      "source": "single_context/batch_summary.json /current_update_facts/*/selected_iterations",
+      "expected": "Holding-only B: 29 iteration-zero + 1 synthetic = 30 initialization, 5 positive. Terminal-only C: 16 iteration-zero + 1 synthetic = 17 initialization, 18 positive."
+    },
+    {
+      "criterion": "Holding-only mean update time references",
+      "passed": false,
+      "pointer": "/reasoning",
+      "observed": "against the retained baseline ... mean_complete_update_s -0.38570029716938947",
+      "expected": "-0.38570029716938947 s against historical search start; +0.12975374571978904 s against retained baseline"
+    }
+  ],
+  "missing_decision_critical_fields": [
+    {
+      "criterion": "Proposed variables consistent with experiment",
+      "passed": false,
+      "pointer": "/next_research/proposed_variables",
+      "observed": {},
+      "expected": "Explicit declared changed weights; empty map conflicts with bounded_check"
+    }
+  ],
+  "nonessential_not_repeated": [
+    "Terminal tension/margin unless used to justify the decision",
+    "Archived dual/single queried update lists unless discussed",
+    "Self-comparison and remaining prior-budget numbers unless discussed"
+  ],
+  "decision_critical_qualification": "Any stated historical number, reference or claim still must be accurate.",
+  "delivery_defect": {
+    "description": "The runner handed over the linked supplement and its reference, but did not put its full content into role_context. The fact catalog omits strings longer than 180 characters. The sealed provider payload lacks all four additional research-condition instruction strings. This is an engineering delivery defect, not evidence that the model rejected those instructions.",
+    "offline_repair": "Add the full request and linked supplement content directly to role_context in the authorized runner; preserve the one-attempt guard, original limits and all sealed submitted evidence. No rerun is authorized by this repair."
+  }
+}

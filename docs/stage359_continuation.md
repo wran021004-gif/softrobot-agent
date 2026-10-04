@@ -91,3 +91,40 @@ model-authored executable plan, a frozen prelaunch implementation, the one
 authorized terminal-only live batch, accurate interpretation of both comparisons,
 and one proposed next direction. Later structure/control alternation needs its
 own implementation and live evidence before the whole milestone can close.
+
+2026-10-04 scope amendment and accepted interpretation: the historical status
+above remains the record of offline preparation at 475f988. The new compact
+Stage 3.58 interpretation cycle passed its source review and closed Milestone 3.
+The user permits Route A (terminal varies, holding zero) or Route B (holding
+varies, terminal 0.05). The model chose Route A and proposed one 0.10 terminal
+point. No backend was run during repair; original 0/0 baseline identity remains.
+
+The new registered search.family_explicit@1.0.0 adapter proposes an immutable
+ordered list through the existing ask/tell/checkpoint and receipt executor.
+Feedback ranks completed results and does not change the list. Coordinate plans
+remain supported with actual domains/start/step/feedback. A changed first finite
+point is reused only when execution scope matches the starting result; its
+ordinal alone cannot reuse that result. Finite list length equals max_candidates,
+every point contains precisely the varied builder paths, and normal target or
+proposal-limit stopping remains unchanged. No in-run reach early stop is added.
+The new proposal contract is isolated from physical dependency contracts.
+Manifest/optimization source changes are pinned as nonphysical migrations; all
+five verified historical physical contracts must still match exactly.
+
+Three changed offline checks cover finite generation/persistence/invalid points;
+first changed-point execution, sealed-stage continuation, both comparisons and
+one-result stopping; and the actual source binding, immutable plan validation
+and serialized planning/final payloads. Initial contract-closure and incomplete
+single-store artifact-closure fixture failures are preserved; only affected
+checks were rerun. Prior passing checks are reused where behavior is unchanged.
+
+The new live launcher remains one separate 8-provider/20-tool/4200-second grant,
+four proposals and at most two new backends, with zero workers/local solves or
+prediction evaluations. It requires the accepted interpretation, a new immutable
+model-authored plan, committed implementation and current focused verification.
+It declares intended new complete result count before launch and preserves
+900/30/60-second execution reservations plus 600 seconds and four provider/tool
+slots for interpretation. The plan must reconcile the earlier advisory budget
+and saved-state wording with a full fixed-initializer backend evaluation. Unknown
+work is never replayed. The final decision uses a compact source-bound packet
+and proposes exactly one further direction, which is not executed.

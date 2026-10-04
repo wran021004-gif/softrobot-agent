@@ -202,7 +202,10 @@ class SearchBatchPlan(Contract):
     target_changed_configurations: int | None = Field(default=None,ge=1,le=12,
         description='Stop normally after this many distinct changed configurations have complete evaluation and profile.')
     failure_policy: Literal['stop_on_material_failure'] = 'stop_on_material_failure'
-    step: float = Field(gt=0, le=1)
+    step: float | None = Field(default=None, gt=0, le=1,
+        description='Required for coordinate search; null for an explicit finite sequence.')
+    candidates: list[dict[str, float]] | None = Field(default=None, min_length=1, max_length=12,
+        description='Exact ordered values for search.family_explicit@1.0.0; each contains precisely the varied paths. Feedback does not change this sequence.')
     planned_budget: Budget
     fidelity_limits: list[str] = Field(min_length=1)
     verification: list[str] = Field(min_length=1)

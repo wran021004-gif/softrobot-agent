@@ -22,6 +22,15 @@ class SearchState(Contract):
     best_score: float | None = None
 
 
+class ExplicitSearchParameters(Contract):
+    initial: dict[str, float]
+    bounds: dict[str, tuple[float, float]]
+    candidates: list[dict[str, float]] = Field(min_length=1, max_length=12)
+
+    @property
+    def max_trials(self): return len(self.candidates)
+
+
 class OptimizationRequest(Contract):
     session: SessionInput
     template: str | None = None
@@ -51,6 +60,29 @@ class CoordinateSearch:
     def stopped(self): return self.state.proposed>=self.parameters.max_trials
     def save(self): return Payload(contract='family.search_state',data=plain(self.state))
     def restore(self, state): self.state=SearchState.model_validate(state)
+
+
+class ExplicitSearch(CoordinateSearch):
+    """Finite ask/tell sequence; feedback ranks results without moving points."""
+    def __init__(self, parameters):
+        super().__init__(parameters)
+        for point in parameters.candidates:
+            if set(point)!=set(parameters.initial): raise ValueError('EXPLICIT_CANDIDATE_PATHS_MISMATCH')
+            self.space.encode(point)
+
+    def propose(self):
+        if self.stopped(): raise ValueError('EXPLICIT_PROPOSAL_LIMIT')
+        point=dict(self.parameters.candidates[self.state.proposed])
+        self.state=self.state.model_copy(update=dict(pending=self.space.encode(point),proposed=self.state.proposed+1))
+        return point
+
+
+def batch_search(method, parameters):
+    if method=='search.family_coordinate@1.0.0':
+        return CoordinateSearch(SearchParameters.model_validate(parameters))
+    if method=='search.family_explicit@1.0.0':
+        return ExplicitSearch(ExplicitSearchParameters.model_validate(parameters))
+    raise ValueError('BATCH_SEARCH_METHOD_UNAVAILABLE')
 
 
 def prepare_optimization(value):

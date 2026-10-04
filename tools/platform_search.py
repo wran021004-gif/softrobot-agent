@@ -13,7 +13,7 @@ def validate_batch_plan(store, view, proposal):
     from schemas.platform_handoff import SearchBatchPlan
     from tools.platform_registry import registry
     from tools.platform_tools import _candidate
-    from extensions.tendon_family.optimization import SearchParameters,CoordinateSearch
+    from extensions.tendon_family.optimization import batch_search
     from tools.diagnostic_revision import resolve_aliases
     plan=SearchBatchPlan.model_validate(proposal);reg=registry()
     state=store.session(view.run_id)['state'];role=state['role_context']
@@ -30,9 +30,15 @@ def validate_batch_plan(store, view, proposal):
     effective=store.artifact(candidate['configuration'])['effective']
     controller=effective['policy']['controller'];identity=controller['extension_id']+'@'+controller['version']
     if plan.fixed_controller!=identity:raise ValueError('PLAN_FIXED_CONTROLLER_MISMATCH: '+identity)
-    if plan.method!='search.family_coordinate@1.0.0':raise ValueError('PLAN_METHOD_UNAVAILABLE: supported search.family_coordinate@1.0.0 (candidate ask/tell only)')
-    definition=reg.get('search.family_coordinate','1.0.0','search')
-    if not reg.inspect(definition,{'search.family_coordinate':'1.0.0'})['executable']:raise ValueError('PLAN_METHOD_NOT_INSTALLED')
+    if plan.method not in ('search.family_coordinate@1.0.0','search.family_explicit@1.0.0'):raise ValueError('PLAN_METHOD_UNAVAILABLE')
+    method,version=plan.method.split('@')
+    definition=reg.get(method,version,'search')
+    if not reg.inspect(definition,{method:version})['executable']:raise ValueError('PLAN_METHOD_NOT_INSTALLED')
+    explicit=method=='search.family_explicit'
+    if explicit:
+        if plan.step is not None or not plan.candidates or len(plan.candidates)!=plan.max_candidates:
+            raise ValueError('PLAN_EXPLICIT_SEQUENCE_REQUIRED: null step, candidates count equals max_candidates')
+    elif plan.step is None or plan.candidates is not None:raise ValueError('PLAN_COORDINATE_STEP_REQUIRED_WITHOUT_EXPLICIT_POINTS')
     mappings={r['parameter']:r for r in view.parameter_impacts['mapped']}
     if not plan.variables or set(plan.variables)-mappings.keys():raise ValueError('PLAN_VARIABLE_PATHS: only demonstrated speed-weight builder paths')
     initial={}
@@ -49,7 +55,7 @@ def validate_batch_plan(store, view, proposal):
         # excludes (0,0.0001) through the builder, and the reachable lattice
         # must never propose such a value. No numerical candidate is evaluated.
         width=hi-lo
-        for origin in (lo,hi,initial[path]):
+        for origin in (() if explicit else (lo,hi,initial[path])):
             for k in range(-plan.max_candidates,plan.max_candidates+1):
                 v=min(hi,max(lo,origin+k*plan.step*width))
                 if 1e-12<v<.0001-1e-12:raise ValueError('PLAN_COORDINATE_STEP_CAN_PROPOSE_ILLEGAL_SMALL_WEIGHT: increase domain/step or use positive lower bound')
@@ -57,7 +63,14 @@ def validate_batch_plan(store, view, proposal):
         for endpoint in (lo,hi):
             changed=plain(_candidate(SessionInput.model_validate(effective),{path:endpoint},reg))
             if changed['robot']!=effective['robot'] or changed['task']!=effective['task']:raise ValueError('PLAN_FIXED_ROBOT_TASK_CHANGED')
-    CoordinateSearch(SearchParameters(initial=initial,bounds=plan.variables,max_trials=plan.max_candidates,step=plan.step))
+    parameters=dict(initial=initial,bounds=plan.variables)
+    parameters.update(candidates=plan.candidates) if explicit else parameters.update(max_trials=plan.max_candidates,step=plan.step)
+    batch_search(plan.method,parameters)
+    if explicit:
+        for point in plan.candidates:
+            for value in point.values():
+                if 0<value<.0001:raise ValueError('PLAN_EXPLICIT_ILLEGAL_SMALL_WEIGHT')
+            _candidate(SessionInput.model_validate(effective),point,reg)
     required_fixed={'robot','task','acceptance','controller_implementation','other_numerical_settings'}
     if not required_fixed<=set(plan.fixed_conditions):raise ValueError('PLAN_FIXED_CONDITIONS_REQUIRED: '+', '.join(sorted(required_fixed)))
     required_objectives={'joint_reach_holding_acceptance','terminal_error_m','holding_max_error_m','holding_max_speed_m_s'}
@@ -80,7 +93,7 @@ def validate_batch_plan(store, view, proposal):
             controller=controller,dynamics_model=view.task['execution_model'],source_report=role['source_report'],
             revised_assessment=role['previous_report'],check_feedback=role['result_feedback'],evidence_selectors=selectors,
             fixed_configuration_identity=digest(fixed),fixed_configuration=fixed),
-        batch_semantics='One immutable plan for the batch. Shared coordinate scheduling supports offline fixtures and separately granted real execution; plan submission executes nothing.',
+        batch_semantics='One immutable plan for the batch. Registered coordinate or finite ask/tell scheduling uses the same receipt executor; plan submission executes nothing.',
         screening=dict(local_screening='none',raw_weighted_objectives_are_physical_ranking=False),
         final_comparison_policy=RANKING,required_fresh_steps=sorted(required_verification),
         cost_floor_per_candidate_s=dict(simulation=900,evaluation=30,profile=60),
@@ -308,14 +321,14 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
     from copy import deepcopy
     from tools.diagnostic_handoff import accepted_product
     from schemas.platform_handoff import SearchBatchPlan
-    from extensions.tendon_family.optimization import SearchParameters,CoordinateSearch
+    from extensions.tendon_family.optimization import batch_search
     from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
     from extensions.tendon_family.gvs_profile import execution_scope
     record=accepted_product(host.store,plan_ref,'search_batch_plan')
     plan=SearchBatchPlan.model_validate(record['plan'])
     if not record['structurally_operationally_valid'] or record['execution_authorized']:
         raise ValueError('BATCH_REQUIRES_VALID_UNEXECUTED_PLAN')
-    if plan.fixed_controller!='controller.gvs_nmpc@7.0.0' or plan.method!='search.family_coordinate@1.0.0':
+    if plan.fixed_controller!='controller.gvs_nmpc@7.0.0' or plan.method not in ('search.family_coordinate@1.0.0','search.family_explicit@1.0.0'):
         raise ValueError('BATCH_FIXED_IMPLEMENTATION_REQUIRED')
     if not plan.variables or set(plan.variables)-set(REACH_WEIGHT_PATHS):raise ValueError('BATCH_WEIGHT_PATHS_ONLY')
     state=host.store.session(host.run_id)['state'];existing=state.get('search_batch')
@@ -342,7 +355,9 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
     if floor!=990 or interpretation_reserve_s<0 or budget['wall_s']<floor*count+interpretation_reserve_s or budget['tool_calls']<4*count:
         raise ValueError('BATCH_RESERVATION_CAPACITY_REQUIRED: 990 seconds and 4 tools per proposal, plus explicit interpretation reserve')
     initial={p:effective['policy']['controller']['parameters']['data']['recipe'][p.rsplit('/',1)[-1]] for p in plan.variables}
-    parameters=SearchParameters(initial=initial,bounds=plan.variables,max_trials=plan.max_candidates,step=plan.step)
+    parameters=dict(initial=initial,bounds=plan.variables)
+    parameters.update(candidates=plan.candidates) if plan.method=='search.family_explicit@1.0.0' else parameters.update(max_trials=plan.max_candidates,step=plan.step)
+    algorithm=batch_search(plan.method,parameters)
     if starting_facts and starting_facts['candidate']!=record['bindings']['subject']:
         raise ValueError('BATCH_START_EVIDENCE_MISMATCH')
     for facts in (starting_facts,retained_baseline):
@@ -366,7 +381,7 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
             key=path.rsplit('/',1)[-1];reusable['policy']['controller']['parameters']['data']['recipe'][key]=original['policy']['controller']['parameters']['data']['recipe'][key]
         permitted.append({**saved,'reusable_under_plan':execution_scope(reusable)==execution_scope(original)})
     batch=dict(plan=plan_ref,batch_id='batch-'+plan_ref['artifact_id'][:16],mode=mode,
-        parameters=plain(parameters),algorithm=plain(CoordinateSearch(parameters).save()),pending=None,
+        method=plan.method,parameters=plain(algorithm.parameters),algorithm=plain(algorithm.save()),pending=None,
         proposals=[],configurations={},starting_facts=starting_facts,base_configuration=record['bindings']['subject']['configuration'],
         retained_baseline=retained_baseline,max_backend_attempts=count,target_changed_configurations=plan.target_changed_configurations,
         historical_results=permitted,
@@ -422,13 +437,13 @@ def _run_batch(host,inject,*,stop_after_stage=None):
     """
     import json,time
     from schemas.platform import CandidateInput
-    from extensions.tendon_family.optimization import SearchParameters,CoordinateSearch
+    from extensions.tendon_family.optimization import batch_search
     from tools.platform_tools import _candidate
     from tools.platform_store import zero
     from copy import deepcopy
     batch=host.store.session(host.run_id)['state']['search_batch']
     record=host.store.artifact(batch['plan']);source=host.store.artifact(batch['base_configuration'])['effective']
-    algorithm=CoordinateSearch(SearchParameters.model_validate(batch['parameters']))
+    algorithm=batch_search(batch.get('method','search.family_coordinate@1.0.0'),batch['parameters'])
     algorithm.restore(batch['algorithm']['data'])
     stages=(('apply',0.),('simulation',900.),('evaluation',30.),('profile',60.))
     while batch['pending'] or not algorithm.stopped():
@@ -453,7 +468,11 @@ def _run_batch(host,inject,*,stop_after_stage=None):
             proposal=dict(index=len(batch['proposals']),changes=changes,optimizer_changes=raw_changes,
                 roundoff_canonicalized=canonicalized,identity=identity,reused=False)
             batch['proposals'].append(proposal);previous=batch['configurations'].get(identity)
-            start=batch['starting_facts'] if proposal['index']==0 else None
+            start=None
+            if proposal['index']==0 and batch['starting_facts']:
+                from extensions.tendon_family.gvs_profile import execution_scope
+                original=host.store.artifact(batch['starting_facts']['configuration'])['effective']
+                if execution_scope(effective)==execution_scope(original):start=batch['starting_facts']
             retained=None
             historical=None
             if not previous and batch.get('historical_results'):

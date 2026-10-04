@@ -1,0 +1,64 @@
+{
+  "candidate_disposition": "retain_baseline",
+  "disposition": "defer",
+  "feedback": {
+    "artifact_id": "4238a83d8cb7188c516ef50cb46380105d1090aaa16d6640233e280ceb004bed",
+    "media_type": "application/json"
+  },
+  "next_action": "finish",
+  "next_research": {
+    "bounded_check": "One saved-state execution at control/recipe/terminal_tip_speed_weight=0.10 with holding_tip_speed_weight fixed at 0.0, launched from the completed 0/0.05 predecessor (50618bf2) on the frozen stack; no repeat and no sweep.",
+    "evidence": [
+      "50618bf23b31464ba4f84c55cd26d1ca (0/0.05 predecessor): holding_max_speed 0.0356 m/s, holding_speed_passed false, terminal_reach_passed true, terminal_error 0.0082 m",
+      "cf997605885642759ee33920e2c9e2ef (retained baseline 0/0): holding_max_speed 1.581 m/s, holding_speed_passed false",
+      "087adee8e8a24fe88e5c85fe89e638c8 (0.05/0.0 older_search_start): holding_max_speed 1.175 m/s — holding weight alone barely lowers speed",
+      "22241105b8984e0daae4530963848953 (0.10/0.0) and 25e26708480848d79bad378b669915e3 (0.30/0.0): terminal reach fails"
+    ],
+    "expected_observations": [
+      "Supporting: holding_max_speed falls below 0.02 m/s with terminal_reach_passed true and terminal_error <=0.01 m",
+      "Weakening: holding_max_speed stays above 0.02 m/s, or terminal_error exceeds 0.01 m so reach is lost"
+    ],
+    "fixed_conditions": [
+      "control/recipe/holding_tip_speed_weight fixed at 0.0",
+      "frozen robot, task, evaluator, timing and controller.gvs_nmpc@7.0.0",
+      "criteria: holding speed 0.02 m/s, terminal error 0.01 m, window 0.05 s"
+    ],
+    "limitations": [
+      "single controller-side point; establishes neither a continuous range nor a causal mechanism",
+      "one-step position mismatch does not certify holding-speed prediction",
+      "no real-time, global or hardware claim"
+    ],
+    "proposed_budget": {
+      "backend_solves": 1,
+      "model_calls": 2,
+      "tool_calls": 4,
+      "wall_s": 1200.0,
+      "worker_calls": 0
+    },
+    "proposed_variables": {
+      "control/recipe/terminal_tip_speed_weight": "single point 0.10; coordinate start 0.05 (completed 0/0.05 predecessor); bounded domain [0.05, 0.20], step not swept"
+    },
+    "route": "continue_weight_combinations",
+    "stopping_conditions": [
+      "stop after the single 0.10 point; do not sweep a range",
+      "stop early if terminal reach fails or no holding-speed reduction appears",
+      "reserve at least 600 s of the 4200 s grant for interpretation"
+    ],
+    "unresolved_question": "Does a single higher terminal_tip_speed_weight (0.10, holding fixed at 0.0) push the sampled final-window holding tip speed below the 0.02 m/s criterion while retaining terminal reach (<=0.01 m)? A terminal-weight-only question, not a joint-weight question."
+  },
+  "reasoning": "Recommendation disposition: defer — retain rec-defer-causal-replay and rec-defer-weight-tuning; adopt no parameter value. Candidate disposition independently: retain_baseline; no evaluated candidate is selected. improvement-96f0ade35119 (0.05/0.0) is not an overall improvement — its sealed comparison against the retained baseline stays physical_tradeoff and joint_reach_holding_passed is false; holding_only (0.10/0.0, terminal_error 0.0116 m) and prior_candidate (0.30/0.0, 0.0187 m) fail terminal reach.\n\nHypothesis clauses: the terminal-weight-alone clause is supported only as movement, not as meeting the criterion. The completed 0/0.05 predecessor (50618bf2) lowers holding_max_speed from the retained baseline's 1.581 to 0.0356 m/s (candidate-minus-reference -1.545) — still above the 0.02 m/s criterion, holding_speed_passed false — while terminal reach is retained (0.0082 m, terminal_reach_passed true). The joint positive-weight clause is untested (joint_positive_weight_tested false). Reach-preserving improvement is weakened at the tested holding-only points. Moving toward the threshold is not meeting it.\n\nCorrect record: holding-only has 30 initialization (29 iteration-zero + 1 synthetic) and 5 positive-iteration selections; terminal-only has 17 (16 + 1 synthetic) and 18. Holding-only mean_complete_update_s is +0.1298 s against the retained baseline (slower); the -0.3857 s figure was against the older search start.\n\nRoute A selected: vary control/recipe/terminal_tip_speed_weight with holding fixed at 0.0; one point at 0.10 from the 0/0.05 predecessor.",
+  "recommendation_id": "revision_recommendation",
+  "report": {
+    "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+    "media_type": "application/json"
+  },
+  "selected_candidate": {
+    "candidate_id": "baseline-replay",
+    "configuration": {
+      "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+      "media_type": "application/json"
+    },
+    "execution_id": "cf997605885642759ee33920e2c9e2ef",
+    "owner_run_id": "gvs-stage351-baseline-executor"
+  }
+}

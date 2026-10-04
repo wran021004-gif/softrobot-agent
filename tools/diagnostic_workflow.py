@@ -65,7 +65,9 @@ def save(store,value):
 
 
 def implementation():
-    paths=['tools/diagnostic_handoff.py','tools/platform_search.py','tools/working_state.py','schemas/working_state.py',
+    paths=['examples/stage359_continuation.py','examples/stage359_live_continuation.py','tests/test_stage359_explicit.py',
+        'extensions/tendon_family/optimization.py','extensions/tendon_family/manifest.py','tests/test_stage359_continuation.py',
+        'tools/diagnostic_handoff.py','tools/platform_search.py','tools/working_state.py','schemas/working_state.py',
         'examples/stage356_milestone2.py','examples/stage357_live_pilot.py','examples/stage358_confirmation.py','examples/stage358_interpretation_repair.py','tests/test_stage358_interpretation_repair.py','tests/test_stage358_confirmation.py','tests/test_stage356_milestone2.py','tests/test_stage356_batch.py','tests/test_stage357_live_batch.py',
         'tools/diagnostic_reference_adapter.py','tools/diagnostic_revision.py','schemas/diagnostic_revision.py','tools/diagnostic_workflow.py','tools/diagnostic_native.py','tools/diagnostic_inventory.py','tools/diagnostic_facts.py',
         'tools/diagnostic_summary.py','tools/live_batch_execution.py','extensions/tendon_family/diagnostic_evidence.py','tools/execution_completion.py',
@@ -285,6 +287,7 @@ class DiagnosticWorkflow:
                     handover(host,feedback['result'],feedback['result_content'],origin=dict(feedback=feedback['reference'],receipt=feedback['receipt']),kind='numerical_result')
         before=self.store.session(host.run_id)['state'].get('handoffs',{}).get(kind)
         print('PHASE',self.directory.name,phase,flush=True)
+        if hasattr(self,'check_provider_payload'):self.check_provider_payload(host)
         run_loop(host)
         state=self.store.session(host.run_id)['state'];ref=state.get('handoffs',{}).get(kind)
         if not ref or ref==before:raise RuntimeError('PHASE_INCOMPLETE '+phase+': '+str(state.get('stop_reason')))
