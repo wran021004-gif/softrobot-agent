@@ -1,0 +1,256 @@
+{
+  "configurations": [
+    {
+      "candidate_id": "batch-ebbeadbdaca10732-0",
+      "configuration": {
+        "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "media_type": "application/json"
+      },
+      "scientific_identity": "c9c6bde67d572a20ae3d8fef46aca5c00c63de23ce2a52e3a1a341447a888273",
+      "role": "reference"
+    },
+    {
+      "candidate_id": "batch-387f92fd17f0639f-0",
+      "configuration": {
+        "artifact_id": "9185b0f4c24b4303ce9c7ac043dd16386833cae8ad0f992a63e3ff7c974985b8",
+        "media_type": "application/json"
+      },
+      "scientific_identity": "4f91669bf87b31b80ff1353e3b85c89a79c1d9af143e9283e01784becbaf24f5",
+      "role": "validation",
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.075
+      }
+    },
+    {
+      "candidate_id": "batch-387f92fd17f0639f-1",
+      "configuration": {
+        "artifact_id": "e07deb59e3dc7973c535d980ecd937b2fade03de3bf73ffbe1713e5460ecd301",
+        "media_type": "application/json"
+      },
+      "scientific_identity": "1ab7c97192415b310190fe184390f7a72cd86d4563098b8fc3f4f0b223e1b85f",
+      "role": "validation",
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.15
+      }
+    }
+  ],
+  "source": {
+    "candidate_id": "batch-ebbeadbdaca10732-0",
+    "owner_run_id": "batch-ebbeadbdaca10732-0",
+    "configuration": {
+      "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+      "media_type": "application/json"
+    },
+    "execution_id": "91c3ba1b01d6499fb26df8f95409401b"
+  },
+  "accepted_plan": {
+    "artifact_id": "387f92fd17f0639ff5e2e2277a5ff005eded16bec2699ee220206d1f1e4a520d",
+    "media_type": "application/json"
+  },
+  "input_order": [
+    "near_t0",
+    "near_t1",
+    "near_t2",
+    "far_t0",
+    "far_t1",
+    "far_t2"
+  ],
+  "force_limits_n": [
+    8.0,
+    8.0,
+    8.0,
+    8.0,
+    8.0,
+    8.0
+  ],
+  "integration_step_s": 0.002,
+  "horizon_s": 0.01,
+  "model": "model.gvs@1.0.0",
+  "units": {
+    "position": "world m",
+    "speed": "world m/s",
+    "input": "N",
+    "state": "GVS curvature rad/m and rate rad/m/s"
+  },
+  "warm_start": "Common cold constant previous applied input; candidate-model states independently regenerated; not historical warm reconstruction.",
+  "classification": "bounded_prediction_validation",
+  "snapshots": [
+    {
+      "update_id": 20,
+      "time_s": 0.2,
+      "measured_initial_state": [
+        1.0828713751120485,
+        -1.1216507612278703,
+        -3.7914966772949596,
+        0.6668072430302824,
+        0.47527109744413204,
+        0.07610302531964014,
+        -0.3133435383453159,
+        -1.1020423195965607,
+        -3.2862664743889556,
+        3.0064667249172916,
+        2.441259561398547,
+        2.5981169873392824,
+        -0.3842503422206125,
+        -1.4235098623407298,
+        -5.0728666062507655,
+        2.1150576225833855,
+        0.7944320186851371,
+        0.38603682593083566,
+        17.053177283261135,
+        8.323812489530182,
+        1.0902765158193235,
+        -9.977967941094851,
+        -4.969042125384243,
+        -1.095357377683122
+      ],
+      "previous_input_n": [
+        3.914026632882363,
+        5.434503122042697,
+        1.3923616125002753,
+        2.683046109850833,
+        1.6353748800337493,
+        1.8510406743319383
+      ],
+      "effective_horizon": 10,
+      "backend_speed_m_s": 0.026739562743258418,
+      "backend_position_m": [
+        0.28829178086025514,
+        0.037304159383782814,
+        0.19188185730156063
+      ],
+      "state_reference": {
+        "reference": {
+          "artifact_id": "92ae225fc6e6d8d9941159c60c139fa4a6b063d828223e4eb1d79f8b0032c715",
+          "media_type": "application/octet-stream"
+        },
+        "pointer": "/20/measured_initial_state"
+      },
+      "previous_input_reference": {
+        "reference": {
+          "artifact_id": "92ae225fc6e6d8d9941159c60c139fa4a6b063d828223e4eb1d79f8b0032c715",
+          "media_type": "application/octet-stream"
+        },
+        "pointer": "/19/actual_tension_n"
+      }
+    },
+    {
+      "update_id": 30,
+      "time_s": 0.3,
+      "measured_initial_state": [
+        1.0192589401146288,
+        -1.14491265562429,
+        -3.8557497145526614,
+        0.7240870599839093,
+        0.48347574153389944,
+        0.03890658099662206,
+        0.31905608434746435,
+        -0.9761978360501703,
+        -3.669525979449041,
+        2.7324241953833797,
+        2.3488300069118058,
+        2.65248619506053,
+        0.5225256753127642,
+        0.34487932400549515,
+        0.33744616410669104,
+        -0.35761558682181926,
+        -0.10865748547686521,
+        0.2073615016550205,
+        1.4589240565843418,
+        -0.7497053091524511,
+        -3.8776386430279755,
+        0.31657250158568684,
+        0.8759235829935691,
+        1.5730947573577634
+      ],
+      "previous_input_n": [
+        3.736107548587665,
+        5.357208160536622,
+        1.6263988169603336,
+        2.801297248141538,
+        1.6272059076304959,
+        1.789546108646038
+      ],
+      "effective_horizon": 5,
+      "backend_speed_m_s": 0.011821191815948177,
+      "backend_position_m": [
+        0.28875902329074515,
+        0.036732178568254815,
+        0.19151575300814924
+      ],
+      "state_reference": {
+        "reference": {
+          "artifact_id": "92ae225fc6e6d8d9941159c60c139fa4a6b063d828223e4eb1d79f8b0032c715",
+          "media_type": "application/octet-stream"
+        },
+        "pointer": "/30/measured_initial_state"
+      },
+      "previous_input_reference": {
+        "reference": {
+          "artifact_id": "92ae225fc6e6d8d9941159c60c139fa4a6b063d828223e4eb1d79f8b0032c715",
+          "media_type": "application/octet-stream"
+        },
+        "pointer": "/29/actual_tension_n"
+      }
+    }
+  ],
+  "development_executions": [
+    "bebcfd47274940fb88a55ce5a2457c4c",
+    "91c3ba1b01d6499fb26df8f95409401b",
+    "110dc2c9c1d642dcb018664a65c62c30"
+  ],
+  "development_bindings": {
+    "bebcfd47274940fb88a55ce5a2457c4c": {
+      "artifact_id": "9822261f6de394a9a8d104d163cd93257024c7561d0a8e6e76504c52bbf56c07",
+      "media_type": "application/json"
+    },
+    "91c3ba1b01d6499fb26df8f95409401b": {
+      "artifact_id": "3c7aa586184230b63096410b1bc0ab39e4515b86abdc9b3a6f0ccac8c3ab117a",
+      "media_type": "application/json"
+    },
+    "110dc2c9c1d642dcb018664a65c62c30": {
+      "artifact_id": "e430f866e67758ff90527bda5ae76072637a27fa658c976eaf6edb8533e67442",
+      "media_type": "application/json"
+    }
+  },
+  "development_fidelity_reference": {
+    "artifact_id": "f3660d73670c42a0b8922e6342137ccb3af32d787fecf90fcca35545a130dab0",
+    "media_type": "application/json"
+  },
+  "limits": {
+    "max_wall_s": 600.0,
+    "max_local_solves": 6,
+    "max_prediction_rollouts": 6
+  },
+  "tolerances": {
+    "position_m": 1e-06,
+    "speed_m_s": 0.0001,
+    "input_n": 1e-09,
+    "time_s": 1e-08
+  },
+  "observation_rule": "0.20 s first command divergence and 0.30 s holding entry; selected before new numerical results.",
+  "forecast_rule": "Holding-entry candidate plan max speed/error compared with incumbent plan on common projected state; unresolved for sub-tolerance differences; no absolute acceptance forecast.",
+  "speed_order_rule": "With two candidates compare the same 0.30 s cold-preview holding-plan maxima; differences <=1e-4 m/s abstain; otherwise predict ascending full-task max holding speed. Score actual ties explicitly using the same tolerance. One candidate: not applicable.",
+  "local_direction_labels": [
+    "increasing",
+    "decreasing",
+    "approximately_unchanged"
+  ],
+  "quantity_definitions": {
+    "local": "world endpoint velocity and speed change over same applied constant command and 0.01 s interval",
+    "preview": "0.20 s horizon 0.10 s; 0.30 s horizon 0.05 s; production integrator/substeps and early-stop policy unchanged",
+    "full_task": "backend sampled maximum over final 0.05 s, acceptance unchanged"
+  },
+  "prospective_local_rule": "At updates 20 and 30 seal existing production first-period prediction after actual input verification and before mj_step; score next backend sample. No added solve/rollout.",
+  "resolution": "Numerical tolerances chosen before new outcomes; no measured repeatability or statistical confidence.",
+  "revision": {
+    "commit": "4d2145f0bc6a3a1af4752d659ef027ab9dca5bed",
+    "files": {
+      "examples/milestone5_validation.py": "c6b78abf7a05da5108584b97443a1cffe6194a136e326d29e6b18ca368866960",
+      "extensions/tendon_family/milestone5_validation.py": "fc3c8b2003257b69ff58acaaa9053b33d7c1985ee4a520ab71f6efd4ea80b8dc",
+      "extensions/tendon_family/control_evidence.py": "d74d5ab82181e1192366a809667d7963f46fb6f0b935ac490188de16da3d93e1",
+      "extensions/tendon_family/backends.py": "3608cec50143a594fcb7c6cbc533780f99b7cfb082114ce5ebbedcb40073299b",
+      "tests/test_milestone5_validation.py": "946fc36424eeda1b4f7e879190c92772675b0e737f667373ac95ebdec0166631"
+    }
+  }
+}

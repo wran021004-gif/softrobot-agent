@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
-  "status": "awaiting_external_payload_approval",
-  "stop_reason": "Offline historical diagnosis completed; external provider handoff remains blocked by automatic approval review.",
+  "status": "completed",
+  "stop_reason": "Bounded prospective validation completed; final model decision semantically accepted; M4 incumbent retained, M5 open.",
   "mode": "single_context",
   "pilot": false,
   "minimal": false,
@@ -36,15 +36,47 @@
       "media_type": "application/json"
     },
     "batch_summary": {
-      "artifact_id": "7fb2eb727d4f0cfed46bd9477bcf95a8d1118d6a611c20dcfc00159aaff13b88",
+      "artifact_id": "f0bf928cdff1ce4e131d442c3f033cb490e47f8228d9e354972a1e258d5f220a",
       "media_type": "application/json"
     },
     "development_fidelity": {
       "artifact_id": "f3660d73670c42a0b8922e6342137ccb3af32d787fecf90fcca35545a130dab0",
       "media_type": "application/json"
+    },
+    "refreshed_handoff": {
+      "artifact_id": "8eb2952362552f4d5a9f742638a8dbd1033ae2ae26a0c1f9c7811644b6fe9c87",
+      "media_type": "application/json"
+    },
+    "search_plan": {
+      "artifact_id": "387f92fd17f0639ff5e2e2277a5ff005eded16bec2699ee220206d1f1e4a520d",
+      "media_type": "application/json"
+    },
+    "prediction_numerical": {
+      "artifact_id": "28173375b13b1da1f18c3c918dfc0d6f7ca848396ae8abd8f0428e14e378c132",
+      "media_type": "application/json"
+    },
+    "forecast_interpretation": {
+      "artifact_id": "b46d0029fd2cfc0ab622345e38414a3f417780bff6a024c2b086100984c8cca8",
+      "media_type": "application/json"
+    },
+    "forecast_seal": {
+      "artifact_id": "5f257d9e4e2c505c7d39513be9d47f5d6ca26e476b78d4b6d2d79d3a58276460",
+      "media_type": "application/json"
+    },
+    "batch_result": {
+      "artifact_id": "63c9e307dc0237ef75af42719c35d887a3a41fb1b0331935e35c92b1b78f9651",
+      "media_type": "application/json"
+    },
+    "final_response": {
+      "artifact_id": "44d160c6aeeb449a358ec87ba1570d7e5ad61774ffc2d234fcc52e44a06d5f95",
+      "media_type": "application/json"
+    },
+    "prediction_assessment": {
+      "artifact_id": "93b4ea44791f8c585045e82c1b66d0d17340a64c0f92c5b9f9c2842d76e56a9e",
+      "media_type": "application/json"
     }
   },
-  "feedback_complete": false,
+  "feedback_complete": true,
   "numerical_check_status": "completed",
   "usage": {
     "limit": {
@@ -55,17 +87,17 @@
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 3,
-      "model_calls": 0,
-      "backend_solves": 0,
+      "tool_calls": 18,
+      "model_calls": 9,
+      "backend_solves": 2,
       "worker_calls": 0,
-      "wall_s": 10.234999999869615
+      "wall_s": 971.7059999990743
     },
     "remaining": {
-      "backend_solves": 2,
-      "model_calls": 24,
-      "tool_calls": 57,
-      "wall_s": 8989.76500000013,
+      "backend_solves": 0,
+      "model_calls": 15,
+      "tool_calls": 42,
+      "wall_s": 8028.294000000926,
       "worker_calls": 0
     },
     "occupied": {}
@@ -76,14 +108,106 @@
       "prediction_evaluations": 24
     },
     "used": {
-      "local_solves": 0,
-      "prediction_evaluations": 0
+      "local_solves": 6,
+      "prediction_evaluations": 6
     }
   },
-  "provider_usage": [],
+  "provider_usage": [
+    {
+      "completion_tokens": 3241,
+      "completion_tokens_details": {
+        "reasoning_tokens": 2367
+      },
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 6502,
+      "prompt_tokens": 7910,
+      "prompt_tokens_details": {
+        "cached_tokens": 1408
+      },
+      "total_tokens": 11151
+    },
+    {
+      "completion_tokens": 16454,
+      "completion_tokens_details": {
+        "reasoning_tokens": 15179
+      },
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 13257,
+      "prompt_tokens": 14665,
+      "prompt_tokens_details": {
+        "cached_tokens": 1408
+      },
+      "total_tokens": 31119
+    },
+    {
+      "completion_tokens": 4417,
+      "completion_tokens_details": {
+        "reasoning_tokens": 3151
+      },
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 28580,
+      "prompt_tokens": 29988,
+      "prompt_tokens_details": {
+        "cached_tokens": 1408
+      },
+      "total_tokens": 34405
+    },
+    {
+      "completion_tokens": 5677,
+      "completion_tokens_details": {
+        "reasoning_tokens": 4128
+      },
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 25121,
+      "prompt_tokens": 26529,
+      "prompt_tokens_details": {
+        "cached_tokens": 1408
+      },
+      "total_tokens": 32206
+    },
+    {
+      "completion_tokens": 4817,
+      "completion_tokens_details": {
+        "reasoning_tokens": 3265
+      },
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 26807,
+      "prompt_tokens": 28215,
+      "prompt_tokens_details": {
+        "cached_tokens": 1408
+      },
+      "total_tokens": 33032
+    },
+    {
+      "completion_tokens": 3373,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1497
+      },
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 26758,
+      "prompt_tokens": 28166,
+      "prompt_tokens_details": {
+        "cached_tokens": 1408
+      },
+      "total_tokens": 31539
+    },
+    {
+      "completion_tokens": 4161,
+      "completion_tokens_details": {
+        "reasoning_tokens": 2301
+      },
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 27329,
+      "prompt_tokens": 28737,
+      "prompt_tokens_details": {
+        "cached_tokens": 1408
+      },
+      "total_tokens": 32898
+    }
+  ],
   "monetary_cost": null,
   "elapsed_s": 0.0,
-  "protocol_corrections": 0,
+  "protocol_corrections": 2,
   "recovery": {
     "shared": {
       "version": "2.0.0",
@@ -94,9 +218,9 @@
           "max_consecutive": 2,
           "max_total": 4
         },
-        "total_used": 0,
+        "total_used": 2,
         "consecutive_used": 0,
-        "total_remaining": 4,
+        "total_remaining": 2,
         "consecutive_remaining": 2,
         "reset": "Completed business call resets consecutive only; decoding alone does not."
       },

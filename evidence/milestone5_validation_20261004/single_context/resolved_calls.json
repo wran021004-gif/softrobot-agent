@@ -1,1 +1,378 @@
-[]
+[
+  {
+    "run_id": "gvs-milestone5-validation-2fa476b084a4-forecast-transport-retry1",
+    "reference": {
+      "artifact_id": "81ad1fc183a6028298c1dd4fb2a6e61c2eba8f38f8726a7d9381db104b3019d7",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "retain_baseline",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "eead2af1094f47b9a317caa4e9fbfc8bae06b6e2f3c3a71361cec3daf1f7ae54",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "unresolved",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "No new execution; defer to the already accepted pending batch backend outcomes before any speed-order decision.",
+          "evidence": [
+            "forecasts batch-387f92fd17f0639f-0/-1 joint_acceptance unresolved",
+            "speed_order_forecast status tie, difference 0.0 m/s, tolerance 1e-4",
+            "horizon-5 rows identical across reference/-0/-1 (update_id 30, verified_settled_seed)",
+            "horizon-10 endpoint_speed spread ≈6e-6 m/s"
+          ],
+          "expected_observations": [
+            "pending candidate backend outcomes either separate holding-speed order beyond tolerance or remain tied/abstain"
+          ],
+          "fixed_conditions": [
+            "primary_reference batch-ebbeadbdaca10732-0 configuration",
+            "development checkpoints 0.2 s and 0.3 s",
+            "forecast rule and 1e-4 m/s tolerance"
+          ],
+          "limitations": [
+            "cold previews are development, not prospective",
+            "no full-task equivalence or absolute acceptance",
+            "no hardware/real-time claims"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "pending batch backend outcomes available",
+            "any candidate exceeds order tolerance"
+          ],
+          "unresolved_question": "Whether either pending holding_tip_speed_weight candidate (0.075, 0.15) changes full-task holding-speed order versus the baseline; the tied cold preview abstains."
+        },
+        "reasoning": "Pre-execution forecast only; both pending candidates (holding_tip_speed_weight 0.075 batch-387f92fd17f0639f-0, 0.15 -1) have no backend outcomes, so no acceptance is supported. Deterministic cold-preview rule: at effective_horizon 5 the reference and both candidates are numerically identical (endpoint_speed 0.020111533, holding_plan_max_speed 0.019915547, holding_plan_max_error 0.001360191, update_id 30, stop_reason verified_settled_seed), giving zero differentiation. At horizon 10 they differ only at ~1e-5–1e-6: endpoint_speed 0.027262142/0.027263675/0.027268202 and holding_plan_max_speed 0.004599727/0.004597579/0.004591288; projected position/speed differences are identical (0.002720768 m, -0.002415542 m/s). speed_order_forecast = tie (difference 0.0, tolerance 1e-4) → abstention, not a supported order. Terminal reach, holding position, holding speed and measured complete-update timing (0.2 s, 0.3 s) remain unresolved for candidates; the horizon-5 controller stop (verified_settled_seed, update_id 30) and horizon-10 relative_seed_improvement (update_id 20) are separate statuses. These are development previews matched to recorded production prediction, not prospective validation; no full-task equivalence. This small, tied batch only describes these tested weights.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "baseline-replay",
+          "configuration": {
+            "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+            "media_type": "application/json"
+          },
+          "execution_id": "cf997605885642759ee33920e2c9e2ef",
+          "owner_run_id": "gvs-stage351-baseline-executor"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-0-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone5-validation-2fa476b084a4-forecast-transport-retry1",
+    "reference": {
+      "artifact_id": "c3e93a24da2f90efa9d0144aee093f36c39aa72c396f04268c94dc7e168fd694",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "defer_selection",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "f0bf928cdff1ce4e131d442c3f033cb490e47f8228d9e354972a1e258d5f220a",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "rejected",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "No new execution is proposed in this campaign; any replication of the non-monotonic sweep (e.g. weights 0.06-0.14 at fixed structure/terminal weight) would require a new authorized plan and a fresh frozen source.",
+          "evidence": [
+            "execution 2413ff2a56de422dac47b7fd78717563 (batch-387f92fd17f0639f-0, w=0.075): holding_max_speed_m_s=0.0232859, holding_speed_passed=false, joint_reach_holding_passed=false",
+            "execution 9865f1636266479c93817cad42a65353 (batch-387f92fd17f0639f-1, w=0.15): holding_max_speed_m_s=0.0129392, holding_speed_passed=true, joint_reach_holding_passed=true",
+            "vs_source 0.075 joint_acceptance_lost; vs_source 0.15 physical_tradeoff (terminal -5.58e-6, holding_max_error +1.60e-5, holding_max_speed +1.89e-4)",
+            "vs_retained_baseline 0.15 joint_acceptance_gained; 0.075 physical_pareto_improvement"
+          ],
+          "expected_observations": [
+            "No further observations are gathered under this stop decision; the stated non-monotonicity remains a hypothesis for future authorized work."
+          ],
+          "fixed_conditions": [
+            "structure a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33",
+            "control/recipe/terminal_tip_speed_weight=0.05",
+            "control_period_s=0.01, 35 updates",
+            "acceptance window 0.05 s, terminal 0.01 m, holding error 0.01 m, holding speed 0.02 m/s"
+          ],
+          "limitations": [
+            "Two tested points cannot establish a response over the full weight range.",
+            "Non-monotonic re-entry at 0.15 is an observation, not a diagnosed mechanism.",
+            "No continuous-time, hardware, real-time or global claims.",
+            "Solver/controller policy stops and deadline_misses are separate from reach/holding acceptance."
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Campaign evidence complete; this adapts the current phase and grants no execution.",
+            "Any further study requires a separately model-authored, validated plan and new authorization."
+          ],
+          "unresolved_question": "Whether joint holding acceptance in holding_tip_speed_weight is genuinely non-monotonic on structure a609...44c33 (0.05 pass, 0.075 fail, 0.1 fail, 0.15 pass) and what mechanism produces the re-entry, unresolved by the completed batch."
+        },
+        "reasoning": "Both sealed forecasts are falsified on frozen structure a609...44c33 (terminal weight 0.05 held). Forecast: 0.075 retains joint acceptance - observed holding_max_speed_m_s=0.0232859 (>0.02) so holding_speed_passed=false, joint_reach_holding_passed=false; terminal_reach_passed (0.0028347<0.01), holding position passed (0.0029058<0.01), mean_complete_update 8.514 s, 35 deadline_misses, force-bound_violation 0. Forecast: 0.15 loses - observed holding_max_speed_m_s=0.0129392 (<0.02), holding position passed (0.0027461), terminal_reach_passed (0.0026922), joint_reach_holding_passed=true, mean_complete_update 8.511 s, 35 deadline_misses. Thus the boundary statement (0.05,0.15] is falsified and the response is non-monotonic (0.075 fails, 0.15 passes). Relational labels: vs retained baseline 0.15=joint_acceptance_gained, 0.075=physical_pareto_improvement; vs the accepted source 0.075=joint_acceptance_lost, 0.15=physical_tradeoff (terminal better by 5.58e-6, holding_max_error worse by 1.60e-5, holding_max_speed worse by 1.89e-4). Adoption is independent of hypothesis standing: neither new candidate dominates the accepted predecessor (source), which keeps the best holding metrics among joint-passing configs; a trade-off is not overall improvement, so no promotion and no reversion to the failing retained baseline. Selection is deferred; the predecessor remains. Scope: a small batch describes only these tested points on this structure; zero bound violation does not exclude legal near-bound inputs; deadline_misses follow controller policy, distinct from reach/holding acceptance; no causal, range-wide, continuous-time, hardware or real-time claims.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": null
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-1-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone5-validation-2fa476b084a4-forecast-transport-retry1",
+    "reference": {
+      "artifact_id": "16923c3bc9ccf63b25a1e8e0d1c991afaa87b19359983b94b89bbc43b158b294",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "defer_selection",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "f0bf928cdff1ce4e131d442c3f033cb490e47f8228d9e354972a1e258d5f220a",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "rejected",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "None executed; no run authorized. A hypothetical bounded test would sweep holding_tip_speed_weight on the fixed structure bracketing 0.075 — proposed, not run.",
+          "evidence": [
+            "local_fidelity: 6/6 development-matched predictions, direction 4/4 correct, endpoint within tolerance 0",
+            "prediction_assessment direction_counts correct 0 / incorrect 0 / unresolved 4; accuracy_among_resolved null; resolved_coverage 0.0",
+            "execution 2413ff2a56de422dac47b7fd78717563 (weight 0.075): joint acceptance lost, holding speed 0.02329 > 0.02 m/s",
+            "execution 9865f1636266479c93817cad42a65353 (weight 0.15): joint acceptance preserved, holding speed 0.01294 m/s",
+            "observed_speed_order resolved (-0.0103 m/s) while sealed forecast was tie → ordering_verdict unresolved"
+          ],
+          "expected_observations": [
+            "Not applicable within this grant; no further observation is authorized."
+          ],
+          "fixed_conditions": [
+            "structure a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33",
+            "near 0.16 m, far 0.11 m, section_scale 0.95, material compliant",
+            "control/recipe/terminal_tip_speed_weight 0.05",
+            "control_period_s 0.01, 35 updates"
+          ],
+          "limitations": [
+            "Only two points tested; the non-monotone pattern is descriptive, not causal",
+            "No prospective full-task direction or ranking resolved",
+            "No real-time, continuous-time, or hardware claims supported"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Grant close; no further runs authorized by this response."
+          ],
+          "unresolved_question": "Whether joint reach+holding acceptance is non-monotone in control/recipe/holding_tip_speed_weight on the frozen a6099... structure and where any passing band lies; unresolvable without further runs, which this grant disallows."
+        },
+        "reasoning": "Final prediction-validation disposition; no diagnostic recommendation_id supplied, so this defers hypothesis judgement only.\n\nLocal dynamics fidelity: all six local checkpoint predictions reproduced the recorded production first-period predictions (development-matched, retrospective); local direction 4/4 correct, endpoint within tolerance 0/4. This is local diagnostic evidence only, not prospective validation.\n\nCandidate-specific cold-preview policy behavior: both sealed forecasts were unresolved (tie; 4.6e-3 m/s maxima, difference 0.0 m/s), so the cold preview gave no discriminating policy direction. The observed full-task holding-speed order resolved (batch-387f92fd17f0639f-1 slower than -0 by 0.0103 m/s) but was not forecast; ordering_verdict unresolved.\n\nFull-task acceptance (structure a6099...): candidate -0 (holding_tip_speed_weight 0.075) LOST joint reach+holding acceptance — terminal reach passed (0.00283 m) and holding position passed (0.00291 m), but holding speed 0.02329 m/s exceeds the 0.02 m/s limit. Candidate -1 (0.15) PRESERVED joint acceptance: terminal 0.00269 m, holding position 0.00275 m, holding speed 0.01294 m/s. Against the retained baseline both improve holding error/speed and complete-update time; -1 versus the accepted source is a physical tradeoff (holding error +1.6e-5 m, holding speed +1.9e-4 m/s, terminal error -5.6e-6 m). No claim of global or continuous-time success follows.\n\nComputation/real-time: both candidates miss all 35 deadlines (mean complete update ~8.51 s at 0.01 s period, real_time_demonstrated false) — a computational/real-time failure independent of holding acceptance. Zero force-bound violations does not exclude legal near-bound inputs.\n\nHypothesis: rejected. The planned separation (0.075 pass, 0.15 fail) was contradicted in both directions, so the boundary statement (0.05, 0.15] is falsified for this structure. This describes only the two tested points; it does not establish a dominant cause or range-wide ineffectiveness. Any non-monotonicity is an observation, not a demonstrated mechanism.\n\nPredictor coverage: 0 of 4 forecasts resolved, accuracy undefined; the narrowest supported role is local diagnostic evidence (retrospective) plus execution ordering requiring full evaluation — not a reliability claim. Raw termination and controller policy stops are distinct here.\n\nMilestone4 remains closed; Milestone5 stays open — no original gate is demonstrably met. No further run is authorized in this grant.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": null
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-2-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone5-validation-2fa476b084a4-forecast-transport-retry1",
+    "reference": {
+      "artifact_id": "dbc268c0fcf8da6d5490e9140073c33c3eee55d3f80352a97b5a3bf2d96e649d",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "retain_baseline",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "f0bf928cdff1ce4e131d442c3f033cb490e47f8228d9e354972a1e258d5f220a",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "rejected",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "None executed or authorized; a hypothetical sweep of holding_tip_speed_weight bracketing 0.075 on the fixed structure would be proposed, not run.",
+          "evidence": [
+            "execution 2413ff2a56de422dac47b7fd78717563 (holding 0.075): joint acceptance lost, holding speed 0.023286 m/s > 0.02, holding position 0.002906 m, terminal 0.002835 m, 35/35 deadline misses",
+            "execution 9865f1636266479c93817cad42a65353 (holding 0.15): joint acceptance preserved, holding speed 0.012939 m/s, holding position 0.002746 m, terminal 0.002692 m, 35/35 deadline misses",
+            "Source comparison (incumbent .05/.05 batch-ebbeadbdaca10732-0): both candidates deteriorate holding error and speed; -1 is a physical tradeoff with better terminal error",
+            "Sealed cold-preview forecasts tie (maxima 0.01991554683358343 m/s each), predicted order abstained; actual holding-speed order resolved (-0.01035 m/s); ordering_verdict unresolved, resolved coverage 0.0",
+            "Local diagnostics: 6 historical (6/6 signs, 0/6 tolerance) and 4 prospective (4/4 signs, 0/4 endpoint tolerance) — local diagnostic evidence only"
+          ],
+          "expected_observations": [
+            "None within this grant; no further observation is authorized."
+          ],
+          "fixed_conditions": [
+            "structure a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33",
+            "near 0.16 m, far 0.11 m, section_scale 0.95, material compliant",
+            "control/recipe/terminal_tip_speed_weight 0.05",
+            "control_period_s 0.01, 35 updates"
+          ],
+          "limitations": [
+            "Only two points tested; the non-monotone pattern is descriptive, not causal",
+            "No prospective full-task direction, ordering, or ranking resolved (resolved coverage 0.0; conditional accuracy undefined)",
+            "No real-time, continuous-time, or hardware claims supported",
+            "Zero bound violations does not exclude legal near-bound input"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Grant closed; no further runs authorized by this response."
+          ],
+          "unresolved_question": "Whether joint reach+holding acceptance is non-monotone in control/recipe/holding_tip_speed_weight on frozen structure a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33, and where any passing band lies — unresolved and outside this closed grant's scope."
+        },
+        "reasoning": "Diagnostic recommendation: none supplied (recommendation_id null), so this disposition judges the study hypothesis only, not a recommendation.\n\nPredictive evidence, two classes kept distinct (issue 1): (a) six historical development intervals, retrospective — 6/6 direction signs, 0/6 within numerical tolerance; (b) FOUR new production one-step predictions, each sealed prospectively before its backend step (chronology verified) — 4/4 signs, 0/4 endpoint-within-tolerance. Narrowest supported role: local diagnostic fidelity of the embedded first-period predictor on this structure. Scoped evidence, not general reliability; no screening or automatic-rejection authority (issue 3).\n\nFrozen pairwise mapping used the 0.30 s cold holding-entry plans, all maxima 0.01991554683358343 m/s → tie, order abstained; the ~0.0046 m/s values belong to the 0.20 s preview and do not define that mapping (issue 2). All four full-task forecasts unresolved; zero resolved coverage; conditional accuracy undefined. Actual holding-speed order resolved (-1 slower than -0 by 0.01035 m/s) but predicted order abstained (null) → ordering_verdict unresolved. An abstained forecast does not demonstrate execution-ordering usefulness.\n\nFull-task acceptance on frozen structure a6099… (near 0.16 m, far 0.11 m, section_scale 0.95, compliant; terminal_tip_speed_weight 0.05): candidate -0 (holding 0.075) LOST joint reach+holding — terminal reach passed 0.002835 m, holding position passed 0.002906 m, holding speed 0.023286 m/s > 0.02 limit. Candidate -1 (0.15) PRESERVED joint acceptance — terminal 0.002692 m, holding position 0.002746 m, holding speed 0.012939 m/s. Both miss 35/35 deadlines (mean complete update ~8.51 s at 0.01 s period; real_time_demonstrated false) — a timing failure independent of holding. Zero force-bound violations does not exclude legal near-bound input. Against the selected .05/.05 incumbent (batch-ebbeadbdaca10732-0) BOTH candidates deteriorate holding error and speed at frozen tolerances; -1 remains a physical tradeoff with better terminal error (-5.58e-6 m) — distinct from the improvement both show only against the earlier failing retained baseline (issue 5).\n\nHypothesis rejected (issue 4): the planned pointwise separation (.075 passes, .15 fails) was contradicted at both points. Scope: .075 failing is consistent with some boundary within (0.05,0.15]; .15 passing rejects only the stated high-point failure. This does not falsify the whole interval as a boundary, and no continuous threshold or monotonic law is validated; the non-monotone pattern is an observation, not a mechanism, and a two-point batch describes only the tested candidates.\n\nCandidate disposition: retain the accepted .05/.05 incumbent (baseline here = the incumbent accepted source batch-ebbeadbdaca10732-0); no promotion. M4 closed, M5 overall open. Accepted operational next action: none in this grant — close the substage with the incumbent retained, zero future budget, route stop (issue 6).",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "baseline-replay",
+          "configuration": {
+            "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+            "media_type": "application/json"
+          },
+          "execution_id": "cf997605885642759ee33920e2c9e2ef",
+          "owner_run_id": "gvs-stage351-baseline-executor"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-4-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone5-validation-2fa476b084a4-forecast-transport-retry1",
+    "reference": {
+      "artifact_id": "80b3deeab753b6b01bf249a5767de293024899a4e25062707e194045d3c22c5b",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "retain_baseline",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "f0bf928cdff1ce4e131d442c3f033cb490e47f8228d9e354972a1e258d5f220a",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "rejected",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "None executed or authorized. A single hypothetical bracketing point of control/recipe/holding_tip_speed_weight between 0.075 and 0.15 would be PROPOSED, not run.",
+          "evidence": [
+            "execution 2413ff2a56de422dac47b7fd78717563 (holding 0.075, batch-387f92fd17f0639f-0): joint acceptance lost — holding speed 0.023286 m/s > 0.02, holding position 0.002906 m passed, terminal 0.002835 m passed, 35/35 deadline misses",
+            "execution 9865f1636266479c93817cad42a65353 (holding 0.15, batch-387f92fd17f0639f-1): joint acceptance preserved — holding speed 0.012939 m/s, holding position 0.002746 m, terminal 0.002692 m, 35/35 deadline misses",
+            "Selected .05/.05 incumbent batch-ebbeadbdaca10732-0 (execution 91c3ba1b01d6499fb26df8f95409401b): both candidates deteriorate holding error and speed; -1 is a physical tradeoff with terminal error -5.58e-6 m",
+            "Sealed cold-preview forecasts (seal 5f257d9e4e2c505c7d39513be9d47f5d6ca26e476b78d4b6d2d79d3a58276460): 0.30 s maxima 0.01991554683358343 m/s each → tie, order abstained; actual holding-speed order resolved (-0.01035 m/s); ordering_verdict unresolved, resolved coverage 0.0",
+            "Local diagnostics only: 6 historical intervals (6/6 signs, 0/6 tolerance) and 4 prospective one-step predictions sealed before backend step (4/4 signs, 0/4 endpoint-within-tolerance)"
+          ],
+          "expected_observations": [
+            "None within this grant; no further observation is authorized by this response."
+          ],
+          "fixed_conditions": [
+            "structure a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33",
+            "near 0.16 m, far 0.11 m, section_scale 0.95, material compliant",
+            "control/recipe/terminal_tip_speed_weight 0.05",
+            "control_period_s 0.01, 35 updates, same cold-start policy"
+          ],
+          "limitations": [
+            "Only two points tested; any non-monotone pattern is descriptive, not causal or range-wide",
+            "No prospective full-task direction, ordering, or ranking resolved (resolved coverage 0.0; conditional accuracy undefined)",
+            "No real-time, continuous-time, or hardware claims supported; raw 35/35 deadline misses do not demonstrate physical impossibility",
+            "Zero force-bound violations does not exclude legal near-bound input; availability of further observations unverified for any unread inventory subset"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Grant closed; no further runs authorized by this response."
+          ],
+          "unresolved_question": "Whether joint reach+holding acceptance is non-monotone in control/recipe/holding_tip_speed_weight on frozen structure a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33, and where any passing band lies — unresolved and outside this closed grant's scope."
+        },
+        "reasoning": "Diagnostic recommendation: none supplied (recommendation_id null); this disposition assesses only the study hypothesis. defer neither adopts nor rejects a recommendation; promotion is judged independently.\n\nBaseline binding corrected. retain_baseline/baseline now refers exactly to the selected .05/.05 incumbent batch-ebbeadbdaca10732-0, execution 91c3ba1b01d6499fb26df8f95409401b (holding 0.05, terminal 0.05) — NOT the earlier Stage351 baseline-replay cf997605885642759ee33920e2c9e2ef (holding error 0.058138 m, speed 1.581015 m/s; a failing reference). A third distinct entry is the passing 0/.05 pre-adaptation reference batch-e4843b561ebaea27-0 (holding error 0.002737 m, speed 0.012736 m/s). These three must not be conflated.\n\nPredictive evidence, two classes separate: (a) six historical retrospective development intervals — 6/6 direction signs, 0/6 within numerical tolerance; (b) four new production one-step predictions, each sealed prospectively before its backend step (seal 5f257d..., chronology passed) — 4/4 signs, 0/4 endpoint-within-tolerance. Narrowest supported role: local diagnostic fidelity of the embedded first-period predictor on this frozen structure. No general reliability, screening, or automatic-rejection authority follows. The frozen pairwise mapping used the 0.30 s cold holding-entry plans, maxima all 0.01991554683358343 m/s → tie, order abstained (null); the ~0.0046 m/s values are the 0.20 s preview and do not define that mapping. All four full-task forecasts unresolved; predicted order abstained while actual holding-speed order resolved (-1 slower than -0 by 0.01035 m/s) → ordering_verdict unresolved, resolved coverage 0.0, conditional accuracy undefined. An abstained forecast does not demonstrate execution-ordering usefulness.\n\nFull-task outcomes on frozen structure a6099... (near 0.16 m, far 0.11 m, section_scale 0.95, compliant; terminal_tip_speed_weight 0.05). Candidate -0 (holding 0.075) LOST joint reach+holding: terminal reach passed 0.002835 m, holding position passed 0.002906 m, holding speed 0.023286 m/s > 0.02. Candidate -1 (0.15) PRESERVED joint acceptance: terminal 0.002692 m, holding position 0.002746 m, holding speed 0.012939 m/s. Both report 35/35 deadline_misses and mean complete update ~8.51 s at 0.01 s period (real_time_demonstrated false) — raw termination/timing measures, distinct from any controller policy stop; no real-time, continuous-time, or hardware claim supported. Against the selected incumbent both candidates deteriorate holding error and speed at frozen tolerances; -1 is a physical tradeoff with better terminal error (-5.58e-6 m), an improvement appearing only versus the earlier failing baseline.\n\nHypothesis rejected. The planned pointwise separation (.075 passes, .15 fails) was contradicted at both points. Scope: .075 failing is consistent with some boundary within (0.05, 0.15]; .15 passing rejects only the stated high-point failure. This falsifies no whole interval, validates no continuous threshold or monotonic law, and is an observation, not a mechanism; a two-point batch describes only the tested candidates, so no range-wide claim of dominant cause or ineffectiveness is made. Zero force-bound violations does not exclude legal near-bound input.\n\nCandidate disposition: retain the accepted .05/.05 incumbent; no promotion. M4 closed, M5 overall open. Next action finish; next route stop; no further execution authorized. Availability of further observations is unverified for any unread inventory subset.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-6-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  }
+]

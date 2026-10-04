@@ -1,0 +1,61 @@
+{
+  "candidate_disposition": "retain_baseline",
+  "disposition": "defer",
+  "feedback": {
+    "artifact_id": "eead2af1094f47b9a317caa4e9fbfc8bae06b6e2f3c3a71361cec3daf1f7ae54",
+    "media_type": "application/json"
+  },
+  "hypothesis_assessment": "unresolved",
+  "next_action": "finish",
+  "next_research": {
+    "bounded_check": "No new execution; defer to the already accepted pending batch backend outcomes before any speed-order decision.",
+    "evidence": [
+      "forecasts batch-387f92fd17f0639f-0/-1 joint_acceptance unresolved",
+      "speed_order_forecast status tie, difference 0.0 m/s, tolerance 1e-4",
+      "horizon-5 rows identical across reference/-0/-1 (update_id 30, verified_settled_seed)",
+      "horizon-10 endpoint_speed spread ≈6e-6 m/s"
+    ],
+    "expected_observations": [
+      "pending candidate backend outcomes either separate holding-speed order beyond tolerance or remain tied/abstain"
+    ],
+    "fixed_conditions": [
+      "primary_reference batch-ebbeadbdaca10732-0 configuration",
+      "development checkpoints 0.2 s and 0.3 s",
+      "forecast rule and 1e-4 m/s tolerance"
+    ],
+    "limitations": [
+      "cold previews are development, not prospective",
+      "no full-task equivalence or absolute acceptance",
+      "no hardware/real-time claims"
+    ],
+    "proposed_budget": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "proposed_variables": {},
+    "route": "stop",
+    "stopping_conditions": [
+      "pending batch backend outcomes available",
+      "any candidate exceeds order tolerance"
+    ],
+    "unresolved_question": "Whether either pending holding_tip_speed_weight candidate (0.075, 0.15) changes full-task holding-speed order versus the baseline; the tied cold preview abstains."
+  },
+  "reasoning": "Pre-execution forecast only; both pending candidates (holding_tip_speed_weight 0.075 batch-387f92fd17f0639f-0, 0.15 -1) have no backend outcomes, so no acceptance is supported. Deterministic cold-preview rule: at effective_horizon 5 the reference and both candidates are numerically identical (endpoint_speed 0.020111533, holding_plan_max_speed 0.019915547, holding_plan_max_error 0.001360191, update_id 30, stop_reason verified_settled_seed), giving zero differentiation. At horizon 10 they differ only at ~1e-5–1e-6: endpoint_speed 0.027262142/0.027263675/0.027268202 and holding_plan_max_speed 0.004599727/0.004597579/0.004591288; projected position/speed differences are identical (0.002720768 m, -0.002415542 m/s). speed_order_forecast = tie (difference 0.0, tolerance 1e-4) → abstention, not a supported order. Terminal reach, holding position, holding speed and measured complete-update timing (0.2 s, 0.3 s) remain unresolved for candidates; the horizon-5 controller stop (verified_settled_seed, update_id 30) and horizon-10 relative_seed_improvement (update_id 20) are separate statuses. These are development previews matched to recorded production prediction, not prospective validation; no full-task equivalence. This small, tied batch only describes these tested weights.",
+  "recommendation_id": null,
+  "report": {
+    "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+    "media_type": "application/json"
+  },
+  "selected_candidate": {
+    "candidate_id": "baseline-replay",
+    "configuration": {
+      "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+      "media_type": "application/json"
+    },
+    "execution_id": "cf997605885642759ee33920e2c9e2ef",
+    "owner_run_id": "gvs-stage351-baseline-executor"
+  }
+}

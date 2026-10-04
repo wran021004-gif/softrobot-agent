@@ -24,7 +24,7 @@ from tools.diagnostic_reference_adapter import EvidenceDrivenAdapter
 from extensions.tendon_family.control_evidence import ControlEvidence,PRE_STEP_OBSERVER
 from extensions.tendon_family.gvs_profile import execution_scope
 from extensions.tendon_family.diagnostic_evidence import measured_motion
-from extensions.tendon_family.milestone5_validation import DEFINITION,CHECKPOINTS,TOLERANCES,diagnose,direction,aligned_interval,local_score,ImportedReader
+from extensions.tendon_family.milestone5_validation import DEFINITION,CHECKPOINTS,TOLERANCES,diagnose,direction,aligned_interval,local_score,ImportedReader,pairwise_speed_order,ordering_score
 import numpy as np
 
 RUN=ROOT/'runs/milestone5_validation_20261004/single_context'
@@ -35,6 +35,13 @@ INCUMBENT=DEVELOPMENT[1]
 FILES=['examples/milestone5_validation.py','extensions/tendon_family/milestone5_validation.py',
     'extensions/tendon_family/control_evidence.py','extensions/tendon_family/backends.py','tests/test_milestone5_validation.py']
 AUTHORIZATION='User attachment 2026-10-04: NEW bounded prediction-validation stage,24 provider/60 workflow/2 backend/12 additional solves/24 additional rollouts/9000 charged seconds/0 workers,4 corrections max2 consecutive; local commit,no push; predecessor immutable.'
+EXTERNAL_AUTHORIZATION=dict(destination='https://api.deepseek.com',model='deepseek-flash',
+    user_statement='I explicitly authorize sending the prepared research handoff and its updated version to https://api.deepseek.com through the existing deepseek-flash configuration.',
+    covered_data=['robot/task/controller/candidate configurations','historical diagnostics and all six matched intervals',
+        'scientific identities/artifact references/numerical results/errors/comparisons','instructions/tool schemas/budgets/status',
+        'candidate proposals/previews/frozen forecasts/evaluations/interpretation and correction messages necessary for this stage'],
+    credentials='Existing authenticated client only; excluded from messages and evidence.',resumes_existing_grant=True,reviewed_commit='0baf49c',
+    source='User resume attachment 1eb439f5-29a3-4063-a2cb-abba3963ee65, 2026-10-04')
 
 
 def revision():return dict(commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
@@ -58,7 +65,16 @@ class ValidationWorkflow(shared.MilestoneWorkflow):
     def check_provider_payload(self,host):
         assert_predecessor(self)
         super().check_provider_payload(host)
-        atomic_json(self.directory/(self.current_stage+'_serialized_handoff.json'),payload_for(host,EvidenceDrivenAdapter()))
+        payload=payload_for(host,EvidenceDrivenAdapter())
+        atomic_json(self.directory/(self.current_stage+'_serialized_handoff.json'),payload)
+        if self.current_stage=='validation':
+            packet=json.loads(payload['messages'][1]['content'])['role_context']['study_packet']
+            if len(packet.get('development_fidelity',{}).get('development_local_fidelity',[]))!=6:raise ValueError('SIX_INTERVALS_MISSING_FROM_ACTUAL_PAYLOAD')
+            if packet['external_transmission_authorization']!=EXTERNAL_AUTHORIZATION:raise ValueError('ACTUAL_PAYLOAD_AUTHORIZATION_MISSING')
+            from tools.batch_budget import downstream_available
+            if packet['budget']['available']!=downstream_available(self.store,host.run_id):raise ValueError('ACTUAL_HANDOFF_BUDGET_STALE')
+            atomic_json(self.directory/'validation_serialized_handoff_v2.json',payload)
+            self.chain['refreshed_handoff']=save(self.store,payload)
 
 
 def assert_predecessor(w):
@@ -124,7 +140,7 @@ def restore():
         ('common','common_scientific_input'),('source_record','source_record'),('eligibility','numerical_eligibility')]:setattr(w,attr,freeze[key])
     w.historical_results=freeze['historical_results'];w.retained_baseline=w.historical_results[0]['facts'];w.incumbent=freeze['incumbent']
     w.latest_tested=freeze.get('latest_tested',w.historical_results[-1]['facts']['candidate']);w.predecessor_decision=freeze['predecessor_decision']
-    w.chain=read(RUN/'chain.json');w.previous=w.host('design');return w
+    w.chain=read(RUN/'chain.json');w.historical_feedback=w.store.artifact(w.common['feedback']);w.previous=w.host('design');return w
 
 
 def prediction_protocol(w,record,source):
@@ -157,6 +173,8 @@ def prediction_protocol(w,record,source):
         limits=dict(max_wall_s=600.,max_local_solves=6,max_prediction_rollouts=6),tolerances=TOLERANCES,
         observation_rule=read(RUN/'historical_diagnosis.json')['observation_rule'],
         forecast_rule='Holding-entry candidate plan max speed/error compared with incumbent plan on common projected state; unresolved for sub-tolerance differences; no absolute acceptance forecast.',
+        speed_order_rule='With two candidates compare the same 0.30 s cold-preview holding-plan maxima; differences <=1e-4 m/s abstain; otherwise predict ascending full-task max holding speed. Score actual ties explicitly using the same tolerance. One candidate: not applicable.',
+        local_direction_labels=['increasing','decreasing','approximately_unchanged'],
         quantity_definitions=dict(local='world endpoint velocity and speed change over same applied constant command and 0.01 s interval',
             preview='0.20 s horizon 0.10 s; 0.30 s horizon 0.05 s; production integrator/substeps and early-stop policy unchanged',
             full_task='backend sampled maximum over final 0.05 s, acceptance unchanged'),
@@ -166,20 +184,30 @@ def prediction_protocol(w,record,source):
 
 
 def freeze_forecasts(w,record,source):
-    protocol=prediction_protocol(w,record,source);ref=save(w.store,protocol);atomic_json(RUN/'prediction_protocol.json',protocol)
+    if (RUN/'forecast_seal.json').exists():
+        if w.store.artifact(w.chain['forecast_seal'])!=read(RUN/'forecast_seal.json'):raise ValueError('EXISTING_FORECAST_CHANGED')
+        return
     from tools.platform_registry import registry
     reg=registry();reg.add(DEFINITION)
-    inp=deepcopy(w.store.artifact(source['facts']['configuration'])['effective']);inp['run_id']=w.project+'-numerical'
-    inp['policy'].update(budget={**LIMITS,'model_calls':0},route=None,tool_bindings={DEFINITION.extension_id:DEFINITION.version},allowed_tools=[],timeout_s=600.)
-    inp['policy']['operation_allowances']={DEFINITION.extension_id:dict(timeout_s=600.,reserve_s=600.)}
-    host=Host(RUN,inp['run_id'],reg=reg);host.create(inp);host.resume()
-    receipt=host.invoke(dict(request_id='two-checkpoint-preview',tool_id=DEFINITION.extension_id,tool_version=DEFINITION.version,
-        arguments=dict(protocol=ref),reason='Authorized bounded common cold previews and matched development dynamics diagnosis before both new backends.',cache='new'))
-    atomic_json(RUN/'numerical_receipt.json',receipt)
+    host=Host(RUN,w.project+'-numerical',reg=reg)
+    if (RUN/'numerical_receipt.json').exists():
+        receipt=read(RUN/'numerical_receipt.json')
+        if receipt['execution_status']!='completed':raise ValueError('FAILED_NUMERICAL_ATTEMPT_NOT_REPLAYED')
+        result=w.store.artifact(receipt['output'])['detail'];ref=result['protocol'];protocol=w.store.artifact(ref)
+        if protocol!=read(RUN/'prediction_protocol.json') or protocol['accepted_plan']!=w.chain['search_plan']:raise ValueError('SAVED_PREVIEW_BINDING_CHANGED')
+    else:
+        protocol=prediction_protocol(w,record,source);ref=save(w.store,protocol);atomic_json(RUN/'prediction_protocol.json',protocol)
+        inp=deepcopy(w.store.artifact(source['facts']['configuration'])['effective']);inp['run_id']=host.run_id
+        inp['policy'].update(budget={**LIMITS,'model_calls':0},route=None,tool_bindings={DEFINITION.extension_id:DEFINITION.version},allowed_tools=[],timeout_s=600.)
+        inp['policy']['operation_allowances']={DEFINITION.extension_id:dict(timeout_s=600.,reserve_s=600.)}
+        host.create(inp);host.resume()
+        receipt=host.invoke(dict(request_id='two-checkpoint-preview',tool_id=DEFINITION.extension_id,tool_version=DEFINITION.version,
+            arguments=dict(protocol=ref),reason='Authorized bounded common cold previews and matched development dynamics diagnosis before both new backends.',cache='new'))
+        atomic_json(RUN/'numerical_receipt.json',receipt)
     if receipt['execution_status']!='completed':raise ValueError('NUMERICAL_PREVIEW_FAILED: '+str(receipt.get('error')))
     result=w.store.artifact(receipt['output'])['detail'];atomic_json(RUN/'prediction_numerical.json',result);w.chain['prediction_numerical']=receipt['output']
     w.current_stage='forecast_interpretation'
-    w.instructions={**w.instructions,'response_final':shared.FINAL+''' Pre-execution forecast interpretation. BOTH new candidates remain pending and have no backend outcomes. Review the deterministic forecast rule and candidate-specific preview; distinguish development data from validation. Freeze the numerical directions or explicit unresolved status and explain qualifications; do not claim full-task equivalence from tied cold previews. No absolute acceptance or overall ordering is supported. Select the completed incumbent if selecting any result. next_research.route=stop and zero budget means no experiment beyond the already accepted pending batch. About250 words.'''}
+    w.instructions={**w.instructions,'response_final':shared.FINAL+''' Pre-execution forecast interpretation. All new candidates remain pending and have no backend outcomes. Review the deterministic forecast rule and candidate-specific preview; distinguish development data from validation. Freeze the numerical directions or explicit unresolved status and explain qualifications; do not claim full-task equivalence from tied cold previews. Interpret speed_order_forecast as a limited secondary speed-order hypothesis only; its tie/unavailable status means abstention, one candidate means not applicable. No absolute acceptance or overall design ranking is supported. Select the completed incumbent if selecting any result. next_research.route=stop and zero budget means no experiment beyond the already accepted pending batch. About250 words.'''}
     compact=deepcopy(result)
     for row in compact['rows']:row.pop('plan_metrics',None)
     w.phase('response_final','design_response','forecast_interpretation',decision_packet=dict(numerical_preview=compact,
@@ -190,7 +218,10 @@ def freeze_forecasts(w,record,source):
         source_report=w.common['source_report'],source_record=w.source_record)
     forecast=dict(protocol=ref,numerical=receipt['output'],accepted_plan=w.chain['search_plan'],configurations=protocol['configurations'],
         research_interpretation=w.chain['forecast_interpretation'],
+        numerical_dependencies_reference=save(w.store,w.store.session(host.run_id)['snapshot']['dependencies']),
+        numerical_dependency_fingerprint=digest(w.store.session(host.run_id)['snapshot']['dependencies']),
         development_executions=DEVELOPMENT,validation_exclusions=DEVELOPMENT,forecasts=result['forecasts'],predicted_speed_order=result['predicted_speed_order'],
+        speed_order_forecast=result['speed_order_forecast'],speed_order_rule=protocol['speed_order_rule'],
         acceptance_prediction='unresolved',tolerances=TOLERANCES,predictor_fingerprint=revision(),warm_start=protocol['warm_start'],
         local_checkpoint_rule=protocol['prospective_local_rule'],accounting_limits=LIMITS,diagnostic_limits=w.numerical_limits)
     w.chain['forecast_seal']=save(w.store,forecast);atomic_json(RUN/'forecast_seal.json',forecast)
@@ -247,11 +278,13 @@ def assess(w):
             done=next(e for e in events if e['run_id']==event['run_id'] and e['request_id']=='complete-simulation' and e['status']=='completed' and e['sequence']>event['sequence'])
             local.append(dict(prediction=prediction,prediction_reference=event['outputs'][0],seal_sequence=event['sequence'],simulation_completion_sequence=done['sequence'],score=local_score(prediction,following)))
     counts={k:sum(v==k for r in outcomes for v in r['verdict'].values()) for k in ('correct','incorrect','unresolved')}
+    observed_order=pairwise_speed_order([dict(candidate_id=r['candidate_id'],holding_max_speed_m_s=r['metrics']['holding_max_speed_m_s']) for r in outcomes],'holding_max_speed_m_s')
     result=dict(outcomes=outcomes,direction_counts=counts,resolved_coverage=sum(counts[k] for k in ('correct','incorrect'))/sum(counts.values()),
         accuracy_among_resolved=None if counts['correct']+counts['incorrect']==0 else counts['correct']/(counts['correct']+counts['incorrect']),
         local_fidelity=local,local_direction_counts={k:sum(r['score']['direction_verdict']==k for r in local) for k in ('correct','incorrect')},
         local_endpoint_within_tolerance=sum(r['score']['endpoint_within_tolerance'] for r in local),predicted_speed_order=forecast['predicted_speed_order'],
-        observed_speed_order=[r['candidate_id'] for r in sorted(outcomes,key=lambda r:r['metrics']['holding_max_speed_m_s'])],ordering_verdict='unresolved',
+        observed_speed_order=observed_order['order'],observed_speed_order_detail=observed_order,
+        speed_order_forecast=forecast['speed_order_forecast'],ordering_verdict=ordering_score(forecast['speed_order_forecast'],observed_order),
         forecast_chronology=dict(seal_sequence=seal['sequence'],backend_reservation_sequences=[e['sequence'] for e in reservations],passed=True),
         full_evaluation_cost_s=sum(r['charged']['wall_s'] for row in batch['candidates'] for r in row['execution']['receipts'].values()),
         predictor_cost_s=read(RUN/'numerical_receipt.json')['charged']['wall_s'],rules_unchanged=True)
@@ -295,6 +328,11 @@ def planning_handoff(w):
         accepted_final_selection=w.incumbent['candidate'],diagnosis=read(RUN/'historical_diagnosis.json'),development_exclusions=DEVELOPMENT,
         extra_preview_reservation=dict(wall_s=600.,tool_calls=1),stage_authorization=AUTHORIZATION)
     if w.chain.get('development_fidelity'):packet['development_fidelity']=w.store.artifact(w.chain['development_fidelity'])['detail']
+    packet.update(external_transmission_authorization=EXTERNAL_AUTHORIZATION,
+        development_fidelity_reference=w.chain.get('development_fidelity'),
+        scientific_warning='At 0.31 s the historical 0.10/0.05 recipe predicted approximately 0.015943 m/s versus observed 0.022129 m/s, crossing the 0.020000 m/s limit. Correct speed-change direction did not establish reliable threshold classification.',
+        development_interpretation='All six matched intervals underestimated endpoint speed and missed 1e-4 m/s tolerance; projection and subsequent error are distinct. Historical local direction labels meant increasing/decreasing speed, not automatically worse/better task outcome. Tiny trajectory onset is numerical, not proof of meaningful deterioration.',
+        stage_remaining=w.store.remaining()['remaining'],correction_usage=dict(protocol=w.store.session(w.host('design').run_id)['state'].get('protocol_corrections_used',0),semantic=w.freeze.get('semantic_corrections',0)))
     packet['history']=predecessor.compact_decision_packet(dict(history=packet['history']),None)['history']
     packet['diagnosis_reference']=save(w.store,packet['diagnosis'])
     for row in packet['diagnosis']['records']:
@@ -305,6 +343,31 @@ def planning_handoff(w):
         require_source_binding=True,predecessor_decision=w.predecessor_decision,planned_backend_count=2,
         allowed_batch_variables=['control/recipe/holding_tip_speed_weight'],max_variable_count=1,
         required_structure_identity=execution_scope(w.store.artifact(w.incumbent['configuration'])['effective'])['robot']['identity'])
+
+
+def refresh_handoff():
+    """Version the prior blocked payload and record explicit same-stage approval."""
+    from unittest.mock import patch
+    w=restore();assert_predecessor(w)
+    if w.store.remaining()['used']['model_calls']:raise ValueError('FIRST_HANDOFF_ALREADY_SENT')
+    old=RUN/'validation_serialized_handoff.json';historical=RUN/'validation_serialized_handoff_v1.json'
+    if not historical.exists():historical.write_bytes(old.read_bytes())
+    prior_delivery=EVIDENCE/'delivery_before_resume.json'
+    if not prior_delivery.exists():prior_delivery.write_bytes((EVIDENCE/'delivery.json').read_bytes())
+    ref=save(w.store,EXTERNAL_AUTHORIZATION);w.freeze['external_transmission_authorization']=ref
+    with w.store.transaction() as db:w.store.event(db,w.host('design').run_id,'authorization','resumed_same_grant',outputs=[ref])
+    atomic_json(RUN/'external_transmission_authorization.json',EXTERNAL_AUTHORIZATION)
+    extra=planning_handoff(w);original=w.check_provider_payload
+    def check_only(host):
+        original(host);raise RuntimeError('REFRESHED_OUTBOUND_HANDOFF_ONLY')
+    with patch.object(w,'check_provider_payload',side_effect=check_only):
+        try:w.phase('improvement','search_batch_plan','search_plan',**extra)
+        except RuntimeError as exc:
+            if str(exc)!='REFRESHED_OUTBOUND_HANDOFF_ONLY':raise
+    atomic_json(RUN/'handoff_versions.json',dict(v1=dict(path=historical.name,sha256=hashlib.sha256(historical.read_bytes()).hexdigest(),status='blocked_historical',includes_six_intervals=False),
+        v2=dict(path='validation_serialized_handoff_v2.json',reference=w.chain['refreshed_handoff'],status='authorized_current',includes_six_intervals=True),
+        prior_rejection='external_handoff_review.json',external_authorization=ref,usage_unchanged=w.store.remaining()['used']))
+    export(w,'authorized_handoff_refreshed','Explicit transmission approval recorded; existing stage and usage preserved; actual six-interval outbound payload checked.',0.)
 
 
 def prepare_review():
@@ -402,17 +465,31 @@ def live():
         if '127.0.0.1:9' in os.environ.get(key,''):os.environ.pop(key)
     if subprocess.check_output(['git','diff','HEAD','--',*FILES],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
     w=restore() if (RUN/'freeze.json').exists() else prepare();start=time.monotonic();status='incomplete';reason=None
-    if w.store.remaining()['used']['model_calls'] or 'search_plan' in w.chain:raise ValueError('DO_NOT_REPLAY_STARTED_VALIDATION')
     try:
         # Existing planner creates its own capacity packet, so add diagnosis and
         # renewed stage ceiling to the actual shared serialized handoff.
-        w.phase('improvement','search_batch_plan','search_plan',**planning_handoff(w))
+        if 'search_plan' not in w.chain:
+            if w.store.remaining()['used']['model_calls']:raise ValueError('NO_ACCEPTED_PLAN_AFTER_PAID_ATTEMPT')
+            w.phase('improvement','search_batch_plan','search_plan',**planning_handoff(w))
+        elif (RUN/'validation_batch_result.json').exists():
+            raise ValueError('FULL_BATCH_SAVED_USE_EVIDENCE_ONLY_INTERPRETATION_RECOVERY')
+        elif w.store.remaining()['used']['backend_solves']:
+            raise ValueError('BACKEND_ATTEMPT_EXISTS_USE_SAVED_RECEIPT_RECOVERY')
+        else:
+            state=w.store.session(w.host('design').run_id)['state']
+            if state.get('stop_reason')=='IncompleteRead(0 bytes read)':
+                previous=w.host('design').run_id
+                shared.migrate_planning_host(w,'forecast-transport-retry1')
+                intervention=dict(prior_context=previous,new_context=w.host('design').run_id,reason='Known failed forecast interpretation transport receipt; same project, no usage or correction reset.',
+                    reuse='Accepted plan and completed six solves/six rollouts; no numerical replay.',settings_changed=False)
+                atomic_json(RUN/'forecast_transport_recovery.json',intervention)
+                w.freeze.setdefault('resume_interventions',[]).append(intervention)
         record=w.store.artifact(w.chain['search_plan']);atomic_json(RUN/'validation_plan.json',record)
         count=record['plan']['max_candidates']
         if record['bindings']['subject']!=w.incumbent['candidate'] or not 1<=count<=2 or record['plan']['max_backend_attempts']!=count or record['plan']['target_changed_configurations']!=count:raise ValueError('VALIDATION_PLAN_SCOPE')
         if any(r['control/recipe/holding_tip_speed_weight'] in (0,.05,.1) for r in record['plan']['candidates']):raise ValueError('DEVELOPMENT_POINT_NOT_VALIDATION')
         required=batch_requirement(count,planning=dict(model_calls=0,tool_calls=0,wall_s=0),preparation_reserve_s=5.)['requirement']
-        required['wall_s']+=600.;required['tool_calls']+=1
+        if not (RUN/'numerical_receipt.json').exists():required['wall_s']+=600.;required['tool_calls']+=1
         remaining=w.store.remaining()['remaining']
         if any(v>remaining[k] for k,v in required.items()):raise ValueError('PREVIEW_EXECUTION_INTERPRETATION_CAPACITY')
         atomic_json(RUN/'prelaunch_review.json',dict(passed=True,plan=w.chain['search_plan'],exact_candidates=record['plan']['candidates'],required=required,available=remaining,
@@ -444,6 +521,7 @@ def live():
 
 if __name__=='__main__':
     if '--prepare-review' in sys.argv:prepare_review()
+    elif '--refresh-handoff' in sys.argv:refresh_handoff()
     elif '--offline-fidelity' in sys.argv:offline_fidelity()
     elif '--deliver-blocked' in sys.argv:deliver_blocked()
     else:live()

@@ -1,0 +1,133 @@
+{
+  "protocol": {
+    "artifact_id": "bafbb6e2859b282c7a5f9bd85c3b6f20087731f4d489060819eeba65d5465c1d",
+    "media_type": "application/json"
+  },
+  "numerical": {
+    "artifact_id": "28173375b13b1da1f18c3c918dfc0d6f7ca848396ae8abd8f0428e14e378c132",
+    "media_type": "application/json"
+  },
+  "accepted_plan": {
+    "artifact_id": "387f92fd17f0639ff5e2e2277a5ff005eded16bec2699ee220206d1f1e4a520d",
+    "media_type": "application/json"
+  },
+  "configurations": [
+    {
+      "candidate_id": "batch-ebbeadbdaca10732-0",
+      "configuration": {
+        "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "media_type": "application/json"
+      },
+      "role": "reference",
+      "scientific_identity": "c9c6bde67d572a20ae3d8fef46aca5c00c63de23ce2a52e3a1a341447a888273"
+    },
+    {
+      "candidate_id": "batch-387f92fd17f0639f-0",
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.075
+      },
+      "configuration": {
+        "artifact_id": "9185b0f4c24b4303ce9c7ac043dd16386833cae8ad0f992a63e3ff7c974985b8",
+        "media_type": "application/json"
+      },
+      "role": "validation",
+      "scientific_identity": "4f91669bf87b31b80ff1353e3b85c89a79c1d9af143e9283e01784becbaf24f5"
+    },
+    {
+      "candidate_id": "batch-387f92fd17f0639f-1",
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.15
+      },
+      "configuration": {
+        "artifact_id": "e07deb59e3dc7973c535d980ecd937b2fade03de3bf73ffbe1713e5460ecd301",
+        "media_type": "application/json"
+      },
+      "role": "validation",
+      "scientific_identity": "1ab7c97192415b310190fe184390f7a72cd86d4563098b8fc3f4f0b223e1b85f"
+    }
+  ],
+  "research_interpretation": {
+    "artifact_id": "b46d0029fd2cfc0ab622345e38414a3f417780bff6a024c2b086100984c8cca8",
+    "media_type": "application/json"
+  },
+  "numerical_dependencies_reference": {
+    "artifact_id": "e94e4c9eb4206717d146ac84cd5a481b7a092fb86e2cec8ae1c2df5028c6f571",
+    "media_type": "application/json"
+  },
+  "numerical_dependency_fingerprint": "e94e4c9eb4206717d146ac84cd5a481b7a092fb86e2cec8ae1c2df5028c6f571",
+  "development_executions": [
+    "bebcfd47274940fb88a55ce5a2457c4c",
+    "91c3ba1b01d6499fb26df8f95409401b",
+    "110dc2c9c1d642dcb018664a65c62c30"
+  ],
+  "validation_exclusions": [
+    "bebcfd47274940fb88a55ce5a2457c4c",
+    "91c3ba1b01d6499fb26df8f95409401b",
+    "110dc2c9c1d642dcb018664a65c62c30"
+  ],
+  "forecasts": [
+    {
+      "candidate_id": "batch-387f92fd17f0639f-0",
+      "configuration": {
+        "artifact_id": "9185b0f4c24b4303ce9c7ac043dd16386833cae8ad0f992a63e3ff7c974985b8",
+        "media_type": "application/json"
+      },
+      "holding_position_direction": "unresolved",
+      "holding_speed_direction": "unresolved",
+      "joint_acceptance": "unresolved",
+      "qualification": "Heuristic full-task direction from common projected holding-entry cold preview; incomplete closed-loop coverage.",
+      "scientific_identity": "4f91669bf87b31b80ff1353e3b85c89a79c1d9af143e9283e01784becbaf24f5"
+    },
+    {
+      "candidate_id": "batch-387f92fd17f0639f-1",
+      "configuration": {
+        "artifact_id": "e07deb59e3dc7973c535d980ecd937b2fade03de3bf73ffbe1713e5460ecd301",
+        "media_type": "application/json"
+      },
+      "holding_position_direction": "unresolved",
+      "holding_speed_direction": "unresolved",
+      "joint_acceptance": "unresolved",
+      "qualification": "Heuristic full-task direction from common projected holding-entry cold preview; incomplete closed-loop coverage.",
+      "scientific_identity": "1ab7c97192415b310190fe184390f7a72cd86d4563098b8fc3f4f0b223e1b85f"
+    }
+  ],
+  "predicted_speed_order": null,
+  "speed_order_forecast": {
+    "difference_m_s": 0.0,
+    "mapping": "Cold holding-entry plan max speed order hypothesizes full-task holding max speed order; tie/unavailable implies abstention.",
+    "order": null,
+    "status": "tie",
+    "tolerance_m_s": 0.0001
+  },
+  "speed_order_rule": "With two candidates compare the same 0.30 s cold-preview holding-plan maxima; differences <=1e-4 m/s abstain; otherwise predict ascending full-task max holding speed. Score actual ties explicitly using the same tolerance. One candidate: not applicable.",
+  "acceptance_prediction": "unresolved",
+  "tolerances": {
+    "position_m": 1e-06,
+    "speed_m_s": 0.0001,
+    "input_n": 1e-09,
+    "time_s": 1e-08
+  },
+  "predictor_fingerprint": {
+    "commit": "72dfeb5b6b0a0437db3edb579897d3fd0d3a04e3",
+    "files": {
+      "examples/milestone5_validation.py": "595afea0f91d8a791e34017b8c0760fd6e72ed3fd761dadfe3a44eb49c2c4fbf",
+      "extensions/tendon_family/milestone5_validation.py": "fc3c8b2003257b69ff58acaaa9053b33d7c1985ee4a520ab71f6efd4ea80b8dc",
+      "extensions/tendon_family/control_evidence.py": "d74d5ab82181e1192366a809667d7963f46fb6f0b935ac490188de16da3d93e1",
+      "extensions/tendon_family/backends.py": "3608cec50143a594fcb7c6cbc533780f99b7cfb082114ce5ebbedcb40073299b",
+      "tests/test_milestone5_validation.py": "946fc36424eeda1b4f7e879190c92772675b0e737f667373ac95ebdec0166631"
+    }
+  },
+  "warm_start": "Common cold constant previous applied input; candidate-model states independently regenerated; not historical warm reconstruction.",
+  "local_checkpoint_rule": "At updates 20 and 30 seal existing production first-period prediction after actual input verification and before mj_step; score next backend sample. No added solve/rollout.",
+  "accounting_limits": {
+    "model_calls": 24,
+    "tool_calls": 60,
+    "backend_solves": 2,
+    "wall_s": 9000.0,
+    "worker_calls": 0
+  },
+  "diagnostic_limits": {
+    "local_solves": 12,
+    "prediction_evaluations": 24
+  }
+}

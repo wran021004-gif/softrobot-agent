@@ -21,6 +21,27 @@ def direction(delta,epsilon):
     return 'improvement' if delta < -epsilon else 'deterioration' if delta > epsilon else 'practically_unchanged'
 
 
+def speed_change_direction(delta,epsilon=TOLERANCES['speed_m_s']):
+    return 'decreasing' if delta < -epsilon else 'increasing' if delta > epsilon else 'approximately_unchanged'
+
+
+def pairwise_speed_order(rows,key):
+    """Only a tolerance-resolved speed order; no overall ranking."""
+    if len(rows)==1:return dict(status='not_applicable',order=None,reason='Only one candidate.')
+    if len(rows)!=2 or any(not r.get('valid_coverage',True) or r.get(key) is None or not np.isfinite(r[key]) for r in rows):
+        return dict(status='unavailable',order=None,reason='Two valid comparable candidate quantities required.')
+    delta=rows[1][key]-rows[0][key]
+    if abs(delta)<=TOLERANCES['speed_m_s']:
+        return dict(status='tie',order=None,difference_m_s=delta,tolerance_m_s=TOLERANCES['speed_m_s'])
+    return dict(status='resolved',order=[r['candidate_id'] for r in sorted(rows,key=lambda r:r[key])],difference_m_s=delta,tolerance_m_s=TOLERANCES['speed_m_s'])
+
+
+def ordering_score(predicted,observed):
+    if predicted['status']=='not_applicable':return 'not_applicable'
+    if predicted['status']!='resolved' or observed['status']=='unavailable':return 'unresolved'
+    return 'correct' if observed['status']=='resolved' and predicted['order']==observed['order'] else 'incorrect'
+
+
 def aligned_interval(observation, following, period_s):
     p=observation['one_step_prediction']
     if abs(p['time_s']-observation['time_s']-period_s)>TOLERANCES['time_s'] or abs(following['time_s']-p['time_s'])>TOLERANCES['time_s']:
@@ -33,7 +54,7 @@ def aligned_interval(observation, following, period_s):
 def local_score(prediction,observed):
     predicted_delta=prediction['endpoint_speed_m_s']-prediction['initial_projected_speed_m_s']
     observed_delta=observed['speed_m_s']-prediction['initial_backend_speed_m_s']
-    a=direction(predicted_delta,TOLERANCES['speed_m_s']);b=direction(observed_delta,TOLERANCES['speed_m_s'])
+    a=speed_change_direction(predicted_delta);b=speed_change_direction(observed_delta)
     return dict(predicted_speed_change_m_s=predicted_delta,observed_speed_change_m_s=observed_delta,
         endpoint_speed_error_m_s=prediction['endpoint_speed_m_s']-observed['speed_m_s'],
         velocity_error_norm_m_s=float(np.linalg.norm(np.asarray(prediction['endpoint_velocity_m_s'])-observed['velocity_m_s'])),
@@ -129,8 +150,12 @@ def execute(ctx,args):
             if f[key]=='practically_unchanged':f[key]='unresolved'
     development=(ctx.artifact(protocol['development_fidelity_reference'])['detail']['development_local_fidelity']
         if protocol.get('development_fidelity_reference') else development_fidelity(ctx,protocol))
+    candidates=[dict(candidate_id=r['candidate_id'],holding_plan_max_speed_m_s=r['holding_plan_max_speed_m_s'],
+        valid_coverage=r['effective_horizon']==5) for r in rows if r['role']!='reference' and r['update_id']==30]
+    ordering=pairwise_speed_order(candidates,'holding_plan_max_speed_m_s')
+    ordering['mapping']='Cold holding-entry plan max speed order hypothesizes full-task holding max speed order; tie/unavailable implies abstention.'
     return DiagnosticEvidence(detail=dict(protocol=plain(args.protocol),rows=rows,forecasts=forecasts,development_local_fidelity=development,
-        predicted_speed_order=None,acceptance_prediction='unresolved',local_solves=len(rows),prediction_rollouts=len(rows),
+        predicted_speed_order=ordering['order'],speed_order_forecast=ordering,acceptance_prediction='unresolved',local_solves=len(rows),prediction_rollouts=len(rows),
         complete_cost_s=time.perf_counter()-start,scope='Candidate-specific production-policy cold previews at two development checkpoints; full task hypotheses remain qualified.'))
 
 

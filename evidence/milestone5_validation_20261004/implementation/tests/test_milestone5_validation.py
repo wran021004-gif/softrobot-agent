@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 from unittest import TestCase
 from unittest.mock import patch
 import json
-from extensions.tendon_family.milestone5_validation import aligned_interval,local_score,direction,diagnose
+from extensions.tendon_family.milestone5_validation import aligned_interval,local_score,direction,diagnose,pairwise_speed_order,ordering_score,speed_change_direction
 from tools.platform_models import payload_for
 from tools.diagnostic_reference_adapter import EvidenceDrivenAdapter
 from tools.state_io import read
@@ -59,3 +59,38 @@ class AlignmentTests(TestCase):
         self.assertEqual(result['differences'][0]['first_command']['time_s'],.2)
         self.assertEqual(result['differences'][0]['first_position']['time_s'],.21)
         self.assertFalse(result['records'][0]['availability']['historical_warm_plans'])
+
+
+class ResumeChangesTests(TestCase):
+    def test_speed_order_abstains_for_ties_and_missing_coverage(self):
+        rows=[dict(candidate_id='a',speed=.01),dict(candidate_id='b',speed=.01001)]
+        tied=pairwise_speed_order(rows,'speed');self.assertEqual(tied['status'],'tie');self.assertIsNone(tied['order'])
+        self.assertEqual(ordering_score(tied,tied),'unresolved')
+        rows[1]['valid_coverage']=False
+        self.assertEqual(pairwise_speed_order(rows,'speed')['status'],'unavailable')
+        self.assertEqual(pairwise_speed_order(rows[:1],'speed')['status'],'not_applicable')
+
+    def test_speed_order_scores_correct_incorrect_and_actual_tie(self):
+        predicted=pairwise_speed_order([dict(candidate_id='a',speed=.02),dict(candidate_id='b',speed=.01)],'speed')
+        self.assertEqual(predicted['order'],['b','a'])
+        self.assertEqual(ordering_score(predicted,predicted),'correct')
+        other=pairwise_speed_order([dict(candidate_id='a',speed=.01),dict(candidate_id='b',speed=.02)],'speed')
+        self.assertEqual(ordering_score(predicted,other),'incorrect')
+        tied=pairwise_speed_order([dict(candidate_id='a',speed=.01),dict(candidate_id='b',speed=.01001)],'speed')
+        self.assertEqual(ordering_score(predicted,tied),'incorrect')
+
+    def test_local_speed_labels_are_neutral(self):
+        self.assertEqual(speed_change_direction(.01),'increasing')
+        self.assertEqual(speed_change_direction(-.01),'decreasing')
+        self.assertEqual(speed_change_direction(.00001),'approximately_unchanged')
+
+    def test_actual_refreshed_handoff_has_six_intervals_and_current_capacity(self):
+        payload=read(stage.RUN/'validation_serialized_handoff_v2.json');packet=json.loads(payload['messages'][1]['content'])['role_context']['study_packet']
+        self.assertEqual(len(packet['development_fidelity']['development_local_fidelity']),6)
+        self.assertEqual(packet['external_transmission_authorization'],stage.EXTERNAL_AUTHORIZATION)
+        self.assertIn('0.015943',packet['scientific_warning']);self.assertIn('0.022129',packet['scientific_warning'])
+        self.assertEqual(packet['budget']['available']['backend_solves'],2)
+        self.assertEqual(packet['stage_remaining']['model_calls'],24)
+        versions=read(stage.RUN/'handoff_versions.json')
+        import hashlib
+        self.assertEqual(hashlib.sha256((stage.RUN/versions['v1']['path']).read_bytes()).hexdigest(),versions['v1']['sha256'])
