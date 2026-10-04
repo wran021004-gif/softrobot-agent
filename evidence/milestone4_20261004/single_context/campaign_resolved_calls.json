@@ -1,0 +1,588 @@
+[
+  {
+    "run_id": "gvs-milestone4-e117fbe28995-control-engineering1",
+    "reference": {
+      "artifact_id": "9539a112f04a54bf5184f97b77fbc03022bae9d8236038a6df95f92a7dc95fb0",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "adopt_candidate",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "f1471a780471484c90cbe0f2a2f356e115a909e2550b472c5f7afe2c8017c5a6",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "supported",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "Apply exactly one canonical structural edit, components/near/length_m = 0.16 (inside permitted [0.15,0.17]), leaving components/far/length_m and all section/modulus paths unmodified and the controller recipe frozen; run one complete simulation/evaluation/profile and compare holding_max_speed_m_s, holding_max_error_m and terminal_error_m against the 0.02 m/s and 0.01 m bounds.",
+          "evidence": [
+            "candidate exec a8382f8a4c6e4ebe921fb72f821b2188: joint_reach_holding_passed true, holding_max_speed_m_s=0.018335, holding_max_error_m=0.008212, terminal_error_m=0.008117 under holding=0.05/terminal=0.05",
+            "source exec 50618bf23b31464ba4f84c55cd26d1ca (terminal=0.05): holding_speed 0.035567, joint holding failed",
+            "retained baseline exec cf997605885642759ee33920e2c9e2ef (weights 0/0): holding_speed 1.581, joint holding failed",
+            "structure identity ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060 shared by all six completed rows",
+            "correction_review a8dc2e4dbec738453c8d70708a3906734f764c0cfed071b905cc8d0ba2079094: prior 1500 s/5-tool/1-model budget short of execution+interpretation reservations"
+          ],
+          "expected_observations": [
+            "Supporting: holding_max_speed_m_s stays below 0.02 m/s with holding_max_error_m<=0.01 and terminal_error_m<=0.01, joint_reach_holding_passed true on the changed structure",
+            "Weakening: holding speed rises above 0.02 m/s or position/terminal exceed 0.01 m, i.e. acceptance lost after the length change",
+            "Neutral: holding speed near the 0.02 m/s bound with position and terminal still passing"
+          ],
+          "fixed_conditions": [
+            "controller.gvs_nmpc@7.0.0 recipe frozen: control/recipe/holding_tip_speed_weight=0.05, control/recipe/terminal_tip_speed_weight=0.05",
+            "components/far/length_m unchanged at 0.11 and all section, angle, density and modulus fields unchanged",
+            "acceptance bounds unchanged: holding_max_error_m<=0.01, holding_max_speed_m_s<=0.02, terminal_error_m<=0.01, final-window 0.05 s"
+          ],
+          "limitations": [
+            "Single structure and single configuration; no causal, global, continuous-time, hardware or real-time conclusion",
+            "Perturbation applies one length only; section, angle and modulus effects are not tested and would need separate declared paths",
+            "Physical failure would not establish physical impossibility, and an acceptance loss is only a tested-candidate observation, not proof of ineffectiveness across the length range",
+            "Controller-weight adaptation on the changed structure is a separate later study"
+          ],
+          "proposed_budget": {
+            "backend_solves": 1,
+            "model_calls": 5,
+            "tool_calls": 9,
+            "wall_s": 1590.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {
+            "components/near/length_m": "0.16"
+          },
+          "route": "structure_change",
+          "stopping_conditions": [
+            "Stop after one charged backend attempt (single immutable structural result); do not chain further length edits in this route",
+            "Stop early if the build cannot apply the canonical path or any physical bound is violated during simulation",
+            "Record but do not extend on solver_error_count>0"
+          ],
+          "unresolved_question": "On the frozen controller recipe (holding_tip_speed_weight=0.05, terminal_tip_speed_weight=0.05) that just gained joint acceptance, does shortening the canonical near-segment length components/near/length_m from 0.15 to a bounded 0.16 retain holding-speed below 0.02 m/s together with holding-position and terminal error within 0.01 m?"
+        },
+        "reasoning": "Completed batch-9293a74b063bb9a0-0 (exec a8382f8a4c6e4ebe921fb72f821b2188), weights holding=0.05/terminal=0.05: terminal reach passed (terminal_error_m=0.008117<=0.01); holding position passed (holding_max_error_m=0.008212<=0.01); holding speed passed at 0.018335 m/s, below the 0.02 criterion and the source's 0.035567; joint_reach_holding_passed=true. Deadline misses 35, mean_complete_update_s 17.259 vs source 16.876, no solver errors, force_bound_violation_n=0. Against retained baseline af649bf5... and source 50618bf23b31464ba4f84c55cd26d1ca, all three physical metrics improve or equal, so this is joint acceptance gained, not a trade-off; raw objectives under differing weights are not ranked. Timing is marginally slower than source. Scope: one registered structure, one configuration; no causal, global, continuous-time, hardware or real-time claim; zero bound violation does not exclude legal near-bound input. Hypothesis is supported for this tested point only. Diagnostic disposition: defer with recommendation_id=null, since only the study hypothesis was assessed and no recommendation ID was supplied. Adoption is independent: adopt_candidate batch-9293a74b063bb9a0-0. Correcting the prior proposal per correction_review: its 1500 s / 5-tool / 1-model budget was below computed execution and interpretation reservations for two evaluations; this route proposes one structural result and uses the computed one-result requirement. Prior proposal varied undeclared section/modulus paths; here exactly one canonical length path is varied, recipe frozen.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-9293a74b063bb9a0-0",
+          "configuration": {
+            "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+            "media_type": "application/json"
+          },
+          "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+          "owner_run_id": "batch-9293a74b063bb9a0-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-3-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone4-e117fbe28995-control-engineering1",
+    "reference": {
+      "artifact_id": "7b3b88c38b29ee3cc3295d0c88e5ae0d52ca8cf922923ccbfbae8ae75ab698a9",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "adopt_candidate",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "f1471a780471484c90cbe0f2a2f356e115a909e2550b472c5f7afe2c8017c5a6",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "supported",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "One structure change: set components/near/length_m to 0.16 (increase from 0.15), then run one complete simulation/evaluation and re-test joint acceptance.",
+          "evidence": [
+            "a8382f8a4c6e4ebe921fb72f821b2188: joint_reach_holding_passed true; holding_max_speed_m_s 0.018335; holding_max_error_m 0.008212; terminal_error_m 0.008117",
+            "review next_study: path components/near/length_m, proposed_value 0.16, source_value 0.15 (a length increase)"
+          ],
+          "expected_observations": [
+            "holding_max_error_m, holding_max_speed_m_s, terminal_error_m at length 0.16 relative to length 0.15",
+            "whether joint_reach_holding_passed is retained or lost"
+          ],
+          "fixed_conditions": [
+            "controller.gvs_nmpc@7.0.0",
+            "control/recipe/holding_tip_speed_weight=0.05",
+            "control/recipe/terminal_tip_speed_weight=0.05",
+            "all other structure components unchanged (near cross-section, mid_guide, connector, far, payload)",
+            "acceptance thresholds (terminal 0.01 m, holding pos 0.01 m, holding speed 0.02 m/s, window 0.05 s) unchanged"
+          ],
+          "limitations": [
+            "single structure point and single seed/case; no causal or range-wide claim",
+            "no continuous-time guarantee; deadline_misses 35; no real-time or hardware claim",
+            "a physical failure at 0.16 m would not establish physical impossibility",
+            "one-result budget from a one-length proposal"
+          ],
+          "proposed_budget": {
+            "backend_solves": 1,
+            "model_calls": 1,
+            "tool_calls": 4,
+            "wall_s": 960.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {
+            "components/near/length_m": "0.16 (increase from 0.15)"
+          },
+          "route": "structure_change",
+          "stopping_conditions": [
+            "stop after one completed evaluation",
+            "stop early if joint acceptance is lost",
+            "stop if force-bound violation or solver_error_count becomes nonzero"
+          ],
+          "unresolved_question": "On the unchanged controller.gvs_nmpc@7.0.0 with both tip-speed weights at 0.05, does increasing components/near/length_m from 0.15 m to 0.16 m retain joint acceptance and change holding and terminal errors?"
+        },
+        "reasoning": "Sealed complete evaluation a8382f8a4c6e4ebe921fb72f821b2188 (batch-9293a74b063bb9a0-0, holding=0.05/terminal=0.05) is the first executed joint-positive point. Terminal reach: terminal_error_m 0.008117 <= 0.01, pass. Holding position: holding_max_error_m 0.008212 <= 0.01, pass. Holding speed: holding_max_speed_m_s 0.018335 <= 0.02, pass. Complete-update timing: mean_complete_update_s 17.259, 35/35 deadline misses, real_time_demonstrated false — observation only, no real-time claim.\n\nTwo named comparison vectors. Versus source 50618bf23b31464ba4f84c55cd26d1ca: holding speed 0.035567->0.018335 (crosses 0.02), holding error 0.0082751->0.008212, terminal error 0.0081869->0.0081173 all lower; mean update time +0.3825 s higher (tradeoff). Versus retained baseline cf997605885642759ee33920e2c9e2ef: holding error 0.058138->0.008212, holding speed 1.581->0.018335, mean update time slightly lower; but terminal_error_m 0.0076426->0.0081173 is HIGHER by 4.75e-4 m. Correction of prior prose: not all physical metrics improve against baseline — terminal error is slightly worse versus baseline, while reach still passes and joint acceptance is gained. Both reference comparisons classify joint_acceptance_gained.\n\nHypothesis (holding speed below 0.03557 toward 0.02, with holding error and terminal error <= 0.01 retained) is supported by the sealed evaluation. Diagnostic recommendation: none supplied, so defer with recommendation_id null. Candidate selection is independent: the candidate meets every acceptance threshold and gains joint acceptance versus both references, so adopt_candidate.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-9293a74b063bb9a0-0",
+          "configuration": {
+            "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+            "media_type": "application/json"
+          },
+          "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+          "owner_run_id": "batch-9293a74b063bb9a0-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-4-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone4-e117fbe28995-control-final-budget",
+    "reference": {
+      "artifact_id": "e51cf0dfaa628cdbdb8df8d884c6273ae84095315c46f251e3582698d507f09f",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "adopt_candidate",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "f1471a780471484c90cbe0f2a2f356e115a909e2550b472c5f7afe2c8017c5a6",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "supported",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "Execute one structure-change candidate with control weights frozen at holding 0.05 / terminal 0.05 and evaluate the complete reach+holding result, comparing componentwise physical metrics against candidate batch-9293a74b063bb9a0-0.",
+          "evidence": [
+            "Candidate batch-9293a74b063bb9a0-0 execution a8382f8a4c6e4ebe921fb72f821b2188 gained joint_acceptance_gained: holding_max_speed_m_s 0.01833, holding_max_error_m 0.00821, terminal_error_m 0.00812, joint_reach_holding_passed true.",
+            "Source batch-43a6daab7e3c1ce6-3 execution 50618bf23b31464ba4f84c55cd26d1ca had holding_speed_passed false (0.03557 m/s) at terminal 0.05 only.",
+            "Retained baseline cf997605885642759ee33920e2c9e2ef failed holding (0.05814 m; 1.581 m/s).",
+            "All retained rows share structure_identity ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060, deadline_misses 35/35, real_time_demonstrated false."
+          ],
+          "expected_observations": [
+            "holding_max_speed_m_s either remains < 0.02 with joint acceptance retained, or shifts measurably, indicating structural sensitivity of the joint-positive result",
+            "terminal_reach and holding flags reported separately",
+            "mean_complete_update_s and deadline_misses reported as measured timing"
+          ],
+          "fixed_conditions": [
+            "controller.gvs_nmpc@7.0.0",
+            "control_period_s 0.01",
+            "control/recipe/holding_tip_speed_weight 0.05",
+            "control/recipe/terminal_tip_speed_weight 0.05",
+            "acceptance thresholds terminal 0.01 m, holding error 0.01 m, holding speed 0.02 m/s, window 0.05 s"
+          ],
+          "limitations": [
+            "Single simulated execution; no hardware or real-time validation",
+            "Structure change is not proven causal for any metric difference",
+            "Result describes only the tested candidate, not a parameter range",
+            "Physical failure would not establish impossibility"
+          ],
+          "proposed_budget": {
+            "backend_solves": 1,
+            "model_calls": 5,
+            "tool_calls": 9,
+            "wall_s": 1590.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {
+            "physical_structure": "single far-component section/length modification",
+            "structure_identity": "changed from ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060"
+          },
+          "route": "structure_change",
+          "stopping_conditions": [
+            "Stop after one structure-change candidate",
+            "Do not iterate structure if joint acceptance is lost or physical metrics degrade"
+          ],
+          "unresolved_question": "Does a single structural modification of the soft continuum body change holding speed/position margins beyond the joint-positive control point (holding 0.05 / terminal 0.05), or is joint acceptance specific to the tested structure identity with these weights frozen?"
+        },
+        "reasoning": "Hypothesis supported. Candidate batch-9293a74b063bb9a0-0 (execution a8382f8a4c6e4ebe921fb72f821b2188), the previously unexecuted joint-positive point (holding 0.05 / terminal 0.05), reached holding_max_speed_m_s 0.01833 m/s (below the 0.02 criterion and the 0.03557 m/s source value), holding_max_error_m 0.00821, terminal_error_m 0.00812, with terminal_reach_passed, holding_position_passed, holding_speed_passed, joint_reach_holding_passed and official_reach_task_success all true. Program classification: joint_acceptance_gained against both source (50618bf23b31464ba4f84c55cd26d1ca) and retained baseline (cf997605885642759ee33920e2c9e2ef). Versus source, all three physical metrics improved (holding error -6.31e-05 m, speed -0.01723 m/s, terminal -6.96e-05 m) with update time worsening +0.3825 s—a timing tradeoff only, not a physical one. Versus retained baseline, holding metrics improved strongly while terminal_error slightly worsened (+4.75e-04 m, still passing), i.e. a physical tradeoff at a passing level. All retained executions show deadline_misses 35/35 and real_time_demonstrated false; zero force-bound violations do not exclude legal near-bound inputs. This is diagnostic-only assessment, so no recommendation ID is issued. Candidate adoption is independent: joint acceptance was gained, so the evaluated candidate is adopted. No causal, global, continuous-time, hardware or real-time claim is made; physical failure is not impossibility.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-9293a74b063bb9a0-0",
+          "configuration": {
+            "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+            "media_type": "application/json"
+          },
+          "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+          "owner_run_id": "batch-9293a74b063bb9a0-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-0-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone4-e117fbe28995-shared",
+    "reference": {
+      "artifact_id": "4fae6c29789d5ad60d05127a0feb95c72522042d6ae905dd1d6953e2b9cb2919",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidates": [
+          {
+            "control/recipe/holding_tip_speed_weight": 0.05,
+            "control/recipe/terminal_tip_speed_weight": 0.05
+          }
+        ],
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F1",
+          "F10",
+          "F100"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "Sampled metrics only: holding window = retained samples in final 0.05 s and terminal = last execution sample, with continuous_time_guarantee false and real_time_demonstrated false in every completed row; no continuous-time, real-time or hardware claim.",
+          "Single new control point on the two existing speed-weight paths; no dominant-cause attribution and no parameter-range ineffectiveness claim can be derived from this batch.",
+          "Deadline misses are present throughout the historical rows; raw termination and controller policy stops remain distinct and are not conflated with acceptance."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "On the frozen stack, adding a positive control/recipe/holding_tip_speed_weight (0.05) to the terminal-only source execution 50618bf23b31464ba4f84c55cd26d1ca (holding 0.0 / terminal 0.05) reduces sampled final-window holding maximum world-tip speed below the source 0.035567 m/s toward the 0.02 m/s criterion while retaining terminal reach (terminal_error_m <= 0.01) and holding position (holding_max_error_m <= 0.01), so that joint_reach_holding_passed becomes true. The previously untested joint-positive branch (tested_branches.joint_positive empty) is the direct object of the test.",
+        "max_backend_attempts": 1,
+        "max_candidates": 1,
+        "method": "search.family_explicit@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 1,
+          "model_calls": 5,
+          "tool_calls": 9,
+          "wall_s": 1590.0,
+          "worker_calls": 0
+        },
+        "predecessor_decision": {
+          "artifact_id": "c2d2d417264ff7f0357f58838b1dccb9d48b013a71d0f78aa09d5e88123b4fb3",
+          "media_type": "application/json"
+        },
+        "rationale": "Source selection (separate from retained baseline and latest tested): completed terminal-only execution 50618bf23b31464ba4f84c55cd26d1ca (candidate batch-43a6daab7e3c1ce6-3) has holding_tip_speed_weight 0.0 / terminal_tip_speed_weight 0.05, holding_max_error_m 0.008275 pass, holding_max_speed_m_s 0.035567 fail, terminal_error_m 0.008187 pass, joint_reach_holding_passed false, valid_complete_execution true. It is neither the retained baseline cf997605885642759ee33920e2c9e2ef (holding_max_error_m 0.05814, holding_max_speed_m_s 1.5810, terminal_error_m 0.00764, joint false) nor the latest tested 44dbf3bc2964402e9f6af6a93c0f8d7d (terminal 0.1, holding_max_speed_m_s 0.04868, joint false).\n\nObservation / hypothesis / proposed test are kept distinct. Observations: the six completed rows form zero-zero (cf997605), holding-only positives (087adee8 0.05, 22241105 0.1, 25e26708 0.3), and terminal-only positives (50618bf2 0.05, 44dbf3bc 0.1); holding-only weights retained-fail the holding-speed criterion and 0.1/0.3 lost terminal reach, while terminal-only 0.05 produced the smallest sampled holding speed (0.035567) still above 0.02. Hypothesis (proposed test): a small holding weight added on top of terminal 0.05 lowers sampled holding speed below 0.035567 while terminal reach is retained, giving joint acceptance. Proposed test: exactly one changed configuration, holding 0.05 / terminal 0.05 (terminal fixed at the source value), one backend attempt, target_changed_configurations 1.\n\nOnly the two existing speed-weight paths are varied; task, actuation (force_bounds), controller_implementation (controller.gvs_nmpc@7.0.0), initializer, timing (control_period_s 0.01, 35 control updates), solver, horizon and all undeclared structural fields (robot) are preserved, as are acceptance and other_numerical_settings. claims are scoped: the association of holding-only positive weights with retained-fail holding speed and degraded terminal reach holds for the tested points and does not identify a dominant cause or ineffectiveness across the parameter range; sampled coverage and the absent continuous-time guarantee bound generalization. No separate numerical diagnostic work is planned, and no physical improvement is claimed before execution.",
+        "scientific_promise": "uncertain",
+        "source_candidate": {
+          "candidate_id": "batch-43a6daab7e3c1ce6-3",
+          "configuration": {
+            "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+            "media_type": "application/json"
+          },
+          "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+          "owner_run_id": "batch-43a6daab7e3c1ce6-3"
+        },
+        "step": null,
+        "stopping_conditions": [
+          "Stop after the single changed configuration has a complete evaluation and profile (target_changed_configurations=1), or after the single backend attempt cap is reached.",
+          "Stop on unknown or material failure, or if delivery capacity is insufficient to complete the changed configuration.",
+          "If joint_reach_holding_passed is true, stop and report the configuration as a joint-acceptance candidate for adoption review.",
+          "If holding_max_speed_m_s does not fall below the source 0.035567 m/s, stop raising holding_tip_speed_weight and report the observed adverse or non-monotone step.",
+          "If terminal reach or holding position acceptance is lost (terminal_reach_passed false or holding_max_error_m > 0.01), stop and report as completed physical evidence."
+        ],
+        "target_changed_configurations": 1,
+        "variables": {
+          "control/recipe/holding_tip_speed_weight": [
+            0.0,
+            0.05
+          ],
+          "control/recipe/terminal_tip_speed_weight": [
+            0.05,
+            0.05
+          ]
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "Within the six completed rows only, holding-only positive weights did not approach the 0.02 m/s criterion: 087adee8 (holding 0.05/terminal 0.0) holding_max_speed_m_s 1.175005, 22241105 (0.1/0.0) 1.363232 with terminal_reach_passed false, 25e26708 (0.3/0.0) 1.127628 with terminal_reach_passed false; this scopes to those tested points and is not evidence of ineffectiveness across the whole weight range.",
+          "The terminal-weight step did not behave monotonically: 44dbf3bc (terminal 0.1) raised holding_max_speed_m_s by +0.013112 versus the 50618bf2 source (0.035567 -> 0.048675), so a further holding-weight addition need not lower sampled holding speed.",
+          "All completed rows report deadline_misses equal to control_updates (35) and real_time_demonstrated false; coverage is sampled (holding = retained samples in final 0.05 s, terminal = last execution sample) with continuous_time_guarantee false, so any outcome bounds only this sampled protocol.",
+          "A passing holding_max_error_m does not certify holding-speed prediction, and zero force_bound_violation_n does not exclude legal near-bound but finite-safe inputs."
+        ]
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-0-tool",
+      "tool_id": "design.submit_search_plan",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone4-e117fbe28995-shared",
+    "reference": {
+      "artifact_id": "6872210f54931c9a0cd368017c67cae09de59100b51bb34a71b01aadcbcae5de",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidates": [
+          {
+            "control/recipe/holding_tip_speed_weight": 0.05
+          }
+        ],
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F1",
+          "F10",
+          "F100"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "Sampled metrics only: terminal coverage is the last execution sample, holding coverage is all retained samples in the final 0.05 s, continuous_time_guarantee false.",
+          "No real-time or hardware claim: real_time_demonstrated false, deadline_misses 35, mean_complete_update_s ~17 s against control_period_s 0.01.",
+          "Single previously unevaluated control point at frozen terminal weight 0.05; no interpolation, monotonicity or parameter-range claim.",
+          "Zero force_bound_violation_n in prior rows does not exclude a legal near-bound input; raw termination and controller policy stops are separate and not conflated."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "On the unchanged controller.gvs_nmpc@7.0.0 stack with control/recipe/terminal_tip_speed_weight frozen at 0.05, setting control/recipe/holding_tip_speed_weight to 0.05 (a joint-positive point that has never been executed; joint_positive_weight_tested false) will lower the sampled final-window holding maximum world-tip speed holding_max_speed_m_s below the 0.03557 m/s measured for source execution 50618bf23b31464ba4f84c55cd26d1ca, toward the 0.02 m/s criterion, while holding_max_error_m <= 0.01 and terminal_error_m <= 0.01 are retained (joint_reach_holding_passed true).",
+        "max_backend_attempts": 1,
+        "max_candidates": 1,
+        "method": "search.family_explicit@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 1,
+          "model_calls": 5,
+          "tool_calls": 9,
+          "wall_s": 1590.0,
+          "worker_calls": 0
+        },
+        "predecessor_decision": {
+          "artifact_id": "c2d2d417264ff7f0357f58838b1dccb9d48b013a71d0f78aa09d5e88123b4fb3",
+          "media_type": "application/json"
+        },
+        "rationale": "Source selection: from study_packet.history.rows I select batch-43a6daab7e3c1ce6-3 / execution 50618bf23b31464ba4f84c55cd26d1ca (holding 0.0 / terminal 0.05) as the verified source, because its frozen terminal value 0.05 is exactly the intended fixed condition for this point; it is distinct from the retained baseline (baseline-replay / cf997605) and the latest tested (batch-bc1f58ac54026d97-0 / 44dbf3bc, terminal 0.1). Only the holding speed-weight path is varied, inside the current builder grant; terminal_tip_speed_weight is a fixed numerical setting under other_numerical_settings, not a varied path. Predecessor_decision is copied from study_packet.predecessor_decision. Observations from the six completed configurations: terminal-only positives (50618bf2, 44dbf3bc) retain holding position and terminal reach but never reach holding speed <= 0.02 (0.03557, 0.04868), and the terminal step 0.05 -> 0.1 was an adverse non-monotone increase at that tested point; holding-only positives with terminal 0 (087adee8 at 0.05, 2224110 at 0.1, 25e26708 at 0.3) kept holding position failing (holding_max_error_m 0.0565-0.0634) and 0.1/0.3 additionally lost official_reach_task_success. The joint-positive branch (both weights positive) is untested. Hypothesis (proposed test, not a conclusion): with terminal fixed at 0.05, holding 0.05 lowers holding_max_speed_m_s below 0.03557 while holding_max_error_m and terminal_error_m stay <= 0.01. Scope: this is one previously unevaluated point and cannot establish a dominant cause, monotonicity, or ineffectiveness across a parameter range; a small unsuccessful batch would only describe the tested candidate. All undeclared structural fields (robot), task, acceptance, controller implementation, timing, initializer, solver and horizon are preserved. This is one shared cumulative campaign with no reset or extra grant.",
+        "scientific_promise": "uncertain",
+        "source_candidate": {
+          "candidate_id": "batch-43a6daab7e3c1ce6-3",
+          "configuration": {
+            "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+            "media_type": "application/json"
+          },
+          "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+          "owner_run_id": "batch-43a6daab7e3c1ce6-3"
+        },
+        "step": null,
+        "stopping_conditions": [
+          "Stop after the single planned backend attempt (max_backend_attempts=1) reaching target_changed_configurations=1 distinct changed configuration.",
+          "Stop on any unknown or material failure (backend rejection, solver error, invalid or incomplete execution).",
+          "If joint_reach_holding_passed is true, stop and consider adoption; if false, stop and report the observed step without separate numerical diagnostic work.",
+          "If holding_max_speed_m_s does not fall below 0.03557 m/s, stop and report the observed adverse or non-monotone step rather than extending the batch."
+        ],
+        "target_changed_configurations": 1,
+        "variables": {
+          "control/recipe/holding_tip_speed_weight": [
+            0.0,
+            0.05
+          ]
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "holding_max_speed_m_s at or above the source value 0.03557 m/s, or an increase like the adverse terminal-weight step (0.05 -> 0.1 raised it from 0.03557 to 0.04868), indicating no sampled reduction at this single tested point.",
+          "Loss of holding_max_error_m <= 0.01 or terminal_error_m <= 0.01 (joint_reach_holding_passed false), as seen for the terminal-0 holding-only positives where holding_max_error_m was 0.0565-0.0634.",
+          "Any force_bound_violation_n > 0, solver_error_count > 0, or non-valid/incomplete execution.",
+          "One previously unevaluated point cannot establish monotonicity, a dominant cause, or ineffectiveness across the weight range; zero force_bound_violation_n in prior rows does not exclude a legal near-bound input."
+        ]
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-1-tool",
+      "tool_id": "design.submit_search_plan",
+      "tool_version": "1.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone4-e117fbe28995-shared",
+    "reference": {
+      "artifact_id": "8d82c1957a5e8fa81d250c1ab206c93265bdeeafc94f08e863a283cc109d74dd",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidates": [
+          {
+            "control/recipe/holding_tip_speed_weight": 0.05
+          }
+        ],
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F1",
+          "F10",
+          "F100"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "Single tested control point with one backend attempt; the result describes only this point and supports no interpolation, monotonicity or parameter-range inference over holding_tip_speed_weight.",
+          "Sampled final-window coverage conventions are unchanged (holding = all retained samples in the final 0.05 s; terminal = last execution sample); there is no continuous_time_guarantee.",
+          "No real-time or hardware claim is made; deadline_misses and mean_complete_update_s are runtime/policy observations distinct from raw solver termination.",
+          "Zero force_bound_violation_n at tested points does not exclude legal near-bound actuation inputs.",
+          "Fixed_conditions robot/task/acceptance/controller_implementation/other_numerical_settings are held as in the source; the only varied field is control/recipe/holding_tip_speed_weight, with control/recipe/terminal_tip_speed_weight frozen at 0.05 and control_period_s 0.01 / 35 control updates unchanged."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "On the frozen stack, adding a positive control/recipe/holding_tip_speed_weight = 0.05 while control/recipe/terminal_tip_speed_weight is fixed at 0.05 (the source value) will reduce sampled final-window holding maximum world-tip speed below the 0.02 m/s criterion while terminal reach is retained (terminal_error_m <= 0.01, terminal_reach_passed true), yielding joint_reach_holding_passed true at the first previously unevaluated joint-positive control point.",
+        "max_backend_attempts": 1,
+        "max_candidates": 1,
+        "method": "search.family_explicit@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 1,
+          "model_calls": 5,
+          "tool_calls": 9,
+          "wall_s": 1590.0,
+          "worker_calls": 0
+        },
+        "predecessor_decision": {
+          "artifact_id": "c2d2d417264ff7f0357f58838b1dccb9d48b013a71d0f78aa09d5e88123b4fb3",
+          "media_type": "application/json"
+        },
+        "rationale": "Source: exact verified identity copied from study_packet.history.rows — source_candidate batch-43a6daab7e3c1ce6-3, configuration artifact e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014, execution 50618bf23b31464ba4f84c55cd26d1ca, owner_run_id batch-43a6daab7e3c1ce6-3, controller controller.gvs_nmpc@7.0.0. This is distinct from the retained baseline (baseline-replay / af649bf5... / cf997605...) and from the latest tested candidate (batch-bc1f58ac54026d97-0 / 311433c7... / 44dbf3bc..., which set terminal weight 0.1). predecessor_decision is copied from study_packet (artifact c2d2d417...).\n\nObservations (completed historical evidence, six configurations): the zero/zero baseline fails holding (holding_max_error_m 0.05814 m, holding_max_speed_m_s 1.5810 m/s, both components false); the three holding-only positive points (0.05, 0.1, 0.3 with terminal 0.0) fail holding speed and the official reach task; the two terminal-only positive points (holding 0.0 with terminal 0.05 and 0.1) pass terminal reach and holding position but fail holding speed (0.03557 and 0.04868 m/s, both above the 0.02 criterion), so joint_reach_holding_passed is false in every retained row and joint_positive_weight_tested is false. The source row 50618bf2 is the better terminal-only point (holding_max_speed_m_s 0.03557, holding_max_error_m 0.00828, terminal_error_m 0.00819).\n\nHypothesis (proposed, not yet observed): since holding position and terminal reach are individually attainable via separate single-axis positive weights, adding a positive holding weight of 0.05 on top of the fixed terminal 0.05 source may further suppress sampled final-window holding maximum world-tip speed toward the 0.02 m/s criterion while retaining terminal reach. Rationale for this being the untested branch: the joint-positive quadrant is empty, and the same-terminal-weight change of the two existing speed-weight paths is the minimal scope. The suggestion is treated as a test, not a conclusion; the alternative (that the response is non-monotone, consistent with the adverse terminal 0.05 -> 0.1 step observed at 44dbf3bc) is equally open and is captured in the weakening observations.\n\nWeakening observations are listed separately above. Tested-point and evidential scope: this batch evaluates exactly one previously unevaluated control point with one backend attempt and a completed-result target of one changed configuration. Whatever the outcome, it characterizes only this tested point; it cannot establish a dominant cause of the holding-speed shortfall, nor ineffectiveness of holding_tip_speed_weight across a range, because that range was exercised only with terminal weight 0.0 and no intermediate joint points are covered. Raw solver termination/valid execution status and controller-policy stops (deadline_misses, real_time_demonstrated) are separate considerations, and zero force_bound_violation_n does not exclude legal near-bound actuation input. Fixed conditions: robot (all undeclared structural fields), task, acceptance, controller_implementation, other_numerical_settings are frozen as in the source — the only varied builder path is control/recipe/holding_tip_speed_weight, with control/recipe/terminal_tip_speed_weight held at 0.05 and control_period_s 0.01 with 35 control updates unchanged. Planned budget backend_solves=1 is this phase cap; the other limits cover study_packet.budget.requirement (tool_calls 9 >= 9, model_calls 5 >= 5, wall_s 1590.0 >= 1590.0, worker_calls 0) and stay within study_packet.budget.available.",
+        "scientific_promise": "uncertain",
+        "source_candidate": {
+          "candidate_id": "batch-43a6daab7e3c1ce6-3",
+          "configuration": {
+            "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+            "media_type": "application/json"
+          },
+          "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+          "owner_run_id": "batch-43a6daab7e3c1ce6-3"
+        },
+        "step": null,
+        "stopping_conditions": [
+          "Stop after the single declared candidate under max_backend_attempts=1 and target_changed_configurations=1; the explicit sequence is not extended and feedback does not add candidates.",
+          "Stop and report if joint_reach_holding_passed is true at the tested point, for adoption review.",
+          "Stop on unknown or material failure (invalid/incomplete execution, non-zero solver_error_count, non-zero force bound violation) instead of adding candidates.",
+          "Stop when the declared completed-result target of one distinct changed configuration is reached, or if delivery capacity for this phase is insufficient."
+        ],
+        "target_changed_configurations": 1,
+        "variables": {
+          "control/recipe/holding_tip_speed_weight": [
+            0.0,
+            0.05
+          ]
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "holding_max_speed_m_s at or above the source value 0.03556730769134125 m/s at the tested point would weaken the added-holding-weight expectation and indicate a non-monotone or adverse joint step.",
+          "holding_max_error_m > 0.01 or terminal_error_m > 0.01 (loss of the holding-position/terminal-reach components already passing at the source) would weaken the hypothesis.",
+          "official_reach_task_success false, joint_reach_holding_passed false, or an invalid/incomplete execution (valid_complete_execution false) would make the tested point unusable as a clean comparison; non-zero solver_error_count or non-zero force_bound_violation_n would also break comparability with the source row."
+        ]
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-2-tool",
+      "tool_id": "design.submit_search_plan",
+      "tool_version": "1.0.0"
+    }
+  }
+]

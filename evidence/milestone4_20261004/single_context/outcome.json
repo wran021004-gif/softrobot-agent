@@ -1,0 +1,212 @@
+{
+  "schema_version": "1.0.0",
+  "status": "stopped_correction_limit",
+  "stop_reason": "MODEL_PROTOCOL_CORRECTION_TOTAL_LIMIT: INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls: EXACTLY_ONE_TOOL_CALL_REQUIRED: received 0",
+  "mode": "single_context",
+  "pilot": false,
+  "minimal": false,
+  "classification": "One separately granted engineering confirmation; predecessor results and costs retained.",
+  "chain": {
+    "request": {
+      "artifact_id": "fc212b3d304af016964ee28d6d2c9610702d183d64e05bfc7a49bf8cde05af38",
+      "media_type": "application/json"
+    },
+    "initial_report": {
+      "artifact_id": "ba4a149a60c11c1780c276065cc90aa4b364bf410a0ceb5fde3cc1103d5dfc78",
+      "media_type": "application/json"
+    },
+    "initial_response": {
+      "artifact_id": "0bdaefffe586e19f2199174e35e396d530ba4cb08dfd6a8744b88958b33740f1",
+      "media_type": "application/json"
+    },
+    "check": {
+      "artifact_id": "59b68a0c3b54fb35c4104fd330a928115a02c0d4fbf8c5f76a62fe39fab4b3f9",
+      "media_type": "application/json"
+    },
+    "feedback": {
+      "artifact_id": "eead2af1094f47b9a317caa4e9fbfc8bae06b6e2f3c3a71361cec3daf1f7ae54",
+      "media_type": "application/json"
+    },
+    "revised_report": {
+      "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+      "media_type": "application/json"
+    },
+    "revised_handoff": {
+      "artifact_id": "e10f1849b7a5f592e33d7e0ce1b0950f675eaac5e0c07996037b3df8ab88b8ce",
+      "media_type": "application/json"
+    },
+    "search_plan": {
+      "artifact_id": "9293a74b063bb9a0027cdb56fe38e6f6c666d1e4bedf1dca2bff4bdddc6e944a",
+      "media_type": "application/json"
+    },
+    "batch_result": {
+      "artifact_id": "a1635974df133548ff3071630fef8247b13cc35c0915e48c29e53e5418dd7d06",
+      "media_type": "application/json"
+    },
+    "batch_summary": {
+      "artifact_id": "f1471a780471484c90cbe0f2a2f356e115a909e2550b472c5f7afe2c8017c5a6",
+      "media_type": "application/json"
+    },
+    "final_response": {
+      "artifact_id": "59b4a95c2c9993f7d7fa2e48e6da149a9cd833b55841194d6acb6bd2bbfea89f",
+      "media_type": "application/json"
+    }
+  },
+  "feedback_complete": true,
+  "numerical_check_status": "Historical performed-check reference only; zero new separate local solves or prediction evaluations.",
+  "usage": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 9000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 14,
+      "model_calls": 11,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 932.1719999995548
+    },
+    "remaining": {
+      "backend_solves": 3,
+      "model_calls": 13,
+      "tool_calls": 46,
+      "wall_s": 8067.828000000445,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "numerical_work": {
+    "limits": {
+      "local_solves": 0,
+      "prediction_evaluations": 0
+    },
+    "used": {
+      "local_solves": 0,
+      "prediction_evaluations": 0
+    }
+  },
+  "provider_usage": [
+    {
+      "completion_tokens": 13092,
+      "completion_tokens_details": {
+        "reasoning_tokens": 11720
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 16785,
+      "prompt_tokens": 16785,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 29877
+    },
+    {
+      "completion_tokens": 13340,
+      "completion_tokens_details": {
+        "reasoning_tokens": 12136
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 17014,
+      "prompt_tokens": 17014,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 30354
+    }
+  ],
+  "monetary_cost": null,
+  "elapsed_s": 0.0,
+  "protocol_corrections": 4,
+  "recovery": {
+    "shared": {
+      "version": "2.0.0",
+      "scope": "workflow shared across phases and contexts",
+      "protocol": {
+        "category": "native_schema_or_envelope",
+        "limits": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "total_used": 4,
+        "consecutive_used": 1,
+        "total_remaining": 0,
+        "consecutive_remaining": 1,
+        "reset": "Completed business call resets consecutive only; decoding alone does not."
+      },
+      "business": {
+        "category": "accepted_call_execution_rejected_or_failed",
+        "limit": 2,
+        "consecutive_failures": 0,
+        "total_failures": 3,
+        "remaining_repairs": 2,
+        "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+        "reset": "Completed business call resets consecutive; phase/context switch does not.",
+        "feedback": null
+      },
+      "transport": {
+        "category": "provider_transport_failure",
+        "automatic_retry": false
+      },
+      "length": {
+        "category": "truncated_without_usable_action",
+        "limit": 1,
+        "used": 0,
+        "configuration": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        }
+      },
+      "stop_reason": "MODEL_PROTOCOL_CORRECTION_TOTAL_LIMIT: INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls: EXACTLY_ONE_TOOL_CALL_REQUIRED: received 0"
+    },
+    "executor": {
+      "version": "2.0.0",
+      "scope": "workflow shared across phases and contexts",
+      "protocol": {
+        "category": "native_schema_or_envelope",
+        "limits": {
+          "max_consecutive": 2,
+          "max_total": 4
+        },
+        "total_used": 0,
+        "consecutive_used": 0,
+        "total_remaining": 4,
+        "consecutive_remaining": 2,
+        "reset": "Completed business call resets consecutive only; decoding alone does not."
+      },
+      "business": {
+        "category": "accepted_call_execution_rejected_or_failed",
+        "limit": 2,
+        "consecutive_failures": 0,
+        "total_failures": 0,
+        "remaining_repairs": 2,
+        "stop_when": "consecutive_failures > limit; two repair opportunities after first failure",
+        "reset": "Completed business call resets consecutive; phase/context switch does not.",
+        "feedback": null
+      },
+      "transport": {
+        "category": "provider_transport_failure",
+        "automatic_retry": false
+      },
+      "length": {
+        "category": "truncated_without_usable_action",
+        "limit": 1,
+        "used": 0,
+        "configuration": {
+          "enabled": true,
+          "max_tokens": 131072,
+          "timeout_s": 900.0
+        }
+      },
+      "stop_reason": null
+    }
+  },
+  "physical_improvement": "Evaluated by sealed current-campaign profiles and separate source/baseline physical vectors; see stage decision packets.",
+  "source_preserved": true,
+  "confirmation_grant_links": {
+    "historical_unknown_reservation_s": 900.0,
+    "budgets_transferred": false
+  }
+}

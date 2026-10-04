@@ -1,0 +1,89 @@
+{
+  "passed": true,
+  "model_response": {
+    "artifact_id": "6872210f54931c9a0cd368017c67cae09de59100b51bb34a71b01aadcbcae5de",
+    "media_type": "application/json"
+  },
+  "plan": {
+    "artifact_id": "9293a74b063bb9a0027cdb56fe38e6f6c666d1e4bedf1dca2bff4bdddc6e944a",
+    "media_type": "application/json"
+  },
+  "review_method": "Shared program validation plus direct agent source/semantic review; no judge service.",
+  "exact_point": [
+    {
+      "control/recipe/holding_tip_speed_weight": 0.05
+    }
+  ],
+  "source": {
+    "candidate_id": "batch-43a6daab7e3c1ce6-3",
+    "configuration": {
+      "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+      "media_type": "application/json"
+    },
+    "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+    "owner_run_id": "batch-43a6daab7e3c1ce6-3"
+  },
+  "baseline": {
+    "candidate_id": "baseline-replay",
+    "owner_run_id": "gvs-stage351-baseline-executor",
+    "configuration": {
+      "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+      "media_type": "application/json"
+    },
+    "execution_id": "cf997605885642759ee33920e2c9e2ef"
+  },
+  "actual_differences": [
+    {
+      "actual_changes": [
+        {
+          "after": 0.05,
+          "before": 0.0,
+          "path": "control/recipe/holding_tip_speed_weight"
+        }
+      ],
+      "proposed": {
+        "control/recipe/holding_tip_speed_weight": 0.05
+      },
+      "unchanged_declared_fields": []
+    }
+  ],
+  "budget": {
+    "available": {
+      "backend_solves": 4,
+      "model_calls": 21,
+      "tool_calls": 54,
+      "wall_s": 8897.594000000041,
+      "worker_calls": 0
+    },
+    "operation_reservations_s": {
+      "control.profile_report": 60.0,
+      "evaluation.run": 30.0,
+      "simulation.run": 900.0
+    },
+    "planning": {},
+    "preparation": "candidate.apply is one charged workflow call; physical rebuild wall time is charged there and in simulation preparation.",
+    "protected_interpretation": {
+      "model_calls": 4,
+      "tool_calls": 4,
+      "wall_s": 600.0
+    },
+    "requirement": {
+      "backend_solves": 1,
+      "model_calls": 4,
+      "tool_calls": 8,
+      "wall_s": 1590.0,
+      "worker_calls": 0
+    },
+    "shortfalls": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0,
+      "worker_calls": 0
+    },
+    "sufficient": true
+  },
+  "hypothesis_scoped_to_one_point": true,
+  "history_interpretation_accurate": true,
+  "earlier_model_statement_bytes_preserved": true
+}

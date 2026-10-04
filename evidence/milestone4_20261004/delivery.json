@@ -1,0 +1,681 @@
+{
+  "status": "incomplete",
+  "milestone4_passed": false,
+  "milestone4_closed": false,
+  "gates": {
+    "shared_research_state": true,
+    "control_continuation": true,
+    "structural_workflow_offline": true,
+    "changed_structure_full_evaluation": false,
+    "new_structure_control_adaptation": false,
+    "final_full_sequence_model_decision": false
+  },
+  "stop_reason": "MODEL_PROTOCOL_CORRECTION_TOTAL_LIMIT: INVALID_TOOL_CALL_ENVELOPE: choices[0].message.tool_calls: EXACTLY_ONE_TOOL_CALL_REQUIRED: received 0",
+  "root_cause": "Research host inherited execution-only tool bindings from evaluated child; zero planning tools were advertised. Host repair is verified offline; correction ceiling prevents another request in this campaign.",
+  "project_id": "gvs-milestone4-e117fbe28995",
+  "usage": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 9000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 14,
+      "model_calls": 11,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 932.1719999995548
+    },
+    "remaining": {
+      "backend_solves": 3,
+      "model_calls": 13,
+      "tool_calls": 46,
+      "wall_s": 8067.828000000445,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "receipt_charge_sum": {
+    "tool_calls": 14,
+    "model_calls": 11,
+    "backend_solves": 1,
+    "worker_calls": 0,
+    "wall_s": 932.1719999995548
+  },
+  "recovery": {
+    "total_corrections": 4,
+    "consecutive": 1,
+    "total_limit": 4,
+    "consecutive_limit": 2,
+    "business_failures_total": 3,
+    "counters_reset": false
+  },
+  "actual_new_executions": [
+    {
+      "candidate": {
+        "candidate_id": "batch-9293a74b063bb9a0-0",
+        "configuration": {
+          "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+          "media_type": "application/json"
+        },
+        "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+        "owner_run_id": "batch-9293a74b063bb9a0-0"
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+          "configuration": {
+            "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "3610005c77ec7b4bceed35e03143696900ecfb7fc4bb876472bd2af949ddb99f",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "244ae3290530232a5dda1448b046838ef6353fecc4ec2b9f0e9868d24f90105b",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "8ffe18d0b74354d92cd7f4b7d6fcde36b377e174bfb2ec68f3acf96519b531e7",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.008117263030117125,
+        "holding_max_error_m": 0.008211990469035185,
+        "holding_max_speed_m_s": 0.0183345147769523,
+        "terminal_reach_passed": true,
+        "holding_position_passed": true,
+        "holding_speed_passed": true,
+        "joint_reach_holding_passed": true,
+        "mean_complete_update_s": 17.258959311459744,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.05
+      },
+      "source": {
+        "candidate_id": "batch-43a6daab7e3c1ce6-3",
+        "configuration": {
+          "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+          "media_type": "application/json"
+        },
+        "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+        "owner_run_id": "batch-43a6daab7e3c1ce6-3"
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "candidate_id": "batch-9293a74b063bb9a0-0",
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.05
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+          "configuration": {
+            "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "3610005c77ec7b4bceed35e03143696900ecfb7fc4bb876472bd2af949ddb99f",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "244ae3290530232a5dda1448b046838ef6353fecc4ec2b9f0e9868d24f90105b",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "8ffe18d0b74354d92cd7f4b7d6fcde36b377e174bfb2ec68f3acf96519b531e7",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.008117263030117125,
+        "holding_max_error_m": 0.008211990469035185,
+        "holding_max_speed_m_s": 0.0183345147769523,
+        "terminal_reach_passed": true,
+        "holding_position_passed": true,
+        "holding_speed_passed": true,
+        "joint_reach_holding_passed": true,
+        "mean_complete_update_s": 17.258959311459744,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "against_source": {
+        "baseline": {
+          "source": {
+            "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+            "configuration": {
+              "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "7abd2e19f80f8c419cb2918561d934a9dc05b254276ebe25174c1c53512dc5c6",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "2e0ddfa47b6e235e2535fcc8da614b4077a0f15623ef65e507b5c0880e710738",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "31303b3a6d07507baa182b4f5929aa0cc77ce674280ee00379efa0a67417a0a3",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.008186891107577365,
+          "holding_max_error_m": 0.008275123365557732,
+          "holding_max_speed_m_s": 0.03556730769134125,
+          "terminal_reach_passed": true,
+          "holding_position_passed": true,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 16.876452619954943,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+            "configuration": {
+              "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "3610005c77ec7b4bceed35e03143696900ecfb7fc4bb876472bd2af949ddb99f",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "244ae3290530232a5dda1448b046838ef6353fecc4ec2b9f0e9868d24f90105b",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "8ffe18d0b74354d92cd7f4b7d6fcde36b377e174bfb2ec68f3acf96519b531e7",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.008117263030117125,
+          "holding_max_error_m": 0.008211990469035185,
+          "holding_max_speed_m_s": 0.0183345147769523,
+          "terminal_reach_passed": true,
+          "holding_position_passed": true,
+          "holding_speed_passed": true,
+          "joint_reach_holding_passed": true,
+          "mean_complete_update_s": 17.258959311459744,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": -6.962807746024001e-05,
+          "holding_max_error_m": -6.313289652254764e-05,
+          "holding_max_speed_m_s": -0.017232792914388947,
+          "mean_complete_update_s": 0.3825066915048012,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "joint_acceptance_gained",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      },
+      "against_retained_baseline": {
+        "baseline": {
+          "source": {
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.007642608585867386,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+            "configuration": {
+              "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "3610005c77ec7b4bceed35e03143696900ecfb7fc4bb876472bd2af949ddb99f",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "244ae3290530232a5dda1448b046838ef6353fecc4ec2b9f0e9868d24f90105b",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "8ffe18d0b74354d92cd7f4b7d6fcde36b377e174bfb2ec68f3acf96519b531e7",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.008117263030117125,
+          "holding_max_error_m": 0.008211990469035185,
+          "holding_max_speed_m_s": 0.0183345147769523,
+          "terminal_reach_passed": true,
+          "holding_position_passed": true,
+          "holding_speed_passed": true,
+          "joint_reach_holding_passed": true,
+          "mean_complete_update_s": 17.258959311459744,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": 0.0004746544442497391,
+          "holding_max_error_m": -0.04992611381669737,
+          "holding_max_speed_m_s": -1.5626807591973284,
+          "mean_complete_update_s": -0.004359737105136929,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "joint_acceptance_gained",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      }
+    }
+  ],
+  "retained_baseline": {
+    "candidate_id": "baseline-replay",
+    "owner_run_id": "gvs-stage351-baseline-executor",
+    "configuration": {
+      "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+      "media_type": "application/json"
+    },
+    "execution_id": "cf997605885642759ee33920e2c9e2ef"
+  },
+  "latest_tested": {
+    "candidate_id": "batch-9293a74b063bb9a0-0",
+    "configuration": {
+      "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+      "media_type": "application/json"
+    },
+    "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+    "owner_run_id": "batch-9293a74b063bb9a0-0"
+  },
+  "last_accepted_substage_selection": {
+    "candidate_id": "batch-9293a74b063bb9a0-0",
+    "configuration": {
+      "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+      "media_type": "application/json"
+    },
+    "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+    "owner_run_id": "batch-9293a74b063bb9a0-0"
+  },
+  "full_sequence_selection": null,
+  "control_substage_model_decision": {
+    "candidate_disposition": "adopt_candidate",
+    "disposition": "defer",
+    "feedback": {
+      "artifact_id": "f1471a780471484c90cbe0f2a2f356e115a909e2550b472c5f7afe2c8017c5a6",
+      "media_type": "application/json"
+    },
+    "hypothesis_assessment": "supported",
+    "next_action": "finish",
+    "next_research": {
+      "bounded_check": "Execute one structure-change candidate with control weights frozen at holding 0.05 / terminal 0.05 and evaluate the complete reach+holding result, comparing componentwise physical metrics against candidate batch-9293a74b063bb9a0-0.",
+      "evidence": [
+        "Candidate batch-9293a74b063bb9a0-0 execution a8382f8a4c6e4ebe921fb72f821b2188 gained joint_acceptance_gained: holding_max_speed_m_s 0.01833, holding_max_error_m 0.00821, terminal_error_m 0.00812, joint_reach_holding_passed true.",
+        "Source batch-43a6daab7e3c1ce6-3 execution 50618bf23b31464ba4f84c55cd26d1ca had holding_speed_passed false (0.03557 m/s) at terminal 0.05 only.",
+        "Retained baseline cf997605885642759ee33920e2c9e2ef failed holding (0.05814 m; 1.581 m/s).",
+        "All retained rows share structure_identity ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060, deadline_misses 35/35, real_time_demonstrated false."
+      ],
+      "expected_observations": [
+        "holding_max_speed_m_s either remains < 0.02 with joint acceptance retained, or shifts measurably, indicating structural sensitivity of the joint-positive result",
+        "terminal_reach and holding flags reported separately",
+        "mean_complete_update_s and deadline_misses reported as measured timing"
+      ],
+      "fixed_conditions": [
+        "controller.gvs_nmpc@7.0.0",
+        "control_period_s 0.01",
+        "control/recipe/holding_tip_speed_weight 0.05",
+        "control/recipe/terminal_tip_speed_weight 0.05",
+        "acceptance thresholds terminal 0.01 m, holding error 0.01 m, holding speed 0.02 m/s, window 0.05 s"
+      ],
+      "limitations": [
+        "Single simulated execution; no hardware or real-time validation",
+        "Structure change is not proven causal for any metric difference",
+        "Result describes only the tested candidate, not a parameter range",
+        "Physical failure would not establish impossibility"
+      ],
+      "proposed_budget": {
+        "backend_solves": 1,
+        "model_calls": 5,
+        "tool_calls": 9,
+        "wall_s": 1590.0,
+        "worker_calls": 0
+      },
+      "proposed_variables": {
+        "physical_structure": "single far-component section/length modification",
+        "structure_identity": "changed from ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060"
+      },
+      "route": "structure_change",
+      "stopping_conditions": [
+        "Stop after one structure-change candidate",
+        "Do not iterate structure if joint acceptance is lost or physical metrics degrade"
+      ],
+      "unresolved_question": "Does a single structural modification of the soft continuum body change holding speed/position margins beyond the joint-positive control point (holding 0.05 / terminal 0.05), or is joint acceptance specific to the tested structure identity with these weights frozen?"
+    },
+    "reasoning": "Hypothesis supported. Candidate batch-9293a74b063bb9a0-0 (execution a8382f8a4c6e4ebe921fb72f821b2188), the previously unexecuted joint-positive point (holding 0.05 / terminal 0.05), reached holding_max_speed_m_s 0.01833 m/s (below the 0.02 criterion and the 0.03557 m/s source value), holding_max_error_m 0.00821, terminal_error_m 0.00812, with terminal_reach_passed, holding_position_passed, holding_speed_passed, joint_reach_holding_passed and official_reach_task_success all true. Program classification: joint_acceptance_gained against both source (50618bf23b31464ba4f84c55cd26d1ca) and retained baseline (cf997605885642759ee33920e2c9e2ef). Versus source, all three physical metrics improved (holding error -6.31e-05 m, speed -0.01723 m/s, terminal -6.96e-05 m) with update time worsening +0.3825 s—a timing tradeoff only, not a physical one. Versus retained baseline, holding metrics improved strongly while terminal_error slightly worsened (+4.75e-04 m, still passing), i.e. a physical tradeoff at a passing level. All retained executions show deadline_misses 35/35 and real_time_demonstrated false; zero force-bound violations do not exclude legal near-bound inputs. This is diagnostic-only assessment, so no recommendation ID is issued. Candidate adoption is independent: joint acceptance was gained, so the evaluated candidate is adopted. No causal, global, continuous-time, hardware or real-time claim is made; physical failure is not impossibility.",
+    "recommendation_id": null,
+    "report": {
+      "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+      "media_type": "application/json"
+    },
+    "selected_candidate": {
+      "candidate_id": "batch-9293a74b063bb9a0-0",
+      "configuration": {
+        "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+        "media_type": "application/json"
+      },
+      "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+      "owner_run_id": "batch-9293a74b063bb9a0-0"
+    }
+  },
+  "structural_proposal_review": {
+    "status": "rejected_unexecuted",
+    "original_responses": [
+      {
+        "artifact_id": "13dffe566b685b031dffd35fae81ae8c51de90e6d96db699d64d81fb61949496",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "23f4dac0b1a0bde17a131d7b72a659a74176c50f5cc72681367f3c18b286fc69",
+        "media_type": "application/json"
+      }
+    ],
+    "proposal": {
+      "source_candidate": {
+        "candidate_id": "batch-9293a74b063bb9a0-0",
+        "configuration": {
+          "artifact_id": "10ab5d77921b1a45beed67cc0ec9769d96282923ef1078409c22f36ec1d72a4f",
+          "media_type": "application/json"
+        },
+        "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+        "owner_run_id": "batch-9293a74b063bb9a0-0"
+      },
+      "path": "components/far/length_m",
+      "source_value": 0.11,
+      "proposed_value": 0.12
+    },
+    "material_errors": [
+      "No native function call; planning request advertised zero tools.",
+      "Saved prose does not satisfy SearchBatchPlan: missing canonical variables/method/evidence/fidelity_limits/scientific_promise; nested invented search fields and dictionary fixed_conditions."
+    ],
+    "scientific_text_changed": false,
+    "proposal_executed": false,
+    "extra_provider_retry": false
+  },
+  "organization": {
+    "live": "single_context",
+    "dual_context": "shared-interface offline checks only",
+    "paired_comparison": false
+  },
+  "structural_coverage": {
+    "offline": [
+      "length",
+      "section_scale",
+      "material_scenario"
+    ],
+    "live": []
+  },
+  "historical": {
+    "milestones2_and3_closed": true,
+    "unknown_reservation_s": 900.0,
+    "charges_transferred": false,
+    "archived_interpretations_and_failures_rewritten": false
+  },
+  "forbidden_extra_work": {
+    "separate_diagnostic_solves": 0,
+    "prediction_sweeps": 0,
+    "workers": 0,
+    "new_controller": false,
+    "new_campaign": false,
+    "push": false
+  },
+  "last_live_revision": {
+    "commit": "9e9a878b012947f14de3657b192d8696868bab83",
+    "files": {
+      "examples/stage359_continuation.py": "7061c7bb6ea081b7a7beb6f79baa1ba26aa115ba82db2d78733bbf4557030057",
+      "examples/stage359_live_continuation.py": "224ead466e1f724088ef0caaa623ecaf9cb3ba3168a8b59bf8ab3526207c074d",
+      "tests/test_stage359_explicit.py": "31666e7e9ecf2eac79a34506c44673c7f25a4ff9db8098c2b8e91e588a4de04e",
+      "extensions/tendon_family/optimization.py": "3d8b1d5045fa2badb6cfe7360c1e84300b9215148d47430e1b314a5ce08b3d2c",
+      "extensions/tendon_family/manifest.py": "592c417b2bfc1684040e6eef385f32f9a35e1af5c86c393642d98c2b6c4fedea",
+      "tests/test_stage359_continuation.py": "87a33591fdbd35e5e87b040df4315f82236ea84354e5047352bd190a1d100a01",
+      "tools/diagnostic_handoff.py": "1dbd0a46ae072122096ed59e2dbdcbf186951d6130a5a8de0e3952221f34c73f",
+      "tools/platform_search.py": "152c378d0389476f75b437b007b634ec127ea81be6a2dae72d8a853a1b98f57d",
+      "tools/working_state.py": "8eb6bb9e1ebeb2285a9279e2f39b2c869f90d175d3d6ca59f2db6b8fd174da97",
+      "schemas/working_state.py": "97e35dff3b0ce1a28ee5045af948707ac4e20a12068cbedc553641207efab9b2",
+      "examples/stage356_milestone2.py": "5317c5b4c45e475dbdd609082dc014e29fd0e76da9e9074fc2dd45b993b92401",
+      "examples/stage357_live_pilot.py": "79d2f0375b5e83de2467283926b80787b62ea8e93bcbe72b59f66acd62e93ea1",
+      "examples/stage358_confirmation.py": "6a6ae896dfa748c32b2f560ccf0d753d03a6a25e0eac3caa6f810445d72cd586",
+      "examples/stage358_interpretation_repair.py": "33c5c09b46c50c291b50d665dd83596302253befe03c3b7d141ea1247e69948e",
+      "tests/test_stage358_interpretation_repair.py": "4ac8ab31017ea69ebc24fbf0af1707a44b5cee2ad840aa6e02e02a4a51754199",
+      "tests/test_stage358_confirmation.py": "5f846847ba45ce6cb9144448d1d9f2f3b2a7b47bead81d2a6f19ea62fea91a49",
+      "tests/test_stage356_milestone2.py": "accb8f4e05134f243d457c9f3c579d2f246881dc6da0fb7327e5f57d99468f7e",
+      "tests/test_stage356_batch.py": "776a313f320abf9ad9f15bf11757fdc9f67b5b9e1f7979cff2bce4ab50cc9873",
+      "tests/test_stage357_live_batch.py": "3845a794ac118e3a1666aa7be71e57c04b4a2087dded790aa92df9d88032bd5f",
+      "tools/diagnostic_reference_adapter.py": "b9a243382c8599bdbe0a07393ca431bad2b1e6fd36823cdc12b6b4ef8da9223a",
+      "tools/diagnostic_revision.py": "5b618332cf2abe594bbf355c1ca701ffb2d36fce79aff81422d75754fc261c36",
+      "schemas/diagnostic_revision.py": "d6eb3472cbbab2aaa3bb5ab168e734ca61924f06ea232a8d2cd5fc86f12aedec",
+      "tools/diagnostic_workflow.py": "a91e6bb56946dc5e98f707aba2bde1257c026fba829b5d49f7477f9acd9f9f2c",
+      "tools/diagnostic_native.py": "ad007fff7a1c0d139a93db6b715d9ffd0a40631903ee32eab6c20befabb4bc11",
+      "tools/diagnostic_inventory.py": "2178f03ad6e991870a69e9e8986c84336753bcf26f2d617ed02d9a786e2a0651",
+      "tools/diagnostic_facts.py": "5a05214a31816fe3871b7e26d8f9fe86c70083d860eee99e2bb6bf8cd70b0d09",
+      "tools/diagnostic_summary.py": "a88f5d5db01728ddfb5ebd9a43cb0b9f944c2fcb3357bb55e895888ed70e052b",
+      "tools/live_batch_execution.py": "92fa901ac26f344a05a586b03aa8a971d839a846556689c2eade48ffaf5c5160",
+      "extensions/tendon_family/diagnostic_evidence.py": "f14e67c1dc2b201c2114eceb1e5fbb41d94d129299e222b533f1e35f0e43a836",
+      "tools/execution_completion.py": "f597ef1a6a16b2e443cbdcac5b7955dd41cf758bc7d56c53995c629a86d3df80",
+      "tools/platform_models.py": "27a8154de6cdeb43f88348489fbd65a0e7756cfb75bbc0acc58a5beb5e142574",
+      "tools/platform_handoff.py": "4a185dfee831fe21f7207e3706354c44f73bf20976641a554f9b4408cedbf246",
+      "tools/platform_diagnosis_coordinator.py": "ae8c0554d0303a76ae6a55eeb7d849f3df63fe27e1fa8a04cbd1f995358b736a",
+      "tools/platform_host.py": "134123ac29d5279d9480fde5e064771c6ee3702fb185142a496d54a0eeed30fa",
+      "tools/platform_store.py": "1727f687b1dea1ae0cd078ca753edd9d7e9c7ecf9706225fde52af2ddfe8d318",
+      "schemas/platform_handoff.py": "9b434dc87c04051567f925aecb8475df9c585e48b187ab79200afa456aa51c94",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "e5746170e5b0f4a55a2461cefd55f4c872566fbe1fdf4d324b46df1cd08f8996",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "0df3a9f900b8c3c8efd7f72a99c9ff4524eca0826f5c5e2e904bdda9a2e5607c",
+      "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "e9723ef5881f037ff420992a14e6f768a05815fa3f021b05d32a9ea15f7d74c9",
+      "tools/platform_tools.py": "e1815614e5f2fc5a0310e48a0bf0444708685d71189efb90de32919a54e050fa",
+      "extensions/tendon_family/candidate.py": "e5a551c5fc2dbe060ee21c1e2130a2d8a98da1954518b8150518fe8a8693fb97",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88",
+      "examples/milestone4.py": "a3c7fe0164b9ff41765127374c1d41f61609ef16a52b11cb75186b62342e9147",
+      "tools/study_history.py": "c66acdffebdeca1aef2f0e92cabdb82e25e3f2bc4c4da912e85e76dd5afa644c",
+      "tools/batch_budget.py": "11e2a16976a79e896c8d4d61c68ec0466d8994314c7a0c38e0c62985b301f70c",
+      "tools/candidate_parameters.py": "215c257e8eb83352eb54f785d6d200692600e473c575193f8a87c7e3f6dd6753",
+      "tools/parameter_impacts.py": "b420633a704799c5d2f615d836cb58c3b3fa8b47e5d654ba86160e2f3cf7340c",
+      "tests/test_milestone4.py": "07d6a33dc47de3b9cbad4f8e9a11fe9e1f71c7ba47a42a70028025373566e858",
+      "schemas/parameter_domains.py": "53678ba78c43a9c5e7af5f4bb8f48e7117c9b37375f92639a12615f00ded2bf1",
+      "tools/structural_study.py": "4cf693fc4b972f70285ead4db180f43eb6821245b91249e62236270c7d8c7d68",
+      "tools/optimization_interfaces.py": "6d4c3bc00d5982fb64b04e8a1c855bb443e53142b9d2bdd74a9039bf430bceb7",
+      "tests/test_milestone4_structure.py": "fdc46aac843f567a675f2a6d823e50522ca3122e821ac57b81d48fbac33ae5cb",
+      "extensions/tendon_family/profiles/milestone4_reach_experiment_v1.json": "04e57ec4f44c6e03823ed4a7c376b44db2dd77435dbeead2ca140b93c9e36023"
+    }
+  },
+  "offline_repair_revision": {
+    "commit": "b8cbac515bd4d2b29e56183dca3db38f5ac4fb50",
+    "files": {
+      "examples/stage359_continuation.py": "7061c7bb6ea081b7a7beb6f79baa1ba26aa115ba82db2d78733bbf4557030057",
+      "examples/stage359_live_continuation.py": "224ead466e1f724088ef0caaa623ecaf9cb3ba3168a8b59bf8ab3526207c074d",
+      "tests/test_stage359_explicit.py": "31666e7e9ecf2eac79a34506c44673c7f25a4ff9db8098c2b8e91e588a4de04e",
+      "extensions/tendon_family/optimization.py": "3d8b1d5045fa2badb6cfe7360c1e84300b9215148d47430e1b314a5ce08b3d2c",
+      "extensions/tendon_family/manifest.py": "592c417b2bfc1684040e6eef385f32f9a35e1af5c86c393642d98c2b6c4fedea",
+      "tests/test_stage359_continuation.py": "87a33591fdbd35e5e87b040df4315f82236ea84354e5047352bd190a1d100a01",
+      "tools/diagnostic_handoff.py": "1dbd0a46ae072122096ed59e2dbdcbf186951d6130a5a8de0e3952221f34c73f",
+      "tools/platform_search.py": "152c378d0389476f75b437b007b634ec127ea81be6a2dae72d8a853a1b98f57d",
+      "tools/working_state.py": "8eb6bb9e1ebeb2285a9279e2f39b2c869f90d175d3d6ca59f2db6b8fd174da97",
+      "schemas/working_state.py": "97e35dff3b0ce1a28ee5045af948707ac4e20a12068cbedc553641207efab9b2",
+      "examples/stage356_milestone2.py": "5317c5b4c45e475dbdd609082dc014e29fd0e76da9e9074fc2dd45b993b92401",
+      "examples/stage357_live_pilot.py": "79d2f0375b5e83de2467283926b80787b62ea8e93bcbe72b59f66acd62e93ea1",
+      "examples/stage358_confirmation.py": "6a6ae896dfa748c32b2f560ccf0d753d03a6a25e0eac3caa6f810445d72cd586",
+      "examples/stage358_interpretation_repair.py": "33c5c09b46c50c291b50d665dd83596302253befe03c3b7d141ea1247e69948e",
+      "tests/test_stage358_interpretation_repair.py": "4ac8ab31017ea69ebc24fbf0af1707a44b5cee2ad840aa6e02e02a4a51754199",
+      "tests/test_stage358_confirmation.py": "5f846847ba45ce6cb9144448d1d9f2f3b2a7b47bead81d2a6f19ea62fea91a49",
+      "tests/test_stage356_milestone2.py": "accb8f4e05134f243d457c9f3c579d2f246881dc6da0fb7327e5f57d99468f7e",
+      "tests/test_stage356_batch.py": "776a313f320abf9ad9f15bf11757fdc9f67b5b9e1f7979cff2bce4ab50cc9873",
+      "tests/test_stage357_live_batch.py": "3845a794ac118e3a1666aa7be71e57c04b4a2087dded790aa92df9d88032bd5f",
+      "tools/diagnostic_reference_adapter.py": "b9a243382c8599bdbe0a07393ca431bad2b1e6fd36823cdc12b6b4ef8da9223a",
+      "tools/diagnostic_revision.py": "5b618332cf2abe594bbf355c1ca701ffb2d36fce79aff81422d75754fc261c36",
+      "schemas/diagnostic_revision.py": "d6eb3472cbbab2aaa3bb5ab168e734ca61924f06ea232a8d2cd5fc86f12aedec",
+      "tools/diagnostic_workflow.py": "a91e6bb56946dc5e98f707aba2bde1257c026fba829b5d49f7477f9acd9f9f2c",
+      "tools/diagnostic_native.py": "ad007fff7a1c0d139a93db6b715d9ffd0a40631903ee32eab6c20befabb4bc11",
+      "tools/diagnostic_inventory.py": "2178f03ad6e991870a69e9e8986c84336753bcf26f2d617ed02d9a786e2a0651",
+      "tools/diagnostic_facts.py": "5a05214a31816fe3871b7e26d8f9fe86c70083d860eee99e2bb6bf8cd70b0d09",
+      "tools/diagnostic_summary.py": "a88f5d5db01728ddfb5ebd9a43cb0b9f944c2fcb3357bb55e895888ed70e052b",
+      "tools/live_batch_execution.py": "92fa901ac26f344a05a586b03aa8a971d839a846556689c2eade48ffaf5c5160",
+      "extensions/tendon_family/diagnostic_evidence.py": "f14e67c1dc2b201c2114eceb1e5fbb41d94d129299e222b533f1e35f0e43a836",
+      "tools/execution_completion.py": "f597ef1a6a16b2e443cbdcac5b7955dd41cf758bc7d56c53995c629a86d3df80",
+      "tools/platform_models.py": "27a8154de6cdeb43f88348489fbd65a0e7756cfb75bbc0acc58a5beb5e142574",
+      "tools/platform_handoff.py": "4a185dfee831fe21f7207e3706354c44f73bf20976641a554f9b4408cedbf246",
+      "tools/platform_diagnosis_coordinator.py": "ae8c0554d0303a76ae6a55eeb7d849f3df63fe27e1fa8a04cbd1f995358b736a",
+      "tools/platform_host.py": "134123ac29d5279d9480fde5e064771c6ee3702fb185142a496d54a0eeed30fa",
+      "tools/platform_store.py": "1727f687b1dea1ae0cd078ca753edd9d7e9c7ecf9706225fde52af2ddfe8d318",
+      "schemas/platform_handoff.py": "9b434dc87c04051567f925aecb8475df9c585e48b187ab79200afa456aa51c94",
+      "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+      "extensions/platform/manifest.py": "e5746170e5b0f4a55a2461cefd55f4c872566fbe1fdf4d324b46df1cd08f8996",
+      "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+      "tools/model_transports/deepseek.py": "0df3a9f900b8c3c8efd7f72a99c9ff4524eca0826f5c5e2e904bdda9a2e5607c",
+      "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+      "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+      "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+      "tools/diagnostic_improvement.py": "e9723ef5881f037ff420992a14e6f768a05815fa3f021b05d32a9ea15f7d74c9",
+      "tools/platform_tools.py": "e1815614e5f2fc5a0310e48a0bf0444708685d71189efb90de32919a54e050fa",
+      "extensions/tendon_family/candidate.py": "e5a551c5fc2dbe060ee21c1e2130a2d8a98da1954518b8150518fe8a8693fb97",
+      "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+      "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+      "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88",
+      "examples/milestone4.py": "acd5c0ef2eede14c8fa672d4ce73bc2ac429bdf216136f37899c917c41f29766",
+      "tools/study_history.py": "c66acdffebdeca1aef2f0e92cabdb82e25e3f2bc4c4da912e85e76dd5afa644c",
+      "tools/batch_budget.py": "11e2a16976a79e896c8d4d61c68ec0466d8994314c7a0c38e0c62985b301f70c",
+      "tools/candidate_parameters.py": "215c257e8eb83352eb54f785d6d200692600e473c575193f8a87c7e3f6dd6753",
+      "tools/parameter_impacts.py": "b420633a704799c5d2f615d836cb58c3b3fa8b47e5d654ba86160e2f3cf7340c",
+      "tests/test_milestone4.py": "07d6a33dc47de3b9cbad4f8e9a11fe9e1f71c7ba47a42a70028025373566e858",
+      "schemas/parameter_domains.py": "53678ba78c43a9c5e7af5f4bb8f48e7117c9b37375f92639a12615f00ded2bf1",
+      "tools/structural_study.py": "9d775d1051b90e7dbaa79980ad7fa3516f52b46606dbdf65fd2b5076b4c1f73e",
+      "tools/optimization_interfaces.py": "6d4c3bc00d5982fb64b04e8a1c855bb443e53142b9d2bdd74a9039bf430bceb7",
+      "tests/test_milestone4_structure.py": "0dd9b1fb9a3fa7eefcd35ce956ab0be70c84d69c38c25e26d18335154de23e89",
+      "extensions/tendon_family/profiles/milestone4_reach_experiment_v1.json": "04e57ec4f44c6e03823ed4a7c376b44db2dd77435dbeead2ca140b93c9e36023"
+    }
+  },
+  "limitations": [
+    "Only the tested control candidate gained joint sampled acceptance.",
+    "No changed structure was executed; proposed far length 0.12 m has no performance evidence.",
+    "No structural/adaptation success, global optimum, physical impossibility, causal identification, continuous-time, hardware, or real-time feasibility claim."
+  ]
+}

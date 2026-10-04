@@ -1,0 +1,61 @@
+{
+  "arguments": {
+    "candidate_disposition": "adopt_candidate",
+    "disposition": "defer",
+    "hypothesis_assessment": "supported",
+    "next_action": "finish",
+    "next_research": {
+      "bounded_check": "Freeze weights at holding 0.05 / terminal 0.05; vary exactly one structural parameter per evaluation and run at most two backend evaluations under the same acceptance contract.",
+      "evidence": [
+        "a8382f8a4c6e4ebe921fb72f821b2188 (batch-9293a74b063bb9a0-0): joint_acceptance_gained, holding_max_speed_m_s 0.018335, holding_max_error_m 0.008212, terminal_error_m 0.008117, deadline_misses 35/35, mean_complete_update_s 17.259, real_time_demonstrated false",
+        "50618bf23b31464ba4f84c55cd26d1ca (source 0.0/0.05): holding_speed_passed false, holding_max_speed_m_s 0.035567",
+        "cf997605885642759ee33920e2c9e2ef (retained baseline 0.0/0.0): holding_max_error_m 0.058138, joint_reach_holding_passed false",
+        "all retained rows share structure_identity ab220124976af3c068e7002eaadaf8216b383d7fbc6f6437d70b61db1b680060"
+      ],
+      "expected_observations": [
+        "whether joint_reach_holding_passed is retained",
+        "direction and size of change in holding_max_speed_m_s margin relative to 0.02",
+        "change in deadline_misses and mean_complete_update_s"
+      ],
+      "fixed_conditions": [
+        "controller.gvs_nmpc@7.0.0",
+        "control/recipe/holding_tip_speed_weight=0.05",
+        "control/recipe/terminal_tip_speed_weight=0.05",
+        "control_period_s 0.01",
+        "holding window 0.05 s",
+        "holding_max_error_m<=0.01, holding_max_speed_m_s<=0.02, terminal_error_m<=0.01"
+      ],
+      "limitations": [
+        "single-run, sampling-based evidence; no continuous-time guarantee",
+        "a single-parameter change may still confound other physical parameters",
+        "no causal, hardware, or real-time claim; physical failure does not establish impossibility",
+        "residual timing gap may be controller/sampling policy rather than structure"
+      ],
+      "proposed_budget": {
+        "backend_solves": 2,
+        "model_calls": 1,
+        "tool_calls": 5,
+        "wall_s": 1500.0,
+        "worker_calls": 0
+      },
+      "proposed_variables": {
+        "far_component_young_pa": "5400000 -> one alternative value",
+        "near_component_semi_y_m": "0.0095 -> one alternative value"
+      },
+      "route": "structure_change",
+      "stopping_conditions": [
+        "stop if joint acceptance is lost on the first structure change",
+        "stop after the bounded two evaluations",
+        "stop if no measurable change in holding-speed margin or update timing"
+      ],
+      "unresolved_question": "With joint-positive control weights frozen (holding 0.05, terminal 0.05), does one single-parameter physical-structure change preserve joint_reach_holding_passed and the thin holding-speed margin (0.018335 vs 0.02), or is the residual dominated by controller/sampling policy?"
+    },
+    "reasoning": "No diagnostic recommendation ID was supplied, so disposition=defer with recommendation_id=null; only the study hypothesis is assessed here, and candidate selection is handled separately. Direct test: batch-9293a74b063bb9a0-0 (execution a8382f8a4c6e4ebe921fb72f821b2188; holding_tip_speed_weight 0.05, terminal_tip_speed_weight 0.05, structure_identity ab2201... 60 unchanged) versus declared source 50618bf23b31464ba4f84c55cd26d1ca (0.0/0.05). Terminal reach: official_reach_task_success true, terminal_error_m 0.008117 <= 0.01. Holding position: holding_max_error_m 0.008212 <= 0.01, passed. Holding speed: holding_max_speed_m_s 0.018335, below the 0.02 criterion and below source 0.035567, passed. joint_reach_holding_passed true. Against retained baseline cf997605885642759ee33920e2c9e2ef (holding_max_error 0.058138, joint unsuccessful) the packet reports joint_acceptance_gained; all three physical metrics improve versus source (terminal -6.96e-05, position -6.31e-05, speed -0.01723) with no component worsening. The predicted direction is realized in this single sealed execution, so the hypothesis is supported at that scope only, not causally or range-wide. Measured complete-update timing: mean_complete_update_s 17.259 vs source 16.876 (+0.383 s); deadline_misses 35/35; real_time_demonstrated false; timing is not an acceptance metric and carries no real-time claim. Other retained rows scope the search: holding-only weights 0.05/0/0.1 and 0.3 failed joint acceptance (e.g. 0.3: reach unsuccessful, terminal_error 0.01869), terminal-only 0.1 gave speed 0.048676 (failed); therefore no claim of dominance or ineffectiveness across a weight range. Candidate adoption is independent of the absent recommendation and rests on packet acceptance, hence adopt_candidate for this exact evaluated candidate.",
+    "recommendation_id": null,
+    "selected_candidate": "batch-9293a74b063bb9a0-0"
+  },
+  "errors": [],
+  "phase": "response_final",
+  "status": "unaccepted",
+  "tool": "design.respond_diagnosis"
+}
