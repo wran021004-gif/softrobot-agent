@@ -16,7 +16,7 @@ from tools.settling_campaign import campaign_metrics,compare_results
 def deliver():
     w=run.restore();run.assert_predecessor(w);destination=run.EVIDENCE
     structure=read(run.RUN/'structure_batch_result.json');adaptation=read(run.RUN/'adaptation_batch_result.json')
-    decision=read(run.RUN/'complete_sequence_corrected_final_response.json');forecast=read(run.RUN/'pilot_forecast_seal.json')
+    decision=read(run.RUN/'complete_sequence_closed_final_response.json');forecast=read(run.RUN/'pilot_forecast_seal.json')
     assessment=read(run.RUN/'pilot_assessment.json');accounting=read(destination/'accounting.json')
     outcome=read(run.RUN/'outcome.json')
     if outcome['status']!='sequence_complete' or structure['fully_evaluated_distinct_changed_configurations']!=1 or adaptation['fully_evaluated_distinct_changed_configurations'] not in (1,2):raise ValueError('INCOMPLETE_REQUIRED_SEQUENCE')
@@ -63,7 +63,7 @@ def deliver():
             'Repaired missing summary lineage and exporter duplicate key; resumed interpretation without simulation replay.',
             'Preserved and requested model correction of the false structural confounding caveat.',
             'Focused test and Git writes needed sandbox escalation; no automatic approval rejection.'],
-        semantic_correction_requests=2,protocol_correction_counts=accounting['corrections'],
+        semantic_correction_requests=3,protocol_correction_counts=accounting['corrections'],
         limitations=['Sampled simulation acceptance only; no real-time, hardware or continuous-time proof.',
             'Prospective pilot uses one final-holding projected state and a common cold seed; all three local policy solves stopped at verified_settled_seed and selected iteration zero.',
             'Local endpoint metrics are not full-task holding maxima; no absolute acceptance or overall ordering forecast.',
