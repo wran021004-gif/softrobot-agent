@@ -148,6 +148,8 @@ def inspect(reader,binding,args):
         state_pointer_template='/{update_id}/measured_initial_state',input_pointer_template='/{update_id}/actual_tension_n'),
         limitations=['No historical optimizer iterations or full warm plans are reconstructed.',
             'Single execution and model comparisons do not establish a dominant cause.'])
+    from tools.diagnostic_summary import update_facts
+    detail['deterministic_facts']=update_facts(reader,s,selected if args.view in ('plans','prediction') else None)
     if args.view=='motion':detail['late_motion']=late
     elif args.view in ('plans','prediction'):
         evidence=plain(reader.query(EvidenceQuery(execution_id=b['execution_id'],operation='prediction' if args.view=='prediction' else 'plans',update_ids=selected)))

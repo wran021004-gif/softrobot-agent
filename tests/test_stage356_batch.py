@@ -43,8 +43,8 @@ class BatchTests(TestCase):
         self.configuration=old.artifact(self.plan['bindings']['subject']['configuration'])
         self.facts=read(HISTORY/'feedback.json')['execution']['factual_result']
 
-    def fixture(self,directory,*,wall_s=3570.,max_candidates=3):
-        store=Store(directory);budget={**zero(),'tool_calls':4*max_candidates,'wall_s':wall_s}
+    def fixture(self,directory,*,wall_s=3570.,max_candidates=3,backend_attempts=0,model_calls=0):
+        store=Store(directory);budget={**zero(),'tool_calls':4*max_candidates+4,'wall_s':wall_s,'backend_solves':backend_attempts,'model_calls':model_calls}
         store.create(dict(project_id='offline-batch',grant_id='offline-only-'+uuid4().hex,budget=budget,
             authorization_source='Engineer-authored synthetic offline fixtures; zero provider/backend/workers.'))
         host=Host(directory,'offline-batch');inp=deepcopy(self.configuration['effective']);inp['run_id']=host.run_id

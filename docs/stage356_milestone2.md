@@ -1,5 +1,10 @@
 # Stage 3.56: evidence-driven diagnosis and future batch planning
 
+The original results below remain preserved. A new repaired single-context
+confirmation completed all Milestone 2 gates in Stage 3.57; see
+[the separate confirmation and development pilot](stage357_development_pilot.md).
+It is not combined with the old dual-context result as a new matched comparison.
+
 This stage extends the existing diagnostic workflow, host, SQLite store, evidence
 catalog and phase budgets. It adds no search-batch runner. Both organizations use
 the Stage 3.54 single-context candidate `087adee8e8a24fe88e5c85fe89e638c8`,

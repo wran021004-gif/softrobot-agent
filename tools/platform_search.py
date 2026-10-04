@@ -65,9 +65,11 @@ def validate_batch_plan(store, view, proposal):
     if not {'frozen_acceptance','force_bounds','finite_valid_execution'}<=set(plan.constraints):raise ValueError('PLAN_CONSTRAINTS_REQUIRED: frozen_acceptance, force_bounds, finite_valid_execution')
     required_verification={'candidate.apply','simulation.run','evaluation.run','control.profile_report','bound_comparison','diagnostic_revision'}
     if not required_verification<=set(plan.verification):raise ValueError('PLAN_FRESH_VERIFICATION_REQUIRED: '+', '.join(sorted(required_verification)))
-    budget=plain(plan.planned_budget);count=plan.max_candidates
+    budget=plain(plan.planned_budget);count=plan.max_backend_attempts or plan.max_candidates
     if budget['backend_solves']!=count or budget['tool_calls']<count*4 or budget['worker_calls']!=0 or budget['wall_s']<count*990:
-        raise ValueError('PLAN_COSTS_INSUFFICIENT: backend_solves=max_candidates, tool_calls>=4 per candidate, wall_s>=990 per candidate, workers=0')
+        raise ValueError('PLAN_COSTS_INSUFFICIENT: backend_solves=explicit max_backend_attempts (legacy max_candidates), tool_calls>=4 per new execution, wall_s>=990 per new execution, workers=0')
+    if plan.max_backend_attempts is not None and (plan.max_backend_attempts>plan.max_candidates or
+            (plan.target_changed_configurations or 1)>plan.max_backend_attempts):raise ValueError('PLAN_CAPS_INCONSISTENT')
     fixed=deepcopy(effective)
     for path in plan.variables:fixed['policy']['controller']['parameters']['data']['recipe'][path.rsplit('/',1)[-1]]='<batch variable>'
     from tools.settling_campaign import RANKING
@@ -78,7 +80,7 @@ def validate_batch_plan(store, view, proposal):
             controller=controller,dynamics_model=view.task['execution_model'],source_report=role['source_report'],
             revised_assessment=role['previous_report'],check_feedback=role['result_feedback'],evidence_selectors=selectors,
             fixed_configuration_identity=digest(fixed),fixed_configuration=fixed),
-        batch_semantics='One plan for the batch. Existing coordinate ask/tell proposes bounded candidates; no batch runner implemented in this stage.',
+        batch_semantics='One immutable plan for the batch. Shared coordinate scheduling supports offline fixtures and separately granted real execution; plan submission executes nothing.',
         screening=dict(local_screening='none',raw_weighted_objectives_are_physical_ranking=False),
         final_comparison_policy=RANKING,required_fresh_steps=sorted(required_verification),
         cost_floor_per_candidate_s=dict(simulation=900,evaluation=30,profile=60),
@@ -301,7 +303,7 @@ def _save_batch(host,batch):
         host.store.update_state(db,host.run_id,state)
 
 
-def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_reserve_s=600.):
+def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_reserve_s=600.,mode='offline_injected',retained_baseline=None):
     """Bind an accepted immutable plan in a separate offline grant, with no live adapter."""
     from copy import deepcopy
     from tools.diagnostic_handoff import accepted_product
@@ -328,19 +330,31 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
     snapshot=host.store.session(host.run_id)['snapshot']['input']
     if execution_scope(snapshot)!=execution_scope(effective):raise ValueError('BATCH_HOST_SCIENCE_MISMATCH')
     budget=host.store.spendable(host.run_id)['remaining']
-    if any(budget[k] for k in ('backend_solves','model_calls','worker_calls')):
+    if mode=='offline_injected' and any(budget[k] for k in ('backend_solves','model_calls','worker_calls')):
         raise ValueError('OFFLINE_BATCH_REQUIRES_ZERO_LIVE_GRANT')
+    count=plan.max_backend_attempts or plan.max_candidates
+    if mode=='live':
+        if (plan.max_backend_attempts is None or plan.target_changed_configurations is None or
+                budget['backend_solves']<count or budget['worker_calls']!=0 or not starting_facts or not retained_baseline):
+            raise ValueError('LIVE_BATCH_EXPLICIT_CAPS_AND_TWO_REFERENCES_REQUIRED')
+        if retained_baseline['candidate']!=record['bindings']['baseline']:raise ValueError('BATCH_RETAINED_BASELINE_MISMATCH')
+        if set(plan.variables)!=set(REACH_WEIGHT_PATHS):raise ValueError('LIVE_PILOT_REQUIRES_TWO_DOMAINS')
     floor=sum(record['cost_floor_per_candidate_s'].values())
-    if floor!=990 or interpretation_reserve_s<0 or budget['wall_s']<floor*plan.max_candidates+interpretation_reserve_s or budget['tool_calls']<4*plan.max_candidates:
+    if floor!=990 or interpretation_reserve_s<0 or budget['wall_s']<floor*count+interpretation_reserve_s or budget['tool_calls']<4*count:
         raise ValueError('BATCH_RESERVATION_CAPACITY_REQUIRED: 990 seconds and 4 tools per proposal, plus explicit interpretation reserve')
     initial={p:effective['policy']['controller']['parameters']['data']['recipe'][p.rsplit('/',1)[-1]] for p in plan.variables}
     parameters=SearchParameters(initial=initial,bounds=plan.variables,max_trials=plan.max_candidates,step=plan.step)
     if starting_facts and starting_facts['candidate']!=record['bindings']['subject']:
         raise ValueError('BATCH_START_EVIDENCE_MISMATCH')
-    batch=dict(plan=plan_ref,batch_id='batch-'+plan_ref['artifact_id'][:16],mode='offline_injected',
+    for facts in (starting_facts,retained_baseline):
+        if facts and (facts['candidate']['execution_id']!=facts['execution_id'] or facts['candidate']['configuration']!=facts['configuration']):
+            raise ValueError('BATCH_REFERENCE_FACT_BINDING_MISMATCH')
+    batch=dict(plan=plan_ref,batch_id='batch-'+plan_ref['artifact_id'][:16],mode=mode,
         parameters=plain(parameters),algorithm=plain(CoordinateSearch(parameters).save()),pending=None,
         proposals=[],configurations={},starting_facts=starting_facts,base_configuration=record['bindings']['subject']['configuration'],
-        interpretation_reserve_s=interpretation_reserve_s,usage_start=host.store.remaining(host.run_id)['used'],stop_reason=None)
+        retained_baseline=retained_baseline,max_backend_attempts=count,target_changed_configurations=plan.target_changed_configurations,
+        interpretation_reserve_s=interpretation_reserve_s,usage_start=host.store.remaining()['used'],stop_reason=None,
+        grant=host.store.config(),interpretation_reserve=dict(model_calls=4,tool_calls=4))
     _save_batch(host,batch)
     return batch
 
@@ -348,21 +362,38 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
 def offline_batch_result(host):
     """Compact public result suitable for the existing evidence handover path."""
     batch=host.store.session(host.run_id)['state']['search_batch']
-    now=host.store.remaining(host.run_id)['used'];used={k:v-batch['usage_start'][k] for k,v in now.items()}
+    now=host.store.remaining()['used'];used={k:v-batch['usage_start'][k] for k,v in now.items()}
     rows=list(batch['configurations'].values())
     return dict(contract='platform.search_batch_result',version='1.0.0',mode=batch['mode'],plan=batch['plan'],
-        batch_id=batch['batch_id'],status='completed' if batch['stop_reason']=='proposal_limit' else 'stopped' if batch['stop_reason'] else 'pending' if batch['pending'] else 'prepared',
+        batch_id=batch['batch_id'],status='completed' if batch['stop_reason'] in ('proposal_limit','pilot_target_complete') else 'stopped' if batch['stop_reason'] else 'pending' if batch['pending'] else 'prepared',
         stop_reason=batch['stop_reason'],pending=batch['pending'],proposals=batch['proposals'],
         candidates=[{k:v for k,v in row.items() if k!='effective'} for row in rows],
         accounting=dict(proposals=len(batch['proposals']),distinct_configurations=len(rows),
             reused_evaluations=sum(p.get('reused',False) for p in batch['proposals']),
-            new_backend_attempts=used['backend_solves'],offline_execution_attempts=sum(not r['reused'] and 'simulation' in r['stages'] for r in rows),
+            historical_start_reuse=sum(p.get('reuse_kind')=='historical_start' for p in batch['proposals']),
+            duplicate_result_reuse=sum(p.get('reuse_kind')=='duplicate' for p in batch['proposals']),
+            new_backend_attempts=used['backend_solves'],offline_execution_attempts=sum(not r['reused'] and 'simulation' in r['stages'] for r in rows) if batch['mode']=='offline_injected' else 0,
             completed_new_evaluations=sum(not r['reused'] and r.get('feedback') is not None for r in rows),usage=used),
+        completed_evaluations=sum(not r['reused'] and r['stages'].get('evaluation',{}).get('execution_status')=='completed' for r in rows),
+        completed_profiles=sum(not r['reused'] and r['stages'].get('profile',{}).get('execution_status')=='completed' for r in rows),
+        fully_evaluated_distinct_changed_configurations=sum(not r['reused'] and r.get('feedback') is not None for r in rows),
         physical_acceptance_authority='Frozen full comparison; optimizer guidance does not promote a candidate.',
-        execution_authorized=False,candidate_promoted=False)
+        execution_authorized=batch['mode']=='live',candidate_promoted=False,grant=batch.get('grant'))
 
 
 def run_offline_batch(host,inject,*,stop_after_stage=None):
+    batch=host.store.session(host.run_id)['state']['search_batch']
+    if batch['mode']!='offline_injected':raise ValueError('SYNTHETIC_OUTPUTS_CANNOT_SATISFY_LIVE_ACCEPTANCE')
+    return _run_batch(host,inject,stop_after_stage=stop_after_stage)
+
+
+def run_live_batch(host,*,stop_after_stage=None):
+    from tools.live_batch_execution import LiveBatchExecution
+    if host.store.session(host.run_id)['state']['search_batch']['mode']!='live':raise ValueError('LIVE_BATCH_GRANT_REQUIRED')
+    return _run_batch(host,LiveBatchExecution(host),stop_after_stage=stop_after_stage)
+
+
+def _run_batch(host,inject,*,stop_after_stage=None):
     """Injected apply/simulation/evaluation/profile outputs only; no provider or physics.
 
     The callback receives (stage, candidate, retained stage receipts). Its profile
@@ -395,9 +426,13 @@ def run_offline_batch(host,inject,*,stop_after_stage=None):
                 if start and not previous:
                     previous=dict(candidate_id=start['candidate']['candidate_id'],configuration=start['configuration'],identity=identity,
                         stages={k:dict(execution_status='historical_reused') for k,_ in stages},reused=True,
+                        changes=changes,
                         feedback=physical_feedback(start,start,record['bindings']['acceptance']))
+                    if batch.get('retained_baseline'):
+                        from tools.settling_campaign import compare_results
+                        previous['retained_baseline_comparison']=compare_results(batch['retained_baseline'],start)
                     batch['configurations'][identity]=previous
-                proposal.update(reused=True,reused_from=previous['candidate_id'])
+                proposal.update(reused=True,reused_from=previous['candidate_id'],reuse_kind='historical_start' if start else 'duplicate')
                 algorithm.feedback(previous['feedback']['score']);batch['algorithm']=plain(algorithm.save());_save_batch(host,batch);continue
             candidate_id=batch['batch_id']+'-'+str(proposal['index'])
             prepared=CandidateInput(candidate_id=candidate_id,baseline_identity=digest(source),builder=source['policy']['candidate_builder']['extension_id'],
@@ -408,7 +443,32 @@ def run_offline_batch(host,inject,*,stop_after_stage=None):
             batch['configurations'][identity]=dict(**batch['pending'],stages={},reused=False)
             batch['algorithm']=plain(algorithm.save());_save_batch(host,batch)
         candidate=batch['pending'];row=batch['configurations'][candidate['identity']]
+        live=batch['mode']=='live'
+        if live:
+            # Reconcile sealed child receipts before testing new-work caps.
+            executor=inject.candidate_host(candidate)
+            for stage,_ in stages[1:]:
+                old=executor.store.lookup(executor.run_id,'complete-'+stage)
+                if old and old['receipt'] and stage not in row['stages']:
+                    row['stages'][stage]=json.loads(old['receipt'])
+                elif old and not old['receipt']:
+                    executor.store.mark_unknown(executor.run_id,'complete-'+stage)
+                    row['stages'][stage]=dict(execution_status='unknown',execution_id=old['execution_id'],charged=json.loads(old['charged']),output=None)
+                    batch['stop_reason']='unresolved_execution';_save_batch(host,batch)
+                    return offline_batch_result(host)
+            _save_batch(host,batch)
+            used=offline_batch_result(host)['accounting']['usage'];remaining=host.store.remaining()['remaining']
+            missing=[s for s,_ in stages if s not in row['stages']]
+            if 'simulation' in missing and used['backend_solves']>=batch['max_backend_attempts']:
+                batch['stop_reason']='backend_attempt_limit';_save_batch(host,batch);break
+            needed=sum(s for k,s in stages if k in missing)
+            if (remaining['wall_s']<needed+batch['interpretation_reserve_s'] or remaining['tool_calls']<len(missing)+4 or remaining['model_calls']<4):
+                batch['stop_reason']='insufficient_delivery_capacity';_save_batch(host,batch);break
         for stage,reserve_s in stages:
+            if live and stage in row['stages']:
+                receipt=row['stages'][stage]
+                if receipt['execution_status']!='completed':return offline_batch_result(host)
+                continue
             request_id=candidate['candidate_id']+'-'+stage
             old=host.store.lookup(host.run_id,request_id)
             if old and not old['receipt']:
@@ -418,6 +478,8 @@ def run_offline_batch(host,inject,*,stop_after_stage=None):
                 _save_batch(host,batch)
                 return offline_batch_result(host)
             if old:receipt=json.loads(old['receipt'])
+            elif live and stage!='apply':
+                receipt=inject.stage(stage,deepcopy(candidate))
             else:
                 if host.store.spendable(host.run_id)['remaining']['wall_s']<reserve_s+batch['interpretation_reserve_s']:
                     return offline_batch_result(host)
@@ -426,20 +488,33 @@ def run_offline_batch(host,inject,*,stop_after_stage=None):
                 started=time.monotonic()
                 output=host.store.artifact(candidate['configuration']) if stage=='apply' else inject(stage,deepcopy(candidate),deepcopy(row['stages']))
                 receipt=host.store.complete(reservation,dict(request_id=request_id,execution_id=reservation['execution_id'],caller=host.actor,
-                    tool_id='offline.batch.'+stage,tool_version='1.0.0',execution_status='completed' if stage=='apply' else output.get('execution_status','completed'),charged=zero()),
-                    dict(mode='offline_injected',configuration=candidate['configuration'],result=output),time.monotonic()-started)
+                    tool_id='candidate.apply' if live else 'offline.batch.'+stage,tool_version='1.0.0',execution_status='completed' if stage=='apply' else output.get('execution_status','completed'),charged=zero()),
+                    dict(mode=batch['mode'],configuration=candidate['configuration'],result=output),time.monotonic()-started)
             row['stages'][stage]=receipt;_save_batch(host,batch)
-            if receipt['execution_status']!='completed':return offline_batch_result(host)
+            if receipt['execution_status']!='completed':
+                if live:
+                    batch['stop_reason']='unresolved_execution' if receipt['execution_status']=='unknown' else 'material_execution_failure'
+                    _save_batch(host,batch)
+                return offline_batch_result(host)
             if stop_after_stage==stage:return offline_batch_result(host)
-        facts=host.store.artifact(row['stages']['profile']['output'])['result']['factual_result']
-        if (facts['configuration']!=candidate['configuration'] or facts['candidate']['configuration']!=candidate['configuration']
+        if live:
+            completed=inject.facts(deepcopy(candidate));facts=completed['factual_result'];row['execution']=completed
+            row['executed_configuration']=completed['configuration']
+        else: facts=host.store.artifact(row['stages']['profile']['output'])['result']['factual_result']
+        if (not live and (facts['configuration']!=candidate['configuration'] or facts['candidate']['configuration']!=candidate['configuration'])
                 or facts['candidate']['candidate_id']!=candidate['candidate_id']):
             raise ValueError('BATCH_RESULT_CONFIGURATION_MISMATCH')
         baseline=batch['starting_facts']
         if baseline is None:batch['starting_facts']=baseline=facts
         row['feedback']=physical_feedback(baseline,facts,record['bindings']['acceptance'])
+        if batch.get('retained_baseline'):
+            from tools.settling_campaign import compare_results
+            row['retained_baseline_comparison']=compare_results(batch['retained_baseline'],facts)
+        row['joint_acceptance']=row['feedback']['physical_metrics']['joint_reach_holding_passed']
         algorithm.feedback(row['feedback']['score']);batch['pending']=None;batch['algorithm']=plain(algorithm.save())
         if row['feedback']['score'] is None:batch['stop_reason']='invalid_physical_result'
+        if live and not batch['stop_reason'] and sum(not r['reused'] and r.get('feedback') is not None for r in batch['configurations'].values())>=batch['target_changed_configurations']:
+            batch['stop_reason']='pilot_target_complete'
         _save_batch(host,batch)
     if not batch['stop_reason']:batch['stop_reason']='proposal_limit'
     _save_batch(host,batch)
@@ -447,5 +522,5 @@ def run_offline_batch(host,inject,*,stop_after_stage=None):
     with host.store.transaction() as db:
         ref=host.store.put(db,result);state=host.store.session(host.run_id,db)['state'];state['search_batch_result']=plain(ref)
         host.store.update_state(db,host.run_id,state)
-        host.store.event(db,host.run_id,'search_batch','offline_result',inputs=[batch['plan']],outputs=[ref])
+        host.store.event(db,host.run_id,'search_batch','live_result' if batch['mode']=='live' else 'offline_result',inputs=[batch['plan']],outputs=[ref])
     return result

@@ -1,5 +1,9 @@
 # Milestone 3 offline preparation
 
+Stage 3.57 connects this shared scheduler to real execution under a separate
+grant; see [the development pilot](stage357_development_pilot.md). The original
+offline preparation and original model products below remain preserved.
+
 The original Stage 3.56 pair is frozen in commit `1ded856`. This subsequent work
 is **Milestone 3 offline preparation**, not Milestone 3 completion or live
 validation of the repairs. No additional provider request, controller solve or

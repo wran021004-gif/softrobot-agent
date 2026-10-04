@@ -197,6 +197,11 @@ class SearchBatchPlan(Contract):
     constraints: list[str] = Field(min_length=1)
     method: str = Field(description='Registered search extension_id@version.')
     max_candidates: int = Field(ge=1, le=12)
+    max_backend_attempts: int | None = Field(default=None,ge=1,le=12,
+        description='Separate new full backend attempt cap. Omitted legacy plans retain backend_solves=max_candidates.')
+    target_changed_configurations: int | None = Field(default=None,ge=1,le=12,
+        description='Stop normally after this many distinct changed configurations have complete evaluation and profile.')
+    failure_policy: Literal['stop_on_material_failure'] = 'stop_on_material_failure'
     step: float = Field(gt=0, le=1)
     planned_budget: Budget
     fidelity_limits: list[str] = Field(min_length=1)

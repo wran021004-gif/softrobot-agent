@@ -163,8 +163,14 @@ def respond_workflow(ctx,args):
         if args.candidate_disposition in ('defer_selection','reject_all'):
             expected=None
         else:
-            facts=feedback['baseline_facts'] if args.candidate_disposition=='retain_baseline' else feedback['execution']['factual_result']
-            expected=facts['candidate']
+            if args.candidate_disposition=='adopt_candidate' and role.get('batch_result'):
+                choices=[c['execution']['factual_result']['candidate'] for c in role['batch_result']['candidates']
+                    if not c['reused'] and c.get('feedback') is not None]
+                if args.selected_candidate not in choices:raise ValueError('FINAL_BATCH_CANDIDATE_BINDING_MISMATCH')
+                expected=args.selected_candidate
+                facts=None
+            else:facts=feedback['baseline_facts'] if args.candidate_disposition=='retain_baseline' else feedback['execution']['factual_result']
+            if facts is not None:expected=facts['candidate']
         if args.selected_candidate!=expected:raise ValueError('FINAL_CANDIDATE_BINDING_MISMATCH')
     return transition(ctx,'design_response',args)
 

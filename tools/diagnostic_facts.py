@@ -139,7 +139,10 @@ def context_view(state, *, max_catalog_bytes=75000, priority_handles=()):
         r=deepcopy(item);r['displayed_handles']=[h for h in r['handles'] if h in shown]
         r['presentation']='explicitly_handed_over' if r['method']=='explicit_handoff' else ('displayed_catalog' if r['displayed_handles'] else 'available_by_reference')
         ledger.append(r)
+    from tools.diagnostic_summary import read_coverage
+    total=max((e.get('total_records',0) for e in state.get('role_context',{}).get('inventory',{}).get('entries',[]) if e.get('type')!='backend_motion'),default=0)
     return dict(fact_catalog=list(reversed(selected)),read_ledger=ledger,fact_catalog_policy=POLICY,
+        queried_coverage=read_coverage({'current_context':state},total),
         additional_evidence='Use diagnosis.inspect_evidence views or evidence.read on JSON results. Compressed backend motion uses the motion view.')
 
 

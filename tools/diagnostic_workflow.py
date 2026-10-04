@@ -66,8 +66,9 @@ def save(store,value):
 
 def implementation():
     paths=['tools/diagnostic_handoff.py','tools/platform_search.py','tools/working_state.py','schemas/working_state.py',
-        'examples/stage356_milestone2.py','tests/test_stage356_milestone2.py',
+        'examples/stage356_milestone2.py','examples/stage357_live_pilot.py','tests/test_stage356_milestone2.py','tests/test_stage356_batch.py','tests/test_stage357_live_batch.py',
         'tools/diagnostic_reference_adapter.py','tools/diagnostic_revision.py','schemas/diagnostic_revision.py','tools/diagnostic_workflow.py','tools/diagnostic_native.py','tools/diagnostic_inventory.py','tools/diagnostic_facts.py',
+        'tools/diagnostic_summary.py','tools/live_batch_execution.py','extensions/tendon_family/diagnostic_evidence.py','tools/execution_completion.py',
         'tools/platform_models.py','tools/platform_handoff.py','tools/platform_diagnosis_coordinator.py',
         'tools/platform_host.py','tools/platform_store.py','schemas/platform_handoff.py','schemas/platform_diagnostics.py',
         'extensions/platform/manifest.py','extensions/tendon_family/diagnostic_evidence.py','extensions/tendon_family/diagnostic_math.py',
@@ -259,6 +260,7 @@ class DiagnosticWorkflow:
             report=self.chain['revised_report' if phase=='response_final' else 'initial_report']
             common.update(report=report,report_content=self.store.artifact(report),final_response=phase=='response_final')
         instruction=self.instructions[phase]
+        instruction+=' Claims of dominant causes or ineffectiveness throughout a parameter range must state their evidential scope. Distinguish observations, hypotheses and proposed tests. A small unsuccessful batch only describes tested candidates. Raw termination and controller policy stops are separate. Zero bound violation does not exclude legal near-bound input.'
         if self.experiment.get('fact_handles'):
             instruction=instruction.replace('2-4 exact selected facts','2-4 facts selected using fact_handles').replace(
                 'Fact selectors point into original query result artifacts (e.g. /detail/summary/terminal_speed_m_s), not observation envelopes. report.source is the supplied binding; recommendation configuration_scope is identities.configuration.',

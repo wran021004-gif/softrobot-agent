@@ -59,7 +59,7 @@ class WireFinalDecision(Contract):
     reasoning: str = Field(min_length=1)
     next_action: Literal['finish']
     candidate_disposition: Literal['adopt_candidate', 'retain_baseline', 'defer_selection', 'reject_all']
-    selected_candidate: Literal['baseline', 'candidate', 'none']
+    selected_candidate: str = Field(description='baseline, candidate, none; for a supplied completed batch, an exact evaluated candidate_id may be selected.')
 
 
 def without(schema, fields, **replacements):
