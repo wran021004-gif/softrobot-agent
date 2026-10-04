@@ -50,3 +50,48 @@ requests and backend solves are blocked in those fixtures. Live results and
 final completion gates will be recorded under
 `evidence/stage358_confirmation_20261004/`, with exact evidence bytes protected
 by the scoped Git attribute.
+
+## Current delivery and prelaunch review
+
+The repaired implementation is frozen in local commit `8ce57af`. Seven distinct
+focused offline checks passed. A Windows sandbox fixture-access failure and two
+implementation-check failures are retained. The verification-only historical
+path issue and resumed-candidate progress-log issue were repaired; the affected
+checks passed on rerun. No paid verification or numerical screening occurred.
+
+The live launch was rejected by automatic approval review before a process
+started. The stated reason was that no trusted user instruction authorized the
+specific repository payload and `api.deepseek.com` destination. The attached
+request contains authorization, but the reviewer did not recognize it for this
+transfer. Direct authorization was requested in chat; no workaround or indirect
+execution was attempted. See `prelaunch_review.json` for the rejection record.
+
+Milestone 3 is **not complete**. This confirmation has no current model-authored
+accepted plan, newly executed results, model interpretation, final candidate
+decision or next research route. Provider attempts, workflow tools, proposals,
+backend attempts, corrections and tokens are all zero. Charged wall time and
+unresolved reservations are zero. The live run directory has not been created,
+so its guard and authorized caps remain available after platform-recognized
+approval. No model reasoning was replaced with an engineer-authored decision.
+
+The verified historical physical results remain:
+
+| Reference | Holding / terminal weight | Terminal error (m) | Holding max error (m) | Holding max speed (m/s) | Reach |
+|---|---|---:|---:|---:|---|
+| Retained baseline | 0 / 0 | 0.007642608585867386 | 0.05813810428573256 | 1.5810152739742807 | Pass |
+| Historical search start | 0.05 / 0 | 0.00869890424761182 | 0.05650455971948983 | 1.1750052670100422 | Pass |
+| Prior complete candidate | 0.30 / 0 | 0.018690324120991027 | 0.06344380037515782 | 1.1276277677182223 | Fail |
+
+None passed joint reach/holding acceptance or demonstrated real-time operation.
+The prior candidate trades lower holding speed for worse terminal and holding
+position against both references. This weakens reach-preserving improvement at
+that point; it establishes no conclusion about the whole weight range. Exact
+source identities, receipts, metric vectors and both comparisons are in
+`historical_reference_inventory.json` and `delivery_summary.json`.
+
+Historical charges are separate and unchanged: the Stage 3.57 pilot used three
+provider attempts, eleven tools and two backend attempts, with one complete new
+evaluation/profile. Its ledger wall use remains `1712.29400000046 s`, including
+an unresolved `900 s` reservation; sealed actual charges remain
+`812.29400000046 s`. Milestone 2 remains closed. There was no budget transfer,
+new baseline execution, replacement campaign or push.

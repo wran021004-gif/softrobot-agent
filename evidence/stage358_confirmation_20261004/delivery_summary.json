@@ -1,0 +1,1364 @@
+{
+  "milestone3": {
+    "passed": false,
+    "status": "live_not_started_platform_approval_required",
+    "unmet_criteria": [
+      "Current accepted model-authored confirmation plan",
+      "Two distinct changed configurations newly executed and fully evaluated/profiled",
+      "Model-authored interpretation and final decision",
+      "Model-selected next research route or justified deferral"
+    ]
+  },
+  "implementation_commit": "8ce57af849acd48c6dd5da070ece4c4668967cc9",
+  "implementation_frozen": true,
+  "offline_validation": {
+    "passed": true,
+    "distinct_affected_checks": 7,
+    "latest_successful_check_sources": {
+      "tests.test_stage358_confirmation.ConfirmationTests.test_three_verified_records_duplicate_and_two_new_target": "checks_1791091340751036900.json",
+      "tests.test_stage357_live_batch.LiveIntegrationTests.test_retained_baseline_and_float_roundtrip_never_spend_backend_budget": "checks_1791091279113439500.json",
+      "tests.test_stage357_live_batch.LiveIntegrationTests.test_shared_scheduler_two_comparisons_caps_and_continuation": "checks_1791091340751036900.json",
+      "tests.test_stage357_live_batch.LiveIntegrationTests.test_live_adapter_refuses_wrong_result_configuration": "checks_1791091279113439500.json",
+      "tests.test_stage358_confirmation.ConfirmationTests.test_confirmation_plan_context_and_final_research_consumption": "checks_1791091279113439500.json",
+      "tests.test_stage357_live_batch.LiveIntegrationTests.test_pilot_launcher_preserves_provider_and_model_plan_path": "checks_1791091279113439500.json",
+      "tests.test_stage357_live_batch.FactualSummaryTests.test_archived_counts_bounds_and_merged_role_coverage": "checks_1791091279113439500.json"
+    },
+    "current_implementation_checks": {
+      "passed": true,
+      "tests_run": 2,
+      "names": [
+        "tests.test_stage358_confirmation.ConfirmationTests.test_three_verified_records_duplicate_and_two_new_target",
+        "tests.test_stage357_live_batch.LiveIntegrationTests.test_shared_scheduler_two_comparisons_caps_and_continuation"
+      ],
+      "output": "test_three_verified_records_duplicate_and_two_new_target (tests.test_stage358_confirmation.ConfirmationTests.test_three_verified_records_duplicate_and_two_new_target) ... ok\ntest_shared_scheduler_two_comparisons_caps_and_continuation (tests.test_stage357_live_batch.LiveIntegrationTests.test_shared_scheduler_two_comparisons_caps_and_continuation) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 26.562s\n\nOK\n",
+      "elapsed_s": 26.593000000109896,
+      "implementation": {
+        "commit": "dcee87bc2faf6ba13d5b29fcb52e070c5797ecaa",
+        "files": {
+          "tools/diagnostic_handoff.py": "1dbd0a46ae072122096ed59e2dbdcbf186951d6130a5a8de0e3952221f34c73f",
+          "tools/platform_search.py": "e1771ecbb4523ab7a6d6407d04d255da03edd34099b12012e9bfc16a12361316",
+          "tools/working_state.py": "cf69b822bff82897d86a8a50bf3660bab8f18a20a4ad11571b7d125370ce16a8",
+          "schemas/working_state.py": "41733f38151ce0d630e07552b358680450876e64cdfb11253286be7f05ba871c",
+          "examples/stage356_milestone2.py": "5317c5b4c45e475dbdd609082dc014e29fd0e76da9e9074fc2dd45b993b92401",
+          "examples/stage357_live_pilot.py": "79d2f0375b5e83de2467283926b80787b62ea8e93bcbe72b59f66acd62e93ea1",
+          "examples/stage358_confirmation.py": "6a6ae896dfa748c32b2f560ccf0d753d03a6a25e0eac3caa6f810445d72cd586",
+          "tests/test_stage358_confirmation.py": "5f846847ba45ce6cb9144448d1d9f2f3b2a7b47bead81d2a6f19ea62fea91a49",
+          "tests/test_stage356_milestone2.py": "accb8f4e05134f243d457c9f3c579d2f246881dc6da0fb7327e5f57d99468f7e",
+          "tests/test_stage356_batch.py": "776a313f320abf9ad9f15bf11757fdc9f67b5b9e1f7979cff2bce4ab50cc9873",
+          "tests/test_stage357_live_batch.py": "3845a794ac118e3a1666aa7be71e57c04b4a2087dded790aa92df9d88032bd5f",
+          "tools/diagnostic_reference_adapter.py": "709403879bb4351036a1f54f61a806f373868be6cedc8f0137a31d6d93a5c06e",
+          "tools/diagnostic_revision.py": "5b618332cf2abe594bbf355c1ca701ffb2d36fce79aff81422d75754fc261c36",
+          "schemas/diagnostic_revision.py": "9d04a02beae21b3a50561646c45d02d4d143b1293a2d06e4fd36d0ca32ba1f1a",
+          "tools/diagnostic_workflow.py": "686564e3bbc3d767dfa172681923d7f8cebad24cf896bdf6548490662c4fcf9f",
+          "tools/diagnostic_native.py": "ad007fff7a1c0d139a93db6b715d9ffd0a40631903ee32eab6c20befabb4bc11",
+          "tools/diagnostic_inventory.py": "2178f03ad6e991870a69e9e8986c84336753bcf26f2d617ed02d9a786e2a0651",
+          "tools/diagnostic_facts.py": "5a05214a31816fe3871b7e26d8f9fe86c70083d860eee99e2bb6bf8cd70b0d09",
+          "tools/diagnostic_summary.py": "a88f5d5db01728ddfb5ebd9a43cb0b9f944c2fcb3357bb55e895888ed70e052b",
+          "tools/live_batch_execution.py": "728b6e120a2fe595cef6dd4c5ff7afb81f870b43ef1c3fc04b5d344e30a78066",
+          "extensions/tendon_family/diagnostic_evidence.py": "f14e67c1dc2b201c2114eceb1e5fbb41d94d129299e222b533f1e35f0e43a836",
+          "tools/execution_completion.py": "c10c008003d191fa5dbd7b69cd55dac50543495b119802459190d498a6d742a5",
+          "tools/platform_models.py": "27a8154de6cdeb43f88348489fbd65a0e7756cfb75bbc0acc58a5beb5e142574",
+          "tools/platform_handoff.py": "26b76e4568c0f4c15141ae8de1b6a9435114c4a8a8655c92af5b51afcedbe97f",
+          "tools/platform_diagnosis_coordinator.py": "ae8c0554d0303a76ae6a55eeb7d849f3df63fe27e1fa8a04cbd1f995358b736a",
+          "tools/platform_host.py": "134123ac29d5279d9480fde5e064771c6ee3702fb185142a496d54a0eeed30fa",
+          "tools/platform_store.py": "1727f687b1dea1ae0cd078ca753edd9d7e9c7ecf9706225fde52af2ddfe8d318",
+          "schemas/platform_handoff.py": "bbf4ed037ce8b0a6c69cdd7ec15a800b43a2a9cb8fbb685cdb5637ed13fa3ac1",
+          "schemas/platform_diagnostics.py": "9dc0a0a6137710798be6fc3bc824a97d5d7d92937d4587fd8e87c0d75a9ddd0a",
+          "extensions/platform/manifest.py": "e5746170e5b0f4a55a2461cefd55f4c872566fbe1fdf4d324b46df1cd08f8996",
+          "extensions/tendon_family/diagnostic_math.py": "7b96c3fd2451e8e717c402e73e74eb66b0f18e36c5968283162e255d6c99bbd8",
+          "tools/model_transports/deepseek.py": "0df3a9f900b8c3c8efd7f72a99c9ff4524eca0826f5c5e2e904bdda9a2e5607c",
+          "examples/stage346_shared_diagnosis.py": "54ec2b5c63aa833d7f260575238e63520dae381023f57212e8d51f7befcae146",
+          "examples/stage348_experiment.json": "f0e78fbacf16903687a151e3a68f59490bffe577501aa3af2a0223f624547aca",
+          "examples/stage349_experiment.json": "9fb475e6f3286faa81c67ee1bc896512ecfc0f4ad22df36cf5e607d76224f8c6",
+          "tools/diagnostic_improvement.py": "e9723ef5881f037ff420992a14e6f768a05815fa3f021b05d32a9ea15f7d74c9",
+          "tools/platform_tools.py": "e1815614e5f2fc5a0310e48a0bf0444708685d71189efb90de32919a54e050fa",
+          "extensions/tendon_family/candidate.py": "e5a551c5fc2dbe060ee21c1e2130a2d8a98da1954518b8150518fe8a8693fb97",
+          "examples/gvs_design_input.py": "3486458ee65da3a99f74ee93d4db84cb17d6d7ffc806d9a92fc9c542615b0ac3",
+          "examples/gvs_nmpc_route_experiment.py": "7f849a347384a97a272acffa0ebe81385c12b252a89a3924032954e34d65e758",
+          "tasks/reach_free/task.yaml": "3f641688a1b10bcede5e646e8b230ce3cb0963904cc7660bc528748488472b88"
+        }
+      },
+      "new_provider_requests": 0,
+      "new_backend_attempts": 0,
+      "new_numerical_solves": 0
+    },
+    "failed_attempts_preserved": [
+      "checks_1791090907141037000.json",
+      "checks_1791091018097245000.json",
+      "checks_1791091279113439500.json"
+    ],
+    "scope": "Offline fixtures and read-only sealed-history verification; no synthetic fixture counts as live Milestone 3 completion.",
+    "current_recheck": "Only logging on resumed candidates and tighter historical associations changed after the seven-check run; both affected paths were rerun successfully."
+  },
+  "live_validation": {
+    "status": "prelaunch_rejected_no_process_started",
+    "action": "One Stage 3.58 live confirmation on implementation commit 8ce57af",
+    "approval_source": "automatic approval review",
+    "review_reason": "The action sends repository evidence to the untrusted external destination api.deepseek.com; no trusted user instruction authorizes that specific payload and destination, so sensitive egress must be denied. Do not bypass this rejection through a workaround or indirect execution.",
+    "confirmation_directory_created": false,
+    "new_provider_attempts": 0,
+    "new_workflow_tool_calls": 0,
+    "new_backend_attempts": 0,
+    "new_numerical_solves": 0,
+    "new_worker_calls": 0,
+    "new_charged_wall_s": 0.0,
+    "new_unresolved_reservations": [],
+    "requires": "Direct authorization in chat recognized by the platform before this repository-data transfer can execute.",
+    "workaround_attempted": false
+  },
+  "limits": {
+    "provider_attempts": 16,
+    "workflow_tool_calls": 60,
+    "charged_wall_s": 7200.0,
+    "optimizer_proposals": 6,
+    "new_backend_attempts": 3,
+    "workers": 0,
+    "target_new_complete_changed_configurations": 2
+  },
+  "actual_confirmation": {
+    "proposals": 0,
+    "distinct_configurations": 0,
+    "historical_start_reuse": 0,
+    "retained_baseline_reuse": 0,
+    "other_historical_reuse": 0,
+    "current_batch_duplicate_reuse": 0,
+    "provider_attempts": 0,
+    "workflow_tools": 0,
+    "new_backend_attempts": 0,
+    "completed_new_evaluations": 0,
+    "completed_new_profiles": 0,
+    "fully_evaluated_distinct_changed_configurations": 0,
+    "protocol_corrections": 0,
+    "charged_wall_s": 0.0,
+    "reported_prompt_tokens": 0,
+    "reported_completion_tokens": 0,
+    "reported_reasoning_tokens": 0,
+    "reported_total_tokens": 0,
+    "sealed_actual_charges": 0.0,
+    "unresolved_reservations": []
+  },
+  "model_selected_plan": null,
+  "actual_candidate_sequence": [],
+  "model_final_candidate_decision": null,
+  "next_research_route": null,
+  "permitted_historical_metrics": [
+    {
+      "role": "retained_baseline",
+      "candidate": {
+        "candidate_id": "baseline-replay",
+        "configuration": {
+          "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+          "media_type": "application/json"
+        },
+        "owner_run_id": "gvs-stage351-baseline-executor",
+        "execution_id": "cf997605885642759ee33920e2c9e2ef"
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "cf997605885642759ee33920e2c9e2ef",
+          "configuration": {
+            "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.007642608585867386,
+        "holding_max_error_m": 0.05813810428573256,
+        "holding_max_speed_m_s": 1.5810152739742807,
+        "terminal_reach_passed": true,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.26331904856488,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "against_search_start": {
+        "baseline": {
+          "source": {
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "configuration": {
+              "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.00869890424761182,
+          "holding_max_error_m": 0.05650455971948983,
+          "holding_max_speed_m_s": 1.1750052670100422,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.77877309145406,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.007642608585867386,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": -0.001056295661744434,
+          "holding_max_error_m": 0.001633544566242727,
+          "holding_max_speed_m_s": 0.4060100069642385,
+          "mean_complete_update_s": -0.5154540428891785,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "physical_tradeoff",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      },
+      "against_retained_baseline": {
+        "baseline": {
+          "source": {
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.007642608585867386,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.007642608585867386,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": 0.0,
+          "holding_max_error_m": 0.0,
+          "holding_max_speed_m_s": 0.0,
+          "mean_complete_update_s": 0.0,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "physical_equivalent_within_tolerance",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      }
+    },
+    {
+      "role": "historical_start",
+      "candidate": {
+        "candidate_id": "improvement-96f0ade35119",
+        "configuration": {
+          "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+          "media_type": "application/json"
+        },
+        "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+        "execution_id": "087adee8e8a24fe88e5c85fe89e638c8"
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+          "configuration": {
+            "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.00869890424761182,
+        "holding_max_error_m": 0.05650455971948983,
+        "holding_max_speed_m_s": 1.1750052670100422,
+        "terminal_reach_passed": true,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.77877309145406,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "against_search_start": {
+        "baseline": {
+          "source": {
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "configuration": {
+              "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.00869890424761182,
+          "holding_max_error_m": 0.05650455971948983,
+          "holding_max_speed_m_s": 1.1750052670100422,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.77877309145406,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "configuration": {
+              "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.00869890424761182,
+          "holding_max_error_m": 0.05650455971948983,
+          "holding_max_speed_m_s": 1.1750052670100422,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.77877309145406,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": 0.0,
+          "holding_max_error_m": 0.0,
+          "holding_max_speed_m_s": 0.0,
+          "mean_complete_update_s": 0.0,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "physical_equivalent_within_tolerance",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      },
+      "against_retained_baseline": {
+        "baseline": {
+          "source": {
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.007642608585867386,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "configuration": {
+              "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.00869890424761182,
+          "holding_max_error_m": 0.05650455971948983,
+          "holding_max_speed_m_s": 1.1750052670100422,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.77877309145406,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": 0.001056295661744434,
+          "holding_max_error_m": -0.001633544566242727,
+          "holding_max_speed_m_s": -0.4060100069642385,
+          "mean_complete_update_s": 0.5154540428891785,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "physical_tradeoff",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      }
+    },
+    {
+      "role": "historical_candidate",
+      "candidate": {
+        "candidate_id": "batch-2ef6ee45913c43c9-1",
+        "configuration": {
+          "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+          "media_type": "application/json"
+        },
+        "owner_run_id": "batch-2ef6ee45913c43c9-1",
+        "execution_id": "25e26708480848d79bad378b669915e3"
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "25e26708480848d79bad378b669915e3",
+          "configuration": {
+            "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "ac9f4834c4722feac739fd45378ebbfbee77376cd699318deb29ed177028145b",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "96328da478505dc97a565fab88e5510721d242f0c23e41ce2da503fec9bdc333",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "3d2e58ec5e393e5277b2d134657d6b1a38eba06482647a3dbaaca1ebdf4bacb6",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": false,
+        "terminal_error_m": 0.018690324120991027,
+        "holding_max_error_m": 0.06344380037515782,
+        "holding_max_speed_m_s": 1.1276277677182223,
+        "terminal_reach_passed": false,
+        "holding_position_passed": false,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 17.30461485715849,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "against_search_start": {
+        "baseline": {
+          "source": {
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "configuration": {
+              "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.00869890424761182,
+          "holding_max_error_m": 0.05650455971948983,
+          "holding_max_speed_m_s": 1.1750052670100422,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.77877309145406,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "25e26708480848d79bad378b669915e3",
+            "configuration": {
+              "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "ac9f4834c4722feac739fd45378ebbfbee77376cd699318deb29ed177028145b",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "96328da478505dc97a565fab88e5510721d242f0c23e41ce2da503fec9bdc333",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "3d2e58ec5e393e5277b2d134657d6b1a38eba06482647a3dbaaca1ebdf4bacb6",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": false,
+          "terminal_error_m": 0.018690324120991027,
+          "holding_max_error_m": 0.06344380037515782,
+          "holding_max_speed_m_s": 1.1276277677182223,
+          "terminal_reach_passed": false,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.30461485715849,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": 0.009991419873379207,
+          "holding_max_error_m": 0.0069392406556679845,
+          "holding_max_speed_m_s": -0.04737749929181989,
+          "mean_complete_update_s": -0.4741582342955688,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "physical_tradeoff",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      },
+      "against_retained_baseline": {
+        "baseline": {
+          "source": {
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.007642608585867386,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "terminal_reach_passed": true,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "25e26708480848d79bad378b669915e3",
+            "configuration": {
+              "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "ac9f4834c4722feac739fd45378ebbfbee77376cd699318deb29ed177028145b",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "96328da478505dc97a565fab88e5510721d242f0c23e41ce2da503fec9bdc333",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "3d2e58ec5e393e5277b2d134657d6b1a38eba06482647a3dbaaca1ebdf4bacb6",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": false,
+          "terminal_error_m": 0.018690324120991027,
+          "holding_max_error_m": 0.06344380037515782,
+          "holding_max_speed_m_s": 1.1276277677182223,
+          "terminal_reach_passed": false,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.30461485715849,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": 0.011047715535123641,
+          "holding_max_error_m": 0.0053056960894252575,
+          "holding_max_speed_m_s": -0.4533875062560584,
+          "mean_complete_update_s": 0.041295808593609706,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "physical_tradeoff",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      }
+    }
+  ],
+  "predecessor_costs": {
+    "milestone2": {
+      "passed": true,
+      "gate": "evidence/stage357_confirmation_20261004/single_context/acceptance.json",
+      "implementation_commit": "fd796ed",
+      "usage": {
+        "ledger": {
+          "limit": {
+            "backend_solves": 0,
+            "model_calls": 24,
+            "tool_calls": 60,
+            "wall_s": 1800.0,
+            "worker_calls": 0
+          },
+          "used": {
+            "tool_calls": 9,
+            "model_calls": 6,
+            "backend_solves": 0,
+            "worker_calls": 0,
+            "wall_s": 321.1439999991562
+          },
+          "remaining": {
+            "backend_solves": 0,
+            "model_calls": 18,
+            "tool_calls": 51,
+            "wall_s": 1478.8560000008438,
+            "worker_calls": 0
+          },
+          "occupied": {}
+        },
+        "numerical_work": {
+          "limits": {
+            "local_solves": 2,
+            "prediction_evaluations": 2
+          },
+          "used": {
+            "local_solves": 0,
+            "prediction_evaluations": 0
+          }
+        },
+        "protocol_corrections": 0,
+        "reported_prompt_tokens": 446409,
+        "reported_completion_tokens": 74578,
+        "reported_reasoning_tokens": 61301,
+        "reported_total_tokens": 520987,
+        "workflow_elapsed_s": 343.0150000001304,
+        "monetary_cost": null
+      }
+    },
+    "milestone3": {
+      "passed": false,
+      "stop_reason": "material_scheduler_failure_retained_baseline_reexecution",
+      "implementation_commit": "98416a0",
+      "plan": {
+        "artifact_id": "2ef6ee45913c43c9888aa77fbeec53a5b556abc49ce2b4ee1a7df7a50d72ded9",
+        "media_type": "application/json"
+      },
+      "plan_parameters": {
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F160",
+          "F167",
+          "F177",
+          "F157",
+          "F153",
+          "F154",
+          "F1324",
+          "F1728",
+          "F1745",
+          "F1730",
+          "F1712",
+          "F1734",
+          "F1694",
+          "F1541",
+          "F1546",
+          "F1596",
+          "F1465",
+          "F1433",
+          "F1474",
+          "F1558",
+          "F1534",
+          "F1442"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "Only the two granted recipe tip-speed weights are varied; horizon 10, max_iterations 120, settling settings, timing/control period, warm-start and seed policy, robot definition and evaluator are unchanged.",
+          "Physical acceptance and the baseline comparison come only from the frozen sealed evaluator and sealed campaign comparison; local or raw weighted costs are never a final physical ranking.",
+          "The sampled final-window holding metrics cover only the last 0.05 s (6 samples) with continuous_time_guarantee false, and no closed-loop counterfactual replay exists, so trajectories, settling and causality are not established.",
+          "search.family_coordinate@1.0.0 supplies candidate ask/tell only; every changed configuration still requires a fresh simulation.run, evaluation.run and control.profile_report before any comparable fact exists.",
+          "Frames stay distinct: world for tip vectors, projected GVS coordinates for state, serial backend joint coordinates for q/qdot."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "On the frozen task, robot, evaluator and fixed controller controller.gvs_nmpc@7.0.0, raising the recipe tip-speed cost weights — control/recipe/holding_tip_speed_weight above the already-tested 0.05 and/or control/recipe/terminal_tip_speed_weight above the already-tested 0.0 — will lower the sampled final-window holding max world tip speed (tested candidate 1.1750052670100422 m/s, F1728, F1310) relative to that tested candidate while terminal reach stays inside the 0.01 m tolerance and the recorded force bound violation stays 0 N. The claim is scoped to exactly the changed configurations this bounded coordinate batch executes on the shared frozen baseline; it is a local candidate-comparison statement, not a closed-loop causal attribution and not a statement about the whole weight range.",
+        "max_backend_attempts": 3,
+        "max_candidates": 6,
+        "method": "search.family_coordinate@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s",
+          "complete_update_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 3,
+          "model_calls": 4,
+          "tool_calls": 24,
+          "wall_s": 2970.0,
+          "worker_calls": 0
+        },
+        "rationale": "Linked to the accepted single-context diagnosis and the performed plans check; this is the current authorized development pilot plan and executes no batch and promotes no candidate. Observation (performed-check aliases): the tested candidate fails the sampled final holding window while passing terminal reach — holding max error 0.05650455971948983 m (F1730) vs position limit 0.01 m (F1712), holding max speed 1.1750052670100422 m/s (F1728) vs speed limit 0.02 m/s (F1745), terminal error 0.00869890424761182 m (F1734) inside tolerance with terminal_reach_passed true (F1694), joint_reach_holding_passed false (F1541); the sealed comparison remains physical_tradeoff (F1324) with holding improvements (F1465, F1596) offset by terminal-error and computation worsening (F1546, F1433, baseline terminal error F1558); the performed plans view recorded User_Requested_Stop termination (F160) with policy_stop_reason budget_best_feasible (F167) and accepted plans (F177), 6 noninitialization selections over 35 updates (F153, F154), sampled applied tensions up to 7.999987676698501 N at update 32 (F157) with 0 N recorded violation (F1534) on a finite valid execution (F1442). Hypothesis (scope-qualified, explicitly not causal): raising the two tip-speed weights lowers the sampled hold speed relative to the tested candidate without breaking terminal reach or the force bound; it covers only the configurations actually executed, and no dominant-cause or whole-range claim is made. Proposed test: a coordinate batch on exactly the two granted paths with fresh executions and the frozen comparison. The prior step 0.0 -> 0.05 moved the sampled hold speed only 1.5810152739742807 -> 1.1750052670100422 m/s (F1474, F1728), so promise is uncertain. Recommendation/candidate separation: retained diagnostic positions (no closed-loop causal attribution; further weight-only tuning is low-yield on this baseline) are kept as diagnostic views and are independent of selecting the controller candidate; nothing is selected or promoted here. Fixed: robot, task, acceptance, controller_implementation and other_numerical_settings unchanged, fixed_controller controller.gvs_nmpc@7.0.0, method search.family_coordinate@1.0.0. Variables are only control/recipe/holding_tip_speed_weight and control/recipe/terminal_tip_speed_weight with granted bounds [0,1]; saved starting values 0.05 and 0.0 lie in-domain, both domains have nonzero width and include the saved values, and the 0.25 coordinate step stays clear of the forbidden (0, 0.0001) interval (0.05+0.25=0.30, 0.0+0.25=0.25). The proposal list includes the saved start point and duplicates; duplicates are not new backend attempts. Costs restated for the rejected-draft repair: max_backend_attempts=3 with planned backend_solves=3, tool_calls=24 (>=4 per new execution), wall_s=2970 (>=990 per new execution), model_calls=4, worker_calls=0; no separate numerical screening and no new baseline. Stop after two distinct changed configurations complete simulation/evaluation/profile even if joint acceptance occurs earlier, and protect ~600 s and four provider/tool slots for interpretation and delivery. Termination is kept distinct from convergence, applied updates distinct from optimized selections, wall deadlines distinct from simulated steps, and terminal reach distinct from holding. A validated plan still requires a future grant.",
+        "scientific_promise": "uncertain",
+        "step": 0.25,
+        "stopping_conditions": [
+          "Stop normally after TWO distinct changed configurations have completed simulation.run, evaluation.run and control.profile_report, even if joint_reach_holding_acceptance is reached earlier.",
+          "Stop after at most 6 candidate proposals and at most 3 new full backend attempts; stop immediately on a material failure under stop_on_material_failure.",
+          "Stop with no promotion and no selection of any controller candidate; report every unexecuted candidate as not_run and keep ~600 s plus four provider/tool slots for interpretation and delivery.",
+          "Report raw termination status and controller policy stop reason separately, and report zero bound violation separately from legal near-bound input."
+        ],
+        "target_changed_configurations": 2,
+        "variables": {
+          "control/recipe/holding_tip_speed_weight": [
+            0.0,
+            1.0
+          ],
+          "control/recipe/terminal_tip_speed_weight": [
+            0.0,
+            1.0
+          ]
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "A prior paired change (holding_tip_speed_weight 0.0 -> 0.05) reduced the sampled final-window hold max speed only from 1.5810152739742807 m/s (F1474) to 1.1750052670100422 m/s (F1728, F1310), still far above the 0.02 m/s limit (F1745); weight-only leverage on this term was small at that step, so the expected yield of further weight increases is weak to uncertain.",
+          "The same change worsened other physical and cost metrics: terminal error delta +0.001056295661744434 m (F1546) against candidate terminal error 0.00869890424761182 m (F1734), mean complete-update delta +0.5154540428891785 s (F1433) against candidate mean 17.77877309145406 s (F1743), holding error delta -0.001633544566242727 m (F1465), holding speed delta -0.4060100069642385 m/s (F1596); the sealed comparison is classified physical_tradeoff (F1324), so a further increase may again trade one physical metric for another.",
+          "Controller-side plan records from the performed check show termination by User_Requested_Stop (F160) with policy_stop_reason budget_best_feasible (F167) and accepted plans (F177), so the accepted plan at sampled updates may be compute-budget limited rather than weight limited; a weight-only batch cannot separate these explanations.",
+          "Sampled applied tensions reached 7.999987676698501 N at update 32 (F157) near the 8.0 N per-tendon limit while the recorded bound violation is 0 N (F1534); raising speed penalties could push loading closer to that bound, and zero violation does not exclude legal near-bound input.",
+          "Holding coverage is only the final 0.05 s (6 samples) with no continuous-time guarantee, joint_reach_holding_passed is false (F1541), and no closed-loop counterfactual replay or causal-attribution tool exists; a small batch describes only the candidates actually tested."
+        ]
+      },
+      "accounting": {
+        "proposals": 3,
+        "distinct_configurations": 3,
+        "reused_evaluations": 1,
+        "historical_start_reuse": 1,
+        "duplicate_result_reuse": 0,
+        "new_backend_attempts": 2,
+        "offline_execution_attempts": 0,
+        "completed_new_evaluations": 1,
+        "usage": {
+          "tool_calls": 6,
+          "model_calls": 0,
+          "backend_solves": 2,
+          "worker_calls": 0,
+          "wall_s": 1511.0779999999795
+        }
+      },
+      "completed_evaluations": 1,
+      "completed_profiles": 1,
+      "fully_evaluated_distinct_changed_configurations": 1,
+      "usage": {
+        "ledger": {
+          "limit": {
+            "backend_solves": 3,
+            "model_calls": 16,
+            "tool_calls": 60,
+            "wall_s": 7200.0,
+            "worker_calls": 0
+          },
+          "used": {
+            "tool_calls": 11,
+            "model_calls": 3,
+            "backend_solves": 2,
+            "worker_calls": 0,
+            "wall_s": 1712.29400000046
+          },
+          "remaining": {
+            "backend_solves": 1,
+            "model_calls": 13,
+            "tool_calls": 49,
+            "wall_s": 5487.70599999954,
+            "worker_calls": 0
+          },
+          "occupied": {}
+        },
+        "numerical_work": {
+          "limits": {
+            "local_solves": 0,
+            "prediction_evaluations": 0
+          },
+          "used": {
+            "local_solves": 0,
+            "prediction_evaluations": 0
+          }
+        },
+        "protocol_corrections": 0,
+        "reported_prompt_tokens": 237850,
+        "reported_completion_tokens": 43719,
+        "reported_reasoning_tokens": 37319,
+        "reported_total_tokens": 281569,
+        "workflow_elapsed_s": 1109.6152687072754,
+        "monetary_cost": null
+      },
+      "sealed_actual_charged_wall_s": 812.2940000004601,
+      "unresolved_reservation_s": 900.0,
+      "controller_optimizer_requests": {
+        "complete_candidate": 35,
+        "interrupted_attempt_completed_records": 3,
+        "interrupted_in_flight_request_count": "unknown"
+      },
+      "charged_business_call_failures": 1,
+      "provider_connection_probes": 0,
+      "additional_backend_work_after_stop": 0
+    },
+    "candidate_table": [
+      {
+        "candidate_id": "improvement-96f0ade35119",
+        "parameters": {
+          "control/recipe/holding_tip_speed_weight": 0.05,
+          "control/recipe/terminal_tip_speed_weight": 0.0
+        },
+        "metrics": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.05650455971948983,
+          "holding_max_speed_m_s": 1.1750052670100422,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.77877309145406,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+              "media_type": "application/json"
+            },
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "profile": {
+              "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.00869890424761182,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "versus_search_start": "physical_equivalent_within_tolerance",
+        "versus_retained_baseline": "physical_tradeoff",
+        "stages": {
+          "apply": "historical_reused",
+          "evaluation": "historical_reused",
+          "profile": "historical_reused",
+          "simulation": "historical_reused"
+        },
+        "reused": true
+      },
+      {
+        "candidate_id": "batch-2ef6ee45913c43c9-1",
+        "parameters": {
+          "control/recipe/holding_tip_speed_weight": 0.3,
+          "control/recipe/terminal_tip_speed_weight": 0.0
+        },
+        "metrics": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.06344380037515782,
+          "holding_max_speed_m_s": 1.1276277677182223,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.30461485715849,
+          "official_reach_task_success": false,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "ac9f4834c4722feac739fd45378ebbfbee77376cd699318deb29ed177028145b",
+              "media_type": "application/json"
+            },
+            "execution_id": "25e26708480848d79bad378b669915e3",
+            "profile": {
+              "artifact_id": "96328da478505dc97a565fab88e5510721d242f0c23e41ce2da503fec9bdc333",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "3d2e58ec5e393e5277b2d134657d6b1a38eba06482647a3dbaaca1ebdf4bacb6",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.018690324120991027,
+          "terminal_reach_passed": false,
+          "valid_complete_execution": true
+        },
+        "versus_search_start": "physical_tradeoff",
+        "versus_retained_baseline": "physical_tradeoff",
+        "stages": {
+          "apply": "completed",
+          "evaluation": "completed",
+          "profile": "completed",
+          "simulation": "completed"
+        },
+        "reused": false
+      },
+      {
+        "candidate_id": "batch-2ef6ee45913c43c9-2",
+        "parameters": {
+          "control/recipe/holding_tip_speed_weight": 0.0,
+          "control/recipe/terminal_tip_speed_weight": 0.0
+        },
+        "metrics": null,
+        "versus_search_start": null,
+        "versus_retained_baseline": null,
+        "stages": {
+          "apply": "completed",
+          "simulation": "unknown"
+        },
+        "reused": false
+      }
+    ],
+    "model_decision": {
+      "reference": {
+        "artifact_id": "49b32ac3209bfc8e7b97ad77b93cfd5c301c51ca666045e8893f59622460fd2f",
+        "media_type": "application/json"
+      },
+      "recommendation_disposition": "adopt",
+      "recommendation_id": "rec-defer-weight-tuning",
+      "candidate_disposition": "retain_baseline",
+      "selected_candidate": {
+        "candidate_id": "baseline-replay",
+        "configuration": {
+          "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+          "media_type": "application/json"
+        },
+        "execution_id": "cf997605885642759ee33920e2c9e2ef",
+        "owner_run_id": "gvs-stage351-baseline-executor"
+      },
+      "proposed_next_action": "finish",
+      "semantic_audit": "model_decision_audit.json"
+    },
+    "verification": {
+      "pre_pilot": "verification_current.json",
+      "post_pilot": "post_pilot/verification_current.json",
+      "post_stop_repairs_live_validated": false
+    },
+    "remaining": [
+      "Two complete distinct new configurations still need future explicit authorization; the stopped pilot is not complete.",
+      "Retained-baseline reuse and float-roundtrip repairs passed focused offline checks but have no live confirmation.",
+      "Interrupted baseline attempt remains unknown with original reservation; no automatic replay.",
+      "Model semantic errors are preserved and audited; no causal, global, statistical, organizational, hardware or real-time claim."
+    ],
+    "pushed": false,
+    "local_commits": {
+      "confirmation_launcher": "fd796ed",
+      "pre_pilot_implementation": "98416a0",
+      "offline_reuse_repair_and_stopped_evidence": "e3958cb"
+    },
+    "evidence_storage": "Scoped .gitattributes disable Git text normalization to preserve sealed artifact bytes and partial XML exports."
+  },
+  "historical_evidence_preserved": true,
+  "budgets_transferred": false,
+  "pushed": false
+}
