@@ -225,6 +225,19 @@ class MujocoBackend(MatlabBackend):
                 self.controller.last['predicted_tension_n']=actual_tension.tolist()
                 self.controller.observations[-1].update(tension_tracking_error_n=tracking,
                     predicted_tension_n=actual_tension.tolist(),actual_tension_n=actual_tension.tolist())
+                from .control_evidence import PRE_STEP_OBSERVER
+                observer = PRE_STEP_OBSERVER.get()
+                if observer is not None:
+                    capture_start = time.perf_counter()
+                    observer(step, t, self.controller, g, g['Jtip'] @ data.qvel[vi], actual_tension)
+                    capture_s = time.perf_counter() - capture_start
+                    self.controller.last['prediction_seal_wall_s'] = capture_s
+                    self.controller.observations[-1]['prediction_seal_wall_s'] = capture_s
+                    self.controller.last['update_wall_s'] += capture_s
+                    self.controller.last['deadline_missed'] = self.controller.last['update_wall_s'] > dt
+                    self.controller.observations[-1].update(
+                        update_wall_s=self.controller.last['update_wall_s'],
+                        deadline_missed=self.controller.last['deadline_missed'])
             for _ in range(substeps):
                 previous_time=data.time
                 mujoco.mj_step(model,data); steps+=1

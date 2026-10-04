@@ -14,6 +14,9 @@ from tools.platform_store import plain
 from tools.state_io import digest
 
 RECORD_UPDATE_IDS = ContextVar('control_evidence_update_ids', default=())
+# Optional evidence capture after actuator application and before backend stepping.
+# The observer cannot supply a command or alter controller selection.
+PRE_STEP_OBSERVER = ContextVar('control_evidence_pre_step_observer', default=None)
 
 
 class EvidenceQuery(Contract):
