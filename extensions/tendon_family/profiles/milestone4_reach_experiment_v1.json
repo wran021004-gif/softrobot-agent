@@ -1,0 +1,17 @@
+{
+  "source": "Milestone 4 current-stage development scope; historical multiphysics profile remains unchanged",
+  "controller_version": "7.0.0",
+  "parameters": {
+    "components/near/length_m": {"type": "number", "bounds": [0.15, 0.17], "unit": "m", "category": "length"},
+    "components/far/length_m": {"type": "number", "bounds": [0.11, 0.13], "unit": "m", "category": "length"},
+    "design/section_scale": {"type": "number", "bounds": [0.95, 1.05], "unit": "1", "category": "section"},
+    "design/material_scenario": {"type": "choice", "options": ["baseline", "compliant", "stiff"], "unit": null, "category": "material"}
+  },
+  "semantic_decisions": {
+    "design/section_scale": {"operation": "section_scale", "components": ["near", "far"], "baseline_value": 1.0},
+    "design/material_scenario": {"operation": "material_scenario", "components": ["near", "far"], "baseline_value": "baseline"}
+  },
+  "semantic_source_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4",
+  "material_qualification": "Numerical Young-modulus scenarios, not experimentally identified materials; source-relative factors baseline 1, compliant 0.9, stiff 1.1. Density and viscosity remain fixed.",
+  "frozen": ["task", "evaluator", "holding_definition", "environment", "timing", "force_bounds", "topology", "tendon_routing", "actuation_contract", "initializer", "controller_implementation", "undeclared_recipe_fields"]
+}

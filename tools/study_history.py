@@ -45,5 +45,6 @@ def select_source(records, requested, fallback=None):
     if requested is None:return fallback
     matches=[r['facts']['candidate'] for r in records if r.get('facts') and
              r['facts'].get('valid_complete_execution') and r['facts']['candidate']==requested]
+    matches=list({digest(c):c for c in matches}.values())
     if len(matches)!=1:raise ValueError('PLAN_SOURCE_NOT_VERIFIED_COMPLETE_OR_AMBIGUOUS')
     return matches[0]

@@ -15,15 +15,25 @@ class ParameterSpace:
         if not variables or len(set(variables))!=len(variables) or any(v not in bounds for v in variables):
             raise ValueError('INVALID_PARAMETER_SPACE')
         self.variables=tuple(variables);self.logs=set(logarithmic)
-        self.bounds=[]
+        self.bounds=[];self.choices={}
         for name in variables:
-            lo,hi=bounds[name]
+            from schemas.parameter_domains import domain
+            spec=domain(bounds[name])
+            if spec['kind']=='discrete':
+                if name in self.logs:raise ValueError('DISCRETE_LOGARITHMIC_DOMAIN_UNSUPPORTED')
+                self.choices[name]=spec['choices'];self.bounds.append((0.,float(max(1,len(spec['choices'])-1))));continue
+            lo,hi=spec['bounds']
             if not all(math.isfinite(v) for v in (lo,hi)) or lo>=hi or (name in self.logs and lo<=0):
                 raise ValueError('INVALID_PARAMETER_BOUNDS')
             self.bounds.append((math.log(lo),math.log(hi)) if name in self.logs else (lo,hi))
 
     def encode(self, values):
-        result=[((math.log(values[n]) if n in self.logs else values[n])-lo)/(hi-lo)
+        def value(n):
+            if n in self.choices:
+                if values[n] not in self.choices[n]:raise ValueError('PARAMETERS_OUT_OF_BOUNDS: '+n)
+                return self.choices[n].index(values[n])
+            return math.log(values[n]) if n in self.logs else values[n]
+        result=[(value(n)-lo)/(hi-lo)
             for n,(lo,hi) in zip(self.variables,self.bounds)]
         self.decode(result)
         return result
@@ -31,8 +41,15 @@ class ParameterSpace:
     def decode(self, vector):
         if len(vector)!=len(self.variables) or any(not math.isfinite(v) or not -1e-12<=v<=1+1e-12 for v in vector):
             raise ValueError('PARAMETERS_OUT_OF_BOUNDS')
-        return {n:math.exp(lo+v*(hi-lo)) if n in self.logs else lo+v*(hi-lo)
-                for n,(lo,hi),v in zip(self.variables,self.bounds,vector)}
+        result={}
+        for n,(lo,hi),v in zip(self.variables,self.bounds,vector):
+            x=lo+v*(hi-lo)
+            if n in self.choices:
+                index=round(x)
+                if abs(x-index)>1e-10 or not 0<=index<len(self.choices[n]):raise ValueError('DISCRETE_ENUMERATION_REQUIRED')
+                result[n]=self.choices[n][index]
+            else:result[n]=math.exp(x) if n in self.logs else x
+        return result
 
 
 def coordinate_proposal(state):

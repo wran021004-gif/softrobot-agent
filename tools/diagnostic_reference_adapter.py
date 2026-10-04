@@ -133,8 +133,10 @@ class ScopedReferenceAdapter(BoundSavedStateAdapter):
             if self.role.get('batch_result') and disposition=='adopt_candidate':
                 candidates=self.role['batch_result']['candidates']
                 match=next((c for c in candidates if c['candidate_id']==choice and c.get('execution') and c.get('feedback') is not None),None)
-                if not match:raise ValueError('SELECTED_BATCH_CANDIDATE_HAS_NO_COMPLETE_EVIDENCE')
-                args['selected_candidate']=deepcopy(match['execution']['factual_result']['candidate'])
+                facts=match['execution']['factual_result'] if match else next((r['facts'] for r in self.role.get('research_records',[])
+                    if r['facts']['candidate']['candidate_id']==choice and r['facts'].get('valid_complete_execution')),None)
+                if not facts:raise ValueError('SELECTED_BATCH_CANDIDATE_HAS_NO_COMPLETE_EVIDENCE')
+                args['selected_candidate']=deepcopy(facts['candidate'])
                 args['feedback']=self.role['check_feedback'][0]['reference'];return args
             expected={'retain_baseline':'baseline','adopt_candidate':'candidate','defer_selection':'none','reject_all':'none'}[disposition]
             if choice!=expected:raise ValueError('CANDIDATE_DISPOSITION_SELECTION_MISMATCH')

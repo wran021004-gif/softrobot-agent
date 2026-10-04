@@ -4,6 +4,7 @@ from pydantic import Field, model_validator
 from schemas.common import Contract
 from schemas.platform import EvidenceRef, Budget
 from schemas.platform_diagnostics import DiagnosticReport
+from schemas.parameter_domains import ParameterDomain
 
 
 class SavedStateScope(Contract):
@@ -192,7 +193,7 @@ class SearchBatchPlan(Contract):
     hypothesis: str = Field(min_length=1)
     evidence: list[str] = Field(min_length=1, description='Exact current F aliases only, including at least one performed-check result alias. Put explanations in rationale.')
     weakening_observations: list[str] = Field(min_length=1)
-    variables: dict[str, list[float]] = Field(description='Exact builder paths mapped to [lower, upper] numeric bounds.')
+    variables: dict[str, ParameterDomain] = Field(description='Exact builder paths to archived [lower,upper] bounds or typed {kind:continuous,bounds:[lower,upper]} / {kind:discrete,choices:[...]} domains. Discrete domains require finite explicit enumeration.')
     fixed_conditions: list[str] = Field(min_length=1, description='Bare identifiers: robot, task, acceptance, controller_implementation, other_numerical_settings. Put descriptions in rationale, not in these identifiers.')
     fixed_controller: str = Field(description='Exact extension_id@version, fixed implementation.')
     objectives: list[str] = Field(min_length=1)
@@ -206,7 +207,7 @@ class SearchBatchPlan(Contract):
     failure_policy: Literal['stop_on_material_failure'] = 'stop_on_material_failure'
     step: float | None = Field(default=None, gt=0, le=1,
         description='Required for coordinate search; null for an explicit finite sequence.')
-    candidates: list[dict[str, float]] | None = Field(default=None, min_length=1, max_length=12,
+    candidates: list[dict[str, float | str]] | None = Field(default=None, min_length=1, max_length=12,
         description='Exact ordered values for search.family_explicit@1.0.0; each contains precisely the varied paths. Feedback does not change this sequence.')
     planned_budget: Budget
     fidelity_limits: list[str] = Field(min_length=1)

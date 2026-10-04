@@ -1,4 +1,4 @@
-"""Demonstrated two-weight builder mapping; other dependencies remain unmapped."""
+"""Family-specific rebuild obligations for authorized control and physical edits."""
 from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
 from extensions.tendon_family.contracts import GVSTrajectoryParameters
 
@@ -31,5 +31,26 @@ def parameter_impacts(effective, *, reference=None):
     # Do not duplicate the entire controller recipe in each row.
     for row in mapped:
         row['controller']={k:controller[k] for k in ('extension_id','version')}
-    return dict(version='1.0.0',mapped=mapped,unmapped='All other parameter dependencies, including geometry/material/model changes.',
+    from tools.candidate_parameters import STRUCTURAL_PATHS,parameter_value
+    space=policy.get('candidate_builder',{}).get('parameters',{}).get('data',{})
+    for path in STRUCTURAL_PATHS:
+        spec=space.get('parameters',{}).get(path)
+        if not spec:continue
+        mapped.append(dict(parameter=path,meaning='Source-relative '+spec.get('category','structural')+' decision.',
+            granted_range=policy.get('editable',{}).get(path,spec.get('options')),builder_spec=spec,
+            authorized_parameter=spec['type']=='choice' or path in policy.get('editable',{}),
+            implementation_supported=controller['extension_id']=='controller.gvs_nmpc' and controller['version']=='7.0.0',
+            current_value=parameter_value(effective,path),source=reference,
+            reconstruct=['Resolved section/material/mass/stiffness/damping and backend robot geometry',
+                'Reduced geometry and structural basis resolution; candidate state projection',
+                'Candidate-specific graph/solver workspace; initializer metadata; warm-state regeneration',
+                'Owned configuration, execution, evaluator, profile and comparison bindings'],
+            reusable=['Frozen task/evaluator/timing/environment/topology/routing/force limits',
+                'Compatible historical tensions as bounded numerical guesses only'],
+            cannot_rebind=['Historical states, equilibria, trajectories, evaluations, profiles or prediction evidence'],
+            fresh_steps=['candidate.apply','simulation.run','evaluation.run','control.profile_report','bound_comparison'],
+            evidence_rule='Changed structure needs a complete new result; no unconditional equilibrium or separate analysis solve.',
+            references=['extensions/tendon_family/design_decisions.py::expand','extensions/tendon_family/gvs_profile.py::candidate_numerical',
+                'extensions/tendon_family/gvs_profile.py::prepare_execution']))
+    return dict(version='1.0.0',mapped=mapped,unmapped='Undeclared model/discretization/topology/routing and other numerical edits.',
         authorization='Installed controller support and parameter grants do not authorize an execution; working_state.actions and existing host rules apply.')

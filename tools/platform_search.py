@@ -27,13 +27,18 @@ def validate_batch_plan(store, view, proposal):
         available=[a for a,h in aliases.items() if state['fact_catalog'][h]['selector']['reference']==feedback['result']]
         raise ValueError('PLAN_REQUIRES_PERFORMED_CHECK_EVIDENCE: evidence must include an exact result alias, e.g. '+', '.join(available[:8]))
     from tools.study_history import select_source
-    from tools.candidate_parameters import fixed_configuration, parameter_value, actual_parameter_changes
+    from tools.candidate_parameters import fixed_configuration, parameter_value, actual_parameter_changes,planning_configuration,comparison_scope
     from tools.batch_budget import budget_capacity, batch_requirement, downstream_available
     if role.get('require_source_binding') and (plan.source_candidate is None or plain(plan.predecessor_decision)!=role.get('predecessor_decision')):
         raise ValueError('PLAN_EXPLICIT_SOURCE_AND_PREDECESSOR_REQUIRED')
     candidate=select_source(role.get('research_records',[]),plan.source_candidate,view.latest_tested)
-    effective=store.artifact(candidate['configuration'])['effective']
-    if effective['task']!=store.session(view.run_id)['snapshot']['input']['task']:
+    current_input=store.session(view.run_id)['snapshot']['input']
+    effective=planning_configuration(store,candidate,current_input['policy'])
+    if role.get('required_structure_identity'):
+        from extensions.tendon_family.gvs_profile import execution_scope
+        if execution_scope(effective)['robot']['identity']!=role['required_structure_identity']:
+            raise ValueError('PLAN_ADAPTATION_STRUCTURE_MISMATCH')
+    if comparison_scope(effective)!=comparison_scope(current_input):
         raise ValueError('PLAN_SOURCE_OUTSIDE_CURRENT_TASK')
     from tools.parameter_impacts import parameter_impacts
     controller=effective['policy']['controller'];identity=controller['extension_id']+'@'+controller['version']
@@ -48,16 +53,29 @@ def validate_batch_plan(store, view, proposal):
             raise ValueError('PLAN_EXPLICIT_SEQUENCE_REQUIRED: null step, candidates count equals max_candidates')
     elif plan.step is None or plan.candidates is not None:raise ValueError('PLAN_COORDINATE_STEP_REQUIRED_WITHOUT_EXPLICIT_POINTS')
     mappings={r['parameter']:r for r in parameter_impacts(effective,reference=candidate['configuration'])['mapped']}
+    if role.get('allowed_batch_variables') and set(plan.variables)-set(role['allowed_batch_variables']):
+        raise ValueError('PLAN_SUBSTAGE_VARIABLE_SCOPE')
+    if role.get('max_variable_count') and len(plan.variables)>role['max_variable_count']:
+        raise ValueError('PLAN_SUBSTAGE_VARIABLE_COUNT')
     if not plan.variables or set(plan.variables)-mappings.keys():raise ValueError('PLAN_VARIABLE_PATHS: only demonstrated speed-weight builder paths')
-    initial={}
-    for path,domain in plan.variables.items():
-        if len(domain)!=2:raise ValueError('PLAN_DOMAIN_REQUIRES_TWO_BOUNDS: '+path)
-        lo,hi=domain
+    from schemas.parameter_domains import domain as parameter_domain
+    from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
+    initial={};domains=plain(plan.variables);search_bounds={}
+    for path,value_domain in plan.variables.items():
+        spec_domain=parameter_domain(value_domain)
         row=mappings[path];bounds=row['granted_range'];spec=row['builder_spec']
         if not row['authorized_parameter'] or not row['implementation_supported']:raise ValueError('PLAN_BUILDER_PARAMETER_UNSUPPORTED: '+path)
-        if not bounds[0]<=lo<hi<=bounds[1] or not spec['bounds'][0]<=lo<hi<=spec['bounds'][1]:raise ValueError('PLAN_DOMAIN_OUTSIDE_BUILDER_GRANT: '+path)
-        if 0<lo<.0001 or hi<.0001:raise ValueError('PLAN_DOMAIN_CONTAINS_ILLEGAL_BOUNDARY_WEIGHT: zero or >=0.0001 required')
         initial[path]=parameter_value(effective,path)
+        if spec_domain['kind']=='discrete':
+            if not explicit or spec['type']!='choice':raise ValueError('PLAN_DISCRETE_REQUIRES_EXPLICIT_ENUMERATION: '+path)
+            choices=spec_domain['choices']
+            if not set(choices)<=set(spec['options']) or initial[path] not in choices:raise ValueError('PLAN_CHOICES_OUTSIDE_BUILDER_OR_SOURCE: '+path)
+            search_bounds[path]=spec_domain
+            continue
+        if spec['type']!='number':raise ValueError('PLAN_CONTINUOUS_BUILDER_REQUIRED: '+path)
+        lo,hi=spec_domain['bounds'];search_bounds[path]=[lo,hi]
+        if not bounds[0]<=lo<hi<=bounds[1] or not spec['bounds'][0]<=lo<hi<=spec['bounds'][1]:raise ValueError('PLAN_DOMAIN_OUTSIDE_BUILDER_GRANT: '+path)
+        if path in REACH_WEIGHT_PATHS and (0<lo<.0001 or hi<.0001):raise ValueError('PLAN_DOMAIN_CONTAINS_ILLEGAL_BOUNDARY_WEIGHT: zero or >=0.0001 required')
         if not lo<=initial[path]<=hi:raise ValueError('PLAN_START_OUTSIDE_DOMAIN: saved candidate value must be included for existing coordinate method: '+path)
         # Coordinate search visits this bounded lattice; a zero lower bound
         # excludes (0,0.0001) through the builder, and the reachable lattice
@@ -66,19 +84,19 @@ def validate_batch_plan(store, view, proposal):
         for origin in (() if explicit else (lo,hi,initial[path])):
             for k in range(-plan.max_candidates,plan.max_candidates+1):
                 v=min(hi,max(lo,origin+k*plan.step*width))
-                if 1e-12<v<.0001-1e-12:raise ValueError('PLAN_COORDINATE_STEP_CAN_PROPOSE_ILLEGAL_SMALL_WEIGHT: increase domain/step or use positive lower bound')
+                if path in REACH_WEIGHT_PATHS and 1e-12<v<.0001-1e-12:raise ValueError('PLAN_COORDINATE_STEP_CAN_PROPOSE_ILLEGAL_SMALL_WEIGHT: increase domain/step or use positive lower bound')
         # Build both boundary configurations without constructing any workspace.
         for endpoint in (lo,hi):
             changed=plain(_candidate(SessionInput.model_validate(effective),{path:endpoint},reg))
-            if changed['robot']!=effective['robot'] or changed['task']!=effective['task']:raise ValueError('PLAN_FIXED_ROBOT_TASK_CHANGED')
-    parameters=dict(initial=initial,bounds=plan.variables)
+            if fixed_configuration(changed,plan.variables)!=fixed_configuration(effective,plan.variables):raise ValueError('PLAN_FIXED_ROBOT_TASK_CHANGED')
+    parameters=dict(initial=initial,bounds=search_bounds)
     parameters.update(candidates=plan.candidates) if explicit else parameters.update(max_trials=plan.max_candidates,step=plan.step)
     batch_search(plan.method,parameters)
     differences=[]
     if explicit:
         for point in plan.candidates:
-            for value in point.values():
-                if 0<value<.0001:raise ValueError('PLAN_EXPLICIT_ILLEGAL_SMALL_WEIGHT')
+            for path,value in point.items():
+                if path in REACH_WEIGHT_PATHS and 0<value<.0001:raise ValueError('PLAN_EXPLICIT_ILLEGAL_SMALL_WEIGHT')
             changed=plain(_candidate(SessionInput.model_validate(effective),point,reg))
             actual=actual_parameter_changes(effective,changed,plan.variables)
             if digest(fixed_configuration(changed,plan.variables))!=digest(fixed_configuration(effective,plan.variables)):
@@ -94,31 +112,40 @@ def validate_batch_plan(store, view, proposal):
     required_verification={'candidate.apply','simulation.run','evaluation.run','control.profile_report','bound_comparison','diagnostic_revision'}
     if not required_verification<=set(plan.verification):raise ValueError('PLAN_FRESH_VERIFICATION_REQUIRED: '+', '.join(sorted(required_verification)))
     budget=plain(plan.planned_budget);count=plan.max_backend_attempts or plan.max_candidates
-    execution_floor=batch_requirement(count,interpretation={},planning={})['requirement']
+    from tools.batch_budget import PREPARATION_RESERVE_S
+    prep_reserve=PREPARATION_RESERVE_S if effective['policy']['candidate_builder']['parameters']['data'].get('semantic_decisions') else 0.
+    execution_floor=batch_requirement(count,interpretation={},planning={},preparation_reserve_s=prep_reserve)['requirement']
     if budget['backend_solves']!=count or budget['worker_calls']!=0 or any(budget[k]<v for k,v in execution_floor.items()):
         raise ValueError('PLAN_COSTS_INSUFFICIENT: backend_solves=explicit max_backend_attempts (legacy max_candidates), tool_calls>=4 per new execution, wall_s>=990 per new execution, workers=0')
     if plan.max_backend_attempts is not None and (plan.max_backend_attempts>plan.max_candidates or
             (plan.target_changed_configurations or 1)>plan.max_backend_attempts):raise ValueError('PLAN_CAPS_INCONSISTENT')
-    capacity=budget_capacity(count,budget)
+    capacity=budget_capacity(count,budget,preparation_reserve_s=prep_reserve)
     # Execution and interpretation follow this planning phase. Its local call
     # limit/protected capacity must not be counted as the downstream grant.
-    available=budget_capacity(count,downstream_available(store,view.run_id),planning={})
+    available=budget_capacity(count,downstream_available(store,view.run_id),planning={},preparation_reserve_s=prep_reserve)
     if role.get('require_source_binding') and (not capacity['sufficient'] or not available['sufficient']):
         raise ValueError('PLAN_TOTAL_CAPACITY_INSUFFICIENT: '+str(dict(planned=capacity['shortfalls'],available=available['shortfalls'])))
     fixed=fixed_configuration(effective,plan.variables)
+    if effective==store.artifact(candidate['configuration'])['effective']:
+        execution_source=candidate['configuration']
+    else:
+        with store.transaction() as db:
+            execution_source=plain(store.put(db,dict(effective=effective,source_configuration=candidate['configuration'],
+                classification='Current authorized builder projection; source performance evidence remains bound to archived configuration.')))
     from tools.settling_campaign import RANKING
     return dict(plan=plain(plan),structurally_operationally_valid=True,scientific_promise=plan.scientific_promise,
         semantic_status='Model-authored promise and causal reasoning are separate from operational validation.',
         actual_differences=differences,budget_requirement=capacity,available_capacity=available,
         execution_authorized=False,requires_future_grant=True,baseline_replaced=False,candidate_promoted=False,
         bindings=dict(task=view.task,acceptance=view.acceptance,baseline=view.baseline,subject=candidate,
+            source_configuration=candidate['configuration'],execution_source_configuration=execution_source,
             controller=controller,dynamics_model=view.task['execution_model'],source_report=role['source_report'],
             revised_assessment=role['previous_report'],check_feedback=role['result_feedback'],evidence_selectors=selectors,
             fixed_configuration_identity=digest(fixed),fixed_configuration=fixed),
         batch_semantics='One immutable plan for the batch. Registered coordinate or finite ask/tell scheduling uses the same receipt executor; plan submission executes nothing.',
         screening=dict(local_screening='none',raw_weighted_objectives_are_physical_ranking=False),
         final_comparison_policy=RANKING,required_fresh_steps=sorted(required_verification),
-        cost_floor_per_candidate_s={k.split('.')[0] if k!='control.profile_report' else 'profile':v for k,v in batch_requirement(1)['operation_reservations_s'].items()},
+        cost_floor_per_candidate_s=dict(apply=prep_reserve,**{k.split('.')[0] if k!='control.profile_report' else 'profile':v for k,v in batch_requirement(1)['operation_reservations_s'].items()}),
         execution_requirements=['Future grant binding this immutable plan, candidate/work limits and capabilities.',
             'Existing search proposal method alone supplies no holding ranking or deployment authority; fresh sealed profiles and frozen physical comparison are required.',
             'Candidate-specific graph/solver and regenerated warm states; old plans and measurements remain bound to original identities.'])
@@ -353,17 +380,19 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
         raise ValueError('BATCH_REQUIRES_VALID_UNEXECUTED_PLAN')
     if plan.fixed_controller!='controller.gvs_nmpc@7.0.0' or plan.method not in ('search.family_coordinate@1.0.0','search.family_explicit@1.0.0'):
         raise ValueError('BATCH_FIXED_IMPLEMENTATION_REQUIRED')
-    if not plan.variables or set(plan.variables)-set(REACH_WEIGHT_PATHS):raise ValueError('BATCH_WEIGHT_PATHS_ONLY')
+    from tools.candidate_parameters import STRUCTURAL_PATHS,comparison_scope,scientific_fixed_scope
+    if not plan.variables or set(plan.variables)-set((*REACH_WEIGHT_PATHS,*STRUCTURAL_PATHS)):raise ValueError('BATCH_UNSUPPORTED_PARAMETER_PATHS')
     state=host.store.session(host.run_id)['state'];existing=state.get('search_batch')
     if existing:
         if existing['plan']!=plan_ref:raise ValueError('BATCH_PLAN_IMMUTABLE')
         return existing
-    effective=host.store.artifact(record['bindings']['subject']['configuration'])['effective']
+    source_configuration=record['bindings'].get('execution_source_configuration',record['bindings']['subject']['configuration'])
+    effective=host.store.artifact(source_configuration)['effective']
     fixed=fixed_configuration(effective,plan.variables)
     if digest(fixed)!=record['bindings']['fixed_configuration_identity']:
         raise ValueError('BATCH_SOURCE_CONFIGURATION_MISMATCH')
     snapshot=host.store.session(host.run_id)['snapshot']['input']
-    if snapshot['task']!=effective['task'] or snapshot['policy']['controller']['version']!=effective['policy']['controller']['version']:
+    if comparison_scope(snapshot)!=comparison_scope(effective):
         raise ValueError('BATCH_HOST_SCIENCE_MISMATCH')
     budget=host.store.spendable(host.run_id)['remaining']
     if mode=='offline_injected' and any(budget[k] for k in ('backend_solves','model_calls','worker_calls')):
@@ -376,11 +405,13 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
         if retained_baseline['candidate']!=record['bindings']['baseline']:raise ValueError('BATCH_RETAINED_BASELINE_MISMATCH')
     floor=sum(record['cost_floor_per_candidate_s'].values())
     from tools.batch_budget import budget_capacity
-    capacity=budget_capacity(count,budget,interpretation=dict(wall_s=interpretation_reserve_s),planning={})
+    capacity=budget_capacity(count,budget,interpretation=dict(wall_s=interpretation_reserve_s),planning={},
+        preparation_reserve_s=record['cost_floor_per_candidate_s'].get('apply',0.))
     if interpretation_reserve_s<0 or not capacity['sufficient']:
         raise ValueError('BATCH_RESERVATION_CAPACITY_REQUIRED: 990 seconds and 4 tools per proposal, plus explicit interpretation reserve')
     initial={p:parameter_value(effective,p) for p in plan.variables}
-    parameters=dict(initial=initial,bounds=plan.variables)
+    from schemas.parameter_domains import domain
+    parameters=dict(initial=initial,bounds={p:domain(d) if domain(d)['kind']=='discrete' else domain(d)['bounds'] for p,d in plan.variables.items()})
     parameters.update(candidates=plan.candidates) if plan.method=='search.family_explicit@1.0.0' else parameters.update(max_trials=plan.max_candidates,step=plan.step)
     algorithm=batch_search(plan.method,parameters)
     if starting_facts and starting_facts['candidate']!=record['bindings']['subject']:
@@ -394,20 +425,14 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
         if (saved['execution_id']!=facts['execution_id'] or saved['owner_run_id']!=facts['candidate']['owner_run_id']
                 or saved['execution_scope']!=execution_scope(original)):
             raise ValueError('BATCH_HISTORICAL_SOURCE_BINDING_MISMATCH')
-        expected=deepcopy(effective)
-        # Register complete weight-study references even when an unvaried
-        # weight differs. They can inform comparisons but cannot be reused as
-        # evaluations of a configuration with different fixed conditions.
-        for path in REACH_WEIGHT_PATHS:
-            key=path.rsplit('/',1)[-1];expected['policy']['controller']['parameters']['data']['recipe'][key]=original['policy']['controller']['parameters']['data']['recipe'][key]
-        if execution_scope(expected)!=execution_scope(original):raise ValueError('BATCH_HISTORICAL_FIXED_SCIENCE_MISMATCH')
-        reusable=deepcopy(effective)
-        for path in plan.variables:
-            key=path.rsplit('/',1)[-1];reusable['policy']['controller']['parameters']['data']['recipe'][key]=original['policy']['controller']['parameters']['data']['recipe'][key]
-        permitted.append({**saved,'reusable_under_plan':execution_scope(reusable)==execution_scope(original)})
+        comparable=comparison_scope(effective)==comparison_scope(original)
+        if not comparable:raise ValueError('BATCH_HISTORICAL_FIXED_SCIENCE_MISMATCH')
+        permitted.append({**saved,'available_for_reasoning':True,'comparable_under_task':comparable,
+            'reusable_under_plan':scientific_fixed_scope(effective,plan.variables)==scientific_fixed_scope(original,plan.variables),
+            'exact_reuse_rule':'Full execution_scope must additionally equal proposed candidate; no cross-structure result rebinding.'})
     batch=dict(plan=plan_ref,batch_id='batch-'+plan_ref['artifact_id'][:16],mode=mode,
         method=plan.method,parameters=plain(algorithm.parameters),algorithm=plain(algorithm.save()),pending=None,
-        proposals=[],configurations={},starting_facts=starting_facts,base_configuration=record['bindings']['subject']['configuration'],
+        proposals=[],configurations={},starting_facts=starting_facts,base_configuration=source_configuration,
         retained_baseline=retained_baseline,max_backend_attempts=count,target_changed_configurations=plan.target_changed_configurations,
         historical_results=permitted,
         interpretation_reserve_s=interpretation_reserve_s,usage_start=host.store.remaining()['used'],stop_reason=None,
@@ -472,11 +497,12 @@ def _run_batch(host,inject,*,stop_after_stage=None):
     record=host.store.artifact(batch['plan']);source=host.store.artifact(batch['base_configuration'])['effective']
     algorithm=batch_search(batch.get('method','search.family_coordinate@1.0.0'),batch['parameters'])
     algorithm.restore(batch['algorithm']['data'])
-    stages=(('apply',0.),*[(stage,EXECUTION_ALLOWANCES[tool]['reserve_s']) for stage,tool in
+    stages=(('apply',record['cost_floor_per_candidate_s'].get('apply',0.)),*[(stage,EXECUTION_ALLOWANCES[tool]['reserve_s']) for stage,tool in
         [('simulation','simulation.run'),('evaluation','evaluation.run'),('profile','control.profile_report')]])
     while batch['pending'] or not algorithm.stopped():
         if batch['stop_reason']:break
         if batch['pending'] is None:
+            build_started=time.monotonic()
             changes=algorithm.propose();raw_changes=dict(changes)
             # A coordinate return to a known point must not create a second
             # execution just because subtraction changed its last float bit.
@@ -486,7 +512,8 @@ def _run_batch(host,inject,*,stop_after_stage=None):
                 known.append({p:parameter_value(saved_input,p) for p in changes})
             canonicalized=[]
             for path,value in changes.items():
-                old=next((p[path] for p in known if path in p and abs(p[path]-value)<=1e-12),value)
+                old=next((p[path] for p in known if path in p and
+                    (abs(p[path]-value)<=1e-12 if isinstance(value,(int,float)) and isinstance(p[path],(int,float)) else p[path]==value)),value)
                 if old!=value:canonicalized.append(path);changes[path]=old
             if canonicalized:algorithm.state=algorithm.state.model_copy(update=dict(pending=algorithm.space.encode(changes)))
             effective=plain(_candidate(SessionInput.model_validate(source),changes,host.reg));identity=digest(effective)
@@ -547,7 +574,8 @@ def _run_batch(host,inject,*,stop_after_stage=None):
                 builder_version=source['policy']['candidate_builder']['version'],changes=changes,allowed=source['policy']['editable'],
                 effective=effective,content_identity=identity)
             with host.store.transaction() as db:configuration=plain(host.store.put(db,prepared))
-            batch['pending']=dict(candidate_id=candidate_id,configuration=configuration,identity=identity,changes=changes)
+            batch['pending']=dict(candidate_id=candidate_id,configuration=configuration,identity=identity,changes=changes,
+                candidate_build_s=time.monotonic()-build_started)
             batch['configurations'][identity]=dict(**batch['pending'],stages={},reused=False)
             batch['algorithm']=plain(algorithm.save());_save_batch(host,batch)
         candidate=batch['pending'];row=batch['configurations'][candidate['identity']]
@@ -598,7 +626,8 @@ def _run_batch(host,inject,*,stop_after_stage=None):
                 output=host.store.artifact(candidate['configuration']) if stage=='apply' else inject(stage,deepcopy(candidate),deepcopy(row['stages']))
                 receipt=host.store.complete(reservation,dict(request_id=request_id,execution_id=reservation['execution_id'],caller=host.actor,
                     tool_id='candidate.apply' if live else 'offline.batch.'+stage,tool_version='1.0.0',execution_status='completed' if stage=='apply' else output.get('execution_status','completed'),charged=zero()),
-                    dict(mode=batch['mode'],configuration=candidate['configuration'],result=output),time.monotonic()-started)
+                    dict(mode=batch['mode'],configuration=candidate['configuration'],result=output),
+                    time.monotonic()-started+(candidate.get('candidate_build_s',0.) if stage=='apply' else 0.))
             row['stages'][stage]=receipt;_save_batch(host,batch)
             if receipt['execution_status']!='completed':
                 if live:

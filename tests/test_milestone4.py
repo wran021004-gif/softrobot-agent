@@ -99,6 +99,14 @@ class MilestonePlanningTests(TestCase):
                 candidate_disposition='retain_baseline',selected_candidate='baseline',hypothesis_assessment='unresolved'))
             self.assertEqual(args['selected_candidate'],w.retained_baseline['candidate'])
             self.assertEqual(args['feedback'],w.chain['feedback'])
+            # Selecting a verified earlier result is independent of choosing the current batch/source.
+            adapter.role['batch_result']={'candidates':[]}
+            adapter.role['research_records']=w.historical_results
+            earlier=w.historical_results[-2]['facts']['candidate']
+            adopted=adapter.resolve_business('design.respond_diagnosis',dict(disposition='defer',recommendation_id=None,
+                reasoning='Offline historical deliverable selection.',next_action='finish',candidate_disposition='adopt_candidate',
+                selected_candidate=earlier['candidate_id'],hypothesis_assessment='unresolved'))
+            self.assertEqual(adopted['selected_candidate'],earlier)
             from schemas.diagnostic_revision import FinalDesignResponse
             from tools.platform_handoff import respond_workflow
             from types import SimpleNamespace

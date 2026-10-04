@@ -33,17 +33,24 @@ GRANT=dict(model_calls=24,tool_calls=60,backend_solves=4,worker_calls=0,wall_s=9
 COMMON_PLAN='''Author one NEW immutable SearchBatchPlan. Copy the exact verified source_candidate identity from study_packet.history.rows; select the source yourself, separately from retained baseline and latest tested. Copy predecessor_decision from study_packet. Cite exact F aliases from study_packet.evidence_aliases, including a performed-check result alias. State a testable hypothesis, rationale, weakening observations, tested-point limits and stopping conditions. fixed_controller=controller.gvs_nmpc@7.0.0. Use search.family_explicit@1.0.0 for exact values: candidates contain precisely variables paths; max_candidates=list length; step=null. Numeric variables use bounds including source and points; source/point weights must be zero or >=0.0001 through 1. Fixed_conditions include robot,task,acceptance,controller_implementation,other_numerical_settings; robot means all undeclared structural fields. objectives include joint_reach_holding_acceptance,terminal_error_m,holding_max_error_m,holding_max_speed_m_s; constraints frozen_acceptance,force_bounds,finite_valid_execution; verification candidate.apply,simulation.run,evaluation.run,control.profile_report,bound_comparison,diagnostic_revision. Use max_backend_attempts and target_changed_configurations explicitly. planned_budget backend_solves is that phase cap; other resource limits can use study_packet.budget.available but must cover study_packet.budget.requirement. This is ONE shared cumulative campaign: no reset or extra grant. Stop on unknown/material failure/insufficient delivery capacity and at the declared completed-result target. Completed physical failure remains usable evidence. No separate numerical diagnostic work. Preserve task, actuation, implementation, initializer, timing, solver, horizon and all undeclared fields.'''
 CONTROL_PLAN=COMMON_PLAN+''' Current step: ONE new control point, at most one backend attempt and target_changed_configurations=1. All SIX completed historical configurations are visible, including holding-only positive tests. The untested branch is joint positive. A supported available point is holding 0.05 / terminal 0.05 from the 0/0.05 source execution 50618bf23b31464ba4f84c55cd26d1ca: vary ONLY holding, terminal is fixed 0.05. Confirm or justify another previously unevaluated control point in the same scope. Only the two existing speed-weight paths are permitted now. Choose the scientific hypothesis and weakening observations; the suggested point is not a prescribed scientific conclusion.'''
 FINAL='''Interpret EVERY completed result in decision_packet, using the program-computed comparisons with the declared source and retained baseline (and original research source when supplied). State separate terminal reach, holding position, holding speed and measured complete-update timing outcomes. Never turn a tradeoff or guidance score into automatic promotion. hypothesis_assessment is supported,weakened,rejected,or unresolved. disposition addresses only a diagnostic recommendation: use defer with recommendation_id=null if you are only assessing the study hypothesis; do not invent IDs or conflate hypothesis rejection with recommendation rejection. Candidate adoption/retention/deferment is independent. next_action=finish closes this substage. selected_candidate=baseline,none,or exact complete candidate_id. Author exactly one next_research route with bounded_check,source evidence,varied/fixed conditions,weakening/supporting observations, budget and stop conditions. This next action is a proposal; the subsequent model-authored immutable plan is separately validated before execution. No causal,global,continuous-time,hardware or real-time success claims. Physical failure does not establish physical impossibility. Keep concise, about 350 words.'''
+STRUCTURE_PLAN=COMMON_PLAN+''' Current step: choose one verified evaluated structure/control source. The completed joint-positive Step 2 result is available. Choose exactly ONE components/near/length_m within [0.15,0.17] or components/far/length_m within [0.11,0.13], one distinct new value, typed continuous bounds including source. One backend attempt, target_changed_configurations=1. Keep the source controller recipe fixed, including both speed weights. This is a structural sensitivity study, not controller optimization. Do not vary section scale or material live. The predecessor next_research is advisory; its generic physical_structure label is not executable. Use an exact canonical length path and value with your own scientific rationale. A completed physical failure remains evidence and may motivate the required bounded adaptation. Numerical scenarios and simulation are not hardware identification.'''
+ADAPT_PLAN=COMMON_PLAN+''' Current step: adapt control on the newly evaluated structure. Select that exact structure/control result as source. Keep its structure fixed. Only control/recipe/holding_tip_speed_weight and control/recipe/terminal_tip_speed_weight may vary. Author ONE explicit batch with one or at most two distinct previously unevaluated weight configurations on this structure; do not request a model call for each candidate. Declare the finite adaptation rule and exact points, including rationale and weakening observations. The backend cap and completed changed target equal the number of new points (one or two); candidates must be distinct and each differs from source. Use the computed requirement for that number, within remaining cumulative capacity. This is bounded adaptation, not global optimization. Compare against pre-adaptation changed structure, original research source and retained baseline. Reused starts/duplicates are recorded separately and consume no invented new result quota.'''
 
 
 def revision():
     paths=[*implementation()['files'],'examples/milestone4.py','tools/study_history.py','tools/batch_budget.py',
-        'tools/candidate_parameters.py','tools/parameter_impacts.py','schemas/diagnostic_revision.py','tests/test_milestone4.py']
+        'tools/candidate_parameters.py','tools/parameter_impacts.py','schemas/diagnostic_revision.py','tests/test_milestone4.py',
+        'schemas/parameter_domains.py','tools/structural_study.py','tools/optimization_interfaces.py','tests/test_milestone4_structure.py',
+        'extensions/tendon_family/profiles/milestone4_reach_experiment_v1.json']
     return dict(commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         files={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in dict.fromkeys(paths) if (ROOT/p).exists()})
 
 
 def reviewed_changes():
     review=history.reviewed_changes()
+    review['tools/optimization_interfaces.py']=dict(reason='Add finite discrete parameter encoding for explicit enumeration; existing numeric coordinate steps, physical equations and archived numeric behavior preserved.',
+        current_hash=hashlib.sha256((ROOT/'tools/optimization_interfaces.py').read_bytes()).hexdigest(),historical_hashes=[])
+    review['extensions/tendon_family/optimization.py']['reason']='Extend existing finite ask/tell parameters to typed choices; numeric coordinate method and physical/controller equations preserved.'
     for _,directory,execution in SOURCES:
         old=Store(directory);source=ControlEvidence(old).resolve(execution)
         for dep in old.session(source['owner'])['snapshot']['dependencies'].values():
@@ -113,10 +120,12 @@ def planning_packet(w,count):
     host=w.host('design');state=w.store.session(host.run_id)['state']
     aliases=ensure_aliases(state)['aliases'];result=w.store.artifact(w.chain['feedback'])['result']
     required=[a for a,h in aliases.items() if state['fact_catalog'][h]['selector']['reference']==result]
+    from tools.batch_budget import PREPARATION_RESERVE_S,downstream_available
+    prep=PREPARATION_RESERVE_S if w.store.session(host.run_id)['snapshot']['input']['policy']['candidate_builder']['parameters']['data'].get('semantic_decisions') else 0.
     packet=dict(history=study_history(w.store,w.historical_results,retained_baseline=w.retained_baseline['candidate'],latest_tested=w.latest_tested),
         predecessor_decision=w.predecessor_decision,
         predecessor_interpretation=w.store.artifact(w.predecessor_decision),
-        budget=budget_capacity(count,w.store.spendable(host.run_id)['remaining']),
+        budget=budget_capacity(count,downstream_available(w.store,host.run_id),preparation_reserve_s=prep),
         evidence_aliases=dict(performed_check_result=required[:3]),
         campaign_limits=GRANT,correction_limits=dict(max_total=4,max_consecutive=2))
     return packet
@@ -129,11 +138,17 @@ def plan(w,stage,count,instructions):
     check=w.store.artifact(w.chain['feedback']);handover(host,check['result'],w.store.artifact(check['result']),origin=dict(kind='accepted_saved_check'),kind='performed_check_result')
     packet=planning_packet(w,count)
     w.instructions={**w.instructions,'improvement':instructions};w.freeze['stage_instructions']=w.instructions
+    allowed=['components/near/length_m','components/far/length_m'] if stage=='structure' else ['control/recipe/holding_tip_speed_weight','control/recipe/terminal_tip_speed_weight']
+    scope={}
+    if stage=='adaptation':
+        from extensions.tendon_family.gvs_profile import execution_scope
+        scope['required_structure_identity']=execution_scope(w.store.artifact(w.latest_tested['configuration'])['effective'])['robot']['identity']
     w.phase('improvement','search_batch_plan','search_plan',study_packet=packet,research_records=w.historical_results,
         latest_tested=w.latest_tested,require_source_binding=True,predecessor_decision=w.predecessor_decision,
-        planned_backend_count=count)
+        planned_backend_count=count,allowed_batch_variables=allowed,max_variable_count=1 if stage=='structure' else 2,**scope)
     record=w.store.artifact(w.chain['search_plan']);p=record['plan']
-    if p['max_backend_attempts']!=count or p['target_changed_configurations']!=count or any(p['planned_budget'][k]>v for k,v in packet['budget']['available'].items()):
+    chosen=p['max_backend_attempts']
+    if not 1<=chosen<=count or p['target_changed_configurations']!=chosen or p['max_candidates']!=chosen or any(p['planned_budget'][k]>v for k,v in packet['budget']['available'].items()):
         raise ValueError('MILESTONE_PHASE_CAP_OR_CUMULATIVE_BUDGET_MISMATCH')
     atomic_json(w.directory/(stage+'_plan.json'),record)
     w.freeze['stage_instructions']=w.instructions
@@ -162,16 +177,23 @@ def execute(w,stage,record):
         against_source=compare_results(source['facts'],r['execution']['factual_result']),
         against_retained_baseline=compare_results(w.retained_baseline,r['execution']['factual_result']))
         for r in result['candidates'] if r.get('execution')]
+    if stage=='adaptation':
+        original=next(r['facts'] for r in w.historical_results if r['facts']['candidate']==w.freeze['original_research_source'])
+        for row,candidate in zip(rows,[r for r in result['candidates'] if r.get('execution')]):
+            row['against_original_research_source']=compare_results(original,candidate['execution']['factual_result'])
+    from tools.batch_budget import PREPARATION_RESERVE_S
     packet=dict(source_plan=w.chain['search_plan'],hypothesis=record['plan']['hypothesis'],source=source['facts']['candidate'],
         retained_baseline=campaign_metrics(w.retained_baseline),completed_results=rows,
         history=study_history(w.store,w.historical_results,retained_baseline=w.retained_baseline['candidate'],selected_source=source['facts']['candidate'],latest_tested=w.latest_tested),
-        budget=budget_capacity(1,w.store.remaining()['remaining']),usage=w.store.remaining(),
+        budget=budget_capacity(2 if stage=='structure' else 1,w.store.remaining()['remaining'],preparation_reserve_s=PREPARATION_RESERVE_S),usage=w.store.remaining(),
         acceptance=read(prior.repair.EVIDENCE/'decision_packet.json')['acceptance'],substage=stage,
         next_required_step='structure_change' if stage=='control' else 'controller_adaptation' if stage=='structure' else 'final_decision',
         further_execution_requires_separate_model_authored_plan=True)
     packet_ref=save(w.store,packet);atomic_json(w.directory/(stage+'_decision_packet.json'),packet)
+    continuation=FINAL+(' Next required step is controller_adaptation: a bounded one-or-two-point weight batch on this exact new structure, not another physical change. For two points use computed two-result budget, or for one point use shared one-result requirement (1595 s,5 provider,9 tools,1 backend,0 workers). Physical failure alone does not imply impossibility. If you choose stop, say so; the required adaptation gate remains incomplete.' if stage=='structure' else ' The requested campaign evidence is complete after this adaptation. Choose next_research.route=stop and zero proposed_budget for this campaign, with any further study stated only as future work needing new authorization. Select any fully evaluated candidate in history by its exact ID, retain baseline, or none; source and selected deliverable remain distinct.')
+    w.instructions={**w.instructions,'response_final':continuation};w.freeze['stage_instructions']=w.instructions
     w.phase('response_final','design_response','final_response',decision_packet=packet,decision_packet_reference=packet_ref,
-        batch_result=summary,require_research_route=True,research_records=w.historical_results,latest_tested=w.latest_tested,
+        batch_result=summary,require_research_route=True,require_research_budget=True,candidate_preparation_reserve_s=PREPARATION_RESERVE_S,research_records=w.historical_results,latest_tested=w.latest_tested,
         improvement_feedback_content=dict(baseline_facts=w.retained_baseline,execution=None),check_feedback=[dict(reference=w.chain['batch_summary'])],
         source_report=w.common['source_report'],source_record=w.source_record)
     response=w.store.artifact(w.chain['final_response']);atomic_json(w.directory/(stage+'_final_response.json'),response)
@@ -204,7 +226,7 @@ def restore():
     w.inventory=freeze['inventory'];w.inventory_ref=freeze['inventory_reference']
     w.common=freeze['common_scientific_input'];w.source_record=freeze['source_record'];w.eligibility=freeze['numerical_eligibility']
     w.chain=outcome['chain'];w.historical_feedback=w.store.artifact(w.common['feedback'])
-    w.historical_results=freeze['historical_results']
+    w.historical_results=deepcopy(freeze['historical_results'])
     for stage in ('control','structure','adaptation'):
         path=RUN/(stage+'_batch_result.json')
         if not path.exists():continue
@@ -212,17 +234,18 @@ def restore():
             if not row.get('execution'):continue
             facts=row['execution']['factual_result'];cfg=w.store.artifact(facts['configuration'])['effective']
             from extensions.tendon_family.gvs_profile import execution_scope
-            w.historical_results.append(dict(role='historical_candidate',facts=facts,execution_scope=execution_scope(cfg),source_store=str(RUN),
-                owner_run_id=facts['candidate']['owner_run_id'],execution_id=facts['execution_id'],receipts=row['execution']['receipts'],reuse_reason='Sealed current-campaign result.'))
+            if not any(r['facts']['candidate']==facts['candidate'] for r in w.historical_results):
+                w.historical_results.append(dict(role='historical_candidate',facts=facts,execution_scope=execution_scope(cfg),source_store=str(RUN),
+                    owner_run_id=facts['candidate']['owner_run_id'],execution_id=facts['execution_id'],receipts=row['execution']['receipts'],reuse_reason='Sealed current-campaign result.'))
     w.retained_baseline=w.historical_results[0]['facts'];w.latest_tested=w.historical_results[-1]['facts']['candidate']
     w.predecessor_decision=w.chain.get('final_response') or read(prior.RUN/'chain.json')['final_response']
     w.previous=w.host('design');return w
 
 
-def migrate_planning_host(w,suffix):
+def migrate_planning_host(w,suffix,*,input_override=None):
     """Explicit engineering continuation after changed planner dependencies, same project."""
-    old=w.host('design');inp=deepcopy(w.store.session(old.run_id)['snapshot']['input']);inp['run_id']=w.project+'-'+suffix
-    new=Host(RUN,inp['run_id']);new.create(inp);transfer_recovery(old,new)
+    old=w.host('design');inp=deepcopy(input_override or w.store.session(old.run_id)['snapshot']['input']);inp['run_id']=w.project+'-'+suffix
+    new=Host(w.directory,inp['run_id']);new.create(inp);transfer_recovery(old,new)
     old_state=w.store.session(old.run_id)['state']
     with w.store.transaction() as db:
         state=w.store.session(new.run_id,db)['state']
@@ -361,6 +384,48 @@ def correct_control_comparison(*,budget_only=False):
     atomic_json(RUN/'freeze.json',w.freeze);export(w,status,reason,time.monotonic()-start)
 
 
+def structure_live(*,adaptation=False):
+    """Advance the existing project through the next authorized gate only."""
+    from examples.gvs_nmpc_route_experiment import load_credential
+    from tools.structural_study import structural_input
+    if subprocess.check_output(['git','diff','HEAD','--',*revision()['files']],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
+    load_credential(Path.home()/'.codex/.env')
+    for name in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):
+        if '127.0.0.1:9' in os.environ.get(name,''):os.environ.pop(name)
+    w=restore();stage='adaptation' if adaptation else 'structure'
+    if (RUN/(stage+'_batch_result.json')).exists():raise ValueError('DO_NOT_REPLAY_SEALED_STAGE')
+    if adaptation:
+        decision=read(RUN/'structure_final_response.json')
+        if decision['next_research']['route']!='controller_adaptation':raise ValueError('MODEL_STOPPED_REQUIRED_ADAPTATION_GATE_INCOMPLETE')
+    else:
+        atomic_json(RUN/'control_semantic_review.json',dict(current_result_interpretation_passed=True,control_substage_closed=True,
+            decision=w.predecessor_decision,next_direction_advisory_only=True,next_executable_plan_pending=True,
+            baseline_preserved=w.retained_baseline['candidate']))
+    current=w.store.session(w.host('design').run_id)['snapshot']['input']
+    profile=read(ROOT/'extensions/tendon_family/profiles/milestone4_reach_experiment_v1.json')
+    # Install the latest evaluated science while preserving this campaign's provider/admin policies.
+    from tools.candidate_parameters import planning_configuration
+    inp=planning_configuration(w.store,w.latest_tested,current['policy'])
+    inp=structural_input(inp,profile)
+    migrate_planning_host(w,stage+'-planning',input_override=inp)
+    w.freeze['implementation']=implementation();w.freeze['milestone4_revision']=revision()
+    atomic_json(RUN/(stage+'_freeze.json'),dict(input=inp,profile=profile,revision=revision(),usage=w.store.remaining(),project=w.project))
+    (RUN/('executed_'+stage+'_runner.py')).write_bytes(Path(__file__).read_bytes())
+    start=time.monotonic();status='incomplete';reason=None
+    try:
+        record=plan(w,stage,2 if adaptation else 1,ADAPT_PLAN if adaptation else STRUCTURE_PLAN)
+        if not adaptation:w.freeze['original_research_source']=record['bindings']['subject']
+        atomic_json(RUN/(stage+'_prelaunch_review.json'),dict(passed=True,method='Shared validation and direct source/scope review; no judge service.',
+            plan=w.chain['search_plan'],source=record['bindings']['subject'],actual_differences=record['actual_differences'],
+            budget=record['available_capacity'],scientific_hypothesis_is_model_authored=True))
+        result,response=execute(w,stage,record)
+        status='adaptation_complete' if adaptation else 'structure_complete'
+        reason='Sealed stage and model interpretation completed in the original cumulative ledger.'
+    except Exception as exc:
+        reason=str(exc);atomic_json(RUN/(stage+'_failure.json'),dict(type=type(exc).__name__,message=reason));print('STOP',reason,flush=True)
+    atomic_json(RUN/'freeze.json',w.freeze);export(w,status,reason,time.monotonic()-start)
+
+
 def control_live():
     if RUN.exists():raise ValueError('PRESERVE_EXISTING_CAMPAIGN_NO_REPLACEMENT')
     if subprocess.check_output(['git','diff','HEAD','--',*revision()['files']],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
@@ -381,7 +446,9 @@ def control_live():
 
 
 if __name__=='__main__':
-    if len(sys.argv)>1 and sys.argv[1]=='repair-control':repair_control()
+    if len(sys.argv)>1 and sys.argv[1]=='structure-live':structure_live()
+    elif len(sys.argv)>1 and sys.argv[1]=='adaptation-live':structure_live(adaptation=True)
+    elif len(sys.argv)>1 and sys.argv[1]=='repair-control':repair_control()
     elif len(sys.argv)>1 and sys.argv[1]=='repair-interpretation':repair_interpretation()
     elif len(sys.argv)>1 and sys.argv[1]=='correct-control-comparison':correct_control_comparison()
     elif len(sys.argv)>1 and sys.argv[1]=='correct-control-next-budget':correct_control_comparison(budget_only=True)

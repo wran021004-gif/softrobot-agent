@@ -49,7 +49,7 @@ class Corrections(Contract):
 
 
 class NextResearchRoute(Contract):
-    route: Literal['continue_weight_combinations','initialization_selection','prediction_backend_disagreement','holding_control_arrangements','structure_change','controller_adaptation','defer']
+    route: Literal['continue_weight_combinations','initialization_selection','prediction_backend_disagreement','holding_control_arrangements','structure_change','controller_adaptation','defer','stop']
     unresolved_question: str = Field(min_length=1)
     evidence: list[str] = Field(min_length=1,description='Execution/artifact identities and exact observations motivating this route.')
     bounded_check: str = Field(min_length=1)

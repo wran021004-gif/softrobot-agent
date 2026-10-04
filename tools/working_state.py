@@ -141,12 +141,17 @@ def project_working_state(store, run_id):
             store.artifact(plan,db=db)
         work_row=db.execute("SELECT value FROM meta WHERE key='diagnostic_work'").fetchone()
         from tools.study_history import study_history
-        from tools.batch_budget import budget_capacity,downstream_available
+        from tools.batch_budget import budget_capacity,downstream_available,PREPARATION_RESERVE_S
         research_records=role.get('research_records')
         research_study=study_history(store,research_records,retained_baseline=baseline,
             latest_tested=latest,selected_source=role.get('selected_source'),selection=final.get('selected_candidate') if final else None) if research_records is not None else None
         if research_study is not None:
-            research_study['budget']=budget_capacity(role.get('planned_backend_count',1),downstream_available(store,run_id,db))
+            prep=PREPARATION_RESERVE_S if inp['policy']['candidate_builder']['parameters']['data'].get('semantic_decisions') else 0.
+            research_study['budget']=budget_capacity(role.get('planned_backend_count',1),downstream_available(store,run_id,db),preparation_reserve_s=prep)
+        impact_effective=effective
+        if research_records is not None and (latest or baseline):
+            from tools.candidate_parameters import planning_configuration
+            impact_effective=planning_configuration(store,latest or baseline,inp['policy'])
         return WorkingState(run_id=run_id,
             task=dict(identity=role.get('identities',{}).get('task_identity') or (scope or {}).get('task',{}).get('identity'),
                 task_id=effective['task']['task_id'],family=effective['task']['family'],configuration=config_ref,
@@ -177,7 +182,7 @@ def project_working_state(store, run_id):
                 phase=store.phase_remaining(run_id,db),spendable=spendable,
                 numerical=json.loads(work_row[0]) if work_row else None),
             recovery=recovery_status(state,inp['policy']['model']),actions=actions,acceptance=acceptance,
-            parameter_impacts=parameter_impacts(effective,reference=config_ref),
+            parameter_impacts=parameter_impacts(impact_effective,reference=config_ref),
             experiment_plan=dict(reference=plan,source='role_context.experiment_plan' if role.get('experiment_plan') else 'state.experiment_plan') if plan else None,
             research_study=research_study,
             search_batch=dict(plan=state['search_batch']['plan'],mode=state['search_batch']['mode'],

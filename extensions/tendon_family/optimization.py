@@ -6,6 +6,7 @@ from schemas.common import Contract
 from schemas.platform import SessionInput, Payload, Binding
 from tools.optimization_interfaces import ParameterSpace, coordinate_proposal
 from tools.platform_store import plain
+from schemas.parameter_domains import ParameterDomain
 
 
 class SearchParameters(Contract):
@@ -23,9 +24,9 @@ class SearchState(Contract):
 
 
 class ExplicitSearchParameters(Contract):
-    initial: dict[str, float]
-    bounds: dict[str, tuple[float, float]]
-    candidates: list[dict[str, float]] = Field(min_length=1, max_length=12)
+    initial: dict[str, float | str]
+    bounds: dict[str, ParameterDomain]
+    candidates: list[dict[str, float | str]] = Field(min_length=1, max_length=12)
 
     @property
     def max_trials(self): return len(self.candidates)

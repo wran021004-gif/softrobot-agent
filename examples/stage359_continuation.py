@@ -37,7 +37,7 @@ def require_interpretation_gate():
 
 def reviewed_changes():
     review = prior.reviewed_changes()
-    for path in ('extensions/tendon_family/optimization.py','extensions/tendon_family/manifest.py'):
+    for path in ('extensions/tendon_family/optimization.py','extensions/tendon_family/manifest.py','tools/optimization_interfaces.py'):
         review[path]=dict(reason='Add a separate finite ask/tell proposal adapter and registration; existing coordinate algorithm, physical equations, simulation/controller and physical contracts unchanged.',
             current_hash=hashlib.sha256((ROOT/path).read_bytes()).hexdigest(),historical_hashes=[])
     # Only the already reviewed transport/accounting/scheduling migrations.
