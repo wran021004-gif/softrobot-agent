@@ -66,7 +66,7 @@ def save(store,value):
 
 def implementation():
     paths=['tools/diagnostic_handoff.py','tools/platform_search.py','tools/working_state.py','schemas/working_state.py',
-        'examples/stage356_milestone2.py','examples/stage357_live_pilot.py','examples/stage358_confirmation.py','tests/test_stage358_confirmation.py','tests/test_stage356_milestone2.py','tests/test_stage356_batch.py','tests/test_stage357_live_batch.py',
+        'examples/stage356_milestone2.py','examples/stage357_live_pilot.py','examples/stage358_confirmation.py','examples/stage358_interpretation_repair.py','tests/test_stage358_interpretation_repair.py','tests/test_stage358_confirmation.py','tests/test_stage356_milestone2.py','tests/test_stage356_batch.py','tests/test_stage357_live_batch.py',
         'tools/diagnostic_reference_adapter.py','tools/diagnostic_revision.py','schemas/diagnostic_revision.py','tools/diagnostic_workflow.py','tools/diagnostic_native.py','tools/diagnostic_inventory.py','tools/diagnostic_facts.py',
         'tools/diagnostic_summary.py','tools/live_batch_execution.py','extensions/tendon_family/diagnostic_evidence.py','tools/execution_completion.py',
         'tools/platform_models.py','tools/platform_handoff.py','tools/platform_diagnosis_coordinator.py',

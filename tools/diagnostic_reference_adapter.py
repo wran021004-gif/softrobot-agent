@@ -191,6 +191,21 @@ class EvidenceDrivenAdapter(ScopedReferenceAdapter):
         for native,internal in self.advertised.items():instruction=instruction.replace(internal,native)
         view['instructions']=instruction
         view['additional_evidence']='Initial content is honestly supplied. In the check phase, record your proposed distinction before the host obtains the selected result. Use exact current-context aliases; do not copy identity hashes.'
+        if self.role.get('decision_packet') is not None:
+            # Opt-in final interpretation: keep numerical authority and required
+            # prose together, without duplicating catalogs or raw exports.
+            # Full products remain in the store for validation and provenance.
+            view={k:view[k] for k in ('role','phase','instructions','decision_packet',
+                                     'decision_packet_reference','unaccepted_draft') if k in view}
+            context={k:context[k] for k in ('protocol_correction','recovery_status',
+                                           'correction_budget','phase_progress') if k in context}
+            context['role_context']=view
+            payload['messages'][0]['content']=(
+                'Perform the current final-decision phase with exactly one advertised native function. '
+                'English. Use the supplied source-bound program facts; author only interpretation and judgment. '
+                'Required instructions are in role_context.instructions. Keep the response concise. '
+                'Diagnostic recommendation disposition, candidate selection and next research route are separate. '
+                'A valid function call does not certify factual accuracy. No further execution is authorized by this response.')
         payload['messages'][1]['content']=encode(context)
         return payload
 
