@@ -1,5 +1,9 @@
 # Milestone 3 separately granted confirmation
 
+Current gate after the explicitly authorized correction: **Milestone 3 remains
+open**. See the 2026-10-04 bounded correction review below. Execution completion
+in `acceptance.json` does not override the semantic gate.
+
 Stage 3.58 extends the existing shared coordinate scheduler and live execution
 adapter. It preserves the accepted Milestone 2 confirmation, the incomplete
 Stage 3.57 pilot, its model responses, charges and unresolved 900-second
@@ -266,3 +270,35 @@ preserved bytes without a query or model call; the original unresolved-reference
 list is also retained. The prelaunch rejection and zero-usage delivery snapshot
 remain separate from the approved launch and live results. Local evidence
 commits are distinct from the implementation and launch commits; no push occurs.
+
+## 2026-10-04 bounded correction review
+
+Direct authorization allowed one semantic correction on the existing ledger.
+The attempt completed with one provider request, one workflow tool, zero new
+backend attempts, zero protocol recoveries and 112,901 reported tokens. Its
+charged time was 129.9220000000205 s. Project totals are three provider attempts,
+13 tools, two backend attempts, 320,125 reported tokens and
+1488.0280000006314 charged seconds; no current unresolved reservation exists.
+The historical interrupted pilot's 900-second reservation remains separate.
+Original phase starting usage and protocol counters were preserved. Four phase
+provider attempts and thirteen project attempts remain, but the single semantic
+correction cycle is spent. No further correction or experiment was run.
+
+The corrected decision remains materially inaccurate: point C is assigned
+point B's iteration counts; point B's negative time delta is still attributed
+to the retained baseline; the terminal tension/margin and remaining phase-budget
+corrections are omitted; and the new proposal has empty variables. The model
+retains the baseline and proposes one combined 0.05/0.05 weight point. This is
+an unaccepted proposed route, outside the authorized terminal-only next batch.
+No engineer-authored conclusion replaces it. The semantic gate fails, so Stage
+3.59 must remain offline and no accepted new plan or proposal sequence exists.
+
+A delivery defect is also preserved: the linked supplement was catalogued, but
+its long instruction strings were omitted by the adapter. Its full content was
+not supplied in role_context. The executed runner is preserved byte-for-byte
+with its guard hash. The repaired runner adds full request and supplement
+content to role_context; the existing spent-attempt guard prevents replay.
+The sealed provider payload and original/revised model responses remain in the
+artifact export. `correction_semantic_review.json` records exact contradictions,
+the omitted supplement instructions, and the distinct operational/semantic gates.
+Milestone 2 remains closed. Nothing was pushed.

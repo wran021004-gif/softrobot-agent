@@ -1,0 +1,33 @@
+{
+  "passed": false,
+  "classification": "One bounded semantic correction completed; interpretation remains materially inaccurate",
+  "corrected_response": {"artifact_id": "c03d5cc817adc8b9e588df0651cc097af5ba090362bb9f8f765982d99fec5556", "media_type": "application/json"},
+  "submitted_provider_payload": {"artifact_id": "daeef04be622a4aa4601c9c25b8d1b4e833cfe589f238721328e25a7693b1cb3", "media_type": "application/json"},
+  "source_batch_summary": {"artifact_id": "4238a83d8cb7188c516ef50cb46380105d1090aaa16d6640233e280ceb004bed", "media_type": "application/json"},
+  "review": [
+    {"criterion": "Initialization and positive-iteration selections", "passed": false, "pointer": "/reasoning", "observed": "point C: 29 iteration_zero, 5 positive iteration, 1 synthetic initialization", "source": "single_context/batch_summary.json /current_update_facts/*/selected_iterations", "expected": "Holding-only B: 29 iteration-zero + 1 synthetic = 30 initialization, 5 positive. Terminal-only C: 16 iteration-zero + 1 synthetic = 17 initialization, 18 positive."},
+    {"criterion": "Retained baseline reuse and comparisons", "passed": false, "observed": "Reuse is corrected, but response does not clearly state D is equivalent to itself and a tradeoff against historical start; cited campaign comparison is A-minus-D."},
+    {"criterion": "Terminal-only maximum tension and upper margin", "passed": false, "observed": "Required correction omitted", "expected": "5.934318773865956 N on near_t1; upper margin 2.065681226134044 N"},
+    {"criterion": "Holding-only mean update time references", "passed": false, "pointer": "/reasoning", "observed": "against the retained baseline ... mean_complete_update_s -0.38570029716938947", "expected": "-0.38570029716938947 s against historical search start; +0.12975374571978904 s against retained baseline"},
+    {"criterion": "Joint-positive branch untested", "passed": true},
+    {"criterion": "Dual and single queried coverage distinct from handoffs", "passed": false, "observed": "Dual IDs corrected; distinct repaired single-context IDs omitted", "expected": "dual [24,26,27,28,29,31,32,33]; single [0,8,16,24,28,30,32,34]"},
+    {"criterion": "Phase versus project budget", "passed": false, "observed": "Ceilings supplied; remaining phase/project distinction omitted", "expected": "Pre-correction five phase attempts and fourteen project attempts; post-correction four and thirteen"},
+    {"criterion": "Proposed variables consistent with experiment", "passed": false, "pointer": "/next_research/proposed_variables", "observed": {}, "expected": "Explicit declared changed weights; empty map conflicts with bounded_check"},
+    {"criterion": "Late horizon alone is not a causal/stopping discriminator", "passed": true, "observed": "Unsupported previous horizon-only stopping claim removed"},
+    {"criterion": "Position prediction does not certify holding-speed prediction", "passed": true, "observed": "Unsupported previous inference removed"},
+    {"criterion": "Read-only associations do not separate causes", "passed": true, "observed": "Previous causal separation claim removed"},
+    {"criterion": "Tested values do not establish continuous range or exhaustion", "passed": true, "observed": "Scope limited to tested points"}
+  ],
+  "delivery_defect": {
+    "description": "The runner handed over the linked supplement and its reference, but did not put its full content into role_context. The fact catalog omits strings longer than 180 characters. The sealed provider payload lacks all four additional research-condition instruction strings. This is an engineering delivery defect, not evidence that the model rejected those instructions.",
+    "offline_repair": "Add the full request and linked supplement content directly to role_context in the authorized runner; preserve the one-attempt guard, original limits and all sealed submitted evidence. No rerun is authorized by this repair."
+  },
+  "model_candidate_decision": "retain_baseline",
+  "model_proposed_route": "continue_weight_combinations: one 0.05/0.05 joint point; variables empty; proposal remains unaccepted and outside terminal-only continuation scope",
+  "stage359_live_launch_permitted": false,
+  "new_backend_work_in_correction": 0,
+  "semantic_cycles": 1,
+  "provider_attempts": 1,
+  "protocol_recoveries": 0,
+  "no_second_semantic_revision": true
+}
