@@ -1,0 +1,2504 @@
+{
+  "classification": "Concrete single bounded factual-correction payload; prepared locally and NOT transmitted.",
+  "original_response_reference": {
+    "artifact_id": "2c597b92af389ff9a271eec3d997cdfa5f3ba46d48fdb1f727291c749d9ea188",
+    "media_type": "application/json"
+  },
+  "original_response": {
+    "candidate_disposition": "retain_baseline",
+    "disposition": "reject",
+    "feedback": {
+      "artifact_id": "4238a83d8cb7188c516ef50cb46380105d1090aaa16d6640233e280ceb004bed",
+      "media_type": "application/json"
+    },
+    "next_action": "finish",
+    "next_research": {
+      "bounded_check": "One bounded probe batch under the same frozen conditions: at most two NEW distinct changed configurations on the single coordinate terminal_tip_speed_weight = {0.10, 0.25} with holding_tip_speed_weight fixed at 0.0, each passed through the standard validated candidate preparation, simulation, evaluation and profile, and each compared with the retained 0.0/0.0 baseline and with the already-complete 0.05/0.0 point (same conventions: world tip vectors, projected GVS state, serial backend joints; sampled final window [0.30,0.35] s, 6 samples; terminal error at the last execution sample). Paired read-only queries on the same new runs restricted to update_ids 28,30,32,34 plus the matched-endpoint one-step-prediction view, to separate any weight effect from horizon truncation and budget saturation. No change to robot definition, task, goal, evaluator, timing, seed/warm-state policy or any production artifact; no baseline rerun, screening, probe or replacement campaign.",
+      "evidence": [
+        "Tested point batch-43a6daab7e3c1ce6-3 (holding_tip_speed_weight 0.0, terminal_tip_speed_weight 0.05), complete run 50618bf23b31464ba4f84c55cd26d1ca: terminal_error_m 0.008186891107577365 m <= 0.01 with terminal_reach_passed true and task_accepted true; holding_max_error_m 0.008275123365557732 m <= 0.01 (holding_position_passed true) but holding_max_speed_m_s 0.03556730769134125 m/s vs 0.02 (holding_speed_passed false); joint_reach_holding_passed false. Retained-baseline comparison physical_tradeoff: holding error -0.049862980920174826 m and holding speed -1.5454479662829395 m/s improve, terminal_error_m +0.0005442825217099791 m worsens but stays inside tolerance. Applied tensions peak 5.901740472907578 N (near_t0); all channels >= 2.09 N below the 8 N limit; force_bound_violation_n 0.0.",
+        "Tested point batch-43a6daab7e3c1ce6-1 (holding 0.10, terminal 0.0), complete run 22241105b8984e0daae4530963848953: terminal_error_m 0.011558241033380132 m > 0.01, task_accepted false, terminal_reach_passed false; holding_max_error_m 0.06344380037515782 m and holding_max_speed_m_s 1.3632316140443952 m/s (both worse). In-batch comparison physical_pareto_worsening; retained-baseline comparison physical_tradeoff with terminal_error_m +0.003915632447512746 m and holding error +0.0053056960894252575 m worse.",
+        "Tested point improvement-96f0ade35119 (holding 0.05, terminal 0.0), reuse of 087adee8e8a24fe88e5c85fe89e638c8: sealed comparison physical_tradeoff (F2420; F2329 -0.4060100069642385 m/s, F2610 -0.001633544566242727 m, F2409 +0.001056295661744434 m, F2513 +0.5154540428891785 s); joint_reach_holding_passed false for baseline F2195 and candidate F2544; terminal reach passes (F2476, F2192 0.00869890424761182 m) while holding fails (F2556 0.05650455971948983 m, F2271 1.1750052670100422 m/s).",
+        "Retained baseline-replay (0.0/0.0): holding_max_error_m 0.05813810428573256 m, holding_max_speed_m_s 1.5810152739742807 m/s, terminal_error_m 0.007642608585867386 m, joint_reach_holding_passed false; deadline_misses 35 (F2415) so joint acceptance is not reached by the baseline either.",
+        "Confound control (not causal): archived dual queried plans view for 087adee8e8a24fe88e5c85fe89e638c8 covers exactly 8 of 35 updates (0,8,16,24,28,30,32,34) and shows effective_horizon 10,10,10,10,7,5,3,1 with optimization_selected_iteration 0/68 below max_iterations 120 and raw User_Requested_Stop / Maximum_Iterations_Exceeded; the 0.05/0.0 run reaches within 1.7003228620637856e-06 N of the 8 N limit on near_t0 at update 30 (near-bound legal loading, no cause established).",
+        "The interrupted attempt d06d23180c19424faf5ac6618c779173 started with partial work and has no sealed complete result and is excluded."
+      ],
+      "expected_observations": [
+        "If terminal_tip_speed_weight 0.10-0.25 yields holding_max_speed_m_s <= 0.02 m/s with holding_max_error_m <= 0.01 m and terminal_error_m <= 0.01 m in at least one new complete configuration (joint_reach_holding_passed true) -> supports the hypothesis that this coordinate can reach joint acceptance; promotion would still require a separate adoption decision.",
+        "If holding_max_speed_m_s falls monotonically toward/below 0.02 m/s while terminal_error_m rises but stays <= 0.01 m -> supports the hypothesized reach-preserving speed reduction and identifies a tested operating band on this coordinate only.",
+        "If holding_max_speed_m_s plateaus near ~0.03 m/s or reverses while terminal_error_m grows past 0.01 m or task_accepted turns false -> weakens the hypothesis and marks the coordinate exhausted at those tested points.",
+        "If the new runs still show deadline_misses 35/35 with effective_horizon truncating to <= 7 over the final holding window at updates 28-34 and optimization_raw_status still User_Requested_Stop / Maximum_Iterations_Exceeded with selected iteration far below max_iterations 120 -> weakens a weight-only explanation and points toward the holding_control_arrangements route (holding window, horizon, compute budget), without certifying a cause.",
+        "If applied tensions at the new points again stay well below the 8 N limit with force_bound_violation_n 0.0 and no near-bound loading -> weakens actuator-limit saturation as the holding-failure driver at those points; near-bound legal loading would neither confirm nor refute it.",
+        "If matched-endpoint one-step prediction differences at updates 28-34 stay of the order of the recorded ~0.0018-0.0040 m means -> weakens prediction/model mismatch; materially larger differences would re-open the prediction_backend_disagreement route."
+      ],
+      "fixed_conditions": [
+        "task identity 24eb233a2e36d7194994c416207bf05f3ff644db2ed02c8a50496f8c3dc4b041 (task.reach, family-multisegment-dev) with evaluator evaluate.reach@1.0.0 tolerance_m 0.01",
+        "controller.gvs_nmpc@7.0.0 at controller identity 4224c700c6c1bc9ce8816d7ad1384c27687deef88795883d2ec9923d72d930ad; recipe unchanged except the named weight coordinate",
+        "control_period_s 0.01 s, duration_s 0.35 s, 35 applied control updates, sample_period_s 0.01 s, coordinate frames unchanged (world tip / projected GVS state / serial backend joints)",
+        "settling window_s 0.05, position_limit_m 0.01 m, speed_limit_m_s 0.02 m/s; 6-tendon 8.0 N per-tendon force limit; model.serial_bending_cells execution model",
+        "control/recipe/holding_tip_speed_weight fixed at 0.0 while only control/recipe/terminal_tip_speed_weight varies; same initialization/seed and warm-state regeneration policy; same 3.58 milestone context and accounting"
+      ],
+      "limitations": [
+        "Tested points only: the probe brackets two values of one coordinate and establishes no monotonicity, range, statistical or global claim.",
+        "Single execution per configuration with per-update initialization/seed selection applied (29 and 30 initialization-selected in the two new runs), so a weight change is confounded with per-update selection and warm-state regeneration; no causal attribution is possible.",
+        "Sampled final window is 6 samples over 0.05 s with continuous_time_guarantee false; speed is reconstructed tip speed from recorded backend qvel, not a hardware measurement, and no real-time claim is made.",
+        "No closed-loop counterfactual replay capability exists, so the causal-replay deferral is retained and no dominant settling cause can be established.",
+        "Only 1 project backend_solves and 6 phase model_calls remain after this phase, so this route requires fresh explicit authorization; reused historical points keep their original charges and the interrupted attempt is excluded.",
+        "Archived dual queried coverage corresponds to 8 of 35 update_ids and is distinct from handoffs; the remaining 27 updates stay not_read and are not inferred absent."
+      ],
+      "proposed_budget": {
+        "backend_solves": 2,
+        "model_calls": 8,
+        "tool_calls": 14,
+        "wall_s": 4200.0,
+        "worker_calls": 0
+      },
+      "proposed_variables": {},
+      "route": "continue_weight_combinations",
+      "stopping_conditions": [
+        "Stop after the two declared NEW distinct configurations are complete, or earlier if one reaches joint_reach_holding_passed true.",
+        "Stop and report the coordinate exhausted if two consecutive new configurations show no monotone reduction of holding_max_speed_m_s toward 0.02 m/s while terminal_error_m grows toward the 0.01 m limit.",
+        "Stop if any new configuration violates the 8 N per-tendon force bound, records a solver error, or fails to yield valid_complete_execution.",
+        "Stop if the paired plans/prediction reads show the final-window effective_horizon truncation unchanged at the new points; then hand off to the holding_control_arrangements route instead of adding more weight points.",
+        "Do not exceed the declared proposed budget; add no probes, baseline reruns, screening or replacement campaigns; execute nothing under this response."
+      ],
+      "unresolved_question": "At the frozen robot, task, evaluator, timing and controller (controller.gvs_nmpc@7.0.0, controller identity 4224c700c6c1bc9ce8816d7ad1384c27687deef88795883d2ec9923d72d930ad), does raising control/recipe/terminal_tip_speed_weight above 0.05 with control/recipe/holding_tip_speed_weight fixed at 0.0 drive the sampled final-window holding tip speed below the frozen 0.02 m/s criterion while terminal_error_m stays inside 0.01 m, or does the reach/holding tension on this coordinate stop it short?"
+    },
+    "reasoning": "RECOMMENDATION DISPOSITION (separate from candidate selection). I dispose of the carried diagnostic recommendation separately from the controller candidate. rec-defer-weight-tuning is REJECTED as superseded: its stated basis was that the sampled hold speed and position \"still fail by large margins\" while budget-driven termination and late horizon truncation govern. The new complete tested point batch-43a6daab7e3c1ce6-3 falsifies that basis at one tested point (holding position now passes; holding speed drops ~45x), so a bounded further search on the weight coordinate is warranted rather than deferred. rec-defer-causal-replay remains accepted/retained: no closed-loop counterfactual replay capability exists, so no dominant settling cause is established and nothing here certifies causality. Candidate selection is separate from both: no evaluated candidate reaches joint_reach_holding_passed true, so I retain the frozen baseline and select nothing.\n\nTESTED POINTS, EACH WITH BOTH REFERENCE COMPARISONS.\n(1) batch-43a6daab7e3c1ce6-3 (holding_tip_speed_weight 0.0, terminal_tip_speed_weight 0.05), new complete run 50618bf23b31464ba4f84c55cd26d1ca, valid_complete_execution true: terminal_error_m 0.008186891107577365 <= 0.01 m with terminal_reach_passed true and task_accepted true; holding_max_error_m 0.008275123365557732 <= 0.01 m (holding_position_passed true, first such pass) but holding_max_speed_m_s 0.03556730769134125 against the 0.02 m/s criterion (holding_speed_passed false), so joint_reach_holding_passed false. Applied tensions peak at 5.901740472907578 N on near_t0, every channel >= 2.09 N below the 8 N limit, force_bound_violation_n 0.0 (no near-bound loading here). In-batch comparison vs the 0.05/0.0 point: physical_pareto_improvement (holding error -0.0482294363539321, holding speed -1.139437959318701, mean_complete_update_s -0.9023204714991166, terminal_error_m -0.0005120131400344549). Retained-baseline comparison vs 0.0/0.0: physical_tradeoff - holding_max_error_m -0.049862980920174826 and holding_max_speed_m_s -1.5454479662829395 improve while terminal_error_m +0.0005442825217099791 worsens but stays inside 0.01 m. Guidance score 1.5143458741077604 is guidance only and cannot promote a candidate.\n(2) batch-43a6daab7e3c1ce6-1 (holding 0.10, terminal 0.0), new complete run 22241105b8984e0daae4530963848953: terminal_error_m 0.011558241033380132 > 0.01 m, task_accepted false, terminal_reach_passed false; holding_max_error_m 0.06344380037515782 m and holding_max_speed_m_s 1.3632316140443952 m/s, both worse. In-batch comparison vs 0.05/0.0: physical_pareto_worsening. Retained-baseline comparison vs 0.0/0.0: physical_tradeoff only because mean_complete_update_s -0.38570029716938947 and holding speed -0.21778365992988546 improve while holding error +0.0053056960894252575 and terminal_error_m +0.003915632447512746 worsen - and it also breaks official reach, so it is rejected outright. Raw termination (Solve_Succeeded 1, User_Requested_Stop 34) is recorded separately from controller policy stops (budget_best_feasible 33, relative_seed_improvement 1, None 1).\n(3) improvement-96f0ade35119 (holding 0.05, terminal 0.0), historical reuse 087adee8e8a24fe88e5c85fe89e638c8: vs the retained 0.0/0.0 baseline the sealed comparison is physical_tradeoff (F2420) with F2329 holding_max_speed_m_s -0.4060100069642385, F2610 holding_max_error_m -0.001633544566242727, F2409 terminal_error_m +0.001056295661744434 and F2513 mean_complete_update_s +0.5154540428891785; joint_reach_holding_passed false for both baseline (F2195) and candidate (F2544). Its in-batch self-comparison is physical_equivalent_within_tolerance. Reach still passes (F2476 true; F2192 0.00869890424761182 <= 0.01 m) while holding fails (F2556 0.05650455971948983 m vs 0.01; F2271 1.1750052670100422 m/s vs 0.02).\n(4) baseline-replay (0.0/0.0), 0.0 change: within-tolerance equivalent to itself in both comparisons (holding error 0.05813810428573256 m, holding speed 1.5810152739742807 m/s, terminal_error_m 0.007642608585867386 m, joint false) - a re-measurement reference, not a candidate.\n\nEFFECT ON THE CURRENT PLAN HYPOTHESIS. Partially supported, at tested-point scope only. Point (1) supports the hypothesis that a nonzero terminal_tip_speed_weight, alone, can lower the sampled final-window holding tip speed toward 0.02 m/s while retaining terminal reach: 1.5810152739742807 -> 0.03556730769134125 m/s (~45x) with holding position pulled to 0.008275 m and terminal_error_m inside 0.01 m. Point (2) weakens the joint branch of the hypothesis: raising the holding weight to 0.10 worsened both holding metrics and broke reach, so the productive tested coordinate so far is the terminal weight, not the holding weight. Point (3) leaves the 0.05 holding point a tradeoff. The joint-acceptance claim remains unachieved everywhere (0.03556730769134125 m/s is still 1.78x the criterion; joint_reach_holding_passed false at all four points). I make no monotonicity, range or global claim; only the four tested coordinates are described and no ineffectiveness throughout any parameter range is asserted.\n\nCONFOUNDS AND BOUNDARIES RETAINED. deadline_misses is 35/35 in every run (F2308, F2415) with controller policy stops budget_best_feasible and, in the archived dual queried plans view for 087adee8e8a24fe88e5c85fe89e638c8 (exactly 8 of 35 updates: 0,8,16,24,28,30,32,34 - distinct from handoffs; 27 updates remain not_read), late effective_horizon truncation 10,10,10,10,7,5,3,1 and optimization_selected_iteration 0/68 against max_iterations 120. Those are controller-side plan values, distinct from raw termination, from applied updates (29 initialization-selected vs 6 noninitialization-selected in that run) and from backend motion. Zero force bound violation does not exclude legal near-bound loading: the 0.05/0.0 run reaches within 1.7003228620637856e-06 N of the 8 N limit on near_t0 at update 30, and proximity alone identifies no cause. The interrupted attempt d06d23180c19424faf5ac6618c779173 started with partial work and has no sealed complete result and is excluded from complete physical evidence. All runs record real_time_demonstrated false and solver_error_count 0; none of this is a statistical, organizational, real-time or hardware claim.\n\nNEXT ACTION (stated independently). End this phase: record the decision that the baseline is retained, no candidate is selected, the weight-tuning deferral is rejected as superseded and the causal-replay deferral is retained, and hand off exactly one proposed next stage - a bounded, unexecuted probe on the terminal_tip_speed_weight coordinate. Nothing is executed here; the proposal authorizes no execution.",
+    "recommendation_id": "rec-defer-weight-tuning",
+    "report": {
+      "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+      "media_type": "application/json"
+    },
+    "selected_candidate": {
+      "candidate_id": "baseline-replay",
+      "configuration": {
+        "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+        "media_type": "application/json"
+      },
+      "execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "owner_run_id": "gvs-stage351-baseline-executor"
+    }
+  },
+  "source_batch_summary": {
+    "artifact_id": "4238a83d8cb7188c516ef50cb46380105d1090aaa16d6640233e280ceb004bed",
+    "media_type": "application/json"
+  },
+  "contradictions": [
+    {
+      "pointer": "/next_research/limitations/1",
+      "original": "Single execution per configuration with per-update initialization/seed selection applied (29 and 30 initialization-selected in the two new runs), so a weight change is confounded with per-update selection and warm-state regeneration; no causal attribution is possible.",
+      "source": "/current_update_facts/*/selected_iterations",
+      "facts": [
+        {
+          "execution_id": "22241105b8984e0daae4530963848953",
+          "configuration": {
+            "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+            "media_type": "application/json"
+          },
+          "manifest": {
+            "artifact_id": "1d7b9e26c08409a21521e4f89d65cb6b9633618af46900396310db2082a2aeea",
+            "media_type": "application/json"
+          },
+          "sources": {
+            "controller_observations.json": {
+              "artifact_id": "f6f46c42ce4b7770307e4e0301f0770a85812832b8188bccf3b00cea35e6f5eb",
+              "media_type": "application/octet-stream"
+            },
+            "resolved_physics.json": {
+              "artifact_id": "0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd",
+              "media_type": "application/octet-stream"
+            },
+            "actual_commands.json": {
+              "artifact_id": "5d6d649f633eb4173e6b90ab2aa4fc30b7b6f3d123046e52376a852ef0418abb",
+              "media_type": "application/octet-stream"
+            }
+          },
+          "scope": {
+            "update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "total_retained_updates": 35
+          },
+          "raw_optimizer_termination": {
+            "Solve_Succeeded": {
+              "count": 1,
+              "update_ids": [
+                34
+              ]
+            },
+            "User_Requested_Stop": {
+              "count": 34,
+              "update_ids": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33
+              ]
+            }
+          },
+          "controller_policy_stop": {
+            "None": {
+              "count": 1,
+              "update_ids": [
+                34
+              ]
+            },
+            "budget_best_feasible": {
+              "count": 33,
+              "update_ids": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                31,
+                32,
+                33
+              ]
+            },
+            "relative_seed_improvement": {
+              "count": 1,
+              "update_ids": [
+                30
+              ]
+            }
+          },
+          "selected_iterations": {
+            "iteration_zero": {
+              "count": 29,
+              "update_ids": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29
+              ]
+            },
+            "positive_iteration": {
+              "count": 5,
+              "update_ids": [
+                30,
+                31,
+                32,
+                33,
+                34
+              ]
+            },
+            "synthetic_initialization": {
+              "count": 1,
+              "update_ids": [
+                14
+              ]
+            }
+          },
+          "tension_channels": [
+            {
+              "channel": "near_t0",
+              "channel_index": 0,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": -5.4193256104895227e-08,
+                "minimum_distance_update_ids": [
+                  31
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 5.4193256104895227e-08
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 0.0,
+                "minimum_distance_update_ids": [
+                  31
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            },
+            {
+              "channel": "near_t1",
+              "channel_index": 1,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": 0.03472099092691305,
+                "minimum_distance_update_ids": [
+                  34
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 0.03472099092691305,
+                "minimum_distance_update_ids": [
+                  34
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            },
+            {
+              "channel": "near_t2",
+              "channel_index": 2,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": -6.765069393566137e-08,
+                "minimum_distance_update_ids": [
+                  34
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 6.765069393566137e-08
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 0.0,
+                "minimum_distance_update_ids": [
+                  34
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            },
+            {
+              "channel": "far_t0",
+              "channel_index": 3,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": -7.914298016942212e-08,
+                "minimum_distance_update_ids": [
+                  34
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 7.914298016942212e-08
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 0.0,
+                "minimum_distance_update_ids": [
+                  34
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            },
+            {
+              "channel": "far_t1",
+              "channel_index": 4,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": 0.15653560974569647,
+                "minimum_distance_update_ids": [
+                  33
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 0.15653560974569647,
+                "minimum_distance_update_ids": [
+                  33
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            },
+            {
+              "channel": "far_t2",
+              "channel_index": 5,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": -7.554220005090428e-08,
+                "minimum_distance_update_ids": [
+                  33
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 7.554220005090428e-08
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 0.0,
+                "minimum_distance_update_ids": [
+                  33
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            }
+          ],
+          "input_semantics": {
+            "requested_input": "Controller requested command from requested_tension_n.",
+            "applied_input_backend_readback": "actual_tension_n: MuJoCo -actuator_force readback at the pre-step update boundary; simulated force, not hardware measurement.",
+            "backend_motion": "Recorded serial backend q/qdot and tip position are distinct from input commands.",
+            "bounds": "Distance to upper bound and actual violation are separate quantities. Legal near-bound tension need not violate a bound."
+          },
+          "interpretation": "Counts cover exactly listed update IDs. Observations do not identify a dominant cause or establish ineffectiveness throughout a parameter range."
+        },
+        {
+          "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+          "configuration": {
+            "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+            "media_type": "application/json"
+          },
+          "manifest": {
+            "artifact_id": "d31808f970789bfaa3164514e35ccc9850631dc9df3fa8ec72993ecf8047e214",
+            "media_type": "application/json"
+          },
+          "sources": {
+            "controller_observations.json": {
+              "artifact_id": "a814cec0180773c0ce7105f4f3ff4baa1c4cdd3e8d6d88526592edd04fb9ed42",
+              "media_type": "application/octet-stream"
+            },
+            "resolved_physics.json": {
+              "artifact_id": "0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd",
+              "media_type": "application/octet-stream"
+            },
+            "actual_commands.json": {
+              "artifact_id": "83bf8e7740915d6b7fa77f527bd5c9d5e0e428f5b7bbc5c0656e5ad05271dd22",
+              "media_type": "application/octet-stream"
+            }
+          },
+          "scope": {
+            "update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "total_retained_updates": 35
+          },
+          "raw_optimizer_termination": {
+            "Solve_Succeeded": {
+              "count": 1,
+              "update_ids": [
+                34
+              ]
+            },
+            "User_Requested_Stop": {
+              "count": 34,
+              "update_ids": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33
+              ]
+            }
+          },
+          "controller_policy_stop": {
+            "None": {
+              "count": 1,
+              "update_ids": [
+                34
+              ]
+            },
+            "budget_best_feasible": {
+              "count": 29,
+              "update_ids": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                7,
+                9,
+                11,
+                12,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33
+              ]
+            },
+            "relative_seed_improvement": {
+              "count": 5,
+              "update_ids": [
+                6,
+                8,
+                10,
+                13,
+                14
+              ]
+            }
+          },
+          "selected_iterations": {
+            "iteration_zero": {
+              "count": 16,
+              "update_ids": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                9,
+                11,
+                12,
+                18,
+                21,
+                23,
+                26,
+                29,
+                30,
+                32
+              ]
+            },
+            "positive_iteration": {
+              "count": 18,
+              "update_ids": [
+                6,
+                8,
+                10,
+                13,
+                14,
+                15,
+                16,
+                17,
+                19,
+                20,
+                22,
+                24,
+                25,
+                27,
+                28,
+                31,
+                33,
+                34
+              ]
+            },
+            "synthetic_initialization": {
+              "count": 1,
+              "update_ids": [
+                7
+              ]
+            }
+          },
+          "tension_channels": [
+            {
+              "channel": "near_t0",
+              "channel_index": 0,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": 2.098259527092422,
+                "minimum_distance_update_ids": [
+                  21
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 2.098259527092422,
+                "minimum_distance_update_ids": [
+                  21
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            },
+            {
+              "channel": "near_t1",
+              "channel_index": 1,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": 2.0656812261340436,
+                "minimum_distance_update_ids": [
+                  6
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 2.0656812261340436,
+                "minimum_distance_update_ids": [
+                  6
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            },
+            {
+              "channel": "near_t2",
+              "channel_index": 2,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": 4.8968433313369975,
+                "minimum_distance_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 8.241626921452384e-09
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 4.8968433313369975,
+                "minimum_distance_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            },
+            {
+              "channel": "far_t0",
+              "channel_index": 3,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": 4.371416637215879,
+                "minimum_distance_update_ids": [
+                  6
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 4.371416637215879,
+                "minimum_distance_update_ids": [
+                  6
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            },
+            {
+              "channel": "far_t1",
+              "channel_index": 4,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": 5.739901271358768,
+                "minimum_distance_update_ids": [
+                  19
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 5.739901271358768,
+                "minimum_distance_update_ids": [
+                  19
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            },
+            {
+              "channel": "far_t2",
+              "channel_index": 5,
+              "upper_bound_n": 8.0,
+              "requested_input": {
+                "minimum_distance_to_upper_bound_n": 5.060174091422408,
+                "minimum_distance_update_ids": [
+                  13
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              },
+              "applied_input_backend_readback": {
+                "minimum_distance_to_upper_bound_n": 5.060174091422408,
+                "minimum_distance_update_ids": [
+                  13
+                ],
+                "queried_update_ids": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34
+                ],
+                "maximum_bound_violation_n": 0.0
+              }
+            }
+          ],
+          "input_semantics": {
+            "requested_input": "Controller requested command from requested_tension_n.",
+            "applied_input_backend_readback": "actual_tension_n: MuJoCo -actuator_force readback at the pre-step update boundary; simulated force, not hardware measurement.",
+            "backend_motion": "Recorded serial backend q/qdot and tip position are distinct from input commands.",
+            "bounds": "Distance to upper bound and actual violation are separate quantities. Legal near-bound tension need not violate a bound."
+          },
+          "interpretation": "Counts cover exactly listed update IDs. Observations do not identify a dominant cause or establish ineffectiveness throughout a parameter range."
+        }
+      ],
+      "required_correction": "New-run initialization_selected values are 30 and 17, with 5 and 18 positive-iteration selections; iteration-zero counts alone are 29 and 16."
+    },
+    {
+      "pointer": "/reasoning, point (4)",
+      "original": "within-tolerance equivalent to itself in both comparisons",
+      "source": "/candidates/baseline-replay/feedback/comparison",
+      "facts": {
+        "baseline": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.05650455971948983,
+          "holding_max_speed_m_s": 1.1750052670100422,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.77877309145406,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+              "media_type": "application/json"
+            },
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "profile": {
+              "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.00869890424761182,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "candidate": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.007642608585867386,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "candidate_minus_baseline": {
+          "deadline_misses": 0,
+          "holding_max_error_m": 0.001633544566242727,
+          "holding_max_speed_m_s": 0.4060100069642385,
+          "mean_complete_update_s": -0.5154540428891785,
+          "terminal_error_m": -0.001056295661744434
+        },
+        "classification": "physical_tradeoff",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose.",
+        "ranking_rule": {
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "version": "1.0.0"
+        }
+      },
+      "required_correction": "Baseline was reused, not re-measured. It is equivalent to itself and a physical tradeoff against the search start."
+    },
+    {
+      "pointer": "/reasoning and /next_research/evidence/0",
+      "original": "Applied tensions peak at 5.901740472907578 N on near_t0, every channel >= 2.09 N below the 8 N limit",
+      "source": "/candidates/batch-43a6daab7e3c1ce6-3/execution/factual_result/applied_tension_ranges",
+      "facts": {
+        "ranges": [
+          {
+            "limit_n": 8.0,
+            "maximum_n": 5.901740472907578,
+            "minimum_n": 1.7512764858409064,
+            "tendon": "near_t0",
+            "tendon_index": 0
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 5.934318773865956,
+            "minimum_n": 4.084252734737754,
+            "tendon": "near_t1",
+            "tendon_index": 1
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 3.1031566686630025,
+            "minimum_n": -0.0,
+            "tendon": "near_t2",
+            "tendon_index": 2
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 3.628583362784121,
+            "minimum_n": 1.0036718457457203,
+            "tendon": "far_t0",
+            "tendon_index": 3
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 2.260098728641232,
+            "minimum_n": 0.7859357597552847,
+            "tendon": "far_t1",
+            "tendon_index": 4
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 2.9398259085775917,
+            "minimum_n": 0.27677002909956944,
+            "tendon": "far_t2",
+            "tendon_index": 5
+          }
+        ],
+        "peak": {
+          "limit_n": 8.0,
+          "maximum_n": 5.934318773865956,
+          "minimum_n": 4.084252734737754,
+          "tendon": "near_t1",
+          "tendon_index": 1
+        },
+        "minimum_upper_margin_n": 2.0656812261340436
+      },
+      "required_correction": "Peak is 5.934318773865956 N on near_t1; minimum upper margin is 2.065681226134044 N."
+    },
+    {
+      "pointer": "/reasoning, point (2)",
+      "original": "Retained-baseline comparison ... mean_complete_update_s -0.38570029716938947",
+      "source": "/candidates/batch-43a6daab7e3c1ce6-1/retained_baseline_comparison",
+      "facts": {
+        "start": {
+          "baseline": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.05650455971948983,
+            "holding_max_speed_m_s": 1.1750052670100422,
+            "holding_position_passed": false,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 17.77877309145406,
+            "official_reach_task_success": true,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+                "media_type": "application/json"
+              },
+              "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+              "profile": {
+                "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.00869890424761182,
+            "terminal_reach_passed": true,
+            "valid_complete_execution": true
+          },
+          "candidate": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.06344380037515782,
+            "holding_max_speed_m_s": 1.3632316140443952,
+            "holding_position_passed": false,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 17.39307279428467,
+            "official_reach_task_success": false,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "91fd22c7623c45c4c43e971a226439beebb94be0468700e872fdf413cd58f984",
+                "media_type": "application/json"
+              },
+              "execution_id": "22241105b8984e0daae4530963848953",
+              "profile": {
+                "artifact_id": "d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "6c0a9d1c79d361c88c6b8e71490bb8b7ccf10661ae2998a566404e33923e6d49",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.011558241033380132,
+            "terminal_reach_passed": false,
+            "valid_complete_execution": true
+          },
+          "candidate_minus_baseline": {
+            "deadline_misses": 0,
+            "holding_max_error_m": 0.0069392406556679845,
+            "holding_max_speed_m_s": 0.18822634703435304,
+            "mean_complete_update_s": -0.38570029716938947,
+            "terminal_error_m": 0.002859336785768312
+          },
+          "classification": "physical_pareto_worsening",
+          "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose.",
+          "ranking_rule": {
+            "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+            "objective": "Raw scalar objectives under different weights are not ranked.",
+            "physical_metrics": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s"
+            ],
+            "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+            "tolerance": 1e-09,
+            "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+            "version": "1.0.0"
+          }
+        },
+        "baseline": {
+          "baseline": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.05813810428573256,
+            "holding_max_speed_m_s": 1.5810152739742807,
+            "holding_position_passed": false,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 17.26331904856488,
+            "official_reach_task_success": true,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+                "media_type": "application/json"
+              },
+              "execution_id": "cf997605885642759ee33920e2c9e2ef",
+              "profile": {
+                "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.007642608585867386,
+            "terminal_reach_passed": true,
+            "valid_complete_execution": true
+          },
+          "candidate": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.06344380037515782,
+            "holding_max_speed_m_s": 1.3632316140443952,
+            "holding_position_passed": false,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 17.39307279428467,
+            "official_reach_task_success": false,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "91fd22c7623c45c4c43e971a226439beebb94be0468700e872fdf413cd58f984",
+                "media_type": "application/json"
+              },
+              "execution_id": "22241105b8984e0daae4530963848953",
+              "profile": {
+                "artifact_id": "d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "6c0a9d1c79d361c88c6b8e71490bb8b7ccf10661ae2998a566404e33923e6d49",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.011558241033380132,
+            "terminal_reach_passed": false,
+            "valid_complete_execution": true
+          },
+          "candidate_minus_baseline": {
+            "deadline_misses": 0,
+            "holding_max_error_m": 0.0053056960894252575,
+            "holding_max_speed_m_s": -0.21778365992988546,
+            "mean_complete_update_s": 0.12975374571978904,
+            "terminal_error_m": 0.003915632447512746
+          },
+          "classification": "physical_tradeoff",
+          "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose.",
+          "ranking_rule": {
+            "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+            "objective": "Raw scalar objectives under different weights are not ranked.",
+            "physical_metrics": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s"
+            ],
+            "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+            "tolerance": 1e-09,
+            "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+            "version": "1.0.0"
+          }
+        }
+      },
+      "required_correction": "This time delta is against start. Against baseline it is +0.12975374571978904 s. Computation is separate from physical classification."
+    },
+    {
+      "pointer": "/reasoning, effect on hypothesis",
+      "original": "Point (2) weakens the joint branch of the hypothesis",
+      "source": "/proposals",
+      "facts": [
+        {
+          "changes": {
+            "control/recipe/holding_tip_speed_weight": 0.05,
+            "control/recipe/terminal_tip_speed_weight": 0.0
+          },
+          "identity": "2769e9622f2ec1d65be9a3f41b43e218dc8e654dc99caf6ec6583efa72d66e7d",
+          "index": 0,
+          "optimizer_changes": {
+            "control/recipe/holding_tip_speed_weight": 0.05,
+            "control/recipe/terminal_tip_speed_weight": 0.0
+          },
+          "reuse_kind": "historical_start",
+          "reuse_reason": "Explicit complete comparable historical record with verified artifacts, receipts and scientific dependencies; original charges remain historical.",
+          "reused": true,
+          "reused_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+          "reused_from": "improvement-96f0ade35119",
+          "roundoff_canonicalized": []
+        },
+        {
+          "changes": {
+            "control/recipe/holding_tip_speed_weight": 0.1,
+            "control/recipe/terminal_tip_speed_weight": 0.0
+          },
+          "identity": "2c463829cbeac8c6915badfff4402b9ccc6d9b5425a7e3b087513c25213da10f",
+          "index": 1,
+          "optimizer_changes": {
+            "control/recipe/holding_tip_speed_weight": 0.1,
+            "control/recipe/terminal_tip_speed_weight": 0.0
+          },
+          "reused": false,
+          "roundoff_canonicalized": []
+        },
+        {
+          "changes": {
+            "control/recipe/holding_tip_speed_weight": 0.0,
+            "control/recipe/terminal_tip_speed_weight": 0.0
+          },
+          "identity": "ea42fadf7aab615d5e3cfe5f3de663370eeeea62231b450a6d3499bd8d2d4f2d",
+          "index": 2,
+          "optimizer_changes": {
+            "control/recipe/holding_tip_speed_weight": 0.0,
+            "control/recipe/terminal_tip_speed_weight": 0.0
+          },
+          "reuse_kind": "retained_baseline",
+          "reuse_reason": "Explicit complete comparable historical record with verified artifacts, receipts and scientific dependencies; original charges remain historical.",
+          "reused": true,
+          "reused_execution_id": "cf997605885642759ee33920e2c9e2ef",
+          "reused_from": "baseline-replay",
+          "roundoff_canonicalized": []
+        },
+        {
+          "changes": {
+            "control/recipe/holding_tip_speed_weight": 0.0,
+            "control/recipe/terminal_tip_speed_weight": 0.05
+          },
+          "identity": "c12dc6dd50b38894e1dfb5ac9077257e2af3d45044a2e5a5d29e756a760e9809",
+          "index": 3,
+          "optimizer_changes": {
+            "control/recipe/holding_tip_speed_weight": 0.0,
+            "control/recipe/terminal_tip_speed_weight": 0.05
+          },
+          "reused": false,
+          "roundoff_canonicalized": []
+        }
+      ],
+      "required_correction": "The 0.10/0 point is holding-only. No joint-positive-weight point was tested; that branch remains untested."
+    },
+    {
+      "pointer": "/reasoning and /next_research/evidence/4 and /next_research/limitations/5",
+      "original": "archived dual queried plans ... exactly 8 of 35 updates: 0,8,16,24,28,30,32,34",
+      "source": "factual_audit.json /dual_read_coverage and /confirmation_selected_updates",
+      "facts": {
+        "dual_read_coverage": {
+          "contexts": [
+            {
+              "context": "design",
+              "views": [],
+              "unique_update_ids": [],
+              "queried_count": 0,
+              "unread_update_ids": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34
+              ],
+              "sources": []
+            },
+            {
+              "context": "diagnostic",
+              "views": [
+                {
+                  "role": "diagnostic",
+                  "view": "plans",
+                  "method": "diagnosis.inspect_evidence",
+                  "update_ids": [
+                    24,
+                    26,
+                    27,
+                    28,
+                    29,
+                    31,
+                    32,
+                    33
+                  ],
+                  "count": 8
+                }
+              ],
+              "unique_update_ids": [
+                24,
+                26,
+                27,
+                28,
+                29,
+                31,
+                32,
+                33
+              ],
+              "queried_count": 8,
+              "unread_update_ids": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                25,
+                30,
+                34
+              ],
+              "sources": [
+                {
+                  "request_id": "milestone2-selected-check",
+                  "result": {
+                    "artifact_id": "a7470ffa6dc4cb722ff1dff64220334838f6545199014923029eee2bc9dd1fb6",
+                    "media_type": "application/json"
+                  },
+                  "update_ids": [
+                    24,
+                    26,
+                    27,
+                    28,
+                    29,
+                    31,
+                    32,
+                    33
+                  ]
+                }
+              ]
+            },
+            {
+              "context": "executor",
+              "views": [
+                {
+                  "role": "executor",
+                  "view": "plans",
+                  "method": "diagnosis.inspect_evidence",
+                  "update_ids": [
+                    24,
+                    26,
+                    27,
+                    28,
+                    29,
+                    31,
+                    32,
+                    33
+                  ],
+                  "count": 8
+                }
+              ],
+              "unique_update_ids": [
+                24,
+                26,
+                27,
+                28,
+                29,
+                31,
+                32,
+                33
+              ],
+              "queried_count": 8,
+              "unread_update_ids": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                25,
+                30,
+                34
+              ],
+              "sources": [
+                {
+                  "request_id": "milestone2-selected-check",
+                  "result": {
+                    "artifact_id": "a7470ffa6dc4cb722ff1dff64220334838f6545199014923029eee2bc9dd1fb6",
+                    "media_type": "application/json"
+                  },
+                  "update_ids": [
+                    24,
+                    26,
+                    27,
+                    28,
+                    29,
+                    31,
+                    32,
+                    33
+                  ]
+                }
+              ]
+            }
+          ],
+          "shared_workflow": {
+            "unique_update_ids": [
+              24,
+              26,
+              27,
+              28,
+              29,
+              31,
+              32,
+              33
+            ],
+            "queried_count": 8,
+            "unread_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              25,
+              30,
+              34
+            ]
+          },
+          "scope": "Union of successful retained query/read receipts in the supplied workflow. Each context has its own coverage; shared union does not mean any role read another role private context. Explicit handoffs are excluded from queried coverage."
+        },
+        "confirmation_selected_scope": {
+          "update_ids": [
+            0,
+            8,
+            16,
+            24,
+            28,
+            30,
+            32,
+            34
+          ],
+          "total_retained_updates": 35
+        }
+      },
+      "required_correction": "The dual query union is [24,26,27,28,29,31,32,33]. The other eight IDs belong to the repaired single-context confirmation. Keep query coverage distinct from handoffs."
+    },
+    {
+      "pointer": "/next_research/limitations/4",
+      "original": "Only 1 project backend_solves and 6 phase model_calls remain after this phase, so this route requires fresh explicit authorization; reused historical points keep their original charges and the interrupted attempt is excluded.",
+      "source": "Persistent project and original final-response phase ledger",
+      "facts": {
+        "project": {
+          "limit": {
+            "backend_solves": 3,
+            "model_calls": 16,
+            "tool_calls": 60,
+            "wall_s": 7200.0,
+            "worker_calls": 0
+          },
+          "used": {
+            "tool_calls": 12,
+            "model_calls": 2,
+            "backend_solves": 2,
+            "worker_calls": 0,
+            "wall_s": 1358.106000000611
+          },
+          "remaining": {
+            "backend_solves": 1,
+            "model_calls": 14,
+            "tool_calls": 48,
+            "wall_s": 5841.893999999389,
+            "worker_calls": 0
+          },
+          "occupied": {}
+        },
+        "phase_remaining": {
+          "limit": {
+            "model_calls": 6
+          },
+          "started_usage": {
+            "backend_solves": 0,
+            "model_calls": 1,
+            "tool_calls": 4,
+            "wall_s": 69.1390000001993,
+            "worker_calls": 0
+          },
+          "used": {
+            "backend_solves": 0,
+            "model_calls": 1,
+            "tool_calls": 1,
+            "wall_s": 79.12500000023283,
+            "worker_calls": 0
+          },
+          "remaining": {
+            "backend_solves": 1,
+            "model_calls": 5,
+            "tool_calls": 48,
+            "wall_s": 5841.893999999389,
+            "worker_calls": 0
+          }
+        }
+      },
+      "required_correction": "The final-response phase has five provider attempts remaining, not six; project has fourteen. Proposed next research still requires separate authorization."
+    },
+    {
+      "pointer": "/next_research/proposed_variables",
+      "original": {},
+      "source": "/next_research/bounded_check",
+      "required_correction": "Explicitly name the proposed terminal-weight variable and fixed holding weight consistently with the check; horizon truncation or wall misses alone do not disentangle causes."
+    }
+  ],
+  "project_usage_before": {
+    "limit": {
+      "backend_solves": 3,
+      "model_calls": 16,
+      "tool_calls": 60,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 12,
+      "model_calls": 2,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 1358.106000000611
+    },
+    "remaining": {
+      "backend_solves": 1,
+      "model_calls": 14,
+      "tool_calls": 48,
+      "wall_s": 5841.893999999389,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "maximum_semantic_correction_attempts": 1,
+  "instruction": "Correct these exact contradictions and submit one full model-authored final decision using the same batch and persistent ledger. Keep independent recommendation disposition, candidate choice and exactly one proposed unexecuted route with question/check/fixed conditions/variables/expected distinctions/budget/stop/limits. Scientific reasoning and route choice remain yours. No experiments, numerical work, extra data inspection or budget reset."
+}

@@ -1,0 +1,3994 @@
+{
+  "contract": "platform.search_batch_result",
+  "version": "1.0.0",
+  "mode": "live",
+  "plan": {
+    "artifact_id": "43a6daab7e3c1ce6db033408eea6e087a95e3cd2f3acf86f1b66205c4554e128",
+    "media_type": "application/json"
+  },
+  "batch_id": "batch-43a6daab7e3c1ce6",
+  "status": "completed",
+  "stop_reason": "pilot_target_complete",
+  "pending": null,
+  "proposals": [
+    {
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.05,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "identity": "2769e9622f2ec1d65be9a3f41b43e218dc8e654dc99caf6ec6583efa72d66e7d",
+      "index": 0,
+      "optimizer_changes": {
+        "control/recipe/holding_tip_speed_weight": 0.05,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "reuse_kind": "historical_start",
+      "reuse_reason": "Explicit complete comparable historical record with verified artifacts, receipts and scientific dependencies; original charges remain historical.",
+      "reused": true,
+      "reused_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "reused_from": "improvement-96f0ade35119",
+      "roundoff_canonicalized": []
+    },
+    {
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.1,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "identity": "2c463829cbeac8c6915badfff4402b9ccc6d9b5425a7e3b087513c25213da10f",
+      "index": 1,
+      "optimizer_changes": {
+        "control/recipe/holding_tip_speed_weight": 0.1,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "reused": false,
+      "roundoff_canonicalized": []
+    },
+    {
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.0,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "identity": "ea42fadf7aab615d5e3cfe5f3de663370eeeea62231b450a6d3499bd8d2d4f2d",
+      "index": 2,
+      "optimizer_changes": {
+        "control/recipe/holding_tip_speed_weight": 0.0,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "reuse_kind": "retained_baseline",
+      "reuse_reason": "Explicit complete comparable historical record with verified artifacts, receipts and scientific dependencies; original charges remain historical.",
+      "reused": true,
+      "reused_execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "reused_from": "baseline-replay",
+      "roundoff_canonicalized": []
+    },
+    {
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.0,
+        "control/recipe/terminal_tip_speed_weight": 0.05
+      },
+      "identity": "c12dc6dd50b38894e1dfb5ac9077257e2af3d45044a2e5a5d29e756a760e9809",
+      "index": 3,
+      "optimizer_changes": {
+        "control/recipe/holding_tip_speed_weight": 0.0,
+        "control/recipe/terminal_tip_speed_weight": 0.05
+      },
+      "reused": false,
+      "roundoff_canonicalized": []
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_id": "improvement-96f0ade35119",
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.05,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "configuration": {
+        "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+        "media_type": "application/json"
+      },
+      "reused": true,
+      "source_execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "stages": {
+        "apply": {
+          "execution_status": "historical_reused"
+        },
+        "evaluation": {
+          "execution_status": "historical_reused"
+        },
+        "profile": {
+          "execution_status": "historical_reused"
+        },
+        "simulation": {
+          "execution_status": "historical_reused"
+        }
+      },
+      "feedback": {
+        "candidate_promoted": false,
+        "comparison": {
+          "baseline": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.05650455971948983,
+            "holding_max_speed_m_s": 1.1750052670100422,
+            "holding_position_passed": false,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 17.77877309145406,
+            "official_reach_task_success": true,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+                "media_type": "application/json"
+              },
+              "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+              "profile": {
+                "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.00869890424761182,
+            "terminal_reach_passed": true,
+            "valid_complete_execution": true
+          },
+          "candidate": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.05650455971948983,
+            "holding_max_speed_m_s": 1.1750052670100422,
+            "holding_position_passed": false,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 17.77877309145406,
+            "official_reach_task_success": true,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+                "media_type": "application/json"
+              },
+              "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+              "profile": {
+                "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.00869890424761182,
+            "terminal_reach_passed": true,
+            "valid_complete_execution": true
+          },
+          "candidate_minus_baseline": {
+            "deadline_misses": 0,
+            "holding_max_error_m": 0.0,
+            "holding_max_speed_m_s": 0.0,
+            "mean_complete_update_s": 0.0,
+            "terminal_error_m": 0.0
+          },
+          "classification": "physical_equivalent_within_tolerance",
+          "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose.",
+          "ranking_rule": {
+            "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+            "objective": "Raw scalar objectives under different weights are not ranked.",
+            "physical_metrics": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s"
+            ],
+            "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+            "tolerance": 1e-09,
+            "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+            "version": "1.0.0"
+          }
+        },
+        "guidance_only": true,
+        "physical_metrics": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.05650455971948983,
+          "holding_max_speed_m_s": 1.1750052670100422,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.77877309145406,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+              "media_type": "application/json"
+            },
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "profile": {
+              "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.00869890424761182,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "rule": "Joint acceptance bucket plus mean v/(v+frozen_limit); minimize. Trade-offs may guide exploration, never promotion.",
+        "score": 1.7660357824348738
+      },
+      "retained_baseline_comparison": {
+        "baseline": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.007642608585867386,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "candidate": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.05650455971948983,
+          "holding_max_speed_m_s": 1.1750052670100422,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.77877309145406,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+              "media_type": "application/json"
+            },
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "profile": {
+              "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.00869890424761182,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "candidate_minus_baseline": {
+          "deadline_misses": 0,
+          "holding_max_error_m": -0.001633544566242727,
+          "holding_max_speed_m_s": -0.4060100069642385,
+          "mean_complete_update_s": 0.5154540428891785,
+          "terminal_error_m": 0.001056295661744434
+        },
+        "classification": "physical_tradeoff",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose.",
+        "ranking_rule": {
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "version": "1.0.0"
+        }
+      },
+      "execution": {
+        "factual_result": {
+          "accepted_noninitialization_plans": 6,
+          "accepted_plans": 35,
+          "applied_tension_ranges": [
+            {
+              "limit_n": 8.0,
+              "maximum_n": 7.999998299677138,
+              "minimum_n": 1.4749693269771889,
+              "tendon": "near_t0",
+              "tendon_index": 0
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 7.971101900799905,
+              "minimum_n": 0.7462395679809365,
+              "tendon": "near_t1",
+              "tendon_index": 1
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 3.1031566686630025,
+              "minimum_n": -0.0,
+              "tendon": "near_t2",
+              "tendon_index": 2
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 7.95958597479067,
+              "minimum_n": 9.64023692634927e-06,
+              "tendon": "far_t0",
+              "tendon_index": 3
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 6.861223279053087,
+              "minimum_n": 0.7859357597552847,
+              "tendon": "far_t1",
+              "tendon_index": 4
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 7.3991583536481516,
+              "minimum_n": 0.6315302379791942,
+              "tendon": "far_t2",
+              "tendon_index": 5
+            }
+          ],
+          "candidate": {
+            "candidate_id": "improvement-96f0ade35119",
+            "configuration": {
+              "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+              "media_type": "application/json"
+            },
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "owner_run_id": "gvs-stage354-aa097c784425-candidate"
+          },
+          "complete": true,
+          "configuration": {
+            "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+            "media_type": "application/json"
+          },
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "converged_updates": 0,
+          "coordinate_frame": "world",
+          "deadline_misses": 35,
+          "error_convention": "actual_tip minus target",
+          "evaluation": {
+            "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+            "media_type": "application/json"
+          },
+          "evaluation_validity": "valid",
+          "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+          "force_bound_violation_n": 0.0,
+          "hold_last_responses": 0,
+          "initialization_selected": 29,
+          "mean_complete_update_s": 17.77877309145406,
+          "measured_computation_s": 625.6870000001509,
+          "one_step_prediction_evidence": {
+            "artifact_id": "5930824f7d4f6706b584b09c26c23e7ef20796fbf140a5f0b624aba40ce8edb2",
+            "media_type": "application/json"
+          },
+          "one_step_prediction_summary": {
+            "aligned_count": 35,
+            "frame": "world",
+            "maximum_tip_difference_m": 0.008736401356980448,
+            "mean_tip_difference_m": 0.0038155345179042557,
+            "missing": [],
+            "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+          },
+          "real_time_demonstrated": false,
+          "report": {
+            "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+            "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+            "reference": {
+              "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile"
+          },
+          "result_type": "free_reach",
+          "sampled_settling": {
+            "available": true,
+            "continuous_time_guarantee": false,
+            "max_error_m": 0.05650455971948983,
+            "max_speed_m_s": 1.1750052670100422,
+            "passed": false,
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "signed_position_error_m": [
+            -0.008394006877141591,
+            0.0005183319067122646,
+            0.002223266895832049
+          ],
+          "simulated_duration_s": 0.35000000000000003,
+          "simulation": {
+            "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+            "media_type": "application/json"
+          },
+          "solver_error_count": 0,
+          "target_position_m": [
+            0.29,
+            0.035,
+            0.19
+          ],
+          "task_accepted": true,
+          "terminal_error_m": 0.00869890424761182,
+          "terminal_position_m": [
+            0.2816059931228584,
+            0.03551833190671227,
+            0.19222326689583205
+          ],
+          "terminal_tip_speed_m_s": 0.7736319051526312,
+          "valid_complete_execution": true
+        }
+      }
+    },
+    {
+      "candidate_id": "batch-43a6daab7e3c1ce6-1",
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.1,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "configuration": {
+        "artifact_id": "03b3d05bb29e654cbf8c71ff787cde0e47b9ea9574d381cd426873d79d813db2",
+        "media_type": "application/json"
+      },
+      "reused": false,
+      "source_execution_id": "22241105b8984e0daae4530963848953",
+      "stages": {
+        "apply": {
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "error": null,
+          "execution_id": "858cf128c02a49d39317280ad4a712e7",
+          "execution_status": "completed",
+          "output": {
+            "artifact_id": "9f4f7cb61fa27b1b415b873e646abca66e2e0714ae7d8b544579ecfa998ba43b",
+            "media_type": "application/json"
+          }
+        },
+        "evaluation": {
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.047000000020489,
+            "worker_calls": 0
+          },
+          "error": null,
+          "execution_id": "c6fb979526c6479e8dda239333c5d8cb",
+          "execution_status": "completed",
+          "output": {
+            "artifact_id": "91fd22c7623c45c4c43e971a226439beebb94be0468700e872fdf413cd58f984",
+            "media_type": "application/json"
+          }
+        },
+        "profile": {
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.1089999999385327,
+            "worker_calls": 0
+          },
+          "error": null,
+          "execution_id": "a3c30f1e9a5d45cbba4251c6fa9f40e3",
+          "execution_status": "completed",
+          "output": {
+            "artifact_id": "d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "charged": {
+            "backend_solves": 1,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 612.125,
+            "worker_calls": 0
+          },
+          "error": null,
+          "execution_id": "22241105b8984e0daae4530963848953",
+          "execution_status": "completed",
+          "output": {
+            "artifact_id": "6c0a9d1c79d361c88c6b8e71490bb8b7ccf10661ae2998a566404e33923e6d49",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "feedback": {
+        "candidate_promoted": false,
+        "comparison": {
+          "baseline": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.05650455971948983,
+            "holding_max_speed_m_s": 1.1750052670100422,
+            "holding_position_passed": false,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 17.77877309145406,
+            "official_reach_task_success": true,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+                "media_type": "application/json"
+              },
+              "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+              "profile": {
+                "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.00869890424761182,
+            "terminal_reach_passed": true,
+            "valid_complete_execution": true
+          },
+          "candidate": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.06344380037515782,
+            "holding_max_speed_m_s": 1.3632316140443952,
+            "holding_position_passed": false,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 17.39307279428467,
+            "official_reach_task_success": false,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "91fd22c7623c45c4c43e971a226439beebb94be0468700e872fdf413cd58f984",
+                "media_type": "application/json"
+              },
+              "execution_id": "22241105b8984e0daae4530963848953",
+              "profile": {
+                "artifact_id": "d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "6c0a9d1c79d361c88c6b8e71490bb8b7ccf10661ae2998a566404e33923e6d49",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.011558241033380132,
+            "terminal_reach_passed": false,
+            "valid_complete_execution": true
+          },
+          "candidate_minus_baseline": {
+            "deadline_misses": 0,
+            "holding_max_error_m": 0.0069392406556679845,
+            "holding_max_speed_m_s": 0.18822634703435304,
+            "mean_complete_update_s": -0.38570029716938947,
+            "terminal_error_m": 0.002859336785768312
+          },
+          "classification": "physical_pareto_worsening",
+          "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose.",
+          "ranking_rule": {
+            "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+            "objective": "Raw scalar objectives under different weights are not ranked.",
+            "physical_metrics": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s"
+            ],
+            "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+            "tolerance": 1e-09,
+            "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+            "version": "1.0.0"
+          }
+        },
+        "guidance_only": true,
+        "physical_metrics": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.06344380037515782,
+          "holding_max_speed_m_s": 1.3632316140443952,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.39307279428467,
+          "official_reach_task_success": false,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "91fd22c7623c45c4c43e971a226439beebb94be0468700e872fdf413cd58f984",
+              "media_type": "application/json"
+            },
+            "execution_id": "22241105b8984e0daae4530963848953",
+            "profile": {
+              "artifact_id": "d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "6c0a9d1c79d361c88c6b8e71490bb8b7ccf10661ae2998a566404e33923e6d49",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.011558241033380132,
+          "terminal_reach_passed": false,
+          "valid_complete_execution": true
+        },
+        "rule": "Joint acceptance bucket plus mean v/(v+frozen_limit); minimize. Trade-offs may guide exploration, never promotion.",
+        "score": 1.7951742792717353
+      },
+      "retained_baseline_comparison": {
+        "baseline": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.007642608585867386,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "candidate": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.06344380037515782,
+          "holding_max_speed_m_s": 1.3632316140443952,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.39307279428467,
+          "official_reach_task_success": false,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "91fd22c7623c45c4c43e971a226439beebb94be0468700e872fdf413cd58f984",
+              "media_type": "application/json"
+            },
+            "execution_id": "22241105b8984e0daae4530963848953",
+            "profile": {
+              "artifact_id": "d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "6c0a9d1c79d361c88c6b8e71490bb8b7ccf10661ae2998a566404e33923e6d49",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.011558241033380132,
+          "terminal_reach_passed": false,
+          "valid_complete_execution": true
+        },
+        "candidate_minus_baseline": {
+          "deadline_misses": 0,
+          "holding_max_error_m": 0.0053056960894252575,
+          "holding_max_speed_m_s": -0.21778365992988546,
+          "mean_complete_update_s": 0.12975374571978904,
+          "terminal_error_m": 0.003915632447512746
+        },
+        "classification": "physical_tradeoff",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose.",
+        "ranking_rule": {
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "version": "1.0.0"
+        }
+      },
+      "execution": {
+        "factual_result": {
+          "accepted_noninitialization_plans": 5,
+          "accepted_plans": 35,
+          "applied_tension_ranges": [
+            {
+              "limit_n": 8.0,
+              "maximum_n": 8.0,
+              "minimum_n": 1.7512764858409064,
+              "tendon": "near_t0",
+              "tendon_index": 0
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 7.965279009073087,
+              "minimum_n": 1.9853323393649012,
+              "tendon": "near_t1",
+              "tendon_index": 1
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 8.0,
+              "minimum_n": 1.331651125791543e-08,
+              "tendon": "near_t2",
+              "tendon_index": 2
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 8.0,
+              "minimum_n": 7.226153398398572e-08,
+              "tendon": "far_t0",
+              "tendon_index": 3
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 7.8434643902543035,
+              "minimum_n": 0.7859357597552847,
+              "tendon": "far_t1",
+              "tendon_index": 4
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 8.0,
+              "minimum_n": 0.6315302379791942,
+              "tendon": "far_t2",
+              "tendon_index": 5
+            }
+          ],
+          "candidate": {
+            "candidate_id": "batch-43a6daab7e3c1ce6-1",
+            "configuration": {
+              "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+              "media_type": "application/json"
+            },
+            "execution_id": "22241105b8984e0daae4530963848953",
+            "owner_run_id": "batch-43a6daab7e3c1ce6-1"
+          },
+          "complete": true,
+          "configuration": {
+            "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+            "media_type": "application/json"
+          },
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "converged_updates": 1,
+          "coordinate_frame": "world",
+          "deadline_misses": 35,
+          "error_convention": "actual_tip minus target",
+          "evaluation": {
+            "artifact_id": "91fd22c7623c45c4c43e971a226439beebb94be0468700e872fdf413cd58f984",
+            "media_type": "application/json"
+          },
+          "evaluation_validity": "valid",
+          "execution_id": "22241105b8984e0daae4530963848953",
+          "force_bound_violation_n": 0.0,
+          "hold_last_responses": 0,
+          "initialization_selected": 30,
+          "mean_complete_update_s": 17.39307279428467,
+          "measured_computation_s": 612.125,
+          "one_step_prediction_evidence": {
+            "artifact_id": "8ce7fcbf09a622fa0af1d0a5835499165b60c4133cf9aa3bee0180f3b145a085",
+            "media_type": "application/json"
+          },
+          "one_step_prediction_summary": {
+            "aligned_count": 35,
+            "frame": "world",
+            "maximum_tip_difference_m": 0.009181602244904687,
+            "mean_tip_difference_m": 0.003952144454298828,
+            "missing": [],
+            "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+          },
+          "real_time_demonstrated": false,
+          "report": {
+            "execution_id": "22241105b8984e0daae4530963848953",
+            "owner_run_id": "batch-43a6daab7e3c1ce6-1",
+            "reference": {
+              "artifact_id": "d718298187097c85daf45af6f6057407beb5786ef81599c5d4eff5019faa155d",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile"
+          },
+          "result_type": "free_reach",
+          "sampled_settling": {
+            "available": true,
+            "continuous_time_guarantee": false,
+            "max_error_m": 0.06344380037515782,
+            "max_speed_m_s": 1.3632316140443952,
+            "passed": false,
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "signed_position_error_m": [
+            -0.010082464468725849,
+            0.0016421916936064027,
+            0.005407407184967961
+          ],
+          "simulated_duration_s": 0.35000000000000003,
+          "simulation": {
+            "artifact_id": "6c0a9d1c79d361c88c6b8e71490bb8b7ccf10661ae2998a566404e33923e6d49",
+            "media_type": "application/json"
+          },
+          "solver_error_count": 0,
+          "target_position_m": [
+            0.29,
+            0.035,
+            0.19
+          ],
+          "task_accepted": false,
+          "terminal_error_m": 0.011558241033380132,
+          "terminal_position_m": [
+            0.27991753553127413,
+            0.036642191693606406,
+            0.19540740718496796
+          ],
+          "terminal_tip_speed_m_s": 0.8428870947176257,
+          "valid_complete_execution": true
+        }
+      }
+    },
+    {
+      "candidate_id": "batch-43a6daab7e3c1ce6-3",
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.0,
+        "control/recipe/terminal_tip_speed_weight": 0.05
+      },
+      "configuration": {
+        "artifact_id": "19fc6aa6bfca980c5ffa2d4c38aa82968d49c3d5e0b3618a86466d7ef8a4c1bd",
+        "media_type": "application/json"
+      },
+      "reused": false,
+      "source_execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+      "stages": {
+        "apply": {
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "error": null,
+          "execution_id": "6aac964fb0934ac188a6855e5d95240d",
+          "execution_status": "completed",
+          "output": {
+            "artifact_id": "294628841e6714c9092c544cf70e34758661a74f83a5ac5a6b36c9604611ac89",
+            "media_type": "application/json"
+          }
+        },
+        "evaluation": {
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 0.9529999999795109,
+            "worker_calls": 0
+          },
+          "error": null,
+          "execution_id": "b67fe0624642440aa0ce06d52ad6a6ab",
+          "execution_status": "completed",
+          "output": {
+            "artifact_id": "7abd2e19f80f8c419cb2918561d934a9dc05b254276ebe25174c1c53512dc5c6",
+            "media_type": "application/json"
+          }
+        },
+        "profile": {
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.093000000109896,
+            "worker_calls": 0
+          },
+          "error": null,
+          "execution_id": "11a5a9ec3f6a4b0797aad8919f2729f0",
+          "execution_status": "completed",
+          "output": {
+            "artifact_id": "2e0ddfa47b6e235e2535fcc8da614b4077a0f15623ef65e507b5c0880e710738",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "charged": {
+            "backend_solves": 1,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 592.5,
+            "worker_calls": 0
+          },
+          "error": null,
+          "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+          "execution_status": "completed",
+          "output": {
+            "artifact_id": "31303b3a6d07507baa182b4f5929aa0cc77ce674280ee00379efa0a67417a0a3",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "feedback": {
+        "candidate_promoted": false,
+        "comparison": {
+          "baseline": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.05650455971948983,
+            "holding_max_speed_m_s": 1.1750052670100422,
+            "holding_position_passed": false,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 17.77877309145406,
+            "official_reach_task_success": true,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+                "media_type": "application/json"
+              },
+              "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+              "profile": {
+                "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.00869890424761182,
+            "terminal_reach_passed": true,
+            "valid_complete_execution": true
+          },
+          "candidate": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.008275123365557732,
+            "holding_max_speed_m_s": 0.03556730769134125,
+            "holding_position_passed": true,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 16.876452619954943,
+            "official_reach_task_success": true,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "7abd2e19f80f8c419cb2918561d934a9dc05b254276ebe25174c1c53512dc5c6",
+                "media_type": "application/json"
+              },
+              "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+              "profile": {
+                "artifact_id": "2e0ddfa47b6e235e2535fcc8da614b4077a0f15623ef65e507b5c0880e710738",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "31303b3a6d07507baa182b4f5929aa0cc77ce674280ee00379efa0a67417a0a3",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.008186891107577365,
+            "terminal_reach_passed": true,
+            "valid_complete_execution": true
+          },
+          "candidate_minus_baseline": {
+            "deadline_misses": 0,
+            "holding_max_error_m": -0.0482294363539321,
+            "holding_max_speed_m_s": -1.139437959318701,
+            "mean_complete_update_s": -0.9023204714991166,
+            "terminal_error_m": -0.0005120131400344549
+          },
+          "classification": "physical_pareto_improvement",
+          "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose.",
+          "ranking_rule": {
+            "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+            "objective": "Raw scalar objectives under different weights are not ranked.",
+            "physical_metrics": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s"
+            ],
+            "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+            "tolerance": 1e-09,
+            "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+            "version": "1.0.0"
+          }
+        },
+        "guidance_only": true,
+        "physical_metrics": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.008275123365557732,
+          "holding_max_speed_m_s": 0.03556730769134125,
+          "holding_position_passed": true,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 16.876452619954943,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "7abd2e19f80f8c419cb2918561d934a9dc05b254276ebe25174c1c53512dc5c6",
+              "media_type": "application/json"
+            },
+            "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+            "profile": {
+              "artifact_id": "2e0ddfa47b6e235e2535fcc8da614b4077a0f15623ef65e507b5c0880e710738",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "31303b3a6d07507baa182b4f5929aa0cc77ce674280ee00379efa0a67417a0a3",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.008186891107577365,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "rule": "Joint acceptance bucket plus mean v/(v+frozen_limit); minimize. Trade-offs may guide exploration, never promotion.",
+        "score": 1.5143458741077604
+      },
+      "retained_baseline_comparison": {
+        "baseline": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.007642608585867386,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "candidate": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.008275123365557732,
+          "holding_max_speed_m_s": 0.03556730769134125,
+          "holding_position_passed": true,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 16.876452619954943,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "7abd2e19f80f8c419cb2918561d934a9dc05b254276ebe25174c1c53512dc5c6",
+              "media_type": "application/json"
+            },
+            "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+            "profile": {
+              "artifact_id": "2e0ddfa47b6e235e2535fcc8da614b4077a0f15623ef65e507b5c0880e710738",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "31303b3a6d07507baa182b4f5929aa0cc77ce674280ee00379efa0a67417a0a3",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.008186891107577365,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "candidate_minus_baseline": {
+          "deadline_misses": 0,
+          "holding_max_error_m": -0.049862980920174826,
+          "holding_max_speed_m_s": -1.5454479662829395,
+          "mean_complete_update_s": -0.38686642860993814,
+          "terminal_error_m": 0.0005442825217099791
+        },
+        "classification": "physical_tradeoff",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose.",
+        "ranking_rule": {
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "version": "1.0.0"
+        }
+      },
+      "execution": {
+        "factual_result": {
+          "accepted_noninitialization_plans": 18,
+          "accepted_plans": 35,
+          "applied_tension_ranges": [
+            {
+              "limit_n": 8.0,
+              "maximum_n": 5.901740472907578,
+              "minimum_n": 1.7512764858409064,
+              "tendon": "near_t0",
+              "tendon_index": 0
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 5.934318773865956,
+              "minimum_n": 4.084252734737754,
+              "tendon": "near_t1",
+              "tendon_index": 1
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 3.1031566686630025,
+              "minimum_n": -0.0,
+              "tendon": "near_t2",
+              "tendon_index": 2
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 3.628583362784121,
+              "minimum_n": 1.0036718457457203,
+              "tendon": "far_t0",
+              "tendon_index": 3
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 2.260098728641232,
+              "minimum_n": 0.7859357597552847,
+              "tendon": "far_t1",
+              "tendon_index": 4
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 2.9398259085775917,
+              "minimum_n": 0.27677002909956944,
+              "tendon": "far_t2",
+              "tendon_index": 5
+            }
+          ],
+          "candidate": {
+            "candidate_id": "batch-43a6daab7e3c1ce6-3",
+            "configuration": {
+              "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+              "media_type": "application/json"
+            },
+            "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+            "owner_run_id": "batch-43a6daab7e3c1ce6-3"
+          },
+          "complete": true,
+          "configuration": {
+            "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+            "media_type": "application/json"
+          },
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "converged_updates": 1,
+          "coordinate_frame": "world",
+          "deadline_misses": 35,
+          "error_convention": "actual_tip minus target",
+          "evaluation": {
+            "artifact_id": "7abd2e19f80f8c419cb2918561d934a9dc05b254276ebe25174c1c53512dc5c6",
+            "media_type": "application/json"
+          },
+          "evaluation_validity": "valid",
+          "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+          "force_bound_violation_n": 0.0,
+          "hold_last_responses": 0,
+          "initialization_selected": 17,
+          "mean_complete_update_s": 16.876452619954943,
+          "measured_computation_s": 592.5,
+          "one_step_prediction_evidence": {
+            "artifact_id": "bb78b014f9083054e03191671e7cc1405d51915209835624196a5070214d7d3b",
+            "media_type": "application/json"
+          },
+          "one_step_prediction_summary": {
+            "aligned_count": 35,
+            "frame": "world",
+            "maximum_tip_difference_m": 0.0035571638333263787,
+            "mean_tip_difference_m": 0.0018332243534005656,
+            "missing": [],
+            "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+          },
+          "real_time_demonstrated": false,
+          "report": {
+            "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+            "owner_run_id": "batch-43a6daab7e3c1ce6-3",
+            "reference": {
+              "artifact_id": "2e0ddfa47b6e235e2535fcc8da614b4077a0f15623ef65e507b5c0880e710738",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile"
+          },
+          "result_type": "free_reach",
+          "sampled_settling": {
+            "available": true,
+            "continuous_time_guarantee": false,
+            "max_error_m": 0.008275123365557732,
+            "max_speed_m_s": 0.03556730769134125,
+            "passed": false,
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "signed_position_error_m": [
+            -0.00818544215751793,
+            -0.00015285768544816974,
+            1.890029780116098e-05
+          ],
+          "simulated_duration_s": 0.35000000000000003,
+          "simulation": {
+            "artifact_id": "31303b3a6d07507baa182b4f5929aa0cc77ce674280ee00379efa0a67417a0a3",
+            "media_type": "application/json"
+          },
+          "solver_error_count": 0,
+          "target_position_m": [
+            0.29,
+            0.035,
+            0.19
+          ],
+          "task_accepted": true,
+          "terminal_error_m": 0.008186891107577365,
+          "terminal_position_m": [
+            0.28181455784248205,
+            0.034847142314551834,
+            0.19001890029780116
+          ],
+          "terminal_tip_speed_m_s": 0.007383435281707362,
+          "valid_complete_execution": true
+        }
+      }
+    },
+    {
+      "candidate_id": "baseline-replay",
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.0,
+        "control/recipe/terminal_tip_speed_weight": 0.0
+      },
+      "configuration": {
+        "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+        "media_type": "application/json"
+      },
+      "reused": true,
+      "source_execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "stages": {
+        "apply": {
+          "execution_status": "historical_reused"
+        },
+        "evaluation": {
+          "execution_status": "historical_reused"
+        },
+        "profile": {
+          "execution_status": "historical_reused"
+        },
+        "simulation": {
+          "execution_status": "historical_reused"
+        }
+      },
+      "feedback": {
+        "candidate_promoted": false,
+        "comparison": {
+          "baseline": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.05650455971948983,
+            "holding_max_speed_m_s": 1.1750052670100422,
+            "holding_position_passed": false,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 17.77877309145406,
+            "official_reach_task_success": true,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+                "media_type": "application/json"
+              },
+              "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+              "profile": {
+                "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.00869890424761182,
+            "terminal_reach_passed": true,
+            "valid_complete_execution": true
+          },
+          "candidate": {
+            "control_period_s": 0.01,
+            "control_updates": 35,
+            "coverage": {
+              "continuous_time_guarantee": false,
+              "holding": "all retained samples in final 0.05 s",
+              "terminal": "last execution sample"
+            },
+            "deadline_misses": 35,
+            "force_bound_violation_n": 0.0,
+            "holding_max_error_m": 0.05813810428573256,
+            "holding_max_speed_m_s": 1.5810152739742807,
+            "holding_position_passed": false,
+            "holding_speed_passed": false,
+            "joint_reach_holding_passed": false,
+            "mean_complete_update_s": 17.26331904856488,
+            "official_reach_task_success": true,
+            "real_time_demonstrated": false,
+            "solver_error_count": 0,
+            "source": {
+              "configuration": {
+                "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+                "media_type": "application/json"
+              },
+              "evaluation": {
+                "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+                "media_type": "application/json"
+              },
+              "execution_id": "cf997605885642759ee33920e2c9e2ef",
+              "profile": {
+                "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+                "media_type": "application/json"
+              },
+              "simulation": {
+                "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+                "media_type": "application/json"
+              }
+            },
+            "terminal_error_m": 0.007642608585867386,
+            "terminal_reach_passed": true,
+            "valid_complete_execution": true
+          },
+          "candidate_minus_baseline": {
+            "deadline_misses": 0,
+            "holding_max_error_m": 0.001633544566242727,
+            "holding_max_speed_m_s": 0.4060100069642385,
+            "mean_complete_update_s": -0.5154540428891785,
+            "terminal_error_m": -0.001056295661744434
+          },
+          "classification": "physical_tradeoff",
+          "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose.",
+          "ranking_rule": {
+            "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+            "objective": "Raw scalar objectives under different weights are not ranked.",
+            "physical_metrics": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s"
+            ],
+            "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+            "tolerance": 1e-09,
+            "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+            "version": "1.0.0"
+          }
+        },
+        "guidance_only": true,
+        "physical_metrics": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.007642608585867386,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "rule": "Joint acceptance bucket plus mean v/(v+frozen_limit); minimize. Trade-offs may guide exploration, never promotion.",
+        "score": 1.7579791871892954
+      },
+      "retained_baseline_comparison": {
+        "baseline": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.007642608585867386,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "candidate": {
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "coverage": {
+            "continuous_time_guarantee": false,
+            "holding": "all retained samples in final 0.05 s",
+            "terminal": "last execution sample"
+          },
+          "deadline_misses": 35,
+          "force_bound_violation_n": 0.0,
+          "holding_max_error_m": 0.05813810428573256,
+          "holding_max_speed_m_s": 1.5810152739742807,
+          "holding_position_passed": false,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 17.26331904856488,
+          "official_reach_task_success": true,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "source": {
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+              "media_type": "application/json"
+            },
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "profile": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+              "media_type": "application/json"
+            }
+          },
+          "terminal_error_m": 0.007642608585867386,
+          "terminal_reach_passed": true,
+          "valid_complete_execution": true
+        },
+        "candidate_minus_baseline": {
+          "deadline_misses": 0,
+          "holding_max_error_m": 0.0,
+          "holding_max_speed_m_s": 0.0,
+          "mean_complete_update_s": 0.0,
+          "terminal_error_m": 0.0
+        },
+        "classification": "physical_equivalent_within_tolerance",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose.",
+        "ranking_rule": {
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "version": "1.0.0"
+        }
+      },
+      "execution": {
+        "factual_result": {
+          "accepted_noninitialization_plans": 6,
+          "accepted_plans": 35,
+          "applied_tension_ranges": [
+            {
+              "limit_n": 8.0,
+              "maximum_n": 7.990411884680996,
+              "minimum_n": 1.7512764858409064,
+              "tendon": "near_t0",
+              "tendon_index": 0
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 6.086855343352726,
+              "minimum_n": 2.757372796476204,
+              "tendon": "near_t1",
+              "tendon_index": 1
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 3.1031566686630025,
+              "minimum_n": 1.4216485070827969e-08,
+              "tendon": "near_t2",
+              "tendon_index": 2
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 3.218253612486097,
+              "minimum_n": 5.115521779319541e-07,
+              "tendon": "far_t0",
+              "tendon_index": 3
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 5.165423523313249,
+              "minimum_n": 0.12734806870748366,
+              "tendon": "far_t1",
+              "tendon_index": 4
+            },
+            {
+              "limit_n": 8.0,
+              "maximum_n": 6.400860298939372,
+              "minimum_n": -0.0,
+              "tendon": "far_t2",
+              "tendon_index": 5
+            }
+          ],
+          "candidate": {
+            "candidate_id": "baseline-replay",
+            "configuration": {
+              "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+              "media_type": "application/json"
+            },
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "owner_run_id": "gvs-stage351-baseline-executor"
+          },
+          "complete": true,
+          "configuration": {
+            "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+            "media_type": "application/json"
+          },
+          "control_period_s": 0.01,
+          "control_updates": 35,
+          "converged_updates": 1,
+          "coordinate_frame": "world",
+          "deadline_misses": 35,
+          "error_convention": "actual_tip minus target",
+          "evaluation": {
+            "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+            "media_type": "application/json"
+          },
+          "evaluation_validity": "valid",
+          "execution_id": "cf997605885642759ee33920e2c9e2ef",
+          "force_bound_violation_n": 0.0,
+          "hold_last_responses": 0,
+          "initialization_selected": 29,
+          "mean_complete_update_s": 17.26331904856488,
+          "measured_computation_s": 608.0149999998976,
+          "one_step_prediction_evidence": {
+            "artifact_id": "3d2c01848435ead2e8fca7bf1ef6c54712c850c2ed34af4d20b50ac38a203ba5",
+            "media_type": "application/json"
+          },
+          "one_step_prediction_summary": {
+            "aligned_count": 35,
+            "frame": "world",
+            "maximum_tip_difference_m": 0.0076898869753466255,
+            "mean_tip_difference_m": 0.0038032038653228557,
+            "missing": [],
+            "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+          },
+          "real_time_demonstrated": false,
+          "report": {
+            "execution_id": "cf997605885642759ee33920e2c9e2ef",
+            "owner_run_id": "gvs-stage351-baseline-executor",
+            "reference": {
+              "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile"
+          },
+          "result_type": "free_reach",
+          "sampled_settling": {
+            "available": true,
+            "continuous_time_guarantee": false,
+            "max_error_m": 0.05813810428573256,
+            "max_speed_m_s": 1.5810152739742807,
+            "passed": false,
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "signed_position_error_m": [
+            -0.007385741011230296,
+            -0.0013174790122655808,
+            -0.0014575818207032132
+          ],
+          "simulated_duration_s": 0.35000000000000003,
+          "simulation": {
+            "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+            "media_type": "application/json"
+          },
+          "solver_error_count": 0,
+          "target_position_m": [
+            0.29,
+            0.035,
+            0.19
+          ],
+          "task_accepted": true,
+          "terminal_error_m": 0.007642608585867386,
+          "terminal_position_m": [
+            0.2826142589887697,
+            0.03368252098773442,
+            0.1885424181792968
+          ],
+          "terminal_tip_speed_m_s": 0.6351726092425104,
+          "valid_complete_execution": true
+        }
+      }
+    }
+  ],
+  "accounting": {
+    "proposals": 4,
+    "distinct_configurations": 4,
+    "reused_evaluations": 2,
+    "historical_start_reuse": 1,
+    "retained_baseline_reuse": 1,
+    "other_historical_reuse": 0,
+    "duplicate_result_reuse": 0,
+    "new_backend_attempts": 2,
+    "offline_execution_attempts": 0,
+    "completed_new_evaluations": 2,
+    "usage": {
+      "tool_calls": 8,
+      "model_calls": 0,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 1208.8270000000484
+    }
+  },
+  "completed_evaluations": 2,
+  "completed_profiles": 2,
+  "fully_evaluated_distinct_changed_configurations": 2,
+  "plan_hypothesis": "At the frozen robot, task, evaluator, timing and controller implementation (controller.gvs_nmpc@7.0.0), a nonzero terminal tip-speed weight (control/recipe/terminal_tip_speed_weight > 0), alone or jointly with a small holding tip-speed weight retained near 0.05, may lower the sampled final-window holding tip speed toward the frozen 0.02 m/s criterion while still retaining terminal reach acceptance (terminal_error_m <= 0.01 m). Scope: this is a tested-point claim about the two declared weight coordinates only; the supplied complete 0.30/0.0 result weakens reach-preserving improvement at that single tested point, not across the entire parameter range, and no dominant settling cause is claimed.",
+  "retained_references": [
+    {
+      "role": "retained_baseline",
+      "execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "facts": {
+        "result_type": "free_reach",
+        "candidate": {
+          "candidate_id": "baseline-replay",
+          "owner_run_id": "gvs-stage351-baseline-executor",
+          "configuration": {
+            "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+            "media_type": "application/json"
+          },
+          "execution_id": "cf997605885642759ee33920e2c9e2ef"
+        },
+        "configuration": {
+          "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+          "media_type": "application/json"
+        },
+        "execution_id": "cf997605885642759ee33920e2c9e2ef",
+        "simulation": {
+          "artifact_id": "da55b910eea8f990cd3879183c5d325ec6ed4c87bc2df3be2dc7aa953a054e98",
+          "media_type": "application/json"
+        },
+        "evaluation": {
+          "artifact_id": "4470bb9983f383d0168aa6d466eaa997d172467c5d0b0ce25e64d57d687febda",
+          "media_type": "application/json"
+        },
+        "report": {
+          "reference": {
+            "artifact_id": "f235132baeb44995219700ab951d56d67d010b052434d7dd734dbb3bcf0a39dc",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage351-baseline-executor",
+          "execution_id": "cf997605885642759ee33920e2c9e2ef",
+          "request_id": "complete-profile"
+        },
+        "task_accepted": true,
+        "evaluation_validity": "valid",
+        "complete": true,
+        "valid_complete_execution": true,
+        "target_position_m": [
+          0.29,
+          0.035,
+          0.19
+        ],
+        "terminal_position_m": [
+          0.2826142589887697,
+          0.03368252098773442,
+          0.1885424181792968
+        ],
+        "signed_position_error_m": [
+          -0.007385741011230296,
+          -0.0013174790122655808,
+          -0.0014575818207032132
+        ],
+        "error_convention": "actual_tip minus target",
+        "coordinate_frame": "world",
+        "terminal_error_m": 0.007642608585867386,
+        "terminal_tip_speed_m_s": 0.6351726092425104,
+        "sampled_settling": {
+          "available": true,
+          "continuous_time_guarantee": false,
+          "max_error_m": 0.05813810428573256,
+          "max_speed_m_s": 1.5810152739742807,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        },
+        "control_updates": 35,
+        "accepted_plans": 35,
+        "initialization_selected": 29,
+        "accepted_noninitialization_plans": 6,
+        "converged_updates": 1,
+        "solver_error_count": 0,
+        "hold_last_responses": 0,
+        "applied_tension_ranges": [
+          {
+            "tendon": "near_t0",
+            "tendon_index": 0,
+            "minimum_n": 1.7512764858409064,
+            "maximum_n": 7.990411884680996,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "near_t1",
+            "tendon_index": 1,
+            "minimum_n": 2.757372796476204,
+            "maximum_n": 6.086855343352726,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "near_t2",
+            "tendon_index": 2,
+            "minimum_n": 1.4216485070827969e-08,
+            "maximum_n": 3.1031566686630025,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "far_t0",
+            "tendon_index": 3,
+            "minimum_n": 5.115521779319541e-07,
+            "maximum_n": 3.218253612486097,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "far_t1",
+            "tendon_index": 4,
+            "minimum_n": 0.12734806870748366,
+            "maximum_n": 5.165423523313249,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "far_t2",
+            "tendon_index": 5,
+            "minimum_n": -0.0,
+            "maximum_n": 6.400860298939372,
+            "limit_n": 8.0
+          }
+        ],
+        "force_bound_violation_n": 0.0,
+        "one_step_prediction_summary": {
+          "aligned_count": 35,
+          "frame": "world",
+          "maximum_tip_difference_m": 0.0076898869753466255,
+          "mean_tip_difference_m": 0.0038032038653228557,
+          "missing": [],
+          "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+        },
+        "one_step_prediction_evidence": {
+          "artifact_id": "3d2c01848435ead2e8fca7bf1ef6c54712c850c2ed34af4d20b50ac38a203ba5",
+          "media_type": "application/json"
+        },
+        "simulated_duration_s": 0.35000000000000003,
+        "measured_computation_s": 608.0149999998976,
+        "mean_complete_update_s": 17.26331904856488,
+        "control_period_s": 0.01,
+        "deadline_misses": 35,
+        "real_time_demonstrated": false
+      }
+    },
+    {
+      "role": "historical_start",
+      "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+      "facts": {
+        "result_type": "free_reach",
+        "candidate": {
+          "candidate_id": "improvement-96f0ade35119",
+          "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+          "configuration": {
+            "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+            "media_type": "application/json"
+          },
+          "execution_id": "087adee8e8a24fe88e5c85fe89e638c8"
+        },
+        "configuration": {
+          "artifact_id": "44966d2f43342e35d15e1b80d0e8e799022b95c052dec7887db40a6f0b536a9f",
+          "media_type": "application/json"
+        },
+        "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+        "simulation": {
+          "artifact_id": "397215fa895fdcbb812f74a1892169b1ab5d40cf56bd214e30137f7be45184df",
+          "media_type": "application/json"
+        },
+        "evaluation": {
+          "artifact_id": "27830c4c5e270b6fa0a291bf15c9049e594d214234c192dddd44892923b29525",
+          "media_type": "application/json"
+        },
+        "report": {
+          "reference": {
+            "artifact_id": "c751254607f66f40ba5be5ad5b6c85cbcdeebb8cf32095388df7df4ee1a2aab7",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "gvs-stage354-aa097c784425-candidate",
+          "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+          "request_id": "complete-profile"
+        },
+        "task_accepted": true,
+        "evaluation_validity": "valid",
+        "complete": true,
+        "valid_complete_execution": true,
+        "target_position_m": [
+          0.29,
+          0.035,
+          0.19
+        ],
+        "terminal_position_m": [
+          0.2816059931228584,
+          0.03551833190671227,
+          0.19222326689583205
+        ],
+        "signed_position_error_m": [
+          -0.008394006877141591,
+          0.0005183319067122646,
+          0.002223266895832049
+        ],
+        "error_convention": "actual_tip minus target",
+        "coordinate_frame": "world",
+        "terminal_error_m": 0.00869890424761182,
+        "terminal_tip_speed_m_s": 0.7736319051526312,
+        "sampled_settling": {
+          "available": true,
+          "continuous_time_guarantee": false,
+          "max_error_m": 0.05650455971948983,
+          "max_speed_m_s": 1.1750052670100422,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        },
+        "control_updates": 35,
+        "accepted_plans": 35,
+        "initialization_selected": 29,
+        "accepted_noninitialization_plans": 6,
+        "converged_updates": 0,
+        "solver_error_count": 0,
+        "hold_last_responses": 0,
+        "applied_tension_ranges": [
+          {
+            "tendon": "near_t0",
+            "tendon_index": 0,
+            "minimum_n": 1.4749693269771889,
+            "maximum_n": 7.999998299677138,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "near_t1",
+            "tendon_index": 1,
+            "minimum_n": 0.7462395679809365,
+            "maximum_n": 7.971101900799905,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "near_t2",
+            "tendon_index": 2,
+            "minimum_n": -0.0,
+            "maximum_n": 3.1031566686630025,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "far_t0",
+            "tendon_index": 3,
+            "minimum_n": 9.64023692634927e-06,
+            "maximum_n": 7.95958597479067,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "far_t1",
+            "tendon_index": 4,
+            "minimum_n": 0.7859357597552847,
+            "maximum_n": 6.861223279053087,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "far_t2",
+            "tendon_index": 5,
+            "minimum_n": 0.6315302379791942,
+            "maximum_n": 7.3991583536481516,
+            "limit_n": 8.0
+          }
+        ],
+        "force_bound_violation_n": 0.0,
+        "one_step_prediction_summary": {
+          "aligned_count": 35,
+          "frame": "world",
+          "maximum_tip_difference_m": 0.008736401356980448,
+          "mean_tip_difference_m": 0.0038155345179042557,
+          "missing": [],
+          "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+        },
+        "one_step_prediction_evidence": {
+          "artifact_id": "5930824f7d4f6706b584b09c26c23e7ef20796fbf140a5f0b624aba40ce8edb2",
+          "media_type": "application/json"
+        },
+        "simulated_duration_s": 0.35000000000000003,
+        "measured_computation_s": 625.6870000001509,
+        "mean_complete_update_s": 17.77877309145406,
+        "control_period_s": 0.01,
+        "deadline_misses": 35,
+        "real_time_demonstrated": false
+      }
+    },
+    {
+      "role": "historical_candidate",
+      "execution_id": "25e26708480848d79bad378b669915e3",
+      "facts": {
+        "result_type": "free_reach",
+        "candidate": {
+          "candidate_id": "batch-2ef6ee45913c43c9-1",
+          "owner_run_id": "batch-2ef6ee45913c43c9-1",
+          "configuration": {
+            "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+            "media_type": "application/json"
+          },
+          "execution_id": "25e26708480848d79bad378b669915e3"
+        },
+        "configuration": {
+          "artifact_id": "9eb50ebb19babfe82de82248809879e70aa022469901115bede662d07badfb00",
+          "media_type": "application/json"
+        },
+        "execution_id": "25e26708480848d79bad378b669915e3",
+        "simulation": {
+          "artifact_id": "3d2e58ec5e393e5277b2d134657d6b1a38eba06482647a3dbaaca1ebdf4bacb6",
+          "media_type": "application/json"
+        },
+        "evaluation": {
+          "artifact_id": "ac9f4834c4722feac739fd45378ebbfbee77376cd699318deb29ed177028145b",
+          "media_type": "application/json"
+        },
+        "report": {
+          "reference": {
+            "artifact_id": "96328da478505dc97a565fab88e5510721d242f0c23e41ce2da503fec9bdc333",
+            "media_type": "application/json"
+          },
+          "owner_run_id": "batch-2ef6ee45913c43c9-1",
+          "execution_id": "25e26708480848d79bad378b669915e3",
+          "request_id": "complete-profile"
+        },
+        "task_accepted": false,
+        "evaluation_validity": "valid",
+        "complete": true,
+        "valid_complete_execution": true,
+        "target_position_m": [
+          0.29,
+          0.035,
+          0.19
+        ],
+        "terminal_position_m": [
+          0.27589843416172494,
+          0.03888601311854941,
+          0.20163498855603026
+        ],
+        "signed_position_error_m": [
+          -0.014101565838275043,
+          0.003886013118549407,
+          0.011634988556030262
+        ],
+        "error_convention": "actual_tip minus target",
+        "coordinate_frame": "world",
+        "terminal_error_m": 0.018690324120991027,
+        "terminal_tip_speed_m_s": 0.6599545255853448,
+        "sampled_settling": {
+          "available": true,
+          "continuous_time_guarantee": false,
+          "max_error_m": 0.06344380037515782,
+          "max_speed_m_s": 1.1276277677182223,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        },
+        "control_updates": 35,
+        "accepted_plans": 35,
+        "initialization_selected": 31,
+        "accepted_noninitialization_plans": 4,
+        "converged_updates": 1,
+        "solver_error_count": 0,
+        "hold_last_responses": 0,
+        "applied_tension_ranges": [
+          {
+            "tendon": "near_t0",
+            "tendon_index": 0,
+            "minimum_n": 1.7020289623325817,
+            "maximum_n": 7.999997195801962,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "near_t1",
+            "tendon_index": 1,
+            "minimum_n": 3.8138843455665485,
+            "maximum_n": 8.0,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "near_t2",
+            "tendon_index": 2,
+            "minimum_n": 1.6308426111539074e-07,
+            "maximum_n": 7.647782945976024,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "far_t0",
+            "tendon_index": 3,
+            "minimum_n": 0.049636516651964016,
+            "maximum_n": 7.999999947953814,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "far_t1",
+            "tendon_index": 4,
+            "minimum_n": 0.5950931922505491,
+            "maximum_n": 7.338190280788848,
+            "limit_n": 8.0
+          },
+          {
+            "tendon": "far_t2",
+            "tendon_index": 5,
+            "minimum_n": 0.6315302379791942,
+            "maximum_n": 7.954223986277476,
+            "limit_n": 8.0
+          }
+        ],
+        "force_bound_violation_n": 0.0,
+        "one_step_prediction_summary": {
+          "aligned_count": 35,
+          "frame": "world",
+          "maximum_tip_difference_m": 0.009239854640753666,
+          "mean_tip_difference_m": 0.003980540870263713,
+          "missing": [],
+          "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+        },
+        "one_step_prediction_evidence": {
+          "artifact_id": "bf343339f412dfd1c3cebd764639d2a0102771fc09bb5b444257686e489581ce",
+          "media_type": "application/json"
+        },
+        "simulated_duration_s": 0.35000000000000003,
+        "measured_computation_s": 609.0310000001919,
+        "mean_complete_update_s": 17.30461485715849,
+        "control_period_s": 0.01,
+        "deadline_misses": 35,
+        "real_time_demonstrated": false
+      }
+    }
+  ],
+  "current_update_facts": [
+    {
+      "execution_id": "22241105b8984e0daae4530963848953",
+      "configuration": {
+        "artifact_id": "e1f5d1f3c4b7dbdae7b613b9a70796a1b104375a004dc94d4ff5cb7bf7b80122",
+        "media_type": "application/json"
+      },
+      "manifest": {
+        "artifact_id": "1d7b9e26c08409a21521e4f89d65cb6b9633618af46900396310db2082a2aeea",
+        "media_type": "application/json"
+      },
+      "sources": {
+        "controller_observations.json": {
+          "artifact_id": "f6f46c42ce4b7770307e4e0301f0770a85812832b8188bccf3b00cea35e6f5eb",
+          "media_type": "application/octet-stream"
+        },
+        "resolved_physics.json": {
+          "artifact_id": "0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd",
+          "media_type": "application/octet-stream"
+        },
+        "actual_commands.json": {
+          "artifact_id": "5d6d649f633eb4173e6b90ab2aa4fc30b7b6f3d123046e52376a852ef0418abb",
+          "media_type": "application/octet-stream"
+        }
+      },
+      "scope": {
+        "update_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34
+        ],
+        "total_retained_updates": 35
+      },
+      "raw_optimizer_termination": {
+        "Solve_Succeeded": {
+          "count": 1,
+          "update_ids": [
+            34
+          ]
+        },
+        "User_Requested_Stop": {
+          "count": 34,
+          "update_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ]
+        }
+      },
+      "controller_policy_stop": {
+        "None": {
+          "count": 1,
+          "update_ids": [
+            34
+          ]
+        },
+        "budget_best_feasible": {
+          "count": 33,
+          "update_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            31,
+            32,
+            33
+          ]
+        },
+        "relative_seed_improvement": {
+          "count": 1,
+          "update_ids": [
+            30
+          ]
+        }
+      },
+      "selected_iterations": {
+        "iteration_zero": {
+          "count": 29,
+          "update_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ]
+        },
+        "positive_iteration": {
+          "count": 5,
+          "update_ids": [
+            30,
+            31,
+            32,
+            33,
+            34
+          ]
+        },
+        "synthetic_initialization": {
+          "count": 1,
+          "update_ids": [
+            14
+          ]
+        }
+      },
+      "tension_channels": [
+        {
+          "channel": "near_t0",
+          "channel_index": 0,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": -5.4193256104895227e-08,
+            "minimum_distance_update_ids": [
+              31
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 5.4193256104895227e-08
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 0.0,
+            "minimum_distance_update_ids": [
+              31
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        },
+        {
+          "channel": "near_t1",
+          "channel_index": 1,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": 0.03472099092691305,
+            "minimum_distance_update_ids": [
+              34
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 0.03472099092691305,
+            "minimum_distance_update_ids": [
+              34
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        },
+        {
+          "channel": "near_t2",
+          "channel_index": 2,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": -6.765069393566137e-08,
+            "minimum_distance_update_ids": [
+              34
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 6.765069393566137e-08
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 0.0,
+            "minimum_distance_update_ids": [
+              34
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        },
+        {
+          "channel": "far_t0",
+          "channel_index": 3,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": -7.914298016942212e-08,
+            "minimum_distance_update_ids": [
+              34
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 7.914298016942212e-08
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 0.0,
+            "minimum_distance_update_ids": [
+              34
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        },
+        {
+          "channel": "far_t1",
+          "channel_index": 4,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": 0.15653560974569647,
+            "minimum_distance_update_ids": [
+              33
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 0.15653560974569647,
+            "minimum_distance_update_ids": [
+              33
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        },
+        {
+          "channel": "far_t2",
+          "channel_index": 5,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": -7.554220005090428e-08,
+            "minimum_distance_update_ids": [
+              33
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 7.554220005090428e-08
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 0.0,
+            "minimum_distance_update_ids": [
+              33
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        }
+      ],
+      "input_semantics": {
+        "requested_input": "Controller requested command from requested_tension_n.",
+        "applied_input_backend_readback": "actual_tension_n: MuJoCo -actuator_force readback at the pre-step update boundary; simulated force, not hardware measurement.",
+        "backend_motion": "Recorded serial backend q/qdot and tip position are distinct from input commands.",
+        "bounds": "Distance to upper bound and actual violation are separate quantities. Legal near-bound tension need not violate a bound."
+      },
+      "interpretation": "Counts cover exactly listed update IDs. Observations do not identify a dominant cause or establish ineffectiveness throughout a parameter range."
+    },
+    {
+      "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+      "configuration": {
+        "artifact_id": "e30da8eace34a9a5a3f6b4f121079877d2f4fe797fb9fb6c981ed687e3984014",
+        "media_type": "application/json"
+      },
+      "manifest": {
+        "artifact_id": "d31808f970789bfaa3164514e35ccc9850631dc9df3fa8ec72993ecf8047e214",
+        "media_type": "application/json"
+      },
+      "sources": {
+        "controller_observations.json": {
+          "artifact_id": "a814cec0180773c0ce7105f4f3ff4baa1c4cdd3e8d6d88526592edd04fb9ed42",
+          "media_type": "application/octet-stream"
+        },
+        "resolved_physics.json": {
+          "artifact_id": "0a960268cc836ca9e5c5871afcad116033e0bd22471092179506f2efd9c580cd",
+          "media_type": "application/octet-stream"
+        },
+        "actual_commands.json": {
+          "artifact_id": "83bf8e7740915d6b7fa77f527bd5c9d5e0e428f5b7bbc5c0656e5ad05271dd22",
+          "media_type": "application/octet-stream"
+        }
+      },
+      "scope": {
+        "update_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34
+        ],
+        "total_retained_updates": 35
+      },
+      "raw_optimizer_termination": {
+        "Solve_Succeeded": {
+          "count": 1,
+          "update_ids": [
+            34
+          ]
+        },
+        "User_Requested_Stop": {
+          "count": 34,
+          "update_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ]
+        }
+      },
+      "controller_policy_stop": {
+        "None": {
+          "count": 1,
+          "update_ids": [
+            34
+          ]
+        },
+        "budget_best_feasible": {
+          "count": 29,
+          "update_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            7,
+            9,
+            11,
+            12,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ]
+        },
+        "relative_seed_improvement": {
+          "count": 5,
+          "update_ids": [
+            6,
+            8,
+            10,
+            13,
+            14
+          ]
+        }
+      },
+      "selected_iterations": {
+        "iteration_zero": {
+          "count": 16,
+          "update_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            9,
+            11,
+            12,
+            18,
+            21,
+            23,
+            26,
+            29,
+            30,
+            32
+          ]
+        },
+        "positive_iteration": {
+          "count": 18,
+          "update_ids": [
+            6,
+            8,
+            10,
+            13,
+            14,
+            15,
+            16,
+            17,
+            19,
+            20,
+            22,
+            24,
+            25,
+            27,
+            28,
+            31,
+            33,
+            34
+          ]
+        },
+        "synthetic_initialization": {
+          "count": 1,
+          "update_ids": [
+            7
+          ]
+        }
+      },
+      "tension_channels": [
+        {
+          "channel": "near_t0",
+          "channel_index": 0,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": 2.098259527092422,
+            "minimum_distance_update_ids": [
+              21
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 2.098259527092422,
+            "minimum_distance_update_ids": [
+              21
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        },
+        {
+          "channel": "near_t1",
+          "channel_index": 1,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": 2.0656812261340436,
+            "minimum_distance_update_ids": [
+              6
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 2.0656812261340436,
+            "minimum_distance_update_ids": [
+              6
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        },
+        {
+          "channel": "near_t2",
+          "channel_index": 2,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": 4.8968433313369975,
+            "minimum_distance_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 8.241626921452384e-09
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 4.8968433313369975,
+            "minimum_distance_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        },
+        {
+          "channel": "far_t0",
+          "channel_index": 3,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": 4.371416637215879,
+            "minimum_distance_update_ids": [
+              6
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 4.371416637215879,
+            "minimum_distance_update_ids": [
+              6
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        },
+        {
+          "channel": "far_t1",
+          "channel_index": 4,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": 5.739901271358768,
+            "minimum_distance_update_ids": [
+              19
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 5.739901271358768,
+            "minimum_distance_update_ids": [
+              19
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        },
+        {
+          "channel": "far_t2",
+          "channel_index": 5,
+          "upper_bound_n": 8.0,
+          "requested_input": {
+            "minimum_distance_to_upper_bound_n": 5.060174091422408,
+            "minimum_distance_update_ids": [
+              13
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          },
+          "applied_input_backend_readback": {
+            "minimum_distance_to_upper_bound_n": 5.060174091422408,
+            "minimum_distance_update_ids": [
+              13
+            ],
+            "queried_update_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34
+            ],
+            "maximum_bound_violation_n": 0.0
+          }
+        }
+      ],
+      "input_semantics": {
+        "requested_input": "Controller requested command from requested_tension_n.",
+        "applied_input_backend_readback": "actual_tension_n: MuJoCo -actuator_force readback at the pre-step update boundary; simulated force, not hardware measurement.",
+        "backend_motion": "Recorded serial backend q/qdot and tip position are distinct from input commands.",
+        "bounds": "Distance to upper bound and actual violation are separate quantities. Legal near-bound tension need not violate a bound."
+      },
+      "interpretation": "Counts cover exactly listed update IDs. Observations do not identify a dominant cause or establish ineffectiveness throughout a parameter range."
+    }
+  ],
+  "current_project_usage": {
+    "limit": {
+      "backend_solves": 3,
+      "model_calls": 16,
+      "tool_calls": 60,
+      "wall_s": 7200.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 11,
+      "model_calls": 1,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 1278.9810000003781
+    },
+    "remaining": {
+      "backend_solves": 1,
+      "model_calls": 15,
+      "tool_calls": 49,
+      "wall_s": 5921.018999999622,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "unresolved_current_reservations": [],
+  "historical_cost_links": {
+    "predecessor_milestone2_gate": "D:\\softrobot-agent\\evidence\\stage357_confirmation_20261004\\single_context\\acceptance.json",
+    "predecessor_pilot": "D:\\softrobot-agent\\evidence\\stage357_pilot_20261004",
+    "predecessor_pilot_usage": {
+      "limit": {
+        "backend_solves": 3,
+        "model_calls": 16,
+        "tool_calls": 60,
+        "wall_s": 7200.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 11,
+        "model_calls": 3,
+        "backend_solves": 2,
+        "worker_calls": 0,
+        "wall_s": 1712.29400000046
+      },
+      "remaining": {
+        "backend_solves": 1,
+        "model_calls": 13,
+        "tool_calls": 49,
+        "wall_s": 5487.70599999954,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "unusable_interrupted_execution": "d06d23180c19424faf5ac6618c779173",
+    "predecessor_unresolved_reservation_s": 900.0,
+    "budgets_transferred": false,
+    "current_authorization": "Current explicit user authorization: ONE separately linked Stage 3.58 Milestone 3 confirmation; repository evidence transmission to https://api.deepseek.com via existing credential loader; 16 provider attempts/60 workflow tools/7200 charged seconds/6 optimizer proposals/3 backend attempts/zero workers. Two distinct NEW complete changed configurations. No probes, baseline reruns, screening, replacement campaigns or push."
+  },
+  "interpretation_limits": [
+    "Tested points only; full guidance vector and both comparisons govern interpretation.",
+    "Zero force violation does not exclude operation at the limit; proximity alone identifies no cause.",
+    "The prior interrupted attempt started with partial work; it is excluded from complete physical evidence.",
+    "Initialization selections apply control; synchronous wall overruns are distinct from simulated delays."
+  ]
+}

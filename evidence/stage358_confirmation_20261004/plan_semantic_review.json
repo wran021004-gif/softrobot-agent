@@ -1,0 +1,36 @@
+{
+  "plan": {
+    "artifact_id": "43a6daab7e3c1ce6db033408eea6e087a95e3cd2f3acf86f1b66205c4554e128",
+    "media_type": "application/json"
+  },
+  "author": "model",
+  "domains": {
+    "control/recipe/holding_tip_speed_weight": [
+      0.0,
+      1.0
+    ],
+    "control/recipe/terminal_tip_speed_weight": [
+      0.0,
+      1.0
+    ]
+  },
+  "step": 0.05,
+  "max_proposals": 4,
+  "max_backend_attempts": 3,
+  "target": 2,
+  "planned_budget": {
+    "backend_solves": 3,
+    "model_calls": 6,
+    "tool_calls": 18,
+    "wall_s": 6000.0,
+    "worker_calls": 0
+  },
+  "material_wording_note": {
+    "original": "Stop on any material failure per failure_policy=stop_on_material_failure; no more than max_backend_attempts=3 new full backend attempts, with one attempt reserved for a scheduler-failure re-attempt.",
+    "interpretation": "The final retry wording is not additional authorization. The existing executor stops on material failure and unknown execution, preserves the reservation, and does not automatically replay it. The third allowance is counted headroom only.",
+    "plan_edited": false,
+    "executor_changed": false
+  },
+  "hypothesis_scope": "Terminal weight alone or jointly with holding weight near the search start; existing optimizer chooses coordinates and points.",
+  "guidance_not_physical_ranking": true
+}
