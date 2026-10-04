@@ -317,7 +317,7 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
         raise ValueError('BATCH_REQUIRES_VALID_UNEXECUTED_PLAN')
     if plan.fixed_controller!='controller.gvs_nmpc@7.0.0' or plan.method!='search.family_coordinate@1.0.0':
         raise ValueError('BATCH_FIXED_IMPLEMENTATION_REQUIRED')
-    if set(plan.variables)-set(REACH_WEIGHT_PATHS):raise ValueError('BATCH_WEIGHT_PATHS_ONLY')
+    if not plan.variables or set(plan.variables)-set(REACH_WEIGHT_PATHS):raise ValueError('BATCH_WEIGHT_PATHS_ONLY')
     state=host.store.session(host.run_id)['state'];existing=state.get('search_batch')
     if existing:
         if existing['plan']!=plan_ref:raise ValueError('BATCH_PLAN_IMMUTABLE')
@@ -338,7 +338,6 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
                 budget['backend_solves']<count or budget['worker_calls']!=0 or not starting_facts or not retained_baseline):
             raise ValueError('LIVE_BATCH_EXPLICIT_CAPS_AND_TWO_REFERENCES_REQUIRED')
         if retained_baseline['candidate']!=record['bindings']['baseline']:raise ValueError('BATCH_RETAINED_BASELINE_MISMATCH')
-        if set(plan.variables)!=set(REACH_WEIGHT_PATHS):raise ValueError('LIVE_PILOT_REQUIRES_TWO_DOMAINS')
     floor=sum(record['cost_floor_per_candidate_s'].values())
     if floor!=990 or interpretation_reserve_s<0 or budget['wall_s']<floor*count+interpretation_reserve_s or budget['tool_calls']<4*count:
         raise ValueError('BATCH_RESERVATION_CAPACITY_REQUIRED: 990 seconds and 4 tools per proposal, plus explicit interpretation reserve')
@@ -356,10 +355,16 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
                 or saved['execution_scope']!=execution_scope(original)):
             raise ValueError('BATCH_HISTORICAL_SOURCE_BINDING_MISMATCH')
         expected=deepcopy(effective)
-        for path in plan.variables:
+        # Register complete weight-study references even when an unvaried
+        # weight differs. They can inform comparisons but cannot be reused as
+        # evaluations of a configuration with different fixed conditions.
+        for path in REACH_WEIGHT_PATHS:
             key=path.rsplit('/',1)[-1];expected['policy']['controller']['parameters']['data']['recipe'][key]=original['policy']['controller']['parameters']['data']['recipe'][key]
         if execution_scope(expected)!=execution_scope(original):raise ValueError('BATCH_HISTORICAL_FIXED_SCIENCE_MISMATCH')
-        permitted.append(saved)
+        reusable=deepcopy(effective)
+        for path in plan.variables:
+            key=path.rsplit('/',1)[-1];reusable['policy']['controller']['parameters']['data']['recipe'][key]=original['policy']['controller']['parameters']['data']['recipe'][key]
+        permitted.append({**saved,'reusable_under_plan':execution_scope(reusable)==execution_scope(original)})
     batch=dict(plan=plan_ref,batch_id='batch-'+plan_ref['artifact_id'][:16],mode=mode,
         parameters=plain(parameters),algorithm=plain(CoordinateSearch(parameters).save()),pending=None,
         proposals=[],configurations={},starting_facts=starting_facts,base_configuration=record['bindings']['subject']['configuration'],
@@ -453,7 +458,7 @@ def _run_batch(host,inject,*,stop_after_stage=None):
             historical=None
             if not previous and batch.get('historical_results'):
                 from extensions.tendon_family.gvs_profile import execution_scope
-                historical=next((r for r in batch['historical_results'] if r['execution_scope']==execution_scope(effective)),None)
+                historical=next((r for r in batch['historical_results'] if r.get('reusable_under_plan',True) and r['execution_scope']==execution_scope(effective)),None)
                 if historical:
                     facts=historical['facts']
                     previous=dict(candidate_id=facts['candidate']['candidate_id'],configuration=facts['configuration'],identity=identity,
