@@ -1,4 +1,42 @@
-# Current development status - Milestones 4 and 5, 2026-10-04
+# Current development status - Milestones 4 and 5, 2026-10-05
+
+The new bounded saved-evidence diagnostic stage is **completed and stopped**.
+The research model selected D: retain local diagnostic use and defer run-ahead
+screening. The Milestone 4 deliverable remains candidate `batch-ebbeadbdaca10732-0`,
+execution `91c3ba1b01d6499fb26df8f95409401b`, holding/terminal .05/.05,
+controller.gvs_nmpc@7.0.0. Milestones 2–4 are closed; Milestone 5 remains open.
+
+Six fixed-input reduced rollouts at .01/.002/.001 s reproduced the saved coarse
+predictions and found a material numerical-resolution contribution: scalar errors
+fell 26.16%/20.99%, but residual errors remain .004676/.004103 m/s and .15 velocity
+vector error worsened. Fine-step differences still exceed 1e-4 m/s, so convergence
+and endpoint accuracy are unproven. The .075 interval remains false-safe at the
+.02 m/s limit. No unique physical defect was identified.
+
+At .30 s the common cold seed satisfied weight-independent .005 m/.02 m/s checks
+and independent feasibility; iteration-zero acceptance preceded weight-dependent
+optimization updates. This explains identical previews. Production history,
+state/input and solver paths also differ; historical warm plans are unavailable.
+No new controller solve, weight experiment, backend step or simulation ran.
+
+The predecessor's forecasts, responses, session states, evidence and usage remain
+immutable. The current calculations are retrospective development evidence. The
+precise next validation protocol is sealed **unexecuted**, requiring a separate
+grant and two newly frozen independent histories. It grants no automatic launch,
+screening authority, promotion or Milestone 5 closure.
+
+New-stage usage: 7 provider attempts, 9 workflow calls, 0 backend attempts,
+196.171 charged seconds, 0 extra controller solves and 6 reduced rollouts.
+Cumulative usage: 35/64/6, 3398.084 seconds, 9 solves/15 rollouts and 210 embedded
+updates. One protocol correction, three semantic reviews and all failed handoff
+receipts are preserved. No workers/subagents or push. Exact receipts govern sums.
+
+See [current delivery](../evidence/milestone5_diagnostic_20261005/delivery.json),
+[diagnostic report](milestone5_bounded_diagnostic.md),
+[explicit research handoff](../evidence/milestone5_diagnostic_20261005/research_handoff.json),
+and [unexecuted protocol](../evidence/milestone5_diagnostic_20261005/next_validation_protocol.json).
+
+## Completed predecessor status, 2026-10-04
 
 Milestones 2, 3, and 4 are closed. Milestone 5 remains open. The accepted
 Milestone 4 deliverable is execution `91c3ba1b01d6499fb26df8f95409401b`,

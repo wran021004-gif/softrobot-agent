@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0.0",
+  "classification": "proposed future validation protocol, sealed but NOT executed or authorized by this stage",
+  "selected_primary_action": "D",
+  "intended_role": "Local diagnosis only; no run-ahead screening, candidate ordering or automatic rejection",
+  "implementation_change": "None. Retain production first-period implicit Euler @0.01 s and controller.gvs_nmpc@7.0.0; no production shortcut/weight/projection changes.",
+  "selected_deliverable": {
+    "candidate_id": "batch-ebbeadbdaca10732-0",
+    "owner_run_id": "batch-ebbeadbdaca10732-0",
+    "configuration": {
+      "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+      "media_type": "application/json"
+    },
+    "execution_id": "91c3ba1b01d6499fb26df8f95409401b"
+  },
+  "development_data": {
+    "executions": [
+      "2413ff2a56de422dac47b7fd78717563",
+      "9865f1636266479c93817cad42a65353"
+    ],
+    "current_retrospective_rollouts": 6,
+    "predecessor_prospective_intervals": 4,
+    "independent_prospective_validation": false
+  },
+  "required_new_evidence": "Two genuinely new held-out initial-state histories/executions. Their exact existing-family initial configurations must be registered and frozen in a separate future grant before backend advancement. No new weight experiments. Deterministic identical repeats are not independent evidence.",
+  "fixed_conditions": [
+    "incumbent robot 0.16/0.11 m,section scale 0.95,compliant material",
+    "incumbent holding/terminal .05/.05",
+    "same reach task, world frame,0.01 s control period",
+    "physical holding .01 m/.02 m/s and real-time acceptance unchanged",
+    "same solver and provider settings"
+  ],
+  "checkpoints_s": [
+    0.2,
+    0.3
+  ],
+  "endpoint_s": [
+    0.21,
+    0.31
+  ],
+  "interval_duration_s": 0.01,
+  "prediction_source": "Actual-input production accepted first-period prediction sealed before backend advancement; no extra optimization or rollout",
+  "quantities": [
+    "world position and velocity vectors",
+    "speed norms",
+    "initial projection error",
+    "predicted and observed changes",
+    "predicted-minus-observed endpoint errors",
+    "distance to physical thresholds"
+  ],
+  "direction_rule": "Speed change <-1e-4 decreasing, >1e-4 increasing, otherwise approximately unchanged; compare predicted relative to projected initial and observed relative to backend initial.",
+  "numerical_rules": {
+    "speed_error_tolerance_m_s": 0.0001,
+    "velocity_vector_error_tolerance_m_s": 0.0001,
+    "position": "Report vectors and norms separately; no new accuracy claim from holding acceptance"
+  },
+  "abstention": "Unaligned state/input/time, nonfinite prediction, unavailable endpoint or scaled residual >1e-5: unresolved, never silently exclude; valid near-threshold estimates retain signed error and false-safe scoring.",
+  "ordering_rule": "Not supported under D; all full-task candidate directions, ordering and screening remain abstentions. No unseen future backend state/warm plan used for screening.",
+  "threshold_crossing": {
+    "speed_limit_m_s": 0.02,
+    "holding_position_limit_m": 0.01,
+    "scope": "Holding-entry .30-.31 interval",
+    "false_safe": "predicted <= limit and observed > limit",
+    "false_unsafe": "predicted > limit and observed <= limit",
+    "report": "counts, signed margins and errors; do not weaken 1e-4 tolerance"
+  },
+  "reporting": {
+    "resolved_prediction_coverage": "resolved/planned; invalids count in denominator",
+    "accuracy_among_resolved": "correct/resolved, undefined if none",
+    "predicted_safe_observed_violating": "Count and rates among planned and resolved predictions",
+    "useful_discrimination": "Local diagnostic information and threshold classification per charged second; full-task discrimination remains unsupported"
+  },
+  "cost_comparison": {
+    "prior_preview_s": 73.31299999984913,
+    "prior_two_full_evaluations_s": 605.936999999918,
+    "measure": "Separate full-evaluation costs, incremental sealing/reconstruction/interpretation overhead, embedded control work. Cheaper alone does not establish decision value."
+  },
+  "proposed_future_ceiling": {
+    "model_calls": 4,
+    "tool_calls": 20,
+    "backend_solves": 2,
+    "local_solves": 0,
+    "prediction_evaluations": 0,
+    "wall_s": 2500.0,
+    "worker_calls": 0,
+    "corrections_total": 2,
+    "corrections_consecutive": 2
+  },
+  "exit_conditions": [
+    "Invalid alignment or numerical validity",
+    "Any false-safe holding threshold crossing",
+    "Both fresh executions and four interval scores complete",
+    "Any ceiling reached"
+  ],
+  "acceptance": "Numerical misses preserve diagnosis-only use and prohibit screening; correct local directions alone do not pass endpoint accuracy. No automatic candidate promotion or Milestone5 closure.",
+  "status": "unexecuted",
+  "backend_authorization_in_current_stage": 0
+}

@@ -1,0 +1,120 @@
+{
+  "selected_primary_action": "D",
+  "operational_decision": "finish/stop",
+  "retained_candidate": {
+    "candidate_id": "batch-ebbeadbdaca10732-0",
+    "owner_run_id": "batch-ebbeadbdaca10732-0",
+    "configuration": {
+      "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+      "media_type": "application/json"
+    },
+    "execution_id": "91c3ba1b01d6499fb26df8f95409401b"
+  },
+  "original_baseline": {
+    "candidate_id": "baseline-replay",
+    "owner_run_id": "gvs-stage351-baseline-executor",
+    "configuration": {
+      "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+      "media_type": "application/json"
+    },
+    "execution_id": "cf997605885642759ee33920e2c9e2ef"
+  },
+  "passing_pre_adaptation_reference": {
+    "candidate_id": "batch-e4843b561ebaea27-0",
+    "owner_run_id": "batch-e4843b561ebaea27-0",
+    "configuration": {
+      "artifact_id": "3535b142e00a10ceee822fa9ef5661dac3e5e1ada46c5b9a25ced8d80773574c",
+      "media_type": "application/json"
+    },
+    "execution_id": "bebcfd47274940fb88a55ce5a2457c4c"
+  },
+  "latest_tested": {
+    "candidate_id": "batch-387f92fd17f0639f-1",
+    "configuration": {
+      "artifact_id": "880b45ed2e5a152f435ba87ea4c590ff94f82bf35d2600e576fbbb59c6db6444",
+      "media_type": "application/json"
+    },
+    "execution_id": "9865f1636266479c93817cad42a65353",
+    "owner_run_id": "batch-387f92fd17f0639f-1"
+  },
+  "evidence_classes": {
+    "historical_development": "Known configurations,actual observations,cold preview plans",
+    "previously_sealed_prospective": "Predecessor 4 local intervals and 4 unresolved full-task forecasts; immutable",
+    "current_retrospective": "Two interval decompositions,six reduced rollouts,preview extraction; no new prospective evidence"
+  },
+  "numerical_records": [
+    {
+      "execution_id": "2413ff2a56de422dac47b7fd78717563",
+      "candidate_id": "batch-387f92fd17f0639f-0",
+      "configuration": {
+        "artifact_id": "bf68f5d6b05e02fc786bc925aad0a620dd0c18264e57e5d2d6f57169edd3e762",
+        "media_type": "application/json"
+      },
+      "checkpoint_s": 0.3,
+      "interval_s": [
+        0.3,
+        0.31
+      ],
+      "evidence_type": "current retrospective diagnostic calculation",
+      "initial_speed_offset_m_s": 1.680131696473082e-05,
+      "initial_velocity_error_norm_m_s": 0.00037922371316335865,
+      "initial_position_error_norm_m": 0.0026891778822236262,
+      "scalar_change_error_m_s": -0.006349182365779639,
+      "saved_endpoint_speed_error_m_s": -0.0063323810488149085,
+      "coarse_to_fine_speed_change_m_s": 0.0016563900821140697,
+      "scalar_error_reduction_fraction": 0.26157462443403534,
+      "fine_endpoint_speed_error_m_s": -0.004675990536602188,
+      "fine_velocity_error_norm_m_s": 0.006859011574378832,
+      "fine_difference": {
+        "position_norm_m": 1.206676819452844e-05,
+        "speed_m_s": 0.0002074082261871897,
+        "velocity_norm_m_s": 0.00024715681832129316
+      },
+      "supported_inference": "Integration resolution contributes materially to scalar speed error, but residual discrepancy and fine-step differences remain; vector improvement inconsistent.",
+      "uncertainty": "No convergence at reporting tolerance or uniquely identified physical defect; projection is not full backend state.",
+      "supported_use": "Local diagnosis only",
+      "proposed_next_test": "next_validation_protocol.json"
+    },
+    {
+      "execution_id": "9865f1636266479c93817cad42a65353",
+      "candidate_id": "batch-387f92fd17f0639f-1",
+      "configuration": {
+        "artifact_id": "880b45ed2e5a152f435ba87ea4c590ff94f82bf35d2600e576fbbb59c6db6444",
+        "media_type": "application/json"
+      },
+      "checkpoint_s": 0.3,
+      "interval_s": [
+        0.3,
+        0.31
+      ],
+      "evidence_type": "current retrospective diagnostic calculation",
+      "initial_speed_offset_m_s": -5.814344499306505e-05,
+      "initial_velocity_error_norm_m_s": 0.00036431540818624943,
+      "initial_position_error_norm_m": 0.0026889844817533045,
+      "scalar_change_error_m_s": -0.005134912482431548,
+      "saved_endpoint_speed_error_m_s": -0.005193055927424613,
+      "coarse_to_fine_speed_change_m_s": 0.0010902608575317626,
+      "scalar_error_reduction_fraction": 0.2099425240653383,
+      "fine_endpoint_speed_error_m_s": -0.004102878847659414,
+      "fine_velocity_error_norm_m_s": 0.007222011082626113,
+      "fine_difference": {
+        "position_norm_m": 6.936600841694444e-06,
+        "speed_m_s": 0.00012934960544570828,
+        "velocity_norm_m_s": 0.0001734793534399653
+      },
+      "supported_inference": "Integration resolution contributes materially to scalar speed error, but residual discrepancy and fine-step differences remain; vector improvement inconsistent.",
+      "uncertainty": "No convergence at reporting tolerance or uniquely identified physical defect; projection is not full backend state.",
+      "supported_use": "Local diagnosis only",
+      "proposed_next_test": "next_validation_protocol.json"
+    }
+  ],
+  "preview_reference": "single_context/preview.json",
+  "initialization_policy": "Cold repeated previous input for preview; actual projected state/applied tension for resolution comparison",
+  "comparison_reference": "Exact source manifests, saved controller observations, serial q/qdot and XML; no stepping",
+  "supported_model_role": "local diagnostic evidence only",
+  "next_validation": "next_validation_protocol.json",
+  "research_model_final": {
+    "artifact_id": "9b25b9a49f1203fb87a53cbf79b4016e5470f9658aad8a084d46546cbee4cfc2",
+    "media_type": "application/json"
+  }
+}

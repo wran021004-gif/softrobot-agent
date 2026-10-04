@@ -1,0 +1,63 @@
+{
+  "candidate_disposition": "retain_baseline",
+  "disposition": "defer",
+  "feedback": {
+    "artifact_id": "c04e04bf39491f8b6b30d6379130cc93e11d165d1252ceba75cc9db232ab5288",
+    "media_type": "application/json"
+  },
+  "hypothesis_assessment": "unresolved",
+  "next_action": "finish",
+  "next_research": {
+    "bounded_check": "None executed and none authorized in this stage; the described future independent-backend protocol is unexecuted and requires a separate grant.",
+    "evidence": [
+      "execution 2413ff2a56de422dac47b7fd78717563 (batch-387f92fd17f0639f-0, .075 development): predicted endpoint speed 0.016953566461155 vs observed 0.023285947509969908, false-safe; .001 prediction 0.01860995697336772 still false-safe",
+      "execution 9865f1636266479c93817cad42a65353 (batch-387f92fd17f0639f-1, .15 development): predicted 0.005830076194148043 and observed 0.011023132121572656, both below .02, NOT false-safe",
+      "coarse reproduction position differences 2.618125142092799e-11 / 9.192850617016396e-10 m and speed differences 4.3009865113852186e-10 / -8.377776656350727e-08 m/s; refined residuals reach 4.486943585776948e-11",
+      "incumbent retained: batch-ebbeadbdaca10732-0 execution 91c3ba1b01d6499fb26df8f95409401b; predecessor four direction-correct/zero endpoint-pass intervals sealed prospectively, now development"
+    ],
+    "expected_observations": [
+      "No new observations; the stage stops at handoff with no further model, tool or backend execution."
+    ],
+    "fixed_conditions": [
+      "incumbent batch-ebbeadbdaca10732-0 retained, selected_candidate=baseline",
+      "zero backend solves, zero worker/subagent calls in this diagnostic stage",
+      "numerical reporting tolerance 1e-4 m/s; physical acceptance .01 m position, .02 m/s; settled-seed check .005 m",
+      "M4 closed, M5 open"
+    ],
+    "limitations": [
+      "Current six calculations are retrospective; no new prospective accuracy",
+      "A scalar speed-norm match is not a vector match; a single finer value is not convergence",
+      "Historical warm plans absent, so warm-start-only attribution is impossible",
+      "Development intervals including the previously sealed four cannot be fresh validation"
+    ],
+    "proposed_budget": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "proposed_variables": {},
+    "route": "stop",
+    "stopping_conditions": [
+      "Stage terminates at this handoff with zero operational budget",
+      "Any future independent validation would begin only under a separate new grant"
+    ],
+    "unresolved_question": "Whether the millimetres-per-second endpoint speed discrepancy is dominated by projection/omitted modes versus integration and the differing production solver/state/input paths; current retrospective calculations cannot separate them."
+  },
+  "reasoning": "Primary action: D — retain the local diagnosis only and defer run-ahead screening; narrowest supported role is retrospective local diagnosis, no promotion, experiment or screening promise. A fails as an action: scalar resolution materially contributes, but no correction of local prediction integration has been identified that would close the residual vector error, so it would be an unfounded experiment. B fails its precondition: no specific defect is identified. C is unsupported: the .075/.15 candidates' historical warm plans were not saved (historical_plan_availability false in every production row), so no candidate-specific generated history preview can be built from retained evidence.\n\nQuantities. Coarse production reproduction is near-exact: position differences 2.618125142092799e-11 and 9.192850617016396e-10 m; speed differences 4.3009865113852186e-10 and -8.377776656350727e-08 m/s. The retained production defects (5.0952387057809356e-8 and 1.9131447419756277e-6 scaled) explain those tiny offsets, not the millimetres-per-second discrepancy. Initial position error norms 2.6891778822236262e-3 / 2.6889844817533045e-3 m; initial velocity-vector errors 3.7922371316335865e-4 / 3.6431540818624943e-4 m/s despite tiny speed offsets; endpoint vector errors 7.492333503420177e-3 / 6.934123087733086e-3 m/s. Refinement contribution: coarse-to-.001 endpoint speeds rise 1.65639008211407e-3 and 1.09026085753176e-3 m/s, cutting scalar endpoint errors about 26.16% and 20.99%. At .15 refinement the scalar speed improves while the vector error worsens (6.934196218480314e-3 → 7.222011082626113e-3): a scalar speed-norm match is not a vector match. Fine differences 2.074082261871897e-4 and 1.2934960544570828e-4 m/s are .001-minus-.002, NOT fine-minus-coarse. Refined-root residuals reach 4.486943585776948e-11, not all ≤2.4e-14. No uniquely proven projection-level physical cause; physical change error mixes projection, omitted modes, transcription and integration, so one finer value is not convergence.\n\nAt .30 the common regenerated cold seed is feasible with weight-independent checks; seed_settled true, selected_iteration 0, selected_plan_is_seed true, optimized_before_acceptance false, stop_reason verified_settled_seed — the callback stops at iteration zero before any weight-dependent update, so the .005 m / .02 m/s checks that pass cannot rank terminal_weight rows. Cold equality does not imply full-task equivalence; production history, state, input and solver paths also differ and historical warm plans are absent, so no warm-start-only attribution.\n\nFalse-safe scope corrected: ONLY the .075 development interval crosses .02 (predicted .016953566461155, observed .023285947509969908) — 1 of 2 development intervals, not prospective validation. The .15 interval predicts .005830076194148043 and observes .011023132121572656, BOTH below .02, so .15 is NOT false-safe; the plural claim is removed. The .001 .075 prediction .01860995697336772 remains false-safe. Current six calculations are retrospective; the FOUR direction-correct/zero endpoint-pass intervals were sealed prospectively in the completed predecessor and now serve as development; the six older historical development intervals are retained separately. No new prospective accuracy here. M4 closed, M5 open.\n\nFuture protocol (unexecuted, prose only, separate from the zero operational budget): under a FUTURE separate grant, obtain genuinely NEW independent backend evidence — a fresh execution of one specified candidate over declared resolved coverage, reporting per-interval predicted vs observed speed and position with direction, endpoint-vector error, order, abstentions and threshold crossings; count false-safe intervals against a pre-registered .02 m/s threshold; require cost/discrimination (measured backends, wall time) and pre-registered exit rules (stop when N intervals resolve or cost exceeds a bounded budget) with a bounded budget. Zero backend in this diagnostic stage does not mean a future fresh observation costs zero backend. Preserve the 1e-4 m/s numerical reporting tolerance and real-time acceptance; retain incumbent batch-ebbeadbdaca10732-0 execution 91c3ba1b01d6499fb26df8f95409401b.",
+  "recommendation_id": null,
+  "report": {
+    "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+    "media_type": "application/json"
+  },
+  "selected_candidate": {
+    "candidate_id": "batch-ebbeadbdaca10732-0",
+    "configuration": {
+      "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+      "media_type": "application/json"
+    },
+    "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+    "owner_run_id": "batch-ebbeadbdaca10732-0"
+  }
+}

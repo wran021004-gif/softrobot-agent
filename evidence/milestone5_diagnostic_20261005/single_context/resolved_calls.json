@@ -1,0 +1,506 @@
+[
+  {
+    "run_id": "gvs-milestone5-diagnostic-d0e4130f5370-feedback-bound-final",
+    "reference": {
+      "artifact_id": "4c1aae65ac71ad2b1133dddd5686d0ef0c1fa776d3a8bbac4d8ef236d23a344f",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "retain_baseline",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "c04e04bf39491f8b6b30d6379130cc93e11d165d1252ceba75cc9db232ab5288",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "unresolved",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "None executed in this grant; it stops at local retrospective diagnosis. No new backend solve, replay or batch is performed.",
+          "evidence": [
+            "Incumbent batch-ebbeadbdaca10732-0 execution 91c3ba1b01d6499fb26df8f95409401b (retained)",
+            "Retrospective intervals batch-387f92fd17f0639f-0 exec 2413ff2a56de422dac47b7fd78717563 and batch-387f92fd17f0639f-1 exec 9865f1636266479c93817cad42a65353",
+            "Coarse reproduction differences 2.618125142092799e-11 m and 9.192850617016396e-10 m; speed 4.3009865113852186e-10 and -8.377776656350727e-08 m/s",
+            "Fine differences 0.00020740822618719 / 0.000129349605445708 m/s are .001-minus-.002",
+            "Endpoint velocity vector error norms 0.007492333503420177 / 0.006934123087733086 m/s with vector error worsening at .001",
+            ".30 s regenerated cold seed feasible, scaled_violation 5.2794479400188055e-12, iterations 0 for all three weights",
+            ".075 first-step 0.016953566461155 -> observed 0.023285947509969908 m/s, a false-safe under 0.02"
+          ],
+          "expected_observations": [
+            "No further observation is expected here; any future paired rollout must report signed tip error, scalar and vector speed errors, order of magnitude, abstention and explicit threshold-crossing counts against 0.02 m/s and 0.01 m at 1e-4 tolerance",
+            "Scalar/vector disagreement would falsify the speed-norm-equals-vector-safety hypothesis",
+            "False-safe crossings would count against acceptance"
+          ],
+          "fixed_conditions": [
+            "Same task, controller and world frame",
+            "control_period 0.01 s and 1e-4 m/s numerical reporting tolerance preserved",
+            ".075/.15 treated only as development data",
+            "Incumbent retained; no promotion and no broad causal claim",
+            "Future independent evidence would require a separate future grant"
+          ],
+          "limitations": [
+            "Diagnosis is retrospective; previously sealed prospective intervals are now development data, not fresh accuracy",
+            "Production history, state, input and solver paths differ and historical warm plans are unavailable",
+            "Projection, omitted modes, transcription and integration remain entangled; no unique physical cause",
+            "Zero backend here does not imply a future fresh observation is costless; the future budget is prose only"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "This grant stops now with zero operational budget",
+            "A future run stops on any false-safe threshold crossing or scalar/vector disagreement",
+            "Spending the bounded future budget ends it; no promotion on retrospective agreement"
+          ],
+          "unresolved_question": "Whether scalar speed-norm agreement implies vector-safe real-time tracking across holding weights; unresolved, so only local retrospective diagnosis of the incumbent is retained."
+        },
+        "reasoning": "Primary action D (retain local diagnosis only; defer run-ahead screening); narrowest role: retrospective numerical diagnosis of the retained incumbent, with no screening promise. I acknowledge material scalar resolution contribution AND remaining vector error, which is precisely why A is not the narrowest supported action: numerical resolution is a contributor, not a proven sole cause, so defect repair (B) and candidate history preview (C) lack support.\n\nCoarse production reproduction at checkpoint 0.30 s (records re-solved with recorded actual applied tensions held for the exact interval from the recorded projected state, not historical solver replays): position differences 2.618125142092799e-11 m and 9.192850617016396e-10 m; speed differences 4.3009865113852186e-10 and -8.377776656350727e-08 m/s; velocity-norm differences 2.6184579927347476e-09 and 9.196761137540435e-08 m/s. Initial position error norms 0.0026891778822236262 / 0.0026889844817533045 m; initial velocity vector error norms 0.00037922371316335865 / 0.00036431540818624943 m/s — tiny speed offsets but non-trivial vector differences. Endpoint velocity vector error norms 0.007492333503420177 / 0.006934123087733086 m/s.\n\nRefinement contributes: coarse-to-.001 scalar speeds increase 0.00165639008211407 and 0.00109026085753176 m/s, cutting scalar endpoint errors about 26.16% and 20.99%. Fine differences 0.00020740822618719 / 0.000129349605445708 m/s are .001-minus-.002, NOT fine-minus-coarse. A scalar speed-norm match is not a vector match: at .001 the vector error 0.006934196218480314 -> 0.007222011082626113 worsens versus .002 while scalar speed improves; one finer value does not demonstrate convergence. Refined-root residuals reach 4.486943585776948e-11, not all <=2.4e-14; saved production defects 5.0952387057809356e-8 / 1.9131447419756277e-6 explain only tiny coarse reproduction offsets, not the mm/s discrepancy. Projection, omitted modes, transcription and integration stay entangled; no uniquely proven projection-level physical cause.\n\nAt 0.30 s the common cold constant previous applied input yields a regenerated candidate-model cold seed (not historical warm reconstruction): all three weights 0.05/0.075/0.15 are feasible with initial scaled_violation 5.2794479400188055e-12, seed_settled=true, position 0.001360 m <= 0.005 m check and speed 0.01991554683358343 <= 0.02 m/s; the callback stops at iteration 0 (selected_plan_is_seed=true) before any weight-dependent update, so this equality is weight-independent and does not discriminate weights. The 0.005 m check is the settled-seed threshold; physical holding acceptance remains 0.01 m position and 0.02 m/s, with a 1e-4 m/s numerical reporting tolerance and real-time acceptance.\n\nSafety-relevant: at .075 the first-step predicted speed 0.016953566461155 < 0.02 while observed 0.023285947509969908 > 0.02; the .001 scalar speed 0.01860995697336772 is still false-safe under 0.02. I separate incumbent original saved observations, the previously sealed FOUR prospective intervals (now development data), and the current six retrospective calculations; no new prospective accuracy was obtained. Production history, state, input and solver paths also differ and historical warm plans are absent (historical_warm_plan_available=false), so no warm-start-only attribution. M4 closed; M5 open. I retain incumbent batch-ebbeadbdaca10732-0 execution 91c3ba1b01d6499fb26df8f95409401b.\n\nFuture falsification protocol (prose only, unexecuted, separate from the zero operational budget): under a FUTURE separate grant with genuinely NEW independent backend evidence, a pre-registered paired test of \"scalar speed-norm agreement implies vector-safe tracking\". Fixed conditions: same task, controller, control_period 0.01 s, world frame; .075/.15 development only. Quantity/scope: paired fresh rollouts at checkpoints not previously sealed. Report per interval signed tip error (actual minus target), scalar and vector speed errors, order of magnitude, abstention when unresolved, and explicit threshold-crossing counts against 0.02 m/s and 0.01 m at 1e-4 m/s tolerance. Bounded cost with backend_solves > 0, model_calls bounded, wall clock bounded. Exit rules: stop on any false-safe crossing or scalar/vector disagreement; stop when budget is exhausted; no promotion on retrospective agreement.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-0-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone5-diagnostic-d0e4130f5370-feedback-bound-final",
+    "reference": {
+      "artifact_id": "4b4d06d26717b1f94fcf35fc01ae1172eb53f1c3d326a2c11a2477f7e292b73d",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "retain_baseline",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "c04e04bf39491f8b6b30d6379130cc93e11d165d1252ceba75cc9db232ab5288",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "unresolved",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "No execution now; prepare only. Under a separate FUTURE grant, seal two new independent held-out initial-state histories and production first-period predictions at .20/.30 s, then obtain .21/.31 backend samples under actual applied tension.",
+          "evidence": [
+            "Incumbent batch-ebbeadbdaca10732-0 execution 91c3ba1b01d6499fb26df8f95409401b retained unchanged.",
+            "Retrospective interval diagnostics executions 2413ff2a56de422dac47b7fd78717563 and 9865f1636266479c93817cad42a65353.",
+            "Predicted vs observed endpoint speed: .016953566461155 < .02 vs .023285947509969908 > .02 (candidate-0); .005830076194148043 vs .011023132121572656 (candidate-1).",
+            "Refinement .01->.001 reduces scalar speed error by .00165639008211407 / .00109026085753176 m/s (~26.16% / ~20.99%) but vector error worsens .006934196218480314 -> .007222011082626113 m/s for .15 (coarse .01 -> fine .001)."
+          ],
+          "expected_observations": [
+            "Per-interval norm and vector projection/change/endpoint errors.",
+            "Signed predicted-minus-observed speed error and speed direction by ±1e-4 rule.",
+            "Endpoint scalar and vector passes ≤1e-4 m/s; position discrepancy reported separately.",
+            "False-safe if predicted ≤.02 and observed >.02, with distance to threshold; abstention on invalid alignment or residual >1e-5/nonfinite.",
+            "Resolved coverage, accuracy among resolved (undefined when zero), false-safe counts and total/conditional rates."
+          ],
+          "fixed_conditions": [
+            "Production predictor/controller unchanged (.01 implicit Euler, @7, incumbent .05/.05).",
+            "Zero screening authority in the current diagnostic stage.",
+            "Same robot/task/acceptance/controller recipe; histories and initial states sealed before backend."
+          ],
+          "limitations": [
+            "Current .075/.15 and all current calculations are development only; sealed prior prospective results unchanged.",
+            "No new prospective accuracy established; historical warm plans absent.",
+            "Endpoint numerical failure retains diagnosis only and cannot establish screening reliability.",
+            "M5 remains open; no automatic launch."
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Failed validity.",
+            "Any false-safe.",
+            "Both runs completed.",
+            "Any ceiling reached."
+          ],
+          "unresolved_question": "Whether production first-period predictions can be prospectively screened for endpoint speed acceptance at 1e-4 m/s under the incumbent .05/.05 configuration, given the unexplained millimetres-per-second scalar and vector residual errors."
+        },
+        "reasoning": "Primary action: D (retain local diagnosis only; defer run-ahead screening). Narrowest supported role: retrospective diagnosis of the development executions bound to the incumbent reference — not prospective validation and not a screening mandate. I acknowledge BOTH a material scalar numerical-resolution contribution AND uncorrected vector error, so no convergence, promotion or causal claim is warranted.\n\nCoarse production reproduction is essentially exact: at .30–.31 s the saved states reproduce to position 2.618125142092799e-11 / 9.192850617016396e-10 m and velocity 2.6184579927347476e-09 / 9.196761137540435e-08 m/s; saved production defects are 5.0952387057809356e-8 and 1.9131447419756277e-6, so those tiny offsets do not explain the residual. Initial errors are already large: position norms .0026891778822236262 / .0026889844817533045 m, initial velocity vector norms .00037922371316335865 / .00036431540818624943 m/s; endpoint vector velocity errors reach .007492333503420177 / .006934123087733086 m/s, and change errors .0072664637497075425 / .006759890279313809 m/s. Refinement from .01 to .001 s DOES help scalar speed: +.00165639008211407 / +.00109026085753176 m/s, cutting scalar endpoint speed error ~26.16% / ~20.99%, yet the residual stays >40× the 1e-4 m/s tolerance. Vector error is not consistently improved: for .15 the .01→.001 span moves .006934196218480314 -> .007222011082626113 m/s, with the .002 value .007142183950770937. Fine differences .0002074082261871897 / .000129349605445708 are .001-minus-.002 (not fine-minus-coarse). No uniquely proven projection-level physical cause exists; a single finer value is not convergence.\n\nAt .30 s the common feasible regenerated cold seed satisfies weight-independent checks: objective ~.13, scaled violation 5.2794479400188055e-12, max position error 0.0013601908212322671 < .005 m and speed 0.01991554683358343 < .02 m/s; all three weights share identical first_command_n because the callback stops at iteration zero (selected_plan_is_seed) before any weight-dependent update. These production history/state/input/solver paths differ from the diagnostic, and exact historical warm plans are absent, so no warm-start-only attribution is possible.\n\nSafety: .075/.15 predictions remain false-safe — predicted .016953566461155 < .02 while observed .023285947509969908 > .02, and the .001 result .01860995697336772 is still false-safe. Production acceptance is position .01 m, speed .02 m/s; numerical reporting tolerance is 1e-4 m/s. The four historical correct local directions, zero endpoint numerical passes, full-task 0 resolved / 4 unresolved and ordering abstention are preserved; sealed prior prospective intervals (now development), .075/.15 and all current calculations establish no new prospective reliability. M4 stays closed; M5 stays open.\n\nFuture protocol (prose only, UNEXECUTED, under a separate grant): production predictor/controller unchanged (.01 implicit Euler, @7, incumbent .05/.05), zero screening authority; seal two NEW independent held-out initial-state histories with configuration/initial states fixed before backend, same robot/task/acceptance/controller recipe; seal production first-period predictions at .20 and .30 s and compare .21/.31 backend samples under actual applied tension (four intervals). Per interval report norm and vector projection/change/endpoint errors, signed predicted-minus-observed speed error, speed direction by ±1e-4 rule, endpoint scalar and vector passes ≤1e-4 m/s, position discrepancy separately; false-safe if predicted ≤.02 and observed >.02 with distance to threshold; invalid alignment or residual >1e-5/nonfinite → abstention preserving failed attempts; report resolved coverage, accuracy among resolved (undefined when zero), false-safe counts and total/conditional rates; full-task ordering/screening always abstain, no ranking; useful local information and capture/reconstruction overhead versus full evaluation cost reported separately. Separate future ceiling: 4 provider attempts, 20 workflow calls, 2 backend attempts, 0 extra controller solves, 0 reduced rollouts, 2500 charged seconds, 0 workers, 2 total corrections max 2 consecutive. Stop on failed validity, any false-safe, both runs done, or any ceiling. Endpoint numerical failure retains diagnosis only and prohibits screening; do not close M5; no automatic launch. The operational next_research budget is zero; the current grant stops.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-1-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone5-diagnostic-d0e4130f5370-feedback-bound-final",
+    "reference": {
+      "artifact_id": "7b5b7c82caeafee75be1f3822f3d527f7607c185c01ad1753b51817ce1246a0a",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "retain_baseline",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "c04e04bf39491f8b6b30d6379130cc93e11d165d1252ceba75cc9db232ab5288",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "unresolved",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "None executed and none authorized in this stage; the described future independent-backend protocol is unexecuted and requires a separate grant.",
+          "evidence": [
+            "execution 2413ff2a56de422dac47b7fd78717563 (batch-387f92fd17f0639f-0, .075 development): predicted endpoint speed 0.016953566461155 vs observed 0.023285947509969908, false-safe; .001 prediction 0.01860995697336772 still false-safe",
+            "execution 9865f1636266479c93817cad42a65353 (batch-387f92fd17f0639f-1, .15 development): predicted 0.005830076194148043 and observed 0.011023132121572656, both below .02, NOT false-safe",
+            "coarse reproduction position differences 2.618125142092799e-11 / 9.192850617016396e-10 m and speed differences 4.3009865113852186e-10 / -8.377776656350727e-08 m/s; refined residuals reach 4.486943585776948e-11",
+            "incumbent retained: batch-ebbeadbdaca10732-0 execution 91c3ba1b01d6499fb26df8f95409401b; predecessor four direction-correct/zero endpoint-pass intervals sealed prospectively, now development"
+          ],
+          "expected_observations": [
+            "No new observations; the stage stops at handoff with no further model, tool or backend execution."
+          ],
+          "fixed_conditions": [
+            "incumbent batch-ebbeadbdaca10732-0 retained, selected_candidate=baseline",
+            "zero backend solves, zero worker/subagent calls in this diagnostic stage",
+            "numerical reporting tolerance 1e-4 m/s; physical acceptance .01 m position, .02 m/s; settled-seed check .005 m",
+            "M4 closed, M5 open"
+          ],
+          "limitations": [
+            "Current six calculations are retrospective; no new prospective accuracy",
+            "A scalar speed-norm match is not a vector match; a single finer value is not convergence",
+            "Historical warm plans absent, so warm-start-only attribution is impossible",
+            "Development intervals including the previously sealed four cannot be fresh validation"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Stage terminates at this handoff with zero operational budget",
+            "Any future independent validation would begin only under a separate new grant"
+          ],
+          "unresolved_question": "Whether the millimetres-per-second endpoint speed discrepancy is dominated by projection/omitted modes versus integration and the differing production solver/state/input paths; current retrospective calculations cannot separate them."
+        },
+        "reasoning": "Primary action: D — retain the local diagnosis only and defer run-ahead screening; narrowest supported role is retrospective local diagnosis, no promotion, experiment or screening promise. A fails as an action: scalar resolution materially contributes, but no correction of local prediction integration has been identified that would close the residual vector error, so it would be an unfounded experiment. B fails its precondition: no specific defect is identified. C is unsupported: the .075/.15 candidates' historical warm plans were not saved (historical_plan_availability false in every production row), so no candidate-specific generated history preview can be built from retained evidence.\n\nQuantities. Coarse production reproduction is near-exact: position differences 2.618125142092799e-11 and 9.192850617016396e-10 m; speed differences 4.3009865113852186e-10 and -8.377776656350727e-08 m/s. The retained production defects (5.0952387057809356e-8 and 1.9131447419756277e-6 scaled) explain those tiny offsets, not the millimetres-per-second discrepancy. Initial position error norms 2.6891778822236262e-3 / 2.6889844817533045e-3 m; initial velocity-vector errors 3.7922371316335865e-4 / 3.6431540818624943e-4 m/s despite tiny speed offsets; endpoint vector errors 7.492333503420177e-3 / 6.934123087733086e-3 m/s. Refinement contribution: coarse-to-.001 endpoint speeds rise 1.65639008211407e-3 and 1.09026085753176e-3 m/s, cutting scalar endpoint errors about 26.16% and 20.99%. At .15 refinement the scalar speed improves while the vector error worsens (6.934196218480314e-3 → 7.222011082626113e-3): a scalar speed-norm match is not a vector match. Fine differences 2.074082261871897e-4 and 1.2934960544570828e-4 m/s are .001-minus-.002, NOT fine-minus-coarse. Refined-root residuals reach 4.486943585776948e-11, not all ≤2.4e-14. No uniquely proven projection-level physical cause; physical change error mixes projection, omitted modes, transcription and integration, so one finer value is not convergence.\n\nAt .30 the common regenerated cold seed is feasible with weight-independent checks; seed_settled true, selected_iteration 0, selected_plan_is_seed true, optimized_before_acceptance false, stop_reason verified_settled_seed — the callback stops at iteration zero before any weight-dependent update, so the .005 m / .02 m/s checks that pass cannot rank terminal_weight rows. Cold equality does not imply full-task equivalence; production history, state, input and solver paths also differ and historical warm plans are absent, so no warm-start-only attribution.\n\nFalse-safe scope corrected: ONLY the .075 development interval crosses .02 (predicted .016953566461155, observed .023285947509969908) — 1 of 2 development intervals, not prospective validation. The .15 interval predicts .005830076194148043 and observes .011023132121572656, BOTH below .02, so .15 is NOT false-safe; the plural claim is removed. The .001 .075 prediction .01860995697336772 remains false-safe. Current six calculations are retrospective; the FOUR direction-correct/zero endpoint-pass intervals were sealed prospectively in the completed predecessor and now serve as development; the six older historical development intervals are retained separately. No new prospective accuracy here. M4 closed, M5 open.\n\nFuture protocol (unexecuted, prose only, separate from the zero operational budget): under a FUTURE separate grant, obtain genuinely NEW independent backend evidence — a fresh execution of one specified candidate over declared resolved coverage, reporting per-interval predicted vs observed speed and position with direction, endpoint-vector error, order, abstentions and threshold crossings; count false-safe intervals against a pre-registered .02 m/s threshold; require cost/discrimination (measured backends, wall time) and pre-registered exit rules (stop when N intervals resolve or cost exceeds a bounded budget) with a bounded budget. Zero backend in this diagnostic stage does not mean a future fresh observation costs zero backend. Preserve the 1e-4 m/s numerical reporting tolerance and real-time acceptance; retain incumbent batch-ebbeadbdaca10732-0 execution 91c3ba1b01d6499fb26df8f95409401b.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-2-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "3.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone5-diagnostic-d0e4130f5370-shared",
+    "reference": {
+      "artifact_id": "f4fbf349cbdfb2a7b7c2552a58fd53e8af7f49dafa73d130d2211ac86ee7f4f6",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "retain_baseline",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "c04e04bf39491f8b6b30d6379130cc93e11d165d1252ceba75cc9db232ab5288",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "unresolved",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "No further execution is authorized in this grant; the proposed check is a future, unexecuted protocol only (fresh independent tasks, full 0.35 s rollout, per-step signed position/velocity change errors, abstention on scaled-residual crossing).",
+          "evidence": [
+            "Execution 91c3ba1b01d6499fb26df8f95409401b (batch-ebbeadbdaca10732-0): 35/35 deadline misses at 0.01 s, mean update 8.518 s, real_time_demonstrated=false; terminal error 2.698e-3 m; one-step mean tip difference 2.641e-3 m (max 4.298e-3 m), world frame.",
+            "Execution 2413ff2a56de422dac47b7fd78717563 (batch-387f92fd17f0639f-0, 0.3→0.31 s): coarse reproduction 2.62e-11 m / 2.62e-9 m/s; endpoint position-error norm 2.632e-3 m; position change-error norm 9.07e-5 m; velocity change-error norm 7.27e-3 m/s; speed change-error -6.35e-3 m/s; fine-vs-coarse 1.207e-5 m.",
+            "Execution 9865f1636266479c93817cad42a65353 (batch-387f92fd17f0639f-1): coarse 9.19e-10 m / 9.20e-8 m/s; endpoint error 2.680e-3 m; velocity change-error norm 6.76e-3 m/s; speed change-error -5.13e-3 m/s; fine-vs-coarse 6.94e-6 m.",
+            "All three integrations root_residual_verified with max_scaled_residual <= 2.4e-14; step-10 vs step-1 endpoint difference ~1e-4 m, i.e. not convergence.",
+            "Rows at 0.30 s: checks_depend_on_weights=false, seed_settled=true, selected_iteration=0, selected_plan_is_seed=true, optimized_before_acceptance=false, stop_reason=verified_settled_seed, scaled_violation 5.28e-12, max plan error 1.360e-3 m, max plan speed 1.9916e-2 m/s.",
+            "predecessor_results immutable: full_task_resolved 0, full_task_unresolved 4, local_numerical_pass 0, ordering abstained."
+          ],
+          "expected_observations": [
+            "Signed position and velocity change errors per axis with stated order",
+            "Direction-correct counts and explicit abstentions when sealed scaled residual is exceeded",
+            "Explicit statement of whether any threshold (0.005 m, 0.02 m/s, 1e-4 m/s, real-time) is crossed",
+            "Whether the projection offset and velocity change mismatch reproduce on independent data"
+          ],
+          "fixed_conditions": [
+            "Same backend, control period 0.01 s, world frame, error convention actual_tip minus target",
+            "Position 0.005 m / speed 0.02 m/s acceptance thresholds and 1e-4 m/s numerical reporting tolerance preserved",
+            "Reported as signed per-axis errors with refinement/order scaling, never as a single speed-norm match",
+            "Incumbent batch-ebbeadbdaca10732-0 / execution 91c3ba1b01d6499fb26df8f95409401b unchanged"
+          ],
+          "limitations": [
+            "Development-only data (.075/.15) cannot be fresh validation",
+            "Projection, omitted modes, transcription and integration effects remain blended",
+            "Historical warm plans unavailable; production state/input/solver paths differ",
+            "No convergence claim from a single finer step; no broad causal claim, promotion, or new experiment performed"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Any acceptance-threshold crossing on fresh independent data",
+            "Any real-time miss beyond the reported 35/35 baseline",
+            "Budget exhaustion of the separately-proposed future protocol",
+            "This grant ends at finish; no execution performed"
+          ],
+          "unresolved_question": "Whether the velocity-level change mismatch (7.27e-3 / 6.76e-3 m/s) and the ~2.7e-3 m projection offset persist on independent fresh tasks, or are artifacts of development data and retrospective setup — and whether anything at a candidate-specific level is distinguishable before weight-dependent updates."
+        },
+        "reasoning": "Primary action: D — retain local diagnosis only and defer run-ahead screening. A is unsupported: refinement is not a material error term (refinement shifts are 1e-5 m / 2e-4 m/s against a 2.6e-3 m endpoint offset). B has no identified specific defect to repair. C's preview is weight-independent and cannot license candidate-specific screening. D matches the evidence: the local one-step model is directionally adequate, coarse reproduction is exact, and residual deficit is projection-level, not integration-level.\n\nCoarse production reproduction (checkpoint 0.3 s): batch-387f92fd17f0639f-0 reproduces its saved trajectory to 2.62e-11 m position and 2.62e-9 m/s velocity; batch-387f92fd17f0639f-1 to 9.19e-10 m and 9.20e-8 m/s. Replay is therefore faithful at the checkpoint.\n\nInitial/vector/change errors, 0.3→0.31 s (candidate 0 / candidate 1): initial endpoint error 2.616e-3 / 2.620e-3 m; initial projection error [6.54e-4, -1.686e-3, -1.990e-3] m, norm 2.689e-3 m, so the projection offset alone is ~2.7 mm. Endpoint position-error norm 2.632e-3 / 2.680e-3 m ≈ initial projection error — the interval adds almost nothing. Position change-error norm 9.07e-5 / 5.71e-5 m. Velocity change-error norm 7.27e-3 / 6.76e-3 m/s; speed change-error -6.35e-3 / -5.13e-3 m/s (predicted 4.82e-3 vs observed 1.117e-2 m/s). Dominant deficit is thus velocity-level change, an order above the 1e-4 m/s reporting tolerance, while position change is far smaller.\n\nRefinement contributions / fine-step differences: candidate 0 fine-vs-coarse 1.207e-5 m position, 2.07e-4 m/s speed, 2.47e-4 m/s velocity (candidate 1: 6.94e-6 m, 1.29e-4 m/s, 1.73e-4 m/s). Step-10 endpoints differ ~1e-4 m from step-1 (2.632e-3 vs 2.719e-3 m). One-to-two orders below the endpoint offset; a single smaller finer value is not convergence, and matching speed norm is not a vector match. All three integrations report root_residual_verified (max_scaled_residual ≤2.4e-14), so solver residuals are not the cause.\n\nUnresolved causes: projection, omitted modes, transcription and integration are blended; the velocity change mismatch is not explained by refinement — no broad causal claim is made.\n\nWeight behavior: at 0.30 s all three holding weights (0.05/0.075/0.15) yield identical first_command and identical position/speed checks — checks_depend_on_weights=false — with seed_settled=true, selected_iteration=0, selected_plan_is_seed=true, optimized_before_acceptance=false, stop_reason=verified_settled_seed, scaled_violation 5.28e-12. Thresholds are 0.005 m position / 0.02 m/s speed; max selected plan error 1.360e-3 m, max plan speed 1.9916e-2 m/s. Because the callback stops at iteration zero, the settled seed is weight-independent and does not discriminate the weights; cold equality does not imply full-task equivalence. At 0.2 s objectives differ mildly with weight (0.017375/0.017399/0.017470) at iteration 5.\n\nProvenance: predecessor results (0/4 resolved, 0 local numerical passes, ordering abstained) and the one-step prediction summary (35 aligned, mean 2.641e-3 m, max 4.298e-3 m tip difference, world frame, no future-plan replay) are sealed prior prospective results now serving as development; interval records are current retrospective calculations; .075/.15 are development data. Incumbent batch-ebbeadbdaca10732-0 / execution 91c3ba1b01d6499fb26df8f95409401b is retained; real_time_demonstrated=false with 35/35 deadline misses at 0.01 s (mean update 8.518 s), so real-time acceptance remains unmet; the 1e-4 m/s tolerance is preserved. M4 closed, M5 open. Production states, previous inputs and optimizer paths also differ, and historical warm plans are absent, so no warm-start-only attribution is possible.\n\nUnexecuted future falsification protocol (prose only, independent of the zero operational budget below): on a fresh independent validation set of whole free-reach tasks (not .075/.15) executed with the same backend, compare each accepted first-step prediction against the independently observed next 0.01 s step over a full 0.35 s rollout, reporting signed position and velocity change errors with their order/refinement scaling, per-axis direction-correct counts, and an explicit abstention rule when saved scaled residual exceeds its seal; flag any threshold crossing of 0.005 m / 0.02 m/s / 1e-4 m/s and any real-time miss. Cost estimate ~6 local solves + 8 prediction evaluations, no backend stepping; cease on one crossing or after the budget.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-1-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "4.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone5-diagnostic-d0e4130f5370-shared",
+    "reference": {
+      "artifact_id": "cc4c707f66e736c1741d90a9861eadc070938fdc9d5986129305296e8d310e4a",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "retain_baseline",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "c04e04bf39491f8b6b30d6379130cc93e11d165d1252ceba75cc9db232ab5288",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "unresolved",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "None executed in this phase; the proposed independent-validation protocol above remains unexecuted and cannot use .075/.15 as fresh validation.",
+          "evidence": [
+            "incumbent batch-ebbeadbdaca10732-0 / execution 91c3ba1b01d6499fb26df8f95409401b: sealed one-step evidence 373126bbfb1218e1329fe3862d2c5cf6a60990eed54c7bcbc521fa9db8289f22, aligned_count 35, mean_tip_difference_m 0.002641, max 0.004298 m",
+            "retrospective interval ...9f-0 execution 2413ff2a56de422dac47b7fd78717563: coarse reproduction 2.62e-11 m; initial_error_norm 2.69e-3 m; endpoint_error_norm 2.63e-3 m; change_error_norm 9.07e-5 m; fine_difference position_norm 1.21e-5 m",
+            "retrospective interval ...9f-1 execution 9865f1636266479c93817cad42a65353: coarse reproduction 9.19e-10 m; initial_error_norm 2.69e-3 m; endpoint_error_norm 2.68e-3 m; velocity change_error_norm 6.76e-3 m/s; fine_difference position_norm 6.94e-6 m",
+            ".30 s rows: feasible=true, scaled_violation 5.2794479400188055e-12, seed_settled=true, selected_iteration=0, stop_reason=verified_settled_seed across all three weight variants",
+            "historical_plan_availability all false; historical_warm_plan_available=false; predecessor_results local_numerical_pass 0, full_task_resolved 0/4, ordering abstained"
+          ],
+          "expected_observations": [
+            "If the projection/omitted-mode hypothesis holds: removing recorded projection reduces endpoint position error by >=3x at all checkpoints",
+            "If weak: reduction <1.5x, leaving omitted modes/transcription unresolved",
+            "Refinement ladder deltas should remain below 1e-4 m/s before any convergence claim"
+          ],
+          "fixed_conditions": [
+            "Same robot/task/controller/coordinate frame (world) and error convention (actual_tip minus target)",
+            "Same 0.30 s horizon, 0.01 s control period, recorded applied-tension input policy",
+            "Weight-independent position/speed checks and 1e-4 m/s numerical reporting tolerance preserved",
+            "No backend solves, no worker/subagent calls (0 budget)"
+          ],
+          "limitations": [
+            "This grant stops; no run-ahead screening, promotion, or new experiment is authorized",
+            "Historical warm plans unavailable, so no warm-start-only attribution is possible",
+            "Velocity-level change error (~1e-2 m/s) is not explained by position-level errors; speed-norm is not a vector match",
+            "A single finer step value cannot establish convergence; production states, inputs and solver paths also differ",
+            "Proposed future budget is prose only and separate from the zero operational next_research budget"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "Any signature or credential failure",
+            "More than two transport timeouts",
+            "Unambiguous threshold crossing reached",
+            "Grant budget exhausted"
+          ],
+          "unresolved_question": "Whether the ~2.6e-3 m one-step endpoint error is dominated by initial projection/omitted-mode mismatch rather than integration refinement (unresolved; not testable within this grant)."
+        },
+        "reasoning": "Primary action: D — retain the local diagnosis only and defer run-ahead screening. This is the narrowest supported role: a retrospective diagnostic calculation, not a defect repair (no isolated defect is identified, so B is unsupported), not a prediction-integration improvement (no demonstration that local numerical error materially drives the outcome, so A is unsupported), and not a candidate-specific generated-history preview (the historical warm plans are absent — control_plans.json / control_snapshots.json / optimizer_snapshots.json all false, historical_warm_plan_available=false — so C cannot be supported either). D is the only action the evidence types authorize; .075/.15 are development data and the .20/.30 rows are historical development, not fresh validation.\n\nCoarse production reproduction. The regeneration reproduces saved states at 0.30 s to ~1e-11..1e-9 m: candidate ...9f-0 position_difference 2.62e-11 m, speed 4.30e-10 m/s; ...9f-1 9.19e-10 m, −8.38e-8 m/s. So the cold constant-input regeneration and saved-state consistency are near machine-level; the coarse reproduction is not the source of the residual.\n\nInitial / vector / change errors. Initial projection error norms are ~2.69e-3 m (position) and ~3.6e-4 m/s (velocity) for both intervals; endpoint_error_norm ~2.63e-3 m (...9f-0) and ~2.68e-3 m (...9f-1). The change_error (observed_change − predicted_change) is smaller: position change_error_norm 9.07e-5 m (...9f-0), 5.71e-5 m (...9f-1); velocity change_error_norm 7.27e-3 (...9f-0), 6.76e-3 m/s (...9f-1). Note the asymmetry: position change errors are ~1e-5..1e-4 m while velocity change errors are ~1e-2 m/s — a velocity-level mismatch. Do not collapse these: a speed-norm match is not a vector match. Here speed change_error is −6.35e-3 (...9f-0) and −5.13e-3 m/s (...9f-1), while the velocity vector change errors are 7.27e-3 and 6.76e-3 m/s — same order but different decomposition, so neither the speed nor the speed-norm should be read as an endpoint vector agreement.\n\nRefinement contributions / fine-step differences. A single finer step changes the endpoint only slightly: fine_difference position_norm 1.21e-5 m (...9f-0) and 6.94e-6 m (...9f-1); speed 2.07e-4 and 1.29e-4 m/s; velocity_norm 2.47e-4 and 1.73e-4 m/s. These refinement deltas are 1e-5..1e-4, i.e. one-to-two orders below the ~2.6e-3 m endpoint error, so numerical refinement is not the dominant term and a single finer value cannot be called converged.\n\nUnresolved causes. The decomposition preserves identity (identity_residual ~0) and the residual splits into a projection/initial term (~2.69e-3 m) plus a change term; the change term includes projection, omitted modes, transcription and integration and is explicitly not an isolated physical-dynamics error. So the largest unresolved contributor is the initial projection/omitted-mode term, followed by an unexplained velocity change mismatch, with integration/transcription unseparated.\n\n.30 settled-seed thresholds / feasibility / weight-independence. At 0.30 s all three weight variants converge to the same feasible cold seed: feasible=true, scaled_violation 5.2794479400188055e-12, position 0.001360 m <0.005 m and speed 0.019916 m/s <0.02 m/s, seed_settled=true, selected_iteration=0, selected_plan_is_seed=true, stop_reason=verified_settled_seed. Because the callback stops at iteration zero before a weight-dependent update, acceptance is weight-independent; at 0.20 s the seeds are not settled and rows differ by objective (e.g. 0.017375 vs 0.017399 vs 0.017470) with feasible=true and larger scaled_violation ~5.8e-6, and optimized_before_acceptance=true. cold equality at one checkpoint does not imply full-task equivalence.\n\nCost and boundaries. prior_costs preview 73.3 s, two full evaluations 605.9 s; measured_computation_s 300.265 s; mean_complete_update_s 8.518 s; control_updates 35, converged_updates 0, deadline_misses 35, real_time_demonstrated=false. One-step prediction: aligned_count 35, mean_tip_difference_m 2.64e-3, max 4.30e-3 m, missing none — this is sealed prior prospective evidence, now development data, distinct from the current retrospective calculations. Retain incumbent batch-ebbeadbdaca10732-0 / execution 91c3ba1b01d6499fb26df8f95409401b.\n\nCandidate-level ranking: the three weight variants are not separated by these diagnostics (objectives within ~1%, violations weight-independent at .30); ...9f-0/...9f-1 change errors differ only modestly, so no candidate promotion is warranted.\n\nProposed future falsification/validation protocol (unexecuted, prose only, separate from the zero operational budget). Hypothesis: the ~2.6e-3 m endpoint error is dominated by initial projection/omitted-mode mismatch rather than integration refinement. Quantity: one-step tip position/velocity endpoint error at matched checkpoints. Scope: independent re-executions from a held-out set of at least 8 unseen checkpoints on independent trajectories, not .075/.15 and not the four predecessor runs. Direction: predicted-minus-observed per axis. Error/order reporting: report per-axis and norm position error and velocity vector error separately, with a refinement ladder (single/double/half step) so order is visible; abstain from any convergence claim unless the finer-vs-coarser delta falls below 1e-4 m/s velocity tolerance. Threshold-crossing: declare the projection hypothesis supported only if removing the recorded projection (backend vs projected) reduces endpoint position error by ≥3× across all checkpoints; declare weak if reduction is <1.5×. Cost: bounded to the .30 s horizon at ≤8 matched intervals; proposed future budget (prose) ~1 preview plus 2 full evaluations (~680 s) and ≤8 numerical evaluations — not operationally invoked here. Stopping rules: stop on any signature/security failure, on >2 transport timeouts, or once the tolerance crossing is unambiguous. Independent evidence is required; .075/.15 cannot serve as fresh validation. Retain real-time acceptance and the 1e-4 m/s reporting tolerance.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-2-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "4.0.0"
+    }
+  },
+  {
+    "run_id": "gvs-milestone5-diagnostic-d0e4130f5370-shared",
+    "reference": {
+      "artifact_id": "6b029a2a5e4532d6d95baaa5701ed969ced6890957f2a904e0573410b85fa230",
+      "media_type": "application/json"
+    },
+    "invocation": {
+      "arguments": {
+        "candidate_disposition": "retain_baseline",
+        "disposition": "defer",
+        "feedback": {
+          "artifact_id": "c04e04bf39491f8b6b30d6379130cc93e11d165d1252ceba75cc9db232ab5288",
+          "media_type": "application/json"
+        },
+        "hypothesis_assessment": "unresolved",
+        "next_action": "finish",
+        "next_research": {
+          "bounded_check": "Proposed, unexecuted: one pre-registered weight-discriminating condition vs baseline on unseen held-out rollouts, with a settling threshold not pre-satisfied so optimization actually updates; report per-update position and velocity VECTOR errors (m, m/s) at the 1e-4 m/s tolerance.",
+          "evidence": [
+            "batch-387f92fd17f0639f-0 execution 2413ff2a56de422dac47b7fd78717563 interval [0.3,0.31]: coarse reproduction position_difference_m 2.618e-11, speed difference 4.30e-10 m/s",
+            "batch-387f92fd17f0639f-1 execution 9865f1636266479c93817cad42a65353 coarse reproduction 9.19e-10 m, velocity difference norm 9.20e-08 m/s",
+            "rows @0.3: holding weights 0.05/0.075/0.15 give identical first_command_n, selected_iteration 0, selected_plan_is_seed true, stop_reason verified_settled_seed, maximum_selected_plan_speed 1.9916e-02 m/s < 0.02",
+            "rows @0.2: weights differ (objectives 1.7375e-02 / 1.7399e-02 / 1.7470e-02), maximum_selected_plan_speed 2.513e-02 m/s > 0.02",
+            "incumbent 91c3ba1b01d6499fb26df8f95409401b: task_accepted true, terminal_error 2.698e-03 m, 35/35 deadline misses, converged_updates 0, real_time_demonstrated false"
+          ],
+          "expected_observations": [
+            "weight-dependent plan divergence rather than a pre-settled seed",
+            "signed velocity-vector error direction and magnitude",
+            "full-task terminal error and deadline-miss count",
+            "abstention if the result sits inside the tolerance band"
+          ],
+          "fixed_conditions": [
+            "configuration/controller/checkpoints identical to incumbent",
+            "independent held-out data, not .075/.15 and not the sealed prospective set",
+            "numerical reporting tolerance 1e-4 m/s",
+            "acceptance thresholds position 0.005 m, speed 0.02 m/s"
+          ],
+          "limitations": [
+            "historical warm plans unavailable",
+            "production states, inputs and solver paths differ",
+            "change error bundles projection, omitted modes, transcription and integration",
+            "single .30 point is degenerately weight-independent"
+          ],
+          "proposed_budget": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 0,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "proposed_variables": {},
+          "route": "stop",
+          "stopping_conditions": [
+            "stop after one bounded batch",
+            "stop if no decisive threshold crossing",
+            "stop on budget exhaustion"
+          ],
+          "unresolved_question": "Whether the retained incumbent batch-ebbeadbdaca10732-0 / execution 91c3ba1b01d6499fb26df8f95409401b stays non-inferior under an independent condition where the weight variants actually discriminate; unresolved because the .30 s seeds satisfy the thresholds a priori."
+        },
+        "reasoning": "Primary action: D - retain local diagnosis only and defer run-ahead screening; narrowest role: retrospective numerical reconciliation of already-validated local predictions, not promotion or re-execution. Disposition defer, recommendation_id null, next_action finish, route stop, zero operational next_research budget.\n\nCoarse production reproduction is effectively exact: regenerated cold states vs saved trajectories differ by 2.62e-11 m (f-0) and 9.19e-10 m (f-1) position, speed differences 4.30e-10 and -8.38e-08 m/s, velocity-norm differences 2.62e-09 and 9.20e-08 m/s at 0.30 s. Reconstruction is thus not the error source.\n\nInitial errors at 0.30 s are projection-dominated: initial position error norms 0.0026892 and 0.0026890 m with projection components [6.54e-4,-1.69e-3,-1.99e-3] m; initial speed projection errors only 1.68e-05 and -5.81e-05 m/s. Over the 0.01 s interval, position change-error norms are 9.07e-05 and 5.71e-05 m; velocity change-error norms 7.27e-03 and 6.76e-03 m/s; speed change-error -6.35e-03 and -5.13e-03 m/s. Endpoint position error norms 2.63e-03 and 2.68e-03 m; endpoint velocity error norms 7.49e-03 and 6.93e-03 m/s. The change/endpoint velocity discrepancy (~7e-3 m/s) is larger than the speed-norm change error (~6e-3 m/s): a speed-norm match is NOT a vector match, and the x-axis dominates directionally.\n\nRefinement is negligible and non-converging: 0.01 to 0.002 to 0.001 s (1/5/10 steps, all root_residual_verified) changes endpoint position error norm only 2.63190e-03 to 2.70852e-03 to 2.71856e-03 (f-0) and 2.67990e-03 to 2.71934e-03 to 2.72428e-03 (f-1) - slightly increasing, so no single finer value certifies convergence. Coarse/fine differences are 1.21e-05 and 6.94e-06 m position, 2.07e-04 and 1.29e-04 m/s speed, 2.47e-04 and 1.73e-04 m/s velocity-norm; the speed/velocity differences straddle the 1e-4 m/s reporting tolerance, so step resolution is marginally material at that tolerance yet cannot explain the ~7e-3 m/s change error.\n\nAt 0.30 s the settled-seed rule makes the check weight-independent: 0.05/0.075/0.15 all yield identical first_command_n equal to previous_input_n, selected_iteration 0, selected_plan_is_seed true, optimized_before_acceptance false, stop_reason verified_settled_seed, initial scaled violation 5.28e-12, maximum_selected_plan_error 1.360e-03 m (<0.005 m) and maximum_selected_plan_speed 1.992e-02 m/s (<0.02 m/s). Because the seed already clears both thresholds the callback stops at iteration zero before any weight-dependent update, so the weights never diverge - this degenerate acceptance cannot test weight sensitivity. At 0.20 s seeds are not settled (optimized, selected_iteration 5, stop relative_seed_improvement), weights do differ (objectives 1.7375e-02/1.7399e-02/1.7470e-02), and maximum_selected_plan_speed 2.513e-02 m/s exceeds the 0.02 limit.\n\nUnresolved causes: historical warm plans are absent and production states/inputs/solver paths differ (state_difference_from_common_preview_norm up to 0.46), so no warm-start-only attribution; change error bundles projection, omitted modes, transcription and integration and is not isolated dynamics error. The sealed one-step prospective set (artifact 373126bbfb1218e1329fe3862d2c5cf6a60990eed54c7bcbc521fa9db8289f22, 35 aligned, mean tip diff 2.64e-03 m, max 4.30e-03 m) is now development, distinct from the .075/.15 historical-development weights and from these current retrospective interval calculations.\n\nRetain incumbent batch-ebbeadbdaca10732-0 / execution 91c3ba1b01d6499fb26df8f95409401b: task_accepted true, terminal error 2.698e-03 m, sampled settling passed (max error 2.73e-03 m, max speed 1.275e-02 m/s), 0 solver errors - but 35/35 deadline misses, converged_updates 0, real_time_demonstrated false; hence defer, not promote.\n\nFuture falsification/validation protocol (proposed, unexecuted, prose-only): on independent held-out rollouts (not .075/.15, not the sealed set), run one pre-registered weight-discriminating condition against baseline with all else fixed and a settling threshold not pre-satisfied so optimization actually updates; report per-update position and velocity VECTOR errors (m, m/s) at the 1e-4 m/s tolerance, not speed norms; report full-task terminal error, deadline-miss count, direction/sign, error magnitude, rank order, abstentions and pre-declared threshold crossings; estimated cost about 2 full evaluations (~600 s) plus solves. Bounded future budget (prose only, separate from the zero operational budget): model_calls <=8, local_solves <=6, backend_solves 0, wall <=1800 s. M4 closed, M5 open; independent evidence required - .075/.15 cannot serve as fresh validation.",
+        "recommendation_id": null,
+        "report": {
+          "artifact_id": "f4499792c577e668e648ed0bba2435d312f5a83dc774dbd4e329d2f3482fcc4d",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        }
+      },
+      "cache": "reuse",
+      "contract_version": "1.0.0",
+      "evidence": [],
+      "reason": "Model-authored business fields expanded by scoped reference adapter v5.",
+      "request_id": "model-3-tool",
+      "tool_id": "design.respond_diagnosis",
+      "tool_version": "4.0.0"
+    }
+  }
+]
