@@ -188,10 +188,10 @@ class SearchBatchPlan(Contract):
     contract: Literal['platform.search_batch_plan'] = 'platform.search_batch_plan'
     version: Literal['1.0.0'] = '1.0.0'
     hypothesis: str = Field(min_length=1)
-    evidence: list[str] = Field(min_length=1)
+    evidence: list[str] = Field(min_length=1, description='Exact current F aliases only, including at least one performed-check result alias. Put explanations in rationale.')
     weakening_observations: list[str] = Field(min_length=1)
     variables: dict[str, list[float]] = Field(description='Exact builder paths mapped to [lower, upper] numeric bounds.')
-    fixed_conditions: list[str] = Field(min_length=1)
+    fixed_conditions: list[str] = Field(min_length=1, description='Bare identifiers: robot, task, acceptance, controller_implementation, other_numerical_settings. Put descriptions in rationale, not in these identifiers.')
     fixed_controller: str = Field(description='Exact extension_id@version, fixed implementation.')
     objectives: list[str] = Field(min_length=1)
     constraints: list[str] = Field(min_length=1)

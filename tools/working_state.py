@@ -170,4 +170,8 @@ def project_working_state(store, run_id):
                 numerical=json.loads(work_row[0]) if work_row else None),
             recovery=recovery_status(state,inp['policy']['model']),actions=actions,acceptance=acceptance,
             parameter_impacts=parameter_impacts(effective,reference=config_ref),
-            experiment_plan=dict(reference=plan,source='role_context.experiment_plan' if role.get('experiment_plan') else 'state.experiment_plan') if plan else None)
+            experiment_plan=dict(reference=plan,source='role_context.experiment_plan' if role.get('experiment_plan') else 'state.experiment_plan') if plan else None,
+            search_batch=dict(plan=state['search_batch']['plan'],mode=state['search_batch']['mode'],
+                pending=state['search_batch']['pending'],proposals=len(state['search_batch']['proposals']),
+                distinct_configurations=len(state['search_batch']['configurations']),stop_reason=state['search_batch']['stop_reason'],
+                result=state.get('search_batch_result')) if state.get('search_batch') else None)

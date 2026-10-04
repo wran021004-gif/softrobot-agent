@@ -21,7 +21,11 @@ def validate_batch_plan(store, view, proposal):
     accepted_product(store,role['previous_report'],'diagnosis_report')
     selectors=resolve_aliases(state,{'plan':plan.evidence})['plan']
     feedback=store.artifact(role['result_feedback'])
-    if not any(s['reference']==feedback['result'] for s in selectors):raise ValueError('PLAN_REQUIRES_PERFORMED_CHECK_EVIDENCE')
+    if not any(s['reference']==feedback['result'] for s in selectors):
+        from tools.diagnostic_revision import ensure_aliases
+        aliases=ensure_aliases(state)['aliases']
+        available=[a for a,h in aliases.items() if state['fact_catalog'][h]['selector']['reference']==feedback['result']]
+        raise ValueError('PLAN_REQUIRES_PERFORMED_CHECK_EVIDENCE: evidence must include an exact result alias, e.g. '+', '.join(available[:8]))
     candidate=view.latest_tested
     effective=store.artifact(candidate['configuration'])['effective']
     controller=effective['policy']['controller'];identity=controller['extension_id']+'@'+controller['version']
@@ -260,3 +264,188 @@ def _save(host, saved):
         state = host.store.session(host.run_id, db)['state']
         state['search'] = saved
         host.store.update_state(db, host.run_id, state)
+
+
+def physical_feedback(baseline, candidate, acceptance):
+    """Scalar coordinate guidance; the frozen physical comparison stays separate."""
+    import math
+    from tools.settling_campaign import compare_results
+    comparison=compare_results(baseline,candidate)
+    metrics=comparison['candidate']
+    limits=[acceptance['terminal']['value'],acceptance['holding']['position']['value'],
+        acceptance['holding']['speed']['value']]
+    holding=acceptance['holding']
+    for facts in (baseline,candidate):
+        settling=facts['sampled_settling']
+        if [settling['position_limit_m'],settling['speed_limit_m_s'],settling['window_s']]!=[
+                holding['position']['value'],holding['speed']['value'],holding['duration']['value']]:
+            raise ValueError('BATCH_ACCEPTANCE_CHANGED')
+    vector=[metrics[k] for k in comparison['ranking_rule']['physical_metrics']]
+    legal=(metrics['valid_complete_execution'] and candidate['sampled_settling']['available']
+        and metrics['force_bound_violation_n']==0 and metrics['solver_error_count']==0
+        and all(math.isfinite(v) and v>=0 for v in vector))
+    if not all(math.isfinite(v) and v>0 for v in limits):raise ValueError('BATCH_ACCEPTANCE_LIMITS_REQUIRED')
+    # Acceptance occupies [0,1); nonacceptance [1,2). The bounded normalized
+    # physical loss is monotone in each metric. A trade-off can guide ask/tell,
+    # but its classification is never changed to "overall improvement".
+    score=(int(not metrics['joint_reach_holding_passed'])+
+        sum(v/(v+limit) for v,limit in zip(vector,limits))/len(vector)) if legal else None
+    return dict(score=score,comparison=comparison,physical_metrics=metrics,
+        rule='Joint acceptance bucket plus mean v/(v+frozen_limit); minimize. Trade-offs may guide exploration, never promotion.',
+        guidance_only=True,candidate_promoted=False)
+
+
+def _save_batch(host,batch):
+    with host.store.transaction() as db:
+        state=host.store.session(host.run_id,db)['state'];state['search_batch']=batch
+        host.store.update_state(db,host.run_id,state)
+
+
+def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_reserve_s=600.):
+    """Bind an accepted immutable plan in a separate offline grant, with no live adapter."""
+    from copy import deepcopy
+    from tools.diagnostic_handoff import accepted_product
+    from schemas.platform_handoff import SearchBatchPlan
+    from extensions.tendon_family.optimization import SearchParameters,CoordinateSearch
+    from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
+    from extensions.tendon_family.gvs_profile import execution_scope
+    record=accepted_product(host.store,plan_ref,'search_batch_plan')
+    plan=SearchBatchPlan.model_validate(record['plan'])
+    if not record['structurally_operationally_valid'] or record['execution_authorized']:
+        raise ValueError('BATCH_REQUIRES_VALID_UNEXECUTED_PLAN')
+    if plan.fixed_controller!='controller.gvs_nmpc@7.0.0' or plan.method!='search.family_coordinate@1.0.0':
+        raise ValueError('BATCH_FIXED_IMPLEMENTATION_REQUIRED')
+    if set(plan.variables)-set(REACH_WEIGHT_PATHS):raise ValueError('BATCH_WEIGHT_PATHS_ONLY')
+    state=host.store.session(host.run_id)['state'];existing=state.get('search_batch')
+    if existing:
+        if existing['plan']!=plan_ref:raise ValueError('BATCH_PLAN_IMMUTABLE')
+        return existing
+    effective=host.store.artifact(record['bindings']['subject']['configuration'])['effective']
+    fixed=deepcopy(effective)
+    for path in plan.variables:fixed['policy']['controller']['parameters']['data']['recipe'][path.rsplit('/',1)[-1]]='<batch variable>'
+    if digest(fixed)!=record['bindings']['fixed_configuration_identity']:
+        raise ValueError('BATCH_SOURCE_CONFIGURATION_MISMATCH')
+    snapshot=host.store.session(host.run_id)['snapshot']['input']
+    if execution_scope(snapshot)!=execution_scope(effective):raise ValueError('BATCH_HOST_SCIENCE_MISMATCH')
+    budget=host.store.spendable(host.run_id)['remaining']
+    if any(budget[k] for k in ('backend_solves','model_calls','worker_calls')):
+        raise ValueError('OFFLINE_BATCH_REQUIRES_ZERO_LIVE_GRANT')
+    floor=sum(record['cost_floor_per_candidate_s'].values())
+    if floor!=990 or interpretation_reserve_s<0 or budget['wall_s']<floor*plan.max_candidates+interpretation_reserve_s or budget['tool_calls']<4*plan.max_candidates:
+        raise ValueError('BATCH_RESERVATION_CAPACITY_REQUIRED: 990 seconds and 4 tools per proposal, plus explicit interpretation reserve')
+    initial={p:effective['policy']['controller']['parameters']['data']['recipe'][p.rsplit('/',1)[-1]] for p in plan.variables}
+    parameters=SearchParameters(initial=initial,bounds=plan.variables,max_trials=plan.max_candidates,step=plan.step)
+    if starting_facts and starting_facts['candidate']!=record['bindings']['subject']:
+        raise ValueError('BATCH_START_EVIDENCE_MISMATCH')
+    batch=dict(plan=plan_ref,batch_id='batch-'+plan_ref['artifact_id'][:16],mode='offline_injected',
+        parameters=plain(parameters),algorithm=plain(CoordinateSearch(parameters).save()),pending=None,
+        proposals=[],configurations={},starting_facts=starting_facts,base_configuration=record['bindings']['subject']['configuration'],
+        interpretation_reserve_s=interpretation_reserve_s,usage_start=host.store.remaining(host.run_id)['used'],stop_reason=None)
+    _save_batch(host,batch)
+    return batch
+
+
+def offline_batch_result(host):
+    """Compact public result suitable for the existing evidence handover path."""
+    batch=host.store.session(host.run_id)['state']['search_batch']
+    now=host.store.remaining(host.run_id)['used'];used={k:v-batch['usage_start'][k] for k,v in now.items()}
+    rows=list(batch['configurations'].values())
+    return dict(contract='platform.search_batch_result',version='1.0.0',mode=batch['mode'],plan=batch['plan'],
+        batch_id=batch['batch_id'],status='completed' if batch['stop_reason']=='proposal_limit' else 'stopped' if batch['stop_reason'] else 'pending' if batch['pending'] else 'prepared',
+        stop_reason=batch['stop_reason'],pending=batch['pending'],proposals=batch['proposals'],
+        candidates=[{k:v for k,v in row.items() if k!='effective'} for row in rows],
+        accounting=dict(proposals=len(batch['proposals']),distinct_configurations=len(rows),
+            reused_evaluations=sum(p.get('reused',False) for p in batch['proposals']),
+            new_backend_attempts=used['backend_solves'],offline_execution_attempts=sum(not r['reused'] and 'simulation' in r['stages'] for r in rows),
+            completed_new_evaluations=sum(not r['reused'] and r.get('feedback') is not None for r in rows),usage=used),
+        physical_acceptance_authority='Frozen full comparison; optimizer guidance does not promote a candidate.',
+        execution_authorized=False,candidate_promoted=False)
+
+
+def run_offline_batch(host,inject,*,stop_after_stage=None):
+    """Injected apply/simulation/evaluation/profile outputs only; no provider or physics.
+
+    The callback receives (stage, candidate, retained stage receipts). Its profile
+    output supplies factual_result in the existing complete-execution shape.
+    SQLite seals each synthetic receipt before continuing; unknown work is never
+    automatically replayed. A future live adapter still needs a separate grant.
+    """
+    import json,time
+    from schemas.platform import CandidateInput
+    from extensions.tendon_family.optimization import SearchParameters,CoordinateSearch
+    from tools.platform_tools import _candidate
+    from tools.platform_store import zero
+    from copy import deepcopy
+    batch=host.store.session(host.run_id)['state']['search_batch']
+    record=host.store.artifact(batch['plan']);source=host.store.artifact(batch['base_configuration'])['effective']
+    algorithm=CoordinateSearch(SearchParameters.model_validate(batch['parameters']))
+    algorithm.restore(batch['algorithm']['data'])
+    stages=(('apply',0.),('simulation',900.),('evaluation',30.),('profile',60.))
+    while batch['pending'] or not algorithm.stopped():
+        if batch['stop_reason']:break
+        if batch['pending'] is None:
+            changes=algorithm.propose();effective=plain(_candidate(SessionInput.model_validate(source),changes,host.reg));identity=digest(effective)
+            fixed=deepcopy(effective)
+            for p in batch['parameters']['bounds']:fixed['policy']['controller']['parameters']['data']['recipe'][p.rsplit('/',1)[-1]]='<batch variable>'
+            if digest(fixed)!=record['bindings']['fixed_configuration_identity']:raise ValueError('BATCH_CANDIDATE_CHANGED_FIXED_CONFIGURATION')
+            proposal=dict(index=len(batch['proposals']),changes=changes,identity=identity,reused=False)
+            batch['proposals'].append(proposal);previous=batch['configurations'].get(identity)
+            start=batch['starting_facts'] if proposal['index']==0 else None
+            if previous or start:
+                if start and not previous:
+                    previous=dict(candidate_id=start['candidate']['candidate_id'],configuration=start['configuration'],identity=identity,
+                        stages={k:dict(execution_status='historical_reused') for k,_ in stages},reused=True,
+                        feedback=physical_feedback(start,start,record['bindings']['acceptance']))
+                    batch['configurations'][identity]=previous
+                proposal.update(reused=True,reused_from=previous['candidate_id'])
+                algorithm.feedback(previous['feedback']['score']);batch['algorithm']=plain(algorithm.save());_save_batch(host,batch);continue
+            candidate_id=batch['batch_id']+'-'+str(proposal['index'])
+            prepared=CandidateInput(candidate_id=candidate_id,baseline_identity=digest(source),builder=source['policy']['candidate_builder']['extension_id'],
+                builder_version=source['policy']['candidate_builder']['version'],changes=changes,allowed=source['policy']['editable'],
+                effective=effective,content_identity=identity)
+            with host.store.transaction() as db:configuration=plain(host.store.put(db,prepared))
+            batch['pending']=dict(candidate_id=candidate_id,configuration=configuration,identity=identity,changes=changes)
+            batch['configurations'][identity]=dict(**batch['pending'],stages={},reused=False)
+            batch['algorithm']=plain(algorithm.save());_save_batch(host,batch)
+        candidate=batch['pending'];row=batch['configurations'][candidate['identity']]
+        for stage,reserve_s in stages:
+            request_id=candidate['candidate_id']+'-'+stage
+            old=host.store.lookup(host.run_id,request_id)
+            if old and not old['receipt']:
+                host.store.mark_unknown(host.run_id,request_id)
+                row['stages'][stage]=dict(execution_status='unknown',request_id=request_id,execution_id=old['execution_id'],
+                    charged=json.loads(old['charged']),output=None)
+                _save_batch(host,batch)
+                return offline_batch_result(host)
+            if old:receipt=json.loads(old['receipt'])
+            else:
+                if host.store.spendable(host.run_id)['remaining']['wall_s']<reserve_s+batch['interpretation_reserve_s']:
+                    return offline_batch_result(host)
+                reservation,_=host.store.reserve(host.run_id,request_id,digest(dict(candidate=candidate,stage=stage)),host.actor,
+                    {**zero(),'tool_calls':1,'wall_s':reserve_s})
+                started=time.monotonic()
+                output=host.store.artifact(candidate['configuration']) if stage=='apply' else inject(stage,deepcopy(candidate),deepcopy(row['stages']))
+                receipt=host.store.complete(reservation,dict(request_id=request_id,execution_id=reservation['execution_id'],caller=host.actor,
+                    tool_id='offline.batch.'+stage,tool_version='1.0.0',execution_status='completed' if stage=='apply' else output.get('execution_status','completed'),charged=zero()),
+                    dict(mode='offline_injected',configuration=candidate['configuration'],result=output),time.monotonic()-started)
+            row['stages'][stage]=receipt;_save_batch(host,batch)
+            if receipt['execution_status']!='completed':return offline_batch_result(host)
+            if stop_after_stage==stage:return offline_batch_result(host)
+        facts=host.store.artifact(row['stages']['profile']['output'])['result']['factual_result']
+        if (facts['configuration']!=candidate['configuration'] or facts['candidate']['configuration']!=candidate['configuration']
+                or facts['candidate']['candidate_id']!=candidate['candidate_id']):
+            raise ValueError('BATCH_RESULT_CONFIGURATION_MISMATCH')
+        baseline=batch['starting_facts']
+        if baseline is None:batch['starting_facts']=baseline=facts
+        row['feedback']=physical_feedback(baseline,facts,record['bindings']['acceptance'])
+        algorithm.feedback(row['feedback']['score']);batch['pending']=None;batch['algorithm']=plain(algorithm.save())
+        if row['feedback']['score'] is None:batch['stop_reason']='invalid_physical_result'
+        _save_batch(host,batch)
+    if not batch['stop_reason']:batch['stop_reason']='proposal_limit'
+    _save_batch(host,batch)
+    result=offline_batch_result(host)
+    with host.store.transaction() as db:
+        ref=host.store.put(db,result);state=host.store.session(host.run_id,db)['state'];state['search_batch_result']=plain(ref)
+        host.store.update_state(db,host.run_id,state)
+        host.store.event(db,host.run_id,'search_batch','offline_result',inputs=[batch['plan']],outputs=[ref])
+    return result

@@ -103,6 +103,10 @@ ranking or execution authority. This stage does not implement that batch runner.
 
 ## Delivery status
 
+Subsequent interface repairs and the injected batch path are documented in
+[Milestone 3 offline preparation](stage356_milestone3_offline.md). They are
+separate from the original live implementation and are offline validated only.
+
 The original authorized pair ran on commit `3bc8557` with one matched common
 freeze. Single-context is incomplete: its check and evidence-dependent revision
 were accepted, but search-plan submission exhausted the existing repair allowance

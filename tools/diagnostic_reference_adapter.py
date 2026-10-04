@@ -202,7 +202,17 @@ class EvidenceDrivenAdapter(ScopedReferenceAdapter):
         if name=='diagnosis.propose_check':selections={str(i):r.get('references') for i,r in enumerate(args.get('relationships',[]))}
         elif name=='diagnosis.revise_assessment':selections={str(i):r.get('references') for i,r in enumerate(args.get('new_facts',[]))}
         elif name=='design.submit_search_plan':selections={'evidence':args.get('evidence')}
-        errors+=alias_errors(self.fact_state,selections)
+        alias_failures=alias_errors(self.fact_state,selections)
+        for error in alias_failures:
+            path=error['path'].removeprefix('fact_handles.')
+            if name=='diagnosis.propose_check':
+                index,_,suffix=path.partition('.')
+                path='relationships.'+index+'.references'+('.'+suffix if suffix else '')
+            elif name=='diagnosis.revise_assessment':
+                index,_,suffix=path.partition('.')
+                path='new_facts.'+index+'.references'+('.'+suffix if suffix else '')
+            error['path']=path
+        errors+=alias_failures
         self.retain(name,args,errors)
         if errors:raise ToolProtocolError(errors)
         return args
