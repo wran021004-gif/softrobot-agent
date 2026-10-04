@@ -8,21 +8,35 @@ sampled acceptance passed; mean update was 8.518 s with 35/35 deadline misses.
 The passing 0/0.05 recipe remains a research reference; the adaptation is a
 tradeoff, not dominance. Selected deliverable and latest execution are distinct.
 
-The original Milestone 5 pilot remains sealed and inconclusive. The separately
-authorized later stage completed historical diagnosis and matched-input
-development analysis, but prospective execution is **awaiting external-payload
-approval**. Automatic approval review rejected transmission to the configured
-DeepSeek endpoint. No new provider or backend attempt ran.
+The original Milestone 5 pilot remains sealed and inconclusive. The later bounded
+prediction-validation stage is now completed in the same ledger. The model chose
+weights 0.075 and 0.15; both received full evaluation. Weight 0.075 lost holding
+speed acceptance (0.023286 m/s), while 0.15 preserved joint sampled acceptance
+(0.012939 m/s). The incumbent remains retained; the latest tested result is distinct.
 
-Commands first diverge at 0.20 s, tip trajectories at 0.21 s. The 0.10 recipe's
-holding-speed peak occurs at 0.31 s; both passing recipes peak at 0.35 s. The
-observation rule selects 0.20 s and 0.30 s. Six historical matched-input intervals
-agree on speed-change direction, but none meets the numerical endpoint-speed
-tolerance. This is development evidence only, not prospective discrimination.
+Four prospectively sealed local intervals had correct speed-change directions
+but all missed the 1e-4 m/s endpoint tolerance. These are separate from the six
+historical development intervals (6/6 directions, 0/6 numerical passes). All four
+full-task direction forecasts abstained; conditional accuracy is undefined.
+The implemented secondary speed-order rule abstained on tied cold previews;
+actual full-task speed order resolved, so ordering usefulness was not demonstrated.
+
+The accepted research-model role is local diagnostic evidence only. Its next
+action is finish/stop with zero future budget. Milestone 5 remains open: numerical
+accuracy, useful prospective discrimination, repeatability and real-time operation
+remain gaps. Both new runs missed all 35 deadlines. No further experiment is
+launched or authorized by the future-research proposal.
+
+Stage usage was 9 provider attempts, 18 workflow calls, 2 backend attempts and
+971.706 charged seconds; cumulative usage was 28/55/6 and 3201.913 seconds.
+Two protocol and two semantic corrections and a charged transport failure are
+preserved. Additional solves/rollouts were 6/6; embedded controller updates 70.
+The explicit transmission authorization and earlier automatic rejection remain
+alongside the versioned handoffs. No historical replay, worker, subagent or push.
 
 See [current delivery](../evidence/milestone5_validation_20261004/delivery.json),
 [stage report](milestone5_prediction_validation.md), [Milestone 4](milestone4.md),
-and [original pilot](milestone5.md). No follow-up experiment launches automatically.
+and [original pilot](milestone5.md).
 
 ## Historical Stage 3.42 status, 2026-10-01
 

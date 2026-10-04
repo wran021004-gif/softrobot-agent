@@ -1,9 +1,11 @@
 # Milestone 5 initial prospective pilot, 2026-10-04
 
-A later [prediction-validation stage](milestone5_prediction_validation.md)
-completed historical diagnosis and matched-input development analysis, but is
-awaiting external-handoff approval. It has no new prospective outcome. The
-original pilot and its forecasts below remain unchanged.
+The later [prediction-validation stage](milestone5_prediction_validation.md)
+is now completed: four prospective local directions were correct, all four
+endpoint speeds missed tolerance, and full-task directions/speed ordering
+abstained. The accepted role is local diagnostic evidence only; the M4 incumbent
+is retained and Milestone 5 remains open. The original pilot and forecasts below
+remain unchanged.
 
 The first bounded pilot **completed with an inconclusive result**. It demonstrated neither full-task speed-direction prediction nor candidate-order prediction. Milestone 5 remains open; no automatic screening, general reliability, structural screening or controller-family comparison was validated. See [delivery.json](../evidence/milestone45_continuation_20261004/delivery.json) and the [frozen forecast](../evidence/milestone45_continuation_20261004/single_context/pilot_forecast_seal.json).
 

@@ -1,19 +1,25 @@
 # Bounded Milestone 5 prediction validation, 2026-10-04
 
-This separately authorized stage is **incomplete and awaiting external-payload
-approval**. Historical diagnosis and matched-input development analysis completed.
-No new provider attempt, controller solve, reduced rollout, or backend attempt
-ran. Automatic approval review rejected the launch because authorization for the
-specific historical diagnostics/project payload and external destination was not
-established in that review. The prepared native handoff is
-[validation_serialized_handoff.json](../evidence/milestone5_validation_20261004/single_context/validation_serialized_handoff.json),
-for `https://api.deepseek.com`, model `deepseek-flash`; credentials are excluded.
+The existing bounded stage is **completed with mixed local evidence and no
+resolved full-task discrimination**. Explicit user authorization resumed the same
+ledger and permitted the updated project payload and necessary follow-up requests
+to the existing DeepSeek endpoint. The original automatic rejection is preserved
+in [delivery_before_resume.json](../evidence/milestone5_validation_20261004/delivery_before_resume.json).
+No usage was reset. No historical simulation was replayed, worker or subagent
+used, or change pushed.
 
-The [delivery](../evidence/milestone5_validation_20261004/delivery.json) separates
-this access restriction from a scientific prediction result. There is no accepted
-new candidate plan, prospective forecast, validation outcome, or research-model
-final decision. Implementation commit `8b64aac` preceded the rejected launch;
-offline recovery and evidence are committed separately. Nothing was pushed.
+The research model selected holding weights **0.075 and 0.15**, terminal weight
+0.05, on the fixed incumbent structure. Both received complete evaluation.
+The accepted final role is **local diagnostic evidence** of the embedded
+first-period predictor on this structure. Full-task discrimination and execution
+ordering remain unsupported. The accepted next action is finish/stop with zero
+future budget, retaining the Milestone 4 incumbent without promoting a candidate.
+Milestones 2, 3, and 4 remain closed; the overall Milestone 5 remains open.
+
+See [delivery](../evidence/milestone5_validation_20261004/delivery.json),
+[unchanged forecasts](../evidence/milestone5_validation_20261004/single_context/forecast_seal.json),
+[assessment](../evidence/milestone5_validation_20261004/single_context/prediction_assessment.json),
+and [accepted model decision](../evidence/milestone5_validation_20261004/single_context/final_response.json).
 
 ## Preserved scientific state
 
@@ -93,59 +99,137 @@ Bindings and vector discrepancies are in
 This supports a narrow development diagnostic observation, without prospective
 validation or a research-model acceptance of that role.
 
-## Question B and prospective validation remain pending
+## Candidate-specific cold preview and prospective full-task scoring
 
-The formal handoff binds the passing 0.05/0.05 incumbent, fixes structure and
-terminal weight, and excludes development points 0, 0.05, and 0.10. It asks the
-research model to justify one or two new holding weights in the existing [0,1]
-domain. No candidate value or scientific conclusion is supplied by an engineer.
-Every accepted candidate still requires full evaluation.
+The actual refreshed outbound handoff included all six historical matched
+intervals, their systematic underestimation, projection discrepancies, the
+0.31 s threshold warning, development exclusions, remaining capacity, and explicit
+external authorization. The original handoff is version 1; the actual authorized
+handoff is version 2. Detailed artifacts and both payload versions are retained.
 
-The implemented preview mapping compares physical holding-plan maxima, using
-position tolerance `1e-6 m` and speed tolerance `1e-4 m/s`. Improvement and
-deterioration require signed differences beyond tolerance; practically unchanged
-describes an observed within-tolerance difference; unresolved denotes abstention
-or insufficient coverage. Cold-preview equality maps to unresolved full-task
-prediction, not task equivalence. Local endpoints and planned holding maxima
-remain distinct from full closed-loop backend maxima. No absolute acceptance
-or overall ordering is assumed.
+Six additional controller solves and six reduced rollouts covered the incumbent
+and both new recipes at 0.20 and 0.30 s. Initialization was a common cold repeated
+previous-input seed with independently regenerated candidate state, not a
+reconstructed historical warm plan. Production early stops and effective horizons
+10/5 were preserved. At 0.20 s all three selected iteration 5 through
+`relative_seed_improvement`; their small plan differences are development-state
+preview observations. At 0.30 s all selected iteration zero through
+`verified_settled_seed`, with identical holding-plan maximum speed
+**0.01991554683358343 m/s**. This latter checkpoint defines the full-task mapping.
 
-An opt-in observer seals existing production first-period predictions at both
-checkpoints after actual input verification and before `mj_step`. It supplies
-no command and changes no solver, horizon, integration, or acceptance setting.
-Capture time is included in simulation/update charges. Candidate configuration,
-execution identity, and event ordering bind predictions. Embedded production
-updates remain separate from additional diagnostic solves/rollouts.
+The predeclared rules use position tolerance 1e-6 m and speed tolerance 1e-4 m/s.
+Cold-preview equality maps to abstention about full-task directions. The limited
+secondary speed-order rule uses the same comparable 0.30 s plans and tolerance:
+tie or invalid coverage means abstention; actual ties remain explicit. This rule
+was implemented and tested, rather than represented by an always-empty field.
+It predicts neither overall design ranking nor joint acceptance. The frozen
+joint-acceptance forecast remained unresolved.
 
-No prospective forecast or outcome exists, so validation coverage, accuracy,
-ranking, and acceptance preservation are unavailable, not zero-percent accuracy.
-No screening, automatic rejection, structural inference, controller-family
-comparison, or single/dual superiority is validated. The research model has not
-accepted a final role or next-action decision because its access is blocked.
-Operationally, await explicit external-transmission approval; no follow-up run
-launches automatically. Milestone 5 is not closed by offline development work.
+The forecast seal event was sequence 115; backend reservations were sequences
+122 and 150. Exact plan, prepared/scientific configuration, execution, numerical
+dependency and implementation bindings passed chronology checks. No mapping,
+checkpoint, tolerance or forecast was revised after observing outcomes.
 
-## Accounting and verification
+| Holding weight | Frozen error/speed directions | Observed directions vs .05 incumbent | Full-task holding error, m | Full-task holding speed, m/s | Actual joint acceptance |
+|---|---|---|---:|---:|---|
+| 0.075 | Both unresolved | Both deterioration | 0.002905756 | 0.023285948 | lost |
+| 0.15 | Both unresolved | Both deterioration | 0.002746094 | 0.012939198 | preserved |
 
-| Resource | Immutable predecessor | New stage | Cumulative |
+The executions were `2413ff2a56de422dac47b7fd78717563` (0.075) and
+`9865f1636266479c93817cad42a65353` (0.15). Both passed terminal reach and holding
+position. Only 0.075 failed the 0.020000 m/s holding-speed requirement.
+The 0.15 candidate preserved sampled acceptance but traded improved terminal
+error against worsened holding error and speed relative to the incumbent.
+It was not promoted. Both had 35/35 deadline misses; mean complete updates were
+8.514238 s and 8.510688 s at a 0.01 s period. Timing failure remains separate
+from sampled physical acceptance.
+
+Full-task direction scoring is **0 correct, 0 incorrect, 4 unresolved**;
+resolved coverage is zero and conditional accuracy is **undefined**.
+The predicted speed-order status was tie (abstention); actual speed order resolved
+0.15 ahead of 0.075, separated by 0.010346749 m/s. Ordering verdict is unresolved;
+this is not demonstrated ordering usefulness or an overall candidate ranking.
+The model's original plan expected 0.075 to pass and 0.15 to fail; both pointwise
+expectations were contradicted. This research hypothesis is separate from the
+reduced predictor's abstentions. These points establish no continuous boundary,
+general screening reliability or dominant causal mechanism.
+
+## Prospective local dynamics under actual applied input
+
+The observer verified the actual input and sealed the existing production
+first-period prediction before backend advancement at each checkpoint. Local
+seal sequences were 128/129 and 156/157; simulation completions were 130 and 158.
+The subsequent physical samples and exact execution/configuration bindings were
+verified. Capture overhead was charged normally. This instrumentation supplied no
+command and added no diagnostic solve or rollout. Embedded production updates
+remain separate from the six additional diagnostic solves.
+
+| Holding weight | Interval, s | Predicted speed, m/s | Observed speed, m/s | Signed endpoint error, m/s | Local direction | Within 1e-4 m/s? |
+|---|---|---:|---:|---:|---|---|
+| 0.075 | 0.20-0.21 | 0.038326588 | 0.038833712 | -0.000507124 | increasing, correct | No |
+| 0.075 | 0.30-0.31 | 0.016953566 | 0.023285948 | -0.006332381 | increasing, correct | No |
+| 0.15 | 0.20-0.21 | 0.038327398 | 0.038834415 | -0.000507016 | increasing, correct | No |
+| 0.15 | 0.30-0.31 | 0.005830076 | 0.011023132 | -0.005193056 | decreasing, correct | No |
+
+These **four new prospective intervals** had 4/4 correct speed-change directions
+and 0/4 numerical endpoint passes. All four speeds were underestimated. Local
+increasing/decreasing labels describe dynamics; acceleration before holding is
+not automatically task deterioration. The .075 prediction at 0.31 s was
+0.016954 m/s versus 0.023286 m/s observed, crossing the 0.020000 requirement despite
+correct acceleration direction. The historical .10 warning remains separate:
+0.015943 predicted versus 0.022129 observed at 0.31 s. Projection discrepancies
+are recorded separately from endpoint errors. Correct direction does not establish
+threshold classification, numerical accuracy, repeatability or general reliability.
+
+The accepted model decision supports local diagnostic evidence only. It defers
+full-task discrimination and execution-ordering use, retains full evaluations,
+and stops this stage. The original Milestone 5 gates remain unmet: accurate local
+numerics, useful resolved full-task discrimination/order, broader repeatability,
+and real-time feasibility have not been demonstrated. No automatic rejection,
+structural inference, controller-family comparison, hardware or continuous-time
+guarantee follows. Proposed future research authorizes no further run.
+
+## Accounting, corrections and verification
+
+| Resource | Immutable predecessor | Current stage | Cumulative |
 |---|---:|---:|---:|
-| Provider attempts | 19 | 0 / 24 | 19 |
-| Workflow calls | 37 | 3 / 60 | 40 |
-| Full backend attempts | 4 | 0 / 2 | 4 |
-| Charged seconds | 2230.207 | 10.235 / 9000 | 2240.442 |
+| Provider attempts | 19 | 9 / 24 | 28 |
+| Workflow calls | 37 | 18 / 60 | 55 |
+| Full backend attempts | 4 | 2 / 2 | 6 |
+| Charged seconds | 2230.207 | 971.706 / 9000 | 3201.913 |
 | Workers | 0 | 0 / 0 | 0 |
 
-Exact receipts govern arithmetic. New additional controller solves and prediction
-rollouts are both zero. Protocol corrections: old 4, new 0, lifetime 4; semantic
-corrections: old 3, new 0. One automatic approval rejection occurred before
-process creation and is separately retained, not charged as a provider/backend
-attempt or platform correction. Offline engineering/test time is separate from
-receipt-charged execution time. No reservation remains occupied.
+Exact receipts govern arithmetic and match the complete call ledger. Additional
+local solves/rollouts: old 3/3, current 6/6, cumulative 9/9. Embedded controller
+updates: old 140, current 70, cumulative 210, accounted separately. Preview receipt
+cost was 73.313 s; complete candidate evaluations cost 605.937 s. No reservation
+remains occupied. The current 12-solve/24-rollout ceilings were not exhausted.
 
-Eight focused checks passed for serialized planning context, imported evidence,
-time/input alignment, projection-aware scoring, immutable predecessor state,
-and evidence-only recovery. Initial Windows sandbox permissions and an imported
-ownership-resolution defect were repaired with authorized filesystem access and
-the existing `BoundReader`. Original failures are retained in the verification
-record. No paid preflight, sweep, dependency upgrade, historical replay,
-worker, or subagent ran.
+Protocol corrections: old 4, current 2, lifetime 6; current corrections were
+nonconsecutive `CANDIDATE_DISPOSITION_SELECTION_MISMATCH` repairs. Semantic
+corrections: old 3, current 2, lifetime 5. The original final interpretation
+confused historical and prospective evidence, used the wrong checkpoint maximum,
+claimed unsupported ordering usefulness, and overstated a boundary inference.
+Its first semantic repair exposed an old-baseline selection binding; the second
+repair bound retention to the exact M4 incumbent. Original responses, rejected
+interpretations, protocol feedback and all charges are preserved.
+
+One provider attempt failed with `IncompleteRead(0 bytes read)` after the six
+previews. A targeted same-project context migration reused those saved previews
+and the accepted plan; it reset no budget or recovery allowance and repeated no
+numerical or backend work. Offline handoff refresh also repaired the restored
+historical feedback field. The original automatic rejection remains recorded as
+a pre-process event, not a provider attempt; the later explicit authorization
+resolved it. Provider/model/token/TLS settings and authentication handling stayed
+unchanged; no credentials are in evidence.
+
+The previous eight focused checks were reused. Four resume checks passed for the
+actual six-interval outbound payload and budget, neutral local labels, and
+ordering ties/coverage/scoring. Final identity, prospective chronology, unchanged
+rules, full receipt sums, predecessor immutability and sealed Git bytes were
+checked. No broad suite, paid preflight, parameter sweep, dependency upgrade,
+historical replay, worker or subagent ran. Offline engineering time is separate
+from receipt-charged execution time.
+
+Implementation/resume commits: `4d2145f`, `72dfeb5`; final delivery commits are
+reported in the final response and Git history. All commits are local.
