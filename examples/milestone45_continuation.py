@@ -258,6 +258,7 @@ def live(stage):
         instructions=(prior.STRUCTURE_PLAN if stage=='structure' else prior.ADAPT_PLAN).replace('No separate numerical diagnostic work.',
             'The explicitly authorized prospective pilot reserves 300 charged seconds, one numerical workflow tool and one model/tool forecast interpretation before adaptation backends. It cannot filter or reorder the batch.')
         instructions+=' This is an explicitly authorized continuation segment with only remaining cumulative capacity. Historical stopped campaign stays stopped, old corrections=4, new segment correction cap=4 (max two consecutive); no usage erased.'
+        instructions+=' Selecting a source independently does not require it to differ from latest or baseline. Fixed material/section-scale values are fixed conditions, not additional changes or confounders; use validated actual_differences.'
         if stage=='adaptation':instructions+=' Prefer one-factor holding-weight comparison with two distinct points if remaining capacity supports it, to test speed ordering. Local comparison uses candidate-specific solves; final physical ranking stays unchanged.'
         record=prior.plan(w,stage,1 if stage=='structure' else 2,instructions)
         if stage=='structure':w.freeze['original_research_source']=record['bindings']['subject']
@@ -305,6 +306,34 @@ def resume_structure_interpretation():
     assert_predecessor(w);export(w,status,reason,time.monotonic()-start)
 
 
+def correct_structure_semantics():
+    """Paid model correction; original scientific prose remains immutable."""
+    if subprocess.check_output(['git','diff','HEAD','--',*revision()['files']],cwd=ROOT,text=True):raise ValueError('COMMIT_BEFORE_LIVE')
+    from examples.gvs_nmpc_route_experiment import load_credential
+    load_credential(Path(os.environ['SOFTAGENT_CONFIGURATION_PATH']))
+    for key in ('HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','http_proxy','https_proxy','all_proxy'):
+        if '127.0.0.1:9' in os.environ.get(key,''):os.environ.pop(key)
+    w=restore();w.current_stage='structure_semantic_correction';start=time.monotonic();status='incomplete';reason=None
+    record=read(w.directory/'structure_plan.json');packet=read(w.directory/'structure_decision_packet.json')
+    review=dict(original_response=w.chain['final_response'],original_preserved=True,semantic_passed=False,
+        issue='Reasoning claims clean single-variable attribution is not fully shown because material and section scale are listed in decision fields. Those are fixed values in source and candidate, not changes.',
+        actual_differences=record['actual_differences'],fixed_conditions=dict(section_scale=.95,material_scenario='compliant',holding_weight=0.,terminal_weight=.05),
+        required_correction='State the observed effect of the single tested near-length change under fixed control. Preserve limited tested-point/simulation scope; do not invent confounding changes. Source and latest are independent roles and can coincide.')
+    atomic_json(w.directory/'structure_interpretation_semantic_review.json',review);packet.update(semantic_review=review)
+    w.instructions={**w.instructions,'response_final':prior.FINAL+' Correct the precise material issue in semantic_review using actual_differences. Do not rewrite the prior response; this is a superseding interpretation. Keep next_research.route=controller_adaptation for the required separately planned one-or-two-point batch; budgets use shared current requirement, stop at completed target, not merely because source already passes. No new structure or backend execution in this response.'}
+    try:
+        w.phase('response_final','design_response','final_response',decision_packet=packet,decision_packet_reference=save(w.store,packet),
+            batch_result=w.store.artifact(w.chain['batch_summary']),require_research_route=True,require_research_budget=True,candidate_preparation_reserve_s=5.,
+            research_records=w.historical_results,latest_tested=w.latest_tested,
+            improvement_feedback_content=dict(baseline_facts=w.retained_baseline,execution=None),check_feedback=[dict(reference=w.chain['batch_summary'])],
+            source_report=w.common['source_report'],source_record=w.source_record)
+        atomic_json(w.directory/'structure_corrected_final_response.json',w.store.artifact(w.chain['final_response']))
+        status='structure_complete';reason='Model-authored structural interpretation corrected; original response and all charges preserved.'
+    except Exception as exc:reason=str(exc);print('STOP',reason,flush=True)
+    assert_predecessor(w);export(w,status,reason,time.monotonic()-start)
+
+
 if __name__=='__main__':
     if sys.argv[1]=='resume-structure-interpretation':resume_structure_interpretation()
+    elif sys.argv[1]=='correct-structure-semantics':correct_structure_semantics()
     else:live(sys.argv[1])
