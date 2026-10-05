@@ -264,4 +264,7 @@ implementation identities are also verified. No broad suite or extra simulation
 was run.
 
 Task-related source, evidence and reports are committed/pushed without force;
-publication receipt is recorded separately after the remote contains the commit.
+the [publication receipt](../evidence/milestone5_predictor_development_20261005/publication_receipt.json)
+verifies remote delivery of `9f9ef2ffe67f43d278c1472b9f5695d867ddefcc`.
+The receipt is committed separately after that remote check. This task is finished;
+no additional predictor campaign or candidate batch starts automatically.
