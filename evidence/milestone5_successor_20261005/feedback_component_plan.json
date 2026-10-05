@@ -1,0 +1,29 @@
+{
+  "version": "native_exact_every_update@1.0.0",
+  "hypothesis": "Exact native force/Jacobian acceleration enables testing every-update feedback at the earliest original and reset divergences. Complete command and warm/solve/validation costs, not kernel timings, decide realtime. Timed stopping may change controller response and is recorded.",
+  "cases": [
+    {
+      "candidate": "original075",
+      "updates": 3
+    },
+    {
+      "candidate": "reset075",
+      "updates": 2
+    }
+  ],
+  "nonzero_acceleration_checks": [
+    {
+      "candidate": "original075",
+      "update": 1
+    },
+    {
+      "candidate": "reset075",
+      "update": 20
+    }
+  ],
+  "nonzero_acceleration_work": "Two original and two native residual/Jacobian evaluations; saved current-time one-step controller plans supply acceleration, never used to advance the new candidate history.",
+  "native_identity": "94d6ec9a4884cdf3f2f17023496ca06201a1f6acb198d3f48b9011ac1e0898f2",
+  "full_forecasts": 0,
+  "new_backends": 0,
+  "reserve_s": 450.0
+}

@@ -165,6 +165,14 @@ def export_checkpoint():
         next_command_scope='Existing verified local RUN and compiled DLL; identity checked before reuse. No new experiment was started after the commit/push request.',
         excluded_generated_files='Portable compiler archive/toolchain, huge generated C/object files and DLLs stay in ignored runs; source hashes, exact compiler commands, versions, recipes and measured results are exported.',
         report='docs/milestone5_successor_campaign.md')
+    if a['complete_update_component'] is not None:
+        component=a['complete_update_component']; receipt=read(stage.RUN/'feedback_component_receipt.json')
+        audit.update(status='limited_5A_component_checkpoint_sealed',complete_update_measured=True,
+            component_status=receipt['execution_status'],component_charge=receipt['charged'],
+            nonzero_acceleration_checks=component.get('nonzero_acceleration_checks',[]),
+            task_A_stopped=True,task_A_full_forecasts=0,task_A_provider_attempts=0,
+            next_command=None,next_command_scope='Task A stopped. No further M5 execution in this authorization.')
+        audit['remaining']=audit['remaining'][1:]
     for name,value in (('acceptance_audit',audit),('receipts',receipts),('events',events)):
         atomic_json(stage.RUN/(name+'.json'),value)
     stage.EVIDENCE.mkdir(parents=True,exist_ok=True)
