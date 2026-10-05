@@ -21,8 +21,9 @@ charged seconds and 6 shared integrations. Cumulative: 40/76/6, 4684.302 seconds
 Three focused tests passed; all predecessor work and records were reused unchanged.
 The rejected native handoff, reservation repair, initial factual annotation and
 one provider semantic correction remain recorded. All new sessions are stopped.
-Commit/push to origin feat/gvs-dynamics is explicitly authorized; publication
-verification is recorded separately after the computation commit.
+Computation commit `5f3855a5d43a3649c075e1b53b43d21c8b9ad838` was pushed without
+force to origin feat/gvs-dynamics; an independent remote query verified the
+exact commit. A separate publication receipt preserves that verification.
 
 See [delivery](../evidence/milestone5_first_interval_20261005/delivery.json),
 [linked protocol](../evidence/milestone5_first_interval_20261005/protocol.json),

@@ -246,6 +246,9 @@ hashes. Every new stage session is stopped with operational action `finish_stop`
 
 The stage began on clean `feat/gvs-dynamics` at
 `c98e027edc4eec3a22086b4db0e676e7986aac29`. Only task-related changes are committed.
-The authorized non-force push and remote-containment verification are recorded
-in the delivery message and a publication receipt after the computation commit;
-publication does not authorize follow-up experiments.
+Computation commit `5f3855a5d43a3649c075e1b53b43d21c8b9ad838` was pushed to
+origin `feat/gvs-dynamics` without force. An independent `git ls-remote` returned
+that exact commit on the remote branch. The
+[publication receipt](../evidence/milestone5_first_interval_20261005/publication_receipt.json)
+records the result and is committed separately after the computation commit.
+Publication does not authorize follow-up experiments.
