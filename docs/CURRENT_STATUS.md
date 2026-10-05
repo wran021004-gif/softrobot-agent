@@ -7,6 +7,9 @@ were rejected before process creation; the second explicitly refuses to treat
 the attachment's embedded authorization as direct chat authorization. The exact
 rejections and concrete 55,143-byte native payload are preserved; direct chat
 confirmation has been requested. No provider attempt or backend attempt occurred.
+The development checkpoint is locally committed as `6429c6b8f481ff6e8769bb0143ba73784b8fdd20`.
+Automatic review also rejected its non-force push to the existing origin branch;
+direct chat push authorization is requested, and remote publication is unverified.
 
 The single repaired 2560-substep continuation completed in 608.265 charged seconds.
 Both continuous and represented-serial mappings now pass the unchanged last-two

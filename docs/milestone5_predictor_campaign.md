@@ -10,6 +10,14 @@ and concrete 55,143-byte native payload are retained. Direct confirmation has be
 requested. No provider attempt, prospective forecast, validation grant or backend
 attempt has occurred. The pending judgment must not default to completion.
 
+The development checkpoint is committed locally as
+`6429c6b8f481ff6e8769bb0143ba73784b8fdd20`. Its non-force push to the existing
+`origin` / `feat/gvs-dynamics` was separately rejected by automatic approval
+review before process creation. The exact [push rejection](../evidence/milestone5_predictor_campaign_20261005/push_rejection.json)
+and [publication status](../evidence/milestone5_predictor_campaign_20261005/publication.json)
+are retained. Direct chat authorization for that GitHub transmission is pending;
+remote publication and containment of the delivered commit are unverified.
+
 This linked campaign addresses both local prediction accuracy and operational
 screening cost. It does not change the production controller, robot, actuator
 limits, task, incumbent, historical outcomes, or real-time requirements.
