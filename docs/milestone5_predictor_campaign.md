@@ -20,10 +20,11 @@ stopped** because the sealed decision abstained and counterfactual net saving wa
 negative. The accepted final native judgment is STOP. The ranking substage is
 complete with a negative result; no ranking capability is accepted and M5 stays open.
 
-The existing origin / feat/gvs-dynamics non-force push is directly authorized.
-Final commit and remote verification follow this completed scientific closeout;
-[publication status](../evidence/milestone5_predictor_campaign_20261005/publication.json)
-preserves the earlier blocked checkpoint and subsequent recovery.
+The scientific delivery is committed as `85adf82bfd6a251a90f37f763ca5c46854557aec` and was
+normally pushed to `origin/feat/gvs-dynamics`; `git ls-remote` returned that exact
+SHA. The [publication receipt](../evidence/milestone5_predictor_campaign_20261005/publication.json)
+records verification and the resolved earlier approval blocks. A following metadata
+commit records this receipt; the final delivery response verifies that final head.
 
 This linked campaign addresses both local prediction accuracy and operational
 screening cost. It does not change the production controller, robot, actuator

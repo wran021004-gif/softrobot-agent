@@ -51,6 +51,10 @@ See [acceptance audit](../evidence/milestone5_predictor_campaign_20261005/accept
 [accounting](../evidence/milestone5_predictor_campaign_20261005/accounting.json),
 [publication](../evidence/milestone5_predictor_campaign_20261005/publication.json).
 
+Scientific delivery `85adf82bfd6a251a90f37f763ca5c46854557aec` was normally pushed to
+`origin/feat/gvs-dynamics` and verified by exact remote SHA. The publication receipt
+is committed as a follow-up; final branch-head verification accompanies delivery.
+
 ## Predecessor predictor-output development
 
 The latest [bounded predictor development](milestone5_predictor_development.md)
