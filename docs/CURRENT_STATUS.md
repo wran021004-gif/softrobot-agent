@@ -1,5 +1,36 @@
 # Current development status - Milestones 4 and 5, 2026-10-05
 
+The latest [shared first-interval and recovered research stage](milestone5_first_interval.md)
+is **completed and stopped**. Actual native research selection and corrected final
+interpretation succeeded. The shared original .00-.01 s calculation ran once for
+both historical cases, with six integrations and exact saved coarse reproduction.
+Velocity-vector error fell 81.406%, from .054080221 to .010055626 m/s, but last
+successive vector/speed differences .000247710/.000244941 remain above 1e-4.
+The finest result is tested only; numerical stability and physical accuracy
+remain unestablished. Instantaneous output and evolution terms partially cancel.
+
+The accepted model selects **C: resolve local numerical stability as a
+prerequisite**. Its finer-than-tested investigation remains unexecuted and needs
+its own authorization/cap. Screening is deferred; .075/.15 remains conditional.
+Milestones 2-4 remain closed, Milestone 5 open, and the incumbent unchanged.
+No controller optimization, complete preview, backend step, worker or subagent ran.
+
+Stage usage: 3 provider attempts, 5 workflow calls, 0 backend attempts, 225.750
+charged seconds and 6 shared integrations. Cumulative: 40/76/6, 4684.302 seconds,
+79 controller attempts, 41 integrations and 210 historical backend updates.
+Three focused tests passed; all predecessor work and records were reused unchanged.
+The rejected native handoff, reservation repair, initial factual annotation and
+one provider semantic correction remain recorded. All new sessions are stopped.
+Commit/push to origin feat/gvs-dynamics is explicitly authorized; publication
+verification is recorded separately after the computation commit.
+
+See [delivery](../evidence/milestone5_first_interval_20261005/delivery.json),
+[linked protocol](../evidence/milestone5_first_interval_20261005/protocol.json),
+[separate readiness](../evidence/milestone5_first_interval_20261005/readiness.json),
+and [accounting](../evidence/milestone5_first_interval_20261005/accounting.json).
+
+## Historical recovery stage
+
 The latest [bounded recovery and history diagnosis](milestone5_recovery_diagnostic.md)
 is **completed and stopped with its research handoff still blocked**. Automatic
 approval review again rejected the DeepSeek transmission despite the attachment's
