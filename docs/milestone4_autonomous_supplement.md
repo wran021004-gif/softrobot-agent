@@ -83,3 +83,8 @@ new physical improvement untested; realtime unproven. The historical selected
 existing sampled acceptance cannot count as either required new batch. The primary
 `.10/.05` source remains the documented failed historical case. Budget and frozen
 conditions remain intact for an approved continuation of this same run.
+
+The blocked checkpoint was committed locally as `84fa62e`. Its remote publication
+was separately rejected by automatic review because specific approval for the
+evidence payload's GitHub destination was not established. Local evidence export
+remains available; no rejected external action was executed indirectly.
