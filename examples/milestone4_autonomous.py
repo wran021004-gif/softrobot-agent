@@ -305,10 +305,42 @@ def live():
     export(w)
 
 
+def repair_projection():
+    """Refresh stale administrative dependencies through the existing migration."""
+    from tools.platform_store import zero
+    w=restore();old=w.host;failure=read(RUN/'failure.json')
+    if w.repairs or w.rounds or w.store.remaining()['used']['model_calls']:
+        raise ValueError('ONE_PRE_REQUEST_REPAIR_ONLY_NO_RESET')
+    if not failure['message'].startswith('DEPENDENCIES_CHANGED:'):
+        raise ValueError('REPAIR_REQUIRES_DEMONSTRATED_PROJECTION_DEFECT')
+    atomic_json(RUN/'pre_repair_freeze.json',w.freeze)
+    snapshot=w.store.session(old.run_id)['snapshot'];inp=deepcopy(snapshot['input'])
+    reservation,_=w.store.reserve(old.run_id,'research-projection-repair1',digest(failure),'engineering',
+        {**zero(),'tool_calls':1,'wall_s':60.})
+    started=time.monotonic()
+    # Restore the inherited workflow host selector for the shared migration.
+    del w.host;w.hosts={'shared':old}
+    new=prior.migrate_planning_host(w,'research-projection-repair1',input_override=inp);w.host=new
+    if execution_scope(inp)!=execution_scope(w.store.session(new.run_id)['snapshot']['input']):
+        raise ValueError('REPAIR_CHANGED_SCIENCE')
+    configure(w);payload=payload_for(new,EvidenceDrivenAdapter());new.resume()
+    change=dict(failure=failure,previous_host=old.run_id,new_host=new.run_id,scientific_conditions_changed=False,
+        budget_reset=False,provider_attempts_before=0,backend_attempts_before=0,completed_backend_replayed=False,
+        remedy='Existing migrate_planning_host creates a current immutable dependency snapshot and carries aliases, role state and cumulative recovery in the same project.',
+        serialized_payload_identity=digest(payload),revision=revision())
+    receipt=w.store.complete(reservation,dict(request_id='research-projection-repair1',execution_id=reservation['execution_id'],
+        caller='engineering',tool_id='engineering.research_projection',tool_version='1.0.0',execution_status='completed',charged=zero()),change,time.monotonic()-started)
+    w.repairs=1;w.status='prepared_after_repair';w.stop_reason=None
+    w.freeze.update(research_host=new.run_id,implementation=revision())
+    persist(w);atomic_json(RUN/'engineering_intervention1.json',dict(change=change,receipt=receipt))
+    print(json.dumps(dict(repair='completed',charge=receipt['charged'],science_unchanged=True)),flush=True)
+
+
 if __name__=='__main__':
     if sys.argv[1]=='prepare':prepare()
     elif sys.argv[1]=='live':live()
     elif sys.argv[1]=='export':export(restore())
+    elif sys.argv[1]=='repair-projection':repair_projection()
     elif sys.argv[1]=='seal':
         w=restore()
         if w.store.remaining()['used']['model_calls'] or w.rounds:raise ValueError('CANNOT_RESEAL_AFTER_LIVE_DECISION')
