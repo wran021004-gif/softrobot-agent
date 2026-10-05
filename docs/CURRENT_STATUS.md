@@ -10,17 +10,23 @@ Task A is stopped; six protected M5 backend slots remain untouched. **M5 remains
 The [new M4 autonomous supplement](milestone4_autonomous_supplement.md) implements
 evidence-dependent control/structural search, retained diagnosis and voluntary
 stop through a native shared interface. Eight scheduling and three structural
-parameter checks passed offline. **Live execution has not started:** automatic
-approval review rejected the same DeepSeek egress command twice, including after
-exact payload/destination/attachment-authorization review. The reviewer requires
-direct trusted-chat egress approval and treats attachment authorization as
-untrusted. There are zero provider attempts, zero backend attempts and zero new
-research decisions/batches; multibatch acceptance is incomplete. Preparation
-charges 2.125 s / two workflow calls against the separate 24/60/4/9000 grant.
-Frozen primary, known incumbent, payload and both rejection reasons are retained
-in [delivery](../evidence/milestone4_autonomous_20261005/delivery.json) and
-[authorization review](../evidence/milestone4_autonomous_20261005/authorization_review.json).
-No budget reset, sandbox bypass, model substitution or protected-M5 transfer occurred.
+parameter checks passed offline; one affected projection check passed again after
+the single dependency-snapshot repair. Direct chat authorization enabled live
+execution on the same ledger. DeepSeek chose one control batch (.075 and .09 holding
+weights, .05 terminal weight), then voluntarily stopped after receiving both new
+complete evaluations and kept the passing historical .05/.05 incumbent.
+**Core multibatch acceptance remains incomplete: one batch is not two batches.**
+Both new candidates pass official reach (2.694 / 2.771 mm error) but fail sampled
+holding speed (.023286 / .022605 m/s against .02); complete updates take 8.447 /
+8.644 s against .01 s, with 35/35 misses each. New superiority and realtime are
+not demonstrated. Actual cost: 3 provider / 14 workflow / 2 backend / 760.250 s;
+one cumulative protocol correction, 70 embedded updates, zero standalone numerical
+operations. Two backend attempts remain unused under voluntary stop; no fallback
+was frozen. Unsupported model claims and a corrected chronological latest label
+are explicitly reviewed in the [acceptance audit](../evidence/milestone4_autonomous_20261005/acceptance_audit.json).
+The original runtime report and native traces remain intact. Prior approval
+denials are historical records, not the outcome of this live run. No budget reset,
+model substitution or protected-M5 transfer occurred.
 
 The previous successor checkpoint below is preserved as historical context:
 

@@ -19,5 +19,13 @@
     "Windows temporary directory ACL required supported escalation"
   ],
   "provider_attempts_during_checks": 0,
-  "backend_attempts_during_checks": 0
+  "backend_attempts_during_checks": 0,
+  "after_live_projection_repair": {
+    "command": "python -m unittest tests.test_research_scheduler.ResearchSchedulingTests.test_cumulative_recovery_and_execution_child_projection -v",
+    "passed": true,
+    "checks": 1,
+    "elapsed_s": 20.769,
+    "provider_attempts": 0,
+    "backend_attempts": 0
+  }
 }

@@ -1,0 +1,724 @@
+{
+  "status": "sealed_after_voluntary_stop",
+  "scientific_restart_authorized": false,
+  "implementation_checks": "11 focused checks passed; one affected projection check passed again after repair",
+  "real_execution": "3 real DeepSeek attempts; 1 accepted batch; 2 new complete evaluations and profiles",
+  "autonomy_coverage": "incomplete: model stopped after first batch; no second plan or frozen fallback",
+  "core_multibatch_acceptance": false,
+  "physical_improvement": "Both new candidates lose joint acceptance against the selected incumbent",
+  "realtime": "Both new candidates miss all 35 deadlines; no real-time demonstration",
+  "stable_controller": {
+    "extensions/tendon_family/gvs_nmpc.py": "39fc23b1ce3756ab06d42486f004edb8bb1db4b64b69e158b55f9bc2761cb698",
+    "extensions/tendon_family/gvs_trajectory.py": "160b47df2f0958929527d4871c61a66e3c69d766b7406144c97cb197ad65292b",
+    "extensions/tendon_family/gvs_profile.py": "2860f671093c665e1bc1840b92a42f33b3735767873cb9035acfdc43e2ff9711"
+  },
+  "historical_baseline": {
+    "candidate_id": "baseline-replay",
+    "owner_run_id": "gvs-stage351-baseline-executor",
+    "configuration": {
+      "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+      "media_type": "application/json"
+    },
+    "execution_id": "cf997605885642759ee33920e2c9e2ef"
+  },
+  "primary": {
+    "candidate_id": "batch-ebbeadbdaca10732-1",
+    "owner_run_id": "batch-ebbeadbdaca10732-1",
+    "configuration": {
+      "artifact_id": "3daef7685a18a518a3e8a5cbc824b072c77a66eeee1a5f1e9325958094b9eed6",
+      "media_type": "application/json"
+    },
+    "execution_id": "110dc2c9c1d642dcb018664a65c62c30"
+  },
+  "batch_source": {
+    "candidate_id": "batch-ebbeadbdaca10732-0",
+    "configuration": {
+      "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+      "media_type": "application/json"
+    },
+    "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+    "owner_run_id": "batch-ebbeadbdaca10732-0"
+  },
+  "chronological_new_executions": [
+    {
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.075
+      },
+      "candidate": {
+        "candidate_id": "batch-bc9cc559d65f5c74-0",
+        "configuration": {
+          "artifact_id": "c39304bd92853f70823cb05b3770d002d1acbd09a9bace4aedcf94555fe25a2f",
+          "media_type": "application/json"
+        },
+        "execution_id": "e3876a1d289f41f08d46c96202f1da0c",
+        "owner_run_id": "batch-bc9cc559d65f5c74-0"
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "e3876a1d289f41f08d46c96202f1da0c",
+          "configuration": {
+            "artifact_id": "c39304bd92853f70823cb05b3770d002d1acbd09a9bace4aedcf94555fe25a2f",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "0d1dbd34f3e79206ce748cad20c3245ee4ceccc9f0eebffde4b88bca40f0e6a8",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "a689044eee049d2577b6d5c88f2f32891b49eecc6f6000a293c4985bcb1ec7d6",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "b08b8fdb1aed79531813f08dbc71d3a22bf479220f48830a4ba901c42ddb2ff0",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.002693932595420545,
+        "holding_max_error_m": 0.002693932595420545,
+        "holding_max_speed_m_s": 0.023285947509969908,
+        "terminal_reach_passed": true,
+        "holding_position_passed": true,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 8.44693633142858,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "comparison_to_selected": {
+        "baseline": {
+          "source": {
+            "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+            "configuration": {
+              "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "87d4cbf3d906873cf70b4357ad8c884eb7e4888563f101451cbce89cdcc11ced",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "2e05e163d28a51f6ebe36459f5e2f13e39f7a5809b496833c2e4a36ac24944ac",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "9c4891d7aad28a0b4d3638e13fa8589a20de52e2efb645228795b91d3123aab4",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.0026978288583256148,
+          "holding_max_error_m": 0.0027300544346297905,
+          "holding_max_speed_m_s": 0.012750255515948416,
+          "terminal_reach_passed": true,
+          "holding_position_passed": true,
+          "holding_speed_passed": true,
+          "joint_reach_holding_passed": true,
+          "mean_complete_update_s": 8.518060568580404,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "e3876a1d289f41f08d46c96202f1da0c",
+            "configuration": {
+              "artifact_id": "c39304bd92853f70823cb05b3770d002d1acbd09a9bace4aedcf94555fe25a2f",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "0d1dbd34f3e79206ce748cad20c3245ee4ceccc9f0eebffde4b88bca40f0e6a8",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "a689044eee049d2577b6d5c88f2f32891b49eecc6f6000a293c4985bcb1ec7d6",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "b08b8fdb1aed79531813f08dbc71d3a22bf479220f48830a4ba901c42ddb2ff0",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.002693932595420545,
+          "holding_max_error_m": 0.002693932595420545,
+          "holding_max_speed_m_s": 0.023285947509969908,
+          "terminal_reach_passed": true,
+          "holding_position_passed": true,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 8.44693633142858,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": -3.896262905069871e-06,
+          "holding_max_error_m": -3.612183920924557e-05,
+          "holding_max_speed_m_s": 0.010535691994021492,
+          "mean_complete_update_s": -0.07112423715182459,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "joint_acceptance_lost",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      },
+      "receipts": {
+        "evaluation": {
+          "analysis_status": "valid",
+          "cache_hit": false,
+          "caller": "local-human",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 0.9849999999999,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": null,
+          "execution_id": "a3bdfb5b89664b5cbd3bea032a3ed65e",
+          "execution_status": "completed",
+          "original_execution_id": null,
+          "output": {
+            "artifact_id": "0d1dbd34f3e79206ce748cad20c3245ee4ceccc9f0eebffde4b88bca40f0e6a8",
+            "media_type": "application/json"
+          },
+          "request_id": "complete-evaluation",
+          "result_contract": "EvaluationResult",
+          "result_version": "1.2.0",
+          "solver_status": "not_run",
+          "task_success": true,
+          "tool_id": "evaluation.run",
+          "tool_version": "1.0.0"
+        },
+        "profile": {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "local-human",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.140999999999849,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": null,
+          "execution_id": "cea9ddce69c244a9895222b5765c23c8",
+          "execution_status": "completed",
+          "original_execution_id": null,
+          "output": {
+            "artifact_id": "a689044eee049d2577b6d5c88f2f32891b49eecc6f6000a293c4985bcb1ec7d6",
+            "media_type": "application/json"
+          },
+          "request_id": "complete-profile",
+          "result_contract": "ProfileOutput",
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "control.profile_report",
+          "tool_version": "1.0.0"
+        },
+        "simulation": {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "local-human",
+          "charged": {
+            "backend_solves": 1,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 299.328,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": null,
+          "execution_id": "e3876a1d289f41f08d46c96202f1da0c",
+          "execution_status": "completed",
+          "original_execution_id": "e3876a1d289f41f08d46c96202f1da0c",
+          "output": {
+            "artifact_id": "b08b8fdb1aed79531813f08dbc71d3a22bf479220f48830a4ba901c42ddb2ff0",
+            "media_type": "application/json"
+          },
+          "request_id": "complete-simulation",
+          "result_contract": "BackendResult",
+          "result_version": "1.0.0",
+          "solver_status": "completed",
+          "task_success": null,
+          "tool_id": "simulation.run",
+          "tool_version": "1.0.0"
+        }
+      }
+    },
+    {
+      "changes": {
+        "control/recipe/holding_tip_speed_weight": 0.09
+      },
+      "candidate": {
+        "candidate_id": "batch-bc9cc559d65f5c74-1",
+        "configuration": {
+          "artifact_id": "5fbaec6f6119410b5d51fec8641d36f3f53e1fa989b1c54fa84897dd659b2281",
+          "media_type": "application/json"
+        },
+        "execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+        "owner_run_id": "batch-bc9cc559d65f5c74-1"
+      },
+      "metrics": {
+        "source": {
+          "execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+          "configuration": {
+            "artifact_id": "5fbaec6f6119410b5d51fec8641d36f3f53e1fa989b1c54fa84897dd659b2281",
+            "media_type": "application/json"
+          },
+          "evaluation": {
+            "artifact_id": "2ef1c2d2805304d5ea8ad401e857c4f6009956f223c32af9d7265b9b6389647f",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "4462e22ea75332c041ef255df175aebfd0b3b20bf63587d649d2959d3bd5aa13",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "23e2416ca790180dbdb680ff29dfd6ada7a6e4603710dedf4874ec416c65d27b",
+            "media_type": "application/json"
+          }
+        },
+        "coverage": {
+          "terminal": "last execution sample",
+          "holding": "all retained samples in final 0.05 s",
+          "continuous_time_guarantee": false
+        },
+        "valid_complete_execution": true,
+        "official_reach_task_success": true,
+        "terminal_error_m": 0.002771173824806968,
+        "holding_max_error_m": 0.0028202094361386796,
+        "holding_max_speed_m_s": 0.02260458517372844,
+        "terminal_reach_passed": true,
+        "holding_position_passed": true,
+        "holding_speed_passed": false,
+        "joint_reach_holding_passed": false,
+        "mean_complete_update_s": 8.644476228571408,
+        "deadline_misses": 35,
+        "control_updates": 35,
+        "control_period_s": 0.01,
+        "real_time_demonstrated": false,
+        "solver_error_count": 0,
+        "force_bound_violation_n": 0.0
+      },
+      "comparison_to_selected": {
+        "baseline": {
+          "source": {
+            "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+            "configuration": {
+              "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "87d4cbf3d906873cf70b4357ad8c884eb7e4888563f101451cbce89cdcc11ced",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "2e05e163d28a51f6ebe36459f5e2f13e39f7a5809b496833c2e4a36ac24944ac",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "9c4891d7aad28a0b4d3638e13fa8589a20de52e2efb645228795b91d3123aab4",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.0026978288583256148,
+          "holding_max_error_m": 0.0027300544346297905,
+          "holding_max_speed_m_s": 0.012750255515948416,
+          "terminal_reach_passed": true,
+          "holding_position_passed": true,
+          "holding_speed_passed": true,
+          "joint_reach_holding_passed": true,
+          "mean_complete_update_s": 8.518060568580404,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate": {
+          "source": {
+            "execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+            "configuration": {
+              "artifact_id": "5fbaec6f6119410b5d51fec8641d36f3f53e1fa989b1c54fa84897dd659b2281",
+              "media_type": "application/json"
+            },
+            "evaluation": {
+              "artifact_id": "2ef1c2d2805304d5ea8ad401e857c4f6009956f223c32af9d7265b9b6389647f",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "4462e22ea75332c041ef255df175aebfd0b3b20bf63587d649d2959d3bd5aa13",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "23e2416ca790180dbdb680ff29dfd6ada7a6e4603710dedf4874ec416c65d27b",
+              "media_type": "application/json"
+            }
+          },
+          "coverage": {
+            "terminal": "last execution sample",
+            "holding": "all retained samples in final 0.05 s",
+            "continuous_time_guarantee": false
+          },
+          "valid_complete_execution": true,
+          "official_reach_task_success": true,
+          "terminal_error_m": 0.002771173824806968,
+          "holding_max_error_m": 0.0028202094361386796,
+          "holding_max_speed_m_s": 0.02260458517372844,
+          "terminal_reach_passed": true,
+          "holding_position_passed": true,
+          "holding_speed_passed": false,
+          "joint_reach_holding_passed": false,
+          "mean_complete_update_s": 8.644476228571408,
+          "deadline_misses": 35,
+          "control_updates": 35,
+          "control_period_s": 0.01,
+          "real_time_demonstrated": false,
+          "solver_error_count": 0,
+          "force_bound_violation_n": 0.0
+        },
+        "candidate_minus_baseline": {
+          "terminal_error_m": 7.334496648135321e-05,
+          "holding_max_error_m": 9.015500150888912e-05,
+          "holding_max_speed_m_s": 0.009854329657780025,
+          "mean_complete_update_s": 0.1264156599910038,
+          "deadline_misses": 0
+        },
+        "ranking_rule": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "classification": "joint_acceptance_lost",
+        "interpretation": "Derived arithmetic from sealed complete evaluations/profile; source agreement does not certify scientific prose."
+      },
+      "receipts": {
+        "evaluation": {
+          "analysis_status": "valid",
+          "cache_hit": false,
+          "caller": "local-human",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.0,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": null,
+          "execution_id": "4de6f0f2507e4ce4ad5b19cee41175b3",
+          "execution_status": "completed",
+          "original_execution_id": null,
+          "output": {
+            "artifact_id": "2ef1c2d2805304d5ea8ad401e857c4f6009956f223c32af9d7265b9b6389647f",
+            "media_type": "application/json"
+          },
+          "request_id": "complete-evaluation",
+          "result_contract": "EvaluationResult",
+          "result_version": "1.2.0",
+          "solver_status": "not_run",
+          "task_success": true,
+          "tool_id": "evaluation.run",
+          "tool_version": "1.0.0"
+        },
+        "profile": {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "local-human",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.155999999999949,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": null,
+          "execution_id": "350294b1bd1d443f88994a4baeeb1cb1",
+          "execution_status": "completed",
+          "original_execution_id": null,
+          "output": {
+            "artifact_id": "4462e22ea75332c041ef255df175aebfd0b3b20bf63587d649d2959d3bd5aa13",
+            "media_type": "application/json"
+          },
+          "request_id": "complete-profile",
+          "result_contract": "ProfileOutput",
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "control.profile_report",
+          "tool_version": "1.0.0"
+        },
+        "simulation": {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "local-human",
+          "charged": {
+            "backend_solves": 1,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 304.5160000000001,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": null,
+          "execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+          "execution_status": "completed",
+          "original_execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+          "output": {
+            "artifact_id": "23e2416ca790180dbdb680ff29dfd6ada7a6e4603710dedf4874ec416c65d27b",
+            "media_type": "application/json"
+          },
+          "request_id": "complete-simulation",
+          "result_contract": "BackendResult",
+          "result_version": "1.0.0",
+          "solver_status": "completed",
+          "task_success": null,
+          "tool_id": "simulation.run",
+          "tool_version": "1.0.0"
+        }
+      }
+    }
+  ],
+  "actual_latest_execution": {
+    "candidate_id": "batch-bc9cc559d65f5c74-1",
+    "configuration": {
+      "artifact_id": "5fbaec6f6119410b5d51fec8641d36f3f53e1fa989b1c54fa84897dd659b2281",
+      "media_type": "application/json"
+    },
+    "execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+    "owner_run_id": "batch-bc9cc559d65f5c74-1"
+  },
+  "selected_deliverable": {
+    "candidate_id": "batch-ebbeadbdaca10732-0",
+    "configuration": {
+      "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+      "media_type": "application/json"
+    },
+    "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+    "owner_run_id": "batch-ebbeadbdaca10732-0"
+  },
+  "selected_metrics": {
+    "source": {
+      "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+      "configuration": {
+        "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "artifact_id": "87d4cbf3d906873cf70b4357ad8c884eb7e4888563f101451cbce89cdcc11ced",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "2e05e163d28a51f6ebe36459f5e2f13e39f7a5809b496833c2e4a36ac24944ac",
+        "media_type": "application/json"
+      },
+      "simulation": {
+        "artifact_id": "9c4891d7aad28a0b4d3638e13fa8589a20de52e2efb645228795b91d3123aab4",
+        "media_type": "application/json"
+      }
+    },
+    "coverage": {
+      "terminal": "last execution sample",
+      "holding": "all retained samples in final 0.05 s",
+      "continuous_time_guarantee": false
+    },
+    "valid_complete_execution": true,
+    "official_reach_task_success": true,
+    "terminal_error_m": 0.0026978288583256148,
+    "holding_max_error_m": 0.0027300544346297905,
+    "holding_max_speed_m_s": 0.012750255515948416,
+    "terminal_reach_passed": true,
+    "holding_position_passed": true,
+    "holding_speed_passed": true,
+    "joint_reach_holding_passed": true,
+    "mean_complete_update_s": 8.518060568580404,
+    "deadline_misses": 35,
+    "control_updates": 35,
+    "control_period_s": 0.01,
+    "real_time_demonstrated": false,
+    "solver_error_count": 0,
+    "force_bound_violation_n": 0.0
+  },
+  "first_batch_feedback": {
+    "artifact_id": "02cebaa909ff37624909e45737f993eb538c100cc09cb6c9b1fbe65691d2f86f",
+    "media_type": "application/json"
+  },
+  "final_decision": {
+    "artifact_id": "bd37cd1974f2c8577dae1520dfd3879c369526cb07b78bda5009a88f43b84421",
+    "media_type": "application/json"
+  },
+  "final_model_stop_reason": "incumbent_already_meets_joint_acceptance_no_affordable_gain",
+  "final_stop_references_first_batch": true,
+  "second_plan": null,
+  "legal_actions_at_stop": [
+    "control_search",
+    "structure_search",
+    "diagnosis",
+    "stop"
+  ],
+  "budget": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 9000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 14,
+      "model_calls": 3,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 760.2499999999995
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 21,
+      "tool_calls": 46,
+      "wall_s": 8239.75,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "interpretation_review": [
+    "The final decision accurately reports both new speed failures and keeps the verified passing incumbent.",
+    "No affordable gain is the model's scientific judgment, not a platform capacity restriction: two backend attempts and 8239.75 charged seconds remain, with both search routes and retained diagnosis legal.",
+    "Calling the .10 loss reproducible is unsupported by this run: .10 was not repeated; the new .075/.09 tests are different configurations.",
+    "A narrow passing window around .05 is not established by these sparse samples. The zero-weight baseline changes both speed weights, so it does not isolate lowering only the holding weight.",
+    "Unadaptable structural change is unsupported: structural search and optional later control adaptation remain legal capabilities.",
+    "Acceptance passes at the incumbent; this does not prove all minimization objectives are optimal or that no affordable improvement exists.",
+    "The prediction that .075 passes is contradicted; both probes fail. Their speed decreases from .075 to .09, which also weakens a monotone-degradation interpretation.",
+    "Schema/reference validation establishes provenance, not a dominant physical cause or a sound scientific stopping proof."
+  ],
+  "reporting_limit": {
+    "runtime_latest_execution": {
+      "candidate_id": "batch-bc9cc559d65f5c74-0",
+      "configuration": {
+        "artifact_id": "c39304bd92853f70823cb05b3770d002d1acbd09a9bace4aedcf94555fe25a2f",
+        "media_type": "application/json"
+      },
+      "execution_id": "e3876a1d289f41f08d46c96202f1da0c",
+      "owner_run_id": "batch-bc9cc559d65f5c74-0"
+    },
+    "actual_latest_execution": {
+      "candidate_id": "batch-bc9cc559d65f5c74-1",
+      "configuration": {
+        "artifact_id": "5fbaec6f6119410b5d51fec8641d36f3f53e1fa989b1c54fa84897dd659b2281",
+        "media_type": "application/json"
+      },
+      "execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+      "owner_run_id": "batch-bc9cc559d65f5c74-1"
+    },
+    "cause": "Batch result iterates configuration hash order; runtime latest label used the final iterated row rather than execution chronology.",
+    "impact": "Both complete candidates and their correct metrics were supplied to the final model. Preserve its original request/response and the original runtime report; correct chronological attribution only in delivery audit.",
+    "new_live_repair": false,
+    "backend_replay": false
+  },
+  "program_controlled": [
+    "Frozen domains and acceptance",
+    "Complete build/simulation/evaluation/profile reservations",
+    "Native schema, evidence ownership and cumulative correction limits",
+    "Candidate generation within accepted explicit batch",
+    "Stop execution after legal voluntary model decision; no post-hoc fallback"
+  ],
+  "engineering_interventions": 1,
+  "corrections": {
+    "total": 1,
+    "consecutive": 0
+  },
+  "standalone_numerical_operations": 0,
+  "embedded_controller_updates": 70,
+  "transport_retries": 0,
+  "workers": 0,
+  "subagents": 0,
+  "budget_reset": false,
+  "M5_protected_slots_used": 0,
+  "provenance_checks": [
+    "Evaluation/profile execution identities and numerical metrics match",
+    "Second request contains the exact first-batch feedback and both outcomes",
+    "Final resolved evidence cites first-batch feedback and exact selected complete candidate",
+    "Completed receipt charges sum to the global shared ledger",
+    "Stable controller hashes match frozen implementation"
+  ],
+  "revision": {
+    "commit": "104c4abec8fe549f320125c1ef8b8105cf042b13",
+    "files": {
+      "examples/milestone4_autonomous.py": "35294e2318bb212636e80905dee9a7888d75edbe73a7ba5070e8d439cf415d1f",
+      "tools/research_scheduler.py": "ad74e6d82a92d701c2edfec488fc09d2844fbdd771db59c97fc0c43734f48d55",
+      "tools/platform_search.py": "03e10f3fdedd3b65e756a54aaa1f5e7af48403eb33737418bcaf7ff3c1328390",
+      "tools/structural_study.py": "759885d1ef42eb1de24a5ebe3aacca272953df718e45134f4433df66dcaf0f5d",
+      "tools/diagnostic_reference_adapter.py": "8895248408371528c2c15fe3f097807e92bd4e261286a59adf54d58dbd2392a3",
+      "tools/platform_models.py": "fec97daf907da29f2d3fb726410d93eeb1b9f2a20439f03837af85e19eb1fdad",
+      "schemas/platform_handoff.py": "4da1139a74fb4a6db9748f936de98d9c612811bd4a06e64b59fda50b3a574015",
+      "extensions/platform/manifest.py": "9b29e664856076325d1d663c866e60fc331f078a36ca58f1529fd56caa522510",
+      "tests/test_research_scheduler.py": "8b709869a28d9d1f80e87c23ec253b1f46a1190e3aca88ef5848f7fdc5cd6bd0"
+    },
+    "stable_controller": {
+      "extensions/tendon_family/gvs_nmpc.py": "39fc23b1ce3756ab06d42486f004edb8bb1db4b64b69e158b55f9bc2761cb698",
+      "extensions/tendon_family/gvs_trajectory.py": "160b47df2f0958929527d4871c61a66e3c69d766b7406144c97cb197ad65292b",
+      "extensions/tendon_family/gvs_profile.py": "2860f671093c665e1bc1840b92a42f33b3735767873cb9035acfdc43e2ff9711"
+    }
+  }
+}
