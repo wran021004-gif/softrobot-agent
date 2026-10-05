@@ -1,5 +1,20 @@
 # Current development status - Milestones 4 and 5, 2026-10-05
 
+Latest: the [linked successor checkpoint](milestone5_successor_campaign.md) is
+being delivered at the user's commit/push request. **Milestone 5 remains open;
+the campaign is not complete.** The explicitly approved fixed-0.5-ms local target
+passes all six numerical/position/speed/vector/direction checks. The final chunked
+native force/Jacobian kernel is equivalent on six points and measures a 1.6555x
+median speedup, but still takes 43.5–64.1 ms for the kernel alone. Complete command
+timing, full-history repair, useful ranking/economics and prospective validation
+remain outstanding. No new controller solve or independent backend was launched.
+Successor usage: 3,420.897 s / 2 provider / 21 workflow / 0 backend attempts.
+Shared authorization remaining: 25,641.241 s / 15 provider / 129 workflow /
+6 backend attempts. Eleven focused checks pass. The historical incumbent,
+Milestones 2–4 and all prior negative evidence remain unchanged.
+
+The following describes the preserved predecessor campaign:
+
 The [full-scope development campaign](milestone5_fullscope_campaign.md) is complete
 with accepted native **NO_GO**; **Milestone 5 remains open**. It starts from
 `a1f8f5d` under new direct authorization and preserves the preceding STOP and

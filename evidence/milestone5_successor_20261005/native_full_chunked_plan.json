@@ -1,0 +1,15 @@
+{
+  "version": "gvs_native_chunked_kernel@2.0.0",
+  "hypothesis": "Chunked scalar reverse compiles with optimization and preserves all six comparisons, but .87x speedup still loses to baseline. Reuse the already generated full-Jacobian source and apply the proven chunking transformation, avoiding repeated directional forward/reverse work when the entire Jacobian is requested. The cheap equivalent mass-form probe was also slower (.12x), so it is rejected.",
+  "source_sha256": "98371fbf98e72c0cd3a6f6c7149c8dc5861d69f10858b2fd4b6d2abf00f61725",
+  "compiler_flags": [
+    "-O1",
+    "-fno-inline",
+    "-fno-fast-math",
+    "-shared"
+  ],
+  "compile_cap_s": 900.0,
+  "points": 6,
+  "reserve_s": 960.0,
+  "continuation": "Only equivalent and faster kernel qualifies for nonzero-acceleration checks and five complete causal controller updates, never direct backend admission."
+}

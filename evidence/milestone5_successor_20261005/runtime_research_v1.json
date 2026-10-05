@@ -1,0 +1,18 @@
+{
+  "holding_weights": [
+    0.075,
+    0.15
+  ],
+  "limitations": [
+    "Only fixed-step transition validity is certified; no continuous, hardware, or global propagation correctness.",
+    "Slower O0 variants and optimizer timeouts are capacity evidence, not proof that optimization is impossible.",
+    "Six-case timing is single-sample per variant; a one-run gate may not capture distribution or variance.",
+    "Altered controller response under acceleration would require fresh comparisons before any backend reuse.",
+    "Original and failed reset histories remain development, not validation.",
+    "No provider migration or workers; all six prospective backends and final interpretation stay reserved."
+  ],
+  "next_action": "finish_stop",
+  "phase": "interpretation",
+  "rationale": "The six same-state local numerical cases now pass: kernel_probe, native_o0 and native_reverse_o0 are all_equivalent, with 6/6 vector, position, speed and direction passes, zero speed_false_safe/unsafe, under the user-approved fixed .5 ms transition reference and independent Cholesky residual/backward-error checks. This certifies only fixed-step transition reproduction — not continuous accuracy, independent backend validation, or milestone closure. Native acceleration is unproven: both completed native variants are slower (median_speedup 0.556 and 0.318; reverse_o0 0.318), and every optimized build failed — -O2 native_probe exceeded the preregistered 600 s cap (~754 s charged), -O1 native_o1 timed out at 360 s (~443 s), and native_reverse (-O1, integrated cc1) timed out at 180 s (~183 s). No successful speedup may be claimed, and timeouts do not prove all optimized methods impossible; only O0 compilation finished. Because timed optimizer stopping can change controller response when accelerated, any accelerated artifact needs a distinct version identity and fresh equivalence comparisons — old backend outcomes cannot validate altered response.\n\nDecisive affordable next experiment: one 16 MB scalar reverse-AD native build at a single optimized level under an explicit 900 s task-local cap, no new backend, followed by exactly six same-state equivalence evaluations against the saved production trajectory plus paired wall-clock timings, and the outstanding feedback/position classification on the original and reset pairs.\n\nPrecise measured gate (admit only if all hold): (a) the single optimized build completes within 900 s; (b) all six equivalence checks (vector, position, speed, direction) pass as native_o0 did, with zero false_safe/false_unsafe; (c) median speedup ≥ 1.0x, i.e. strictly faster than the current Python path on the six same-state cases. Fail any condition and do not purchase backends or full forecasts.\n\nWhen to abstain from complete forecasts/backends: while any candidate native variant is unmeasured or slower, or while an altered controller response lacks fresh equivalence, do not spend the six protected backend reservations or buy full forecasts. Complete deadline is .01 s including all preparation/optimization/validation; cold setup is charged separately and explicitly.",
+  "readiness": "NO_GO for promotion or backend validation of this revision: local fixed-step equivalence passes, but no native variant has demonstrated acceleration and the optimized gate is unmet. Proceed only with the bounded development experiment below; affordable development is not cancelled."
+}

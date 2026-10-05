@@ -1,0 +1,29 @@
+{
+  "version": "gvs_native_force_kernel@1.0.0",
+  "hypothesis": "Scalar expansion was equivalent but slower (median speedup .556). Exact native code for the force balance and AD Jacobian targets measured interpreter/graph evaluation cost without changing equations.",
+  "source": "CasADi 3.7.2 existing MX function and exact jacobian()",
+  "compiler": {
+    "name": "llvm-mingw-20260922-ucrt-x86_64.zip",
+    "size": 190725905,
+    "digest": "sha256:e3ad77d117a4bea19a7a3b333341824d79a5a371004a10e25b8504e7b3047666",
+    "browser_download_url": "https://github.com/mstorsjo/llvm-mingw/releases/download/20260922/llvm-mingw-20260922-ucrt-x86_64.zip"
+  },
+  "options": [
+    "-O2",
+    "-fno-fast-math",
+    "-shared"
+  ],
+  "environment": "Task-local portable compiler; installed Conda packages unchanged.",
+  "workload": {
+    "builds": 1,
+    "native_points": 6,
+    "baseline_reused": "Saved original evaluations in kernel_probe.json at identical states/inputs and zero acceleration",
+    "reserve_s": 1200.0
+  },
+  "criteria": {
+    "residual_difference": 1e-10,
+    "relative_jacobian_difference": 1e-08,
+    "performance": "Measure native force+Jacobian including Python call boundary; only proceed to full update if useful."
+  },
+  "charging": "Compilation/download are charged campaign setup; operational candidate work and any amortization will be explicit. Kernel time never counts as full-update time."
+}

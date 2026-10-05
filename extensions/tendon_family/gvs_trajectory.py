@@ -1,5 +1,7 @@
 """Trusted fixed-design GVS dynamic transcription and reusable NMPC workspace."""
 import time
+from contextvars import ContextVar
+from contextlib import contextmanager
 import casadi as ca
 import numpy as np
 from schemas.platform import Binding, Objective, Payload
@@ -9,6 +11,22 @@ from .contracts import GVSModelParameters, GVSTrajectoryParameters
 from .gvs import GVSModel, coordinate_order
 from .gvs_casadi import expression_from_system, functions_for
 from .pcc import quaternion_wxyz_to_rotation
+
+
+_FUNCTION_PROVIDER=ContextVar('gvs_trajectory_function_provider',default=None)
+
+
+@contextmanager
+def use_trajectory_functions(provider):
+    """Execution-scoped experimental evaluator; default production is unchanged."""
+    token=_FUNCTION_PROVIDER.set(provider)
+    try:yield
+    finally:_FUNCTION_PROVIDER.reset(token)
+
+
+def trajectory_functions(expression):
+    original=functions_for(expression);provider=_FUNCTION_PROVIDER.get()
+    return original if provider is None else provider(original)
 
 
 def implicit_step_residual(functions,n,m,h):
@@ -74,7 +92,7 @@ class GVSTrajectoryAssembler:
         model_params=GVSModelParameters(basis=p.basis)
         system=GVSModel(model_params).build_system(robot,model_params,None,SystemContext(
             x0=context.x0,u0=context.u0,scene=task.environment))
-        functions=functions_for(expression_from_system(system))
+        functions=trajectory_functions(expression_from_system(system))
         steps=p.horizon*p.substeps
         decision_symbols={name:ca.MX.sym('v_'+str(i)) for i,name in enumerate(expected)}
         symbols={name:value*expected[name].get('physical_scale',1.) for name,value in decision_symbols.items()}
@@ -193,7 +211,7 @@ class TrajectoryWorkspace:
             p=GVSModelParameters(basis=self.parameters.basis)
             system=GVSModel(p).build_system(self.robot,p,None,SystemContext(
                 x0=self.nominal_x,u0=self.nominal_u,scene=self.scene))
-            functions=functions_for(expression_from_system(system))
+            functions=trajectory_functions(expression_from_system(system))
             q=functions.q_symbol;v=ca.MX.sym('motion_rate',self.n)
             local_tip=functions.tip_position_expression
             assembly=self.scene.data

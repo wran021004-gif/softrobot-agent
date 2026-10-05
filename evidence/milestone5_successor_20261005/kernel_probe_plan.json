@@ -1,0 +1,15 @@
+{
+  "version": "gvs_scalar_force_kernel@1.0.0",
+  "hypothesis": "Saved matched IPOPT Jacobians take .212-.213 s per call and dominate solve time; a single-step scalar CasADi evaluation may remove interpreter graph overhead without changing the equation.",
+  "evidence": "Fullscope matched diagnostics: Jacobian 7.648/8.585 s and 6.173/6.872 s of optimization; warm generation similarly differentiates the same dynamics.",
+  "change": "Expand only the existing force-balance kernel to SX, retaining cell function boundaries. No whole-horizon expansion, solver migration, physics or acceptance change.",
+  "decisive_comparison": "Six registered development current states and current applied inputs, acceleration fixed to zero: compare original and scalar force residual plus exact full argument Jacobian. Residual difference <=1e-10, relative Jacobian difference <=1e-8. Measure cold construction separately.",
+  "workload": {
+    "force_and_jacobian_point_evaluations": 12,
+    "complete_controller_solves": 0,
+    "backend_steps": 0,
+    "reserve_s": 600.0
+  },
+  "continuation": "Only if equivalent and materially faster, integrate into a versioned workspace and measure actual warm regeneration/complete controller updates; no claim from kernel timings.",
+  "target_decision_dependency": false
+}

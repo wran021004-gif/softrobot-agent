@@ -1,0 +1,14 @@
+{
+  "version": "gvs_native_chunked_kernel@1.0.0",
+  "hypothesis": "Split compilation is fast but unoptimized orchestration remains slower; shared optimized matrix helpers alone worsened performance. Partition giant force/adjoint code at complete MX operation boundaries into <=250-operation functions so the entire unchanged arithmetic graph can be optimized in bounded-size functions. Cross-chunk scalar and read-only pointer temporaries are explicitly retained.",
+  "source_sha256": "a85c0eacbaa1138ed16ee470cfb016a8b78ec796dace44728c625cc1a826a128",
+  "compiler_flags": [
+    "-O1",
+    "-fno-inline",
+    "-fno-fast-math",
+    "-shared"
+  ],
+  "compile_cap_s": 240.0,
+  "points": 6,
+  "reserve_s": 300.0
+}

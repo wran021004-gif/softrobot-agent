@@ -1,0 +1,29 @@
+{
+  "superseded_reference": {
+    "artifact_id": "0e4ba7ce1740ececcd2a5f01b09b4546885757a1b5999eab24b42ca5c880a0e1",
+    "media_type": "application/json"
+  },
+  "phase_budget_before": {
+    "limit": {
+      "model_calls": 2,
+      "tool_calls": 4,
+      "wall_s": 180.0
+    },
+    "protect_project": {
+      "wall_s": 1265.0
+    },
+    "started_usage": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    }
+  },
+  "facts": [
+    "Local propagation fixed_target.json passes position/speed/vector/direction and independent Cholesky checks in all six cases. Kernel probes are different experiments: force residual and exact full argument Jacobian at current state/input/zero acceleration. Kernel equivalence is not endpoint accuracy or direction testing.",
+    "Measured median speedups: scalar MX-to-SX kernel_probe 0.5563646; full-Jacobian native_o0 about 0.5204320; scalar reverse native_reverse_o0 about 0.3175721. All are slower. Failed compile attempts are compiler timeouts, not numerical optimizer timeouts.",
+    "The optimized reverse build is pending; its 900 s cap and all costs are registered. No timing success is known. Kernel gate is residual difference <=1e-10 and relative Jacobian difference <=1e-8 at all six points, plus median speedup strictly >1. These thresholds are distinct from the approved local trajectory thresholds.",
+    "After a useful equivalent kernel result, next is ONLY five actual complete command updates: original075 first three, reset075 first two, with own causal full-state history. No full forecasts or backends merely because a kernel is faster. Complete .01 s update, useful full-history classification/ranking and all-in economics remain open."
+  ]
+}
