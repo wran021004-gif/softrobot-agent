@@ -18,7 +18,8 @@ def validate_batch_plan(store, view, proposal):
     plan=SearchBatchPlan.model_validate(proposal);reg=registry()
     state=store.session(view.run_id)['state'];role=state['role_context']
     from tools.diagnostic_handoff import accepted_product
-    accepted_product(store,role['previous_report'],'diagnosis_report')
+    if not role.get('autonomous_scheduling'):
+        accepted_product(store,role['previous_report'],'diagnosis_report')
     selectors=resolve_aliases(state,{'plan':plan.evidence})['plan']
     feedback=store.artifact(role['result_feedback'])
     if not any(s['reference']==feedback['result'] for s in selectors):
@@ -140,7 +141,7 @@ def validate_batch_plan(store, view, proposal):
         bindings=dict(task=view.task,acceptance=view.acceptance,baseline=view.baseline,subject=candidate,
             source_configuration=candidate['configuration'],execution_source_configuration=execution_source,
             controller=controller,dynamics_model=view.task['execution_model'],source_report=role['source_report'],
-            revised_assessment=role['previous_report'],check_feedback=role['result_feedback'],evidence_selectors=selectors,
+            revised_assessment=role.get('previous_report'),check_feedback=role['result_feedback'],evidence_selectors=selectors,
             fixed_configuration_identity=digest(fixed),fixed_configuration=fixed),
         batch_semantics='One immutable plan for the batch. Registered coordinate or finite ask/tell scheduling uses the same receipt executor; plan submission executes nothing.',
         screening=dict(local_screening='none',raw_weighted_objectives_are_physical_ranking=False),

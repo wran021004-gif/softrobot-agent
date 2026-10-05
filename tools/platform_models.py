@@ -627,7 +627,8 @@ def run_loop(host, adapter=None):
                 return _stop(host, 'needs_input', 'TOOL_EXECUTION_UNKNOWN')
             if 'BUDGET_EXHAUSTED' in (receipt.get('error') or ''):
                 return _stop(host, 'budget_exhausted', receipt['error'])
-            if config.get('adapter_version') not in ('3.0.0','4.0.0','5.0.0','6.0.0') and receipt['execution_status']=='rejected' and (receipt.get('error') or '').startswith('INVALID_TOOL_ARGUMENTS:'):
+            scheduling=state.get('role_context',{}).get('autonomous_scheduling')
+            if (scheduling and receipt['execution_status'] in ('failed','rejected')) or (receipt['execution_status']=='rejected' and config.get('adapter_version') not in ('3.0.0','4.0.0','5.0.0','6.0.0') and (receipt.get('error') or '').startswith('INVALID_TOOL_ARGUMENTS:')):
                 stopped = _argument_rejection(host, active_decision, receipt, config)
                 if stopped is not None:
                     return stopped
@@ -652,7 +653,7 @@ def _argument_rejection(host, decision, receipt, config):
     """
     if config.get('adapter_version') in ('3.0.0','4.0.0','5.0.0','6.0.0'):
         with host.store.transaction() as db:
-            ref=plain(host.store.put(db,dict(error=receipt['error'],protocol_errors=[dict(path='business_parameters',expected=receipt['error'])])))
+            ref=plain(host.store.put(db,dict(error=receipt['error'],response=receipt.get('output'),protocol_errors=[dict(path='business_parameters',expected=receipt['error'])])))
         return _model_failure(host,{**receipt,'output':ref},advance_turn=False)
     with host.store.transaction() as db:
         state = host.store.session(host.run_id, db)['state']
@@ -665,7 +666,7 @@ def _argument_rejection(host, decision, receipt, config):
             stop = False
             if exhausted: state['argument_limit_correction_used'] = True
             state['protocol_correction'] = dict(type='tool_arguments', request_id=receipt['request_id'],
-                requirement=receipt['error']+' The rejected call did not execute. Correct the invalid fields using the supplied schema and resubmit the complete provider tool-call envelope, with domain fields inside arguments. '+delivery_instruction(host)+' All counters and limits remain in force.')
+                requirement=receipt['error']+' The rejected call did not execute. Correct only the invalid fields using the advertised native schema. '+delivery_instruction(host)+' All counters and limits remain in force.')
             request_ref = host.store.put(db, decision)
             rejection_ref = host.store.put(db, receipt)
             correction_ref = host.store.put(db, state['protocol_correction'])

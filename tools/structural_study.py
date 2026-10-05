@@ -32,7 +32,7 @@ def research_planning_input(effective,profile,*,budget,model,tool_bindings):
     from extensions.tendon_family.gvs_profile import execution_scope
     result=structural_input(effective,profile)
     result['policy'].update(budget=deepcopy(budget),model=deepcopy(model),tool_bindings=deepcopy(tool_bindings))
-    if 'design.submit_search_plan' not in tool_bindings or 'design.respond_diagnosis' not in tool_bindings:
+    if 'research.decide' not in tool_bindings and ('design.submit_search_plan' not in tool_bindings or 'design.respond_diagnosis' not in tool_bindings):
         raise ValueError('RESEARCH_PLANNING_HANDOFF_TOOLS_REQUIRED')
     if execution_scope(result)!=execution_scope(effective):raise ValueError('RESEARCH_POLICY_CHANGED_SCIENCE')
     return result

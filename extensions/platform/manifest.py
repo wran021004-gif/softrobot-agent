@@ -56,6 +56,10 @@ EXTENSIONS = [replace(d, capabilities={**d.capabilities,
     'role': 'adapter'}) for d in EXTENSIONS]
 
 from schemas import platform_handoff as handoff
+EXTENSIONS.append(Extension('research.decide','tool','1.0.0',handoff.ResearchDecision,handoff.HandoffResult,
+    'tools.research_scheduler:decide','Choose an evidence-bound control search, structure search, bounded diagnosis or voluntary stop.',
+    sources=('schemas/platform_handoff.py','tools/research_scheduler.py','tools/platform_search.py'),
+    capabilities=dict(category='research',role='public_tool',route_visible=True,preflight='tools.platform_handoff:preflight')))
 from tools.diagnostic_improvement import ImprovementDecision
 from schemas.diagnostic_revision import FinalDesignResponse
 EXTENSIONS.append(Extension('deepseek','model_adapter','6.0.0',Empty,ModelResponse,

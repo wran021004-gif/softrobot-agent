@@ -215,3 +215,35 @@ class SearchBatchPlan(Contract):
     stopping_conditions: list[str] = Field(min_length=1)
     scientific_promise: Literal['promising', 'uncertain', 'unlikely']
     rationale: str = Field(min_length=1)
+
+
+class ResearchDiagnosis(Contract):
+    source_candidate: dict
+    hypotheses: list[str] = Field(min_length=2)
+    evidence: list[str] = Field(min_length=1)
+    missing_observation: str = Field(min_length=1)
+    view: Literal['prediction', 'plans', 'motion']
+    update_ids: list[int] = Field(default_factory=list, max_length=8)
+    outcome_actions: dict[str, str] = Field(min_length=2)
+    max_wall_s: float = Field(gt=0, le=180)
+    exit_condition: str = Field(min_length=1)
+    replication_reason: str | None = None
+
+
+class ResearchDecision(Contract):
+    action: Literal['control_search', 'structure_search', 'diagnosis', 'stop']
+    evidence: list[str] = Field(min_length=1)
+    reasoning: str = Field(min_length=1)
+    plan: SearchBatchPlan | None = None
+    diagnosis: ResearchDiagnosis | None = None
+    selected_candidate: dict | None = None
+    stop_reason: str | None = None
+
+    @model_validator(mode='after')
+    def action_fields(self):
+        search=self.action in ('control_search','structure_search')
+        if search != (self.plan is not None) or (self.action=='diagnosis') != (self.diagnosis is not None):
+            raise ValueError('Supply plan only for search and diagnosis only for diagnosis')
+        if self.action=='stop' and not self.stop_reason:
+            raise ValueError('Stopping requires stop_reason')
+        return self
