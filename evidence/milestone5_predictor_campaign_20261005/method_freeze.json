@@ -1,0 +1,42 @@
+{
+  "version": "serial_pullback_replan5@1.0.0",
+  "selected_after": "localization-r1.json",
+  "accuracy": {
+    "version": "represented_serial_mechanics@1.0.0",
+    "finding": "Projection and rates are consistent. Continuous and represented serial mechanics differ: mass about 8%, gravity/bias about 5.4%, with nonzero discarded modes. Combined dynamics/representation limitation, not an established projection bug.",
+    "correction": "Replace ONLY predictor reduced mechanics with constant-map virtual-work pullback M_r=B.T M_serial(Bq) B and f_r=B.T f_serial(Bq,Bv,u); preserve represented serial output, original reduced coordinates, all physical parameters, limits and production controller.",
+    "limitations": "Discarded serial modes remain excluded. Fixed-state projected full acceleration is not equal to constrained Galerkin acceleration. No claim to recover full backend dynamics.",
+    "integration": "Installed scipy Radau on 24-dimensional reduced ODE; non-advancing forward mechanics evaluations only; backend data.time remains zero; no mj_step or full-order rollout.",
+    "local_grids": [
+      {
+        "max_step_s": 0.0005,
+        "rtol": 1e-06,
+        "atol": 1e-08
+      },
+      {
+        "max_step_s": 0.00025,
+        "rtol": 3e-07,
+        "atol": 3e-09
+      },
+      {
+        "max_step_s": 0.000125,
+        "rtol": 1e-07,
+        "atol": 1e-09
+      }
+    ],
+    "working_grid_index": 2,
+    "numerical": "Finite successful implicit solve and scaled reduced force-balance residual <=1e-5; last two successive vector AND speed differences <=1e-4. Old continuum reference is NOT a reference for changed mechanics."
+  },
+  "cost": {
+    "version": "replan_every_5@1.0.0",
+    "dominant_component_s": 665.7255870010704,
+    "baseline_pair_s": 694.4266482002567,
+    "strategy": "Seven candidate-specific NMPC replans at updates 0,5,10,15,20,25,30; execute each new plan next five inputs without intermediate feedback in predictor only. Production still replans all 35 times.",
+    "warm_start": "At each replan shift prior predictor plan by five executed intervals, truncate to actual horizon and regenerate using candidate current predicted state. No historical future states or inputs.",
+    "assessment": "One isolated initial controller-response probe against saved production actions, then two final combined histories. Do not infer exact controller behavior from fewer solves.",
+    "economics": "Count measured cold setup, graphs, seven solves, all propagation/output/serialization, and actual accepted research decision overhead per pair; compare with one skipped evaluation; abstention avoids zero."
+  },
+  "scope": "Retrospective development on frozen original-initializer pair and four local intervals. No safety authority or promotion. Future reset scenarios remain unobserved.",
+  "exact_future_reference": "Not established; admission must separately justify claimed scope",
+  "before_new_correction_comparisons": true
+}

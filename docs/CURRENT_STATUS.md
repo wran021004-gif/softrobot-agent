@@ -1,5 +1,46 @@
 # Current development status - Milestones 4 and 5, 2026-10-05
 
+The latest [accuracy and screening-cost campaign](milestone5_predictor_campaign.md)
+has completed its authorized development calculations, with **accepted research
+go/no-go blocked by automatic approval review**. Two supported host-call requests
+were rejected before process creation; the second explicitly refuses to treat
+the attachment's embedded authorization as direct chat authorization. The exact
+rejections and concrete 55,143-byte native payload are preserved; direct chat
+confirmation has been requested. No provider attempt or backend attempt occurred.
+
+The single repaired 2560-substep continuation completed in 608.265 charged seconds.
+Both continuous and represented-serial mappings now pass the unchanged last-two
+vector/speed stability criterion on the shared original .00-.01 interval.
+One predictor-only serial mass/force pullback improves physical error, while its
+four distinct local cases give 4/4 numerical passes and correct directions but
+0/4 position, 0/4 vector and only 1/4 speed accuracy passes. The .075 local
+holding false-safe is present. Production mechanics/controller remain unchanged.
+
+One five-interval replanning approximation cuts complete pair forecast cost to
+220.484 s from 694.471 s. Two new independent 35-interval histories use seven
+solves each and correctly rank .15 ahead of .075 at a .000966588 m/s gap.
+Both predict speed violations; .15 is actually acceptable, so eligibility remains
+wrong for one candidate. The pre-decision potential net saving is at most 83.312 s
+against one skipped .075 evaluation; required live research overhead remains
+unknown and final economics are not admitted. No safety authority, prospective
+forecast, validation grant, backend step, candidate promotion or M5 closure.
+
+New usage: 0 provider / 7 workflow / 0 backend attempts, 880.514 s, 13 integrations,
+15 controller attempts (one isolated probe and 14 embedded in two previews),
+zero workers/subagents. Cumulative: 43/88/6, 6487.379 s, 94 additional controller
+attempts, 57 integration attempts and 210 historical backend controller updates.
+Seven focused checks passed; missing native judgment is explicitly
+non-admitting. Prior ledgers/artifacts and production dependency hashes are unchanged.
+Next: confirm the specific transmission and resume the saved research packet;
+do not repeat numerical work. Conditional validation still requires accepted
+scientific and economic entry. Incumbent retained; real-time 35/35 misses remain.
+See [delivery](../evidence/milestone5_predictor_campaign_20261005/delivery.json),
+[assessment](../evidence/milestone5_predictor_campaign_20261005/assessment.json),
+[readiness](../evidence/milestone5_predictor_campaign_20261005/readiness.json),
+[accounting](../evidence/milestone5_predictor_campaign_20261005/accounting.json).
+
+## Predecessor predictor-output development
+
 The latest [bounded predictor development](milestone5_predictor_development.md)
 ends **not ready, with corrected final research interpretation accepted**. One predictor-only
 represented serial tip/Jacobian output map improves instantaneous reconstruction
