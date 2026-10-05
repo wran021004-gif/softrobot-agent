@@ -1,0 +1,23 @@
+{
+  "version": "full_serial_discrete@2.0.0",
+  "revision": 2,
+  "evidence": [
+    "revision1_local.json",
+    "matched.json"
+  ],
+  "hypothesis": "After restoring all modes, continuous Radau remains inaccurate against the backend despite refinement. Backend implicitfast finite-step dynamics are the next specific cause.",
+  "expected_improvement": "The saved backend .0005 s implicit-damping recurrence should reproduce local endpoints; decreasing its step may instead converge toward the inaccurate-against-backend continuous prediction.",
+  "implementation": "Full 96-state independent recurrence: (M+h*C)*a=f, v_next=v+h*a, q_next=q+h*v_next, hinge-only ideal tension with joint damping. No mj_step or hidden evaluation.",
+  "decisive_comparison": "Primary prediction is frozen at the actual backend step .0005, independent of outcomes. Also .00025 and .000125: two successive original numerical comparisons. No relabeling backend reproduction as converged continuous physics; admission still requires numerical AND primary quantitative passes.",
+  "primary_grid_index": 0,
+  "work": {
+    "local_integrations": 18,
+    "reservation_s": 1800.0,
+    "optional_complete_forecasts": 4,
+    "forecast_question": "Does causal holding-window replanning plus complete state restore position-feasible discrimination, and what is all-in cost? Development only, even if numerical gate fails."
+  },
+  "causal_replan_rule": "Every control update in configured holding window; every five intervals before it. Exactly 11 solves for this task, independent of observed divergence time.",
+  "performance": "Reuse one immutable compiled point model across each candidate. All setup charged. Do not alter production solver/early acceptance; measure saved preparation/optimization obstruction.",
+  "documentation": "https://mujoco.readthedocs.io/en/3.9.0/computation/index.html#numerical-integration",
+  "scope": "Full-order backend-equivalent physics emulation, counted as such; no cheap reduced-model claim. Backend outcomes still independent complete evaluations."
+}

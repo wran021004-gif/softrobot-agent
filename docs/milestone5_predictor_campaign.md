@@ -361,3 +361,11 @@ reconciliation: its 370.970 s subtotal plus the final 6.329 s charge gives the
 The original research phase used 3/4 provider and 4/4 workflow slots, including
 the rejected submission; no capacity was reset. Two semantic corrections and one
 engineering repair stay within the three-repair bound. No workers or subagents.
+
+## Subsequent full-scope campaign
+
+The separately authorized [full-scope campaign](milestone5_fullscope_campaign.md)
+completed the matched-state investigation and two further predictor revisions.
+Its final judgment is NO_GO; Milestone 5 stays open. This document and its linked
+campaign remain historical: the original STOP, evidence and canceled second batch
+were preserved. Current status and accounting are in the new report.

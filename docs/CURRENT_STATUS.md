@@ -1,5 +1,46 @@
 # Current development status - Milestones 4 and 5, 2026-10-05
 
+The [full-scope development campaign](milestone5_fullscope_campaign.md) is complete
+with accepted native **NO_GO**; **Milestone 5 remains open**. It starts from
+`a1f8f5d` under new direct authorization and preserves the preceding STOP and
+canceled validation batch. Two matched-state solves, two evidence-backed revisions,
+36 local integrations and four complete own-history forecasts are delivered.
+
+Matched commands separate by 2.113 N. Continuous full-state R1 passes numerical
+checks 6/6 but local position/speed/vector accuracy only 0/6, 3/6, 2/6. Discrete
+full-state R2 reproduces all six backend endpoints within the original quantitative
+limits, but numerical refinement and supported directions pass only 3/6. Local
+threshold errors are zero. Neither revision passes the joint admission gate.
+
+Configured holding-phase feedback restores raw candidate differences. The original
+pair abstains because both forecasts violate position feasibility. The reset pair
+has correct raw speed order but two falsely feasible holding positions. Useful
+feasibility-qualified comparisons: 0/2. Full-history raw errors include two position
+false-safe, two position false-unsafe and one speed false-unsafe classifications;
+no actual candidate exclusion occurred.
+
+All-in screening is 556.799 s / 398.361 s, with counterfactual net
+−556.799 s / +292.138 s for original/reset pairs. Positive reset arithmetic does not
+repair its failed feasibility prediction. Actual savings are zero. The matched
+complete cold solves take 21.012 / 18.308 s against the .01 s production deadline;
+removing construction alone is insufficient. No new prospective backend pair or
+repeat is admitted, so repeatability remains untested. Incumbent and M2–4 unchanged.
+
+New usage: 3 provider / 10 workflow / 0 real backend attempts, 937.862 s;
+46 controller solves, 36 standalone integrations, four full-order forecasts and
+2,800 explicitly counted emulated physics steps. Cumulative: 51 / 114 / 8,
+9,268.525 s. No workers/subagents. The two revisions were used; the time/API/backend
+ceilings were not exhausted. Seven focused checks verify equations, causal
+scheduling, frozen gates, histories, receipts, native judgments and evidence bytes.
+
+Remaining: jointly accurate/numerically supported local prediction, transient
+feedback and position-feasible screening with positive economics, a controller
+meeting the complete .01 s deadline, then two untouched pairs plus a registered
+independent repeat. See the report's evidence-to-requirement decision and
+[acceptance audit](../evidence/milestone5_fullscope_20261005/acceptance_audit.json).
+
+## Previous delivered campaign
+
 The [accuracy and screening-cost campaign](milestone5_predictor_campaign.md) is
 **complete with a negative prospective result; Milestone 5 remains open**.
 The corrected native development judgment admitted ranking-only validation.

@@ -1,0 +1,22 @@
+{
+  "version": "full_serial_continuous@1.0.0",
+  "revision": 1,
+  "evidence": [
+    "matched.json",
+    "../milestone5_predictor_campaign_20261005/localization-r1.json"
+  ],
+  "hypothesis": "Discarded serial modes account for instantaneous mapping and much propagation error; retaining all 48 angles and 48 rates removes that representation loss without changing physics.",
+  "expected_improvement": "Zero full-state initial output error and lower local endpoint errors; continuous integration may retain backend discretization error.",
+  "decisive_comparison": "Six preregistered distinct cases, three Radau resolutions each, all original physical/numerical thresholds; future endpoints read for scoring only after each forecast is saved.",
+  "controller_response": {
+    "matched_hypothesis": true,
+    "proposed_causal_rule": "Replan every control update during the configured holding window; retain five-interval replanning outside holding. This uses configured task phase, never an observed divergence timestamp.",
+    "validation": "Complete candidate forecasts conditional on local accuracy; no claim from two matched solves."
+  },
+  "bounded_work": {
+    "local_integrations": 18,
+    "reservation_s": 1800.0,
+    "complete_forecasts": 0
+  },
+  "scope": "Full-order continuous serial physics using non-advancing point evaluations. Not reduced, not free backend validation. No production change."
+}
