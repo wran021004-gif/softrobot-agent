@@ -1,5 +1,29 @@
 # Current development status - Milestones 4 and 5, 2026-10-05
 
+Latest scoped delivery: [limited M5A closeout](milestone5A_component_closeout.md)
+completed two nonzero-acceleration comparisons and five causal command updates.
+Residual differences are zero; relative Jacobian differences <=3.253e-19.
+Commands take 6.581–14.822 s, exceeding the 10 ms deadline. The component receipt
+charges 56.312 s / one workflow call / zero provider / zero backend attempts.
+Task A is stopped; six protected M5 backend slots remain untouched. **M5 remains open.**
+
+The [new M4 autonomous supplement](milestone4_autonomous_supplement.md) implements
+evidence-dependent control/structural search, retained diagnosis and voluntary
+stop through a native shared interface. Eight scheduling and three structural
+parameter checks passed offline. **Live execution has not started:** automatic
+approval review rejected the same DeepSeek egress command twice, including after
+exact payload/destination/attachment-authorization review. The reviewer requires
+direct trusted-chat egress approval and treats attachment authorization as
+untrusted. There are zero provider attempts, zero backend attempts and zero new
+research decisions/batches; multibatch acceptance is incomplete. Preparation
+charges 2.125 s / two workflow calls against the separate 24/60/4/9000 grant.
+Frozen primary, known incumbent, payload and both rejection reasons are retained
+in [delivery](../evidence/milestone4_autonomous_20261005/delivery.json) and
+[authorization review](../evidence/milestone4_autonomous_20261005/authorization_review.json).
+No budget reset, sandbox bypass, model substitution or protected-M5 transfer occurred.
+
+The previous successor checkpoint below is preserved as historical context:
+
 Latest: the [linked successor checkpoint](milestone5_successor_campaign.md) is
 being delivered at the user's commit/push request. **Milestone 5 remains open;
 the campaign is not complete.** The explicitly approved fixed-0.5-ms local target

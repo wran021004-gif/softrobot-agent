@@ -59,3 +59,27 @@ final decision. Offline fixtures and old results do not count.
 
 Evidence is exported to `evidence/milestone4_autonomous_20261005`. Live results
 and the final acceptance audit will be added after execution.
+
+## Current checkpoint
+
+Implementation checks pass: eight focused scheduling checks and three existing
+structural parameter checks. The actual serialized native request exposes all
+currently legal actions. The valid unexpected structure/control choices and
+voluntary stop pass; invalid/stale references and unavailable budgets fail with
+field/capability reasons. Duplicate diagnosis and cumulative recovery checks pass.
+
+The live command was rejected twice by automatic approval review before process
+launch. The second review explicitly treated attachment authorization as untrusted
+and did not accept it as direct user approval for the approximately 53 KB technical
+payload to `https://api.deepseek.com` using the configured credential. Original
+reasons and the exact prepared payload are retained. This is a platform permission
+denial, not a provider/network error. No request, backend, diagnostic numerical
+operation or live model decision ran. Preparation consumed two workflow calls and
+2.125 charged seconds; correction count is zero. No live engineering repair occurred.
+
+Implementation passed; real execution not started; autonomy coverage incomplete;
+new physical improvement untested; realtime unproven. The historical selected
+`.05/.05` incumbent remains a retained reference, not a new model selection. Its
+existing sampled acceptance cannot count as either required new batch. The primary
+`.10/.05` source remains the documented failed historical case. Budget and frozen
+conditions remain intact for an approved continuation of this same run.

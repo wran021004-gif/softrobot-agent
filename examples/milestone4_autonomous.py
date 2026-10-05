@@ -273,8 +273,11 @@ def export(w):
         retained_baseline=w.baseline['candidate'],usage=w.store.remaining(),
         corrections=dict(total=state.get('protocol_corrections_used',0),consecutive=state.get('protocol_corrections_consecutive',0)),
         standalone_numerical_operations=0,embedded_controller_updates=35*w.store.remaining()['used']['backend_solves'],
-        engineering_interventions=w.repairs,physical_improvement='Individual sealed profiles; no required superiority criterion',
-        realtime='No realtime success established',model_reasoning='Citations validated; causal explanations remain subject to evidence review',
+        engineering_interventions=w.repairs,
+        physical_improvement='Individual new sealed profiles; no required superiority criterion' if searches else 'Not evaluated: zero new complete search evaluations',
+        realtime='No realtime success established',
+        model_reasoning='Citations validated; causal explanations remain subject to evidence review' if w.rounds else 'None: no accepted live model decision',
+        selection_role='Model-selected complete deliverable' if w.status=='model_stopped' else 'Retained historical incumbent; no new final model selection',
         milestones=dict(M4_historical='closed',M4_supplement='separate acceptance',M5='open'),revision=revision())
     atomic_json(EVIDENCE/'delivery.json',delivery)
     atomic_json(EVIDENCE/'sha256_manifest.json',{p.relative_to(EVIDENCE).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
