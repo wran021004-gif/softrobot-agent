@@ -1,5 +1,6 @@
 {
   "passed": false,
+  "role": "ranking_only",
   "checks": {
     "causal_implementation": true,
     "supported_original_reference": true,
@@ -9,22 +10,30 @@
     "original_quantitative_accuracy": false,
     "useful_historical_discrimination": true,
     "known_false_safe_resolved": false,
-    "positive_operational_net_saving": false,
-    "accepted_research_interpretation": false,
-    "research_admits_experiment": false
+    "positive_operational_net_saving": true,
+    "accepted_research_interpretation": true,
+    "research_admits_experiment": true,
+    "known_failures_handled_in_ranking_only_role": true
   },
   "failed": [
     "original_quantitative_accuracy",
-    "known_false_safe_resolved",
-    "positive_operational_net_saving",
-    "accepted_research_interpretation",
-    "research_admits_experiment"
+    "known_false_safe_resolved"
   ],
-  "backend_attempts": 0,
-  "backend_steps": 0,
-  "validation_grants": 0,
+  "original_accuracy_failures_remain": true,
+  "safety_authority": false,
+  "backend_attempts": 2,
+  "validation_grants": 1,
   "milestone5": "open",
   "incumbent_retained": true,
-  "research_status": "missing_no_default_acceptance",
-  "realtime": "Unmet; production unchanged"
+  "research_status": "accepted_ranking_only",
+  "realtime": "Unmet; production unchanged",
+  "development_admission_passed": true,
+  "final_status": "prospective_screening_not_useful",
+  "accepted_final_research": "STOP",
+  "further_validation_permitted": false,
+  "final_failed_conditions": [
+    "resolved_correct_ranking",
+    "positive_net",
+    "accepted_research_continuation"
+  ]
 }

@@ -4508,5 +4508,1000 @@
     "sequence": 151,
     "status": "export_pending_research",
     "timestamp": "2026-10-05T04:00:40.187337+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "d2da61c71590499695d43e05e179a463",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "session",
+    "outputs": [],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 152,
+    "status": "resumed",
+    "timestamp": "2026-10-05T04:08:34.760911+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "37b8a6a566104eb79f5b179cad704571",
+    "execution_id": null,
+    "implementation_version": "6.0.0",
+    "inputs": [
+      {
+        "artifact_id": "d3677cc501c20bb3caffb505280c841ae90d5aa34201feff02fcf05792ec4c88",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "context_selection",
+    "outputs": [],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 153,
+    "status": "selected",
+    "timestamp": "2026-10-05T04:08:37.724973+00:00"
+  },
+  {
+    "agent_id": "model-transport",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 1,
+      "tool_calls": 0,
+      "wall_s": 600.0,
+      "worker_calls": 0
+    },
+    "event_id": "78205e6fdc104cdd80c638973de114ec",
+    "execution_id": "a55e2d81db414494ab2c6e91eb7f4ca7",
+    "implementation_version": "6.0.0",
+    "inputs": [
+      {
+        "artifact_id": "d3677cc501c20bb3caffb505280c841ae90d5aa34201feff02fcf05792ec4c88",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "68c5970b17725f1dbadb5814be80b51946ec1a01135202004bab643b57fa993e",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "model_request",
+    "outputs": [],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-0",
+    "run_id": "m5campaign-research",
+    "sequence": 154,
+    "status": "reserved",
+    "timestamp": "2026-10-05T04:08:38.052677+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "813747c951d346a19d72108452cac367",
+    "execution_id": "a55e2d81db414494ab2c6e91eb7f4ca7",
+    "implementation_version": "6.0.0",
+    "inputs": [
+      {
+        "artifact_id": "d3677cc501c20bb3caffb505280c841ae90d5aa34201feff02fcf05792ec4c88",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "68c5970b17725f1dbadb5814be80b51946ec1a01135202004bab643b57fa993e",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "context_delivery",
+    "outputs": [],
+    "parent_id": "78205e6fdc104cdd80c638973de114ec",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-0",
+    "run_id": "m5campaign-research",
+    "sequence": 155,
+    "status": "adapter_submitted",
+    "timestamp": "2026-10-05T04:08:38.061678+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "14aa5066bcce4f348d9d58456a4578a3",
+    "execution_id": "a55e2d81db414494ab2c6e91eb7f4ca7",
+    "implementation_version": "6.0.0",
+    "inputs": [
+      {
+        "artifact_id": "d3677cc501c20bb3caffb505280c841ae90d5aa34201feff02fcf05792ec4c88",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "model_raw_response",
+    "outputs": [
+      {
+        "artifact_id": "c1a41d8e58eeb726e2f8dbe44d8a0ace22d7fbd5ca0c407b9630f05fd9fc9457",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": "78205e6fdc104cdd80c638973de114ec",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-0",
+    "run_id": "m5campaign-research",
+    "sequence": 156,
+    "status": "completed",
+    "timestamp": "2026-10-05T04:09:07.770082+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "27c072d1544e470ebd87d12c0ea5d32f",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "model_draft",
+    "outputs": [
+      {
+        "artifact_id": "ee51fe80487d73b33258ef31ee05606fce4ac3600ce3fed550378fff426da76b",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 157,
+    "status": "unaccepted",
+    "timestamp": "2026-10-05T04:09:07.832031+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "97bff866966e4291828b022116f21107",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [
+      {
+        "artifact_id": "c1a41d8e58eeb726e2f8dbe44d8a0ace22d7fbd5ca0c407b9630f05fd9fc9457",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "model_decision",
+    "outputs": [
+      {
+        "artifact_id": "b36a98162615d6efadd98e6f0fd9cf8e11e8ad0e352d499135983a6918603188",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": "78205e6fdc104cdd80c638973de114ec",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 158,
+    "status": "normalized",
+    "timestamp": "2026-10-05T04:09:08.901618+00:00"
+  },
+  {
+    "agent_id": "model-transport",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 1,
+      "tool_calls": 0,
+      "wall_s": 30.842999999877065,
+      "worker_calls": 0
+    },
+    "event_id": "b9757d07fb8147759bd5a349880d961e",
+    "execution_id": "a55e2d81db414494ab2c6e91eb7f4ca7",
+    "implementation_version": "6.0.0",
+    "inputs": [],
+    "kind": "model_response",
+    "outputs": [
+      {
+        "artifact_id": "b36a98162615d6efadd98e6f0fd9cf8e11e8ad0e352d499135983a6918603188",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": "78205e6fdc104cdd80c638973de114ec",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-0",
+    "run_id": "m5campaign-research",
+    "sequence": 159,
+    "status": "completed",
+    "timestamp": "2026-10-05T04:09:08.910724+00:00"
+  },
+  {
+    "agent_id": "model",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 1,
+      "wall_s": 5.0,
+      "worker_calls": 0
+    },
+    "event_id": "83d57ec04ca148929e3ccc799df3d7f2",
+    "execution_id": "b53a9d5ee8944207826ee7c062e6af59",
+    "implementation_version": "1.0.0",
+    "inputs": [
+      {
+        "artifact_id": "b36a98162615d6efadd98e6f0fd9cf8e11e8ad0e352d499135983a6918603188",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "tool",
+    "outputs": [],
+    "parent_id": "78205e6fdc104cdd80c638973de114ec",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-0-tool",
+    "run_id": "m5campaign-research",
+    "sequence": 160,
+    "status": "reserved",
+    "timestamp": "2026-10-05T04:09:10.062925+00:00"
+  },
+  {
+    "agent_id": "model",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "e14233ef818d4e34b6cb385920a31f20",
+    "execution_id": "b53a9d5ee8944207826ee7c062e6af59",
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "m5_interpretation",
+    "outputs": [
+      {
+        "artifact_id": "17933b70b430f8bed5600e10cb6349f3e314079590f8e593c5ecaeae96bee22b",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": "83d57ec04ca148929e3ccc799df3d7f2",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-0-tool",
+    "run_id": "m5campaign-research",
+    "sequence": 161,
+    "status": "saved",
+    "timestamp": "2026-10-05T04:09:10.093945+00:00"
+  },
+  {
+    "agent_id": "model",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "3ce9df75ab664a3c9911609de11dd173",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "role_transition",
+    "outputs": [
+      {
+        "artifact_id": "17933b70b430f8bed5600e10cb6349f3e314079590f8e593c5ecaeae96bee22b",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 162,
+    "status": "m5_interpretation",
+    "timestamp": "2026-10-05T04:09:10.113233+00:00"
+  },
+  {
+    "agent_id": "model",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 1,
+      "wall_s": 1.2030000002123415,
+      "worker_calls": 0
+    },
+    "event_id": "c820d86cec5040fd94e8b49760e14b4b",
+    "execution_id": "b53a9d5ee8944207826ee7c062e6af59",
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "tool",
+    "outputs": [
+      {
+        "artifact_id": "25fe53b14801ae26b43d5990d1a6c792813f0c637f329b32e1d1b6638fca31ea",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": "83d57ec04ca148929e3ccc799df3d7f2",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-0-tool",
+    "run_id": "m5campaign-research",
+    "sequence": 163,
+    "status": "completed",
+    "timestamp": "2026-10-05T04:09:10.122232+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "a4beb5b4ec0546618bfeac29ada4c3df",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [
+      {
+        "artifact_id": "17933b70b430f8bed5600e10cb6349f3e314079590f8e593c5ecaeae96bee22b",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "semantic_correction",
+    "outputs": [
+      {
+        "artifact_id": "691b238fd0c6364b0f55d0b31bc269e386bb430c4db92dfc921d7cd10289766b",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "f2b4fceea0b77a37fb0e1fafd5dab97cc8fc97943f8e344722c91b568eec36b3",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 164,
+    "status": "prepared",
+    "timestamp": "2026-10-05T04:13:47.495317+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "36b91c4eaee94d5fb6619b00f514f30c",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "session",
+    "outputs": [],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 165,
+    "status": "resumed",
+    "timestamp": "2026-10-05T04:13:50.926968+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "36f2a80de425436692c0040dc407708b",
+    "execution_id": null,
+    "implementation_version": "6.0.0",
+    "inputs": [
+      {
+        "artifact_id": "f43fe1923c2d43ca751b4f2c814e6ad299716581e2304dafdf3fe42bbfdfb714",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "context_selection",
+    "outputs": [],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 166,
+    "status": "selected",
+    "timestamp": "2026-10-05T04:13:53.971431+00:00"
+  },
+  {
+    "agent_id": "model-transport",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 1,
+      "tool_calls": 0,
+      "wall_s": 600.0,
+      "worker_calls": 0
+    },
+    "event_id": "f4f9e39c745a4fc1b54df7e3e14726f7",
+    "execution_id": "fee9963ad49743f8bb5ddb02a3a1d5cd",
+    "implementation_version": "6.0.0",
+    "inputs": [
+      {
+        "artifact_id": "f43fe1923c2d43ca751b4f2c814e6ad299716581e2304dafdf3fe42bbfdfb714",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "68c5970b17725f1dbadb5814be80b51946ec1a01135202004bab643b57fa993e",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "model_request",
+    "outputs": [],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-1",
+    "run_id": "m5campaign-research",
+    "sequence": 167,
+    "status": "reserved",
+    "timestamp": "2026-10-05T04:13:54.338476+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "55e1d20286ec4123be97e0d5ab062d41",
+    "execution_id": "fee9963ad49743f8bb5ddb02a3a1d5cd",
+    "implementation_version": "6.0.0",
+    "inputs": [
+      {
+        "artifact_id": "f43fe1923c2d43ca751b4f2c814e6ad299716581e2304dafdf3fe42bbfdfb714",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "68c5970b17725f1dbadb5814be80b51946ec1a01135202004bab643b57fa993e",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "context_delivery",
+    "outputs": [],
+    "parent_id": "f4f9e39c745a4fc1b54df7e3e14726f7",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-1",
+    "run_id": "m5campaign-research",
+    "sequence": 168,
+    "status": "adapter_submitted",
+    "timestamp": "2026-10-05T04:13:54.346476+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "01d9d18bc24b4806884d66de9d159608",
+    "execution_id": "fee9963ad49743f8bb5ddb02a3a1d5cd",
+    "implementation_version": "6.0.0",
+    "inputs": [
+      {
+        "artifact_id": "f43fe1923c2d43ca751b4f2c814e6ad299716581e2304dafdf3fe42bbfdfb714",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "model_raw_response",
+    "outputs": [
+      {
+        "artifact_id": "23cf57825987b1d2cb7e1c7fb80061c73ab39824b156051593e0c4fafd671b33",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": "f4f9e39c745a4fc1b54df7e3e14726f7",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-1",
+    "run_id": "m5campaign-research",
+    "sequence": 169,
+    "status": "completed",
+    "timestamp": "2026-10-05T04:14:23.636547+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "be6ca2d8f6a7419e92af9afe518799fd",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "model_draft",
+    "outputs": [
+      {
+        "artifact_id": "f772b96216679f9360191d9763bb6261f9d3f5256b33feb5081640dd5358d690",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 170,
+    "status": "unaccepted",
+    "timestamp": "2026-10-05T04:14:23.668102+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "8a85a4c6f442434cbbeed9f96fcf7084",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [
+      {
+        "artifact_id": "23cf57825987b1d2cb7e1c7fb80061c73ab39824b156051593e0c4fafd671b33",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "model_decision",
+    "outputs": [
+      {
+        "artifact_id": "862e235242e176a511d214e0b1f070ab6df06c9b0034ad54de53fab2aa97d901",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": "f4f9e39c745a4fc1b54df7e3e14726f7",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 171,
+    "status": "normalized",
+    "timestamp": "2026-10-05T04:14:24.853508+00:00"
+  },
+  {
+    "agent_id": "model-transport",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 1,
+      "tool_calls": 0,
+      "wall_s": 30.515999999828637,
+      "worker_calls": 0
+    },
+    "event_id": "711fbb7c4914446380f49f3680b26588",
+    "execution_id": "fee9963ad49743f8bb5ddb02a3a1d5cd",
+    "implementation_version": "6.0.0",
+    "inputs": [],
+    "kind": "model_response",
+    "outputs": [
+      {
+        "artifact_id": "862e235242e176a511d214e0b1f070ab6df06c9b0034ad54de53fab2aa97d901",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": "f4f9e39c745a4fc1b54df7e3e14726f7",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-1",
+    "run_id": "m5campaign-research",
+    "sequence": 172,
+    "status": "completed",
+    "timestamp": "2026-10-05T04:14:24.862064+00:00"
+  },
+  {
+    "agent_id": "model",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 1,
+      "wall_s": 5.0,
+      "worker_calls": 0
+    },
+    "event_id": "528d0cee6a3a4ebe81709776fda006cc",
+    "execution_id": "34de4e72d36342739b7fc914bb48e734",
+    "implementation_version": "1.0.0",
+    "inputs": [
+      {
+        "artifact_id": "862e235242e176a511d214e0b1f070ab6df06c9b0034ad54de53fab2aa97d901",
+        "media_type": "application/json"
+      }
+    ],
+    "kind": "tool",
+    "outputs": [],
+    "parent_id": "f4f9e39c745a4fc1b54df7e3e14726f7",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-1-tool",
+    "run_id": "m5campaign-research",
+    "sequence": 173,
+    "status": "reserved",
+    "timestamp": "2026-10-05T04:14:26.088519+00:00"
+  },
+  {
+    "agent_id": "model",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "de7edaebe2fb45c5a48e46a83642ea28",
+    "execution_id": "34de4e72d36342739b7fc914bb48e734",
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "m5_interpretation",
+    "outputs": [
+      {
+        "artifact_id": "971616b593f25e8c1da32bc3150e677d1db40ea0f150b5b23a10ed2665fee29a",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": "528d0cee6a3a4ebe81709776fda006cc",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-1-tool",
+    "run_id": "m5campaign-research",
+    "sequence": 174,
+    "status": "saved",
+    "timestamp": "2026-10-05T04:14:26.152711+00:00"
+  },
+  {
+    "agent_id": "model",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "25d75d70315a40c78198206999411d33",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "role_transition",
+    "outputs": [
+      {
+        "artifact_id": "971616b593f25e8c1da32bc3150e677d1db40ea0f150b5b23a10ed2665fee29a",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 175,
+    "status": "m5_interpretation",
+    "timestamp": "2026-10-05T04:14:26.172711+00:00"
+  },
+  {
+    "agent_id": "model",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 1,
+      "wall_s": 1.3130000000819564,
+      "worker_calls": 0
+    },
+    "event_id": "c0d3acd0ab774962b0cc76658a7a540a",
+    "execution_id": "34de4e72d36342739b7fc914bb48e734",
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "tool",
+    "outputs": [
+      {
+        "artifact_id": "5fee23572f360ba2b1ea2c1b28cf31ea301a32188453d26ef888f24b0b9b4af4",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": "528d0cee6a3a4ebe81709776fda006cc",
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": "model-1-tool",
+    "run_id": "m5campaign-research",
+    "sequence": 176,
+    "status": "completed",
+    "timestamp": "2026-10-05T04:14:26.181266+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "5dff51f5ea3940379bdfb067911a11dd",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "campaign",
+    "outputs": [
+      {
+        "artifact_id": "dff099b298d518dce0d5adb2310d949c43451bd38dd29e21ff566f11e8a35de7",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 177,
+    "status": "finish_stop",
+    "timestamp": "2026-10-05T04:19:08.360555+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "da9362555f264b2c89dca868dc2c9da8",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "campaign",
+    "outputs": [
+      {
+        "artifact_id": "3a1563f109051066aaeed6963d7fbf6050e046ed3a91bb2fd003f5d49a0acd36",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 178,
+    "status": "finish_stop",
+    "timestamp": "2026-10-05T05:26:46.835161+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "45d35892031444b8b56501372d193607",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "campaign",
+    "outputs": [
+      {
+        "artifact_id": "b0ae2a931a35bd533a1ea93a82bb2e0f6921a319423deedd5049dc257ed34a7c",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 179,
+    "status": "finish_stop",
+    "timestamp": "2026-10-05T05:32:30.198400+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "3f39a84d06724f1896952a217cee3e6d",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "campaign",
+    "outputs": [
+      {
+        "artifact_id": "b0ae2a931a35bd533a1ea93a82bb2e0f6921a319423deedd5049dc257ed34a7c",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 180,
+    "status": "finish_stop",
+    "timestamp": "2026-10-05T05:35:06.530913+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "d0cac06d65174dc29b3ac156431bcd62",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "campaign_delivery",
+    "outputs": [
+      {
+        "artifact_id": "e47e49dc117c483c6c581d6ac6191bea2e694c50e77c07f96e38275fd60cae0f",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 181,
+    "status": "completed_stopped",
+    "timestamp": "2026-10-05T05:35:07.774737+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "e25fe192c76146669d0b6f27609b59f8",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "campaign",
+    "outputs": [
+      {
+        "artifact_id": "b0ae2a931a35bd533a1ea93a82bb2e0f6921a319423deedd5049dc257ed34a7c",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 182,
+    "status": "finish_stop",
+    "timestamp": "2026-10-05T05:35:46.516358+00:00"
+  },
+  {
+    "agent_id": "host",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "event_id": "8c12768c158447debcea3842e3c4121a",
+    "execution_id": null,
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "campaign_delivery",
+    "outputs": [
+      {
+        "artifact_id": "c18f7bab61227917d5fd82f7771e81e764498cb23389ba7f54516674ad4dcc89",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": null,
+    "project_id": "m5-predictor-campaign-20261005",
+    "request_id": null,
+    "run_id": "m5campaign-research",
+    "sequence": 183,
+    "status": "completed_stopped",
+    "timestamp": "2026-10-05T05:35:47.576543+00:00"
   }
 ]

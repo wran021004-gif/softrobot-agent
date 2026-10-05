@@ -113,10 +113,111 @@ class CampaignChecks(unittest.TestCase):
         self.assertEqual(s.artifact(ref),read(stage.RUN/'interpretation_response.json'))
         with s.connect(True) as db:receipts=[json.loads(r[0]) for r in db.execute("SELECT receipt FROM calls WHERE status='completed' AND receipt IS NOT NULL")]
         self.assertTrue(any(r['tool_id']=='research.milestone5_preparation' and s.artifact(r['output']).get('reference')==ref for r in receipts))
-        self.assertFalse(p['ready_for_bounded_prospective_experiment'])
-        self.assertFalse(read(stage.RUN/'protocol_seal.json')['backend_grant_materialized'])
+        admitted=read(stage.RUN/'interpretation_response.json')['readiness'].startswith('GO_EXPERIMENT_RANKING_ONLY')
+        if p['status']=='validation_completed_stopped':
+            self.assertTrue(p['development_admission_passed'])
+            self.assertFalse(p['ready_for_bounded_prospective_experiment'])
+            self.assertTrue(p['accepted_final_research_judgment']['readiness'].startswith('STOP'))
+        else:self.assertEqual(p['ready_for_bounded_prospective_experiment'],admitted)
+        if admitted:
+            future=read(stage.RUN/'prospective_protocol.json')
+            self.assertFalse(future['role']['safety_authority'])
+            self.assertFalse(future['role']['eligibility_authority'])
+            self.assertEqual(future['local_checkpoints'],[20,30])
+            original=read(stage.RUN/'interpretation_correction.json')['original_phase_budget']
+            self.assertEqual(s.session('m5campaign-research')['state']['role_context']['phase_budget'],original)
         self.assertEqual([b['scenario_id'] for b in p['batches']],['incumbent_checkpoint_20_new_clock','incumbent_checkpoint_30_new_clock'])
-        self.assertEqual(read(stage.RUN/'accounting.json')['cumulative']['backend_solves'],6)
+        ledger=read(stage.RUN/'accounting.json')
+        self.assertEqual(ledger['cumulative']['backend_solves'],6+ledger['validation']['backend_solves'])
+
+    def test_campaign_pair_seal_requires_current_method_and_prebackend_timing(self):
+        from copy import deepcopy
+        from tests.test_milestone5_preparation import MemoryStore
+        from examples import milestone5_campaign_validation as validation
+        p=read(stage.RUN/'prospective_protocol.json');scenario=p['scenarios'][0];forecasts=[]
+        for i,recipe in enumerate(p['recipes']):
+            cfg=validation.configuration(p,1,recipe)
+            f=deepcopy(read(stage.RUN/('history075.json' if i==0 else 'history15.json')))
+            f.update(recipe_id=recipe['recipe_id'],scenario_id=scenario['scenario_id'],scientific_identity=digest(validation.execution_scope(cfg)))
+            forecasts.append(f)
+        store=MemoryStore()
+        with self.assertRaisesRegex(ValueError,'BOTH'):validation.seal_pair(store,'fixture',p,scenario,forecasts[:1])
+        ref=validation.seal_pair(store,'fixture',p,scenario,forecasts)
+        self.assertEqual(store.artifact(ref)['predictor_version'],validation.VERSION)
+        forecasts[0]['metrics']['holding_max_speed_m_s']+=.01
+        with self.assertRaisesRegex(ValueError,'IMMUTABLE'):validation.seal_pair(store,'fixture',p,scenario,forecasts)
+        store.backend=True
+        with self.assertRaisesRegex(ValueError,'STARTED'):validation.seal_pair(store,'fixture',p,scenario,forecasts)
+
+    def test_campaign_local_seal_precedes_step_and_uses_current_command(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        from tests.test_milestone5_preparation import MemoryStore
+        from examples import milestone5_campaign_validation as validation
+        store=MemoryStore();store.connect=lambda *args:store.transaction()
+        seal=dict(artifact_id='pair',media_type='application/json');store.state['m5_pair_seal']=seal
+        h=SimpleNamespace(store=store,run_id='fixture')
+        controller=SimpleNamespace(last=dict(desired_tension_n=[1.]),observations=[dict(measured_initial_state=[0.,0.])])
+        observer=validation.checkpoint_observer(h,{},seal,dict(local_checkpoints=[20,30]))
+        with patch.object(validation,'static_model',return_value=object()),patch.object(validation,'diagnose',return_value=dict(start_s=.2,end_s=.21)) as call:
+            observer(20,.2,controller,dict(tip=np.zeros(3)),np.zeros(3),np.array([1.]))
+            store.events.append(('backend','advance',{}))
+            self.assertEqual(store.events[0][1],'sealed_before_step')
+            self.assertEqual(call.call_args.args[2].tolist(),[1.])
+            self.assertEqual(call.call_args.args[3],.2)
+            with self.assertRaisesRegex(ValueError,'CAUSAL'):observer(20,.2,controller,dict(tip=np.zeros(3)),np.zeros(3),np.array([2.]))
+
+    def test_prospective_evidence_and_recovered_research_are_bound_without_replay(self):
+        from examples import milestone5_campaign_validation as v
+        from examples import milestone5_campaign_closeout as closeout
+        from extensions.tendon_family.control_evidence import ControlEvidence
+        s=Store(v.folder(1));a=read(v.folder(1)/'assessment.json');p=read(v.folder(1)/'protocol.json')
+        v.check_protocol(p)
+        self.assertFalse(v.folder(2).exists())
+        self.assertFalse(a['continue_batch2'])
+        self.assertTrue(a['research_judgment']['readiness'].startswith('STOP'))
+        self.assertEqual(s.artifact(a['research_reference']),a['research_judgment'])
+        with s.connect(True) as db:
+            calls=[dict(r) for r in db.execute('SELECT * FROM calls')]
+        self.assertTrue(all(r['status'] not in ('running','unknown') for r in calls))
+        receipts=[json.loads(r['receipt']) for r in calls]
+        self.assertEqual(sum(r['tool_id']=='simulation.run' for r in receipts),2)
+        self.assertEqual(sum(r['request_id']=='campaign-preview' for r in receipts),2)
+        self.assertEqual(sum(r['tool_id']=='model.deepseek' for r in receipts),3)
+        self.assertTrue(any(r['execution_status']=='completed' and r['tool_id']=='research.milestone5_preparation'
+            and s.artifact(r['output'])['reference']==a['research_reference'] for r in receipts))
+        for k,value in s.remaining()['used'].items():self.assertAlmostEqual(value,sum(r['charged'][k] for r in receipts),places=6)
+        research_cost=sum(r['charged']['wall_s'] for r in receipts if r['tool_id'] in ('model.deepseek','research.milestone5_preparation','evidence.read'))
+        self.assertAlmostEqual(a['economics']['required_research_s'],research_cost)
+        self.assertEqual(a['economics']['one_skipped_evaluation_s'],0.)
+        self.assertAlmostEqual(a['economics']['counterfactual_net_savings_s'],-a['economics']['incremental_screening_s'])
+        phase=s.phase_remaining(closeout.REVISED)
+        self.assertEqual(phase['used']['model_calls'],3)
+        self.assertEqual(phase['used']['tool_calls'],4)
+        self.assertAlmostEqual(phase['used']['wall_s'],research_cost)
+        seal=s.artifact(a['pair_seal']);self.assertEqual(seal['protocol_identity'],digest(p))
+        reader=ControlEvidence(s);unique=set()
+        pair_event=next(e for e in s.events('m5campaign-b1-r1') if e['kind']=='m5_pair_forecast')
+        for i,f in enumerate(seal['forecasts'],1):
+            self.assertEqual(f['initial_state'],p['scenarios'][0]['reduced_initial_state'])
+            self.assertEqual(len(f['rows']),35)
+            for j,row in enumerate(f['rows']):
+                self.assertEqual(row['input_information_time_s'],row['time_s'])
+                if j:self.assertEqual(row['initial_state'],f['rows'][j-1]['state'])
+            run=f'm5campaign-b1-r{i}';events=s.events(run)
+            reservation=next(e for e in events if e['request_id']=='complete-simulation' and e['status']=='reserved')
+            self.assertLess(pair_event['sequence'],reservation['sequence'])
+            result=read(v.folder(1)/(run+'_result.json'));source=reader.resolve(result['execution_id'])
+            updates=reader.read_file(source,'controller_observations.json')
+            for event in (e for e in events if e['kind']=='m5_local_prediction'):
+                pred=s.artifact(event['outputs'][0]);update=updates[pred['update_id']]
+                self.assertEqual(event['status'],'sealed_before_step')
+                self.assertEqual(pred['pair_seal'],a['pair_seal'])
+                self.assertEqual(pred['input_n'],update['actual_tension_n'])
+                self.assertEqual(pred['initial_state'],update['measured_initial_state'])
+                self.assertEqual(pred['input_information_time_s'],update['time_s'])
+                unique.add(digest([pred['start_s'],pred['initial_state'],pred['input_n']]))
+        self.assertEqual(len(unique),2)
 
 
 if __name__=='__main__':unittest.main()

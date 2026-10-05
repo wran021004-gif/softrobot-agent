@@ -1,0 +1,59 @@
+{
+  "reference": {
+    "artifact_id": "3f90165c1a53fe7bf84b5caf05a02ba6707f38029cf312a198f897fc7e270e1f",
+    "media_type": "application/json"
+  },
+  "decision": {
+    "candidates": [
+      {
+        "candidate_id": "m5campaign-b1-r1",
+        "eligibility": "abstain",
+        "metrics": {
+          "holding_max_error_m": 0.03913274742731842,
+          "holding_max_speed_m_s": 0.16109583613199474,
+          "terminal_error_m": 0.03913274742731842
+        },
+        "valid": true
+      },
+      {
+        "candidate_id": "m5campaign-b1-r2",
+        "eligibility": "abstain",
+        "metrics": {
+          "holding_max_error_m": 0.03913274742731842,
+          "holding_max_speed_m_s": 0.16109583613199474,
+          "terminal_error_m": 0.03913274742731842
+        },
+        "valid": true
+      }
+    ],
+    "gap_m_s": null,
+    "hypothetical_rejection": null,
+    "order": null,
+    "rules": {
+      "abstention": "Incomplete/nonfinite/infeasible history, position violation, or speed gap <=1e-4: abstain. Resolved history rank is a testable forecast, not a proven safe rejection.",
+      "constraint_handling": "Position or terminal failure makes eligibility unresolved; forecast speed <=.02 is predicted-safe, otherwise predicted-violating. Always evaluate both candidates.",
+      "direction_neutral_m_s": 0.0001,
+      "empirical_allowance": null,
+      "local_direction": "Compare predicted change to projected initial speed, observed change to observed initial speed. Absolute change <=1e-4 is neutral; predicted change within numerical uncertainty of +/-1e-4 is indeterminate.",
+      "numerical_speed_tolerance_m_s": 0.0001,
+      "original_gates": "Accurate local numerics, useful prospective full-task discrimination/order, broader repeatability and real-time operation remain required. No threshold is relaxed.",
+      "position_limit_m": 0.01,
+      "primary_objective": "Lowest sampled maximum holding speed, conditional on predicted terminal and holding position feasibility.",
+      "readiness_dimensions": [
+        "implementation",
+        "registration",
+        "numerical_stability",
+        "backend_accuracy",
+        "discrimination",
+        "budget_admission",
+        "prospective_execution"
+      ],
+      "screening_usefulness": "Universal abstention fails useful screening; report pairwise order errors, resolved coverage, accuracy, false rejection and false-safe counts.",
+      "speed_limit_m_s": 0.02,
+      "speed_tie_margin_m_s": 0.0001,
+      "velocity_vector_tolerance_m_s": 0.0001
+    },
+    "safety_claim": false,
+    "status": "abstain"
+  }
+}

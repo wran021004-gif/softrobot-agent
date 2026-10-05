@@ -11,7 +11,11 @@
     {
       "issue": "Git automatic text normalization changed one staged raw XML artifact relative to its content hash",
       "correction": "Scope -text attributes to this campaign evidence directory and stage exact bytes; prior evidence and repository-wide settings unchanged."
+    },
+    {
+      "issue": "Correction-packet preparation initially placed an EvidenceRef object into JSON session state",
+      "correction": "Convert the reference to its plain dictionary before session serialization. The failed transaction rolled back before credential loading or provider dispatch; no numerical or API work repeated."
     }
   ],
-  "semantic_provider_corrections": 0
+  "semantic_provider_corrections": 1
 }

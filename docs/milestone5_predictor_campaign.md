@@ -1,22 +1,29 @@
 # Milestone 5 accuracy and screening-cost campaign, 2026-10-05
 
-Development calculations are complete. **The accepted research go/no-go is
-blocked by automatic approval review**, which rejected the DeepSeek transmission
-twice before process creation. The second rejection states that the attachment's
-embedded authorization is not accepted as direct chat authorization. The exact
-[rejections](../evidence/milestone5_predictor_campaign_20261005/platform_rejection.json),
-[authorization evidence and payload hash](../evidence/milestone5_predictor_campaign_20261005/authorization_review_evidence.json),
-and concrete 55,143-byte native payload are retained. Direct confirmation has been
-requested. No provider attempt, prospective forecast, validation grant or backend
-attempt has occurred. The pending judgment must not default to completion.
+Development and the accepted native research judgment are complete. The first
+interpretation was NO_GO but misstated numerical gates and the requirement for
+actual savings before validation. One factual follow-up preserved that response,
+the original phase budget and all receipts. The corrected judgment is
+**GO_EXPERIMENT_RANKING_ONLY**, conditional on the final receipt cost. Reconciliation
+passes: 220.484 s for fresh forecasts plus 63.875 s for both required research
+interactions totals 284.359 s, giving 19.437 s counterfactual margin against one
+303.796 s evaluation. No actual saving has been realized.
 
-The development checkpoint is committed locally as
-`6429c6b8f481ff6e8769bb0143ba73784b8fdd20`. Its non-force push to the existing
-`origin` / `feat/gvs-dynamics` was separately rejected by automatic approval
-review before process creation. The exact [push rejection](../evidence/milestone5_predictor_campaign_20261005/push_rejection.json)
-and [publication status](../evidence/milestone5_predictor_campaign_20261005/publication.json)
-are retained. Direct chat authorization for that GitHub transmission is pending;
-remote publication and containment of the delivered commit are unverified.
+The user's direct chat authorization resolved the earlier automatic-review
+rejections. The exact rejections and original reviewed payload remain in the audit
+trail; two native provider responses and their accepted tool receipts now exist.
+The [corrected development judgment](../evidence/milestone5_predictor_campaign_20261005/interpretation_response.json)
+permits only a frozen ranking experiment, with safety and eligibility authority
+withheld. The [prospective protocol](../evidence/milestone5_predictor_campaign_20261005/prospective_protocol.json)
+was frozen before both new candidate forecasts. **Batch 1 completed; Batch 2
+stopped** because the sealed decision abstained and counterfactual net saving was
+negative. The accepted final native judgment is STOP. The ranking substage is
+complete with a negative result; no ranking capability is accepted and M5 stays open.
+
+The existing origin / feat/gvs-dynamics non-force push is directly authorized.
+Final commit and remote verification follow this completed scientific closeout;
+[publication status](../evidence/milestone5_predictor_campaign_20261005/publication.json)
+preserves the earlier blocked checkpoint and subsequent recovery.
 
 This linked campaign addresses both local prediction accuracy and operational
 screening cost. It does not change the production controller, robot, actuator
@@ -161,63 +168,195 @@ eligibility accuracy is only 1/2. The previous full-history .075 false-safe is
 removed, while the separate local .075 false-safe remains. No safety or eligibility
 authority follows from the correct order.
 
-The recorded arithmetic comparison is against the .075 evaluation the rule would
-skip: 303.796 seconds. **Before the still-blocked required research decision**, the
-maximum potential net saving is 83.312 seconds. Actual native decision receipts
-must be added before final economic admission; treating blocked interaction as
-zero operational cost would be incorrect. The retained .15 evaluation still costs
-302.141 seconds. Actual evaluations avoided and validation savings are both zero.
+The comparison is against the .075 evaluation the sealed historical rule would
+skip: 303.796 seconds. The two required native research interactions cost 63.875 s,
+so full incremental screening cost is **284.359 s** and counterfactual net saving
+is **19.437 s**. The margin is small and is not evidence of general economic
+reliability. The retained .15 evaluation still costs 302.141 s. Actual evaluations
+avoided and validation savings are zero. Development/reference work remains a
+separate one-time charge; no completed history is treated as a free future forecast.
 
 ## Admission, limitations and next action
 
-The method is not admitted. Original local quantitative accuracy remains failed,
-the local false-safe persists, full-history numerical accuracy is unestablished,
-and the accepted research judgment and measured required interaction cost are
-missing. A ranking-only experiment is a possible research question, not an
-automatically approved fallback. Any such role must be frozen before validation
-and withhold safety/eligibility authority without erasing the original failures.
+Full quantitative prediction is not admitted. Position/vector accuracy still
+fails on all four local intervals, the local .075 false-safe persists and complete
+history numerical accuracy is not established. These failures remain visible.
+The corrected native judgment admits a ranking-only test: whether the same
+seven-replan predictor resolves the order of sampled maximum holding speed on the
+registered unobserved reset-clock episodes at the unchanged 1e-4 m/s margin.
+Prediction remains experimental and cannot certify safety or eligibility.
 
 The registered `.20` and `.30` reset-clock scenarios and accepted .075/.15 pair
-are preserved in the linked protocol. No new reset episode has been forecast or
-executed. Recomputed public reservation is 5230 s per batch: 2590 s public base,
-2400 s two previews, 180 s local overhead and 60 s export. It fits the 6000 s
-ceiling, but budget fit does not establish scientific admission. Batch 2 also
-requires the same frozen method and the declared continuation checks; no tuning
-between validation batches is authorized under that frozen experiment.
+are unchanged. Both complete candidate forecasts must be sealed before either
+backend execution. Local predictions at new-clock .20 and .30 are sealed before
+advancement, using only current observed state and available held command. They
+use the same three frozen resolution grids; their original accuracy errors are
+scored independently of ranking. Both candidates receive complete evaluation.
 
-The immediate next action is direct chat confirmation of the concrete DeepSeek
-transmission, then resume the saved native packet without recalculation. Obtain
-an accepted go/no-go and final interpretation; only an admitted and concretely
-frozen validation protocol can materialize grants. The incumbent remains
-`batch-ebbeadbdaca10732-0` / `91c3ba1b01d6499fb26df8f95409401b`, .05/.05,
-.16/.11 m, .95/compliant, production controller 7.0.0. M2-4 stay closed; M5 stays
-open. Real-time control, wider repeatability and family generalization remain unmet.
+Recomputed public reservation is 5230 s per batch: 2590 s public base, 2400 s for
+two previews, 180 s local overhead and 60 s export. The 6000 s ceiling, four model
+attempts, 16 workflow calls and two backend attempts remain unchanged. Embedded
+preview solves count against 70; production's 70 updates are recorded separately.
+The four local checkpoints permit twelve integrations, charged inside the backend
+workflow. Their measured validation instrumentation is subtracted from the
+counterfactual cost of a skipped operational evaluation, avoiding inflated savings.
+
+Batch 2 requires complete valid Batch 1, no local holding or full-history
+false-safe, resolved correct rank, all local numerical checks passing, positive
+counterfactual net saving including required decision receipts, and accepted native
+continuation. Any failure stops the campaign; no method tuning or replacement
+simulation is allowed. The incumbent remains `batch-ebbeadbdaca10732-0` /
+`91c3ba1b01d6499fb26df8f95409401b`, .05/.05, .16/.11 m, .95/compliant,
+production controller 7.0.0. M2-4 stay closed; M5 stays open. Real-time control,
+wider repeatability and family generalization remain unmet.
+
+## Prospective Batch 1 and capability acceptance
+
+The `.20` reset-clock batch completed two candidate-specific forecasts, both real
+backend executions and full evaluations. The pair seal is event **97**, before
+backend reservations **99** and **135**. Local prediction seals are events
+**111, 119, 147, 155**, each emitted synchronously before the corresponding backend
+step. Current state, actual applied input, time, configuration and execution
+bindings were verified. All 35 intervals and 35 production updates per candidate
+are present. No incomplete numerical or backend case was replaced or hidden.
+
+| Holding weight | Predicted holding speed (m/s) | Observed holding speed (m/s) | Predicted holding/terminal position error (m) | Observed holding / terminal error (m) |
+| --- | ---: | ---: | ---: | ---: |
+| .075 | 0.161095836 | 1.149100815 | 0.039132747 | 0.026289243 / 0.016158442 |
+| .15 | 0.161095836 | 0.907361857 | 0.039132747 | 0.025127241 / 0.009301106 |
+
+The two predicted histories have identical states and commands despite distinct
+configuration identities. Both predicted positions exceed 0.01 m, triggering the
+frozen abstention rule; the raw predicted speed gap is also zero. Ranking coverage
+is **0/1**, with one abstention, no asserted ordering error and no false rejection;
+accuracy among resolved decisions is undefined. Observed raw speed order favors
+.15 by 0.241738958 m/s, but both candidates violate holding position and speed
+limits, so there is no position-feasible winner under the conditional objective.
+Both full-history eligibility predictions abstain (0/2 resolved); this is neither
+a successful constraint classification nor a categorical false-safe/false-unsafe.
+
+| Local interval, each candidate | Predicted / observed speed change | Position error (m) | Vector error (m/s) | Signed speed error (m/s) | Direction |
+| --- | --- | ---: | ---: | ---: | --- |
+| .20-.21 | +0.006666671 / +0.011395251 | 0.000153927 | 0.008491293 | -0.004733323 | Correct increasing |
+| .30-.31 | -0.005178438 / +0.001556277 | 0.000184246 | 0.009501082 | -0.006631540 | Incorrect decreasing |
+
+These are **four candidate checkpoint observations but only two unique
+state/input/time cases**. Direction resolves 4/4 and is correct 2/4; there are no
+neutral or indeterminate results. All four local numerical checks pass, while
+position, speed and vector accuracy each pass 0/4 at the original reporting
+tolerances. Local speed false-safe and false-unsafe are both 0/4; holding
+false-safe is 0/2. These cases do not remove the historical local .075 false-safe
+or establish reliable threshold classification. Local numerical convergence does
+not establish complete-history convergence or physical accuracy.
+
+Fresh forecast receipts are 156.063 + 172.531 = **328.594 s**. Required research,
+including the initial response, native recovery, two factual corrections and
+accepted tool submissions, costs **48.705 s**. The all-in screening cost is
+**377.299 s**. The sealed rule omits no candidate, so avoided cost is **0 s** and
+counterfactual net saving is **-377.299 s**. Actual evaluations saved and actual
+savings are zero. The historical admission margin of +19.437 s did not transfer.
+
+Both complete evaluations cost 692.032 and 710.015 s with instrumentation.
+Measured local validation-only instrumentation is 1.532639 and 1.499520 s, leaving
+operational comparators of 690.499361 and 708.515480 s. Neither is counted as
+avoided because the decision abstained. Two candidate preparation receipts cost
+0.063 s separately in the validation ledger. All validation charges total
+1779.409 s; no cost category was moved to obtain a favorable margin.
+
+The frozen continuation condition includes **both local holding false-safe and
+full-history false-safe**. Complete evaluation, local numerics and no false-safe
+pass on this batch; resolved correct ranking and positive net saving fail. The
+accepted final research judgment is **STOP**. Batch 2 has no grant, preview or
+backend attempt. A narrower ranking role did not remove any stop condition.
+
+| Original requirement | Acceptance conclusion |
+| --- | --- |
+| Numerical reference | Supported on the explicitly tested local scopes; complete-history convergence unestablished |
+| Local directional diagnosis | Experimental only: 2/4 prospective observations correct, two unique cases |
+| Local quantitative prediction | Failed: 0/4 position, vector and speed passes |
+| Constraint/threshold reliability | Unsupported; historical false-safe retained, full-history eligibility abstains |
+| Prospective ranking usefulness | Failed useful-screening gate: 0/1 resolved, no omission |
+| Operational economics | Failed: -377.299 s counterfactual net benefit |
+| Causal sealing, identity and recovery | Verified; existing native store, receipts and phase counters retained |
+| Repeatability and real-time | Unestablished repeatability; 70/70 new and 35/35 incumbent deadline misses |
+
+The [acceptance audit](../evidence/milestone5_predictor_campaign_20261005/acceptance_audit.json)
+uses the original documented milestone requirements. The ranking experiment is
+closed as a negative result; Milestone 5 remains open, M2-4 remain closed and the
+incumbent is retained. Complete candidate evaluation remains necessary.
+
+One precise next objective is to investigate the lost weight-dependent controller
+response at the saved first production input divergence, **.32 s**, which is an
+omitted replan in the five-interval predictor. A separately bounded investigation
+would compare exactly two unchanged production-controller solves at one common
+observed reduced state, available previous input and common initialization. Command
+separation above 1e-9 N supports this specific diagnostic hypothesis; otherwise
+reject it. Preserve early acceptance. This investigation is not executed here and
+would not itself repair local dynamics accuracy or establish screening utility.
+Any resulting predictor version needs untouched prospective reset-clock pairs,
+the original accuracy/constraint/ranking metrics and positive all-in economics;
+this completed batch would be development evidence for that revision.
+
+See [Batch 1 assessment](../evidence/milestone5_predictor_campaign_validation1_20261005/assessment.json),
+[final native judgment](../evidence/milestone5_predictor_campaign_validation1_20261005/interpretation.json)
+and [saved controller comparison](../evidence/milestone5_predictor_campaign_validation1_20261005/saved_controller_comparison.json).
 
 ## Accounting and interventions
 
 | Usage | Predecessors | New development | Validation | Cumulative |
 | --- | ---: | ---: | ---: | ---: |
-| Provider attempts | 43 | 0 | 0 | 43 |
-| Workflow calls | 81 | 7 | 0 | 88 |
-| Backend attempts | 6 | 0 | 0 | 6 |
-| Charged seconds | 5606.865 | 880.514 | 0 | 6487.379 |
-| Additional controller attempts | 79 | 15 | 0 | 94 |
-| Standalone integration attempts | 44 | 13 | 0 | 57 |
-| Historical backend controller updates | 210 | 0 | 0 | 210 |
+| Provider attempts | 43 | 2 | 3 | 48 |
+| Workflow calls | 81 | 9 | 14 | 104 |
+| Backend attempts | 6 | 0 | 2 | 8 |
+| Charged seconds | 5606.865 | 944.389 | 1779.409 | 8330.663 |
+| Additional controller attempts | 79 | 15 | 14 | 108 |
+| Standalone integration attempts | 44 | 13 | 12 | 69 |
+| Backend controller updates | 210 | 0 | 70 | 280 |
 
 The 15 new controller attempts comprise one isolated response probe plus 14
 embedded preview solves. The 13 integrations comprise the single continuation
 and twelve changed-model local integrations; all completed. Existing histories,
 reference endpoints and accepted historical selection were reused without charge.
-Protocol/provider semantic corrections remain zero; workers and subagents are zero.
+One semantic provider correction and zero protocol recovery corrections were used
+in development; workers and subagents are zero. The original phase budget and
+started-usage counters were preserved. The first response remains available rather
+than being rewritten. Its estimated correction runtime is superseded by the actual
+31.829 s receipt in the economic assessment.
 
-Three engineering interventions are preserved: correcting diagnostic vector-shape
-broadcasting (original localization and charged corrected non-advancing evaluation
-both retained), and fixing export's distinction between JSON-schema property
-objects and concrete artifact references. A campaign-local Git attribute preserves
-exact evidence bytes after staging exposed CRLF conversion of a hashed XML artifact.
-Export recovered saved artifacts without repeating computations. Both external-call approval rejections occurred before
-process creation and consumed no provider quota. Seven focused checks passed;
-the final binding check verifies that missing native judgment cannot
-silently authorize validation. Production dependency hashes and predecessor
-evidence/ledgers remain unchanged.
+Four engineering interventions are preserved: correcting diagnostic vector-shape
+broadcasting (both original and corrected charged observations retained), fixing
+export's distinction between JSON-schema property objects and concrete artifact
+references, adding campaign-local Git attributes to preserve hashed raw bytes,
+and converting a correction-packet reference to plain JSON before serialization.
+That last failed transaction rolled back before authentication or provider dispatch.
+No completed integration, optimization, preview or API result was replayed.
+Earlier approval rejections occurred before process creation and consumed no quota.
+
+The seven development checks previously passed. After the accepted correction,
+five focused checks passed: two new sealing-point tests and three receipt/budget,
+causality/cost and accepted-binding checks. Static validation confirms exact frozen
+implementation identities and unchanged public reservations before any prospective
+computation. Production dependency hashes and predecessor evidence remain unchanged.
+The final prospective binding/recovery test also passed, including real seal
+sequences, all current-input bindings, accepted native research references, zero
+duplicate previews/backends, original phase counters and no unresolved writers.
+No broad suite or numerical/API replay was run.
+
+Validation needed one engineering recovery: the research handoff inherited a
+900 s simulation allowance, exceeding its 600 s phase, and its packet lacked the
+required selected-weight field. The rejected tool attempt counts. A research-only
+session revision supplied the established 10 s timeout / 5 s reservation and
+frozen weights in the same grant, preserving phase usage. It submitted the exact
+saved native response without another provider call. A copied result-ownership
+cache was then removed from that research-only session after a read-only lookup
+failure; original execution ownership and results were retained.
+
+Two subsequent native factual corrections fixed time/candidate indexing, the
+next-investigation definition and stale economics. Original responses remain
+preserved. The final model explicitly leaves its own call cost for receipt
+reconciliation: its 370.970 s subtotal plus the final 6.329 s charge gives the
+377.299 s reported above. Validation used 3/4 provider, 14/16 workflow, 2/2 backend,
+14/70 preview controller and 70/70 production updates within 1779.409/6000 s.
+The original research phase used 3/4 provider and 4/4 workflow slots, including
+the rejected submission; no capacity was reset. Two semantic corrections and one
+engineering repair stay within the three-repair bound. No workers or subagents.

@@ -132,6 +132,63 @@ def interpretation(*,send=True):
     decision=run_until_handoff(h,'m5_interpretation');atomic_json(path,h.store.artifact(decision));stage.check_previous()
 
 
+def correct_interpretation():
+    """One factual follow-up in the same native session and original phase budget."""
+    from tools.platform_diagnosis_coordinator import run_until_handoff
+    from tools.platform_models import payload_for
+    from tools.diagnostic_reference_adapter import EvidenceDrivenAdapter
+    from tools.platform_store import plain
+    from examples.gvs_nmpc_route_experiment import load_credential
+    stage.prepare();h=stage.create_session('research');path=stage.RUN/'interpretation_correction.json'
+    state=h.store.session(h.run_id)['state'];current=state['handoffs']['m5_interpretation']
+    if path.exists():
+        correction=read(path)
+        if current!=correction['superseded_reference']:
+            atomic_json(stage.RUN/'interpretation_response.json',h.store.artifact(current));return
+    else:
+        a=assessment();f=read(stage.RUN/'freeze.json');interventions=read(stage.RUN/'interventions.json')
+        assert interventions['semantic_provider_corrections']==0,'ONE_FACTUAL_FOLLOWUP_ONLY'
+        assert state.get('protocol_corrections_used',0)+1<=f['corrections']['total']
+        atomic_json(stage.RUN/'interpretation_response_v1.json',h.store.artifact(current))
+        original_budget=deepcopy(state['role_context']['phase_budget'])
+        packet=deepcopy(state['role_context']['decision_packet'])
+        packet.update(assessment=a,previous_interpretation=h.store.artifact(current),
+            factual_correction=dict(
+                position_reporting_m=1e-6,equation_residual_limit=1e-5,
+                numerical_status='Both original output-map reference checks and all four changed-model local resolution checks PASS. Complete-history numerical accuracy is not established by these local checks.',
+                local_errors='Position 1.68014e-5 to 6.21625e-5 m; vector .000472262 to .004929694 m/s. Position 0/4, vector 0/4, speed 1/4; direction 4/4.',
+                controller_probe='First TWO saved inputs match, at 0 and .01 s. Divergence at .02 s, norm 3.31617 N.',
+                economics='The original call is now charged. The assessment includes all completed research receipts so far. This correction call also counts; subtract its eventual actual receipt from the current positive margin. No final cost may be invented before that receipt exists.',
+                admission='Use the exact frozen criteria.admission list. Plausible positive counterfactual saving is the economic entry gate, NOT prior actual savings. Both validation candidates are evaluated, so actual validation savings are zero by design. Failed quantitative accuracy and known false-safe forbid safety/eligibility authority but do not automatically forbid a separately justified, frozen ranking-only experiment.',
+                reservation='Current public requirement per batch is 5230 s (2590 base, 2400 previews, 180 local, 60 export), below 6000 s; model4/tool16/backend2 ceilings. The .20/.30 reset-clock scenarios are unobserved.'),
+            remaining=h.store.remaining()['remaining'])
+        instruction=('Correct the factual/semantic errors in your first interpretation using this packet and the exact original frozen admission list. '
+            'Do not preserve a conclusion merely because you previously wrote it. Assess accuracy and economics separately. '
+            'Do not conflate the 1e-6 m position tolerance, 1e-4 m/s vector/speed tolerance and 1e-5 equation residual, or call passed local numerical checks failures. '
+            'Report current economics including the first actual research call and condition any positive-saving claim on this correction call fitting the remaining margin. Export will reconcile all actual receipts. Actual validation savings zero is not an entry failure. '
+            'Reassess NO_GO, GO_EXPERIMENT_RANKING_ONLY or GO_EXPERIMENT_FULL against the frozen gates without inventing extra gates or relaxing the original failed accuracy metrics. '
+            'Ranking-only, if scientifically justified, must withhold safety/eligibility authority and identify the specific independent registered reset-clock hypothesis, prospective quantities and honest handling of failures. '
+            'If NO_GO, name the actual failed admission condition and ONE bounded next investigation with a falsifiable criterion; do not execute it. '
+            'State supported diagnostic uses, screening useful/experimental/deferred, when complete evaluation is required, whether another experiment is justified and remaining original M5 failures. '
+            'Keep the incumbent and production unchanged, no milestone closure or reliability claim. Return exactly one native research.milestone5_preparation tool call, phase interpretation, holding_weights [.075,.15], rationale, readiness starting one of the three labels, limitations, next_action finish_stop. About 650 words.')
+        correction=dict(superseded_reference=current,reason=packet['factual_correction'],
+            original_phase_budget=original_budget,usage_before=h.store.remaining()['used'],semantic_correction_number=1)
+        with h.store.transaction() as db:
+            state=h.store.session(h.run_id,db)['state'];role=state['role_context']
+            role.update(instructions=instruction,decision_packet=packet,decision_packet_reference=plain(h.store.put(db,packet)),
+                phase_started_turn=state.get('turn',0))
+            assert role['phase_budget']==original_budget,'PHASE_BUDGET_MUST_NOT_RESET'
+            h.store.update_state(db,h.run_id,state)
+            h.store.event(db,h.run_id,'semantic_correction','prepared',inputs=[current],outputs=[h.store.put(db,correction),h.store.put(db,role)])
+        atomic_json(stage.RUN/'interpretation_correction_packet.json',packet)
+        atomic_json(stage.RUN/'interpretation_correction_serialized_handoff.json',payload_for(h,EvidenceDrivenAdapter()))
+        interventions['semantic_provider_corrections']=1
+        atomic_json(stage.RUN/'interventions.json',interventions);atomic_json(path,correction)
+    load_credential(Path(os.environ['SOFTAGENT_CONFIGURATION_PATH']))
+    decision=run_until_handoff(h,'m5_interpretation')
+    atomic_json(stage.RUN/'interpretation_response.json',h.store.artifact(decision));stage.check_previous()
+
+
 def export():
     a=assessment();f=read(stage.RUN/'freeze.json');store=Store(stage.RUN)
     decision=read(stage.RUN/'interpretation_response.json') if (stage.RUN/'interpretation_response.json').exists() else None
@@ -153,43 +210,59 @@ def export():
         positive_operational_net_saving=a['economics']['positive_net_saving'],
         accepted_research_interpretation=p['research_interpretation_complete'],
         research_admits_experiment=decision is not None and decision['readiness'].startswith('GO_EXPERIMENT'))
-    # A proposed narrowed role must be reviewed as a concrete separate protocol;
-    # it must never cause a missing accepted judgment to default to admission.
-    if checks['research_admits_experiment']:
-        atomic_json(stage.RUN/'development_entry_checks.json',checks)
-        raise ValueError('ACCEPTED_GO_REQUIRES_CONCRETE_FROZEN_VALIDATION_IMPLEMENTATION')
+    narrowed=decision is not None and decision['readiness'].startswith('GO_EXPERIMENT_RANKING_ONLY')
+    admitted=narrowed and all(checks[k] for k in ('causal_implementation','supported_original_reference',
+        'changed_model_local_numerical_support','evidence_backed_physical_correction','measured_dominant_cost_strategy',
+        'useful_historical_discrimination','positive_operational_net_saving','accepted_research_interpretation'))
+    if checks['research_admits_experiment'] and not narrowed:raise ValueError('FULL_ROLE_NOT_SUPPORTED_BY_FAILED_ACCURACY')
+    checks['known_failures_handled_in_ranking_only_role']=narrowed
     from tools.batch_budget import batch_requirement
     base=batch_requirement(2,planning=dict(model_calls=0,tool_calls=0,wall_s=0.),preparation_reserve_s=5.)
     required=deepcopy(base['requirement']);required['tool_calls']+=4;required['wall_s']+=2400.+180.+60.
-    status='not_ready_no_validation_launched' if decision is not None else 'development_completed_research_blocked'
-    next_action='finish_stop' if decision is not None else 'await_direct_chat_authorization_then_resume_saved_research_packet'
+    from examples import milestone5_campaign_validation as validation
+    batches=[read(validation.folder(i)/'assessment.json') for i in (1,2) if (validation.folder(i)/'delivery.json').exists()]
+    validation_finished=bool(batches) and not batches[-1]['continue_batch2']
+    status=('validation_completed_stopped' if validation_finished else 'ranking_only_admitted_validation_pending') if admitted else ('not_ready_no_validation_launched' if decision is not None else 'development_completed_research_blocked')
+    next_action=('finish_stop' if validation_finished else 'execute_frozen_conditional_validation') if admitted else ('finish_stop' if decision is not None else 'await_direct_chat_authorization_then_resume_saved_research_packet')
     p.update(version=VERSION,status=status,preview_version=VERSION,local_version=VERSION,
         predictor_method=read(stage.RUN/'method_freeze.json'),development_entry_checks=checks,
-        accepted_research_judgment=decision,ready_for_bounded_prospective_experiment=False,
+        accepted_research_judgment=decision,ready_for_bounded_prospective_experiment=admitted,
         conditional_authorization=stage.AUTHORIZATION,continuation=f['conditional_validation']['continuation'],
         local_reference_stable=checks['changed_model_local_numerical_support'],reference_scope=a['reference_assessments'],
         numerical_results_provenance='reference.json and accuracy.json in this campaign, exact receipts; local reference only',
-        prospective_outcomes_observed=False,prospective_forecasts_generated=False,operational_next_action=next_action)
-    p['authorization_in_current_stage']='Two conditional batches authorized by current user; prerequisites failed so no grants materialized'
+        prospective_outcomes_observed=bool(batches),prospective_forecasts_generated=bool(batches),operational_next_action=next_action)
+    p['authorization_in_current_stage']='Two conditional batches authorized by current user; ranking-only admission accepted' if admitted else 'Two conditional batches authorized by current user; no grants before admission'
     p['model']='Predictor represented_serial_mechanics@1.0.0; production controller retains model.gvs@1.0.0'
     p['local_step_s']=.000125
     p['reservations']=dict(development=dict(ceiling=stage.LIMITS,numerical=stage.NUMERICAL),
         **{'batch'+str(i):dict(public_base=base,complete_requirement=required,ceiling=stage.VALIDATION_LIMITS,
             preview_reserve_s=2400.,local_overhead_s=180.,export_s=60.,fits=all(required[k]<=stage.VALIDATION_LIMITS[k] for k in required),
             controller_attempts=dict(preview_ceiling=70,expected_this_method=14,production_expected=70,combined_ceiling=140),
-            admitted=False,grant_materialized=False) for i in (1,2)})
+            admitted=admitted,grant_materialized=(validation.folder(i)/'grant.json').exists()) for i in (1,2)})
     p['commands']=dict(export='python examples/milestone5_campaign_delivery.py --phase export',
-        execution='No validation launch: development prerequisites fail. Historical numerical work must not be rerun.')
+        execution='python examples/milestone5_campaign_validation.py --batch 1' if admitted else 'No validation launch: admission absent. Historical numerical work must not be rerun.')
     files=['examples/milestone5_predictor_campaign.py','examples/milestone5_campaign_delivery.py',
         'extensions/tendon_family/milestone5_campaign_reference.py','extensions/tendon_family/milestone5_campaign_localization.py',
         'extensions/tendon_family/milestone5_campaign_predictor.py','extensions/tendon_family/milestone5_campaign_assessment.py',
-        'extensions/tendon_family/milestone5_campaign_local.py']
+        'extensions/tendon_family/milestone5_campaign_local.py','examples/milestone5_campaign_validation.py']
     p['implementation_identity']['files'].update({n:hashlib.sha256((ROOT/n).read_bytes()).hexdigest() for n in files})
+    if admitted:
+        prospective=validation.freeze_protocol(p,a,f)
+        p['prospective_protocol_identity']=digest(prospective)
+        p['prospective_protocol']='prospective_protocol.json'
+    validation_used={k:0 for k in stage.LIMITS};validation_work=dict(local_solves=0,prediction_evaluations=0,preview_attempts=0)
+    for i in (1,2):
+        if not (validation.folder(i)/'accounting.json').exists():continue
+        ledger=read(validation.folder(i)/'accounting.json')
+        for k in validation_used:validation_used[k]+=ledger['used'][k]
+        for k in validation_work:validation_work[k]+=ledger['numerical_work']['used'][k]
+    p['actual_batches']=batches
     atomic_json(stage.RUN/'protocol.json',p);seal=save(store,p)
-    atomic_json(stage.RUN/'protocol_seal.json',dict(protocol_reference=seal,identity=digest(p),backend_grant_materialized=False,prospective_forecasts_sealed=False))
-    atomic_json(stage.RUN/'readiness.json',dict(passed=False,checks=checks,failed=[k for k,v in checks.items() if not v],
-        backend_attempts=0,backend_steps=0,validation_grants=0,milestone5='open',incumbent_retained=True,
-        research_status='accepted_no_go' if decision else 'missing_no_default_acceptance',realtime='Unmet; production unchanged'))
+    atomic_json(stage.RUN/'protocol_seal.json',dict(protocol_reference=seal,identity=digest(p),backend_grant_materialized=bool(validation_used['backend_solves']),prospective_forecasts_sealed=bool(batches)))
+    atomic_json(stage.RUN/'readiness.json',dict(passed=admitted,role='ranking_only' if admitted else None,checks=checks,failed=[k for k,v in checks.items() if not v],
+        original_accuracy_failures_remain=True,safety_authority=False,backend_attempts=validation_used['backend_solves'],
+        validation_grants=sum((validation.folder(i)/'grant.json').exists() for i in (1,2)),milestone5='open',incumbent_retained=True,
+        research_status='accepted_ranking_only' if admitted else 'accepted_no_go' if decision else 'missing_no_default_acceptance',realtime='Unmet; production unchanged'))
     with store.transaction() as db:
         running=db.execute("SELECT COUNT(*) FROM calls WHERE status='running'").fetchone()[0]
         assert running==0,'UNRESOLVED_CALLS_CANNOT_FINISH'
@@ -197,7 +270,7 @@ def export():
         for run_id in ids:
             if decision is None and run_id=='m5campaign-research':continue
             session=store.session(run_id,db);session['state']['development_calculations_finished']=True
-            session['state']['campaign_finished']=decision is not None
+            session['state']['campaign_finished']=validation_finished if admitted else decision is not None
             store.update_state(db,run_id,session['state'],'stopped')
         store.event(db,'m5campaign-research','campaign','finish_stop' if decision is not None else 'export_pending_research',outputs=[seal])
     with store.connect(True) as db:
@@ -209,12 +282,13 @@ def export():
     corrections=dict(protocol_total=state.get('protocol_corrections_used',0),protocol_consecutive=state.get('protocol_corrections_consecutive',0),
         semantic_total=read(stage.RUN/'interventions.json').get('semantic_provider_corrections',0))
     assert corrections['protocol_total']+corrections['semantic_total']<=4
-    accounting=dict(historical=prior,development=used,validation={k:0 for k in used},
-        cumulative={k:prior[k]+used[k] for k in prior},receipt_charge_sum=sums,development_limits=stage.LIMITS,
+    accounting=dict(historical=prior,development=used,validation=validation_used,
+        cumulative={k:prior[k]+used[k]+validation_used[k] for k in prior},receipt_charge_sum=sums,development_limits=stage.LIMITS,
         validation_per_batch_limits=stage.VALIDATION_LIMITS,numerical_work=work,
-        cumulative_numerical_work=dict(controller_attempts=79+work['used']['local_solves'],
-            standalone_integrations=44+work['used']['reference_integrations']+work['used']['prediction_evaluations'],
-            historical_backend_controller_updates=210,new_backend_controller_updates=0),corrections=corrections,
+        validation_numerical_work=validation_work,
+        cumulative_numerical_work=dict(controller_attempts=79+work['used']['local_solves']+validation_work['local_solves'],
+            standalone_integrations=44+work['used']['reference_integrations']+work['used']['prediction_evaluations']+validation_work['prediction_evaluations'],
+            historical_backend_controller_updates=210,new_backend_controller_updates=sum(b['backend_controller_updates'] for b in batches)),corrections=corrections,
         numerical_details=dict(reference_attempts=1,reference_completions=1,local_integrations=work['used']['prediction_evaluations'],
             complete_previews=work['used']['preview_attempts'],embedded_preview_controller_attempts=sum(x['solves'] for x in a['screening']['forecasts']),
             isolated_controller_probe_attempts=1),
@@ -223,11 +297,16 @@ def export():
     atomic_json(stage.RUN/'accounting.json',accounting);atomic_json(stage.RUN/'receipts.json',receipts)
     events=[e for run_id in ids for e in store.events(run_id)];atomic_json(stage.RUN/'events.json',events)
     delivery=dict(status=p['status'],research_interpretation_accepted=decision is not None,incumbent=f['incumbent'],
-        milestone2='closed',milestone3='closed',milestone4='closed',milestone5='open',backend_attempts=0,backend_steps=0,
-        prospective_outcomes=None,conditional_validation='Not admitted; both linked grants remain unmaterialized',
+        milestone2='closed',milestone3='closed',milestone4='closed',milestone5='open',backend_attempts=validation_used['backend_solves'],
+        prospective_outcomes=batches,conditional_validation='Frozen ranking-only protocol; continuation checked per batch' if admitted else 'Not admitted; both linked grants remain unmaterialized',
         report='docs/milestone5_predictor_campaign.md',accounting='accounting.json',readiness='readiness.json',
         remaining_failures=[k for k,v in checks.items() if not v],operational_next_action=next_action,
-        incomplete_work=[] if decision is not None else ['accepted development go/no-go','conditional prospective validation if admitted','final accepted capability judgment'])
+        incomplete_work=([] if validation_finished else ['conditional prospective validation','final accepted capability judgment']) if admitted else ([] if decision is not None else ['accepted development go/no-go','conditional prospective validation if admitted','final accepted capability judgment']))
+    linked=read(stage.RUN/'linked_ledgers.json')
+    for i,item in enumerate(linked['validation'],1):
+        item['grant_materialized']=(validation.folder(i)/'grant.json').exists()
+        if (validation.folder(i)/'accounting.json').exists():item['used']=read(validation.folder(i)/'accounting.json')['used']
+    atomic_json(stage.RUN/'linked_ledgers.json',linked)
     atomic_json(stage.RUN/'delivery.json',delivery);stage.EVIDENCE.mkdir(parents=True,exist_ok=True)
     for fpath in stage.RUN.glob('*.json'):(stage.EVIDENCE/fpath.name).write_bytes(fpath.read_bytes())
     seen=set()
@@ -261,5 +340,6 @@ if __name__=='__main__':
     if args.phase=='assessment':print(json.dumps(assessment()['local_counts']))
     elif args.phase=='interpret':interpretation()
     elif args.phase=='prepare-research':interpretation(send=False)
+    elif args.phase=='correct-interpretation':correct_interpretation()
     elif args.phase=='export':export()
     else:raise ValueError('Unknown phase')

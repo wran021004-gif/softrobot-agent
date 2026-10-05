@@ -1,0 +1,257 @@
+{
+  "model": "deepseek-flash",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Perform the current final-decision phase with exactly one advertised native function. English. Use the supplied source-bound program facts; author only interpretation and judgment. Required instructions are in role_context.instructions. Keep the response concise. Diagnostic recommendation disposition, candidate selection and next research route are separate. A valid function call does not certify factual accuracy. No further execution is authorized by this response."
+    },
+    {
+      "role": "user",
+      "content": "{\"correction_budget\":{\"consecutive_used\":0,\"limits\":{\"max_consecutive\":2,\"max_total\":3},\"total_used\":0},\"phase_progress\":{\"budget\":{\"limit\":{\"model_calls\":4,\"tool_calls\":4,\"wall_s\":600.0},\"protect_project\":{\"wall_s\":60.0},\"remaining\":{\"backend_solves\":0,\"model_calls\":2,\"tool_calls\":1,\"wall_s\":557.6239999998361,\"worker_calls\":0},\"started_usage\":{\"backend_solves\":0,\"model_calls\":-1,\"tool_calls\":-1,\"wall_s\":-23.969000000040978,\"worker_calls\":0},\"used\":{\"backend_solves\":0,\"model_calls\":2,\"tool_calls\":3,\"wall_s\":42.37600000016391,\"worker_calls\":0}},\"evidence_turn_limit\":null,\"instruction\":\"Use supplied content and retained evidence. When the read allowance ends, deliver the current phase using its remaining advertised handoff tool.\",\"successful_read_turns\":0,\"turns_used\":0},\"recovery_status\":{\"business\":{\"category\":\"accepted_call_execution_rejected_or_failed\",\"consecutive_failures\":0,\"feedback\":null,\"limit\":2,\"remaining_repairs\":2,\"reset\":\"Completed business call resets consecutive; phase/context switch does not.\",\"stop_when\":\"consecutive_failures > limit; two repair opportunities after first failure\",\"total_failures\":1},\"length\":{\"category\":\"truncated_without_usable_action\",\"configuration\":{\"enabled\":true,\"max_tokens\":131072,\"timeout_s\":900.0},\"limit\":1,\"used\":0},\"protocol\":{\"category\":\"native_schema_or_envelope\",\"consecutive_remaining\":2,\"consecutive_used\":0,\"limits\":{\"max_consecutive\":2,\"max_total\":3},\"reset\":\"Completed business call resets consecutive only; decoding alone does not.\",\"total_remaining\":3,\"total_used\":0},\"scope\":\"workflow shared across phases and contexts\",\"stop_reason\":\"BUDGET_EXHAUSTED: active phase / protected downstream capacity\",\"transport\":{\"automatic_retry\":false,\"category\":\"provider_transport_failure\"},\"version\":\"2.0.0\"},\"role_context\":{\"decision_packet\":{\"actual_receipted_economics\":{\"actual_evaluations_avoided\":0,\"actual_validation_savings_s\":0.0,\"counterfactual_net_savings_s\":-370.9700000002049,\"final_research_receipted\":true,\"incremental_screening_s\":370.9700000002049,\"one_skipped_evaluation_s\":0.0,\"pair_forecast_s\":328.594000000041,\"required_research_s\":42.37600000016391},\"continuation_conditions\":{\"accepted_research_continuation\":false,\"both_evaluations_complete\":true,\"no_false_safe\":true,\"numerical\":true,\"positive_net\":false,\"resolved_correct_ranking\":false},\"frozen_status\":\"STOP; ranking abstains and avoided evaluation cost is zero. No Batch2.\",\"local_summary\":{\"direction_accuracy_among_resolved\":0.5,\"distinct_intervals\":4,\"holding_false_safe\":0,\"numerical_passes\":4,\"position_passes\":0,\"resolved\":4,\"resolved_coverage\":1.0,\"speed_passes\":0,\"vector_passes\":0},\"next_objective\":\"Investigate the five-interval controller approximation at the saved first production command divergence, new-clock .32 s. In a separately authorized bounded investigation, compare two unchanged production-controller solves (.075/.15) at one identical saved observed reduced state, available previous input and common initialization. Pass this diagnostic hypothesis only if command separation >1e-9 N is reproduced without changing early acceptance; otherwise reject the claimed lost-feedback mechanism. No backend replay now. Any subsequent predictor revision needs fresh, untouched reset-clock pairs, original accuracy/ranking/constraint thresholds and positive all-in screening economics; the used Batch1 becomes development evidence.\",\"selected_weights\":[0.075,0.15]},\"decision_packet_reference\":{\"artifact_id\":\"de241a4bd4281e0368358bcedded4af409b042d2a2c18d0c854a6de2ab70cfed\",\"media_type\":\"application/json\"},\"instructions\":\"Your latest response repeated superseded required_research_s=0 and -328.594 as current totals despite the updated packet. This is the second and final factual correction, not a request for a favorable decision. CURRENT RECEIPTS: pair forecasts 328.594 s; required native research overhead 42.376 s INCLUDING prior provider calls and accepted recovered/corrected tool calls; incremental screening 370.970 s; avoided evaluation 0; net -370.970 s BEFORE THIS FINAL CORRECTION. State that the final correction receipt will be ADDED and make net more negative; do not guess its runtime or call the cost final. Do not state required_research_s=0 or -328.594 as current economics. Keep STOP, no Batch2, incumbent unchanged, M5 open. Concisely preserve 4 checkpoint observations / 2 unique state-input-time cases, direction2/4, numerical4/4, quantitative0/4, ranking abstention, no threshold authority. State one precise next objective from the packet as a recommendation only, with no current execution or promised success. Return exactly one native research_milestone5_preparation, phase interpretation, holding_weights [.075,.15], rationale, readiness STOP, limitations, next_action finish_stop. About300 words.\",\"phase\":\"interpretation\",\"role\":\"design\"}}"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "evidence_read",
+        "description": "Read immutable saved evidence with JSON Pointer and offset paging. An oversized subtree returns a labeled pointer overview, not original content. Follow its pointers using the same source reference and next_offset at the same pointer. No solve or evaluation is performed.",
+        "parameters": {
+          "type": "object",
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "reference": {
+                  "$ref": "#/$defs/EvidenceRef",
+                  "description": "Existing immutable evidence reference, not a node_id. A build has no evaluation or trajectory to read."
+                },
+                "pointer": {
+                  "default": "",
+                  "description": "JSON Pointer into original evidence, e.g. /detail or /signals/0/values. Empty reads the root. Oversized nested content returns a labeled overview with valid child pointers; follow those pointers using the same source reference.",
+                  "title": "Pointer",
+                  "type": "string"
+                },
+                "offset": {
+                  "default": 0,
+                  "minimum": 0,
+                  "title": "Offset",
+                  "type": "integer"
+                },
+                "limit": {
+                  "default": 20,
+                  "maximum": 100,
+                  "minimum": 1,
+                  "title": "Limit",
+                  "type": "integer"
+                },
+                "byte_limit": {
+                  "default": 4096,
+                  "description": "Requested content byte cap; response and observation envelopes also count toward the inline limit. Pages may be smaller. Follow next_offset at the same pointer.",
+                  "maximum": 8192,
+                  "minimum": 128,
+                  "title": "Byte Limit",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "reference"
+              ],
+              "title": "ReadEvidence",
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "corrections": {
+                  "items": {
+                    "$ref": "#/$defs/FieldCorrection"
+                  },
+                  "maxItems": 20,
+                  "minItems": 1,
+                  "title": "Corrections",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "corrections"
+              ],
+              "title": "Corrections",
+              "type": "object"
+            }
+          ],
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            },
+            "FieldCorrection": {
+              "additionalProperties": false,
+              "properties": {
+                "operation": {
+                  "default": "replace",
+                  "enum": [
+                    "replace",
+                    "remove"
+                  ],
+                  "title": "Operation",
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Exact existing-field JSON pointer relative to draft.arguments, e.g. /new_facts/0/references. The explicit draft-root spelling /arguments/new_facts/0/references is also supported. No guessed paths.",
+                  "title": "Path",
+                  "type": "string"
+                },
+                "value": {
+                  "default": null,
+                  "title": "Value"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "title": "FieldCorrection",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "research_milestone5_preparation",
+        "description": "Select two future recipes or interpret fixed development evidence; finish/stop only.",
+        "parameters": {
+          "type": "object",
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "phase": {
+                  "enum": [
+                    "selection",
+                    "interpretation"
+                  ],
+                  "title": "Phase",
+                  "type": "string"
+                },
+                "holding_weights": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "title": "Holding Weights",
+                  "type": "array"
+                },
+                "rationale": {
+                  "minLength": 20,
+                  "title": "Rationale",
+                  "type": "string"
+                },
+                "readiness": {
+                  "title": "Readiness",
+                  "type": "string"
+                },
+                "limitations": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Limitations",
+                  "type": "array"
+                },
+                "next_action": {
+                  "const": "finish_stop",
+                  "title": "Next Action",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "phase",
+                "holding_weights",
+                "rationale",
+                "readiness",
+                "limitations",
+                "next_action"
+              ],
+              "title": "ResearchDecision",
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "corrections": {
+                  "items": {
+                    "$ref": "#/$defs/FieldCorrection"
+                  },
+                  "maxItems": 20,
+                  "minItems": 1,
+                  "title": "Corrections",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "corrections"
+              ],
+              "title": "Corrections",
+              "type": "object"
+            }
+          ],
+          "$defs": {
+            "FieldCorrection": {
+              "additionalProperties": false,
+              "properties": {
+                "operation": {
+                  "default": "replace",
+                  "enum": [
+                    "replace",
+                    "remove"
+                  ],
+                  "title": "Operation",
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Exact existing-field JSON pointer relative to draft.arguments, e.g. /new_facts/0/references. The explicit draft-root spelling /arguments/new_facts/0/references is also supported. No guessed paths.",
+                  "title": "Path",
+                  "type": "string"
+                },
+                "value": {
+                  "default": null,
+                  "title": "Value"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "title": "FieldCorrection",
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "max_tokens": 65536,
+  "stream": false,
+  "thinking": {
+    "type": "enabled"
+  },
+  "reasoning_effort": "high"
+}

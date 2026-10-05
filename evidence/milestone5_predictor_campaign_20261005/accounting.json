@@ -7,32 +7,32 @@
     "wall_s": 5606.864999998594
   },
   "development": {
-    "tool_calls": 7,
-    "model_calls": 0,
+    "tool_calls": 9,
+    "model_calls": 2,
     "backend_solves": 0,
     "worker_calls": 0,
-    "wall_s": 880.5139999999665
+    "wall_s": 944.3889999999665
   },
   "validation": {
-    "tool_calls": 0,
-    "model_calls": 0,
-    "backend_solves": 0,
+    "model_calls": 3,
+    "tool_calls": 14,
+    "backend_solves": 2,
     "worker_calls": 0,
-    "wall_s": 0
+    "wall_s": 1779.408999999985
   },
   "cumulative": {
-    "tool_calls": 88,
-    "model_calls": 43,
-    "backend_solves": 6,
+    "tool_calls": 104,
+    "model_calls": 48,
+    "backend_solves": 8,
     "worker_calls": 0,
-    "wall_s": 6487.37899999856
+    "wall_s": 8330.662999998545
   },
   "receipt_charge_sum": {
-    "tool_calls": 7,
-    "model_calls": 0,
+    "tool_calls": 9,
+    "model_calls": 2,
     "backend_solves": 0,
     "worker_calls": 0,
-    "wall_s": 880.5139999999665
+    "wall_s": 944.3889999999665
   },
   "development_limits": {
     "model_calls": 12,
@@ -62,16 +62,22 @@
       "reference_integrations": 1
     }
   },
+  "validation_numerical_work": {
+    "local_solves": 14,
+    "prediction_evaluations": 12,
+    "preview_attempts": 2
+  },
   "cumulative_numerical_work": {
-    "controller_attempts": 94,
-    "standalone_integrations": 57,
+    "controller_attempts": 108,
+    "standalone_integrations": 69,
     "historical_backend_controller_updates": 210,
-    "new_backend_controller_updates": 0
+    "new_backend_controller_updates": 70
   },
   "corrections": {
     "protocol_total": 0,
     "protocol_consecutive": 0,
-    "semantic_total": 0
+    "semantic_total": 1,
+    "scope": "development only; validation corrections recorded separately"
   },
   "numerical_details": {
     "reference_attempts": 1,
@@ -84,5 +90,67 @@
   "nested_time": "Embedded solver, propagation, point mechanics, serialization and all failures charged once in outer workflow receipts.",
   "engineering": "Editing, read-only inspection, focused verification and export use preserved offline engineering convention.",
   "workers": 0,
-  "subagents": 0
+  "subagents": 0,
+  "validation_corrections": {
+    "engineering": [
+      "Research handoff inherited simulation timeout/reservation 900s, exceeding the protected 600s research phase. Supply the existing 10s/5s research allowance; also bind the required selected_weights packet field to the frozen recipes.",
+      "Copied result ownership cache was removed from the research-only revised session after a read-only scoring failure; original backend owners retained. Failure occurred before credential loading/provider dispatch."
+    ],
+    "protocol_recovery_corrections": 0,
+    "semantic_provider_corrections": 2,
+    "rejected_tool_attempts": 1,
+    "total_bounded_repairs_and_semantic_corrections": 3,
+    "provider_calls": 3,
+    "original_phase": {
+      "limit": {
+        "model_calls": 4,
+        "tool_calls": 4,
+        "wall_s": 600.0
+      },
+      "protect_project": {
+        "wall_s": 60.0
+      },
+      "started_usage": {
+        "backend_solves": 0,
+        "model_calls": -1,
+        "tool_calls": -1,
+        "wall_s": -23.969000000040978,
+        "worker_calls": 0
+      }
+    },
+    "final_phase": {
+      "limit": {
+        "model_calls": 4,
+        "tool_calls": 4,
+        "wall_s": 600.0
+      },
+      "protect_project": {
+        "wall_s": 60.0
+      },
+      "started_usage": {
+        "backend_solves": 0,
+        "model_calls": -1,
+        "tool_calls": -1,
+        "wall_s": -23.969000000040978,
+        "worker_calls": 0
+      },
+      "used": {
+        "backend_solves": 0,
+        "model_calls": 3,
+        "tool_calls": 4,
+        "wall_s": 48.705000000074506,
+        "worker_calls": 0
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 551.2949999999255,
+        "worker_calls": 0
+      }
+    },
+    "new_allocations": 0,
+    "numerical_replays": 0,
+    "provider_response_replays": 0
+  }
 }

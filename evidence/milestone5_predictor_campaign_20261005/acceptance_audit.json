@@ -1,0 +1,130 @@
+{
+  "status": "campaign_complete_milestone5_open",
+  "batch1": "completed_valid_sealed",
+  "batch2": "not_launched_stop_conditions_failed",
+  "original_criteria_sources": [
+    "docs/milestone5.md",
+    "docs/milestone5_prediction_validation.md",
+    "evidence/milestone5_predictor_campaign_20261005/freeze.json"
+  ],
+  "protocol_identity": "6b5c45f00980237f20187201732fa0a679849953c3921c52b5371dabf2a7e9b6",
+  "accepted_final_research": {
+    "artifact_id": "c87a3eeb2fb6b38d52c3e4b278b68013ef4f9a187fd5a21af0ad75bc28938e66",
+    "media_type": "application/json"
+  },
+  "capabilities": [
+    {
+      "name": "numerical_reference",
+      "verdict": "supported_locally",
+      "evidence": "Original shared reference passes two successive comparisons in both output maps; changed-model local checks 4/4 development and 4/4 prospective checkpoint observations. No complete-history convergence claim."
+    },
+    {
+      "name": "local_direction",
+      "verdict": "experimental_not_reliable",
+      "development": "4/4 correct",
+      "prospective": "4/4 resolved, 2/4 correct; no neutral or indeterminate results. Four observations are two unique state/input/time cases."
+    },
+    {
+      "name": "local_quantitative_accuracy",
+      "verdict": "failed",
+      "prospective": {
+        "position_passes": 0,
+        "speed_passes": 0,
+        "vector_passes": 0,
+        "observations": 4
+      },
+      "thresholds": {
+        "position_m": 1e-06,
+        "vector_speed_m_s": 0.0001
+      }
+    },
+    {
+      "name": "threshold_reliability",
+      "verdict": "unsupported",
+      "local": "Prospective speed false-safe 0/4 and false-unsafe 0/4, holding false-safe 0/2; both holding speeds correctly above .02 on these cases. Historical local .075 false-safe remains.",
+      "full_history": "Position gate abstains 2/2; eligibility coverage 0/2, accuracy undefined, no categorical false-safe or false-unsafe claim."
+    },
+    {
+      "name": "prospective_ranking",
+      "verdict": "failed_usefulness_gate",
+      "planned_pairs": 1,
+      "resolved": 0,
+      "abstentions": 1,
+      "ordering_errors": 0,
+      "accuracy_among_resolved": null,
+      "false_rejections": 0,
+      "predicted_raw_speed_gap_m_s": 0.0,
+      "observed_raw_speed_gap_m_s": 0.24173895806868206,
+      "qualification": "Both observed candidates violate position feasibility; raw speed order is not an eligible winner."
+    },
+    {
+      "name": "operational_economics",
+      "verdict": "failed",
+      "pair_forecast_s": 328.594000000041,
+      "required_research_s": 48.705000000074506,
+      "incremental_screening_s": 377.2990000001155,
+      "one_skipped_evaluation_s": 0.0,
+      "counterfactual_net_savings_s": -377.2990000001155,
+      "final_research_receipted": true,
+      "actual_validation_savings_s": 0.0,
+      "actual_evaluations_avoided": 0
+    },
+    {
+      "name": "causal_sealing_identity_recovery",
+      "verdict": "passed",
+      "pair_seal_sequence": 97,
+      "backend_reservation_sequences": [
+        99,
+        135
+      ],
+      "local_seal_sequences": [
+        111,
+        119,
+        147,
+        155
+      ],
+      "native_recovery": "Exact saved model response accepted through native tool after allowance/packet repair, same grant and preserved phase usage; no numerical/API replay."
+    },
+    {
+      "name": "broader_repeatability",
+      "verdict": "not_established",
+      "evidence": "One prospective reset-clock pair; two unique local cases; Batch2 stopped."
+    },
+    {
+      "name": "real_time",
+      "verdict": "failed_unchanged",
+      "incumbent_deadline_misses": "35/35",
+      "validation_deadline_misses": "70/70"
+    }
+  ],
+  "ranking_substage": "completed_with_negative_result; no ranking capability accepted",
+  "incumbent_retained": true,
+  "milestones": {
+    "M2": "closed",
+    "M3": "closed",
+    "M4": "closed",
+    "M5": "open"
+  },
+  "next_objective": {
+    "investigation": "At the saved first production input divergence (.32 s), compare .075/.15 unchanged controller solves at one identical observed reduced state, common available previous command and common initialization.",
+    "rationale": "Seven-replan forecasts have identical commands throughout; production inputs first diverge at .32, an omitted replan. This is an association to test, not proven causation. It does not resolve the separate local dynamics/representation error.",
+    "scope": "Two controller solves in a separately bounded future investigation; no backend replay now; preserve early acceptance and original thresholds.",
+    "pass_fail": "Command separation >1e-9 N supports a candidate-dependent response lost by holding a prior plan; otherwise reject this specific explanation. This diagnostic test does not itself validate ranking or quantitative accuracy.",
+    "fresh_evidence": "After any versioned correction, use untouched reset-clock candidate pairs with prior forecast/local seals, original accuracy and constraint reporting, resolved correct conditional ranking, and positive all-in screening economics. Batch1 is development data for that revision.",
+    "executed": false
+  },
+  "writer_check": {
+    "unresolved_calls": 0,
+    "session_statuses": {
+      "m5campaign-b1-r1": "stopped",
+      "m5campaign-b1-r1-interpretation-repair": "stopped",
+      "m5campaign-b1-r2": "stopped"
+    }
+  },
+  "limitations": [
+    "No safety/eligibility authority",
+    "No candidate promotion",
+    "No statistical or family-wide reliability",
+    "No hardware or continuous-time guarantee"
+  ]
+}

@@ -1,46 +1,55 @@
 # Current development status - Milestones 4 and 5, 2026-10-05
 
-The latest [accuracy and screening-cost campaign](milestone5_predictor_campaign.md)
-has completed its authorized development calculations, with **accepted research
-go/no-go blocked by automatic approval review**. Two supported host-call requests
-were rejected before process creation; the second explicitly refuses to treat
-the attachment's embedded authorization as direct chat authorization. The exact
-rejections and concrete 55,143-byte native payload are preserved; direct chat
-confirmation has been requested. No provider attempt or backend attempt occurred.
-The development checkpoint is locally committed as `6429c6b8f481ff6e8769bb0143ba73784b8fdd20`.
-Automatic review also rejected its non-force push to the existing origin branch;
-direct chat push authorization is requested, and remote publication is unverified.
+The [accuracy and screening-cost campaign](milestone5_predictor_campaign.md) is
+**complete with a negative prospective result; Milestone 5 remains open**.
+The corrected native development judgment admitted ranking-only validation.
+Batch 1 completed two sealed forecasts and two complete real backend evaluations.
+The frozen decision abstained, so ranking and economic continuation gates failed;
+final native judgment is **STOP**, and Batch 2 was not launched or granted.
 
-The single repaired 2560-substep continuation completed in 608.265 charged seconds.
-Both continuous and represented-serial mappings now pass the unchanged last-two
-vector/speed stability criterion on the shared original .00-.01 interval.
-One predictor-only serial mass/force pullback improves physical error, while its
-four distinct local cases give 4/4 numerical passes and correct directions but
-0/4 position, 0/4 vector and only 1/4 speed accuracy passes. The .075 local
-holding false-safe is present. Production mechanics/controller remain unchanged.
+Prospective local diagnosis: four checkpoint observations, two unique state/input/
+time cases; direction resolved 4/4 and correct 2/4; numerical checks pass 4/4;
+position, speed and velocity-vector accuracy each pass 0/4. No local holding
+false-safe occurred in this batch; the historical .075 false-safe remains.
+Complete-history eligibility abstained for both candidates and grants no authority.
 
-One five-interval replanning approximation cuts complete pair forecast cost to
-220.484 s from 694.471 s. Two new independent 35-interval histories use seven
-solves each and correctly rank .15 ahead of .075 at a .000966588 m/s gap.
-Both predict speed violations; .15 is actually acceptable, so eligibility remains
-wrong for one candidate. The pre-decision potential net saving is at most 83.312 s
-against one skipped .075 evaluation; required live research overhead remains
-unknown and final economics are not admitted. No safety authority, prospective
-forecast, validation grant, backend step, candidate promotion or M5 closure.
+Prospective ranking: 0/1 resolved, one abstention, no false rejection; accuracy
+among resolved comparisons is undefined. Both forecasts violate position feasibility
+and have identical predicted speed. Observed raw speed order favors .15 by
+0.241738958 m/s, but both candidates violate holding position and speed limits.
+No eligible winner or validated screening capability follows.
 
-New usage: 0 provider / 7 workflow / 0 backend attempts, 880.514 s, 13 integrations,
-15 controller attempts (one isolated probe and 14 embedded in two previews),
-zero workers/subagents. Cumulative: 43/88/6, 6487.379 s, 94 additional controller
-attempts, 57 integration attempts and 210 historical backend controller updates.
-Seven focused checks passed; missing native judgment is explicitly
-non-admitting. Prior ledgers/artifacts and production dependency hashes are unchanged.
-Next: confirm the specific transmission and resume the saved research packet;
-do not repeat numerical work. Conditional validation still requires accepted
-scientific and economic entry. Incumbent retained; real-time 35/35 misses remain.
-See [delivery](../evidence/milestone5_predictor_campaign_20261005/delivery.json),
-[assessment](../evidence/milestone5_predictor_campaign_20261005/assessment.json),
-[readiness](../evidence/milestone5_predictor_campaign_20261005/readiness.json),
-[accounting](../evidence/milestone5_predictor_campaign_20261005/accounting.json).
+Fresh forecasts cost 328.594 s and required research costs 48.705 s: screening
+cost **377.299 s**, avoided evaluation cost 0, counterfactual net **-377.299 s**.
+Both candidates were evaluated, so actual savings are zero. Validation-only local
+instrumentation is recorded separately without inflating an avoided cost.
+
+Original reference support and causal seals/identities are verified. Quantitative
+accuracy, reliable directional/threshold prediction, useful prospective ranking,
+positive operational economics, broader repeatability and real-time capability
+remain unsupported. New executions missed 70/70 deadlines; incumbent misses remain
+35/35. The ranking substage closes with a negative result, not a passed capability.
+M2-4 stay closed and the incumbent is unchanged; no promotion or safety authority.
+
+Usage: development 2 provider / 9 workflow / 0 backend, 944.389 s; validation
+3 / 14 / 2, 1779.409 s. Cumulative 48 / 104 / 8, 8330.663 s, 108 additional
+controller attempts, 69 standalone integrations and 280 backend controller updates.
+No workers/subagents or duplicate numerical/API execution. Native submission recovery
+and two factual corrections preserved the original phase and project counters.
+No unresolved writer remains. Focused seal, receipt, causality and recovery checks pass.
+
+Next objective, not executed: test whether an omitted .32 s replan loses the
+weight-dependent controller response, using two matched-state unchanged controller
+solves with common initialization; require command separation >1e-9 N, otherwise
+reject that explanation. Any revised predictor needs untouched prospective pairs
+under all original accuracy/ranking/constraint thresholds and positive economics.
+This does not remove the separate local dynamics accuracy failure.
+
+See [acceptance audit](../evidence/milestone5_predictor_campaign_20261005/acceptance_audit.json),
+[Batch 1 results](../evidence/milestone5_predictor_campaign_validation1_20261005/assessment.json),
+[final research judgment](../evidence/milestone5_predictor_campaign_validation1_20261005/interpretation.json),
+[accounting](../evidence/milestone5_predictor_campaign_20261005/accounting.json),
+[publication](../evidence/milestone5_predictor_campaign_20261005/publication.json).
 
 ## Predecessor predictor-output development
 

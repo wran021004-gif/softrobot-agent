@@ -1,0 +1,987 @@
+{
+  "status": "evaluated",
+  "receipts": {
+    "simulation": {
+      "contract_version": "1.2.0",
+      "request_id": "complete-simulation",
+      "execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+      "caller": "local-human",
+      "tool_id": "simulation.run",
+      "tool_version": "1.0.0",
+      "result_contract": "BackendResult",
+      "result_version": "1.0.0",
+      "execution_status": "completed",
+      "solver_status": "completed",
+      "analysis_status": "not_assessed",
+      "task_success": null,
+      "output": {
+        "artifact_id": "786263c45dfede5e3c232f40b0f273a9ec409915128cfb5fd26eba3419fb327e",
+        "media_type": "application/json"
+      },
+      "error": null,
+      "cache_hit": false,
+      "original_execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+      "charged": {
+        "tool_calls": 1,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 706.6089999997057
+      }
+    },
+    "evaluation": {
+      "contract_version": "1.2.0",
+      "request_id": "complete-evaluation",
+      "execution_id": "335e9845189d4bc9850c734cd6e132dd",
+      "caller": "local-human",
+      "tool_id": "evaluation.run",
+      "tool_version": "1.0.0",
+      "result_contract": "EvaluationResult",
+      "result_version": "1.2.0",
+      "execution_status": "completed",
+      "solver_status": "not_run",
+      "analysis_status": "valid",
+      "task_success": true,
+      "output": {
+        "artifact_id": "440b9c34a372575c2c0a0bc8f910ed4b6f0e6eff00e70b00352614550b49de16",
+        "media_type": "application/json"
+      },
+      "error": null,
+      "cache_hit": false,
+      "original_execution_id": null,
+      "charged": {
+        "tool_calls": 1,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 1.5470000002533197
+      }
+    },
+    "profile": {
+      "contract_version": "1.2.0",
+      "request_id": "complete-profile",
+      "execution_id": "e09f43e07c0d41a6b5d0acc3b1cfaad6",
+      "caller": "local-human",
+      "tool_id": "control.profile_report",
+      "tool_version": "1.0.0",
+      "result_contract": "ProfileOutput",
+      "result_version": "1.0.0",
+      "execution_status": "completed",
+      "solver_status": "not_run",
+      "analysis_status": "not_assessed",
+      "task_success": null,
+      "output": {
+        "artifact_id": "adfa73aed6ac452f376086a9c5b07bf9c34d2140c0f4b93a4f933243a7258953",
+        "media_type": "application/json"
+      },
+      "error": null,
+      "cache_hit": false,
+      "original_execution_id": null,
+      "charged": {
+        "tool_calls": 1,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 1.8590000001713634
+      }
+    }
+  },
+  "execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+  "configuration": {
+    "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+    "media_type": "application/json"
+  },
+  "design_statement": {
+    "physical_changes": [
+      {
+        "path": "components/near/sections/0/section/parameters/semi_y_m",
+        "baseline_value": 0.01,
+        "effective_value": 0.0095,
+        "baseline_delta": -0.0005000000000000004,
+        "unit": "m",
+        "category": "section"
+      },
+      {
+        "path": "components/near/sections/0/section/parameters/semi_z_m",
+        "baseline_value": 0.008,
+        "effective_value": 0.0076,
+        "baseline_delta": -0.0004000000000000002,
+        "unit": "m",
+        "category": "section"
+      },
+      {
+        "path": "components/near/physics/young_pa",
+        "baseline_value": 8000000.0,
+        "effective_value": 7200000.0,
+        "baseline_delta": -800000.0,
+        "unit": "Pa",
+        "category": "material"
+      },
+      {
+        "path": "components/far/length_m",
+        "baseline_value": 0.12,
+        "effective_value": 0.11,
+        "baseline_delta": -0.009999999999999995,
+        "unit": "m",
+        "category": "length"
+      },
+      {
+        "path": "components/far/sections/0/section/parameters/height_z_m",
+        "baseline_value": 0.01,
+        "effective_value": 0.0095,
+        "baseline_delta": -0.0005000000000000004,
+        "unit": "m",
+        "category": "section"
+      },
+      {
+        "path": "components/far/sections/0/section/parameters/width_y_m",
+        "baseline_value": 0.014,
+        "effective_value": 0.0133,
+        "baseline_delta": -0.000700000000000001,
+        "unit": "m",
+        "category": "section"
+      },
+      {
+        "path": "components/far/sections/1/section/parameters/height_z_m",
+        "baseline_value": 0.009,
+        "effective_value": 0.008549999999999999,
+        "baseline_delta": -0.00045000000000000075,
+        "unit": "m",
+        "category": "section"
+      },
+      {
+        "path": "components/far/sections/1/section/parameters/width_y_m",
+        "baseline_value": 0.012,
+        "effective_value": 0.0114,
+        "baseline_delta": -0.0005999999999999998,
+        "unit": "m",
+        "category": "section"
+      },
+      {
+        "path": "components/far/physics/young_pa",
+        "baseline_value": 6000000.0,
+        "effective_value": 5400000.0,
+        "baseline_delta": -600000.0,
+        "unit": "Pa",
+        "category": "material"
+      }
+    ],
+    "semantic_provenance": {
+      "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+      "material_groups": {
+        "far": {
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0003,
+            0.0004
+          ],
+          "density_kg_m3": 1050.0,
+          "line_density_kg_m": null,
+          "mode": "material",
+          "young_pa": 5400000.0
+        },
+        "near": {
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0005,
+            0.0007
+          ],
+          "density_kg_m3": 1100.0,
+          "line_density_kg_m": null,
+          "mode": "material",
+          "young_pa": 7200000.0
+        }
+      },
+      "selections": {
+        "design/material_scenario": "compliant",
+        "design/section_scale": 0.95
+      },
+      "source": "Frozen experiment semantic_source; original per-section material parameters",
+      "source_identity": "03f948b02a2f0b9eb368bdc3fb34e6c9575ede4334c118384652b339f7c357b4"
+    },
+    "physical_summary": {
+      "physics_identity": "701641ba08a962af7d41ba76c12c07764b240d1179a4b9d62d080fa4d1640726",
+      "sections": [
+        {
+          "component": "near",
+          "length_m": 0.16,
+          "material": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0005,
+              0.0007
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          },
+          "mass_kg": 0.03992084616769622,
+          "cells": 12,
+          "area_range_m2": [
+            0.00022682298958918306,
+            0.00022682298958918306
+          ],
+          "cell_inertia_diagonal_kg_m2": [
+            [
+              1.2309759252668163e-07,
+              9.73230801572219e-08,
+              1.243445029069813e-07
+            ],
+            [
+              1.2309759252668163e-07,
+              9.73230801572219e-08,
+              1.243445029069813e-07
+            ]
+          ],
+          "cell_stiffness_nm_rad": [
+            [
+              1.7686749436206135,
+              2.7635545994072093
+            ],
+            [
+              1.7686749436206135,
+              2.7635545994072093
+            ]
+          ],
+          "cell_damping_nm_s_rad": [
+            [
+              0.0375,
+              0.0525
+            ],
+            [
+              0.0375,
+              0.0525
+            ]
+          ]
+        },
+        {
+          "component": "far",
+          "length_m": 0.11,
+          "material": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.0003,
+              0.0004
+            ],
+            "density_kg_m3": 1050.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          },
+          "mass_kg": 0.012890738103298613,
+          "cells": 12,
+          "area_range_m2": [
+            9.860125868055555e-05,
+            0.0001250745920138889
+          ],
+          "cell_inertia_diagonal_kg_m2": [
+            [
+              2.651362945725062e-08,
+              1.7408297483880295e-08,
+              2.5964706594223954e-08
+            ],
+            [
+              1.625638963011029e-08,
+              1.2480527663054697e-08,
+              1.7066775264606748e-08
+            ]
+          ],
+          "cell_stiffness_nm_rad": [
+            [
+              0.549529104358711,
+              1.0732177091759663
+            ],
+            [
+              0.3571311468479687,
+              0.6378289929689349
+            ]
+          ],
+          "cell_damping_nm_s_rad": [
+            [
+              0.03272727272727272,
+              0.04363636363636364
+            ],
+            [
+              0.03272727272727272,
+              0.04363636363636364
+            ]
+          ]
+        }
+      ],
+      "force_limits_n": {
+        "near_t0": 8.0,
+        "near_t1": 8.0,
+        "near_t2": 8.0,
+        "far_t0": 8.0,
+        "far_t1": 8.0,
+        "far_t2": 8.0
+      },
+      "assumptions": "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+      "applicability": {
+        "compilable": true,
+        "backends": [
+          "backend.matlab_spatial",
+          "backend.family_mujoco"
+        ],
+        "physics": "serial rigid cells with two principal bending hinges; fixed rigid attachments; straight frictionless tendons",
+        "omitted": [
+          "axial stretch",
+          "shear",
+          "material torsion",
+          "friction",
+          "elastic rope",
+          "motor dynamics",
+          "self collision"
+        ],
+        "collision": "section convex hull extrusions; holes filled for collision only; exact polygon/circular area moments; guide box envelope"
+      }
+    },
+    "multi_category_coverage": false,
+    "candidate_id": "m5campaign-b1-r2",
+    "configuration": {
+      "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+      "media_type": "application/json"
+    },
+    "frozen_baseline_identity": "b6bec3e7c8032264f2f7c6b1306031a5f990c719c668018ff633698eaea40b19",
+    "effective_identity": "9f7f9a9e7058f42983583f006d6be981acc8faad11c037069556991e5d68bdda",
+    "owner_run_id": "m5campaign-b1-r2",
+    "execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+    "parameters": [
+      {
+        "path": "components/far/length_m",
+        "baseline_value": 0.11,
+        "effective_value": 0.11,
+        "baseline_delta": 0.0,
+        "unit": "m"
+      },
+      {
+        "path": "components/near/length_m",
+        "baseline_value": 0.16,
+        "effective_value": 0.16,
+        "baseline_delta": 0.0,
+        "unit": "m"
+      },
+      {
+        "path": "design/material_scenario",
+        "baseline_value": "compliant",
+        "effective_value": "compliant",
+        "baseline_delta": null,
+        "unit": null
+      },
+      {
+        "path": "design/section_scale",
+        "baseline_value": 0.95,
+        "effective_value": 0.95,
+        "baseline_delta": 0.0,
+        "unit": "1"
+      },
+      {
+        "path": "control/recipe/holding_tip_speed_weight",
+        "baseline_value": 0.05,
+        "effective_value": 0.15,
+        "baseline_delta": 0.09999999999999999,
+        "unit": "1"
+      },
+      {
+        "path": "control/recipe/terminal_tip_speed_weight",
+        "baseline_value": 0.05,
+        "effective_value": 0.05,
+        "baseline_delta": 0.0,
+        "unit": "1"
+      }
+    ]
+  },
+  "factual_result": {
+    "result_type": "free_reach",
+    "candidate": {
+      "candidate_id": "m5campaign-b1-r2",
+      "owner_run_id": "m5campaign-b1-r2",
+      "configuration": {
+        "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+        "media_type": "application/json"
+      },
+      "execution_id": "e9c62a5e772b49ba95f40e6873405ee7"
+    },
+    "configuration": {
+      "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+      "media_type": "application/json"
+    },
+    "execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+    "simulation": {
+      "artifact_id": "786263c45dfede5e3c232f40b0f273a9ec409915128cfb5fd26eba3419fb327e",
+      "media_type": "application/json"
+    },
+    "evaluation": {
+      "artifact_id": "440b9c34a372575c2c0a0bc8f910ed4b6f0e6eff00e70b00352614550b49de16",
+      "media_type": "application/json"
+    },
+    "report": {
+      "reference": {
+        "artifact_id": "adfa73aed6ac452f376086a9c5b07bf9c34d2140c0f4b93a4f933243a7258953",
+        "media_type": "application/json"
+      },
+      "owner_run_id": "m5campaign-b1-r2",
+      "execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+      "request_id": "complete-profile"
+    },
+    "task_accepted": true,
+    "evaluation_validity": "valid",
+    "complete": true,
+    "valid_complete_execution": true,
+    "target_position_m": [
+      0.29,
+      0.035,
+      0.19
+    ],
+    "terminal_position_m": [
+      0.28240135467745214,
+      0.03820962619585706,
+      0.1942976113391725
+    ],
+    "signed_position_error_m": [
+      -0.007598645322547837,
+      0.00320962619585706,
+      0.004297611339172502
+    ],
+    "error_convention": "actual_tip minus target",
+    "coordinate_frame": "world",
+    "terminal_error_m": 0.009301106078181996,
+    "terminal_tip_speed_m_s": 0.08528138465393933,
+    "sampled_settling": {
+      "available": true,
+      "continuous_time_guarantee": false,
+      "max_error_m": 0.02512724057412036,
+      "max_speed_m_s": 0.907361856591984,
+      "passed": false,
+      "position_limit_m": 0.01,
+      "speed_limit_m_s": 0.02,
+      "window_s": 0.05
+    },
+    "control_updates": 35,
+    "accepted_plans": 35,
+    "initialization_selected": 31,
+    "accepted_noninitialization_plans": 4,
+    "converged_updates": 1,
+    "solver_error_count": 0,
+    "hold_last_responses": 0,
+    "applied_tension_ranges": [
+      {
+        "tendon": "near_t0",
+        "tendon_index": 0,
+        "minimum_n": 1.7512764858409064,
+        "maximum_n": 7.999974804306818,
+        "limit_n": 8.0
+      },
+      {
+        "tendon": "near_t1",
+        "tendon_index": 1,
+        "minimum_n": 4.7309302251853085,
+        "maximum_n": 8.0,
+        "limit_n": 8.0
+      },
+      {
+        "tendon": "near_t2",
+        "tendon_index": 2,
+        "minimum_n": 1.4525192069423287e-05,
+        "maximum_n": 6.209743850430892,
+        "limit_n": 8.0
+      },
+      {
+        "tendon": "far_t0",
+        "tendon_index": 3,
+        "minimum_n": 0.06456973290034881,
+        "maximum_n": 8.0,
+        "limit_n": 8.0
+      },
+      {
+        "tendon": "far_t1",
+        "tendon_index": 4,
+        "minimum_n": 0.7859357597552847,
+        "maximum_n": 5.217549813777269,
+        "limit_n": 8.0
+      },
+      {
+        "tendon": "far_t2",
+        "tendon_index": 5,
+        "minimum_n": 0.6315302379791942,
+        "maximum_n": 5.992682091930739,
+        "limit_n": 8.0
+      }
+    ],
+    "force_bound_violation_n": 0.0,
+    "one_step_prediction_summary": {
+      "aligned_count": 35,
+      "frame": "world",
+      "maximum_tip_difference_m": 0.0071935745597829365,
+      "mean_tip_difference_m": 0.004088833793428669,
+      "missing": [],
+      "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+    },
+    "one_step_prediction_evidence": {
+      "artifact_id": "24f4e8797a687ad80b14332e3f320229a434d75707a764124bc1ced7e9cd6fa9",
+      "media_type": "application/json"
+    },
+    "simulated_duration_s": 0.35000000000000003,
+    "measured_computation_s": 706.6089999997057,
+    "mean_complete_update_s": 20.101655460055916,
+    "control_period_s": 0.01,
+    "deadline_misses": 35,
+    "real_time_demonstrated": false
+  },
+  "profile_report": {
+    "reference": {
+      "artifact_id": "adfa73aed6ac452f376086a9c5b07bf9c34d2140c0f4b93a4f933243a7258953",
+      "media_type": "application/json"
+    },
+    "owner_run_id": "m5campaign-b1-r2",
+    "execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+    "request_id": "complete-profile"
+  },
+  "evaluation_data": {
+    "candidate_id": "m5campaign-b1-r2",
+    "comparison_identity": "ea668cade12198420e5946166db0ae1791cdb1a4cc663e244c24d1945c8c4e83",
+    "constraints": [
+      {
+        "limit": 0.01,
+        "name": "task_bound",
+        "observed": 0.009301106078181996,
+        "satisfied": true,
+        "units": "m"
+      }
+    ],
+    "contract_version": "1.2.0",
+    "evaluator": "evaluate.reach",
+    "evaluator_version": "1.0.0",
+    "metrics": [
+      {
+        "name": "position_error",
+        "units": "m",
+        "value": 0.009301106078181996
+      }
+    ],
+    "original_execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+    "reason": null,
+    "source": {
+      "artifact_id": "786263c45dfede5e3c232f40b0f273a9ec409915128cfb5fd26eba3419fb327e",
+      "media_type": "application/json"
+    },
+    "source_execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+    "task_success": true,
+    "validity": "valid"
+  },
+  "completion_stages": {
+    "simulation": {
+      "candidate_id": "m5campaign-b1-r2",
+      "configuration": {
+        "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+        "media_type": "application/json"
+      },
+      "source_execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+      "source_owner": "m5campaign-b1-r2",
+      "operation": "simulation.run",
+      "version": "1.0.0",
+      "status": "completed",
+      "receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-simulation",
+        "execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+        "caller": "local-human",
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "completed",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "786263c45dfede5e3c232f40b0f273a9ec409915128cfb5fd26eba3419fb327e",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 706.6089999997057
+        }
+      },
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "charged_usage": {
+        "tool_calls": 1,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 706.6089999997057
+      },
+      "accounting_scope": "current_store"
+    },
+    "evaluation": {
+      "candidate_id": "m5campaign-b1-r2",
+      "configuration": {
+        "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+        "media_type": "application/json"
+      },
+      "source_execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+      "source_owner": "m5campaign-b1-r2",
+      "operation": "evaluation.run",
+      "version": "1.0.0",
+      "status": "completed",
+      "receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-evaluation",
+        "execution_id": "335e9845189d4bc9850c734cd6e132dd",
+        "caller": "local-human",
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "valid",
+        "task_success": true,
+        "output": {
+          "artifact_id": "440b9c34a372575c2c0a0bc8f910ed4b6f0e6eff00e70b00352614550b49de16",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.5470000002533197
+        }
+      },
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "charged_usage": {
+        "tool_calls": 1,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 1.5470000002533197
+      },
+      "accounting_scope": "current_store"
+    },
+    "profile": {
+      "candidate_id": "m5campaign-b1-r2",
+      "configuration": {
+        "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+        "media_type": "application/json"
+      },
+      "source_execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+      "source_owner": "m5campaign-b1-r2",
+      "operation": "control.profile_report",
+      "version": "1.0.0",
+      "status": "completed",
+      "receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "complete-profile",
+        "execution_id": "e09f43e07c0d41a6b5d0acc3b1cfaad6",
+        "caller": "local-human",
+        "tool_id": "control.profile_report",
+        "tool_version": "1.0.0",
+        "result_contract": "ProfileOutput",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "adfa73aed6ac452f376086a9c5b07bf9c34d2140c0f4b93a4f933243a7258953",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.8590000001713634
+        }
+      },
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "charged_usage": {
+        "tool_calls": 1,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 1.8590000001713634
+      },
+      "accounting_scope": "current_store"
+    }
+  },
+  "profile_producer_run_id": "m5campaign-b1-r2",
+  "structured_feedback": {
+    "completion": {
+      "simulation": "completed",
+      "evaluation": "completed",
+      "profile": "completed"
+    },
+    "source_execution_id": "e9c62a5e772b49ba95f40e6873405ee7",
+    "source_owner": "m5campaign-b1-r2",
+    "configuration": {
+      "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+      "media_type": "application/json"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "acceptance_definition": {
+      "contract": "platform.acceptance_definition",
+      "version": "1.0.0",
+      "terminal": {
+        "value": 0.01,
+        "unit": "m",
+        "definition": "Euclidean world tip position error at the final execution sample; sealed evaluate.reach is the outcome authority.",
+        "source": {
+          "reference": {
+            "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+            "media_type": "application/json"
+          },
+          "pointer": "/effective/task/evaluator/parameters/data/tolerance_m"
+        }
+      },
+      "holding": {
+        "duration": {
+          "value": 0.05,
+          "unit": "s",
+          "definition": "Final closed interval [task duration - window, task duration].",
+          "source": {
+            "reference": {
+              "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+              "media_type": "application/json"
+            },
+            "pointer": "/effective/policy/controller/parameters/data/settling/window_s"
+          }
+        },
+        "interval_s": [
+          0.3,
+          0.35
+        ],
+        "position": {
+          "value": 0.01,
+          "unit": "m",
+          "definition": "Maximum sampled world tip position error in the final interval.",
+          "source": {
+            "reference": {
+              "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+              "media_type": "application/json"
+            },
+            "pointer": "/effective/policy/controller/parameters/data/settling/position_limit_m"
+          }
+        },
+        "speed": {
+          "value": 0.02,
+          "unit": "m/s",
+          "definition": "Maximum sampled world tip translational speed norm in the final interval.",
+          "source": {
+            "reference": {
+              "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+              "media_type": "application/json"
+            },
+            "pointer": "/effective/policy/controller/parameters/data/settling/speed_limit_m_s"
+          }
+        },
+        "coverage": {
+          "expected_sample_count": 6,
+          "definition": "Both endpoints, timestamps aligned to task sample_period_s; missing samples are unavailable, never a pass.",
+          "recorded_available": true,
+          "source": {
+            "reference": {
+              "artifact_id": "adfa73aed6ac452f376086a9c5b07bf9c34d2140c0f4b93a4f933243a7258953",
+              "media_type": "application/json"
+            },
+            "pointer": "/detail/sampled_settling/available"
+          }
+        },
+        "continuous_time_guarantee": false
+      },
+      "speed": {
+        "definition": "Euclidean norm of tip-site translational Jacobian times recorded backend qvel, reconstructed with sealed robot.xml and qpos; no finite differencing",
+        "unit": "m/s",
+        "frame": "world",
+        "implementation": "extensions/tendon_family/gvs_reporting.py::reconstruct_motion",
+        "source": {
+          "reference": {
+            "artifact_id": "6a94a693bc11744b2db614d39f253e6d2c62cc2db9a08ee64ff388d661ba342e",
+            "media_type": "application/json"
+          },
+          "pointer": "/*/tip_speed_m_s"
+        }
+      },
+      "timing": {
+        "control_period": {
+          "value": 0.01,
+          "unit": "s",
+          "definition": "Simulated control spacing; synchronous wall overruns do not imply skipped applied updates or injected actuator delay.",
+          "source": {
+            "reference": {
+              "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+              "media_type": "application/json"
+            },
+            "pointer": "/effective/task/timing/control_period_s"
+          }
+        },
+        "sample_period": {
+          "value": 0.01,
+          "unit": "s",
+          "definition": "Retained backend sampling interval.",
+          "source": {
+            "reference": {
+              "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+              "media_type": "application/json"
+            },
+            "pointer": "/effective/task/timing/sample_period_s"
+          }
+        },
+        "duration": {
+          "value": 0.35,
+          "unit": "s",
+          "definition": "Simulated task horizon, separate from computation wall time.",
+          "source": {
+            "reference": {
+              "artifact_id": "72e49b53ef640ad9740a1f73cb3edd092c334b467a52969b0f186209f17cf377",
+              "media_type": "application/json"
+            },
+            "pointer": "/effective/task/timing/duration_s"
+          }
+        },
+        "interpretation": "Applied updates, initialization selections, simulated duration and measured wall time are separate facts."
+      },
+      "comparison": {
+        "policy": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "source": "tools/acceptance_definitions.py::RANKING (settling campaign v1)",
+        "applicable": true
+      },
+      "historical_contract": null,
+      "missing": []
+    },
+    "terminal": {
+      "error_m": 0.009301106078181996,
+      "limit_m": 0.01,
+      "passed": true
+    },
+    "holding": {
+      "interval_s": [
+        0.3,
+        0.35
+      ],
+      "sample_times_s": [
+        0.3,
+        0.31,
+        0.32,
+        0.33,
+        0.34,
+        0.35000000000000003
+      ],
+      "sample_count": 6,
+      "coverage_complete": true,
+      "max_position_error_m": 0.02512724057412036,
+      "position_limit_m": 0.01,
+      "position_passed": false,
+      "max_speed_m_s": 0.907361856591984,
+      "speed_limit_m_s": 0.02,
+      "speed_passed": false,
+      "speed_definition": "Euclidean norm of tip-site translational Jacobian times recorded backend qvel, reconstructed with sealed robot.xml and qpos; no finite differencing",
+      "speed_units": "m/s",
+      "frame": "world",
+      "continuous_time_guarantee": false
+    },
+    "actual_applied_control_updates": 35,
+    "initialization_selected": 31,
+    "newly_optimized_selected": 4,
+    "simulated_duration_s": 0.35000000000000003,
+    "simulation_wall_s": 706.6089999997057,
+    "deadline_misses": 35,
+    "mean_complete_update_s": 20.101655460055916,
+    "reach_only_success": true,
+    "joint_reach_holding_success": false,
+    "evidence": {
+      "simulation": {
+        "artifact_id": "786263c45dfede5e3c232f40b0f273a9ec409915128cfb5fd26eba3419fb327e",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "artifact_id": "440b9c34a372575c2c0a0bc8f910ed4b6f0e6eff00e70b00352614550b49de16",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "adfa73aed6ac452f376086a9c5b07bf9c34d2140c0f4b93a4f933243a7258953",
+        "media_type": "application/json"
+      },
+      "motion": {
+        "artifact_id": "6a94a693bc11744b2db614d39f253e6d2c62cc2db9a08ee64ff388d661ba342e",
+        "media_type": "application/json"
+      },
+      "manifest": {
+        "artifact_id": "360f35e86cf598e41a53a900eeb46365446bd8940d11d600fd2010d551bf6d4e",
+        "media_type": "application/json"
+      },
+      "commands": {
+        "artifact_id": "7c5afac00972d746419dbfb89f158c28cd7947433026e09c2dba01310d61226e",
+        "media_type": "application/octet-stream"
+      }
+    },
+    "missing_data": [],
+    "timing_qualification": "Initialization-selected plans apply control. Synchronous wall overruns do not establish skipped updates or simulated actuator delay."
+  }
+}
