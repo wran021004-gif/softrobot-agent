@@ -1,5 +1,50 @@
 # Current development status - Milestones 4 and 5, 2026-10-05
 
+The latest [bounded predictor development](milestone5_predictor_development.md)
+ends **not ready, with corrected final research interpretation accepted**. One predictor-only
+represented serial tip/Jacobian output map improves instantaneous reconstruction
+and removes the .075 local holding false-safe on the frozen interval. Both holding
+directions are correct, but all three distinct working intervals fail position,
+speed and vector reporting tolerances. First-interval propagation error worsens
+when the old cancellation is removed. Full-task ranking remains 0/1 resolved,
+and the .075 complete-history false-safe remains 1/2. Screening costs 694.471 s
+against only 302–304 s for one potentially skipped complete evaluation.
+
+Two finer shared reference integrations completed; the third hit an incorrectly
+undersized 400 s guard. It counts as a failed attempt, not scientific instability.
+The final two completed vector/speed comparisons are .000124110/.000122724 and
+.000062119/.000061425 m/s, so two-successive stability remains unestablished.
+The future diagnostic guard is corrected to 800 s; no fourth integration ran.
+All previous calculations and exact independent forecast histories were reused.
+
+After the initial network failure and automatic-approval rejection, the user's
+direct chat confirmation authorized the supported host recovery. The native
+research handoff succeeded, followed by one accepted semantic correction that
+separates resolution differences from backend errors and preserves the original
+first interval as the next numerical investigation. Original responses, failures,
+correction and receipts remain preserved. Scientific and economic entry gates
+fail. No first-batch grant, prospective forecast, backend
+attempt or step was launched. The authorized conditional reset-clock .075/.15
+outcomes remain unobserved. Incumbent retained, M2–4 closed, M5 open; real-time
+status remains unmet at 35/35 incumbent deadline misses.
+
+New usage: 3 provider attempts, 5 workflow calls, 0 backend attempts, 922.563 s,
+3 reference attempts (2 completed), 0 other integrations/optimizations/new complete
+previews/workers/subagents. Cumulative: 43/81/6 and 5606.865 s, 79 controller
+attempts, 44 standalone integration attempts and 210 historical backend updates.
+Seven focused checks passed; phase and project counters were preserved. Supported
+use is limited offline diagnosis; screening and safety claims remain unsupported.
+The precise next numerical investigation is one original .00–.01 s integration
+at 2560 substeps with the repaired 800 s guard and 1200 s outer reservation,
+reusing eight completed results under fresh bounded authorization. It was not run;
+even a reference pass would leave discrimination, false-safe and cost gates failed.
+See [delivery](../evidence/milestone5_predictor_development_20261005/delivery.json),
+[protocol](../evidence/milestone5_predictor_development_20261005/protocol.json),
+[readiness](../evidence/milestone5_predictor_development_20261005/readiness.json)
+and [accounting](../evidence/milestone5_predictor_development_20261005/accounting.json).
+
+## Completed prior first-interval stage
+
 The latest [shared first-interval and recovered research stage](milestone5_first_interval.md)
 is **completed and stopped**. Actual native research selection and corrected final
 interpretation succeeded. The shared original .00-.01 s calculation ran once for

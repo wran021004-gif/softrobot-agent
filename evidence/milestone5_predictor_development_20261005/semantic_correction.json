@@ -1,0 +1,53 @@
+{
+  "classification": "One focused semantic correction of an accepted native response; no numerical work",
+  "issues": [
+    "Backend endpoint error was mislabeled as successive-resolution difference.",
+    "An undersized guard and unresolved working-grid accuracy were described as mathematical instability.",
+    "The next investigation wrongly targeted already stable holding entry and several extra halvings instead of the missing original first-interval resolution.",
+    "First-interval worsening after removing cancellation and .15 local errors need separate numerical reporting."
+  ],
+  "first_reference": {
+    "last_two_vector_differences_m_s": [
+      0.00012410987986690233,
+      6.211894449087865e-05
+    ],
+    "last_two_speed_differences_m_s": [
+      0.00012272362244580837,
+      6.142529808983443e-05
+    ],
+    "finest_completed_continuous_backend_vector_error_m_s": 0.010143890863352064,
+    "finest_completed_serial_backend_vector_error_m_s": 0.041613423666608265,
+    "completed_new": 2,
+    "failed_third_guard_s": 400.0,
+    "stable": false
+  },
+  "working_first": {
+    "step_s": 0.000125,
+    "old_backend_vector_error_m_s": 0.00973170977666171,
+    "new_backend_vector_error_m_s": 0.04059779183623771,
+    "two_grid_serial_speed_difference_m_s": 0.0010760558901588557
+  },
+  "holding": {
+    "reference_supported_both": true,
+    "direction_correct_resolved": "2/2",
+    "vector_errors_m_s": [
+      0.006012680707188608,
+      0.0068635833853055665
+    ],
+    "speed_errors_m_s": [
+      -0.0023461844942744246,
+      -0.002762828304952015
+    ],
+    "local_false_safe": "0/2; .075 predicted .020939763 > .02, observed .023285948",
+    "position_speed_vector_passes": "0/3 distinct working intervals each"
+  },
+  "screening": {
+    "resolved": "0/1",
+    "false_safe": "1/2; .075",
+    "cost_s": 694.4708773999009,
+    "one_skipped_upper_bound_s": 303.7959999998566
+  },
+  "only_next_investigation": "ONE .00000390625 s/2560-substep ORIGINAL .00-.01 fixed-state/fixed-input integration under FRESH bounded authorization, 800 s guard/1200 s outer reservation, reuse eight completed results. No .30 holding rerun, no .000001953125 step, no new current calculation. Finite roots, residual <=1e-5 and last TWO vector AND speed differences <=1e-4 decide reference support; backend mismatch is separately scored.",
+  "caution": "Even a first-reference pass cannot overcome universal abstention, full-history false-safe, adverse one-skipped economics, repeatability or real-time failure.",
+  "semantic_provider_corrections": 1
+}

@@ -1,0 +1,20 @@
+{
+  "version": "represented_serial_output@1.0.0",
+  "selected_after": "localization.json",
+  "selection_basis": "At .01 observed projected state: continuous vector discrepancy .034070582 m/s versus represented serial .000016374 m/s; serial position 3.263e-8 m versus continuous .000251437 m. Both Jacobians match finite differences, so this is a kinematic definition/representation mismatch, not a proven projection bug.",
+  "primary_change": "Predictor reports represented serial tip position and its same world-frame Jacobian velocity using registered integrated_v2 mapping and saved XML/compiled indices.",
+  "fixed": [
+    "production controller 7.0.0",
+    "continuous dynamics model 1.0.0",
+    "physical structure/material/tensions/task thresholds",
+    "optimizer and controller transcription",
+    "own candidate state/input/plan histories"
+  ],
+  "working_local_step_s": 0.000125,
+  "local_uncertainty_step_s": 0.00025,
+  "complete_history_step_s": 0.01,
+  "safety_claim": false,
+  "adoption": "Experimental predictor-only output correction; full propagation accuracy is separately assessed. No claim this repairs unrepresented cell modes or continuous dynamics.",
+  "forecast_reuse": "Output does not affect commands or propagation; exact accepted forecast histories reused after request/receipt and scientific configuration checks; no historical future outcomes enter re-output.",
+  "next_test": "Frozen original first/early/holding intervals and exact two independent complete historical forecasts; no new optimizations or full previews required."
+}
