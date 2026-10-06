@@ -66,10 +66,11 @@ class _FeasibleIterate(ca.Callback):
         name=self.names[i]
         return ca.Sparsity.dense(self.nx if name in ('x','lam_x') else self.ng if name in ('g','lam_g') else 1 if name=='f' else 0,1)
 
-    def reset(self,lbx,ubx,lbg,ubg,start,policy=None,seed_objective=None,seed_settled=False,trace=False):
+    def reset(self,lbx,ubx,lbg,ubg,start,policy=None,seed_objective=None,seed_settled=False,trace=False,work_cap=None):
         self.bounds=(lbx,ubx,lbg,ubg);self.best=None;self.first=None;self.latest=None
         self.iteration=-1;self.start=start
         self.policy=policy;self.seed_objective=seed_objective;self.seed_settled=seed_settled
+        self.work_cap=work_cap
         self.stop_reason=None;self.stop_s=None
         self.trace=[] if trace else None
         self.checkpoints={} if trace else None
@@ -105,6 +106,10 @@ class _FeasibleIterate(ca.Callback):
             if self.first is None:self.first=candidate
             if self.best is None or objective<self.best['objective'] or (self.best.get('initialization_only') and objective==self.best['objective']):
                 self.best=candidate
+        if self.work_cap is not None and self.iteration>=self.work_cap:
+            self.stop_reason='diagnostic_work_cap'
+            self.stop_s=elapsed
+            return [1]
         if self.policy is not None and self.best is not None:
             base=self.seed_objective
             improvement=(base-self.best['objective'])/max(abs(base),1e-12) if base is not None else None
@@ -164,6 +169,7 @@ class IpoptSolver:
         self.parameters = IpoptParameters.model_validate(parameters or {})
         self.last_diagnostics = None
         self.diagnostic_trace = False
+        self.diagnostic_work_cap = None  # Opt-in diagnostics only; production default unchanged.
         self.last_returned_optimum = None
         self._compiled = {}
 
@@ -268,7 +274,9 @@ class IpoptSolver:
         initial_finite=np.isfinite(np.r_[x0,np.asarray(initial_check['constraints']).ravel(),float(initial_check['objective'])]).all()
         seed_objective=float(initial_check['objective']) if initial_finite and initial_violation<=1e-5 else None
         if seed_objective is not None and problem.objective.direction!='minimize':seed_objective=-seed_objective
-        if selector is not None:selector.reset(lbx,ubx,lbg,ubg,solve_start,self.parameters.feasible_return,seed_objective,seed_settled,self.diagnostic_trace)
+        if selector is not None:selector.reset(lbx,ubx,lbg,ubg,solve_start,
+            self.parameters.feasible_return if self.diagnostic_work_cap is None else None,
+            seed_objective,seed_settled,self.diagnostic_trace,self.diagnostic_work_cap)
         if selector is not None and seed_objective is not None and self.parameters.feasible_return is not None:
             selector.best=dict(x=np.asarray(x0),objective=seed_objective,iteration=-1,
                 elapsed_s=0.,scaled_violation=initial_violation,iteration_zero=False,

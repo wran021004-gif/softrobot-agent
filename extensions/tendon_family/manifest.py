@@ -667,6 +667,10 @@ EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='control
     version='7.0.0',binding='extensions.tendon_family.gvs_nmpc:DeadlineReachNMPCController',
     description='Candidate-aware reach with horizon truncated at the official task deadline. Unchanged feasibility, physical bounds and solve limits; complete-update cost includes horizon graph construction.'))
 
+EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='controller.gvs_nmpc' and d.version=='7.0.0'),
+    version='8.0.0',binding='extensions.tendon_family.gvs_bounded_nmpc:BoundedReachNMPCController',
+    description='Experimental bounded two-node horizon and two-iteration recipe with measured warm regeneration and unchanged feasibility/physical thresholds. New scientific behavior; v7 evidence does not validate it. No hard deadline or fallback safety guarantee.'))
+
 from . import candidate_comparison
 EXTENSIONS.append(Extension('analysis.compare_candidates','tool','1.0.0',candidate_comparison.CompareRequest,route.RouteResult,
     'extensions.tendon_family.candidate_comparison:compare','Compare owned evaluated candidates, actual physical changes, reach, force utilization, solver behavior and cost; zero solves.',
