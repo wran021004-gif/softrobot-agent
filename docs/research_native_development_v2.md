@@ -128,3 +128,15 @@ A read-only remote check still returns the starting SHA
 published. Next action, once directly authorized and within the original elapsed
 ceiling, is the already prepared campaign's `live` command; no new grant or reset.
 If the elapsed ceiling expires first, preserve this preparation and do not launch.
+
+The exported [prelaunch delivery](../evidence/research_native_development_v2_20261007/prelaunch_delivery.json)
+records the settled same-project version-2 request, original version boundary,
+zero occupied reservations and compatible executable fingerprints. The request
+is 114,670 transport UTF-8 bytes, conservatively estimated at 122,862 input tokens
+including framing, below the unchanged 160,000 allowance. Provider token usage is
+not observed because no request was sent. Actual charged use is two workflow
+operations / 5.125 seconds, zero providers, backends, standalone numerical calls,
+workers or subagents. Offline engineering/test elapsed time is separately bounded
+by the ten-hour assignment deadline; it is not fabricated provider billing.
+The repaired migration's real-ledger save/restore check passes (one test, 19.765s);
+the earlier synthetic-capacity-fixture rejection remains in the offline log.
