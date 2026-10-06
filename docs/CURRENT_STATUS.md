@@ -1,5 +1,30 @@
 # Current development status - Milestones 4 and 5, 2026-10-06
 
+Latest bounded successor: [M4 evidence-bound reporting](milestone4_bound_reporting.md)
+implements source-bound numeric rendering with four focused checks; its first
+provider command was rejected by automatic approval before process launch, then
+the user directly authorized M4/M5 configured provider requests in chat. Three
+genuine model-authored reports and two targeted corrections ran; the third passed
+binding and claim-specific review. The supplement is closed with the qualification
+that original multibatch behavior passed and factual reporting passed only after
+the versioned post-run repair. Charges: 3 provider / 8 workflow / 189.548 s,
+zero numerical/backend work. Historical STOP/incumbent/audits are unchanged.
+
+[M5 control development](milestone5_control_successor.md) delivers five saved-state
+termination/warm-input diagnostic solves and four measurements of the distinct
+experimental v8 controller. The original075 local intervention supports timed
+termination as a cause of command divergence, with limited scope. v8's cached
+complete software intervals are 0.442–0.524 s and return initialization with zero
+objective improvement. Local admission fails; no complete forecast/backend pair,
+cheap method family or protected validation was launched. All six protected slots
+remain untouched. New M5 charges are 1 provider / 13 workflow / 0 backend /
+86.608 s, nine standalone updates. Actual configured model interpretation passes
+review and recommends STOP production advancement with limited diagnostic use.
+The scope is sealed negative; **M5 remains open.** Normal remote publication was
+separately rejected before execution and awaits direct chat authorization.
+
+The earlier checkpoints below remain preserved historical evidence.
+
 Latest: the [separate M4 scientific-scope reporting remediation](milestone4_reporting_scientific_remediation.md)
 repairs the actual evidence projection and preserves all prior failures. Two new
 model-authored reports cost 2 provider / 4 workflow / 90.123 s, with zero numerical
