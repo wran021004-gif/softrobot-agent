@@ -1,0 +1,57 @@
+{
+  "passed": true,
+  "already_working_request": "evidence/milestone4_reporting_20261006/correction2_request.json",
+  "parameters": {
+    "model": "deepseek-flash",
+    "max_tokens": 65536,
+    "thinking": {
+      "type": "enabled"
+    },
+    "reasoning_effort": "high",
+    "stream": false
+  },
+  "configuration": {
+    "adapter": "deepseek",
+    "adapter_version": "6.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 400000,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-03"
+    },
+    "length_recovery": {
+      "enabled": true,
+      "max_tokens": 131072,
+      "timeout_s": 900.0
+    },
+    "max_no_progress": 3,
+    "max_repairs": 2,
+    "max_tokens": 65536,
+    "max_turns": 24,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_total": 4,
+      "max_consecutive": 2
+    },
+    "readonly_batch_limit": 3,
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0,
+    "tool_naming": {
+      "scheme": "readable_v1",
+      "mapping_identity": "ae769b2a4822b5f771cf13adb207ddaacbf36b90d1fe8232fa562f3638014a68"
+    }
+  },
+  "transport_source_sha": "0df3a9f900b8c3c8efd7f72a99c9ff4524eca0826f5c5e2e904bdda9a2e5607c",
+  "tls": "Existing urllib default verified HTTPS; no TLS override or redirect enabled.",
+  "source_packet_bytes": 200990
+}

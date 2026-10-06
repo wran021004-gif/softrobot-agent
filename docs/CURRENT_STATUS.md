@@ -1,6 +1,17 @@
 # Current development status - Milestones 4 and 5, 2026-10-06
 
-Latest: the [bounded M4 reporting remediation](milestone4_reporting_remediation.md)
+Latest: the [separate M4 scientific-scope reporting remediation](milestone4_reporting_scientific_remediation.md)
+repairs the actual evidence projection and preserves all prior failures. Two new
+model-authored reports cost 2 provider / 4 workflow / 90.123 s, with zero numerical
+or backend work. Geometry and replication attribution are corrected, but the
+final report quotes another execution's terminal metric for `a8382f8a...`:
+0.00812354088231156 instead of 0.008117263030117125 m. The two-attempt ceiling is
+exhausted; the supplement remains open on this precise numeric contradiction.
+Original multibatch behavior passed; factual reporting has not passed after
+recorded post-run remediation. Original STOP, incumbent, failed audits and M5
+budgets/protocol remain sealed and unchanged.
+
+The preceding [bounded M4 reporting remediation](milestone4_reporting_remediation.md)
 used three provider attempts and zero numerical/backend work. Its model correction
 acknowledges the matching replication, but incorrectly includes an original-geometry
 pass in shortened-geometry history. Review rejects closure; the autonomous supplement
