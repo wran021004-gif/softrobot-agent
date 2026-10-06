@@ -10,25 +10,25 @@
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 2,
+      "tool_calls": 3,
       "model_calls": 0,
       "backend_solves": 0,
       "worker_calls": 0,
-      "wall_s": 5.125
+      "wall_s": 8.562999999994645
     },
     "remaining": {
       "backend_solves": 28,
       "model_calls": 24,
-      "tool_calls": 198,
-      "wall_s": 35994.875,
+      "tool_calls": 197,
+      "wall_s": 35991.437000000005,
       "worker_calls": 0
     },
     "occupied": {}
   },
   "request_measurement": {
-    "characters": 114670,
-    "utf8_bytes": 114670,
-    "estimated_input_tokens": 122862,
+    "characters": 115904,
+    "utf8_bytes": 115904,
+    "estimated_input_tokens": 124096,
     "actual_input_tokens": null,
     "method": "Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.",
     "input_budget_tokens": 160000,
@@ -38,17 +38,17 @@
     "passed": true
   },
   "implementation": {
-    "commit": "9fc48541f8c75c83ffd3d86d234aa45aa2f280ce",
+    "commit": "70602142d1276397d81a92528e4d445b0132b597",
     "files": {
-      "examples/research_model_v1.py": "8095507633a950b9843eb0ca2fec7e77bfb05ad73c2da8672993a60e893c84b9",
+      "examples/research_model_v1.py": "fab2ad7e1713cf14df9a0b82aefd2eaf773151a8bbbb5f878a9b091ef673132e",
       "examples/milestone4_autonomous.py": "764462cb45bb72b5f5f506f2dad38a1d46de8a9e67a3c8ece1143070c8057a44",
       "configs/research/native_pilot_v1.json": "b096d68d9f85bd53cd686ce8e697f992e45ae5696533600e15c851c86b6ab375",
       "tools/research_scheduler.py": "57ed31e4360056263ab6d4dd188d287b145363686d91d76ba90ec5affc6bab64",
       "tools/platform_search.py": "32a9e44ae76cae62c2394699631b77434566abb7d4c0c56f62cefcc023d24c9d",
       "tools/live_batch_execution.py": "9c59f58453ea876ca7be00c724737d55b9d4ce30a83a6cffc3b4d5e3bb3fad8e",
-      "tools/context_assembly.py": "19449639a540c763078fa0e3a40c880e8c1b3acfb89b4a48fc0c5177459d3949",
+      "tools/context_assembly.py": "2bb9ce822d0e0985e488bc42c603f2cf38231915545582646037a1e74149aff5",
       "tools/diagnostic_reference_adapter.py": "3970455301f493a50656fae905161fcce645743ad270c879a5e3e0b85a0c72cf",
-      "examples/research_campaign_v2.py": "3b904c5bdfa68106ed252e81235b39d188546216fab599b547448be59f5bfabf",
+      "examples/research_campaign_v2.py": "d36fb589a3ceb39055f2dd0e2134ee88e34212d9897bb648a436d5833a4f575e",
       "configs/research/native_campaign_v2.json": "abcf6ebc59b8870366d607db15345b48b04e65c8e921b8e6e2611bc304033bc3",
       "schemas/platform_handoff.py": "0cf890ec8dcadb94d05e1781cf20d6b0ec5de048a92ba50ebe941b6f722916f7",
       "tools/batch_budget.py": "e9829d980cb4316738359692569196cbaaba8e432700efff07e5890d6b52aad5",
@@ -57,7 +57,8 @@
       "tools/candidate_parameters.py": "2c08bfdd5c15dc752b2ea6e5b85833584ba6d069e0c13fa98c097f04df3a7b61",
       "tools/research_tasks.py": "c728710c80d97c48e53c31422a1f0aece54093e686b0d512c8f7cba0654101c9",
       "tools/fixed_research.py": "27207dc82c489ce3f90669fd252530628fef7a65d3b543c56869ddfd2bc5891f",
-      "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43"
+      "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43",
+      "tools/verification_evidence.py": "c9461fcdd882a1c1e0301fe0babff4fef2db76a7d36a311f3a5c9b4ecab8963f"
     },
     "stable_controller": {
       "extensions/tendon_family/gvs_nmpc.py": "e3d6c33acf8fe6ab326de84634c0a4edf11ffe67ade1b9b72d9527787aae4e5a",
@@ -66,37 +67,11 @@
     }
   },
   "prelaunch_version_boundary": {
-    "kind": "prelaunch_seed18_metadata_compatibility",
-    "old_host": "research_native_development_v2_20261007-research",
-    "new_host": "research_native_development_v2_20261007-research-prelaunch2",
+    "kind": "prelaunch_verification_working_ledger_binding",
+    "prelaunch_version": 3,
+    "old_host": "research_native_development_v2_20261007-research-prelaunch2",
+    "new_host": "research_native_development_v2_20261007-research-prelaunch2-prelaunch3",
     "old_implementation": {
-      "commit": "5e886990bbf1657ce3db9adcfc900a986086f4cb",
-      "files": {
-        "examples/research_model_v1.py": "644e353540a50f5ccf1c2285e665b707fe9f3ba19d442afdba0f7f79f78021f8",
-        "examples/milestone4_autonomous.py": "764462cb45bb72b5f5f506f2dad38a1d46de8a9e67a3c8ece1143070c8057a44",
-        "configs/research/native_pilot_v1.json": "b096d68d9f85bd53cd686ce8e697f992e45ae5696533600e15c851c86b6ab375",
-        "tools/research_scheduler.py": "57ed31e4360056263ab6d4dd188d287b145363686d91d76ba90ec5affc6bab64",
-        "tools/platform_search.py": "32a9e44ae76cae62c2394699631b77434566abb7d4c0c56f62cefcc023d24c9d",
-        "tools/live_batch_execution.py": "9c59f58453ea876ca7be00c724737d55b9d4ce30a83a6cffc3b4d5e3bb3fad8e",
-        "tools/context_assembly.py": "19449639a540c763078fa0e3a40c880e8c1b3acfb89b4a48fc0c5177459d3949",
-        "tools/diagnostic_reference_adapter.py": "3970455301f493a50656fae905161fcce645743ad270c879a5e3e0b85a0c72cf",
-        "examples/research_campaign_v2.py": "d5532bcd127b7ff567101bb726c346e2b3c3ddbc49cb893c3c4b14be0718e3d5",
-        "configs/research/native_campaign_v2.json": "abcf6ebc59b8870366d607db15345b48b04e65c8e921b8e6e2611bc304033bc3",
-        "schemas/platform_handoff.py": "0cf890ec8dcadb94d05e1781cf20d6b0ec5de048a92ba50ebe941b6f722916f7",
-        "tools/batch_budget.py": "b48e19423bd9fa66956526a3764d0c8cb6624079b6c579337c0c7ff33d0406b6",
-        "tools/research_spec.py": "df3e03575a54a4c67c5dc4b6a42625eda6940cfe980d1ca8874dd67a06c9b153",
-        "tools/study_history.py": "4697e64b4643e73ab675688e477299dcfe742002d36be89d49b819f4aeb15b70",
-        "tools/candidate_parameters.py": "2c08bfdd5c15dc752b2ea6e5b85833584ba6d069e0c13fa98c097f04df3a7b61",
-        "tools/research_tasks.py": "c728710c80d97c48e53c31422a1f0aece54093e686b0d512c8f7cba0654101c9",
-        "tools/fixed_research.py": "27207dc82c489ce3f90669fd252530628fef7a65d3b543c56869ddfd2bc5891f"
-      },
-      "stable_controller": {
-        "extensions/tendon_family/gvs_nmpc.py": "e3d6c33acf8fe6ab326de84634c0a4edf11ffe67ade1b9b72d9527787aae4e5a",
-        "extensions/tendon_family/gvs_trajectory.py": "160b47df2f0958929527d4871c61a66e3c69d766b7406144c97cb197ad65292b",
-        "extensions/tendon_family/gvs_profile.py": "f1f851165f9c4bdd15cfed13a18ddaac9be6cf8356ccca59ad55b3b3b6cc9d08"
-      }
-    },
-    "new_implementation": {
       "commit": "9fc48541f8c75c83ffd3d86d234aa45aa2f280ce",
       "files": {
         "examples/research_model_v1.py": "8095507633a950b9843eb0ca2fec7e77bfb05ad73c2da8672993a60e893c84b9",
@@ -124,20 +99,49 @@
         "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43"
       }
     },
+    "new_implementation": {
+      "commit": "70602142d1276397d81a92528e4d445b0132b597",
+      "files": {
+        "examples/research_model_v1.py": "fab2ad7e1713cf14df9a0b82aefd2eaf773151a8bbbb5f878a9b091ef673132e",
+        "examples/milestone4_autonomous.py": "764462cb45bb72b5f5f506f2dad38a1d46de8a9e67a3c8ece1143070c8057a44",
+        "configs/research/native_pilot_v1.json": "b096d68d9f85bd53cd686ce8e697f992e45ae5696533600e15c851c86b6ab375",
+        "tools/research_scheduler.py": "57ed31e4360056263ab6d4dd188d287b145363686d91d76ba90ec5affc6bab64",
+        "tools/platform_search.py": "32a9e44ae76cae62c2394699631b77434566abb7d4c0c56f62cefcc023d24c9d",
+        "tools/live_batch_execution.py": "9c59f58453ea876ca7be00c724737d55b9d4ce30a83a6cffc3b4d5e3bb3fad8e",
+        "tools/context_assembly.py": "2bb9ce822d0e0985e488bc42c603f2cf38231915545582646037a1e74149aff5",
+        "tools/diagnostic_reference_adapter.py": "3970455301f493a50656fae905161fcce645743ad270c879a5e3e0b85a0c72cf",
+        "examples/research_campaign_v2.py": "d36fb589a3ceb39055f2dd0e2134ee88e34212d9897bb648a436d5833a4f575e",
+        "configs/research/native_campaign_v2.json": "abcf6ebc59b8870366d607db15345b48b04e65c8e921b8e6e2611bc304033bc3",
+        "schemas/platform_handoff.py": "0cf890ec8dcadb94d05e1781cf20d6b0ec5de048a92ba50ebe941b6f722916f7",
+        "tools/batch_budget.py": "e9829d980cb4316738359692569196cbaaba8e432700efff07e5890d6b52aad5",
+        "tools/research_spec.py": "df3e03575a54a4c67c5dc4b6a42625eda6940cfe980d1ca8874dd67a06c9b153",
+        "tools/study_history.py": "4697e64b4643e73ab675688e477299dcfe742002d36be89d49b819f4aeb15b70",
+        "tools/candidate_parameters.py": "2c08bfdd5c15dc752b2ea6e5b85833584ba6d069e0c13fa98c097f04df3a7b61",
+        "tools/research_tasks.py": "c728710c80d97c48e53c31422a1f0aece54093e686b0d512c8f7cba0654101c9",
+        "tools/fixed_research.py": "27207dc82c489ce3f90669fd252530628fef7a65d3b543c56869ddfd2bc5891f",
+        "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43",
+        "tools/verification_evidence.py": "c9461fcdd882a1c1e0301fe0babff4fef2db76a7d36a311f3a5c9b4ecab8963f"
+      },
+      "stable_controller": {
+        "extensions/tendon_family/gvs_nmpc.py": "e3d6c33acf8fe6ab326de84634c0a4edf11ffe67ade1b9b72d9527787aae4e5a",
+        "extensions/tendon_family/gvs_trajectory.py": "160b47df2f0958929527d4871c61a66e3c69d766b7406144c97cb197ad65292b",
+        "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43"
+      }
+    },
     "project_grant_unchanged": true,
     "old_session_consumption_deducted": {
       "tool_calls": 1,
       "model_calls": 0,
       "backend_solves": 0,
       "worker_calls": 0,
-      "wall_s": 1.875
+      "wall_s": 3.25
     },
     "backend_replays": 0,
     "provider_requests": 0,
     "physical_or_solver_criteria_changed": false,
-    "failure": "Real candidate_host compilation rejected predeclared seed18 sampling metadata; 15 affected checks now pass."
+    "failure": "Final verification was absent from the recovered experiment ledger and canonical history; saved-receipt tests now check ownership, exact cases, failed acceptance and restore without backend execution."
   },
-  "elapsed_assignment_s": 1735.0219671726227,
+  "elapsed_assignment_s": 3525.189747095108,
   "model_decisions": 0,
   "standalone_numerical_operations": 0,
   "backend_attempts": 0,
@@ -158,5 +162,80 @@
     "read_only_remote_sha": "90ee32a663ed122f89d845d74305935921c93f31"
   },
   "original_answers_and_old_allocations": "unchanged",
-  "next": "Directly authorize existing endpoint/payload and normal specified-branch push, then run the same prepared campaign before elapsed cap; no reset"
+  "next": "Directly authorize existing endpoint/payload and normal specified-branch push, then run the same prepared campaign before elapsed cap; no reset",
+  "prior_prelaunch_versions": [
+    {
+      "kind": "prelaunch_seed18_metadata_compatibility",
+      "old_host": "research_native_development_v2_20261007-research",
+      "new_host": "research_native_development_v2_20261007-research-prelaunch2",
+      "old_implementation": {
+        "commit": "5e886990bbf1657ce3db9adcfc900a986086f4cb",
+        "files": {
+          "examples/research_model_v1.py": "644e353540a50f5ccf1c2285e665b707fe9f3ba19d442afdba0f7f79f78021f8",
+          "examples/milestone4_autonomous.py": "764462cb45bb72b5f5f506f2dad38a1d46de8a9e67a3c8ece1143070c8057a44",
+          "configs/research/native_pilot_v1.json": "b096d68d9f85bd53cd686ce8e697f992e45ae5696533600e15c851c86b6ab375",
+          "tools/research_scheduler.py": "57ed31e4360056263ab6d4dd188d287b145363686d91d76ba90ec5affc6bab64",
+          "tools/platform_search.py": "32a9e44ae76cae62c2394699631b77434566abb7d4c0c56f62cefcc023d24c9d",
+          "tools/live_batch_execution.py": "9c59f58453ea876ca7be00c724737d55b9d4ce30a83a6cffc3b4d5e3bb3fad8e",
+          "tools/context_assembly.py": "19449639a540c763078fa0e3a40c880e8c1b3acfb89b4a48fc0c5177459d3949",
+          "tools/diagnostic_reference_adapter.py": "3970455301f493a50656fae905161fcce645743ad270c879a5e3e0b85a0c72cf",
+          "examples/research_campaign_v2.py": "d5532bcd127b7ff567101bb726c346e2b3c3ddbc49cb893c3c4b14be0718e3d5",
+          "configs/research/native_campaign_v2.json": "abcf6ebc59b8870366d607db15345b48b04e65c8e921b8e6e2611bc304033bc3",
+          "schemas/platform_handoff.py": "0cf890ec8dcadb94d05e1781cf20d6b0ec5de048a92ba50ebe941b6f722916f7",
+          "tools/batch_budget.py": "b48e19423bd9fa66956526a3764d0c8cb6624079b6c579337c0c7ff33d0406b6",
+          "tools/research_spec.py": "df3e03575a54a4c67c5dc4b6a42625eda6940cfe980d1ca8874dd67a06c9b153",
+          "tools/study_history.py": "4697e64b4643e73ab675688e477299dcfe742002d36be89d49b819f4aeb15b70",
+          "tools/candidate_parameters.py": "2c08bfdd5c15dc752b2ea6e5b85833584ba6d069e0c13fa98c097f04df3a7b61",
+          "tools/research_tasks.py": "c728710c80d97c48e53c31422a1f0aece54093e686b0d512c8f7cba0654101c9",
+          "tools/fixed_research.py": "27207dc82c489ce3f90669fd252530628fef7a65d3b543c56869ddfd2bc5891f"
+        },
+        "stable_controller": {
+          "extensions/tendon_family/gvs_nmpc.py": "e3d6c33acf8fe6ab326de84634c0a4edf11ffe67ade1b9b72d9527787aae4e5a",
+          "extensions/tendon_family/gvs_trajectory.py": "160b47df2f0958929527d4871c61a66e3c69d766b7406144c97cb197ad65292b",
+          "extensions/tendon_family/gvs_profile.py": "f1f851165f9c4bdd15cfed13a18ddaac9be6cf8356ccca59ad55b3b3b6cc9d08"
+        }
+      },
+      "new_implementation": {
+        "commit": "9fc48541f8c75c83ffd3d86d234aa45aa2f280ce",
+        "files": {
+          "examples/research_model_v1.py": "8095507633a950b9843eb0ca2fec7e77bfb05ad73c2da8672993a60e893c84b9",
+          "examples/milestone4_autonomous.py": "764462cb45bb72b5f5f506f2dad38a1d46de8a9e67a3c8ece1143070c8057a44",
+          "configs/research/native_pilot_v1.json": "b096d68d9f85bd53cd686ce8e697f992e45ae5696533600e15c851c86b6ab375",
+          "tools/research_scheduler.py": "57ed31e4360056263ab6d4dd188d287b145363686d91d76ba90ec5affc6bab64",
+          "tools/platform_search.py": "32a9e44ae76cae62c2394699631b77434566abb7d4c0c56f62cefcc023d24c9d",
+          "tools/live_batch_execution.py": "9c59f58453ea876ca7be00c724737d55b9d4ce30a83a6cffc3b4d5e3bb3fad8e",
+          "tools/context_assembly.py": "19449639a540c763078fa0e3a40c880e8c1b3acfb89b4a48fc0c5177459d3949",
+          "tools/diagnostic_reference_adapter.py": "3970455301f493a50656fae905161fcce645743ad270c879a5e3e0b85a0c72cf",
+          "examples/research_campaign_v2.py": "3b904c5bdfa68106ed252e81235b39d188546216fab599b547448be59f5bfabf",
+          "configs/research/native_campaign_v2.json": "abcf6ebc59b8870366d607db15345b48b04e65c8e921b8e6e2611bc304033bc3",
+          "schemas/platform_handoff.py": "0cf890ec8dcadb94d05e1781cf20d6b0ec5de048a92ba50ebe941b6f722916f7",
+          "tools/batch_budget.py": "e9829d980cb4316738359692569196cbaaba8e432700efff07e5890d6b52aad5",
+          "tools/research_spec.py": "df3e03575a54a4c67c5dc4b6a42625eda6940cfe980d1ca8874dd67a06c9b153",
+          "tools/study_history.py": "4697e64b4643e73ab675688e477299dcfe742002d36be89d49b819f4aeb15b70",
+          "tools/candidate_parameters.py": "2c08bfdd5c15dc752b2ea6e5b85833584ba6d069e0c13fa98c097f04df3a7b61",
+          "tools/research_tasks.py": "c728710c80d97c48e53c31422a1f0aece54093e686b0d512c8f7cba0654101c9",
+          "tools/fixed_research.py": "27207dc82c489ce3f90669fd252530628fef7a65d3b543c56869ddfd2bc5891f",
+          "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43"
+        },
+        "stable_controller": {
+          "extensions/tendon_family/gvs_nmpc.py": "e3d6c33acf8fe6ab326de84634c0a4edf11ffe67ade1b9b72d9527787aae4e5a",
+          "extensions/tendon_family/gvs_trajectory.py": "160b47df2f0958929527d4871c61a66e3c69d766b7406144c97cb197ad65292b",
+          "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43"
+        }
+      },
+      "project_grant_unchanged": true,
+      "old_session_consumption_deducted": {
+        "tool_calls": 1,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 1.875
+      },
+      "backend_replays": 0,
+      "provider_requests": 0,
+      "physical_or_solver_criteria_changed": false,
+      "failure": "Real candidate_host compilation rejected predeclared seed18 sampling metadata; 15 affected checks now pass."
+    }
+  ],
+  "host_compatible": true
 }
