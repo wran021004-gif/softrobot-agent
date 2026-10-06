@@ -44,6 +44,50 @@ def expand(data, space, changes):
         source='Frozen experiment semantic_source; original per-section material parameters')
 
 
+def expand_segment(data, space, changes):
+    """v2 disjoint groups: update only the quantity owned by each decision.
+
+    Original v1 expansion stays available for frozen historical workflows.
+    Scales are absolute against semantic_source, never compounded on a candidate.
+    """
+    from .candidate import check_value
+    if not space.semantic_decisions:
+        return
+    if space.semantic_source is None:
+        raise ValueError('SEMANTIC_FROZEN_SOURCE_REQUIRED')
+    source = space.semantic_source.model_dump(mode='json')
+    before = {c['id']: c for c in source['components']}
+    after = {c['id']: c for c in data['components']}
+    previous = data.get('metadata', {}).get('design_decisions', {}).get('selections', {})
+    selections, owners, groups = {}, set(), {}
+    for path, decision in space.semantic_decisions.items():
+        value = changes.get(path, previous.get(path, decision.baseline_value))
+        check_value(path, value, space.parameters[path], {})
+        selections[path] = value
+        for component in decision.components:
+            owner = (component, decision.operation)
+            if owner in owners:
+                raise ValueError('OVERLAPPING_SEMANTIC_DECISION: '+component+'/'+decision.operation)
+            owners.add(owner)
+            original, target = before[component], after[component]
+            if decision.operation == 'section_scale':
+                if len(target['sections']) != len(original['sections']):
+                    raise ValueError('SEMANTIC_SECTION_STATIONS_CHANGED')
+                for old, station in zip(original['sections'], target['sections']):
+                    if old['section']['kind'] not in ('ellipse', 'rectangle') or station['section']['kind'] != old['section']['kind']:
+                        raise ValueError('SEMANTIC_SECTION_KIND_UNSUPPORTED')
+                    station['section']['parameters'] = {k: v*value for k,v in old['section']['parameters'].items()}
+            else:
+                if target['physics']['mode'] != 'material' or original['physics']['mode'] != 'material':
+                    raise ValueError('MATERIAL_SCENARIO_REQUIRES_MATERIAL_INPUT')
+                # Preserve density, viscosity, and every unowned physical input.
+                target['physics']['young_pa'] = original['physics']['young_pa']*MATERIAL_FACTORS[value]
+                groups[component] = deepcopy(target['physics'])
+    data.setdefault('metadata', {})['design_decisions'] = dict(selections=selections,
+        source_identity=digest(source), material_groups=groups, assumptions=ASSUMPTIONS,
+        source='Frozen experiment semantic_source; disjoint per-segment expansion v2')
+
+
 def physical_effects(baseline, effective):
     """Actual physical rows, independently computed from effective design bytes."""
     original = {c['id']: c for c in baseline['components']}

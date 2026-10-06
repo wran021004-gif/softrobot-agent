@@ -3,7 +3,7 @@
 Working directories are not transactions. External side effects can finish without
 a commit; such reservations remain unknown and are never automatically replayed.
 """
-from contextlib import contextmanager
+from contextlib import contextmanager, closing
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -45,6 +45,34 @@ class Store:
             db.execute('PRAGMA synchronous=FULL')
         db.row_factory = sqlite3.Row
         return db
+
+    def create_context_archive(self):
+        """Artifact-only offline checkpoint Store; never an execution grant.
+
+        The ordinary host requires project configuration and sessions, which this
+        archive deliberately does not contain. Existing project Stores are not
+        converted or modified by this operation.
+        """
+        if self.db.exists():
+            with closing(self.connect(True)) as db:
+                row = db.execute("SELECT value FROM meta WHERE key='context_archive'").fetchone()
+                if row is None or json.loads(row[0]) != str(self.root):
+                    raise ValueError('CONTEXT_ARCHIVE_STORE_REQUIRED')
+            return
+        self.root.mkdir(parents=True, exist_ok=True)
+        with closing(self.connect()) as db:
+            with db:
+                db.executescript('CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);'
+                    'CREATE TABLE artifacts (id TEXT PRIMARY KEY, media TEXT NOT NULL, body BLOB NOT NULL);')
+                db.execute('INSERT INTO meta VALUES (?,?)', ('context_archive', encode(str(self.root))))
+
+    def put_context_checkpoint(self, value):
+        """Use the existing immutable blob contract without creating a session."""
+        self.create_context_archive()
+        with closing(self.connect()) as db:
+            with db:
+                db.execute('BEGIN IMMEDIATE')
+                return plain(self.put(db, value))
 
     @contextmanager
     def transaction(self):

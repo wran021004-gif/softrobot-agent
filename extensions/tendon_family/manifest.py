@@ -679,3 +679,17 @@ EXTENSIONS.append(Extension('analysis.compare_candidates','tool','1.0.0',candida
 # Focused development and registered research handoff; no backend capability.
 from .milestone5_preparation import DEFINITION as M5_PREPARATION, RESEARCH as M5_RESEARCH
 EXTENSIONS.extend((M5_PREPARATION,M5_RESEARCH))
+
+# Future first-study pool: historical candidate.family@1.0 behavior is unchanged.
+EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='candidate.family' and d.version=='1.0.0'),
+    version='1.1.0', binding='extensions.tendon_family.parameter_capabilities:apply_study',
+    sources=(*SOURCES,'extensions/tendon_family/parameter_capabilities.py','tools/parameter_catalog.py',
+        'tools/candidate_parameters.py','tools/parameter_impacts.py'),
+    capabilities=dict(category='robot_design',role='adapter',editable=[],
+        authorize_changes='extensions.tendon_family.parameter_capabilities:authorize_study',
+        parameter_declarations='extensions.tendon_family.parameter_capabilities:declarations',
+        parameter_capability_version='1.0.0',
+        parameter_support=dict(controller=['controller.gvs_nmpc@7.0.0'],
+            backend=['backend.family_mujoco@1.1.0'],model=['model.serial_bending_cells@1.0.0'],
+            task_families=['task.reach']),
+        search='Shared bounded physical/control pool; caller chooses any subset.')))

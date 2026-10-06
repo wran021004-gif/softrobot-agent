@@ -384,13 +384,18 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
     if plan.fixed_controller!='controller.gvs_nmpc@7.0.0' or plan.method not in ('search.family_coordinate@1.0.0','search.family_explicit@1.0.0'):
         raise ValueError('BATCH_FIXED_IMPLEMENTATION_REQUIRED')
     from tools.candidate_parameters import STRUCTURAL_PATHS,comparison_scope,scientific_fixed_scope
-    if not plan.variables or set(plan.variables)-set((*REACH_WEIGHT_PATHS,*STRUCTURAL_PATHS)):raise ValueError('BATCH_UNSUPPORTED_PARAMETER_PATHS')
+    source_configuration=record['bindings'].get('execution_source_configuration',record['bindings']['subject']['configuration'])
+    effective=host.store.artifact(source_configuration)['effective']
+    builder=effective['policy']['candidate_builder']
+    allowed_paths=(*REACH_WEIGHT_PATHS,*STRUCTURAL_PATHS)
+    if builder.get('extension_id')=='candidate.family' and builder.get('version')=='1.1.0':
+        from tools.parameter_catalog import effective_catalog
+        allowed_paths=effective_catalog(effective)['usable_pool']
+    if not plan.variables or set(plan.variables)-set(allowed_paths):raise ValueError('BATCH_UNSUPPORTED_PARAMETER_PATHS')
     state=host.store.session(host.run_id)['state'];existing=state.get('search_batch')
     if existing:
         if existing['plan']!=plan_ref:raise ValueError('BATCH_PLAN_IMMUTABLE')
         return existing
-    source_configuration=record['bindings'].get('execution_source_configuration',record['bindings']['subject']['configuration'])
-    effective=host.store.artifact(source_configuration)['effective']
     fixed=fixed_configuration(effective,plan.variables)
     if digest(fixed)!=record['bindings']['fixed_configuration_identity']:
         raise ValueError('BATCH_SOURCE_CONFIGURATION_MISMATCH')

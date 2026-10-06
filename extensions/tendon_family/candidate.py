@@ -188,7 +188,7 @@ def validate_final(data,discretization,space,changes,task_bounds):
         check_value(path,read_parameter(target,local_path),spec,normalized_task)
 
 
-def build(value, *, task_bounds=None):
+def build(value, *, task_bounds=None, semantic_expander=None):
     req = BuildRequest.model_validate(value)
     authorize(None,req.space,req.changes)
     if any(path.startswith('model/') for path in req.changes):
@@ -221,7 +221,7 @@ def build(value, *, task_bounds=None):
             else: obj[key] = value
             summary.append(dict(operation='set',path=path,before=old,after=value))
         from .design_decisions import expand
-        expand(data, req.space, req.changes)
+        (semantic_expander or expand)(data, req.space, req.changes)
         validate_final(data,discretization,req.space,req.changes,task_bounds or {})
         candidate = Design.model_validate(data)
         model = Discretization.model_validate(discretization)
@@ -235,11 +235,12 @@ def build(value, *, task_bounds=None):
         return BuildResult(status='physically_invalid',summary=summary,reason=str(exc))
 
 
-def apply(inp, parameters, changes):
+def apply(inp, parameters, changes, *, semantic_expander=None):
     explicit = inp.policy.discretization.data if inp.policy.discretization is not None else None
     design_changes={k:v for k,v in changes.items() if not k.startswith(('control/','model/'))}
     design_bounds={k:v for k,v in inp.policy.editable.items() if not k.startswith(('control/','model/'))}
-    result = build(dict(baseline=inp.robot.structure.data,space=parameters,discretization=explicit,changes=design_changes),task_bounds=design_bounds)
+    result = build(dict(baseline=inp.robot.structure.data,space=parameters,discretization=explicit,changes=design_changes),task_bounds=design_bounds,
+        semantic_expander=semantic_expander)
     if result.status != 'valid': raise ValueError(result.status.upper()+': '+str(result.reason))
     from .contracts import Control, GVSLQRControl
     from .contracts import GVSTrajectoryParameters

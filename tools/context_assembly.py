@@ -433,3 +433,198 @@ def research_authority(packet, *, replication_pairs=(), new_execution_ids=()):
             reason=packet['current_feedback']['content'].get('stop_reason')),
         unresolved=['Dominant physical cause and broad repeatability remain unresolved.'],
         change_evidence=packet.get('case', {}).get('stopping_criteria', []))
+
+
+WORKING_STATE_VERSION = 'research_working_state@1.0.0'
+EXPERIMENT_STATUSES = {'pending', 'failed', 'incomplete', 'completed'}
+
+
+def _claim_revision(claim, sequence, archive):
+    """Claims are interpretations; source validity does not make them facts."""
+    archive.register_references(claim)
+    for key in ('supporting_evidence', 'counterexamples'):
+        for selector in claim.get(key, []):
+            if isinstance(selector, dict) and 'reference' in selector:
+                page = archive.retrieve(selector['reference'], pointer=selector.get('pointer', ''),
+                    limit=100, byte_limit=8192)
+                if 'value' in selector and page['page']['content'] != selector['value']:
+                    raise ValueError('CONTEXT_CLAIM_EVIDENCE_VALUE_CHANGED')
+    return dict(sequence=sequence, claim=deepcopy(claim),
+        evidence_source=archive.snapshot(claim), causal_truth_verified=False)
+
+
+def create_working_state(packet, *, authority, archive, claims=(), experiments=(),
+                         candidate_configuration=None, candidate_artifacts=()):
+    """Derived state over the shared assembler and caller's authorized sources.
+
+    Metric descriptions and scientific interpretations are supplied by the task
+    adapter. This common layer retains evidence, identity, lineage and authority.
+    It neither discovers historical Stores nor allocates research resources.
+    """
+    assembly = assemble_context('research_decision', packet, archive=archive, authority=authority)
+    state = dict(version=WORKING_STATE_VERSION, revision=0, packet=deepcopy(packet),
+        authority=deepcopy(authority), current_facts=assembly['canonical_facts'],
+        evidence_history=[dict(revision=0, source=assembly['audit']['source_reference'],
+            canonical_facts=assembly['audit']['canonical_fact_reference'])],
+        claims={}, experiments={}, candidate_configuration=deepcopy(candidate_configuration),
+        candidate_artifacts=deepcopy(list(candidate_artifacts)),
+        capabilities=deepcopy(packet.get('capabilities', {})),
+        experiment_permissions=deepcopy(authority.get('experiment_permissions', packet.get('scope'))),
+        budget=deepcopy(authority.get('remaining_budget')),
+        budget_accounting=deepcopy(authority.get('budget_accounting')), archive_scope=deepcopy(archive.scope))
+    for claim in claims:
+        state['claims'].setdefault(claim['claim_id'], []).append(_claim_revision(claim, 0, archive))
+    return update_working_state(state, archive=archive, experiment_updates=experiments,
+        _initial=True)
+
+
+def update_working_state(state, *, archive, evidence_packet=None, authority=None,
+                         claim_revisions=(), experiment_updates=(),
+                         candidate_configuration=None, _initial=False):
+    """Append traceable claim/experiment revisions; never reset a sealed scope."""
+    if state['version'] != WORKING_STATE_VERSION or state['archive_scope'] != archive.scope:
+        raise ValueError('CONTEXT_WORKING_STATE_SCOPE')
+    result = deepcopy(state)
+    revision = state['revision'] + (0 if _initial else 1)
+    result['revision'] = revision
+    if authority is not None:
+        old_stop = state['authority'].get('stop', {})
+        new_stop = authority.get('stop', {})
+        old_status = str(old_stop.get('status', '')).lower()
+        if (old_stop.get('sealed_cases') or 'stop' in old_status or
+                old_status in {'sealed', 'closed', 'finished'}) and new_stop != old_stop:
+            raise ValueError('CONTEXT_SEALED_SCOPE_CANNOT_REOPEN')
+        # A new observation may consume resources; it cannot mint restored budget.
+        old_budget = state.get('budget') or {}
+        new_budget = authority.get('remaining_budget') or {}
+        for key, value in old_budget.items():
+            if isinstance(value, (int, float)) and new_budget.get(key, value) > value:
+                raise ValueError('CONTEXT_BUDGET_CANNOT_RESET')
+        result['authority'] = deepcopy(authority)
+        result['budget'] = deepcopy(new_budget)
+        result['budget_accounting'] = deepcopy(authority.get('budget_accounting', state.get('budget_accounting')))
+        result['experiment_permissions'] = deepcopy(authority.get('experiment_permissions', state.get('experiment_permissions')))
+    if evidence_packet is not None:
+        assembly = assemble_context('research_decision', evidence_packet,
+            archive=archive, authority=result['authority'])
+        result['packet'] = deepcopy(evidence_packet)
+        result['current_facts'] = assembly['canonical_facts']
+        result['capabilities'] = deepcopy(evidence_packet.get('capabilities', {}))
+        result['evidence_history'].append(dict(revision=revision,
+            source=assembly['audit']['source_reference'],
+            canonical_facts=assembly['audit']['canonical_fact_reference']))
+    for claim in claim_revisions:
+        result['claims'].setdefault(claim['claim_id'], []).append(_claim_revision(claim, revision, archive))
+    for experiment in experiment_updates:
+        if experiment['status'] not in EXPERIMENT_STATUSES:
+            raise ValueError('CONTEXT_EXPERIMENT_STATUS')
+        archive.register_references(experiment)
+        key = experiment['experiment_id']
+        previous = result['experiments'].get(key)
+        if previous and previous[-1]['entry']['status'] != 'pending':
+            if previous[-1]['entry'] != experiment:
+                raise ValueError('CONTEXT_COMPLETED_WORK_IMMUTABLE')
+            continue
+        repeat = experiment.get('replication_of')
+        if repeat and repeat == key:
+            raise ValueError('CONTEXT_REPLICATION_REQUIRES_NEW_ID')
+        if repeat and (repeat not in result['experiments'] or
+                       result['experiments'][repeat][-1]['entry']['status'] != 'completed'):
+            raise ValueError('CONTEXT_REPLICATION_SOURCE_NOT_COMPLETED')
+        if repeat and experiment.get('cache_hit'):
+            raise ValueError('CONTEXT_CACHE_IS_NOT_REPETITION')
+        result['experiments'].setdefault(key, []).append(dict(revision=revision, entry=deepcopy(experiment)))
+    if candidate_configuration is not None and candidate_configuration != state.get('candidate_configuration'):
+        result['candidate_configuration'] = deepcopy(candidate_configuration)
+        for artifact in result['candidate_artifacts']:
+            # Dependencies are the adapter/catalog declaration, not guessed from metric names.
+            dependencies = artifact.get('dependencies', {})
+            if not dependencies or any(candidate_configuration.get(k) != v for k, v in dependencies.items()):
+                artifact.update(reusable=False, invalidated_at_revision=revision,
+                    invalidation_reason='Declared candidate configuration dependency changed')
+    return result
+
+
+def assert_experiment_eligible(state, experiment):
+    """Recovery must not replay completed or uncertain work, or resume STOP."""
+    stop = state['authority'].get('stop', {})
+    status = str(stop.get('status', '')).lower()
+    if stop.get('sealed_cases') or 'stop' in status or status in {'sealed', 'closed', 'finished'}:
+        raise ValueError('CONTEXT_SEALED_SCOPE_CANNOT_RESUME')
+    key = experiment['experiment_id']
+    if key in state['experiments']:
+        current = state['experiments'][key][-1]['entry']['status']
+        raise ValueError('CONTEXT_WORK_ALREADY_RECORDED: ' + current)
+    action = experiment.get('action')
+    if action and not state['authority'].get('legal_actions', {}).get(action, False):
+        raise ValueError('CONTEXT_ACTION_NOT_PERMITTED')
+    repeat = experiment.get('replication_of')
+    if repeat and (repeat not in state['experiments'] or
+                   state['experiments'][repeat][-1]['entry']['status'] != 'completed'):
+        raise ValueError('CONTEXT_REPLICATION_SOURCE_NOT_COMPLETED')
+    if repeat and experiment.get('cache_hit'):
+        raise ValueError('CONTEXT_CACHE_IS_NOT_REPETITION')
+    for key, cost in experiment.get('cost', {}).items():
+        budget = state.get('budget') or {}
+        if cost > budget.get(key, 0):
+            raise ValueError('CONTEXT_BUDGET_EXHAUSTED: ' + key)
+    return True
+
+
+def assemble_working_context(purpose, state, *, archive):
+    """Decisions and reporting consume identical bound facts and role bindings."""
+    packet = state['packet']
+    if purpose == 'final_report' and 'history' in packet:
+        _, packet = _research(packet, state['authority'], archive)
+    result = assemble_context(purpose, packet, archive=archive, authority=state['authority'])
+    if result['canonical_facts'] != state['current_facts']:
+        raise ValueError('CONTEXT_WORKING_FACTS_CHANGED')
+    state_reference = archive.snapshot(state)
+    if purpose == 'final_report':
+        result['view']['working_context']['chronology'] = dict(reference=state_reference,
+            pointer='/authority/chronology', authority='Original reservation/completion events; current roles retained above')
+    experiment_view = {key:[dict(revision=row['revision'], entry={k:v for k,v in row['entry'].items()
+        if k not in {'observed_metrics', 'candidate'}}, original_entry=dict(reference=state_reference,
+            pointer='/experiments/' + pointer_part(key) + '/' + str(i) + '/entry'))
+        for i,row in enumerate(rows)] for key,rows in state['experiments'].items()}
+    result['view']['working_context']['recovery'] = dict(version=state['version'],
+        revision=state['revision'], claim_history=state['claims'],
+        experiment_ledger=experiment_view, candidate_artifacts=state['candidate_artifacts'],
+        evidence_history=state['evidence_history'],
+        budget_accounting=state['budget_accounting'],
+        experiment_permissions=dict(reference=state_reference, pointer='/experiment_permissions'),
+        authority_scope='Derived read-only state; does not authorize execution or override host grants')
+    result['audit']['source_manifest'] = archive.manifest()
+    return result
+
+
+def assemble_working_request(payload, config, purpose, state, *, archive):
+    """Prepare, measure and archive the recovered next input, without sending."""
+    result = assemble_working_context(purpose, state, archive=archive)
+    wire = deepcopy(payload)
+    wire['messages'][1]['content'] = encode(result['view'])
+    measurement = measure_input(wire, config, purpose)
+    result['audit'].update(measurement=measurement, working_revision=state['revision'],
+        assembled_input_reference=archive.snapshot(wire), source_manifest=archive.manifest())
+    atomic_json(archive.directory / 'audits' / (digest(result['audit']) + '.json'), result['audit'])
+    if not measurement['passed']:
+        raise ValueError('CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET')
+    return wire, result['audit']
+
+
+def persist_working_state(state, *, store, archive):
+    """Store immutable full state alongside the existing source allowlist."""
+    _no_secrets(state)
+    archive.register_references(state)
+    value = dict(version=WORKING_STATE_VERSION, state=state, source_manifest=archive.manifest())
+    return store.put_context_checkpoint(value)
+
+
+def restore_working_state(reference, *, store, scope, stores=()):
+    """Rehydrate from durable Store bytes; caller supplies the same read scope."""
+    value = store.artifact(reference)
+    if value['version'] != WORKING_STATE_VERSION or value['state']['archive_scope'] != scope:
+        raise ValueError('CONTEXT_WORKING_STATE_SCOPE')
+    archive = EvidenceArchive.from_manifest(ROOT / value['source_manifest'], scope=scope, stores=stores)
+    archive.register_references(value['state'])
+    return deepcopy(value['state']), archive
