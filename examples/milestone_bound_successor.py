@@ -106,22 +106,28 @@ def prepare4():
     paths=list((ROOT/'evidence/milestone4_reporting_scientific_20261006').rglob('*'))
     atomic_json(M4/'protected_hashes.json',protected_hashes() | {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in paths if p.is_file()})
 
-def provider4(index,prepare_only=False):
-    from tools.runtime_identity import require_softagent_runtime
-    require_softagent_runtime()
-    if index not in (0,1,2):raise ValueError('THREE_ATTEMPT_BOUND')
+def reporting_authority4(packet):
+    from tools.study_history import execution_chronology
+    state=read(ROOT/'runs/milestone4_autonomous_20261006/scheduler_state.json')
+    freeze=read(ROOT/'evidence/milestone4_autonomous_20261006/freeze.json')
+    chronology=execution_chronology(Store(ROOT/'runs/milestone4_autonomous_20261006'),state['records'])
+    issues=[dict(source_path=(M4/f'review{i}.json').relative_to(ROOT).as_posix(),status='Historical rejected report; preserved',
+        contradictions=read(M4/f'review{i}.json')['specific_contradictions']) for i in (0,1) if (M4/f'review{i}.json').exists()]
+    return dict(question='Interpret the completed M4 batches, tradeoffs, explicit repeat and qualified reporting repair.',
+        acceptance=freeze['common_scientific_input'].get('acceptance',freeze['profile']),chronology=chronology,
+        roles=dict(selected_incumbent=packet['selected'],latest_attempt=chronology['latest_execution'],
+            latest_completed_evaluation=chronology['latest_completed_evaluation'],source_baseline=state['baseline']['candidate']),
+        stop=packet['stop'],legal_actions={'report_only':'No scientific execution or budget reopening'},
+        remaining_budget=read(M4/'accounting.json')['remaining'],
+        unresolved=packet['limitations'],rejected_claims=packet['failures'],known_review_issues=issues)
+
+
+def build_reporting_request4(config,packet,instructions,*,archive=None):
+    """Actual request builder, also inspectable offline after the scope seals."""
     from examples.milestone45_checkpoint import reporting_payload
-    from examples.gvs_nmpc_route_experiment import load_credential
-    from tools.model_transports.deepseek import request_completion
-    config=read(ROOT/'evidence/milestone4_autonomous_20261006/freeze.json')['provider_configuration']
     from tools.bound_reporting import model_packet
-    packet=model_packet(read(M4/'ledger.json'))
-    instructions='''Author a standalone interpretation of the stopped autonomous supplement under evidence_bound_reporting@3.0.0. Read ALL compact execution facts including original geometry counterexamples. Every quantitative assertion must be a structured claim referencing a fact_ref with its exact execution_id and metric; use comparison_ref and less/greater/equal for comparisons, recorded otherwise. Renderer prints the value you reference, never fixes wrong selections or references. Do not type ANY digit in interpretation/recommendation/unresolved prose; put execution IDs only in structured fields. Select facts worth discussing freely. Include the original geometry matching-weight pass, the distinct shortened historical passes, new passing-point tradeoffs versus retained incumbent, replication metrics, timing. Provide geometry_groups for all executions. Replications must match actual source/repeat IDs; only aggregate metric repeat, not broad variability or trajectories/timing. Retain selected versus latest. Stop was exhausted backend capacity for another complete search, not reporting cost. Distinguish four historical failure causes. Describe evidence projection defects as possible contributors, not proven internal mechanisms. Preserve all scientific STOPs and do not request scientific work. Explain that closure needs this versioned post-run repair and does not retroactively correct earlier text. Submit report_interpretation once.'''
-    if index:
-        prior=read(M4/f'review{index-1}.json')
-        if prior['passed']:raise ValueError('NO_CORRECTION_AFTER_PASS')
-        packet=dict(**packet,correction=prior,previous=read(M4/f'interpretation{index-1}.json'))
-    payload=reporting_payload(config,packet,instructions)
+    from tools.context_assembly import EvidenceArchive,assemble_request
+    payload=reporting_payload(config,model_packet(packet),instructions,check_context=False)
     string=dict(type='string')
     claim=dict(type='object',properties=dict(execution_id=string,metric=string,fact_ref=string,comparison_ref=string,
         relation=dict(type='string',enum=['recorded','less','greater','equal'])),required=['execution_id','metric','fact_ref','relation'],additionalProperties=False)
@@ -131,7 +137,28 @@ def provider4(index,prepare_only=False):
         selected_execution_id=string,latest_execution_id=string,claims=dict(type='array',items=claim),
         geometry_groups=dict(type='array',items=group),replications=dict(type='array',items=rep))
     payload['tools'][0]['function']['parameters']=dict(type='object',properties=props,required=list(props),additionalProperties=False)
-    atomic_json(M4/f'interpretation{index}_request.json',dict(provider_configuration=config,payload=payload))
+    archive=archive or EvidenceArchive(M4/'context_assembly',scope={'role':'M4 final reporting','scientific_execution':False},
+        stores=(Store(ROOT/'runs/milestone4_autonomous_20261006'),Store(M4)))
+    return assemble_request(payload,config,'final_report',packet,archive=archive,authority=reporting_authority4(packet))
+
+
+def provider4(index,prepare_only=False):
+    from tools.runtime_identity import require_softagent_runtime
+    require_softagent_runtime()
+    if (M4/'checkpoint_seal.json').exists():raise ValueError('SUCCESSOR_SEALED')
+    if index not in (0,1,2):raise ValueError('THREE_ATTEMPT_BOUND')
+    if (M4/f'interpretation{index}_request.json').exists():raise ValueError('NO_REPLAY')
+    from examples.gvs_nmpc_route_experiment import load_credential
+    from tools.model_transports.deepseek import request_completion
+    config=read(ROOT/'evidence/milestone4_autonomous_20261006/freeze.json')['provider_configuration']
+    packet=read(M4/'ledger.json')
+    instructions='''Author a standalone interpretation of the stopped autonomous supplement under evidence_bound_reporting@3.0.0. Read ALL compact execution facts including original geometry counterexamples. Every quantitative assertion must be a structured claim referencing a fact_ref with its exact execution_id and metric; use comparison_ref and less/greater/equal for comparisons, recorded otherwise. Renderer prints the value you reference, never fixes wrong selections or references. Do not type ANY digit in interpretation/recommendation/unresolved prose; put execution IDs only in structured fields. Select facts worth discussing freely. Include the original geometry matching-weight pass, the distinct shortened historical passes, new passing-point tradeoffs versus retained incumbent, replication metrics, timing. Provide geometry_groups for all executions. Replications must match actual source/repeat IDs; only aggregate metric repeat, not broad variability or trajectories/timing. Retain selected versus latest. Stop was exhausted backend capacity for another complete search, not reporting cost. Distinguish four historical failure causes. Describe evidence projection defects as possible contributors, not proven internal mechanisms. Preserve all scientific STOPs and do not request scientific work. Explain that closure needs this versioned post-run repair and does not retroactively correct earlier text. Submit report_interpretation once.'''
+    if index:
+        prior=read(M4/f'review{index-1}.json')
+        if prior['passed']:raise ValueError('NO_CORRECTION_AFTER_PASS')
+        packet=dict(**packet,correction=prior,previous=read(M4/f'interpretation{index-1}.json'))
+    payload,audit=build_reporting_request4(config,packet,instructions)
+    atomic_json(M4/f'interpretation{index}_request.json',dict(provider_configuration=config,payload=payload,context_assembly_audit=audit))
     if prepare_only:return
     def call(ctx):
         load_credential(Path(os.environ['SOFTAGENT_CONFIGURATION_PATH']))

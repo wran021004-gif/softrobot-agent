@@ -54,8 +54,6 @@ def revision():
 def compact_history(w):
     history=study_history(w.store,w.records,retained_baseline=w.baseline['candidate'],latest_tested=w.latest,
         selection=w.selected,selected_source=getattr(w,'batch_source',None))
-    for row in history['rows']:
-        row.pop('physical_structure',None)
     return history
 
 
@@ -270,6 +268,7 @@ def configure(w):
         chronology=chronology,current_batch_source=getattr(w,'batch_source',None),
         current_feedback=dict(reference=latest_ref,content=w.store.artifact(latest_ref),aliases=current),
         predecessor_decision=w.previous_decision,capabilities=cap,scope=w.freeze['profile'],
+        acceptance=w.freeze['common_scientific_input']['acceptance'],
         engineering_coverage=dict(completed_search_batches=sum(r.get('case_id','primary')==getattr(w,'current_case','primary') and r.get('kind')=='search' and r.get('complete') for r in w.rounds),
             target='Two separate real search batches, later plan explicitly referencing actual first-batch evidence. This does not override voluntary stopping.'),
         corrections=dict(total=state.get('protocol_corrections_used',0),consecutive=state.get('protocol_corrections_consecutive',0)))
@@ -279,9 +278,23 @@ def configure(w):
     packet['performed_batch_evidence']=[dict(reference=r['feedback_result'],aliases={a:dict(pointer=catalog[h]['selector']['pointer'],value=catalog[h]['value'])
         for a,h in aliases.items() if catalog[h]['selector']['reference']==r['feedback_result']})
         for r in w.rounds if r.get('kind')=='search' and r.get('feedback_result') and r.get('case_id','primary')==getattr(w,'current_case','primary')]
+    from tools.context_assembly import research_authority
+    new_ids=[];pairs=[]
+    for r in w.rounds:
+        if r.get('kind')!='search' or not r.get('complete'):continue
+        for candidate in w.store.artifact(r['result'])['candidates']:
+            if candidate.get('reused') or not candidate.get('execution_id'):continue
+            new_ids.append(candidate['execution_id'])
+            if candidate.get('replication_of'):
+                pairs.append((candidate['replication_of']['execution_id'],candidate['execution_id']))
+    authority=research_authority(packet,replication_pairs=pairs,new_execution_ids=new_ids)
+    if w.rounds:
+        previous=w.rounds[-1].get('decision',{})
+        authority.update(hypotheses=previous.get('model_interpretations',[]),
+            unresolved=previous.get('unresolved_uncertainties',authority['unresolved']))
     configure_role(w.host,'design',w.freeze.get('research_instructions',INSTRUCTIONS),phase='research',delivery_tool='research.decide',phase_budget={},
         fact_separation=w.freeze.get('fact_separation',False),
-        autonomous_scheduling=True,research_packet=packet,research_records=w.records,result_feedback=w.feedback,
+        autonomous_scheduling=True,research_packet=packet,context_authority=authority,research_records=w.records,result_feedback=w.feedback,
         predecessor_decision=w.previous_decision,latest_tested=w.latest,require_source_binding=True,
         max_batch_backends=2,source_report=w.freeze['common_scientific_input']['source_report'],
         improvement_feedback_content=dict(baseline_facts=w.baseline,execution=None),
@@ -293,7 +306,8 @@ def decision(w):
     packet=configure(w);adapter=EvidenceDrivenAdapter();payload=payload_for(w.host,adapter)
     native=[adapter.advertised[t['function']['name']] for t in payload['tools']]
     if native!=['research.decide']:raise ValueError('ACTUAL_NATIVE_SCHEDULING_SCHEMA_NOT_EXPOSED: '+str(native))
-    index=len(w.rounds);atomic_json(w.directory/f'round{index}_request.json',dict(packet=packet,payload=payload))
+    index=len(w.rounds);atomic_json(w.directory/f'round{index}_request.json',dict(packet=packet,payload=payload,
+        context_assembly_audit=adapter.context_assembly_audit))
     before=w.store.session(w.host.run_id)['state'].get('handoffs',{}).get('research_decision')
     run_loop(w.host,adapter)
     state=w.store.session(w.host.run_id)['state'];ref=state.get('handoffs',{}).get('research_decision')

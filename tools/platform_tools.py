@@ -172,6 +172,37 @@ def retain_evidence(pages, page, attribution=None):
     return pages
 
 
+def bounded_evidence_page(value, args):
+    """Pure original-document paging shared by host reads and context archives."""
+    if args.pointer:
+        if not args.pointer.startswith('/'):
+            raise ValueError('JSON_POINTER_MUST_START_WITH_SLASH')
+        try:
+            for part in args.pointer[1:].split('/'):
+                key = part.replace('~1', '/').replace('~0', '~')
+                value = value[int(key)] if isinstance(value, list) else value[key]
+        except (KeyError, IndexError, TypeError, ValueError):
+            hint = '; use pointer="" to read the root object' if args.pointer == '/' else ''
+            raise ValueError('EVIDENCE_POINTER_NOT_FOUND: ' + args.pointer + hint) from None
+    from tools.platform_store import encode
+    total=len(value) if isinstance(value,(list,dict,str)) else 1
+    count=min(args.limit,max(0,total-args.offset));kind='content'
+    while True:
+        end=args.offset+count
+        if kind=='overview': page=evidence_overview(value,args.pointer,args.offset,count)
+        elif isinstance(value,dict): page={k:value[k] for k in list(value)[args.offset:end]}
+        elif isinstance(value,(list,str)): page=value[args.offset:end]
+        else: page=value
+        result=c.EvidencePage(source=args.reference,pointer=args.pointer,content=page,
+            next_offset=end if end<total else None,kind=kind,offset=args.offset,total_items=total,returned_items=count,presentation='original')
+        measured=plain(result)
+        if len(encode(measured['content']).encode('utf8'))<=args.byte_limit and len(encode(measured).encode('utf8'))<=6000:
+            return result
+        if count>1: count=max(1,count//2)
+        elif kind=='content' and isinstance(value,(dict,list)): kind='overview'
+        else: raise ValueError('EVIDENCE_POINTER_OR_BYTE_LIMIT_TOO_SMALL: increase byte_limit for this pointer; original evidence retained')
+
+
 def read_evidence(ctx, args):
     if 'gzip' in args.reference.media_type:
         raise ValueError('COMPRESSED_MOTION_REQUIRES_DERIVED_QUERY: use diagnosis.inspect_evidence(view="motion"); this raw JSON access failure does not mean motion evidence is unavailable')
@@ -186,43 +217,11 @@ def read_evidence(ctx, args):
                  if isinstance(value,dict) and k in value}
     if isinstance(value,dict) and isinstance(value.get('simulation'),dict) and value['simulation'].get('execution_id'):
         attribution['source_execution_id']=value['simulation']['execution_id']
-    if args.pointer:
-        if not args.pointer.startswith('/'):
-            raise ValueError('JSON_POINTER_MUST_START_WITH_SLASH')
-        try:
-            for part in args.pointer[1:].split('/'):
-                key = part.replace('~1', '/').replace('~0', '~')
-                value = value[int(key)] if isinstance(value, list) else value[key]
-        except (KeyError, IndexError, TypeError, ValueError):
-            hint = '; use pointer="" to read the root object' if args.pointer == '/' else ''
-            raise ValueError('EVIDENCE_POINTER_NOT_FOUND: ' + args.pointer + hint) from None
-    from tools.platform_store import encode
-    presentation='original'
-    total=len(value) if isinstance(value,(list,dict,str)) else 1
-    count=min(args.limit,max(0,total-args.offset));kind='content'
-    while True:
-        end=args.offset+count
-        if kind=='overview': page=evidence_overview(value,args.pointer,args.offset,count)
-        elif isinstance(value,dict): page={k:value[k] for k in list(value)[args.offset:end]}
-        elif isinstance(value,(list,str)): page=value[args.offset:end]
-        else: page=value
-        result=c.EvidencePage(source=args.reference,pointer=args.pointer,content=page,
-            next_offset=end if end<total else None,kind=kind,offset=args.offset,total_items=total,returned_items=count,presentation=presentation)
-        # Include the EvidencePage envelope and leave room for Host's receipt and
-        # ToolObservation envelope.
-        measured=plain(result)
-        if len(encode(measured['content']).encode('utf8'))<=args.byte_limit and len(encode(measured).encode('utf8'))<=6000:
-            break
-        if count>1:
-            count=max(1,count//2)
-        elif kind=='content' and isinstance(value,(dict,list)):
-            kind='overview'
-        else:
-            raise ValueError('EVIDENCE_POINTER_OR_BYTE_LIMIT_TOO_SMALL: increase byte_limit for this pointer; original evidence retained')
+    result=bounded_evidence_page(value,args)
     with ctx.store.transaction() as db:
         state = ctx.store.session(ctx.run_id, db)['state']
         state.setdefault('reads', {})[digest(plain(args))] = dict(source=plain(args.reference), pointer=args.pointer, offset=args.offset,
-            next_offset=result.next_offset, kind=kind,content_hash=digest(result.content))
+            next_offset=result.next_offset, kind=result.kind,content_hash=digest(result.content))
         state['reads'] = dict(list(state['reads'].items())[-8:])
         state['recent_evidence']=retain_evidence(state.get('recent_evidence',[]),result,attribution)
         ctx.store.update_state(db, ctx.run_id, state)

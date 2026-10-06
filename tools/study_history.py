@@ -76,6 +76,31 @@ def execution_chronology(store, records):
             latest_complete_result='Latest full profiled evaluation with retained bound facts, by profile completion event'))
 
 
+def operation_chronology(store, prefixes):
+    """Local diagnostic attempts use the same reservation-event authority.
+
+    This does not turn a local controller update into a backend evaluation.
+    """
+    import json
+    with store.connect(True) as db:
+        events={e['event_id']:e for e in (json.loads(r[0]) for r in db.execute('SELECT body FROM events'))}
+        calls=[dict(r) for r in db.execute('SELECT * FROM calls')]
+    attempts=[]
+    for call in calls:
+        if not call['request_id'].startswith(tuple(prefixes)):continue
+        event=events.get(call['parent_id'])
+        if event is None:raise ValueError('OPERATION_CHRONOLOGY_MISSING')
+        receipt=json.loads(call['receipt']) if call['receipt'] else None
+        attempts.append(dict(execution_id=call['execution_id'],request_id=call['request_id'],
+            owner_run_id=call['run_id'],reservation_sequence=event['sequence'],
+            reservation_event=event['event_id'],status=call['status'],
+            source=receipt.get('output') if receipt else None,
+            tool_version=receipt.get('tool_version') if receipt else None))
+    attempts.sort(key=lambda r:r['reservation_sequence'])
+    return dict(ordering_authority='Store reservation event sequence',scope='Local diagnostic/controller operations; no new backend evaluation',
+        attempts=attempts,latest_attempt=attempts[-1] if attempts else None,latest_completed_evaluation=None)
+
+
 def study_history(store, records, *, retained_baseline=None, selected_source=None,
                   latest_tested=None, selection=None):
     rows=[]; seen=set()

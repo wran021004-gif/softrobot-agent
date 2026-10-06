@@ -414,6 +414,10 @@ def payload_for(host, adapter=None):
     config = model_input.context['policy']['model']
     adapter = adapter or OfflineAdapter()
     payload = adapter.encode(model_input, config)
+    if getattr(adapter,'context_assembly_audit',None):
+        # Shared assembly already checks all final schemas/messages. Required
+        # evidence must never enter the legacy silent page-trimming fallback.
+        return payload
     # Optional retained pages yield to required current facts within the same cap.
     while len(encode(payload).encode('utf8')) > config['context_bytes'] and model_input.context.get('recent_evidence'):
         model_input.context['recent_evidence'].pop(0)

@@ -8,8 +8,8 @@ VERSION = 'evidence_bound_reporting@3.0.0'
 def model_packet(packet):
     """Transmit each execution's immutable source metadata once, not per fact."""
     result={k:v for k,v in packet.items() if k not in ('facts','executions','selected','latest')}
-    result['selected_execution_id']=packet['selected']['execution_id']
-    result['latest_execution_id']=packet['latest']['execution_id']
+    result['selected_execution_id']=(packet.get('selected') or {}).get('execution_id')
+    result['latest_execution_id']=(packet.get('latest') or {}).get('execution_id')
     result['executions']=[]
     for row in packet['executions']:
         sources={name:packet['facts'][ref]['source_artifact'] for name,ref in row['facts'].items()}

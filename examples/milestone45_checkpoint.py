@@ -80,7 +80,7 @@ def operation(root,name,fn,reserve_s,model=False):
     return result
 
 
-def reporting_payload(config,packet,instructions):
+def reporting_payload(config,packet,instructions,*,check_context=True):
     """The already successful thinking-enabled reporting client parameters."""
     payload=dict(model=config['model'],max_tokens=config['max_tokens'],thinking={'type':config['thinking']},
         reasoning_effort=config['reasoning_effort'],messages=[dict(role='system',content=instructions),
@@ -89,8 +89,8 @@ def reporting_payload(config,packet,instructions):
             parameters=dict(type='object',properties=dict(report=dict(type='string'),recommendation=dict(type='string'),
                 unresolved=dict(type='array',items=dict(type='string'))),required=['report','recommendation','unresolved'],additionalProperties=False)))],
         stream=False)
-    if len(encode(payload).encode())>config['context_bytes']:raise ValueError('CONTEXT_BYTES_LIMIT')
-    if len(encode(payload).encode())+config['max_tokens']+config['context_guard']['framing_headroom_tokens']>config['context_guard']['context_limit_tokens']:
+    if check_context and len(encode(payload).encode())>config['context_bytes']:raise ValueError('CONTEXT_BYTES_LIMIT')
+    if check_context and len(encode(payload).encode())+config['max_tokens']+config['context_guard']['framing_headroom_tokens']>config['context_guard']['context_limit_tokens']:
         raise ValueError('CONTEXT_TOKEN_GUARD')
     return payload
 
