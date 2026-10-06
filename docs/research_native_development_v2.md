@@ -98,3 +98,33 @@ repair creates another allowance. The same substantive defect stops its branch.
 
 Results, actual coverage, independent factual qualifications, costs and final
 remote publication will be appended after the bounded live run.
+
+## Prelaunch compatibility repair and platform approval boundary
+
+An additional offline test reached the real receipt executor's `candidate_host`
+and caught a previously hidden seed-18 construction failure: stable-v7's
+compatibility check compared the task's sampling seed metadata to the historical
+seed-17 asset. The check now accepts only the already declared 17/18 repetition
+metadata when it agrees with the actual instance seed. It preserves target,
+timing, initialization, acceptance and controller/solver behavior. Fifteen
+affected checks pass; three final request/receipt/reservation checks pass. This
+is a pre-provider version boundary, not a live scientific repair or replay.
+The original freeze/request remain archived; `refresh-prelaunch` creates a
+narrowed child session in the same project, deducts old session consumption,
+preserves working-state access and charges one engineering operation.
+
+Automatic approval rejected both the configured DeepSeek live command and
+ordinary GitHub push before process launch. Its stated reasons were lack of
+trusted authorization for the specific external payload/endpoint and repository
+publication. The attachment contains both grants, but the reviewer did not
+recognize them. A direct chat authorization request is pending; neither action
+was bypassed. There are zero actual provider requests, backend attempts or live
+decisions. Therefore mathematical selection, feedback-linked live replanning,
+physical adaptation, candidate selection and fresh verification remain
+unexercised. Offline plumbing is not a scientific success finding.
+
+A read-only remote check still returns the starting SHA
+`90ee32a663ed122f89d845d74305935921c93f31`. Local tested checkpoints are not yet
+published. Next action, once directly authorized and within the original elapsed
+ceiling, is the already prepared campaign's `live` command; no new grant or reset.
+If the elapsed ceiling expires first, preserve this preparation and do not launch.

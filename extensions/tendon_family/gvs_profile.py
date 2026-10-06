@@ -87,6 +87,12 @@ def checked_reach(inp):
         and all(plain(getattr(inp.policy,k))==plain(getattr(old.policy,k))
                 for k in ('backend','dynamics_model','discretization')))
     task_before,task_after=plain(old.task),plain(inp.task)
+    if (inp.policy.controller.version=='7.0.0' and inp.seed in (17,18)
+            and task_after['sampling']['seeds']==[inp.seed]):
+        # The frozen reach/hold study predeclares fresh repetitions 17 and 18.
+        # Seed labels affect instance provenance, not target, physical timing,
+        # acceptance, initialization mapping or stable-v7 solver behavior.
+        task_before['sampling']['seeds']=list(task_after['sampling']['seeds'])
     for task in (task_before,task_after):
         for key in ('goal','initializer','timing'):task.pop(key)
     if not fixed or task_before!=task_after:

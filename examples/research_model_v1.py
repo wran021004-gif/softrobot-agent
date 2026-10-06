@@ -56,7 +56,7 @@ def revision():
 
 def archive(w):
     if not hasattr(w,'context_archive'):
-        scope=dict(context_id=w.host.run_id,role='design',binding=w.freeze['binding'])
+        scope=dict(context_id=w.freeze.get('context_id',w.host.run_id),role='design',binding=w.freeze['binding'])
         saved=w.directory/'working_state.json'
         w.context_archive=(EvidenceArchive.from_manifest(ROOT/read(saved)['source_manifest'],scope=scope,stores=(w.store,))
             if saved.exists() else EvidenceArchive(w.directory/'context_assembly',scope=scope,stores=(w.store,)))
@@ -158,7 +158,7 @@ def restore(directory):
     for k,v in read(directory/'scheduler_state.json').items():setattr(w,k,v)
     if (directory/'working_state.json').exists():
         from tools.context_assembly import restore_working_state
-        scope=dict(context_id=w.host.run_id,role='design',binding=w.freeze['binding'])
+        scope=dict(context_id=w.freeze.get('context_id',w.host.run_id),role='design',binding=w.freeze['binding'])
         w.working,w.context_archive=restore_working_state(read(directory/'working_state.json')['reference'],
             store=Store(directory/'working_archive'),scope=scope,stores=(w.store,))
     else:w.working=None
@@ -246,7 +246,8 @@ def configure(w):
             state=w.store.session(w.host.run_id,db)['state']
             state.setdefault('role_context',{}).update(frozen_cases=w.freeze['frozen_cases'],
                 campaign_permissions=dict(allocation=w.freeze['allocation'],search_backend_limit=8,
-                    reserved_verification_backends=20,workers=0))
+                    reserved_verification_backends=20,workers=0,
+                    elapsed_deadline_unix=w.freeze.get('assignment_start_unix',w.freeze['campaign_state']['assignment_start_unix'])+36000))
             w.store.update_state(db,w.host.run_id,state)
     if w.freeze.get('decision_only'):
         with w.store.transaction() as db:
@@ -338,13 +339,14 @@ def configure(w):
         diagnosis_remaining=max(0,w.freeze['diagnosis_limit']-sum(r['decision']['decision']['action']=='diagnosis' for r in w.rounds)),
         predecessor_decision=w.previous_decision,latest_tested=w.latest,require_source_binding=True,max_batch_backends=2,
         source_report=w.freeze['source_report'],improvement_feedback_content=dict(baseline_facts=w.baseline,execution=None),
-        native_store_root=str(w.store.root),native_fixed={},memory_identity=w.host.run_id,binding=w.freeze['binding'])
+        native_store_root=str(w.store.root),native_fixed={},memory_identity=w.freeze.get('context_id',w.host.run_id),binding=w.freeze['binding'])
     if w.freeze.get('campaign_state'):
         with w.store.transaction() as db:
             state=w.store.session(w.host.run_id,db)['state']
             state['role_context']['frozen_cases']=w.freeze['frozen_cases']
             state['role_context']['campaign_permissions']=dict(allocation=w.freeze['allocation'],
-                search_backend_limit=8,reserved_verification_backends=20,workers=0)
+                search_backend_limit=8,reserved_verification_backends=20,workers=0,
+                elapsed_deadline_unix=w.freeze.get('assignment_start_unix',w.freeze['campaign_state']['assignment_start_unix'])+36000)
             w.store.update_state(db,w.host.run_id,state)
     return packet
 

@@ -3,6 +3,7 @@ from copy import deepcopy
 import json
 from pathlib import Path
 from unittest.mock import patch
+from unittest import TestCase
 from examples import research_campaign_v2 as campaign
 from tests.test_research_model_v1 import NativePilotTests
 from tools.state_io import read
@@ -78,3 +79,63 @@ class NativeCampaignTests(NativePilotTests):
         self.assertIn('e3876a1d289f41f08d46c96202f1da0c',[r['candidate']['execution_id'] for r in matches])
         perturbed=apply_frozen_case(changed,'near_z_plus',17,self.w.freeze['frozen_cases'])
         self.assertFalse(matching_scientific_history(self.w.store,perturbed,self.w.records))
+
+    def test_case_and_edits_survive_real_receipt_executor_host(self):
+        from tools.platform_search import prepare_offline_batch
+        from tools.platform_diagnosis_coordinator import configure_role
+        from tools.live_batch_execution import LiveBatchExecution
+        from schemas.platform import SessionInput
+        from tools.platform_tools import _candidate
+        from tools.platform_store import plain
+        from uuid import uuid4
+        args=self.search(mixed=True);args['plan'].update(case_id='near_z_minus',seed=18)
+        result,_=self.invoke_native(args)
+        configure_role(self.w.host,'executor','Offline construction fixture; zero backend grant.',phase_budget={})
+        batch=prepare_offline_batch(self.w.host,result['search_plan'],starting_facts=self.w.baseline,
+            retained_baseline=self.w.baseline,historical_results=self.w.records)
+        source=self.w.store.artifact(batch['base_configuration'])['effective']
+        point=args['plan']['candidates'][0]
+        effective=plain(_candidate(SessionInput.model_validate(source),point,self.w.host.reg))
+        with self.w.store.transaction() as db:
+            ref=plain(self.w.store.put(db,dict(effective=effective)))
+        child=LiveBatchExecution(self.w.host).candidate_host(dict(candidate_id='offline-case-'+uuid4().hex,configuration=ref))
+        actual=self.w.store.session(child.run_id)['snapshot']['input']
+        initial=actual['task']['initializer']['parameters']['data']
+        self.assertEqual(initial['qpos_rad']['near_cell_0_z'],-.01/12)
+        self.assertEqual(initial['qvel_rad_s']['near_cell_0_z'],-.02/12)
+        self.assertEqual(actual['seed'],18)
+        self.assertEqual(actual['policy']['controller']['parameters']['data']['recipe']['holding_tip_speed_weight'],.075)
+        self.assertEqual(actual['task'],effective['task'])
+        self.assertEqual(self.w.store.remaining()['used']['backend_solves'],0)
+
+    def test_same_project_prelaunch_refresh_restores_settled_state(self):
+        from examples import research_model_v1 as pilot
+        # The inherited native decision fixture advertises synthetic capacity;
+        # migration must compare the real zero-live ledger on both sides.
+        for p in self.patches:p.stop()
+        before=self.w.store.remaining()['used']
+        old=self.w.host.run_id
+        revised=campaign.refresh_prelaunch(self.root)
+        restored=pilot.restore(self.root)
+        self.assertEqual(restored.host.run_id,old+'-prelaunch2')
+        self.assertEqual(restored.freeze['context_id'],old)
+        self.assertEqual(restored.store.remaining()['used']['tool_calls'],before['tool_calls']+1)
+        self.assertEqual(restored.working['current_facts'],revised.working['current_facts'])
+        self.assertEqual(restored.status,'prepared')
+        self.assertEqual(restored.store.remaining()['used']['backend_solves'],0)
+        self.assertFalse(restored.store.session(restored.host.run_id)['state'].get('pending'))
+
+
+class CampaignBudgetTests(TestCase):
+    def test_child_charges_do_not_unlock_final_reservations(self):
+        from tools.batch_budget import downstream_available
+        class FakeStore:
+            def remaining(self,run_id=None,db=None):
+                return {'remaining':dict(backend_solves=26 if run_id is None else 8,
+                    tool_calls=180 if run_id is None else 125,model_calls=22,wall_s=34000 if run_id is None else 14000,worker_calls=0)}
+            def session(self,run_id,db=None):
+                return {'state':{'role_context':{'campaign_permissions':{'reserved_verification_backends':20}}}}
+        available=downstream_available(FakeStore(),'research')
+        self.assertEqual(available['backend_solves'],6)
+        self.assertEqual(available['tool_calls'],120)
+        self.assertEqual(available['wall_s'],14000)

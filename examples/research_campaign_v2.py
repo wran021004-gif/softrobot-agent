@@ -21,7 +21,8 @@ from tools.candidate_parameters import parameter_value
 CONFIG_PATH=ROOT/'configs/research/native_campaign_v2.json'
 FILES=(*pilot.FILES,'examples/research_campaign_v2.py','configs/research/native_campaign_v2.json',
        'schemas/platform_handoff.py','tools/batch_budget.py','tools/research_spec.py','tools/study_history.py',
-       'tools/candidate_parameters.py','tools/research_tasks.py','tools/fixed_research.py')
+       'tools/candidate_parameters.py','tools/research_tasks.py','tools/fixed_research.py',
+       'extensions/tendon_family/gvs_profile.py')
 
 
 def seal():
@@ -93,6 +94,57 @@ def native_decision(w):
         return pilot.decision(w)
 
 
+def refresh_prelaunch(directory=None):
+    """Explicit narrowed child session after an observed pre-provider repair."""
+    from tools.platform_host import Host
+    from tools.platform_diagnosis_coordinator import transfer_recovery
+    from tools.platform_models import payload_for
+    from tools.diagnostic_reference_adapter import EvidenceDrivenAdapter
+    config=read(CONFIG_PATH);w=pilot.restore(directory or ROOT/'runs'/config['campaign_id'])
+    if w.status!='prepared' or w.store.remaining()['used']['model_calls'] or w.store.remaining()['used']['backend_solves']:
+        raise ValueError('ONLY_UNEXECUTED_PRELAUNCH_REFRESH_PERMITTED')
+    if w.freeze.get('prelaunch_repair'):raise ValueError('PRELAUNCH_REPAIR_ALREADY_RECORDED')
+    old=w.host;old_freeze=deepcopy(w.freeze)
+    atomic_json(w.directory/'original_prelaunch_freeze.json',old_freeze)
+    atomic_json(w.directory/'original_prelaunch_request.json',read(w.directory/'prepared_request.json'))
+    session=w.store.session(old.run_id);inp=deepcopy(session['snapshot']['input'])
+    used=w.store.remaining(old.run_id)['used']
+    inp['run_id']=old.run_id+'-prelaunch2'
+    inp['policy']['budget']={k:max(0,v-used[k]) for k,v in inp['policy']['budget'].items()}
+    new=Host(w.directory,inp['run_id']);new.create(inp);transfer_recovery(old,new)
+    with w.store.transaction() as db:
+        state=w.store.session(new.run_id,db)['state']
+        for k in ('role_context','fact_scope','fact_catalog','reference_interface','read_ledger'):
+            if k in session['state']:state[k]=deepcopy(session['state'][k])
+        w.store.update_state(db,new.run_id,state)
+    w.host=new;w.freeze['research_host']=new.run_id
+    w.freeze['context_id']=old.run_id
+    w.freeze['implementation']=seal()
+    boundary=dict(kind='prelaunch_seed18_metadata_compatibility',old_host=old.run_id,new_host=new.run_id,
+        old_implementation=old_freeze['implementation'],new_implementation=w.freeze['implementation'],
+        project_grant_unchanged=True,old_session_consumption_deducted=used,backend_replays=0,
+        provider_requests=0,physical_or_solver_criteria_changed=False,
+        failure='Real candidate_host compilation rejected predeclared seed18 sampling metadata; 15 affected checks now pass.')
+    reservation,_=w.store.reserve(new.run_id,'prelaunch-seed18-review',digest(boundary),'engineering',
+        {**zero(),'tool_calls':1,'wall_s':30.})
+    started=time.monotonic()
+    w.freeze['prelaunch_repair']=boundary
+    previous_working=deepcopy(w.working)
+    pilot.configure(w)
+    adapter=EvidenceDrivenAdapter();payload=payload_for(w.host,adapter)
+    w.store.complete(reservation,dict(request_id=reservation['request_id'],execution_id=reservation['execution_id'],caller='engineering',
+        tool_id='engineering.prelaunch_seed18',tool_version='1.0.0',execution_status='completed',charged=zero()),boundary,time.monotonic()-started)
+    # Reservation releases are not restored research allowance. Reconcile from
+    # the settled checkpoint instead of persisting transient occupied capacity.
+    w.working=previous_working
+    pilot.configure(w);pilot.persist(w)
+    adapter=EvidenceDrivenAdapter();payload=payload_for(w.host,adapter)
+    atomic_json(w.directory/'prepared_request.json',dict(payload=payload,audit=adapter.context_assembly_audit))
+    atomic_json(w.directory/'prelaunch_version2.json',boundary)
+    atomic_json(w.directory/'freeze_seal.json',dict(identity=digest(w.freeze),before_paid_activity=True,original_freeze_preserved=True))
+    return w
+
+
 def search_rows(w):
     spec=load_spec();source=spec['starting_configuration']['effective']
     rows=[]
@@ -121,7 +173,8 @@ def verify(w):
     if path.exists():raise ValueError('VERIFICATION_ALREADY_FROZEN_NO_AUTOMATIC_REPLAY')
     atomic_json(path,plan)
     for slot in slots:
-        if time.time()-w.freeze['assignment_start_unix']>=36000:break
+        elapsed_remaining=w.freeze['assignment_start_unix']+36000-time.time()
+        if elapsed_remaining<len(groups)*990+1200:break
         remaining=w.store.remaining()['remaining']
         # Delivery capacity remains protected until final interpretation.
         remaining={k:max(0,v-{'model_calls':2,'tool_calls':10,'wall_s':1200}.get(k,0)) for k,v in remaining.items()}
@@ -154,6 +207,8 @@ def finish(w):
     w.freeze['final_reporting']=True
     pilot.configure(w);pilot.persist(w)
     try:
+        if w.freeze['assignment_start_unix']+36000-time.time()<600:
+            raise ValueError('ELAPSED_LIMIT_PRECLUDES_FURTHER_PROVIDER_REQUEST')
         row=pilot.decision(w)
         atomic_json(w.directory/'final_model_interpretation.json',row)
     except Exception as exc:
@@ -185,6 +240,8 @@ def live(directory=None):
     config=read(CONFIG_PATH);w=pilot.restore(directory or ROOT/'runs'/config['campaign_id'])
     if w.status!='prepared' or w.freeze.get('offline_fixture'):raise ValueError('SEALED_OR_ATTEMPTED_CAMPAIGN_NO_RESET')
     if seal()['files']!=w.freeze['implementation']['files']:raise ValueError('FROZEN_IMPLEMENTATION_CHANGED')
+    if w.freeze['assignment_start_unix']+36000-time.time()<600:
+        raise ValueError('ELAPSED_LIMIT_PRECLUDES_LIVE_START')
     load_credential(Path.home()/'.codex/.env')
     w.status='running';pilot.persist(w)
     try:
@@ -205,6 +262,8 @@ def live(directory=None):
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live']);parser.add_argument('--output',type=Path)
+    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','refresh-prelaunch']);parser.add_argument('--output',type=Path)
     args=parser.parse_args()
-    prepare(args.output) if args.mode=='prepare' else live(args.output)
+    if args.mode=='prepare':prepare(args.output)
+    elif args.mode=='refresh-prelaunch':refresh_prelaunch(args.output)
+    else:live(args.output)

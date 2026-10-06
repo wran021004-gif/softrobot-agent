@@ -9,6 +9,9 @@ def downstream_available(store,run_id,db=None):
     project=store.remaining(None,db)['remaining'];session=store.remaining(run_id,db)['remaining']
     permissions=store.session(run_id,db)['state'].get('role_context',{}).get('campaign_permissions')
     if permissions:
+        if permissions.get('elapsed_deadline_unix'):
+            import time
+            project['wall_s']=min(project['wall_s'],max(0,permissions['elapsed_deadline_unix']-time.time()))
         # Child executions charge the project, not the research-role session.
         # Protect the full frozen paired allowance until search has ended.
         for k,v in dict(backend_solves=20,tool_calls=60,wall_s=19800.).items():
