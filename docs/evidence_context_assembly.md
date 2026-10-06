@@ -104,3 +104,10 @@ See [saved input observations](../evidence/context_assembly_20261006/observation
 [unchanged historical sources](../evidence/context_assembly_20261006/protected_hash_verification.json)
 and the scoped source manifests linked in each assembly audit. Publication status
 is recorded separately after the implementation and evidence checkpoints.
+
+Implementation commit: `e9e3c23`; evidence commit: `c4d02ec`. The normal push was
+rejected by automatic approval before process launch: the reviewer requires
+trusted direct-chat authorization for this code/evidence payload and the existing
+GitHub destination. No alternative export was attempted. The verified remote
+remains `1c0f886bc0f267778e4af73c324f6fc3d8759148`. See the
+[publication rejection](../evidence/context_assembly_publication_20261006/publication.json).
