@@ -4,9 +4,29 @@ The [independent M4 autonomous successor](milestone4_autonomous_successor.md)
 repairs shared receipt/event chronology and separates verified observations,
 uncertain interpretations and decisions. Its primary response question and
 distinct original-geometry fallback use one new cumulative 24/60/4/9000 grant.
-The preceding voluntary stop remains sealed. Focused prelaunch checks and live
-outcomes are being recorded under `evidence/milestone4_autonomous_20261006`.
-The autonomous supplement closes only if its actual per-case multibatch gate passes.
+The preceding voluntary stop remains sealed. Twelve focused prelaunch checks pass.
+DeepSeek executed two feedback-linked batches in the primary case: four complete
+backend evaluations, including one explicit replication. Core multibatch behavior
+passes. The final model STOP retains the historical .05/.05 incumbent after the
+four-backend ceiling is exhausted; the frozen fallback does not activate.
+**The autonomous supplement remains open:** final model text incorrectly denies
+the completed replication. The original response is preserved with a linked
+[factual review](../evidence/milestone4_autonomous_20261006/acceptance_audit.json);
+passing copied-value checks does not establish factual consistency of free prose.
+Shared delivery now distinguishes the core gate from reviewed overall acceptance.
+The affected reporting check passes without another provider/backend call.
+
+Of the four new executions, only .09/.10 passes joint reach and holding acceptance
+(3.313 mm terminal error, .010201 m/s holding maximum speed). The .06/.05,
+replicated .09/.05 and intermediate .09/.075 runs fail holding speed. All four
+pass official reach and holding position; all 140 updates miss the 10 ms deadline,
+with mean complete updates 8.561–9.211 s. The new passing point trades increased
+position error for lower holding speed relative to the incumbent; superiority,
+causal explanation and realtime are unproven. Actual aggregate use is 3 provider /
+24 workflow / 4 backend / 1,531.473 charged seconds, including two post-run review
+receipts; standalone numerical operations, corrections, live repairs and workers
+are zero. M4's original bounded-flow closure and completed M5A are preserved;
+**M5 remains open**, with its protected allocations untouched.
 
 The following 2026-10-05 delivery remains historical evidence:
 

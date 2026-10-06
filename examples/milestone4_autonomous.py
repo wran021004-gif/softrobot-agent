@@ -384,9 +384,17 @@ def export(w):
     embedded=sum(r['facts']['control_updates'] for r in w.records if r['execution_id'] in
         {a['candidate']['execution_id'] for a in chronology['attempts']})
     state=w.store.session(w.host.run_id)['state']
+    review_path=w.directory/'acceptance_audit.json'
+    review=read(review_path) if review_path.exists() else {}
+    core=any(c['core_multibatch_acceptance'] for c in cases)
+    factual_review=review.get('factual_interpretations_consistent')
+    accepted=core and (not w.freeze.get('fact_separation') or factual_review is True)
+    supplement_status=('closed' if accepted else 'open_factual_reasoning_errors' if core and factual_review is False
+        else 'open_review_pending' if core else 'open_incomplete_autonomy_coverage')
     delivery=dict(status=w.status,stop_reason=w.stop_reason,implementation_checks='see focused_checks.json',
         real_search_batches=len(searches),cases=cases,sealed_cases=w.sealed_cases,
-        core_multibatch_acceptance=any(c['core_multibatch_acceptance'] for c in cases),
+        core_multibatch_acceptance=core,factual_interpretations_consistent=factual_review,
+        overall_supplement_acceptance=accepted,acceptance_review='acceptance_audit.json' if review else None,
         feedback_bound_to_second_plan=any(c['feedback_bound_to_second_plan'] for c in cases),
         selected_candidate=w.selected,latest_execution=chronology['latest_execution'],
         latest_completed_evaluation=chronology['latest_completed_evaluation'],latest_complete_result=chronology['latest_complete_result'],
@@ -400,7 +408,7 @@ def export(w):
         realtime='No realtime success established',
         model_reasoning='Citations validated; causal explanations remain subject to evidence review' if w.rounds else 'None: no accepted live model decision',
         selection_role='Model-selected complete deliverable' if w.status=='model_stopped' else 'Retained historical incumbent; no new final model selection',
-        milestones=dict(M4_historical='closed',M4_supplement='closed' if any(c['core_multibatch_acceptance'] for c in cases) else 'open_incomplete_autonomy_coverage',M5='open'),revision=revision())
+        milestones=dict(M4_historical='closed',M4_supplement=supplement_status,M5='open'),revision=revision())
     atomic_json(EVIDENCE/'delivery.json',delivery)
     atomic_json(EVIDENCE/'sha256_manifest.json',{p.relative_to(EVIDENCE).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
         for p in EVIDENCE.rglob('*') if p.is_file() and p.name!='sha256_manifest.json'})
