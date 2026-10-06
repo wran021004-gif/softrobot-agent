@@ -1,0 +1,44 @@
+{
+  "initial": {
+    "status": "passed",
+    "checks": 9,
+    "native_checks": 3,
+    "task_acceptance_checks": 6,
+    "command": "python -m unittest tests.test_research_model_v1 tests.test_research_tasks -v",
+    "synthetic_engineering_only": true,
+    "provider_calls": 0,
+    "backend_attempts": 0,
+    "native_recheck": {
+      "checks": 3,
+      "elapsed_s": 17.882,
+      "status": "passed"
+    },
+    "legacy_checks": {
+      "status": "not_started",
+      "reason": "Windows private TemporaryDirectory ACL WinError5",
+      "requested_checks": 2
+    },
+    "prelive_engineering_fixes": [
+      "Resolve original incumbent owner Store through frozen provenance",
+      "Install alias fact scope before handover",
+      "Reuse context source allowlist and archive-only checkpoint Store",
+      "Preserve original candidate identity in feedback fixture"
+    ],
+    "remaining_live_validation": "Not exercised: automatic approval rejected process launch"
+  },
+  "post_failure_repair": {
+    "command": "python -m unittest tests.test_research_model_v1 -v",
+    "checks": 4,
+    "status": "passed",
+    "elapsed_s": 21.857,
+    "provider_calls": 0,
+    "backend_attempts": 0
+  },
+  "delivery_review": {
+    "selector_checks": 26,
+    "source_acceptance_recomposition": true,
+    "actual_feedback_request_verified": true,
+    "canonical_fact_identity_check": true
+  },
+  "no_broad_suite_repetition": true
+}

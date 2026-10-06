@@ -1,23 +1,36 @@
 # Current development status - Milestones 4 and 5, 2026-10-06
 
-The [new native first-study pilot](research_native_pilot.md) connects the real
-`research.decide` schema/validator to the eight-variable catalog, joint mixed
-structural/control batch semantics, shared working request/state and unified
-intermediate acceptance. Nine focused checks pass; three native checks pass again
-after checkpoint recovery integration. The exact incumbent and completed shared
-development failure retain original provenance. A new four-backend cumulative
-pilot is frozen, with nominal seed17 fixed before outcomes. **Live execution was
-rejected by automatic approval before launch**, twice including a documented
-reconsideration. Specific external-transfer authorization is pending. Actual use
-is zero model / zero backend / one preparation operation / 0.437 charged seconds;
-no scientific improvement or live model-quality result is claimed. Formal 28-run
-and three-group comparisons, the Mainline 3 backlog, roadmap and protected old
-M5 slots are untouched. A subsequent administrative prelaunch fingerprint fix
-uses the same ledger: cumulative use is now two workflow operations / 0.671
-charged seconds, still zero model/backend/numerical/worker work. Normal push was
-also rejected before launch; the read-only verified remote remains `f6cafa17`.
-Specific live-transfer and publication questions are pending in chat. Earlier
-evidence and closures below remain historical.
+The [native first-study pilot](research_native_pilot.md) ran after direct chat
+authorization. DeepSeek's first native request selected explicit holding-speed
+weights 0.075 and 0.10 with terminal weight fixed at 0.05. Both nominal seed17
+executions passed terminal/holding position, force, validity, coverage and solver
+checks but failed maximum holding speed: 0.023285947509969908 and
+0.022128674933740447 m/s against 0.02. The retained incumbent remains selected;
+no improvement or robustness is demonstrated. No fresh reference or repetition
+was run. Two of the four backend slots remain unused.
+
+A post-batch legacy comparison-reader fault was sealed and repaired at an
+explicit same-ledger source-version boundary; no execution was replayed. Four
+focused native checks pass after the repair. The actual second provider request
+included the new feedback but failed with `IncompleteRead(2891 bytes read)`;
+no valid second decision exists. The frozen failure policy closed this campaign,
+without a retry or model-authored voluntary STOP. Final shared working facts and
+report facts have identical identity. All 26 selected/observed fact bindings in
+the successful decision resolve to their exact immutable values.
+
+[Live delivery and review](../evidence/research_native_v1_live_20261006/live_review.json)
+record cumulative use of 2 actual provider requests / 12 workflow operations /
+2 backend attempts / 788.3279999999941 charged seconds, zero standalone numerical
+operations, workers or subagents. The complete response reports 23861 input and
+12846 output tokens (10202 reasoning); the failed request's token usage is unknown,
+so these are a known subtotal, not aggregate provider billing. The catalog and
+actual request/report path are supported within the observed scope. Mathematical
+selection evidence, a subsequent feedback-informed decision and robot improvement
+remain unsupported. Structure/mixed/categorical searches were exercised offline,
+not live. Formal 28-run and three-group comparisons, the Mainline 3 backlog,
+roadmap and protected old M5 slots remain untouched. Earlier blocked snapshots
+and closures below remain historical; direct chat authorization resolved their
+pending permission questions.
 
 The independently authorized [final shared-path development validation](research_shared_path_validation.md)
 completed on frozen implementation `c80d331691b1a0f9d683049f1b09480c8bd62319`.

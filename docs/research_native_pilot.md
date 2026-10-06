@@ -175,4 +175,69 @@ replays zero decisions/candidates/executions and creates no new allowance. Norma
 `live` still rejects automatic resume of stopped/failed campaigns. Outcomes across
 the boundary remain separately identified; the stable controller, task, physical
 pool and acceptance do not change. Subsequent feedback and final interpretation
-will be recorded as new live evidence.
+were attempted as new live evidence.
+
+The [new live delivery](../evidence/research_native_v1_live_20261006/delivery.json)
+and [factual review](../evidence/research_native_v1_live_20261006/live_review.json)
+close this bounded campaign with an execution/transport failure, not a voluntary
+model STOP. Request `model-0` planned the two-point explicit batch; its 92218-byte
+canonical stored payload corresponds to 93071 bytes under the actual transport's
+JSON serialization. Provider-observed input/output are 23861/12846 tokens,
+including 10202 reasoning tokens, cache hit 4480 and cache miss 19381.
+Request `model-1` carried post-batch facts and the engineering boundary through
+the shared working-state path (132533 canonical bytes; 133386 transport bytes).
+It failed after 103.45299999999406 charged seconds with
+`IncompleteRead(2891 bytes read)`; no complete response, observed token count,
+accepted decision or final model interpretation exists. It was not resent.
+The reported 36707 tokens are the known first-call subtotal; total provider token
+usage and monetary billing across both requests are unknown. Estimates, canonical
+sizes and transport serialization sizes remain separately labelled.
+
+| Holding weight | Execution | Terminal error (m) | Holding max error (m) | Holding max speed (m/s) | Joint acceptance |
+| --- | --- | --- | --- | --- | --- |
+| 0.075 | `68ec1d6cc55c4b9baefe6eb58b73540b` | 0.0028347191207395775 | 0.002905756064671871 | 0.023285947509969908 | false |
+| 0.10 | `af79836372454e4184e61dee1030ec39` | 0.002633323294646377 | 0.0028109103441942935 | 0.022128674933740447 | false |
+
+Both are complete valid executions, have all six inclusive holding samples,
+zero force-bound violation and zero solver errors. Each performs 35 embedded
+controller updates (70 total), distinct from zero standalone numerical calls.
+Both execute unchanged controller v7 on the old code fingerprint; checkout
+`2ab35850a62be012af4e5d04fae0e577915d1de3` is retained separately from executable
+source identity `5bdaf118d6cf46fa2179cb04cf41bd239b74bd67`. The feedback repair is
+`7675fd5a0473b3ef4402039cb196249b859d5750` and produced no further backend result.
+Full robot provenance IDs differ from the archived common-selector source only
+because builder v1.1 expands its metadata to disjoint per-segment selectors;
+the physical structure, task, timing, backend and unchanged control settings
+were verified exactly. Original labels and full configurations remain retained.
+The successful initial decision's 26 resolved selectors/observations and all new
+acceptance components were checked against their original sealed sources.
+
+The first model rationale correctly treats the speed penalty as a qualitative
+mechanism and denies an analytic guarantee for sampled maximum speed. No
+applicable numerical sensitivity/optimization evidence or new mathematical tool
+supported its selected points. Its phrase "two interior points" is inaccurate:
+0.10 is the frozen upper boundary. Its generalization from one unmatched
+`near_z_plus` event to a "fragile" component remains a hypothesis, not identified
+causality. Neither wording issue was manually rewritten into the scientific
+submission. Numeric observations, source identities and accepted plan bounds
+were correct; a failed second response cannot be factually reviewed.
+
+The [five independent judgments](../evidence/research_native_v1_live_20261006/evidence_judgments.json)
+are: catalog selection supported for the single selected control variable;
+quantitative mathematical choice unsupported; feedback storage/request delivery
+supported but a subsequent decision unsupported; exact factual binding supported
+for the complete first response with the prose limitations above; improvement
+unsupported. Both candidates lose joint acceptance compared with the retained
+historical nominal observation; there is no fresh matched reference/repetition,
+perturbation suite, fixed-baseline comparison or compression-benefit experiment.
+
+Actual same-ledger totals are **2 provider requests, 12 workflow operations,
+2 backend attempts, 788.3279999999941 charged seconds, zero standalone numerical,
+worker or subagent calls**. The second request's network failure closes the run
+under its frozen failure rule; two backend slots stay unused. No extra final
+report request was added. Final-report canonical fact identity equals the shared
+working state's current fact identity. The next bounded work is Mainline 3's
+explicit builder/mutation/compatibility/rebuild/evidence gaps for broader section,
+material, topology, routing, model and discretization coverage. A new scientific
+campaign or formal comparison needs a separate versioned allocation; this stopped
+assignment is not reset or resumed automatically.
