@@ -241,3 +241,44 @@ explicit builder/mutation/compatibility/rebuild/evidence gaps for broader sectio
 material, topology, routing, model and discretization coverage. A new scientific
 campaign or formal comparison needs a separate versioned allocation; this stopped
 assignment is not reset or resumed automatically.
+
+### Historical coverage correction, 2026-10-07
+
+The original preparation seeded only the incumbent and omitted available
+nominal failures and counterexamples. Its phrase “no repetitions” therefore
+needs qualification: the two pilot simulations were fresh, charged executions
+of **previously evaluated scientific parameter points**, with zero deliberately
+planned independent repetitions. Their original `replication_reason=null`
+is preserved. Original model response, review and failure artifacts remain sealed.
+
+Unmasked scientific-scope comparison resolves the 0.075 pair
+`e3876a1d289f41f08d46c96202f1da0c` / `68ec1d6cc55c4b9baefe6eb58b73540b`
+and the 0.10 pair `110dc2c9c1d642dcb018664a65c62c30` /
+`af79836372454e4184e61dee1030ec39`. Effective physical structure, task/initializer,
+controller recipe, backend and discretization match within each pair. Builder
+1.0/1.1, selector metadata, checkout/implementation and execution provenance
+remain distinct. Such matches do not establish cache compatibility. In the
+0.075 pair only holding maximum speed is identical; terminal and holding
+maximum position errors differ. All three retained aggregate metrics match in
+the 0.10 pair; trajectory and timing equality are unverified.
+
+Preparation now considers a pinned 16-record manifest and explicitly selects
+seven historical observations: incumbent, both directly matching failures,
+zero-holding-weight pass, lower-holding-weight failure, an intermediate failure
+and a jointly changed-weight pass. Full records, source references and selection
+limitations are archived; compact shared views preserve exact metric bindings.
+Unselected history is not evidence of absence. Scientific repeat detection
+precedes candidate expenditure and requires an explicit purpose if a known point
+cannot be strictly reused. Unknown implementation compatibility remains unknown.
+
+The linked recovery uses the original project ledger and a new child session
+for the same decision role. Its smaller local ceiling is 3 provider requests,
+12 charged workflow operations, 1800 charged seconds, zero backends/numerical
+experiments/workers. One protocol correction and one reconciled transport retry
+are the maximum; length expansion is disabled locally while provider/model,
+endpoint, thinking/reasoning, token limits, TLS and credential loader are
+unchanged. The decision tool reserves 30 seconds and engineering factual review
+retains 60 seconds. Future plans are proposals only, never dispatched here.
+Nine focused saved-evidence/native checks passed before live recovery; no
+numerical experiment was used. The original failed session, calls and published
+bytes are sealed independently from the successor's accounting and disposition.

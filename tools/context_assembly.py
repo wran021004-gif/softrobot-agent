@@ -78,7 +78,7 @@ class EvidenceArchive:
 
     def register_references(self, value):
         if isinstance(value, dict):
-            if set(value) == {'artifact_id', 'media_type'}:
+            if set(value) == {'artifact_id', 'media_type'} and isinstance(value['artifact_id'],str) and isinstance(value['media_type'],str):
                 self.register(value)
             else:
                 for v in value.values(): self.register_references(v)
@@ -225,6 +225,15 @@ def _research(packet, authority, archive):
         for r in sorted(rows, key=lambda r:(r['candidate'].get('execution_id') or '', r['configuration_identity']))])
     # Sorting is presentation only; chronology and latest remain event-bound.
     reduced['bound_evidence'] = _compact_ledger(bound)
+    if reduced.get('study',{}).get('m5_feedback'):
+        m5=reduced['study']['m5_feedback']
+        reduced['study']['m5_feedback']=dict(source=m5['source'],scope=m5['scope'],
+            negative_findings='Retained prediction evidence supplies no screening authority, candidate exclusion, v8 adoption or compression-benefit claim.',
+            complete_text=dict(reference=archive.snapshot(packet),pointer='/study/m5_feedback'))
+    reduced['scientific_overlap'] = dict(new_execution_count=summary['new_execution_count'],
+        novel_configuration_count=summary['novel_configuration_count'],
+        previously_evaluated_count=summary['scientifically_previously_evaluated_count'],
+        overlaps=summary['scientific_overlaps'],deliberate_replication_count=summary['replication_count'])
     if 'case' in reduced:
         reduced['case']['question_status'] = 'frozen_pre_experiment_background; consult recorded_replications for current evidence'
     feedback = reduced['current_feedback']
@@ -595,7 +604,7 @@ def assemble_working_context(purpose, state, *, archive):
         result['view']['working_context']['chronology'] = dict(reference=state_reference,
             pointer='/authority/chronology', authority='Original reservation/completion events; current roles retained above')
     experiment_view = {key:[dict(revision=row['revision'], entry={k:v for k,v in row['entry'].items()
-        if k not in {'observed_metrics', 'candidate'}}, original_entry=dict(reference=state_reference,
+        if k in {'status','case_id','seed','task_identity','structure_identity','cache_hit'}}, original_entry=dict(reference=state_reference,
             pointer='/experiments/' + pointer_part(key) + '/' + str(i) + '/entry'))
         for i,row in enumerate(rows)] for key,rows in state['experiments'].items()}
     result['view']['working_context']['recovery'] = dict(version=state['version'],

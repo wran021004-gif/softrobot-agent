@@ -130,7 +130,7 @@ def validate_batch_plan(store, view, proposal):
             changed=plain(_candidate(SessionInput.model_validate(effective),{path:endpoint},reg))
             if fixed_configuration(changed,plan.variables)!=fixed_configuration(effective,plan.variables):raise ValueError('PLAN_FIXED_ROBOT_TASK_CHANGED')
     parameter_search(effective,plan.method,plan.variables,candidates=plan.candidates,max_trials=plan.max_candidates,step=plan.step)
-    differences=[]
+    differences=[]; matching_history=[]
     if explicit:
         for point in plan.candidates:
             for path,value in point.items():
@@ -140,6 +140,11 @@ def validate_batch_plan(store, view, proposal):
             if digest(fixed_configuration(changed,plan.variables))!=digest(fixed_configuration(effective,plan.variables)):
                 raise ValueError('PLAN_ACTUAL_FIXED_FIELDS_CHANGED')
             differences.append(dict(proposed=point,actual_changes=actual,unchanged_declared_fields=sorted(set(point)-{r['path'] for r in actual})))
+            matches=matching_scientific_history(store,changed,role.get('research_records',[]),
+                implementation=store.session(view.run_id)['snapshot'])
+            matching_history.append(dict(proposed=point,matches=matches))
+            if matches and not any(r['comparison']['reuse_eligible'] for r in matches) and not plan.replication_reason:
+                raise ValueError('PLAN_KNOWN_SCIENTIFIC_POINT_REQUIRES_REPETITION_PURPOSE: '+str([r['candidate']['execution_id'] for r in matches]))
         if not plan.replication_reason and any(not any(r['path']==path for d in differences for r in d['actual_changes']) for path in plan.variables):
             raise ValueError('PLAN_DECLARED_VARIABLE_NEVER_CHANGES')
         if plan.replication_reason and len({digest(p) for p in plan.candidates})!=len(plan.candidates):
@@ -163,7 +168,7 @@ def validate_batch_plan(store, view, proposal):
     # Execution and interpretation follow this planning phase. Its local call
     # limit/protected capacity must not be counted as the downstream grant.
     available=budget_capacity(count,downstream_available(store,view.run_id),planning={},preparation_reserve_s=prep_reserve)
-    if role.get('require_source_binding') and (not capacity['sufficient'] or not available['sufficient']):
+    if role.get('require_source_binding') and (not capacity['sufficient'] or (not role.get('decision_only') and not available['sufficient'])):
         raise ValueError('PLAN_TOTAL_CAPACITY_INSUFFICIENT: '+str(dict(planned=capacity['shortfalls'],available=available['shortfalls'])))
     fixed=fixed_configuration(effective,plan.variables)
     if effective==store.artifact(candidate['configuration'])['effective']:
@@ -176,6 +181,7 @@ def validate_batch_plan(store, view, proposal):
     return dict(plan=plain(plan),structurally_operationally_valid=True,scientific_promise=plan.scientific_promise,
         semantic_status='Model-authored promise and causal reasoning are separate from operational validation.',
         actual_differences=differences,budget_requirement=capacity,available_capacity=available,
+        matching_scientific_history=matching_history,decision_only=role.get('decision_only',False),
         execution_authorized=False,requires_future_grant=True,baseline_replaced=False,candidate_promoted=False,
         bindings=dict(task=view.task,acceptance=view.acceptance,baseline=view.baseline,subject=candidate,
             source_configuration=candidate['configuration'],execution_source_configuration=execution_source,
@@ -417,6 +423,25 @@ def _save_batch(host,batch):
         host.store.update_state(db,host.run_id,state)
 
 
+def matching_scientific_history(store,effective,records,*,implementation=None):
+    from tools.study_history import scientific_match
+    matches=[]
+    for saved in records:
+        facts=saved.get('facts')
+        if not facts or not facts.get('valid_complete_execution'):continue
+        original=store.artifact(facts['configuration'])['effective']
+        prior=saved.get('implementation',{})
+        if not prior.get('dependencies'):
+            try:
+                from tools.platform_store import Store
+                source=Store(saved['source_store']) if saved.get('source_store') else store
+                prior=source.session(facts['candidate']['owner_run_id'])['snapshot']
+            except (ValueError,OSError):pass
+        comparison=scientific_match(effective,original,implementation=implementation,historical_implementation=prior)
+        if comparison['scientific_match']:matches.append(dict(candidate=facts['candidate'],comparison=comparison))
+    return matches
+
+
 def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_reserve_s=600.,mode='offline_injected',retained_baseline=None,historical_results=()):
     """Bind an accepted immutable plan in a separate offline grant, with no live adapter."""
     from copy import deepcopy
@@ -425,6 +450,8 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
     from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
     from extensions.tendon_family.gvs_profile import execution_scope
     from tools.candidate_parameters import fixed_configuration,parameter_value
+    if host.store.session(host.run_id)['state'].get('role_context',{}).get('decision_only'):
+        raise ValueError('DECISION_ONLY_NO_BATCH_EXECUTION')
     record=accepted_product(host.store,plan_ref,'search_batch_plan')
     plan=SearchBatchPlan.model_validate(record['plan'])
     if not record['structurally_operationally_valid'] or record['execution_authorized']:
@@ -543,6 +570,8 @@ def run_live_batch(host,*,stop_after_stage=None):
 def _run_batch(host,inject,*,stop_after_stage=None):
     from tools.candidate_parameters import parameter_value,fixed_configuration
     from tools.execution_completion import EXECUTION_ALLOWANCES
+    if host.store.session(host.run_id)['state'].get('role_context',{}).get('decision_only'):
+        raise ValueError('DECISION_ONLY_NO_BATCH_EXECUTION')
     """Injected apply/simulation/evaluation/profile outputs only; no provider or physics.
 
     The callback receives (stage, candidate, retained stage receipts). Its profile
@@ -587,16 +616,27 @@ def _run_batch(host,inject,*,stop_after_stage=None):
             from tools.candidate_parameters import actual_parameter_changes
             proposal['actual_changes']=actual_parameter_changes(source,effective,changes)
             batch['proposals'].append(proposal);previous=batch['configurations'].get(identity)
+            known_records=list(batch.get('historical_results',[]))
+            for facts in (batch.get('starting_facts'),batch.get('retained_baseline')):
+                if facts and not any(r['facts']['execution_id']==facts['execution_id'] for r in known_records):
+                    known_records.append(dict(facts=facts))
+            matches=matching_scientific_history(host.store,effective,known_records,
+                implementation=host.store.session(host.run_id)['snapshot'])
+            proposal['matching_scientific_history']=matches
+            eligible={r['candidate']['execution_id'] for r in matches if r['comparison']['reuse_eligible']}
+            if matches and not eligible and not batch.get('replication_reason'):
+                batch['stop_reason']='known_scientific_point_requires_repetition_purpose'
+                batch['algorithm']=plain(algorithm.save());_save_batch(host,batch);break
             start=None
             if proposal['index']==0 and batch['starting_facts']:
                 from extensions.tendon_family.gvs_profile import execution_scope
                 original=host.store.artifact(batch['starting_facts']['configuration'])['effective']
-                if execution_scope(effective)==execution_scope(original):start=batch['starting_facts']
+                if batch['starting_facts']['execution_id'] in eligible:start=batch['starting_facts']
             retained=None
             historical=None
             if not previous and batch.get('historical_results'):
                 from extensions.tendon_family.gvs_profile import execution_scope
-                historical=next((r for r in batch['historical_results'] if r.get('reusable_under_plan',True) and r['execution_scope']==execution_scope(effective)),None)
+                historical=next((r for r in batch['historical_results'] if r['execution_id'] in eligible),None)
                 if historical and not batch.get('replication_reason'):
                     facts=historical['facts']
                     previous=dict(candidate_id=facts['candidate']['candidate_id'],configuration=facts['configuration'],identity=identity,
@@ -610,11 +650,12 @@ def _run_batch(host,inject,*,stop_after_stage=None):
                 from extensions.tendon_family.gvs_profile import execution_scope
                 candidate=batch['retained_baseline']
                 original=host.store.artifact(candidate['configuration'])['effective']
-                if execution_scope(effective)==execution_scope(original):retained=candidate
+                if candidate['execution_id'] in eligible:retained=candidate
             replication_of=None
             if batch.get('replication_reason'):
                 replication_of=(historical['facts']['candidate'] if historical else
                     start['candidate'] if start else retained['candidate'] if retained else None)
+                if not replication_of and matches:replication_of=matches[0]['candidate']
                 previous=start=retained=None
                 if replication_of:proposal.update(replication_of=replication_of,replication_reason=batch['replication_reason'])
             if previous or start or retained:

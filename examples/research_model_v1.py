@@ -66,7 +66,7 @@ def archive(w):
 def copy_references(source,destination,value,seen=None):
     seen=set() if seen is None else seen
     if isinstance(value,dict):
-        if set(value)=={'artifact_id','media_type'}:
+        if set(value)=={'artifact_id','media_type'} and isinstance(value['artifact_id'],str) and isinstance(value['media_type'],str):
             if value['artifact_id'] in seen:return
             seen.add(value['artifact_id'])
             try:body=source.artifact(value,raw=True)
@@ -112,7 +112,37 @@ def historical(w,root,eid,role):
     return dict(role=role,facts=facts,acceptance=acceptance,execution_id=eid,owner_run_id=owned['owner'],
         execution_scope=execution_scope(effective),source_store=str(source.root),binding=imported,receipts=receipts,
         reuse_reason='Exact archived observation; original implementation/charges retained. Not a fresh matched reference.',
-        implementation=dict(commit=source.session(owned['owner'])['snapshot']['project_commit']))
+        implementation=dict(commit=source.session(owned['owner'])['snapshot']['project_commit'],
+            dependencies={k:digest(v) for k,v in source.session(owned['owner'])['snapshot']['dependencies'].items()}))
+
+
+RELEVANT_HISTORY = {
+    '91c3ba1b01d6499fb26df8f95409401b':'retained_baseline',
+    'e3876a1d289f41f08d46c96202f1da0c':'matching_holding_075_failure',
+    '110dc2c9c1d642dcb018664a65c62c30':'matching_holding_100_failure',
+    'bebcfd47274940fb88a55ce5a2457c4c':'zero_holding_weight_passing_counterexample',
+    '312ef97407b34ff28905e883a947f475':'lower_holding_weight_failure_counterexample',
+    '148a2a290daa440f9b966f4d5cee4b5f':'joint_weights_passing_confounded_counterexample',
+    '1ffdcbc4f93f4dc4bb16a807c7b4056b':'intermediate_holding_weight_failure',
+}
+
+
+def relevant_history(w):
+    """Bounded explicit evidence selection; no recency or success-only filter."""
+    manifest='runs/milestone4_autonomous_20261006/scheduler_state.json'
+    candidates=read(ROOT/manifest)['records']; selected=[]; considered=[]
+    for r in candidates:
+        eid=r['execution_id']; role=RELEVANT_HISTORY.get(eid)
+        considered.append(dict(execution_id=eid,source_store=r['source_store'],selected=bool(role),
+            reason=role or 'Outside bounded nominal same-robot weight neighborhood; not evidence of absence'))
+        if role:selected.append(historical(w,r['source_store'],eid,role))
+    if {r['execution_id'] for r in selected}!=set(RELEVANT_HISTORY):raise ValueError('RELEVANT_HISTORY_UNRESOLVED')
+    selected.sort(key=lambda r:(r['role']!='retained_baseline',r['execution_id']))
+    return selected,dict(selection_version='native_history_coverage@1.1.0',source_manifest=manifest,
+        considered=considered,selected_execution_ids=[r['execution_id'] for r in selected],
+        limitations=['Targeted saved manifest only; no full repository audit or exhaustive history claim.',
+            'Imported executions retain original source event chronology; presentation order is not chronology.',
+            'Builder/implementation boundaries do not turn scientific overlap into result-reuse eligibility.'])
 
 
 def persist(w):
@@ -162,7 +192,8 @@ def prepare(directory=DEFAULT, *, offline_fixture=False):
         state=store.session(host.run_id,db)['state'];state['fact_scope']=dict(project=grant,binding=incumbent['binding'])
         store.update_state(db,host.run_id,state)
     final=historical(w,'runs/research_shared_path_v11_approval_20261006','8b8ce2691fc24b3392ff5e7fa4905ba4','subsequent_development_event')
-    w.records=[incumbent];w.baseline=incumbent['facts'];w.latest=None;w.selected=spec['source']['candidate']
+    w.records,coverage=relevant_history(w)
+    w.baseline=incumbent['facts'];w.latest=None;w.selected=spec['source']['candidate']
     source_ref=save(store,dict(specification_identity=digest(spec),incumbent=spec['source']['candidate']))
     w.previous_decision=source_ref
     w.freeze=dict(version=VERSION,project_id=grant,research_host=host.run_id,limits=budget,offline_fixture=offline_fixture,
@@ -186,6 +217,7 @@ def prepare(directory=DEFAULT, *, offline_fixture=False):
         task_acceptance=spec['acceptance'],study_question=spec['question'],frozen_cases=spec['cases'],
         initial_state_mapping=spec['initial_state_mapping'],common_scientific_input=dict(acceptance=resolve_acceptance(inp)),
         subsequent_event=final,
+        history_coverage=coverage,
         m5_feedback=dict(source='docs/milestone5_control_successor.md',text=(ROOT/'docs/milestone5_control_successor.md').read_text(encoding='utf8'),
             scope='Sealed negative controller/prediction evidence; no screening authority, no v8 adoption or protected allocation.'),
         experiment=dict(evidence_directory=str(EXPORT)))
@@ -202,6 +234,11 @@ def prepare(directory=DEFAULT, *, offline_fixture=False):
 
 
 def configure(w):
+    if w.freeze.get('decision_only'):
+        with w.store.transaction() as db:
+            state=w.store.session(w.host.run_id,db)['state']
+            state.setdefault('role_context',{}).update(decision_only=True)
+            w.store.update_state(db,w.host.run_id,state)
     cap=capabilities(w.store,w.host.run_id,w.records)
     if sum(r['decision']['decision']['action']=='diagnosis' for r in w.rounds)>=w.freeze['diagnosis_limit']:
         cap['legal'].pop('diagnosis',None);cap['unavailable']['diagnosis']='Frozen two-read diagnostic ceiling reached'
@@ -226,16 +263,27 @@ def configure(w):
             for r in w.rounds if r.get('feedback_result')],
         corrections=dict(total=state.get('protocol_corrections_used',0),consecutive=state.get('protocol_corrections_consecutive',0)))
     packet['execution_version_boundary']=w.freeze.get('repair_boundary')
+    packet['history_coverage']=w.freeze.get('history_coverage')
+    boundary=w.freeze.get('recovery_boundary')
+    packet['decision_recovery']=({k:v for k,v in boundary.items() if not k.endswith('_seal') and k!='old_implementation'}
+        | dict(old_implementation_commit=boundary['old_implementation']['commit'])) if boundary else None
     event=w.freeze['subsequent_event']
     packet['study']['subsequent_event']=dict(candidate=event['facts']['candidate'],case_id='near_z_plus',seed=17,
         acceptance=event['acceptance'],implementation=event['implementation'],completed=True,matched_nominal_reference=False)
-    authority=research_authority(packet,new_execution_ids=[r['execution_id'] for r in w.records if r['source_store']==str(w.directory)],
+    authority=research_authority(packet,new_execution_ids=w.freeze.get('original_pilot_execution_ids',
+        [r['execution_id'] for r in w.records if r['source_store']==str(w.directory)]),
         replication_pairs=[(c['replication_of']['execution_id'],c['execution_id']) for r in w.rounds if r.get('result')
             for c in w.store.artifact(r['result']).get('candidates',[]) if c.get('replication_of') and c.get('execution_id')])
     authority.update(stop=dict(status=w.status,reason=w.stop_reason,sealed_cases=w.sealed_cases),
         budget_accounting=w.store.remaining(),experiment_permissions=w.freeze['allocation'])
     if w.rounds:
         last=w.rounds[-1]['decision'];authority.update(hypotheses=last['model_interpretations'],unresolved=last['unresolved_uncertainties'])
+        if w.freeze.get('decision_only'):
+            authority['hypotheses']=[dict(statement=h['statement'],scope=h['scope'],uncertainty=h['uncertainty'],
+                original_decision=w.rounds[-1]['accepted_decision'],bound_evidence=last['interpretation_bindings'][i])
+                for i,h in enumerate(last['model_interpretations'])]
+            authority['experiment_permissions']=dict(decision_only=True,backend_solves=0,numerical_operations=0,
+                workers=0,proposals_require_separate_authorization=True)
     experiments=[dict(experiment_id=r['execution_id'],status='completed',candidate=r['facts']['candidate'],
         case_id='nominal',seed=17,task_identity=r['acceptance']['task_identity'],structure_identity=digest(w.store.artifact(r['facts']['configuration'])['effective']['robot']),
         implementation=r.get('implementation',w.freeze['implementation']),observed_metrics=r['acceptance'],
@@ -251,13 +299,15 @@ def configure(w):
     else:
         w.working=update_working_state(w.working,archive=a,evidence_packet=packet,authority=authority,
             experiment_updates=experiments,claim_revisions=claims)
-    configure_role(w.host,'design',INSTRUCTIONS,phase='research',delivery_tool='research.decide',phase_budget={},
+    configure_role(w.host,'design',w.freeze.get('recovery_instructions',INSTRUCTIONS),phase='research',delivery_tool='research.decide',
+        phase_budget=dict(protect_project=dict(tool_calls=1,wall_s=60.),protect_role=dict(tool_calls=1,wall_s=60.)) if w.freeze.get('decision_only') else {},
+        decision_only=w.freeze.get('decision_only',False),decision_recovery_policy=w.freeze.get('recovery_policy'),
         fact_separation=True,autonomous_scheduling=True,research_packet=packet,context_authority=authority,
         research_working_state=w.working,research_working_manifest=a.manifest(),research_records=w.records,result_feedback=w.feedback,
         diagnosis_remaining=max(0,w.freeze['diagnosis_limit']-sum(r['decision']['decision']['action']=='diagnosis' for r in w.rounds)),
         predecessor_decision=w.previous_decision,latest_tested=w.latest,require_source_binding=True,max_batch_backends=2,
         source_report=w.freeze['source_report'],improvement_feedback_content=dict(baseline_facts=w.baseline,execution=None),
-        native_store_root=str(w.directory),native_fixed={},memory_identity=w.host.run_id,binding=w.freeze['binding'])
+        native_store_root=str(w.store.root),native_fixed={},memory_identity=w.host.run_id,binding=w.freeze['binding'])
     return packet
 
 

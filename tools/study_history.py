@@ -15,6 +15,31 @@ def reporting_scientific_scope(effective):
     return scientific_fixed_scope(effective, ())
 
 
+def scientific_match(proposed, original, *, implementation=None, historical_implementation=None):
+    """Scientific identity and conservative result reuse are separate decisions.
+
+    Unknown implementation mappings never authorize reuse. A commit difference
+    alone is not evidence that the physical model changed.
+    """
+    from extensions.tendon_family.gvs_profile import execution_scope
+    matched = reporting_scientific_scope(proposed) == reporting_scientific_scope(original)
+    strict_scope = execution_scope(proposed) == execution_scope(original)
+    builder = proposed['policy']['candidate_builder'] == original['policy']['candidate_builder']
+    a, b = implementation or {}, historical_implementation or {}
+    required = ('backend.', 'model.', 'controller.', 'solver.', 'initialize.', 'evaluate.', 'task.')
+    def numerical_dependencies(value):
+        return {k:(v if isinstance(v,str) else digest(v)) for k,v in value.get('dependencies', {}).items() if k.startswith(required)}
+    left, right = numerical_dependencies(a), numerical_dependencies(b)
+    known = bool(left and right) and set(left) == set(right)
+    compatible = known and left == right
+    return dict(scientific_match=matched, scientific_configuration_identity=digest(reporting_scientific_scope(proposed)),
+        reuse_eligible=matched and strict_scope and builder and compatible,
+        strict_execution_scope_equal=strict_scope, builder_binding_equal=builder,
+        implementation_mapping='compatible' if compatible else 'incompatible' if known else 'unknown',
+        implementation_commits=dict(proposed=a.get('commit',a.get('project_commit')),historical=b.get('commit',b.get('project_commit'))),
+        qualification='Matching science does not establish identical outputs or cache compatibility; provenance remains bound to each execution.')
+
+
 def execution_chronology(store, records):
     """Order this store's real attempts by reservation events, not presentation.
 
@@ -177,6 +202,12 @@ def reporting_summary(history, *, new_execution_ids, replication_pairs, selected
     new=[by_id[e] for e in new_execution_ids]
     historical_ids={r['scientific_configuration_identity'] for e,r in by_id.items() if e not in new_execution_ids}
     novel_ids={r['scientific_configuration_identity'] for r in new}-historical_ids
+    overlaps=[dict(new_execution=r['candidate'],historical_executions=[old['candidate'] for e,old in by_id.items()
+        if e not in new_execution_ids and old['scientific_configuration_identity']==r['scientific_configuration_identity']],
+        scientific_configuration_identity=r['scientific_configuration_identity'],
+        deliberately_planned=any(p['repeated_execution_id']==r['candidate']['execution_id'] for p in repetitions),
+        repetition_purpose='See original plan; no retrospective intent inferred') for r in new
+        if r['scientific_configuration_identity'] in historical_ids]
     results=[dict(candidate=r['candidate'],execution_id=e,weights=r['weights'],metrics=r['metrics'],
         configuration_identity=r['configuration_identity'],scientific_configuration_identity=r['scientific_configuration_identity'],
         structure_identity=r['structure_identity'],controller=r['controller'],decisions=r['decisions'],references=r['references'],
@@ -186,6 +217,7 @@ def reporting_summary(history, *, new_execution_ids, replication_pairs, selected
     groups=[dict(structure_identity=s,result_execution_ids=[r['execution_id'] for r in results if r['structure_identity']==s])
         for s in sorted({r['structure_identity'] for r in results})]
     return dict(new_execution_count=len(new),novel_configuration_count=len(novel_ids),
+        scientifically_previously_evaluated_count=len(overlaps),scientific_overlaps=overlaps,
         replication_count=len(repetitions),replications=repetitions,
         results=results,geometry_groups=groups,selected=selected,latest=latest,usage=usage,stop=stop,
         limits=['One matching repeat does not establish general repeatability, variance, identical trajectories or identical timing.',

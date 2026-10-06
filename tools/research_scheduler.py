@@ -42,6 +42,8 @@ def capabilities(store, run_id, records):
     remaining=downstream_available(store,run_id)
     capacity=budget_capacity(1,remaining,preparation_reserve_s=PREPARATION_RESERVE_S)
     inp=store.session(run_id)['snapshot']['input']; controller=inp['policy']['controller']
+    proposal_only=store.session(run_id)['state'].get('role_context',{}).get('decision_only',False)
+    if proposal_only:remaining=store.spendable(run_id)['remaining']
     stable=(controller['extension_id'],controller['version'])==('controller.gvs_nmpc','7.0.0')
     pool=resolved_pool(inp)
     legal={}; gaps={}; reg=registry()
@@ -51,7 +53,7 @@ def capabilities(store, run_id, records):
                          ('structure_search',list(pool))]:
         reason=None
         if not stable:reason='Stable controller.gvs_nmpc@7.0.0 prerequisite absent'
-        elif not capacity['sufficient']:reason='Complete execution and delivery reservation unavailable: '+str(capacity['shortfalls'])
+        elif not proposal_only and not capacity['sufficient']:reason='Complete execution and delivery reservation unavailable: '+str(capacity['shortfalls'])
         elif not paths or (action=='structure_search' and not any(not p.startswith('control/') for p in paths)):
             reason='Authorized builder paths unavailable'
         elif not methods:reason='No compatible installed batch method'
@@ -66,11 +68,13 @@ def capabilities(store, run_id, records):
     role=store.session(run_id)['state'].get('role_context',{})
     if role.get('diagnosis_remaining',1)<=0:
         gaps['diagnosis']='Frozen retained-query decision ceiling reached'
-    elif not records or remaining['wall_s']<780 or remaining['tool_calls']<6 or remaining['model_calls']<4:
+    elif not records or (not proposal_only and (remaining['wall_s']<780 or remaining['tool_calls']<6 or remaining['model_calls']<4)):
         gaps['diagnosis']='Verified saved evidence or 180-second query plus protected delivery capacity unavailable'
     else:legal['diagnosis']=dict(operations=['retained prediction/plans/motion query'],max_wall_s=180,
         numerical_gap='Local controller comparisons require separately bound adoption and saved-horizon prerequisites; no such grant installed in this scheduling context.')
     legal['stop']=dict(reason='Voluntary delivery is always legal')
+    if proposal_only:
+        for value in legal.values():value.update(proposal_only=True,execution_authorized=False)
     return dict(legal=legal,unavailable=gaps,remaining=remaining)
 
 

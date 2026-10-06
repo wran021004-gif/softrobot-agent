@@ -492,6 +492,11 @@ def run_loop(host, adapter=None):
                     expected = definition.extension_id
                     request_id = f'model-{state["turn"]}'
                     cost = {**zero(), 'model_calls': int(definition.capabilities.get('real_requests', False)), 'wall_s': config['timeout_s']}
+                    if state.get('role_context',{}).get('decision_only'):
+                        allowance=session['snapshot']['input']['policy']['operation_allowances']['research.decide']
+                        available=host.store.spendable(host.run_id)['remaining']
+                        if available['wall_s']<cost['wall_s']+allowance['reserve_s'] or available['tool_calls']<1:
+                            raise ValueError('BUDGET_EXHAUSTED: complete provider request plus decision validation and protected factual review required')
                     with host.store.transaction() as db:
                         input_ref = host.store.put(db, payload)
                         config_ref = host.store.put(db, config)
@@ -694,6 +699,8 @@ def _model_failure(host, receipt, advance_turn=True):
     truncated = failure.get('length_truncated') and failure.get('finish_reason') == 'length'
     recovery=host.store.session(host.run_id)['snapshot']['input']['policy']['model'].get('length_recovery')
     eligible=recovery is None or (recovery.get('enabled',True) and failure.get('without_usable_action'))
+    decision_recovery=state.get('role_context',{}).get('decision_recovery_policy')
+    if decision_recovery:eligible=False  # Preserve provider token/timeout settings.
     if truncated and eligible and not state.get('length_retries_used', 0):
         with host.store.transaction() as db:
             state = host.store.session(host.run_id, db)['state']
@@ -715,6 +722,7 @@ def _model_failure(host, receipt, advance_turn=True):
     malformed = 'protocol_errors' in failure or 'tool_call_count' in failure
     config = host.store.session(host.run_id)['snapshot']['input']['policy']['model']
     limits = config.get('protocol_recovery') or dict(max_total=1, max_consecutive=1)
+    if decision_recovery:limits=dict(max_total=decision_recovery['max_protocol_corrections'],max_consecutive=1)
     total = state.get('protocol_corrections_used', 0)
     consecutive = state.get('protocol_corrections_consecutive', 0)
     if malformed and total < limits['max_total'] and consecutive < limits['max_consecutive']:

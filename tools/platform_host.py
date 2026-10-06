@@ -146,6 +146,8 @@ class Host:
             snapshot = self.store.session(self.run_id)
             inp = SessionInput.model_validate(snapshot['snapshot']['input'])
             role_grant = snapshot['state'].get('role_grant')
+            if snapshot['state'].get('role_context',{}).get('decision_only') and request.tool_id!='research.decide':
+                raise ValueError('DECISION_ONLY_NO_EXPERIMENT_DISPATCH')
             if role_grant and request.tool_id not in role_grant['permitted_tools']:
                 raise ValueError('TOOL_NOT_IN_DIAGNOSTIC_REQUEST_SCOPE')
             from tools.platform_models import phase_tools
