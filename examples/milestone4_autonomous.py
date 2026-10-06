@@ -339,7 +339,8 @@ def execute(w,row):
                     owner_run_id=facts['candidate']['owner_run_id'],execution_scope=execution_scope(cfg),source_store=str(w.directory),
                     receipts=candidate['execution']['receipts'],reuse_reason='New complete feedback-driven supplement evaluation'))
             compact.append(dict(candidate=facts['candidate'],metrics=campaign_metrics(facts),
-                source_comparison=compare_results(source['facts'],facts),baseline_comparison=compare_results(w.baseline,facts),
+                **({'acceptance':candidate['execution']['acceptance']} if candidate['execution'].get('acceptance') else {}),
+                source_comparison=candidate['feedback']['comparison'],baseline_comparison=candidate['retained_baseline_comparison'],
                 profile=facts['report']))
         w.latest=result['execution_chronology']['latest_complete_result']
         row['feedback_result']=feedback(w,dict(batch_result=ref,plan=plan,source=source['facts']['candidate'],

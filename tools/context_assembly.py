@@ -228,7 +228,7 @@ def _research(packet, authority, archive):
     def selected_aliases(aliases):
         selected={a:r for a,r in aliases.items() if a in required_aliases or
             ((('/metrics/' in r['pointer'] and '/source/' not in r['pointer'] and '/coverage/' not in r['pointer']) or
-              '/candidate_minus_baseline/' in r['pointer'] or r['pointer'].endswith(('/classification','/status','/stop_reason'))))}
+              '/acceptance/' in r['pointer'] or '/candidate_minus_baseline/' in r['pointer'] or r['pointer'].endswith(('/classification','/status','/stop_reason'))))}
         # Initial handoffs have no outcome wrapper; preserve that exact handoff.
         return selected or aliases
     feedback['aliases']=selected_aliases(feedback['aliases'])
@@ -598,11 +598,16 @@ def assemble_working_context(purpose, state, *, archive):
     return result
 
 
-def assemble_working_request(payload, config, purpose, state, *, archive):
+def assemble_working_request(payload, config, purpose, state, *, archive, context_slot=None):
     """Prepare, measure and archive the recovered next input, without sending."""
     result = assemble_working_context(purpose, state, archive=archive)
     wire = deepcopy(payload)
-    wire['messages'][1]['content'] = encode(result['view'])
+    if context_slot:
+        context=json.loads(wire['messages'][1]['content'])
+        context['role_context'][context_slot]=result['view']
+        wire['messages'][1]['content']=encode(context)
+    else:
+        wire['messages'][1]['content'] = encode(result['view'])
     measurement = measure_input(wire, config, purpose)
     result['audit'].update(measurement=measurement, working_revision=state['revision'],
         assembled_input_reference=archive.snapshot(wire), source_manifest=archive.manifest())

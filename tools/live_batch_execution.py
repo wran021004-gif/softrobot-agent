@@ -128,4 +128,10 @@ class LiveBatchExecution:
         actual=self.host.store.artifact(result['configuration'])['effective']
         if execution_scope(actual)!=execution_scope(expected) or actual['robot']!=expected['robot'] or actual['task']!=expected['task']:
             raise ValueError('BATCH_REAL_RESULT_CONFIGURATION_MISMATCH')
+        from tools.research_tasks import assemble_acceptance
+        report=self.host.store.artifact(result['profile_report']['reference'])
+        motion=self.host.store.artifact(report['detail']['motion'])
+        result['acceptance']=assemble_acceptance(actual,result['evaluation_data'],report,
+            evaluation_reference=result['factual_result']['evaluation'],
+            profile_reference=result['profile_report']['reference'],motion=motion)
         return result

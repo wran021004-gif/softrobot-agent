@@ -1,0 +1,24 @@
+{
+  "version": "research.native_first_study@1.0.0",
+  "campaign_id": "research_native_v1_20261006",
+  "parent_spec": "configs/research/reach_hold_v1_1.json",
+  "limits": {
+    "model_calls": 12,
+    "tool_calls": 40,
+    "backend_solves": 4,
+    "worker_calls": 0,
+    "wall_s": 16000.0
+  },
+  "max_batch_backends": 2,
+  "retained_query_decisions": 2,
+  "standalone_numerical_operations": 0,
+  "execution_case": "nominal",
+  "seed": 17,
+  "other_cases": "Frozen in parent specification; fresh matched perturbation comparisons deferred. Completed near_z_plus evidence is supplied as a subsequent event.",
+  "corrections": "Use configured cumulative protocol policy and one configured length recovery; all consume this same ledger and request/time ceiling. No transport resend or retry-to-pass.",
+  "provider": "Read actual parent model configuration and existing credential loader; preserve endpoint, model, reasoning, token limits, timeouts and TLS verification.",
+  "stop": "Voluntary model STOP, material/unknown failure, insufficient complete reservations, or cumulative ceilings. No fallback or budget reset.",
+  "allocation_derivation": "4*(900+30+60+5) + 12*900 + 120 preparation + 2*180 retained queries = 15260 < 16000 seconds. 16 execution/preparation operations +12 native decisions +2 queries +1 setup +4 delivery operations =35 <40. Existing batch reservations protect4 model/4 tool/600s delivery capacity; provider requests still reserve their actual timeout.",
+  "formal_28_allocation": "Untouched",
+  "protected_M5_slots": "Untouched"
+}

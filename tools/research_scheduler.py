@@ -2,10 +2,16 @@
 from tools.platform_store import plain
 from tools.state_io import digest
 from tools.batch_budget import budget_capacity, downstream_available, PREPARATION_RESERVE_S
-from tools.candidate_parameters import STRUCTURAL_PATHS
-from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
 
 ACTIONS=('control_search','structure_search','diagnosis','stop')
+
+
+def resolved_pool(effective):
+    """The effective builder/catalog is the single action and validation pool."""
+    from tools.parameter_impacts import parameter_impacts
+    rows=parameter_impacts(effective)['mapped']
+    return {r['parameter']:r for r in rows
+        if r['authorized_parameter'] and r['implementation_supported']}
 
 
 def verified_observations(state, decision):
@@ -37,19 +43,30 @@ def capabilities(store, run_id, records):
     capacity=budget_capacity(1,remaining,preparation_reserve_s=PREPARATION_RESERVE_S)
     inp=store.session(run_id)['snapshot']['input']; controller=inp['policy']['controller']
     stable=(controller['extension_id'],controller['version'])==('controller.gvs_nmpc','7.0.0')
-    space=inp['policy']['candidate_builder']['parameters']['data']
+    pool=resolved_pool(inp)
     legal={}; gaps={}; reg=registry()
-    for action,paths in [('control_search',REACH_WEIGHT_PATHS),('structure_search',STRUCTURAL_PATHS)]:
-        builder=space.get('control_parameters',{}) if action=='control_search' else space['parameters']
+    methods=[m+'@1.0.0' for m in ('search.family_coordinate','search.family_explicit')
+        if reg.inspect(reg.get(m,'1.0.0','search'),{m:'1.0.0'})['executable']]
+    for action,paths in [('control_search',[p for p in pool if p.startswith('control/')]),
+                         ('structure_search',list(pool))]:
         reason=None
         if not stable:reason='Stable controller.gvs_nmpc@7.0.0 prerequisite absent'
         elif not capacity['sufficient']:reason='Complete execution and delivery reservation unavailable: '+str(capacity['shortfalls'])
-        elif not all(p in builder for p in paths):reason='Authorized builder paths unavailable'
+        elif not paths or (action=='structure_search' and not any(not p.startswith('control/') for p in paths)):
+            reason='Authorized builder paths unavailable'
+        elif not methods:reason='No compatible installed batch method'
         elif not all(reg.inspect(reg.get(t,'1.0.0','tool'),{t:'1.0.0'})['executable'] for t in
                      ('simulation.run','evaluation.run','control.profile_report')):reason='Backend/evaluation/profile implementation unavailable'
         if reason:gaps[action]=reason
-        else:legal[action]=dict(paths=list(paths),minimum_batch=capacity['requirement'])
-    if not records or remaining['wall_s']<780 or remaining['tool_calls']<6 or remaining['model_calls']<4:
+        else:legal[action]=dict(paths=list(paths),minimum_batch=capacity['requirement'],methods=methods,
+            domains={p:pool[p]['granted_range'] for p in paths},
+            mixed_semantics='structure_search permits a joint structural/control subset; each ask/tell point constructs all selected values together, followed by one unchanged v7 closed-loop execution. No inner search or extra control budget.',
+            method_semantics={'search.family_coordinate@1.0.0':'Numerically generated continuous coordinate proposals; categorical paths unavailable.',
+                'search.family_explicit@1.0.0':'Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated.'})
+    role=store.session(run_id)['state'].get('role_context',{})
+    if role.get('diagnosis_remaining',1)<=0:
+        gaps['diagnosis']='Frozen retained-query decision ceiling reached'
+    elif not records or remaining['wall_s']<780 or remaining['tool_calls']<6 or remaining['model_calls']<4:
         gaps['diagnosis']='Verified saved evidence or 180-second query plus protected delivery capacity unavailable'
     else:legal['diagnosis']=dict(operations=['retained prediction/plans/motion query'],max_wall_s=180,
         numerical_gap='Local controller comparisons require separately bound adoption and saved-horizon prerequisites; no such grant installed in this scheduling context.')
@@ -82,8 +99,10 @@ def validate_decision(store, view, decision):
     if d.plan:
         if (d.plan.max_backend_attempts or d.plan.max_candidates)>role['max_batch_backends']:
             raise ValueError('BATCH_ALLOCATION_EXCEEDED: '+str(role['max_batch_backends']))
-        paths=set(d.plan.variables);allowed=set(REACH_WEIGHT_PATHS if d.action=='control_search' else STRUCTURAL_PATHS)
+        paths=set(d.plan.variables);allowed=set(cap['legal'][d.action]['paths'])
         if not paths or paths-allowed:raise ValueError('ACTION_VARIABLE_SCOPE: '+str(sorted(allowed)))
+        if d.action=='structure_search' and not any(not p.startswith('control/') for p in paths):
+            raise ValueError('STRUCTURE_SEARCH_REQUIRES_STRUCTURAL_VARIABLE')
         if plain(d.plan.predecessor_decision)!=role['predecessor_decision']:raise ValueError('PLAN_PREDECESSOR_DECISION_MISMATCH')
         result['batch_plan']=validate_batch_plan(store,view,d.plan)
     if d.diagnosis:

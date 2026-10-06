@@ -239,9 +239,19 @@ class EvidenceDrivenAdapter(ScopedReferenceAdapter):
             authority['required_aliases']=sorted(set(re.findall(r'\bF\d+\b',encode(dict(
                 draft=self.fact_state.get('unaccepted_draft'),correction=context.get('protocol_correction'),
                 hypotheses=authority.get('hypotheses'))))))
-            payload,self.context_assembly_audit=assemble_request(payload,config,'research_decision',packet,
-                archive=archive,authority=authority,
-                context_slot='research_packet')
+            if self.role.get('research_working_state') is not None:
+                from tools.context_assembly import assemble_working_request
+                from tools.context_assembly import ROOT
+                archive=EvidenceArchive.from_manifest(ROOT/self.role['research_working_manifest'],
+                    scope=archive.scope,stores=(self.store,))
+                working=deepcopy(self.role['research_working_state'])
+                # Protocol corrections keep their original source-scoped aliases.
+                working['authority'].update(required_aliases=authority['required_aliases'])
+                payload,self.context_assembly_audit=assemble_working_request(
+                    payload,config,'research_decision',working,archive=archive,context_slot='research_packet')
+            else:
+                payload,self.context_assembly_audit=assemble_request(payload,config,'research_decision',packet,
+                    archive=archive,authority=authority,context_slot='research_packet')
         return payload
 
     def resolve_business(self,name,args):

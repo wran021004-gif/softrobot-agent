@@ -370,7 +370,7 @@ def _save(host, saved):
         host.store.update_state(db, host.run_id, state)
 
 
-def physical_feedback(baseline, candidate, acceptance):
+def physical_feedback(baseline, candidate, acceptance, *, unified=None):
     """Scalar coordinate guidance; the frozen physical comparison stays separate."""
     import math
     from tools.settling_campaign import compare_results
@@ -392,11 +392,23 @@ def physical_feedback(baseline, candidate, acceptance):
     # Acceptance occupies [0,1); nonacceptance [1,2). The bounded normalized
     # physical loss is monotone in each metric. A trade-off can guide ask/tell,
     # but its classification is never changed to "overall improvement".
+    if unified is not None:
+        metrics['joint_reach_holding_passed']=unified['accepted']
+        legal=legal and unified['status'] in ('accepted','valid_failure')
     score=(int(not metrics['joint_reach_holding_passed'])+
         sum(v/(v+limit) for v,limit in zip(vector,limits))/len(vector)) if legal else None
-    return dict(score=score,comparison=comparison,physical_metrics=metrics,
+    return dict(score=score,comparison=comparison,physical_metrics=metrics,**({'acceptance':unified} if unified is not None else {}),
         rule='Joint acceptance bucket plus mean v/(v+frozen_limit); minimize. Trade-offs may guide exploration, never promotion.',
         guidance_only=True,candidate_promoted=False)
+
+
+def bound_acceptance(store, facts):
+    """Read original sealed sources; do not rebind a profile to a new candidate."""
+    from tools.research_tasks import assemble_acceptance
+    report=store.artifact(facts['report']['reference'])
+    return assemble_acceptance(store.artifact(facts['configuration'])['effective'],
+        store.artifact(facts['evaluation']),report,evaluation_reference=facts['evaluation'],
+        profile_reference=facts['report']['reference'],motion=store.artifact(report['detail']['motion']))
 
 
 def _save_batch(host,batch):
@@ -703,10 +715,17 @@ def _run_batch(host,inject,*,stop_after_stage=None):
             raise ValueError('BATCH_RESULT_CONFIGURATION_MISMATCH')
         baseline=batch['starting_facts']
         if baseline is None:batch['starting_facts']=baseline=facts
-        row['feedback']=physical_feedback(baseline,facts,record['bindings']['acceptance'])
+        row['feedback']=physical_feedback(baseline,facts,record['bindings']['acceptance'],
+            unified=row.get('execution',{}).get('acceptance'))
         if batch.get('retained_baseline'):
             from tools.settling_campaign import compare_results
             row['retained_baseline_comparison']=compare_results(batch['retained_baseline'],facts)
+        if row.get('execution',{}).get('acceptance') is not None:
+            from tools.research_tasks import compare_acceptance
+            unified=row['execution']['acceptance']
+            row['feedback']['comparison']=compare_acceptance(unified,bound_acceptance(host.store,baseline))
+            if batch.get('retained_baseline'):
+                row['retained_baseline_comparison']=compare_acceptance(unified,bound_acceptance(host.store,batch['retained_baseline']))
         row['joint_acceptance']=row['feedback']['physical_metrics']['joint_reach_holding_passed']
         algorithm.feedback(row['feedback']['score']);batch['pending']=None;batch['algorithm']=plain(algorithm.save())
         if row['feedback']['score'] is None:batch['stop_reason']='invalid_physical_result'
