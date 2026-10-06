@@ -1,9 +1,17 @@
 {
-  "status": "prepared",
+  "status": "running",
   "stop_reason": null,
   "implementation_checks": "see focused_checks.json",
-  "real_search_batches": 0,
-  "cases": [],
+  "real_search_batches": 1,
+  "cases": [
+    {
+      "case_id": "primary",
+      "real_search_batches": 1,
+      "feedback_bound_to_second_plan": false,
+      "final_model_stop": false,
+      "core_multibatch_acceptance": false
+    }
+  ],
   "sealed_cases": [],
   "core_multibatch_acceptance": false,
   "feedback_bound_to_second_plan": false,
@@ -16,16 +24,95 @@
     },
     "execution_id": "91c3ba1b01d6499fb26df8f95409401b"
   },
-  "latest_execution": null,
-  "latest_completed_evaluation": null,
-  "latest_complete_result": null,
+  "latest_execution": {
+    "candidate_id": "batch-53e711298410eeb5-1",
+    "configuration": {
+      "artifact_id": "df7535c444d58d66d56ef827dbca0b40ae43b2b28e7d733e08a707d4d8db9b43",
+      "media_type": "application/json"
+    },
+    "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+    "owner_run_id": "batch-53e711298410eeb5-1"
+  },
+  "latest_completed_evaluation": {
+    "candidate_id": "batch-53e711298410eeb5-1",
+    "configuration": {
+      "artifact_id": "df7535c444d58d66d56ef827dbca0b40ae43b2b28e7d733e08a707d4d8db9b43",
+      "media_type": "application/json"
+    },
+    "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+    "owner_run_id": "batch-53e711298410eeb5-1"
+  },
+  "latest_complete_result": {
+    "candidate_id": "batch-53e711298410eeb5-1",
+    "configuration": {
+      "artifact_id": "df7535c444d58d66d56ef827dbca0b40ae43b2b28e7d733e08a707d4d8db9b43",
+      "media_type": "application/json"
+    },
+    "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+    "owner_run_id": "batch-53e711298410eeb5-1"
+  },
   "execution_chronology": {
     "scope": "Real executions in this campaign store; imported records are historical evidence, not new attempts",
     "ordering_authority": "Store reservation and completion event sequence",
-    "attempts": [],
-    "latest_execution": null,
-    "latest_completed_evaluation": null,
-    "latest_complete_result": null,
+    "attempts": [
+      {
+        "candidate": {
+          "candidate_id": "batch-53e711298410eeb5-0",
+          "configuration": {
+            "artifact_id": "6fecf2ae17910534d32a569ddd780a7b21be91be653bb41db5268bbe4a7071de",
+            "media_type": "application/json"
+          },
+          "execution_id": "312ef97407b34ff28905e883a947f475",
+          "owner_run_id": "batch-53e711298410eeb5-0"
+        },
+        "reservation_sequence": 71,
+        "reservation_event": "f0e0c663d39040dc90e13174c5e3ad60",
+        "status": "completed",
+        "configuration_binding": "executed"
+      },
+      {
+        "candidate": {
+          "candidate_id": "batch-53e711298410eeb5-1",
+          "configuration": {
+            "artifact_id": "df7535c444d58d66d56ef827dbca0b40ae43b2b28e7d733e08a707d4d8db9b43",
+            "media_type": "application/json"
+          },
+          "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+          "owner_run_id": "batch-53e711298410eeb5-1"
+        },
+        "reservation_sequence": 97,
+        "reservation_event": "01dbb25eac9c4c2bb51b63d873033317",
+        "status": "completed",
+        "configuration_binding": "executed"
+      }
+    ],
+    "latest_execution": {
+      "candidate_id": "batch-53e711298410eeb5-1",
+      "configuration": {
+        "artifact_id": "df7535c444d58d66d56ef827dbca0b40ae43b2b28e7d733e08a707d4d8db9b43",
+        "media_type": "application/json"
+      },
+      "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+      "owner_run_id": "batch-53e711298410eeb5-1"
+    },
+    "latest_completed_evaluation": {
+      "candidate_id": "batch-53e711298410eeb5-1",
+      "configuration": {
+        "artifact_id": "df7535c444d58d66d56ef827dbca0b40ae43b2b28e7d733e08a707d4d8db9b43",
+        "media_type": "application/json"
+      },
+      "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+      "owner_run_id": "batch-53e711298410eeb5-1"
+    },
+    "latest_complete_result": {
+      "candidate_id": "batch-53e711298410eeb5-1",
+      "configuration": {
+        "artifact_id": "df7535c444d58d66d56ef827dbca0b40ae43b2b28e7d733e08a707d4d8db9b43",
+        "media_type": "application/json"
+      },
+      "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+      "owner_run_id": "batch-53e711298410eeb5-1"
+    },
     "missing_chronology": [],
     "unordered_historical_executions": [
       "087adee8e8a24fe88e5c85fe89e638c8",
@@ -47,7 +134,15 @@
       "latest_complete_result": "Latest full profiled evaluation with retained bound facts, by profile completion event"
     }
   },
-  "current_batch_source": null,
+  "current_batch_source": {
+    "candidate_id": "batch-bc9cc559d65f5c74-1",
+    "owner_run_id": "batch-bc9cc559d65f5c74-1",
+    "configuration": {
+      "artifact_id": "5fbaec6f6119410b5d51fec8641d36f3f53e1fa989b1c54fa84897dd659b2281",
+      "media_type": "application/json"
+    },
+    "execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b"
+  },
   "retained_baseline": {
     "candidate_id": "baseline-replay",
     "owner_run_id": "gvs-stage351-baseline-executor",
@@ -66,17 +161,17 @@
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 3,
-      "model_calls": 0,
-      "backend_solves": 0,
+      "tool_calls": 12,
+      "model_calls": 2,
+      "backend_solves": 2,
       "worker_calls": 0,
-      "wall_s": 21.688999999998487
+      "wall_s": 1363.1580000000104
     },
     "remaining": {
-      "backend_solves": 4,
-      "model_calls": 24,
-      "tool_calls": 57,
-      "wall_s": 8978.311000000002,
+      "backend_solves": 2,
+      "model_calls": 22,
+      "tool_calls": 48,
+      "wall_s": 7636.84199999999,
       "worker_calls": 0
     },
     "occupied": {}
@@ -86,12 +181,12 @@
     "consecutive": 0
   },
   "standalone_numerical_operations": 0,
-  "embedded_controller_updates": 0,
+  "embedded_controller_updates": 70,
   "attempts_without_complete_update_count": [],
   "engineering_interventions": 0,
-  "physical_improvement": "Not evaluated: zero new complete search evaluations",
+  "physical_improvement": "Individual new sealed profiles; no required superiority criterion",
   "realtime": "No realtime success established",
-  "model_reasoning": "None: no accepted live model decision",
+  "model_reasoning": "Citations validated; causal explanations remain subject to evidence review",
   "selection_role": "Retained historical incumbent; no new final model selection",
   "milestones": {
     "M4_historical": "closed",
@@ -99,7 +194,7 @@
     "M5": "open"
   },
   "revision": {
-    "commit": "6543d4788d00796e256b9968a05b535549d0b843",
+    "commit": "314a2ae097e3651f5760a4ec9376bdb66406f686",
     "files": {
       "examples/milestone4_autonomous.py": "cd2a875dbfb071687b1bec4a2f18a0421bd7ef40d3a34542abc818c142992dd8",
       "tools/research_scheduler.py": "8a9193b606ff866cb7791656be6b906aea35aa9ced7ebd14eff2af7bb0a5bb02",
