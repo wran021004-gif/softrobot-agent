@@ -313,13 +313,22 @@ def configure(w):
     experiments=[dict(experiment_id=r['execution_id'],status='completed',candidate=r['facts']['candidate'],
         case_id=r.get('case_id','nominal'),seed=w.store.artifact(r['facts']['configuration'])['effective']['seed'],task_identity=r['acceptance']['task_identity'],structure_identity=digest(w.store.artifact(r['facts']['configuration'])['effective']['robot']),
         implementation=r.get('implementation',w.freeze['implementation']),observed_metrics=r['acceptance'],
-        receipt=r['receipts']['simulation'],cache_hit=r['receipts']['simulation'].get('cache_hit')) for r in w.records if r.get('acceptance')]
+        receipt=r['receipts']['simulation'],cache_hit=r['receipts']['simulation'].get('cache_hit'),
+        **{k:r[k] for k in ('phase','repetition') if k in r}) for r in w.records if r.get('acceptance')]
     claims=[dict(claim_id=f'round{r["index"]}-interpretation-{i}',statement=h['statement'],
         supporting_evidence=r['decision']['interpretation_bindings'][i].get('support',[]),
         counterexamples=r['decision']['interpretation_bindings'][i].get('contradiction',[]),
         evidence_aliases=dict(support=h['supporting_evidence'],contradiction=h['contradicting_evidence']),
         scope=h['scope'],uncertainty=h['uncertainty']) for r in w.rounds[-1:] for i,h in enumerate(r['decision']['model_interpretations'])]
     a=archive(w)
+    progress_path=w.directory/'verification_progress.json'
+    if w.freeze.get('campaign_state') and progress_path.exists():
+        from tools.verification_evidence import verification_view,incomplete_verification_experiments
+        progress=read(progress_path)
+        final_path=w.directory/'verification.json'
+        packet['verification']=verification_view(progress,read(final_path) if final_path.exists() else None)
+        packet['verification']['full_evidence']=a.snapshot(progress)
+        experiments.extend(incomplete_verification_experiments(progress,archive=a))
     if w.working is None:
         w.working=create_working_state(packet,authority=authority,archive=a,experiments=experiments)
     else:
@@ -377,14 +386,14 @@ def export(w):
     final=assemble_working_context('final_report',w.working,archive=archive(w))
     shutil.copytree(w.directory/'context_assembly',out/'context_assembly',dirs_exist_ok=True)
     atomic_json(out/'final_working_context.json',final)
-    atomic_json(out/'delivery.json',dict(version=VERSION,status=w.status,stop_reason=w.stop_reason,
+    atomic_json(out/'delivery.json',dict(version=w.freeze.get('version',VERSION),status=w.status,stop_reason=w.stop_reason,
         selected_candidate=w.selected,rounds=w.rounds,usage=w.store.remaining(),
         standalone_numerical_operations=0,workers=0,subagents=0,
         outcomes=[dict(candidate=r['facts']['candidate'],case_id=r.get('case_id','nominal'),seed=w.store.artifact(r['facts']['configuration'])['effective']['seed'],acceptance=r['acceptance'],
             receipts=r['receipts'],implementation=r['implementation'],
             execution_checkout_commit=w.store.session(r['owner_run_id'])['snapshot']['project_commit'])
             for r in w.records if r['source_store']==str(w.directory)],
-        limitations=['No ten-slot matched robustness suite','No formal baseline/three-group comparison',
+        limitations=['See separate frozen verification result for final-suite coverage' if w.freeze.get('campaign_state') else 'No ten-slot matched robustness suite','No formal baseline/three-group comparison',
             'No causal/screening/compression-benefit claim','Mainline 3 integration backlog remains in frozen catalog'],
         final_fact_identity=digest(final['canonical_facts']),working_fact_identity=digest(w.working['current_facts'])))
 

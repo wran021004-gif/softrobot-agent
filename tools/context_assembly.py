@@ -221,6 +221,7 @@ def _research(packet, authority, archive):
         bound['structure_definitions'][r['structure_identity']]) for r in rows if r.get('metrics')}
     reduced = deepcopy(packet)
     reduced['history'] = dict(history, rows=[{k:deepcopy(r[k]) for k in ('candidate','status','configuration_identity')} |
+        {k:deepcopy(r[k]) for k in ('case_id','seed','task_identity') if k in r} |
         ({k:deepcopy(r[k]) for k in ('structure_identity','scientific_configuration_identity','decisions','controller')} if not r.get('metrics') else {})
         for r in sorted(rows, key=lambda r:(r['candidate'].get('execution_id') or '', r['configuration_identity']))])
     # Sorting is presentation only; chronology and latest remain event-bound.

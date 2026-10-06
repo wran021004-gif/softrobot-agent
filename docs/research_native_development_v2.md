@@ -140,3 +140,23 @@ workers or subagents. Offline engineering/test elapsed time is separately bounde
 by the ten-hour assignment deadline; it is not fabricated provider billing.
 The repaired migration's real-ledger save/restore check passes (one test, 19.765s);
 the earlier synthetic-capacity-fixture rejection remains in the offline log.
+
+## 最终验证账本的离线修复
+
+后续检查发现，最终验证原来只写入反馈和独立结果文件，未进入恢复后的
+实验账本和共同事实视图。现在每个完整验证结果必须核对本项目实际回执、
+新鲜计费的模拟、冻结配置、工况、种子以及绑定的评估与报告；验收字段从
+封存来源重新计算，拒绝把历史回执或手改的通过字段当作新结果。完整失败、
+未完成结果及缺少的验证槽位会进入后续请求和最终解释；验证阶段明确标记，
+不会回流为候选搜索结果。
+
+原生路径检查 17 项通过（145.592 秒）；验证绑定和共同上下文检查 10 项
+通过（27.563 秒）；账本与预启动恢复检查 2 项通过（24.882 秒）；最终
+汇总视图追加检查 1 项通过（12.198 秒）。这些是工程离线检查，其中绑定
+夹具仅模拟当前项目回执所有权，不构成新鲜科学实验或可重复性证据。
+没有新增提供方请求、后端执行、独立数值操作或研究决策。
+
+第二次预启动修复仍在同一项目、同一累计额度内，保留第二版冻结和请求，
+扣除旧会话消耗，并限制预启动修复最多两次。物理、稳定 v7 控制器、任务、
+求解及验收条件不变。线上研究、最终配对验证和远端发布继续受已记录的
+自动审批拒绝阻塞；本地完成程度不能支持物理改进或模型优势的结论。

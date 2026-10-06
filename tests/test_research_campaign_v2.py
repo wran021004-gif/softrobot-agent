@@ -125,6 +125,74 @@ class NativeCampaignTests(NativePilotTests):
         self.assertEqual(restored.store.remaining()['used']['backend_solves'],0)
         self.assertFalse(restored.store.session(restored.host.run_id)['state'].get('pending'))
 
+    def saved_verification_row(self):
+        event=self.w.freeze['subsequent_event']
+        f=event['facts']
+        return dict(candidate_id=f['candidate']['candidate_id'],case_id='near_z_plus',seed=17,repetition=1,
+            purpose='engineering_saved_receipt_binding_fixture',configuration=f['configuration'],
+            acceptance=event['acceptance'],receipt=event['receipts']['simulation'],
+            receipts=list(event['receipts'].values()),profile=f['report']['reference'],evaluation=f['evaluation'])
+
+    def test_saved_historical_receipt_cannot_be_new_verification(self):
+        from tools.verification_evidence import verification_record
+        with self.assertRaisesRegex(ValueError,'NOT_OWNED_BY_CURRENT_PROJECT'):
+            verification_record(self.w.store,self.saved_verification_row(),self.w.freeze['implementation'])
+        self.assertEqual(self.w.store.remaining()['used']['backend_solves'],0)
+
+    def test_bound_verification_failure_survives_next_request_and_restore(self):
+        from tools.verification_evidence import verification_record
+        from examples import research_model_v1 as pilot
+        from tools.platform_models import payload_for
+        from tools.diagnostic_reference_adapter import EvidenceDrivenAdapter
+        from tools.state_io import atomic_json
+        original=pilot.restore(self.root)
+        self.addCleanup(lambda:pilot.persist(original))
+        progress_path=self.root/'verification_progress.json'
+        self.addCleanup(lambda:progress_path.unlink(missing_ok=True))
+        final_path=self.root/'verification.json'
+        self.addCleanup(lambda:final_path.unlink(missing_ok=True))
+        row=self.saved_verification_row()
+        receipts={r['request_id']:r for r in row['receipts']}
+        # Saved-record binding fixture substitutes only current receipt ownership;
+        # it creates no fresh execution or claim about repeatability.
+        with patch.object(self.w.store,'lookup',side_effect=lambda owner,request_id:{'receipt':json.dumps(receipts[request_id])}):
+            bound=verification_record(self.w.store,row,self.w.freeze['implementation'])
+            wrong=deepcopy(row);wrong['case_id']='near_z_minus'
+            with self.assertRaisesRegex(ValueError,'CONFIGURATION_OR_CASE_MISMATCH'):
+                verification_record(self.w.store,wrong,self.w.freeze['implementation'])
+            altered=deepcopy(row);altered['acceptance']['accepted']=True
+            with self.assertRaisesRegex(ValueError,'ACCEPTANCE_DIFFERS_FROM_SEALED_SOURCES'):
+                verification_record(self.w.store,altered,self.w.freeze['implementation'])
+        self.w.records=[r for r in self.w.records if r['execution_id']!=bound['execution_id']]+[bound]
+        self.w.working=None
+        progress=dict(plan=dict(schedule=[{k:row[k] for k in ('case_id','seed','repetition')}],
+            fixture_scope='Saved receipt binding, no fresh execution'),groups=[dict(role='unchanged_incumbent',records=[row])],
+            usage=self.w.store.remaining())
+        atomic_json(progress_path,progress)
+        from tools.research_tasks import aggregate_acceptance
+        from tools.fixed_research import schedule
+        from tools.research_spec import load_spec
+        aggregate=aggregate_acceptance([row],10,schedule=schedule(load_spec()))
+        atomic_json(final_path,dict(complete=False,comparison=dict(relation='unavailable',reason='Engineering fixture: nine slots missing'),
+            improvement_supported=False,aggregates=[dict(role='unchanged_incumbent',acceptance=aggregate)]))
+        self.w.freeze['final_reporting']=True
+        packet=pilot.configure(self.w)
+        self.assertFalse(packet['verification']['outcomes'][0]['accepted'])
+        self.assertFalse(packet['verification']['complete'])
+        self.assertEqual(packet['verification']['aggregates'][0]['acceptance']['unrecorded'],9)
+        self.assertEqual(set(packet['capabilities']['legal']),{'stop'})
+        entry=self.w.working['experiments'][bound['execution_id']][-1]['entry']
+        self.assertEqual(entry['phase'],'verification')
+        self.assertEqual(entry['case_id'],'near_z_plus')
+        self.assertFalse(entry['observed_metrics']['accepted'])
+        payload=payload_for(self.w.host,EvidenceDrivenAdapter())
+        view=json.loads(payload['messages'][1]['content'])['role_context']['research_packet']
+        self.assertEqual(view['verification']['outcomes'][0]['metrics'],row['acceptance']['metrics'])
+        pilot.persist(self.w);restored=pilot.restore(self.root)
+        self.assertEqual(restored.working['experiments'][bound['execution_id']][-1]['entry'],entry)
+        self.assertFalse(campaign.search_rows(restored))
+        self.assertEqual(restored.store.remaining()['used']['backend_solves'],0)
+
 
 class CampaignBudgetTests(TestCase):
     def test_child_charges_do_not_unlock_final_reservations(self):

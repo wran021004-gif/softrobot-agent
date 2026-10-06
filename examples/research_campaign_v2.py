@@ -22,7 +22,7 @@ CONFIG_PATH=ROOT/'configs/research/native_campaign_v2.json'
 FILES=(*pilot.FILES,'examples/research_campaign_v2.py','configs/research/native_campaign_v2.json',
        'schemas/platform_handoff.py','tools/batch_budget.py','tools/research_spec.py','tools/study_history.py',
        'tools/candidate_parameters.py','tools/research_tasks.py','tools/fixed_research.py',
-       'extensions/tendon_family/gvs_profile.py')
+       'extensions/tendon_family/gvs_profile.py','tools/verification_evidence.py')
 
 
 def seal():
@@ -103,13 +103,17 @@ def refresh_prelaunch(directory=None):
     config=read(CONFIG_PATH);w=pilot.restore(directory or ROOT/'runs'/config['campaign_id'])
     if w.status!='prepared' or w.store.remaining()['used']['model_calls'] or w.store.remaining()['used']['backend_solves']:
         raise ValueError('ONLY_UNEXECUTED_PRELAUNCH_REFRESH_PERMITTED')
-    if w.freeze.get('prelaunch_repair'):raise ValueError('PRELAUNCH_REPAIR_ALREADY_RECORDED')
+    previous_versions=list(w.freeze.get('prelaunch_versions',[]))
+    if w.freeze.get('prelaunch_repair'):previous_versions.append(w.freeze['prelaunch_repair'])
+    if len(previous_versions)>=2:raise ValueError('PRELAUNCH_REPAIR_LIMIT_REACHED')
+    version=2+len(previous_versions)
     old=w.host;old_freeze=deepcopy(w.freeze)
-    atomic_json(w.directory/'original_prelaunch_freeze.json',old_freeze)
-    atomic_json(w.directory/'original_prelaunch_request.json',read(w.directory/'prepared_request.json'))
+    prefix='original_prelaunch' if version==2 else f'prelaunch_version{version}_prior'
+    atomic_json(w.directory/(prefix+'_freeze.json'),old_freeze)
+    atomic_json(w.directory/(prefix+'_request.json'),read(w.directory/'prepared_request.json'))
     session=w.store.session(old.run_id);inp=deepcopy(session['snapshot']['input'])
     used=w.store.remaining(old.run_id)['used']
-    inp['run_id']=old.run_id+'-prelaunch2'
+    inp['run_id']=old.run_id+f'-prelaunch{version}'
     inp['policy']['budget']={k:max(0,v-used[k]) for k,v in inp['policy']['budget'].items()}
     new=Host(w.directory,inp['run_id']);new.create(inp);transfer_recovery(old,new)
     with w.store.transaction() as db:
@@ -118,29 +122,34 @@ def refresh_prelaunch(directory=None):
             if k in session['state']:state[k]=deepcopy(session['state'][k])
         w.store.update_state(db,new.run_id,state)
     w.host=new;w.freeze['research_host']=new.run_id
-    w.freeze['context_id']=old.run_id
+    w.freeze['context_id']=old_freeze.get('context_id',old.run_id)
     w.freeze['implementation']=seal()
-    boundary=dict(kind='prelaunch_seed18_metadata_compatibility',old_host=old.run_id,new_host=new.run_id,
+    boundary=dict(kind='prelaunch_seed18_metadata_compatibility' if version==2 else 'prelaunch_verification_working_ledger_binding',
+        prelaunch_version=version,old_host=old.run_id,new_host=new.run_id,
         old_implementation=old_freeze['implementation'],new_implementation=w.freeze['implementation'],
         project_grant_unchanged=True,old_session_consumption_deducted=used,backend_replays=0,
         provider_requests=0,physical_or_solver_criteria_changed=False,
-        failure='Real candidate_host compilation rejected predeclared seed18 sampling metadata; 15 affected checks now pass.')
-    reservation,_=w.store.reserve(new.run_id,'prelaunch-seed18-review',digest(boundary),'engineering',
+        failure='Real candidate_host compilation rejected predeclared seed18 sampling metadata; 15 affected checks now pass.' if version==2 else
+            'Final verification was absent from the recovered experiment ledger and canonical history; saved-receipt tests now check ownership, exact cases, failed acceptance and restore without backend execution.')
+    request_id='prelaunch-seed18-review' if version==2 else 'prelaunch-verification-ledger-review'
+    reservation,_=w.store.reserve(new.run_id,request_id,digest(boundary),'engineering',
         {**zero(),'tool_calls':1,'wall_s':30.})
     started=time.monotonic()
     w.freeze['prelaunch_repair']=boundary
+    w.freeze['prelaunch_versions']=previous_versions
     previous_working=deepcopy(w.working)
     pilot.configure(w)
     adapter=EvidenceDrivenAdapter();payload=payload_for(w.host,adapter)
     w.store.complete(reservation,dict(request_id=reservation['request_id'],execution_id=reservation['execution_id'],caller='engineering',
-        tool_id='engineering.prelaunch_seed18',tool_version='1.0.0',execution_status='completed',charged=zero()),boundary,time.monotonic()-started)
+        tool_id='engineering.prelaunch_seed18' if version==2 else 'engineering.prelaunch_verification_ledger',
+        tool_version='1.0.0',execution_status='completed',charged=zero()),boundary,time.monotonic()-started)
     # Reservation releases are not restored research allowance. Reconcile from
     # the settled checkpoint instead of persisting transient occupied capacity.
     w.working=previous_working
     pilot.configure(w);pilot.persist(w)
     adapter=EvidenceDrivenAdapter();payload=payload_for(w.host,adapter)
     atomic_json(w.directory/'prepared_request.json',dict(payload=payload,audit=adapter.context_assembly_audit))
-    atomic_json(w.directory/'prelaunch_version2.json',boundary)
+    atomic_json(w.directory/f'prelaunch_version{version}.json',boundary)
     atomic_json(w.directory/'freeze_seal.json',dict(identity=digest(w.freeze),before_paid_activity=True,original_freeze_preserved=True))
     return w
 
@@ -149,7 +158,7 @@ def search_rows(w):
     spec=load_spec();source=spec['starting_configuration']['effective']
     rows=[]
     for r in w.records:
-        if r['source_store']!=str(w.directory):continue
+        if r['source_store']!=str(w.directory) or r.get('phase')=='verification':continue
         effective=w.store.artifact(r['facts']['configuration'])['effective']
         changes={p:parameter_value(effective,p) for p in spec['parameter_grants']
                  if parameter_value(effective,p)!=parameter_value(source,p)}
@@ -183,8 +192,14 @@ def verify(w):
             candidate_id=f'v2-verify-{g["role"]}-{slot["case_id"]}-rep{slot["repetition"]}'
             print('VERIFY',candidate_id,flush=True)
             r=evaluate_candidate(w.store,spec,candidate_id=candidate_id,changes=g['changes'],purpose='native_matched_verification',**slot)
+            r['verification_role']=g['role']
+            from tools.verification_evidence import verification_record
+            expected=w.store.artifact(frozen['configuration'])['effective'] if g['role']=='selected_candidate' else spec['starting_configuration']['effective']
+            bound=verification_record(w.store,r,w.freeze['implementation'],expected_configuration=expected)
+            if bound:w.records.append(bound)
             g['records'].append(r)
             atomic_json(w.directory/'verification_progress.json',dict(plan=plan,groups=groups,usage=w.store.remaining()))
+            pilot.configure(w);pilot.persist(w)
             if r['status']!='completed':
                 atomic_json(w.directory/'verification_failure.json',r)
                 break
@@ -209,7 +224,7 @@ def finish(w):
     try:
         if w.freeze['assignment_start_unix']+36000-time.time()<600:
             raise ValueError('ELAPSED_LIMIT_PRECLUDES_FURTHER_PROVIDER_REQUEST')
-        row=pilot.decision(w)
+        row=native_decision(w)
         atomic_json(w.directory/'final_model_interpretation.json',row)
     except Exception as exc:
         atomic_json(w.directory/'final_interpretation_failure.json',dict(type=type(exc).__name__,message=str(exc)))
