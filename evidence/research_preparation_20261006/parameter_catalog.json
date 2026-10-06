@@ -1,0 +1,714 @@
+{
+  "version": "1.0.0",
+  "capability_version": "1.0.0",
+  "builder": {
+    "extension_id": "candidate.family",
+    "version": "1.1.0"
+  },
+  "effective_identity": "7abd19232ce95564977be658b3b139e9e59760ddfd2572e35ef5ea6ca69c5273",
+  "parameters": [
+    {
+      "id": "components/near/length_m",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "m",
+      "meaning": "near flexible segment length; attachment station fractions remain fixed.",
+      "schema": "family.design:Segment.length_m",
+      "legal_domain": {
+        "exclusive_minimum": 0
+      },
+      "operation": "set",
+      "components": [
+        "near"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/near/length_m"
+      ],
+      "coupled_constraints": [
+        "Fixed serial topology, cell counts, section stations and tendon routing; compiler checks geometry."
+      ],
+      "derived_quantities": [
+        "cell length",
+        "mass",
+        "inertia",
+        "hinge stiffness/damping",
+        "tendon site positions"
+      ],
+      "current_value": 0.16,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.15,
+          0.17
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.15,
+          0.17
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability.",
+        "offline_check_result": "evidence/research_preparation_20261006/validation.json#/offline_checks/parameter_catalog"
+      },
+      "mutation_mechanism": "candidate.family@1.1.0: set",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/near_section_scale",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "1",
+      "meaning": "Uniform positive scale of all near section dimensions against original semantic_source.",
+      "schema": "family.space:SemanticDecision.section_scale",
+      "legal_domain": {
+        "exclusive_minimum": 0
+      },
+      "operation": "section_scale",
+      "components": [
+        "near"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/near/sections/*/section/parameters/*"
+      ],
+      "coupled_constraints": [
+        "Only ellipse/rectangle; preserve aspect ratios, station layout and section orientation.",
+        "One scale owner per segment; common and per-segment scale selectors cannot overlap.",
+        "Tendon offsets and straight frictionless routing remain fixed; this scale changes the bending section and backend mesh."
+      ],
+      "derived_quantities": [
+        "area",
+        "bending second moments",
+        "mass",
+        "inertia",
+        "hinge stiffness/damping",
+        "backend mesh"
+      ],
+      "current_value": 0.95,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.95,
+          1.05
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.95,
+          1.05
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability.",
+        "offline_check_result": "evidence/research_preparation_20261006/validation.json#/offline_checks/parameter_catalog",
+        "integration_execution": "ef0a8703dff7494f8053e34067b33f7a",
+        "integration_outcome": "valid_failure",
+        "scope": "One .96 section edit plus nonzero near_z initial angle/rate; complete valid physical failure, not a robustness pass."
+      },
+      "mutation_mechanism": "candidate.family@1.1.0: section_scale",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/near_material_scenario",
+      "kind": "physical_design",
+      "type": "choice",
+      "unit": "1",
+      "meaning": "near numerical Young modulus scenario against original semantic_source.",
+      "schema": "family.space:SemanticDecision.material_scenario",
+      "legal_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "operation": "material_scenario",
+      "components": [
+        "near"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/near/physics/young_pa"
+      ],
+      "coupled_constraints": [
+        "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "Density and bending viscosity stay fixed; no independently mixed material properties.",
+        "One scenario owner per segment; common and per-segment material selectors cannot overlap."
+      ],
+      "derived_quantities": [
+        "Young modulus",
+        "hinge stiffness"
+      ],
+      "current_value": "compliant",
+      "experiment_granted_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "builder_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability.",
+        "offline_check_result": "evidence/research_preparation_20261006/validation.json#/offline_checks/parameter_catalog"
+      },
+      "mutation_mechanism": "candidate.family@1.1.0: material_scenario",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "components/far/length_m",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "m",
+      "meaning": "far flexible segment length; attachment station fractions remain fixed.",
+      "schema": "family.design:Segment.length_m",
+      "legal_domain": {
+        "exclusive_minimum": 0
+      },
+      "operation": "set",
+      "components": [
+        "far"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/far/length_m"
+      ],
+      "coupled_constraints": [
+        "Fixed serial topology, cell counts, section stations and tendon routing; compiler checks geometry."
+      ],
+      "derived_quantities": [
+        "cell length",
+        "mass",
+        "inertia",
+        "hinge stiffness/damping",
+        "tendon site positions"
+      ],
+      "current_value": 0.11,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.11,
+          0.13
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.11,
+          0.13
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability.",
+        "offline_check_result": "evidence/research_preparation_20261006/validation.json#/offline_checks/parameter_catalog"
+      },
+      "mutation_mechanism": "candidate.family@1.1.0: set",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/far_section_scale",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "1",
+      "meaning": "Uniform positive scale of all far section dimensions against original semantic_source.",
+      "schema": "family.space:SemanticDecision.section_scale",
+      "legal_domain": {
+        "exclusive_minimum": 0
+      },
+      "operation": "section_scale",
+      "components": [
+        "far"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/far/sections/*/section/parameters/*"
+      ],
+      "coupled_constraints": [
+        "Only ellipse/rectangle; preserve aspect ratios, station layout and section orientation.",
+        "One scale owner per segment; common and per-segment scale selectors cannot overlap.",
+        "Tendon offsets and straight frictionless routing remain fixed; this scale changes the bending section and backend mesh."
+      ],
+      "derived_quantities": [
+        "area",
+        "bending second moments",
+        "mass",
+        "inertia",
+        "hinge stiffness/damping",
+        "backend mesh"
+      ],
+      "current_value": 0.95,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.95,
+          1.05
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.95,
+          1.05
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability.",
+        "offline_check_result": "evidence/research_preparation_20261006/validation.json#/offline_checks/parameter_catalog"
+      },
+      "mutation_mechanism": "candidate.family@1.1.0: section_scale",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/far_material_scenario",
+      "kind": "physical_design",
+      "type": "choice",
+      "unit": "1",
+      "meaning": "far numerical Young modulus scenario against original semantic_source.",
+      "schema": "family.space:SemanticDecision.material_scenario",
+      "legal_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "operation": "material_scenario",
+      "components": [
+        "far"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/far/physics/young_pa"
+      ],
+      "coupled_constraints": [
+        "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "Density and bending viscosity stay fixed; no independently mixed material properties.",
+        "One scenario owner per segment; common and per-segment material selectors cannot overlap."
+      ],
+      "derived_quantities": [
+        "Young modulus",
+        "hinge stiffness"
+      ],
+      "current_value": "compliant",
+      "experiment_granted_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "builder_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability.",
+        "offline_check_result": "evidence/research_preparation_20261006/validation.json#/offline_checks/parameter_catalog"
+      },
+      "mutation_mechanism": "candidate.family@1.1.0: material_scenario",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "control/recipe/terminal_tip_speed_weight",
+      "kind": "control_objective",
+      "type": "number",
+      "unit": "1",
+      "meaning": "Dimensionless terminal weight on squared world tip speed / tip_speed_scale_m_s. Zero preserves legacy cost.",
+      "schema": "family.gvs_trajectory_parameters:terminal_tip_speed_weight",
+      "legal_domain": {
+        "options": [
+          0
+        ],
+        "intervals": [
+          [
+            0.0001,
+            1.0
+          ]
+        ]
+      },
+      "operation": "set",
+      "components": [
+        "controller"
+      ],
+      "effective_locations": [
+        "policy/controller/parameters/data/recipe/terminal_tip_speed_weight"
+      ],
+      "coupled_constraints": [
+        "Squared world tip speed normalized by fixed tip_speed_scale_m_s.",
+        "Holding cost follows fixed holding window; this objective does not change task acceptance."
+      ],
+      "derived_quantities": [
+        "controller objective terms"
+      ],
+      "current_value": 0.05,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.025,
+          0.1
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.025,
+          0.1
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability.",
+        "offline_check_result": "evidence/research_preparation_20261006/validation.json#/offline_checks/parameter_catalog"
+      },
+      "mutation_mechanism": "candidate.family@1.1.0: set",
+      "required_rebuilds": [
+        "controller graph/solver",
+        "warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "control/recipe/holding_tip_speed_weight",
+      "kind": "control_objective",
+      "type": "number",
+      "unit": "1",
+      "meaning": "Per-second squared spatial speed weight on nodes at/after the configured task settling-window start. Requires explicit settling settings.",
+      "schema": "family.gvs_trajectory_parameters:holding_tip_speed_weight",
+      "legal_domain": {
+        "options": [
+          0
+        ],
+        "intervals": [
+          [
+            0.0001,
+            1.0
+          ]
+        ]
+      },
+      "operation": "set",
+      "components": [
+        "controller"
+      ],
+      "effective_locations": [
+        "policy/controller/parameters/data/recipe/holding_tip_speed_weight"
+      ],
+      "coupled_constraints": [
+        "Squared world tip speed normalized by fixed tip_speed_scale_m_s.",
+        "Holding cost follows fixed holding window; this objective does not change task acceptance."
+      ],
+      "derived_quantities": [
+        "controller objective terms"
+      ],
+      "current_value": 0.05,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.025,
+          0.1
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.025,
+          0.1
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability.",
+        "offline_check_result": "evidence/research_preparation_20261006/validation.json#/offline_checks/parameter_catalog"
+      },
+      "mutation_mechanism": "candidate.family@1.1.0: set",
+      "required_rebuilds": [
+        "controller graph/solver",
+        "warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    }
+  ],
+  "usable_pool": [
+    "components/near/length_m",
+    "design/near_section_scale",
+    "design/near_material_scenario",
+    "components/far/length_m",
+    "design/far_section_scale",
+    "design/far_material_scenario",
+    "control/recipe/terminal_tip_speed_weight",
+    "control/recipe/holding_tip_speed_weight"
+  ],
+  "integration_backlog": [
+    {
+      "id": "segment_count",
+      "kind": "physical_design",
+      "reason": "No research mutation adapter or comparable initializer mapping for changed segment topology; historical controller compatibility requires fixed component topology."
+    },
+    {
+      "id": "tendon_count",
+      "kind": "physical_design",
+      "reason": "No research mutation adapter for changed input dimension, ordered tension guesses, actuator transmission and NMPC input-order reconstruction."
+    },
+    {
+      "id": "tendon_routing",
+      "kind": "physical_design",
+      "reason": "Underlying compiler supports declared routes, but stable reach technical scope freezes routing; changed-route projection, feasible warm guess and controller/backend validation are absent."
+    },
+    {
+      "id": "section_shape",
+      "kind": "physical_design",
+      "reason": "Backend compiler supports several shapes; stable reach compatibility only admits fixed ellipse/rectangle shape, station layout and uniform per-segment scaling. Changed-shape projection/controller validation is absent."
+    },
+    {
+      "id": "independent_material_properties",
+      "kind": "physical_design",
+      "reason": "Density and viscosity are represented but no manufacturing-consistent material declaration or study-validated coupled material mapping exists; Young-only scenarios are explicitly numerical."
+    },
+    {
+      "id": "natural_curvature",
+      "kind": "physical_design",
+      "reason": "Compiler represents rest curvature, but stable reach scope freezes it; no research mutation adapter, preload-consistent initial challenge mapping or changed-rest-shape controller validation is connected."
+    },
+    {
+      "id": "payload_mass_and_inertia",
+      "kind": "physical_design",
+      "reason": "Rigid payload mass, COM and full inertia tensor are represented, but stable reach scope freezes rigid components; no coupled physically consistent payload mutation, projection/controller validation or study initialization mapping is connected."
+    },
+    {
+      "id": "discretization/cells",
+      "kind": "numerical_model",
+      "reason": "Compiler can rebuild meshes, but first-study state mapping/controller compatibility and candidate cache policy are frozen to 12+12 cells; changed-dimension study adapter is absent."
+    },
+    {
+      "id": "omitted_physics",
+      "kind": "numerical_model",
+      "reason": "Serial bending model omits shear, stretch, torsion, tendon friction, rope elasticity and motor dynamics; these are not editable supported physical effects."
+    },
+    {
+      "id": "solver_recipe",
+      "kind": "numerical_model",
+      "reason": "First study freezes stable v7 horizon, stopping rules and solver budgets; arbitrary numerical recipe mutation is not connected to this candidate builder."
+    }
+  ],
+  "subset_selection": "All comparison groups may choose any subset of usable_pool within frozen domains; no per-batch permission.",
+  "version_rule": "Newly connected capability requires a new shared capability/study version.",
+  "execution_permission": "Parameter permission does not consume or override the separate frozen execution budget.",
+  "identity": "ecdcb3e38e180d11c92b3781738802b99b581d774312999feb275e3f7df29045"
+}

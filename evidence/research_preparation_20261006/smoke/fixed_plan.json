@@ -1,0 +1,165 @@
+{
+  "version": "fixed_coordinate_reach_hold@1.0.0",
+  "specification_identity": "36ebab4dc2a41e7d9ff13352bd63c3112eeb14b08fb88c1f73ca4a7b34518cea",
+  "parameter_pool_version": "1.0.0",
+  "structural_proposal_order": [
+    {
+      "components/near/length_m": 0.16,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "compliant",
+      "design/far_material_scenario": "compliant"
+    },
+    {
+      "components/near/length_m": 0.165,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "compliant",
+      "design/far_material_scenario": "compliant"
+    },
+    {
+      "components/near/length_m": 0.155,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "compliant",
+      "design/far_material_scenario": "compliant"
+    },
+    {
+      "components/near/length_m": 0.16,
+      "components/far/length_m": 0.115,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "compliant",
+      "design/far_material_scenario": "compliant"
+    },
+    {
+      "components/near/length_m": 0.16,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.975,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "compliant",
+      "design/far_material_scenario": "compliant"
+    },
+    {
+      "components/near/length_m": 0.16,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.975,
+      "design/near_material_scenario": "compliant",
+      "design/far_material_scenario": "compliant"
+    },
+    {
+      "components/near/length_m": 0.16,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "baseline",
+      "design/far_material_scenario": "compliant"
+    },
+    {
+      "components/near/length_m": 0.16,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "stiff",
+      "design/far_material_scenario": "compliant"
+    },
+    {
+      "components/near/length_m": 0.16,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "compliant",
+      "design/far_material_scenario": "baseline"
+    },
+    {
+      "components/near/length_m": 0.16,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "compliant",
+      "design/far_material_scenario": "stiff"
+    }
+  ],
+  "control_initial": {
+    "control/recipe/terminal_tip_speed_weight": 0.05,
+    "control/recipe/holding_tip_speed_weight": 0.05
+  },
+  "policy": {
+    "version": "fixed_coordinate_reach_hold@1.0.0",
+    "structural_variables": [
+      "components/near/length_m",
+      "components/far/length_m",
+      "design/near_section_scale",
+      "design/far_section_scale",
+      "design/near_material_scenario",
+      "design/far_material_scenario"
+    ],
+    "control_variables": [
+      "control/recipe/terminal_tip_speed_weight",
+      "control/recipe/holding_tip_speed_weight"
+    ],
+    "method": "Existing ParameterSpace and bounded coordinate_proposal kernels; discrete scenarios enumerated, never interpolated.",
+    "max_structures": 4,
+    "control_evaluations_per_structure": 2,
+    "max_finalists": 2,
+    "normalized_step": 0.25,
+    "structure_policy": "Start from exact incumbent; numeric coordinate +/- .25 of granted width in catalog order, skip unchanged/duplicates; enumerate remaining discrete options in declared order. Advance centre only on joint acceptance then componentwise dominance. Stop at four structures; unvisited dimensions remain untested.",
+    "control_policy": "Each structure starts incumbent two control weights; one extra bounded coordinate proposal in catalog control order at nominal case/seed17. Advance only on joint acceptance then componentwise dominance; incomparable ties keep earlier proposal.",
+    "validation": "After adaptation, select up to two nondominated nominal candidates in proposal order; schedule all five cases x two fresh independent repetitions. Adaptation nominal execution does not count as a robustness repetition.",
+    "final_selection": "Maximize joint accepted count; then componentwise physical dominance; incomparable ties retain earliest candidate and report tradeoff.",
+    "stopping": "Bounded allocations, no novel legal proposals, or all remaining proposed work cannot be completely reserved. Budget is ceiling. No success-based pruning of frozen scheduled repetitions.",
+    "failure": "Preserve failures; unknown reservations not replayed; inadequate adaptation and incomplete runs are not structural infeasibility proofs.",
+    "mathematical_analysis": {
+      "enabled": false,
+      "reason": "No additional local affine analysis is needed to validate this integrated path. Future uses must predeclare decision question and outcomes that change or retain selection."
+    }
+  },
+  "full_budget": {
+    "tool_calls": 100,
+    "model_calls": 8,
+    "backend_solves": 28,
+    "worker_calls": 0,
+    "wall_s": 30000.0
+  },
+  "integration_budget": {
+    "budget": {
+      "tool_calls": 12,
+      "model_calls": 0,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 2100.0
+    },
+    "historical_cost": {
+      "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+      "measured_computation_s": 300.2650000001304,
+      "reserve_per_backend_s": 900.0,
+      "evaluation_reserve_s": 30.0,
+      "profile_reserve_s": 60.0
+    },
+    "normal_executions": 1,
+    "repair_execution": "Second slot only for a material versioned repair; failed first result retained.",
+    "case_id": "near_z_plus",
+    "seed": 17,
+    "repetition": 1,
+    "changes": {
+      "design/near_section_scale": 0.96
+    },
+    "scope": "One generated changed structure with incumbent control seed, actual closed-loop control adaptation, simulation, joint evaluation, comparison and delivery. Not full robustness, research superiority or three-group evidence."
+  },
+  "launch_status": "smoke_scheduled",
+  "llm_calls": 0,
+  "schedule": [
+    {
+      "case_id": "near_z_plus",
+      "seed": 17,
+      "repetition": 1,
+      "changes": {
+        "design/near_section_scale": 0.96
+      }
+    }
+  ]
+}

@@ -1,0 +1,336 @@
+{
+  "version": "research.reach_hold_initial_variation@1.0.0",
+  "specification_identity": "36ebab4dc2a41e7d9ff13352bd63c3112eeb14b08fb88c1f73ca4a7b34518cea",
+  "environment": {
+    "branch": "feat/gvs-dynamics",
+    "starting_checkout": "46a8d91e217060c6f3cc8dda6e93baea4981d6c7",
+    "python": "3.11.16",
+    "mujoco": "3.13.0",
+    "numpy": "2.4.6",
+    "casadi": "3.7.2",
+    "pydantic": "2.13.5",
+    "pytest": "not_installed; existing unittest used",
+    "provider": "Configured deepseek-flash settings preserved; existing credential loader used; no credentials archived.",
+    "services": "No MATLAB or unrelated service started."
+  },
+  "offline_checks": {
+    "fixed_baseline": {
+      "passed": true,
+      "checks": 5,
+      "initial_duration_s": 1.123,
+      "affected_duration_s": 0.006
+    },
+    "parameter_catalog": {
+      "passed": true,
+      "checks": 3,
+      "initial_duration_s": 0.297,
+      "combined_nine_check_duration_s": 0.301,
+      "command": "python -m unittest tests.test_parameter_catalog"
+    },
+    "task_adapters": {
+      "passed": true,
+      "checks": 6,
+      "duration_s": 0.229,
+      "tracking_affected_duration_s": 0.202
+    },
+    "recovery": {
+      "version": "research_working_state@1.0.0",
+      "command": "C:/Users/gugugaga/miniconda3/envs/softagent/python.exe -m unittest tests.test_research_recovery -v",
+      "focused_checks": 3,
+      "passed": true,
+      "duration_s": 1.338,
+      "checks": [
+        "Claim source values, prior support/counterexample revisions, declared candidate dependency invalidation, immutable budget and STOP, Store persistence and scope checks",
+        "Pending, failed, incomplete, completed and deliberate replication ledger states; cache hits cannot count as repetitions",
+        "Saved three-round M4 sequence restored in fresh subprocess, exact incumbent/latest roles and budget, identical 256 facts for next decision and report, sealed campaign remains stopped"
+      ],
+      "repairs": [
+        "Workspace sandbox rejects private-mode tempfile ACLs; use normal inherited directory ACLs for test fixtures",
+        "Existing Store read-only SQLite handles are collected before verified fixture cleanup",
+        "Rejected input preparations exposed duplicated experiment metrics and report chronology; full original sources remain archived with pointers while factual metrics are rendered once"
+      ],
+      "charges": {
+        "model_calls": 0,
+        "backend_solves": 0,
+        "workflow_operations": 0
+      },
+      "live_context_input_cost_and_quality": "pending"
+    },
+    "historical_structure": {
+      "passed": true,
+      "checks": 3,
+      "duration_s": 0.233
+    },
+    "historical_context": {
+      "passed": true,
+      "checks": 5,
+      "duration_s": 7.898,
+      "initial_failure": "Sandbox denied private Python temporary-directory ACL; all five tests repeated with approved filesystem access. No scientific failure or evidence modification."
+    },
+    "shared_parameter_batch": {
+      "version": "research.shared_parameter_checks@1.0.0",
+      "date": "2026-10-06",
+      "status": "passed",
+      "catalog_version": "1.0.0",
+      "candidate_builder": "candidate.family@1.1.0",
+      "tests": [
+        {
+          "command": "python -m unittest tests.test_parameter_catalog tests.test_milestone4_structure.StructuralParameterTests",
+          "passed": 7,
+          "new_checks": 4,
+          "historical_checks": 3,
+          "elapsed_s": 0.472
+        },
+        {
+          "command": "python -m unittest tests.test_parameter_catalog.ParameterCatalogTests.test_catalog_preserves_science_and_separates_three_dimensions",
+          "passed": 1,
+          "elapsed_s": 0.198,
+          "purpose": "Affected assertion: actual granted subset masks near scale but preserves an ungranted far Young-modulus difference"
+        }
+      ],
+      "cost": {
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "standalone_numerical_solves": 0
+      },
+      "engineering_fixture": {
+        "test": "tests/test_parameter_catalog.py::ParameterCatalogTests.test_registered_pool_flows_through_shared_plan_and_batch",
+        "source_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "source_execution": "91c3ba1b01d6499fb26df8f95409401b",
+        "substituted": [
+          "In-memory Store/Host bookkeeping",
+          "Host accepted-product lookup",
+          "Bound evidence alias lookup"
+        ],
+        "real_checks": [
+          "Typed immutable SearchBatchPlan parsing",
+          "Registry and effective catalog pool",
+          "Candidate domains and mutation through public _candidate",
+          "Original scientific execution scope preservation",
+          "Archived common selector projection and source-relative reconstruction",
+          "Frozen comparison scope",
+          "validate_batch_plan",
+          "prepare_offline_batch",
+          "Existing finite ask/tell preparation"
+        ],
+        "limits": "No provider request, backend execution, new scientific outcome, robustness assertion or replayed repetition."
+      },
+      "implementation_distinction": {
+        "smoke_manifest": "implementation_manifest.json::live_dependency_fingerprints",
+        "smoke_delivery": "smoke/delivery.json",
+        "post_smoke_changes": "New-builder-only shared planner/catalog bridge plus concrete unsupported-parameter backlog; stable v7 controller recipe and numerical kernels unchanged.",
+        "sources": {
+          "tools/candidate_parameters.py": {
+            "post_smoke_sha256": "e474cc616c2a0bb4abb9de34b5c5cef78e43ced441ac608b2244a51a730a7a74",
+            "smoke_registered_builder_sha256": null,
+            "smoke_binding_status": "absent_from_live_builder_dependency_declaration"
+          },
+          "tools/parameter_impacts.py": {
+            "post_smoke_sha256": "6ffb20d9e15dd44341138597989f35e3e65bc5892bd538433f355c4f86e770f6",
+            "smoke_registered_builder_sha256": null,
+            "smoke_binding_status": "absent_from_live_builder_dependency_declaration"
+          },
+          "tools/platform_search.py": {
+            "post_smoke_sha256": "990427dd9c2ad2dc0042744d433e119b643462cc6cb214830ece2b3edce2f4ec",
+            "smoke_registered_builder_sha256": "624e38c0d8d536d3f4b8cd155f0faad5fb23f3b6bf11c8c8723f5aa94e6ff90a",
+            "smoke_binding_status": "bound_in_live_builder_dependency"
+          },
+          "extensions/tendon_family/manifest.py": {
+            "post_smoke_sha256": "d4c4cb26897eb72068ea992f6afd74936229d5832d6b90b424251bf0827ef3ec",
+            "smoke_registered_builder_sha256": "983b1f798ab49fb1cb2b7b0f8075722379363a717d8a83e1948fc367f4471c97",
+            "smoke_binding_status": "bound_in_live_builder_dependency"
+          },
+          "extensions/tendon_family/parameter_capabilities.py": {
+            "post_smoke_sha256": "8e181686551e6f2a0b7c1a1f6d3607d3239eaff4173d5c964fcf8513f5ea5f96",
+            "smoke_registered_builder_sha256": "81710c6593f63b8e9e3e4c7c071761876e2a4554dad5854e082ea9ad234e21b0",
+            "smoke_binding_status": "bound_in_live_builder_dependency"
+          },
+          "tools/parameter_catalog.py": {
+            "post_smoke_sha256": "5a09498522b7e979440c145d94dac7081ed0de093b28648bb47cfe650129aa48",
+            "smoke_registered_builder_sha256": "5a09498522b7e979440c145d94dac7081ed0de093b28648bb47cfe650129aa48",
+            "smoke_binding_status": "bound_in_live_builder_dependency"
+          },
+          "tests/test_parameter_catalog.py": {
+            "post_smoke_sha256": "b1ec19d9268e8066cafd3bc5653da2b252abc39b6c5825eca1aca48d307b539b",
+            "smoke_registered_builder_sha256": null,
+            "smoke_binding_status": "absent_from_live_builder_dependency_declaration"
+          },
+          "docs/research_parameter_catalog.md": {
+            "post_smoke_sha256": "df9fb34227098d9266797243c500dd578bfe705d3110ecd7524a116c9cc7db6f",
+            "smoke_registered_builder_sha256": null,
+            "smoke_binding_status": "absent_from_live_builder_dependency_declaration"
+          }
+        }
+      },
+      "result_scope": "Offline future-builder compatibility validation; smoke remains independently bound to its executed implementation and original result."
+    }
+  },
+  "integration": {
+    "complete": true,
+    "execution_id": "ef0a8703dff7494f8053e34067b33f7a",
+    "configuration": {
+      "artifact_id": "d8d6f847177a1986d6f9ba46530593437514344ef02e0aff1b2b5f2d785e24d6",
+      "media_type": "application/json"
+    },
+    "evaluation": {
+      "artifact_id": "96c969a26f6377bc426983d53a23b13262e5e0c6050db1328b4ceae38db92b32",
+      "media_type": "application/json"
+    },
+    "profile": {
+      "artifact_id": "712c5efa338efa8e8510269b18ba5e622af74f2deb3d2518de9cb0376e99bdd5",
+      "media_type": "application/json"
+    },
+    "acceptance": {
+      "contract": "research.task_acceptance",
+      "version": "1.0.0",
+      "protocol_id": "offline_reach_hold_v1",
+      "task_family": "task.reach",
+      "task_identity": "0e947b2e82a33653de5b098a57dfe510e82bb13a37f3d656af8b18503d587acf",
+      "status": "valid_failure",
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "value": "valid",
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "execution_complete": {
+          "value": true,
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "task_evaluator": {
+          "value": true,
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "evaluator:task_bound": {
+          "value": 0.0028974459148354828,
+          "passed": true,
+          "unit": "m",
+          "limit": 0.01,
+          "reason": null
+        },
+        "solver_errors": {
+          "value": 0,
+          "passed": true,
+          "unit": "count",
+          "limit": 0,
+          "reason": null
+        },
+        "force_bounds": {
+          "value": 0.0,
+          "passed": true,
+          "unit": "N",
+          "limit": 1e-08,
+          "reason": null
+        },
+        "holding_coverage": {
+          "value": true,
+          "passed": true,
+          "unit": "inclusive uniform samples",
+          "limit": 6,
+          "reason": null
+        },
+        "holding_position": {
+          "value": 0.0028974459148354828,
+          "passed": true,
+          "unit": "m",
+          "limit": 0.01,
+          "reason": null
+        },
+        "holding_speed": {
+          "value": 0.06773111912652348,
+          "passed": false,
+          "unit": "m/s",
+          "limit": 0.02,
+          "reason": null
+        }
+      },
+      "metrics": {
+        "terminal_error_m": 0.0028974459148354828,
+        "holding_max_error_m": 0.0028974459148354828,
+        "holding_max_speed_m_s": 0.06773111912652348
+      },
+      "missing": [],
+      "issues": [],
+      "execution_id": "ef0a8703dff7494f8053e34067b33f7a",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "96c969a26f6377bc426983d53a23b13262e5e0c6050db1328b4ceae38db92b32",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "712c5efa338efa8e8510269b18ba5e622af74f2deb3d2518de9cb0376e99bdd5",
+          "media_type": "application/json"
+        }
+      },
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005,
+        "real_time_required": false,
+        "real_time_demonstrated": false,
+        "deadline_misses": 35,
+        "mean_update_s": 9.452216597144641,
+        "simulation_wall_s": 334.375
+      },
+      "continuous_time_guarantee": false
+    },
+    "cost": {
+      "tool_calls": 3,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 336.3589999999822
+    },
+    "budget": {
+      "limit": {
+        "backend_solves": 2,
+        "model_calls": 0,
+        "tool_calls": 12,
+        "wall_s": 2100.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 3,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 336.3589999999822
+      },
+      "remaining": {
+        "backend_solves": 1,
+        "model_calls": 0,
+        "tool_calls": 9,
+        "wall_s": 1763.6410000000178,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "scheduled_cases_consumed": 1,
+    "formal_campaign_launched": false,
+    "repair_backend_slot_used": false
+  },
+  "protected_historical_sources_unchanged": true,
+  "pending": [
+    "Eligible live context input-cost/response-quality validation",
+    "Full frozen perturbation study",
+    "Formal three-group comparison"
+  ],
+  "engineering_parallel_tasks": 3,
+  "scientific_worker_calls": 0,
+  "scientific_claim": "Shared pipeline completed with honest holding-speed failure; no robustness/superiority/real-time claim."
+}

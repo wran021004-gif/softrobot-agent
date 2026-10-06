@@ -1,0 +1,408 @@
+{
+  "new_process": true,
+  "state_identity": "54322964d0a796c9157a9ef4cedc9183272af74a9e9e04b967eb406c98af6de4",
+  "roles": {
+    "current_batch_source": {
+      "candidate_id": "batch-bc9cc559d65f5c74-1",
+      "configuration": {
+        "artifact_id": "5fbaec6f6119410b5d51fec8641d36f3f53e1fa989b1c54fa84897dd659b2281",
+        "media_type": "application/json"
+      },
+      "execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+      "owner_run_id": "batch-bc9cc559d65f5c74-1"
+    },
+    "current_case": {
+      "candidate_id": "batch-bc9cc559d65f5c74-1",
+      "configuration": {
+        "artifact_id": "5fbaec6f6119410b5d51fec8641d36f3f53e1fa989b1c54fa84897dd659b2281",
+        "media_type": "application/json"
+      },
+      "execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+      "owner_run_id": "batch-bc9cc559d65f5c74-1"
+    },
+    "latest_attempt": {
+      "candidate_id": "batch-fe7caa0b88e9129b-1",
+      "configuration": {
+        "artifact_id": "b066c30781da300693dbb101baff29314f664b181e9634416197e17d0ed8916d",
+        "media_type": "application/json"
+      },
+      "execution_id": "3389776a7ca449bb90388e2501194400",
+      "owner_run_id": "batch-fe7caa0b88e9129b-1"
+    },
+    "latest_completed_evaluation": {
+      "candidate_id": "batch-fe7caa0b88e9129b-1",
+      "configuration": {
+        "artifact_id": "b066c30781da300693dbb101baff29314f664b181e9634416197e17d0ed8916d",
+        "media_type": "application/json"
+      },
+      "execution_id": "3389776a7ca449bb90388e2501194400",
+      "owner_run_id": "batch-fe7caa0b88e9129b-1"
+    },
+    "selected_incumbent": {
+      "candidate_id": "batch-ebbeadbdaca10732-0",
+      "configuration": {
+        "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "media_type": "application/json"
+      },
+      "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+      "owner_run_id": "batch-ebbeadbdaca10732-0"
+    },
+    "source_baseline": {
+      "candidate_id": "baseline-replay",
+      "configuration": {
+        "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+        "media_type": "application/json"
+      },
+      "execution_id": "cf997605885642759ee33920e2c9e2ef",
+      "owner_run_id": "gvs-stage351-baseline-executor"
+    }
+  },
+  "budget": {
+    "backend_solves": 0,
+    "model_calls": 21,
+    "tool_calls": 38,
+    "wall_s": 7471.028000000006,
+    "worker_calls": 0
+  },
+  "claims": {
+    "holding_response": [
+      {
+        "causal_truth_verified": false,
+        "claim": {
+          "claim_id": "holding_response",
+          "counterexamples": [],
+          "historical_decision_round": 0,
+          "hypothesis_status": "unresolved",
+          "interpretation": {
+            "contradicting_evidence": [],
+            "scope": "Five completed evaluations, single shortened compliant geometry, terminal weight fixed at 0.05.",
+            "statement": "On the shortened compliant geometry at fixed terminal_tip_speed_weight=0.05, holding_max_speed is ~0.0127 m/s and passing for holding∈{0.0,0.05} but ~0.022-0.023 m/s and failing for holding∈{0.075,0.09,0.10}, with a non-monotone jump concentrated between 0.05 and 0.075.",
+            "supporting_evidence": [
+              "F196",
+              "F93",
+              "F195",
+              "F224",
+              "F211"
+            ],
+            "uncertainty": "Five sparse points and no repeats; the boundary between 0.05 and 0.075 is unresolved and a discrete regime change cannot be excluded."
+          },
+          "supporting_evidence": [
+            {
+              "pointer": "/observations/1/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "ee85bc1d3d6945245ed02641c5b0a92ea98a35dd83cd6190b27fee3eaeca86bc",
+                "media_type": "application/json"
+              },
+              "value": 0.012750255515948416
+            },
+            {
+              "pointer": "/observations/0/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "ee85bc1d3d6945245ed02641c5b0a92ea98a35dd83cd6190b27fee3eaeca86bc",
+                "media_type": "application/json"
+              },
+              "value": 0.01273567785134029
+            },
+            {
+              "pointer": "/observations/3/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "ee85bc1d3d6945245ed02641c5b0a92ea98a35dd83cd6190b27fee3eaeca86bc",
+                "media_type": "application/json"
+              },
+              "value": 0.023285947509969908
+            },
+            {
+              "pointer": "/observations/4/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "ee85bc1d3d6945245ed02641c5b0a92ea98a35dd83cd6190b27fee3eaeca86bc",
+                "media_type": "application/json"
+              },
+              "value": 0.02260458517372844
+            },
+            {
+              "pointer": "/observations/2/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "ee85bc1d3d6945245ed02641c5b0a92ea98a35dd83cd6190b27fee3eaeca86bc",
+                "media_type": "application/json"
+              },
+              "value": 0.022128674933740447
+            }
+          ]
+        },
+        "evidence_source": {
+          "artifact_id": "c90f3db8b754ce590b9ad5fc0441ccc316845ecc81ec9816f90462e48aac2c59",
+          "media_type": "application/json"
+        },
+        "sequence": 0
+      },
+      {
+        "causal_truth_verified": false,
+        "claim": {
+          "claim_id": "holding_response",
+          "counterexamples": [
+            {
+              "pointer": "/outcomes/0/metrics/holding_speed_passed",
+              "reference": {
+                "artifact_id": "7a285d6736e9f2d2cfbfb3aeb4d84ea6dbce5dc7a5c06d9ad02b69bf33858e94",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "historical_decision_round": 1,
+          "hypothesis_status": "unresolved",
+          "interpretation": {
+            "contradicting_evidence": [],
+            "scope": "controller.gvs_nmpc@7.0.0, frozen compliant shortened structure (near 0.16 m, far 0.11 m, section 0.95), sampled holding/terminal tip-speed weights",
+            "statement": "On the frozen compliant shortened structure at fixed terminal weight 0.05, holding-speed acceptance flips from pass at holding 0.05 (~0.0127 m/s) to fail at holding 0.06 (0.023994623331658485), while the same holding 0.09 passes at terminal 0.10 (0.010201160469407439), so a terminal×holding weight interaction plausibly governs acceptance rather than a fixed holding threshold.",
+            "supporting_evidence": [
+              "F375",
+              "F280",
+              "F258",
+              "F328",
+              "F423"
+            ],
+            "uncertainty": "Only a small sampled set; no intermediate terminal weight between 0.05 and 0.10; solver-plan selection and structural sensitivity are not excluded."
+          },
+          "supporting_evidence": [
+            {
+              "pointer": "/outcomes/0/source_comparison/baseline/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "7a285d6736e9f2d2cfbfb3aeb4d84ea6dbce5dc7a5c06d9ad02b69bf33858e94",
+                "media_type": "application/json"
+              },
+              "value": 0.02260458517372844
+            },
+            {
+              "pointer": "/outcomes/0/source_comparison/candidate/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "7a285d6736e9f2d2cfbfb3aeb4d84ea6dbce5dc7a5c06d9ad02b69bf33858e94",
+                "media_type": "application/json"
+              },
+              "value": 0.023994623331658485
+            },
+            {
+              "pointer": "/outcomes/1/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "7a285d6736e9f2d2cfbfb3aeb4d84ea6dbce5dc7a5c06d9ad02b69bf33858e94",
+                "media_type": "application/json"
+              },
+              "value": 0.010201160469407439
+            },
+            {
+              "pointer": "/outcomes/1/metrics/holding_speed_passed",
+              "reference": {
+                "artifact_id": "7a285d6736e9f2d2cfbfb3aeb4d84ea6dbce5dc7a5c06d9ad02b69bf33858e94",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/outcomes/0/metrics/holding_speed_passed",
+              "reference": {
+                "artifact_id": "7a285d6736e9f2d2cfbfb3aeb4d84ea6dbce5dc7a5c06d9ad02b69bf33858e94",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ]
+        },
+        "evidence_source": {
+          "artifact_id": "c9012f81eb68c24a93dd0c55af64ab9dbc31c0003a5e1448aca2522c65546a42",
+          "media_type": "application/json"
+        },
+        "sequence": 1
+      },
+      {
+        "causal_truth_verified": false,
+        "claim": {
+          "claim_id": "holding_response",
+          "counterexamples": [
+            {
+              "pointer": "/outcomes/1/source_comparison/candidate/holding_speed_passed",
+              "reference": {
+                "artifact_id": "5069b140254cae3ce279647a9e847ad97f4a6634595bf8c820a270e53e8755b7",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/outcomes/0/source_comparison/candidate/holding_speed_passed",
+              "reference": {
+                "artifact_id": "5069b140254cae3ce279647a9e847ad97f4a6634595bf8c820a270e53e8755b7",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "historical_decision_round": 2,
+          "hypothesis_status": "unresolved",
+          "interpretation": {
+            "contradicting_evidence": [],
+            "scope": "Two sealed complete evaluations on the compliant structure (holding 0.09/terminal 0.05 and 0.09/terminal 0.075)",
+            "statement": "At fixed holding weight 0.09, the recorded holding_max_speed differs by 0.005878747594748938 between terminal weights 0.05 and 0.075, and both still fail speed, so the response is not a single monotone holding-weight boundary and weight interaction is at least consistent with the data.",
+            "supporting_evidence": [
+              "F746",
+              "F675",
+              "F690",
+              "F741",
+              "F656"
+            ],
+            "uncertainty": "Two points cannot separate solver-plan selection from weight interaction or structural sensitivity; no repetition/variance is available, so no causal or boundary claim follows."
+          },
+          "supporting_evidence": [
+            {
+              "pointer": "/outcomes/1/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "5069b140254cae3ce279647a9e847ad97f4a6634595bf8c820a270e53e8755b7",
+                "media_type": "application/json"
+              },
+              "value": 0.02848333276847738
+            },
+            {
+              "pointer": "/outcomes/0/source_comparison/candidate/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "5069b140254cae3ce279647a9e847ad97f4a6634595bf8c820a270e53e8755b7",
+                "media_type": "application/json"
+              },
+              "value": 0.02260458517372844
+            },
+            {
+              "pointer": "/outcomes/1/source_comparison/candidate_minus_baseline/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "5069b140254cae3ce279647a9e847ad97f4a6634595bf8c820a270e53e8755b7",
+                "media_type": "application/json"
+              },
+              "value": 0.005878747594748938
+            },
+            {
+              "pointer": "/outcomes/1/source_comparison/candidate/holding_speed_passed",
+              "reference": {
+                "artifact_id": "5069b140254cae3ce279647a9e847ad97f4a6634595bf8c820a270e53e8755b7",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/outcomes/0/source_comparison/candidate/holding_speed_passed",
+              "reference": {
+                "artifact_id": "5069b140254cae3ce279647a9e847ad97f4a6634595bf8c820a270e53e8755b7",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ]
+        },
+        "evidence_source": {
+          "artifact_id": "e897ab4f19a8c81e188262470a9ceff2c8e8192db446d6e12ad74d2a138494bf",
+          "media_type": "application/json"
+        },
+        "sequence": 2
+      }
+    ]
+  },
+  "stop": {
+    "reason": "insufficient_complete_delivery_reservation",
+    "sealed_cases": [
+      {
+        "case_id": "primary",
+        "final_decision": {
+          "artifact_id": "07527198bf6e39868e7103119eab5397c39063e3110b05a20463696913d58d5c",
+          "media_type": "application/json"
+        },
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        },
+        "status": "model_stopped",
+        "stop_reason": "insufficient_complete_delivery_reservation",
+        "usage": {
+          "limit": {
+            "backend_solves": 4,
+            "model_calls": 24,
+            "tool_calls": 60,
+            "wall_s": 9000.0,
+            "worker_calls": 0
+          },
+          "occupied": {},
+          "remaining": {
+            "backend_solves": 0,
+            "model_calls": 21,
+            "tool_calls": 38,
+            "wall_s": 7471.028000000006,
+            "worker_calls": 0
+          },
+          "used": {
+            "backend_solves": 4,
+            "model_calls": 3,
+            "tool_calls": 22,
+            "wall_s": 1528.9719999999943,
+            "worker_calls": 0
+          }
+        }
+      }
+    ],
+    "status": "model_stopped"
+  },
+  "retained_candidate_artifacts": [
+    {
+      "dependencies": {
+        "scientific_configuration_identity": "454b5b5427ab8fd7a4680b97b2dc233fabcb9e149c25e9a4e110a28122b90190"
+      },
+      "invalidated_at_revision": 2,
+      "invalidation_reason": "Declared candidate configuration dependency changed",
+      "kind": "invalidation_contract_probe",
+      "reference": {
+        "artifact_id": "de9d6c1cf7fe0c111b64f4772a1faba2b95fa7bda72f08cf8df88c279b79e98c",
+        "media_type": "application/json"
+      },
+      "reusable": false
+    }
+  ],
+  "purposes": {
+    "research_decision": {
+      "fact_identity": "3592ed592d5294668480a1287d5e0ebbd84fc4f203cc22723d51cc4a92278155",
+      "facts": 256,
+      "measurement": {
+        "characters": 135882,
+        "utf8_bytes": 135887,
+        "estimated_input_tokens": 144079,
+        "actual_input_tokens": null,
+        "method": "Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.",
+        "input_budget_tokens": 160000,
+        "configured_context_limit_tokens": 1000000,
+        "response_reserve_tokens": 65536,
+        "interaction_reserve_tokens": 8192,
+        "passed": true
+      },
+      "prepared": true,
+      "sent": false
+    },
+    "final_report": {
+      "fact_identity": "3592ed592d5294668480a1287d5e0ebbd84fc4f203cc22723d51cc4a92278155",
+      "facts": 256,
+      "measurement": {
+        "characters": 87296,
+        "utf8_bytes": 87301,
+        "estimated_input_tokens": 95493,
+        "actual_input_tokens": null,
+        "method": "Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.",
+        "input_budget_tokens": 96000,
+        "configured_context_limit_tokens": 1000000,
+        "response_reserve_tokens": 65536,
+        "interaction_reserve_tokens": 8192,
+        "passed": true
+      },
+      "prepared": true,
+      "sent": false
+    }
+  },
+  "same_factual_entry_point": true,
+  "resume_rejection": "CONTEXT_SEALED_SCOPE_CANNOT_RESUME",
+  "live_input_cost_and_quality": "pending; no independently eligible call performed"
+}

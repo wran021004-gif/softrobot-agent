@@ -1,0 +1,90 @@
+{
+  "contract": "research.task_adapter",
+  "version": "1.0.0",
+  "family": "task.reach",
+  "evaluator": {
+    "extension_id": "evaluate.reach",
+    "version": "1.0.0",
+    "parameters": {
+      "contract": "reference.reach_evaluation",
+      "version": "1.0.0",
+      "data": {
+        "tolerance_m": 0.01
+      }
+    }
+  },
+  "output": {
+    "name": "tip_position",
+    "entity": "tip",
+    "dimension": 3,
+    "units": "m",
+    "frame": "world",
+    "phase": "post_step",
+    "missing": "unsupported"
+  },
+  "reference": {
+    "contract": "reference.reach_goal",
+    "version": "1.0.0",
+    "data": {
+      "target_m": [
+        0.29,
+        0.035,
+        0.19
+      ]
+    }
+  },
+  "operating_point": {
+    "time_s": 0.0,
+    "reference_position_m": [
+      0.29,
+      0.035,
+      0.19
+    ],
+    "reference_velocity_m_s": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "frame": "world",
+    "state_source": "Named task initializer; subsequent measured backend state",
+    "reference_is_equilibrium": false
+  },
+  "metrics": [
+    {
+      "name": "terminal_error_m",
+      "unit": "m",
+      "meaning": "Sealed endpoint evaluator position error"
+    },
+    {
+      "name": "holding_max_error_m",
+      "unit": "m",
+      "meaning": "Maximum sampled final-window tip error"
+    },
+    {
+      "name": "holding_max_speed_m_s",
+      "unit": "m/s",
+      "meaning": "Maximum sampled world translational tip speed"
+    }
+  ],
+  "scoring_interval_s": [
+    0.0,
+    0.35
+  ],
+  "holding": {
+    "position_limit_m": 0.01,
+    "speed_limit_m_s": 0.02,
+    "window_s": 0.05
+  },
+  "timing": {
+    "timestep_s": 0.0005,
+    "control_period_s": 0.01,
+    "sample_period_s": 0.01,
+    "duration_s": 0.35,
+    "termination": [
+      "duration",
+      "numerical_failure"
+    ]
+  },
+  "continuous_time_guarantee": false,
+  "context": "Endpoint reach and final-window position/speed are distinct components. Offline deployment timing is diagnostic."
+}

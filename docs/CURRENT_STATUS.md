@@ -1,5 +1,21 @@
 # Current development status - Milestones 4 and 5, 2026-10-06
 
+New research preparation: [the first offline study](research_first_study.md)
+freezes the exact retained M4 incumbent, five small initial angle/rate cases and
+two fresh repetitions per case. A registered eight-variable catalog, task adapters,
+one joint acceptance result, and the executable fixed mathematical baseline are
+connected. Offline multi-round recovery uses a new process and preserves 256
+bound facts, role distinctions, hypothesis revisions, budgets and STOP.
+One new MuJoCo integration execution completes the pipeline: terminal error
+0.0028974459148354828 m passes, but holding maximum speed
+0.06773111912652348 m/s fails the 0.02 m/s requirement. Force violation and solver
+errors are zero. Actual cost is 3 tools / 1 backend / 336.359 s, zero providers;
+the second integration slot is unused. This verifies execution, not robustness or
+research superiority. Formal groups and Mainlines 4–6 have not launched; live
+context quality remains pending. Old M4/M5 reports, seals and six protected M5
+backend allocations remain unchanged. See the separate study documentation and
+linked validation/evidence for precise versions and costs.
+
 Latest amendment: [shared evidence context assembly](evidence_context_assembly.md)
 now serves actual M4 research, M4 bound reporting and M5 interpretation builders.
 Ten focused checks passed across the initial and affected repair passes. Complete

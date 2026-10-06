@@ -1,0 +1,98 @@
+{
+  "version": "research.shared_parameter_checks@1.0.0",
+  "date": "2026-10-06",
+  "status": "passed",
+  "catalog_version": "1.0.0",
+  "candidate_builder": "candidate.family@1.1.0",
+  "tests": [
+    {
+      "command": "python -m unittest tests.test_parameter_catalog tests.test_milestone4_structure.StructuralParameterTests",
+      "passed": 7,
+      "new_checks": 4,
+      "historical_checks": 3,
+      "elapsed_s": 0.472
+    },
+    {
+      "command": "python -m unittest tests.test_parameter_catalog.ParameterCatalogTests.test_catalog_preserves_science_and_separates_three_dimensions",
+      "passed": 1,
+      "elapsed_s": 0.198,
+      "purpose": "Affected assertion: actual granted subset masks near scale but preserves an ungranted far Young-modulus difference"
+    }
+  ],
+  "cost": {
+    "model_calls": 0,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "standalone_numerical_solves": 0
+  },
+  "engineering_fixture": {
+    "test": "tests/test_parameter_catalog.py::ParameterCatalogTests.test_registered_pool_flows_through_shared_plan_and_batch",
+    "source_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+    "source_execution": "91c3ba1b01d6499fb26df8f95409401b",
+    "substituted": [
+      "In-memory Store/Host bookkeeping",
+      "Host accepted-product lookup",
+      "Bound evidence alias lookup"
+    ],
+    "real_checks": [
+      "Typed immutable SearchBatchPlan parsing",
+      "Registry and effective catalog pool",
+      "Candidate domains and mutation through public _candidate",
+      "Original scientific execution scope preservation",
+      "Archived common selector projection and source-relative reconstruction",
+      "Frozen comparison scope",
+      "validate_batch_plan",
+      "prepare_offline_batch",
+      "Existing finite ask/tell preparation"
+    ],
+    "limits": "No provider request, backend execution, new scientific outcome, robustness assertion or replayed repetition."
+  },
+  "implementation_distinction": {
+    "smoke_manifest": "implementation_manifest.json::live_dependency_fingerprints",
+    "smoke_delivery": "smoke/delivery.json",
+    "post_smoke_changes": "New-builder-only shared planner/catalog bridge plus concrete unsupported-parameter backlog; stable v7 controller recipe and numerical kernels unchanged.",
+    "sources": {
+      "tools/candidate_parameters.py": {
+        "post_smoke_sha256": "e474cc616c2a0bb4abb9de34b5c5cef78e43ced441ac608b2244a51a730a7a74",
+        "smoke_registered_builder_sha256": null,
+        "smoke_binding_status": "absent_from_live_builder_dependency_declaration"
+      },
+      "tools/parameter_impacts.py": {
+        "post_smoke_sha256": "6ffb20d9e15dd44341138597989f35e3e65bc5892bd538433f355c4f86e770f6",
+        "smoke_registered_builder_sha256": null,
+        "smoke_binding_status": "absent_from_live_builder_dependency_declaration"
+      },
+      "tools/platform_search.py": {
+        "post_smoke_sha256": "990427dd9c2ad2dc0042744d433e119b643462cc6cb214830ece2b3edce2f4ec",
+        "smoke_registered_builder_sha256": "624e38c0d8d536d3f4b8cd155f0faad5fb23f3b6bf11c8c8723f5aa94e6ff90a",
+        "smoke_binding_status": "bound_in_live_builder_dependency"
+      },
+      "extensions/tendon_family/manifest.py": {
+        "post_smoke_sha256": "d4c4cb26897eb72068ea992f6afd74936229d5832d6b90b424251bf0827ef3ec",
+        "smoke_registered_builder_sha256": "983b1f798ab49fb1cb2b7b0f8075722379363a717d8a83e1948fc367f4471c97",
+        "smoke_binding_status": "bound_in_live_builder_dependency"
+      },
+      "extensions/tendon_family/parameter_capabilities.py": {
+        "post_smoke_sha256": "8e181686551e6f2a0b7c1a1f6d3607d3239eaff4173d5c964fcf8513f5ea5f96",
+        "smoke_registered_builder_sha256": "81710c6593f63b8e9e3e4c7c071761876e2a4554dad5854e082ea9ad234e21b0",
+        "smoke_binding_status": "bound_in_live_builder_dependency"
+      },
+      "tools/parameter_catalog.py": {
+        "post_smoke_sha256": "5a09498522b7e979440c145d94dac7081ed0de093b28648bb47cfe650129aa48",
+        "smoke_registered_builder_sha256": "5a09498522b7e979440c145d94dac7081ed0de093b28648bb47cfe650129aa48",
+        "smoke_binding_status": "bound_in_live_builder_dependency"
+      },
+      "tests/test_parameter_catalog.py": {
+        "post_smoke_sha256": "b1ec19d9268e8066cafd3bc5653da2b252abc39b6c5825eca1aca48d307b539b",
+        "smoke_registered_builder_sha256": null,
+        "smoke_binding_status": "absent_from_live_builder_dependency_declaration"
+      },
+      "docs/research_parameter_catalog.md": {
+        "post_smoke_sha256": "df9fb34227098d9266797243c500dd578bfe705d3110ecd7524a116c9cc7db6f",
+        "smoke_registered_builder_sha256": null,
+        "smoke_binding_status": "absent_from_live_builder_dependency_declaration"
+      }
+    }
+  },
+  "result_scope": "Offline future-builder compatibility validation; smoke remains independently bound to its executed implementation and original result."
+}
