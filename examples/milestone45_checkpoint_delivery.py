@@ -279,6 +279,8 @@ def export():
         for path in root.glob('*.json'):
             if not path.name.endswith('_pending.json'):shutil.copy2(path,destination/path.name)
         atomic_json(destination/'receipt_accounting.json',receipt_accounting(root))
+        if (root/'implementation').exists():
+            shutil.copytree(root/'implementation',destination/'implementation',dirs_exist_ok=True)
         # Selected update histories and receipt outputs already exported as JSON.
         # Export backend manifests and non-secret source artifacts once, preserving bytes.
         store=Store(root)
