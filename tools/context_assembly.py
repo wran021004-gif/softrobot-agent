@@ -230,6 +230,13 @@ def _research(packet, authority, archive):
         reduced['study']['m5_feedback']=dict(source=m5['source'],scope=m5['scope'],
             negative_findings='Retained prediction evidence supplies no screening authority, candidate exclusion, v8 adoption or compression-benefit claim.',
             complete_text=dict(reference=archive.snapshot(packet),pointer='/study/m5_feedback'))
+    if reduced.get('study',{}).get('parameter_catalog'):
+        catalog=reduced['study']['parameter_catalog']
+        retained=('id','kind','meaning','type','unit','current_value','builder_domain',
+            'experiment_granted_domain','effective_locations','operation','coupled_constraints',
+            'study_permission','technical_support')
+        catalog['parameters']=[{k:r[k] for k in retained if k in r} for r in catalog['parameters']]
+        catalog['full_mutation_rebuild_reuse_evidence']=dict(reference=archive.snapshot(packet),pointer='/study/parameter_catalog')
     reduced['scientific_overlap'] = dict(new_execution_count=summary['new_execution_count'],
         novel_configuration_count=summary['novel_configuration_count'],
         previously_evaluated_count=summary['scientifically_previously_evaluated_count'],
@@ -609,7 +616,9 @@ def assemble_working_context(purpose, state, *, archive):
             pointer='/experiments/' + pointer_part(key) + '/' + str(i) + '/entry'))
         for i,row in enumerate(rows)] for key,rows in state['experiments'].items()}
     result['view']['working_context']['recovery'] = dict(version=state['version'],
-        revision=state['revision'], claim_history=state['claims'],
+        revision=state['revision'], claim_history={key:[dict(revision=row['revision'],
+            original_entry=dict(reference=state_reference,pointer='/claims/'+pointer_part(key)+'/'+str(i)))
+            for i,row in enumerate(rows)] for key,rows in state['claims'].items()},
         experiment_ledger=experiment_view, candidate_artifacts=state['candidate_artifacts'],
         evidence_history=state['evidence_history'],
         budget_accounting=state['budget_accounting'],

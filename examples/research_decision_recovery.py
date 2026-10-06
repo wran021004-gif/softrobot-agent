@@ -169,7 +169,18 @@ def refresh_preparation(directory=DIRECTORY):
     old=pilot.save(w.store,w.freeze)
     verify_seals(w)
     if not w.host.compatibility()['compatible']:raise ValueError('NEW_SESSION_VERSION_BOUNDARY_REQUIRED')
-    row,_=w.store.reserve(w.host.run_id,'prelive-context-compaction',digest(dict(old=old,version=VERSION)),
+    prior=w.store.lookup(w.host.run_id,'prelive-context-compaction')
+    if prior and not prior['receipt']:
+        # The failed local process exited before sending anything. Preserve the
+        # full reserved charge; elapsed wall time was not sealed, so is unknown.
+        w.store.complete(prior,dict(request_id=prior['request_id'],execution_id=prior['execution_id'],caller='engineering',
+            tool_id='engineering.context_compaction',tool_version='1.0.0',execution_status='failed',charged=zero(),
+            error='Pre-provider outgoing context remained oversized; no request sent; elapsed unknown, full 30s reservation conservatively charged.'),
+            dict(outgoing_sent=False,elapsed_known=False,charge_basis='full reserved wall bound'),30.)
+        shutil.copyfile(w.directory/'prelive_context_boundary.json',w.directory/'prelive_context_boundary_v1.json')
+    request_id='prelive-context-compaction-v2' if prior else 'prelive-context-compaction'
+    if w.store.lookup(w.host.run_id,request_id):raise ValueError('COMPACTION_ALREADY_RECORDED_NO_REPLAY')
+    row,_=w.store.reserve(w.host.run_id,request_id,digest(dict(old=old,version=VERSION)),
         'engineering',{**zero(),'tool_calls':1,'wall_s':30.});started=time.monotonic()
     boundary=dict(kind='pre_provider_context_compaction',original_freeze=old,provider_requests_before=0,
         allowance_reset=False,original_preparation_charge_retained=True,
