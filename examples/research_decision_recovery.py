@@ -298,6 +298,7 @@ def finish(w):
     review.update(recovery_usage=w.store.remaining(w.host.run_id),combined_usage=w.store.remaining(),
         original_usage=w.freeze['recovery_boundary']['original_usage'])
     atomic_json(w.directory/'factual_review.json',review)
+    pilot.configure(w)
     pilot.persist(w)
     # Close host without implying a model scientific STOP or completed experiment.
     with w.store.transaction() as db:

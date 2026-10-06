@@ -282,6 +282,7 @@ def configure(w):
             for c in w.store.artifact(r['result']).get('candidates',[]) if c.get('replication_of') and c.get('execution_id')])
     authority.update(stop=dict(status=w.status,reason=w.stop_reason,sealed_cases=w.sealed_cases),
         budget_accounting=w.store.remaining(),experiment_permissions=w.freeze['allocation'])
+    if w.freeze.get('decision_only'):authority['ledger_reconciliation']=True
     if w.rounds:
         last=w.rounds[-1]['decision'];authority.update(hypotheses=last['model_interpretations'],unresolved=last['unresolved_uncertainties'])
         if w.freeze.get('decision_only'):

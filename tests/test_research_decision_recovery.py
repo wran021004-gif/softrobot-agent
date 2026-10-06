@@ -122,3 +122,16 @@ class RecoveryEvidenceTests(TestCase):
         self.assertTrue(result['batch_plan']['requires_future_grant'])
         self.assertEqual(self.w.store.remaining()['used']['backend_solves'],0)
         self.assertNotIn('search_batch',self.w.store.session(self.w.host.run_id)['state'])
+
+    def test_ledger_settlement_cannot_mint_budget(self):
+        from tools.context_assembly import update_working_state
+        state=deepcopy(self.w.working);authority=deepcopy(state['authority'])
+        authority['ledger_reconciliation']=True
+        authority['budget_accounting']=self.w.store.remaining()
+        authority['remaining_budget']=self.w.store.spendable(self.w.host.run_id)['remaining']
+        state['budget']['wall_s']=authority['remaining_budget']['wall_s']-1
+        updated=update_working_state(state,archive=pilot.archive(self.w),authority=authority)
+        self.assertEqual(updated['budget_accounting'],self.w.store.remaining())
+        forged=deepcopy(authority);forged['remaining_budget']['wall_s']+=1
+        with self.assertRaisesRegex(ValueError,'CONTEXT_LEDGER_RECONCILIATION_NOT_VERIFIED'):
+            update_working_state(state,archive=pilot.archive(self.w),authority=forged)

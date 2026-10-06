@@ -525,8 +525,20 @@ def update_working_state(state, *, archive, evidence_packet=None, authority=None
         # A new observation may consume resources; it cannot mint restored budget.
         old_budget = state.get('budget') or {}
         new_budget = authority.get('remaining_budget') or {}
+        reconciled=False
+        if authority.get('ledger_reconciliation'):
+            run_id=archive.scope.get('context_id')
+            for store in archive.stores:
+                try:store.session(run_id)
+                except ValueError:continue
+                actual=store.remaining()
+                if (authority.get('budget_accounting')==actual and
+                    state.get('budget_accounting',{}).get('limit')==actual['limit'] and
+                    new_budget==store.spendable(run_id)['remaining']):
+                    reconciled=True
+            if not reconciled:raise ValueError('CONTEXT_LEDGER_RECONCILIATION_NOT_VERIFIED')
         for key, value in old_budget.items():
-            if isinstance(value, (int, float)) and new_budget.get(key, value) > value:
+            if isinstance(value, (int, float)) and new_budget.get(key, value) > value and not reconciled:
                 raise ValueError('CONTEXT_BUDGET_CANNOT_RESET')
         result['authority'] = deepcopy(authority)
         result['budget'] = deepcopy(new_budget)
