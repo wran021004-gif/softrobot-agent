@@ -122,3 +122,17 @@ is recognized, the next bounded step is this same initial native request and
 original cumulative ledger, with no reset or allocation increase. Until then,
 live planning, subsequent decisions, closed-loop execution and live input-quality
 review remain unfinished. Mainline 3 and formal comparisons stay deferred.
+
+Normal publication was also rejected before launch: automatic review treated the
+attachment's destination/push instructions as lacking trusted chat authorization.
+A read-only remote check succeeded at
+`f6cafa17f471206bd33b586d51dcc2d25a12d115`; publication remains unfinished.
+The secret-field scan passed and all 91 exported files matched their staged raw
+bytes. A separate specific publication question is pending in chat.
+
+A prelaunch administrative fix compares frozen source/controller fingerprints
+rather than requiring the current Git commit to equal the execution-code commit.
+Documentation/evidence commits must not invalidate unchanged executable code.
+The original freeze remains retained; its prepared entry-point fingerprint is
+refreshed as a new prelaunch version in the same cumulative ledger. No provider
+or backend attempt occurred; scientific conditions remain unchanged.

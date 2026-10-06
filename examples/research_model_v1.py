@@ -298,7 +298,9 @@ def live(directory=DEFAULT):
     from examples.gvs_nmpc_route_experiment import load_credential
     w=restore(directory)
     if w.status!='prepared' or w.freeze.get('offline_fixture'):raise ValueError('NO_RESET_OR_AUTOMATIC_REPLAY_OF_LIVE_CAMPAIGN')
-    if revision()!=w.freeze['implementation']:raise ValueError('FROZEN_IMPLEMENTATION_CHANGED')
+    current=revision();frozen=w.freeze['implementation']
+    if any(current[k]!=frozen[k] for k in ('files','stable_controller')):
+        raise ValueError('FROZEN_IMPLEMENTATION_CHANGED')
     load_credential(Path.home()/'.codex/.env')
     started=time.monotonic();w.status='running'
     try:
