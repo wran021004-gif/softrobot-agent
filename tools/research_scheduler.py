@@ -8,6 +8,29 @@ from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
 ACTIONS=('control_search','structure_search','diagnosis','stop')
 
 
+def verified_observations(state, decision):
+    """Check explicit values/arithmetic; hypotheses remain model judgments."""
+    from tools.diagnostic_revision import resolve_aliases
+    checked=[]
+    for i,o in enumerate(decision.observations):
+        refs=[o.evidence]+([o.comparison_evidence] if o.comparison_evidence else [])
+        selectors=resolve_aliases(state,{'observation':refs})['observation']
+        a=selectors[0]['value'];expected=a
+        if o.operation!='recorded':
+            if len(selectors)!=2:raise ValueError(f'OBSERVATION_{i}_COMPARISON_EVIDENCE_REQUIRED')
+            b=selectors[1]['value']
+            if o.operation!='equal' and any(isinstance(v,bool) or not isinstance(v,(int,float)) for v in (a,b)):
+                raise ValueError(f'OBSERVATION_{i}_NUMERIC_VALUES_REQUIRED')
+            expected={'difference':lambda:a-b,'less_than':lambda:a<b,'greater_than':lambda:a>b,'equal':lambda:a==b}[o.operation]()
+        elif len(selectors)!=1:raise ValueError(f'OBSERVATION_{i}_RECORDED_USES_ONE_REFERENCE')
+        v=o.value
+        numeric=all(not isinstance(x,bool) and isinstance(x,(int,float)) for x in (expected,v))
+        match=abs(v-expected)<=1e-12*max(1.,abs(expected)) if numeric else type(v)==type(expected) and v==expected
+        if not match:raise ValueError(f'OBSERVATION_{i}_VALUE_MISMATCH: expected {expected!r} from {refs}; operation={o.operation}')
+        checked.append(dict(operation=o.operation,value=expected,evidence_selectors=selectors))
+    return checked
+
+
 def capabilities(store, run_id, records):
     from tools.platform_registry import registry
     remaining=downstream_available(store,run_id)
@@ -47,7 +70,14 @@ def validate_decision(store, view, decision):
     latest=role['result_feedback']; feedback=store.artifact(latest)['result']
     if not any(s['reference']==feedback for s in selectors):raise ValueError('DECISION_REQUIRES_CURRENT_FEEDBACK_REFERENCE')
     if d.selected_candidate is not None:select_source(role['research_records'],d.selected_candidate)
+    if role.get('fact_separation') and not d.observations:
+        raise ValueError('OBSERVATIONS_REQUIRED: bind at least one recorded fact; interpretations and voluntary stop remain free')
+    observations=verified_observations(state,d)
+    interpretation_bindings=[resolve_aliases(state,{k:v for k,v in dict(support=i.supporting_evidence,contradiction=i.contradicting_evidence).items() if v})
+        for i in d.interpretations]
     result=dict(decision=plain(d),evidence_selectors=selectors,capabilities=cap,feedback=latest,
+        verified_observations=observations,model_interpretations=[plain(i) for i in d.interpretations],
+        interpretation_bindings=interpretation_bindings,unresolved_uncertainties=d.unresolved_uncertainties,
         scientific_reasoning_status='Model-authored; valid references do not establish causal truth')
     if d.plan:
         if (d.plan.max_backend_attempts or d.plan.max_candidates)>role['max_batch_backends']:

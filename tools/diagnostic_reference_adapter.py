@@ -217,6 +217,10 @@ class EvidenceDrivenAdapter(ScopedReferenceAdapter):
             for tool in payload['tools']:
                 if self.advertised[tool['function']['name']]=='research.decide':
                     tool['function']['parameters']['anyOf'][0]['properties']['action']['enum']=list(self.role['research_packet']['capabilities']['legal'])
+                    if self.role.get('fact_separation'):
+                        schema=tool['function']['parameters']['anyOf'][0]
+                        schema['required']+=['observations','interpretations','unresolved_uncertainties']
+                        schema['properties']['observations']['minItems']=1
             context={k:context[k] for k in ('protocol_correction','recovery_status','correction_budget') if k in context}
             context['role_context']=dict(role=self.role['role'],phase=self.phase,instructions=instruction,
                 research_packet=self.role['research_packet'],unaccepted_draft=self.fact_state.get('unaccepted_draft'))
@@ -246,6 +250,11 @@ class EvidenceDrivenAdapter(ScopedReferenceAdapter):
             selections={'evidence':args.get('evidence')}
             if args.get('plan'):selections['plan.evidence']=args['plan'].get('evidence')
             if args.get('diagnosis'):selections['diagnosis.evidence']=args['diagnosis'].get('evidence')
+            for i,o in enumerate(args.get('observations',[])):
+                selections[f'observations.{i}.evidence']=[o['evidence']]+([o['comparison_evidence']] if o.get('comparison_evidence') else [])
+            for i,h in enumerate(args.get('interpretations',[])):
+                for key in ('supporting_evidence','contradicting_evidence'):
+                    if h.get(key):selections[f'interpretations.{i}.{key}']=h[key]
         alias_failures=alias_errors(self.fact_state,selections)
         for error in alias_failures:
             path=error['path'].removeprefix('fact_handles.')

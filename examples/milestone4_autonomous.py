@@ -22,20 +22,26 @@ from tools.diagnostic_reference_adapter import EvidenceDrivenAdapter
 from tools.research_scheduler import capabilities
 from tools.platform_search import prepare_offline_batch,run_live_batch
 from tools.live_batch_execution import verified_historical_result
-from tools.study_history import study_history
+from tools.study_history import study_history,execution_chronology
 from tools.structural_study import research_planning_input
 from tools.settling_campaign import campaign_metrics,compare_results
 from extensions.tendon_family.gvs_profile import execution_scope
 
 RUN=ROOT/'runs/milestone4_autonomous_20261005'
 EVIDENCE=ROOT/'evidence/milestone4_autonomous_20261005'
+PREDECESSOR_RUN=RUN
+SUCCESSOR_RUN=ROOT/'runs/milestone4_autonomous_20261006'
+SUCCESSOR_EVIDENCE=ROOT/'evidence/milestone4_autonomous_20261006'
 LIMITS=dict(model_calls=24,tool_calls=60,backend_solves=4,worker_calls=0,wall_s=9000.)
 FILES=('examples/milestone4_autonomous.py','tools/research_scheduler.py','tools/platform_search.py',
     'tools/structural_study.py','tools/diagnostic_reference_adapter.py','tools/platform_models.py',
-    'schemas/platform_handoff.py','extensions/platform/manifest.py','tests/test_research_scheduler.py')
+    'schemas/platform_handoff.py','extensions/platform/manifest.py','tests/test_research_scheduler.py','tools/study_history.py')
 INSTRUCTIONS='''Choose control_search,structure_search,diagnosis,or stop yourself from research_packet.capabilities. No stage or round forces a route. The research question concerns the observed holding-speed acceptance loss at holding weight .10 versus the known passing .05/.05 incumbent on near .16/far .11/scale .95/compliant, and whether affordable further control or structural evidence is useful. The incumbent is already successful. You may retain it and stop. Engineering multibatch coverage is measured separately and must not force scientific continuation. Explain actual feedback and cite current F aliases, including a latest-feedback alias. Select any verified complete source from history; primary is a starting question, not a forced source. After a search result explain which new observations support your next action. Citation validity does not certify a causal explanation.
 Use exactly one research.decide native tool with ordinary structured fields. For search embed ONE SearchBatchPlan object. Use exact source_candidate and predecessor_decision from packet; evidence uses F aliases including current feedback. Allowed variables are the current builder paths shown in capabilities; keep undeclared fields fixed. Both installed search.family_explicit@1.0.0 and search.family_coordinate@1.0.0 are legal. Explicit method has null step and candidates containing precisely variables; coordinate has step and null candidates. Source values must lie in declared domains. Weights zero or >=.0001 through 1; structural domains use the frozen controller-7 profile; material choices require explicit enumeration. fixed_controller=controller.gvs_nmpc@7.0.0; fixed_conditions include robot,task,acceptance,controller_implementation,other_numerical_settings. Objectives joint_reach_holding_acceptance,terminal_error_m,holding_max_error_m,holding_max_speed_m_s (optional complete_update_s); constraints frozen_acceptance,force_bounds,finite_valid_execution; verification candidate.apply,simulation.run,evaluation.run,control.profile_report,bound_comparison,diagnostic_revision. Declare hypothesis,rationale,weakening observations,fidelity limits and exit conditions. max_backend_attempts and target_changed_configurations explicit, at most two backend attempts per batch (frozen allocation preserving feedback/delivery capacity). max_candidates may include a reused start. planned_budget covers computed complete execution plus delivery requirement, within remaining totals; backend_solves equals batch cap,workers=0. No automatic extra control adaptation after a structure change.
 For diagnosis identify competing hypotheses,existing evidence,missing observation,outcome_actions,max_wall_s and exit_condition. Only retained prediction/plans/motion queries are executable here. Numerical saved-state work has an explicit capability gap; do not request unsupported computations. Duplicate queries return prior evidence without execution unless replication_reason justifies a changed hypothesis or repeated measurement. For stop provide stop_reason,reasoning,evidence and selected_candidate as an exact complete identity or null. No physical,hardware,realtime,global-optimum or causal success claim follows merely from acceptance. Keep interpretation concise.'''
+SUCCESSOR_INSTRUCTIONS=INSTRUCTIONS[INSTRUCTIONS.index('Use exactly one research.decide'):]+'''
+Choose among all currently legal actions yourself. The current case's question, verified starting observations, counterexamples, known passing incumbents and frozen stopping criteria are in research_packet.case. The purpose is resolving a control-response uncertainty or judging the value of further evidence, not just finding an already-known passing configuration. No next values, structural change or sequence are required. Voluntary stop remains legal under uncertainty and unused capacity. Coverage targets do not require two batches. A sealed case is never reopened; any fallback is a separately frozen case.
+Separate observations, interpretations and the action. observations entries bind one exact current F alias and copied value (operation=recorded, comparison_evidence=null), or a deterministic difference/less_than/greater_than/equal operation with two exact aliases. Use full supplied values rather than rounded prose numbers. interpretations entries state a hypothesis or judgment, supporting_evidence, contradicting_evidence, scope and uncertainty. An empty interpretations list is legal; list unresolved_uncertainties explicitly. Numerical bindings are checked; free scientific explanations are not certified. Referencing a passing sample cannot prove optimality or a passing interval. An unavailable route is a factual capability claim; distinguish it from a judgment that further spending has little value. Existing configurations are reused unless the search plan provides replication_reason; deliberate replication is a new execution, not a novel design. One execution per configuration per batch; source values may be repeated only for explicit replication. Keep free-text interpretations concise and conditional.'''
 
 
 def revision():
@@ -47,7 +53,7 @@ def revision():
 
 def compact_history(w):
     history=study_history(w.store,w.records,retained_baseline=w.baseline['candidate'],latest_tested=w.latest,
-        selection=w.selected)
+        selection=w.selected,selected_source=getattr(w,'batch_source',None))
     for row in history['rows']:
         row.pop('physical_structure',None);row.pop('references',None)
     return history
@@ -59,15 +65,17 @@ def feedback(w,value,kind):
     w.feedback=envelope;return ref
 
 
-def prepare(directory=RUN):
+def prepare(directory=None,*,successor=False):
     from tools.runtime_identity import require_softagent_runtime
     from examples.stage356_milestone2 import scientific_bundle,import_common
-    directory=Path(directory)
+    directory=Path(directory or (SUCCESSOR_RUN if successor else RUN))
     if (directory/'scheduler_state.json').exists():raise ValueError('EXISTING_CAMPAIGN_USE_RESUME_NO_RESET')
     old=Store(continuation.RUN);old_freeze=read(continuation.RUN/'freeze.json')
-    config=deepcopy(old_freeze['experiment']);config.update(evidence_directory=str(EVIDENCE),
+    config=deepcopy(old_freeze['experiment']);config.update(evidence_directory=str(SUCCESSOR_EVIDENCE if successor else EVIDENCE),
         project_prefix='gvs-m4-autonomous',provider_freeze=str(continuation.RUN/'freeze.json'),adapter_version='6.0.0',
         authorization_source='User 2026-10-05 attachment c93a3290: new M4 supplement 24 provider/60 workflow/4 backend/9000 charged seconds/12 standalone numerical operations/0 workers and subagents; live DeepSeek,simulations,one narrow repair,resume,commit/push authorized. Historical STOP/NO_GO preserved.')
+    if successor:config.update(project_prefix='gvs-m4-autonomous-successor',
+        authorization_source='User 2026-10-06 attachment e46020d6 and direct continuation: new linked 24/60/4/9000 campaign,12 standalone diagnostics,zero workers/subagents; real configured DeepSeek,backend,one narrow repair,non-secret evidence publication and normal push authorized. Predecessor stop is sealed.')
     w=prior.MilestoneWorkflow(directory,'single_context',experiment=config)
     w.tools={**w.tools,'research.decide':'1.0.0'}
     if (directory/'freeze.json').exists():
@@ -81,6 +89,12 @@ def prepare(directory=RUN):
         else:import_common(w,scientific_bundle())
     else:
         w.prepare(require_softagent_runtime());import_common(w,scientific_bundle())
+    if successor:
+        from tools.platform_store import zero
+        prep_owner=w.host('design').run_id
+        prep_row,_=w.store.reserve(prep_owner,'successor-preparation',digest(dict(successor=True)),
+            'preparation',{**zero(),'tool_calls':1,'wall_s':120.})
+        prep_started=time.monotonic();prep_charge_start=w.store.remaining()['used']['wall_s']
     prior.prior.previous.prior.import_confirmation(w)
     review=deepcopy(old_freeze['compatibility_review'])
     # Transport-only schema/receipt changes have no altered production equations.
@@ -95,9 +109,15 @@ def prepare(directory=RUN):
     sources=[(Store(r['source_store']),r['execution_id']) for r in old_freeze['historical_results']]
     for stage in ('structure','adaptation'):
         sources.extend((old,row['execution']['factual_result']['execution_id']) for row in read(continuation.RUN/(stage+'_batch_result.json'))['candidates'] if row.get('execution'))
+    predecessor=restore(PREDECESSOR_RUN) if successor else None
+    if successor:
+        sources.extend((predecessor.store,eid) for eid in ('e3876a1d289f41f08d46c96202f1da0c','1ffdcbc4f93f4dc4bb16a807c7b4056b'))
     from extensions.tendon_family.control_evidence import ControlEvidence
     for path,note in compatibility_notes.items():
-        row=review.setdefault(path,dict(current_hash=hashlib.sha256((ROOT/path).read_bytes()).hexdigest(),historical_hashes=[],reason=note))
+        review.setdefault(path,dict(current_hash=hashlib.sha256((ROOT/path).read_bytes()).hexdigest(),historical_hashes=[],reason=note))
+    if successor:
+        review['tools/platform_search.py']['reason']='Receipt-derived chronology metadata and opt-in deliberate replication; default historical reuse, candidate reconstruction, task/evaluator and controller equations unchanged.'
+    for path,row in review.items():
         for store,eid in sources:
             snapshot=store.session(ControlEvidence(store).resolve(eid)['owner'])['snapshot']
             for dep in snapshot['dependencies'].values():
@@ -114,7 +134,10 @@ def prepare(directory=RUN):
                 eid=row['execution']['factual_result']['execution_id']
                 if not any(r['execution_id']==eid for r in w.records):
                     w.records.append(verified_historical_result(w.host('design'),old,eid,'historical_candidate',review))
-    primary=next(r for r in w.records if r['execution_id'].startswith('110dc2c9'))
+    if successor:
+        for source,eid in sources[-2:]:
+            w.records.append(verified_historical_result(w.host('design'),source,eid,'historical_candidate',review))
+    primary=next(r for r in w.records if r['execution_id']==('1ffdcbc4f93f4dc4bb16a807c7b4056b' if successor else '110dc2c9c1d642dcb018664a65c62c30'))
     incumbent=next(r for r in w.records if r['execution_id']=='91c3ba1b01d6499fb26df8f95409401b')
     w.baseline=w.records[0]['facts'];w.latest=primary['facts']['candidate'];w.selected=incumbent['facts']['candidate']
     w.previous_decision=save(w.store,read(continuation.RUN/'adaptation_final_response.json'))
@@ -129,6 +152,7 @@ def prepare(directory=RUN):
         state=w.store.session(host.run_id,db)['state'];state['fact_scope']=dict(project=w.project,binding=primary['binding'])
         w.store.update_state(db,host.run_id,state)
     w.rounds=[];w.repairs=0;w.status='prepared';w.stop_reason=None
+    w.batch_source=None;w.current_case='primary';w.sealed_cases=[]
     w.freeze.update(limits=LIMITS,research_host=host.run_id,provider_configuration=model,profile=read(continuation.PROFILE),
         primary=primary['facts']['candidate'],incumbent=incumbent['facts']['candidate'],fallback=None,
         unresolved_question='Why the observed .10 holding weight loses speed acceptance against .05, and which further bounded control/structural evidence is useful.',
@@ -143,8 +167,31 @@ def prepare(directory=RUN):
             'provider/correction ceilings','finished scoped delivery; do not spend unused budgets'],
         historical_links=dict(m4=str(prior.RUN),m45=str(continuation.RUN),m5A='evidence/milestone5_successor_20261005/acceptance_audit.json'),
         historical_stops_preserved=True,protected_M5_budget_transferred=False,workers=0,subagents=0)
+    if successor:
+        fallback=next(r for r in w.records if r['execution_id']=='44dbf3bc2964402e9f6af6a93c0f8d7d')
+        w.freeze.update(fact_separation=True,predecessor_campaign=str(PREDECESSOR_RUN),
+            predecessor_stop=predecessor.rounds[-1]['accepted_decision'],
+            cases=dict(primary=dict(candidate=primary['facts']['candidate'],
+                question='What affordable evidence could distinguish observed holding-response differences on the shortened compliant geometry from solver-plan selection, weight interaction or structural sensitivity? The saved .075/.09/.10 holding values all fail speed with decreasing maxima; 0/.05 and .05/.05 both pass. Sparse samples do not establish a boundary, monotonicity, repetition or a dominant cause.',
+                evidence_execution_ids=['bebcfd47274940fb88a55ce5a2457c4c','91c3ba1b01d6499fb26df8f95409401b','110dc2c9c1d642dcb018664a65c62c30','e3876a1d289f41f08d46c96202f1da0c','1ffdcbc4f93f4dc4bb16a807c7b4056b'],
+                stopping_criteria=w.freeze['termination']),
+                fallback=dict(candidate=fallback['facts']['candidate'],
+                    question='On the original geometry, terminal-only .05 and .10 both fail holding speed despite passing position, while joint .05/.05 passes. What further control/structure or retained-plan evidence is worth collecting about interaction or structure dependence? The shorter compliant geometry has counterexamples; comparisons changing several fields do not isolate one cause. A passing incumbent is disclosed; finding any passing point is not the sole research purpose.',
+                    evidence_execution_ids=['50618bf23b31464ba4f84c55cd26d1ca','44dbf3bc2964402e9f6af6a93c0f8d7d','a8382f8a4c6e4ebe921fb72f821b2188','bebcfd47274940fb88a55ce5a2457c4c'],
+                    stopping_criteria=w.freeze['termination'])),
+            fallback=dict(case_id='fallback',activation='Only after valid voluntary primary stop with fewer than two real batches and capacity for two complete executions plus shared delivery; never after material/unknown/provider failure or reopening a stopped case.',
+                minimum_backend_capacity=2),
+            research_instructions=SUCCESSOR_INSTRUCTIONS)
+        w.previous_decision=save(w.store,dict(predecessor_campaign=str(PREDECESSOR_RUN),sealed_decision=predecessor.rounds[-1]['decision']))
     feedback(w,dict(primary=primary['facts']['candidate'],metrics=campaign_metrics(primary['facts']),
         comparison_to_incumbent=compare_results(incumbent['facts'],primary['facts']),source_profile=primary['facts']['report']), 'verified_primary_feedback')
+    if successor:case_feedback(w)
+    if successor:
+        elapsed=time.monotonic()-prep_started
+        other_charge=w.store.remaining()['used']['wall_s']-prep_charge_start
+        w.store.complete(prep_row,dict(request_id='successor-preparation',execution_id=prep_row['execution_id'],
+            caller='preparation',tool_id='engineering.research_preparation',tool_version='1.0.0',execution_status='completed',charged=zero()),
+            dict(verified_history=len(w.records),scientific_replay=False,preparation_wall_s=elapsed,other_nested_charged_s=other_charge),max(0.,elapsed-other_charge))
     persist(w);atomic_json(directory/'freeze_seal.json',dict(identity=digest(w.freeze),before_first_live_request=True))
     return w
 
@@ -152,29 +199,88 @@ def prepare(directory=RUN):
 def persist(w):
     atomic_json(w.directory/'freeze.json',w.freeze)
     atomic_json(w.directory/'scheduler_state.json',dict(records=w.records,baseline=w.baseline,latest=w.latest,selected=w.selected,
-        previous_decision=w.previous_decision,feedback=w.feedback,rounds=w.rounds,repairs=w.repairs,status=w.status,stop_reason=w.stop_reason))
+        previous_decision=w.previous_decision,feedback=w.feedback,rounds=w.rounds,repairs=w.repairs,status=w.status,stop_reason=w.stop_reason,
+        batch_source=getattr(w,'batch_source',None),current_case=getattr(w,'current_case','primary'),sealed_cases=getattr(w,'sealed_cases',[])))
 
 
-def restore(directory=RUN):
+def restore(directory=None):
+    directory=Path(directory or RUN)
     freeze=read(Path(directory)/'freeze.json');w=prior.MilestoneWorkflow(directory,'single_context',experiment=freeze['experiment'])
     w.freeze=freeze;w.host=Host(directory,freeze['research_host']);w.project=freeze['project_id']
     for k,v in read(Path(directory)/'scheduler_state.json').items():setattr(w,k,v)
     return w
 
 
+def case_feedback(w):
+    case=w.freeze['cases'][w.current_case];rows=[]
+    for eid in case['evidence_execution_ids']:
+        f=next(r['facts'] for r in w.records if r['execution_id']==eid)
+        profile=w.store.artifact(f['report']['reference'])['detail']
+        rows.append(dict(candidate=f['candidate'],metrics=campaign_metrics(f),profile=f['report']['reference'],
+            observed_plan_behavior={k:profile[k] for k in ('initialization_selected','accepted_noninitialization_plans',
+                'converged_updates','optimization_status_counts','one_step_prediction_summary')}))
+    feedback(w,dict(case_id=w.current_case,question=case['question'],source=case['candidate'],observations=rows,
+        known_passing_incumbent=w.freeze['incumbent'],limits='Historical measurements, not causal proofs or new executions'), 'verified_case_start')
+
+
+def fallback_eligible(w):
+    from tools.batch_budget import budget_capacity,PREPARATION_RESERVE_S
+    policy=w.freeze.get('fallback')
+    if not policy or w.current_case!='primary' or w.status!='model_stopped':return False
+    searches=[r for r in w.rounds if r.get('case_id','primary')=='primary' and r.get('kind')=='search' and r.get('complete')]
+    return len(searches)<2 and budget_capacity(policy['minimum_backend_capacity'],
+        w.store.remaining()['remaining'],preparation_reserve_s=PREPARATION_RESERVE_S)['sufficient']
+
+
+def seal_case(w):
+    if any(c['case_id']==w.current_case for c in w.sealed_cases):return
+    w.sealed_cases.append(dict(case_id=w.current_case,status=w.status,stop_reason=w.stop_reason,
+        final_decision=w.previous_decision,selected_candidate=w.selected,usage=w.store.remaining()))
+
+
+def activate_fallback(w):
+    if not fallback_eligible(w):return False
+    seal_case(w);w.current_case='fallback';case=w.freeze['cases']['fallback']
+    w.batch_source=None;w.status='running';w.stop_reason=None
+    case_feedback(w)
+    with w.store.transaction() as db:
+        w.store.event(db,w.host.run_id,'frozen_fallback','activated',inputs=[w.previous_decision],
+            outputs=[w.store.put(db,dict(case=case,policy=w.freeze['fallback'],budget_reset=False,
+                corrections_carried=w.store.session(w.host.run_id,db)['state'].get('protocol_corrections_used',0)))])
+    persist(w);return True
+
+
 def configure(w):
+    active=w.store.session(w.host.run_id)['state'].get('search_batch',{})
+    chronology=execution_chronology(w.store,[*w.records,*active.get('configurations',{}).values()])
+    w.latest=chronology['latest_complete_result']
     cap=capabilities(w.store,w.host.run_id,w.records);state=w.store.session(w.host.run_id)['state']
+    context_ref=None
+    if w.freeze.get('fact_separation'):
+        value=dict(legal_actions={k:k in cap['legal'] for k in ('control_search','structure_search','diagnosis','stop')},
+            unavailable=cap['unavailable'],remaining=cap['remaining'],chronology=chronology,
+            convention='Capacity before this provider attempt; interpretation text remains model judgment')
+        context_ref=save(w.store,value);handover(w.host,context_ref,value,origin=dict(kind='verified_context'),kind='verified_context')
+        state=w.store.session(w.host.run_id)['state']
     aliases=ensure_aliases(state)['aliases'];catalog=state.get('fact_catalog',{})
     latest_ref=w.store.artifact(w.feedback)['result']
     current={a:dict(pointer=catalog[h]['selector']['pointer'],value=catalog[h]['value']) for a,h in aliases.items()
         if catalog[h]['selector']['reference']==latest_ref}
     packet=dict(history=compact_history(w),primary=w.freeze['primary'],incumbent=w.freeze['incumbent'],
+        chronology=chronology,current_batch_source=getattr(w,'batch_source',None),
         current_feedback=dict(reference=latest_ref,content=w.store.artifact(latest_ref),aliases=current),
         predecessor_decision=w.previous_decision,capabilities=cap,scope=w.freeze['profile'],
-        engineering_coverage=dict(completed_search_batches=sum(r.get('kind')=='search' and r.get('complete') for r in w.rounds),
+        engineering_coverage=dict(completed_search_batches=sum(r.get('case_id','primary')==getattr(w,'current_case','primary') and r.get('kind')=='search' and r.get('complete') for r in w.rounds),
             target='Two separate real search batches, later plan explicitly referencing actual first-batch evidence. This does not override voluntary stopping.'),
         corrections=dict(total=state.get('protocol_corrections_used',0),consecutive=state.get('protocol_corrections_consecutive',0)))
-    configure_role(w.host,'design',INSTRUCTIONS,phase='research',delivery_tool='research.decide',phase_budget={},
+    if context_ref:packet.update(case_id=w.current_case,case=w.freeze['cases'][w.current_case],sealed_cases=w.sealed_cases,
+        context_observation_reference=context_ref,context_observation_aliases={a:dict(pointer=catalog[h]['selector']['pointer'],value=catalog[h]['value'])
+            for a,h in aliases.items() if catalog[h]['selector']['reference']==context_ref})
+    packet['performed_batch_evidence']=[dict(reference=r['feedback_result'],aliases={a:dict(pointer=catalog[h]['selector']['pointer'],value=catalog[h]['value'])
+        for a,h in aliases.items() if catalog[h]['selector']['reference']==r['feedback_result']})
+        for r in w.rounds if r.get('kind')=='search' and r.get('feedback_result') and r.get('case_id','primary')==getattr(w,'current_case','primary')]
+    configure_role(w.host,'design',w.freeze.get('research_instructions',INSTRUCTIONS),phase='research',delivery_tool='research.decide',phase_budget={},
+        fact_separation=w.freeze.get('fact_separation',False),
         autonomous_scheduling=True,research_packet=packet,research_records=w.records,result_feedback=w.feedback,
         predecessor_decision=w.previous_decision,latest_tested=w.latest,require_source_binding=True,
         max_batch_backends=2,source_report=w.freeze['common_scientific_input']['source_report'],
@@ -193,7 +299,7 @@ def decision(w):
     state=w.store.session(w.host.run_id)['state'];ref=state.get('handoffs',{}).get('research_decision')
     if not ref or ref==before:raise RuntimeError('RESEARCH_DECISION_INCOMPLETE: '+str(state.get('stop_reason')))
     result=w.store.artifact(ref);w.previous_decision=ref
-    row=dict(index=index,kind=result['decision']['action'],request=save(w.store,dict(packet=packet,payload=payload)),
+    row=dict(index=index,case_id=getattr(w,'current_case','primary'),kind=result['decision']['action'],request=save(w.store,dict(packet=packet,payload=payload)),
         accepted_decision=ref,decision=result,usage_after_decision=w.store.remaining())
     w.rounds.append(row);persist(w);return row
 
@@ -201,14 +307,15 @@ def decision(w):
 def execute(w,row):
     d=row['decision']['decision'];action=d['action']
     if d['selected_candidate'] is not None:w.selected=d['selected_candidate']
-    if action=='stop':w.status='model_stopped';w.stop_reason=d['stop_reason'];persist(w);return
+    if action=='stop':w.status='model_stopped';w.stop_reason=d['stop_reason'];seal_case(w);persist(w);return
     if action in ('control_search','structure_search'):
         plan=row['decision']['search_plan'];record=w.store.artifact(plan)
         source=next(r for r in w.records if r['facts']['candidate']==record['bindings']['subject'])
+        w.batch_source=source['facts']['candidate']
         configure_role(w.host,'executor','Execute the accepted immutable research batch only.',phase_budget={});w.host.resume()
         prepare_offline_batch(w.host,plan,mode='live',starting_facts=source['facts'],retained_baseline=w.baseline,historical_results=w.records)
         result=run_live_batch(w.host);ref=save(w.store,result);row.update(kind='search',route=action,result=ref,
-            complete=result['status']=='completed' and result['fully_evaluated_distinct_changed_configurations']>0)
+            complete=result['status']=='completed' and result.get('fully_evaluated_new_executions',result['fully_evaluated_distinct_changed_configurations'])>0)
         compact=[]
         for candidate in result['candidates']:
             if not candidate.get('execution'):continue
@@ -217,11 +324,12 @@ def execute(w,row):
                 w.records.append(dict(role='historical_candidate',facts=facts,execution_id=facts['execution_id'],
                     owner_run_id=facts['candidate']['owner_run_id'],execution_scope=execution_scope(cfg),source_store=str(w.directory),
                     receipts=candidate['execution']['receipts'],reuse_reason='New complete feedback-driven supplement evaluation'))
-            w.latest=facts['candidate'];compact.append(dict(candidate=facts['candidate'],metrics=campaign_metrics(facts),
+            compact.append(dict(candidate=facts['candidate'],metrics=campaign_metrics(facts),
                 source_comparison=compare_results(source['facts'],facts),baseline_comparison=compare_results(w.baseline,facts),
                 profile=facts['report']))
+        w.latest=result['execution_chronology']['latest_complete_result']
         row['feedback_result']=feedback(w,dict(batch_result=ref,plan=plan,source=source['facts']['candidate'],
-            outcomes=compact,status=result['status'],stop_reason=result['stop_reason']), 'new_complete_batch_feedback')
+            outcomes=compact,chronology=result['execution_chronology'],status=result['status'],stop_reason=result['stop_reason']), 'new_complete_batch_feedback')
         # Archive immutable batch before opening a subsequent model-authored batch.
         with w.store.transaction() as db:
             state=w.store.session(w.host.run_id,db)['state'];batch=state.pop('search_batch',None)
@@ -258,27 +366,41 @@ def execute(w,row):
 
 def export(w):
     from tools.improvement_workflow import archive_store
+    EVIDENCE=Path(w.freeze['experiment']['evidence_directory'])
     EVIDENCE.mkdir(parents=True,exist_ok=True)
     for path in w.directory.glob('*.json'):(EVIDENCE/path.name).write_bytes(path.read_bytes())
     archive_store(w.store,EVIDENCE/'store',source_stores=[Path(r['source_store']) for r in w.records if r['source_store']!=str(w.directory)])
     searches=[r for r in w.rounds if r.get('kind')=='search' and r.get('complete')]
-    binding=False
-    if len(searches)>=2:
-        first=searches[0]['feedback_result'];second=searches[1]['decision']['batch_plan']
-        binding=any(s['reference']==first for s in second['bindings']['evidence_selectors'])
+    cases=[]
+    for case_id in sorted({r.get('case_id','primary') for r in w.rounds}):
+        steps=[r for r in searches if r.get('case_id','primary')==case_id];binding=False
+        if len(steps)>=2:
+            first=steps[0]['feedback_result'];second=steps[1]['decision']['batch_plan']
+            binding=any(s['reference']==first for s in second['bindings']['evidence_selectors'])
+        stopped=any(r.get('case_id','primary')==case_id and r['decision']['decision']['action']=='stop' for r in w.rounds)
+        cases.append(dict(case_id=case_id,real_search_batches=len(steps),feedback_bound_to_second_plan=binding,
+            final_model_stop=stopped,core_multibatch_acceptance=len(steps)>=2 and binding and stopped))
+    chronology=execution_chronology(w.store,w.records)
+    embedded=sum(r['facts']['control_updates'] for r in w.records if r['execution_id'] in
+        {a['candidate']['execution_id'] for a in chronology['attempts']})
     state=w.store.session(w.host.run_id)['state']
     delivery=dict(status=w.status,stop_reason=w.stop_reason,implementation_checks='see focused_checks.json',
-        real_search_batches=len(searches),core_multibatch_acceptance=len(searches)>=2 and binding and w.status=='model_stopped',
-        feedback_bound_to_second_plan=binding,selected_candidate=w.selected,latest_execution=w.latest,
+        real_search_batches=len(searches),cases=cases,sealed_cases=w.sealed_cases,
+        core_multibatch_acceptance=any(c['core_multibatch_acceptance'] for c in cases),
+        feedback_bound_to_second_plan=any(c['feedback_bound_to_second_plan'] for c in cases),
+        selected_candidate=w.selected,latest_execution=chronology['latest_execution'],
+        latest_completed_evaluation=chronology['latest_completed_evaluation'],latest_complete_result=chronology['latest_complete_result'],
+        execution_chronology=chronology,current_batch_source=getattr(w,'batch_source',None),
         retained_baseline=w.baseline['candidate'],usage=w.store.remaining(),
         corrections=dict(total=state.get('protocol_corrections_used',0),consecutive=state.get('protocol_corrections_consecutive',0)),
-        standalone_numerical_operations=0,embedded_controller_updates=35*w.store.remaining()['used']['backend_solves'],
+        standalone_numerical_operations=0,embedded_controller_updates=embedded,
+        attempts_without_complete_update_count=[a['candidate']['execution_id'] for a in chronology['attempts'] if not any(r['execution_id']==a['candidate']['execution_id'] for r in w.records)],
         engineering_interventions=w.repairs,
         physical_improvement='Individual new sealed profiles; no required superiority criterion' if searches else 'Not evaluated: zero new complete search evaluations',
         realtime='No realtime success established',
         model_reasoning='Citations validated; causal explanations remain subject to evidence review' if w.rounds else 'None: no accepted live model decision',
         selection_role='Model-selected complete deliverable' if w.status=='model_stopped' else 'Retained historical incumbent; no new final model selection',
-        milestones=dict(M4_historical='closed',M4_supplement='separate acceptance',M5='open'),revision=revision())
+        milestones=dict(M4_historical='closed',M4_supplement='closed' if any(c['core_multibatch_acceptance'] for c in cases) else 'open_incomplete_autonomy_coverage',M5='open'),revision=revision())
     atomic_json(EVIDENCE/'delivery.json',delivery)
     atomic_json(EVIDENCE/'sha256_manifest.json',{p.relative_to(EVIDENCE).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
         for p in EVIDENCE.rglob('*') if p.is_file() and p.name!='sha256_manifest.json'})
@@ -294,8 +416,10 @@ def live():
     load_credential(Path(os.environ['SOFTAGENT_CONFIGURATION_PATH']))
     start=time.monotonic();w.status='running'
     try:
-        while w.status=='running':
-            row=decision(w);execute(w,row)
+        while True:
+            while w.status=='running':
+                row=decision(w);execute(w,row)
+            if not activate_fallback(w):break
     except Exception as exc:
         w.status='failed';w.stop_reason=str(exc)
         atomic_json(w.directory/'failure.json',dict(type=type(exc).__name__,message=str(exc),usage=w.store.remaining()))
@@ -337,7 +461,9 @@ def repair_projection():
 
 
 if __name__=='__main__':
-    if sys.argv[1]=='prepare':prepare()
+    successor='--successor' in sys.argv
+    if successor:RUN=SUCCESSOR_RUN;EVIDENCE=SUCCESSOR_EVIDENCE
+    if sys.argv[1]=='prepare':prepare(RUN,successor=successor)
     elif sys.argv[1]=='live':live()
     elif sys.argv[1]=='export':export(restore())
     elif sys.argv[1]=='repair-projection':repair_projection()

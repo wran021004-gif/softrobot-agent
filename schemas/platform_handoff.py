@@ -215,6 +215,7 @@ class SearchBatchPlan(Contract):
     stopping_conditions: list[str] = Field(min_length=1)
     scientific_promise: Literal['promising', 'uncertain', 'unlikely']
     rationale: str = Field(min_length=1)
+    replication_reason: str | None = Field(default=None,description='Purpose for a new execution of a known configuration; otherwise reuse history. One execution per configuration within a batch.')
 
 
 class ResearchDiagnosis(Contract):
@@ -230,10 +231,28 @@ class ResearchDiagnosis(Contract):
     replication_reason: str | None = None
 
 
+class ResearchObservation(Contract):
+    evidence: str = Field(description='One current F alias for the exact recorded observation.')
+    operation: Literal['recorded','difference','less_than','greater_than','equal'] = 'recorded'
+    comparison_evidence: str | None = None
+    value: float | int | bool | str | list[float] = Field(description='Exact recorded value, or deterministic operation on the two referenced values.')
+
+
+class ResearchInterpretation(Contract):
+    statement: str = Field(min_length=1)
+    supporting_evidence: list[str] = Field(default_factory=list)
+    contradicting_evidence: list[str] = Field(default_factory=list)
+    scope: str = Field(min_length=1)
+    uncertainty: str = Field(min_length=1,description='Limits or unresolved alternatives. A citation does not certify causality.')
+
+
 class ResearchDecision(Contract):
     action: Literal['control_search', 'structure_search', 'diagnosis', 'stop']
     evidence: list[str] = Field(min_length=1)
     reasoning: str = Field(min_length=1)
+    observations: list[ResearchObservation] = Field(default_factory=list)
+    interpretations: list[ResearchInterpretation] = Field(default_factory=list)
+    unresolved_uncertainties: list[str] = Field(default_factory=list)
     plan: SearchBatchPlan | None = None
     diagnosis: ResearchDiagnosis | None = None
     selected_candidate: dict | None = None

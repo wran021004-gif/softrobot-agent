@@ -103,8 +103,10 @@ def validate_batch_plan(store, view, proposal):
             if digest(fixed_configuration(changed,plan.variables))!=digest(fixed_configuration(effective,plan.variables)):
                 raise ValueError('PLAN_ACTUAL_FIXED_FIELDS_CHANGED')
             differences.append(dict(proposed=point,actual_changes=actual,unchanged_declared_fields=sorted(set(point)-{r['path'] for r in actual})))
-        if any(not any(r['path']==path for d in differences for r in d['actual_changes']) for path in plan.variables):
+        if not plan.replication_reason and any(not any(r['path']==path for d in differences for r in d['actual_changes']) for path in plan.variables):
             raise ValueError('PLAN_DECLARED_VARIABLE_NEVER_CHANGES')
+        if plan.replication_reason and len({digest(p) for p in plan.candidates})!=len(plan.candidates):
+            raise ValueError('PLAN_REPLICATION_ONE_EXECUTION_PER_CONFIGURATION_PER_BATCH')
     required_fixed={'robot','task','acceptance','controller_implementation','other_numerical_settings'}
     if not required_fixed<=set(plan.fixed_conditions):raise ValueError('PLAN_FIXED_CONDITIONS_REQUIRED: '+', '.join(sorted(required_fixed)))
     required_objectives={'joint_reach_holding_acceptance','terminal_error_m','holding_max_error_m','holding_max_speed_m_s'}
@@ -408,6 +410,11 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
     from tools.batch_budget import budget_capacity
     capacity=budget_capacity(count,budget,interpretation=dict(wall_s=interpretation_reserve_s),planning={},
         preparation_reserve_s=record['cost_floor_per_candidate_s'].get('apply',0.))
+    if mode=='offline_injected':
+        # Injected stages reserve workflow/time only, under the zero-live guard.
+        capacity['requirement']['backend_solves']=0
+        capacity['shortfalls']['backend_solves']=0
+        capacity['sufficient']=not any(capacity['shortfalls'].values())
     if interpretation_reserve_s<0 or not capacity['sufficient']:
         raise ValueError('BATCH_RESERVATION_CAPACITY_REQUIRED: 990 seconds and 4 tools per proposal, plus explicit interpretation reserve')
     initial={p:parameter_value(effective,p) for p in plan.variables}
@@ -437,6 +444,7 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
         retained_baseline=retained_baseline,max_backend_attempts=count,target_changed_configurations=plan.target_changed_configurations,
         historical_results=permitted,
         interpretation_reserve_s=interpretation_reserve_s,usage_start=host.store.remaining()['used'],stop_reason=None,
+        replication_reason=plan.replication_reason,
         grant=host.store.config(),interpretation_reserve=dict(model_calls=4,tool_calls=4))
     _save_batch(host,batch)
     return batch
@@ -447,7 +455,10 @@ def offline_batch_result(host):
     batch=host.store.session(host.run_id)['state']['search_batch']
     now=host.store.remaining()['used'];used={k:v-batch['usage_start'][k] for k,v in now.items()}
     rows=list(batch['configurations'].values())
+    from tools.study_history import execution_chronology
+    chronology=execution_chronology(host.store,rows) if batch['mode']=='live' else None
     return dict(contract='platform.search_batch_result',version='1.0.0',mode=batch['mode'],plan=batch['plan'],
+        execution_chronology=chronology,
         batch_id=batch['batch_id'],status='completed' if batch['stop_reason'] in ('proposal_limit','pilot_target_complete') else 'stopped' if batch['stop_reason'] else 'pending' if batch['pending'] else 'prepared',
         stop_reason=batch['stop_reason'],pending=batch['pending'],proposals=batch['proposals'],
         candidates=[{k:v for k,v in row.items() if k!='effective'} for row in rows],
@@ -461,7 +472,9 @@ def offline_batch_result(host):
             completed_new_evaluations=sum(not r['reused'] and r.get('feedback') is not None for r in rows),usage=used),
         completed_evaluations=sum(not r['reused'] and r['stages'].get('evaluation',{}).get('execution_status')=='completed' for r in rows),
         completed_profiles=sum(not r['reused'] and r['stages'].get('profile',{}).get('execution_status')=='completed' for r in rows),
-        fully_evaluated_distinct_changed_configurations=sum(not r['reused'] and r.get('feedback') is not None for r in rows),
+        fully_evaluated_distinct_changed_configurations=sum(not r['reused'] and not r.get('replication_of') and r.get('feedback') is not None for r in rows),
+        fully_evaluated_new_executions=sum(not r['reused'] and r.get('feedback') is not None for r in rows),
+        deliberate_replications=sum(bool(r.get('replication_of')) and r.get('feedback') is not None for r in rows),
         physical_acceptance_authority='Frozen full comparison; optimizer guidance does not promote a candidate.',
         execution_authorized=batch['mode']=='live',candidate_promoted=False,grant=batch.get('grant'))
 
@@ -535,7 +548,7 @@ def _run_batch(host,inject,*,stop_after_stage=None):
             if not previous and batch.get('historical_results'):
                 from extensions.tendon_family.gvs_profile import execution_scope
                 historical=next((r for r in batch['historical_results'] if r.get('reusable_under_plan',True) and r['execution_scope']==execution_scope(effective)),None)
-                if historical:
+                if historical and not batch.get('replication_reason'):
                     facts=historical['facts']
                     previous=dict(candidate_id=facts['candidate']['candidate_id'],configuration=facts['configuration'],identity=identity,
                         changes=changes,stages={k:dict(execution_status='historical_reused') for k,_ in stages},reused=True,
@@ -549,6 +562,12 @@ def _run_batch(host,inject,*,stop_after_stage=None):
                 candidate=batch['retained_baseline']
                 original=host.store.artifact(candidate['configuration'])['effective']
                 if execution_scope(effective)==execution_scope(original):retained=candidate
+            replication_of=None
+            if batch.get('replication_reason'):
+                replication_of=(historical['facts']['candidate'] if historical else
+                    start['candidate'] if start else retained['candidate'] if retained else None)
+                previous=start=retained=None
+                if replication_of:proposal.update(replication_of=replication_of,replication_reason=batch['replication_reason'])
             if previous or start or retained:
                 if start and not previous:
                     previous=dict(candidate_id=start['candidate']['candidate_id'],configuration=start['configuration'],identity=identity,
@@ -576,7 +595,8 @@ def _run_batch(host,inject,*,stop_after_stage=None):
                 effective=effective,content_identity=identity)
             with host.store.transaction() as db:configuration=plain(host.store.put(db,prepared))
             batch['pending']=dict(candidate_id=candidate_id,configuration=configuration,identity=identity,changes=changes,
-                candidate_build_s=time.monotonic()-build_started)
+                candidate_build_s=time.monotonic()-build_started,replication_of=replication_of,
+                replication_reason=batch.get('replication_reason') if replication_of else None)
             batch['configurations'][identity]=dict(**batch['pending'],stages={},reused=False)
             batch['algorithm']=plain(algorithm.save());_save_batch(host,batch)
         candidate=batch['pending'];row=batch['configurations'][candidate['identity']]

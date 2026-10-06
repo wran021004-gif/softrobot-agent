@@ -4,6 +4,67 @@ from tools.state_io import digest
 from extensions.tendon_family.candidate import candidate_facts
 
 
+def execution_chronology(store, records):
+    """Order this store's real attempts by reservation events, not presentation.
+
+    latest_execution is the latest attempted simulation, including failures.
+    latest_completed_evaluation is ordered by official evaluation completion;
+    latest_complete_result additionally requires the retained full profile/facts.
+    Imported history has no position in this campaign's local event sequence.
+    """
+    import json
+    facts={}; builds={}
+    for record in records:
+        f=record.get('facts') or record.get('execution',{}).get('factual_result')
+        if f:facts[f['execution_id']]=f
+        if record.get('candidate_id'):builds[record['candidate_id']]=record
+    with store.connect(True) as db:
+        calls=[dict(r) for r in db.execute('SELECT * FROM calls')]
+        events=[json.loads(r[0]) for r in db.execute('SELECT body FROM events ORDER BY seq')]
+    reservations={e['event_id']:e for e in events}
+    completions={(e['run_id'],e['execution_id']):e for e in events
+                 if e['status'] in ('completed','failed','unknown') and e['parent_id']}
+    attempts=[];missing=[];evaluated=[];complete=[]
+    for call in calls:
+        if json.loads(call['charged'])['backend_solves']==0:continue
+        receipt=json.loads(call['receipt']) if call['receipt'] else None
+        if receipt and (receipt['tool_id']!='simulation.run' or receipt.get('cache_hit')):continue
+        start=reservations.get(call['parent_id']);eid=call['execution_id'];f=facts.get(eid)
+        metadata=store.session(call['run_id'])['state'].get('result_executions',{}).get(eid,{})
+        candidate=f['candidate'] if f else dict(candidate_id=metadata.get('candidate',call['run_id']),
+            owner_run_id=call['run_id'],execution_id=eid,configuration=metadata.get('candidate_input'))
+        if not start:missing.append(eid);continue
+        attempts.append(dict(candidate=candidate,reservation_sequence=start['sequence'],
+            reservation_event=start['event_id'],status=call['status'],
+            configuration_binding='executed' if candidate['configuration'] else 'not retained yet'))
+    by_id={r['candidate']['execution_id']:r for r in attempts}
+    for call in calls:
+        if not call['receipt']:continue
+        r=json.loads(call['receipt'])
+        if r['execution_status']!='completed' or not r.get('output'):continue
+        if r['tool_id'] not in ('evaluation.run','control.profile_report'):continue
+        value=store.artifact(r['output']);value=value.get('detail',value)
+        eid=value.get('source_execution_id' if r['tool_id']=='evaluation.run' else 'execution_id')
+        if eid not in by_id:continue
+        end=completions.get((call['run_id'],call['execution_id']))
+        if not end:missing.append(call['execution_id']);continue
+        row=dict(candidate=by_id[eid]['candidate'],completion_sequence=end['sequence'],
+            completion_event=end['event_id'],receipt=r['output'])
+        if r['tool_id']=='evaluation.run':evaluated.append(row)
+        elif eid in facts:complete.append(row)
+    attempts.sort(key=lambda r:r['reservation_sequence'])
+    evaluated.sort(key=lambda r:r['completion_sequence']);complete.sort(key=lambda r:r['completion_sequence'])
+    return dict(scope='Real executions in this campaign store; imported records are historical evidence, not new attempts',
+        ordering_authority='Store reservation and completion event sequence',attempts=attempts,
+        latest_execution=attempts[-1]['candidate'] if attempts and not missing else None,
+        latest_completed_evaluation=evaluated[-1]['candidate'] if evaluated and not missing else None,
+        latest_complete_result=complete[-1]['candidate'] if complete and not missing else None,
+        missing_chronology=missing,unordered_historical_executions=sorted(set(facts)-set(by_id)),
+        semantics=dict(latest_execution='Latest attempted simulation by reservation event; may be failed/incomplete',
+            latest_completed_evaluation='Latest official evaluation completion event; does not imply acceptance or complete profiling',
+            latest_complete_result='Latest full profiled evaluation with retained bound facts, by profile completion event'))
+
+
 def study_history(store, records, *, retained_baseline=None, selected_source=None,
                   latest_tested=None, selection=None):
     rows=[]; seen=set()

@@ -1,4 +1,14 @@
-# Current development status - Milestones 4 and 5, 2026-10-05
+# Current development status - Milestones 4 and 5, 2026-10-06
+
+The [independent M4 autonomous successor](milestone4_autonomous_successor.md)
+repairs shared receipt/event chronology and separates verified observations,
+uncertain interpretations and decisions. Its primary response question and
+distinct original-geometry fallback use one new cumulative 24/60/4/9000 grant.
+The preceding voluntary stop remains sealed. Focused prelaunch checks and live
+outcomes are being recorded under `evidence/milestone4_autonomous_20261006`.
+The autonomous supplement closes only if its actual per-case multibatch gate passes.
+
+The following 2026-10-05 delivery remains historical evidence:
 
 Latest scoped delivery: [limited M5A closeout](milestone5A_component_closeout.md)
 completed two nonzero-acceleration comparisons and five causal command updates.

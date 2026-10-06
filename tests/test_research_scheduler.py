@@ -20,7 +20,7 @@ class ResearchSchedulingTests(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.temp=TemporaryDirectory(dir=campaign.ROOT/'runs',prefix='scheduler-offline-');cls.directory=Path(cls.temp.name)/'campaign'
-        campaign.prepare(cls.directory)
+        campaign.prepare(cls.directory,successor=True)
 
     @classmethod
     def tearDownClass(cls):
@@ -38,7 +38,13 @@ class ResearchSchedulingTests(TestCase):
 
     def stop(self):
         return dict(action='stop',evidence=[self.alias],reasoning='The known incumbent passes; further evidence may be deferred.',
-            selected_candidate=self.w.freeze['incumbent'],stop_reason='Voluntary delivery')
+            selected_candidate=self.w.freeze['incumbent'],stop_reason='Voluntary delivery',**self.separation())
+
+    def separation(self):
+        return dict(observations=[dict(evidence=self.alias,value=self.packet['current_feedback']['aliases'][self.alias]['value'])],
+            interpretations=[dict(statement='Further evidence may or may not be valuable',supporting_evidence=[self.alias],
+                contradicting_evidence=[],scope='This bounded offline fixture',uncertainty='Dominant cause unresolved')],
+            unresolved_uncertainties=['No optimum or dominant physical cause established'])
 
     def search(self,route='control_search'):
         p=deepcopy(read(campaign.continuation.RUN/'adaptation_plan.json')['plan'])
@@ -48,7 +54,7 @@ class ResearchSchedulingTests(TestCase):
         p.update(source_candidate=self.source,predecessor_decision=self.w.previous_decision,evidence=[self.alias],
             variables={path:bounds},candidates=[{path:value}],max_candidates=1,max_backend_attempts=1,
             target_changed_configurations=1,planned_budget=dict(model_calls=5,tool_calls=9,backend_solves=1,worker_calls=0,wall_s=1595.))
-        return dict(action=route,evidence=[self.alias],reasoning='The current feedback motivates this bounded sensitivity check.',plan=p)
+        return dict(action=route,evidence=[self.alias],reasoning='The current feedback motivates this bounded sensitivity check.',plan=p,**self.separation())
 
     def test_actual_projection_native_schema_all_legal_routes(self):
         adapter=EvidenceDrivenAdapter();payload=payload_for(self.w.host,adapter)
@@ -60,6 +66,8 @@ class ResearchSchedulingTests(TestCase):
         self.assertEqual(set(body['capabilities']['legal']),{'control_search','structure_search','diagnosis','stop'})
         self.assertNotIn('next required',payload['messages'][0]['content'].lower())
         self.assertIsInstance(schema['$defs']['SearchBatchPlan']['properties']['variables'],dict)
+        self.assertIn('observations',schema['anyOf'][0]['required'])
+        self.assertIn('interpretations',schema['anyOf'][0]['properties'])
 
     def test_unexpected_structure_control_repeat_and_voluntary_stop(self):
         for route in ('control_search','structure_search'):
@@ -79,7 +87,8 @@ class ResearchSchedulingTests(TestCase):
         campaign.feedback(self.w,dict(new_result=2.,meaning='Offline fixture, never live evidence'),'offline_fixture')
         campaign.configure(self.w)
         with self.assertRaisesRegex(ValueError,'CURRENT_FEEDBACK_REFERENCE'):self.validate(stale)
-        self.alias=next(iter(campaign.configure(self.w)['current_feedback']['aliases']))
+        self.packet=campaign.configure(self.w)
+        self.alias=next(iter(self.packet['current_feedback']['aliases']))
         result=self.validate(self.search())
         self.assertNotEqual(self.alias,old_alias)
         self.assertEqual(result['batch_plan']['bindings']['check_feedback'],self.w.feedback)
@@ -88,7 +97,7 @@ class ResearchSchedulingTests(TestCase):
         request=dict(source_candidate=self.source,hypotheses=['Plan selection changes','Observed motion changes'],
             evidence=[self.alias],missing_observation='Compare saved holding plans.',view='plans',update_ids=[34],
             outcome_actions={'same':'defer','different':'consider control search'},max_wall_s=180.,exit_condition='One saved query')
-        decision=dict(action='diagnosis',evidence=[self.alias],reasoning='Resolve the uncertainty using retained data.',diagnosis=request)
+        decision=dict(action='diagnosis',evidence=[self.alias],reasoning='Resolve the uncertainty using retained data.',diagnosis=request,**self.separation())
         result=self.validate(decision);ref=self.w.store.artifact(self.w.feedback)['result']
         with self.w.store.transaction() as db:
             state=self.w.store.session(self.w.host.run_id,db)['state']
@@ -146,3 +155,87 @@ class ResearchSchedulingTests(TestCase):
         state=host.store.session(host.run_id)['state']
         self.assertEqual((state['protocol_corrections_used'],state['protocol_corrections_consecutive']),(4,2))
         self.assertIsNotNone(_argument_rejection(host,invocation,rejected,config))
+
+    def test_saved_execution_chronology_ignores_reversed_presentation(self):
+        from tools.study_history import execution_chronology
+        old=campaign.restore(campaign.PREDECESSOR_RUN)
+        rows=old.store.artifact(old.rounds[0]['result'])['candidates']
+        selected=deepcopy(old.selected)
+        runtime=campaign.ROOT/'evidence/milestone4_autonomous_20261005/delivery_runtime.json'
+        before=runtime.read_bytes()
+        for presented in (rows,list(reversed(rows))):
+            result=execution_chronology(old.store,presented)
+            self.assertEqual(result['latest_execution']['execution_id'],'1ffdcbc4f93f4dc4bb16a807c7b4056b')
+            self.assertEqual(result['latest_completed_evaluation'],result['latest_complete_result'])
+            self.assertEqual(result['latest_complete_result']['execution_id'],'1ffdcbc4f93f4dc4bb16a807c7b4056b')
+            self.assertEqual(old.selected,selected)
+        self.assertEqual(runtime.read_bytes(),before)
+
+    def test_verified_facts_arithmetic_and_uncertain_stop(self):
+        from tools.diagnostic_revision import ensure_aliases
+        state=self.w.store.session(self.w.host.run_id)['state'];aliases=ensure_aliases(state)['aliases']
+        catalog=state['fact_catalog'];numbers=[a for a,h in aliases.items() if type(catalog[h]['value']) is float][:2]
+        a,b=numbers;x=catalog[aliases[a]]['value'];y=catalog[aliases[b]]['value']
+        d=self.stop();d['observations']=[dict(evidence=a,comparison_evidence=b,operation='difference',value=x-y)]
+        result=self.validate(d)
+        self.assertEqual(result['verified_observations'][0]['value'],x-y)
+        self.assertEqual(result['decision']['action'],'stop')
+        self.assertEqual(result['model_interpretations'],d['interpretations'])
+        d['observations'][0]['value']+=.1
+        with self.assertRaisesRegex(ValueError,'VALUE_MISMATCH: expected'):self.validate(d)
+        d=self.stop();d['observations'][0]['evidence']='F999999'
+        with self.assertRaisesRegex(ValueError,'out-of-scope'):self.validate(d)
+
+    def test_frozen_fallback_carries_shared_budget_and_recovery(self):
+        from tools.state_io import atomic_json
+        original=read(self.directory/'scheduler_state.json')
+        self.w.status='model_stopped';self.w.current_case='primary';self.w.sealed_cases=[];self.w.rounds=[]
+        before=self.w.store.remaining();host=self.w.host.run_id
+        self.assertTrue(campaign.fallback_eligible(self.w))
+        with patch.object(self.w.store,'remaining',return_value={**before,'remaining':{**before['remaining'],'backend_solves':1}}):
+            self.assertFalse(campaign.fallback_eligible(self.w))
+        self.assertTrue(campaign.activate_fallback(self.w))
+        self.assertEqual(self.w.host.run_id,host)
+        self.assertEqual(self.w.store.remaining(),before)
+        self.assertEqual(self.w.current_case,'fallback')
+        self.assertEqual(self.w.sealed_cases[0]['case_id'],'primary')
+        self.assertFalse(campaign.fallback_eligible(self.w))
+        atomic_json(self.directory/'scheduler_state.json',original)
+
+    def test_deliberate_replication_preserves_known_identity(self):
+        d=self.search();p=d['plan'];p['candidates']=[{'control/recipe/holding_tip_speed_weight':.09}]
+        with self.assertRaisesRegex(ValueError,'NEVER_CHANGES'):self.validate(d)
+        p['replication_reason']='Repeat the same scientific configuration to measure run-to-run response; not a novel design.'
+        result=self.validate(d)
+        self.assertEqual(result['batch_plan']['actual_differences'][0]['actual_changes'],[])
+        self.assertEqual(result['batch_plan']['plan']['replication_reason'],p['replication_reason'])
+        from tools.platform_search import prepare_offline_batch,run_offline_batch
+        from tools.platform_host import Host
+        from tools.platform_store import Store,zero
+        from uuid import uuid4
+        root=Path(self.temp.name)/'replication-offline';store=Store(root)
+        budget={**zero(),'tool_calls':20,'wall_s':4000.}
+        store.create(dict(project_id='offline-replication',grant_id='offline-'+uuid4().hex,budget=budget,
+            authorization_source='Synthetic offline fixture; zero API/backend/workers'))
+        host=Host(root,'offline-replication');inp=deepcopy(self.w.store.session(self.w.host.run_id)['snapshot']['input'])
+        inp['run_id']=host.run_id;inp['policy'].update(budget=budget,tool_bindings={},allowed_tools=[])
+        host.create(inp)
+        record=result['batch_plan'];refs=[r['facts']['configuration'] for r in self.w.records]
+        refs.append(record['bindings']['execution_source_configuration'])
+        with store.transaction() as db:
+            for ref in refs:self.assertEqual(plain(store.put(db,self.w.store.artifact(ref,raw=True))),ref)
+            record['offline_engineering_fixture']=True;ref=plain(store.put(db,record))
+            store.event(db,host.run_id,'role_transition','search_batch_plan',outputs=[ref])
+        source=next(r['facts'] for r in self.w.records if r['facts']['candidate']==self.source)
+        prepare_offline_batch(host,ref,starting_facts=source,retained_baseline=self.w.baseline,historical_results=self.w.records)
+        stages=[]
+        def injected(stage,candidate,receipts):
+            stages.append(stage);facts=deepcopy(source)
+            facts['configuration']=candidate['configuration'];facts['candidate'].update(candidate_id=candidate['candidate_id'],configuration=candidate['configuration'])
+            return dict(factual_result=facts,synthetic=True) if stage=='profile' else dict(synthetic=True)
+        executed=run_offline_batch(host,injected)
+        self.assertEqual(stages,['simulation','evaluation','profile'])
+        self.assertEqual(executed['deliberate_replications'],1)
+        self.assertEqual(executed['fully_evaluated_new_executions'],1)
+        self.assertEqual(executed['fully_evaluated_distinct_changed_configurations'],0)
+        self.assertEqual(self.w.selected,self.w.freeze['incumbent'])

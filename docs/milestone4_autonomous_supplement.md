@@ -1,5 +1,10 @@
 # Milestone 4 autonomous scheduling supplement — 2026-10-05
 
+The [2026-10-06 successor](milestone4_autonomous_successor.md) fixes shared
+chronology and fact/interpretation handling under a separately identified grant.
+This campaign's original requests, decisions, charges and voluntary stop remain
+sealed; its unused budget is not reopened.
+
 This is a new grant linked to the closed Milestone 4 campaign and limited M5A
 checkpoint. Historical STOP/NO_GO decisions and charges remain preserved.
 Milestone 5 stays open. The stable `controller.gvs_nmpc@7.0.0` path is used,
