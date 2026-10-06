@@ -74,6 +74,13 @@ def validate_batch_plan(store, view, proposal):
     candidate=select_source(role.get('research_records',[]),plan.source_candidate,view.latest_tested)
     current_input=store.session(view.run_id)['snapshot']['input']
     effective=planning_configuration(store,candidate,current_input['policy'])
+    cases=role.get('frozen_cases')
+    if cases:
+        from tools.research_spec import apply_frozen_case
+        effective=apply_frozen_case(effective,plan.case_id,plan.seed,cases)
+        current_input=apply_frozen_case(current_input,plan.case_id,plan.seed,cases)
+    elif plan.case_id!='nominal' or plan.seed!=17:
+        raise ValueError('CASE_AWARE_CAMPAIGN_REQUIRED')
     if role.get('required_structure_identity'):
         from extensions.tendon_family.gvs_profile import execution_scope
         if execution_scope(effective)['robot']['identity']!=role['required_structure_identity']:
@@ -184,6 +191,7 @@ def validate_batch_plan(store, view, proposal):
         matching_scientific_history=matching_history,decision_only=role.get('decision_only',False),
         execution_authorized=False,requires_future_grant=True,baseline_replaced=False,candidate_promoted=False,
         bindings=dict(task=view.task,acceptance=view.acceptance,baseline=view.baseline,subject=candidate,
+            frozen_cases=cases,case_id=plan.case_id,seed=plan.seed,
             source_configuration=candidate['configuration'],execution_source_configuration=execution_source,
             controller=controller,dynamics_model=view.task['execution_model'],source_report=role['source_report'],
             revised_assessment=role.get('previous_report'),check_feedback=role['result_feedback'],evidence_selectors=selectors,
@@ -475,6 +483,10 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
     if digest(fixed)!=record['bindings']['fixed_configuration_identity']:
         raise ValueError('BATCH_SOURCE_CONFIGURATION_MISMATCH')
     snapshot=host.store.session(host.run_id)['snapshot']['input']
+    cases=record['bindings'].get('frozen_cases')
+    if cases:
+        from tools.research_spec import apply_frozen_case
+        snapshot=apply_frozen_case(snapshot,plan.case_id,plan.seed,cases)
     if comparison_scope(snapshot)!=comparison_scope(effective):
         raise ValueError('BATCH_HOST_SCIENCE_MISMATCH')
     budget=host.store.spendable(host.run_id)['remaining']
@@ -510,15 +522,16 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
                 or saved['execution_scope']!=execution_scope(original)):
             raise ValueError('BATCH_HISTORICAL_SOURCE_BINDING_MISMATCH')
         comparable=comparison_scope(effective)==comparison_scope(original)
-        if not comparable:raise ValueError('BATCH_HISTORICAL_FIXED_SCIENCE_MISMATCH')
+        if not comparable and not cases:raise ValueError('BATCH_HISTORICAL_FIXED_SCIENCE_MISMATCH')
         permitted.append({**saved,'available_for_reasoning':True,'comparable_under_task':comparable,
-            'reusable_under_plan':scientific_fixed_scope(effective,plan.variables)==scientific_fixed_scope(original,plan.variables),
+            'reusable_under_plan':comparable and scientific_fixed_scope(effective,plan.variables)==scientific_fixed_scope(original,plan.variables),
             'exact_reuse_rule':'Full execution_scope must additionally equal proposed candidate; no cross-structure result rebinding.'})
     batch=dict(plan=plan_ref,batch_id='batch-'+plan_ref['artifact_id'][:16],mode=mode,
         method=plan.method,parameters=plain(algorithm.parameters),algorithm=plain(algorithm.save()),pending=None,
         proposals=[],configurations={},starting_facts=starting_facts,base_configuration=source_configuration,
         retained_baseline=retained_baseline,max_backend_attempts=count,target_changed_configurations=plan.target_changed_configurations,
         historical_results=permitted,
+        case_id=plan.case_id,seed=plan.seed,
         interpretation_reserve_s=interpretation_reserve_s,usage_start=host.store.remaining()['used'],stop_reason=None,
         replication_reason=plan.replication_reason,
         grant=host.store.config(),interpretation_reserve=dict(model_calls=4,tool_calls=4))
@@ -704,7 +717,9 @@ def _run_batch(host,inject,*,stop_after_stage=None):
                     batch['stop_reason']='unresolved_execution';_save_batch(host,batch)
                     return offline_batch_result(host)
             _save_batch(host,batch)
-            used=offline_batch_result(host)['accounting']['usage'];remaining=host.store.remaining()['remaining']
+            used=offline_batch_result(host)['accounting']['usage']
+            from tools.batch_budget import downstream_available
+            remaining=downstream_available(host.store,host.run_id)
             missing=[s for s,_ in stages if s not in row['stages']]
             if 'simulation' in missing and used['backend_solves']>=batch['max_backend_attempts']:
                 batch['stop_reason']='backend_attempt_limit';_save_batch(host,batch);break
@@ -764,9 +779,18 @@ def _run_batch(host,inject,*,stop_after_stage=None):
         if row.get('execution',{}).get('acceptance') is not None:
             from tools.research_tasks import compare_acceptance
             unified=row['execution']['acceptance']
-            row['feedback']['comparison']=compare_acceptance(unified,bound_acceptance(host.store,baseline))
+            def compare_bound(reference):
+                prior=bound_acceptance(host.store,reference)
+                if unified['task_identity']!=prior['task_identity']:
+                    return dict(relation='unavailable',reason='Different exact task/initial state/seed; nominal evidence is not a matched perturbed reference')
+                return compare_acceptance(unified,prior)
+            row['feedback']['comparison']=compare_bound(baseline)
+            if row['feedback']['comparison']['relation']=='unavailable':
+                # Scalar ask/tell still uses this candidate's absolute metrics;
+                # no cross-case comparative physical claim survives in feedback.
+                row['feedback']['comparison']['candidate_metrics']=unified['metrics']
             if batch.get('retained_baseline'):
-                row['retained_baseline_comparison']=compare_acceptance(unified,bound_acceptance(host.store,batch['retained_baseline']))
+                row['retained_baseline_comparison']=compare_bound(batch['retained_baseline'])
         row['joint_acceptance']=row['feedback']['physical_metrics']['joint_reach_holding_passed']
         algorithm.feedback(row['feedback']['score']);batch['pending']=None;batch['algorithm']=plain(algorithm.save())
         if row['feedback']['score'] is None:batch['stop_reason']='invalid_physical_result'

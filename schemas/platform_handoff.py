@@ -190,6 +190,8 @@ class SearchBatchPlan(Contract):
     version: Literal['1.0.0'] = '1.0.0'
     source_candidate: dict | None = Field(default=None,description='Exact verified historical candidate/configuration/execution/owner identity, distinct from latest tested and retained baseline.')
     predecessor_decision: EvidenceRef | None = None
+    case_id: str = Field(default='nominal', description='Exact frozen development case ID; initialization is a task condition, not a design variable.')
+    seed: int = Field(default=17, description='Frozen scheduled seed; case and seed bind all executions in this batch.')
     hypothesis: str = Field(min_length=1)
     evidence: list[str] = Field(min_length=1, description='Exact current F aliases only, including at least one performed-check result alias. Put explanations in rationale.')
     weakening_observations: list[str] = Field(min_length=1)

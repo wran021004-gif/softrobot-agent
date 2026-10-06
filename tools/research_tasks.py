@@ -288,7 +288,13 @@ def compare_acceptance(candidate, incumbent, tolerance=1e-9):
             return dict(relation='unavailable',reason='Missing, invalid or incomplete acceptance is not a physical failure')
         left,right = int(candidate['accepted']),int(incumbent['accepted'])
     if left != right:
-        return dict(relation='improved' if left>right else 'worse',basis='primary_joint_acceptance')
+        names=(('terminal_error_m','holding_max_error_m','holding_max_speed_m_s')
+               if candidate['task_family']=='task.reach' else ('max_position_error','rms_position_error','terminal_position_error'))
+        components={n:dict(candidate=candidate['metrics'].get(n),incumbent=incumbent['metrics'].get(n),
+            change=candidate['metrics'][n]-incumbent['metrics'][n]) for n in names
+            if all(_number(v['metrics'].get(n)) for v in (candidate,incumbent))}
+        return dict(relation='improved' if left>right else 'worse',basis='primary_joint_acceptance',
+                    componentwise=components)
     names = (('terminal_error_m','holding_max_error_m','holding_max_speed_m_s')
              if candidate['task_family']=='task.reach' else ('max_position_error','rms_position_error','terminal_position_error'))
     if any(not _number(v['metrics'].get(n)) for v in (candidate,incumbent) for n in names):
@@ -296,7 +302,9 @@ def compare_acceptance(candidate, incumbent, tolerance=1e-9):
     changes = {n:candidate['metrics'][n]-incumbent['metrics'][n] for n in names}
     better, worse = any(v < -tolerance for v in changes.values()), any(v > tolerance for v in changes.values())
     return dict(relation='tradeoff' if better and worse else 'improved' if better else 'worse' if worse else 'equivalent',
-                basis='componentwise_physical_metrics',changes=changes,computation='reported separately')
+                basis='componentwise_physical_metrics',changes=changes,
+                componentwise={n:dict(candidate=candidate['metrics'][n],incumbent=incumbent['metrics'][n],change=changes[n]) for n in names},
+                computation='reported separately')
 
 
 def stop_interpretation(result, reason, *, budget_exhausted=False, remaining_work=0):

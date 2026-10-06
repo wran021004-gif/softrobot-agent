@@ -378,7 +378,9 @@ def request_facts(request):
 def measure_input(payload, config, purpose):
     """Complete wire payload measurement; explicit conservative estimate only."""
     _no_secrets(payload)
-    serialized = encode(payload)
+    # Match the transport serializer, including its spaces, rather than only
+    # measuring the canonical archive encoding.
+    serialized = json.dumps(payload, ensure_ascii=False)
     byte_count = len(serialized.encode('utf-8'))
     guard = config['context_guard']; framing = guard['framing_headroom_tokens']
     estimate = byte_count + framing
@@ -390,6 +392,77 @@ def measure_input(payload, config, purpose):
         input_budget_tokens=allowance, configured_context_limit_tokens=guard['context_limit_tokens'],
         response_reserve_tokens=payload['max_tokens'], interaction_reserve_tokens=INTERACTION_RESERVE,
         passed=estimate<=allowance and byte_count<=config['context_bytes'])
+
+
+def fit_request(wire, config, purpose, *, archive):
+    """Bounded deterministic fitting; required facts never become references.
+
+    Full originals and each changed section remain retrievable. Schema, model
+    settings, exact observations, current permissions and budget stay inline.
+    """
+    wire = deepcopy(wire)
+    original = archive.snapshot(wire)
+    steps = []
+    context = json.loads(wire['messages'][1]['content'])
+    def report():
+        sections = {k:len(json.dumps(v,ensure_ascii=False).encode('utf8'))
+                    for k,v in context.items()}
+        role = context.get('role_context', {})
+        sections.update({'role_context/'+k:len(json.dumps(v,ensure_ascii=False).encode('utf8'))
+                         for k,v in role.items()})
+        packet = role.get('research_packet', context)
+        sections.update({'packet/'+k:len(json.dumps(v,ensure_ascii=False).encode('utf8'))
+                         for k,v in packet.items()})
+        sections['tool_schemas'] = len(json.dumps(wire.get('tools',[]),ensure_ascii=False).encode('utf8'))
+        return sections
+    def reference(value, path):
+        return dict(reference=archive.snapshot(value), pointer='',
+                    original_request=dict(reference=original,pointer=path),
+                    scope='Archived detail; required decision facts retained inline')
+    for stage in range(4):
+        wire['messages'][1]['content'] = encode(context)
+        measurement = measure_input(wire,config,purpose)
+        steps.append(dict(stage=stage,measurement=measurement,section_bytes=report()))
+        if measurement['passed']:
+            return wire,dict(fitting_steps=steps,measurement=measurement,original_payload=original)
+        if stage==3:break
+        seen={}
+        def compact(value,path=''):
+            if isinstance(value,list):return [compact(v,path+'/'+str(i)) for i,v in enumerate(value)]
+            if not isinstance(value,dict):return value
+            out={}
+            for key,child in value.items():
+                p=path+'/'+pointer_part(key)
+                # Remove only redundant representations, never an execution's
+                # metric, alias, identity or failure. First occurrence stays.
+                if stage==0 and isinstance(child,(dict,list)) and key in {
+                        'parameter_catalog','legal_actions','remaining_budget','chronology','frozen_cases'}:
+                    identity=digest(child)
+                    if identity in seen:
+                        out[key]=dict(view_pointer=seen[identity]);continue
+                    seen[identity]=p
+                # Verbose historical decisions are not current instructions.
+                if stage==1 and key in {'decisions','original_action','complete_original_decision'}:
+                    # Parameter decision dictionaries are exact configuration
+                    # facts. Only historical free-text rationale is offloaded.
+                    def prior_summary(v,location):
+                        if isinstance(v,list):return [prior_summary(x,location+'/'+str(i)) for i,x in enumerate(v)]
+                        if not isinstance(v,dict):return v
+                        return {k:(reference(x,location+'/'+pointer_part(k)) if k in {
+                            'reasoning','rationale','next_step'} and isinstance(x,str) else
+                            prior_summary(x,location+'/'+pointer_part(k))) for k,x in v.items()}
+                    out[key]=prior_summary(child,p);continue
+                if stage==2 and key in {'considered','experiment_ledger','evidence_history',
+                        'candidate_artifacts','full_mutation_rebuild_reuse_evidence','metric_sources'}:
+                    out[key]=reference(child,p);continue
+                out[key]=compact(child,p)
+            return out
+        context=compact(context)
+    audit=dict(fitting_steps=steps,measurement=measurement,original_payload=original,
+        action='Reduce optional archived detail or split the decision purpose; required facts/schemas exceed the unchanged cap.')
+    path=archive.directory/'audits'/(digest(audit)+'.json')
+    atomic_json(path,audit)
+    raise ValueError('CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET: '+str(path)+'; '+json.dumps(report(),sort_keys=True))
 
 
 def assemble_request(payload, config, purpose, packet, *, archive, authority=None, context_slot=None):
@@ -425,9 +498,10 @@ def assemble_request(payload, config, purpose, packet, *, archive, authority=Non
     issues=[]
     try:inspect(json.loads(wire['messages'][1]['content']))
     except ValueError as exc:issues.append(str(exc))
-    result['audit'].update(measurement=measure_input(wire, config, purpose),
+    wire,fitting=fit_request(wire,config,purpose,archive=archive)
+    result['audit'].update(**fitting,
         before_measurement=measure_input(payload, config, purpose),
-        original_payload=original_wire, assembled_payload_identity=digest(wire),
+        unassembled_payload=original_wire, assembled_payload_identity=digest(wire),
         source_manifest=archive.manifest(),preparation_issues=issues)
     audit_path = archive.directory / 'audits' / (digest(result['audit']) + '.json')
     atomic_json(audit_path, result['audit'])
@@ -650,8 +724,9 @@ def assemble_working_request(payload, config, purpose, state, *, archive, contex
         wire['messages'][1]['content']=encode(context)
     else:
         wire['messages'][1]['content'] = encode(result['view'])
-    measurement = measure_input(wire, config, purpose)
-    result['audit'].update(measurement=measurement, working_revision=state['revision'],
+    wire,fitting=fit_request(wire,config,purpose,archive=archive)
+    measurement = fitting['measurement']
+    result['audit'].update(**fitting, working_revision=state['revision'],
         assembled_input_reference=archive.snapshot(wire), source_manifest=archive.manifest())
     atomic_json(archive.directory / 'audits' / (digest(result['audit']) + '.json'), result['audit'])
     if not measurement['passed']:

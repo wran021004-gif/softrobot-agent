@@ -1,5 +1,13 @@
 # Current development status - Milestones 4 and 5, 2026-10-07
 
+A separately authorized [native development v2 campaign](research_native_development_v2.md)
+now connects deterministic full-request budget fitting, corrected bounded history,
+authoritative current permissions and the existing five frozen initial-state cases
+to native research. Its new cumulative 28/24/200/36000 grant protects twenty final
+verification backend slots before search. Focused offline checks pass; live research
+and physical findings are pending below the implementation checkpoint. Earlier
+STOPs, answers, costs and protected formal/M5 allocations are unchanged.
+
 The [linked decision-only recovery](research_native_pilot.md#linked-decision-recovery-delivered)
 has completed without new simulations. Historical coverage now includes seven
 explicitly selected records and both pilot executions; both pilot points match

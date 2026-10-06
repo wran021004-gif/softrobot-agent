@@ -162,6 +162,17 @@ def map_initial_state(effective, case):
     return dict(qpos_rad=q, qvel_rad_s=v, unspecified='zero')
 
 
+def apply_frozen_case(effective, case_id, seed, cases):
+    """The shared native/fixed mapping; reject invented cases or seeds."""
+    from copy import deepcopy
+    case=next((c for c in cases if c['case_id']==case_id),None)
+    if case is None or seed not in (17,18):raise ValueError('FROZEN_CASE_OR_SEED_REQUIRED')
+    result=deepcopy(effective)
+    result['task']['initializer']['parameters']['data']=map_initial_state(result,case)
+    result['seed']=seed;result['task']['sampling']['seeds']=[seed]
+    return result
+
+
 def freeze_first_study(path=LEGACY_SPEC_PATH):
     """Resolve bytes from the retained incumbent, never rounded reconstruction."""
     from tools.platform_store import Store

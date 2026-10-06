@@ -7,6 +7,12 @@ PREPARATION_RESERVE_S=5.
 
 def downstream_available(store,run_id,db=None):
     project=store.remaining(None,db)['remaining'];session=store.remaining(run_id,db)['remaining']
+    permissions=store.session(run_id,db)['state'].get('role_context',{}).get('campaign_permissions')
+    if permissions:
+        # Child executions charge the project, not the research-role session.
+        # Protect the full frozen paired allowance until search has ended.
+        for k,v in dict(backend_solves=20,tool_calls=60,wall_s=19800.).items():
+            project[k]=max(0,project[k]-v)
     return {k:min(v,session[k]) for k,v in project.items()}
 
 

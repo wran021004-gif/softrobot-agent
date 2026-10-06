@@ -12,7 +12,20 @@ def reporting_scientific_scope(effective):
     original configuration and structure hashes are retained separately.
     """
     from tools.candidate_parameters import scientific_fixed_scope
-    return scientific_fixed_scope(effective, ())
+    from copy import deepcopy
+    canonical=deepcopy(effective)
+    initial=canonical['task']['initializer']
+    if (initial['extension_id'],initial['version'])==('initialize.family','1.0.0'):
+        # The installed initializer defaults unspecified named joints to zero.
+        # This is scientific equivalence only; raw bindings still gate reuse.
+        data=initial['parameters']['data']
+        if data.get('unspecified','zero')=='zero':
+            for key in ('qpos_rad','qvel_rad_s'):
+                if key in data:
+                    data[key]={k:v for k,v in data[key].items() if v!=0.}
+                    if not data[key]:data.pop(key)
+            data.pop('unspecified',None)
+    return scientific_fixed_scope(canonical, ())
 
 
 def scientific_match(proposed, original, *, implementation=None, historical_implementation=None):
@@ -149,6 +162,8 @@ def study_history(store, records, *, retained_baseline=None, selected_source=Non
                 for c in effective['robot']['structure']['data']['components']],
             structure_identity=digest(effective['robot']),
             controller=effective['policy']['controller']['extension_id']+'@'+effective['policy']['controller']['version'],
+            case_id=record.get('case_id','nominal'),seed=effective['seed'],
+            initial_state=effective['task']['initializer'],task_identity=digest(effective['task']),
             weights=dict(holding=recipe.get('holding_tip_speed_weight'),terminal=recipe.get('terminal_tip_speed_weight')),
             metrics=campaign_metrics(facts) if status=='completed_evaluation' else None,
             references=dict(source_store=record.get('source_store'),receipts=record.get('receipts'),

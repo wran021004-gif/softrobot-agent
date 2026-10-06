@@ -326,7 +326,9 @@ def execute(w,row):
         plan=row['decision']['search_plan'];record=w.store.artifact(plan)
         source=next(r for r in w.records if r['facts']['candidate']==record['bindings']['subject'])
         w.batch_source=source['facts']['candidate']
-        configure_role(w.host,'executor','Execute the accepted immutable research batch only.',phase_budget={});w.host.resume()
+        prior_role=w.store.session(w.host.run_id)['state']['role_context']
+        configure_role(w.host,'executor','Execute the accepted immutable research batch only.',phase_budget={},
+            **{k:prior_role[k] for k in ('frozen_cases','campaign_permissions') if k in prior_role});w.host.resume()
         prepare_offline_batch(w.host,plan,mode='live',starting_facts=source['facts'],retained_baseline=w.baseline,historical_results=w.records)
         result=run_live_batch(w.host);ref=save(w.store,result);row.update(kind='search',route=action,result=ref,
             complete=result['status']=='completed' and result.get('fully_evaluated_new_executions',result['fully_evaluated_distinct_changed_configurations'])>0)

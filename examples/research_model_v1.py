@@ -165,20 +165,23 @@ def restore(directory):
     return w
 
 
-def prepare(directory=DEFAULT, *, offline_fixture=False):
+def prepare(directory=DEFAULT, *, offline_fixture=False, campaign_config=None):
     spec=load_spec();directory=Path(directory)
     store=Store(directory)
     if store.db.exists():raise ValueError('EXISTING_CAMPAIGN_NO_RESET')
     # A single assignment identity cannot be minted again by choosing another directory.
-    grant=CAMPAIGN if not offline_fixture else 'engineering-native-fixture-'+digest(str(directory.resolve()))[:16]
-    budget=LIMITS if not offline_fixture else {**LIMITS,'model_calls':0,'backend_solves':0}
+    config=campaign_config or CONFIG
+    campaign=config.get('campaign_id',CAMPAIGN)
+    limits=config['limits']
+    grant=campaign if not offline_fixture else 'engineering-native-fixture-'+digest(str(directory.resolve()))[:16]
+    budget=limits if not offline_fixture else {**limits,'model_calls':0,'backend_solves':0}
     store.create(dict(project_id=grant,grant_id=grant,budget=budget,
-        authorization_source='User attachment ddf1f248, 2026-10-06: one new cumulative native pilot, <=4 backend attempts, real configured model, commit and normal push.',exclusive_resources={'mujoco':1}))
+        authorization_source=config.get('authorization_source','User attachment ddf1f248, 2026-10-06: bounded native pilot'),exclusive_resources={'mujoco':1}))
     model=deepcopy(spec['comparison_groups']['model_configuration'])
     bindings={'research.decide':'1.0.0','diagnosis.inspect_evidence':'1.0.0'}
     model['tool_naming']=tool_naming_policy(bindings,READABLE_TOOL_NAMING)
-    inp=deepcopy(spec['execution_template']);inp['run_id']=CAMPAIGN+'-research'
-    inp['policy'].update(budget=LIMITS,model=model,route=None,allowed_tools=[],tool_bindings=bindings)
+    inp=deepcopy(spec['execution_template']);inp['run_id']=campaign+'-research'
+    inp['policy'].update(budget=config.get('research_limits',limits),model=model,route=None,allowed_tools=[],tool_bindings=bindings)
     host=Host(directory,inp['run_id']);host.create(inp)
     w=SimpleNamespace(directory=directory,store=store,host=host,working=None,rounds=[],repairs=0,
         status='prepared',stop_reason=None,batch_source=None,current_case='nominal',sealed_cases=[])
@@ -196,12 +199,12 @@ def prepare(directory=DEFAULT, *, offline_fixture=False):
     w.baseline=incumbent['facts'];w.latest=None;w.selected=spec['source']['candidate']
     source_ref=save(store,dict(specification_identity=digest(spec),incumbent=spec['source']['candidate']))
     w.previous_decision=source_ref
-    w.freeze=dict(version=VERSION,project_id=grant,research_host=host.run_id,limits=budget,offline_fixture=offline_fixture,
+    w.freeze=dict(version=config['version'],project_id=grant,research_host=host.run_id,limits=budget,offline_fixture=offline_fixture,
         primary=w.selected,incumbent=w.selected,binding=incumbent['binding'],source_report=source_ref,
         provider_configuration=model,implementation=revision(),parameter_catalog=effective_catalog(inp),
         specification_identity=digest(spec),spec_path='configs/research/reach_hold_v1_1.json',
-        profile=spec['boundaries'],max_batch_backends=CONFIG['max_batch_backends'],
-        standalone_numerical_limit=CONFIG['standalone_numerical_operations'],diagnosis_limit=CONFIG['retained_query_decisions'],
+        profile=spec['boundaries'],max_batch_backends=config['max_batch_backends'],
+        standalone_numerical_limit=config['standalone_numerical_operations'],diagnosis_limit=config['retained_query_decisions'],
         allocation=dict(execution_case='nominal',seed=17,available_development_cases=['nominal'],
             deferred_cases=[c['case_id'] for c in spec['cases'] if c['case_id']!='nominal'],
             rationale='Nominal source task permits existing native source-bound batch execution without modifying its scientific settings. Four attempts cannot complete the ten-slot matched suite. Exposed near_z_plus outcome supplied as a subsequent event.',
@@ -220,7 +223,11 @@ def prepare(directory=DEFAULT, *, offline_fixture=False):
         history_coverage=coverage,
         m5_feedback=dict(source='docs/milestone5_control_successor.md',text=(ROOT/'docs/milestone5_control_successor.md').read_text(encoding='utf8'),
             scope='Sealed negative controller/prediction evidence; no screening authority, no v8 adoption or protected allocation.'),
-        experiment=dict(evidence_directory=str(EXPORT)))
+        experiment=dict(evidence_directory=str(ROOT/'evidence'/campaign)))
+    if campaign_config:
+        w.freeze.update(campaign_state=config,recovery_instructions=config['instructions'],
+            allocation=config['allocation'],budget_derivation=config['reservations'],
+            study_question=config['question'])
     reusable.feedback(w,dict(status='prepared',incumbent=dict(candidate=w.selected,acceptance=incumbent['acceptance']),
         subsequent_event=dict(candidate=final['facts']['candidate'],acceptance=final['acceptance'],implementation=final['implementation'],
             case_id='near_z_plus',seed=17,matched_nominal_reference=False,completed=True),
@@ -234,14 +241,24 @@ def prepare(directory=DEFAULT, *, offline_fixture=False):
 
 
 def configure(w):
+    if w.freeze.get('campaign_state'):
+        with w.store.transaction() as db:
+            state=w.store.session(w.host.run_id,db)['state']
+            state.setdefault('role_context',{}).update(frozen_cases=w.freeze['frozen_cases'],
+                campaign_permissions=dict(allocation=w.freeze['allocation'],search_backend_limit=8,
+                    reserved_verification_backends=20,workers=0))
+            w.store.update_state(db,w.host.run_id,state)
     if w.freeze.get('decision_only'):
         with w.store.transaction() as db:
             state=w.store.session(w.host.run_id,db)['state']
             state.setdefault('role_context',{}).update(decision_only=True)
             w.store.update_state(db,w.host.run_id,state)
     cap=capabilities(w.store,w.host.run_id,w.records)
+    if w.freeze.get('final_reporting'):
+        cap['legal']={'stop':dict(reason='Final interpretation only; research STOP remains sealed',execution_authorized=False)}
+        cap['unavailable'].update({a:'Research trajectory closed; final interpretation cannot dispatch work' for a in ('control_search','structure_search','diagnosis')})
     if sum(r['decision']['decision']['action']=='diagnosis' for r in w.rounds)>=w.freeze['diagnosis_limit']:
-        cap['legal'].pop('diagnosis',None);cap['unavailable']['diagnosis']='Frozen two-read diagnostic ceiling reached'
+        cap['legal'].pop('diagnosis',None);cap['unavailable']['diagnosis']='Frozen retained-query diagnostic ceiling reached'
     state=w.store.session(w.host.run_id)['state'];aliases=ensure_aliases(state)['aliases'];catalog=state.get('fact_catalog',{})
     ref=w.store.artifact(w.feedback)['result']
     def alias_view(reference):
@@ -254,7 +271,7 @@ def configure(w):
         current_batch_source=w.batch_source,predecessor_decision=w.previous_decision,
         current_feedback=dict(reference=ref,content=w.store.artifact(ref),aliases=alias_view(ref)),
         capabilities=cap,scope=w.freeze['profile'],acceptance=w.freeze['common_scientific_input']['acceptance'],
-        case_id='nominal',case=dict(question=w.freeze['study_question'],evidence_execution_ids=[w.freeze['incumbent']['execution_id']],
+        case_id=w.current_case,case=dict(question=w.freeze['study_question'],evidence_execution_ids=[w.freeze['incumbent']['execution_id']],
             stopping_criteria=w.freeze['termination']),sealed_cases=w.sealed_cases,
         study={k:w.freeze[k] for k in ('version','specification_identity','parameter_catalog','task_acceptance',
             'allocation','frozen_cases','initial_state_mapping','m5_feedback')},
@@ -281,7 +298,8 @@ def configure(w):
         replication_pairs=[(c['replication_of']['execution_id'],c['execution_id']) for r in w.rounds if r.get('result')
             for c in w.store.artifact(r['result']).get('candidates',[]) if c.get('replication_of') and c.get('execution_id')])
     authority.update(stop=dict(status=w.status,reason=w.stop_reason,sealed_cases=w.sealed_cases),
-        budget_accounting=w.store.remaining(),experiment_permissions=w.freeze['allocation'])
+        budget_accounting=w.store.remaining(),experiment_permissions=w.freeze['allocation'],
+        known_review_issues=w.freeze.get('known_review_issues',[]))
     if w.freeze.get('decision_only'):authority['ledger_reconciliation']=True
     if w.rounds:
         last=w.rounds[-1]['decision'];authority.update(hypotheses=last['model_interpretations'],unresolved=last['unresolved_uncertainties'])
@@ -292,7 +310,7 @@ def configure(w):
             authority['experiment_permissions']=dict(decision_only=True,backend_solves=0,numerical_operations=0,
                 workers=0,proposals_require_separate_authorization=True)
     experiments=[dict(experiment_id=r['execution_id'],status='completed',candidate=r['facts']['candidate'],
-        case_id='nominal',seed=17,task_identity=r['acceptance']['task_identity'],structure_identity=digest(w.store.artifact(r['facts']['configuration'])['effective']['robot']),
+        case_id=r.get('case_id','nominal'),seed=w.store.artifact(r['facts']['configuration'])['effective']['seed'],task_identity=r['acceptance']['task_identity'],structure_identity=digest(w.store.artifact(r['facts']['configuration'])['effective']['robot']),
         implementation=r.get('implementation',w.freeze['implementation']),observed_metrics=r['acceptance'],
         receipt=r['receipts']['simulation'],cache_hit=r['receipts']['simulation'].get('cache_hit')) for r in w.records if r.get('acceptance')]
     claims=[dict(claim_id=f'round{r["index"]}-interpretation-{i}',statement=h['statement'],
@@ -306,8 +324,14 @@ def configure(w):
     else:
         w.working=update_working_state(w.working,archive=a,evidence_packet=packet,authority=authority,
             experiment_updates=experiments,claim_revisions=claims)
-    configure_role(w.host,'design',w.freeze.get('recovery_instructions',INSTRUCTIONS),phase='research',delivery_tool='research.decide',
-        phase_budget=dict(protect_project=dict(tool_calls=1,wall_s=60.),protect_role=dict(tool_calls=1,wall_s=60.)) if w.freeze.get('decision_only') else {},
+    instructions=w.freeze.get('recovery_instructions',INSTRUCTIONS)
+    if w.freeze.get('final_reporting'):
+        instructions+=' Final reporting after sealed research STOP: use only stop. Interpret the newly supplied fresh verification componentwise, with exact observations and scope. This is a permissible delivery step, not a new research trajectory. Do not claim unused/unrecorded slots passed.'
+    phase_budget=(dict(protect_project=dict(model_calls=2,tool_calls=10,wall_s=1200.))
+        if w.freeze.get('campaign_state') and not w.freeze.get('final_reporting') else {})
+    if w.freeze.get('decision_only'):phase_budget=dict(protect_project=dict(tool_calls=1,wall_s=60.),protect_role=dict(tool_calls=1,wall_s=60.))
+    configure_role(w.host,'design',instructions,phase='research',delivery_tool='research.decide',
+        phase_budget=phase_budget,
         decision_only=w.freeze.get('decision_only',False),decision_recovery_policy=w.freeze.get('recovery_policy'),
         fact_separation=True,autonomous_scheduling=True,research_packet=packet,context_authority=authority,
         research_working_state=w.working,research_working_manifest=a.manifest(),research_records=w.records,result_feedback=w.feedback,
@@ -315,6 +339,13 @@ def configure(w):
         predecessor_decision=w.previous_decision,latest_tested=w.latest,require_source_binding=True,max_batch_backends=2,
         source_report=w.freeze['source_report'],improvement_feedback_content=dict(baseline_facts=w.baseline,execution=None),
         native_store_root=str(w.store.root),native_fixed={},memory_identity=w.host.run_id,binding=w.freeze['binding'])
+    if w.freeze.get('campaign_state'):
+        with w.store.transaction() as db:
+            state=w.store.session(w.host.run_id,db)['state']
+            state['role_context']['frozen_cases']=w.freeze['frozen_cases']
+            state['role_context']['campaign_permissions']=dict(allocation=w.freeze['allocation'],
+                search_backend_limit=8,reserved_verification_backends=20,workers=0)
+            w.store.update_state(db,w.host.run_id,state)
     return packet
 
 
@@ -327,7 +358,9 @@ def decision(w):
     state=w.store.session(w.host.run_id)['state'];ref=state.get('handoffs',{}).get('research_decision')
     if not ref or ref==before:raise RuntimeError('RESEARCH_DECISION_INCOMPLETE: '+str(state.get('stop_reason')))
     result=w.store.artifact(ref);w.previous_decision=ref
-    row=dict(index=index,case_id='nominal',kind=result['decision']['action'],accepted_decision=ref,decision=result,
+    chosen_case=(result['decision'].get('plan') or {}).get('case_id',w.current_case)
+    w.current_case=chosen_case
+    row=dict(index=index,case_id=chosen_case,kind=result['decision']['action'],accepted_decision=ref,decision=result,
         request=save(w.store,payload),usage_after_decision=w.store.remaining())
     w.rounds.append(row);persist(w);return row
 
@@ -345,7 +378,7 @@ def export(w):
     atomic_json(out/'delivery.json',dict(version=VERSION,status=w.status,stop_reason=w.stop_reason,
         selected_candidate=w.selected,rounds=w.rounds,usage=w.store.remaining(),
         standalone_numerical_operations=0,workers=0,subagents=0,
-        outcomes=[dict(candidate=r['facts']['candidate'],case_id='nominal',seed=17,acceptance=r['acceptance'],
+        outcomes=[dict(candidate=r['facts']['candidate'],case_id=r.get('case_id','nominal'),seed=w.store.artifact(r['facts']['configuration'])['effective']['seed'],acceptance=r['acceptance'],
             receipts=r['receipts'],implementation=r['implementation'],
             execution_checkout_commit=w.store.session(r['owner_run_id'])['snapshot']['project_commit'])
             for r in w.records if r['source_store']==str(w.directory)],

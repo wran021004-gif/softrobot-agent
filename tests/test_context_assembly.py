@@ -1,7 +1,10 @@
 """Focused real saved-corpus regression; no grants, providers or numerical work."""
 from copy import deepcopy
 from pathlib import Path
-from tempfile import TemporaryDirectory
+from types import SimpleNamespace
+from uuid import uuid4
+import gc
+import shutil
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from types import SimpleNamespace
@@ -17,12 +20,15 @@ from examples.check_context_assembly import ROOT,M4ROOT,saved_research_fixture,a
 
 class ContextAssemblyTests(TestCase):
     def setUp(self):
-        self.temp=TemporaryDirectory(dir=ROOT/'runs',prefix='context-offline-')
+        target=ROOT/'runs'/('context-offline-'+uuid4().hex)
+        target.mkdir()
+        self.temp=SimpleNamespace(name=str(target))
         def cleanup():
             target=Path(self.temp.name).resolve()
             if not target.is_relative_to((ROOT/'runs').resolve()) or not target.name.startswith('context-offline-'):
                 raise ValueError('TEST_CLEANUP_OUTSIDE_EXPECTED_DIRECTORY')
-            self.temp.cleanup()
+            gc.collect()
+            shutil.rmtree(target)
         self.addCleanup(cleanup)
         self.store,self.state,self.packet,self.authority,self.payload=saved_research_fixture()
         self.archive=EvidenceArchive(Path(self.temp.name),scope={'role':'Saved corpus offline test'},stores=(self.store,))

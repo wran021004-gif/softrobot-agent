@@ -66,6 +66,10 @@ def capabilities(store, run_id, records):
             method_semantics={'search.family_coordinate@1.0.0':'Numerically generated continuous coordinate proposals; categorical paths unavailable.',
                 'search.family_explicit@1.0.0':'Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated.'})
     role=store.session(run_id)['state'].get('role_context',{})
+    if role.get('frozen_cases'):
+        for value in legal.values():
+            value.update(frozen_cases=[c['case_id'] for c in role['frozen_cases']],seeds=[17,18],
+                execution_authorized=True,proposal_only=False)
     if role.get('diagnosis_remaining',1)<=0:
         gaps['diagnosis']='Frozen retained-query decision ceiling reached'
     elif not records or (not proposal_only and (remaining['wall_s']<780 or remaining['tool_calls']<6 or remaining['model_calls']<4)):
