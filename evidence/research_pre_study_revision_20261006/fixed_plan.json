@@ -1,0 +1,357 @@
+{
+  "version": "fixed_coordinate_reach_hold@1.1.0",
+  "specification_identity": "eec598e5140f893856d39151ebd6f52d3c58938448cb44b95f285a2ca5ebc732",
+  "parameter_pool_version": "1.0.0",
+  "structural_proposal_order": [
+    {
+      "components/near/length_m": 0.16,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "compliant",
+      "design/far_material_scenario": "compliant"
+    },
+    {
+      "components/near/length_m": 0.165,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "compliant",
+      "design/far_material_scenario": "compliant"
+    },
+    {
+      "components/near/length_m": 0.16,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.975,
+      "design/near_material_scenario": "compliant",
+      "design/far_material_scenario": "compliant"
+    },
+    {
+      "components/near/length_m": 0.16,
+      "components/far/length_m": 0.11,
+      "design/near_section_scale": 0.95,
+      "design/far_section_scale": 0.95,
+      "design/near_material_scenario": "stiff",
+      "design/far_material_scenario": "compliant"
+    }
+  ],
+  "control_initial": {
+    "control/recipe/terminal_tip_speed_weight": 0.05,
+    "control/recipe/holding_tip_speed_weight": 0.05
+  },
+  "search_schedule": [
+    {
+      "structure_slot": 0,
+      "control_slot": 0,
+      "changes": {},
+      "case_id": "nominal",
+      "seed": 17,
+      "repetition": 1
+    },
+    {
+      "structure_slot": 0,
+      "control_slot": 1,
+      "changes": {
+        "control/recipe/terminal_tip_speed_weight": 0.06875
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "repetition": 1
+    },
+    {
+      "structure_slot": 1,
+      "control_slot": 0,
+      "changes": {
+        "components/near/length_m": 0.165
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "repetition": 1
+    },
+    {
+      "structure_slot": 1,
+      "control_slot": 1,
+      "changes": {
+        "components/near/length_m": 0.165,
+        "control/recipe/holding_tip_speed_weight": 0.06875
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "repetition": 1
+    },
+    {
+      "structure_slot": 2,
+      "control_slot": 0,
+      "changes": {
+        "design/far_section_scale": 0.975
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "repetition": 1
+    },
+    {
+      "structure_slot": 2,
+      "control_slot": 1,
+      "changes": {
+        "design/far_section_scale": 0.975,
+        "control/recipe/terminal_tip_speed_weight": 0.06875
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "repetition": 1
+    },
+    {
+      "structure_slot": 3,
+      "control_slot": 0,
+      "changes": {
+        "design/near_material_scenario": "stiff"
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "repetition": 1
+    },
+    {
+      "structure_slot": 3,
+      "control_slot": 1,
+      "changes": {
+        "design/near_material_scenario": "stiff",
+        "control/recipe/holding_tip_speed_weight": 0.06875
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "repetition": 1
+    }
+  ],
+  "validation_schedule": [
+    {
+      "case_id": "nominal",
+      "repetition": 1,
+      "seed": 17
+    },
+    {
+      "case_id": "nominal",
+      "repetition": 2,
+      "seed": 18
+    },
+    {
+      "case_id": "near_z_plus",
+      "repetition": 1,
+      "seed": 17
+    },
+    {
+      "case_id": "near_z_plus",
+      "repetition": 2,
+      "seed": 18
+    },
+    {
+      "case_id": "near_z_minus",
+      "repetition": 1,
+      "seed": 17
+    },
+    {
+      "case_id": "near_z_minus",
+      "repetition": 2,
+      "seed": 18
+    },
+    {
+      "case_id": "far_y_plus",
+      "repetition": 1,
+      "seed": 17
+    },
+    {
+      "case_id": "far_y_plus",
+      "repetition": 2,
+      "seed": 18
+    },
+    {
+      "case_id": "far_y_minus",
+      "repetition": 1,
+      "seed": 17
+    },
+    {
+      "case_id": "far_y_minus",
+      "repetition": 2,
+      "seed": 18
+    }
+  ],
+  "allocation": {
+    "search_adaptation": 8,
+    "unchanged_incumbent_validation": 10,
+    "selected_candidate_validation": 10
+  },
+  "planned_coverage": {
+    "variables": {
+      "components/near/length_m": {
+        "values": [
+          0.165
+        ],
+        "attempts": 2,
+        "complete_results": 0
+      },
+      "components/far/length_m": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "design/near_section_scale": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "design/far_section_scale": {
+        "values": [
+          0.975
+        ],
+        "attempts": 2,
+        "complete_results": 0
+      },
+      "design/near_material_scenario": {
+        "values": [
+          "stiff"
+        ],
+        "attempts": 2,
+        "complete_results": 0
+      },
+      "design/far_material_scenario": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "control/recipe/terminal_tip_speed_weight": {
+        "values": [
+          0.06875
+        ],
+        "attempts": 2,
+        "complete_results": 0
+      },
+      "control/recipe/holding_tip_speed_weight": {
+        "values": [
+          0.06875
+        ],
+        "attempts": 2,
+        "complete_results": 0
+      }
+    },
+    "changed_variables": [
+      "components/near/length_m",
+      "design/far_section_scale",
+      "design/near_material_scenario",
+      "control/recipe/terminal_tip_speed_weight",
+      "control/recipe/holding_tip_speed_weight"
+    ],
+    "unvisited_variables": [
+      "components/far/length_m",
+      "design/near_section_scale",
+      "design/far_material_scenario"
+    ],
+    "interpretation": "Finite proposals and observed coverage, not exhaustive optimization of the exposed eight-variable pool."
+  },
+  "policy": {
+    "version": "fixed_coordinate_reach_hold@1.1.0",
+    "structural_variables": [
+      "components/near/length_m",
+      "components/far/length_m",
+      "design/near_section_scale",
+      "design/far_section_scale",
+      "design/near_material_scenario",
+      "design/far_material_scenario"
+    ],
+    "control_variables": [
+      "control/recipe/terminal_tip_speed_weight",
+      "control/recipe/holding_tip_speed_weight"
+    ],
+    "method": "Existing ParameterSpace and bounded coordinate_proposal kernels; discrete scenarios enumerated, never interpolated.",
+    "max_structures": 4,
+    "control_evaluations_per_structure": 2,
+    "max_finalists": 1,
+    "normalized_step": 0.25,
+    "structure_policy": "Four frozen incumbent-anchored slots: unchanged, near length +0.25 granted width, far section +0.25 granted width, near stiff material. No catalogue-order exhaustion or feedback rewriting.",
+    "control_policy": "Two nominal seed17 search attempts per structure: unchanged incumbent weights then a +0.25 granted-width proposal on the declared alternating control coordinate. Embedded v7 adaptation remains unchanged; finite outer proposals stay frozen.",
+    "validation": "Always schedule unchanged incumbent with empty changes on five frozen cases x two fresh repetitions. If an eligible candidate exists, schedule the identical ten slots for it, paired incumbent then candidate per slot. Search attempts never count as validation repetitions.",
+    "final_selection": "Only complete matched authoritative results permit comparison: acceptance count, then componentwise physical dominance. Promote selected candidate only if improved; retain incumbent on equivalence, tradeoff, worse or unavailable. Costs remain separate.",
+    "stopping": "During search protect twenty full validation reservations (one backend, three tools, 990 s each). At most eight search attempts; no retries/fill work. Freeze every validation slot before execution; pair reservation required. Preserve missing/invalid slots, keep all ten in denominator, and suppress superiority claims for incomplete evidence. No unused-budget transfer between phases.",
+    "failure": "Preserve failures; unknown reservations not replayed; inadequate adaptation and incomplete runs are not structural infeasibility proofs.",
+    "mathematical_analysis": {
+      "enabled": false,
+      "reason": "No additional local affine analysis is needed to validate this integrated path. Future uses must predeclare decision question and outcomes that change or retain selection."
+    },
+    "allocation": {
+      "search_adaptation": 8,
+      "unchanged_incumbent_validation": 10,
+      "selected_candidate_validation": 10
+    },
+    "structure_slots": [
+      {
+        "family": "unchanged",
+        "changes": {}
+      },
+      {
+        "family": "length",
+        "changes": {
+          "components/near/length_m": 0.165
+        }
+      },
+      {
+        "family": "section",
+        "changes": {
+          "design/far_section_scale": 0.975
+        }
+      },
+      {
+        "family": "material",
+        "changes": {
+          "design/near_material_scenario": "stiff"
+        }
+      }
+    ],
+    "extra_control_variables": [
+      "control/recipe/terminal_tip_speed_weight",
+      "control/recipe/holding_tip_speed_weight",
+      "control/recipe/terminal_tip_speed_weight",
+      "control/recipe/holding_tip_speed_weight"
+    ],
+    "allocation_justification": "One representative edit per structural family plus a source anchor within four slots. Near length/material sample proximal leverage; far section samples the distal segment. Alternating control coordinates covers both objectives within two pairs per structure. No exhaustive segment/direction coverage or automatic budget expansion.",
+    "eligibility": "Novel effective design/control changes; fresh charged backend execution with complete authoritative joint nominal acceptance. Valid physical failures, unavailable/incomplete outcomes, cached evidence and unchanged incumbent are not eligible.",
+    "candidate_selection": "Select exactly one eligible nominal nondominated candidate in frozen search order; ties/tradeoffs keep earlier order. Freeze its exact changes/configuration before matched validation. No nominal superiority claim.",
+    "no_candidate": "Retain unchanged incumbent; validate its ten slots only; candidate validation is unscheduled and its ten backend slots remain unused. Report no eligible new candidate and no improvement claim. Never force a candidate, substitute a failed candidate or spend unused slots.",
+    "actual_coverage": "Record changed values and attempted/complete observations per variable and per structure/control slot. Five planned varied variables; three unvisited. Exposing eight variables does not mean all were optimized."
+  },
+  "full_budget": {
+    "tool_calls": 100,
+    "model_calls": 8,
+    "backend_solves": 28,
+    "worker_calls": 0,
+    "wall_s": 30000.0
+  },
+  "integration_budget": {
+    "budget": {
+      "tool_calls": 3,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 990.0
+    },
+    "historical_cost": {
+      "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+      "measured_computation_s": 300.2650000001304,
+      "reserve_per_backend_s": 900.0,
+      "evaluation_reserve_s": 30.0,
+      "profile_reserve_s": 60.0
+    },
+    "normal_executions": 1,
+    "repair_execution": "No automatic second execution or extension; independent authorization required.",
+    "case_id": "near_z_plus",
+    "seed": 17,
+    "repetition": 1,
+    "changes": {
+      "design/near_section_scale": 0.96
+    },
+    "scope": "Final shared projection and catalog-driven finite proposal path feeds the fixed receipt executor; one fresh development observation, no matched robustness or superiority claim.",
+    "development_case": true,
+    "previously_exposed": true,
+    "authorization": "Next independently approved execution; this revision authorizes zero backend or model calls."
+  },
+  "launch_status": "prepared_only",
+  "llm_calls": 0
+}

@@ -11,8 +11,10 @@ from tools.platform_store import encode
 from tools.state_io import atomic_json, digest, read
 
 ROOT = Path(__file__).resolve().parents[1]
-SPEC_PATH = ROOT / 'configs/research/reach_hold_v1.json'
+LEGACY_SPEC_PATH = ROOT / 'configs/research/reach_hold_v1.json'
+SPEC_PATH = ROOT / 'configs/research/reach_hold_v1_1.json'
 VERSION = 'research.reach_hold_initial_variation@1.0.0'
+REVISION_VERSION = 'research.reach_hold_initial_variation@1.1.0'
 
 
 class InitialCase(Contract):
@@ -22,7 +24,7 @@ class InitialCase(Contract):
 
 
 class ResearchSpecification(Contract):
-    version: Literal['research.reach_hold_initial_variation@1.0.0'] = VERSION
+    version: Literal['research.reach_hold_initial_variation@1.0.0','research.reach_hold_initial_variation@1.1.0'] = VERSION
     question: str
     source: dict
     starting_configuration: dict
@@ -40,6 +42,7 @@ class ResearchSpecification(Contract):
     integration_validation: dict
     uncertainty: list[str]
     boundaries: dict
+    revision: dict | None = None
 
     @model_validator(mode='after')
     def frozen_bindings(self):
@@ -65,6 +68,14 @@ class ResearchSpecification(Contract):
                 raise ValueError('STARTING_EXECUTION_BINDING_CHANGED: ' + key)
         if set(self.parameter_grants) != set(template['policy']['candidate_builder']['parameters']['data']['parameters']) | set(template['policy']['candidate_builder']['parameters']['data']['control_parameters']):
             raise ValueError('POOL_GRANT_MISMATCH')
+        if self.version == REVISION_VERSION:
+            p=self.fixed_baseline
+            if self.formal_budget_per_group.backend_solves!=28 or p['allocation']!=dict(search_adaptation=8,unchanged_incumbent_validation=10,selected_candidate_validation=10):
+                raise ValueError('MATCHED_VALIDATION_ALLOCATION_CHANGED')
+            if len(self.cases)!=5 or self.repetitions['seeds']!=[17,18] or self.repetitions['count_per_case']!=2:
+                raise ValueError('MATCHED_CASE_REPETITIONS_CHANGED')
+            if len(p['structure_slots'])!=4 or p['control_evaluations_per_structure']!=2 or len(p['extra_control_variables'])!=4:
+                raise ValueError('SEARCH_ALLOCATION_CHANGED')
         return self
 
 
@@ -72,9 +83,59 @@ def load_spec(path=SPEC_PATH):
     value = read(path)
     claimed = value.pop('specification_identity', None)
     spec = ResearchSpecification.model_validate(value)
-    if claimed != digest(spec.model_dump(mode='json')):
+    result=spec.model_dump(mode='json')
+    if spec.version == VERSION: result.pop('revision',None)
+    if claimed != digest(result):
         raise ValueError('FROZEN_RESEARCH_SPECIFICATION_CHANGED')
-    return spec.model_dump(mode='json')
+    return result
+
+
+def freeze_pre_study_revision(path=SPEC_PATH):
+    """Version the bounded allocation repair; sealed v1 evidence stays unchanged."""
+    if Path(path).exists(): return load_spec(path)
+    spec=load_spec(LEGACY_SPEC_PATH);parent=digest(spec)
+    spec['version']=REVISION_VERSION
+    p=spec['fixed_baseline'];p.update(
+        version='fixed_coordinate_reach_hold@1.1.0',max_finalists=1,
+        allocation=dict(search_adaptation=8,unchanged_incumbent_validation=10,selected_candidate_validation=10),
+        structure_slots=[dict(family='unchanged',changes={}),
+            dict(family='length',changes={'components/near/length_m':.165}),
+            dict(family='section',changes={'design/far_section_scale':.975}),
+            dict(family='material',changes={'design/near_material_scenario':'stiff'})],
+        extra_control_variables=['control/recipe/terminal_tip_speed_weight','control/recipe/holding_tip_speed_weight',
+            'control/recipe/terminal_tip_speed_weight','control/recipe/holding_tip_speed_weight'],
+        structure_policy='Four frozen incumbent-anchored slots: unchanged, near length +0.25 granted width, far section +0.25 granted width, near stiff material. No catalogue-order exhaustion or feedback rewriting.',
+        allocation_justification='One representative edit per structural family plus a source anchor within four slots. Near length/material sample proximal leverage; far section samples the distal segment. Alternating control coordinates covers both objectives within two pairs per structure. No exhaustive segment/direction coverage or automatic budget expansion.',
+        control_policy='Two nominal seed17 search attempts per structure: unchanged incumbent weights then a +0.25 granted-width proposal on the declared alternating control coordinate. Embedded v7 adaptation remains unchanged; finite outer proposals stay frozen.',
+        eligibility='Novel effective design/control changes; fresh charged backend execution with complete authoritative joint nominal acceptance. Valid physical failures, unavailable/incomplete outcomes, cached evidence and unchanged incumbent are not eligible.',
+        candidate_selection='Select exactly one eligible nominal nondominated candidate in frozen search order; ties/tradeoffs keep earlier order. Freeze its exact changes/configuration before matched validation. No nominal superiority claim.',
+        validation='Always schedule unchanged incumbent with empty changes on five frozen cases x two fresh repetitions. If an eligible candidate exists, schedule the identical ten slots for it, paired incumbent then candidate per slot. Search attempts never count as validation repetitions.',
+        no_candidate='Retain unchanged incumbent; validate its ten slots only; candidate validation is unscheduled and its ten backend slots remain unused. Report no eligible new candidate and no improvement claim. Never force a candidate, substitute a failed candidate or spend unused slots.',
+        final_selection='Only complete matched authoritative results permit comparison: acceptance count, then componentwise physical dominance. Promote selected candidate only if improved; retain incumbent on equivalence, tradeoff, worse or unavailable. Costs remain separate.',
+        stopping='During search protect twenty full validation reservations (one backend, three tools, 990 s each). At most eight search attempts; no retries/fill work. Freeze every validation slot before execution; pair reservation required. Preserve missing/invalid slots, keep all ten in denominator, and suppress superiority claims for incomplete evidence. No unused-budget transfer between phases.',
+        actual_coverage='Record changed values and attempted/complete observations per variable and per structure/control slot. Five planned varied variables; three unvisited. Exposing eight variables does not mean all were optimized.')
+    spec['metrics']['primary']='Joint acceptance across ten matched fresh executions per candidate; unchanged incumbent is always the comparison anchor.'
+    spec['comparison_groups']['common']='Identical source, five cases, two fresh repetitions, acceptance, pool and ceilings: eight search/adaptation plus ten unchanged-incumbent and ten selected-candidate validations. No candidate branch leaves unused allocation; no transfer or forced candidate.'
+    smoke=read(ROOT/'evidence/research_preparation_20261006/smoke/delivery.json')
+    spec['revision']=dict(version='research.pre_study_revision@1.1.0',parent_specification_identity=parent,
+        parent_specification='configs/research/reach_hold_v1.json',formal_campaign_launched=False,
+        preserved_smoke=dict(evidence='evidence/research_preparation_20261006/smoke/delivery.json',
+            execution_id=smoke['result']['receipt']['execution_id'],case_id='near_z_plus',seed=17,
+            changes={'design/near_section_scale':.96},status='observed_development_valid_failure',
+            terminal_error_m=.0028974459148354828,holding_max_speed_m_s=.06773111912652348,
+            acceptance_thresholds_unchanged=True,unseen=False),
+        earlier_real_execution='Direct fixed-runner receipt pipeline before later planner/catalog bridge; the holding-speed failure remains sealed.',
+        later_offline_bridge_checks='evidence/research_preparation_20261006/shared_parameter_checks.json; no subsequent real execution of that bridge.',
+        next_execution='Independent approval required. One fresh shared source-projection/catalog/finite-ask-tell/candidate-preparation execution followed by simulation, official evaluation and profile. Same already exposed development case; no formal-study repetition.',
+        live_limits='Native planner role/alias ledger and complete batch orchestration remain separately offline checked; live context quality and full study remain pending.')
+    spec['integration_validation'].update(budget=dict(tool_calls=3,model_calls=0,backend_solves=1,worker_calls=0,wall_s=990.),
+        normal_executions=1,repair_execution='No automatic second execution or extension; independent authorization required.',
+        development_case=True,previously_exposed=True,authorization='Next independently approved execution; this revision authorizes zero backend or model calls.',
+        scope='Final shared projection and catalog-driven finite proposal path feeds the fixed receipt executor; one fresh development observation, no matched robustness or superiority claim.')
+    spec['uncertainty'].append('The exposed near_z_plus development smoke failed holding speed. Final shared preparation has only offline verification until independent execution approval; cases are prospective repetitions, not all unseen.')
+    validated=ResearchSpecification.model_validate(spec).model_dump(mode='json')
+    atomic_json(path,dict(**validated,specification_identity=digest(validated)))
+    return validated
 
 
 def map_initial_state(effective, case):
@@ -101,7 +162,7 @@ def map_initial_state(effective, case):
     return dict(qpos_rad=q, qvel_rad_s=v, unspecified='zero')
 
 
-def freeze_first_study(path=SPEC_PATH):
+def freeze_first_study(path=LEGACY_SPEC_PATH):
     """Resolve bytes from the retained incumbent, never rounded reconstruction."""
     from tools.platform_store import Store
     from tools.parameter_catalog import study_input, effective_catalog
@@ -195,6 +256,6 @@ def freeze_first_study(path=SPEC_PATH):
             task_conditions='Frozen initializer cases, target, timing, gravity, frame and acceptance; excluded from candidate design.',
             unavailable='See generated catalog integration_backlog; dimension-changing edits require new engineering and shared study version.',
             old_milestones='M4 qualified closed, old M5 open and sealed negative successor; six protected old M5 slots untouched; no roadmap changes.'))
-    validated = ResearchSpecification.model_validate(spec).model_dump(mode='json')
+    validated = ResearchSpecification.model_validate(spec).model_dump(mode='json');validated.pop('revision',None)
     atomic_json(path,dict(**validated,specification_identity=digest(validated)))
     return validated

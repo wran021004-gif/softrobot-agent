@@ -1,5 +1,9 @@
 # First offline research study, version 1.0.0
 
+This records the original preparation. The allocation policy and current runner
+are superseded by the [bounded version 1.1 revision](research_pre_study_revision.md).
+The original freeze and observed development smoke remain historical evidence.
+
 The [machine-readable freeze](../configs/research/reach_hold_v1.json) prepares
 Research Mainline 1, offline state recovery from Mainline 2, and the minimum
 shared interfaces needed from Mainline 3. The finalized six-mainline roadmap is

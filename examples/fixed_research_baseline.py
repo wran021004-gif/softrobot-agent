@@ -13,8 +13,8 @@ def main():
     require_softagent_runtime()
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mode',choices=('plan','smoke','study'),default='plan')
-    parser.add_argument('--spec',default='configs/research/reach_hold_v1.json')
-    parser.add_argument('--output',default='runs/research_first_study_20261006')
+    parser.add_argument('--spec',default='configs/research/reach_hold_v1_1.json')
+    parser.add_argument('--output',default='runs/research_first_study_v11_20261006')
     parser.add_argument('--export')
     args=parser.parse_args(); spec=load_spec(args.spec)
     if args.mode=='plan':

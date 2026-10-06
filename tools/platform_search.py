@@ -3,6 +3,46 @@ from schemas.platform import EvaluationResult, Objective, Payload, SessionInput
 from tools.platform_store import plain
 from tools.state_io import digest
 
+PARAMETER_SEARCH_VERSION='shared.parameter_search@1.1.0'
+
+
+def parameter_search(effective, method, variables, *, candidates=None, max_trials=None, step=None):
+    """Catalog-bound ask/tell preparation shared by planners and fixed research.
+
+    This prepares candidates, never a backend workspace or provider request.
+    Host role, evidence and budget checks remain in validate_batch_plan.
+    """
+    from schemas.parameter_domains import domain
+    from tools.parameter_impacts import parameter_impacts
+    from tools.candidate_parameters import parameter_value, fixed_configuration
+    from tools.platform_tools import _candidate
+    from tools.platform_registry import registry
+    from extensions.tendon_family.optimization import batch_search
+    mappings={r['parameter']:r for r in parameter_impacts(effective)['mapped']}
+    bounds={};initial={}
+    for path, granted in variables.items():
+        row=mappings.get(path)
+        if not row or not row['authorized_parameter'] or not row['implementation_supported']:
+            raise ValueError('SHARED_PARAMETER_UNAVAILABLE: '+path)
+        spec=row['builder_spec'];parsed=domain(granted);initial[path]=parameter_value(effective,path)
+        if parsed['kind']=='discrete':
+            if method!='search.family_explicit@1.0.0' or spec['type']!='choice' or not set(parsed['choices'])<=set(spec['options']) or initial[path] not in parsed['choices']:
+                raise ValueError('SHARED_PARAMETER_CHOICES: '+path)
+            bounds[path]=parsed
+        else:
+            lo,hi=parsed['bounds'];allowed=row['granted_range']
+            if spec['type']!='number' or not allowed[0]<=lo<hi<=allowed[1] or not lo<=initial[path]<=hi:
+                raise ValueError('SHARED_PARAMETER_BOUNDS: '+path)
+            bounds[path]=[lo,hi]
+    parameters=dict(initial=initial,bounds=bounds)
+    parameters.update(candidates=candidates) if method=='search.family_explicit@1.0.0' else parameters.update(max_trials=max_trials,step=step)
+    algorithm=batch_search(method,parameters)
+    for point in candidates or []:
+        changed=plain(_candidate(SessionInput.model_validate(effective),point,registry()))
+        if digest(fixed_configuration(changed,variables))!=digest(fixed_configuration(effective,variables)):
+            raise ValueError('SHARED_PARAMETER_FIXED_FIELDS_CHANGED')
+    return algorithm
+
 
 def validate_batch_plan(store, view, proposal):
     """Validate one future batch against installed ask/tell and candidate paths.
@@ -13,7 +53,6 @@ def validate_batch_plan(store, view, proposal):
     from schemas.platform_handoff import SearchBatchPlan
     from tools.platform_registry import registry
     from tools.platform_tools import _candidate
-    from extensions.tendon_family.optimization import batch_search
     from tools.diagnostic_revision import resolve_aliases
     plan=SearchBatchPlan.model_validate(proposal);reg=registry()
     state=store.session(view.run_id)['state'];role=state['role_context']
@@ -90,9 +129,7 @@ def validate_batch_plan(store, view, proposal):
         for endpoint in (lo,hi):
             changed=plain(_candidate(SessionInput.model_validate(effective),{path:endpoint},reg))
             if fixed_configuration(changed,plan.variables)!=fixed_configuration(effective,plan.variables):raise ValueError('PLAN_FIXED_ROBOT_TASK_CHANGED')
-    parameters=dict(initial=initial,bounds=search_bounds)
-    parameters.update(candidates=plan.candidates) if explicit else parameters.update(max_trials=plan.max_candidates,step=plan.step)
-    batch_search(plan.method,parameters)
+    parameter_search(effective,plan.method,plan.variables,candidates=plan.candidates,max_trials=plan.max_candidates,step=plan.step)
     differences=[]
     if explicit:
         for point in plan.candidates:
@@ -373,7 +410,6 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
     from copy import deepcopy
     from tools.diagnostic_handoff import accepted_product
     from schemas.platform_handoff import SearchBatchPlan
-    from extensions.tendon_family.optimization import batch_search
     from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
     from extensions.tendon_family.gvs_profile import execution_scope
     from tools.candidate_parameters import fixed_configuration,parameter_value
@@ -422,11 +458,7 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
         capacity['sufficient']=not any(capacity['shortfalls'].values())
     if interpretation_reserve_s<0 or not capacity['sufficient']:
         raise ValueError('BATCH_RESERVATION_CAPACITY_REQUIRED: 990 seconds and 4 tools per proposal, plus explicit interpretation reserve')
-    initial={p:parameter_value(effective,p) for p in plan.variables}
-    from schemas.parameter_domains import domain
-    parameters=dict(initial=initial,bounds={p:domain(d) if domain(d)['kind']=='discrete' else domain(d)['bounds'] for p,d in plan.variables.items()})
-    parameters.update(candidates=plan.candidates) if plan.method=='search.family_explicit@1.0.0' else parameters.update(max_trials=plan.max_candidates,step=plan.step)
-    algorithm=batch_search(plan.method,parameters)
+    algorithm=parameter_search(effective,plan.method,plan.variables,candidates=plan.candidates,max_trials=plan.max_candidates,step=plan.step)
     if starting_facts and starting_facts['candidate']!=record['bindings']['subject']:
         raise ValueError('BATCH_START_EVIDENCE_MISMATCH')
     for facts in (starting_facts,retained_baseline):

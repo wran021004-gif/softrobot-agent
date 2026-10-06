@@ -1,0 +1,184 @@
+{
+  "version": "research.pre_study_revision@1.1.0",
+  "date": "2026-10-06",
+  "base_commit": "55f3310782e02f14d6752f7e91d4b55c980e5c7c",
+  "specification": "configs/research/reach_hold_v1_1.json",
+  "specification_identity": "eec598e5140f893856d39151ebd6f52d3c58938448cb44b95f285a2ca5ebc732",
+  "parent_specification_identity": "36ebab4dc2a41e7d9ff13352bd63c3112eeb14b08fb88c1f73ca4a7b34518cea",
+  "allocation": {
+    "search_adaptation": 8,
+    "unchanged_incumbent_validation": 10,
+    "selected_candidate_validation": 10
+  },
+  "planned_coverage": {
+    "variables": {
+      "components/near/length_m": {
+        "values": [
+          0.165
+        ],
+        "attempts": 2,
+        "complete_results": 0
+      },
+      "components/far/length_m": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "design/near_section_scale": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "design/far_section_scale": {
+        "values": [
+          0.975
+        ],
+        "attempts": 2,
+        "complete_results": 0
+      },
+      "design/near_material_scenario": {
+        "values": [
+          "stiff"
+        ],
+        "attempts": 2,
+        "complete_results": 0
+      },
+      "design/far_material_scenario": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "control/recipe/terminal_tip_speed_weight": {
+        "values": [
+          0.06875
+        ],
+        "attempts": 2,
+        "complete_results": 0
+      },
+      "control/recipe/holding_tip_speed_weight": {
+        "values": [
+          0.06875
+        ],
+        "attempts": 2,
+        "complete_results": 0
+      }
+    },
+    "changed_variables": [
+      "components/near/length_m",
+      "design/far_section_scale",
+      "design/near_material_scenario",
+      "control/recipe/terminal_tip_speed_weight",
+      "control/recipe/holding_tip_speed_weight"
+    ],
+    "unvisited_variables": [
+      "components/far/length_m",
+      "design/near_section_scale",
+      "design/far_material_scenario"
+    ],
+    "interpretation": "Finite proposals and observed coverage, not exhaustive optimization of the exposed eight-variable pool."
+  },
+  "actual_scientific_coverage": {
+    "variables": {
+      "components/near/length_m": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "components/far/length_m": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "design/near_section_scale": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "design/far_section_scale": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "design/near_material_scenario": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "design/far_material_scenario": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "control/recipe/terminal_tip_speed_weight": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      },
+      "control/recipe/holding_tip_speed_weight": {
+        "values": [],
+        "attempts": 0,
+        "complete_results": 0
+      }
+    },
+    "changed_variables": [],
+    "unvisited_variables": [
+      "components/near/length_m",
+      "components/far/length_m",
+      "design/near_section_scale",
+      "design/far_section_scale",
+      "design/near_material_scenario",
+      "design/far_material_scenario",
+      "control/recipe/terminal_tip_speed_weight",
+      "control/recipe/holding_tip_speed_weight"
+    ],
+    "interpretation": "Finite proposals and observed coverage, not exhaustive optimization of the exposed eight-variable pool."
+  },
+  "new_scientific_executions": 0,
+  "checks": {
+    "command": "python -m unittest tests.test_research_revision tests.test_fixed_research tests.test_parameter_catalog",
+    "passed": 16,
+    "elapsed_s": 2.041,
+    "scope": "Focused offline policy, authoritative comparison, shared preparation and existing catalog bridge checks; synthetic fixture outcomes are not scientific evidence."
+  },
+  "cost": {
+    "model_calls": 0,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "standalone_numerical_solves": 0
+  },
+  "historical_smoke": {
+    "evidence": "evidence/research_preparation_20261006/smoke/delivery.json",
+    "execution_id": "ef0a8703dff7494f8053e34067b33f7a",
+    "case_id": "near_z_plus",
+    "seed": 17,
+    "changes": {
+      "design/near_section_scale": 0.96
+    },
+    "status": "observed_development_valid_failure",
+    "terminal_error_m": 0.0028974459148354828,
+    "holding_max_speed_m_s": 0.06773111912652348,
+    "acceptance_thresholds_unchanged": true,
+    "unseen": false
+  },
+  "post_smoke_offline_bridge": "evidence/research_preparation_20261006/shared_parameter_checks.json; no subsequent real execution of that bridge.",
+  "next_execution": "next_execution.json",
+  "native_planner_role_ledger_live_validation": "pending",
+  "formal_campaign_launched": false,
+  "physical_thresholds_changed": false,
+  "implementations": {
+    "fixed": "fixed_coordinate_reach_hold@1.1.0",
+    "shared_parameter_search": "shared.parameter_search@1.1.0",
+    "catalog": "1.0.0",
+    "candidate_builder": "candidate.family@1.1.0",
+    "acceptance": "1.0.0",
+    "sources": {
+      "tools/research_spec.py": "49b17ddfbb08a3a41dd76bea539c3ca615db7ec6aca6fbcc7c7577e567059be0",
+      "tools/fixed_research.py": "27207dc82c489ce3f90669fd252530628fef7a65d3b543c56869ddfd2bc5891f",
+      "tools/platform_search.py": "ad59ebefb67b03a1ceb9d6938f7890c5bdebeb87db53cb1a30d62c665bab746c",
+      "tools/candidate_parameters.py": "2c08bfdd5c15dc752b2ea6e5b85833584ba6d069e0c13fa98c097f04df3a7b61",
+      "examples/fixed_research_baseline.py": "5b5bdd9da5f0824469e0c2b70fa23514b84a606e8f2dfd5246d19329f9dad469",
+      "tests/test_research_revision.py": "c4cdd33fa32e34665c2446a85a38c37d411a778f30dba28d118f6573a18901a4",
+      "configs/research/reach_hold_v1_1.json": "10f18cf6b41b6e0b63a8fa148f1cf1b85013c84f0e968767c52595cfe35aabbc"
+    }
+  }
+}

@@ -1,5 +1,18 @@
 # Current development status - Milestones 4 and 5, 2026-10-06
 
+Bounded pre-study [revision 1.1](research_pre_study_revision.md) reserves the same
+28 backend ceiling as eight search/adaptation attempts, ten unchanged-incumbent
+validations and ten matched validations for one eligible candidate. No eligible
+candidate means incumbent-only validation and unused candidate budget. Four
+explicit structure slots cover the source, length, section and material families;
+five variables have planned changes and three remain unvisited. Actual coverage
+is recorded, with no all-eight optimization claim. Focused checks are offline;
+no new model/backend call or formal campaign occurred. The earlier holding-speed
+failure remains exposed development evidence, separately identified from later
+offline planner/catalog checks. One independently authorized execution through
+the final shared preparation path is proposed and has not run. Physical acceptance
+and all old milestone seals/protected budgets remain unchanged.
+
 New research preparation: [the first offline study](research_first_study.md)
 freezes the exact retained M4 incumbent, five small initial angle/rate cases and
 two fresh repetitions per case. A registered eight-variable catalog, task adapters,

@@ -72,7 +72,12 @@ def comparison_scope(effective):
 
 def planning_configuration(store,candidate,policy):
     """Add current authorized builder capabilities; preserve archived scientific input."""
-    original=store.artifact(candidate['configuration'])['effective'];effective=deepcopy(original)
+    return project_planning_configuration(store.artifact(candidate['configuration'])['effective'],policy)
+
+
+def project_planning_configuration(original,policy):
+    """Shared source projection for archived planning and the fixed study runner."""
+    effective=deepcopy(original)
     current=policy.get('candidate_builder',{}).get('parameters',{}).get('data',{})
     builder=policy.get('candidate_builder',{})
     future=builder.get('extension_id')=='candidate.family' and builder.get('version')=='1.1.0'
