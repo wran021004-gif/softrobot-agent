@@ -1,0 +1,292 @@
+{
+  "version": "research.shared_path_validation@1.0.0",
+  "verified_at_utc": "2026-10-06T12:49:01.782260+00:00",
+  "integration_complete": true,
+  "physical_task_accepted": false,
+  "physical_status": "valid_failure",
+  "implementation_commit": "c80d331691b1a0f9d683049f1b09480c8bd62319",
+  "implementation_versions": {
+    "fixed": "fixed_coordinate_reach_hold@1.1.0",
+    "shared_parameter_search": "shared.parameter_search@1.1.0",
+    "candidate_builder": "candidate.family@1.1.0",
+    "controller": "controller.gvs_nmpc@7.0.0",
+    "backend": "backend.family_mujoco@1.1.0"
+  },
+  "runtime_snapshot_worktree_dirty": true,
+  "runtime_dirty_explanation": "Pre-execution evidence files were created after the clean code freeze and before Host.create. All executed source hashes and dependency fingerprints match the frozen revision; no code diff or repair.",
+  "source_code_unchanged": true,
+  "specification_identity": "eec598e5140f893856d39151ebd6f52d3c58938448cb44b95f285a2ca5ebc732",
+  "execution_id": "8b8ce2691fc24b3392ff5e7fa4905ba4",
+  "candidate_id": "shared-path-v11-near-section-096-near-z-plus",
+  "configuration": {
+    "artifact_id": "a5bad0274360cb103c6e7056a88b5b539b12e9a6b38445bff3885f36e4c7ba72",
+    "media_type": "application/json"
+  },
+  "simulation": {
+    "artifact_id": "8a8cd93d3a8d7c6a553910e0d819da39cdec981fe4d0773e6cb3f2eda9566c46",
+    "media_type": "application/json"
+  },
+  "evaluation": {
+    "artifact_id": "d6896c85db290ca5bb7b343508546abba78e780ec73e470c13c0794840194456",
+    "media_type": "application/json"
+  },
+  "profile": {
+    "artifact_id": "310cb1690b13def63b6c932e669eeaeec84db14288bcdcc4f9fedf13eaa64fcc",
+    "media_type": "application/json"
+  },
+  "actual_parameter_changes": [
+    {
+      "path": "design/near_section_scale",
+      "before": 0.95,
+      "after": 0.96
+    }
+  ],
+  "physical_parameters": [
+    {
+      "segment": "near",
+      "length_m": 0.16,
+      "young_pa": 7200000.0,
+      "section_parameters": [
+        {
+          "semi_y_m": 0.0096,
+          "semi_z_m": 0.00768
+        }
+      ]
+    },
+    {
+      "segment": "far",
+      "length_m": 0.11,
+      "young_pa": 5400000.0,
+      "section_parameters": [
+        {
+          "height_z_m": 0.0095,
+          "width_y_m": 0.0133
+        },
+        {
+          "height_z_m": 0.008549999999999999,
+          "width_y_m": 0.0114
+        }
+      ]
+    }
+  ],
+  "seed": 17,
+  "case_id": "near_z_plus",
+  "initializer_preserved": true,
+  "holding_samples": [
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 4.710580234003672,
+      "time_s": 0.3,
+      "tip_error_m": 0.004094678029888374,
+      "tip_speed_m_s": 0.06758272073425946,
+      "velocity_error_m_s": 0.06758272073425946
+    },
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 5.804151504895703,
+      "time_s": 0.31,
+      "tip_error_m": 0.003706858463592696,
+      "tip_speed_m_s": 0.06728404185219845,
+      "velocity_error_m_s": 0.06728404185219845
+    },
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 5.927068656092413,
+      "time_s": 0.32,
+      "tip_error_m": 0.0033390285665250725,
+      "tip_speed_m_s": 0.053945566244985935,
+      "velocity_error_m_s": 0.053945566244985935
+    },
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 5.662181458303584,
+      "time_s": 0.33,
+      "tip_error_m": 0.0029944782504908378,
+      "tip_speed_m_s": 0.046597761821686894,
+      "velocity_error_m_s": 0.046597761821686894
+    },
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 5.263807707684251,
+      "time_s": 0.34,
+      "tip_error_m": 0.002793940377480467,
+      "tip_speed_m_s": 0.01407753947808927,
+      "velocity_error_m_s": 0.01407753947808927
+    },
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 4.806452491481053,
+      "time_s": 0.35000000000000003,
+      "tip_error_m": 0.0028029393033160714,
+      "tip_speed_m_s": 0.012106980829123433,
+      "velocity_error_m_s": 0.012106980829123433
+    }
+  ],
+  "component_outcomes": {
+    "evaluation_validity": {
+      "value": "valid",
+      "passed": true,
+      "unit": null,
+      "limit": null,
+      "reason": null
+    },
+    "execution_complete": {
+      "value": true,
+      "passed": true,
+      "unit": null,
+      "limit": null,
+      "reason": null
+    },
+    "task_evaluator": {
+      "value": true,
+      "passed": true,
+      "unit": null,
+      "limit": null,
+      "reason": null
+    },
+    "evaluator:task_bound": {
+      "value": 0.0028029393033160714,
+      "passed": true,
+      "unit": "m",
+      "limit": 0.01,
+      "reason": null
+    },
+    "solver_errors": {
+      "value": 0,
+      "passed": true,
+      "unit": "count",
+      "limit": 0,
+      "reason": null
+    },
+    "force_bounds": {
+      "value": 0.0,
+      "passed": true,
+      "unit": "N",
+      "limit": 1e-08,
+      "reason": null
+    },
+    "holding_coverage": {
+      "value": true,
+      "passed": true,
+      "unit": "inclusive uniform samples",
+      "limit": 6,
+      "reason": null
+    },
+    "holding_position": {
+      "value": 0.004094678029888374,
+      "passed": true,
+      "unit": "m",
+      "limit": 0.01,
+      "reason": null
+    },
+    "holding_speed": {
+      "value": 0.06758272073425946,
+      "passed": false,
+      "unit": "m/s",
+      "limit": 0.02,
+      "reason": null
+    }
+  },
+  "metrics": {
+    "terminal_error_m": 0.0028029393033160714,
+    "holding_max_error_m": 0.004094678029888374,
+    "holding_max_speed_m_s": 0.06758272073425946
+  },
+  "operation_costs": [
+    {
+      "tool_id": "simulation.run",
+      "execution_id": "8b8ce2691fc24b3392ff5e7fa4905ba4",
+      "elapsed_s": 591.8589999999967,
+      "limit_s": 900.0,
+      "overrun_s": 0
+    },
+    {
+      "tool_id": "evaluation.run",
+      "execution_id": "350d04c58d664d84a146483f96032c00",
+      "elapsed_s": 1.2969999999913853,
+      "limit_s": 30.0,
+      "overrun_s": 0
+    },
+    {
+      "tool_id": "control.profile_report",
+      "execution_id": "97ea8739a07f445aae529c2d8e3b3bec",
+      "elapsed_s": 1.1410000000032596,
+      "limit_s": 60.0,
+      "overrun_s": 0
+    }
+  ],
+  "total_charged": {
+    "tool_calls": 3,
+    "model_calls": 0,
+    "backend_solves": 1,
+    "worker_calls": 0,
+    "wall_s": 594.2969999999914
+  },
+  "budget": {
+    "limit": {
+      "backend_solves": 1,
+      "model_calls": 0,
+      "tool_calls": 3,
+      "wall_s": 990.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 3,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 594.2969999999914
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": 395.7030000000086,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "attempts": 1,
+  "retries": 0,
+  "interventions": [],
+  "code_repairs": [],
+  "timeout": false,
+  "total_overrun_s": 0,
+  "artifact_count": 35,
+  "artifact_integrity_verified": true,
+  "old_protected_files_unchanged": true,
+  "prior_evidence_unchanged": true,
+  "development_case": true,
+  "previously_exposed": true,
+  "formal_campaign_launched": false,
+  "earlier_execution": {
+    "execution_id": "ef0a8703dff7494f8053e34067b33f7a",
+    "metrics": {
+      "terminal_error_m": 0.0028974459148354828,
+      "holding_max_error_m": 0.0028974459148354828,
+      "holding_max_speed_m_s": 0.06773111912652348
+    },
+    "charged": {
+      "tool_calls": 3,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 336.3589999999822
+    },
+    "evidence": "evidence/research_preparation_20261006/smoke/delivery.json"
+  },
+  "descriptive_metric_differences": {
+    "terminal_error_m": -9.450661151941134e-05,
+    "holding_max_error_m": 0.0011972321150528912,
+    "holding_max_speed_m_s": -0.00014839839226402085
+  },
+  "comparison_limit": "Both observed development executions fail holding speed. Differences are descriptive only; changed implementation fingerprints and time-limited solver behavior do not establish physical improvement, robustness or a dominant cause.",
+  "remaining_unverified": [
+    "Live LLM planning and context-quality validation",
+    "Native planner role/alias ledger live execution",
+    "Complete multi-candidate fixed baseline and matched robustness validation",
+    "Formal three-group research comparison",
+    "Physical joint reach-and-hold acceptance for this development candidate"
+  ],
+  "next_step_proposed": "Separate approval for the frozen fixed mathematical baseline v1.1 only: cumulative ceiling 28, split 8 search/adaptation + 10 unchanged-incumbent + 10 eligible-candidate matched fresh validations, no candidate branch leaves slots unused. No LLM campaign or formal three-group launch. Nothing launched under this proposal."
+}

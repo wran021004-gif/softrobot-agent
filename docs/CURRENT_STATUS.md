@@ -1,16 +1,30 @@
 # Current development status - Milestones 4 and 5, 2026-10-06
 
+The independently authorized [final shared-path development validation](research_shared_path_validation.md)
+completed on frozen implementation `c80d331691b1a0f9d683049f1b09480c8bd62319`.
+Execution `8b8ce2691fc24b3392ff5e7fa4905ba4` used the reviewed near scale 0.96,
+exposed `near_z_plus` case and incumbent weights 0.05/0.05. Terminal error
+0.0028029393033160714 m and holding maximum error 0.004094678029888374 m pass;
+holding speed 0.06758272073425946 m/s fails. All six holding samples, force bounds
+and complete valid execution are verified. Actual use is one backend / three
+operations / 594.297 charged seconds, zero model/worker calls, without tuning,
+intervention, repair or retry. No code changes were needed. The earlier direct
+smoke failure and later offline bridge checks remain separately identified and
+unchanged. No full study, live LLM/native-ledger validation or formal comparison
+has launched; no robustness improvement is claimed. Old milestone seals and
+protected allocations remain unchanged.
+
 Bounded pre-study [revision 1.1](research_pre_study_revision.md) reserves the same
 28 backend ceiling as eight search/adaptation attempts, ten unchanged-incumbent
 validations and ten matched validations for one eligible candidate. No eligible
 candidate means incumbent-only validation and unused candidate budget. Four
 explicit structure slots cover the source, length, section and material families;
 five variables have planned changes and three remain unvisited. Actual coverage
-is recorded, with no all-eight optimization claim. Focused checks are offline;
-no new model/backend call or formal campaign occurred. The earlier holding-speed
+is recorded, with no all-eight optimization claim. Revision checks were offline;
+no model/backend call or formal campaign occurred during that revision. The earlier holding-speed
 failure remains exposed development evidence, separately identified from later
-offline planner/catalog checks. One independently authorized execution through
-the final shared preparation path is proposed and has not run. Physical acceptance
+offline planner/catalog checks. Its proposed independent final shared-path execution
+has now completed as documented above. Physical acceptance
 and all old milestone seals/protected budgets remain unchanged.
 
 New research preparation: [the first offline study](research_first_study.md)

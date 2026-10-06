@@ -111,8 +111,10 @@ Its independent cap is one backend, three tools, zero model/worker calls and
 990 seconds (900 simulation, 30 evaluation, 60 profile). It consumes no formal
 study allocation and does not transfer the unused earlier smoke slot.
 
-Prepared command, **not executed; requires the separate approval requested by
-the user**:
+The following original proposal was subsequently independently authorized and
+executed once. See [the final shared-path validation](research_shared_path_validation.md)
+for its frozen implementation and physical holding-speed failure. This command
+records that completed attempt; the existing Store must not be rerun or reset:
 
 ```powershell
 & 'C:/Users/gugugaga/miniconda3/envs/softagent/python.exe' examples/fixed_research_baseline.py --mode smoke --spec configs/research/reach_hold_v1_1.json --output runs/research_shared_path_v11_approval_20261006 --export evidence/research_shared_path_v11_approval_20261006
