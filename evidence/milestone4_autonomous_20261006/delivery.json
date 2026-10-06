@@ -1,0 +1,121 @@
+{
+  "status": "prepared",
+  "stop_reason": null,
+  "implementation_checks": "see focused_checks.json",
+  "real_search_batches": 0,
+  "cases": [],
+  "sealed_cases": [],
+  "core_multibatch_acceptance": false,
+  "feedback_bound_to_second_plan": false,
+  "selected_candidate": {
+    "candidate_id": "batch-ebbeadbdaca10732-0",
+    "owner_run_id": "batch-ebbeadbdaca10732-0",
+    "configuration": {
+      "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+      "media_type": "application/json"
+    },
+    "execution_id": "91c3ba1b01d6499fb26df8f95409401b"
+  },
+  "latest_execution": null,
+  "latest_completed_evaluation": null,
+  "latest_complete_result": null,
+  "execution_chronology": {
+    "scope": "Real executions in this campaign store; imported records are historical evidence, not new attempts",
+    "ordering_authority": "Store reservation and completion event sequence",
+    "attempts": [],
+    "latest_execution": null,
+    "latest_completed_evaluation": null,
+    "latest_complete_result": null,
+    "missing_chronology": [],
+    "unordered_historical_executions": [
+      "087adee8e8a24fe88e5c85fe89e638c8",
+      "110dc2c9c1d642dcb018664a65c62c30",
+      "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+      "22241105b8984e0daae4530963848953",
+      "25e26708480848d79bad378b669915e3",
+      "44dbf3bc2964402e9f6af6a93c0f8d7d",
+      "50618bf23b31464ba4f84c55cd26d1ca",
+      "91c3ba1b01d6499fb26df8f95409401b",
+      "a8382f8a4c6e4ebe921fb72f821b2188",
+      "bebcfd47274940fb88a55ce5a2457c4c",
+      "cf997605885642759ee33920e2c9e2ef",
+      "e3876a1d289f41f08d46c96202f1da0c"
+    ],
+    "semantics": {
+      "latest_execution": "Latest attempted simulation by reservation event; may be failed/incomplete",
+      "latest_completed_evaluation": "Latest official evaluation completion event; does not imply acceptance or complete profiling",
+      "latest_complete_result": "Latest full profiled evaluation with retained bound facts, by profile completion event"
+    }
+  },
+  "current_batch_source": null,
+  "retained_baseline": {
+    "candidate_id": "baseline-replay",
+    "owner_run_id": "gvs-stage351-baseline-executor",
+    "configuration": {
+      "artifact_id": "af649bf56cf8642bb85090227ec5390398aff23a96686f972933e24715ba8fd0",
+      "media_type": "application/json"
+    },
+    "execution_id": "cf997605885642759ee33920e2c9e2ef"
+  },
+  "usage": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 24,
+      "tool_calls": 60,
+      "wall_s": 9000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 3,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 21.688999999998487
+    },
+    "remaining": {
+      "backend_solves": 4,
+      "model_calls": 24,
+      "tool_calls": 57,
+      "wall_s": 8978.311000000002,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "corrections": {
+    "total": 0,
+    "consecutive": 0
+  },
+  "standalone_numerical_operations": 0,
+  "embedded_controller_updates": 0,
+  "attempts_without_complete_update_count": [],
+  "engineering_interventions": 0,
+  "physical_improvement": "Not evaluated: zero new complete search evaluations",
+  "realtime": "No realtime success established",
+  "model_reasoning": "None: no accepted live model decision",
+  "selection_role": "Retained historical incumbent; no new final model selection",
+  "milestones": {
+    "M4_historical": "closed",
+    "M4_supplement": "open_incomplete_autonomy_coverage",
+    "M5": "open"
+  },
+  "revision": {
+    "commit": "6543d4788d00796e256b9968a05b535549d0b843",
+    "files": {
+      "examples/milestone4_autonomous.py": "cd2a875dbfb071687b1bec4a2f18a0421bd7ef40d3a34542abc818c142992dd8",
+      "tools/research_scheduler.py": "8a9193b606ff866cb7791656be6b906aea35aa9ced7ebd14eff2af7bb0a5bb02",
+      "tools/platform_search.py": "624e38c0d8d536d3f4b8cd155f0faad5fb23f3b6bf11c8c8723f5aa94e6ff90a",
+      "tools/structural_study.py": "759885d1ef42eb1de24a5ebe3aacca272953df718e45134f4433df66dcaf0f5d",
+      "tools/diagnostic_reference_adapter.py": "de56dd09d3d8d53616c79bcc3642e4db772e76b3795d75267372bb505ecfc0aa",
+      "tools/platform_models.py": "fec97daf907da29f2d3fb726410d93eeb1b9f2a20439f03837af85e19eb1fdad",
+      "schemas/platform_handoff.py": "f6d7bbc1b606fe0ab99bbb6cd62ca4982b512c0c5a7a754c6ab0968bddea204e",
+      "extensions/platform/manifest.py": "9b29e664856076325d1d663c866e60fc331f078a36ca58f1529fd56caa522510",
+      "tests/test_research_scheduler.py": "89a636719905a10a80944bedf981507b5431de7c12b811c820f7998f2c096a4b",
+      "tools/study_history.py": "e5deca3568a293f662739869ba5f23996d5ae03bac479405c31b387495b7ddea"
+    },
+    "stable_controller": {
+      "extensions/tendon_family/gvs_nmpc.py": "39fc23b1ce3756ab06d42486f004edb8bb1db4b64b69e158b55f9bc2761cb698",
+      "extensions/tendon_family/gvs_trajectory.py": "160b47df2f0958929527d4871c61a66e3c69d766b7406144c97cb197ad65292b",
+      "extensions/tendon_family/gvs_profile.py": "2860f671093c665e1bc1840b92a42f33b3735767873cb9035acfdc43e2ff9711"
+    }
+  }
+}
