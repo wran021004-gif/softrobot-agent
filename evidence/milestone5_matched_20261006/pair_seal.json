@@ -1,0 +1,91 @@
+{
+  "protocol_identity": "fc42637b2be9bf7d044faa8074fa84a866909977fc408d307495259b7a5c2930",
+  "implementation_identity": "f322378ffe9b3f2a172ef7aaff52b1259be247e8f3937ea5f9d97a9413d7b577",
+  "forecasts": {
+    "original075": {
+      "identity": "e0accf23804b6a8c76664705a801bba8b7b732d16c09deab22b85f8fb63034d1",
+      "metrics": {
+        "terminal_error_m": 0.003188023774453558,
+        "holding_max_error_m": 0.0032266666247696106,
+        "holding_max_speed_m_s": 0.012173523340786264
+      },
+      "classification": {
+        "terminal_position": true,
+        "holding_position": true,
+        "holding_speed": true,
+        "joint": true
+      }
+    },
+    "original15": {
+      "identity": "8624deabd3b1a494148638ae4d8ad02fb6e4ee460c54838a400cb2a020df763a",
+      "metrics": {
+        "terminal_error_m": 0.003196550895623377,
+        "holding_max_error_m": 0.003291357611439329,
+        "holding_max_speed_m_s": 0.010424725820816648
+      },
+      "classification": {
+        "terminal_position": true,
+        "holding_position": true,
+        "holding_speed": true,
+        "joint": true
+      }
+    }
+  },
+  "pair_decision": {
+    "candidates": [
+      {
+        "candidate_id": "original075",
+        "metrics": {
+          "terminal_error_m": 0.003188023774453558,
+          "holding_max_error_m": 0.0032266666247696106,
+          "holding_max_speed_m_s": 0.012173523340786264
+        },
+        "valid": true,
+        "eligibility": "predicted_safe"
+      },
+      {
+        "candidate_id": "original15",
+        "metrics": {
+          "terminal_error_m": 0.003196550895623377,
+          "holding_max_error_m": 0.003291357611439329,
+          "holding_max_speed_m_s": 0.010424725820816648
+        },
+        "valid": true,
+        "eligibility": "predicted_safe"
+      }
+    ],
+    "order": [
+      "original15",
+      "original075"
+    ],
+    "status": "resolved",
+    "gap_m_s": -0.0017487975199696158,
+    "hypothetical_rejection": "original075",
+    "safety_claim": false,
+    "rules": {
+      "primary_objective": "Lowest sampled maximum holding speed, conditional on predicted terminal and holding position feasibility.",
+      "speed_tie_margin_m_s": 0.0001,
+      "position_limit_m": 0.01,
+      "speed_limit_m_s": 0.02,
+      "numerical_speed_tolerance_m_s": 0.0001,
+      "velocity_vector_tolerance_m_s": 0.0001,
+      "direction_neutral_m_s": 0.0001,
+      "local_direction": "Compare predicted change to projected initial speed, observed change to observed initial speed. Absolute change <=1e-4 is neutral; predicted change within numerical uncertainty of +/-1e-4 is indeterminate.",
+      "constraint_handling": "Position or terminal failure makes eligibility unresolved; forecast speed <=.02 is predicted-safe, otherwise predicted-violating. Always evaluate both candidates.",
+      "empirical_allowance": null,
+      "abstention": "Incomplete/nonfinite/infeasible history, position violation, or speed gap <=1e-4: abstain. Resolved history rank is a testable forecast, not a proven safe rejection.",
+      "screening_usefulness": "Universal abstention fails useful screening; report pairwise order errors, resolved coverage, accuracy, false rejection and false-safe counts.",
+      "original_gates": "Accurate local numerics, useful prospective full-task discrimination/order, broader repeatability and real-time operation remain required. No threshold is relaxed.",
+      "readiness_dimensions": [
+        "implementation",
+        "registration",
+        "numerical_stability",
+        "backend_accuracy",
+        "discrimination",
+        "budget_admission",
+        "prospective_execution"
+      ]
+    }
+  },
+  "sealed_before_either_backend": true
+}

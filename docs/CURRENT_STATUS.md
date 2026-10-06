@@ -1,5 +1,30 @@
 # Current development status - Milestones 4 and 5, 2026-10-06
 
+Latest: the [bounded M4 reporting remediation](milestone4_reporting_remediation.md)
+used three provider attempts and zero numerical/backend work. Its model correction
+acknowledges the matching replication, but incorrectly includes an original-geometry
+pass in shortened-geometry history. Review rejects closure; the autonomous supplement
+remains open, with its original failed report, stop and selection intact.
+
+The [M5 matched development checkpoint](milestone5_matched_development.md) completed
+two pair-sealed 35-update native-controller forecasts, two actual matched development
+backends and four fixed-input LU/Cholesky diagnostics (eight component evaluations).
+Fixed-input checks pass; all aggregate trajectory accuracy gates fail. Position
+task classifications agree, but .075 falsely predicts holding-speed/joint acceptance.
+Pair speed order is correct, with failed accuracy and no useful screening claim.
+Operational pair cost including both model interpretations is 434.031 s versus
+194.951 s for the potentially omitted backend; counterfactual net is -239.080 s,
+actual savings zero. All 140 forecast/backend updates miss 10 ms; optimization is
+the measured dominant component. The corrected model interpretation passes review
+and recommends stopping this route without revision/rerun. New M5 charges are
+2 provider / 19 workflow / 2 development backend / 808.364 s, with 70 standalone
+and 70 separately recorded embedded updates. All six formal-validation slots and
+the incumbent remain untouched. **M5 remains open.** Next requires explicit
+controller/termination development meeting complete 10 ms timing, then matched
+accuracy, classification and economic admission before prospective validation.
+
+The preceding autonomous successor record below remains historical evidence:
+
 The [independent M4 autonomous successor](milestone4_autonomous_successor.md)
 repairs shared receipt/event chronology and separates verified observations,
 uncertain interpretations and decisions. Its primary response question and

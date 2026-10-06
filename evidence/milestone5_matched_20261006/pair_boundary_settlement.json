@@ -1,0 +1,71 @@
+{
+  "boundary": "First forecast reservation to final paired backend-summary completion; Store UTC event wall span, not a hardware measurement.",
+  "start_event": {
+    "agent_id": "local-human",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 1,
+      "wall_s": 1200.0,
+      "worker_calls": 0
+    },
+    "event_id": "22f6b856638742e886fc91955a88607d",
+    "execution_id": "01044c2196f24265ae046c0c5f0693ba",
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "tool",
+    "outputs": [],
+    "parent_id": null,
+    "project_id": "milestone5_matched_20261006",
+    "request_id": "forecast_original075",
+    "run_id": "milestone5_matched_20261006-report",
+    "sequence": 2,
+    "status": "reserved",
+    "timestamp": "2026-10-06T05:02:23.263926+00:00"
+  },
+  "end_event": {
+    "agent_id": "local-human",
+    "candidate_id": null,
+    "contract_version": "1.0.0",
+    "cost": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 1,
+      "wall_s": 0.031000000002677552,
+      "worker_calls": 0
+    },
+    "event_id": "22f2dfb4e04940c5a2cfd8a7da599b97",
+    "execution_id": "f9389fe26730401098c78ee5a9363330",
+    "implementation_version": "1.0.0",
+    "inputs": [],
+    "kind": "tool",
+    "outputs": [
+      {
+        "artifact_id": "7352dcc50964492db7025abb909f39fdab0a48d1769068d6e0f01fa2ca22fef6",
+        "media_type": "application/json"
+      }
+    ],
+    "parent_id": "1136cf8eb231496b886f4bc87bced0ae",
+    "project_id": "milestone5_matched_20261006",
+    "request_id": "backend_summary_original15",
+    "run_id": "milestone5_matched_20261006-report",
+    "sequence": 279,
+    "status": "completed",
+    "timestamp": "2026-10-06T05:15:11.127532+00:00"
+  },
+  "total_pair_wall_span_s": 767.863606,
+  "already_charged_nested_s": 762.3259999999937,
+  "additional_wrapper_overhead_s": 5.537606000006349,
+  "forecast_and_pair_seal_operational_s": 393.796066,
+  "nested_forecast_and_pair_seal_s": 393.38999999999214,
+  "corresponding_complete_backend_costs_s": {
+    "original075": 194.950605,
+    "original15": 179.116935
+  },
+  "assumption": "No system UTC clock adjustment during this recorded interval; individual component timers use monotonic perf_counter.",
+  "excluded": "Offline protocol registration, interpreter launch and first report-host registration before the first numerical reservation; follows the existing engineering convention. Native/model/controller setup is metered inside the forecasts.",
+  "no_numerical_replay": true,
+  "no_double_charge": true
+}

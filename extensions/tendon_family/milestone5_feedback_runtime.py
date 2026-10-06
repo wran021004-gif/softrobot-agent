@@ -49,14 +49,17 @@ def history(configuration,initial_state,model,physics,ctx,*,provider,count,deadl
     x=np.asarray(initial_state,dtype=float).copy();rows=[]
     for i in range(count):
         if time.perf_counter()>deadline:raise RuntimeError('NATIVE_FEEDBACK_DEADLINE')
-        before=x.copy();observe_start=time.perf_counter();z=project(physics,basis,x[:model.full_n],x[model.full_n:])
+        before=x.copy();input_to_command_start=time.perf_counter();observe_start=time.perf_counter();z=project(physics,basis,x[:model.full_n],x[model.full_n:])
         motion=model.motion(x);geometry=dict(tip=np.asarray(motion['position_m']),gvs_projection=z)
         observation_s=time.perf_counter()-observe_start
         warm=controller.seed if controller.seed is not None else controller.workspace.last
         warm_record=None if warm is None else deepcopy({k:warm[k] for k in ('states','tensions')})
+        previous_input=np.asarray(controller.previous).tolist() if hasattr(controller,'previous') else None
         charge_units(ctx,'local_solves',1);start=time.perf_counter()
         with use_trajectory_functions(provider):command=controller.command(i*period,geometry,z['q_gvs'],z['qdot_gvs'])
         complete_command_s=time.perf_counter()-start
+        packaging_start=time.perf_counter();command=list(command);packaging_s=time.perf_counter()-packaging_start
+        input_to_command_s=time.perf_counter()-input_to_command_start
         if controller.stop_requested:raise ValueError('CAUSAL_CONTROLLER_STOP')
         selected=controller.workspace.last
         sealed=dict(update_id=i,time_s=i*period,initial_full_state=before.tolist(),input_n=list(command),
@@ -64,6 +67,8 @@ def history(configuration,initial_state,model,physics,ctx,*,provider,count,deadl
             plan_identity=digest(dict(states=selected['states'],tensions=selected['tensions'])),
             selected_plan={k:selected[k] for k in ('states','tensions')},warm_before_command=warm_record,
             command_receipt=controller.observations[-1],complete_command_s=complete_command_s,observation_s=observation_s,
+            projected_current_state=deepcopy(z),previous_input_n=previous_input,command_packaging_s=packaging_s,
+            software_input_to_command_s=input_to_command_s,
             accepted=controller.last['plan_accepted'],replanned=True)
         save_update(dict(phase='sealed_before_emulated_advance',**sealed))
         end=model.propagate(x,command,grid=dict(max_step_s=.0005),deadline=deadline,duration_s=period);x=np.asarray(end['state'])
