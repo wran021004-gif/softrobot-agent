@@ -282,3 +282,67 @@ retains 60 seconds. Future plans are proposals only, never dispatched here.
 Nine focused saved-evidence/native checks passed before live recovery; no
 numerical experiment was used. The original failed session, calls and published
 bytes are sealed independently from the successor's accounting and disposition.
+
+### Linked decision recovery delivered
+
+[Recovery delivery](../evidence/research_decision_recovery_20261007/delivery.json),
+[scientific overlap review](../evidence/research_decision_recovery_20261007/overlap_review.json)
+and [independent factual review](../evidence/research_decision_recovery_20261007/independent_factual_review.json)
+retain the original failed campaign unchanged. The outgoing request contains
+seven selected historical records plus both original pilot executions. Full
+records and source pointers are archived. Six recovery checks passed after the
+final implementation changes; four original native checks passed earlier.
+
+The actual full canonical request was 142006 bytes, with a conservative input
+estimate of 150198 against the unchanged shared 160000 input allowance. Provider
+observed input was **44545 tokens**, output **19292**, including **16910 reasoning**;
+cache hit/miss were 4480/40065. The single recovery request completed in
+75.63999999999942 charged seconds and authored a voluntary **STOP**, retaining
+`batch-ebbeadbdaca10732-0`. No protocol correction or transport retry was used.
+No search/diagnosis proposal, candidate execution, numerical experiment, worker
+or second search batch followed. Host closure is recorded separately.
+
+All **24 observations/arithmetic bindings** and **22 top-level citations** resolve
+correctly. The model used the recovered matching failures and a confounded
+passing joint-weight counterexample. Its prose is only partly correct: its
+“largest observed holding-speed margin” claim is contradicted by the supplied
+0.010201160469407439 joint-weight pass and 0.01273567785134029 zero-holding-weight
+pass, both below the incumbent's 0.012750255515948416. The latter is outside the
+new proposal domain but remains observed evidence. Its statement that only
+nominal is executable describes the old pilot allocation; this recovery permits
+**no experiments at all**, and non-stop choices were proposals. Aliases cited for
+that route claim establish acceptance components, not execution permission.
+“One execution per point/no explicit repeat” also requires distinguishing one
+fresh pilot execution from the two saved executions at each matched scientific
+point and zero deliberately planned repetitions. The original scientific answer
+is preserved without rewriting or another paid correction request.
+
+Two local context-compaction preparations failed before provider submission;
+each retains a conservative 30-second reservation charge because elapsed time
+was not sealed. A later request assembly succeeded, and authoritative ledger
+settlement updated working capacity without minting allowance. Initial automatic
+approval rejected the external request; checking the user's explicit provider
+and specific evidence-input instructions resolved that denial on review. No
+request was sent by the denied command, and no workaround was used.
+
+Recovery totals are **1 provider request / 7 charged workflow operations /
+0 backend attempts / 148.25 charged seconds**, zero standalone numerical,
+worker and added experimental-role calls. Combined original-assignment totals
+are **3 requests / 19 workflow operations / 2 backend attempts /
+936.5779999999941 charged seconds**. Known combined provider usage is a partial
+subtotal: 68406 input, 32138 output, 100544 total tokens; original failed `model-1`
+usage and monetary billing remain unknown. Preparation failures are included.
+
+This establishes availability of the selected history, separate scientific-match
+and stricter reuse decisions, and one genuine successor STOP. It does not
+retroactively establish full original autonomy, mathematical justification for
+the original points, a second executed batch, monotonicity/causality, physical
+improvement or robustness. Any new incumbent perturbation validation, numerical
+diagnosis or research campaign needs separate authorization; unused old backend
+slots are not permission.
+
+Reproduction: `python examples/research_decision_recovery.py prepare` creates a
+linked boundary once; `live` runs only a prepared, frozen boundary and records
+the decision without executing it. Completed boundaries reject replay. Full
+allowances remain in the original project Store. `repair-preparation` is an
+explicit pre-provider engineering migration, retaining prior failures/costs.

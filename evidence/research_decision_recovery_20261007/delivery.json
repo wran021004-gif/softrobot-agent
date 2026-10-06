@@ -1,0 +1,1257 @@
+{
+  "version": "research.decision_recovery@1.1.0",
+  "status": "decision_recorded",
+  "stop_reason": "Engineering recovery closed after one accepted proposal/interpretation; no experiment authorized.",
+  "successor": {
+    "index": 1,
+    "kind": "stop",
+    "accepted_decision": {
+      "artifact_id": "7439301e0cacb59e3c13bf86e0852d161f2e42999b7894cdb567519dca73b151",
+      "media_type": "application/json"
+    },
+    "decision": {
+      "capabilities": {
+        "legal": {
+          "control_search": {
+            "domains": {
+              "control/recipe/holding_tip_speed_weight": [
+                0.025,
+                0.1
+              ],
+              "control/recipe/terminal_tip_speed_weight": [
+                0.025,
+                0.1
+              ]
+            },
+            "execution_authorized": false,
+            "method_semantics": {
+              "search.family_coordinate@1.0.0": "Numerically generated continuous coordinate proposals; categorical paths unavailable.",
+              "search.family_explicit@1.0.0": "Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated."
+            },
+            "methods": [
+              "search.family_coordinate@1.0.0",
+              "search.family_explicit@1.0.0"
+            ],
+            "minimum_batch": {
+              "backend_solves": 1,
+              "model_calls": 5,
+              "tool_calls": 9,
+              "wall_s": 1595.0,
+              "worker_calls": 0
+            },
+            "mixed_semantics": "structure_search permits a joint structural/control subset; each ask/tell point constructs all selected values together, followed by one unchanged v7 closed-loop execution. No inner search or extra control budget.",
+            "paths": [
+              "control/recipe/terminal_tip_speed_weight",
+              "control/recipe/holding_tip_speed_weight"
+            ],
+            "proposal_only": true
+          },
+          "diagnosis": {
+            "execution_authorized": false,
+            "max_wall_s": 180,
+            "numerical_gap": "Local controller comparisons require separately bound adoption and saved-horizon prerequisites; no such grant installed in this scheduling context.",
+            "operations": [
+              "retained prediction/plans/motion query"
+            ],
+            "proposal_only": true
+          },
+          "stop": {
+            "execution_authorized": false,
+            "proposal_only": true,
+            "reason": "Voluntary delivery is always legal"
+          },
+          "structure_search": {
+            "domains": {
+              "components/far/length_m": [
+                0.11,
+                0.13
+              ],
+              "components/near/length_m": [
+                0.15,
+                0.17
+              ],
+              "control/recipe/holding_tip_speed_weight": [
+                0.025,
+                0.1
+              ],
+              "control/recipe/terminal_tip_speed_weight": [
+                0.025,
+                0.1
+              ],
+              "design/far_material_scenario": [
+                "baseline",
+                "compliant",
+                "stiff"
+              ],
+              "design/far_section_scale": [
+                0.95,
+                1.05
+              ],
+              "design/near_material_scenario": [
+                "baseline",
+                "compliant",
+                "stiff"
+              ],
+              "design/near_section_scale": [
+                0.95,
+                1.05
+              ]
+            },
+            "execution_authorized": false,
+            "method_semantics": {
+              "search.family_coordinate@1.0.0": "Numerically generated continuous coordinate proposals; categorical paths unavailable.",
+              "search.family_explicit@1.0.0": "Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated."
+            },
+            "methods": [
+              "search.family_coordinate@1.0.0",
+              "search.family_explicit@1.0.0"
+            ],
+            "minimum_batch": {
+              "backend_solves": 1,
+              "model_calls": 5,
+              "tool_calls": 9,
+              "wall_s": 1595.0,
+              "worker_calls": 0
+            },
+            "mixed_semantics": "structure_search permits a joint structural/control subset; each ask/tell point constructs all selected values together, followed by one unchanged v7 closed-loop execution. No inner search or extra control budget.",
+            "paths": [
+              "components/near/length_m",
+              "design/near_section_scale",
+              "design/near_material_scenario",
+              "components/far/length_m",
+              "design/far_section_scale",
+              "design/far_material_scenario",
+              "control/recipe/terminal_tip_speed_weight",
+              "control/recipe/holding_tip_speed_weight"
+            ],
+            "proposal_only": true
+          }
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 2,
+          "tool_calls": 5,
+          "wall_s": 1589.577999999994,
+          "worker_calls": 0
+        },
+        "unavailable": {}
+      },
+      "decision": {
+        "action": "stop",
+        "diagnosis": null,
+        "evidence": [
+          "F113",
+          "F215",
+          "F71",
+          "F75",
+          "F122",
+          "F125",
+          "F146",
+          "F188",
+          "F173",
+          "F227",
+          "F96",
+          "F129",
+          "F131",
+          "F63",
+          "F69",
+          "F156",
+          "F89",
+          "F166",
+          "F7",
+          "F79",
+          "F222",
+          "F174"
+        ],
+        "interpretations": [
+          {
+            "contradicting_evidence": [
+              "F7",
+              "F79"
+            ],
+            "scope": "nominal seed17; holding_tip_speed_weight 0.075 and 0.10 with terminal_tip_speed_weight fixed at 0.05",
+            "statement": "The original first-decision hypothesis is contradicted at nominal: raising control/recipe/holding_tip_speed_weight above the incumbent 0.05 raised, not lowered, holding-window tip speed, while holding position and terminal reach stayed within tolerance.",
+            "supporting_evidence": [
+              "F71",
+              "F75",
+              "F122",
+              "F188",
+              "F173",
+              "F113",
+              "F215",
+              "F125",
+              "F146"
+            ],
+            "uncertainty": "One execution per point; the weight-to-speed relation is not established as monotone or causal; acceptance is a sampled nominal result only."
+          },
+          {
+            "contradicting_evidence": [],
+            "scope": "nominal seed17; replicates of historical holding 0.075 and 0.10 records",
+            "statement": "Both new pilot points replicate prior matched failures at the same scientific configuration identities, adding confirmation of a known failure rather than a new signal.",
+            "supporting_evidence": [
+              "F71",
+              "F89",
+              "F75",
+              "F166"
+            ],
+            "uncertainty": "Repeat and historical records carry different structure identities, so strict result reuse is not claimed; a single repeat does not establish variance."
+          },
+          {
+            "contradicting_evidence": [],
+            "scope": "this scheduling context; nominal-only execution",
+            "statement": "The frozen robustness question under small initial-state variation cannot be resolved by any currently legal executable action, because only the zero-perturbation nominal case is executable and the local numerical saved-state route is a capability gap.",
+            "supporting_evidence": [
+              "F129",
+              "F131",
+              "F63",
+              "F69",
+              "F156"
+            ],
+            "uncertainty": "Capability gap is a factual route claim, not evidence the incumbent would fail under perturbation."
+          },
+          {
+            "contradicting_evidence": [],
+            "scope": "nominal seed17, single retained execution 91c3ba1b01d6499fb26df8f95409401b",
+            "statement": "The incumbent configuration (holding 0.05) remains the accepted nominal deliverable with the largest holding-speed margin observed.",
+            "supporting_evidence": [
+              "F122",
+              "F156"
+            ],
+            "uncertainty": "Single sampled run; margin is not a repeatability, continuous-time or robustness guarantee."
+          }
+        ],
+        "observations": [
+          {
+            "comparison_evidence": null,
+            "evidence": "F71",
+            "operation": "recorded",
+            "value": 0.022128674933740447
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F75",
+            "operation": "recorded",
+            "value": 0.023285947509969908
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F122",
+            "operation": "recorded",
+            "value": 0.012750255515948416
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F113",
+            "operation": "recorded",
+            "value": 0.002633323294646377
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F215",
+            "operation": "recorded",
+            "value": 0.0028347191207395775
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F125",
+            "operation": "recorded",
+            "value": 0.0028109103441942935
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F146",
+            "operation": "recorded",
+            "value": 0.002905756064671871
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F188",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F173",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F227",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F96",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F129",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F131",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F63",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F69",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F156",
+            "operation": "recorded",
+            "value": "accepted"
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F7",
+            "operation": "recorded",
+            "value": 0.010201160469407439
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F79",
+            "operation": "recorded",
+            "value": "accepted"
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F222",
+            "operation": "recorded",
+            "value": 0.01273567785134029
+          },
+          {
+            "comparison_evidence": null,
+            "evidence": "F174",
+            "operation": "recorded",
+            "value": "accepted"
+          },
+          {
+            "comparison_evidence": "F71",
+            "evidence": "F122",
+            "operation": "less_than",
+            "value": true
+          },
+          {
+            "comparison_evidence": "F75",
+            "evidence": "F122",
+            "operation": "less_than",
+            "value": true
+          },
+          {
+            "comparison_evidence": "F89",
+            "evidence": "F71",
+            "operation": "equal",
+            "value": true
+          },
+          {
+            "comparison_evidence": "F166",
+            "evidence": "F75",
+            "operation": "equal",
+            "value": true
+          }
+        ],
+        "plan": null,
+        "reasoning": "The original first decision proposed control_search raising control/recipe/holding_tip_speed_weight from 0.05 to {0.075,0.10} with control/recipe/terminal_tip_speed_weight fixed at 0.05, predicting holding_max_speed_m_s below the incumbent 0.012750255515948416 m/s while keeping holding_max_error_m and terminal_error_m at or below 0.01 m. Both newly completed pilot executions now falsify that direction on the nominal case: the 0.075 point (F75=0.023285947509969908) and the 0.10 point (F71=0.022128674933740447) both exceed the 0.02 m/s holding-speed limit and are the only failing component (F188=false, F173=false), while reach and holding position pass (F129=F131=true; F63=F69=true) and both terminal (F113=0.002633323294646377, F215=0.0028347191207395775) and holding position (F125=0.0028109103441942935, F146=0.002905756064671871) stay under 0.01. So raising the holding penalty raised, not lowered, in-window tip speed; the incumbent (F122=0.012750255515948416, F156=accepted) keeps the best margin. The two pilot points also reproduce the matched historical failures at the same scientific configuration identities (holding 0.075: F75=F166 equal; holding 0.10: F71=F89 equal), so they add replication of a known failure rather than a new signal; the original replication_reason was null and no repetition intent is inferred. The passing joint-weight point (F7=0.010201160469407439, F79=accepted, holding 0.09 with terminal 0.10) is confounded by the simultaneous terminal change and cannot attribute the speed reduction to any single lever. The frozen question concerns robustness to prescribed small initial-state variation, but only the zero-perturbation nominal case is executable here (the four perturbation cases are deferred and the local numerical saved-state route is an explicit capability gap), so no currently legal executable action can address that robustness uncertainty. Given the refuted lever, the unreachable robustness route, and an already-accepted incumbent, further nominal-only spending has little scientific value. This is a voluntary model STOP, not an acceptance/optimality/robustness/causality claim.",
+        "selected_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        },
+        "stop_reason": "Original holding-weight hypothesis falsified by its own pilot outcomes (both higher-weight points fail the holding-speed acceptance that the hypothesis targeted while position/terminal pass); the two points merely replicate known matched failures; the frozen perturbation-robustness question has no legal executable route in this context; and an already-accepted incumbent exists, so further nominal-only evidence has little value. Voluntary model STOP.",
+        "unresolved_uncertainties": [
+          "Whether the incumbent passes any of the four frozen perturbation cases (near_z_plus, near_z_minus, far_y_plus, far_y_minus); none is executable here.",
+          "Whether the near_z_plus valid_failure of the distinct near-section-096 candidate would also occur for the incumbent; the identities differ and no matched comparison exists.",
+          "Which single control lever (if any) can reduce holding-window tip speed without a position or terminal trade-off; the passing higher-weight point F7/F79 changes two weights.",
+          "Repeatability and run-to-run variance for any configuration; no explicit matching repeat is recorded.",
+          "Whether the observed holding-speed increase with higher holding weight is monotone or an artifact of the sampled window."
+        ]
+      },
+      "evidence_selectors": [
+        {
+          "pointer": "/outcomes/0/metrics/terminal_error_m",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": 0.002633323294646377
+        },
+        {
+          "pointer": "/outcomes/1/metrics/terminal_error_m",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": 0.0028347191207395775
+        },
+        {
+          "pointer": "/outcomes/0/metrics/holding_max_speed_m_s",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": 0.022128674933740447
+        },
+        {
+          "pointer": "/outcomes/1/metrics/holding_max_speed_m_s",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": 0.023285947509969908
+        },
+        {
+          "pointer": "/history_evidence/0/metrics/holding_max_speed_m_s",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": 0.012750255515948416
+        },
+        {
+          "pointer": "/outcomes/0/metrics/holding_max_error_m",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": 0.0028109103441942935
+        },
+        {
+          "pointer": "/outcomes/1/metrics/holding_max_error_m",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": 0.002905756064671871
+        },
+        {
+          "pointer": "/outcomes/0/metrics/holding_speed_passed",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": false
+        },
+        {
+          "pointer": "/outcomes/1/metrics/holding_speed_passed",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": false
+        },
+        {
+          "pointer": "/outcomes/0/acceptance/accepted",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": false
+        },
+        {
+          "pointer": "/outcomes/1/acceptance/accepted",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": false
+        },
+        {
+          "pointer": "/outcomes/0/metrics/official_reach_task_success",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": true
+        },
+        {
+          "pointer": "/outcomes/1/metrics/official_reach_task_success",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": true
+        },
+        {
+          "pointer": "/outcomes/0/acceptance/components/holding_position/passed",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": true
+        },
+        {
+          "pointer": "/outcomes/1/acceptance/components/holding_position/passed",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": true
+        },
+        {
+          "pointer": "/history_evidence/0/status",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": "accepted"
+        },
+        {
+          "pointer": "/history_evidence/1/metrics/holding_max_speed_m_s",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": 0.022128674933740447
+        },
+        {
+          "pointer": "/history_evidence/6/metrics/holding_max_speed_m_s",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": 0.023285947509969908
+        },
+        {
+          "pointer": "/history_evidence/2/metrics/holding_max_speed_m_s",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": 0.010201160469407439
+        },
+        {
+          "pointer": "/history_evidence/2/status",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": "accepted"
+        },
+        {
+          "pointer": "/history_evidence/5/metrics/holding_max_speed_m_s",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": 0.01273567785134029
+        },
+        {
+          "pointer": "/history_evidence/5/status",
+          "reference": {
+            "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+            "media_type": "application/json"
+          },
+          "value": "accepted"
+        }
+      ],
+      "feedback": {
+        "artifact_id": "23cc8876105fb98f791b68650c14e7b22d70d317f497ea62ce67015c335575b1",
+        "media_type": "application/json"
+      },
+      "interpretation_bindings": [
+        {
+          "contradiction": [
+            {
+              "pointer": "/history_evidence/2/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.010201160469407439
+            },
+            {
+              "pointer": "/history_evidence/2/status",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": "accepted"
+            }
+          ],
+          "support": [
+            {
+              "pointer": "/outcomes/0/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.022128674933740447
+            },
+            {
+              "pointer": "/outcomes/1/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.023285947509969908
+            },
+            {
+              "pointer": "/history_evidence/0/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.012750255515948416
+            },
+            {
+              "pointer": "/outcomes/0/metrics/holding_speed_passed",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/outcomes/1/metrics/holding_speed_passed",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": false
+            },
+            {
+              "pointer": "/outcomes/0/metrics/terminal_error_m",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.002633323294646377
+            },
+            {
+              "pointer": "/outcomes/1/metrics/terminal_error_m",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.0028347191207395775
+            },
+            {
+              "pointer": "/outcomes/0/metrics/holding_max_error_m",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.0028109103441942935
+            },
+            {
+              "pointer": "/outcomes/1/metrics/holding_max_error_m",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.002905756064671871
+            }
+          ]
+        },
+        {
+          "support": [
+            {
+              "pointer": "/outcomes/0/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.022128674933740447
+            },
+            {
+              "pointer": "/history_evidence/1/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.022128674933740447
+            },
+            {
+              "pointer": "/outcomes/1/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.023285947509969908
+            },
+            {
+              "pointer": "/history_evidence/6/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.023285947509969908
+            }
+          ]
+        },
+        {
+          "support": [
+            {
+              "pointer": "/outcomes/0/metrics/official_reach_task_success",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/outcomes/1/metrics/official_reach_task_success",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/outcomes/0/acceptance/components/holding_position/passed",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/outcomes/1/acceptance/components/holding_position/passed",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": true
+            },
+            {
+              "pointer": "/history_evidence/0/status",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": "accepted"
+            }
+          ]
+        },
+        {
+          "support": [
+            {
+              "pointer": "/history_evidence/0/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.012750255515948416
+            },
+            {
+              "pointer": "/history_evidence/0/status",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": "accepted"
+            }
+          ]
+        }
+      ],
+      "model_interpretations": [
+        {
+          "contradicting_evidence": [
+            "F7",
+            "F79"
+          ],
+          "scope": "nominal seed17; holding_tip_speed_weight 0.075 and 0.10 with terminal_tip_speed_weight fixed at 0.05",
+          "statement": "The original first-decision hypothesis is contradicted at nominal: raising control/recipe/holding_tip_speed_weight above the incumbent 0.05 raised, not lowered, holding-window tip speed, while holding position and terminal reach stayed within tolerance.",
+          "supporting_evidence": [
+            "F71",
+            "F75",
+            "F122",
+            "F188",
+            "F173",
+            "F113",
+            "F215",
+            "F125",
+            "F146"
+          ],
+          "uncertainty": "One execution per point; the weight-to-speed relation is not established as monotone or causal; acceptance is a sampled nominal result only."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "nominal seed17; replicates of historical holding 0.075 and 0.10 records",
+          "statement": "Both new pilot points replicate prior matched failures at the same scientific configuration identities, adding confirmation of a known failure rather than a new signal.",
+          "supporting_evidence": [
+            "F71",
+            "F89",
+            "F75",
+            "F166"
+          ],
+          "uncertainty": "Repeat and historical records carry different structure identities, so strict result reuse is not claimed; a single repeat does not establish variance."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "this scheduling context; nominal-only execution",
+          "statement": "The frozen robustness question under small initial-state variation cannot be resolved by any currently legal executable action, because only the zero-perturbation nominal case is executable and the local numerical saved-state route is a capability gap.",
+          "supporting_evidence": [
+            "F129",
+            "F131",
+            "F63",
+            "F69",
+            "F156"
+          ],
+          "uncertainty": "Capability gap is a factual route claim, not evidence the incumbent would fail under perturbation."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "nominal seed17, single retained execution 91c3ba1b01d6499fb26df8f95409401b",
+          "statement": "The incumbent configuration (holding 0.05) remains the accepted nominal deliverable with the largest holding-speed margin observed.",
+          "supporting_evidence": [
+            "F122",
+            "F156"
+          ],
+          "uncertainty": "Single sampled run; margin is not a repeatability, continuous-time or robustness guarantee."
+        }
+      ],
+      "scientific_reasoning_status": "Model-authored; valid references do not establish causal truth",
+      "unresolved_uncertainties": [
+        "Whether the incumbent passes any of the four frozen perturbation cases (near_z_plus, near_z_minus, far_y_plus, far_y_minus); none is executable here.",
+        "Whether the near_z_plus valid_failure of the distinct near-section-096 candidate would also occur for the incumbent; the identities differ and no matched comparison exists.",
+        "Which single control lever (if any) can reduce holding-window tip speed without a position or terminal trade-off; the passing higher-weight point F7/F79 changes two weights.",
+        "Repeatability and run-to-run variance for any configuration; no explicit matching repeat is recorded.",
+        "Whether the observed holding-speed increase with higher holding weight is monotone or an artifact of the sampled window."
+      ],
+      "verified_observations": [
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/0/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.022128674933740447
+            }
+          ],
+          "operation": "recorded",
+          "value": 0.022128674933740447
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/1/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.023285947509969908
+            }
+          ],
+          "operation": "recorded",
+          "value": 0.023285947509969908
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/history_evidence/0/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.012750255515948416
+            }
+          ],
+          "operation": "recorded",
+          "value": 0.012750255515948416
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/0/metrics/terminal_error_m",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.002633323294646377
+            }
+          ],
+          "operation": "recorded",
+          "value": 0.002633323294646377
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/1/metrics/terminal_error_m",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.0028347191207395775
+            }
+          ],
+          "operation": "recorded",
+          "value": 0.0028347191207395775
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/0/metrics/holding_max_error_m",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.0028109103441942935
+            }
+          ],
+          "operation": "recorded",
+          "value": 0.0028109103441942935
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/1/metrics/holding_max_error_m",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.002905756064671871
+            }
+          ],
+          "operation": "recorded",
+          "value": 0.002905756064671871
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/0/metrics/holding_speed_passed",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "operation": "recorded",
+          "value": false
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/1/metrics/holding_speed_passed",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "operation": "recorded",
+          "value": false
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/0/acceptance/accepted",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "operation": "recorded",
+          "value": false
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/1/acceptance/accepted",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": false
+            }
+          ],
+          "operation": "recorded",
+          "value": false
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/0/metrics/official_reach_task_success",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": true
+            }
+          ],
+          "operation": "recorded",
+          "value": true
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/1/metrics/official_reach_task_success",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": true
+            }
+          ],
+          "operation": "recorded",
+          "value": true
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/0/acceptance/components/holding_position/passed",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": true
+            }
+          ],
+          "operation": "recorded",
+          "value": true
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/1/acceptance/components/holding_position/passed",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": true
+            }
+          ],
+          "operation": "recorded",
+          "value": true
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/history_evidence/0/status",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": "accepted"
+            }
+          ],
+          "operation": "recorded",
+          "value": "accepted"
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/history_evidence/2/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.010201160469407439
+            }
+          ],
+          "operation": "recorded",
+          "value": 0.010201160469407439
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/history_evidence/2/status",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": "accepted"
+            }
+          ],
+          "operation": "recorded",
+          "value": "accepted"
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/history_evidence/5/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.01273567785134029
+            }
+          ],
+          "operation": "recorded",
+          "value": 0.01273567785134029
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/history_evidence/5/status",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": "accepted"
+            }
+          ],
+          "operation": "recorded",
+          "value": "accepted"
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/history_evidence/0/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.012750255515948416
+            },
+            {
+              "pointer": "/outcomes/0/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.022128674933740447
+            }
+          ],
+          "operation": "less_than",
+          "value": true
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/history_evidence/0/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.012750255515948416
+            },
+            {
+              "pointer": "/outcomes/1/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.023285947509969908
+            }
+          ],
+          "operation": "less_than",
+          "value": true
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/0/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.022128674933740447
+            },
+            {
+              "pointer": "/history_evidence/1/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.022128674933740447
+            }
+          ],
+          "operation": "equal",
+          "value": true
+        },
+        {
+          "evidence_selectors": [
+            {
+              "pointer": "/outcomes/1/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.023285947509969908
+            },
+            {
+              "pointer": "/history_evidence/6/metrics/holding_max_speed_m_s",
+              "reference": {
+                "artifact_id": "c28e635c46f98b839a59cdd7571f68fd426cefd5f5e2869bcc4949d6efaf5eb8",
+                "media_type": "application/json"
+              },
+              "value": 0.023285947509969908
+            }
+          ],
+          "operation": "equal",
+          "value": true
+        }
+      ]
+    },
+    "proposal_only": true,
+    "execution_dispatched": false
+  },
+  "original_campaign_status": "failed",
+  "proposal_only": true,
+  "execution_dispatched": false,
+  "recovery_usage": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 3,
+      "tool_calls": 12,
+      "wall_s": 1800.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 7,
+      "model_calls": 1,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 148.25
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 2,
+      "tool_calls": 5,
+      "wall_s": 1651.75,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "combined_usage": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 12,
+      "tool_calls": 40,
+      "wall_s": 16000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 19,
+      "model_calls": 3,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 936.5779999999941
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 9,
+      "tool_calls": 21,
+      "wall_s": 15063.422000000006,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  }
+}

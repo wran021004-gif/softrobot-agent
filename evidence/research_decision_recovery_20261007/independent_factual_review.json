@@ -1,0 +1,207 @@
+{
+  "version": "research.decision_recovery@1.1.0",
+  "accepted_decision": {
+    "artifact_id": "7439301e0cacb59e3c13bf86e0852d161f2e42999b7894cdb567519dca73b151",
+    "media_type": "application/json"
+  },
+  "original_model_answer_unchanged": true,
+  "validation": {
+    "valid_native_successor": true,
+    "verified_observations": 24,
+    "resolved_top_level_citations": 22,
+    "all_observation_values_and_arithmetic_correct": true,
+    "native_citations_resolve": true,
+    "semantic_support_not_automatic": true
+  },
+  "model_action": {
+    "action": "stop",
+    "voluntary": true,
+    "selected_candidate": {
+      "candidate_id": "batch-ebbeadbdaca10732-0",
+      "configuration": {
+        "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "media_type": "application/json"
+      },
+      "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+      "owner_run_id": "batch-ebbeadbdaca10732-0"
+    },
+    "proposed_batch": null,
+    "executed_backend": null,
+    "engineering_closure_is_separate": true
+  },
+  "facts_and_scope_fully_correct": false,
+  "issues": [
+    {
+      "claim": "Incumbent has the largest observed holding-speed margin / keeps the best margin.",
+      "verdict": "contradicted by supplied and cited evidence",
+      "incumbent_speed_m_s": 0.012750255515948416,
+      "lower_observed_speeds": [
+        {
+          "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+          "holding_weight": 0.09,
+          "terminal_weight": 0.1,
+          "speed_m_s": 0.010201160469407439
+        },
+        {
+          "execution_id": "bebcfd47274940fb88a55ce5a2457c4c",
+          "holding_weight": 0.0,
+          "terminal_weight": 0.05,
+          "speed_m_s": 0.01273567785134029
+        }
+      ],
+      "qualification": "Retention of incumbent may still be a model judgment; it cannot be justified by a global largest observed margin claim. Zero holding weight is outside the new proposal domain but remains observed evidence."
+    },
+    {
+      "claim": "Only nominal is executable here; no currently legal executable action can resolve robustness.",
+      "verdict": "current permissions overstated and supporting aliases do not substantiate this route claim",
+      "scope": "This recovery authorizes zero experiments or diagnostic reads. All non-stop decisions are proposals. Nominal-only allocation describes the original pilot, not executable recovery permission.",
+      "source": "prepared_request.json: decision_recovery.policy and capabilities.legal.*.proposal_only"
+    },
+    {
+      "claim": "One execution per point / no explicit matching repeat.",
+      "verdict": "needs qualification",
+      "scope": "One fresh pilot execution per selected point; two saved executions per matched scientific point including history. Zero deliberately planned repetitions, with original purpose null.",
+      "source": "overlap_review.json"
+    },
+    {
+      "claim": "Higher holding penalty raised rather than lowered speed.",
+      "verdict": "supports sampled association only",
+      "scope": "Both selected points fail sampled holding speed versus retained incumbent; monotonicity and causal attribution remain unverified, as the model also acknowledges."
+    }
+  ],
+  "per_metric_overlap": {
+    "holding_075": "Holding maximum speed equal; both position metrics differ.",
+    "holding_100": "All three retained aggregate metrics equal; full trajectories/timing not compared."
+  },
+  "judgments": {
+    "history_available": "supported for the explicit bounded selection",
+    "scientific_match_vs_reuse": "supported; two matched points; strict reuse not claimed",
+    "genuine_successor_decision": "supported: one real configured request chose STOP",
+    "numeric_binding": "supported",
+    "prose_factual_scope": "partly incorrect as listed; original answer retained",
+    "mathematical_selection": "unverified; no new numerical experiment or applicable quantified selection proof",
+    "multi_round_experiment_execution": "unverified; no second executed batch",
+    "physical_improvement": "unsupported"
+  },
+  "corrections_or_transport_retries": 0,
+  "requests": [
+    {
+      "request_id": "model-0",
+      "status": "completed",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 75.63999999999942,
+        "worker_calls": 0
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model-transport",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 0,
+          "wall_s": 75.63999999999942,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "7881100970d64c4ba122d90439ee1d40",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "66a6d52edb6f2c82d47a040f01483002917a47c31e7411dd9969a33123d95d3a",
+          "media_type": "application/json"
+        },
+        "request_id": "model-0",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "model.deepseek",
+        "tool_version": "6.0.0"
+      }
+    }
+  ],
+  "known_recovery_provider_usage": {
+    "completion_tokens": 19292,
+    "completion_tokens_details": {
+      "reasoning_tokens": 16910
+    },
+    "prompt_cache_hit_tokens": 4480,
+    "prompt_cache_miss_tokens": 40065,
+    "prompt_tokens": 44545,
+    "prompt_tokens_details": {
+      "cached_tokens": 4480
+    },
+    "total_tokens": 63837
+  },
+  "known_combined_usage": {
+    "prompt_tokens": 68406,
+    "completion_tokens": 32138,
+    "total_tokens": 100544,
+    "reasoning_tokens": 27112
+  },
+  "unknown_usage": [
+    "Original failed model-1 has unknown provider token usage; known combined totals are partial.",
+    "Monetary charges were not supplied; no billing total inferred."
+  ],
+  "recovery_usage": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 3,
+      "tool_calls": 12,
+      "wall_s": 1800.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 7,
+      "model_calls": 1,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 148.25
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 2,
+      "tool_calls": 5,
+      "wall_s": 1651.75,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "combined_usage": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 12,
+      "tool_calls": 40,
+      "wall_s": 16000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 19,
+      "model_calls": 3,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 936.5779999999941
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 9,
+      "tool_calls": 21,
+      "wall_s": 15063.422000000006,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "engineering_failed_preparation": {
+    "calls": [
+      "prelive-context-compaction",
+      "prelive-context-compaction-v2"
+    ],
+    "charge_basis": "Each unsealed local compaction failure conservatively retained full 30s reserve; elapsed duration unknown. No provider request was sent by these failed preparations."
+  },
+  "next_permission": "Any new perturbation validation, numerical diagnosis or research campaign requires separate authorization; unused original backend slots are not permission."
+}

@@ -1,4 +1,24 @@
-# Current development status - Milestones 4 and 5, 2026-10-06
+# Current development status - Milestones 4 and 5, 2026-10-07
+
+The [linked decision-only recovery](research_native_pilot.md#linked-decision-recovery-delivered)
+has completed without new simulations. Historical coverage now includes seven
+explicitly selected records and both pilot executions; both pilot points match
+previously evaluated scientific configurations. They remain fresh charged
+executions with zero recorded deliberate repetition purposes. The earlier
+“no repetitions” wording is qualified accordingly; original sealed evidence is
+unchanged. Strict result reuse is evaluated separately from scientific identity.
+
+One configured DeepSeek request authored a voluntary STOP and retained the
+incumbent. All 24 observations and 22 citations resolve, but prose claims about
+the largest observed speed margin and nominal execution permission are partly
+incorrect; the model answer was preserved. Recovery used 1 request, 7 workflow
+operations, 148.25 charged seconds, zero backend/numerical/worker calls. Combined
+assignment usage is 3 requests, 19 operations, 2 backends, 936.5779999999941 charged
+seconds. The known token subtotal is 100544; original failed-request usage is
+unknown. No second batch or physical improvement was demonstrated. Any future
+perturbation execution requires separate authorization.
+
+The following account describes the sealed original campaign of 2026-10-06.
 
 The [native first-study pilot](research_native_pilot.md) ran after direct chat
 authorization. DeepSeek's first native request selected explicit holding-speed
