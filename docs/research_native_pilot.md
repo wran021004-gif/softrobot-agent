@@ -85,6 +85,40 @@ needs connected builder declarations, mutation, compatibility, rebuild and
 candidate-bound evidence before a new shared campaign version. The eight-variable
 pilot does not complete that backlog. Formal comparisons remain deferred.
 
-Live observations and separate evidence judgments will be recorded below after
-the bounded attempt; operational completion alone cannot establish improvement,
-causality, compression benefit, robustness or superiority over the fixed baseline.
+The live command was rejected twice by automatic approval **before process
+launch**, including one reconsideration with attachment authorization excerpts,
+exact endpoint and secret-checked request metadata. The final stated reason was
+that the chat authorized reading the attachment, not following its external
+transfer instructions. No alternative model, indirect execution or third
+submission was attempted. Specific chat authorization is pending. The prepared
+campaign remains unexecuted; this is not a model-authored voluntary STOP.
+
+The [delivery](../evidence/research_native_v1_20261006/delivery.json),
+[denial record](../evidence/research_native_v1_20261006/platform_approval_denial.json),
+[actual prepared wire request](../evidence/research_native_v1_20261006/round0_request.json)
+and [five judgments](../evidence/research_native_v1_20261006/evidence_judgments.json)
+retain the exact input, scoped source manifests, working-state checkpoints,
+receipt and failures. The input prepared for review is 91162 UTF-8 bytes;
+conservative token estimates are not provider-observed usage. There are **zero
+real model calls, responses, model decisions, backend attempts or repetitions**.
+No provider token count or live factual-quality result is available. Charged
+campaign usage is one preparation workflow operation / 0.4370000000053551 s,
+zero model/backend/standalone numerical/worker operations. Focused checks and
+packaging remain separately identified offline engineering work.
+
+All five live scientific questions remain unexercised or unsupported: model
+catalog discovery, mathematical evidence influencing a live choice, execution
+feedback influencing the next decision, live factual reporting, and robot
+improvement. Engineering checks support the catalog/native validation bridge and
+correct acceptance in next-request assembly; they do not replace live evidence.
+The additional two historical scheduling checks could not start because Windows
+private temporary-directory ACLs denied access; they made zero model/backend
+calls. The three native checks passed again after checkpoint recovery changes.
+
+The executed-code baseline for the prepared campaign is
+`6b621323f8131f94dc7d2bd12c7bb45ab2da6dc9`. No executed robot implementation
+identity exists for this campaign. Once specific external-transfer authorization
+is recognized, the next bounded step is this same initial native request and
+original cumulative ledger, with no reset or allocation increase. Until then,
+live planning, subsequent decisions, closed-loop execution and live input-quality
+review remain unfinished. Mainline 3 and formal comparisons stay deferred.

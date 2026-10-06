@@ -1,5 +1,19 @@
 # Current development status - Milestones 4 and 5, 2026-10-06
 
+The [new native first-study pilot](research_native_pilot.md) connects the real
+`research.decide` schema/validator to the eight-variable catalog, joint mixed
+structural/control batch semantics, shared working request/state and unified
+intermediate acceptance. Nine focused checks pass; three native checks pass again
+after checkpoint recovery integration. The exact incumbent and completed shared
+development failure retain original provenance. A new four-backend cumulative
+pilot is frozen, with nominal seed17 fixed before outcomes. **Live execution was
+rejected by automatic approval before launch**, twice including a documented
+reconsideration. Specific external-transfer authorization is pending. Actual use
+is zero model / zero backend / one preparation operation / 0.437 charged seconds;
+no scientific improvement or live model-quality result is claimed. Formal 28-run
+and three-group comparisons, the Mainline 3 backlog, roadmap and protected old
+M5 slots are untouched. Earlier evidence and closures below remain historical.
+
 The independently authorized [final shared-path development validation](research_shared_path_validation.md)
 completed on frozen implementation `c80d331691b1a0f9d683049f1b09480c8bd62319`.
 Execution `8b8ce2691fc24b3392ff5e7fa4905ba4` used the reviewed near scale 0.96,
