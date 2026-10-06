@@ -1,0 +1,45 @@
+{
+  "passed": false,
+  "model_report_identity": "d7037eb70416884c70bb7820ee6d4cc6be9b3c948552dc5d90286742806749c7",
+  "stage": "claim-specific scientific review",
+  "claim_checks": [
+    {
+      "actual_claim": "Exact references, comparisons, structure groups, repeat links and selected/latest bindings",
+      "source": "rendering0.json; ledger0.json",
+      "passed": true
+    },
+    {
+      "actual_claim": "New pass improves holding speed while worsening both position metrics",
+      "source": "ledger0.json#/facts",
+      "passed": true
+    },
+    {
+      "actual_claim": "Single equal aggregate repeat, unequal recorded mean timing, no broad repeatability claim",
+      "source": "ledger0.json#/replications; rendering0.json",
+      "passed": true
+    },
+    {
+      "actual_claim": "Backend-capacity STOP, no realtime or causal guarantee",
+      "source": "ledger0.json#/usage; #/stop; #/facts",
+      "passed": true
+    },
+    {
+      "actual_claim": "The latter two are evidence-projection defects",
+      "source": "evidence/milestone4_reporting_scientific_20261006/interpretation1_request.json; review1.json",
+      "passed": false,
+      "assessment": "Geometry attribution error and numerical attribution error are model-authored reporting errors. Earlier missing structure metadata is a documented projection defect, but the latest actual request already supplied the correct numerical record. Do not attribute both errors to evidence projection."
+    },
+    {
+      "actual_claim": "Original exact geometry unresolved because compact definition is empty",
+      "source": "source_archive.json#/bindings",
+      "passed": true,
+      "assessment": "True about incomplete compact input, but exact physical definitions exist in immutable source. Enrich input, not guess geometry."
+    }
+  ],
+  "specific_contradictions": [
+    "Distinguish model-authored geometry/numeric reporting errors from the earlier input metadata omission; correct numbers were present in the latest request. No proven internal cause.",
+    "The compact packet omitted original physical component definitions. A source-bound enrichment will provide actual near/far dimensions, sections and physics; inherited group names do not establish which actual arm is shorter.",
+    "Include a bound terminal_error_m claim for the affected original-geometry execution a8382f8a4c6e4ebe921fb72f821b2188 so the repaired numerical attribution is reviewable. Do not retype its number.",
+    "State conditional closure qualification: multibatch scientific behavior passed originally; factual reporting passes only after the reviewed versioned post-run repair."
+  ]
+}

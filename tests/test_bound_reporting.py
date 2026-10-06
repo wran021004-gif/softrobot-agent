@@ -1,10 +1,17 @@
 from copy import deepcopy
 from unittest import TestCase
-from tools.bound_reporting import ledger,render
+from tools.bound_reporting import ledger,render,render_text
 from tools.state_io import read
 from pathlib import Path
 
 class BoundReportTests(TestCase):
+    def test_diagnostic_tokens_preserve_wrong_reference_and_reject_unresolved(self):
+        facts=dict(a=dict(value=.2,unit='s',source='case-a'),b=dict(value=.3,unit='s',source='case-b'))
+        r=dict(report='Interval {{b}}.',recommendation='Retain diagnosis.',unresolved=[])
+        out=render_text(r,facts)
+        self.assertIn('0.3 s',out['rendered']['report']);self.assertEqual(out['provenance'][0]['binding']['source'],'case-b')
+        r['report']='Interval {{missing}}.'
+        with self.assertRaisesRegex(ValueError,'UNRESOLVED'):render_text(r,facts)
     def setUp(self):
         p=Path(__file__).resolve().parents[1]/'evidence/milestone4_reporting_scientific_20261006/prepared_packet.json'
         self.packet=ledger(read(p)['summary'])
@@ -38,6 +45,7 @@ class BoundReportTests(TestCase):
         self.assertEqual(a['scientific_configuration_identity'],b['scientific_configuration_identity'])
 
     def test_exact_and_rounded_render_and_comparison(self):
+        self.assertTrue(all(f['unit']=='N' for f in self.packet['facts'].values() if f['metric']=='force_bound_violation_n'))
         self.report['claims']=[self.claim('a8382f8a4c6e4ebe921fb72f821b2188')]
         output=render(self.report,self.packet)
         self.assertIn('0.008117263030117125',output['rendered']);self.assertIn('0.00811726',output['rendered'])

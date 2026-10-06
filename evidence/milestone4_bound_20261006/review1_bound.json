@@ -1,0 +1,34 @@
+{
+  "passed": false,
+  "model_report_identity": "f6d9ddb1a453b959e97a2665e9bed80a93c300be890a71fa86884422c18e5168",
+  "claim_checks": [
+    {
+      "actual_claim": "All numeric references, corrected affected terminal metric, exact comparisons, geometry and repeat identities",
+      "source": "rendering1.json; ledger.json",
+      "passed": true
+    },
+    {
+      "actual_claim": "Conditional closure qualification, selected/latest and backend-capacity STOP",
+      "source": "ledger.json#/selected; #/latest; #/usage; #/stop",
+      "passed": true
+    },
+    {
+      "actual_claim": "There are distinct historical passes OTHER THAN the incumbent",
+      "source": "ledger.json#/executions/*/observation_phase; #/facts/*/joint_reach_holding_passed",
+      "passed": false,
+      "assessment": "Within the shortened group only bebcfd is another historical joint pass besides incumbent91c3. There are two historical passing weight pairs total, not multiple historical passes besides incumbent."
+    },
+    {
+      "actual_claim": "New passing points: each improves speed while worsening both position metrics",
+      "source": "ledger.json#/executions/*/observation_phase",
+      "passed": false,
+      "assessment": "Only148a2 is an updated-campaign joint pass. bebcfd is frozen background. Its trade-off is real, but calling both new passes misattributes observation phase."
+    }
+  ],
+  "specific_contradictions": [
+    "Exactly two shortened-group historical joint passing configurations TOTAL: bebcfd47274940fb88a55ce5a2457c4c and retained incumbent91c3ba1b01d6499fb26df8f95409401b. Thus only ONE historical joint pass other than incumbent, not plural passes other than incumbent.",
+    "Exactly ONE updated-campaign new joint pass:148a2a290daa440f9b966f4d5cee4b5f. Describe its verified speed/position trade-off in the singular. The other compared pass bebcfd is historical, not new. Do not merge those phases.",
+    "Retain corrected affected terminal reference, reporting-error versus input-omission distinction, narrow repeat scope, capacity STOP and conditional closure. Describe metadata omission in post-run reporting, not as a demonstrated cause of scientific campaign difficulties.",
+    "This is the final allowed correction. Every original response remains preserved; no scientific work or extra attempt is available."
+  ]
+}

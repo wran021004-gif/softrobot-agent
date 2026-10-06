@@ -1,11 +1,15 @@
 # M4 evidence-bound reporting successor — 2026-10-06
 
-The reporting supplement remains **open**. The new contract and focused offline
-checks are complete; a genuine model-authored interpretation has not executed.
-Automatic approval rejected the first provider command before process launch,
-because it did not accept the external-transmission authorization in the attached
-task as direct chat authorization. A direct chat confirmation is pending. There
-is no new provider response, fabricated interpretation or scientific rerun.
+The reporting supplement is **closed after recorded post-run repair under
+`evidence_bound_reporting@3.0.0`**. Multibatch scientific behavior passed in the
+original run; factual reporting passed only after this reviewed, versioned repair.
+No earlier free-text response is retroactively made correct.
+
+Automatic approval initially rejected the provider command before process launch.
+The user then explicitly authorized the configured M4/M5 technical-data transfer
+and billable requests in chat. Three genuine provider responses ran under this new
+grant. Their original requests/responses, bound representations, rendering
+provenance and reviews are retained. No scientific rerun occurred.
 
 The actual preceding saved request, response and review were inspected. Execution
 `a8382f8a4c6e4ebe921fb72f821b2188` has terminal error
@@ -26,6 +30,22 @@ does not repair a wrong reference or establish the truth of free interpretation.
 A separate claim-specific review is required before a superseding report can close
 the supplement. The new contract does not retroactively correct earlier prose.
 
+The first response passes numeric binding but incorrectly categorizes both
+model-authored attribution errors as projection defects; its compact input also
+lacked the original group's physical component definitions. One reporting-only
+engineering repair supplied immutable dimensions/sections/material data and kept
+the first ledger. The second response corrects attribution but overcounts historical
+passes besides the incumbent and calls both a historical pass and the new pass
+new. Its review fails. The final targeted correction accurately separates the two
+historical shortened-group passes total from the single updated new pass, correctly
+renders the affected terminal metric, and passes claim-specific review of replication,
+geometry, trade-offs, timing, selection/latest and exhausted backend capacity.
+
+Inherited group labels are retained for continuity; they do not imply physical
+length order. Exact archived configuration shows near/far lengths of 0.15/0.11 m
+for the original group and 0.16/0.11 m for the other group. The source identities,
+not labels or equal control weights, bind these outcomes.
+
 Four focused offline checks pass: cross-execution swaps, equal weights across
 different structures, matching scientific replication despite different execution
 IDs, and exact/rounded rendering with contradictory comparison rejection. Full
@@ -34,13 +54,23 @@ normalizes shared execution/source metadata instead of repeating it for each
 metric. The previous working service, model, thinking/reasoning, output/context
 settings and verified TLS transport are retained, without `tool_choice=required`.
 
-The separate grant uses one workflow call, **0 provider attempts, 0 backend or
-controller/numerical work, 0.063 charged seconds**. The platform denial did not
-launch a process and therefore incurred no provider receipt. Three provider
-attempts, eleven workflow calls and 1199.937 seconds remain. Original scientific
+The separate grant uses **3 provider attempts, 8 workflow calls, 189.548 charged
+seconds, 0 backend/controller/numerical work**. Both targeted corrections consume
+this same grant. The platform denial did not launch a process and incurred no
+provider receipt. No provider attempts remain; four workflow calls and 1010.452
+seconds remain unused in the sealed reporting scope. Original scientific
 STOP, selected incumbent, multibatch success and every failed report are preserved.
 
-See the [compact prepared request](../evidence/milestone4_bound_20261006/interpretation0_request.json),
+Normal remote publication was separately rejected before execution because the
+reviewer did not recognize attachment authorization for the evidence/source-archive
+export. The earlier offline checkpoint is local commit `8a627e5`; normal publication
+awaits direct chat confirmation. This restriction is distinct from the now-authorized
+provider request path.
+
+See the [final model-authored rendered report](../evidence/milestone4_bound_20261006/rendered_report2.md),
+[final factual review](../evidence/milestone4_bound_20261006/review2.json),
+[qualified superseding closure](../evidence/milestone4_bound_20261006/linked_superseding_report.json),
+[final request](../evidence/milestone4_bound_20261006/interpretation2_request.json),
 [expanded ledger](../evidence/milestone4_bound_20261006/ledger.json),
 [offline checks](../evidence/milestone4_bound_20261006/offline_checks.json),
 [denial record](../evidence/milestone4_bound_20261006/platform_rejection.json) and

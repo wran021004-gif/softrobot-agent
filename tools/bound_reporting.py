@@ -20,6 +20,26 @@ def model_packet(packet):
     return result
 
 
+def render_text(report,facts):
+    """Bound quantitative tokens for the compact diagnostic interpretation."""
+    provenance=[]
+    def paragraph(text):
+        tokens=re.findall(r'\{\{([^{}]+)\}\}',text)
+        remaining=re.sub(r'\{\{[^{}]+\}\}','',text)
+        if re.search(r'\d',remaining):raise ValueError('UNBOUND_NUMBER_IN_PROSE')
+        if '{' in remaining or '}' in remaining:raise ValueError('MALFORMED_BOUND_TOKEN')
+        for key in tokens:
+            if key not in facts:raise ValueError('UNRESOLVED_FACT')
+            f=facts[key]
+            provenance.append(dict(key=key,binding=f))
+            text=text.replace('{{'+key+'}}',f"{f['value']!r} {f['unit']}")
+        return text
+    output={k:paragraph(report[k]) for k in ('report','recommendation')}
+    output['unresolved']=[paragraph(t) for t in report['unresolved']]
+    return dict(version=VERSION,report_identity=digest(report),fact_identity=digest(facts),
+        provenance=provenance,rendered=output,interpretation_verified=False)
+
+
 def ledger(summary):
     facts = {}
     executions = []
@@ -32,7 +52,7 @@ def ledger(summary):
         for name, value in row['metrics'].items():
             if not isinstance(value, (int, float, bool)):
                 continue
-            unit = 'm/s' if name.endswith('_m_s') else 'm' if name.endswith('_m') else 's' if name.endswith('_s') else '1'
+            unit = 'm/s' if name.endswith('_m_s') else 'm' if name.endswith('_m') else 's' if name.endswith('_s') else 'N' if name.endswith('_n') else '1'
             artifact = source['evaluation'] if name == 'terminal_error_m' else source['profile']
             binding = dict(execution_id=eid, metric=name, unit=unit,
                            structure_identity=row['structure_identity'],

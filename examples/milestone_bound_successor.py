@@ -31,6 +31,8 @@ def host(root):
 
 def operation(root,name,fn,reserve=120.,provider=False):
     if (root/'checkpoint_seal.json').exists():raise ValueError('SUCCESSOR_SEALED')
+    if root==M5 and (root/'scientific_stop.json').exists() and name.startswith(('local_','measure8_','forecast_','backend_')):
+        raise ValueError('SCIENTIFIC_DEVELOPMENT_STOPPED_NO_NEW_NUMERICS')
     h=host(root)
     if h.store.lookup(h.run_id,name):raise ValueError('NO_REPLAY')
     if h.store.remaining()['remaining']['wall_s']<reserve+60.:raise ValueError('DELIVERY_RESERVE')
@@ -90,6 +92,13 @@ def prepare4():
     from examples.milestone4_reporting_scientific import build_packet,protected_hashes
     from tools.bound_reporting import ledger
     packet,bindings,history=build_packet();compact=ledger(packet['summary'])
+    for binding in bindings:
+        robot=binding['configuration']['effective']['robot'];identity=digest(robot)
+        definition=dict(components=[{k:c[k] for k in ('id','length_m','sections','physics')}
+            for c in robot['structure']['data']['components'] if c['kind']=='flexible_segment'],
+            source_configuration=binding['candidate']['configuration'],
+            group_name_scope='Original/shortened are inherited group labels; physical dimensions and identity are authoritative, not a claim of length order between groups.')
+        if identity in compact['structure_definitions']:compact['structure_definitions'][identity]=definition
     compact['failures']=dict(connection='Prior connection refusal',client='Incompatible required tool choice with thinking',
         geometry='Original geometry pass attributed to shortened geometry',numerical='Terminal metric attributed across execution IDs; correct source retained in ledger')
     atomic_json(M4/'ledger.json',compact);atomic_json(M4/'source_archive.json',dict(packet=packet,bindings=bindings,history=history))
@@ -100,6 +109,7 @@ def prepare4():
 def provider4(index,prepare_only=False):
     from tools.runtime_identity import require_softagent_runtime
     require_softagent_runtime()
+    if index not in (0,1,2):raise ValueError('THREE_ATTEMPT_BOUND')
     from examples.milestone45_checkpoint import reporting_payload
     from examples.gvs_nmpc_route_experiment import load_credential
     from tools.model_transports.deepseek import request_completion
@@ -108,7 +118,9 @@ def provider4(index,prepare_only=False):
     packet=model_packet(read(M4/'ledger.json'))
     instructions='''Author a standalone interpretation of the stopped autonomous supplement under evidence_bound_reporting@3.0.0. Read ALL compact execution facts including original geometry counterexamples. Every quantitative assertion must be a structured claim referencing a fact_ref with its exact execution_id and metric; use comparison_ref and less/greater/equal for comparisons, recorded otherwise. Renderer prints the value you reference, never fixes wrong selections or references. Do not type ANY digit in interpretation/recommendation/unresolved prose; put execution IDs only in structured fields. Select facts worth discussing freely. Include the original geometry matching-weight pass, the distinct shortened historical passes, new passing-point tradeoffs versus retained incumbent, replication metrics, timing. Provide geometry_groups for all executions. Replications must match actual source/repeat IDs; only aggregate metric repeat, not broad variability or trajectories/timing. Retain selected versus latest. Stop was exhausted backend capacity for another complete search, not reporting cost. Distinguish four historical failure causes. Describe evidence projection defects as possible contributors, not proven internal mechanisms. Preserve all scientific STOPs and do not request scientific work. Explain that closure needs this versioned post-run repair and does not retroactively correct earlier text. Submit report_interpretation once.'''
     if index:
-        packet=dict(**packet,correction=read(M4/f'review{index-1}.json'),previous=read(M4/f'interpretation{index-1}.json'))
+        prior=read(M4/f'review{index-1}.json')
+        if prior['passed']:raise ValueError('NO_CORRECTION_AFTER_PASS')
+        packet=dict(**packet,correction=prior,previous=read(M4/f'interpretation{index-1}.json'))
     payload=reporting_payload(config,packet,instructions)
     string=dict(type='string')
     claim=dict(type='object',properties=dict(execution_id=string,metric=string,fact_ref=string,comparison_ref=string,
