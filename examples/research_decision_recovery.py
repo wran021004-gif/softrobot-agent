@@ -161,6 +161,36 @@ def outgoing(w,name):
     return adapter
 
 
+def refresh_preparation(directory=DIRECTORY):
+    """Explicit pre-provider engineering boundary; no reset or failed replay."""
+    w=restore(directory)
+    if w.status!='prepared' or w.store.remaining(w.host.run_id)['used']['model_calls']:
+        raise ValueError('PRE_PROVIDER_PREPARATION_REPAIR_ONLY')
+    old=pilot.save(w.store,w.freeze)
+    verify_seals(w)
+    if not w.host.compatibility()['compatible']:raise ValueError('NEW_SESSION_VERSION_BOUNDARY_REQUIRED')
+    row,_=w.store.reserve(w.host.run_id,'prelive-context-compaction',digest(dict(old=old,version=VERSION)),
+        'engineering',{**zero(),'tool_calls':1,'wall_s':30.});started=time.monotonic()
+    boundary=dict(kind='pre_provider_context_compaction',original_freeze=old,provider_requests_before=0,
+        allowance_reset=False,original_preparation_charge_retained=True,
+        reason='Complete actual wire exceeded shared 160000-token conservative input allowance; remove duplicated definitions and offload original plan details with exact archive pointers. No fact, provider setting or scientific threshold changed.',
+        before_implementation=w.freeze['implementation'],after_implementation=pilot.revision())
+    atomic_json(w.directory/'prelive_context_boundary.json',boundary)
+    w.freeze['recovery_boundary']['prelive_context_boundary']=pilot.save(w.store,boundary)
+    w.freeze['implementation']=pilot.revision()
+    w.freeze['recovery_files']={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in FILES}
+    pilot.configure(w);pilot.persist(w)
+    outgoing(w,'prepared_request.json')
+    w.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller='engineering',
+        tool_id='engineering.context_compaction',tool_version='1.0.0',execution_status='completed',charged=zero()),
+        boundary,time.monotonic()-started)
+    # Persist reduced remaining capacity; all earlier charges stay in one ledger.
+    pilot.configure(w);pilot.persist(w);outgoing(w,'prepared_request.json')
+    atomic_json(w.directory/'freeze_seal.json',dict(identity=digest(w.freeze),before_first_live_request=True,
+        earlier_freeze_preserved=old))
+    verify_seals(w)
+
+
 def verify_seals(w):
     boundary=w.freeze['recovery_boundary']
     if failed_session_seal(w.store,boundary['original_host'])!=boundary['original_session_seal']:raise ValueError('ORIGINAL_FAILED_SESSION_CHANGED')
@@ -276,7 +306,8 @@ def export(w):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('action',choices=['prepare','live','export']);args=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('action',choices=['prepare','repair-preparation','live','export']);args=p.parse_args()
     if args.action=='prepare':prepare()
+    elif args.action=='repair-preparation':refresh_preparation()
     elif args.action=='live':live()
     else:export(restore())

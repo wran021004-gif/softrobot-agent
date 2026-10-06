@@ -248,7 +248,8 @@ def _research(packet, authority, archive):
     def selected_aliases(aliases):
         selected={a:r for a,r in aliases.items() if a in required_aliases or
             ((('/metrics/' in r['pointer'] and '/source/' not in r['pointer'] and '/coverage/' not in r['pointer']) or
-              '/acceptance/' in r['pointer'] or '/candidate_minus_baseline/' in r['pointer'] or r['pointer'].endswith(('/classification','/status','/stop_reason'))))}
+              ('/acceptance/' in r['pointer'] and r['pointer'].endswith(('/accepted','/passed','/status'))) or
+              '/candidate_minus_baseline/' in r['pointer'] or r['pointer'].endswith(('/classification','/status','/stop_reason'))))}
         # Initial handoffs have no outcome wrapper; preserve that exact handoff.
         return selected or aliases
     feedback['aliases']=selected_aliases(feedback['aliases'])

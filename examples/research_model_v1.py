@@ -267,6 +267,12 @@ def configure(w):
     boundary=w.freeze.get('recovery_boundary')
     packet['decision_recovery']=({k:v for k,v in boundary.items() if not k.endswith('_seal') and k!='old_implementation'}
         | dict(old_implementation_commit=boundary['old_implementation']['commit'])) if boundary else None
+    if boundary:
+        original=boundary['original_action'];plan=original.get('plan') or {}
+        packet['decision_recovery']['original_action']=dict(action=original['action'],reasoning=original['reasoning'],
+            plan={k:plan.get(k) for k in ('source_candidate','variables','method','candidates','replication_reason',
+                'hypothesis','scientific_promise','stop_criteria')},
+            complete_original_decision=boundary['first_decision'])
     event=w.freeze['subsequent_event']
     packet['study']['subsequent_event']=dict(candidate=event['facts']['candidate'],case_id='near_z_plus',seed=17,
         acceptance=event['acceptance'],implementation=event['implementation'],completed=True,matched_nominal_reference=False)
