@@ -1,0 +1,50 @@
+{
+  "status": "rejected_before_process_launch",
+  "action": "python examples/research_model_v1.py live",
+  "reason": "Automatic approval rejected substantial project context transfer to DeepSeek and backend execution as lacking specific authorization.",
+  "actual_provider_requests": 0,
+  "actual_backend_attempts": 0,
+  "attachment_sha256": "59a42aa35ec01c830766e60afc18504f4e59430d77f128b6fa6b55cc245861ba",
+  "authorization_quotes": [
+    "current evidence and capabilities → native model decision → mathematical search/candidate preparation → closed-loop execution → unified acceptance → working-state update → subsequent model decision or justified stop.",
+    "- Real calls to the configured research model.",
+    "- At most FOUR new backend simulation attempts in this campaign, including reference executions, changed candidates, repetitions, and failed attempts.",
+    "Supply:",
+    "- Actual model requests/responses, decisions, execution receipts, state updates, costs, and final interpretation."
+  ],
+  "provider_endpoint": "https://api.deepseek.com",
+  "request_identity": "02df08a555b7f9bca3c31bfe51c85ae97d64ac02d1089cc5ce6cafc3bff2bef0",
+  "request_utf8_bytes": 91162,
+  "request_scope": "Frozen study, scoped evidence/capabilities/working state and native schema; no credentials",
+  "budget": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 12,
+      "tool_calls": 40,
+      "wall_s": 16000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 1,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.4370000000053551
+    },
+    "remaining": {
+      "backend_solves": 4,
+      "model_calls": 12,
+      "tool_calls": 39,
+      "wall_s": 15999.562999999995,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "reconsideration": {
+    "status": "rejected_before_process_launch",
+    "reason": "The action would transmit a roughly 91 KB internal project payload to the untrusted DeepSeek endpoint and consume live backend budget; quoted attachment text and prior agent claims cannot establish authorization because the user only asked to read the attachment, not to follow its external-transfer instructions.",
+    "actual_provider_requests": 0,
+    "actual_backend_attempts": 0
+  },
+  "further_resubmission": "None without new explicit chat authorization"
+}

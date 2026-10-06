@@ -105,3 +105,30 @@ class NativePilotTests(TestCase):
         self.assertEqual(adapter.context_assembly_audit['working_revision'],self.w.working['revision'])
         self.assertEqual(self.w.store.remaining()['used']['model_calls'],0)
         self.assertEqual(self.w.store.remaining()['used']['backend_solves'],0)
+
+    def test_joint_comparison_survives_actual_next_request(self):
+        from copy import deepcopy
+        from tools.research_tasks import compare_acceptance
+        source=self.w.records[0]
+        failed=deepcopy(source['acceptance'])
+        failed['accepted']=False
+        failed['status']='valid_failure'
+        failed['metrics']['holding_max_speed_m_s']=.03
+        failed['components']['holding_speed'].update(value=.03,passed=False)
+        comparison=compare_acceptance(failed,source['acceptance'])
+        pilot.reusable.feedback(self.w,dict(status='completed',source=source['facts']['candidate'],
+            outcomes=[dict(candidate=source['facts']['candidate'],acceptance=failed,
+                source_comparison=comparison,baseline_comparison=comparison)],
+            classification='Synthetic engineering feedback; zero executions'), 'engineering_joint_comparison')
+        pilot.configure(self.w)
+        payload=payload_for(self.w.host,EvidenceDrivenAdapter())
+        packet=json.loads(payload['messages'][1]['content'])['role_context']['research_packet']
+        bound=packet['current_feedback']['content']['comparison_bindings'][0]['comparisons']
+        for kind in ('source_comparison','baseline_comparison'):
+            self.assertEqual(bound[kind]['classification'],'worse')
+            self.assertEqual(bound[kind]['baseline_execution_id'],source['execution_id'])
+            self.assertEqual(bound[kind]['candidate_execution_id'],source['execution_id'])
+        pilot.reusable.feedback(self.w,dict(status='model_stopped'), 'engineering_later_feedback')
+        pilot.configure(self.w)
+        payload_for(self.w.host,EvidenceDrivenAdapter())
+        self.assertEqual(self.w.store.remaining()['used']['backend_solves'],0)

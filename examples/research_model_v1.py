@@ -225,6 +225,7 @@ def configure(w):
         performed_batch_evidence=[dict(reference=r['feedback_result'],aliases=alias_view(r['feedback_result']))
             for r in w.rounds if r.get('feedback_result')],
         corrections=dict(total=state.get('protocol_corrections_used',0),consecutive=state.get('protocol_corrections_consecutive',0)))
+    packet['execution_version_boundary']=w.freeze.get('repair_boundary')
     event=w.freeze['subsequent_event']
     packet['study']['subsequent_event']=dict(candidate=event['facts']['candidate'],case_id='near_z_plus',seed=17,
         acceptance=event['acceptance'],implementation=event['implementation'],completed=True,matched_nominal_reference=False)
@@ -288,7 +289,9 @@ def export(w):
         selected_candidate=w.selected,rounds=w.rounds,usage=w.store.remaining(),
         standalone_numerical_operations=0,workers=0,subagents=0,
         outcomes=[dict(candidate=r['facts']['candidate'],case_id='nominal',seed=17,acceptance=r['acceptance'],
-            receipts=r['receipts'],implementation=w.freeze['implementation']) for r in w.records if r['source_store']==str(w.directory)],
+            receipts=r['receipts'],implementation=r['implementation'],
+            execution_checkout_commit=w.store.session(r['owner_run_id'])['snapshot']['project_commit'])
+            for r in w.records if r['source_store']==str(w.directory)],
         limitations=['No ten-slot matched robustness suite','No formal baseline/three-group comparison',
             'No causal/screening/compression-benefit claim','Mainline 3 integration backlog remains in frozen catalog'],
         final_fact_identity=digest(final['canonical_facts']),working_fact_identity=digest(w.working['current_facts'])))
@@ -315,15 +318,57 @@ def live(directory=DEFAULT):
         w.status='failed';w.stop_reason=str(exc)
         atomic_json(w.directory/'failure.json',dict(type=type(exc).__name__,message=str(exc),usage=w.store.remaining()))
         print('STOP',w.stop_reason,flush=True)
+        persist(w)
         configure(w)
     persist(w);atomic_json(w.directory/'engineering_wall.json',dict(elapsed_s=time.monotonic()-started,not_added_twice=True))
     export(w)
     print(json.dumps(dict(status=w.status,usage=w.store.remaining())),flush=True)
 
 
+def repair_feedback(directory=DEFAULT):
+    """Explicit one-time recovery of the observed completed-feedback bridge fault.
+
+    No decision, candidate or execution is replayed. The failed boundary remains
+    sealed and the existing assignment ledger remains the only budget authority.
+    """
+    w=restore(directory);failure=read(w.directory/'failure.json')
+    if failure['type']!='KeyError' or failure['message']!="'baseline'" or w.freeze.get('repair_boundary'):
+        raise ValueError('ONLY_OBSERVED_SINGLE_FEEDBACK_REPAIR_AUTHORIZED')
+    if w.status not in ('running','failed') or not w.rounds[-1].get('complete'):
+        raise ValueError('COMPLETE_BATCH_BOUNDARY_REQUIRED')
+    with w.store.connect(True) as db:
+        if any(r['status']!='completed' or not r['receipt'] for r in db.execute('SELECT status,receipt FROM calls')):
+            raise ValueError('UNSETTLED_OPERATION_NO_REPLAY')
+    old=deepcopy(w.freeze)
+    result=w.store.artifact(w.rounds[-1]['result'])
+    for r in w.records:
+        if r['source_store']!=str(w.directory):continue
+        candidate=next(c for c in result['candidates'] if c.get('execution_id')==r['execution_id'])
+        r['acceptance']=candidate['execution']['acceptance'];r['implementation']=old['implementation']
+    reservation,_=w.store.reserve(w.host.run_id,'feedback-bridge-version3',digest(old),'engineering',
+        {**zero(),'tool_calls':1,'wall_s':120.})
+    started=time.monotonic()
+    atomic_json(w.directory/'pre_feedback_repair_freeze.json',old)
+    w.freeze['implementation']=revision()
+    w.freeze['repair_boundary']=dict(kind='engineering_feedback_bridge',failure=failure,
+        failed_evidence='evidence/research_native_v1_failure_20261006',
+        old_implementation=old['implementation'],new_implementation=w.freeze['implementation'],
+        backend_attempts_before_repair=w.store.remaining()['used']['backend_solves'],
+        replayed_operations=0,scientific_settings_changed=False,
+        rationale='Accept the unified acceptance relation while retaining exact baseline/source identities in next input.')
+    w.status='prepared';w.stop_reason=None;w.repairs+=1
+    w.store.complete(reservation,dict(request_id='feedback-bridge-version3',execution_id=reservation['execution_id'],
+        caller='engineering',tool_id='engineering.feedback_bridge',tool_version='1.0.0',
+        execution_status='completed',charged=zero()),w.freeze['repair_boundary'],time.monotonic()-started)
+    configure(w);persist(w)
+    atomic_json(w.directory/'feedback_repair_boundary.json',w.freeze['repair_boundary'])
+    print(json.dumps(dict(status=w.status,usage=w.store.remaining())),flush=True)
+
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','export']);parser.add_argument('--output',type=Path,default=DEFAULT)
+    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','export','repair-feedback']);parser.add_argument('--output',type=Path,default=DEFAULT)
     args=parser.parse_args()
     if args.mode=='prepare':prepare(args.output)
     elif args.mode=='live':live(args.output)
+    elif args.mode=='repair-feedback':repair_feedback(args.output)
     else:export(restore(args.output))

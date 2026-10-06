@@ -149,3 +149,30 @@ receipt, without replay or allocation change. The revised prepared request is
 91926 UTF-8 bytes; observed provider token counts remain unavailable. Future live
 exports use a separate evidence destination so the original blocked checkpoint
 stays immutable.
+
+The user's subsequent direct chat instruction, `允许实跑和推送`, authorizes the
+same prepared configured-model request, original cumulative backend ceiling and
+normal publication. The first native planning request completed without a
+protocol correction. DeepSeek selected an explicit two-point control batch:
+holding tip-speed weight 0.075 and 0.10, with terminal weight fixed at 0.05.
+Both executions completed, passed reach/holding position and failed holding
+maximum speed. No fresh reference or repetition was run.
+
+The next-input assembly then failed because its legacy comparison reader expected
+`baseline`/`candidate` metric wrappers, whereas unified acceptance compares a
+`relation`. The [failed boundary](../evidence/research_native_v1_failure_20261006/boundary.json)
+retains the original request/response, two complete receipts, original working
+checkpoint, feedback and exception. The bridge now accepts both contracts and
+binds new comparisons to the explicit source and retained-baseline authority.
+Four focused native checks pass, including the actual next-request and later
+feedback path. This is an engineering repair, not a revised model answer.
+
+`repair-feedback` is an explicit one-time recovery for this exact observed fault:
+it requires the matching exception, completed batch and settled operations;
+preserves both old executed implementation identities; records the new source
+fingerprint; and charges one engineering operation in the existing ledger. It
+replays zero decisions/candidates/executions and creates no new allowance. Normal
+`live` still rejects automatic resume of stopped/failed campaigns. Outcomes across
+the boundary remain separately identified; the stable controller, task, physical
+pool and acceptance do not change. Subsequent feedback and final interpretation
+will be recorded as new live evidence.

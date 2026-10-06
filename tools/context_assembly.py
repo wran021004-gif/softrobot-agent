@@ -166,15 +166,26 @@ def _compact_ledger(bound):
     return view
 
 
-def _comparison_bindings(content):
+def _comparison_bindings(content, authority=None):
     result=[]
     for outcome in content.get('outcomes', []):
         comparisons={}
         for kind in ('baseline_comparison','source_comparison'):
             if kind not in outcome:continue
             c=outcome[kind]
-            comparisons[kind]=dict(baseline_execution_id=c['baseline']['source']['execution_id'],
-                candidate_execution_id=c['candidate']['source']['execution_id'],classification=c['classification'],
+            if 'relation' in c:
+                # Joint acceptance comparisons carry a relation rather than the
+                # legacy metric wrappers. Bind their subjects to the explicit
+                # feedback source and retained-baseline authority.
+                source=(content['source'] if kind=='source_comparison' else
+                        authority['roles']['source_baseline'])
+                baseline_id=source['execution_id']; candidate_id=outcome['candidate']['execution_id']
+                classification=c['relation']
+            else:
+                baseline_id=c['baseline']['source']['execution_id']
+                candidate_id=c['candidate']['source']['execution_id']; classification=c['classification']
+            comparisons[kind]=dict(baseline_execution_id=baseline_id,
+                candidate_execution_id=candidate_id,classification=classification,
                 scope='Frozen campaign metric comparison; changing weights/structure does not isolate a cause')
         result.append(dict(candidate=outcome['candidate'],comparisons=comparisons))
     return result
@@ -219,7 +230,7 @@ def _research(packet, authority, archive):
     feedback = reduced['current_feedback']
     feedback['content'] = dict(status=feedback['content'].get('status'),
         stop_reason=feedback['content'].get('stop_reason'),
-        comparison_bindings=_comparison_bindings(packet['current_feedback']['content']),
+        comparison_bindings=_comparison_bindings(packet['current_feedback']['content'],authority),
         evidence_coverage='Current exact F aliases below; complete feedback in archive')
     current_ref = feedback['reference']
     reduced['performed_batch_evidence'] = [r for r in reduced.get('performed_batch_evidence', [])
@@ -236,7 +247,7 @@ def _research(packet, authority, archive):
         r['aliases']=selected_aliases(r['aliases'])
         source=archive.sources[r['reference']['artifact_id']]
         store=next(s for s in archive.stores if s.root.relative_to(ROOT).as_posix()==source['store_root'])
-        r['comparison_bindings']=_comparison_bindings(store.artifact(r['reference']))
+        r['comparison_bindings']=_comparison_bindings(store.artifact(r['reference']),authority)
     return reduced, bound
 
 
