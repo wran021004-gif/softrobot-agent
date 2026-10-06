@@ -616,9 +616,9 @@ def assemble_working_context(purpose, state, *, archive):
             pointer='/experiments/' + pointer_part(key) + '/' + str(i) + '/entry'))
         for i,row in enumerate(rows)] for key,rows in state['experiments'].items()}
     result['view']['working_context']['recovery'] = dict(version=state['version'],
-        revision=state['revision'], claim_history={key:[dict(revision=row['revision'],
-            original_entry=dict(reference=state_reference,pointer='/claims/'+pointer_part(key)+'/'+str(i)))
-            for i,row in enumerate(rows)] for key,rows in state['claims'].items()},
+        revision=state['revision'], claim_history={key:dict(entries=len(rows),
+            original_history=dict(reference=state_reference,pointer='/claims/'+pointer_part(key)))
+            for key,rows in state['claims'].items()},
         experiment_ledger=experiment_view, candidate_artifacts=state['candidate_artifacts'],
         evidence_history=state['evidence_history'],
         budget_accounting=state['budget_accounting'],

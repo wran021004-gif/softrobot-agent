@@ -169,16 +169,18 @@ def refresh_preparation(directory=DIRECTORY):
     old=pilot.save(w.store,w.freeze)
     verify_seals(w)
     if not w.host.compatibility()['compatible']:raise ValueError('NEW_SESSION_VERSION_BOUNDARY_REQUIRED')
-    prior=w.store.lookup(w.host.run_id,'prelive-context-compaction')
-    if prior and not prior['receipt']:
+    with w.store.connect(True) as db:
+        previous=[dict(r) for r in db.execute("SELECT * FROM calls WHERE run_id=? AND request_id LIKE 'prelive-context-compaction%' ORDER BY rowid",(w.host.run_id,))]
+    for prior in previous:
+        if prior['receipt']:continue
         # The failed local process exited before sending anything. Preserve the
         # full reserved charge; elapsed wall time was not sealed, so is unknown.
         w.store.complete(prior,dict(request_id=prior['request_id'],execution_id=prior['execution_id'],caller='engineering',
             tool_id='engineering.context_compaction',tool_version='1.0.0',execution_status='failed',charged=zero(),
-            error='Pre-provider outgoing context remained oversized; no request sent; elapsed unknown, full 30s reservation conservatively charged.'),
+            error='Local context preparation process failed before provider submission; no request sent; elapsed unknown, full 30s reservation conservatively charged.'),
             dict(outgoing_sent=False,elapsed_known=False,charge_basis='full reserved wall bound'),30.)
-        shutil.copyfile(w.directory/'prelive_context_boundary.json',w.directory/'prelive_context_boundary_v1.json')
-    request_id='prelive-context-compaction-v2' if prior else 'prelive-context-compaction'
+        shutil.copyfile(w.directory/'prelive_context_boundary.json',w.directory/('prelive_context_boundary_'+prior['request_id']+'.json'))
+    request_id='prelive-context-compaction-v'+str(len(previous)+1) if previous else 'prelive-context-compaction'
     if w.store.lookup(w.host.run_id,request_id):raise ValueError('COMPACTION_ALREADY_RECORDED_NO_REPLAY')
     row,_=w.store.reserve(w.host.run_id,request_id,digest(dict(old=old,version=VERSION)),
         'engineering',{**zero(),'tool_calls':1,'wall_s':30.});started=time.monotonic()
