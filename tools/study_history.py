@@ -109,3 +109,30 @@ def select_source(records, requested, fallback=None):
     matches=list({digest(c):c for c in matches}.values())
     if len(matches)!=1:raise ValueError('PLAN_SOURCE_NOT_VERIFIED_COMPLETE_OR_AMBIGUOUS')
     return matches[0]
+
+
+def reporting_summary(history, *, new_execution_ids, replication_pairs, selected, latest, usage, stop):
+    """Compact bound reporting facts; explicit repeats never imply broad variance."""
+    by_id={r['candidate']['execution_id']:r for r in history['rows'] if r.get('metrics')}
+    fields=('terminal_error_m','holding_max_error_m','holding_max_speed_m_s')
+    if len(set(new_execution_ids))!=len(new_execution_ids):raise ValueError('DUPLICATE_NEW_EXECUTION')
+    if len({new for _,new in replication_pairs})!=len(replication_pairs):raise ValueError('DUPLICATE_REPLICATION')
+    repetitions=[]
+    for source,new in replication_pairs:
+        a,b=by_id[source],by_id[new]
+        if new not in new_execution_ids or source in new_execution_ids or source==new:
+            raise ValueError('REPLICATION_SOURCE_NEW_BINDING')
+        if a['structure_identity']!=b['structure_identity'] or a['weights']!=b['weights'] or a['controller']!=b['controller']:
+            raise ValueError('REPLICATION_CONFIGURATION_MISMATCH')
+        repetitions.append(dict(source=a['candidate'],new=b['candidate'],weights=b['weights'],
+            measured_differences={k:b['metrics'][k]-a['metrics'][k] for k in fields},
+            comparison_scope='Only the three retained aggregate metrics; not full trajectories or timing'))
+    new=[by_id[e] for e in new_execution_ids]
+    return dict(new_execution_count=len(new),novel_configuration_count=len(new)-len(repetitions),
+        replication_count=len(repetitions),replications=repetitions,
+        results=[dict(candidate=r['candidate'],weights=r['weights'],metrics=r['metrics'],
+            structure_identity=r['structure_identity'],controller=r['controller'],decisions=r['decisions'],
+            comparison_scope='new execution' if r['candidate']['execution_id'] in new_execution_ids else 'frozen historical')
+            for r in by_id.values()],selected=selected,latest=latest,usage=usage,stop=stop,
+        limits=['One matching repeat does not establish general repeatability, variance, identical trajectories or identical timing.',
+                'Sampled acceptance does not establish a continuous-time guarantee, realtime, superiority or a unique physical cause.'])
