@@ -105,9 +105,12 @@ See [saved input observations](../evidence/context_assembly_20261006/observation
 and the scoped source manifests linked in each assembly audit. Publication status
 is recorded separately after the implementation and evidence checkpoints.
 
-Implementation commit: `e9e3c23`; evidence commit: `c4d02ec`. The normal push was
-rejected by automatic approval before process launch: the reviewer requires
-trusted direct-chat authorization for this code/evidence payload and the existing
-GitHub destination. No alternative export was attempted. The verified remote
-remains `1c0f886bc0f267778e4af73c324f6fc3d8759148`. See the
-[publication rejection](../evidence/context_assembly_publication_20261006/publication.json).
+Implementation commit: `e9e3c23`; evidence commit: `c4d02ec`. The earlier normal
+push was rejected by automatic approval before process launch; its
+[publication rejection](../evidence/context_assembly_publication_20261006/publication.json)
+is preserved. The user subsequently authorized publication directly in chat.
+An ordinary push succeeded, and the remote branch was verified at
+`9963f535445a50ecd1d6db30f05ab41cc03e0218`, containing all completed M4/M5 and
+context assembly checkpoints. See the separate
+[successful publication verification](../evidence/context_assembly_publication_20261006/published_checkpoint.json).
+Publication did not launch new model requests or scientific operations.

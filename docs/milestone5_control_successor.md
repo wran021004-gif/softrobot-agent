@@ -109,5 +109,9 @@ and [accounting](../evidence/milestone5_control_20261006/accounting.json).
 The [actual model-authored interpretation](../evidence/milestone5_control_20261006/rendered_interpretation0.md),
 [factual review](../evidence/milestone5_control_20261006/interpretation_review0.json)
 and [final bounded delivery](../evidence/milestone5_control_20261006/checkpoint_seal.json)
-preserve this distinction. Remote publication awaits direct chat authorization
-after the separately recorded automatic-review rejection; local work is complete.
+preserve this distinction. Following direct chat authorization, an ordinary push
+published the completed checkpoints, with the remote verified at
+`9963f535445a50ecd1d6db30f05ab41cc03e0218`. The separate
+[publication verification](../evidence/context_assembly_publication_20261006/published_checkpoint.json)
+preserves the earlier automatic-review rejection. Publication did not resume
+scientific work; M5 remains open and all six protected backend slots remain unused.

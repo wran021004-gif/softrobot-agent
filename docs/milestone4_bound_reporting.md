@@ -63,9 +63,12 @@ STOP, selected incumbent, multibatch success and every failed report are preserv
 
 Normal remote publication was separately rejected before execution because the
 reviewer did not recognize attachment authorization for the evidence/source-archive
-export. The earlier offline checkpoint is local commit `8a627e5`; normal publication
-awaits direct chat confirmation. This restriction is distinct from the now-authorized
-provider request path.
+export. The earlier offline checkpoint is commit `8a627e5`. The user subsequently
+authorized publication directly in chat; an ordinary push published all completed
+checkpoints, with the remote verified at
+`9963f535445a50ecd1d6db30f05ab41cc03e0218`. The separate
+[publication verification](../evidence/context_assembly_publication_20261006/published_checkpoint.json)
+preserves the earlier rejection. No provider request was repeated for publication.
 
 See the [final model-authored rendered report](../evidence/milestone4_bound_20261006/rendered_report2.md),
 [final factual review](../evidence/milestone4_bound_20261006/review2.json),

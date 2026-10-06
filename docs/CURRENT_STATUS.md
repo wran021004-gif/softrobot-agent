@@ -29,8 +29,12 @@ cheap method family or protected validation was launched. All six protected slot
 remain untouched. New M5 charges are 1 provider / 13 workflow / 0 backend /
 86.608 s, nine standalone updates. Actual configured model interpretation passes
 review and recommends STOP production advancement with limited diagnostic use.
-The scope is sealed negative; **M5 remains open.** Normal remote publication was
-separately rejected before execution and awaits direct chat authorization.
+The scope is sealed negative; **M5 remains open.** Following direct chat
+authorization, normal remote publication succeeded and was verified at
+`9963f535445a50ecd1d6db30f05ab41cc03e0218`. The
+[publication verification](../evidence/context_assembly_publication_20261006/published_checkpoint.json)
+preserves the earlier approval rejection and records the successful publication
+of all completed checkpoints. No new model or scientific operations ran.
 
 The earlier checkpoints below remain preserved historical evidence.
 
