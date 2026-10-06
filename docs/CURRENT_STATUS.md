@@ -1,5 +1,14 @@
 # Current development status - Milestones 4 and 5, 2026-10-06
 
+Latest amendment: [shared evidence context assembly](evidence_context_assembly.md)
+now serves actual M4 research, M4 bound reporting and M5 interpretation builders.
+Ten focused checks passed across the initial and affected repair passes. Complete
+research input shrank from 258006 to 124176 UTF-8 bytes over the same enriched
+saved corpus; sizes are conservative estimates, not new provider token counts.
+No eligible pending paid request remained, so live verification is unperformed.
+No new grants, provider calls, numerical work or agents ran. The existing M4/M5
+seals, scientific outcomes and protected allocations remain unchanged.
+
 Latest bounded successor: [M4 evidence-bound reporting](milestone4_bound_reporting.md)
 implements source-bound numeric rendering with four focused checks; its first
 provider command was rejected by automatic approval before process launch, then
