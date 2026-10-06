@@ -12,7 +12,12 @@ reconsideration. Specific external-transfer authorization is pending. Actual use
 is zero model / zero backend / one preparation operation / 0.437 charged seconds;
 no scientific improvement or live model-quality result is claimed. Formal 28-run
 and three-group comparisons, the Mainline 3 backlog, roadmap and protected old
-M5 slots are untouched. Earlier evidence and closures below remain historical.
+M5 slots are untouched. A subsequent administrative prelaunch fingerprint fix
+uses the same ledger: cumulative use is now two workflow operations / 0.671
+charged seconds, still zero model/backend/numerical/worker work. Normal push was
+also rejected before launch; the read-only verified remote remains `f6cafa17`.
+Specific live-transfer and publication questions are pending in chat. Earlier
+evidence and closures below remain historical.
 
 The independently authorized [final shared-path development validation](research_shared_path_validation.md)
 completed on frozen implementation `c80d331691b1a0f9d683049f1b09480c8bd62319`.

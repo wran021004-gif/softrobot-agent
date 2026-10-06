@@ -136,3 +136,16 @@ Documentation/evidence commits must not invalidate unchanged executable code.
 The original freeze remains retained; its prepared entry-point fingerprint is
 refreshed as a new prelaunch version in the same cumulative ledger. No provider
 or backend attempt occurred; scientific conditions remain unchanged.
+
+The [prelaunch version-2 receipt](../evidence/research_native_publication_20261006/prelaunch_version2.json)
+retains the original freeze and source change. Its code commit is
+`5bdaf118d6cf46fa2179cb04cf41bd239b74bd67`; source/controller fingerprints remain
+the execution authority across later evidence-only commits. The same ledger now
+totals two workflow operations / 0.6710000000020955 charged seconds and still zero
+model/backend/numerical/worker work. One transient checkpoint captured an
+in-flight reservation; its later release tripped monotone-budget validation.
+Recovery used the earlier completed-state checkpoint and the already sealed
+receipt, without replay or allocation change. The revised prepared request is
+91926 UTF-8 bytes; observed provider token counts remain unavailable. Future live
+exports use a separate evidence destination so the original blocked checkpoint
+stays immutable.
