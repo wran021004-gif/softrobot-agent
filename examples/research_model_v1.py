@@ -272,7 +272,10 @@ def configure(w):
             state=w.store.session(w.host.run_id,db)['state']
             state.setdefault('role_context',{}).update(decision_only=True)
             w.store.update_state(db,w.host.run_id,state)
-    cap=capabilities(w.store,w.host.run_id,w.records)
+    guarded=(w.freeze.get('campaign_state',{}).get('phase_budget_policy')=='conditional_verification@3.0.0'
+        and not w.freeze.get('offline_fixture'))
+    accounting_time=time.time()
+    cap=capabilities(w.store,w.host.run_id,w.records,as_of_unix=accounting_time) if guarded else capabilities(w.store,w.host.run_id,w.records)
     if w.freeze.get('final_reporting'):
         cap['legal']={'stop':dict(reason='Final interpretation only; research STOP remains sealed',execution_authorized=False)}
         cap['unavailable'].update({a:'Research trajectory closed; final interpretation cannot dispatch work' for a in ('control_search','structure_search','diagnosis')})
@@ -322,6 +325,9 @@ def configure(w):
     if w.freeze.get('campaign_state',{}).get('phase_budget_policy')=='conditional_verification@3.0.0':
         authority['campaign_clock']=w.freeze.get('live_clock')
         authority['phase_budget_policy']=w.freeze['campaign_state']['phase_budget_policy']
+    if guarded:
+        from tools.current_research_authority import accounting_binding
+        authority['accounting_binding']=accounting_binding(w.store,w.host.run_id,as_of_unix=accounting_time)
     if w.freeze.get('decision_only'):authority['ledger_reconciliation']=True
     if w.rounds:
         last=w.rounds[-1]['decision'];authority.update(hypotheses=last['model_interpretations'],unresolved=last['unresolved_uncertainties'])
@@ -371,6 +377,7 @@ def configure(w):
         source_report=w.freeze['source_report'],improvement_feedback_content=dict(baseline_facts=w.baseline,execution=None),
         research_final_reporting=w.freeze.get('final_reporting',False),
         refresh_current_authority=w.freeze.get('campaign_state',{}).get('phase_budget_policy')=='conditional_verification@3.0.0',
+        enforce_settled_accounting=guarded,
         native_store_root=str(w.store.root),native_fixed={},memory_identity=w.host.run_id,
         archive_context_id=w.freeze.get('context_id',w.host.run_id),binding=w.freeze['binding'])
     if w.freeze.get('campaign_state'):

@@ -37,9 +37,9 @@ def verified_observations(state, decision):
     return checked
 
 
-def capabilities(store, run_id, records):
+def capabilities(store, run_id, records,*,as_of_unix=None):
     from tools.platform_registry import registry
-    remaining=downstream_available(store,run_id)
+    remaining=downstream_available(store,run_id) if as_of_unix is None else downstream_available(store,run_id,as_of_unix=as_of_unix)
     capacity=budget_capacity(1,remaining,preparation_reserve_s=PREPARATION_RESERVE_S)
     inp=store.session(run_id)['snapshot']['input']; controller=inp['policy']['controller']
     proposal_only=store.session(run_id)['state'].get('role_context',{}).get('decision_only',False)

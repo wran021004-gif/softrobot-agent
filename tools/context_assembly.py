@@ -606,6 +606,9 @@ def update_working_state(state, *, archive, evidence_packet=None, authority=None
         old_budget = state.get('budget') or {}
         new_budget = authority.get('remaining_budget') or {}
         reconciled=False
+        if authority.get('accounting_binding'):
+            from tools.current_research_authority import verify_accounting_transition
+            reconciled=verify_accounting_transition(state,authority,archive)
         if authority.get('ledger_reconciliation'):
             run_id=archive.scope.get('context_id')
             for store in archive.stores:

@@ -194,9 +194,58 @@ def recover_live(directory=None):
     continue_trajectory(w)
 
 
+def continue_authorized(directory=None):
+    """One linked continuation under attachment 0b4a8cdb; no new allowance."""
+    from examples.gvs_nmpc_route_experiment import load_credential
+    from tools.diagnostic_workflow import save
+    config=read(CONFIG);w=pilot.restore((directory or ROOT/'runs'/config['campaign_id']).resolve())
+    start=read(w.directory/'continuation_repair_start.json')
+    if w.repairs!=2 or w.status!='failed' or w.sealed_cases or w.freeze.get('continuation_authorization'):
+        raise ValueError('CONTINUATION_REQUIRES_ORIGINAL_FAILED_CHECKPOINT_AND_NEW_AUTHORIZATION')
+    clock=deepcopy(w.freeze['live_clock'])
+    if clock!=read(w.directory/'live_clock.json'):raise ValueError('DURABLE_CLOCK_CHANGED')
+    if time.time()>=clock['deadline_unix']:raise ValueError('ORIGINAL_DEADLINE_PASSED_NO_PAID_CONTINUATION')
+    if seal()['files']==w.freeze['implementation']['files']:raise ValueError('CORRECTED_IMPLEMENTATION_NOT_FROZEN')
+    with w.store.connect(True) as db:
+        unsettled=[dict(r) for r in db.execute("SELECT * FROM calls WHERE receipt IS NULL")]
+    if len(unsettled)!=1 or unsettled[0]['request_id']!='continuation-accounting-repair1':
+        raise ValueError('UNRELATED_UNSETTLED_WORK_CONTINUATION_FORBIDDEN')
+    old=deepcopy(w.freeze);out=ROOT/'evidence'/config['campaign_id']/'continuation_20261007'
+    auth=read(out/'authorization.json')
+    boundary=dict(version='v3-continuation@3.2.0',authorization=auth,old_implementation=old['implementation'],
+        corrected_implementation=seal(),original_clock=clock,previous_repairs=2,additional_repairs_used=1,
+        cumulative_material_repairs=3,budget_reset=False,backend_replayed=0,science_changed=False,
+        usage_before_settlement=w.store.remaining())
+    w.freeze['experiment']['evidence_directory']=str(out)
+    w.freeze['implementation']=seal();w.freeze['continuation_authorization']=auth
+    w.freeze['additional_material_repairs_used']=1;w.freeze['material_live_repairs']=3;w.repairs=3
+    w.freeze['final_reporting']=False;w.status='running';w.stop_reason=None
+    w.freeze['repair_boundary']=dict(version=boundary['version'],old_commit=old['implementation']['commit'],
+        corrected_commit=w.freeze['implementation']['commit'],original_clock=clock,previous_repairs=2,
+        additional_repairs_used=1,full_boundary=save(w.store,boundary),budget_reset=False,backend_replayed=0)
+    w.freeze['known_review_issues']+=read(out.parent/'independent_live_review.json')['issues']
+    w.freeze['recovery_instructions']+=' This is an explicitly authorized linked continuation of the SAME v3 campaign, cumulative ledger, eight-variable pool, five cases and original live deadline. Old STOP-only engineering fault reporting is historical and does not restrict this newly authorized free research decision. Two nominal seed17 executions already consumed two research slots: terminal .10 with holding .05 jointly passed with a historical speed/position tradeoff; terminal .025 with holding .05 failed holding speed. Neither changed physical structure or executed a fresh incumbent reference. Explicit-zero nominal initializer has a different task identity from historical unspecified-zero records; those are background, not fresh matched current references. Use the actual new source-bound feedback to choose freely among current legal actions, including a same-condition reference, supported math, further search or STOP. No action or success is forced. Preserve correction/retry counts and known counterexamples. Final comparison follows the original conditional frozen protocol.'
+    load_credential(Path.home()/'.codex/.env')
+    elapsed=time.time()-start['boundary']['goal_start_unix']
+    receipt=w.store.complete(start['reservation'],dict(request_id=start['reservation']['request_id'],
+        execution_id=start['reservation']['execution_id'],caller='engineering',tool_id='engineering.current_authority_settlement',
+        tool_version='3.2.0',execution_status='completed',charged=zero()),boundary,elapsed)
+    # Working authority is generated after settlement, including released time.
+    pilot.configure(w);adapter=EvidenceDrivenAdapter();payload=payload_for(w.host,adapter)
+    pilot.adopt_current_working(w);pilot.persist(w)
+    atomic_json(out/'continuation_repair_boundary.json',dict(boundary=boundary,receipt=receipt))
+    atomic_json(out/'prepared_continuation_request.json',dict(payload=payload,audit=adapter.context_assembly_audit))
+    if w.freeze['live_clock']!=clock:raise ValueError('CONTINUATION_RESET_CLOCK')
+    # Keep previous delivery outcomes intact and explicitly historical.
+    prior=w.directory/'verification_not_started.json'
+    if prior.exists():prior.rename(w.directory/'pre_continuation_verification_not_started.json')
+    continue_trajectory(w)
+
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','recover-live']);parser.add_argument('--output',type=Path)
+    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','recover-live','continue-authorized']);parser.add_argument('--output',type=Path)
     args=parser.parse_args()
     if args.mode=='prepare':prepare(args.output)
     elif args.mode=='live':live(args.output)
-    else:recover_live(args.output)
+    elif args.mode=='recover-live':recover_live(args.output)
+    else:continue_authorized(args.output)
