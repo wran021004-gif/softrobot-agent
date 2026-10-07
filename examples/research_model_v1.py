@@ -348,7 +348,8 @@ def configure(w):
         diagnosis_remaining=max(0,w.freeze['diagnosis_limit']-sum(r['decision']['decision']['action']=='diagnosis' for r in w.rounds)),
         predecessor_decision=w.previous_decision,latest_tested=w.latest,require_source_binding=True,max_batch_backends=2,
         source_report=w.freeze['source_report'],improvement_feedback_content=dict(baseline_facts=w.baseline,execution=None),
-        native_store_root=str(w.store.root),native_fixed={},memory_identity=w.freeze.get('context_id',w.host.run_id),binding=w.freeze['binding'])
+        native_store_root=str(w.store.root),native_fixed={},memory_identity=w.host.run_id,
+        archive_context_id=w.freeze.get('context_id',w.host.run_id),binding=w.freeze['binding'])
     if w.freeze.get('campaign_state'):
         with w.store.transaction() as db:
             state=w.store.session(w.host.run_id,db)['state']

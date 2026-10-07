@@ -233,7 +233,8 @@ class EvidenceDrivenAdapter(ScopedReferenceAdapter):
             from tools.context_assembly import EvidenceArchive, assemble_request, research_authority
             packet=self.role['research_packet']
             archive=EvidenceArchive(self.store.root/'context_assembly',
-                scope=dict(context_id=self.context_id, role=self.role['role'], binding=self.binding), stores=(self.store,))
+                scope=dict(context_id=self.role.get('archive_context_id',self.context_id),
+                    role=self.role['role'], binding=self.binding), stores=(self.store,))
             import re
             authority=deepcopy(self.role.get('context_authority') or research_authority(packet))
             authority['required_aliases']=sorted(set(re.findall(r'\bF\d+\b',encode(dict(

@@ -124,6 +124,17 @@ class NativeCampaignTests(NativePilotTests):
         self.assertEqual(restored.status,'prepared')
         self.assertEqual(restored.store.remaining()['used']['backend_solves'],0)
         self.assertFalse(restored.store.session(restored.host.run_id)['state'].get('pending'))
+        from tools.platform_models import payload_for
+        from tools.diagnostic_reference_adapter import EvidenceDrivenAdapter
+        adapter=EvidenceDrivenAdapter();payload=payload_for(restored.host,adapter)
+        packet=json.loads(payload['messages'][1]['content'])['role_context']['research_packet']
+        self.assertEqual(set(packet['capabilities']['legal']),{'stop'})
+        self.assertEqual(packet['capabilities']['remaining']['backend_solves'],0)
+        self.assertEqual(adapter.context_id,restored.host.run_id)
+        self.assertEqual(adapter.role['archive_context_id'],old)
+        adapter.retain('research.decide',{'action':'stop'},[])
+        self.assertEqual(restored.store.session(restored.host.run_id)['state']['unaccepted_draft']['arguments'],{'action':'stop'})
+        self.assertNotIn('unaccepted_draft',restored.store.session(old)['state'])
 
     def saved_verification_row(self):
         event=self.w.freeze['subsequent_event']
