@@ -1,5 +1,14 @@
 # Current development status - Milestones 4 and 5, 2026-10-07
 
+A separately authorized [native successor v3](research_native_development_v3.md)
+adds a current campaign/session/revision snapshot for every actual request and
+dispatch, retains the migrated-session fix, and conditions final wall-time
+reservation on the entire verification schedule fitting after development.
+Twenty final backend-count slots remain protected. Its live clock starts only
+after authorized preflight; preparation has a separate two-hour active cap.
+Focused request/restore/clock/case tests pass without provider or backend work.
+The predecessor below remains sealed; this successor has a new cumulative ledger.
+
 A separately authorized [native development v2 campaign](research_native_development_v2.md)
 is now sealed after a negative live scheduling result. Direct chat authorization
 and exact-payload review resolved platform approval; checkpoint 463355c was

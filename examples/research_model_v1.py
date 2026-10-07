@@ -63,6 +63,13 @@ def archive(w):
     return w.context_archive
 
 
+def adopt_current_working(w,state=None):
+    role=(state or w.store.session(w.host.run_id)['state'])['role_context']
+    w.working=deepcopy(role['research_working_state'])
+    w.context_archive=EvidenceArchive.from_manifest(ROOT/role['research_working_manifest'],
+        scope=w.working['archive_scope'],stores=(w.store,))
+
+
 def copy_references(source,destination,value,seen=None):
     seen=set() if seen is None else seen
     if isinstance(value,dict):
@@ -240,14 +247,25 @@ def prepare(directory=DEFAULT, *, offline_fixture=False, campaign_config=None):
     return w
 
 
+def campaign_permissions(w):
+    config=w.freeze['campaign_state']
+    permissions=dict(allocation=w.freeze['allocation'],search_backend_limit=8,
+        reserved_verification_backends=20,workers=0)
+    if config.get('phase_budget_policy')=='conditional_verification@3.0.0':
+        permissions['phase_budget_policy']=config['phase_budget_policy']
+        clock=w.freeze.get('live_clock')
+        if clock:permissions['elapsed_deadline_unix']=clock['deadline_unix']
+    else:
+        permissions['elapsed_deadline_unix']=w.freeze.get('assignment_start_unix',config['assignment_start_unix'])+36000
+    return permissions
+
+
 def configure(w):
     if w.freeze.get('campaign_state'):
         with w.store.transaction() as db:
             state=w.store.session(w.host.run_id,db)['state']
             state.setdefault('role_context',{}).update(frozen_cases=w.freeze['frozen_cases'],
-                campaign_permissions=dict(allocation=w.freeze['allocation'],search_backend_limit=8,
-                    reserved_verification_backends=20,workers=0,
-                    elapsed_deadline_unix=w.freeze.get('assignment_start_unix',w.freeze['campaign_state']['assignment_start_unix'])+36000))
+                campaign_permissions=campaign_permissions(w))
             w.store.update_state(db,w.host.run_id,state)
     if w.freeze.get('decision_only'):
         with w.store.transaction() as db:
@@ -301,6 +319,9 @@ def configure(w):
     authority.update(stop=dict(status=w.status,reason=w.stop_reason,sealed_cases=w.sealed_cases),
         budget_accounting=w.store.remaining(),experiment_permissions=w.freeze['allocation'],
         known_review_issues=w.freeze.get('known_review_issues',[]))
+    if w.freeze.get('campaign_state',{}).get('phase_budget_policy')=='conditional_verification@3.0.0':
+        authority['campaign_clock']=w.freeze.get('live_clock')
+        authority['phase_budget_policy']=w.freeze['campaign_state']['phase_budget_policy']
     if w.freeze.get('decision_only'):authority['ledger_reconciliation']=True
     if w.rounds:
         last=w.rounds[-1]['decision'];authority.update(hypotheses=last['model_interpretations'],unresolved=last['unresolved_uncertainties'])
@@ -348,15 +369,15 @@ def configure(w):
         diagnosis_remaining=max(0,w.freeze['diagnosis_limit']-sum(r['decision']['decision']['action']=='diagnosis' for r in w.rounds)),
         predecessor_decision=w.previous_decision,latest_tested=w.latest,require_source_binding=True,max_batch_backends=2,
         source_report=w.freeze['source_report'],improvement_feedback_content=dict(baseline_facts=w.baseline,execution=None),
+        research_final_reporting=w.freeze.get('final_reporting',False),
+        refresh_current_authority=w.freeze.get('campaign_state',{}).get('phase_budget_policy')=='conditional_verification@3.0.0',
         native_store_root=str(w.store.root),native_fixed={},memory_identity=w.host.run_id,
         archive_context_id=w.freeze.get('context_id',w.host.run_id),binding=w.freeze['binding'])
     if w.freeze.get('campaign_state'):
         with w.store.transaction() as db:
             state=w.store.session(w.host.run_id,db)['state']
             state['role_context']['frozen_cases']=w.freeze['frozen_cases']
-            state['role_context']['campaign_permissions']=dict(allocation=w.freeze['allocation'],
-                search_backend_limit=8,reserved_verification_backends=20,workers=0,
-                elapsed_deadline_unix=w.freeze.get('assignment_start_unix',w.freeze['campaign_state']['assignment_start_unix'])+36000)
+            state['role_context']['campaign_permissions']=campaign_permissions(w)
             w.store.update_state(db,w.host.run_id,state)
     return packet
 
@@ -368,6 +389,8 @@ def decision(w):
     before=w.store.session(w.host.run_id)['state'].get('handoffs',{}).get('research_decision')
     persist(w);run_loop(w.host,adapter)
     state=w.store.session(w.host.run_id)['state'];ref=state.get('handoffs',{}).get('research_decision')
+    if state.get('role_context',{}).get('refresh_current_authority'):
+        adopt_current_working(w,state)
     if not ref or ref==before:raise RuntimeError('RESEARCH_DECISION_INCOMPLETE: '+str(state.get('stop_reason')))
     result=w.store.artifact(ref);w.previous_decision=ref
     chosen_case=(result['decision'].get('plan') or {}).get('case_id',w.current_case)

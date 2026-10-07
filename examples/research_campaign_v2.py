@@ -31,8 +31,8 @@ def seal():
                 stable_controller=pilot.revision()['stable_controller'])
 
 
-def prepare(directory=None,offline_fixture=False):
-    config=read(CONFIG_PATH)
+def prepare(directory=None,offline_fixture=False,*,config=None):
+    config=read(CONFIG_PATH) if config is None else deepcopy(config)
     directory=Path(directory or ROOT/'runs'/config['campaign_id'])
     w=pilot.prepare(directory,offline_fixture=offline_fixture,campaign_config=config)
     w.freeze['implementation']=seal()

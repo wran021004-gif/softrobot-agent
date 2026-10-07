@@ -352,6 +352,8 @@ def length_without_action(response, bindings, adapter=None, advertised_tools=Non
 
 def input_for(host):
     from schemas.platform import ModelInput, ModelContent
+    from tools.current_research_authority import refresh
+    refresh(host)
     context=host.context()
     context['policy']['model']=effective_config(host)
     correction = host.store.session(host.run_id)['state'].get('protocol_correction')
@@ -637,6 +639,17 @@ def run_loop(host, adapter=None):
             if 'BUDGET_EXHAUSTED' in (receipt.get('error') or ''):
                 return _stop(host, 'budget_exhausted', receipt['error'])
             scheduling=state.get('role_context',{}).get('autonomous_scheduling')
+            if scheduling and (receipt.get('error') or '').startswith('CURRENT_AUTHORITY_CHANGED:'):
+                with host.store.transaction() as db:
+                    state=host.store.session(host.run_id,db)['state']
+                    state['authority_revalidations']=state.get('authority_revalidations',0)+1
+                    state['repairs']=max(0,state.get('repairs',0)-1)
+                    state['protocol_correction']=dict(type='authority_revalidation',
+                        requirement=receipt['error']+' The request authority changed during processing. The next request refreshes the actual menu and budget; choose a currently executable action.')
+                    host.store.update_state(db,host.run_id,state)
+                if state['authority_revalidations']>2:
+                    return _stop(host,'needs_input','CURRENT_AUTHORITY_CHANGED_REPEATEDLY')
+                continue
             if (scheduling and receipt['execution_status'] in ('failed','rejected')) or (receipt['execution_status']=='rejected' and config.get('adapter_version') not in ('3.0.0','4.0.0','5.0.0','6.0.0') and (receipt.get('error') or '').startswith('INVALID_TOOL_ARGUMENTS:')):
                 stopped = _argument_rejection(host, active_decision, receipt, config)
                 if stopped is not None:

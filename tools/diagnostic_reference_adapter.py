@@ -253,6 +253,10 @@ class EvidenceDrivenAdapter(ScopedReferenceAdapter):
             else:
                 payload,self.context_assembly_audit=assemble_request(payload,config,'research_decision',packet,
                     archive=archive,authority=authority,context_slot='research_packet')
+        if self.role.get('refresh_current_authority'):
+            from tools.current_research_authority import check_payload
+            from tools.platform_host import Host
+            check_payload(Host(self.store.root,self.context_id),payload)
         return payload
 
     def resolve_business(self,name,args):

@@ -9,13 +9,24 @@ def downstream_available(store,run_id,db=None):
     project=store.remaining(None,db)['remaining'];session=store.remaining(run_id,db)['remaining']
     permissions=store.session(run_id,db)['state'].get('role_context',{}).get('campaign_permissions')
     if permissions:
+        conditional=permissions.get('phase_budget_policy')=='conditional_verification@3.0.0'
+        if conditional:
+            # Delivery is protected by the existing Host phase reservation.
+            # Verification backend count is protected, but its future time and
+            # operations are gated only when a complete schedule is frozen.
+            spendable=store.spendable(run_id,db)['remaining']
+            for k,v in dict(model_calls=2,tool_calls=10,wall_s=1200.).items():
+                project[k]=max(0,project[k]-v)
         if permissions.get('elapsed_deadline_unix'):
             import time
             project['wall_s']=min(project['wall_s'],max(0,permissions['elapsed_deadline_unix']-time.time()))
         # Child executions charge the project, not the research-role session.
         # Protect the full frozen paired allowance until search has ended.
-        for k,v in dict(backend_solves=20,tool_calls=60,wall_s=19800.).items():
+        reserve=dict(backend_solves=20) if conditional else dict(backend_solves=20,tool_calls=60,wall_s=19800.)
+        for k,v in reserve.items():
             project[k]=max(0,project[k]-v)
+        if conditional:
+            project={k:min(v,spendable[k]) for k,v in project.items()}
     return {k:min(v,session[k]) for k,v in project.items()}
 
 

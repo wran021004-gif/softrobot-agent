@@ -90,6 +90,11 @@ def validate_decision(store, view, decision):
     d=ResearchDecision.model_validate(decision);state=store.session(view.run_id)['state'];role=state['role_context']
     if not role.get('autonomous_scheduling'):raise ValueError('AUTONOMOUS_RESEARCH_GRANT_REQUIRED')
     cap=capabilities(store,view.run_id,role['research_records'])
+    if role.get('research_final_reporting'):
+        cap['legal']={'stop':dict(reason='Final interpretation only',execution_authorized=False)}
+        cap['unavailable'].update({a:'Research trajectory closed' for a in ACTIONS if a!='stop'})
+    from tools.current_research_authority import dispatch_snapshot
+    authority_check=dispatch_snapshot(store,view.run_id,role,cap,d.action)
     if d.action not in cap['legal']:raise ValueError('CAPABILITY_GAP: '+cap['unavailable'][d.action])
     selectors=resolve_aliases(state,{'evidence':d.evidence})['evidence']
     latest=role['result_feedback']; feedback=store.artifact(latest)['result']
@@ -101,6 +106,7 @@ def validate_decision(store, view, decision):
     interpretation_bindings=[resolve_aliases(state,{k:v for k,v in dict(support=i.supporting_evidence,contradiction=i.contradicting_evidence).items() if v})
         for i in d.interpretations]
     result=dict(decision=plain(d),evidence_selectors=selectors,capabilities=cap,feedback=latest,
+        authority_check=authority_check,
         verified_observations=observations,model_interpretations=[plain(i) for i in d.interpretations],
         interpretation_bindings=interpretation_bindings,unresolved_uncertainties=d.unresolved_uncertainties,
         scientific_reasoning_status='Model-authored; valid references do not establish causal truth')
