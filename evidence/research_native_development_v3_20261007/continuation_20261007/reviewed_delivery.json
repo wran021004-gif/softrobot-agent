@@ -1,0 +1,341 @@
+{
+  "version": "v3-continuation-review@3.3.0",
+  "status": "sealed_engineering_stop",
+  "source_attachment": "0b4a8cdb-8e3b-48d7-975c-ee44dd2fce54",
+  "same_campaign": true,
+  "same_session": true,
+  "grant_unchanged": true,
+  "clock": {
+    "version": "successor_clock@3.0.0",
+    "origin_unix": 1791341029.4261196,
+    "deadline_unix": 1791377029.4261196,
+    "reset_permitted": false,
+    "subsequent_waits_pause_clock": false
+  },
+  "live_elapsed_s": 3931.200728416443,
+  "deadline_remaining_s": 32068.799271583557,
+  "original_answers_unchanged": true,
+  "prior_checkpoint_preserved": true,
+  "new_provider_calls": [
+    {
+      "request_id": "model-4",
+      "execution_id": "52e7cbf0d5384fb3bb9e07ff79ea1fa0",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 101.17200000002049,
+        "worker_calls": 0
+      },
+      "effect": "Accepted freely chosen feedback-linked structure_search"
+    },
+    {
+      "request_id": "model-5",
+      "execution_id": "5c334d36e18f41f18fd0562f274e426e",
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 0,
+        "wall_s": 63.28100000001723,
+        "worker_calls": 0
+      },
+      "effect": "Accepted STOP-only engineering fault report, not executed as scientific STOP"
+    }
+  ],
+  "incremental_backend_attempts": 0,
+  "cumulative_backend_attempts": 2,
+  "old_backend_execution_ids": [
+    "871e8b83c5d14f9ba813fb65dcb0cc29",
+    "ed8e838859714c17930b16ba7a46e8e1"
+  ],
+  "feedback": {
+    "free_successor_obtained": true,
+    "second_batch_planned": true,
+    "second_batch_executed": false,
+    "accepted_plan": {
+      "artifact_id": "9d47b0f3661a7243e45d339c206e297f158f636f5893df229ef2186d8c80354f",
+      "media_type": "application/json"
+    },
+    "method": "search.family_explicit@1.0.0",
+    "candidates": [
+      {
+        "design/near_section_scale": 1.0
+      },
+      {
+        "design/near_section_scale": 1.05
+      }
+    ],
+    "batch_id": "batch-acf51de37cc32112",
+    "candidates_prepared": 0,
+    "backend_dispatched": 0
+  },
+  "engineering": {
+    "previous_repairs": 2,
+    "additional_authorized_repairs_used": 2,
+    "cumulative_repairs": 4,
+    "repair1": {
+      "contract_version": "1.2.0",
+      "request_id": "continuation-accounting-repair1",
+      "execution_id": "56d2784dce624f6aad1fcce35db8d1b9",
+      "caller": "engineering",
+      "tool_id": "engineering.current_authority_settlement",
+      "tool_version": "3.2.0",
+      "result_contract": null,
+      "result_version": "1.0.0",
+      "execution_status": "completed",
+      "solver_status": "not_run",
+      "analysis_status": "not_assessed",
+      "task_success": null,
+      "output": {
+        "artifact_id": "232abe5ed0aa0847f08ef72a23c81ebe166ad6973d979cded8ea599b5de3b954",
+        "media_type": "application/json"
+      },
+      "error": null,
+      "cache_hit": false,
+      "original_execution_id": null,
+      "charged": {
+        "tool_calls": 1,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 912.0794966220856
+      }
+    },
+    "repair2": {
+      "contract_version": "1.2.0",
+      "request_id": "continuation-dependency-repair2",
+      "execution_id": "4e8efedc3dee45239f1aca7b1ccbf349",
+      "caller": "engineering",
+      "tool_id": "engineering.same_session_dependency_migration",
+      "tool_version": "3.3.0",
+      "result_contract": null,
+      "result_version": "1.0.0",
+      "execution_status": "completed",
+      "solver_status": "not_run",
+      "analysis_status": "not_assessed",
+      "task_success": null,
+      "output": {
+        "artifact_id": "ff3ab0a07a2de4b9ae9e33bc2f2858cad89b34dc18539b43ef396e48af737b5e",
+        "media_type": "application/json"
+      },
+      "error": null,
+      "cache_hit": false,
+      "original_execution_id": null,
+      "charged": {
+        "tool_calls": 1,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 144.08085465431213
+      }
+    },
+    "unresolved": {
+      "location": "tools/platform_search.py:_run_batch historical known-point loop",
+      "operation": "parameter_value(saved historical effective, design/near_section_scale)",
+      "missing_historical_selectors": [
+        {
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "error": "CONSTRAINED_PARAMETER_MISSING: design/near_section_scale"
+        },
+        {
+          "execution_id": "110dc2c9c1d642dcb018664a65c62c30",
+          "error": "CONSTRAINED_PARAMETER_MISSING: design/near_section_scale"
+        },
+        {
+          "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+          "error": "CONSTRAINED_PARAMETER_MISSING: design/near_section_scale"
+        },
+        {
+          "execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+          "error": "CONSTRAINED_PARAMETER_MISSING: design/near_section_scale"
+        },
+        {
+          "execution_id": "312ef97407b34ff28905e883a947f475",
+          "error": "CONSTRAINED_PARAMETER_MISSING: design/near_section_scale"
+        },
+        {
+          "execution_id": "bebcfd47274940fb88a55ce5a2457c4c",
+          "error": "CONSTRAINED_PARAMETER_MISSING: design/near_section_scale"
+        },
+        {
+          "execution_id": "e3876a1d289f41f08d46c96202f1da0c",
+          "error": "CONSTRAINED_PARAMETER_MISSING: design/near_section_scale"
+        }
+      ]
+    },
+    "further_live_repairs_authorized": false
+  },
+  "mathematics": {
+    "new_standalone_numerical_operations": 0,
+    "method": "Model-authored finite enumeration and recorded arithmetic differences; not executed mathematical optimization",
+    "retained_support": "Frozen normalized squared tip-speed objective interpretation; retained M5 forecast evidence has no screening authority",
+    "unexercised": [
+      "Quantitative optimizer",
+      "New linearization/endpoint calculation",
+      "New retained diagnostic query",
+      "Structural backend execution",
+      "Fresh matched verification"
+    ]
+  },
+  "verification": {
+    "status": "not_started",
+    "reason": "Recurring historical-selector defect before any candidate apply/backend; two additional repair allowances exhausted; no free scientific STOP was executed",
+    "conditional_gate_assessment": {
+      "version": "conditional_verification@3.0.0",
+      "selected_candidate": {
+        "candidate_id": "batch-396bdbbae02626d3-0",
+        "configuration": {
+          "artifact_id": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+          "media_type": "application/json"
+        },
+        "changes": {
+          "control/recipe/terminal_tip_speed_weight": 0.1
+        }
+      },
+      "branch": "matched_comparison",
+      "attempts": 20,
+      "schedule": "Five existing cases, seed17 then18, incumbent then candidate per slot when paired",
+      "no_candidate_question": "What is the unchanged incumbent performance under the currently unmeasured frozen perturbations?",
+      "required": {
+        "backend_solves": 20,
+        "model_calls": 2,
+        "tool_calls": 70,
+        "wall_s": 21000.0,
+        "worker_calls": 0
+      },
+      "available": {
+        "backend_solves": 26,
+        "model_calls": 18,
+        "tool_calls": 179,
+        "wall_s": 30982.16902372356,
+        "worker_calls": 0
+      },
+      "shortfalls": {
+        "backend_solves": 0.0,
+        "model_calls": 0.0,
+        "tool_calls": 0.0,
+        "wall_s": 0.0,
+        "worker_calls": 0.0
+      },
+      "authorized": true,
+      "limitation": "Final verification is conditional, not guaranteed by the research allocation; no schedule reduction or search-result substitution."
+    },
+    "gate_evaluation_only": true,
+    "attempts_launched": 0,
+    "eligible_point_not_promoted": true
+  },
+  "issues": [
+    {
+      "location": "model-4 same-condition comparison rationale",
+      "review": "The unchanged incumbent was historical and task identities differ (unspecified-zero vs explicit-zero). Arithmetic differences are descriptive, not a fresh matched reference; no new incumbent execution occurred."
+    },
+    {
+      "location": "model-4 two control axes bracketed / untested structure claims",
+      "review": "Finite terminal-weight points and historical holding-weight points do not exhaust continuous axes or prove structural search has highest information. A changed near-section perturbed event exists in history; zero new structural execution occurred in this continuation."
+    },
+    {
+      "location": "model-4 eligibility wording",
+      "review": "The frozen host selection rule allows an effective changed fresh nominal joint pass nondominated among eligible search rows; it does not require componentwise dominance over the incumbent. The existing terminal=.10 point remains eligible despite a historical tradeoff; no protocol change or promotion was adopted."
+    },
+    {
+      "location": "model-5 changed terminal/holding weight scope",
+      "review": "Both completed current research executions changed terminal tip-speed weight only; holding weight remained .05 and physical structure was unchanged."
+    },
+    {
+      "location": "model-5 previous unaccepted draft / STOP",
+      "review": "model-4 was accepted and its immutable structure_search plan was recorded. Execution then failed before apply or backend dispatch. model-5 is STOP-only fault reporting, not a free scientific successor or executed research seal."
+    }
+  ],
+  "corrections": {
+    "total": 2,
+    "consecutive": 0,
+    "new_protocol_corrections": 0,
+    "transport_retries_total": 0,
+    "new_transport_retries": 0
+  },
+  "usage_at_driver_export": {
+    "limit": {
+      "backend_solves": 28,
+      "model_calls": 24,
+      "tool_calls": 200,
+      "wall_s": 36000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 20,
+      "model_calls": 6,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 3817.83097627644
+    },
+    "remaining": {
+      "backend_solves": 26,
+      "model_calls": 18,
+      "tool_calls": 180,
+      "wall_s": 32182.16902372356,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "incremental_driver_export_usage": {
+    "tool_calls": 5,
+    "model_calls": 2,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 1318.408906290104
+  },
+  "incremental_known_provider_tokens": {
+    "prompt_tokens": 88235,
+    "completion_tokens": 38698,
+    "total_tokens": 126933
+  },
+  "cumulative_known_provider_tokens": {
+    "prompt_tokens": 252578,
+    "completion_tokens": 121241,
+    "total_tokens": 373819
+  },
+  "token_unknowns": false,
+  "monetary_billing": "unknown",
+  "standalone_numerical_operations": 0,
+  "workers": 0,
+  "additional_roles": 0,
+  "next_task": "Offline historical known-point selector projection at _run_batch, using saved records and current planning policy with unchanged physical scope. Further paid execution needs explicit new repair authorization and must use this same ledger and original clock if still valid; never replay old completed attempts or treat the accepted plan as completed experiments.",
+  "limitations": [
+    "Development observations only",
+    "No robustness/superiority/global-optimality/causality claim",
+    "No hardware or real-time deployment claim",
+    "Research roadmap remains incomplete"
+  ],
+  "settled_delivery_usage": {
+    "limit": {
+      "backend_solves": 28,
+      "model_calls": 24,
+      "tool_calls": 200,
+      "wall_s": 36000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 21,
+      "model_calls": 6,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 4101.327783851666
+    },
+    "remaining": {
+      "backend_solves": 26,
+      "model_calls": 18,
+      "tool_calls": 179,
+      "wall_s": 31898.672216148334,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "incremental_settled_delivery_usage": {
+    "tool_calls": 6,
+    "model_calls": 2,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 1601.9057138653297
+  },
+  "publication_tail_status": "Explicitly in flight; final actual local receipt reconciles after remote readback"
+}

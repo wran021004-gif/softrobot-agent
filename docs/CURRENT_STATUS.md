@@ -1,5 +1,19 @@
 # Current development status - Milestones 4 and 5, 2026-10-07
 
+The explicitly authorized **same-ledger v3 continuation** is now sealed on a
+recurring archived-selector engineering defect. Both additional repair allowances
+were used (four cumulative): conserved settlement authority, then a recorded
+same-session dependency migration. New `model-4` freely used both completed
+outcomes to propose near-section scales 1.00/1.05; its accepted plan failed in
+the historical known-point loop before any candidate apply or backend.
+New `model-5` delivered a STOP-only fault report. No new backend or final
+verification ran. The original clock/deadline and counts remain; final verification
+resources were sufficient, but recurring defects and exhausted repair allowance
+require stopping. See the [appended review](../evidence/research_native_development_v3_20261007/continuation_20261007/independent_live_review.json).
+This bounded continuation is delivered; the full scientific roadmap is incomplete.
+
+The following v3 paragraph describes its preserved **pre-continuation checkpoint**.
+
 A separately authorized [native successor v3](research_native_development_v3.md)
 adds a current campaign/session/revision snapshot for every actual request and
 dispatch, retains the migrated-session fix, and conditions final wall-time
