@@ -99,8 +99,10 @@ def verify_accounting_transition(state,authority,archive):
     old_binding=state['authority'].get('accounting_binding')
     if old_binding:
         previous=store.artifact(old_binding['reference'])
-        if previous['grant_identity']!=value['grant_identity'] or previous['session_snapshot']!=value['session_snapshot']:
+        if previous['grant_identity']!=value['grant_identity']:
             raise ValueError('ACCOUNTING_AUTHORIZATION_CHANGED')
+        if previous['session_snapshot']!=value['session_snapshot']:
+            verify_dependency_migration(store,binding['session_id'],previous['session_snapshot'],value['session_snapshot'])
         if previous['clock'] is not None and previous['clock']!=value['clock']:raise ValueError('ACCOUNTING_CLOCK_CHANGED')
         old_policy=deepcopy(previous['phase_policy']);new_policy=deepcopy(value['phase_policy'])
         if previous['clock'] is None:old_policy.pop('elapsed_deadline_unix',None);new_policy.pop('elapsed_deadline_unix',None)
@@ -111,6 +113,39 @@ def verify_accounting_transition(state,authority,archive):
             new=current.get((old['run_id'],old['request_id']))
             if not new or any(new[k]!=old[k] for k in ('execution_id','reserved','parent_id')) or (old['receipt'] and new!=old):
                 raise ValueError('ACCOUNTING_SETTLED_HISTORY_CHANGED')
+    return True
+
+
+def verify_dependency_migration(store,run_id,before_identity,after_identity):
+    """Verify the one explicitly authorized v3 infrastructure revision only."""
+    from tools.platform_registry import dependency_closure,registry
+    session=store.session(run_id)
+    ref=session['state'].get('authorized_dependency_migration')
+    if not ref:raise ValueError('ACCOUNTING_AUTHORIZATION_CHANGED')
+    boundary=store.artifact(ref)
+    before=store.artifact(boundary['before_snapshot']);after=store.artifact(boundary['after_snapshot'])
+    key='research.decide@1.0.0';path='tools/research_scheduler.py'
+    auth=boundary['authorization']
+    if (boundary['version']!='v3-dependency-continuation@3.3.0' or boundary['session_id']!=run_id or
+        boundary['campaign_id']!=store.config()['project_id'] or
+        digest(before)!=before_identity or digest(after)!=after_identity or after!=session['snapshot'] or
+        boundary['grant_identity']!=digest(store.config()) or
+        boundary['original_clock']!=read(store.root/'live_clock.json') or
+        auth['additional_material_live_repairs']!=2 or auth['same_campaign']!=boundary['campaign_id'] or
+        auth['same_session']!=run_id or auth['clock']!=boundary['original_clock'] or
+        auth['source_attachment']!='0b4a8cdb-8e3b-48d7-975c-ee44dd2fce54' or boundary['additional_material_repairs_used']!=2):
+        raise ValueError('ACCOUNTING_DEPENDENCY_MIGRATION_BINDING_CHANGED')
+    expected=deepcopy(before)
+    expected['dependencies'][key]=deepcopy(after['dependencies'][key])
+    if expected!=after:raise ValueError('ACCOUNTING_MIGRATION_CHANGED_AUTHORIZATION_OR_OTHER_DEPENDENCIES')
+    old=before['dependencies'][key];new=after['dependencies'][key]
+    allowed=deepcopy(old);allowed['sources'][path]=new['sources'][path]
+    if old==new or allowed!=new:raise ValueError('ACCOUNTING_MIGRATION_CHANGED_SCIENCE')
+    current=dependency_closure([registry().get('research.decide','1.0.0')],registry())[key]
+    if new!=current:raise ValueError('ACCOUNTING_MIGRATION_IMPLEMENTATION_CHANGED')
+    if not any(e['kind']=='authorized_dependency_migration' and e['status']=='completed' and
+        e['outputs']==[ref] for e in store.events(run_id)):
+        raise ValueError('ACCOUNTING_MIGRATION_EVENT_MISSING')
     return True
 
 

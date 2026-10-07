@@ -59,15 +59,7 @@ class SettlementTests(TestCase):
         state=deepcopy(self.state);state['authority'].update(authority);state['budget_accounting']=authority['budget_accounting'];state['budget']=authority['remaining_budget']
         return state
 
-    def test_recorded_release_and_actual_outgoing_request(self):
-        events=self.store.events(self.run)
-        reserved=next(e for e in events if e['request_id']=='observed-live-boundary-repairs' and e['status']=='reserved')
-        settled=next(e for e in events if e['request_id']=='observed-live-boundary-repairs' and e['status']=='completed')
-        self.assertEqual(reserved['cost']['wall_s'],1800.)
-        self.assertAlmostEqual(settled['cost']['wall_s'],336.64255690574646)
-        self.baseline()
-        # Full configure -> shared fit -> current snapshot check, using the saved
-        # physical outcomes and explicitly permitted historical source archive.
+    def cloned_working(self):
         w=pilot.restore(SOURCE);w.store=self.store
         from tools.platform_host import Host
         w.host=Host(self.root,self.run)
@@ -83,6 +75,46 @@ class SettlementTests(TestCase):
                 source['path']=(self.root.relative_to(ROOT)/suffix).as_posix()
             archive.sources[source['reference']['artifact_id']]=source
         w.context_archive=archive
+        return w
+
+    def test_same_session_dependency_migration_and_request(self):
+        from examples.research_campaign_v3 import migrate_research_dependency,seal
+        from tools.current_research_authority import verify_dependency_migration
+        before_state=self.baseline();w=self.cloned_working()
+        before=deepcopy(self.store.session(self.run));used=self.store.remaining()['used']
+        self.assertEqual(w.host.compatibility()['changed'],['research.decide@1.0.0'])
+        w.freeze['implementation']=seal();boundary=migrate_research_dependency(w)
+        after=self.store.session(self.run)
+        self.assertEqual(after['snapshot']['input'],before['snapshot']['input'])
+        self.assertEqual(after['state']['turn'],before['state']['turn'])
+        self.assertEqual(after['state'].get('protocol_corrections_used'),before['state'].get('protocol_corrections_used'))
+        self.assertEqual(self.store.remaining()['used'],used)
+        self.assertTrue(w.host.compatibility()['compatible'])
+        self.assertTrue(verify_accounting_transition(before_state,self.authority(),self.archive))
+        pilot.configure(w);payload=payload_for(w.host,EvidenceDrivenAdapter())
+        self.assertIn('research_decide',[t['function']['name'] for t in payload['tools']])
+        # Even a migration artifact/event cannot authorize changing the input.
+        from tools.platform_store import plain
+        forged=deepcopy(after['snapshot']);forged['input']['policy']['budget']['model_calls']+=1
+        with self.store.transaction() as db:
+            boundary['after_snapshot']=plain(self.store.put(db,forged));ref=plain(self.store.put(db,boundary))
+            self.store.event(db,self.run,'authorized_dependency_migration','completed',outputs=[ref],version='3.3.0')
+            db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(boundary['after_snapshot']['artifact_id'],self.run))
+            state=self.store.session(self.run,db)['state'];state['authorized_dependency_migration']=ref
+            self.store.update_state(db,self.run,state)
+        with self.assertRaisesRegex(ValueError,'MIGRATION_CHANGED_AUTHORIZATION'):
+            verify_dependency_migration(self.store,self.run,digest(before['snapshot']),digest(forged))
+
+    def test_recorded_release_and_actual_outgoing_request(self):
+        events=self.store.events(self.run)
+        reserved=next(e for e in events if e['request_id']=='observed-live-boundary-repairs' and e['status']=='reserved')
+        settled=next(e for e in events if e['request_id']=='observed-live-boundary-repairs' and e['status']=='completed')
+        self.assertEqual(reserved['cost']['wall_s'],1800.)
+        self.assertAlmostEqual(settled['cost']['wall_s'],336.64255690574646)
+        self.baseline()
+        # Full configure -> shared fit -> current snapshot check, using the saved
+        # physical outcomes and explicitly permitted historical source archive.
+        w=self.cloned_working()
         pilot.configure(w);payload=payload_for(w.host,EvidenceDrivenAdapter())
         packet=json.loads(payload['messages'][1]['content'])['role_context']['research_packet']
         self.assertEqual(packet['capabilities']['remaining'],downstream_available(self.store,self.run))

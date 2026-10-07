@@ -242,10 +242,85 @@ def continue_authorized(directory=None):
     continue_trajectory(w)
 
 
+def migrate_research_dependency(w):
+    """Record a narrow same-session migration; immutable original snapshot survives."""
+    from tools.platform_registry import dependency_closure
+    from tools.platform_store import plain
+    from tools.current_research_authority import verify_dependency_migration
+    key='research.decide@1.0.0';path='tools/research_scheduler.py'
+    session=w.store.session(w.host.run_id);before=deepcopy(session['snapshot'])
+    if session['state'].get('authorized_dependency_migration'):
+        raise ValueError('DEPENDENCY_MIGRATION_ALREADY_USED_NO_REPLAY')
+    if w.host.compatibility()['changed']!=[key]:raise ValueError('UNEXPECTED_DEPENDENCY_CHANGE')
+    new=dependency_closure([w.host.reg.get('research.decide','1.0.0')],w.host.reg)[key]
+    old=before['dependencies'][key];allowed=deepcopy(old);allowed['sources'][path]=new['sources'][path]
+    if old==new or allowed!=new:raise ValueError('DEPENDENCY_CHANGE_EXCEEDS_AUTHORIZED_INFRASTRUCTURE_REPAIR')
+    if new['sources'][path]!=w.freeze['implementation']['files'][path]:raise ValueError('DEPENDENCY_NOT_FROZEN')
+    after=deepcopy(before);after['dependencies'][key]=new
+    with w.store.transaction() as db:
+        prior_ref=plain(w.store.put(db,before));next_ref=plain(w.store.put(db,after))
+        boundary=dict(version='v3-dependency-continuation@3.3.0',campaign_id=w.store.config(db)['project_id'],
+            session_id=w.host.run_id,before_snapshot=prior_ref,after_snapshot=next_ref,
+            grant_identity=digest(w.store.config(db)),original_clock=deepcopy(w.freeze['live_clock']),
+            authorization=w.freeze['continuation_authorization'],additional_material_repairs_used=2,
+            cumulative_material_repairs=4,changed_dependency=key,changed_source=path,
+            implementation=w.freeze['implementation'],science_changed=False,no_new_session=True)
+        ref=plain(w.store.put(db,boundary))
+        w.store.event(db,w.host.run_id,'authorized_dependency_migration','completed',
+            caller='engineering',inputs=[prior_ref],outputs=[ref],version='3.3.0')
+        db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(next_ref['artifact_id'],w.host.run_id))
+        state=session['state'];state['authorized_dependency_migration']=ref
+        w.store.update_state(db,w.host.run_id,state)
+    verify_dependency_migration(w.store,w.host.run_id,digest(before),digest(after))
+    if not w.host.compatibility()['compatible']:raise ValueError('MIGRATED_DEPENDENCY_STILL_INCOMPATIBLE')
+    return boundary
+
+
+def recover_dependency(directory=None):
+    """Second and last additionally authorized repair; no scientific replay."""
+    from examples.gvs_nmpc_route_experiment import load_credential
+    config=read(CONFIG);w=pilot.restore((directory or ROOT/'runs'/config['campaign_id']).resolve())
+    start=read(w.directory/'continuation_dependency_repair_start.json')
+    if (w.status!='failed' or w.repairs!=3 or w.sealed_cases or
+        w.stop_reason!="DEPENDENCIES_CHANGED: ['research.decide@1.0.0']" or
+        w.freeze.get('additional_material_repairs_used')!=1):
+        raise ValueError('ONLY_OBSERVED_DEPENDENCY_BOUNDARY_LAST_REPAIR_AUTHORIZED')
+    if w.freeze['live_clock']!=read(w.directory/'live_clock.json') or time.time()>=w.freeze['live_clock']['deadline_unix']:
+        raise ValueError('ORIGINAL_CLOCK_INVALID_OR_EXPIRED')
+    with w.store.connect(True) as db:
+        unsettled=[dict(r) for r in db.execute('SELECT * FROM calls WHERE receipt IS NULL')]
+    if len(unsettled)!=1 or unsettled[0]['request_id']!='continuation-dependency-repair2':
+        raise ValueError('UNRELATED_UNSETTLED_WORK_RECOVERY_FORBIDDEN')
+    out=Path(w.freeze['experiment']['evidence_directory'])
+    for name in ('failure.json','freeze.json','scheduler_state.json','final_interpretation_failure.json'):
+        atomic_json(out/('dependency_failure_'+name),read(w.directory/name))
+    w.freeze['implementation']=seal()
+    migration=migrate_research_dependency(w)
+    w.repairs=4;w.freeze['additional_material_repairs_used']=2;w.freeze['material_live_repairs']=4
+    w.freeze['final_reporting']=False;w.status='running';w.stop_reason=None
+    w.freeze['repair_boundary']=dict(version='v3-dependency-continuation@3.3.0',previous_repairs=2,
+        additional_repairs_used=2,cumulative_material_repairs=4,
+        full_boundary=w.store.session(w.host.run_id)['state']['authorized_dependency_migration'],
+        corrected_commit=w.freeze['implementation']['commit'],budget_reset=False,science_changed=False,
+        backend_replayed=0,original_clock=w.freeze['live_clock'])
+    load_credential(Path.home()/'.codex/.env')
+    elapsed=time.time()-start['boundary']['started_unix']
+    receipt=w.store.complete(start['reservation'],dict(request_id=start['reservation']['request_id'],
+        execution_id=start['reservation']['execution_id'],caller='engineering',
+        tool_id='engineering.same_session_dependency_migration',tool_version='3.3.0',
+        execution_status='completed',charged=zero()),migration,elapsed)
+    pilot.configure(w);adapter=EvidenceDrivenAdapter();payload=payload_for(w.host,adapter)
+    pilot.adopt_current_working(w);pilot.persist(w)
+    atomic_json(out/'dependency_migration_boundary.json',dict(migration=migration,receipt=receipt))
+    atomic_json(out/'prepared_migrated_request.json',dict(payload=payload,audit=adapter.context_assembly_audit))
+    continue_trajectory(w)
+
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','recover-live','continue-authorized']);parser.add_argument('--output',type=Path)
+    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','recover-live','continue-authorized','recover-dependency']);parser.add_argument('--output',type=Path)
     args=parser.parse_args()
     if args.mode=='prepare':prepare(args.output)
     elif args.mode=='live':live(args.output)
     elif args.mode=='recover-live':recover_live(args.output)
-    else:continue_authorized(args.output)
+    elif args.mode=='continue-authorized':continue_authorized(args.output)
+    else:recover_dependency(args.output)
