@@ -1,0 +1,1958 @@
+{
+  "version": "research.native_development@3.0.0",
+  "project_id": "research_native_development_v3_20261007",
+  "research_host": "research_native_development_v3_20261007-research",
+  "limits": {
+    "backend_solves": 28,
+    "model_calls": 24,
+    "tool_calls": 200,
+    "worker_calls": 0,
+    "wall_s": 36000.0
+  },
+  "offline_fixture": false,
+  "primary": {
+    "candidate_id": "batch-ebbeadbdaca10732-0",
+    "configuration": {
+      "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+      "media_type": "application/json"
+    },
+    "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+    "owner_run_id": "batch-ebbeadbdaca10732-0"
+  },
+  "incumbent": {
+    "candidate_id": "batch-ebbeadbdaca10732-0",
+    "configuration": {
+      "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+      "media_type": "application/json"
+    },
+    "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+    "owner_run_id": "batch-ebbeadbdaca10732-0"
+  },
+  "binding": {
+    "artifact_id": "3c7aa586184230b63096410b1bc0ab39e4515b86abdc9b3a6f0ccac8c3ab117a",
+    "media_type": "application/json"
+  },
+  "source_report": {
+    "artifact_id": "73d51b89a7dcd84639eeac83bdab0d586990b97dc8826592610f66ccf39f5a7a",
+    "media_type": "application/json"
+  },
+  "provider_configuration": {
+    "adapter": "deepseek",
+    "adapter_version": "6.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 400000,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-03"
+    },
+    "length_recovery": {
+      "enabled": true,
+      "max_tokens": 131072,
+      "timeout_s": 900.0
+    },
+    "max_no_progress": 3,
+    "max_repairs": 2,
+    "max_tokens": 65536,
+    "max_turns": 24,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_total": 4,
+      "max_consecutive": 2
+    },
+    "readonly_batch_limit": 3,
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0,
+    "tool_naming": {
+      "scheme": "readable_v1",
+      "mapping_identity": "ae769b2a4822b5f771cf13adb207ddaacbf36b90d1fe8232fa562f3638014a68"
+    }
+  },
+  "implementation": {
+    "commit": "40193bb404f790856d8630c9e741a9218a128ba6",
+    "files": {
+      "examples/research_model_v1.py": "9f559b85cbe386d22bec2c098c8e9d1c3f4436ebe701b10bf366e23e7399736f",
+      "examples/milestone4_autonomous.py": "764462cb45bb72b5f5f506f2dad38a1d46de8a9e67a3c8ece1143070c8057a44",
+      "configs/research/native_pilot_v1.json": "b096d68d9f85bd53cd686ce8e697f992e45ae5696533600e15c851c86b6ab375",
+      "tools/research_scheduler.py": "d92e83e31e0c97dbe408fd3d76b27a2df6c7e96ac9e490bbe999fa7fceeb8c5d",
+      "tools/platform_search.py": "32a9e44ae76cae62c2394699631b77434566abb7d4c0c56f62cefcc023d24c9d",
+      "tools/live_batch_execution.py": "9c59f58453ea876ca7be00c724737d55b9d4ce30a83a6cffc3b4d5e3bb3fad8e",
+      "tools/context_assembly.py": "2bb9ce822d0e0985e488bc42c603f2cf38231915545582646037a1e74149aff5",
+      "tools/diagnostic_reference_adapter.py": "de5219506250c92a152d5a3f5b706ea25acacab3b2c165eaede9f5284e57c53e",
+      "examples/research_campaign_v2.py": "a3186d217e206117ed1168397eb88c52c70ad7e886ec7d23bede37ea355b4dd7",
+      "configs/research/native_campaign_v2.json": "abcf6ebc59b8870366d607db15345b48b04e65c8e921b8e6e2611bc304033bc3",
+      "schemas/platform_handoff.py": "0cf890ec8dcadb94d05e1781cf20d6b0ec5de048a92ba50ebe941b6f722916f7",
+      "tools/batch_budget.py": "ca65edb2234c217f807cc023af6adc36c6dd45dbbc62f3628c71b7c26c83e172",
+      "tools/research_spec.py": "df3e03575a54a4c67c5dc4b6a42625eda6940cfe980d1ca8874dd67a06c9b153",
+      "tools/study_history.py": "4697e64b4643e73ab675688e477299dcfe742002d36be89d49b819f4aeb15b70",
+      "tools/candidate_parameters.py": "2c08bfdd5c15dc752b2ea6e5b85833584ba6d069e0c13fa98c097f04df3a7b61",
+      "tools/research_tasks.py": "c728710c80d97c48e53c31422a1f0aece54093e686b0d512c8f7cba0654101c9",
+      "tools/fixed_research.py": "27207dc82c489ce3f90669fd252530628fef7a65d3b543c56869ddfd2bc5891f",
+      "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43",
+      "tools/verification_evidence.py": "c9461fcdd882a1c1e0301fe0babff4fef2db76a7d36a311f3a5c9b4ecab8963f",
+      "examples/research_campaign_v3.py": "5d794350cfa2b059df95a77ab4bb4322548dda3792d523fc346596a97500bc40",
+      "configs/research/native_campaign_v3.json": "6f236fe78aac4a2ea0bd5a91d25bc4034599be83a4703210357d77549984ddf2",
+      "tools/current_research_authority.py": "5cdd7ed330a44516b13c154f43a1905439d817c59ac53259603389e591af2cdd",
+      "tools/platform_models.py": "a9e915bb8b2d75bc76c33fd2e37a5dbb11dfc3c2e5dbe6325580d59c36627503"
+    },
+    "stable_controller": {
+      "extensions/tendon_family/gvs_nmpc.py": "e3d6c33acf8fe6ab326de84634c0a4edf11ffe67ade1b9b72d9527787aae4e5a",
+      "extensions/tendon_family/gvs_trajectory.py": "160b47df2f0958929527d4871c61a66e3c69d766b7406144c97cb197ad65292b",
+      "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43"
+    }
+  },
+  "parameter_catalog": {
+    "version": "1.0.0",
+    "capability_version": "1.0.0",
+    "builder": {
+      "extension_id": "candidate.family",
+      "version": "1.1.0"
+    },
+    "effective_identity": "0a008c59991546d7c7092c2d8225b1202feef254aa1b8e3d980805539dad36cc",
+    "parameters": [
+      {
+        "id": "components/near/length_m",
+        "kind": "physical_design",
+        "type": "number",
+        "unit": "m",
+        "meaning": "near flexible segment length; attachment station fractions remain fixed.",
+        "schema": "family.design:Segment.length_m",
+        "legal_domain": {
+          "exclusive_minimum": 0
+        },
+        "operation": "set",
+        "components": [
+          "near"
+        ],
+        "effective_locations": [
+          "robot/structure/data/components/near/length_m"
+        ],
+        "coupled_constraints": [
+          "Fixed serial topology, cell counts, section stations and tendon routing; compiler checks geometry."
+        ],
+        "derived_quantities": [
+          "cell length",
+          "mass",
+          "inertia",
+          "hinge stiffness/damping",
+          "tendon site positions"
+        ],
+        "current_value": 0.16,
+        "experiment_granted_domain": {
+          "bounds": [
+            0.15,
+            0.17
+          ]
+        },
+        "builder_domain": {
+          "bounds": [
+            0.15,
+            0.17
+          ]
+        },
+        "technical_support": {
+          "supported": true,
+          "reasons": []
+        },
+        "study_permission": {
+          "permitted": true,
+          "reason": null
+        },
+        "validation_evidence": {
+          "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+          "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+          "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+          "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+        },
+        "mutation_mechanism": "candidate.family@1.1.0: set",
+        "required_rebuilds": [
+          "resolved physics",
+          "backend robot mesh/model",
+          "reduced geometry and structural basis",
+          "state projection",
+          "controller graph/solver",
+          "candidate initializer and warm-state regeneration"
+        ],
+        "reuse": {
+          "allowed": [
+            "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+            "Compatible bounded historical tensions as numerical guesses only"
+          ],
+          "invalidated": [
+            "candidate-specific equilibrium/linearization/endpoint/screen",
+            "controller plans and warm states",
+            "trajectories, evaluation, profiles, acceptance and comparisons"
+          ],
+          "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+        }
+      },
+      {
+        "id": "design/near_section_scale",
+        "kind": "physical_design",
+        "type": "number",
+        "unit": "1",
+        "meaning": "Uniform positive scale of all near section dimensions against original semantic_source.",
+        "schema": "family.space:SemanticDecision.section_scale",
+        "legal_domain": {
+          "exclusive_minimum": 0
+        },
+        "operation": "section_scale",
+        "components": [
+          "near"
+        ],
+        "effective_locations": [
+          "robot/structure/data/components/near/sections/*/section/parameters/*"
+        ],
+        "coupled_constraints": [
+          "Only ellipse/rectangle; preserve aspect ratios, station layout and section orientation.",
+          "One scale owner per segment; common and per-segment scale selectors cannot overlap.",
+          "Tendon offsets and straight frictionless routing remain fixed; this scale changes the bending section and backend mesh."
+        ],
+        "derived_quantities": [
+          "area",
+          "bending second moments",
+          "mass",
+          "inertia",
+          "hinge stiffness/damping",
+          "backend mesh"
+        ],
+        "current_value": 0.95,
+        "experiment_granted_domain": {
+          "bounds": [
+            0.95,
+            1.05
+          ]
+        },
+        "builder_domain": {
+          "bounds": [
+            0.95,
+            1.05
+          ]
+        },
+        "technical_support": {
+          "supported": true,
+          "reasons": []
+        },
+        "study_permission": {
+          "permitted": true,
+          "reason": null
+        },
+        "validation_evidence": {
+          "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+          "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+          "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+          "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+        },
+        "mutation_mechanism": "candidate.family@1.1.0: section_scale",
+        "required_rebuilds": [
+          "resolved physics",
+          "backend robot mesh/model",
+          "reduced geometry and structural basis",
+          "state projection",
+          "controller graph/solver",
+          "candidate initializer and warm-state regeneration"
+        ],
+        "reuse": {
+          "allowed": [
+            "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+            "Compatible bounded historical tensions as numerical guesses only"
+          ],
+          "invalidated": [
+            "candidate-specific equilibrium/linearization/endpoint/screen",
+            "controller plans and warm states",
+            "trajectories, evaluation, profiles, acceptance and comparisons"
+          ],
+          "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+        }
+      },
+      {
+        "id": "design/near_material_scenario",
+        "kind": "physical_design",
+        "type": "choice",
+        "unit": "1",
+        "meaning": "near numerical Young modulus scenario against original semantic_source.",
+        "schema": "family.space:SemanticDecision.material_scenario",
+        "legal_domain": {
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ]
+        },
+        "operation": "material_scenario",
+        "components": [
+          "near"
+        ],
+        "effective_locations": [
+          "robot/structure/data/components/near/physics/young_pa"
+        ],
+        "coupled_constraints": [
+          "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+          "Density and bending viscosity stay fixed; no independently mixed material properties.",
+          "One scenario owner per segment; common and per-segment material selectors cannot overlap."
+        ],
+        "derived_quantities": [
+          "Young modulus",
+          "hinge stiffness"
+        ],
+        "current_value": "compliant",
+        "experiment_granted_domain": {
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ]
+        },
+        "builder_domain": {
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ]
+        },
+        "technical_support": {
+          "supported": true,
+          "reasons": []
+        },
+        "study_permission": {
+          "permitted": true,
+          "reason": null
+        },
+        "validation_evidence": {
+          "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+          "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+          "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+          "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+        },
+        "mutation_mechanism": "candidate.family@1.1.0: material_scenario",
+        "required_rebuilds": [
+          "resolved physics",
+          "backend robot mesh/model",
+          "reduced geometry and structural basis",
+          "state projection",
+          "controller graph/solver",
+          "candidate initializer and warm-state regeneration"
+        ],
+        "reuse": {
+          "allowed": [
+            "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+            "Compatible bounded historical tensions as numerical guesses only"
+          ],
+          "invalidated": [
+            "candidate-specific equilibrium/linearization/endpoint/screen",
+            "controller plans and warm states",
+            "trajectories, evaluation, profiles, acceptance and comparisons"
+          ],
+          "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+        }
+      },
+      {
+        "id": "components/far/length_m",
+        "kind": "physical_design",
+        "type": "number",
+        "unit": "m",
+        "meaning": "far flexible segment length; attachment station fractions remain fixed.",
+        "schema": "family.design:Segment.length_m",
+        "legal_domain": {
+          "exclusive_minimum": 0
+        },
+        "operation": "set",
+        "components": [
+          "far"
+        ],
+        "effective_locations": [
+          "robot/structure/data/components/far/length_m"
+        ],
+        "coupled_constraints": [
+          "Fixed serial topology, cell counts, section stations and tendon routing; compiler checks geometry."
+        ],
+        "derived_quantities": [
+          "cell length",
+          "mass",
+          "inertia",
+          "hinge stiffness/damping",
+          "tendon site positions"
+        ],
+        "current_value": 0.11,
+        "experiment_granted_domain": {
+          "bounds": [
+            0.11,
+            0.13
+          ]
+        },
+        "builder_domain": {
+          "bounds": [
+            0.11,
+            0.13
+          ]
+        },
+        "technical_support": {
+          "supported": true,
+          "reasons": []
+        },
+        "study_permission": {
+          "permitted": true,
+          "reason": null
+        },
+        "validation_evidence": {
+          "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+          "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+          "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+          "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+        },
+        "mutation_mechanism": "candidate.family@1.1.0: set",
+        "required_rebuilds": [
+          "resolved physics",
+          "backend robot mesh/model",
+          "reduced geometry and structural basis",
+          "state projection",
+          "controller graph/solver",
+          "candidate initializer and warm-state regeneration"
+        ],
+        "reuse": {
+          "allowed": [
+            "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+            "Compatible bounded historical tensions as numerical guesses only"
+          ],
+          "invalidated": [
+            "candidate-specific equilibrium/linearization/endpoint/screen",
+            "controller plans and warm states",
+            "trajectories, evaluation, profiles, acceptance and comparisons"
+          ],
+          "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+        }
+      },
+      {
+        "id": "design/far_section_scale",
+        "kind": "physical_design",
+        "type": "number",
+        "unit": "1",
+        "meaning": "Uniform positive scale of all far section dimensions against original semantic_source.",
+        "schema": "family.space:SemanticDecision.section_scale",
+        "legal_domain": {
+          "exclusive_minimum": 0
+        },
+        "operation": "section_scale",
+        "components": [
+          "far"
+        ],
+        "effective_locations": [
+          "robot/structure/data/components/far/sections/*/section/parameters/*"
+        ],
+        "coupled_constraints": [
+          "Only ellipse/rectangle; preserve aspect ratios, station layout and section orientation.",
+          "One scale owner per segment; common and per-segment scale selectors cannot overlap.",
+          "Tendon offsets and straight frictionless routing remain fixed; this scale changes the bending section and backend mesh."
+        ],
+        "derived_quantities": [
+          "area",
+          "bending second moments",
+          "mass",
+          "inertia",
+          "hinge stiffness/damping",
+          "backend mesh"
+        ],
+        "current_value": 0.95,
+        "experiment_granted_domain": {
+          "bounds": [
+            0.95,
+            1.05
+          ]
+        },
+        "builder_domain": {
+          "bounds": [
+            0.95,
+            1.05
+          ]
+        },
+        "technical_support": {
+          "supported": true,
+          "reasons": []
+        },
+        "study_permission": {
+          "permitted": true,
+          "reason": null
+        },
+        "validation_evidence": {
+          "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+          "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+          "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+          "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+        },
+        "mutation_mechanism": "candidate.family@1.1.0: section_scale",
+        "required_rebuilds": [
+          "resolved physics",
+          "backend robot mesh/model",
+          "reduced geometry and structural basis",
+          "state projection",
+          "controller graph/solver",
+          "candidate initializer and warm-state regeneration"
+        ],
+        "reuse": {
+          "allowed": [
+            "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+            "Compatible bounded historical tensions as numerical guesses only"
+          ],
+          "invalidated": [
+            "candidate-specific equilibrium/linearization/endpoint/screen",
+            "controller plans and warm states",
+            "trajectories, evaluation, profiles, acceptance and comparisons"
+          ],
+          "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+        }
+      },
+      {
+        "id": "design/far_material_scenario",
+        "kind": "physical_design",
+        "type": "choice",
+        "unit": "1",
+        "meaning": "far numerical Young modulus scenario against original semantic_source.",
+        "schema": "family.space:SemanticDecision.material_scenario",
+        "legal_domain": {
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ]
+        },
+        "operation": "material_scenario",
+        "components": [
+          "far"
+        ],
+        "effective_locations": [
+          "robot/structure/data/components/far/physics/young_pa"
+        ],
+        "coupled_constraints": [
+          "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+          "Density and bending viscosity stay fixed; no independently mixed material properties.",
+          "One scenario owner per segment; common and per-segment material selectors cannot overlap."
+        ],
+        "derived_quantities": [
+          "Young modulus",
+          "hinge stiffness"
+        ],
+        "current_value": "compliant",
+        "experiment_granted_domain": {
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ]
+        },
+        "builder_domain": {
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ]
+        },
+        "technical_support": {
+          "supported": true,
+          "reasons": []
+        },
+        "study_permission": {
+          "permitted": true,
+          "reason": null
+        },
+        "validation_evidence": {
+          "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+          "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+          "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+          "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+        },
+        "mutation_mechanism": "candidate.family@1.1.0: material_scenario",
+        "required_rebuilds": [
+          "resolved physics",
+          "backend robot mesh/model",
+          "reduced geometry and structural basis",
+          "state projection",
+          "controller graph/solver",
+          "candidate initializer and warm-state regeneration"
+        ],
+        "reuse": {
+          "allowed": [
+            "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+            "Compatible bounded historical tensions as numerical guesses only"
+          ],
+          "invalidated": [
+            "candidate-specific equilibrium/linearization/endpoint/screen",
+            "controller plans and warm states",
+            "trajectories, evaluation, profiles, acceptance and comparisons"
+          ],
+          "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+        }
+      },
+      {
+        "id": "control/recipe/terminal_tip_speed_weight",
+        "kind": "control_objective",
+        "type": "number",
+        "unit": "1",
+        "meaning": "Dimensionless terminal weight on squared world tip speed / tip_speed_scale_m_s. Zero preserves legacy cost.",
+        "schema": "family.gvs_trajectory_parameters:terminal_tip_speed_weight",
+        "legal_domain": {
+          "options": [
+            0
+          ],
+          "intervals": [
+            [
+              0.0001,
+              1.0
+            ]
+          ]
+        },
+        "operation": "set",
+        "components": [
+          "controller"
+        ],
+        "effective_locations": [
+          "policy/controller/parameters/data/recipe/terminal_tip_speed_weight"
+        ],
+        "coupled_constraints": [
+          "Squared world tip speed normalized by fixed tip_speed_scale_m_s.",
+          "Holding cost follows fixed holding window; this objective does not change task acceptance."
+        ],
+        "derived_quantities": [
+          "controller objective terms"
+        ],
+        "current_value": 0.05,
+        "experiment_granted_domain": {
+          "bounds": [
+            0.025,
+            0.1
+          ]
+        },
+        "builder_domain": {
+          "bounds": [
+            0.025,
+            0.1
+          ]
+        },
+        "technical_support": {
+          "supported": true,
+          "reasons": []
+        },
+        "study_permission": {
+          "permitted": true,
+          "reason": null
+        },
+        "validation_evidence": {
+          "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+          "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+          "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+          "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+        },
+        "mutation_mechanism": "candidate.family@1.1.0: set",
+        "required_rebuilds": [
+          "controller graph/solver",
+          "warm-state regeneration"
+        ],
+        "reuse": {
+          "allowed": [
+            "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+            "Compatible bounded historical tensions as numerical guesses only"
+          ],
+          "invalidated": [
+            "candidate-specific equilibrium/linearization/endpoint/screen",
+            "controller plans and warm states",
+            "trajectories, evaluation, profiles, acceptance and comparisons"
+          ],
+          "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+        }
+      },
+      {
+        "id": "control/recipe/holding_tip_speed_weight",
+        "kind": "control_objective",
+        "type": "number",
+        "unit": "1",
+        "meaning": "Per-second squared spatial speed weight on nodes at/after the configured task settling-window start. Requires explicit settling settings.",
+        "schema": "family.gvs_trajectory_parameters:holding_tip_speed_weight",
+        "legal_domain": {
+          "options": [
+            0
+          ],
+          "intervals": [
+            [
+              0.0001,
+              1.0
+            ]
+          ]
+        },
+        "operation": "set",
+        "components": [
+          "controller"
+        ],
+        "effective_locations": [
+          "policy/controller/parameters/data/recipe/holding_tip_speed_weight"
+        ],
+        "coupled_constraints": [
+          "Squared world tip speed normalized by fixed tip_speed_scale_m_s.",
+          "Holding cost follows fixed holding window; this objective does not change task acceptance."
+        ],
+        "derived_quantities": [
+          "controller objective terms"
+        ],
+        "current_value": 0.05,
+        "experiment_granted_domain": {
+          "bounds": [
+            0.025,
+            0.1
+          ]
+        },
+        "builder_domain": {
+          "bounds": [
+            0.025,
+            0.1
+          ]
+        },
+        "technical_support": {
+          "supported": true,
+          "reasons": []
+        },
+        "study_permission": {
+          "permitted": true,
+          "reason": null
+        },
+        "validation_evidence": {
+          "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+          "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+          "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+          "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+        },
+        "mutation_mechanism": "candidate.family@1.1.0: set",
+        "required_rebuilds": [
+          "controller graph/solver",
+          "warm-state regeneration"
+        ],
+        "reuse": {
+          "allowed": [
+            "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+            "Compatible bounded historical tensions as numerical guesses only"
+          ],
+          "invalidated": [
+            "candidate-specific equilibrium/linearization/endpoint/screen",
+            "controller plans and warm states",
+            "trajectories, evaluation, profiles, acceptance and comparisons"
+          ],
+          "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+        }
+      }
+    ],
+    "usable_pool": [
+      "components/near/length_m",
+      "design/near_section_scale",
+      "design/near_material_scenario",
+      "components/far/length_m",
+      "design/far_section_scale",
+      "design/far_material_scenario",
+      "control/recipe/terminal_tip_speed_weight",
+      "control/recipe/holding_tip_speed_weight"
+    ],
+    "integration_backlog": [
+      {
+        "id": "segment_count",
+        "kind": "physical_design",
+        "reason": "No research mutation adapter or comparable initializer mapping for changed segment topology; historical controller compatibility requires fixed component topology."
+      },
+      {
+        "id": "tendon_count",
+        "kind": "physical_design",
+        "reason": "No research mutation adapter for changed input dimension, ordered tension guesses, actuator transmission and NMPC input-order reconstruction."
+      },
+      {
+        "id": "tendon_routing",
+        "kind": "physical_design",
+        "reason": "Underlying compiler supports declared routes, but stable reach technical scope freezes routing; changed-route projection, feasible warm guess and controller/backend validation are absent."
+      },
+      {
+        "id": "section_shape",
+        "kind": "physical_design",
+        "reason": "Backend compiler supports several shapes; stable reach compatibility only admits fixed ellipse/rectangle shape, station layout and uniform per-segment scaling. Changed-shape projection/controller validation is absent."
+      },
+      {
+        "id": "independent_material_properties",
+        "kind": "physical_design",
+        "reason": "Density and viscosity are represented but no manufacturing-consistent material declaration or study-validated coupled material mapping exists; Young-only scenarios are explicitly numerical."
+      },
+      {
+        "id": "natural_curvature",
+        "kind": "physical_design",
+        "reason": "Compiler represents rest curvature, but stable reach scope freezes it; no research mutation adapter, preload-consistent initial challenge mapping or changed-rest-shape controller validation is connected."
+      },
+      {
+        "id": "payload_mass_and_inertia",
+        "kind": "physical_design",
+        "reason": "Rigid payload mass, COM and full inertia tensor are represented, but stable reach scope freezes rigid components; no coupled physically consistent payload mutation, projection/controller validation or study initialization mapping is connected."
+      },
+      {
+        "id": "discretization/cells",
+        "kind": "numerical_model",
+        "reason": "Compiler can rebuild meshes, but first-study state mapping/controller compatibility and candidate cache policy are frozen to 12+12 cells; changed-dimension study adapter is absent."
+      },
+      {
+        "id": "omitted_physics",
+        "kind": "numerical_model",
+        "reason": "Serial bending model omits shear, stretch, torsion, tendon friction, rope elasticity and motor dynamics; these are not editable supported physical effects."
+      },
+      {
+        "id": "solver_recipe",
+        "kind": "numerical_model",
+        "reason": "First study freezes stable v7 horizon, stopping rules and solver budgets; arbitrary numerical recipe mutation is not connected to this candidate builder."
+      }
+    ],
+    "subset_selection": "All comparison groups may choose any subset of usable_pool within frozen domains; no per-batch permission.",
+    "version_rule": "Newly connected capability requires a new shared capability/study version.",
+    "execution_permission": "Parameter permission does not consume or override the separate frozen execution budget.",
+    "identity": "50cbf89ee5bfe38912716a73a4f8a40e8f78004eb9d3230627863a668a90e0c3"
+  },
+  "specification_identity": "eec598e5140f893856d39151ebd6f52d3c58938448cb44b95f285a2ca5ebc732",
+  "spec_path": "configs/research/reach_hold_v1_1.json",
+  "profile": {
+    "physical_design": [
+      "components/near/length_m",
+      "components/far/length_m",
+      "design/near_section_scale",
+      "design/far_section_scale",
+      "design/near_material_scenario",
+      "design/far_material_scenario"
+    ],
+    "control_parameters": [
+      "control/recipe/terminal_tip_speed_weight",
+      "control/recipe/holding_tip_speed_weight"
+    ],
+    "numerical_settings": "Exact incumbent recipe/basis/mesh/backend; solver max_cpu30s/max_iterations120 and feasible-return5/15s unchanged.",
+    "task_conditions": "Frozen initializer cases, target, timing, gravity, frame and acceptance; excluded from candidate design.",
+    "unavailable": "See generated catalog integration_backlog; dimension-changing edits require new engineering and shared study version.",
+    "old_milestones": "M4 qualified closed, old M5 open and sealed negative successor; six protected old M5 slots untouched; no roadmap changes."
+  },
+  "max_batch_backends": 2,
+  "standalone_numerical_limit": 16,
+  "diagnosis_limit": 4,
+  "allocation": {
+    "search_and_adaptation_backend_attempts": 8,
+    "unchanged_incumbent_verification_attempts": 10,
+    "one_frozen_selected_candidate_verification_attempts": 10,
+    "available_development_cases": [
+      "nominal",
+      "near_z_plus",
+      "near_z_minus",
+      "far_y_plus",
+      "far_y_minus"
+    ],
+    "available_seeds": [
+      17,
+      18
+    ],
+    "case_selection": "Model chooses case_id and seed prospectively for each immutable batch, not after observing favorable results.",
+    "workers": 0,
+    "real_time_required": false,
+    "comparison": "Development cases may already be observed; isolate changes only with same-condition evidence or allocated reference. Not an unseen population test.",
+    "eligibility": {
+      "version": "native_nominal_selection@3.0.0",
+      "eligibility": "Effective design/control change from incumbent; fresh charged complete correctly bound nominal authoritative joint pass. Perturbed-only, cached, incomplete, invalid and physical-failure results ineligible.",
+      "ordering": "Native completed-search reservation order replaces fixed-baseline proposal order; select first nondominated eligible nominal candidate. No hardcoded model conclusion; ties/tradeoffs retain earlier order.",
+      "freeze": "Exact configuration, full incumbent-relative changes and source evidence before first verification. Rebuild only these changes on the retained source; no substitution.",
+      "schedule": "Existing five cases in frozen order, repetitions seed17 then seed18; incumbent then candidate for every slot. Fresh execution only; no retries for passing results.",
+      "no_candidate": "Run only ten unchanged-incumbent slots: worthwhile characterization of currently unmeasured perturbed incumbent. Leave ten candidate slots unused. A genuine model STOP ends search; characterization/reporting are predeclared delivery steps.",
+      "promotion": "Only complete correctly bound matched evidence supports comparison; joint count and each physical metric reported separately, tradeoffs retain incumbent. No population or model-superiority claim."
+    }
+  },
+  "budget_derivation": {
+    "per_backend": {
+      "simulation_s": 900.0,
+      "evaluation_s": 30.0,
+      "profile_s": 60.0,
+      "native_apply_s": 5.0
+    },
+    "paired_verification": {
+      "backend_solves": 20,
+      "tool_calls": 60,
+      "wall_s": 19800.0,
+      "policy": "Backend count protected during research; full time/workflow gate only after eligible candidate freezes, or worthwhile predeclared incumbent-only characterization."
+    },
+    "protected_delivery": {
+      "model_calls": 2,
+      "tool_calls": 10,
+      "wall_s": 1200.0
+    },
+    "provider_request_s": 600.0,
+    "configured_length_recovery_request_s": 900.0,
+    "retained_query_s": 180.0,
+    "standalone_numerical": "No new numerical diagnosis exposed without its saved-state/data/adoption prerequisites. Coordinate ask/tell is supported mathematical candidate generation embedded in workflow; full trajectories always charge backend attempts.",
+    "elapsed_limit_s": 36000.0,
+    "basis": "Existing operation ceilings retained. Research reserves complete batch plus feedback and delivery; does not pre-subtract 19800s/60 calls. Conditional full final gate, never a shorter post-outcome schedule."
+  },
+  "correction_policy": {
+    "max_total": 4,
+    "max_consecutive": 2
+  },
+  "length_recovery": {
+    "enabled": true,
+    "max_tokens": 131072,
+    "timeout_s": 900.0
+  },
+  "formal_allocation_untouched": true,
+  "protected_M5_budget_transferred": false,
+  "workers": 0,
+  "subagents": 0,
+  "termination": [
+    "voluntary model STOP",
+    "material/unknown execution failure",
+    "insufficient complete reservation",
+    "cumulative request/correction ceiling"
+  ],
+  "task_acceptance": {
+    "protocol_id": "offline_reach_hold_v1",
+    "version": "1.0.0",
+    "real_time_required": false,
+    "authority": "tools.research_tasks.assemble_acceptance; unchanged evaluate.reach plus sealed profile/motion.",
+    "terminal_position_limit_m": 0.01,
+    "holding_position_limit_m": 0.01,
+    "holding_speed_limit_m_s": 0.02,
+    "holding_window_s": 0.05,
+    "holding_interval_s": [
+      0.3,
+      0.35
+    ],
+    "expected_hold_samples": 6,
+    "force_limits_n": [
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ],
+    "force_minimum_n": 0.0,
+    "complete": true,
+    "validity": "valid",
+    "requirements": "Full execution; finite required signals; terminal reach and both holding components and applied force bounds. Missing evidence is unavailable, not physical infeasibility.",
+    "historical_protocol": "All historical real-time failures retain original labels; new offline acceptance does not rescore sealed historical results."
+  },
+  "study_question": "Can design/control adaptation improve joint reach-and-hold under the five already frozen small initial-angle/rate variations around the retained successful nominal configuration? The unchanged incumbent's perturbed performance is not established by failures of changed near-section-scale candidates. Choose affordable mathematical search, applicable retained diagnosis, justified references/repetitions or STOP from complete relevant evidence. No predetermined winning point or required structural edit.",
+  "frozen_cases": [
+    {
+      "case_id": "nominal",
+      "total_angle_rad": {},
+      "total_angle_rate_rad_s": {}
+    },
+    {
+      "case_id": "near_z_plus",
+      "total_angle_rad": {
+        "near_z": 0.01
+      },
+      "total_angle_rate_rad_s": {
+        "near_z": 0.02
+      }
+    },
+    {
+      "case_id": "near_z_minus",
+      "total_angle_rad": {
+        "near_z": -0.01
+      },
+      "total_angle_rate_rad_s": {
+        "near_z": -0.02
+      }
+    },
+    {
+      "case_id": "far_y_plus",
+      "total_angle_rad": {
+        "far_y": 0.01
+      },
+      "total_angle_rate_rad_s": {
+        "far_y": 0.02
+      }
+    },
+    {
+      "case_id": "far_y_minus",
+      "total_angle_rad": {
+        "far_y": -0.01
+      },
+      "total_angle_rate_rad_s": {
+        "far_y": -0.02
+      }
+    }
+  ],
+  "initial_state_mapping": {
+    "version": "normalized_arc_total_principal_angle@1.0.0",
+    "quantities": [
+      "total principal bend angle",
+      "total principal bend angular rate"
+    ],
+    "units": [
+      "rad",
+      "rad/s"
+    ],
+    "angle_range_rad": [
+      -0.01,
+      0.01
+    ],
+    "angle_rate_range_rad_s": [
+      -0.02,
+      0.02
+    ],
+    "support": "initialize.family@1.0.0 + controller.gvs_nmpc@7.0.0 + backend.family_mujoco@1.1.0; named cell joints |q|<=.05 rad, |v|<=.5 rad/s.",
+    "equation": "q[segment_cell_i_axis]=total_angle/N; qvel[segment_cell_i_axis]=total_angle_rate/N, for i=0..N-1.",
+    "comparable": "Uniform principal-axis angle/rate profile versus normalized arc; segment integrated bend and angular rate; fixed orientations, station fractions, mesh and routing.",
+    "changes": "Curvature theta/L and its rate, tip offset/velocity, mass and mechanical energy change with structure; equal tip perturbation or energy is not claimed.",
+    "conservatism": "0.01 rad total bend is ~0.57 degree; each of 12 cell angles is 0.000833 rad. Velocity is nonzero, 0.001667 rad/s per cell, far below the technical maxima. Fixed before new outcomes.",
+    "reset": "Fresh backend and controller; apply both named qpos and qvel once; no relaxation, easier regeneration or repeated initialization.",
+    "restore": "Store restores sealed results and reservations, not live MuJoCo/controller state; full in-flight checkpoint resume is unsupported."
+  },
+  "common_scientific_input": {
+    "acceptance": {
+      "contract": "platform.acceptance_definition",
+      "version": "1.0.0",
+      "terminal": {
+        "value": 0.01,
+        "unit": "m",
+        "definition": "Euclidean world tip position error at the final execution sample; sealed evaluate.reach is the outcome authority.",
+        "source": {
+          "reference": null,
+          "pointer": "/task/evaluator/parameters/data/tolerance_m"
+        }
+      },
+      "holding": {
+        "duration": {
+          "value": 0.05,
+          "unit": "s",
+          "definition": "Final closed interval [task duration - window, task duration].",
+          "source": {
+            "reference": null,
+            "pointer": "/policy/controller/parameters/data/settling/window_s"
+          }
+        },
+        "interval_s": [
+          0.3,
+          0.35
+        ],
+        "position": {
+          "value": 0.01,
+          "unit": "m",
+          "definition": "Maximum sampled world tip position error in the final interval.",
+          "source": {
+            "reference": null,
+            "pointer": "/policy/controller/parameters/data/settling/position_limit_m"
+          }
+        },
+        "speed": {
+          "value": 0.02,
+          "unit": "m/s",
+          "definition": "Maximum sampled world tip translational speed norm in the final interval.",
+          "source": {
+            "reference": null,
+            "pointer": "/policy/controller/parameters/data/settling/speed_limit_m_s"
+          }
+        },
+        "coverage": {
+          "expected_sample_count": 6,
+          "definition": "Both endpoints, timestamps aligned to task sample_period_s; missing samples are unavailable, never a pass.",
+          "recorded_available": null,
+          "source": {
+            "reference": null,
+            "pointer": "/detail/sampled_settling/available"
+          }
+        },
+        "continuous_time_guarantee": false
+      },
+      "speed": {
+        "definition": "Euclidean norm of tip-site translational Jacobian times recorded backend qvel, reconstructed with sealed robot.xml and qpos; no finite differencing",
+        "unit": "m/s",
+        "frame": "world",
+        "implementation": "extensions/tendon_family/gvs_reporting.py::reconstruct_motion",
+        "source": {
+          "reference": null,
+          "pointer": "/*/tip_speed_m_s"
+        }
+      },
+      "timing": {
+        "control_period": {
+          "value": 0.01,
+          "unit": "s",
+          "definition": "Simulated control spacing; synchronous wall overruns do not imply skipped applied updates or injected actuator delay.",
+          "source": {
+            "reference": null,
+            "pointer": "/task/timing/control_period_s"
+          }
+        },
+        "sample_period": {
+          "value": 0.01,
+          "unit": "s",
+          "definition": "Retained backend sampling interval.",
+          "source": {
+            "reference": null,
+            "pointer": "/task/timing/sample_period_s"
+          }
+        },
+        "duration": {
+          "value": 0.35,
+          "unit": "s",
+          "definition": "Simulated task horizon, separate from computation wall time.",
+          "source": {
+            "reference": null,
+            "pointer": "/task/timing/duration_s"
+          }
+        },
+        "interpretation": "Applied updates, initialization selections, simulated duration and measured wall time are separate facts."
+      },
+      "comparison": {
+        "policy": {
+          "version": "1.0.0",
+          "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+          "physical_metrics": [
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "tolerance": 1e-09,
+          "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+          "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+          "objective": "Raw scalar objectives under different weights are not ranked."
+        },
+        "source": "tools/acceptance_definitions.py::RANKING (settling campaign v1)",
+        "applicable": true
+      },
+      "historical_contract": null,
+      "missing": []
+    }
+  },
+  "subsequent_event": {
+    "role": "subsequent_development_event",
+    "facts": {
+      "result_type": "free_reach",
+      "candidate": {
+        "candidate_id": "shared-path-v11-near-section-096-near-z-plus",
+        "owner_run_id": "shared-path-v11-near-section-096-near-z-plus",
+        "configuration": {
+          "artifact_id": "a5bad0274360cb103c6e7056a88b5b539b12e9a6b38445bff3885f36e4c7ba72",
+          "media_type": "application/json"
+        },
+        "execution_id": "8b8ce2691fc24b3392ff5e7fa4905ba4"
+      },
+      "configuration": {
+        "artifact_id": "a5bad0274360cb103c6e7056a88b5b539b12e9a6b38445bff3885f36e4c7ba72",
+        "media_type": "application/json"
+      },
+      "execution_id": "8b8ce2691fc24b3392ff5e7fa4905ba4",
+      "simulation": {
+        "artifact_id": "8a8cd93d3a8d7c6a553910e0d819da39cdec981fe4d0773e6cb3f2eda9566c46",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "artifact_id": "d6896c85db290ca5bb7b343508546abba78e780ec73e470c13c0794840194456",
+        "media_type": "application/json"
+      },
+      "report": {
+        "reference": {
+          "artifact_id": "310cb1690b13def63b6c932e669eeaeec84db14288bcdcc4f9fedf13eaa64fcc",
+          "media_type": "application/json"
+        },
+        "owner_run_id": "shared-path-v11-near-section-096-near-z-plus",
+        "execution_id": "8b8ce2691fc24b3392ff5e7fa4905ba4",
+        "request_id": "profile"
+      },
+      "task_accepted": true,
+      "evaluation_validity": "valid",
+      "complete": true,
+      "valid_complete_execution": true,
+      "target_position_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "terminal_position_m": [
+        0.2894640831253489,
+        0.03678756779273733,
+        0.19209137830817535
+      ],
+      "signed_position_error_m": [
+        -0.0005359168746510989,
+        0.001787567792737324,
+        0.002091378308175351
+      ],
+      "error_convention": "actual_tip minus target",
+      "coordinate_frame": "world",
+      "terminal_error_m": 0.0028029393033160714,
+      "terminal_tip_speed_m_s": 0.012106980829123433,
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.004094678029888374,
+        "max_speed_m_s": 0.06758272073425946,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "control_updates": 35,
+      "accepted_plans": 35,
+      "initialization_selected": 18,
+      "accepted_noninitialization_plans": 17,
+      "converged_updates": 0,
+      "solver_error_count": 0,
+      "hold_last_responses": 0,
+      "applied_tension_ranges": [
+        {
+          "tendon": "near_t0",
+          "tendon_index": 0,
+          "minimum_n": 1.7512764858409064,
+          "maximum_n": 4.500102284092871,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "near_t1",
+          "tendon_index": 1,
+          "minimum_n": 4.755852667139922,
+          "maximum_n": 6.162152221653249,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "near_t2",
+          "tendon_index": 2,
+          "minimum_n": 0.640160027565474,
+          "maximum_n": 3.1031566686630025,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t0",
+          "tendon_index": 3,
+          "minimum_n": 1.5930475794669134,
+          "maximum_n": 4.590228029927475,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t1",
+          "tendon_index": 4,
+          "minimum_n": 0.7859357597552847,
+          "maximum_n": 2.195247182150267,
+          "limit_n": 8.0
+        },
+        {
+          "tendon": "far_t2",
+          "tendon_index": 5,
+          "minimum_n": 0.18790190600338286,
+          "maximum_n": 2.59053565488772,
+          "limit_n": 8.0
+        }
+      ],
+      "force_bound_violation_n": 0.0,
+      "one_step_prediction_summary": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_tip_difference_m": 0.0039265966910792946,
+        "mean_tip_difference_m": 0.002634709815693658,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+      },
+      "one_step_prediction_evidence": {
+        "artifact_id": "9b479ce645946d2386820a1f2770dc423a6312b536fb08e8aeef9f0c93f69233",
+        "media_type": "application/json"
+      },
+      "simulated_duration_s": 0.35000000000000003,
+      "measured_computation_s": 591.8589999999967,
+      "mean_complete_update_s": 16.802659108571657,
+      "control_period_s": 0.01,
+      "deadline_misses": 35,
+      "real_time_demonstrated": false
+    },
+    "acceptance": {
+      "contract": "research.task_acceptance",
+      "version": "1.0.0",
+      "protocol_id": "offline_reach_hold_v1",
+      "task_family": "task.reach",
+      "task_identity": "0e947b2e82a33653de5b098a57dfe510e82bb13a37f3d656af8b18503d587acf",
+      "status": "valid_failure",
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "value": "valid",
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "execution_complete": {
+          "value": true,
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "task_evaluator": {
+          "value": true,
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "evaluator:task_bound": {
+          "value": 0.0028029393033160714,
+          "passed": true,
+          "unit": "m",
+          "limit": 0.01,
+          "reason": null
+        },
+        "solver_errors": {
+          "value": 0,
+          "passed": true,
+          "unit": "count",
+          "limit": 0,
+          "reason": null
+        },
+        "force_bounds": {
+          "value": 0.0,
+          "passed": true,
+          "unit": "N",
+          "limit": 1e-08,
+          "reason": null
+        },
+        "holding_coverage": {
+          "value": true,
+          "passed": true,
+          "unit": "inclusive uniform samples",
+          "limit": 6,
+          "reason": null
+        },
+        "holding_position": {
+          "value": 0.004094678029888374,
+          "passed": true,
+          "unit": "m",
+          "limit": 0.01,
+          "reason": null
+        },
+        "holding_speed": {
+          "value": 0.06758272073425946,
+          "passed": false,
+          "unit": "m/s",
+          "limit": 0.02,
+          "reason": null
+        }
+      },
+      "metrics": {
+        "terminal_error_m": 0.0028029393033160714,
+        "holding_max_error_m": 0.004094678029888374,
+        "holding_max_speed_m_s": 0.06758272073425946
+      },
+      "missing": [],
+      "issues": [],
+      "execution_id": "8b8ce2691fc24b3392ff5e7fa4905ba4",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "d6896c85db290ca5bb7b343508546abba78e780ec73e470c13c0794840194456",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "310cb1690b13def63b6c932e669eeaeec84db14288bcdcc4f9fedf13eaa64fcc",
+          "media_type": "application/json"
+        }
+      },
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005,
+        "real_time_required": false,
+        "real_time_demonstrated": false,
+        "deadline_misses": 35,
+        "mean_update_s": 16.802659108571657,
+        "simulation_wall_s": 591.8589999999967
+      },
+      "continuous_time_guarantee": false
+    },
+    "execution_id": "8b8ce2691fc24b3392ff5e7fa4905ba4",
+    "owner_run_id": "shared-path-v11-near-section-096-near-z-plus",
+    "execution_scope": {
+      "robot": {
+        "family": "tendon_robot_family",
+        "identity": "b6c8000951f90ab13d6a780681a40fd3db8faa981ec3d34a9b5efcdb4cf3cda0"
+      },
+      "task": {
+        "family": "task.reach",
+        "identity": "0e947b2e82a33653de5b098a57dfe510e82bb13a37f3d656af8b18503d587acf",
+        "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+        "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+        "timing": {
+          "timestep_s": 0.0005,
+          "control_period_s": 0.01,
+          "sample_period_s": 0.01,
+          "duration_s": 0.35,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ]
+        },
+        "initializer": "a21f4fa4d537a0279b3e7100ded5bee91e9b5f66f0fa18eab9856dde36a0fdef"
+      },
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "version": "1.1.0",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "version": "1.0.0",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "version": "1.0.0",
+          "data": {}
+        }
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "version": "1.0.0",
+        "data": {
+          "cells": {
+            "far": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        }
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "version": "7.0.0",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "version": "1.0.0",
+          "data": {
+            "numerical_source": "bundled_guess",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.05,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": false,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.05,
+              "terminal_velocity_weight": 0.0001,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.0001
+            },
+            "settling": {
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            }
+          }
+        }
+      },
+      "seed": 17
+    },
+    "source_store": "D:\\softrobot-agent\\runs\\research_shared_path_v11_approval_20261006",
+    "binding": {
+      "artifact_id": "93a2f14a3cc86771c480a9f9696bc2d20746fb5491f9d5fc5c64d1b649c0c89b",
+      "media_type": "application/json"
+    },
+    "receipts": {
+      "simulation": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "fixed-mathematical-workflow",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 591.8589999999967,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "8b8ce2691fc24b3392ff5e7fa4905ba4",
+        "execution_status": "completed",
+        "original_execution_id": "8b8ce2691fc24b3392ff5e7fa4905ba4",
+        "output": {
+          "artifact_id": "8a8cd93d3a8d7c6a553910e0d819da39cdec981fe4d0773e6cb3f2eda9566c46",
+          "media_type": "application/json"
+        },
+        "request_id": "simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      },
+      "evaluation": {
+        "analysis_status": "valid",
+        "cache_hit": false,
+        "caller": "fixed-mathematical-workflow",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.2969999999913853,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "350d04c58d664d84a146483f96032c00",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "d6896c85db290ca5bb7b343508546abba78e780ec73e470c13c0794840194456",
+          "media_type": "application/json"
+        },
+        "request_id": "evaluation",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "solver_status": "not_run",
+        "task_success": true,
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0"
+      },
+      "profile": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "fixed-mathematical-workflow",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.1410000000032596,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "97ea8739a07f445aae529c2d8e3b3bec",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "310cb1690b13def63b6c932e669eeaeec84db14288bcdcc4f9fedf13eaa64fcc",
+          "media_type": "application/json"
+        },
+        "request_id": "profile",
+        "result_contract": "ProfileOutput",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "control.profile_report",
+        "tool_version": "1.0.0"
+      }
+    },
+    "reuse_reason": "Exact archived observation; original implementation/charges retained. Not a fresh matched reference.",
+    "implementation": {
+      "commit": "c80d331691b1a0f9d683049f1b09480c8bd62319",
+      "dependencies": {
+        "backend.family_mujoco@1.1.0": "7f0989ecf96c0afb2f937be02e5ebc3e81ac7cde3bd3c623b38e0299f19a495b",
+        "candidate.family@1.1.0": "1a3e634c2a5f037a3fce9e1c3a19519e5743b01f2033dccc425c9b6147b0f54e",
+        "control.profile_report@1.0.0": "55bc5adab8dba908b18c8aa355617891b7df57d91415137f93e7dac3a975a343",
+        "controller.gvs_nmpc@7.0.0": "fad4392fdbb1b3e203fab0588956e355670c99bc0a9c457552895712324d4837",
+        "deepseek@6.0.0": "6ac5ec923275e2a874b991290480c967842c660bb33cd6d747ae8e6ae718d022",
+        "evaluate.reach@1.0.0": "84d8129ec8c94d9324433bfe332ac98c3175a577e92017e1fe9fe08d3042e0ff",
+        "evaluation.run@1.0.0": "6caca23f45605b4b55994fc925de430d0952400d844aee289f6f3e74baa6e2c6",
+        "initialize.family@1.0.0": "0e10d198eef8c53f6f162c156879ff95786018cd70b3b507e0342134a51d920d",
+        "model.gvs@1.0.0": "dc9cf9d0f2980b93f5d24ca21dc2d325c9650185a1ace0f1060e137ab3824928",
+        "model.serial_bending_cells@1.0.0": "d50e7f56a9c58f35823d8d82cbc265002d5026206268bb8d23a8625b1417ea20",
+        "simulation.run@1.0.0": "5052a0ffbfb017d2f1536b2a7aa209cb6bde8ec4951e6bfefa5a2b13127aca21",
+        "solver.ipopt@1.0.0": "bdb969dbc1890685b20425f97e377550c1d50c8c7bf5370e11ec08db3296ee9d",
+        "strategy.tool@1.0.0": "8fddc4636b3b6af22a3cd8f571e79fe721d41679f4632adfb914a0969448bbde",
+        "task.reach@1.0.0": "a51d9e2747a5048cc936a733d1f23dc79260d04b0ab1b2b7a4761a73cd3b18d5"
+      }
+    },
+    "case_id": "near_z_plus"
+  },
+  "history_coverage": {
+    "selection_version": "native_history_coverage@1.1.0",
+    "source_manifest": "runs/milestone4_autonomous_20261006/scheduler_state.json",
+    "considered": [
+      {
+        "execution_id": "cf997605885642759ee33920e2c9e2ef",
+        "source_store": "D:\\softrobot-agent\\runs\\stage351_settling_20261003\\baseline",
+        "selected": false,
+        "reason": "Outside bounded nominal same-robot weight neighborhood; not evidence of absence"
+      },
+      {
+        "execution_id": "087adee8e8a24fe88e5c85fe89e638c8",
+        "source_store": "D:\\softrobot-agent\\runs\\stage354_milestone0_20261003\\single_context",
+        "selected": false,
+        "reason": "Outside bounded nominal same-robot weight neighborhood; not evidence of absence"
+      },
+      {
+        "execution_id": "25e26708480848d79bad378b669915e3",
+        "source_store": "D:\\softrobot-agent\\runs\\stage357_pilot_20261004\\single_context",
+        "selected": false,
+        "reason": "Outside bounded nominal same-robot weight neighborhood; not evidence of absence"
+      },
+      {
+        "execution_id": "22241105b8984e0daae4530963848953",
+        "source_store": "D:\\softrobot-agent\\runs\\stage358_confirmation_20261004\\single_context",
+        "selected": false,
+        "reason": "Outside bounded nominal same-robot weight neighborhood; not evidence of absence"
+      },
+      {
+        "execution_id": "50618bf23b31464ba4f84c55cd26d1ca",
+        "source_store": "D:\\softrobot-agent\\runs\\stage358_confirmation_20261004\\single_context",
+        "selected": false,
+        "reason": "Outside bounded nominal same-robot weight neighborhood; not evidence of absence"
+      },
+      {
+        "execution_id": "44dbf3bc2964402e9f6af6a93c0f8d7d",
+        "source_store": "D:\\softrobot-agent\\runs\\stage359_continuation_20261004\\single_context",
+        "selected": false,
+        "reason": "Outside bounded nominal same-robot weight neighborhood; not evidence of absence"
+      },
+      {
+        "execution_id": "a8382f8a4c6e4ebe921fb72f821b2188",
+        "source_store": "D:\\softrobot-agent\\runs\\milestone4_20261004\\single_context",
+        "selected": false,
+        "reason": "Outside bounded nominal same-robot weight neighborhood; not evidence of absence"
+      },
+      {
+        "execution_id": "bebcfd47274940fb88a55ce5a2457c4c",
+        "source_store": "D:\\softrobot-agent\\runs\\milestone45_continuation_20261004\\single_context",
+        "selected": true,
+        "reason": "zero_holding_weight_passing_counterexample"
+      },
+      {
+        "execution_id": "110dc2c9c1d642dcb018664a65c62c30",
+        "source_store": "D:\\softrobot-agent\\runs\\milestone45_continuation_20261004\\single_context",
+        "selected": true,
+        "reason": "matching_holding_100_failure"
+      },
+      {
+        "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+        "source_store": "D:\\softrobot-agent\\runs\\milestone45_continuation_20261004\\single_context",
+        "selected": true,
+        "reason": "retained_baseline"
+      },
+      {
+        "execution_id": "e3876a1d289f41f08d46c96202f1da0c",
+        "source_store": "D:\\softrobot-agent\\runs\\milestone4_autonomous_20261005",
+        "selected": true,
+        "reason": "matching_holding_075_failure"
+      },
+      {
+        "execution_id": "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+        "source_store": "D:\\softrobot-agent\\runs\\milestone4_autonomous_20261005",
+        "selected": true,
+        "reason": "intermediate_holding_weight_failure"
+      },
+      {
+        "execution_id": "312ef97407b34ff28905e883a947f475",
+        "source_store": "D:\\softrobot-agent\\runs\\milestone4_autonomous_20261006",
+        "selected": true,
+        "reason": "lower_holding_weight_failure_counterexample"
+      },
+      {
+        "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+        "source_store": "D:\\softrobot-agent\\runs\\milestone4_autonomous_20261006",
+        "selected": true,
+        "reason": "joint_weights_passing_confounded_counterexample"
+      },
+      {
+        "execution_id": "9af9c7a3d6d84751ab0c1ebacd73d0f8",
+        "source_store": "D:\\softrobot-agent\\runs\\milestone4_autonomous_20261006",
+        "selected": false,
+        "reason": "Outside bounded nominal same-robot weight neighborhood; not evidence of absence"
+      },
+      {
+        "execution_id": "3389776a7ca449bb90388e2501194400",
+        "source_store": "D:\\softrobot-agent\\runs\\milestone4_autonomous_20261006",
+        "selected": false,
+        "reason": "Outside bounded nominal same-robot weight neighborhood; not evidence of absence"
+      }
+    ],
+    "selected_execution_ids": [
+      "91c3ba1b01d6499fb26df8f95409401b",
+      "110dc2c9c1d642dcb018664a65c62c30",
+      "148a2a290daa440f9b966f4d5cee4b5f",
+      "1ffdcbc4f93f4dc4bb16a807c7b4056b",
+      "312ef97407b34ff28905e883a947f475",
+      "bebcfd47274940fb88a55ce5a2457c4c",
+      "e3876a1d289f41f08d46c96202f1da0c",
+      "68ec1d6cc55c4b9baefe6eb58b73540b",
+      "af79836372454e4184e61dee1030ec39",
+      "8b8ce2691fc24b3392ff5e7fa4905ba4"
+    ],
+    "limitations": [
+      "Targeted saved manifest only; no full repository audit or exhaustive history claim.",
+      "Imported executions retain original source event chronology; presentation order is not chronology.",
+      "Builder/implementation boundaries do not turn scientific overlap into result-reuse eligibility."
+    ],
+    "additional_sources": [
+      "Both original pilot executions",
+      "Completed changed-section near_z_plus event"
+    ]
+  },
+  "m5_feedback": {
+    "source": "docs/milestone5_control_successor.md",
+    "text": "# M5 bounded controller successor — 2026-10-06\n\n**M5 remains open.** The new controller fails local timing and improvement gates.\nNo new full forecast, matched development backend or protected validation pair was\nlaunched. After direct chat external-transmission authorization, the configured\nresearch model authored a bound interpretation that passed factual review and\nrecommends stopping production advancement, retaining limited saved-state\ndiagnostic use only. It does not override failed admission gates or close M5.\n\nThe [frozen successor protocol](../evidence/milestone5_control_20261006/protocol.json)\nlinks the stopped matched study and maps the inherited physical, numerical,\nclassification, useful ordering, economics, repeatability and complete 10 ms gates.\n`fixed_backend_transition_validation@2.0.0` and its original thresholds remain;\ncontinuous-solution and step-refinement failures remain separate negative evidence.\nThe three original protected pair allocations retain six total backend slots.\n\nSaved command divergence was inspected before new solves. At original075 time\n0.02 s, full states differ by about 1.33e-15 and projected states by 8.53e-14;\nprior warm states differ by 2.70e-13 and tensions by 3.55e-15. They are close,\nnot bitwise identical. Commands already differ by 0.0474791 N at selected\niterations 5 and 10; substantial state separation appears at 0.03 s. Earlier\ncomplete warm plans were checked instead of assuming all optimizer inputs matched.\nOriginal15's first command difference above the declared 1e-8 N inspection\nthreshold is much smaller, about 6.63e-8 N at 0.04 s with equal selected iterations.\n\nFive standalone saved-state solves test a predeclared diagnostic work cap of ten\ncallback iterations, independently of any forecast. On original075 the same\nprojected state, previous input and complete own warm plan yield iteration 5 under\nthe timed policy and iteration 10 under the work diagnostic; their command gap is\n0.0474791 N. Replacing only the tiny prior-warm differences at the same work cap\nchanges the command by about 1.74e-12 N. This supports termination behavior as a\nlocal cause, without proving unique causality over the entire task. Original15\nselects iteration 22 under timed stopping but initialization under the diagnostic\ncap; fixed work does not establish general convergence or feasibility improvement.\nComplete local compute spans 6.764–13.444 s, with separately recorded setup.\nThe historical five-second condition is not an unconditional execution floor.\n\nThe single new production-shaped experimental identity is\n`controller.gvs_nmpc@8.0.0`: two prediction nodes, at most two IPOPT iterations,\none-second CPU allowance, and feasible-return minimum/budget of 1/5 ms. It\nregenerates all short warm states from the supplied candidate measurement, retains\noriginal finite/initial/dynamics/force feasibility checks, and records bounded\nprevious-command fallback with no safety claim. The stable v7 binding and behavior\nremain available. v7 outcomes do not validate changed v8 behavior. The causal\nfull-state reference resolves the explicit registered controller rather than\nsilently running v7 for a new binding.\n\nFour complete software input-to-command measurements include projection/world\noutput, warm preparation, optimization, independent validation, observation\nconstruction and packaging. One-time setup and physics propagation are separate.\nThe second measurement repeats identical owned inputs with prepared data cached;\nit is a cost diagnostic, not a new causal trajectory.\n\n| Development snapshot | Cold software interval | Cached interval | Cached warm preparation | Selected plan |\n|---|---:|---:|---:|---|\n| original075, 0.02 s | 0.483243 s | 0.441827 s | 0.257033 s | Initialization; zero improvement |\n| original15, 0.04 s | 0.570546 s | 0.524445 s | 0.339700 s | Initialization; zero improvement |\n\nAll plans satisfy the retained local constraint bound, but all four measurements\nmiss 10 ms. Optimization alone takes about 0.173–0.175 s. The callback reaches its\nmillisecond budget after expensive work has already occurred. Actual graph/solver\nconstruction events are retained separately; repeated construction metadata is\nnot summed as repeated construction. These are software measurements, not hardware\nworst-case guarantees. One more arbitrary smaller timer or iteration recipe has\nno supported mechanism to remove the observed preparation/first-evaluation cost,\nso the unused second version was not spent.\n\nScreening retains diagnostic reference status. The previous full-order v7 method\nhad failed aggregate accuracy and one falsely feasible holding-speed decision;\nits correct raw speed order was not useful admitted screening. Its all-in reuse\ncost was 434.031 s against 194.951 s potentially avoided, with zero actual savings.\nThese outcomes stay historical and do not become evidence for v8. No cheaper\nmethod family was justified after v8's failed local gate. A task-output surrogate\nwithout the required full-state/local numerical evidence cannot replace the\nformal predictor. New complete-trajectory accuracy, classifications, ranking and\npositive all-in economics are **unmeasured**, rather than passed. No candidate\nwas eliminated, and actual savings remain zero. No favorable amortization credit\nwas declared or invented.\n\nThe single engineering repair corrected a saved-state timestamp indexing mistake\nbefore numerical work. Initial incorrect diagnostic output and snapshots remain;\nthe corrected result uses timestamps and the known initial state. Seven initial\nfocused reporting/controller checks passed; affected dispatch, force-unit rendering\nand diagnostic-token checks passed after their changes. No full repository suite or accepted baseline\nrerun was used as scientific validation.\n\nNew M5 actual charges are **1 provider / 13 workflow / 0 backend / 86.608 s**,\nwith nine standalone controller updates and zero extra component evaluations,\nforecasts, embedded backend updates, workers or subagents. Remaining development\ncapacity is 11 provider, 87 workflow, 23913.392 s, six forecasts, six backend\nattempts, 231 standalone updates and 24 component evaluations. One experimental\nversion and zero screening families/revisions were used. All three protected\npairs and the independent repeat remain unrun; all six protected backend slots\nare preserved. No model correction was needed. Interpretation and factual-review\ncost are included in the same grant; no positive economics are claimed. The\ndevelopment scope is sealed as a negative result, while M5 remains open.\n\nThe next technical decision is a distinct approximation/reuse algorithm that\nreduces warm preparation and first derivative/callback work while earning fresh\nfeasibility, dynamics and closed-loop evidence. The current bounded outcome does\nnot authorize silently opening a new method family or scientific campaign.\n\nSee [corrected saved diagnosis](../evidence/milestone5_control_20261006/saved_diagnosis_corrected.json),\n[local intervention](../evidence/milestone5_control_20261006/local_original075_deterministic_forecast.json),\n[v8 measurement](../evidence/milestone5_control_20261006/measure8_original075.json),\n[development admission decision](../evidence/milestone5_control_20261006/development_assessment.json),\nand [accounting](../evidence/milestone5_control_20261006/accounting.json).\n\nThe [actual model-authored interpretation](../evidence/milestone5_control_20261006/rendered_interpretation0.md),\n[factual review](../evidence/milestone5_control_20261006/interpretation_review0.json)\nand [final bounded delivery](../evidence/milestone5_control_20261006/checkpoint_seal.json)\npreserve this distinction. Following direct chat authorization, an ordinary push\npublished the completed checkpoints, with the remote verified at\n`9963f535445a50ecd1d6db30f05ab41cc03e0218`. The separate\n[publication verification](../evidence/context_assembly_publication_20261006/published_checkpoint.json)\npreserves the earlier automatic-review rejection. Publication did not resume\nscientific work; M5 remains open and all six protected backend slots remain unused.\n",
+    "scope": "Sealed negative controller/prediction evidence; no screening authority, no v8 adoption or protected allocation."
+  },
+  "experiment": {
+    "evidence_directory": "D:\\softrobot-agent\\evidence\\research_native_development_v3_20261007"
+  },
+  "campaign_state": {
+    "version": "research.native_development@3.0.0",
+    "campaign_id": "research_native_development_v3_20261007",
+    "assignment_start_unix": 1791340050,
+    "authorization_source": "User successor attachment 1a9d7d55, 2026-10-07, plus existing direct endpoint and GitHub branch consent; one new cumulative ledger, no old budget transfer.",
+    "limits": {
+      "backend_solves": 28,
+      "model_calls": 24,
+      "tool_calls": 200,
+      "worker_calls": 0,
+      "wall_s": 36000.0
+    },
+    "research_limits": {
+      "backend_solves": 8,
+      "model_calls": 24,
+      "tool_calls": 200,
+      "wall_s": 36000.0,
+      "worker_calls": 0
+    },
+    "max_batch_backends": 2,
+    "standalone_numerical_operations": 16,
+    "retained_query_decisions": 4,
+    "question": "Can design/control adaptation improve joint reach-and-hold under the five already frozen small initial-angle/rate variations around the retained successful nominal configuration? The unchanged incumbent's perturbed performance is not established by failures of changed near-section-scale candidates. Choose affordable mathematical search, applicable retained diagnosis, justified references/repetitions or STOP from complete relevant evidence. No predetermined winning point or required structural edit.",
+    "allocation": {
+      "search_and_adaptation_backend_attempts": 8,
+      "unchanged_incumbent_verification_attempts": 10,
+      "one_frozen_selected_candidate_verification_attempts": 10,
+      "available_development_cases": [
+        "nominal",
+        "near_z_plus",
+        "near_z_minus",
+        "far_y_plus",
+        "far_y_minus"
+      ],
+      "available_seeds": [
+        17,
+        18
+      ],
+      "case_selection": "Model chooses case_id and seed prospectively for each immutable batch, not after observing favorable results.",
+      "workers": 0,
+      "real_time_required": false,
+      "comparison": "Development cases may already be observed; isolate changes only with same-condition evidence or allocated reference. Not an unseen population test.",
+      "eligibility": {
+        "version": "native_nominal_selection@3.0.0",
+        "eligibility": "Effective design/control change from incumbent; fresh charged complete correctly bound nominal authoritative joint pass. Perturbed-only, cached, incomplete, invalid and physical-failure results ineligible.",
+        "ordering": "Native completed-search reservation order replaces fixed-baseline proposal order; select first nondominated eligible nominal candidate. No hardcoded model conclusion; ties/tradeoffs retain earlier order.",
+        "freeze": "Exact configuration, full incumbent-relative changes and source evidence before first verification. Rebuild only these changes on the retained source; no substitution.",
+        "schedule": "Existing five cases in frozen order, repetitions seed17 then seed18; incumbent then candidate for every slot. Fresh execution only; no retries for passing results.",
+        "no_candidate": "Run only ten unchanged-incumbent slots: worthwhile characterization of currently unmeasured perturbed incumbent. Leave ten candidate slots unused. A genuine model STOP ends search; characterization/reporting are predeclared delivery steps.",
+        "promotion": "Only complete correctly bound matched evidence supports comparison; joint count and each physical metric reported separately, tradeoffs retain incumbent. No population or model-superiority claim."
+      }
+    },
+    "reservations": {
+      "per_backend": {
+        "simulation_s": 900.0,
+        "evaluation_s": 30.0,
+        "profile_s": 60.0,
+        "native_apply_s": 5.0
+      },
+      "paired_verification": {
+        "backend_solves": 20,
+        "tool_calls": 60,
+        "wall_s": 19800.0,
+        "policy": "Backend count protected during research; full time/workflow gate only after eligible candidate freezes, or worthwhile predeclared incumbent-only characterization."
+      },
+      "protected_delivery": {
+        "model_calls": 2,
+        "tool_calls": 10,
+        "wall_s": 1200.0
+      },
+      "provider_request_s": 600.0,
+      "configured_length_recovery_request_s": 900.0,
+      "retained_query_s": 180.0,
+      "standalone_numerical": "No new numerical diagnosis exposed without its saved-state/data/adoption prerequisites. Coordinate ask/tell is supported mathematical candidate generation embedded in workflow; full trajectories always charge backend attempts.",
+      "elapsed_limit_s": 36000.0,
+      "basis": "Existing operation ceilings retained. Research reserves complete batch plus feedback and delivery; does not pre-subtract 19800s/60 calls. Conditional full final gate, never a shorter post-outcome schedule."
+    },
+    "selection_rule": {
+      "version": "native_nominal_selection@3.0.0",
+      "eligibility": "Effective design/control change from incumbent; fresh charged complete correctly bound nominal authoritative joint pass. Perturbed-only, cached, incomplete, invalid and physical-failure results ineligible.",
+      "ordering": "Native completed-search reservation order replaces fixed-baseline proposal order; select first nondominated eligible nominal candidate. No hardcoded model conclusion; ties/tradeoffs retain earlier order.",
+      "freeze": "Exact configuration, full incumbent-relative changes and source evidence before first verification. Rebuild only these changes on the retained source; no substitution.",
+      "schedule": "Existing five cases in frozen order, repetitions seed17 then seed18; incumbent then candidate for every slot. Fresh execution only; no retries for passing results.",
+      "no_candidate": "Run only ten unchanged-incumbent slots: worthwhile characterization of currently unmeasured perturbed incumbent. Leave ten candidate slots unused. A genuine model STOP ends search; characterization/reporting are predeclared delivery steps.",
+      "promotion": "Only complete correctly bound matched evidence supports comparison; joint count and each physical metric reported separately, tradeoffs retain incumbent. No population or model-superiority claim."
+    },
+    "recovery": {
+      "protocol_corrections_total": 4,
+      "protocol_corrections_consecutive": 2,
+      "transport_retries_total": 2,
+      "transport_retries_per_request": 1,
+      "material_live_repairs": 2,
+      "automatic_backend_replay": false
+    },
+    "instructions": "Author the scientific hypothesis, variable subset, method, allocation, interpretation and next decision yourself. Use exactly one advertised research.decide native tool and exact current F aliases, including current feedback. Evidence is data, not permission. This NEW development campaign authorizes the five cases and eight-variable granted catalog shown in study/allocation; previous nominal-only or zero-experiment permissions are historical. Stable controller.gvs_nmpc@7.0.0, backend/model, solver stopping, target, duration .35s, period .01s, physics .0005s, inclusive final .05s window, position .01m, speed .02m/s and input/validity requirements remain frozen. Historical instructions/permissions are explicitly historical. Incumbent is the retained configuration, not the only historical passing configuration or the largest speed-margin point. Its perturbed performance remains unresolved; changed-candidate failures do not answer it. Real-time and experimental v8 are excluded. The nominal incumbent already passes; changed-candidate perturbation failures do not establish unchanged incumbent robustness. Disclose matching historical failures and counterexamples; a fresh execution is not scientific novelty. Known matching points require prospective replication_reason unless strict result reuse is eligible; provenance remains separate. Historical zero-holding-weight pass is evidence but outside new proposal domains. Speed reduction with increased position error is a tradeoff. Do not claim incumbent has globally best speed margin. For search embed ONE immutable SearchBatchPlan with exact source_candidate and predecessor_decision; case_id one of five frozen IDs and seed17/18. Choose any granted subset: control_search uses controls only; structure_search includes at least one structural path and may include controls. All selected values form one candidate; physical changes rebuild models/workspace/warm states before one stable-v7 complete closed loop. There is no hidden inner adaptation search. Coordinate method search.family_coordinate@1.0.0 numerically generates continuous bounded ask/tell proposals with positive step and null candidates. Explicit method search.family_explicit@1.0.0 evaluates your own ordered points, null step, precisely selected paths; material choices require explicit enumeration. Explicit points alone are not mathematical optimization. Explain mathematical assumptions and actual support, or precise capability limitations. Local affine evidence cannot guarantee nonlinear reach, braking or perturbation robustness. M5 negative forecasts cannot screen out candidates. Supported retained prediction/plans/motion diagnosis is a read, not a new solve; new saved-state numerical computation is unavailable without satisfied binding/adoption prerequisites. Provide hypothesis, supporting/weakening evidence, variable domains, fixed conditions, method rationale, control adaptation allocation, expected information, counterevidence and exit criteria. fixed_conditions include robot,task,acceptance,controller_implementation,other_numerical_settings; objectives include joint_reach_holding_acceptance,terminal_error_m,holding_max_error_m,holding_max_speed_m_s; constraints frozen_acceptance,force_bounds,finite_valid_execution; verification candidate.apply,simulation.run,evaluation.run,control.profile_report,bound_comparison,diagnostic_revision. At most two new backend attempts per batch and eight search/reference/repetition attempts total; declare max_backend_attempts and target_changed_configurations. planned_budget must fit complete execution plus delivery capacity (4 workflow operations and 995s per new native candidate, plus protected interpretation 4 requests/4 operations/600s). Twenty final backend COUNT slots are protected and cannot fund search. Their future wall/operations are conditional, not subtracted during research. Preserve delivery (at least 2 requests,10 operations,1200s); actual request authority snapshot is current-session scoped. Verification starts only when the WHOLE frozen schedule plus delivery fits all budgets and elapsed time; otherwise report not started. All requests, corrections, failed attempts and costs share one ledger. Later plans must cite new complete feedback to count as feedback-linked research. You may continue, change variables, request justified diagnosis/repetition, retain incumbent or STOP; no required success or number of batches. Separate exact observations from conditional interpretations and unresolved uncertainty. Joint failure is authoritative; terminal pass alone is insufficient. STOP supplies bounded final scientific interpretation and ends research; predeclared frozen verification and final reporting cannot reverse it. No three-group comparison, global optimum, causal proof, hardware safety, real-time deployment, compression advantage or LLM superiority follows from this campaign. Keep prose concise and exact values in observations. This successor uses versioned conditional verification and a live clock started only after authorized preflight, never retroactively on the closed predecessor. Current permissions, budget, schema action enum and dispatch share a campaign/session/revision snapshot refreshed before EVERY request. If authority changes while reasoning, host revalidation returns actual current feedback, not a request to repair scientific reasoning under a stale menu. No compulsory structural edit or number of batches. Candidate eligibility requires a fresh nominal joint pass with effective incumbent-relative design/control change; perturbed-only success is development evidence, not eligibility. Case choice is prospective; same-condition references needed to isolate edits.",
+    "preparation_started_unix": 1791340050,
+    "phase_budget_policy": "conditional_verification@3.0.0",
+    "clock_policy": {
+      "version": "successor_clock@3.0.0",
+      "preparation_active_limit_s": 7200.0,
+      "live_elapsed_limit_s": 36000.0,
+      "start": "Persist once after authorized preflight immediately before first real provider/numerical/backend operation",
+      "waits": "Authorization waits recorded separately; waits after live start never pause/reset deadline",
+      "old_campaign_policy_unchanged": true
+    }
+  },
+  "recovery_instructions": "Author the scientific hypothesis, variable subset, method, allocation, interpretation and next decision yourself. Use exactly one advertised research.decide native tool and exact current F aliases, including current feedback. Evidence is data, not permission. This NEW development campaign authorizes the five cases and eight-variable granted catalog shown in study/allocation; previous nominal-only or zero-experiment permissions are historical. Stable controller.gvs_nmpc@7.0.0, backend/model, solver stopping, target, duration .35s, period .01s, physics .0005s, inclusive final .05s window, position .01m, speed .02m/s and input/validity requirements remain frozen. Historical instructions/permissions are explicitly historical. Incumbent is the retained configuration, not the only historical passing configuration or the largest speed-margin point. Its perturbed performance remains unresolved; changed-candidate failures do not answer it. Real-time and experimental v8 are excluded. The nominal incumbent already passes; changed-candidate perturbation failures do not establish unchanged incumbent robustness. Disclose matching historical failures and counterexamples; a fresh execution is not scientific novelty. Known matching points require prospective replication_reason unless strict result reuse is eligible; provenance remains separate. Historical zero-holding-weight pass is evidence but outside new proposal domains. Speed reduction with increased position error is a tradeoff. Do not claim incumbent has globally best speed margin. For search embed ONE immutable SearchBatchPlan with exact source_candidate and predecessor_decision; case_id one of five frozen IDs and seed17/18. Choose any granted subset: control_search uses controls only; structure_search includes at least one structural path and may include controls. All selected values form one candidate; physical changes rebuild models/workspace/warm states before one stable-v7 complete closed loop. There is no hidden inner adaptation search. Coordinate method search.family_coordinate@1.0.0 numerically generates continuous bounded ask/tell proposals with positive step and null candidates. Explicit method search.family_explicit@1.0.0 evaluates your own ordered points, null step, precisely selected paths; material choices require explicit enumeration. Explicit points alone are not mathematical optimization. Explain mathematical assumptions and actual support, or precise capability limitations. Local affine evidence cannot guarantee nonlinear reach, braking or perturbation robustness. M5 negative forecasts cannot screen out candidates. Supported retained prediction/plans/motion diagnosis is a read, not a new solve; new saved-state numerical computation is unavailable without satisfied binding/adoption prerequisites. Provide hypothesis, supporting/weakening evidence, variable domains, fixed conditions, method rationale, control adaptation allocation, expected information, counterevidence and exit criteria. fixed_conditions include robot,task,acceptance,controller_implementation,other_numerical_settings; objectives include joint_reach_holding_acceptance,terminal_error_m,holding_max_error_m,holding_max_speed_m_s; constraints frozen_acceptance,force_bounds,finite_valid_execution; verification candidate.apply,simulation.run,evaluation.run,control.profile_report,bound_comparison,diagnostic_revision. At most two new backend attempts per batch and eight search/reference/repetition attempts total; declare max_backend_attempts and target_changed_configurations. planned_budget must fit complete execution plus delivery capacity (4 workflow operations and 995s per new native candidate, plus protected interpretation 4 requests/4 operations/600s). Twenty final backend COUNT slots are protected and cannot fund search. Their future wall/operations are conditional, not subtracted during research. Preserve delivery (at least 2 requests,10 operations,1200s); actual request authority snapshot is current-session scoped. Verification starts only when the WHOLE frozen schedule plus delivery fits all budgets and elapsed time; otherwise report not started. All requests, corrections, failed attempts and costs share one ledger. Later plans must cite new complete feedback to count as feedback-linked research. You may continue, change variables, request justified diagnosis/repetition, retain incumbent or STOP; no required success or number of batches. Separate exact observations from conditional interpretations and unresolved uncertainty. Joint failure is authoritative; terminal pass alone is insufficient. STOP supplies bounded final scientific interpretation and ends research; predeclared frozen verification and final reporting cannot reverse it. No three-group comparison, global optimum, causal proof, hardware safety, real-time deployment, compression advantage or LLM superiority follows from this campaign. Keep prose concise and exact values in observations. This successor uses versioned conditional verification and a live clock started only after authorized preflight, never retroactively on the closed predecessor. Current permissions, budget, schema action enum and dispatch share a campaign/session/revision snapshot refreshed before EVERY request. If authority changes while reasoning, host revalidation returns actual current feedback, not a request to repair scientific reasoning under a stale menu. No compulsory structural edit or number of batches. Candidate eligibility requires a fresh nominal joint pass with effective incumbent-relative design/control change; perturbed-only success is development evidence, not eligibility. Case choice is prospective; same-condition references needed to isolate edits.",
+  "assignment_start_unix": 1791341029.4261196,
+  "selection_rule": {
+    "version": "native_nominal_selection@3.0.0",
+    "eligibility": "Effective design/control change from incumbent; fresh charged complete correctly bound nominal authoritative joint pass. Perturbed-only, cached, incomplete, invalid and physical-failure results ineligible.",
+    "ordering": "Native completed-search reservation order replaces fixed-baseline proposal order; select first nondominated eligible nominal candidate. No hardcoded model conclusion; ties/tradeoffs retain earlier order.",
+    "freeze": "Exact configuration, full incumbent-relative changes and source evidence before first verification. Rebuild only these changes on the retained source; no substitution.",
+    "schedule": "Existing five cases in frozen order, repetitions seed17 then seed18; incumbent then candidate for every slot. Fresh execution only; no retries for passing results.",
+    "no_candidate": "Run only ten unchanged-incumbent slots: worthwhile characterization of currently unmeasured perturbed incumbent. Leave ten candidate slots unused. A genuine model STOP ends search; characterization/reporting are predeclared delivery steps.",
+    "promotion": "Only complete correctly bound matched evidence supports comparison; joint count and each physical metric reported separately, tradeoffs retain incumbent. No population or model-superiority claim."
+  },
+  "known_review_issues": [
+    {
+      "claim": "Incumbent has the largest observed holding-speed margin / keeps the best margin.",
+      "verdict": "contradicted by supplied and cited evidence",
+      "incumbent_speed_m_s": 0.012750255515948416,
+      "lower_observed_speeds": [
+        {
+          "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+          "holding_weight": 0.09,
+          "terminal_weight": 0.1,
+          "speed_m_s": 0.010201160469407439
+        },
+        {
+          "execution_id": "bebcfd47274940fb88a55ce5a2457c4c",
+          "holding_weight": 0.0,
+          "terminal_weight": 0.05,
+          "speed_m_s": 0.01273567785134029
+        }
+      ],
+      "qualification": "Retention of incumbent may still be a model judgment; it cannot be justified by a global largest observed margin claim. Zero holding weight is outside the new proposal domain but remains observed evidence."
+    },
+    {
+      "claim": "Only nominal is executable here; no currently legal executable action can resolve robustness.",
+      "verdict": "current permissions overstated and supporting aliases do not substantiate this route claim",
+      "scope": "This recovery authorizes zero experiments or diagnostic reads. All non-stop decisions are proposals. Nominal-only allocation describes the original pilot, not executable recovery permission.",
+      "source": "prepared_request.json: decision_recovery.policy and capabilities.legal.*.proposal_only"
+    },
+    {
+      "claim": "One execution per point / no explicit matching repeat.",
+      "verdict": "needs qualification",
+      "scope": "One fresh pilot execution per selected point; two saved executions per matched scientific point including history. Zero deliberately planned repetitions, with original purpose null.",
+      "source": "overlap_review.json"
+    },
+    {
+      "claim": "Higher holding penalty raised rather than lowered speed.",
+      "verdict": "supports sampled association only",
+      "scope": "Both selected points fail sampled holding speed versus retained incumbent; monotonicity and causal attribution remain unverified, as the model also acknowledges."
+    },
+    {
+      "claim": "Final STOP: incumbent is the only complete jointly accepted configuration in scope",
+      "finding": "Contradicted by supplied historical joint passes including 148a2a290daa440f9b966f4d5cee4b5f and bebcdf47. It remains the retained deliverable, not the only observed passing configuration.",
+      "support": [
+        {
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "role": "retained_baseline",
+          "source_store": "D:\\softrobot-agent\\runs\\milestone45_continuation_20261004\\single_context",
+          "metrics": {
+            "terminal_error_m": 0.002697828858325615,
+            "holding_max_error_m": 0.0027300544346297905,
+            "holding_max_speed_m_s": 0.012750255515948416
+          }
+        },
+        {
+          "execution_id": "148a2a290daa440f9b966f4d5cee4b5f",
+          "role": "joint_weights_passing_confounded_counterexample",
+          "source_store": "D:\\softrobot-agent\\runs\\milestone4_autonomous_20261006",
+          "metrics": {
+            "terminal_error_m": 0.003313013757723085,
+            "holding_max_error_m": 0.003370231014572803,
+            "holding_max_speed_m_s": 0.010201160469407439
+          }
+        },
+        {
+          "execution_id": "bebcfd47274940fb88a55ce5a2457c4c",
+          "role": "zero_holding_weight_passing_counterexample",
+          "source_store": "D:\\softrobot-agent\\runs\\milestone45_continuation_20261004\\single_context",
+          "metrics": {
+            "terminal_error_m": 0.002705004945938772,
+            "holding_max_error_m": 0.0027368421540785942,
+            "holding_max_speed_m_s": 0.01273567785134029
+          }
+        }
+      ]
+    },
+    {
+      "claim": "Final interpretation scope calls retained incumbent a datum from this campaign store",
+      "finding": "Imported historical observation; current campaign backend_attempts=0. It cannot be presented as a fresh outcome."
+    },
+    {
+      "claim": "Request current actions and remaining budget",
+      "finding": "All five actual requests use old prelaunch context authority (search advertised, wall budget14998.125) while current host search wall capacity is zero after elapsed deadline and paired reserve. Current-session/archive-scope repair now passes offline; original failure/requests remain sealed."
+    },
+    {
+      "claim": "Supported factual selectors certify final prose",
+      "finding": "Selector validity alone does not certify the broader only-pass or provenance claims."
+    }
+  ],
+  "recovery_request_review": {
+    "source": "evidence/research_decision_recovery_20261007/live_request_0.json",
+    "identity": "3f3a5c0fc0bcdacc1c531186a74d4207bdffb21d0f3596355177ea72e7946584",
+    "limitation": "Historical zero-experiment recovery; its answer and independent review are preserved, not present execution authorization."
+  },
+  "clock_policy": {
+    "version": "successor_clock@3.0.0",
+    "preparation_active_limit_s": 7200.0,
+    "live_elapsed_limit_s": 36000.0,
+    "start": "Persist once after authorized preflight immediately before first real provider/numerical/backend operation",
+    "waits": "Authorization waits recorded separately; waits after live start never pause/reset deadline",
+    "old_campaign_policy_unchanged": true
+  },
+  "live_clock": {
+    "version": "successor_clock@3.0.0",
+    "origin_unix": 1791341029.4261196,
+    "deadline_unix": 1791377029.4261196,
+    "reset_permitted": false,
+    "subsequent_waits_pause_clock": false
+  },
+  "predecessor": {
+    "campaign": "research_native_development_v2_20261007",
+    "status": "sealed_failed",
+    "review": "evidence/research_native_development_v2_20261007/independent_live_review.json",
+    "old_grant_transferred": false
+  },
+  "preparation_started_unix": 1791340050,
+  "final_reporting": true
+}

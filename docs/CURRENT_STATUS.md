@@ -6,8 +6,17 @@ dispatch, retains the migrated-session fix, and conditions final wall-time
 reservation on the entire verification schedule fitting after development.
 Twenty final backend-count slots remain protected. Its live clock starts only
 after authorized preflight; preparation has a separate two-hour active cap.
-Focused request/restore/clock/case tests pass without provider or backend work.
-The predecessor below remains sealed; this successor has a new cumulative ledger.
+Focused request/restore/clock/case checks and actual failed-input/receipt replay
+checks pass. Live v3 is now **sealed on an engineering failure**, after four
+provider attempts and two completed nominal seed17 simulations. Terminal weight
+0.10 jointly passed with a speed/position tradeoff; 0.025 failed holding speed.
+Two authorized material repairs addressed authority fitting and archived selector
+projection. Recovery then rejected legitimate reservation release as a budget
+reset (`CONTEXT_BUDGET_CANNOT_RESET`); no third live repair was attempted. Fresh
+verification did not start despite sufficient resources and an eligible nominal
+candidate. The full feedback-driven research loop remains unproved. Original
+answers, failures, clocks and receipts are retained in the linked v3 delivery.
+The predecessor below remains sealed; v3 uses its separate cumulative ledger.
 
 A separately authorized [native development v2 campaign](research_native_development_v2.md)
 is now sealed after a negative live scheduling result. Direct chat authorization

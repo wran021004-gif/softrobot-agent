@@ -1,0 +1,467 @@
+{
+  "status": "sealed_failed",
+  "reason": "Engineering branch sealed: CONTEXT_BUDGET_CANNOT_RESET after reservation settlement; two material live repairs exhausted. No backend replay or further provider activity.",
+  "scientific_stopping_point": false,
+  "usage": {
+    "limit": {
+      "backend_solves": 28,
+      "model_calls": 24,
+      "tool_calls": 200,
+      "wall_s": 36000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 14,
+      "model_calls": 4,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 2270.027676065438
+    },
+    "remaining": {
+      "backend_solves": 26,
+      "model_calls": 20,
+      "tool_calls": 186,
+      "wall_s": 33729.97232393456,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "provider_usage": [
+    {
+      "request_id": "model-0",
+      "usage": {
+        "completion_tokens": 20962,
+        "completion_tokens_details": {
+          "reasoning_tokens": 17555
+        },
+        "prompt_cache_hit_tokens": 3840,
+        "prompt_cache_miss_tokens": 34556,
+        "prompt_tokens": 38396,
+        "prompt_tokens_details": {
+          "cached_tokens": 3840
+        },
+        "total_tokens": 59358
+      }
+    },
+    {
+      "request_id": "model-1",
+      "usage": {
+        "completion_tokens": 5769,
+        "completion_tokens_details": {
+          "reasoning_tokens": 5698
+        },
+        "prompt_cache_hit_tokens": 3456,
+        "prompt_cache_miss_tokens": 38545,
+        "prompt_tokens": 42001,
+        "prompt_tokens_details": {
+          "cached_tokens": 3456
+        },
+        "total_tokens": 47770
+      }
+    },
+    {
+      "request_id": "model-2",
+      "usage": {
+        "completion_tokens": 8440,
+        "completion_tokens_details": {
+          "reasoning_tokens": 4996
+        },
+        "prompt_cache_hit_tokens": 3456,
+        "prompt_cache_miss_tokens": 38616,
+        "prompt_tokens": 42072,
+        "prompt_tokens_details": {
+          "cached_tokens": 3456
+        },
+        "total_tokens": 50512
+      }
+    },
+    {
+      "request_id": "model-3",
+      "usage": {
+        "completion_tokens": 47372,
+        "completion_tokens_details": {
+          "reasoning_tokens": 44216
+        },
+        "prompt_cache_hit_tokens": 128,
+        "prompt_cache_miss_tokens": 41746,
+        "prompt_tokens": 41874,
+        "prompt_tokens_details": {
+          "cached_tokens": 128
+        },
+        "total_tokens": 89246
+      }
+    }
+  ],
+  "known_token_subtotal": {
+    "prompt_tokens": 164343,
+    "completion_tokens": 82543,
+    "total_tokens": 246886
+  },
+  "search": [
+    {
+      "candidate_id": "batch-396bdbbae02626d3-0",
+      "configuration": {
+        "artifact_id": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "control/recipe/terminal_tip_speed_weight": 0.1
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0032997971664596422
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0033674546591454186
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.01025399247985248
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "871e8b83c5d14f9ba813fb65dcb0cc29",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.0033674546591454186,
+          "holding_max_speed_m_s": 0.01025399247985248,
+          "terminal_error_m": 0.0032997971664596422
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "1b587a3a3bbcea44429515affe1360ae767d091717581638e184783149de99ac",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "b4bb9a28d6df7ef9b1b2aef8bb4f05ec9b26bb39adcf9d0bd3468714ea3b9a30",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 8.622879228572128,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 305.4060000000027,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 305.4060000000027,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "871e8b83c5d14f9ba813fb65dcb0cc29",
+        "execution_status": "completed",
+        "original_execution_id": "871e8b83c5d14f9ba813fb65dcb0cc29",
+        "output": {
+          "artifact_id": "d4d0b75e01b6351faf66d328ad1413959b32cfcee2437d2ff861c3cd87e596ed",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "candidate_id": "batch-396bdbbae02626d3-1",
+      "configuration": {
+        "artifact_id": "26c9ed9c22ab66dfa5e7fa8276ae0cc60a13a53af50af9cc17def945949ff944",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "control/recipe/terminal_tip_speed_weight": 0.025
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0028638642071417758
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0028638642071417758
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.02116571913454289
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "ed8e838859714c17930b16ba7a46e8e1",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.0028638642071417758,
+          "holding_max_speed_m_s": 0.02116571913454289,
+          "terminal_error_m": 0.0028638642071417758
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "b695ed9abbdfc7972d79825b2e4ac13a71e328fe9514147cf1bb8d95c52650e1",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "17a193e2a742ecaf6bffb0714a30036d5acabe1657a98fe381c909b94330281e",
+            "media_type": "application/json"
+          }
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 7.577412962855721,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 267.125,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 267.125,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "ed8e838859714c17930b16ba7a46e8e1",
+        "execution_status": "completed",
+        "original_execution_id": "ed8e838859714c17930b16ba7a46e8e1",
+        "output": {
+          "artifact_id": "555ebb52247e85396a20751bc9bfd4a1e8633f2eb85a7c2a7160f297f24cd607",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    }
+  ],
+  "verification": null,
+  "mathematical_support": "Squared normalized tip-speed objective interpretation and model-authored finite two-point enumeration; no standalone quantitative optimization.",
+  "standalone_numerical_operations": 0,
+  "transport_retries": 0,
+  "protocol_corrections": 2,
+  "material_live_repairs": 2,
+  "provider_attempts": 4,
+  "backend_attempts": 2,
+  "feedback_drove_later_scientific_action": false,
+  "feedback_drove_constrained_reporting": true,
+  "old_answers_unchanged": true,
+  "full_native_loop_demonstrated": false,
+  "implementation": {
+    "commit": "caf23010c33186482d70cf9351d04817c46ab1c8",
+    "files": {
+      "examples/research_model_v1.py": "9f559b85cbe386d22bec2c098c8e9d1c3f4436ebe701b10bf366e23e7399736f",
+      "examples/milestone4_autonomous.py": "764462cb45bb72b5f5f506f2dad38a1d46de8a9e67a3c8ece1143070c8057a44",
+      "configs/research/native_pilot_v1.json": "b096d68d9f85bd53cd686ce8e697f992e45ae5696533600e15c851c86b6ab375",
+      "tools/research_scheduler.py": "d92e83e31e0c97dbe408fd3d76b27a2df6c7e96ac9e490bbe999fa7fceeb8c5d",
+      "tools/platform_search.py": "32a9e44ae76cae62c2394699631b77434566abb7d4c0c56f62cefcc023d24c9d",
+      "tools/live_batch_execution.py": "9c59f58453ea876ca7be00c724737d55b9d4ce30a83a6cffc3b4d5e3bb3fad8e",
+      "tools/context_assembly.py": "29aac51019560c1f0b296c6af91ed471b4c1e1f448025cddd768b8bba2202b46",
+      "tools/diagnostic_reference_adapter.py": "de5219506250c92a152d5a3f5b706ea25acacab3b2c165eaede9f5284e57c53e",
+      "examples/research_campaign_v2.py": "9ca313c8cdffe052ca9bf4dd678cd916c3389f236170a77cc205ab3468c88ce1",
+      "configs/research/native_campaign_v2.json": "abcf6ebc59b8870366d607db15345b48b04e65c8e921b8e6e2611bc304033bc3",
+      "schemas/platform_handoff.py": "0cf890ec8dcadb94d05e1781cf20d6b0ec5de048a92ba50ebe941b6f722916f7",
+      "tools/batch_budget.py": "ca65edb2234c217f807cc023af6adc36c6dd45dbbc62f3628c71b7c26c83e172",
+      "tools/research_spec.py": "df3e03575a54a4c67c5dc4b6a42625eda6940cfe980d1ca8874dd67a06c9b153",
+      "tools/study_history.py": "4697e64b4643e73ab675688e477299dcfe742002d36be89d49b819f4aeb15b70",
+      "tools/candidate_parameters.py": "2c08bfdd5c15dc752b2ea6e5b85833584ba6d069e0c13fa98c097f04df3a7b61",
+      "tools/research_tasks.py": "c728710c80d97c48e53c31422a1f0aece54093e686b0d512c8f7cba0654101c9",
+      "tools/fixed_research.py": "27207dc82c489ce3f90669fd252530628fef7a65d3b543c56869ddfd2bc5891f",
+      "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43",
+      "tools/verification_evidence.py": "c9461fcdd882a1c1e0301fe0babff4fef2db76a7d36a311f3a5c9b4ecab8963f",
+      "examples/research_campaign_v3.py": "f6954e3a92b9f5dc922d6322ff1f3774b3b2c764c129e7c081131cb355b91a90",
+      "configs/research/native_campaign_v3.json": "6f236fe78aac4a2ea0bd5a91d25bc4034599be83a4703210357d77549984ddf2",
+      "tools/current_research_authority.py": "5cdd7ed330a44516b13c154f43a1905439d817c59ac53259603389e591af2cdd",
+      "tools/platform_models.py": "a9e915bb8b2d75bc76c33fd2e37a5dbb11dfc3c2e5dbe6325580d59c36627503"
+    },
+    "stable_controller": {
+      "extensions/tendon_family/gvs_nmpc.py": "e3d6c33acf8fe6ab326de84634c0a4edf11ffe67ade1b9b72d9527787aae4e5a",
+      "extensions/tendon_family/gvs_trajectory.py": "160b47df2f0958929527d4871c61a66e3c69d766b7406144c97cb197ad65292b",
+      "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43"
+    }
+  },
+  "clock": {
+    "preparation": {
+      "preparation_active_s": 979.2771191596985,
+      "authorization_waits": {
+        "intervals": [],
+        "total_s": 0.0,
+        "status": "Existing direct user authorization; no human authorization wait before successor launch. Automatic execution review included in preparation elapsed."
+      },
+      "preparation_total_elapsed_s": 979.2771191596985,
+      "prior_charged_s": 1.812000000005355,
+      "separately_charged_engineering_s": 977.4651191596931,
+      "physical_activity": 0
+    },
+    "live_clock": {
+      "version": "successor_clock@3.0.0",
+      "origin_unix": 1791341029.4261196,
+      "deadline_unix": 1791377029.4261196,
+      "reset_permitted": false,
+      "subsequent_waits_pause_clock": false
+    },
+    "live_elapsed_at_seal_s": 1421.7126405239105,
+    "clock_reset": false,
+    "grant_unchanged": true
+  }
+}

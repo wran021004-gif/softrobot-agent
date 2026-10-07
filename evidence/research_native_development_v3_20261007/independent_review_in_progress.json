@@ -1,0 +1,30 @@
+{
+  "status": "provisional; campaign running",
+  "historical_answers_unchanged": true,
+  "first_execution": {
+    "execution_id": "871e8b83c5d14f9ba813fb65dcb0cc29",
+    "case": "nominal",
+    "seed": 17,
+    "change": {
+      "control/recipe/terminal_tip_speed_weight": 0.1
+    },
+    "terminal_error_m": 0.0032997971664596422,
+    "holding_max_error_m": 0.0033674546591454186,
+    "holding_max_speed_m_s": 0.01025399247985248,
+    "joint_pass": true,
+    "comparison": "Lower sampled holding speed, higher terminal and holding position errors than retained historical incumbent; tradeoff."
+  },
+  "issues": [
+    {
+      "location": "Accepted round0 plan rationale",
+      "model_claim": "each point plus the unchanged incumbent reference ... executed once",
+      "review": "The two-attempt research plan executes two changed candidates. Its incumbent reference is historical, not a fresh additional execution. Fresh repetition awaits conditional verification. Preserve the original wording."
+    },
+    {
+      "location": "First-point hypothesis",
+      "review": "Observed position worsening weakens the no-worsening conjunction; one result cannot establish causality, repeatability or robustness."
+    }
+  ],
+  "mathematics": "Explicit two-point enumeration; no standalone quantitative optimization executed.",
+  "material_live_repairs": 0
+}
