@@ -96,6 +96,7 @@ class NativePilotTests(TestCase):
             metrics=actual['metrics'])],classification='Engineering fixture wrapping preserved actual evidence'), 'engineering_feedback_fixture')
         self.packet=pilot.configure(self.w)
         adapter=EvidenceDrivenAdapter();payload=payload_for(self.w.host,adapter)
+        pilot.adopt_current_working(self.w)
         packet=json.loads(payload['messages'][1]['content'])['role_context']['research_packet']
         aliases=packet['current_feedback']['aliases']
         self.assertTrue(any(r['pointer'].endswith('/acceptance/accepted') and r['value'] is False for r in aliases.values()))

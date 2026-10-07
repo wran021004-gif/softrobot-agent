@@ -6,6 +6,7 @@ from unittest import TestCase
 from unittest.mock import patch
 from contextlib import ExitStack,closing,contextmanager
 from uuid import uuid4
+import shutil
 import json
 import gc
 
@@ -26,9 +27,13 @@ OFFLINE_EXAMPLES={}
 
 @contextmanager
 def offline_directory():
-    with TemporaryDirectory(dir=ROOT/'runs') as directory:
-        try:yield directory
-        finally:gc.collect()  # Existing SQLite fixture cleanup on Windows.
+    directory=ROOT/'runs'/('batch-offline-'+uuid4().hex)
+    directory.mkdir()
+    try:yield str(directory)
+    finally:
+        gc.collect()
+        if not directory.resolve().is_relative_to((ROOT/'runs').resolve()):raise ValueError('UNSAFE_OFFLINE_CLEANUP')
+        shutil.rmtree(directory)
 
 
 class BatchTests(TestCase):

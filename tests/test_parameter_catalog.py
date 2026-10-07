@@ -131,7 +131,8 @@ class ParameterCatalogTests(TestCase):
         result_ref=dict(artifact_id='f'*64,media_type='application/json')
         artifacts[feedback_ref['artifact_id']]=dict(result=result_ref)
         state=dict(role_context=dict(autonomous_scheduling=True,result_feedback=feedback_ref,
-            source_report=result_ref,research_records=[dict(facts=dict(candidate=candidate,valid_complete_execution=True))]))
+            source_report=result_ref,research_records=[dict(facts=dict(candidate=candidate,configuration=source_ref,
+                execution_id=candidate['execution_id'],valid_complete_execution=True))]))
         snapshot=dict(input=deepcopy(self.source))
         store=MagicMock()
         store.session.side_effect=lambda *args,**kwargs:dict(state=state,snapshot=snapshot)

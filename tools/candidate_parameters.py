@@ -92,7 +92,70 @@ def project_planning_configuration(original,policy):
             # A planning grant must retain the selected archived source's values,
             # including v1 common selectors, rather than apply incumbent defaults.
             decisions=effective['policy']['candidate_builder']['parameters']['data'].get('semantic_decisions',{})
-            for path,decision in decisions.items():decision['baseline_value']=parameter_value(effective,path)
+            old=original['policy']['candidate_builder']['parameters']['data']
+            selected=original['robot']['structure']['data'].get('metadata',{}).get('design_decisions',{}).get('selections',{})
+            for path,decision in decisions.items():
+                common='design/'+decision['operation']
+                legacy=old.get('semantic_decisions',{}).get(common,{})
+                if path in selected:value=selected[path]
+                elif common in selected:value=selected[common]
+                elif path in old.get('semantic_decisions',{}):value=old['semantic_decisions'][path]['baseline_value']
+                elif legacy and set(decision['components'])<=set(legacy['components']):value=legacy['baseline_value']
+                else:raise ValueError('PLANNING_SEMANTIC_SELECTION_UNAVAILABLE: '+path)
+                decision['baseline_value']=value
     from extensions.tendon_family.gvs_profile import execution_scope
     if execution_scope(effective)!=execution_scope(original):raise ValueError('PLANNING_CAPABILITY_PROJECTION_CHANGED_SCIENCE')
     return effective
+
+
+def historical_parameter_projection(original,policy):
+    """Read-only selector interpretation; never a scientific/cache identity.
+
+    Reject inconsistent provenance or selectors instead of using current defaults.
+    Only the current grant declares which segment operations can be interpreted.
+    """
+    projected=project_planning_configuration(original,policy)
+    space=projected['policy']['candidate_builder']['parameters']['data']
+    decisions=space.get('semantic_decisions',{})
+    if projected['policy']['candidate_builder'].get('version')=='1.1.0' and decisions:
+        from math import isclose
+        from extensions.tendon_family.design_decisions import MATERIAL_FACTORS
+        design=original['robot']['structure']['data']
+        provenance=design.get('metadata',{}).get('design_decisions',{})
+        if provenance.get('source_identity')!=digest(space.get('semantic_source')):
+            raise ValueError('HISTORICAL_SEMANTIC_PROVENANCE_MISMATCH')
+        actual={c['id']:c for c in design['components']}
+        source={c['id']:c for c in space['semantic_source']['components']}
+        for path,decision in decisions.items():
+            value=parameter_value(projected,path)
+            for name in decision['components']:
+                a,b=actual[name],source[name]
+                if decision['operation']=='section_scale':
+                    if len(a['sections'])!=len(b['sections']):raise ValueError('HISTORICAL_SELECTOR_SECTION_LAYOUT_MISMATCH: '+path)
+                    for station,base in zip(a['sections'],b['sections']):
+                        x,y=station['section'],base['section']
+                        if x['kind']!=y['kind'] or x['parameters'].keys()!=y['parameters'].keys():
+                            raise ValueError('HISTORICAL_SELECTOR_SECTION_LAYOUT_MISMATCH: '+path)
+                        if any(not isclose(v,y['parameters'][k]*value,rel_tol=1e-12,abs_tol=0.) for k,v in x['parameters'].items()):
+                            raise ValueError('HISTORICAL_SELECTOR_PHYSICAL_VALUE_MISMATCH: '+path)
+                elif decision['operation']=='material_scenario':
+                    if not isclose(a['physics']['young_pa'],b['physics']['young_pa']*MATERIAL_FACTORS[value],rel_tol=1e-12,abs_tol=0.):
+                        raise ValueError('HISTORICAL_SELECTOR_PHYSICAL_VALUE_MISMATCH: '+path)
+                else:raise ValueError('HISTORICAL_SELECTOR_OPERATION_UNAVAILABLE: '+path)
+    return projected
+
+
+def historical_parameter_comparison(original,policy,paths):
+    """Unavailable parameter reads retain the original historical evidence."""
+    try:
+        projected=historical_parameter_projection(original,policy)
+        space=policy['candidate_builder']['parameters']['data']
+        allowed={**space.get('parameters',{}),**space.get('control_parameters',{}),
+                 **space.get('model_parameters',{}),**space.get('discretization_parameters',{})}
+        if set(paths)-set(allowed):raise ValueError('HISTORICAL_PARAMETER_OUTSIDE_CURRENT_GRANT')
+        return dict(available=True,values={p:parameter_value(projected,p) for p in paths},
+            original_configuration_identity=digest(original),parameter_projection_identity=digest(projected),
+            role='Parameter comparison only; original bytes and implementation still gate scientific match/reuse')
+    except (ValueError,KeyError,TypeError,IndexError) as exc:
+        return dict(available=False,values=None,reason=str(exc),original_configuration_identity=digest(original),
+            role='Historical evidence retained; unavailable mapping is not candidate invalidity or proof of novelty')

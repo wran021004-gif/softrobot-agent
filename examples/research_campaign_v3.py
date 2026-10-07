@@ -19,7 +19,7 @@ from tools.fixed_research import select_candidate
 
 CONFIG=ROOT/'configs/research/native_campaign_v3.json'
 FILES=(*previous.FILES,'examples/research_campaign_v3.py','configs/research/native_campaign_v3.json',
-       'tools/current_research_authority.py','tools/platform_models.py')
+       'tools/current_research_authority.py','tools/platform_models.py','tools/structural_continuation.py')
 
 
 def seal():
@@ -316,11 +316,70 @@ def recover_dependency(directory=None):
     continue_trajectory(w)
 
 
+def continue_structural(directory=None):
+    """Resume the already accepted model-4 plan under attachment 9dae342a."""
+    from examples.gvs_nmpc_route_experiment import load_credential
+    from tools.structural_continuation import migrate,retire_settled_draft
+    config=read(CONFIG);w=pilot.restore((directory or ROOT/'runs'/config['campaign_id']).resolve())
+    start=read(w.directory/'structural_repair_start.json');auth=start['authorization']
+    request_repair=read(w.directory/'structural_request_repair_start.json')
+    gate=read(Path(start['output'])/'engineering_gate.json')
+    if not gate['passed'] or gate['implementation_files']!=seal()['files']:
+        raise ValueError('STRUCTURAL_COMPLETE_OFFLINE_GATE_NOT_FROZEN')
+    if (w.status!='failed' or w.repairs!=4 or w.sealed_cases or
+            w.stop_reason!='CONSTRAINED_PARAMETER_MISSING: design/near_section_scale'):
+        raise ValueError('ONLY_SAVED_STRUCTURAL_READ_BOUNDARY_AUTHORIZED')
+    if auth['clock']!=read(w.directory/'live_clock.json') or time.time()>=auth['clock']['deadline_unix']:
+        raise ValueError('ORIGINAL_CLOCK_INVALID_OR_EXPIRED')
+    batch=w.store.session(w.host.run_id)['state']['search_batch']
+    if batch['plan']!=auth['accepted_plan'] or batch['proposals'] or batch['pending'] is not None:
+        raise ValueError('ACCEPTED_STRUCTURAL_PLAN_ALREADY_DISPATCHED_OR_CHANGED')
+    with w.store.connect(True) as db:
+        unsettled=[dict(r) for r in db.execute('SELECT * FROM calls WHERE receipt IS NULL')]
+    if len(unsettled)!=1 or unsettled[0]['request_id']!=request_repair['reservation']['request_id']:
+        raise ValueError('UNRELATED_PENDING_WORK_NO_REPLAY')
+    original=next(r for r in w.rounds if r['decision'].get('search_plan')==batch['plan'])
+    out=Path(start['output']);w.freeze['implementation']=seal()
+    migration=migrate(w,auth)
+    retired_draft=retire_settled_draft(w)
+    elapsed=time.time()-request_repair['boundary']['started_unix']
+    receipt=w.store.complete(request_repair['reservation'],dict(request_id=request_repair['reservation']['request_id'],
+        execution_id=request_repair['reservation']['execution_id'],caller='engineering',
+        tool_id='engineering.shared_feedback_request_fitting',tool_version='3.5.0',
+        execution_status='completed',charged=zero()),migration,elapsed)
+    w.repairs=6;w.freeze['material_live_repairs']=6
+    w.freeze['structural_continuation_authorization']=auth
+    w.freeze['repair_boundary']=dict(version='v3-structural-read-continuation@3.5.0',
+        full_boundary=w.store.session(w.host.run_id)['state']['structural_read_migration'],
+        corrected_commit=w.freeze['implementation']['commit'],previous_repairs=4,cumulative_material_repairs=6,
+        original_clock=w.freeze['live_clock'],science_changed=False,budget_reset=False,backend_replayed=0)
+    w.freeze['experiment']['evidence_directory']=str(out.resolve())
+    w.freeze['final_reporting']=False;w.status='running';w.stop_reason=None
+    w.freeze['recovery_instructions']+=' Attachment 9dae342a explicitly authorizes continuation of this SAME campaign after the sealed engineering stop, at most three further material repairs (cumulative seven), with unchanged total limits and original clock. The historical selector reader has passed the saved accepted-plan offline complete-path gate. model-4 was accepted, model-5 was STOP-only engineering reporting and not a scientific STOP. Its exact 1.00/1.05 near-section batch is now resumed without requesting the same proposal again. Original source controls remain fixed: terminal and holding speed weights .05. Structural execution requires the existing rebuild/initializer/warm-state path, no hidden adaptation search. Eligibility remains the frozen effective-change fresh nominal joint-pass rule, not dominance over historical incumbent. Read the actual new batch outcomes and decide freely; finite enumeration is not numerical optimization. Preserve all historical failures and mismatched-reference limitations.'
+    row=deepcopy(original);row.update(index=len(w.rounds),resumed_accepted_decision=original['accepted_decision'],
+        original_native_round=original['index'],execution_only_continuation=True)
+    w.rounds.append(row);w.previous_decision=original['accepted_decision']
+    pilot.configure(w);pilot.persist(w)
+    atomic_json(out/'repair_and_plan_resume_boundary.json',dict(migration=migration,receipt=receipt,retired_protocol_draft=retired_draft,
+        accepted_plan=batch['plan'],accepted_decision=original['accepted_decision'],provider_reproposal_calls=0,
+        source_bindings=w.store.artifact(batch['plan'])['bindings']))
+    # Current authority and exact source budget were checked without paid entry.
+    load_credential(Path.home()/'.codex/.env')
+    try:
+        pilot.reusable.execute(w,row);previous.append_results(w,row)
+    except Exception as exc:
+        w.status='failed';w.stop_reason=str(exc)
+        atomic_json(w.directory/'failure.json',dict(type=type(exc).__name__,message=str(exc),usage=w.store.remaining()))
+        pilot.persist(w)
+    continue_trajectory(w)
+
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','recover-live','continue-authorized','recover-dependency']);parser.add_argument('--output',type=Path)
+    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','recover-live','continue-authorized','recover-dependency','continue-structural']);parser.add_argument('--output',type=Path)
     args=parser.parse_args()
     if args.mode=='prepare':prepare(args.output)
     elif args.mode=='live':live(args.output)
     elif args.mode=='recover-live':recover_live(args.output)
     elif args.mode=='continue-authorized':continue_authorized(args.output)
-    else:recover_dependency(args.output)
+    elif args.mode=='recover-dependency':recover_dependency(args.output)
+    else:continue_structural(args.output)

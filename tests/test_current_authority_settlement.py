@@ -145,7 +145,8 @@ class SettlementTests(TestCase):
 
     def test_unauthorized_grant_increase_stale_session_and_lost_charge_rejected(self):
         old=self.baseline();authority=self.authority()
-        stale=deepcopy(old);stale['authority']['current_authority']['session_id']='old-session'
+        stale=deepcopy(old);stale['authority']['current_authority']=dict(
+            campaign_id=authority['accounting_binding']['campaign_id'],session_id='old-session')
         with self.assertRaisesRegex(ValueError,'STALE_SESSION'):verify_accounting_transition(stale,authority,self.archive)
         wrong=deepcopy(authority);wrong['remaining_budget']=self.store.remaining()['remaining']
         with self.assertRaisesRegex(ValueError,'WRONG_PHASE_CAPACITY'):verify_accounting_transition(old,wrong,self.archive)

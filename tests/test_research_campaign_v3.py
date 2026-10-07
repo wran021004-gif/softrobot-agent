@@ -89,7 +89,8 @@ class NativeSuccessorTests(NativePilotTests):
     def test_clock_persists_once_and_restore_cannot_reset_it(self):
         for p in self.patches:p.stop()
         self.w.working=None
-        campaign.start_clock(self.w)
+        with patch('time.time',return_value=self.w.freeze['preparation_started_unix']+60.):
+            campaign.start_clock(self.w)
         clock=deepcopy(self.w.freeze['live_clock'])
         restored=pilot.restore(self.root)
         self.assertEqual(restored.freeze['live_clock'],clock)

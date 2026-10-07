@@ -438,11 +438,16 @@ def fit_request(wire, config, purpose, *, archive):
                 # snapshot at the wire boundary. Keep its menu and budgets
                 # inline; duplicate-detail pointers are for archived evidence.
                 if key=='capabilities' and isinstance(child,dict) and child.get('authority_snapshot'):
+                    if stage==0:
+                        for name in ('legal','remaining'):
+                            if name in child:seen[digest(child[name])]=p+'/'+name
                     out[key]=deepcopy(child);continue
                 # Remove only redundant representations, never an execution's
                 # metric, alias, identity or failure. First occurrence stays.
                 if stage==0 and isinstance(child,(dict,list)) and key in {
-                        'parameter_catalog','legal_actions','remaining_budget','chronology','frozen_cases'}:
+                        'parameter_catalog','legal_actions','remaining_budget','chronology','frozen_cases',
+                        'acceptance','unchanged_acceptance','task_acceptance','roles','incumbent',
+                        'primary','source_baseline','latest_attempt','selected_incumbent','current_batch_source'}:
                     identity=digest(child)
                     if identity in seen:
                         out[key]=dict(view_pointer=seen[identity]);continue
@@ -458,7 +463,7 @@ def fit_request(wire, config, purpose, *, archive):
                             'reasoning','rationale','next_step'} and isinstance(x,str) else
                             prior_summary(x,location+'/'+pointer_part(k))) for k,x in v.items()}
                     out[key]=prior_summary(child,p);continue
-                if stage==2 and key in {'considered','experiment_ledger','evidence_history',
+                if stage==2 and key in {'considered','experiment_ledger','evidence_history','claim_history',
                         'candidate_artifacts','full_mutation_rebuild_reuse_evidence','metric_sources'}:
                     out[key]=reference(child,p);continue
                 out[key]=compact(child,p)

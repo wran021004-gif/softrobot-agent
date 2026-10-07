@@ -521,10 +521,14 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
         if (saved['execution_id']!=facts['execution_id'] or saved['owner_run_id']!=facts['candidate']['owner_run_id']
                 or saved['execution_scope']!=execution_scope(original)):
             raise ValueError('BATCH_HISTORICAL_SOURCE_BINDING_MISMATCH')
-        comparable=comparison_scope(effective)==comparison_scope(original)
-        if not comparable and not cases:raise ValueError('BATCH_HISTORICAL_FIXED_SCIENCE_MISMATCH')
+        from tools.candidate_parameters import historical_parameter_projection,historical_parameter_comparison
+        parameter_comparison=historical_parameter_comparison(original,effective['policy'],plan.variables)
+        projected=historical_parameter_projection(original,effective['policy']) if parameter_comparison['available'] else None
+        comparable=projected is not None and comparison_scope(effective)==comparison_scope(projected)
+        if not comparable and not cases and parameter_comparison['available']:raise ValueError('BATCH_HISTORICAL_FIXED_SCIENCE_MISMATCH')
         permitted.append({**saved,'available_for_reasoning':True,'comparable_under_task':comparable,
-            'reusable_under_plan':comparable and scientific_fixed_scope(effective,plan.variables)==scientific_fixed_scope(original,plan.variables),
+            'parameter_comparison':parameter_comparison,
+            'reusable_under_plan':comparable and scientific_fixed_scope(effective,plan.variables)==scientific_fixed_scope(projected,plan.variables),
             'exact_reuse_rule':'Full execution_scope must additionally equal proposed candidate; no cross-structure result rebinding.'})
     batch=dict(plan=plan_ref,batch_id='batch-'+plan_ref['artifact_id'][:16],mode=mode,
         method=plan.method,parameters=plain(algorithm.parameters),algorithm=plain(algorithm.save()),pending=None,
@@ -614,7 +618,10 @@ def _run_batch(host,inject,*,stop_after_stage=None):
             known=[batch['parameters']['initial'],*[p['changes'] for p in batch['proposals']]]
             for saved in batch.get('historical_results',[]):
                 saved_input=host.store.artifact(saved['facts']['configuration'])['effective']
-                known.append({p:parameter_value(saved_input,p) for p in changes})
+                from tools.candidate_parameters import historical_parameter_comparison
+                comparison=historical_parameter_comparison(saved_input,source['policy'],changes)
+                saved['parameter_comparison']=comparison
+                if comparison['available']:known.append(comparison['values'])
             canonicalized=[]
             for path,value in changes.items():
                 old=next((p[path] for p in known if path in p and

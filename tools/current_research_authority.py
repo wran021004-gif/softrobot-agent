@@ -118,6 +118,10 @@ def verify_accounting_transition(state,authority,archive):
 
 def verify_dependency_migration(store,run_id,before_identity,after_identity):
     """Verify the one explicitly authorized v3 infrastructure revision only."""
+    structural=store.session(run_id)['state'].get('structural_read_migration')
+    if structural:
+        from tools.structural_continuation import verify_migration
+        return verify_migration(store,run_id,before_identity,after_identity)
     from tools.platform_registry import dependency_closure,registry
     session=store.session(run_id)
     ref=session['state'].get('authorized_dependency_migration')
