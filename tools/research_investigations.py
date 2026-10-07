@@ -20,7 +20,7 @@ class InvestigationOrder(Contract):
     parent_id: str | None = None
     role: Literal['principal','coordinator','investigator'] = 'investigator'
     question: str = Field(min_length=1,max_length=2000)
-    evidence: list[EvidenceRef] = Field(min_length=1,max_length=12)
+    evidence: list[EvidenceRef] = Field(min_length=1,max_length=256,description='Finite authorized source scope; metadata is paged, never all bodies prefetched.')
     queries: list[ReadEvidence] = Field(default_factory=list,max_length=12)
     allowed_tools: list[Literal['evidence.read']] = Field(default_factory=lambda:['evidence.read'],min_length=1,max_length=1)
     budget: Budget
@@ -125,12 +125,49 @@ class InvestigationDispatcher:
                 if n.get('status')=='completed' and n.get('result'))
         return evidence
 
+    def _directory(self,order):
+        """A derived Store artifact, not another archive or an access grant.
+
+        Only declared original metadata and root field names are exposed. Bodies
+        remain in the same Store and retain their separate scope checks.
+        """
+        entries=[]
+        identity_keys=('candidate_id','owner_run_id','run_id','execution_id','source_execution_id',
+            'scientific_configuration_identity','result_type','coordinate_frame','tool_id','tool_version','contract_version')
+        for ref in order.evidence:
+            entry=dict(reference=plain(ref),availability='available',metadata_only=True)
+            try:
+                source=self.store.artifact(ref)
+                keys=list(source) if isinstance(source,dict) else []
+                entry['identity_and_version']={k:source[k] for k in identity_keys if k in keys
+                    and isinstance(source[k],(str,int,float,bool)) and len(str(source[k]))<=256}
+                entry['material']=entry['identity_and_version'].get('result_type',
+                    entry['identity_and_version'].get('tool_id','saved '+type(source).__name__+' evidence'))
+                field_keys=list(dict.fromkeys([*keys[:12],*keys[-12:]]))
+                field_keys=[k for k in field_keys if len(k)<=160]
+                entry['fields']=[dict(pointer='/'+k.replace('~','~0').replace('/','~1'),
+                    value_type=type(source[k]).__name__) for k in field_keys]
+                entry['other_fields_at_root']=len(keys)>len(field_keys)
+                entry['questions']='Inspect original fields for recorded observations, identity, applicability, failures or limitations; metadata establishes no scientific conclusion.'
+            except (ValueError,UnicodeError):
+                entry.update(availability='unavailable',reason='SOURCE_UNAVAILABLE_OR_INVALID',material='unresolved authorized reference')
+            entry['read']=dict(reference=plain(ref),pointer='',offset=0,limit=8,byte_limit=4096)
+            entries.append(entry)
+        directory=dict(version='1.0.0',kind='investigation_evidence_directory',metadata_only=True,
+            investigation_id=order.investigation_id,entries=entries,
+            permission='Discovery does not grant body access. Each read rechecks current activity, parent and exact source scope. Directory entries cannot support scientific facts.')
+        with self.store.transaction() as db:ref=plain(self.store.put(db,directory))
+        return ref,entries
+
     def prepare(self, value, *, executing=False):
         from tools.context_assembly import EvidenceArchive, assemble_request, check_outgoing_request
         from tools.platform_models import effective_config
         order=InvestigationOrder.model_validate(value);session,grant=self._scope(order)
         archive=EvidenceArchive(self.host.folder/'investigation_context'/order.investigation_id,
             scope=dict(run_id=self.run_id,investigation_id=order.investigation_id),stores=(self.store,))
+        directory,entries=self._directory(order)
+        archive.register(directory)
+        if executing:self._state(order.investigation_id,directory=directory)
         # Prefetch independently, recording the exact pages made visible to this role.
         from schemas.platform_operations import ReadEvidence
         from tools.platform_tools import bounded_evidence_page
@@ -163,7 +200,20 @@ class InvestigationDispatcher:
         packet=dict(question=order.question,role=order.role,reads=reads,stopping=order.stop_conditions,
             allowed_tools=order.allowed_tools,remaining_budget=plain(order.budget),organization_limits=dict(
                 maximum_count=grant['max_count'],concurrency=grant['max_concurrency'],max_depth=2))
-        if order.role=='principal':packet['principal_inspection_records']=session['state'].get('principal_investigation_reads',[])
+        packet['investigation_id']=order.investigation_id
+        packet['timeout_s']=order.timeout_s
+        packet['output_bytes']=order.output_bytes
+        packet['delegation_budget_limit']=plain(order.budget)
+        packet['evidence_directory']=dict(reference=directory,version='1.0.0',total_entries=len(entries),
+            inline_entries=entries[:1],query=dict(reference=directory,pointer='/entries',offset=0,limit=2,byte_limit=4096),
+            continuation='Use evidence.read at /entries with next_offset until null. An overview requires /entries/<original index>. No source is dropped from this directory.',
+            delegate='Use original entry.reference in child evidence; set parent_id to this investigation_id, role investigator, tools and budget no greater than this request. Do not delegate the directory as scientific evidence.')
+        if order.role=='principal':
+            packet['principal_inspection_records']=session['state'].get('principal_investigation_reads',[])
+            ids={r.artifact_id for r in order.evidence}
+            packet['disposition_targets']=[dict(investigation_id=k,report=n['result'])
+                for k,n in session['state'].get('investigations',{}).items()
+                if n.get('status')=='completed' and n.get('result',{}).get('artifact_id') in ids]
         wire,audit=assemble_request(payload,config,'research_decision',packet,archive=archive,
             authority=dict(question=order.question,legal_actions={'submit_return':{}}))
         measurement=check_outgoing_request(wire,config,'research_decision')
@@ -241,10 +291,13 @@ class InvestigationDispatcher:
         # consume an evidence operation too, within the common node reservation.
         self._consume(order,'tool_calls')
         if 'evidence.read' not in order.allowed_tools:raise ValueError('INVESTIGATION_READ_NOT_GRANTED')
-        if query.reference.artifact_id not in {r.artifact_id for r in order.evidence}:raise ValueError('QUERY_SOURCE_OUT_OF_SCOPE')
+        node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
+        is_directory=plain(query.reference)==node.get('directory')
+        if not is_directory and plain(query.reference) not in [plain(r) for r in order.evidence]:raise ValueError('QUERY_SOURCE_OUT_OF_SCOPE')
         from tools.platform_tools import bounded_evidence_page
-        page=plain(bounded_evidence_page(self.store.artifact(query.reference),query))
-        read=dict(reference=plain(query.reference),pointer=query.pointer,query=plain(query),page=page,content_identity=digest(page))
+        try:page=plain(bounded_evidence_page(self.store.artifact(query.reference),query))
+        except (ValueError,UnicodeError) as exc:raise ValueError('EVIDENCE_UNAVAILABLE: '+str(exc)) from None
+        read=dict(reference=plain(query.reference),pointer=query.pointer,query=plain(query),page=page,content_identity=digest(page),metadata_only=is_directory)
         with self.store.transaction() as db:
             state=self.store.session(self.run_id,db)['state'];state['investigations'][order.investigation_id]['reads'].append(read)
             ref=self.store.put(db,read)
@@ -305,6 +358,11 @@ class InvestigationDispatcher:
         turn=0
         while True:
             config=effective_config(self.host)
+            node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
+            context=json.loads(payload['messages'][1]['content'])
+            context['remaining_budget']={k:max(0,v-node['usage'][k]) for k,v in plain(order.budget).items()}
+            context['remaining_budget']['wall_s']=max(0,order.timeout_s-(time.time()-node['started_unix']))
+            payload['messages'][1]['content']=encode(context)
             # Everything accumulated, all schemas, results and output reserve.
             measurement=check_outgoing_request(payload,config,'research_decision')
             try:self._consume(order,'model_calls')
@@ -318,6 +376,9 @@ class InvestigationDispatcher:
             with self.store.transaction() as db:
                 returned=plain(raw) if isinstance(raw,InvestigationReturn) else getattr(raw,'raw',raw)
                 self.store.event(db,self.run_id,'investigation_provider_response','returned',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,returned)])
+                self.store.event(db,self.run_id,'investigation_token_accounting','recorded',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,dict(turn=turn,
+                    byte_estimate=measurement,provider_usage=returned.get('usage') if isinstance(returned,dict) else None,
+                    provider_usage_source='Returned provider usage only; byte estimates are not actual token counts.'))])
             if time.monotonic()-started>order.timeout_s:
                 return InvestigationReturn(completion='incomplete',interpretation='Elapsed limit exceeded after provider return',unknowns=['INVESTIGATION_ELAPSED_LIMIT'])
             if isinstance(raw,InvestigationReturn):return raw  # Historical offline boundary.
@@ -361,6 +422,12 @@ class InvestigationDispatcher:
             if not any(self._visible(fact,read) for read in reads):raise ValueError('RETURN_FACT_NOT_IN_INSPECTED_PAGE')
         if report.children and (order.role!='coordinator' or order.parent_id):raise ValueError('INVESTIGATOR_CANNOT_DELEGATE')
         if any(c.parent_id!=order.investigation_id for c in report.children):raise ValueError('CHILD_PARENT_BINDING_MISMATCH')
+        for child in report.children:
+            if child.role!='investigator':raise ValueError('ONLY_INVESTIGATOR_CHILDREN')
+            if set(child.allowed_tools)-set(order.allowed_tools):raise ValueError('CHILD_TOOL_SCOPE_EXCEEDED')
+            if {json.dumps(plain(r),sort_keys=True) for r in child.evidence}-{json.dumps(plain(r),sort_keys=True) for r in order.evidence}:
+                raise ValueError('CHILD_EVIDENCE_SCOPE_EXCEEDED')
+            if any(v>plain(order.budget)[k] for k,v in plain(child.budget).items()):raise ValueError('CHILD_BUDGET_SCOPE_EXCEEDED')
         if report.dispositions and order.role!='principal':raise ValueError('PRINCIPAL_ONLY_DISPOSITION_AUTHORITY')
 
     def _validate_fact(self,fact,label):
@@ -401,6 +468,7 @@ class InvestigationDispatcher:
             self.store.update_state(db,self.run_id,state)
 
     def recover(self,key):
+        self._grant()  # Recovery collects evidence; it never revives an expired activity.
         row=self.store.lookup(self.run_id,'investigation-'+key)
         if not row:raise ValueError('INVESTIGATION_NOT_FOUND')
         if row['receipt']:return self._recover_unowned(key,row)
@@ -451,6 +519,7 @@ class InvestigationDispatcher:
         inspection_links=[]
         facts=[*args.evidence_used,*[f for c in args.adopted_claims for f in (*c.supporting_facts,*c.scope)]]
         for fact in facts:
+            if fact.reference.artifact_id not in self._sources(*self._grant()):raise ValueError('PRINCIPAL_SOURCE_OUT_OF_SCOPE')
             self._validate_fact(fact,'PRINCIPAL')
             matching=[r for r in reads if self._visible(fact,r)]
             if not matching:raise ValueError('PRINCIPAL_MUST_INSPECT_SOURCE')
@@ -505,11 +574,14 @@ def disposition(ctx,args):
 def read_source(ctx,args):
     dispatcher=InvestigationDispatcher(ctx.host);session,grant=dispatcher._grant()
     dispatcher._principal_authority()
-    if args.reference.artifact_id not in dispatcher._sources(session,grant):
+    catalogs=[n for n in session['state'].get('investigations',{}).values() if n.get('directory')==plain(args.reference)]
+    if catalogs:
+        for node in catalogs:dispatcher._scope(InvestigationOrder.model_validate(node['order']))
+    elif args.reference.artifact_id not in dispatcher._sources(session,grant):
         raise ValueError('PRINCIPAL_READ_SOURCE_OUT_OF_SCOPE')
     from tools.platform_tools import read_evidence
     result=read_evidence(ctx,args)
-    if result.kind=='content':
+    if result.kind=='content' and not catalogs:
         fact=dict(reference=plain(args.reference),pointer=args.pointer,query=plain(args),page=plain(result),
             inspection_id=digest(dict(request=ctx.request.request_id,query=plain(args),page=plain(result))),
             request_id=ctx.request.request_id,execution_id=ctx.row['execution_id'])

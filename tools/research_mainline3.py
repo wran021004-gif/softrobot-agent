@@ -17,11 +17,12 @@ def interface_proposal(mode):
     from tools.platform_store import zero
     count=3 if mode=='direct' else 4
     tools={t:'1.0.0' for t in ('research.investigate','research.investigation_status','research.investigation_read','research.investigation_disposition')}
-    return dict(tool_bindings=tools,node_budget={**zero(),'model_calls':3,'tool_calls':8,'wall_s':180.},
-        total_node_budget={**zero(),'model_calls':3*count,'tool_calls':8*count,'wall_s':180.*count},
-        project_budget={**zero(),'model_calls':3*count,'tool_calls':512,'wall_s':900. if mode=='direct' else 1200.},
+    return dict(tool_bindings=tools,node_budget={**zero(),'model_calls':6,'tool_calls':8,'wall_s':180.},
+        total_node_budget={**zero(),'model_calls':6*count,'tool_calls':8*count,'wall_s':180.*count},
+        project_budget={**zero(),'model_calls':6*count,'tool_calls':512,'wall_s':2400. if mode=='direct' else 3200.},
         operation_allowances={t:dict(reserve_s=5.,timeout_s=30.) for t in tools},
         node_count=count,concurrency=2,node_timeout_s=180.,output_bytes=16384,provider_retries=0,
+        discovery_accounting='Up to five query/response turns then report per node; catalog pages, original reads and returned reports share eight evidence operations. Larger directories require a separately budgeted narrowed scope, not silent truncation.',
         status='proposal_only_separate_operator_grant_required')
 
 
@@ -123,7 +124,7 @@ def live_interface_scenario(host,mode):
         host.store.update_state(db,host.run_id,state)
     def order(key,question,queries,role='investigator',evidence=None):
         return plain(InvestigationOrder(investigation_id=key,question=question,role=role,
-            evidence=evidence or [source],queries=queries,budget={**zero(),'model_calls':3,'tool_calls':8,'wall_s':180.},
+            evidence=evidence or [source],queries=queries,budget=proposal['node_budget'],
             timeout_s=180.,stop_conditions=['Bounded evidence turns then one report','No scientific computation','No provider retries']))
     rows=[]
     def returned(receipt):
@@ -148,7 +149,7 @@ def live_interface_scenario(host,mode):
             order('timing-question','Explain saved complete-update accounting and its limits',
             [dict(reference=source,pointer='/deadline_misses')])]
     else:
-        coordinator=order('temporary-coordinator','Request exactly two distinct subordinate evidence investigations: reach/settling and complete-update accounting. Set each child parent_id to temporary-coordinator; same source evidence, evidence.read only, up to three model requests and eight evidence operations (including prefetch), zero backend/worker calls, wall_s=180, timeout_s=180. Do not infer causality.',[],role='coordinator')
+        coordinator=order('temporary-coordinator','Request exactly two distinct subordinate evidence investigations: reach/settling and complete-update accounting. Use the actual evidence directory to select original sources; children may read on demand without prefetch. Set each child parent_id to temporary-coordinator; evidence.read only, within the advertised delegation_budget_limit, zero backend/worker calls, wall_s=180, timeout_s=180. Do not infer causality.',[],role='coordinator')
         receipt=invoke(host,'research.investigate',coordinator,request_id='coordinator');rows.append(receipt)
         result=collect(receipt)
         if result['status']!='completed':return dict(engineered_interface_test=True,status=result['status'],receipts=rows)
