@@ -81,7 +81,7 @@ def render_text(report,facts):
         provenance=provenance,rendered=output,interpretation_verified=False)
 
 
-def ledger(summary):
+def ledger(summary, *, resolve=None):
     facts = {}
     executions = []
     for row in summary['results']:
@@ -90,6 +90,11 @@ def ledger(summary):
         if source['execution_id'] != eid:
             raise ValueError('CROSS_EXECUTION_SOURCE')
         refs = {}
+        projection=None
+        if resolve:
+            projection=authoritative_metrics(dict(execution_id=eid,sources=source,
+                structure_identity=row['structure_identity'],scientific_configuration_identity=row['scientific_configuration_identity'],
+                legacy_metrics=row['metrics'].get('legacy_profile_metrics',row['metrics'])),resolve)
         for name, value in row['metrics'].items():
             if not isinstance(value, (int, float, bool)):
                 continue
@@ -99,6 +104,10 @@ def ledger(summary):
                            structure_identity=row['structure_identity'],
                            scientific_configuration_identity=row['scientific_configuration_identity'],
                            source_artifact=artifact)
+            if projection and name in ('terminal_error_m','holding_max_error_m','holding_max_speed_m_s'):
+                ref,fact=next((key,f) for key,f in projection['facts'].items() if f['metric']==name)
+                facts[ref]=fact;refs[name]=ref
+                continue
             ref = 'f_' + digest(binding)[:20]
             facts[ref] = dict(**binding, value=value)
             refs[name] = ref

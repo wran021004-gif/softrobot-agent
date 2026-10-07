@@ -1,0 +1,75 @@
+{
+  "kind": "Research Mainline 2 offline engineering verification",
+  "date": "2026-10-07",
+  "python": "C:/Users/gugugaga/miniconda3/envs/softagent/python.exe",
+  "distinct_focused_tests_passing_after_targeted_repairs": 51,
+  "batches": [
+    {
+      "command": "python -m unittest tests.test_research_mainline2 tests.test_research_tasks tests.test_report_completion tests.test_bound_reporting tests.test_fixed_research -v",
+      "tests": 28,
+      "result": "passed; later added Host deadline assertion passed in its targeted rerun"
+    },
+    {
+      "command": "python -m unittest tests.test_current_authority_settlement tests.test_context_assembly tests.test_research_recovery -v",
+      "tests": 17,
+      "result": "16 passed; one stale capacity expectation failed and was corrected and rerun successfully",
+      "correction": "The current ledger includes later verification executions. Earlier snapshot six-search-slot capacity cannot be asserted at this later cutoff. The test now checks current downstream capacity, STOP-only menu and unchanged current ledger."
+    },
+    {
+      "command": "python -m unittest tests.test_research_decision_recovery -v",
+      "tests": 6,
+      "result": "passed"
+    },
+    {
+      "command": "python -m unittest tests.test_current_authority_settlement.SettlementTests.test_recorded_release_and_actual_outgoing_request tests.test_research_decision_recovery.RecoveryEvidenceTests.test_actual_shared_request_contains_bound_failures_and_counterexamples -v",
+      "tests": 2,
+      "result": "passed; affected request preparation and cutoff assertions"
+    },
+    {
+      "command": "python -m unittest tests.test_research_mainline2.Mainline2Tests.test_host_archive_read_keeps_grant_scope_and_integrity_checks -v",
+      "tests": 1,
+      "result": "passed; includes explicit offline clock at send-boundary deadline"
+    }
+  ],
+  "lifecycle": {
+    "command": "python examples/check_research_mainline2.py",
+    "result": "passed",
+    "evidence": "evidence/research_mainline2_20261007/lifecycle.json",
+    "new_process": true,
+    "canonical_facts": 256,
+    "synthetic_pending_entries": 40,
+    "scientific_sources_changed": false
+  },
+  "concrete_repairs_verified": [
+    "Historical ledger facts use the matching event prefix; elapsed capacity decay and expired authority are separate.",
+    "Exact evaluator terminal values eliminate the legacy profile/evaluator metric join conflict without modifying originals.",
+    "Prior round interpretations compact into retrievable history; current named hypotheses and complete canonical facts remain.",
+    "The outgoing request uses the builder's declared protocol cap, including final research.decide turns.",
+    "Host preflight and evidence.read share the role archive allowlist; scope, content hash and tool grant remain enforced.",
+    "Recorder replaces the transport before credentials; oversized appended history, diagnostic return and schema do not reach it.",
+    "Unchanged historical dependency freezes and the old narrow migration permission cannot authorize Mainline 2 sources."
+  ],
+  "known_fixture_limitation": {
+    "module": "tests.test_research_scheduler",
+    "result": "Historical fixture preparation blocked by HISTORICAL_UNREVIEWED_IMPLEMENTATION_CHANGE for extensions/tendon_family/candidate.py; not counted as passing.",
+    "action": "Preserved the guard and original fixture. Covered public validate_decision, scheduler capabilities, native proposal and request paths through the isolated decision-recovery fixture instead."
+  },
+  "static_checks": {
+    "git_diff_check": "passed",
+    "changed_python_ast_parse": "passed"
+  },
+  "new_activity": {
+    "provider_requests": 0,
+    "backend_executions": 0,
+    "controller_solves": 0,
+    "scientific_experiments": 0,
+    "credential_loads": 0,
+    "diagnostic_workers": 0
+  },
+  "limitations": [
+    "No live-model or provider validation; no actual new token usage measurement.",
+    "No full repository suite or scientific regression reruns.",
+    "Engineering test grants and isolated ledger changes are not scientific execution evidence.",
+    "Saved diagnostic read, explicit handoff and principal presentation are distinct; personal inspection and causal truth are not certified."
+  ]
+}

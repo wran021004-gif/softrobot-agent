@@ -39,7 +39,9 @@ def verified_observations(state, decision):
 
 def capabilities(store, run_id, records,*,as_of_unix=None):
     from tools.platform_registry import registry
-    remaining=downstream_available(store,run_id) if as_of_unix is None else downstream_available(store,run_id,as_of_unix=as_of_unix)
+    import time
+    as_of_unix=time.time() if as_of_unix is None else as_of_unix
+    remaining=downstream_available(store,run_id,as_of_unix=as_of_unix)
     capacity=budget_capacity(1,remaining,preparation_reserve_s=PREPARATION_RESERVE_S)
     inp=store.session(run_id)['snapshot']['input']; controller=inp['policy']['controller']
     proposal_only=store.session(run_id)['state'].get('role_context',{}).get('decision_only',False)
@@ -79,7 +81,16 @@ def capabilities(store, run_id, records,*,as_of_unix=None):
     legal['stop']=dict(reason='Voluntary delivery is always legal')
     if proposal_only:
         for value in legal.values():value.update(proposal_only=True,execution_authorized=False)
-    return dict(legal=legal,unavailable=gaps,remaining=remaining)
+    # Archived role menus and elapsed deadlines cannot reopen a stopped session.
+    session=store.session(run_id)
+    stop=role.get('context_authority',{}).get('stop') or {}
+    stopped=stop.get('sealed_cases') or str(stop.get('status','')).lower() in ('stopped','model_stopped','sealed','closed','finished')
+    if session['status']!='running' or stopped:
+        for action in list(legal):
+            if action!='stop':gaps[action]='Session is '+session['status'];legal.pop(action)
+    from tools.batch_budget import operational_view
+    operational=operational_view(store,run_id,requirement=capacity['requirement'],as_of_unix=as_of_unix)
+    return dict(legal=legal,unavailable=gaps,remaining=remaining,operational_facts=operational)
 
 
 def validate_decision(store, view, decision):
@@ -110,6 +121,10 @@ def validate_decision(store, view, decision):
         verified_observations=observations,model_interpretations=[plain(i) for i in d.interpretations],
         interpretation_bindings=interpretation_bindings,unresolved_uncertainties=d.unresolved_uncertainties,
         scientific_reasoning_status='Model-authored; valid references do not establish causal truth')
+    if d.action=='stop':
+        from tools.research_tasks import stop_interpretation
+        result['stop_interpretation']=stop_interpretation(
+            role.get('acceptance_result') or {},'voluntary_stop',operational=cap['operational_facts'])
     if d.plan:
         if (d.plan.max_backend_attempts or d.plan.max_candidates)>role['max_batch_backends']:
             raise ValueError('BATCH_ALLOCATION_EXCEEDED: '+str(role['max_batch_backends']))

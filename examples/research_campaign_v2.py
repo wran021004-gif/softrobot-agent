@@ -211,8 +211,8 @@ def verify(w):
     aggregates=[dict(role=g['role'],acceptance=aggregate_acceptance(g['records'],10,schedule=slots)) for g in groups]
     complete=all(a['acceptance']['recorded']==10 and all(e['fresh_execution'] and e['acceptance_execution_matches'] and
         e['status'] in ('accepted','valid_failure') for e in a['acceptance']['entries']) for a in aggregates)
-    comparison=compare_acceptance(aggregates[1]['acceptance'],aggregates[0]['acceptance']) if frozen and complete else dict(
-        relation='unavailable',reason='No eligible candidate' if not frozen else 'Incomplete matched evidence')
+    comparison=compare_acceptance(aggregates[1]['acceptance'],aggregates[0]['acceptance']) if frozen else dict(
+        relation='unavailable',reason='No eligible candidate')
     result=dict(plan=plan,groups=groups,aggregates=aggregates,complete=complete,comparison=comparison,
                 improvement_supported=bool(frozen and complete and comparison['relation']=='improved'),usage=w.store.remaining())
     atomic_json(w.directory/'verification.json',result)

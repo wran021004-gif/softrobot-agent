@@ -37,11 +37,16 @@ class SettlementTests(TestCase):
         self.paid=patch.object(Host,'invoke',side_effect=AssertionError('OFFLINE_FIXTURE_NO_EXECUTION'));self.paid.start()
         shutil.copyfile(SOURCE/'live_clock.json',self.root/'live_clock.json')
         self.store=Store(self.root);self.run='research_native_development_v3_20261007-research'
+        # Offline engineering runs at an explicit clock, not the host date.
+        # Put time before the deadline with ample elapsed capacity so this test
+        # isolates reservation release rather than elapsed-time reduction.
+        self.clock=patch('tools.current_research_authority.time.time',return_value=read(self.root/'live_clock.json')['origin_unix']+1000)
+        self.clock.start()
         self.state=read(SOURCE/'working_state.json')['state']
         self.archive=SimpleNamespace(stores=(self.store,))
 
     def tearDown(self):
-        self.guard.stop();self.paid.stop();gc.collect()
+        self.clock.stop();self.guard.stop();self.paid.stop();gc.collect()
         assert self.root.resolve().is_relative_to((ROOT/'runs').resolve());shutil.rmtree(self.root)
 
     def authority(self):
@@ -77,33 +82,21 @@ class SettlementTests(TestCase):
         w.context_archive=archive
         return w
 
-    def test_same_session_dependency_migration_and_request(self):
-        from examples.research_campaign_v3 import migrate_research_dependency,seal
-        from tools.current_research_authority import verify_dependency_migration
+    def test_historical_migration_cannot_authorize_mainline2_sources(self):
+        from examples.research_campaign_v3 import migrate_research_dependency
         before_state=self.baseline();w=self.cloned_working()
         before=deepcopy(self.store.session(self.run));used=self.store.remaining()['used']
-        self.assertEqual(w.host.compatibility()['changed'],['research.decide@1.0.0'])
-        w.freeze['implementation']=seal();boundary=migrate_research_dependency(w)
-        after=self.store.session(self.run)
-        self.assertEqual(after['snapshot']['input'],before['snapshot']['input'])
-        self.assertEqual(after['state']['turn'],before['state']['turn'])
-        self.assertEqual(after['state'].get('protocol_corrections_used'),before['state'].get('protocol_corrections_used'))
+        changed=w.host.compatibility()['changed']
+        self.assertIn('research.decide@1.0.0',changed)
+        self.assertGreater(len(changed),1)
+        # The old grant allowed one scheduler-file repair. Mainline 2 changes
+        # shared evidence/runtime sources and cannot widen that old migration.
+        with self.assertRaisesRegex(ValueError,'UNEXPECTED_DEPENDENCY_CHANGE|MIGRATION_ALREADY_USED_NO_REPLAY'):
+            migrate_research_dependency(w)
+        self.assertEqual(self.store.session(self.run),before)
         self.assertEqual(self.store.remaining()['used'],used)
-        self.assertTrue(w.host.compatibility()['compatible'])
         self.assertTrue(verify_accounting_transition(before_state,self.authority(),self.archive))
-        pilot.configure(w);payload=payload_for(w.host,EvidenceDrivenAdapter())
-        self.assertIn('research_decide',[t['function']['name'] for t in payload['tools']])
-        # Even a migration artifact/event cannot authorize changing the input.
-        from tools.platform_store import plain
-        forged=deepcopy(after['snapshot']);forged['input']['policy']['budget']['model_calls']+=1
-        with self.store.transaction() as db:
-            boundary['after_snapshot']=plain(self.store.put(db,forged));ref=plain(self.store.put(db,boundary))
-            self.store.event(db,self.run,'authorized_dependency_migration','completed',outputs=[ref],version='3.3.0')
-            db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(boundary['after_snapshot']['artifact_id'],self.run))
-            state=self.store.session(self.run,db)['state'];state['authorized_dependency_migration']=ref
-            self.store.update_state(db,self.run,state)
-        with self.assertRaisesRegex(ValueError,'MIGRATION_CHANGED_AUTHORIZATION'):
-            verify_dependency_migration(self.store,self.run,digest(before['snapshot']),digest(forged))
+        self.assertFalse(w.host.compatibility()['compatible'])
 
     def test_recorded_release_and_actual_outgoing_request(self):
         events=self.store.events(self.run)
@@ -114,13 +107,16 @@ class SettlementTests(TestCase):
         self.baseline()
         # Full configure -> shared fit -> current snapshot check, using the saved
         # physical outcomes and explicitly permitted historical source archive.
+        current_ledger=deepcopy(self.store.remaining())
         w=self.cloned_working()
         pilot.configure(w);payload=payload_for(w.host,EvidenceDrivenAdapter())
         packet=json.loads(payload['messages'][1]['content'])['role_context']['research_packet']
         self.assertEqual(packet['capabilities']['remaining'],downstream_available(self.store,self.run))
-        self.assertEqual(packet['capabilities']['remaining']['backend_solves'],6)
-        self.assertEqual(self.store.remaining()['remaining']['backend_solves'],26)
-        self.assertEqual(self.store.remaining()['used']['backend_solves'],2)
+        # This ledger includes the later verification executions. The earlier
+        # research snapshot's six search slots cannot be restored at this cutoff.
+        self.assertEqual(packet['capabilities']['remaining']['backend_solves'],0)
+        self.assertEqual(set(packet['capabilities']['legal']),{'stop'})
+        self.assertEqual(self.store.remaining(),current_ledger)
 
     def test_restored_outstanding_then_failed_partial_settlement_and_repeat(self):
         old=self.baseline();row,_=self.store.reserve(self.run,'offline-reservation',digest('test'),'engineering',{**zero(),'tool_calls':1,'wall_s':1800.})
@@ -169,3 +165,38 @@ class SettlementTests(TestCase):
             state=self.store.session(self.run,db)['state'];state['role_context']['campaign_permissions']['reserved_verification_backends']=0
             self.store.update_state(db,self.run,state)
         with self.assertRaisesRegex(ValueError,'PHASE_POLICY_CHANGED'):verify_accounting_transition(old,self.authority(),self.archive)
+
+    def test_same_cutoff_history_and_current_clock_decay(self):
+        from tools.current_research_authority import verify_accounting_snapshot,restored_execution
+        old=self.baseline();saved=self.store.artifact(old['authority']['accounting_binding']['reference'])
+        row,_=self.store.reserve(self.run,'after-cutoff',digest('after-cutoff'),'engineering',{**zero(),'tool_calls':1,'wall_s':100.})
+        self.store.mark_unknown(self.run,row['request_id'])
+        # Historical rows are compared with the matching event prefix, even
+        # after another pending operation has entered the live ledger.
+        self.assertTrue(verify_accounting_snapshot(self.store,saved)['verified'])
+        deadline=saved['clock']['deadline_unix']
+        self.clock.stop();self.clock=patch('tools.current_research_authority.time.time',return_value=deadline-1000);self.clock.start()
+        later=self.authority()
+        self.assertTrue(verify_accounting_transition(old,later,self.archive))
+        self.assertEqual(later['remaining_budget']['wall_s'],1000)
+        self.assertLess(later['remaining_budget']['wall_s'],old['budget']['wall_s'])
+        expired=restored_execution(old,(self.store,),as_of_unix=deadline+1)
+        self.assertTrue(expired['expired']);self.assertEqual(set(expired['legal_actions']),{'stop'})
+        self.assertEqual(expired['remaining_budget']['wall_s'],0)
+        self.assertEqual(self.store.lookup(self.run,row['request_id'])['status'],'unknown')
+
+    def test_operational_shortfall_reservation_and_release(self):
+        from tools.batch_budget import operational_view
+        view=operational_view(self.store,self.run,requested={'wall_s':2000},requirement={'wall_s':2590})
+        self.assertEqual(view['plan_shortfall']['wall_s'],590)
+        self.assertEqual(view['actual_shortfall']['wall_s'],0)
+        self.assertGreater(view['executable_capacity']['wall_s'],0)
+        row,_=self.store.reserve(self.run,'inflight-publication',digest('publication'),'engineering',{**zero(),'tool_calls':1,'wall_s':1800.})
+        during=operational_view(self.store,self.run)
+        self.assertFalse(during['final_actual_cost'])
+        self.assertEqual(during['outstanding_reservations']['wall_s']-view['outstanding_reservations']['wall_s'],1800)
+        self.settle(row,elapsed=123.5)
+        after=operational_view(self.store,self.run)
+        self.assertEqual(after['authorized_totals'],during['authorized_totals'])
+        self.assertAlmostEqual(after['legitimate_releases']['wall_s']-during['legitimate_releases']['wall_s'],1676.5)
+        self.assertAlmostEqual(after['settled_spending']['wall_s']-during['settled_spending']['wall_s'],123.5)

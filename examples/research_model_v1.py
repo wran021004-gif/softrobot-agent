@@ -321,6 +321,7 @@ def configure(w):
             for c in w.store.artifact(r['result']).get('candidates',[]) if c.get('replication_of') and c.get('execution_id')])
     authority.update(stop=dict(status=w.status,reason=w.stop_reason,sealed_cases=w.sealed_cases),
         budget_accounting=w.store.remaining(),experiment_permissions=w.freeze['allocation'],
+        operational_facts=cap['operational_facts'],
         known_review_issues=w.freeze.get('known_review_issues',[]))
     if w.freeze.get('campaign_state',{}).get('phase_budget_policy')=='conditional_verification@3.0.0':
         authority['campaign_clock']=w.freeze.get('live_clock')

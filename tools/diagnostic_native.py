@@ -12,6 +12,7 @@ class FlatDiagnosticAdapter(ReadableDeepSeekAdapter):
         return args
 
     def encode(self, model_input, config):
+        self.request_config=deepcopy(config)
         self.timeout_s=config['timeout_s'];self.base_url=config['base_url']
         self.readonly_batch_limit=config.get('readonly_batch_limit',1)
         context=deepcopy(model_input.context)

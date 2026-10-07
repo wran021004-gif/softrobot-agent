@@ -170,7 +170,7 @@ class Host:
             for ref in request.evidence:
                 self.store.artifact(ref)
             # References nested in typed input contracts receive the same integrity checks.
-            self._validate_refs(plain(arguments))
+            self._validate_refs(plain(arguments), role_archive_read=request.tool_id == 'evidence.read')
             key = digest(dict(tool=request.tool_id, version=request.tool_version, arguments=plain(arguments),
                 evidence=[plain(r) for r in request.evidence], input=snapshot['snapshot']['input_identity'], dependencies=dependency_identity(definition)))
             cached = self.store.cache(self.run_id, key) if definition.cache and request.cache == 'reuse' else None
@@ -252,17 +252,26 @@ class Host:
             # Historical preflight rejections retain their original accounting.
             return self._receipt(request, dict(execution_id='not_executed'), 'rejected', str(exc))
 
-    def _validate_refs(self, value):
+    def _validate_refs(self, value, *, role_archive_read=False):
         if isinstance(value, dict):
             if 'artifact_id' in value:
                 # Integrity checking must not decode valid binary evidence as UTF-8.
-                self.store.artifact(EvidenceRef.model_validate(value),raw=True)
+                reference = EvidenceRef.model_validate(value)
+                try:
+                    self.store.artifact(reference,raw=True)
+                except ValueError:
+                    if not role_archive_read:
+                        raise
+                    # Only the already granted evidence.read contract can read
+                    # offloaded role sources. The manifest verifies scope/hash.
+                    from tools.context_assembly import role_evidence_archive
+                    role_evidence_archive(self.store,self.run_id).load(plain(reference))
             else:
                 for item in value.values():
-                    self._validate_refs(item)
+                    self._validate_refs(item, role_archive_read=role_archive_read)
         elif isinstance(value, list):
             for item in value:
-                self._validate_refs(item)
+                self._validate_refs(item, role_archive_read=role_archive_read)
 
     def _legacy_service(self, context, definition, arguments):
         from tools.service_execution import execute

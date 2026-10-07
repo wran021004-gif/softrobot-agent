@@ -99,7 +99,8 @@ class RecoveryEvidenceTests(TestCase):
     def test_restore_coverage_budget_seal_and_execution_guard(self):
         restored=pilot.restore(self.directory)
         self.assertEqual(restored.freeze['history_coverage'],self.w.freeze['history_coverage'])
-        self.assertEqual(digest(restored.working),digest(self.w.working))
+        historical=lambda s:{k:v for k,v in s.items() if k!='current_execution'}
+        self.assertEqual(digest(historical(restored.working)),digest(historical(self.w.working)))
         self.assertEqual(restored.store.remaining(),self.w.store.remaining())
         original=pilot.restore(pilot.DEFAULT)
         self.assertEqual(recovery.failed_session_seal(original.store,original.host.run_id),self.original_seal)

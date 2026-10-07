@@ -38,6 +38,16 @@ def _no_secrets(value):
         for v in value: _no_secrets(v)
 
 
+def role_evidence_archive(store, run_id):
+    """Reopen the current role's existing source allowlist, without discovery."""
+    role = store.session(run_id)['state'].get('role_context', {})
+    manifest = role.get('context_source_manifest') or role.get('research_working_manifest')
+    scope = role.get('context_archive_scope') or (role.get('research_working_state') or {}).get('archive_scope')
+    if not manifest or not scope:
+        raise ValueError('CONTEXT_READ_OUT_OF_SCOPE')
+    return EvidenceArchive.from_manifest(ROOT / manifest, scope=scope, stores=(store,))
+
+
 class EvidenceArchive:
     """Content-addressed snapshots and an explicit, scope-local read allowlist.
 
@@ -115,10 +125,8 @@ class EvidenceArchive:
             archive.sources[source['reference']['artifact_id']]=source
         return archive
 
-    def retrieve(self, reference, *, pointer='', offset=0, limit=20, byte_limit=4096, binding=None):
-        """Same original-pointer paging as evidence.read, without host mutations."""
-        from schemas.platform_operations import ReadEvidence
-        from tools.platform_tools import bounded_evidence_page
+    def load(self, reference):
+        """Resolve only the verified immutable source in this scope's allowlist."""
         source = self.sources.get(reference['artifact_id'])
         if not source or source['reference'] != reference:
             raise ValueError('CONTEXT_READ_OUT_OF_SCOPE')
@@ -133,9 +141,17 @@ class EvidenceArchive:
             store = next((s for s in self.stores if s.root.relative_to(ROOT).as_posix() == source['store_root']), None)
             if store is None: raise ValueError('CONTEXT_READ_OUT_OF_SCOPE')
             value = store.artifact(reference)
+        return value
+
+    def retrieve(self, reference, *, pointer='', offset=0, limit=20, byte_limit=4096, binding=None):
+        """Same original-pointer paging as evidence.read, without host mutations."""
+        from schemas.platform_operations import ReadEvidence
+        from tools.platform_tools import bounded_evidence_page
+        value=self.load(reference)
         args = ReadEvidence(reference=reference, pointer=pointer, offset=offset, limit=limit, byte_limit=byte_limit)
         page = plain(bounded_evidence_page(value, args))
         return dict(page=page, binding=binding, units=(binding or {}).get('unit'),
+            source=self.sources[reference['artifact_id']],
             truncated=page['kind'] == 'overview' or page['next_offset'] is not None,
             continuation=(dict(reference=reference, pointer=pointer, offset=page['next_offset'],
                 limit=limit, byte_limit=byte_limit) if page['next_offset'] is not None else None),
@@ -195,12 +211,24 @@ def _research(packet, authority, archive):
     """Reuse reporting_summary/ledger; F aliases remain the current host catalog."""
     from tools.study_history import reporting_summary
     history = packet['history']
-    rows = history['rows']
+    rows = deepcopy(history['rows'])
     if any(not r.get('scientific_configuration_identity') for r in rows):
         raise ValueError('SCIENTIFIC_REPORTING_IDENTITY_REQUIRED')
+    from tools.bound_reporting import authoritative_metrics
+    for row in rows:
+        if not row.get('metrics'):continue
+        metrics=row['metrics'];source=metrics['source']
+        projection=authoritative_metrics(dict(execution_id=row['candidate']['execution_id'],sources=source,
+            structure_identity=row['structure_identity'],scientific_configuration_identity=row['scientific_configuration_identity'],
+            legacy_metrics=metrics),archive.load)
+        metrics['legacy_profile_metrics']={n:metrics[n] for n in ('terminal_error_m','holding_max_error_m','holding_max_speed_m_s')}
+        metrics.update({f['metric']:f['value'] for f in projection['facts'].values()})
     # Explicit case membership, plus lineage/role anchors. No recency cutoff.
     required = set(packet.get('case', {}).get('evidence_execution_ids', []))
     required.update(c['execution_id'] for c in authority.get('roles', {}).values() if c and c.get('execution_id'))
+    # Relationships and canonical results cover the authorized history before
+    # the display selection. A narrow view cannot turn a repeat into novelty.
+    full_rows=rows
     candidates = authority.get('comparison_execution_ids')
     if candidates is not None:
         allowed = set(candidates) | required
@@ -209,16 +237,17 @@ def _research(packet, authority, archive):
         # These are the caller's already scoped research_records, not all stores.
         allowed = {r['candidate'].get('execution_id') for r in rows}
     pairs = authority.get('replication_pairs', [])
+    history_ids={r['candidate'].get('execution_id') for r in full_rows}
     for a, b in pairs:
-        if a not in allowed or b not in allowed: raise ValueError('CONTEXT_REPLICATION_LINEAGE_OMITTED')
-    summary = reporting_summary(dict(history, rows=rows),
+        if a not in history_ids or b not in history_ids: raise ValueError('CONTEXT_REPLICATION_LINEAGE_OMITTED')
+    summary = reporting_summary(dict(history, rows=full_rows),
         new_execution_ids=authority.get('new_execution_ids', []), replication_pairs=pairs,
         selected=authority['roles'].get('selected_incumbent'), latest=authority['roles'].get('latest_attempt'),
         usage=packet['capabilities']['remaining'], stop=authority.get('stop', {}))
     summary['batch_count'] = packet.get('engineering_coverage', {}).get('completed_search_batches', 0)
-    bound = ledger(summary)
+    bound = ledger(summary,resolve=archive.load)
     bound['structure_definitions'] = {r['structure_identity']:r.get('physical_structure',
-        bound['structure_definitions'][r['structure_identity']]) for r in rows if r.get('metrics')}
+        bound['structure_definitions'][r['structure_identity']]) for r in full_rows if r.get('metrics')}
     reduced = deepcopy(packet)
     reduced['history'] = dict(history, rows=[{k:deepcopy(r[k]) for k in ('candidate','status','configuration_identity')} |
         {k:deepcopy(r[k]) for k in ('case_id','seed','task_identity') if k in r} |
@@ -347,6 +376,8 @@ def assemble_context(purpose, packet, *, archive, authority=None):
         unresolved_questions=authority.get('unresolved', packet.get('confounders', [])),
         evidence_that_would_change_decision=authority.get('change_evidence', []),
         legal_actions=authority.get('legal_actions', packet.get('capabilities', {}).get('legal', {})),
+        operational_facts=authority.get('operational_facts'),
+        phase_boundaries=authority.get('phase_boundaries'),
         remaining_budget=authority.get('remaining_budget', packet.get('capabilities', {}).get('remaining')),
         stop=authority.get('stop', packet.get('stop')),
         sources=dict(reference=original, pointer='/packet', verified_retrievable=True),
@@ -419,6 +450,41 @@ def measure_input(payload, config, purpose):
         input_budget_tokens=allowance, configured_context_limit_tokens=guard['context_limit_tokens'],
         response_reserve_tokens=payload['max_tokens'], interaction_reserve_tokens=INTERACTION_RESERVE,
         passed=estimate<=allowance and byte_count<=config['context_bytes'])
+
+
+def check_outgoing_request(payload, config, purpose, *, host=None, as_of_unix=None):
+    """Check the exact final object after every appended message/tool result.
+
+    No fitting or credential loading occurs here. Preparation must resolve an
+    overflow before this boundary, and historical reproduction cannot dispatch.
+    """
+    measurement=measure_input(payload,config,purpose)
+    if not measurement['passed']:
+        raise ValueError('CONTEXT_SEND_BOUNDARY_OVERFLOW: '+json.dumps(measurement,sort_keys=True))
+    if host is not None:
+        from tools.current_research_authority import check_payload
+        import time
+        now=time.time() if as_of_unix is None else as_of_unix
+        session=host.store.session(host.run_id);role=session['state'].get('role_context',{})
+        deadline=role.get('campaign_permissions',{}).get('elapsed_deadline_unix')
+        if session['status']!='running':raise ValueError('CONTEXT_SEND_SESSION_NOT_RUNNING')
+        if deadline is not None and now>=deadline:raise ValueError('CONTEXT_SEND_DEADLINE_EXPIRED')
+        if not host.compatibility()['compatible']:raise ValueError('CONTEXT_SEND_DEPENDENCIES_CHANGED')
+        check_payload(host,payload)
+    return measurement
+
+
+def declare_retrieval(view, payload):
+    """Advertise actual native reads or explicit prefetch, never a hidden tool."""
+    from tools.platform_models import provider_name_map, LEGACY_TOOL_NAMING, READABLE_TOOL_NAMING
+    names={t['function']['name'] for t in payload.get('tools',[])}
+    reads={'evidence.read':'1.0.0'}
+    callable_read=any(provider_name_map(reads,scheme)['evidence.read'] in names
+        for scheme in (LEGACY_TOOL_NAMING,READABLE_TOOL_NAMING))
+    working=view['working_context']
+    working['model_callable_archive_read']=callable_read
+    working['detail_access']=('Use the advertised evidence.read with the original reference and JSON pointer; bounded pages preserve source scope.'
+        if callable_read else 'Required evidence is prefetched. Archive references are provenance only; this request has no model-callable archive read. Missing required material must fail preparation.')
 
 
 def fit_request(wire, config, purpose, *, archive):
@@ -641,13 +707,14 @@ def fit_request(wire, config, purpose, *, archive):
                 # inline; duplicate-detail pointers are for archived evidence.
                 if key=='capabilities' and isinstance(child,dict) and child.get('authority_snapshot'):
                     if stage==0:
-                        for name in ('legal','remaining'):
+                        for name in ('legal','remaining','operational_facts'):
                             if name in child:seen[digest(child[name])]=p+'/'+name
                     out[key]=deepcopy(child);continue
                 # Remove only redundant representations, never an execution's
                 # metric, alias, identity or failure. First occurrence stays.
                 if stage==0 and isinstance(child,(dict,list)) and key in {
                         'parameter_catalog','legal_actions','remaining_budget','chronology','frozen_cases',
+                        'operational_facts','budget_accounting',
                         'acceptance','unchanged_acceptance','task_acceptance','roles','incumbent',
                         'primary','source_baseline','latest_attempt','selected_incumbent','current_batch_source'}:
                     identity=digest(child)
@@ -681,6 +748,7 @@ def fit_request(wire, config, purpose, *, archive):
 def assemble_request(payload, config, purpose, packet, *, archive, authority=None, context_slot=None):
     """Finalize actual outgoing schemas/messages, preserving provider settings."""
     result = assemble_context(purpose, packet, archive=archive, authority=authority)
+    declare_retrieval(result['view'],payload)
     wire = deepcopy(payload)
     if context_slot:
         # Retain role instructions, rejected draft and protocol recovery messages.
@@ -729,18 +797,33 @@ def assemble_request(payload, config, purpose, packet, *, archive, authority=Non
     return wire, result['audit']
 
 
-def research_authority(packet, *, replication_pairs=(), new_execution_ids=()):
+def candidate_roles(packet, *, frozen_selection=None):
+    """Bind each role to its explicit decision/event; promotion preserves STOP."""
+    chronology=packet['chronology'];identities=packet['history']['identities']
+    roles=dict(selected_incumbent=identities['selected_deliverable'] or packet['incumbent'],
+        latest_attempt=chronology['latest_execution'],latest_completed_evaluation=chronology['latest_completed_evaluation'],
+        source_baseline=identities['retained_baseline'],current_case=packet.get('primary'),
+        current_batch_source=packet.get('current_batch_source'),frozen_challenger=None,promoted_deliverable=None)
+    if frozen_selection:roles.update(selection_roles(frozen_selection))
+    return roles
+
+
+def selection_roles(frozen_selection):
+    """Post-verification adoption changes a delivery role, never the old STOP."""
+    return dict(incumbent_at_decision=deepcopy(frozen_selection['model_selected_at_research_stop']),
+        frozen_challenger=deepcopy(frozen_selection['selected_configuration']),
+        promoted_deliverable=(deepcopy(frozen_selection['selected_configuration'])
+            if frozen_selection.get('outcome')=='promote_frozen_candidate' and frozen_selection.get('improvement_supported') is True else None))
+
+
+def research_authority(packet, *, replication_pairs=(), new_execution_ids=(), frozen_selection=None):
     """Role bindings come from saved scheduler/events, never from row order."""
     chronology = packet['chronology']; identities = packet['history']['identities']
     return dict(question=dict(frozen_pre_experiment_question=packet.get('case', {}).get('question'),
             current_question='Choose the next legal decision from updated bound feedback, including recorded matching repeats.'),
         acceptance=packet.get('acceptance', packet.get('scope')),
         case_id=packet.get('case_id'), chronology=chronology,
-        roles=dict(selected_incumbent=identities['selected_deliverable'] or packet['incumbent'],
-            latest_attempt=chronology['latest_execution'],
-            latest_completed_evaluation=chronology['latest_completed_evaluation'],
-            source_baseline=identities['retained_baseline'], current_case=packet.get('primary'),
-            current_batch_source=packet.get('current_batch_source')),
+        roles=candidate_roles(packet,frozen_selection=frozen_selection),
         replication_pairs=list(replication_pairs), new_execution_ids=list(new_execution_ids),
         legal_actions=packet['capabilities']['legal'], remaining_budget=packet['capabilities']['remaining'],
         stop=dict(sealed_cases=packet.get('sealed_cases', []),
@@ -872,22 +955,37 @@ def update_working_state(state, *, archive, evidence_packet=None, authority=None
             if not dependencies or any(candidate_configuration.get(k) != v for k, v in dependencies.items()):
                 artifact.update(reusable=False, invalidated_at_revision=revision,
                     invalidation_reason='Declared candidate configuration dependency changed')
+    if state.get('current_execution'):
+        from tools.current_research_authority import restored_execution
+        result['current_execution']=restored_execution(result,archive.stores)
     return result
 
 
-def assert_experiment_eligible(state, experiment):
+def assert_experiment_eligible(state, experiment, *, as_of_unix=None):
     """Recovery must not replay completed or uncertain work, or resume STOP."""
     stop = state['authority'].get('stop', {})
     status = str(stop.get('status', '')).lower()
     if stop.get('sealed_cases') or 'stop' in status or status in {'sealed', 'closed', 'finished'}:
         raise ValueError('CONTEXT_SEALED_SCOPE_CANNOT_RESUME')
+    import time
+    now=time.time() if as_of_unix is None else as_of_unix
+    deadline=(state['authority'].get('campaign_clock') or {}).get('deadline_unix') or state['authority'].get('elapsed_deadline_unix')
+    current=state.get('current_execution')
+    if current:
+        deadline=current.get('elapsed_deadline_unix') or deadline
+        if not current.get('current_session_verified') or not current.get('implementation_compatible') or current.get('sealed') or current.get('expired'):
+            raise ValueError('CONTEXT_CURRENT_EXECUTION_AUTHORITY_UNAVAILABLE')
+    if deadline is not None and now>=deadline:raise ValueError('CONTEXT_EXECUTION_DEADLINE_EXPIRED')
     key = experiment['experiment_id']
     if key in state['experiments']:
         current = state['experiments'][key][-1]['entry']['status']
         raise ValueError('CONTEXT_WORK_ALREADY_RECORDED: ' + current)
     action = experiment.get('action')
-    if action and not state['authority'].get('legal_actions', {}).get(action, False):
+    legal=(current or state['authority']).get('legal_actions',{})
+    if action and not legal.get(action, False):
         raise ValueError('CONTEXT_ACTION_NOT_PERMITTED')
+    if action and isinstance(legal.get(action),dict) and legal[action].get('execution_authorized') is False:
+        raise ValueError('CONTEXT_ACTION_EXECUTION_UNAUTHORIZED')
     repeat = experiment.get('replication_of')
     if repeat and (repeat not in state['experiments'] or
                    state['experiments'][repeat][-1]['entry']['status'] != 'completed'):
@@ -895,7 +993,7 @@ def assert_experiment_eligible(state, experiment):
     if repeat and experiment.get('cache_hit'):
         raise ValueError('CONTEXT_CACHE_IS_NOT_REPETITION')
     for key, cost in experiment.get('cost', {}).items():
-        budget = state.get('budget') or {}
+        budget = current['remaining_budget'] if current else state.get('budget') or {}
         if cost > budget.get(key, 0):
             raise ValueError('CONTEXT_BUDGET_EXHAUSTED: ' + key)
     return True
@@ -907,6 +1005,12 @@ def assemble_working_context(purpose, state, *, archive):
     if purpose == 'final_report' and 'history' in packet:
         _, packet = _research(packet, state['authority'], archive)
     result = assemble_context(purpose, packet, archive=archive, authority=state['authority'])
+    if state.get('current_execution'):
+        live=state['current_execution'];view=result['view']['working_context']
+        view.update(current_execution=deepcopy(live),legal_actions=deepcopy(live['legal_actions']),remaining_budget=deepcopy(live['remaining_budget']))
+        if result['view'].get('capabilities'):
+            result['view']['capabilities']=dict(legal=deepcopy(live['legal_actions']),remaining=deepcopy(live['remaining_budget']),
+                reason=live['reason'])
     if result['canonical_facts'] != state['current_facts']:
         raise ValueError('CONTEXT_WORKING_FACTS_CHANGED')
     state_reference = archive.snapshot(state)
@@ -926,6 +1030,19 @@ def assemble_working_context(purpose, state, *, archive):
         budget_accounting=state['budget_accounting'],
         experiment_permissions=dict(reference=state_reference, pointer='/experiment_permissions'),
         authority_scope='Derived read-only state; does not authorize execution or override host grants')
+    round_claim = lambda key: re.fullmatch(r'round\d+-interpretation-\d+',key) is not None
+    latest_claim_revision=max((rows[-1]['sequence'] for key,rows in state['claims'].items() if rows and round_claim(key)),default=0)
+    result['view']['working_context']['hypothesis_revisions']={key:dict(
+        current={k:deepcopy(v) for k,v in rows[-1]['claim'].items()
+            if k not in ('supporting_evidence','counterexamples','evidence_aliases')},revision=rows[-1]['sequence'],
+        supporting_evidence_count=len(rows[-1]['claim'].get('supporting_evidence',[])),
+        counterexample_count=len(rows[-1]['claim'].get('counterexamples',[])),
+        supporting_and_contradicting_sources=rows[-1]['evidence_source'],
+        previous_revisions=dict(reference=state_reference,pointer='/claims/'+pointer_part(key)),
+        evidence_scope='Original revision retains exact selectors; all current canonical observations/counterexamples remain in the fact table.',
+        causal_truth_verified=False) for key,rows in state['claims'].items()
+            if rows and (not round_claim(key) or rows[-1]['sequence']==latest_claim_revision)}
+    result['view']['working_context']['hypothesis_display_policy']='Current named hypotheses and latest round interpretations are displayed; earlier round interpretations and all supporting/counterexample selectors remain in recovery.claim_history. The complete canonical evidence table is unchanged.'
     result['audit']['source_manifest'] = archive.manifest()
     return result
 
@@ -933,6 +1050,7 @@ def assemble_working_context(purpose, state, *, archive):
 def assemble_working_request(payload, config, purpose, state, *, archive, context_slot=None):
     """Prepare, measure and archive the recovered next input, without sending."""
     result = assemble_working_context(purpose, state, archive=archive)
+    declare_retrieval(result['view'],payload)
     wire = deepcopy(payload)
     if context_slot:
         context=json.loads(wire['messages'][1]['content'])
@@ -940,10 +1058,23 @@ def assemble_working_request(payload, config, purpose, state, *, archive, contex
         wire['messages'][1]['content']=encode(context)
     else:
         wire['messages'][1]['content'] = encode(result['view'])
+    if state.get('current_execution'):
+        # These are offline next-request preparations. The historical schema
+        # cannot advertise scientific actions after expiry or sealing.
+        legal=state['current_execution']['legal_actions']
+        for tool in wire.get('tools',[]):
+            if tool['function']['name']=='research_decide':
+                schema=tool['function']['parameters']
+                schema=(schema.get('anyOf') or [schema])[0]
+                schema['properties']['action']['enum']=list(legal)
     wire,fitting=fit_request(wire,config,purpose,archive=archive)
     measurement = fitting['measurement']
     result['audit'].update(**fitting, working_revision=state['revision'],
         assembled_input_reference=archive.snapshot(wire), source_manifest=archive.manifest())
+    if state.get('current_execution'):
+        result['audit'].update(offline_preparation=True,execution_authorized=False,
+            historical_as_of=(state['authority'].get('operational_facts') or {}).get('cutoff'),
+            current_execution=state['current_execution'])
     atomic_json(archive.directory / 'audits' / (digest(result['audit']) + '.json'), result['audit'])
     if not measurement['passed']:
         raise ValueError('CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET')
@@ -958,11 +1089,14 @@ def persist_working_state(state, *, store, archive):
     return store.put_context_checkpoint(value)
 
 
-def restore_working_state(reference, *, store, scope, stores=()):
+def restore_working_state(reference, *, store, scope, stores=(), as_of_unix=None):
     """Rehydrate from durable Store bytes; caller supplies the same read scope."""
     value = store.artifact(reference)
     if value['version'] != WORKING_STATE_VERSION or value['state']['archive_scope'] != scope:
         raise ValueError('CONTEXT_WORKING_STATE_SCOPE')
     archive = EvidenceArchive.from_manifest(ROOT / value['source_manifest'], scope=scope, stores=stores)
     archive.register_references(value['state'])
-    return deepcopy(value['state']), archive
+    state=deepcopy(value['state'])
+    from tools.current_research_authority import restored_execution
+    state['current_execution']=restored_execution(state,stores,as_of_unix=as_of_unix)
+    return state, archive

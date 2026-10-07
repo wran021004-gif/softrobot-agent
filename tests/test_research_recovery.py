@@ -84,7 +84,8 @@ class ResearchRecoveryTests(TestCase):
         store = Store(self.directory / 'store')
         reference = persist_working_state(state,store=store,archive=self.archive)
         restored,archive = restore_working_state(reference,store=store,scope=self.archive.scope)
-        self.assertEqual(restored,state)
+        self.assertEqual({k:v for k,v in restored.items() if k!='current_execution'},state)
+        self.assertTrue(restored['current_execution']['sealed'])
         self.assertEqual(archive.retrieve(ref,pointer='/counterexample')['page']['content'],{'value':False,'unit':'1'})
         with self.assertRaisesRegex(ValueError,'WORKING_STATE_SCOPE'):
             restore_working_state(reference,store=store,scope={'role':'different'})

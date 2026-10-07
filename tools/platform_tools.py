@@ -208,6 +208,12 @@ def read_evidence(ctx, args):
         raise ValueError('COMPRESSED_MOTION_REQUIRES_DERIVED_QUERY: use diagnosis.inspect_evidence(view="motion"); this raw JSON access failure does not mean motion evidence is unavailable')
     try:
         value = ctx.artifact(args.reference)
+    except ValueError:
+        # The existing Host has already checked the evidence.read grant. Resolve
+        # offloaded working sources only through the same role's durable allowlist.
+        from tools.context_assembly import role_evidence_archive
+        archive=role_evidence_archive(ctx.store,ctx.run_id)
+        value=archive.load(plain(args.reference))
     except UnicodeDecodeError:
         if ctx.store.artifact(args.reference,raw=True).startswith(b'\x1f\x8b'):
             raise ValueError('COMPRESSED_MOTION_REQUIRES_DERIVED_QUERY: use diagnosis.inspect_evidence(view="motion"); failed raw access does not invalidate the retained motion capability') from None

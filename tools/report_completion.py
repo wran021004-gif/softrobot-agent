@@ -36,6 +36,20 @@ def receipt(row, tool, status='completed'):
         execution_status=status, charged=zero())
 
 
+def phase_boundaries(authorization):
+    """Prior spent counters and later authorized ceilings have distinct scopes."""
+    prior=authorization['prior_failure']
+    binding=dict(campaign_id=authorization['same_campaign'],session_id=authorization['same_session'])
+    return [dict(**binding,phase='prior_report_repair_boundary',
+        cutoff=dict(source_identity=digest(prior),pointer='/prior_failure'),
+        repairs_used=prior['repairs_used'],authorized_repair_ceiling=prior['repair_ceiling']),
+        dict(**binding,phase='report_continuation',
+            cutoff=dict(as_of_unix=authorization['started_unix'],source_identity=digest(authorization)),
+            preceding_repairs=authorization['previous_repairs'],
+            authorized_cumulative_repair_ceiling=authorization['cumulative_material_repairs'],
+            additional_limits=authorization['additional_limits'])]
+
+
 def begin(started_unix):
     if START.exists(): raise ValueError('CONTINUATION_ALREADY_STARTED_NO_RESET')
     w=workspace(); settled=read(D/'structural_final_settled_costs.json')
@@ -101,6 +115,8 @@ def frozen_results(w):
     from tools.study_history import reporting_scientific_scope
     spec=load_spec();v=read(D/'verification.json');prior=read(OLD/'independent_results_review.json')
     selected=read(OLD/'final_frozen_selection.json')
+    from tools.context_assembly import selection_roles
+    roles=selection_roles(selected)
     source_robot=w.store.artifact(selected['model_selected_at_research_stop']['configuration'])['effective']['robot']
     assert v['complete'] and [g['role'] for g in v['groups']]==['unchanged_incumbent','selected_candidate']
     assert v['plan']['schedule']==schedule(spec)
@@ -176,6 +192,7 @@ def frozen_results(w):
         original_incumbent=selected['model_selected_at_research_stop'],selected_configuration=v['plan']['selected_candidate'],
         frozen_selection_outcome=selected['outcome'] if 'outcome' in selected else 'promote_frozen_candidate',
         limitations=['Fixed deterministic observations, not population probability or general robustness.','No continuous-time guarantee, global optimality, mathematical convergence or LLM superiority proof.','Real time was not a suite acceptance condition.'])
+    summary['candidate_roles']=roles
     atomic_json(OUT/'all_execution_results.json',table);atomic_json(OUT/'per_case_results.json',per_case)
     atomic_json(OUT/'aggregate_results.json',summary);atomic_json(OUT/'original_evidence_manifest.json',manifest)
     atomic_json(OUT/'corrected_fact_projection.json',dict(version=PROJECTION_VERSION,bound_facts=facts,supersessions=supersessions,legacy_snapshots_unchanged=True))
@@ -202,6 +219,9 @@ def prepare():
         experiment_permissions=dict(backend_solves=0,numerical_operations=0,workers=0,read_calls=0),
         accounting_binding=current, campaign_clock=auth['original_clock'],
         continuation_authorization=start['authorization_reference'])
+    from tools.batch_budget import operational_view
+    authority.update(operational_facts=operational_view(w.store,w.host.run_id),roles=summary['candidate_roles'])
+    authority['phase_boundaries']=phase_boundaries(auth)
     packet=dict(version=VERSION,summary=summary,research_executions=researched,bound_facts=facts,
         prior_review=dict(path=(OLD/'independent_results_review.json').relative_to(ROOT).as_posix(),sha256=hashlib.sha256((OLD/'independent_results_review.json').read_bytes()).hexdigest()),
         exact_result_tables='all_execution_results.json and per_case_results.json; complete set computed before any display filtering',
@@ -277,8 +297,8 @@ def attempt(number=0, correction=None):
     payload=deepcopy(request['payload']);config=start['authorization']['provider_config']
     if correction:
         payload['messages'].append(dict(role='user',content='Independent factual/protocol discrepancies only; revise the complete report without assuming a favorable conclusion: '+json.dumps(correction,ensure_ascii=False)))
-    from tools.context_assembly import measure_input
-    assert measure_input(payload,config,'final_report')['passed']
+    from tools.context_assembly import measure_input,check_outgoing_request
+    check_outgoing_request(payload,config,'final_report',host=w.host)
     key=f'report-completion-model-{number}'
     if w.store.lookup(w.host.run_id,key):raise ValueError('EXISTING_ATTEMPT_NO_AUTOMATIC_RESEND')
     if number:
@@ -305,6 +325,7 @@ def attempt(number=0, correction=None):
     assert fresh
     atomic_json(OUT/f'outgoing_request_{number}.json',dict(payload=payload,context_assembly_audit=request['context_assembly_audit'],measurement=measure_input(payload,config,'final_report')))
     adapter=DeepSeekAdapter();adapter.timeout_s=config['timeout_s'];adapter.base_url=config['base_url']
+    adapter.request_config=config;adapter.request_purpose='final_report';adapter.request_host=w.host
     then=time.monotonic();raw=None
     try:
         raw=adapter.respond(payload,number);_no_secrets(raw)

@@ -174,7 +174,13 @@ def validate_batch_plan(store, view, proposal):
     capacity=budget_capacity(count,budget,preparation_reserve_s=prep_reserve)
     # Execution and interpretation follow this planning phase. Its local call
     # limit/protected capacity must not be counted as the downstream grant.
-    available=budget_capacity(count,downstream_available(store,view.run_id),planning={},preparation_reserve_s=prep_reserve)
+    from time import time
+    from tools.batch_budget import operational_view
+    cutoff=time()
+    available=budget_capacity(count,downstream_available(store,view.run_id,as_of_unix=cutoff),planning={},preparation_reserve_s=prep_reserve)
+    operational=operational_view(store,view.run_id,requested=budget,requirement=available['requirement'],as_of_unix=cutoff)
+    operational.update(initial_plan_requirement=capacity['requirement'],initial_plan_shortfall=capacity['shortfalls'],
+        requirement_phase='Downstream operation; the current planning request is already accounted separately')
     if role.get('require_source_binding') and (not capacity['sufficient'] or (not role.get('decision_only') and not available['sufficient'])):
         raise ValueError('PLAN_TOTAL_CAPACITY_INSUFFICIENT: '+str(dict(planned=capacity['shortfalls'],available=available['shortfalls'])))
     fixed=fixed_configuration(effective,plan.variables)
@@ -187,7 +193,7 @@ def validate_batch_plan(store, view, proposal):
     from tools.settling_campaign import RANKING
     return dict(plan=plain(plan),structurally_operationally_valid=True,scientific_promise=plan.scientific_promise,
         semantic_status='Model-authored promise and causal reasoning are separate from operational validation.',
-        actual_differences=differences,budget_requirement=capacity,available_capacity=available,
+        actual_differences=differences,budget_requirement=capacity,available_capacity=available,operational_facts=operational,
         matching_scientific_history=matching_history,decision_only=role.get('decision_only',False),
         execution_authorized=False,requires_future_grant=True,baseline_replaced=False,candidate_promoted=False,
         bindings=dict(task=view.task,acceptance=view.acceptance,baseline=view.baseline,subject=candidate,

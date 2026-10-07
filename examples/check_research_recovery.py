@@ -98,11 +98,14 @@ def prepare_sequence(directory):
     return reference
 
 
-def child_restore(directory):
+def child_restore(directory, *, as_of_unix=None):
     source = read(directory / 'input.json')
     state, archive = restore_working_state(source['reference'], store=Store(directory / 'store'),
-        scope=source['scope'], stores=(Store(M4),))
-    assert digest(state) == source['expected_state_identity']
+        scope=source['scope'], stores=(Store(M4),),as_of_unix=as_of_unix)
+    # Historical equality is tested at its saved cutoff. Today's authority is
+    # a separate projection; elapsed time need not equal the old capacity.
+    historical={k:v for k,v in state.items() if k!='current_execution'}
+    assert digest(historical) == source['expected_state_identity']
     decisions = {}
     facts = {}
     for purpose in ('research_decision', 'final_report'):
@@ -151,5 +154,6 @@ def observe(directory=DEST):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--restore', type=Path)
+    parser.add_argument('--as-of-unix',type=float,help='Controlled clock for offline engineering checks only')
     args = parser.parse_args()
-    child_restore(args.restore) if args.restore else observe()
+    child_restore(args.restore,as_of_unix=args.as_of_unix) if args.restore else observe()

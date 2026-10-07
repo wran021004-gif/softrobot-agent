@@ -217,12 +217,21 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
         continuous_time_guarantee=False)
 
 
-def aggregate_acceptance(records, scheduled, *, schedule=None):
+def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=None, comparison_scope=None):
     """The frozen scheduled denominator includes absent, incomplete and replay slots."""
     if not isinstance(scheduled, int) or scheduled<=0 or len(records)>scheduled:
         raise ValueError('POSITIVE_FROZEN_SCHEDULE_REQUIRED')
     if schedule is not None and len(schedule)!=scheduled:
         raise ValueError('SCHEDULE_COUNT_MISMATCH')
+    policy = evidence_policy or {'require_fresh_repetitions':True, 'allow_historical_reuse':False}
+    if any(type(policy.get(k,default)) is not bool for k,default in (
+            ('require_fresh_repetitions',True),('allow_historical_reuse',False))):
+        raise ValueError('DECLARED_FRESHNESS_POLICY_REQUIRED')
+    if any('fresh_required' in s and type(s['fresh_required']) is not bool for s in (schedule or [])):
+        raise ValueError('DECLARED_SLOT_FRESHNESS_REQUIRED')
+    def slot_key(row):return (row.get('case_id'),row.get('seed'),row.get('repetition'))
+    if schedule is not None and len({slot_key(s) for s in schedule}) != scheduled:
+        raise ValueError('DUPLICATE_SCHEDULE_SLOT')
     results = [r['acceptance'] for r in records if r.get('acceptance')]
     families = {r['task_family'] for r in results}
     protocols = {r['protocol_id'] for r in results}
@@ -244,17 +253,34 @@ def aggregate_acceptance(records, scheduled, *, schedule=None):
         receipt = plain(record.get('receipt') or {})
         result = record.get('acceptance')
         execution = receipt.get('execution_id')
-        fresh = bool(execution and execution not in seen and receipt.get('cache_hit') is False
+        fresh = bool(not record.get('historical_reuse') and execution and execution not in seen and receipt.get('cache_hit') is False
                      and receipt.get('charged',{}).get('backend_solves')==1
                      and receipt.get('tool_id')=='simulation.run'
                      and receipt.get('original_execution_id') in (None,execution))
         if execution:
             seen.add(execution)
         binding_matches = bool(result and execution == result.get('execution_id'))
-        count = bool(fresh and binding_matches and result['accepted'] is True)
+        source_issues=[]
+        for kind in ('evaluation','profile'):
+            expected=(result or {}).get('sources',{}).get(kind)
+            if record.get(kind) and record[kind]!=expected:source_issues.append(kind)
+        declaration=next((s for s in (schedule or []) if slot==slot_key(s)), {})
+        fresh_required=declaration.get('fresh_required', policy.get('require_fresh_repetitions', True))
+        # Reuse is protocol evidence, never a fresh repetition. An explicit
+        # policy and source binding are both required for a nonfresh slot.
+        reuse = bool(not fresh and policy.get('allow_historical_reuse') and
+            record.get('historical_reuse') and binding_matches and execution and
+            receipt.get('tool_id')=='simulation.run')
+        evidence_eligible = fresh or (not fresh_required and reuse)
+        count = bool(evidence_eligible and binding_matches and result['accepted'] is True)
         accepted += count
         entries.append(dict(case_id=slot[0], seed=slot[1], repetition=slot[2],
             fresh_execution=fresh, acceptance_execution_matches=binding_matches,
+            fresh_required=fresh_required,
+            historical_reuse=bool(record.get('historical_reuse') or receipt.get('cache_hit')),
+            reuse_permitted=reuse,
+            evidence_eligible=evidence_eligible, receipt=receipt,
+            source_binding_issues=source_issues,
             counted_accepted=count, acceptance=result,
             status=('not_new_repetition' if receipt and not fresh else
                     'acceptance_identity_mismatch' if result and result.get('execution_id') and not binding_matches else
@@ -262,6 +288,7 @@ def aggregate_acceptance(records, scheduled, *, schedule=None):
     return dict(contract='research.task_aggregation',version='1.0.0',accepted=accepted,scheduled=scheduled,
         task_family=family,protocol_id=next(iter(protocols), None),
         schedule_identity=digest(schedule) if schedule is not None else None,
+        schedule=schedule, evidence_policy=policy, comparison_scope=comparison_scope,
         recorded=len(records),unrecorded=scheduled-len(records),joint_acceptance_fraction=accepted/scheduled,
         all_scheduled_accepted=accepted==scheduled,entries=entries,
         interpretation='Deterministic frozen-case observed fraction; not a population success probability',
@@ -270,20 +297,86 @@ def aggregate_acceptance(records, scheduled, *, schedule=None):
                  for name in metric_names})
 
 
+def comparison_prerequisites(candidate, incumbent):
+    """Check complete interpretable slots before any aggregate ranking.
+
+    Task identity is compared per declared slot; robot/control identity may
+    differ. Historical aggregates remain readable, but raw receipts are needed
+    to re-establish executable comparison prerequisites.
+    """
+    issues=[]; seen=set()
+    if candidate.get('comparison_scope') != incumbent.get('comparison_scope'):
+        issues.append(dict(reason='INCOMPATIBLE_COMPARISON_SCOPE'))
+    if candidate.get('evidence_policy') != incumbent.get('evidence_policy'):
+        issues.append(dict(reason='INCOMPATIBLE_EVIDENCE_POLICY'))
+    indexed=[]
+    for role, group in [('candidate',candidate),('incumbent',incumbent)]:
+        schedule=group.get('schedule'); entries=group.get('entries',[])
+        key=lambda r:(r.get('case_id'),r.get('seed'),r.get('repetition'))
+        required={key(r) for r in (schedule or [])}
+        actual={key(r) for r in entries}
+        if schedule is None or len(required)!=group['scheduled'] or digest(schedule)!=group.get('schedule_identity'):
+            issues.append(dict(role=role,reason='DECLARED_SCHEDULE_REQUIRED'))
+        for slot in sorted(required-actual, key=str):
+            issues.append(dict(role=role,slot=list(slot),reason='MISSING_SLOT'))
+        if len(actual)!=len(entries) or actual-required:
+            issues.append(dict(role=role,reason='DUPLICATE_OR_UNDECLARED_SLOT'))
+        counted=0
+        for entry in entries:
+            slot=key(entry); result=entry.get('acceptance') or {};receipt=entry.get('receipt') or {}
+            eid=receipt.get('execution_id')
+            fresh=bool(not entry.get('historical_reuse') and eid and eid not in seen and receipt.get('cache_hit') is False and
+                receipt.get('charged',{}).get('backend_solves')==1 and receipt.get('tool_id')=='simulation.run' and
+                receipt.get('original_execution_id') in (None,eid))
+            if eid:seen.add(eid)
+            declaration=next((s for s in (schedule or []) if key(s)==slot), {})
+            policy=group.get('evidence_policy') or {}
+            fresh_required=declaration.get('fresh_required',policy.get('require_fresh_repetitions',True))
+            reuse=bool(not fresh_required and policy.get('allow_historical_reuse') and entry.get('historical_reuse'))
+            reason=None
+            if not eid or eid!=result.get('execution_id') or receipt.get('tool_id')!='simulation.run':reason='EXECUTION_RECEIPT_BINDING_MISMATCH'
+            elif entry.get('source_binding_issues'):reason='ACCEPTANCE_SOURCE_BINDING_MISMATCH'
+            elif receipt.get('execution_status')!='completed':reason='EXECUTION_NOT_COMPLETE'
+            elif not fresh and not reuse:reason='REQUIRED_FRESH_REPETITION_ABSENT'
+            elif result.get('status') not in ('accepted','valid_failure') or result.get('accepted') is not (result.get('status')=='accepted'):
+                reason='OUTCOME_NOT_INTERPRETABLE'
+            elif result.get('task_family')!=group['task_family'] or result.get('protocol_id')!=group['protocol_id']:
+                reason='TASK_PROTOCOL_MISMATCH'
+            elif not result.get('components') or any(c.get('passed') is None for c in result['components'].values()):
+                reason='OUTCOME_COMPONENTS_INCOMPLETE'
+            elif any(not _number(result['metrics'].get(n)) for n in group.get('metrics',{})):
+                reason='METRIC_MISSING_OR_UNINTERPRETABLE'
+            if reason:issues.append(dict(role=role,slot=list(slot),reason=reason))
+            else:counted+=result['accepted'] is True
+        if counted!=group['accepted'] or group['joint_acceptance_fraction']!=group['accepted']/group['scheduled']:
+            issues.append(dict(role=role,reason='AGGREGATE_COUNT_MISMATCH'))
+        indexed.append({key(e):e.get('acceptance') or {} for e in entries})
+    for slot in indexed[0].keys() & indexed[1].keys():
+        a,b=indexed[0][slot],indexed[1][slot]
+        semantics=lambda r:(r.get('task_identity'),r.get('protocol_id'),
+            {k:(v.get('unit'),v.get('limit')) for k,v in r.get('components',{}).items()})
+        if not a.get('task_identity') or semantics(a)!=semantics(b):
+            issues.append(dict(slot=list(slot),reason='INCOMPATIBLE_TASK_OR_METRIC_MEANINGS'))
+    return issues
+
+
 def compare_acceptance(candidate, incumbent, tolerance=1e-9):
     """Primary acceptance followed by componentwise physical comparison, no score."""
     if candidate['contract'] != incumbent['contract']:
-        raise ValueError('ACCEPTANCE_CONTRACT_MISMATCH')
+        return dict(relation='unavailable',reason='ACCEPTANCE_CONTRACT_MISMATCH')
     aggregate = candidate['contract']=='research.task_aggregation'
     if aggregate:
         if candidate['scheduled'] != incumbent['scheduled']:
-            raise ValueError('SCHEDULE_COUNT_MISMATCH')
+            return dict(relation='unavailable',reason='SCHEDULE_COUNT_MISMATCH')
         if (candidate['task_family'],candidate['protocol_id'],candidate['schedule_identity']) != (incumbent['task_family'],incumbent['protocol_id'],incumbent['schedule_identity']):
-            raise ValueError('TASK_ACCEPTANCE_SCHEDULE_MISMATCH')
+            return dict(relation='unavailable',reason='TASK_ACCEPTANCE_SCHEDULE_MISMATCH')
+        unresolved=comparison_prerequisites(candidate,incumbent)
+        if unresolved:
+            return dict(relation='unavailable',reason='Comparison prerequisites unresolved',unresolved=unresolved)
         left, right = candidate['joint_acceptance_fraction'], incumbent['joint_acceptance_fraction']
     else:
         if (candidate['task_identity'],candidate['protocol_id']) != (incumbent['task_identity'],incumbent['protocol_id']):
-            raise ValueError('TASK_ACCEPTANCE_IDENTITY_MISMATCH')
+            return dict(relation='unavailable',reason='TASK_ACCEPTANCE_IDENTITY_MISMATCH')
         if candidate['accepted'] is None or incumbent['accepted'] is None:
             return dict(relation='unavailable',reason='Missing, invalid or incomplete acceptance is not a physical failure')
         left,right = int(candidate['accepted']),int(incumbent['accepted'])
@@ -307,13 +400,23 @@ def compare_acceptance(candidate, incumbent, tolerance=1e-9):
                 computation='reported separately')
 
 
-def stop_interpretation(result, reason, *, budget_exhausted=False, remaining_work=0):
+def stop_interpretation(result, reason, *, budget_exhausted=False, remaining_work=0, operational=None, assertions=()):
     """A legal stop and a supported success claim do not prove an optimal stop."""
-    aggregate = result['contract']=='research.task_aggregation'
-    accepted = result['all_scheduled_accepted'] if aggregate else result['accepted'] is True
+    aggregate = result.get('contract')=='research.task_aggregation'
+    accepted = result.get('all_scheduled_accepted',False) if aggregate else result.get('accepted') is True
     legal = ((reason=='budget_exhausted' and budget_exhausted) or
              (reason=='completed_schedule' and remaining_work==0) or
-             reason=='predeclared_policy')
+             reason in ('predeclared_policy','voluntary_stop','limited_value','engineering_blocker'))
+    checked=[]
+    for assertion in assertions:
+        resource=assertion.get('resource');field=assertion.get('field')
+        observed=(operational or {}).get(field,{}).get(resource) if field in (
+            'executable_capacity','plan_shortfall','actual_shortfall') else None
+        checked.append(dict(assertion=assertion,observed=observed,
+            support='not_assessed' if observed is None else 'supported' if observed==assertion.get('value') else 'unsupported'))
+    explanation=('unsupported' if any(r['support']=='unsupported' for r in checked) else
+        'supported' if checked and all(r['support']=='supported' for r in checked) else 'not_assessed')
     return dict(legal=legal,reason=reason,success_claim_supported=accepted,
+                explanation_support=explanation,checked_assertions=checked,
                 optimality='not_assessed',acceptance_result=result,
                 budget_is_upper_bound=True)

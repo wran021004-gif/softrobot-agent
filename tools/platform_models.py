@@ -46,6 +46,7 @@ class OfflineAdapter:
         self.decisions = decisions if isinstance(decisions, list) else []
 
     def encode(self, model_input, config):
+        self.request_config = copy.deepcopy(config)
         return encode_chat(model_input, config, LEGACY_TOOL_NAMING)
 
     def decode(self, response, turn, bindings):
@@ -76,17 +77,27 @@ class DeepSeekAdapter:
         pass
 
     def encode(self, model_input, config):
+        self.request_config = copy.deepcopy(config)
         self.timeout_s = config['timeout_s']
         self.readonly_batch_limit = config.get('readonly_batch_limit')
         self.base_url = config.get('base_url','https://api.deepseek.com')
         return encode_chat(model_input, config, self.tool_naming_scheme)
 
     def respond(self, payload, turn):
+        config=getattr(self,'request_config',None)
+        if config and config.get('context_guard'):
+            from tools.context_assembly import check_outgoing_request
+            check_outgoing_request(payload,config,getattr(self,'request_purpose','research_decision'),host=getattr(self,'request_host',None))
+        transport_config=dict(config,context_purpose=getattr(self,'request_purpose','research_decision')) if config else dict(base_url=self.base_url, timeout_s=self.timeout_s)
+        return self._transport(transport_config,payload)
+
+    def _transport(self, config, payload):
+        """Tests replace this boundary before credentials or network are touched."""
         from tools.model_transports.deepseek import request_completion
         key = os.environ.get('DEEPSEEK_API_KEY')
         if not key:
             raise ValueError('MODEL_KEY_MISSING')
-        return request_completion(dict(base_url=self.base_url, timeout_s=self.timeout_s), payload, key)
+        return request_completion(config, payload, key)
 
     def decode(self, response, turn, bindings, advertised_tools=None):
         def require(value, kind, path, expected):
@@ -415,10 +426,39 @@ def payload_for(host, adapter=None):
     model_input = input_for(host)
     config = model_input.context['policy']['model']
     adapter = adapter or OfflineAdapter()
+    adapter.request_config=copy.deepcopy(config)
+    role=host.store.session(host.run_id)['state'].get('role_context',{})
+    purpose='final_report' if role.get('research_final_reporting') else 'research_decision'
+    adapter.request_purpose=purpose;adapter.request_host=host
     payload = adapter.encode(model_input, config)
     if getattr(adapter,'context_assembly_audit',None):
+        # The declared protocol owns its limit: a final research.decide turn
+        # still uses the research-decision builder, while report-only builders
+        # explicitly declare final_report. Role labels cannot change the cap.
+        purpose=adapter.context_assembly_audit['purpose']
+        adapter.request_purpose=purpose
         # Shared assembly already checks all final schemas/messages. Required
         # evidence must never enter the legacy silent page-trimming fallback.
+        from tools.context_assembly import check_outgoing_request
+        if host.store.session(host.run_id)['status']=='running' and any(t['extension_id']=='evidence.read' for t in model_input.tools):
+            audit=adapter.context_assembly_audit
+            from tools.context_assembly import ROOT
+            from tools.state_io import read
+            manifest=read(ROOT/audit['source_manifest'])
+            with host.store.transaction() as db:
+                state=host.store.session(host.run_id,db)['state']
+                state['role_context'].update(context_source_manifest=audit['source_manifest'],context_archive_scope=manifest['scope'])
+                host.store.update_state(db,host.run_id,state)
+        # Encoding is also used for offline historical reproduction. Dispatch
+        # rechecks the current session/deadline; preparation only measures bytes.
+        adapter.context_assembly_audit['offline_preparation']=True
+        check_outgoing_request(payload,config,purpose)
+        return payload
+    if role and config.get('context_guard'):
+        # Supported diagnostic returns and retained history are part of this
+        # complete object. Required role facts never use legacy silent trimming.
+        from tools.context_assembly import check_outgoing_request
+        check_outgoing_request(payload,config,purpose)
         return payload
     # Optional retained pages yield to required current facts within the same cap.
     while len(encode(payload).encode('utf8')) > config['context_bytes'] and model_input.context.get('recent_evidence'):
@@ -520,6 +560,9 @@ def run_loop(host, adapter=None):
                         raw_ref = None
                         started = time.monotonic()
                         try:
+                            if config.get('context_guard') and state.get('role_context'):
+                                from tools.context_assembly import check_outgoing_request
+                                check_outgoing_request(payload,config,getattr(adapter,'request_purpose','research_decision'),host=host)
                             with host.store.transaction() as db:
                                 host.store.event(db, host.run_id, 'context_delivery', 'adapter_submitted', parent=row['parent_id'],
                                     request=request_id, execution=row['execution_id'], inputs=[input_ref, config_ref], version=definition.version)

@@ -27,7 +27,8 @@ def downstream_available(store,run_id,db=None,*,as_of_unix=None):
             project[k]=max(0,project[k]-v)
         if conditional:
             project={k:min(v,spendable[k]) for k,v in project.items()}
-    return {k:min(v,session[k]) for k,v in project.items()}
+    executor=store.spendable(run_id,db)['remaining']
+    return {k:min(v,session[k],executor[k]) for k,v in project.items()}
 
 
 def batch_requirement(count, *, interpretation=None, planning=None,preparation_reserve_s=0.):
@@ -48,3 +49,49 @@ def budget_capacity(count, available, **kwargs):
     result.update(available=available,shortfalls={k:max(0,v-available.get(k,0)) for k,v in result['requirement'].items()})
     result['sufficient']=not any(result['shortfalls'].values())
     return result
+
+
+def operational_view(store, run_id, db=None, *, requested=None, requirement=None, as_of_unix=None):
+    """Describe the existing executor ledger at one observed time/sequence cutoff.
+
+    Unsettled calls occupy capacity, but are not final actual cost. This reads
+    current rows; historical views must use their saved snapshot, not today's rows.
+    """
+    import json
+    import time
+    from tools.platform_store import zero
+    cutoff = time.time() if as_of_unix is None else as_of_unix
+    if db is None:
+        with store.connect(True) as conn:
+            conn.execute('BEGIN')
+            return operational_view(store,run_id,conn,requested=requested,requirement=requirement,as_of_unix=cutoff)
+    project = store.remaining(None, db)
+    session = store.remaining(run_id, db)
+    phase = store.phase_remaining(run_id, db)
+    host_capacity = store.spendable(run_id, db)
+    capacity = downstream_available(store, run_id, db, as_of_unix=cutoff)
+    config = store.config(db)
+    role = store.session(run_id, db)['state'].get('role_context', {})
+    rows = [dict(r) for r in db.execute('SELECT * FROM calls ORDER BY rowid')]
+    sequence = db.execute('SELECT MAX(seq) FROM events').fetchone()[0] or 0
+    settled, outstanding, released = zero(), zero(), zero()
+    for row in rows:
+        charged, reserved = json.loads(row['charged']), json.loads(row['reserved'])
+        target = settled if row['receipt'] else outstanding
+        for key in target:
+            target[key] += charged[key]
+            if row['receipt']:
+                released[key] += max(0, reserved[key]-charged[key])
+    requirement = requirement or {}
+    return dict(version='research.operational_facts@1.0.0',
+        campaign_id=config['project_id'], session_id=run_id,
+        cutoff=dict(as_of_unix=cutoff, event_sequence=sequence, ledger_scope='project'),
+        authorized_totals=project['limit'], settled_spending=settled,
+        outstanding_reservations=outstanding, legitimate_releases=released,
+        final_actual_cost=all(r['receipt'] for r in rows), ledger=project,
+        session_accounting=session, phase=phase, phase_policy=role.get('campaign_permissions'),
+        executor_capacity=host_capacity, executable_capacity=capacity,
+        requested_allocation=requested, complete_requirement=requirement,
+        plan_shortfall=({k:max(0, v-requested.get(k, 0)) for k,v in requirement.items()} if requested is not None else None),
+        actual_shortfall={k:max(0, v-capacity.get(k, 0)) for k,v in requirement.items()},
+        source=dict(store=str(store.root), accounting='Store.remaining/spendable/phase_remaining; downstream_available'))

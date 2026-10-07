@@ -8,16 +8,18 @@ from tools.state_io import digest,read
 
 def accounting_binding(store,run_id,*,as_of_unix=None):
     """Bind the existing ledger and its phase projection, without a new grant."""
-    from tools.batch_budget import downstream_available
+    from tools.batch_budget import downstream_available,operational_view
     from tools.context_assembly import ROOT
     now=time.time() if as_of_unix is None else as_of_unix
     with store.connect(True) as db:
+        db.execute('BEGIN')
         session=store.session(run_id,db)
         calls=[dict(r) for r in db.execute('SELECT * FROM calls ORDER BY rowid')]
         events=[json.loads(r[0]) for r in db.execute('SELECT body FROM events ORDER BY seq')]
         raw=store.remaining(None,db)
         phase=downstream_available(store,run_id,db,as_of_unix=now)
         config=store.config(db)
+        operational=operational_view(store,run_id,db,as_of_unix=now)
     clock_path=store.root/'live_clock.json'
     value=dict(version='current_phase_accounting@3.2.0',source_store=store.root.relative_to(ROOT).as_posix(),
         campaign_id=config['project_id'],session_id=run_id,session_snapshot=digest(session['snapshot']),
@@ -27,6 +29,7 @@ def accounting_binding(store,run_id,*,as_of_unix=None):
         call_rows=[{k:r[k] for k in ('run_id','request_id','execution_id','status','reserved','charged','receipt','parent_id','resources')} for r in calls],
         event_sequence=max((e['sequence'] for e in events),default=0))
     _ledger_prefixes(value,events)
+    value['operational_facts']=operational
     with store.transaction() as db:ref=plain(store.put(db,value))
     return dict(reference=ref,source_store=value['source_store'],session_id=run_id,campaign_id=config['project_id'])
 
@@ -87,7 +90,7 @@ def verify_accounting_transition(state,authority,archive):
     if clock!=value['clock'] or authority.get('campaign_clock')!=clock or (old_clock is not None and clock!=old_clock):raise ValueError('ACCOUNTING_CLOCK_CHANGED')
     from tools.batch_budget import downstream_available
     policy=value['phase_policy'] or {}
-    if policy.get('phase_budget_policy')!='conditional_verification@3.0.0' or policy.get('reserved_verification_backends')!=20 or policy.get('search_backend_limit')!=8:
+    if policy.get('phase_budget_policy')=='conditional_verification@3.0.0' and (policy.get('reserved_verification_backends')!=20 or policy.get('search_backend_limit')!=8):
         raise ValueError('ACCOUNTING_PHASE_POLICY_CHANGED')
     if clock and policy.get('elapsed_deadline_unix')!=clock['deadline_unix']:raise ValueError('ACCOUNTING_PHASE_DEADLINE_CHANGED')
     expected=downstream_available(store,binding['session_id'],as_of_unix=value['as_of_unix'])
@@ -95,16 +98,17 @@ def verify_accounting_transition(state,authority,archive):
         raise ValueError('ACCOUNTING_WRONG_PHASE_CAPACITY')
     with store.connect(True) as db:events=[json.loads(r[0]) for r in db.execute('SELECT body FROM events ORDER BY seq')]
     prefixes=_ledger_prefixes(value,events)
-    if not any(p==old_raw['used'] for p in prefixes):raise ValueError('ACCOUNTING_PREVIOUS_SPENDING_NOT_IN_LEDGER')
+    if not any(p==old_raw['used'] for p in prefixes) and any(old_raw['used'].values()):raise ValueError('ACCOUNTING_PREVIOUS_SPENDING_NOT_IN_LEDGER')
     old_binding=state['authority'].get('accounting_binding')
     if old_binding:
         previous=store.artifact(old_binding['reference'])
+        verify_accounting_snapshot(store,previous)
         if previous['grant_identity']!=value['grant_identity']:
             raise ValueError('ACCOUNTING_AUTHORIZATION_CHANGED')
         if previous['session_snapshot']!=value['session_snapshot']:
             verify_dependency_migration(store,binding['session_id'],previous['session_snapshot'],value['session_snapshot'])
         if previous['clock'] is not None and previous['clock']!=value['clock']:raise ValueError('ACCOUNTING_CLOCK_CHANGED')
-        old_policy=deepcopy(previous['phase_policy']);new_policy=deepcopy(value['phase_policy'])
+        old_policy=deepcopy(previous['phase_policy'] or {});new_policy=deepcopy(value['phase_policy'] or {})
         if previous['clock'] is None:old_policy.pop('elapsed_deadline_unix',None);new_policy.pop('elapsed_deadline_unix',None)
         if old_policy!=new_policy:raise ValueError('ACCOUNTING_PHASE_POLICY_CHANGED')
         # Every previous call survives; settlement can only replace a reservation.
@@ -114,6 +118,71 @@ def verify_accounting_transition(state,authority,archive):
             if not new or any(new[k]!=old[k] for k in ('execution_id','reserved','parent_id')) or (old['receipt'] and new!=old):
                 raise ValueError('ACCOUNTING_SETTLED_HISTORY_CHANGED')
     return True
+
+
+def verify_accounting_snapshot(store, value):
+    """Compare historical call rows and events at the snapshot's explicit cutoff.
+
+    Never compare historical remaining seconds with a later live clock. This
+    validates facts only; downstream_available at today's clock owns authority.
+    """
+    with store.connect(True) as db:
+        events=[json.loads(r[0]) for r in db.execute(
+            'SELECT body FROM events WHERE seq<=? ORDER BY seq',(value['event_sequence'],))]
+    _ledger_prefixes(value,events)
+    return dict(verified=True,as_of_unix=value['as_of_unix'],event_sequence=value['event_sequence'],
+        execution_authorized=False)
+
+
+def restored_execution(state, stores=(), *, as_of_unix=None):
+    """Read current authority independently of a restored historical state."""
+    from tools.context_assembly import ROOT
+    from tools.batch_budget import downstream_available
+    cutoff=time.time() if as_of_unix is None else as_of_unix
+    historical=state['authority'];binding=historical.get('accounting_binding') or {}
+    stamp=historical.get('current_authority') or {}
+    session_id=binding.get('session_id') or stamp.get('session_id') or state['archive_scope'].get('context_id')
+    stop=historical.get('stop') or {};status=str(stop.get('status','')).lower()
+    sealed=bool(stop.get('sealed_cases') or 'stop' in status or status in ('sealed','closed','finished'))
+    deadline=(historical.get('campaign_clock') or {}).get('deadline_unix')
+    deadline=deadline or historical.get('elapsed_deadline_unix')
+    live=None
+    for candidate in stores:
+        if binding.get('source_store') and candidate.root.relative_to(ROOT).as_posix()!=binding['source_store']:continue
+        try:session=candidate.session(session_id)
+        except ValueError:continue
+        if stamp.get('campaign_id') and candidate.config()['project_id']!=stamp['campaign_id']:continue
+        live=candidate;break
+    legal={};capacity={};compatible=False;reason='Current session authority unavailable; historical evidence only'
+    if live is not None:
+        if binding:
+            saved=live.artifact(binding['reference'])
+            verify_accounting_snapshot(live,saved)
+            if saved['grant_identity']!=digest(live.config()):raise ValueError('ACCOUNTING_AUTHORIZATION_CHANGED')
+        session=live.session(session_id);role=session['state'].get('role_context',{})
+        live_deadline=role.get('campaign_permissions',{}).get('elapsed_deadline_unix')
+        if live_deadline is not None:deadline=min(deadline,live_deadline) if deadline else live_deadline
+        capacity=downstream_available(live,session_id,as_of_unix=cutoff)
+        if role.get('autonomous_scheduling'):
+            from tools.research_scheduler import capabilities
+            legal=capabilities(live,session_id,role.get('research_records',[]),as_of_unix=cutoff)['legal']
+        # A generic restored view has no operation grant. Host still owns
+        # checking tools; an archived menu alone cannot supply the current one.
+        reason='Current Store/session checked; Host dispatch checks still required'
+        from tools.platform_host import Host
+        compatible=Host(live.root,session_id).compatibility()['compatible']
+        if not compatible:
+            legal={'stop':dict(execution_authorized=False,reason='Current dependency freeze is incompatible')}
+            reason='Current dependency freeze is incompatible; historical evidence remains readable'
+        sealed=sealed or session['status']!='running' or bool(role.get('research_final_reporting'))
+    expired=deadline is not None and cutoff>=deadline
+    if sealed or expired:
+        legal={'stop':dict(execution_authorized=False,reason='Scope sealed' if sealed else 'Deadline expired')}
+    if expired:capacity={k:0 for k in capacity}
+    return dict(as_of_unix=cutoff,elapsed_deadline_unix=deadline,expired=expired,sealed=sealed,
+        legal_actions=legal,remaining_budget=capacity,current_session_verified=live is not None,
+        implementation_compatible=compatible,
+        host_dispatch_required=True,historical_snapshot_is_authority=False,reason=reason)
 
 
 def verify_dependency_migration(store,run_id,before_identity,after_identity):
@@ -153,44 +222,54 @@ def verify_dependency_migration(store,run_id,before_identity,after_identity):
     return True
 
 
-def refresh(host):
-    role=host.store.session(host.run_id)['state'].get('role_context',{})
-    if not role.get('refresh_current_authority'):return
+def refresh(host, *, as_of_unix=None):
+    session=host.store.session(host.run_id);role=session['state'].get('role_context',{})
+    if session['status']!='running':return  # Offline historical preparation is read only.
+    if not role.get('refresh_current_authority'):
+        stop=role.get('context_authority',{}).get('stop') or {}
+        historical_stop=stop.get('sealed_cases') or 'stop' in str(stop.get('status','')).lower()
+        if not role.get('autonomous_scheduling') or session['status']!='running' or historical_stop:return
     from tools.research_scheduler import capabilities
     from tools.context_assembly import EvidenceArchive,ROOT,update_working_state
-    generated=time.time()
+    generated=time.time() if as_of_unix is None else as_of_unix
     cap=capabilities(host.store,host.run_id,role['research_records'],as_of_unix=generated)
     if role.get('research_final_reporting'):
         cap['legal']={'stop':dict(reason='Sealed trajectory: final interpretation only',execution_authorized=False)}
         cap['unavailable'].update({k:'Research trajectory closed' for k in ('control_search','structure_search','diagnosis')})
     working=deepcopy(role['research_working_state']);packet=deepcopy(role['research_packet'])
+    # A successful live refresh replaces the ephemeral restoration projection
+    # with a newly bound current snapshot. Keeping both menus would duplicate
+    # context and can misbind the exact snapshot at check_payload.
+    working.pop('current_execution',None)
     authority=deepcopy(role['context_authority'])
     state=host.store.session(host.run_id)['state']
     revision=state.get('current_authority_revision',0)+1
     snapshot=dict(campaign_id=host.store.config()['project_id'],session_id=host.run_id,revision=revision,
-        generated_unix=time.time(),capabilities=deepcopy(cap),accounting=host.store.remaining(),
+        generated_unix=generated,capabilities=deepcopy(cap),accounting=host.store.remaining(),
         elapsed_deadline_unix=role.get('campaign_permissions',{}).get('elapsed_deadline_unix'),
         source='Current session and cumulative successor ledger; archived context is evidence only')
     with host.store.transaction() as db:reference=plain(host.store.put(db,snapshot))
     stamp=dict(reference=reference,campaign_id=snapshot['campaign_id'],session_id=host.run_id,revision=revision)
     cap['authority_snapshot']=stamp;packet['capabilities']=cap
     authority.update(legal_actions=deepcopy(cap['legal']),remaining_budget=deepcopy(cap['remaining']),
-        budget_accounting=host.store.remaining(),current_authority=stamp)
-    if role.get('enforce_settled_accounting'):
-        authority['accounting_binding']=accounting_binding(host.store,host.run_id,as_of_unix=generated)
+        budget_accounting=host.store.remaining(),current_authority=stamp,
+        operational_facts=cap['operational_facts'])
+    authority['accounting_binding']=accounting_binding(host.store,host.run_id,as_of_unix=generated)
     archive=EvidenceArchive.from_manifest(ROOT/role['research_working_manifest'],
         scope=working['archive_scope'],stores=(host.store,))
     working=update_working_state(working,archive=archive,evidence_packet=packet,authority=authority)
     with host.store.transaction() as db:
         state=host.store.session(host.run_id,db)['state'];current=state['role_context']
         current.update(research_packet=packet,research_working_state=working,context_authority=authority,
-            research_working_manifest=archive.manifest(),authority_snapshot=stamp)
+            research_working_manifest=archive.manifest(),authority_snapshot=stamp,refresh_current_authority=True)
         state['current_authority_revision']=revision
         host.store.update_state(db,host.run_id,state)
 
 
 def check_payload(host,payload):
-    role=host.store.session(host.run_id)['state'].get('role_context',{})
+    session=host.store.session(host.run_id)
+    if session['status']!='running':return  # Sending is denied separately at the boundary.
+    role=session['state'].get('role_context',{})
     if not role.get('refresh_current_authority'):return
     packet=json.loads(payload['messages'][1]['content'])['role_context']['research_packet']
     stamp=role['authority_snapshot'];snapshot=host.store.artifact(stamp['reference'])

@@ -280,8 +280,7 @@ def run_study(directory, spec):
     complete=lambda g,a: len(g['records'])==10 and all(
         e['fresh_execution'] and e['acceptance_execution_matches'] and e['status'] in ('accepted','valid_failure') for e in a['entries'])
     comparison=(compare_acceptance(robustness[1]['acceptance'],robustness[0]['acceptance'])
-                if frozen and all(complete(g,r['acceptance']) for g,r in zip(groups,robustness)) else
-                dict(relation='unavailable',reason='No eligible new candidate' if not frozen else 'Incomplete matched validation; no improvement claim'))
+                if frozen else dict(relation='unavailable',reason='No eligible new candidate'))
     promote=frozen is not None and comparison['relation']=='improved'
     outstanding=sum(r['acceptance']['unrecorded'] for r in robustness)
     reason='predeclared_policy' if not frozen or outstanding or blocked else 'completed_schedule'

@@ -88,8 +88,10 @@ def request(index,prepare_only=False):
     def call(ctx):
         from examples.gvs_nmpc_route_experiment import load_credential
         from tools.model_transports.deepseek import request_completion
+        from tools.context_assembly import check_outgoing_request
+        check_outgoing_request(payload,config,'research_decision')
         load_credential(Path(os.environ['SOFTAGENT_CONFIGURATION_PATH']))
-        raw=request_completion(config,payload,os.environ['DEEPSEEK_API_KEY']);atomic_json(M5/f'interpretation{index}_raw.json',raw)
+        raw=request_completion(dict(config,context_purpose='research_decision'),payload,os.environ['DEEPSEEK_API_KEY']);atomic_json(M5/f'interpretation{index}_raw.json',raw)
         choice=raw['choices'][0];calls=choice['message'].get('tool_calls',[])
         if choice.get('finish_reason')=='length' or len(calls)!=1 or calls[0]['function']['name']!='report_interpretation':raise ValueError('ONE_COMPLETE_INTERPRETATION_REQUIRED')
         return dict(model_authored=True,interpretation=json.loads(calls[0]['function']['arguments']),request_identity=digest(payload),raw_identity=digest(raw))

@@ -161,6 +161,8 @@ def provider4(index,prepare_only=False):
     atomic_json(M4/f'interpretation{index}_request.json',dict(provider_configuration=config,payload=payload,context_assembly_audit=audit))
     if prepare_only:return
     def call(ctx):
+        from tools.context_assembly import check_outgoing_request
+        check_outgoing_request(payload,config,'final_report')
         load_credential(Path(os.environ['SOFTAGENT_CONFIGURATION_PATH']))
         raw=request_completion(config,payload,os.environ['DEEPSEEK_API_KEY']);atomic_json(M4/f'interpretation{index}_raw.json',raw)
         choice=raw['choices'][0];calls=choice['message'].get('tool_calls',[])

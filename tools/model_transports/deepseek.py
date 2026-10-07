@@ -50,6 +50,9 @@ def failure_details(exc, config, started, key):
 
 
 def request_completion(config, payload, key):
+    if config.get('context_guard'):
+        from tools.context_assembly import check_outgoing_request
+        check_outgoing_request(payload,config,config.get('context_purpose','final_report'))
     url = config['base_url'].rstrip('/') + '/chat/completions'
     request = Request(url, data=json.dumps(payload, ensure_ascii=False).encode('utf-8'),
                       headers={'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key})
