@@ -46,7 +46,9 @@ def capabilities(store, run_id, records,*,as_of_unix=None):
     inp=store.session(run_id)['snapshot']['input']; controller=inp['policy']['controller']
     proposal_only=store.session(run_id)['state'].get('role_context',{}).get('decision_only',False)
     if proposal_only:remaining=store.spendable(run_id)['remaining']
-    stable=(controller['extension_id'],controller['version'])==('controller.gvs_nmpc','7.0.0')
+    from tools.research_tasks import task_adapter
+    compatibility=task_adapter(inp).check_compatibility()['technical_compatibility']
+    stable=compatibility['status']=='supported'
     pool=resolved_pool(inp)
     legal={}; gaps={}; reg=registry()
     methods=[m+'@1.0.0' for m in ('search.family_coordinate','search.family_explicit')
@@ -54,7 +56,7 @@ def capabilities(store, run_id, records,*,as_of_unix=None):
     for action,paths in [('control_search',[p for p in pool if p.startswith('control/')]),
                          ('structure_search',list(pool))]:
         reason=None
-        if not stable:reason='Stable controller.gvs_nmpc@7.0.0 prerequisite absent'
+        if not stable:reason='Selected task/controller pairing incompatible: '+compatibility['reason']
         elif not proposal_only and not capacity['sufficient']:reason='Complete execution and delivery reservation unavailable: '+str(capacity['shortfalls'])
         elif not paths or (action=='structure_search' and not any(not p.startswith('control/') for p in paths)):
             reason='Authorized builder paths unavailable'
@@ -64,7 +66,7 @@ def capabilities(store, run_id, records,*,as_of_unix=None):
         if reason:gaps[action]=reason
         else:legal[action]=dict(paths=list(paths),minimum_batch=capacity['requirement'],methods=methods,
             domains={p:pool[p]['granted_range'] for p in paths},
-            mixed_semantics='structure_search permits a joint structural/control subset; each ask/tell point constructs all selected values together, followed by one unchanged v7 closed-loop execution. No inner search or extra control budget.',
+            mixed_semantics='structure_search permits joint structural/control subsets; each point constructs all selected values followed by one execution with the selected versioned controller. Online solving is separately accounted.',
             method_semantics={'search.family_coordinate@1.0.0':'Numerically generated continuous coordinate proposals; categorical paths unavailable.',
                 'search.family_explicit@1.0.0':'Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated.'})
     role=store.session(run_id)['state'].get('role_context',{})

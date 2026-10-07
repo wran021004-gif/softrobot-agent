@@ -470,14 +470,18 @@ def prepare_offline_batch(host,plan_ref,*,starting_facts=None,interpretation_res
     plan=SearchBatchPlan.model_validate(record['plan'])
     if not record['structurally_operationally_valid'] or record['execution_authorized']:
         raise ValueError('BATCH_REQUIRES_VALID_UNEXECUTED_PLAN')
-    if plan.fixed_controller!='controller.gvs_nmpc@7.0.0' or plan.method not in ('search.family_coordinate@1.0.0','search.family_explicit@1.0.0'):
+    if plan.method not in ('search.family_coordinate@1.0.0','search.family_explicit@1.0.0'):
         raise ValueError('BATCH_FIXED_IMPLEMENTATION_REQUIRED')
     from tools.candidate_parameters import STRUCTURAL_PATHS,comparison_scope,scientific_fixed_scope
     source_configuration=record['bindings'].get('execution_source_configuration',record['bindings']['subject']['configuration'])
     effective=host.store.artifact(source_configuration)['effective']
+    from tools.research_tasks import task_adapter
+    controller=effective['policy']['controller']
+    if plan.fixed_controller!=controller['extension_id']+'@'+controller['version'] or task_adapter(effective).check_compatibility()['technical_compatibility']['status']!='supported':
+        raise ValueError('BATCH_FIXED_CONTROLLER_TASK_INCOMPATIBLE')
     builder=effective['policy']['candidate_builder']
     allowed_paths=(*REACH_WEIGHT_PATHS,*STRUCTURAL_PATHS)
-    if builder.get('extension_id')=='candidate.family' and builder.get('version')=='1.1.0':
+    if builder.get('extension_id')=='candidate.family' and builder.get('version') in ('1.1.0','1.2.0'):
         from tools.parameter_catalog import effective_catalog
         allowed_paths=effective_catalog(effective)['usable_pool']
     if not plan.variables or set(plan.variables)-set(allowed_paths):raise ValueError('BATCH_UNSUPPORTED_PARAMETER_PATHS')

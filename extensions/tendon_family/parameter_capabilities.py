@@ -71,3 +71,48 @@ def apply_study(inp, space, changes):
     from .candidate import apply
     authorize_study(inp, space, changes)
     return apply(inp, space, changes, semantic_expander=expand_segment)
+
+
+def routing_declarations():
+    value = declarations()
+    value['version'] = '1.1.0'
+    for row in value['parameters']:
+        row['task_families'] = ['task.reach', 'task.tracking'] if row['id'].endswith('/length_m') else ['task.reach']
+    for component in ('near', 'far'):
+        value['parameters'].append(dict(id=f'design/{component}_routing_radius_scale',
+            kind='physical_design', type='number', unit='1', operation='routing_radius_scale',
+            components=[component], schema='family.space:SemanticDecision.routing_radius_scale',
+            meaning='Uniform local transverse routing offset scale against immutable semantic_source, owned by physical segment '+component,
+            legal_domain=dict(exclusive_minimum=0), task_families=['task.reach'],
+            controller_versions=['9.0.0'], effective_locations=['segment-owned tendon attachment offsets and rigid guide holes'],
+            coupled_constraints=['Base belongs to root flexible segment; rigid locations belong to closest upstream flexible ancestor.',
+                'Boundary guide holes transform once by upstream owner, including distal tendons. Anchors use their physical attachment owner.',
+                'Longitudinal stations, angle/layout, hole diameter, sections and actuator drum radius stay separate.',
+                'Bounds derived from source guide envelopes/hole separation; full compiler span checks required.'],
+            derived_quantities=['tendon lengths and derivatives', 'force mapping', 'reduced routing graph', 'controller preparation']))
+    value['integration_backlog'] = [r for r in value['integration_backlog'] if r['id'] != 'tendon_routing']
+    for row in value['integration_backlog']:
+        row['target_version'] = '2' if row['id'] in ('segment_count', 'tendon_count') else 'later'
+    value['integration_backlog'].append(dict(id='tendon_layout', kind='physical_design', target_version='2',
+        reason='Finite count/layout choices require topology, input ordering and initialization mappings; v1 permits only source-relative radial offsets.'))
+    return value
+
+
+def authorize_routing(inp, space, changes):
+    from .candidate import authorize
+    declared = {r['id'] for r in routing_declarations()['parameters']}
+    if set(changes)-declared: raise ValueError('RESEARCH_PARAMETER_CAPABILITY_UNAVAILABLE')
+    rows={r['id']:r for r in routing_declarations()['parameters']}
+    if any(inp.task.family not in rows[p]['task_families'] for p in changes):
+        raise ValueError('PARAMETER_OUTSIDE_TASK_ENVELOPE')
+    if any('routing_radius_scale' in p for p in changes) and (
+            inp.task.family != 'task.reach' or inp.policy.controller.version != '9.0.0'):
+        raise ValueError('ROUTING_REQUIRES_REACH_V9')
+    authorize(inp, space, changes)
+
+
+def apply_routing(inp, space, changes):
+    from .candidate import apply
+    from .routing_radius import expand_routing
+    authorize_routing(inp, space, changes)
+    return apply(inp, space, changes, semantic_expander=expand_routing)

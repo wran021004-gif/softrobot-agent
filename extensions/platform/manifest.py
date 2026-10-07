@@ -55,6 +55,35 @@ EXTENSIONS = [replace(d, capabilities={**d.capabilities,
     'category': 'robot_design' if d.kind == 'candidate_builder' else 'platform_services',
     'role': 'adapter'}) for d in EXTENSIONS]
 
+from tools.research_capabilities import CatalogRequest, CatalogResult
+from tools.research_execution import CandidatePreparation, PreparedCandidate, ConfigurationAnalysis
+from schemas.platform_analysis import AnalysisResult
+from extensions.math_analysis.manifest import SOURCES as RESEARCH_MATH_SOURCES
+for name,schema,output,binding,category in (
+    ('research.prepare_candidate',CandidatePreparation,PreparedCandidate,'prepare_candidate_tool','research'),
+    ('analysis.linearize_configuration',ConfigurationAnalysis,AnalysisResult,'linearize_configuration','analysis')):
+    EXTENSIONS.append(Extension(name,'tool','1.0.0',schema,output,'tools.research_execution:'+binding,
+        'Shared owned candidate construction' if category=='research' else 'Existing candidate-local analysis on an owned prepared configuration; working-point equilibrium construction is scientific computation',
+        sources=(*RESEARCH_MATH_SOURCES,'tools/research_execution.py','tools/platform_tools.py'),
+        dependencies=('numpy','scipy','casadi'),capabilities=dict(category=category,role='public_tool',
+            **(dict(task_families=['task.reach'],scientific_computation=True) if category=='analysis' else {}))))
+EXTENSIONS.append(Extension('research.capabilities','tool','1.0.0',CatalogRequest,CatalogResult,
+    'tools.research_capabilities:discover','Effective registry, parameter, compatibility, authority and evidence catalog',
+    sources=('tools/research_capabilities.py','tools/parameter_catalog.py','tools/research_tasks.py'),
+    capabilities=dict(category='research',role='public_tool')))
+from tools.research_investigations import (InvestigationOrder,InvestigationResult,InvestigationStatus,PrincipalDisposition)
+from schemas.platform_operations import ReadEvidence,EvidencePage
+for name,schema,output,binding in (
+    ('research.investigate',InvestigationOrder,InvestigationResult,'dispatch'),
+    ('research.investigation_status',InvestigationStatus,InvestigationResult,'status'),
+    ('research.investigation_disposition',PrincipalDisposition,InvestigationResult,'disposition'),
+    ('research.investigation_read',ReadEvidence,EvidencePage,'read_source')):
+    EXTENSIONS.append(Extension(name,'tool','1.0.0',schema,output,
+        'tools.research_investigations:'+binding,'Bounded scoped evidence investigations; suggestions do not authorize computation',
+        sources=('tools/research_investigations.py','tools/platform_workers.py','tools/platform_store.py','tools/context_assembly.py'),
+        capabilities=dict(category='diagnostics',role='public_tool',
+            **(dict(delegated_execution=True,preflight='tools.research_investigations:dispatch_preflight',model_calls=1) if binding=='dispatch' else {}))))
+
 from schemas import platform_handoff as handoff
 EXTENSIONS.append(Extension('research.decide','tool','1.0.0',handoff.ResearchDecision,handoff.HandoffResult,
     'tools.research_scheduler:decide','Choose an evidence-bound control search, structure search, bounded diagnosis or voluntary stop.',

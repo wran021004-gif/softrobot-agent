@@ -11,7 +11,7 @@ from schemas.platform import SessionInput
 from tools.platform_store import Store, plain
 from tools.platform_host import Host
 from tools.platform_registry import registry
-from tools.platform_tools import _candidate
+from tools.research_execution import construct_candidate
 from tools.state_io import atomic_json, digest, read
 from tools.optimization_interfaces import ParameterSpace, coordinate_proposal
 from tools.research_spec import load_spec, map_initial_state, ROOT
@@ -81,8 +81,8 @@ def schedule(spec):
 
 
 def _call(host, tool, request_id, arguments, reason):
-    receipt = host.invoke(dict(tool_id=tool,tool_version='1.0.0',request_id=request_id,
-        arguments=arguments,reason=reason,evidence=[],cache='new'))
+    from tools.research_execution import invoke
+    receipt = invoke(host,tool,arguments,request_id=request_id,reason=reason)
     atomic_json(host.folder/(request_id+'_receipt.json'),receipt)
     return receipt
 
@@ -99,7 +99,7 @@ def prepare_candidate(spec, *, candidate_id, changes, case_id, seed):
                    dict(kind='discrete',choices=spec['parameter_grants'][p]) for p in changes}
         algorithm=parameter_search(source,'search.family_explicit@1.0.0',variables,candidates=[changes])
         changes=algorithm.propose()
-    inp = plain(_candidate(SessionInput.model_validate(source),changes,registry()))
+    inp = plain(construct_candidate(source,changes,registry()))
     initial = map_initial_state(inp,case)
     inp['task']['initializer']['parameters']['data'] = initial
     inp['seed'] = seed; inp['task']['sampling']['seeds'] = [seed]

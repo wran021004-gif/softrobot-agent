@@ -14,7 +14,7 @@ def parameter_value(effective,path):
     if path in space.get('semantic_decisions',{}):
         builder=effective['policy']['candidate_builder']
         decision=space['semantic_decisions'][path]
-        if builder.get('extension_id')=='candidate.family' and builder.get('version')=='1.1.0':
+        if builder.get('extension_id')=='candidate.family' and builder.get('version') in ('1.1.0','1.2.0'):
             common='design/'+decision['operation']
             if common in selections:return selections[common]
         return effective['robot']['structure']['data'].get('metadata',{}).get('design_decisions',{}).get('selections',{}).get(
@@ -40,7 +40,15 @@ def fixed_configuration(effective,variables):
                 if operation=='section_scale':
                     for station in c['sections']:
                         station['section']['parameters']={k:'<batch variable>' for k in station['section']['parameters']}
-                else:c['physics']['young_pa']='<batch variable>'
+                elif operation=='material_scenario':c['physics']['young_pa']='<batch variable>'
+            if operation=='routing_radius_scale':
+                from extensions.tendon_family.routing_radius import locations
+                for row in locations(space['semantic_source']):
+                    if row['owner'] not in components:continue
+                    obj,key=locate(design,row['path'])
+                    value=obj[int(key)] if isinstance(obj,list) else obj[key]
+                    replacement=[value[0],'<batch variable>','<batch variable>']
+                    obj[int(key) if isinstance(obj,list) else key]=replacement
         else:
             target=fixed['policy']['controller']['parameters']['data'] if path.startswith('control/') else design
             obj,key=locate(target,path[8:] if path.startswith('control/') else path)
@@ -64,7 +72,7 @@ def scientific_fixed_scope(effective,variables):
 def comparison_scope(effective):
     from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
     builder=effective['policy']['candidate_builder']
-    if builder.get('extension_id')=='candidate.family' and builder.get('version')=='1.1.0':
+    if builder.get('extension_id')=='candidate.family' and builder.get('version') in ('1.1.0','1.2.0'):
         from tools.parameter_catalog import effective_catalog
         return scientific_fixed_scope(effective,effective_catalog(effective)['usable_pool'])
     return scientific_fixed_scope(effective,[*STRUCTURAL_PATHS,*REACH_WEIGHT_PATHS])
@@ -80,7 +88,7 @@ def project_planning_configuration(original,policy):
     effective=deepcopy(original)
     current=policy.get('candidate_builder',{}).get('parameters',{}).get('data',{})
     builder=policy.get('candidate_builder',{})
-    future=builder.get('extension_id')=='candidate.family' and builder.get('version')=='1.1.0'
+    future=builder.get('extension_id')=='candidate.family' and builder.get('version') in ('1.1.0','1.2.0')
     if future or any(p in current.get('parameters',{}) for p in STRUCTURAL_PATHS):
         if future:
             source_space=original['policy']['candidate_builder']['parameters']['data']
@@ -101,6 +109,10 @@ def project_planning_configuration(original,policy):
                 elif common in selected:value=selected[common]
                 elif path in old.get('semantic_decisions',{}):value=old['semantic_decisions'][path]['baseline_value']
                 elif legacy and set(decision['components'])<=set(legacy['components']):value=legacy['baseline_value']
+                elif decision['operation']=='routing_radius_scale':
+                    from extensions.tendon_family.routing_radius import normalize
+                    scales=normalize(deepcopy(original['robot']['structure']['data']),current['semantic_source'])
+                    value=scales[decision['components'][0]]
                 else:raise ValueError('PLANNING_SEMANTIC_SELECTION_UNAVAILABLE: '+path)
                 decision['baseline_value']=value
     from extensions.tendon_family.gvs_profile import execution_scope
@@ -117,7 +129,7 @@ def historical_parameter_projection(original,policy):
     projected=project_planning_configuration(original,policy)
     space=projected['policy']['candidate_builder']['parameters']['data']
     decisions=space.get('semantic_decisions',{})
-    if projected['policy']['candidate_builder'].get('version')=='1.1.0' and decisions:
+    if projected['policy']['candidate_builder'].get('version') in ('1.1.0','1.2.0') and decisions:
         from math import isclose
         from extensions.tendon_family.design_decisions import MATERIAL_FACTORS
         design=original['robot']['structure']['data']
@@ -140,6 +152,11 @@ def historical_parameter_projection(original,policy):
                             raise ValueError('HISTORICAL_SELECTOR_PHYSICAL_VALUE_MISMATCH: '+path)
                 elif decision['operation']=='material_scenario':
                     if not isclose(a['physics']['young_pa'],b['physics']['young_pa']*MATERIAL_FACTORS[value],rel_tol=1e-12,abs_tol=0.):
+                        raise ValueError('HISTORICAL_SELECTOR_PHYSICAL_VALUE_MISMATCH: '+path)
+                elif decision['operation']=='routing_radius_scale':
+                    from extensions.tendon_family.routing_radius import normalize
+                    scales=normalize(deepcopy(design),space['semantic_source'])
+                    if not isclose(scales[name],value,rel_tol=1e-12,abs_tol=0.):
                         raise ValueError('HISTORICAL_SELECTOR_PHYSICAL_VALUE_MISMATCH: '+path)
                 else:raise ValueError('HISTORICAL_SELECTOR_OPERATION_UNAVAILABLE: '+path)
     return projected

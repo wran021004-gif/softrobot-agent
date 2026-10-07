@@ -277,7 +277,7 @@ class Store:
                     constraints=[dict(scope=name,remaining=values) for name,values in limits],
                     reservations='Running/unknown calls are charged at reservation until sealed; included once in ledger usage.')
 
-    def reserve(self, run_id, request_id, request_hash, caller, cost, resources=(), cache_key=None, parent=None, inputs=(), kind='tool', version=VERSION):
+    def reserve(self, run_id, request_id, request_hash, caller, cost, resources=(), cache_key=None, parent=None, inputs=(), kind='tool', version=VERSION, guard=None):
         Budget.model_validate(cost)
         with self.transaction() as db:
             old = self.lookup(run_id, request_id, db)
@@ -285,6 +285,8 @@ class Store:
                 if old['request_hash'] != request_hash or old['caller'] != caller:
                     raise ValueError('REQUEST_ID_COLLISION')
                 return old, False
+            if guard is not None:
+                guard(db)  # Scope/count validation and state update share this reservation transaction.
             parent_run = self.session(run_id, db)['snapshot'].get('parent_run_id')
             for constraint in self.spendable(run_id, db)['constraints']:
                 if any(cost[k] > constraint['remaining'][k] + 1e-9 for k in cost):
@@ -302,12 +304,17 @@ class Store:
             # SQLite column count checked by focused tests, not separate accounting.
             return self.lookup(run_id, request_id, db), True
 
-    def complete(self, row, receipt, output=None, elapsed=0., kind='tool', *, result_execution=None):
+    def complete(self, row, receipt, output=None, elapsed=0., kind='tool', *, result_execution=None, actual_cost=None):
         with self.transaction() as db:
             current = self.lookup(row['run_id'], row['request_id'], db)
             if current['receipt']:
                 return json.loads(current['receipt'])
             charged = json.loads(current['reserved'])
+            if actual_cost is not None:
+                actual_cost = plain(Budget.model_validate(actual_cost))
+                if any(actual_cost[k] > charged[k] for k in charged if k != 'wall_s'):
+                    raise ValueError('SETTLEMENT_EXCEEDS_RESERVED_RESOURCE_COUNT')
+                charged = actual_cost
             # Known completion settles actual wall time. Overrun remains charged.
             charged['wall_s'] = max(0, elapsed)
             if output is not None:

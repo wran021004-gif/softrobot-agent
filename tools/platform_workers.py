@@ -18,6 +18,10 @@ class Coordinator:
     def __init__(self, host):
         self.host, self.store, self.run_id = host, host.store, host.run_id
 
+    def investigations(self):
+        from tools.research_investigations import InvestigationDispatcher
+        return InvestigationDispatcher(self.host)
+
     def _folder(self, work_id):
         return self.host.folder / 'workers' / work_id
 

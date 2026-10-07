@@ -69,6 +69,9 @@ def checked_reach(inp):
     # Keep numerical source integrity/order/bounds checks from the fixed path.
     checked_profile(old)
     candidate_robot=plain(inp.robot)
+    if inp.policy.controller.version == '9.0.0':
+        from .routing_radius import normalize
+        normalize(candidate_robot['structure']['data'], plain(old.robot)['structure']['data'])
     if inp.policy.controller.version=='4.0.0':
         # Support length changes only. Topology, sections, materials, damping,
         # attachments and actuator/tendon declarations keep their proven meaning.
@@ -80,14 +83,14 @@ def checked_reach(inp):
                 length=component['length_m']
                 if not np.isfinite(length) or length<=0:raise ValueError('GVS_REACH_INVALID_LENGTH')
                 component['length_m']=source['length_m']
-    if inp.policy.controller.version in ('6.0.0','7.0.0','8.0.0'):
+    if inp.policy.controller.version in ('6.0.0','7.0.0','8.0.0','9.0.0'):
         from .design_decisions import normalize_supported
         normalize_supported(candidate_robot['structure']['data'], plain(old.robot)['structure']['data'])
     fixed=(candidate_robot==plain(old.robot) and plain(inp.task.environment)==plain(old.task.environment)
         and all(plain(getattr(inp.policy,k))==plain(getattr(old.policy,k))
                 for k in ('backend','dynamics_model','discretization')))
     task_before,task_after=plain(old.task),plain(inp.task)
-    if (inp.policy.controller.version=='7.0.0' and inp.seed in (17,18)
+    if (inp.policy.controller.version in ('7.0.0','9.0.0') and inp.seed in (17,18)
             and task_after['sampling']['seeds']==[inp.seed]):
         # The frozen reach/hold study predeclares fresh repetitions 17 and 18.
         # Seed labels affect instance provenance, not target, physical timing,
@@ -131,7 +134,7 @@ def reach_assessment(inp):
         data=plain(GVSModelParameters(basis=control.recipe.basis))))
     assessment=assess_model_uses(inp.robot,inp.task,model,['reduced_dynamics','local_model_control'])
     old=SessionInput.model_validate(load_profile()['session_input'])
-    return dict(technical_compatibility=dict(status='supported',reason='Length, uniform section scaling, material density/elasticity/declared viscosity; unchanged topology and routing' if inp.policy.controller.version in ('6.0.0','7.0.0','8.0.0') else 'Length-only candidate envelope' if inp.policy.controller.version=='4.0.0' else 'Same fixed robot/free-space execution; task-owned target, small named initial state and timing',
+    return dict(technical_compatibility=dict(status='supported',reason='Fixed topology, segment-owned source-relative radial routing, length, uniform sections and material properties; changed-radius execution validation pending' if inp.policy.controller.version=='9.0.0' else 'Length, uniform section scaling, material density/elasticity/declared viscosity; unchanged topology and routing' if inp.policy.controller.version in ('6.0.0','7.0.0','8.0.0') else 'Length-only candidate envelope' if inp.policy.controller.version=='4.0.0' else 'Same fixed robot/free-space execution; task-owned target, small named initial state and timing',
             model_use_assessment=plain(assessment)),
         historical_evidence=dict(status='unvalidated_configuration',exact_execution_scope_match=False,
             historical_task_match=plain(inp.task)==plain(old.task),
@@ -145,7 +148,7 @@ def reach_assessment(inp):
 def reach_numerical(inp):
     """Target-independent guesses only, not a claimed new equilibrium solution."""
     control=checked_reach(inp);p=control.recipe;baseline=load_profile()
-    if inp.policy.controller.version in ('4.0.0','6.0.0','7.0.0','8.0.0'):
+    if inp.policy.controller.version in ('4.0.0','6.0.0','7.0.0','8.0.0','9.0.0'):
         return candidate_numerical(inp,control,baseline)
     from copy import deepcopy
     numerical=deepcopy(baseline['numerical']);n=len(numerical['coordinate_order'])
@@ -228,13 +231,13 @@ def checked_control(inp):
     if inp.policy.controller.version=='5.0.0':
         from .tracking import checked_tracking
         return checked_tracking(inp)
-    if inp.policy.controller.version in ('3.0.0','4.0.0','6.0.0','7.0.0','8.0.0'):
+    if inp.policy.controller.version in ('3.0.0','4.0.0','6.0.0','7.0.0','8.0.0','9.0.0'):
         checked_reach(inp)
     else:checked_profile(inp)
 
 
 def settling_for(inp):
-    return checked_reach(inp).settling if inp.policy.controller.version in ('3.0.0','4.0.0','6.0.0','7.0.0','8.0.0') else SampledSettling()
+    return checked_reach(inp).settling if inp.policy.controller.version in ('3.0.0','4.0.0','6.0.0','7.0.0','8.0.0','9.0.0') else SampledSettling()
 
 
 class ProfileOutput(Contract):
@@ -308,7 +311,7 @@ def describe(ctx, args):
     if ctx.input.policy.controller.version=='5.0.0':
         from .tracking import assessment
         return ProfileOutput(detail=dict(controller=plain(ctx.input.policy.controller),execution_scope=execution_scope(ctx.input),**assessment(ctx.input)))
-    if ctx.input.policy.controller.version in ('3.0.0','4.0.0','6.0.0','7.0.0','8.0.0'):
+    if ctx.input.policy.controller.version in ('3.0.0','4.0.0','6.0.0','7.0.0','8.0.0','9.0.0'):
         return ProfileOutput(detail=dict(controller=plain(ctx.input.policy.controller),
             execution_scope=execution_scope(ctx.input),**reach_assessment(ctx.input),
             execution_authorization=dict(simulation_tool_granted='simulation.run' in ctx.input.policy.tool_bindings,
@@ -330,7 +333,7 @@ def prepare_execution(ctx, controller, inp):
     """Budgeted public execution hook. Imports data, never injects a cache."""
     started = time.perf_counter()
     try:
-        if inp.policy.controller.version in ('3.0.0','4.0.0','5.0.0','6.0.0','7.0.0','8.0.0'):
+        if inp.policy.controller.version in ('3.0.0','4.0.0','5.0.0','6.0.0','7.0.0','8.0.0','9.0.0'):
             numerical=candidate_numerical(inp,checked_control(inp),load_profile()) if inp.policy.controller.version=='5.0.0' else reach_numerical(inp)
             historical=numerical['provenance'].get('historical_source')
             if historical is not None:

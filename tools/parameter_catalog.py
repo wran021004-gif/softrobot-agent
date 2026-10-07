@@ -27,7 +27,7 @@ def _declarations(effective, reg=None):
     return definition, hook()
 
 
-def study_input(effective, grants=None):
+def study_input(effective, grants=None, *, builder_version='1.1.0'):
     """Project grants onto exact saved science without editing source/evidence.
 
     The archived robot bytes (including metadata) stay identical. New selectors'
@@ -37,7 +37,7 @@ def study_input(effective, grants=None):
     result = deepcopy(effective)
     original_scope = execution_scope(effective)
     builder = result['policy']['candidate_builder']
-    builder.update(extension_id='candidate.family', version='1.1.0')
+    builder.update(extension_id='candidate.family', version=builder_version)
     _, capability = _declarations(result)
     grants = deepcopy(STUDY_GRANTS if grants is None else grants)
     declared = {row['id']: row for row in capability['parameters']}
@@ -55,7 +55,9 @@ def study_input(effective, grants=None):
     values = {}
     for path, row in declared.items():
         operation = row['operation']
-        if operation in ('section_scale', 'material_scenario'):
+        if operation == 'routing_radius_scale':
+            values[path] = selected.get(path, previous.get(path, {}).get('baseline_value', 1.))
+        elif operation in ('section_scale', 'material_scenario'):
             old = 'design/'+operation
             values[path] = selected.get(path, selected.get(old, previous.get(path, previous.get(old, {})).get('baseline_value')))
             if values[path] is None:
@@ -69,7 +71,7 @@ def study_input(effective, grants=None):
         category = 'control_parameters' if path.startswith('control/') else 'parameters'
         space[category][path] = spec
         if row['type']=='number': result['policy']['editable'][path] = deepcopy(grant['bounds'])
-        if row['operation'] in ('section_scale', 'material_scenario'):
+        if row['operation'] in ('section_scale', 'material_scenario', 'routing_radius_scale'):
             space['semantic_decisions'][path] = dict(operation=row['operation'],
                 components=row['components'], baseline_value=values[path])
     if execution_scope(result) != original_scope:
@@ -105,6 +107,9 @@ def effective_catalog(effective, grant=None, validation_evidence=None, reg=None)
         try:
             if [c['id'] for c in design['components']] != [c['id'] for c in source['components']]:
                 raise ValueError('SEGMENT_TOPOLOGY_CHANGED')
+            if policy['controller']['version'] == '9.0.0':
+                from extensions.tendon_family.routing_radius import normalize
+                normalize(design,source)
             normalize_supported(design,source)
             for data in (design,source):data.pop('metadata',None)
             if design!=source:raise ValueError('FIXED_TOPOLOGY_ROUTING_OR_SECTION_LAYOUT_CHANGED')
@@ -118,6 +123,10 @@ def effective_catalog(effective, grant=None, validation_evidence=None, reg=None)
         row = deepcopy(declaration); path = row['id']; spec = configured.get(path)
         domain = deepcopy(grant.get(path))
         reason = list(reasons)
+        if effective['task']['family'] not in row.get('task_families', support['task_families']):
+            reason.append('Incompatible task: this parameter is outside the tracking length-only envelope')
+        if policy['controller']['version'] not in row.get('controller_versions', [policy['controller']['version']]):
+            reason.append('Routing mutation requires reach controller.gvs_nmpc@9.0.0')
         if not spec: reason.append('Candidate builder has no connected mutation declaration for this effective input')
         supported = not reason
         current = parameter_value(effective,path) if spec else None
@@ -131,6 +140,12 @@ def effective_catalog(effective, grant=None, validation_evidence=None, reg=None)
                 if lo>hi:raise ValueError('INVALID_STUDY_RANGE: '+path)
                 for value in (lo,hi):check_value(path,value,spec,policy.get('editable',{}))
                 legal=row['legal_domain']
+                if row['operation'] == 'routing_radius_scale':
+                    from extensions.tendon_family.routing_radius import envelope
+                    legal = envelope(space['semantic_source'], row['components'][0])
+                    row['legal_domain'] = legal
+                    if lo <= legal['exclusive_minimum'] or (legal['exclusive_maximum'] is not None and hi >= legal['exclusive_maximum']):
+                        raise ValueError('GRANT_EXCEEDS_ROUTING_GEOMETRY: '+path)
                 if 'exclusive_minimum' in legal and lo<=legal['exclusive_minimum']:raise ValueError('GRANT_EXCEEDS_LEGAL_MINIMUM: '+path)
                 if 'intervals' in legal and not any(a<=lo<=hi<=b for a,b in legal['intervals']) and not lo==hi==0:
                     raise ValueError('GRANT_EXCEEDS_LEGAL_INTERVAL: '+path)
@@ -140,11 +155,11 @@ def effective_catalog(effective, grant=None, validation_evidence=None, reg=None)
             builder_domain={k:v for k,v in (spec or {}).items() if k in ('bounds','options')},
             technical_support=dict(supported=supported, reasons=reason),
             study_permission=dict(permitted=permitted, reason=None if permitted else 'Outside this frozen study grant' if supported else '; '.join(reason)),
-            validation_evidence=deepcopy((validation_evidence or {}).get(path, dict(status='offline_mutation_resolved_compiler_and_mjcf_checked',
-                reference='tests/test_parameter_catalog.py::ParameterCatalogTests',
-                exact_start_configuration=SOURCE_CONFIGURATION,
+            validation_evidence=deepcopy((validation_evidence or {}).get(path, dict(status='pending_changed_radius_closed_loop' if row['operation']=='routing_radius_scale' else 'offline_mutation_resolved_compiler_and_mjcf_checked',
+                reference='tests/test_research_mainline3.py::Mainline3EngineeringTests' if row['operation']=='routing_radius_scale' else 'tests/test_parameter_catalog.py::ParameterCatalogTests',
+                exact_start_configuration='3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b' if row['operation']=='routing_radius_scale' else SOURCE_CONFIGURATION,
                 scientific_claim='No robustness or closed-loop outcome is inferred from capability.'))),
-            mutation_mechanism='candidate.family@1.1.0: '+row['operation'],
+            mutation_mechanism=definition.extension_id+'@'+definition.version+': '+row['operation'],
             required_rebuilds=(['resolved physics','backend robot mesh/model','reduced geometry and structural basis','state projection','controller graph/solver','candidate initializer and warm-state regeneration'] if physical else ['controller graph/solver','warm-state regeneration']),
             reuse=dict(allowed=['Frozen task/reference/evaluator/timing/environment and unchanged topology/input order',
                     'Compatible bounded historical tensions as numerical guesses only'],

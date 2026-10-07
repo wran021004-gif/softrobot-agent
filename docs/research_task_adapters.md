@@ -1,5 +1,7 @@
 # Research task adapters and offline acceptance, version 1.0.0
 
+Mainline 3 adds shared candidate/request services and a separately versioned reach v9 routing envelope. Tracking v5 remains length-only. See [Mainline 3 scope and verification](research_mainline3_v1_capabilities.md); its offline construction checks do not validate changed-radius dynamics.
+
 The first study uses `tools/research_tasks.py` as the shared task entry point. Its adapter selects the registered output, reference, operating point, metric meanings, task context and lifecycle rules. The assembler remains responsible for evidence identity, permissions and budget; numerical kernels remain responsible for numerical calculations. No historical evaluator, report, script, or sealed campaign is redefined.
 
 `task_adapter(effective_or_saved_configuration)` accepts a `SessionInput` or saved candidate configuration. `describe()` exposes task/reference/signal contracts and metric units. `reference_at(times)` delegates timed tracking to the existing Cartesian-reference implementation and gives a constant reference for reach. `operating_point(time_s)` describes reference position and velocity; it does not claim an equilibrium or replace the actual task initialization. `check_compatibility()` checks the registered controller/backend combination separately from matching historical experiments. Technical support is not validation evidence.

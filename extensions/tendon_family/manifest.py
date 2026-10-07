@@ -693,3 +693,22 @@ EXTENSIONS.append(replace(next(d for d in EXTENSIONS if d.extension_id=='candida
             backend=['backend.family_mujoco@1.1.0'],model=['model.serial_bending_cells@1.0.0'],
             task_families=['task.reach']),
         search='Shared bounded physical/control pool; caller chooses any subset.')))
+
+# New routing envelope inherits v7 deadline/stopping behavior; experimental v8 stays separate.
+_reach_v7=next(d for d in EXTENSIONS if d.extension_id=='controller.gvs_nmpc' and d.version=='7.0.0')
+EXTENSIONS.append(replace(_reach_v7,
+    version='9.0.0', sources=(*_reach_v7.sources, 'extensions/tendon_family/routing_radius.py'),
+    description='Fixed-topology reach with independent segment-owned source-relative radial routing. v7 solver stopping rules preserved; changed-radius closed-loop validation pending.',
+    capabilities={**_reach_v7.capabilities,
+        'routing_radius': True, 'scientific_validation': 'pending_changed_radius_execution'}))
+_routing_builder = next(d for d in EXTENSIONS if d.extension_id=='candidate.family' and d.version=='1.1.0')
+EXTENSIONS.append(replace(_routing_builder, version='1.2.0',
+    binding='extensions.tendon_family.parameter_capabilities:apply_routing',
+    sources=(*_routing_builder.sources, 'extensions/tendon_family/routing_radius.py'),
+    capabilities={**_routing_builder.capabilities,
+        'authorize_changes':'extensions.tendon_family.parameter_capabilities:authorize_routing',
+        'parameter_declarations':'extensions.tendon_family.parameter_capabilities:routing_declarations',
+        'parameter_capability_version':'1.1.0',
+        'parameter_support':dict(controller=['controller.gvs_nmpc@7.0.0','controller.gvs_nmpc@9.0.0','controller.gvs_nmpc@5.0.0'],
+            backend=['backend.family_mujoco@1.1.0'], model=['model.serial_bending_cells@1.0.0'],
+            task_families=['task.reach','task.tracking'])}))

@@ -106,6 +106,14 @@ def physical_effects(baseline, effective):
                     a['section']['parameters'][key], value, 'm', 'section')
         for key, unit in (('young_pa', 'Pa'), ('density_kg_m3', 'kg/m^3')):
             add(prefix+'/physics/'+key, old['physics'][key], c['physics'][key], unit, 'material')
+    if baseline['tendons']!=effective['tendons'] or any(
+            c.get('guide_holes')!=original[c['id']].get('guide_holes') for c in effective['components']):
+        from .routing_radius import locations
+        from .candidate import read_parameter
+        for location in locations(baseline):
+            point=read_parameter(effective,location['path'])
+            for axis,(a,b) in enumerate(zip(location['point'],point)):
+                add(location['path']+'/'+str(axis),a,b,'m','routing')
     return rows
 
 

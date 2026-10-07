@@ -313,7 +313,7 @@ class ExperimentSpec(Contract):
 
 class SemanticDecision(Contract):
     """Declarative group expansion; operations are implemented by the builder."""
-    operation: Literal['section_scale', 'material_scenario']
+    operation: Literal['section_scale', 'material_scenario', 'routing_radius_scale']
     components: list[Name] = Field(min_length=1)
     baseline_value: float | str
 
