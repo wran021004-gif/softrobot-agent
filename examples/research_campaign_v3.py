@@ -374,12 +374,64 @@ def continue_structural(directory=None):
     continue_trajectory(w)
 
 
+def continue_feedback(directory=None):
+    """Last authorized observed fitting repair; completed batches stay closed."""
+    from examples.gvs_nmpc_route_experiment import load_credential
+    config=read(CONFIG);w=pilot.restore((directory or ROOT/'runs'/config['campaign_id']).resolve())
+    start=read(w.directory/'structural_repair7_start.json')
+    boundary=start['boundary'];out=Path(start['output']);gate=read(out/'engineering_gate.json')
+    if (w.status!='failed' or w.repairs!=6 or w.sealed_cases or
+        not w.stop_reason.startswith('CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET:') or
+        not gate['passed'] or gate['implementation_files']!=seal()['files']):
+        raise ValueError('ONLY_OBSERVED_POST_BATCH_FITTING_LAST_REPAIR_AUTHORIZED')
+    if boundary['original_clock']!=read(w.directory/'live_clock.json') or time.time()>=boundary['original_clock']['deadline_unix']:
+        raise ValueError('ORIGINAL_CLOCK_INVALID_OR_EXPIRED')
+    with w.store.connect(True) as db:
+        unsettled=[dict(r) for r in db.execute('SELECT * FROM calls WHERE receipt IS NULL')]
+    if len(unsettled)!=1 or unsettled[0]['request_id']!=start['reservation']['request_id']:
+        raise ValueError('UNRELATED_UNSETTLED_WORK_RECOVERY_FORBIDDEN')
+    session=w.store.session(w.host.run_id)
+    if session['state'].get('pending') or session['state'].get('search_batch',{}).get('pending'):
+        raise ValueError('UNSETTLED_SCIENTIFIC_WORK_CANNOT_REPLAY')
+    before=deepcopy(w.freeze['implementation']);after=seal()
+    changed={p for p in before['files'] if before['files'][p]!=after['files'][p]}
+    if changed!={'tools/context_assembly.py','examples/research_campaign_v3.py'} or not w.host.compatibility()['compatible']:
+        raise ValueError('REPAIR7_EXCEEDS_EXACT_REQUEST_REPRESENTATION_SCOPE')
+    repair=dict(version='v3-final-request-representation-repair@3.6.0',authorization=boundary['authorization'],
+        previous_repairs=6,cumulative_material_repairs=7,original_clock=w.freeze['live_clock'],
+        before_implementation=before,after_implementation=after,changed_files=sorted(changed),
+        failed_snapshot=boundary['failed_snapshot'],science_changed=False,backend_replayed=0,
+        grant_identity=digest(w.store.config()),same_session=w.host.run_id,gate=gate)
+    with w.store.transaction() as db:
+        ref=w.store.put(db,repair)
+        w.store.event(db,w.host.run_id,'request_representation_repair','completed',outputs=[ref],version='3.6.0')
+    elapsed=time.time()-boundary['started_unix']
+    receipt=w.store.complete(start['reservation'],dict(request_id=start['reservation']['request_id'],
+        execution_id=start['reservation']['execution_id'],caller='engineering',tool_id='engineering.exact_inline_fact_join',
+        tool_version='3.6.0',execution_status='completed',charged=zero()),repair,elapsed)
+    w.freeze['implementation']=after;w.freeze['material_live_repairs']=7;w.repairs=7
+    w.freeze['final_reporting']=False;w.status='running';w.stop_reason=None
+    w.freeze['repair_boundary']=dict(version=repair['version'],full_boundary=receipt['output'],
+        previous_repairs=6,cumulative_material_repairs=7,original_clock=w.freeze['live_clock'],
+        science_changed=False,budget_reset=False,backend_replayed=0)
+    w.freeze['recovery_instructions']+=' Last authorized repair only joins duplicate exact inline metric tables. Completed near/far batches remain sealed; no simulation is repeated. Independent configuration check corrects model-6: both near-section 1.00 and 1.05 executions kept terminal and holding speed weights .05; only the near selector changed. Its claim that near1.05 also used terminal .025 is false. Exact stable controller is controller.gvs_nmpc@7.0.0. Historical unspecified-zero and current explicit-zero task identities differ; dominance claims about history are descriptive, not fresh matched causal comparisons. Frozen eligibility still includes terminal .10 fresh nominal joint pass, without requiring dominance over history. Decide freely from actual complete far-batch feedback; final verification and delivery remain conditional on the original resources and deadline.'
+    pilot.configure(w);pilot.persist(w)
+    atomic_json(out/'resume_boundary.json',dict(repair=repair,receipt=receipt,previous_decision=w.previous_decision,
+        completed_batches=[r['result'] for r in w.rounds if r.get('result')],provider_reproposal_calls=0))
+    adapter=EvidenceDrivenAdapter();payload=payload_for(w.host,adapter)
+    pilot.adopt_current_working(w);pilot.persist(w)
+    atomic_json(out/'prepared_request.json',dict(payload=payload,audit=adapter.context_assembly_audit))
+    load_credential(Path.home()/'.codex/.env')
+    continue_trajectory(w)
+
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','recover-live','continue-authorized','recover-dependency','continue-structural']);parser.add_argument('--output',type=Path)
+    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','recover-live','continue-authorized','recover-dependency','continue-structural','continue-feedback']);parser.add_argument('--output',type=Path)
     args=parser.parse_args()
     if args.mode=='prepare':prepare(args.output)
     elif args.mode=='live':live(args.output)
     elif args.mode=='recover-live':recover_live(args.output)
     elif args.mode=='continue-authorized':continue_authorized(args.output)
     elif args.mode=='recover-dependency':recover_dependency(args.output)
-    else:continue_structural(args.output)
+    elif args.mode=='continue-structural':continue_structural(args.output)
+    else:continue_feedback(args.output)

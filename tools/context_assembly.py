@@ -254,6 +254,22 @@ def _research(packet, authority, archive):
         if r['reference'] != current_ref]
     required_aliases=set(authority.get('required_aliases', []))
     def selected_aliases(aliases):
+        # Final feedback embeds records in both groups and aggregate entries,
+        # and may embed search records again in its frozen plan. Retain the
+        # authoritative group-record leaves once; their duplicate representations
+        # stay in the original archive and exact canonical execution ledger.
+        if any(r['pointer'].startswith('/verification/') for r in aliases.values()):
+            selected={a:r for a,r in aliases.items() if a in required_aliases or
+                re.fullmatch(r'/verification/groups/\d+/records/\d+/acceptance/(?:metrics/[^/]+|accepted|status)',r['pointer']) or
+                re.fullmatch(r'/verification/aggregates/\d+/acceptance/(?:accepted|scheduled|recorded|unrecorded|joint_acceptance_fraction|all_scheduled_accepted)',r['pointer']) or
+                (r['pointer'].startswith('/verification/comparison/') and not isinstance(r['value'],(dict,list))) or
+                r['pointer'] in {'/status','/verification/complete','/verification/improvement_supported'}}
+            return selected
+        if any(r['pointer'].startswith('/outcomes/') for r in aliases.values()):
+            return {a:r for a,r in aliases.items() if a in required_aliases or
+                re.fullmatch(r'/outcomes/\d+/metrics/[^/]+',r['pointer']) or
+                re.fullmatch(r'/outcomes/\d+/acceptance/(?:accepted|status)',r['pointer']) or
+                r['pointer'] in {'/status','/stop_reason'}}
         selected={a:r for a,r in aliases.items() if a in required_aliases or
             ((('/metrics/' in r['pointer'] and '/source/' not in r['pointer'] and '/coverage/' not in r['pointer']) or
               ('/acceptance/' in r['pointer'] and r['pointer'].endswith(('/accepted','/passed','/status'))) or
@@ -262,7 +278,12 @@ def _research(packet, authority, archive):
         return selected or aliases
     feedback['aliases']=selected_aliases(feedback['aliases'])
     for r in reduced['performed_batch_evidence']:
-        r['aliases']=selected_aliases(r['aliases'])
+        if set(packet.get('capabilities',{}).get('legal',{}))=={'stop'} and packet.get('verification'):
+            # Historical alias wrappers are optional after the research STOP.
+            # Keep those cited by the final hypothesis/correction; every old
+            # exact metric/failure remains in the inline canonical ledger.
+            r['aliases']={a:v for a,v in r['aliases'].items() if a in required_aliases}
+        else:r['aliases']=selected_aliases(r['aliases'])
         source=archive.sources[r['reference']['artifact_id']]
         store=next(s for s in archive.stores if s.root.relative_to(ROOT).as_posix()==source['store_root'])
         r['comparison_bindings']=_comparison_bindings(store.artifact(r['reference']),authority)
@@ -405,6 +426,18 @@ def fit_request(wire, config, purpose, *, archive):
     original = archive.snapshot(wire)
     steps = []
     context = json.loads(wire['messages'][1]['content'])
+    original_metric_sources={}
+    def collect_metric_sources(value):
+        if isinstance(value,dict):
+            for row in value.get('executions',[]) if isinstance(value.get('executions'),list) else []:
+                if isinstance(row,dict) and 'execution_id' in row and isinstance(row.get('metric_sources'),dict):
+                    old=original_metric_sources.get(row['execution_id'])
+                    if old is not None and old!=row['metric_sources']:raise ValueError('CONTEXT_EXECUTION_SOURCE_CONFLICT')
+                    original_metric_sources[row['execution_id']]=deepcopy(row['metric_sources'])
+            for child in value.values():collect_metric_sources(child)
+        elif isinstance(value,list):
+            for child in value:collect_metric_sources(child)
+    collect_metric_sources(context)
     def report():
         sections = {k:len(json.dumps(v,ensure_ascii=False).encode('utf8'))
                     for k,v in context.items()}
@@ -420,13 +453,177 @@ def fit_request(wire, config, purpose, *, archive):
         return dict(reference=archive.snapshot(value), pointer='',
                     original_request=dict(reference=original,pointer=path),
                     scope='Archived detail; required decision facts retained inline')
-    for stage in range(4):
+    for stage in range(7):
         wire['messages'][1]['content'] = encode(context)
         measurement = measure_input(wire,config,purpose)
         steps.append(dict(stage=stage,measurement=measurement,section_bytes=report()))
         if measurement['passed']:
             return wire,dict(fitting_steps=steps,measurement=measurement,original_payload=original)
-        if stage==3:break
+        if stage==6:break
+        if stage==4:
+            packet=context.get('role_context',{}).get('research_packet',context)
+            bound=packet.get('bound_evidence',{})
+            execution_rows={r['execution_id']:r for r in bound.get('executions',[])}
+            # Join identity/case columns that were repeated in a second history
+            # table. Every original field is retained in the same execution row.
+            for row in packet.get('history',{}).get('rows',[]):
+                candidate=row.get('candidate',{});eid=candidate.get('execution_id')
+                target=execution_rows.get(eid)
+                if target is None:continue
+                for key,value in row.items():
+                    if key=='candidate':
+                        target['candidate']=deepcopy(value)
+                    elif key in target and target[key]!=value:
+                        raise ValueError('CONTEXT_HISTORY_EXECUTION_JOIN_CONFLICT: '+key)
+                    else:target[key]=deepcopy(value)
+            if execution_rows and 'history' in packet:
+                packet['history']['rows']=[dict(execution_id=r['candidate']['execution_id'],
+                    inline_execution_row=True) if r['candidate'].get('execution_id') in execution_rows else r
+                    for r in packet.get('history',{}).get('rows',[])]
+                bound['history_binding']='history.rows execution_id joins this executions table; candidate/configuration/case/seed/task identity/status are retained there.'
+            for attempt in packet.get('chronology',{}).get('attempts',[]):
+                candidate=attempt.get('candidate');target=execution_rows.get((candidate or {}).get('execution_id'))
+                if target and target.get('candidate')==candidate:
+                    attempt.pop('candidate');attempt['execution_id']=candidate['execution_id']
+                    attempt['inline_candidate_binding']=True
+            packet.get('chronology',{})['candidate_binding']='An attempts row with inline_candidate_binding joins the exact candidate in bound_evidence.executions by execution_id; reservation event, sequence, status and original ordering stay here.'
+            verification=packet.get('verification')
+            if verification:
+                for row in verification.get('outcomes',[]):
+                    target=execution_rows.get(row.get('execution_id'))
+                    if target is None:continue
+                    # Outcome metrics resolve to the exact metric table; retain
+                    # role/repetition and all other outcome fields inline once.
+                    for key,value in row.items():
+                        if key=='metrics':
+                            if 'fact_columns' not in bound:continue
+                            actual={bound['metric_columns'][c[0]][0]:c[2] for c in target['facts']}
+                            if any(actual.get(k)!=v for k,v in value.items()):
+                                raise ValueError('CONTEXT_VERIFICATION_METRIC_JOIN_CONFLICT')
+                        elif key in {'status','accepted'}:target['verification_'+key]=deepcopy(value)
+                        elif key not in {'role','repetition'}:
+                            if key=='configuration' and target.get('candidate',{}).get('configuration')==value:continue
+                            if key=='candidate_id' and target.get('candidate',{}).get('candidate_id')==value:continue
+                            if key in target and target[key]!=value:raise ValueError('CONTEXT_VERIFICATION_EXECUTION_JOIN_CONFLICT: '+key)
+                            target[key]=deepcopy(value)
+                    preserved={k:row[k] for k in ('execution_id','role','repetition')}
+                    row.clear();row.update(preserved,inline_execution_row=True)
+                verification['outcome_binding']='Each outcomes execution_id joins bound_evidence.executions; that row retains case/seed/configuration, verification_status/accepted and exact metric cells. Role/repetition retained here.'
+            legal=packet.get('capabilities',{}).get('legal',{})
+            if set(legal)=={'stop'} and verification:
+                # Catalog mechanics are historical after a scientific STOP;
+                # exact executed structures remain in bound_evidence, and the
+                # authoritative STOP-only capabilities/schema remain untouched.
+                study=packet.get('study',{})
+                if 'parameter_catalog' in study:
+                    study['parameter_catalog']=reference(study['parameter_catalog'],'/role_context/research_packet/study/parameter_catalog')
+                if 'subsequent_event' in study:
+                    # Exact earlier execution metrics/identity are already in
+                    # the bound execution table; this wrapper repeats its full
+                    # acceptance and historical implementation manifest.
+                    study['subsequent_event']=reference(study['subsequent_event'],'/role_context/research_packet/study/subsequent_event')
+            continue
+        if stage==5:
+            packet=context.get('role_context',{}).get('research_packet',context)
+            def compact_references(value,key=None):
+                if key=='capabilities':return deepcopy(value)
+                if isinstance(value,dict):
+                    if set(value)=={'artifact_id','media_type'} and value['media_type']=='application/json':
+                        return {'$e':value['artifact_id']}
+                    if set(value)=={'$e'}:raise ValueError('CONTEXT_INLINE_EVIDENCE_TAG_COLLISION')
+                    return {k:compact_references(v,k) for k,v in value.items()}
+                if isinstance(value,list):return [compact_references(v) for v in value]
+                return value
+            def table(rows):
+                columns=sorted({k for row in rows for k in row})
+                return dict(table_columns=columns,table_rows=[[row.get(k,{'$absent':True}) for k in columns] for row in rows])
+            bound=packet.get('bound_evidence',{})
+            if isinstance(bound.get('executions'),list) and bound['executions']:
+                bound['executions']=table(bound['executions'])
+            chronology=packet.get('chronology',{})
+            if isinstance(chronology.get('attempts'),list) and chronology['attempts']:
+                chronology['attempts']=table(chronology['attempts'])
+            packet['inline_table_binding']='A {table_columns,table_rows} object is the same row list with field names transmitted once. Each table_rows cell corresponds to table_columns at the same index; singleton {"$absent":true} means that original row omitted the field. Exact values and identities remain inline.'
+            for block in [packet.get('current_feedback',{}),*packet.get('performed_batch_evidence',[])]:
+                aliases=block.get('aliases',{})
+                if not aliases:continue
+                prefixes=sorted({v['pointer'].rsplit('/',1)[0] for v in aliases.values()})
+                prefix_indices={p:i for i,p in enumerate(prefixes)}
+                block['aliases']={a:[prefix_indices[v['pointer'].rsplit('/',1)[0]],v['pointer'].rsplit('/',1)[1],v['value']] for a,v in aliases.items()}
+                block['alias_pointer_prefixes']=prefixes
+                block['alias_columns']=['pointer_prefix_index','escaped_pointer_leaf','exact_value']
+                block['alias_binding']='aliases[F] has alias_columns; exact original JSON pointer is alias_pointer_prefixes[index]+"/"+escaped_pointer_leaf. Its source is this block reference. Native F handles and original host catalog are unchanged.'
+            compressed=compact_references(packet)
+            packet.clear();packet.update(compressed)
+            packet['inline_evidence_binding']='Singleton {"$e":sha256} is exactly {artifact_id:sha256,media_type:"application/json"}; media type transmitted once. All original artifact IDs remain inline. Current capabilities are untouched.'
+            counts={}
+            def count_strings(value,key=None):
+                if key=='capabilities':return
+                if isinstance(value,str) and len(value)>=32:counts[value]=counts.get(value,0)+1
+                elif isinstance(value,dict):
+                    for k,v in value.items():count_strings(v,k)
+                elif isinstance(value,list):
+                    for v in value:count_strings(v)
+            count_strings(packet)
+            strings=sorted(s for s,n in counts.items() if n>=2 and (n-1)*len(s)>n*15)
+            indices={s:i for i,s in enumerate(strings)}
+            def intern(value,key=None):
+                if key=='capabilities':return deepcopy(value)
+                if isinstance(value,str) and value in indices:return {'$s':indices[value]}
+                if isinstance(value,dict):
+                    if set(value)=={'$s'}:raise ValueError('CONTEXT_INLINE_STRING_TAG_COLLISION')
+                    return {k:intern(v,k) for k,v in value.items()}
+                if isinstance(value,list):return [intern(v) for v in value]
+                return value
+            packed=intern(packet)
+            packed['inline_strings']=strings
+            packed['inline_string_binding']='A singleton {"$s":i} means the exact string inline_strings[i] in THIS input. This lossless table interns repeated identity/source strings only; numbers, units, facts and immutable current capabilities are unchanged. No archive read is needed.'
+            packet.clear();packet.update(packed)
+            continue
+        if stage==3:
+            # Each metric was previously transmitted twice: an execution's
+            # metric->fact-ID map, then a global fact-ID->value/unit map.
+            # Join those two exact tables inline. No fact or binding disappears;
+            # canonical archived facts and all F selectors remain unchanged.
+            def join_tables(value):
+                if isinstance(value,list):return [join_tables(v) for v in value]
+                if not isinstance(value,dict):return value
+                if isinstance(value.get('executions'),list) and isinstance(value.get('facts'),dict):
+                    result=deepcopy(value);facts=result['facts']
+                    if all(isinstance(r,dict) and isinstance(r.get('facts'),dict) and
+                           all(fid in facts and set(facts[fid])=={'value','unit'} for fid in r['facts'].values())
+                           for r in result['executions']):
+                        referenced={fid for row in result['executions'] for fid in row['facts'].values()}
+                        if referenced==set(facts):
+                            metric_units={}
+                            for row in result['executions']:
+                                for metric,fid in row['facts'].items():
+                                    unit=facts[fid]['unit']
+                                    if metric in metric_units and metric_units[metric]!=unit:
+                                        raise ValueError('CONTEXT_METRIC_UNIT_CONFLICT')
+                                    metric_units[metric]=unit
+                            result['metric_columns']=[[metric,metric_units[metric]] for metric in sorted(metric_units)]
+                            indices={pair[0]:i for i,pair in enumerate(result['metric_columns'])}
+                            result['fact_columns']=['metric_index','fact_id','value','source_index']
+                            for row in result['executions']:
+                                sources=row.pop('source_artifacts')
+                                metric_sources=row.pop('metric_sources')
+                                if 'reference' in metric_sources:
+                                    original_sources=original_metric_sources.get(row['execution_id'])
+                                    if original_sources is None or hashlib.sha256(encode(original_sources).encode('utf8')).hexdigest()!=metric_sources['reference']['artifact_id']:
+                                        raise ValueError('CONTEXT_METRIC_SOURCES_CHANGED')
+                                    metric_sources=original_sources
+                                source_keys=sorted(sources)
+                                source_indices={key:i for i,key in enumerate(source_keys)}
+                                row['sources']=[sources[key] for key in source_keys]
+                                row['facts']=[[indices[metric],fid,facts[fid]['value'],source_indices[metric_sources[metric]]]
+                                    for metric,fid in sorted(row['facts'].items())]
+                            result.pop('facts')
+                            result['binding_resolution']='Each execution retains exact identities. facts rows use fact_columns: metric_index, immutable fact_id, exact value, source_index. metric_columns[metric_index] is [metric,unit]; row.sources[source_index] is the exact original source artifact. No observation or source binding omitted.'
+                            return result
+                return {k:join_tables(v) for k,v in value.items()}
+            context=join_tables(context)
+            continue
         seen={}
         def compact(value,path=''):
             if isinstance(value,list):return [compact(v,path+'/'+str(i)) for i,v in enumerate(value)]

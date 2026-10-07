@@ -1,0 +1,1979 @@
+{
+  "status": "failed",
+  "stop_reason": "CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET: D:\\softrobot-agent\\runs\\research_native_development_v3_20261007\\context_assembly\\audits\\96164ac806eda852f4856011394d4c1f16fd98589426b3605ec432985bb6c761.json; {\"correction_budget\": 90, \"packet/acceptance\": 3140, \"packet/bound_evidence\": 56711, \"packet/capabilities\": 3469, \"packet/case\": 853, \"packet/case_id\": 9, \"packet/chronology\": 4520, \"packet/corrections\": 30, \"packet/current_batch_source\": 276, \"packet/current_feedback\": 8002, \"packet/decision_recovery\": 4, \"packet/engineering_coverage\": 31, \"packet/execution_version_boundary\": 574, \"packet/history\": 10756, \"packet/history_coverage\": 1389, \"packet/incumbent\": 70, \"packet/performed_batch_evidence\": 15246, \"packet/predecessor_decision\": 117, \"packet/primary\": 70, \"packet/scientific_overlap\": 142, \"packet/scope\": 855, \"packet/sealed_cases\": 2, \"packet/study\": 19888, \"packet/working_context\": 15023, \"recovery_status\": 972, \"role_context\": 149491, \"role_context/instructions\": 7767, \"role_context/phase\": 10, \"role_context/research_packet\": 141620, \"role_context/role\": 8, \"role_context/unaccepted_draft\": 4, \"tool_schemas\": 11858}",
+  "usage": {
+    "limit": {
+      "backend_solves": 28,
+      "model_calls": 24,
+      "tool_calls": 200,
+      "wall_s": 36000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 41,
+      "model_calls": 7,
+      "backend_solves": 6,
+      "worker_calls": 0,
+      "wall_s": 7162.398198261377
+    },
+    "remaining": {
+      "backend_solves": 22,
+      "model_calls": 17,
+      "tool_calls": 159,
+      "wall_s": 28837.601801738623,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "search": [
+    {
+      "candidate_id": "batch-396bdbbae02626d3-0",
+      "configuration": {
+        "artifact_id": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "control/recipe/terminal_tip_speed_weight": 0.1
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0032997971664596422
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0033674546591454186
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.01025399247985248
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "871e8b83c5d14f9ba813fb65dcb0cc29",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.0033674546591454186,
+          "holding_max_speed_m_s": 0.01025399247985248,
+          "terminal_error_m": 0.0032997971664596422
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "1b587a3a3bbcea44429515affe1360ae767d091717581638e184783149de99ac",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "b4bb9a28d6df7ef9b1b2aef8bb4f05ec9b26bb39adcf9d0bd3468714ea3b9a30",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 8.622879228572128,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 305.4060000000027,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 305.4060000000027,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "871e8b83c5d14f9ba813fb65dcb0cc29",
+        "execution_status": "completed",
+        "original_execution_id": "871e8b83c5d14f9ba813fb65dcb0cc29",
+        "output": {
+          "artifact_id": "d4d0b75e01b6351faf66d328ad1413959b32cfcee2437d2ff861c3cd87e596ed",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "candidate_id": "batch-396bdbbae02626d3-1",
+      "configuration": {
+        "artifact_id": "26c9ed9c22ab66dfa5e7fa8276ae0cc60a13a53af50af9cc17def945949ff944",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "control/recipe/terminal_tip_speed_weight": 0.025
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0028638642071417758
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0028638642071417758
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.02116571913454289
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "ed8e838859714c17930b16ba7a46e8e1",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.0028638642071417758,
+          "holding_max_speed_m_s": 0.02116571913454289,
+          "terminal_error_m": 0.0028638642071417758
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "b695ed9abbdfc7972d79825b2e4ac13a71e328fe9514147cf1bb8d95c52650e1",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "17a193e2a742ecaf6bffb0714a30036d5acabe1657a98fe381c909b94330281e",
+            "media_type": "application/json"
+          }
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 7.577412962855721,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 267.125,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 267.125,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "ed8e838859714c17930b16ba7a46e8e1",
+        "execution_status": "completed",
+        "original_execution_id": "ed8e838859714c17930b16ba7a46e8e1",
+        "output": {
+          "artifact_id": "555ebb52247e85396a20751bc9bfd4a1e8633f2eb85a7c2a7160f297f24cd607",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "candidate_id": "batch-acf51de37cc32112-0",
+      "configuration": {
+        "artifact_id": "342158761934905515d6323a934450916fe91400b2d611ea2ed8d1f4cf52469e",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "design/near_section_scale": 1.0
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.003195002241686136
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.003322594723389333
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.013737449416257283
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "054cb6d5151e47b397e5f8003ff9a12a",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.003322594723389333,
+          "holding_max_speed_m_s": 0.013737449416257283,
+          "terminal_error_m": 0.003195002241686136
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "8245e196e43b55e5339ed19b9ae2aa483b3ad0204d3764deee61f2422ee42239",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "244012e3ea5fb76c518eaef28dbe84abc648979708cf192047d51d08d9adaba6",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 7.231787028571957,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 256.7030000000086,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 256.7030000000086,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "054cb6d5151e47b397e5f8003ff9a12a",
+        "execution_status": "completed",
+        "original_execution_id": "054cb6d5151e47b397e5f8003ff9a12a",
+        "output": {
+          "artifact_id": "94675e7c4a6a77fbc909851e2f2bf2f15560ab23bdc14715c158151371e7a3db",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "candidate_id": "batch-acf51de37cc32112-1",
+      "configuration": {
+        "artifact_id": "43b0b5cf0f9a6b9248f8d51f0ee80d50275bb1fbc62554e76827514614b38dd9",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "design/near_section_scale": 1.05
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0027390086467412606
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.002739008646741261
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.054580793692926934
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "dfb3b3986afb4981bf5c0c0c06e61acb",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.002739008646741261,
+          "holding_max_speed_m_s": 0.054580793692926934,
+          "terminal_error_m": 0.0027390086467412606
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "06b553eb15e86c5a5e821e74fd13edc3390534714c4234ceafbe617375daa9fd",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "99112cc3ad44f6fc446f5313ed85ba85d31e52e3e8131bde9ca2f9bc2829881d",
+            "media_type": "application/json"
+          }
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 10.101247971427593,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 356.9219999999914,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 356.9219999999914,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "dfb3b3986afb4981bf5c0c0c06e61acb",
+        "execution_status": "completed",
+        "original_execution_id": "dfb3b3986afb4981bf5c0c0c06e61acb",
+        "output": {
+          "artifact_id": "bc35649f5cc08e583482aa8398c496c6871501def84812115224922477ddd633",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "candidate_id": "batch-d86d193aa1860270-0",
+      "configuration": {
+        "artifact_id": "83b01a8d274c2ee335432dbe0396388862de91e6a47e001ce8d2d41d3ad47b9d",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "design/far_section_scale": 1.0
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0028146985060221873
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0030562651971689147
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.013737300830741445
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "7afd015b1c724120a9598c616a7b31ee",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.0030562651971689147,
+          "holding_max_speed_m_s": 0.013737300830741445,
+          "terminal_error_m": 0.0028146985060221873
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "77d6dad67ae8a56fe92837b39780acf55ded63f68bb8f0dcbcf5b73b3d393f41",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "e2d1f95aa4565aa5faa87aa44d8b6166d8eeb2da26caec1ec8a9f3d4333dc2db",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 11.204572105717046,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 395.5940000000119,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 395.5940000000119,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "7afd015b1c724120a9598c616a7b31ee",
+        "execution_status": "completed",
+        "original_execution_id": "7afd015b1c724120a9598c616a7b31ee",
+        "output": {
+          "artifact_id": "cc09be4638b1f67c18015a51b7d5c666720e0c8cc3a8ab832b70f3bead990ed9",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "candidate_id": "batch-d86d193aa1860270-1",
+      "configuration": {
+        "artifact_id": "0d0143b73799de751f495a6e873a7f03a99c945c67e782b765344469109af7b6",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "design/far_section_scale": 1.05
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.002719001068396446
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.002838475393161377
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.016521988699640333
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "37b1deba58ad4f29afca2fb36b99588b",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.002838475393161377,
+          "holding_max_speed_m_s": 0.016521988699640333,
+          "terminal_error_m": 0.002719001068396446
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "5212094dbafc62914135c3cb7bdee4cbb6e48300435390f57d51751b6d510fb7",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "eda6e15ffbc5961eaecc89fbb369c81e2cb794569e21103ef6a86f3e5177484d",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 8.680877448570183,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 307.375,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 307.375,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "37b1deba58ad4f29afca2fb36b99588b",
+        "execution_status": "completed",
+        "original_execution_id": "37b1deba58ad4f29afca2fb36b99588b",
+        "output": {
+          "artifact_id": "5d43214c836ccb1d82d565106903021e109e6feba0334282c2d73e4b45ab2490",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    }
+  ],
+  "verification": null,
+  "decisions": [
+    {
+      "index": 0,
+      "action": "control_search",
+      "decision": {
+        "artifact_id": "1ffb00ad32cef264632d354a6861ee21080d6b71f1385119e095a509886cf74f",
+        "media_type": "application/json"
+      },
+      "mathematical_support": {
+        "candidates": [
+          {
+            "control/recipe/terminal_tip_speed_weight": 0.1
+          },
+          {
+            "control/recipe/terminal_tip_speed_weight": 0.025
+          }
+        ],
+        "case_id": "nominal",
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F71",
+          "F112",
+          "F39",
+          "F41",
+          "F81",
+          "F124",
+          "F129",
+          "F123",
+          "F98",
+          "F66",
+          "F6",
+          "F95"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "Solver max_cpu 30 s / max_iterations 120 and feasible-return 5 / 15 s are frozen with the incumbent recipe, basis and mesh.",
+          "Acceptance is sampled: 6 required holding samples at 0.01 s in [0.30,0.35] s; no continuous-time guarantee is claimed.",
+          "Each point is one complete v7 closed loop with full structural rebuild only for the selected edit; no inner adaptation search.",
+          "Local one-shot closed-loop evidence, and any affine reading of the objective, cannot guarantee nonlinear reach, braking or perturbation robustness.",
+          "No real-time, hardware or global-optimality claim follows."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "At the incumbent holding_tip_speed_weight 0.05, the terminal_tip_speed_weight is a determinant of the sampled holding-speed margin in the granted [0.025,0.10] domain: the point 0.10 can yield a fresh nominal joint reach-and-hold pass with holding_max_speed_m_s below the incumbent's 0.012750255515948416 m/s and no increase in terminal_error_m or holding_max_error_m, whereas 0.025 does not improve that margin.",
+        "max_backend_attempts": 2,
+        "max_candidates": 2,
+        "method": "search.family_explicit@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 2,
+          "model_calls": 10,
+          "tool_calls": 18,
+          "wall_s": 3790.0,
+          "worker_calls": 0
+        },
+        "predecessor_decision": {
+          "artifact_id": "73d51b89a7dcd84639eeac83bdab0d586990b97dc8826592610f66ccf39f5a7a",
+          "media_type": "application/json"
+        },
+        "rationale": "Mathematical assumption: both tip-speed weights enter the frozen gvs_nmpc@7.0.0 objective as squared world tip speed normalized by the fixed tip_speed_scale_m_s, while acceptance is a sampled threshold test over six samples in [0.30,0.35] s, so the weight-to-acceptance map is nonconvex and local; explicit finite points are enumeration, not mathematical optimization, and no gradient, affine or surrogate model is used or claimed. Support and capability limits: only the two granted continuous control paths are legal in control_search, discrete design/material paths are excluded here, and M5 retained prediction evidence has no screening authority. Allocation: hold holding_tip_speed_weight at the incumbent 0.05 and vary only terminal_tip_speed_weight over the granted [0.025,0.10] with the two ordered points 0.10 then 0.025; each point plus the unchanged incumbent reference is rebuilt from the retained source batch-ebbeadbdaca10732-0 and executed once as one complete v7 closed loop on nominal seed 17, giving a same-condition incumbent-versus-candidate comparison with no inner search and no extra control budget. Expected information: whether terminal weight moves sampled holding_max_speed_m_s at fixed holding weight, whether a fresh nominal joint pass with an effective incumbent-relative control change is obtained, and the sign and size of any terminal/margin tradeoff; both values are previously untested points, so no matching-point replication_reason is required. Counterevidence and honest risks: three imported in-domain increases of holding_tip_speed_weight at terminal 0.05 (0.06, 0.075, 0.09) each failed holding speed (0.02260458517372844, 0.023285947509969908, 0.023994623331658485 m/s), the unique in-domain joint pass (0.09, 0.10) is confounded across two weights and is a tradeoff, the zero-holding-weight pass (0.0, 0.05) is outside the granted domain, and a changed near-section-scale candidate failed holding speed on near_z_plus; a nil or negative result is therefore a live outcome. This batch does not establish the unchanged incumbent's perturbed robustness and does not establish repeatability. Exit criteria: stop on any material failure, reservation shortfall or request/correction ceiling, or on voluntary STOP; only a fresh complete correctly bound nominal joint pass with no physical metric worsening (tradeoffs retain the incumbent) may later be taken forward to perturbed cases.",
+        "replication_reason": null,
+        "scientific_promise": "uncertain",
+        "seed": 17,
+        "source_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        },
+        "step": null,
+        "stopping_conditions": [
+          "Material or unknown execution failure stops the batch.",
+          "Insufficient complete reservation or cumulative request/correction ceiling stops the batch.",
+          "Voluntary model STOP ends research."
+        ],
+        "target_changed_configurations": 2,
+        "variables": {
+          "control/recipe/terminal_tip_speed_weight": [
+            0.025,
+            0.1
+          ]
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "F98",
+          "F129",
+          "F66",
+          "F95",
+          "F6"
+        ]
+      },
+      "interpretations": [
+        {
+          "contradicting_evidence": [],
+          "scope": "Nominal case, seed 17, frozen offline_reach_hold_v1 acceptance and frozen tolerance/window.",
+          "statement": "The retained incumbent batch-ebbeadbdaca10732-0 (execution 91c3ba1b01d6499fb26df8f95409401b) is a complete, valid, jointly accepted nominal reach-and-hold result with terminal_error_m 0.002697828858325615, holding_max_error_m 0.0027300544346297905 and holding_max_speed_m_s 0.012750255515948416 under limit 0.02.",
+          "supporting_evidence": [
+            "F71",
+            "F112",
+            "F39",
+            "F41",
+            "F81",
+            "F124",
+            "F37"
+          ],
+          "uncertainty": "Single stored execution; sampled 6-point acceptance with no continuous-time guarantee; no matching repeat, so variance is unknown."
+        },
+        {
+          "contradicting_evidence": [
+            "F41",
+            "F81"
+          ],
+          "scope": "near_z_plus, seed 17, changed structure b6c8000951f90ab13d6a780681a40fd3db8faa981ec3d34a9b5efcdb4cf3cda0 versus incumbent a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33.",
+          "statement": "The only complete perturbed event in this packet (execution 8b8ce2691fc24b3392ff5e7fa4905ba4, near_z_plus) is a valid failure driven solely by sampled holding speed (0.06758272073425946 m/s) with terminal and holding position still passing; it is not evidence about the unchanged incumbent because it also changed the near section scale.",
+          "supporting_evidence": [
+            "F129",
+            "F123",
+            "F98",
+            "F66",
+            "F6",
+            "F95",
+            "F109"
+          ],
+          "uncertainty": "One changed configuration only; confounding by structure change; cannot be transferred to the incumbent or used to screen candidates."
+        },
+        {
+          "contradicting_evidence": [
+            "F41",
+            "F81"
+          ],
+          "scope": "Historical imported nominal seed17 execution outside this campaign store; provenance is separate from current aliases.",
+          "statement": "Imported historical nominal evidence outside this campaign store (execution 148a2a290daa440f9b966f4d5cee4b5f, which has no current F alias) shows one in-domain weight point (holding 0.09, terminal 0.10) that jointly passed with a lower sampled holding speed 0.010201160469407439 m/s than the incumbent but larger terminal error 0.003313013757723085 m and larger holding max error 0.003370231014572803 m, i.e. a tradeoff, not overall improvement, obtained by changing two weights at once.",
+          "supporting_evidence": [],
+          "uncertainty": "The supporting record is not representable by a current F alias and is therefore cited only as external provenance for the risk statement; no matching repeat; two weights varied simultaneously so the terminal-weight effect is not isolated."
+        },
+        {
+          "contradicting_evidence": [
+            "F98",
+            "F66"
+          ],
+          "scope": "Prospective control-only search batch on nominal, seed 17, source = retained incumbent.",
+          "statement": "At the incumbent holding tip-speed weight 0.05 the terminal tip-speed weight is untested in the granted [0.025,0.10] domain, so an explicit two-point bracket (0.10, 0.025) is the cheapest way to test whether terminal weight moves sampled holding speed without worsening terminal or holding position error.",
+          "supporting_evidence": [
+            "F41",
+            "F39",
+            "F81"
+          ],
+          "uncertainty": "Nonconvex NMPC objective and sampled acceptance; explicit enumeration is not optimization; one execution per point; the effect may be null or masked by unmodeled dynamics."
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "action": "stop",
+      "decision": {
+        "artifact_id": "2138f5c3be4674d49dfe044b00cd9aa1b69f307716ef75f45a0ce39d734424da",
+        "media_type": "application/json"
+      },
+      "mathematical_support": null,
+      "interpretations": [
+        {
+          "contradicting_evidence": [
+            "F308"
+          ],
+          "scope": "nominal case, seed 17, frozen offline_reach_hold_v1 acceptance and frozen duration/window/tolerances; retained deliverable only.",
+          "statement": "Bounded final interpretation (retained incumbent): the retained configuration batch-ebbeadbdaca10732-0 (execution 91c3ba1b01d6499fb26df8f95409401b) remains a complete, valid, jointly accepted nominal reach-and-hold datum, with joint_reach_holding_passed true (F71), acceptance status 'accepted' (F112), validity true (F124), terminal_error_m 0.002697828858325615 (F39), holding_max_error_m 0.0027300544346297905 (F81) and holding_max_speed_m_s 0.012750255515948416 (F41), all inside the frozen 0.01 m and 0.02 m/s limits.",
+          "supporting_evidence": [
+            "F71",
+            "F112",
+            "F124",
+            "F39",
+            "F41",
+            "F81"
+          ],
+          "uncertainty": "Sampled six-sample acceptance with no continuous-time guarantee; one stored execution and no matching repeat in the supplied scope, so variance is unknown. Retention is a modelling judgment, not a claim of global optimality or of the largest observed speed margin: F308 records a smaller sampled holding speed at another configuration."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "nominal case, seed 17; changed configurations relative to the retained source, both packet comparisons to the retained incumbent classified unavailable because the configuration identities differ.",
+          "statement": "Bounded final interpretation (most recent changed candidates): both attempts completed (F135). Attempt 871e8b83c5d14f9ba813fb65dcb0cc29 is a fresh nominal joint pass (F204 true, F242 'accepted', F301 true) whose sampled holding speed 0.01025399247985248 m/s (F308) is 0.002496263036095936 m/s below the incumbent's (F41) while terminal_error_m 0.0032997971664596422 (F274) and holding_max_error_m 0.0033674546591454186 (F256) are 0.0006019683081340272 m and 0.0006374002245156281 m larger, i.e. a physical trade-off and not an overall improvement. Attempt ed8e838859714c17930b16ba7a46e8e1 is a valid_failure (F263, F221 false) whose only failing component is sampled holding speed 0.02116571913454289 m/s (F186 false, F154), 0.00116571913454289 m/s above the 0.02 m/s limit, with terminal reach and holding position still passing (F254, F213).",
+          "supporting_evidence": [
+            "F135",
+            "F242",
+            "F204",
+            "F301",
+            "F308",
+            "F256",
+            "F274",
+            "F263",
+            "F221",
+            "F186",
+            "F154",
+            "F254",
+            "F213"
+          ],
+          "uncertainty": "One execution per configuration; neither the structural nor the weighting change is isolated, so no causal attribution is made; a changed-candidate failure is not evidence about the unchanged incumbent and cannot screen candidates."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "near_z_plus, seed 17, changed structure b6c8000951f90ab13d6a780681a40fd3db8faa981ec3d34a9b5efcdb4cf3cda0 versus incumbent a609999274528b34741e5d29c1fc861d420d315c6585df26019c7dfc16d44c33.",
+          "statement": "Bounded final interpretation (perturbed evidence): the only complete perturbed event in the packet, execution 8b8ce2691fc24b3392ff5e7fa4905ba4 on near_z_plus, is a valid_failure (F129) driven solely by sampled holding speed 0.06758272073425946 m/s (F123 false, F98 false, F66) while terminal_error_m 0.0028029393033160714 (F6) and holding_max_error_m 0.004094678029888374 (F95) remain inside their limits (F109 true). Because that configuration also changed the near section scale, it is not evidence about the unchanged incumbent.",
+          "supporting_evidence": [
+            "F129",
+            "F123",
+            "F98",
+            "F66",
+            "F6",
+            "F95",
+            "F109"
+          ],
+          "uncertainty": "Single execution confounded by a structure change; the dominant physical cause of the violation is unattributed."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "executed evidence only; no population, unseen-case, three-group or global-optimum claim.",
+          "statement": "Bounded final interpretation (aggregate): within the executed in-scope evidence no configuration has been established that is jointly accepted with strictly non-worsening physical metrics relative to the retained incumbent, and the unchanged incumbent's joint acceptance on the four perturbed frozen cases is unmeasured here. The granted control axes executed so far show either holding-speed failures (higher holding_tip_speed_weight, and terminal_tip_speed_weight 0.025) or a position-worsening trade-off (terminal_tip_speed_weight 0.10), so a non-worsening improvement is unproven rather than disproved.",
+          "supporting_evidence": [
+            "F41",
+            "F81",
+            "F39",
+            "F308",
+            "F256",
+            "F274",
+            "F154",
+            "F186"
+          ],
+          "uncertainty": "The granted search space is not exhausted and a non-worsening point may exist; trade-offs retain the incumbent. No continuous-time, real-time, hardware or causal conclusion follows."
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "action": "structure_search",
+      "decision": {
+        "artifact_id": "9d47b0f3661a7243e45d339c206e297f158f636f5893df229ef2186d8c80354f",
+        "media_type": "application/json"
+      },
+      "mathematical_support": {
+        "candidates": [
+          {
+            "design/near_section_scale": 1.0
+          },
+          {
+            "design/near_section_scale": 1.05
+          }
+        ],
+        "case_id": "nominal",
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F135",
+          "F202",
+          "F204",
+          "F242",
+          "F301",
+          "F308",
+          "F256",
+          "F274",
+          "F263",
+          "F221",
+          "F186",
+          "F154",
+          "F254",
+          "F213",
+          "F39",
+          "F41",
+          "F81"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "Solver max_cpu 30 s / max_iterations 120 and feasible-return 5 / 15 s are frozen with the incumbent recipe, basis and mesh.",
+          "Acceptance is sampled: 6 required holding samples at 0.01 s in [0.30,0.35] s; no continuous-time guarantee is claimed.",
+          "Each point rebuilds only the selected structural path from the retained source and runs one complete stable-v7 closed loop; no inner adaptation search and no extra control budget.",
+          "One execution per configuration; local one-shot closed-loop evidence and any affine reading of the objective cannot guarantee nonlinear reach, braking or perturbation robustness.",
+          "Section scaling changes the bending section and backend mesh; density and bending viscosity and tendon routing stay fixed; no real-time, hardware or global-optimality claim follows."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "An isolated physical design change on one flexible segment (near section scale restored/increased while all controls stay at the incumbent values) can produce a fresh nominal joint reach-and-hold pass on seed 17 whose physical metrics are all no worse than the retained incumbent's, whereas the two granted control tip-speed-weight axes already observed give only a trade-off (outcome 0) or a holding-speed failure (outcome 1).",
+        "max_backend_attempts": 2,
+        "max_candidates": 2,
+        "method": "search.family_explicit@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 2,
+          "model_calls": 10,
+          "tool_calls": 18,
+          "wall_s": 3790.0,
+          "worker_calls": 0
+        },
+        "predecessor_decision": {
+          "artifact_id": "2138f5c3be4674d49dfe044b00cd9aa1b69f307716ef75f45a0ce39d734424da",
+          "media_type": "application/json"
+        },
+        "rationale": "Mathematical assumption: the two control tip-speed weights enter the frozen gvs_nmpc@7.0.0 objective as squared world tip speed normalized by the fixed tip_speed_scale_m_s, while acceptance is a sampled threshold test over six samples in [0.30,0.35] s, so the weight-to-acceptance map is nonconvex and local; similarly the section-scale-to-acceptance map is a nonsmooth sampled map with no closed form. Explicit finite enumeration of two bounded numeric points is deliberate exploration, not mathematical optimization; no gradient, affine or surrogate model is used or claimed. Support and capability limits: only physical design paths and the two control paths are legal here; near_section_scale is a granted, technically supported continuous path whose incumbent value is 0.95 at the lower bound (so only the upward direction 1.00 and 1.05 is reachable), discrete material paths are left unused here, and M5 retained prediction evidence has no screening authority. Allocation: hold both control weights and all other design paths at the incumbent values and vary only design/near_section_scale, evaluating the two ordered points 1.00 then 1.05; each point is rebuilt from the retained source batch-ebbeadbdaca10732-0 and executed once as one complete stable-v7 closed loop on nominal seed 17, giving an incumbent-versus-candidate same-condition comparison against the incumbent's existing nominal datum with no inner search. Expected information: whether restoring/increasing near section scale yields a fresh nominal joint pass, in which direction each physical metric moves, and whether a structural change can achieve strictly non-worsening metrics where the control axes could not. Counterevidence and honest risks: the only executed structural change (near_section_scale 0.96) failed sampled holding speed on near_z_plus, and because it was perturbed and confounded it neither proves nor rules out that this axis can help; a nil or negative result at both points is a live outcome. Exit criteria: stop on any material failure, reservation shortfall or request/correction ceiling, or on voluntary STOP; only a fresh complete correctly bound nominal joint pass with no physical metric worsening (trade-offs retain the incumbent) may later be taken forward to perturbed cases.",
+        "replication_reason": null,
+        "scientific_promise": "uncertain",
+        "seed": 17,
+        "source_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        },
+        "step": null,
+        "stopping_conditions": [
+          "Material or unknown execution failure stops the batch.",
+          "Insufficient complete reservation or cumulative request/correction ceiling stops the batch.",
+          "Voluntary model STOP ends research."
+        ],
+        "target_changed_configurations": 2,
+        "variables": {
+          "design/near_section_scale": {
+            "bounds": [
+              0.95,
+              1.05
+            ],
+            "kind": "continuous"
+          }
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "F154",
+          "F186",
+          "F263",
+          "F221",
+          "F256",
+          "F274"
+        ]
+      },
+      "interpretations": [
+        {
+          "contradicting_evidence": [
+            "F308"
+          ],
+          "scope": "Nominal case, seed 17, frozen offline_reach_hold_v1 acceptance and frozen duration/window/tolerances; retained deliverable only.",
+          "statement": "The retained incumbent batch-ebbeadbdaca10732-0 (execution 91c3ba1b01d6499fb26df8f95409401b) remains a complete, valid, jointly accepted nominal reach-and-hold datum: joint_reach_holding_passed true (F71), acceptance status 'accepted' (F112), validity true (F124), terminal_error_m 0.002697828858325615 (F39), holding_max_error_m 0.0027300544346297905 (F81) and holding_max_speed_m_s 0.012750255515948416 (F41), all inside the frozen 0.01 m and 0.02 m/s limits.",
+          "supporting_evidence": [
+            "F71",
+            "F112",
+            "F124",
+            "F39",
+            "F41",
+            "F81",
+            "F301",
+            "F308"
+          ],
+          "uncertainty": "Single stored execution; sampled six-sample acceptance with no continuous-time guarantee; no matching repeat in this scope, so variance is unknown. Retention is a modelling judgment, not a claim of global optimality or of the largest observed speed margin (F308 records a smaller sampled holding speed at another configuration)."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "Nominal case, seed 17; changed terminal tip-speed weight relative to the retained source; packet comparison to the incumbent classified unavailable because configuration identities differ.",
+          "statement": "Outcome 0 (execution 871e8b83c5d14f9ba813fb65dcb0cc29) is a fresh nominal joint pass with an effective incumbent-relative control change (F204 true, F242 'accepted', F301 true) but is a physical trade-off: holding_max_speed_m_s 0.01025399247985248 (F308) is 0.002496263036095936 m/s below the incumbent's 0.012750255515948416 (F41), while terminal_error_m 0.0032997971664596422 (F274) and holding_max_error_m 0.0033674546591454186 (F256) are 0.0006019683081340272 m and 0.0006374002245156281 m larger than the incumbent's F39 and F81; no physical metric improves without another worsening, so the incumbent is retained.",
+          "supporting_evidence": [
+            "F204",
+            "F242",
+            "F301",
+            "F224",
+            "F308",
+            "F274",
+            "F256",
+            "F41",
+            "F39",
+            "F81"
+          ],
+          "uncertainty": "One execution per configuration; the weight change is not isolated from initializer representation, so no causal attribution is made."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "Nominal case, seed 17; changed terminal tip-speed weight relative to the retained source.",
+          "statement": "Outcome 1 (execution ed8e838859714c17930b16ba7a46e8e1) is a valid_failure (F263, F221 false, F266 false) whose only failing component is sampled holding speed 0.02116571913454289 m/s (F186 false, F154), 0.00116571913454289 m/s above the 0.02 m/s limit, with terminal reach and holding position still passing (F254, F213).",
+          "supporting_evidence": [
+            "F263",
+            "F221",
+            "F266",
+            "F186",
+            "F154",
+            "F254",
+            "F213"
+          ],
+          "uncertainty": "One execution; a changed-candidate failure is not evidence about the unchanged incumbent and cannot screen candidates."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "Executed evidence only; no population, unseen-case, three-group or global-optimum claim.",
+          "statement": "Within the executed in-scope evidence no configuration has been established that is jointly accepted with strictly non-worsening physical metrics relative to the retained incumbent: the control tip-speed-weight axes give a trade-off (outcome 0) or a holding-speed failure (outcome 1), and the single changed structural event (near_section_scale 0.96 on near_z_plus) failed holding speed while confounded. The untested physical design paths therefore remain the least-explored, highest-information direction, and a non-worsening point is unproven rather than disproved.",
+          "supporting_evidence": [
+            "F41",
+            "F81",
+            "F39",
+            "F308",
+            "F274",
+            "F256",
+            "F154",
+            "F186"
+          ],
+          "uncertainty": "The granted eight-variable space is not exhausted and a non-worsening point may exist; trade-offs retain the incumbent. No continuous-time, real-time, hardware or causal conclusion follows."
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "action": "stop",
+      "decision": {
+        "artifact_id": "65a56c6d44c377aee75136cdbe52e62082e208e54ce9234104c180e891809117",
+        "media_type": "application/json"
+      },
+      "mathematical_support": null,
+      "interpretations": [
+        {
+          "contradicting_evidence": [],
+          "scope": "Nominal case, seed 17, frozen offline_reach_hold_v1 acceptance; two changed control-weight candidates relative to the retained source.",
+          "statement": "The latest completed development batch (batch-396bdbbae02626d3) contains exactly two outcomes: outcome 0 (execution 871e8b83c5d14f9ba813fb65dcb0cc29) is an accepted joint reach-and-hold pass, and outcome 1 (execution ed8e838859714c17930b16ba7a46e8e1) is a valid_failure with joint_reach_holding_passed false.",
+          "supporting_evidence": [
+            "F248",
+            "F242",
+            "F204",
+            "F301",
+            "F263",
+            "F221",
+            "F266"
+          ],
+          "uncertainty": "Two executions only; sampled six-sample acceptance with no continuous-time guarantee; no matching repeat, so variance and repeatability remain unknown."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "Nominal, seed 17; changed terminal/holding tip-speed weight; incumbent is batch-ebbeadbdaca10732-0 (execution 91c3ba1b01d6499fb26df8f95409401b).",
+          "statement": "Outcome 0 is a physical trade-off relative to the retained incumbent, not an overall improvement: its sampled holding_max_speed_m_s 0.01025399247985248 is 0.002496263036095936 m/s below the incumbent's recorded 0.012750255515948416, while its terminal_error_m 0.0032997971664596422 and holding_max_error_m 0.0033674546591454186 are 0.0006019683081340272 m and 0.0006374002245156281 m larger than the incumbent's recorded 0.002697828858325615 and 0.0027300544346297905.",
+          "supporting_evidence": [
+            "F204",
+            "F301",
+            "F308",
+            "F274",
+            "F256",
+            "F167",
+            "F41",
+            "F39",
+            "F81"
+          ],
+          "uncertainty": "One execution; the weight change is not isolated from the changed initializer representation (different task identity), so no causal attribution and no strict non-worsening point is established."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "Nominal, seed 17; changed control weight; status valid_failure.",
+          "statement": "Outcome 1 is a joint failure whose only failing acceptance component is sampled holding speed 0.02116571913454289 m/s, 0.00116571913454289 above the 0.02 m/s limit, while terminal reach and holding position still pass; the joint result is authoritative and the terminal pass does not offset it.",
+          "supporting_evidence": [
+            "F263",
+            "F221",
+            "F266",
+            "F186",
+            "F154",
+            "F254",
+            "F213",
+            "F205"
+          ],
+          "uncertainty": "One execution; a changed-candidate failure is not evidence about the unchanged incumbent and cannot screen candidates."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "Executed campaign evidence plus the single changed structural perturbed event; no population, unseen-case, three-group or global-optimum claim.",
+          "statement": "Across executed in-scope evidence no configuration has been established that is jointly accepted with strictly non-worsening physical metrics relative to the retained incumbent, and the incumbent's own perturbed-case performance remains unmeasured here because the only complete perturbed event also changed the near section scale and is a changed-candidate valid_failure on holding speed (0.06758272073425946 m/s) with terminal and holding position still passing.",
+          "supporting_evidence": [
+            "F204",
+            "F308",
+            "F274",
+            "F256",
+            "F263",
+            "F186",
+            "F154",
+            "F98",
+            "F66",
+            "F6",
+            "F95"
+          ],
+          "uncertainty": "The granted eight-variable catalog is not exhausted; a non-worsening point may exist but is unproven, and trade-offs retain the incumbent."
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "action": "structure_search",
+      "decision": {
+        "artifact_id": "9d47b0f3661a7243e45d339c206e297f158f636f5893df229ef2186d8c80354f",
+        "media_type": "application/json"
+      },
+      "mathematical_support": {
+        "candidates": [
+          {
+            "design/near_section_scale": 1.0
+          },
+          {
+            "design/near_section_scale": 1.05
+          }
+        ],
+        "case_id": "nominal",
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F135",
+          "F202",
+          "F204",
+          "F242",
+          "F301",
+          "F308",
+          "F256",
+          "F274",
+          "F263",
+          "F221",
+          "F186",
+          "F154",
+          "F254",
+          "F213",
+          "F39",
+          "F41",
+          "F81"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "Solver max_cpu 30 s / max_iterations 120 and feasible-return 5 / 15 s are frozen with the incumbent recipe, basis and mesh.",
+          "Acceptance is sampled: 6 required holding samples at 0.01 s in [0.30,0.35] s; no continuous-time guarantee is claimed.",
+          "Each point rebuilds only the selected structural path from the retained source and runs one complete stable-v7 closed loop; no inner adaptation search and no extra control budget.",
+          "One execution per configuration; local one-shot closed-loop evidence and any affine reading of the objective cannot guarantee nonlinear reach, braking or perturbation robustness.",
+          "Section scaling changes the bending section and backend mesh; density and bending viscosity and tendon routing stay fixed; no real-time, hardware or global-optimality claim follows."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "An isolated physical design change on one flexible segment (near section scale restored/increased while all controls stay at the incumbent values) can produce a fresh nominal joint reach-and-hold pass on seed 17 whose physical metrics are all no worse than the retained incumbent's, whereas the two granted control tip-speed-weight axes already observed give only a trade-off (outcome 0) or a holding-speed failure (outcome 1).",
+        "max_backend_attempts": 2,
+        "max_candidates": 2,
+        "method": "search.family_explicit@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 2,
+          "model_calls": 10,
+          "tool_calls": 18,
+          "wall_s": 3790.0,
+          "worker_calls": 0
+        },
+        "predecessor_decision": {
+          "artifact_id": "2138f5c3be4674d49dfe044b00cd9aa1b69f307716ef75f45a0ce39d734424da",
+          "media_type": "application/json"
+        },
+        "rationale": "Mathematical assumption: the two control tip-speed weights enter the frozen gvs_nmpc@7.0.0 objective as squared world tip speed normalized by the fixed tip_speed_scale_m_s, while acceptance is a sampled threshold test over six samples in [0.30,0.35] s, so the weight-to-acceptance map is nonconvex and local; similarly the section-scale-to-acceptance map is a nonsmooth sampled map with no closed form. Explicit finite enumeration of two bounded numeric points is deliberate exploration, not mathematical optimization; no gradient, affine or surrogate model is used or claimed. Support and capability limits: only physical design paths and the two control paths are legal here; near_section_scale is a granted, technically supported continuous path whose incumbent value is 0.95 at the lower bound (so only the upward direction 1.00 and 1.05 is reachable), discrete material paths are left unused here, and M5 retained prediction evidence has no screening authority. Allocation: hold both control weights and all other design paths at the incumbent values and vary only design/near_section_scale, evaluating the two ordered points 1.00 then 1.05; each point is rebuilt from the retained source batch-ebbeadbdaca10732-0 and executed once as one complete stable-v7 closed loop on nominal seed 17, giving an incumbent-versus-candidate same-condition comparison against the incumbent's existing nominal datum with no inner search. Expected information: whether restoring/increasing near section scale yields a fresh nominal joint pass, in which direction each physical metric moves, and whether a structural change can achieve strictly non-worsening metrics where the control axes could not. Counterevidence and honest risks: the only executed structural change (near_section_scale 0.96) failed sampled holding speed on near_z_plus, and because it was perturbed and confounded it neither proves nor rules out that this axis can help; a nil or negative result at both points is a live outcome. Exit criteria: stop on any material failure, reservation shortfall or request/correction ceiling, or on voluntary STOP; only a fresh complete correctly bound nominal joint pass with no physical metric worsening (trade-offs retain the incumbent) may later be taken forward to perturbed cases.",
+        "replication_reason": null,
+        "scientific_promise": "uncertain",
+        "seed": 17,
+        "source_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        },
+        "step": null,
+        "stopping_conditions": [
+          "Material or unknown execution failure stops the batch.",
+          "Insufficient complete reservation or cumulative request/correction ceiling stops the batch.",
+          "Voluntary model STOP ends research."
+        ],
+        "target_changed_configurations": 2,
+        "variables": {
+          "design/near_section_scale": {
+            "bounds": [
+              0.95,
+              1.05
+            ],
+            "kind": "continuous"
+          }
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "F154",
+          "F186",
+          "F263",
+          "F221",
+          "F256",
+          "F274"
+        ]
+      },
+      "interpretations": [
+        {
+          "contradicting_evidence": [
+            "F308"
+          ],
+          "scope": "Nominal case, seed 17, frozen offline_reach_hold_v1 acceptance and frozen duration/window/tolerances; retained deliverable only.",
+          "statement": "The retained incumbent batch-ebbeadbdaca10732-0 (execution 91c3ba1b01d6499fb26df8f95409401b) remains a complete, valid, jointly accepted nominal reach-and-hold datum: joint_reach_holding_passed true (F71), acceptance status 'accepted' (F112), validity true (F124), terminal_error_m 0.002697828858325615 (F39), holding_max_error_m 0.0027300544346297905 (F81) and holding_max_speed_m_s 0.012750255515948416 (F41), all inside the frozen 0.01 m and 0.02 m/s limits.",
+          "supporting_evidence": [
+            "F71",
+            "F112",
+            "F124",
+            "F39",
+            "F41",
+            "F81",
+            "F301",
+            "F308"
+          ],
+          "uncertainty": "Single stored execution; sampled six-sample acceptance with no continuous-time guarantee; no matching repeat in this scope, so variance is unknown. Retention is a modelling judgment, not a claim of global optimality or of the largest observed speed margin (F308 records a smaller sampled holding speed at another configuration)."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "Nominal case, seed 17; changed terminal tip-speed weight relative to the retained source; packet comparison to the incumbent classified unavailable because configuration identities differ.",
+          "statement": "Outcome 0 (execution 871e8b83c5d14f9ba813fb65dcb0cc29) is a fresh nominal joint pass with an effective incumbent-relative control change (F204 true, F242 'accepted', F301 true) but is a physical trade-off: holding_max_speed_m_s 0.01025399247985248 (F308) is 0.002496263036095936 m/s below the incumbent's 0.012750255515948416 (F41), while terminal_error_m 0.0032997971664596422 (F274) and holding_max_error_m 0.0033674546591454186 (F256) are 0.0006019683081340272 m and 0.0006374002245156281 m larger than the incumbent's F39 and F81; no physical metric improves without another worsening, so the incumbent is retained.",
+          "supporting_evidence": [
+            "F204",
+            "F242",
+            "F301",
+            "F224",
+            "F308",
+            "F274",
+            "F256",
+            "F41",
+            "F39",
+            "F81"
+          ],
+          "uncertainty": "One execution per configuration; the weight change is not isolated from initializer representation, so no causal attribution is made."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "Nominal case, seed 17; changed terminal tip-speed weight relative to the retained source.",
+          "statement": "Outcome 1 (execution ed8e838859714c17930b16ba7a46e8e1) is a valid_failure (F263, F221 false, F266 false) whose only failing component is sampled holding speed 0.02116571913454289 m/s (F186 false, F154), 0.00116571913454289 m/s above the 0.02 m/s limit, with terminal reach and holding position still passing (F254, F213).",
+          "supporting_evidence": [
+            "F263",
+            "F221",
+            "F266",
+            "F186",
+            "F154",
+            "F254",
+            "F213"
+          ],
+          "uncertainty": "One execution; a changed-candidate failure is not evidence about the unchanged incumbent and cannot screen candidates."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "Executed evidence only; no population, unseen-case, three-group or global-optimum claim.",
+          "statement": "Within the executed in-scope evidence no configuration has been established that is jointly accepted with strictly non-worsening physical metrics relative to the retained incumbent: the control tip-speed-weight axes give a trade-off (outcome 0) or a holding-speed failure (outcome 1), and the single changed structural event (near_section_scale 0.96 on near_z_plus) failed holding speed while confounded. The untested physical design paths therefore remain the least-explored, highest-information direction, and a non-worsening point is unproven rather than disproved.",
+          "supporting_evidence": [
+            "F41",
+            "F81",
+            "F39",
+            "F308",
+            "F274",
+            "F256",
+            "F154",
+            "F186"
+          ],
+          "uncertainty": "The granted eight-variable space is not exhausted and a non-worsening point may exist; trade-offs retain the incumbent. No continuous-time, real-time, hardware or causal conclusion follows."
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "action": "structure_search",
+      "decision": {
+        "artifact_id": "74b1bcf6caabe9dbbd04775d100766c59ccaaf004079acf6c03e703db62c618a",
+        "media_type": "application/json"
+      },
+      "mathematical_support": {
+        "candidates": [
+          {
+            "design/far_section_scale": 1.0
+          },
+          {
+            "design/far_section_scale": 1.05
+          }
+        ],
+        "case_id": "nominal",
+        "constraints": [
+          "frozen_acceptance",
+          "force_bounds",
+          "finite_valid_execution"
+        ],
+        "contract": "platform.search_batch_plan",
+        "evidence": [
+          "F414",
+          "F430",
+          "F460",
+          "F454",
+          "F415",
+          "F360",
+          "F350",
+          "F501",
+          "F461",
+          "F325",
+          "F405",
+          "F482",
+          "F437"
+        ],
+        "failure_policy": "stop_on_material_failure",
+        "fidelity_limits": [
+          "Sampled six-sample holding acceptance; no continuous-time guarantee.",
+          "Single seed 17; seed 18 and seed variance unmeasured.",
+          "Two single-change points cannot map the granted eight-variable space, and finite enumeration is not mathematical optimization.",
+          "No local model of the far-section response; nonlinear reach, braking and perturbation robustness are unproven.",
+          "Identity-based incumbent comparison is classified unavailable, so comparisons are descriptive against recorded incumbent metrics."
+        ],
+        "fixed_conditions": [
+          "robot",
+          "task",
+          "acceptance",
+          "controller_implementation",
+          "other_numerical_settings"
+        ],
+        "fixed_controller": "controller.gvs_nmpc@7.0.0",
+        "hypothesis": "Under the frozen nominal case, seed 17, stable controller.gvs_nmpc@7.0.0 and frozen numerical settings, raising the far-segment bending section scale design/far_section_scale from the incumbent 0.95 to 1.00 and 1.05, with every other path (including both control tip-speed weights at 0.05) held at the incumbent, produces one fresh nominal complete closed-loop execution per point; if far-segment stiffening reduces residual tip motion, at least one point is jointly accepted (joint_reach_holding_passed, acceptance 'accepted') with sampled holding speed not larger than the incumbent's 0.012750 m/s and terminal/holding position error not larger than 0.002698 m / 0.002730 m, giving a componentwise non-dominated eligible candidate; otherwise both points characterise this axis as a trade-off or failure. No directional effect is assumed or guaranteed.",
+        "max_backend_attempts": 2,
+        "max_candidates": 2,
+        "method": "search.family_explicit@1.0.0",
+        "objectives": [
+          "joint_reach_holding_acceptance",
+          "terminal_error_m",
+          "holding_max_error_m",
+          "holding_max_speed_m_s"
+        ],
+        "planned_budget": {
+          "backend_solves": 2,
+          "model_calls": 8,
+          "tool_calls": 14,
+          "wall_s": 2700.0,
+          "worker_calls": 0
+        },
+        "predecessor_decision": {
+          "artifact_id": "9d47b0f3661a7243e45d339c206e297f158f636f5893df229ef2186d8c80354f",
+          "media_type": "application/json"
+        },
+        "rationale": "Action: structure_search with search.family_explicit@1.0.0 on one untested continuous structural path, because the newest nominal seed17 feedback probed only the near-section axis (1.00 dominated pass, F415/F360/F350; 1.05 confounded holding-speed failure, F482/F405) and the control-only axes have given only a speed/position trade-off or failure. The incumbent is at the granted lower bound of both section scales, so a non-dominated point cannot come from reducing scale; the far-segment section scale is the directly analogous untested continuous axis. I change exactly one path per candidate (single-change, incumbent-relative) so each point is interpretable, hold robot, task, acceptance, controller implementation and all numerical settings fixed, and keep both control tip-speed weights frozen at 0.05/0.05 so there is zero control adaptation and all variation is structural. Each selected value set rebuilds the structure/workspace/warm states and runs one unchanged stable-v7 closed loop on the nominal case, seed 17; there is no hidden inner adaptation search and no extra control budget. Method rationale: the explicit method evaluates my own ordered points with null step; two levels on one bounded coordinate give only a minimal dose-response, not a mathematical optimization, and no categorical material choice is interpolated. Expected information: whether far-segment stiffening can lower sampled holding speed without worsening terminal or holding position error; a joint pass with non-worsening metrics would be an eligible candidate for retention review, whereas a dominated pass or holding-speed failure closes this axis and directs the remaining untested paths (segments/near length, segments/far length, material scenarios). Control adaptation allocation: none (weights fixed). Counterevidence: acceptance is six-sample with no continuous-time guarantee, identity-based comparison with the incumbent is unavailable, the far-section response is unmodelled, and local evidence cannot guarantee nonlinear reach, braking or perturbation robustness. Exit criteria: complete evaluation plus profile of both changed configurations, or first material/unknown failure, or budget/correction ceiling.",
+        "replication_reason": null,
+        "scientific_promise": "uncertain",
+        "seed": 17,
+        "source_candidate": {
+          "candidate_id": "batch-ebbeadbdaca10732-0",
+          "configuration": {
+            "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+            "media_type": "application/json"
+          },
+          "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+          "owner_run_id": "batch-ebbeadbdaca10732-0"
+        },
+        "step": null,
+        "stopping_conditions": [
+          "Both changed configurations reach complete evaluation and profile (target_changed_configurations=2).",
+          "Any material or unknown execution failure, fail-closed under stop_on_material_failure.",
+          "Insufficient complete reservation or cumulative request/correction ceiling.",
+          "Any candidate fresh nominal joint pass with componentwise non-worsening metrics ends search and triggers retention review.",
+          "Voluntary model STOP."
+        ],
+        "target_changed_configurations": 2,
+        "variables": {
+          "design/far_section_scale": {
+            "bounds": [
+              0.95,
+              1.05
+            ],
+            "kind": "continuous"
+          }
+        },
+        "verification": [
+          "candidate.apply",
+          "simulation.run",
+          "evaluation.run",
+          "control.profile_report",
+          "bound_comparison",
+          "diagnostic_revision"
+        ],
+        "version": "1.0.0",
+        "weakening_observations": [
+          "The single changed near-section 0.96 execution on the perturbed near_z_plus case failed holding speed at 0.0676 m/s (execution 8b8ce269); it is case-confounded and weakens any prior that raising a bending section scale lowers holding speed.",
+          "The fresh near_section_scale ~1.00 point (execution 054cb6d5) was jointly accepted but strictly worse than the incumbent on all three sampled metrics (F415 0.003195 m, F360 0.003323 m, F350 0.013737 m/s versus 0.002698 m, 0.002730 m, 0.012750 m/s), so a structural scale increase is at least as likely to worsen as to improve.",
+          "Sampled holding speed is not monotone in the frozen weights, so a frozen-weight structural probe may land on a non-monotone response.",
+          "The incumbent already sits at the granted lower bound 0.95 of both section scales, so no downward structural scale move is available to recover position error."
+        ]
+      },
+      "interpretations": [
+        {
+          "contradicting_evidence": [],
+          "scope": "Nominal case, seed 17, frozen offline_reach_hold_v1 acceptance, frozen timing/tolerances and stable controller.gvs_normpc@7.0.0; current campaign feedback only.",
+          "statement": "Outcome 0 (execution 054cb6d5) is a fresh, valid, jointly accepted nominal point (F414, F430, F460, F454) that is strictly dominated by the retained incumbent on every sampled physical metric: terminal_error_m 0.003195 m (F415), holding_max_error_m 0.003323 m (F360) and holding_max_speed_m_s 0.013737 m/s (F350) versus the incumbent's recorded 0.002698 m, 0.002730 m and 0.012750 m/s. Outcome 1 (execution dfb3b398) is a valid_failure (F501, F461, F325) whose sole failing component is sampled holding speed 0.054581 m/s (F482, F405); it changes more than one path, so it is confounded and says nothing about the unchanged incumbent.",
+          "supporting_evidence": [
+            "F414",
+            "F430",
+            "F460",
+            "F454",
+            "F415",
+            "F360",
+            "F350",
+            "F501",
+            "F461",
+            "F325",
+            "F482",
+            "F405"
+          ],
+          "uncertainty": "Identity-based incumbent comparison is classified unavailable because configuration identities differ, so the comparison above is descriptive against recorded incumbent metrics; one execution per configuration; no causal attribution and no continuous-time guarantee."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "Executed in-scope evidence only; no population, seed-18, unseen-case, three-group or global-optimum claim.",
+          "statement": "No executed configuration in this scope is yet established as jointly accepted with all three sampled physical metrics non-worsening relative to the retained incumbent; tested deviations give dominated passes (F415/F360/F350) or holding-speed failures (F482). The granted structural region is therefore the highest-information affordable direction: near_section_scale has been probed upward (1.00 dominated pass, 1.05 confounded failure), while design/far_section_scale, components/near/length_m, components/far/length_m and both material scenarios remain untested on nominal.",
+          "supporting_evidence": [
+            "F350",
+            "F415",
+            "F360",
+            "F482",
+            "F437"
+          ],
+          "uncertainty": "Untested points may be non-worsening, dominated or failing; the granted eight-variable catalog is not exhausted and local evidence cannot guarantee nonlinear reach, braking or perturbation robustness."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "Recorded campaign control-weight points at the retained structure; descriptive association only.",
+          "statement": "Sampled holding speed at the frozen structure is not monotone in the frozen control tip-speed weights: higher holding penalties recorded higher sampled holding speed, and the one control-weight change that lowered holding speed did so while enlarging terminal and holding position error. Control-only adaptation therefore currently yields only trade-offs or failures, which motivates an isolated structural probe at frozen weights.",
+          "supporting_evidence": [
+            "F350",
+            "F415",
+            "F360",
+            "F482"
+          ],
+          "uncertainty": "Single executions, confounded representation differences between initializer records, and only two weight values per axis executed; no monotonicity, causality or continuous-time claim is made."
+        }
+      ]
+    }
+  ],
+  "standalone_numerical_operations": 0,
+  "workers": 0,
+  "subagents": 0,
+  "implementation": {
+    "commit": "3c32cdc00814c608b9833dc440799acf9a42a7c1",
+    "files": {
+      "examples/research_model_v1.py": "1e3271f9c49c72cf8e0482267f5132e9fd3a0cb89b6da5caf8b2c75260f8cdf6",
+      "examples/milestone4_autonomous.py": "764462cb45bb72b5f5f506f2dad38a1d46de8a9e67a3c8ece1143070c8057a44",
+      "configs/research/native_pilot_v1.json": "b096d68d9f85bd53cd686ce8e697f992e45ae5696533600e15c851c86b6ab375",
+      "tools/research_scheduler.py": "c1f87413e57fec390b7afb0870978da67068149f673ee20c3cb9fb312c652e12",
+      "tools/platform_search.py": "fdf8fdde435010b2365adbe32a4243408aaffd7ab4bcc0b830c59a33a8a99035",
+      "tools/live_batch_execution.py": "9c59f58453ea876ca7be00c724737d55b9d4ce30a83a6cffc3b4d5e3bb3fad8e",
+      "tools/context_assembly.py": "58e20e3f334cbc4ef6a7d5729112b4e102f7d63ecf3613176c4eb7ca3dfdec09",
+      "tools/diagnostic_reference_adapter.py": "de5219506250c92a152d5a3f5b706ea25acacab3b2c165eaede9f5284e57c53e",
+      "examples/research_campaign_v2.py": "9ca313c8cdffe052ca9bf4dd678cd916c3389f236170a77cc205ab3468c88ce1",
+      "configs/research/native_campaign_v2.json": "abcf6ebc59b8870366d607db15345b48b04e65c8e921b8e6e2611bc304033bc3",
+      "schemas/platform_handoff.py": "0cf890ec8dcadb94d05e1781cf20d6b0ec5de048a92ba50ebe941b6f722916f7",
+      "tools/batch_budget.py": "fa00c59d7a05d08d24e5b853e066a1d097c4b1456ab1e23dde1b243c637c609a",
+      "tools/research_spec.py": "df3e03575a54a4c67c5dc4b6a42625eda6940cfe980d1ca8874dd67a06c9b153",
+      "tools/study_history.py": "4697e64b4643e73ab675688e477299dcfe742002d36be89d49b819f4aeb15b70",
+      "tools/candidate_parameters.py": "f8cc776de2d4be1296bb1bb3537e618724d44764379cd9687629d5c8178601d5",
+      "tools/research_tasks.py": "c728710c80d97c48e53c31422a1f0aece54093e686b0d512c8f7cba0654101c9",
+      "tools/fixed_research.py": "27207dc82c489ce3f90669fd252530628fef7a65d3b543c56869ddfd2bc5891f",
+      "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43",
+      "tools/verification_evidence.py": "c9461fcdd882a1c1e0301fe0babff4fef2db76a7d36a311f3a5c9b4ecab8963f",
+      "examples/research_campaign_v3.py": "cf07b2b43c9fe8ffce030f173de594c1d1145727528b3ba2859dccc47d3ae9d9",
+      "configs/research/native_campaign_v3.json": "6f236fe78aac4a2ea0bd5a91d25bc4034599be83a4703210357d77549984ddf2",
+      "tools/current_research_authority.py": "fc8f134434e6116455c2bd9f16a05b8a08dea58dbf2c652fba5cffab8380eed1",
+      "tools/platform_models.py": "a9e915bb8b2d75bc76c33fd2e37a5dbb11dfc3c2e5dbe6325580d59c36627503",
+      "tools/structural_continuation.py": "64611933122a1d06e4a477e05ff1c675ed0caccffafdf0a60788c00415e344db"
+    },
+    "stable_controller": {
+      "extensions/tendon_family/gvs_nmpc.py": "e3d6c33acf8fe6ab326de84634c0a4edf11ffe67ade1b9b72d9527787aae4e5a",
+      "extensions/tendon_family/gvs_trajectory.py": "160b47df2f0958929527d4871c61a66e3c69d766b7406144c97cb197ad65292b",
+      "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43"
+    }
+  },
+  "historical_answers_unchanged": true,
+  "formal_groups_not_launched": true,
+  "provider_usage": [
+    {
+      "request_id": "model-0",
+      "usage": {
+        "completion_tokens": 20962,
+        "completion_tokens_details": {
+          "reasoning_tokens": 17555
+        },
+        "prompt_cache_hit_tokens": 3840,
+        "prompt_cache_miss_tokens": 34556,
+        "prompt_tokens": 38396,
+        "prompt_tokens_details": {
+          "cached_tokens": 3840
+        },
+        "total_tokens": 59358
+      }
+    },
+    {
+      "request_id": "model-1",
+      "usage": {
+        "completion_tokens": 5769,
+        "completion_tokens_details": {
+          "reasoning_tokens": 5698
+        },
+        "prompt_cache_hit_tokens": 3456,
+        "prompt_cache_miss_tokens": 38545,
+        "prompt_tokens": 42001,
+        "prompt_tokens_details": {
+          "cached_tokens": 3456
+        },
+        "total_tokens": 47770
+      }
+    },
+    {
+      "request_id": "model-2",
+      "usage": {
+        "completion_tokens": 8440,
+        "completion_tokens_details": {
+          "reasoning_tokens": 4996
+        },
+        "prompt_cache_hit_tokens": 3456,
+        "prompt_cache_miss_tokens": 38616,
+        "prompt_tokens": 42072,
+        "prompt_tokens_details": {
+          "cached_tokens": 3456
+        },
+        "total_tokens": 50512
+      }
+    },
+    {
+      "request_id": "model-3",
+      "usage": {
+        "completion_tokens": 47372,
+        "completion_tokens_details": {
+          "reasoning_tokens": 44216
+        },
+        "prompt_cache_hit_tokens": 128,
+        "prompt_cache_miss_tokens": 41746,
+        "prompt_tokens": 41874,
+        "prompt_tokens_details": {
+          "cached_tokens": 128
+        },
+        "total_tokens": 89246
+      }
+    },
+    {
+      "request_id": "model-4",
+      "usage": {
+        "completion_tokens": 23119,
+        "completion_tokens_details": {
+          "reasoning_tokens": 19108
+        },
+        "prompt_cache_hit_tokens": 3456,
+        "prompt_cache_miss_tokens": 41297,
+        "prompt_tokens": 44753,
+        "prompt_tokens_details": {
+          "cached_tokens": 3456
+        },
+        "total_tokens": 67872
+      }
+    },
+    {
+      "request_id": "model-5",
+      "usage": {
+        "completion_tokens": 15579,
+        "completion_tokens_details": {
+          "reasoning_tokens": 13418
+        },
+        "prompt_cache_hit_tokens": 4736,
+        "prompt_cache_miss_tokens": 38746,
+        "prompt_tokens": 43482,
+        "prompt_tokens_details": {
+          "cached_tokens": 4736
+        },
+        "total_tokens": 59061
+      }
+    },
+    {
+      "request_id": "model-6",
+      "usage": {
+        "completion_tokens": 30812,
+        "completion_tokens_details": {
+          "reasoning_tokens": 27344
+        },
+        "prompt_cache_hit_tokens": 4992,
+        "prompt_cache_miss_tokens": 41174,
+        "prompt_tokens": 46166,
+        "prompt_tokens_details": {
+          "cached_tokens": 4992
+        },
+        "total_tokens": 76978
+      }
+    }
+  ],
+  "known_token_subtotal": {
+    "prompt_tokens": 298744,
+    "completion_tokens": 152053,
+    "total_tokens": 450797
+  },
+  "usage_limitations": [
+    "Failed requests without supplied usage remain unknown; monetary billing unknown.",
+    "Embedded controller updates are backend work; zero standalone numerical experiments does not mean zero numerical computation."
+  ]
+}

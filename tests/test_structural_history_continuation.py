@@ -57,8 +57,9 @@ class StructuralHistoryContinuationTests(TestCase):
         self.w.records=deepcopy(self.w.records)
         for r in self.w.records:
             if Path(r['source_store']).resolve()==LIVE.resolve():r['source_store']=str(self.directory)
-        self.original_batch=deepcopy(self.w.store.session(self.w.host.run_id)['state']['search_batch'])
-        self.plan=self.original_batch['plan']
+        if getattr(self,'needs_original_batch',True):
+            self.original_batch=deepcopy(self.w.store.session(self.w.host.run_id)['state']['search_batch'])
+            self.plan=self.original_batch['plan']
         self.original_bytes={r['facts']['configuration']['artifact_id']:
             self.w.store.artifact(r['facts']['configuration'],raw=True) for r in self.w.records}
         self.blockers=[patch('tools.model_transports.deepseek.request_completion',side_effect=AssertionError('OFFLINE_PROVIDER_PROHIBITED')),
