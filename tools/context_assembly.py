@@ -352,6 +352,11 @@ def assemble_context(purpose, packet, *, archive, authority=None):
         sources=dict(reference=original, pointer='/packet', verified_retrievable=True),
         detail_access='Read only original pointers using EvidenceArchive.retrieve or already advertised evidence.read/diagnosis.inspect_evidence. No hidden model tools; if required input cannot fit, preparation fails.',
         retrieval_permission_scope=archive.scope)
+    if purpose=='final_report' and authority.get('prefetched_report_only'):
+        if authority.get('legal_actions') != {'report': {'execution_authorized': False}}:
+            raise ValueError('CONTEXT_REPORT_PERMISSION_REQUIRED')
+        reduced['working_context']['detail_access']='All required evidence is prefetched. References are archive provenance, not model-callable retrieval. No scientific or read tools are available in this report request.'
+        reduced['working_context']['sources']['verified_retrievable']=False
     # M4 already carries replications in its normalized canonical packet.
     if 'replications' in reduced: reduced['working_context'].pop('recorded_replications')
     if purpose=='research_decision' and 'history' in packet:

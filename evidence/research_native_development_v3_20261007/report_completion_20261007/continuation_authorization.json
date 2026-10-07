@@ -1,0 +1,180 @@
+{
+  "authorization": {
+    "version": "completed_verification_report@1.0.0",
+    "source_attachment": "C:\\Users\\gugugaga\\.codex\\attachments\\da43daec-e064-42d0-ba7d-30276c43d87c\\已粘贴的文本.txt",
+    "source_sha256": "5a773ec743d193fc5797190ff072b403e1e1bdc26a9c828a5bc6f3f2e26b2627",
+    "same_campaign": "research_native_development_v3_20261007",
+    "same_session": "research_native_development_v3_20261007-research",
+    "original_clock": {
+      "version": "successor_clock@3.0.0",
+      "origin_unix": 1791341029.4261196,
+      "deadline_unix": 1791377029.4261196,
+      "reset_permitted": false,
+      "subsequent_waits_pause_clock": false
+    },
+    "original_grant": "3a741865c1d34125a700fa248798da1b91cd70f4ed03ccf8354bf0d9fca4bdf6",
+    "started_unix": 1791362888.0,
+    "baseline": {
+      "limit": {
+        "backend_solves": 28,
+        "model_calls": 24,
+        "tool_calls": 200,
+        "wall_s": 36000.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 106,
+        "model_calls": 10,
+        "backend_solves": 26,
+        "worker_calls": 0,
+        "wall_s": 18361.17524650578
+      },
+      "remaining": {
+        "backend_solves": 2,
+        "model_calls": 14,
+        "tool_calls": 94,
+        "wall_s": 17638.82475349422,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "previous_repairs": 7,
+    "cumulative_material_repairs": 8,
+    "allowed_files": [
+      "tools/bound_reporting.py",
+      "tools/context_assembly.py",
+      "tools/report_completion.py",
+      "examples/research_campaign_v3.py"
+    ],
+    "prior_failure": {
+      "error": "CONTEXT_VERIFICATION_METRIC_JOIN_CONFLICT",
+      "original_request_snapshot": "runs\\research_native_development_v3_20261007\\context_assembly\\sources\\6f75ad7ed6c582a4d4b27af1a71777aa45cd758958a722b4d0e6f2f08e85c64f.json",
+      "snapshot_sha256": "6f75ad7ed6c582a4d4b27af1a71777aa45cd758958a722b4d0e6f2f08e85c64f",
+      "conflicts": [
+        {
+          "execution_id": "a8ba333d53a843ecabf97255fd57b4eb",
+          "metric": "terminal_error_m",
+          "verification_value": 0.002697828858325615,
+          "bound_value": 0.0026978288583256148,
+          "difference": 4.336808689942018e-19,
+          "source_fact": "f_96edaddd1d3309826302"
+        },
+        {
+          "execution_id": "118534127d8b47fe97f0dfd81df16240",
+          "metric": "terminal_error_m",
+          "verification_value": 0.002697828858325615,
+          "bound_value": 0.0026978288583256148,
+          "difference": 4.336808689942018e-19,
+          "source_fact": "f_c331bc418b39770ae17e"
+        }
+      ],
+      "repair_ceiling": 7,
+      "repairs_used": 7,
+      "provider_dispatch": false,
+      "backend_replayed": false,
+      "production_files_changed": false
+    },
+    "scientific_stop": {
+      "reason": "Voluntary STOP under a capacity-bound correction: the only planned action was rejected as plan-total-capacity-insufficient (planned wall_s 590 vs available wall_s 0), no capacity-fitting search plan or bound numerical diagnosis is authorized in this allowance, and the latest complete feedback (batch-d86d193) shows no componentwise non-worsening improvement over the retained incumbent. Delivery remains legal and ends research with a bounded interpretation.",
+      "sealed_cases": [
+        {
+          "case_id": "nominal",
+          "final_decision": {
+            "artifact_id": "f0c3cb5649906e28be11d351bd01b19e63d7dcee324e5c58de797542dd300aa8",
+            "media_type": "application/json"
+          },
+          "selected_candidate": {
+            "candidate_id": "batch-ebbeadbdaca10732-0",
+            "configuration": {
+              "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+              "media_type": "application/json"
+            },
+            "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+            "owner_run_id": "batch-ebbeadbdaca10732-0"
+          },
+          "status": "model_stopped",
+          "stop_reason": "Voluntary STOP under a capacity-bound correction: the only planned action was rejected as plan-total-capacity-insufficient (planned wall_s 590 vs available wall_s 0), no capacity-fitting search plan or bound numerical diagnosis is authorized in this allowance, and the latest complete feedback (batch-d86d193) shows no componentwise non-worsening improvement over the retained incumbent. Delivery remains legal and ends research with a bounded interpretation.",
+          "usage": {
+            "limit": {
+              "backend_solves": 28,
+              "model_calls": 24,
+              "tool_calls": 200,
+              "wall_s": 36000.0,
+              "worker_calls": 0
+            },
+            "occupied": {},
+            "remaining": {
+              "backend_solves": 22,
+              "model_calls": 14,
+              "tool_calls": 155,
+              "wall_s": 26760.62363631044,
+              "worker_calls": 0
+            },
+            "used": {
+              "backend_solves": 6,
+              "model_calls": 10,
+              "tool_calls": 45,
+              "wall_s": 9239.37636368956,
+              "worker_calls": 0
+            }
+          }
+        }
+      ],
+      "status": "model_stopped"
+    },
+    "provider_config": {
+      "adapter": "deepseek",
+      "adapter_version": "6.0.0",
+      "base_url": "https://api.deepseek.com",
+      "context_bytes": 400000,
+      "context_guard": {
+        "context_limit_tokens": 1000000,
+        "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+        "framing_headroom_tokens": 8192,
+        "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+        "verified_date": "2026-10-03"
+      },
+      "length_recovery": {
+        "enabled": true,
+        "max_tokens": 131072,
+        "timeout_s": 900.0
+      },
+      "max_no_progress": 3,
+      "max_repairs": 2,
+      "max_tokens": 65536,
+      "max_turns": 24,
+      "model": "deepseek-flash",
+      "parameters": {},
+      "protocol_recovery": {
+        "max_consecutive": 2,
+        "max_total": 4
+      },
+      "readonly_batch_limit": 3,
+      "reasoning_effort": "high",
+      "strategy": "strategy.tool",
+      "strategy_version": "1.0.0",
+      "supports_images": false,
+      "supports_text": true,
+      "supports_tools": true,
+      "thinking": "enabled",
+      "timeout_s": 600.0,
+      "tool_naming": {
+        "mapping_identity": "ae769b2a4822b5f771cf13adb207ddaacbf36b90d1fe8232fa562f3638014a68",
+        "scheme": "readable_v1"
+      }
+    },
+    "additional_limits": {
+      "model_calls": 3,
+      "tool_calls": 12,
+      "wall_s": 1800,
+      "backend_solves": 0,
+      "worker_calls": 0
+    },
+    "scientific_execution_authorized": false,
+    "standalone_numerical_operations": 0
+  },
+  "authorization_reference": {
+    "artifact_id": "d2c7f3dfd1ad8a91c995c6a1fc7a0d24791b137429403be2f8467df77fb4a871",
+    "media_type": "application/json"
+  }
+}

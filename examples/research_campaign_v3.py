@@ -426,6 +426,11 @@ def continue_feedback(directory=None):
 
 
 if __name__=='__main__':
+    if len(sys.argv)>1 and sys.argv[1]=='report-completed':
+        from tools.report_completion import main as report_completion_main
+        sys.argv.pop(1)
+        report_completion_main()
+        raise SystemExit(0)
     parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','recover-live','continue-authorized','recover-dependency','continue-structural','continue-feedback']);parser.add_argument('--output',type=Path)
     args=parser.parse_args()
     if args.mode=='prepare':prepare(args.output)

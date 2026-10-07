@@ -3,6 +3,47 @@ import re
 from tools.state_io import digest
 
 VERSION = 'evidence_bound_reporting@3.0.0'
+PROJECTION_VERSION = 'authoritative_metric_projection@1.0.0'
+
+
+def authoritative_metrics(row, resolve):
+    """New fact identities over original records; never edit legacy ledgers.
+
+    Reach error belongs to evaluate.reach. Holding maxima belong to the
+    profile's sampled-settling definition. Exact source/identity checks precede
+    arithmetic; no approximate equality can rescue a foreign source.
+    """
+    eid = row['execution_id']; sources = row['sources']
+    evaluation = resolve(sources['evaluation'])
+    profile = resolve(sources['profile'])['detail']
+    if (evaluation['source_execution_id'] != eid or
+        evaluation['original_execution_id'] != eid or profile['execution_id'] != eid or
+        profile['evaluation'] != sources['evaluation']):
+        raise ValueError('CROSS_EXECUTION_SOURCE')
+    if (evaluation['evaluator'], evaluation['evaluator_version']) != ('evaluate.reach', '1.0.0'):
+        raise ValueError('WRONG_METRIC_DEFINITION')
+    matches = [(i,m) for i,m in enumerate(evaluation['metrics']) if m['name']=='position_error']
+    if len(matches)!=1 or matches[0][1]['units']!='m':
+        raise ValueError('WRONG_METRIC_UNITS_OR_DEFINITION')
+    i, metric = matches[0]
+    definitions = {
+        'terminal_error_m': (metric['value'], 'm', sources['evaluation'], f'/metrics/{i}/value'),
+        'holding_max_error_m': (profile['sampled_settling']['max_error_m'], 'm', sources['profile'], '/detail/sampled_settling/max_error_m'),
+        'holding_max_speed_m_s': (profile['sampled_settling']['max_speed_m_s'], 'm/s', sources['profile'], '/detail/sampled_settling/max_speed_m_s')}
+    facts = {}; supersessions = []
+    for name,(value,unit,source,pointer) in definitions.items():
+        binding = dict(execution_id=eid, metric=name, unit=unit,
+            structure_identity=row['structure_identity'],
+            scientific_configuration_identity=row['scientific_configuration_identity'], source_artifact=source)
+        legacy = 'f_' + digest(binding)[:20]
+        corrected = dict(**binding, projection_version=PROJECTION_VERSION, source_pointer=pointer)
+        ref = 'f_' + digest(corrected)[:20]
+        facts[ref] = dict(**corrected, value=value)
+        supersessions.append(dict(legacy_fact_id=legacy, corrected_fact_id=ref,
+            legacy_value=row['legacy_metrics'][name], canonical_value=value,
+            discrepancy_m=value-row['legacy_metrics'][name] if unit=='m' else None,
+            reason='Value and pointer resolved from the same authoritative original record; distinct definitions retained'))
+    return dict(version=PROJECTION_VERSION, facts=facts, supersessions=supersessions)
 
 
 def model_packet(packet):
