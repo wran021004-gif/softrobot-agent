@@ -47,9 +47,13 @@ class ContextAssemblyTests(TestCase):
         self.assertNotEqual(pair['original_execution_id'],pair['repeated_execution_id'])
         self.assertTrue(pair['measured_differences']);self.assertIn('broad variability',va['working_context']['repeatability_scope'])
         rows={r['execution_id']:r for r in va['bound_evidence']['executions']}
-        original=rows['a8382f8a4c6e4ebe921fb72f821b2188'];other=rows['91c3ba1b01d6499fb26df8f95409401b']
+        original=next(r for r in self.packet['history']['rows'] if r['candidate']['execution_id']=='a8382f8a4c6e4ebe921fb72f821b2188')
+        other=rows['91c3ba1b01d6499fb26df8f95409401b']
         self.assertEqual(original['weights'],other['weights']);self.assertNotEqual(original['structure_identity'],other['structure_identity'])
-        self.assertEqual(set(rows),{r['candidate']['execution_id'] for r in self.packet['history']['rows'] if r['metrics']})
+        all_rows={r['candidate']['execution_id'] for r in self.packet['history']['rows'] if r['metrics']}
+        self.assertTrue(set(rows)<=all_rows)
+        self.assertTrue(set(self.packet['case']['evidence_execution_ids'])<=set(rows))
+        self.assertEqual({f['execution_id'] for f in a['canonical_facts'].values()},all_rows)
         self.assertTrue(any(f['metric']=='joint_reach_holding_passed' and not f['value'] for f in a['canonical_facts'].values()))
         self.assertTrue(va['working_context']['unresolved_questions'])
         self.assertIn('frozen_pre_experiment_background',va['case']['question_status'])

@@ -175,9 +175,90 @@ def _offload(value, reference, omissions, path=''):
     return value
 
 
-def _compact_ledger(bound):
-    view=model_packet(bound)
-    view['facts']={key:{k:f[k] for k in ('value','unit')} for key,f in bound['facts'].items()}
+DECISION_METRICS = {'terminal_error_m', 'holding_max_error_m', 'holding_max_speed_m_s',
+    'max_position_error', 'rms_position_error', 'terminal_position_error',
+    'task_accepted', 'joint_reach_holding_passed', 'force_bound_violation_n', 'solver_error_count', 'valid_complete_execution'}
+
+
+def _required_aliases(authority):
+    return set(authority.get('required_aliases', [])) | set(re.findall(r'\bF\d+\b',
+        encode({k:authority.get(k) for k in ('required_evidence','hypotheses','contradictions')})))
+
+
+def _required_facts(bound, packet, authority, archive):
+    """Deterministic relevance from existing roles, comparisons and selectors."""
+    facts = bound['facts']; required = set(); executions = set()
+    references = []
+    def scan(value):
+        if isinstance(value, str):
+            if value in facts: required.add(value)
+        elif isinstance(value, list):
+            for child in value: scan(child)
+        elif isinstance(value, dict):
+            for key, child in value.items():
+                if key.endswith('execution_id') and isinstance(child, str): executions.add(child)
+                elif key.endswith('execution_ids') and isinstance(child, list): executions.update(child)
+                if key in facts: required.add(key)
+                scan(child)
+            if isinstance(value.get('reference'), dict) and 'pointer' in value:
+                references.append(value)
+    scan({k:authority.get(k) for k in ('roles','question','comparison_execution_ids',
+        'hypotheses','contradictions','required_evidence','rejected_claims')})
+    scan(packet.get('case', {}))
+    scan(packet.get('current_feedback', {}).get('content', {}))
+    scan(packet.get('verification', {}))
+    for evidence in [packet.get('current_feedback', {})] + packet.get('performed_batch_evidence', []):
+        for alias in _required_aliases(authority):
+            if alias in evidence.get('aliases', {}):
+                scan(dict(reference=evidence['reference'], **evidence['aliases'][alias]))
+    for name in ('selected', 'latest'): scan(bound.get(name))
+    # Exact selectors retain their cited metric. Feedback selectors can point
+    # inside an outcome; walk ancestors to recover its execution binding.
+    for selector in list(references):
+        ref, pointer = selector['reference'], selector['pointer']
+        matching = {key for key, f in facts.items() if f.get('source_artifact')==ref and
+            (not pointer or (f.get('source_pointer') or f.get('source_path'))==pointer)}
+        if not matching:
+            # Older non-projected metrics have no exact source pointer. Keep
+            # that selector's source facts rather than silently losing support.
+            matching = {key for key,f in facts.items() if f.get('source_artifact')==ref}
+        required.update(matching)
+        value = archive.load(ref)
+        scan(value if not pointer else {})
+        parts = pointer.lstrip('/').split('/') if pointer else []
+        node = value
+        for part in parts:
+            if isinstance(node, dict):
+                scan({k:node[k] for k in ('candidate','execution_id','source_execution_id') if k in node})
+            key = part.replace('~1','/').replace('~0','~')
+            node = node[int(key)] if isinstance(node, list) else node[key]
+        scan(node)
+        if parts:
+            metric = parts[-1].replace('~1','/').replace('~0','~')
+            required.update(key for key,f in facts.items()
+                if f.get('execution_id') in executions and f.get('metric')==metric)
+    # Keep both sides of relevant repeats. Full-history relationships were
+    # already calculated; unrelated repeats remain available in the archive.
+    for row in bound.get('replications', []):
+        pair = {row['original_execution_id'], row['repeated_execution_id']}
+        if pair & executions: executions.update(pair)
+    required.update(key for key, f in facts.items()
+        if f.get('execution_id') in executions and f.get('metric') in DECISION_METRICS)
+    # A legacy packet with no relevance declarations requires complete prefetch.
+    if not executions and not references and not required: required.update(facts)
+    return sorted(required)
+
+
+def _compact_ledger(bound, fact_ids=None):
+    selected = set(bound['facts'] if fact_ids is None else fact_ids)
+    subset = deepcopy(bound)
+    subset['facts'] = {key:f for key,f in bound['facts'].items() if key in selected}
+    subset['executions'] = [dict(row, facts={n:key for n,key in row['facts'].items() if key in selected})
+        for row in bound['executions'] if selected.intersection(row['facts'].values())]
+    structures = {row['structure_identity'] for row in subset['executions']}
+    subset['structure_definitions'] = {k:v for k,v in bound['structure_definitions'].items() if k in structures}
+    view=model_packet(subset)
+    view['facts']={key:{k:f[k] for k in ('value','unit')} for key,f in subset['facts'].items()}
     view['binding_resolution']='Each executions row supplies execution/structure/scientific identities; facts[metric] selects the immutable fact ID and canonical value/unit. metric_sources resolve original sources. Full expanded ledger retained in archive.'
     return view
 
@@ -281,7 +362,7 @@ def _research(packet, authority, archive):
     current_ref = feedback['reference']
     reduced['performed_batch_evidence'] = [r for r in reduced.get('performed_batch_evidence', [])
         if r['reference'] != current_ref]
-    required_aliases=set(authority.get('required_aliases', []))
+    required_aliases=_required_aliases(authority)
     def selected_aliases(aliases):
         # Final feedback embeds records in both groups and aggregate entries,
         # and may embed search records again in its frozen plan. Retain the
@@ -307,15 +388,12 @@ def _research(packet, authority, archive):
         return selected or aliases
     feedback['aliases']=selected_aliases(feedback['aliases'])
     for r in reduced['performed_batch_evidence']:
-        if set(packet.get('capabilities',{}).get('legal',{}))=={'stop'} and packet.get('verification'):
-            # Historical alias wrappers are optional after the research STOP.
-            # Keep those cited by the final hypothesis/correction; every old
-            # exact metric/failure remains in the inline canonical ledger.
-            r['aliases']={a:v for a,v in r['aliases'].items() if a in required_aliases}
-        else:r['aliases']=selected_aliases(r['aliases'])
-        source=archive.sources[r['reference']['artifact_id']]
-        store=next(s for s in archive.stores if s.root.relative_to(ROOT).as_posix()==source['store_root'])
-        r['comparison_bindings']=_comparison_bindings(store.artifact(r['reference']),authority)
+        r['aliases']={a:v for a,v in r['aliases'].items() if a in required_aliases}
+    reduced['performed_batch_evidence']=[r for r in reduced['performed_batch_evidence'] if r['aliases']]
+    reduced['performed_batch_evidence_archive']=dict(reference=archive.snapshot(packet),pointer='/performed_batch_evidence')
+    if 'context_observation_aliases' in reduced:
+        reduced['context_observation_aliases']={a:v for a,v in reduced['context_observation_aliases'].items() if a in required_aliases}
+        reduced['context_observation_aliases_archive']=dict(reference=archive.snapshot(packet),pointer='/context_observation_aliases')
     return reduced, bound
 
 
@@ -356,18 +434,45 @@ def assemble_context(purpose, packet, *, archive, authority=None):
             reduced['bound_facts']=compact
             reduced['execution_sources']=sources
             reduced['binding_resolution']='bound_facts[key] joins execution_sources[source_context]; expanded original bindings remain in the archived canonical ledger.'
+    if purpose=='research_decision':
+        fact_ids = _required_facts(bound, packet, authority, archive)
+        inline_executions = {bound['facts'][key].get('execution_id') for key in fact_ids}
+        if 'executions' in bound:
+            inline = _compact_ledger(bound, fact_ids)
+            inline['replications'] = [r for r in bound.get('replications', [])
+                if {r['original_execution_id'],r['repeated_execution_id']} & inline_executions]
+            if 'bound_evidence' in reduced: reduced['bound_evidence'] = inline
+            else: reduced = inline
+        elif bound['facts']:
+            reduced['bound_facts'] = {key:reduced['bound_facts'][key] for key in fact_ids}
+            contexts = {f['source_context'] for f in reduced['bound_facts'].values()}
+            reduced['execution_sources'] = {key:v for key,v in reduced['execution_sources'].items() if key in contexts}
+        if 'history' in reduced:
+            reduced['history']['rows'] = [r for r in reduced['history']['rows']
+                if r['candidate'].get('execution_id') in inline_executions]
+            # Coverage was computed over all authorized rows. Its membership
+            # lists and chronology are archive detail, not replacement fact tables.
+            if 'tested_branches' in reduced['history']:
+                reduced['history']['tested_branches'] = dict(reference=archive.snapshot(reduced['history']['tested_branches']),pointer='')
+            overlap = reduced.get('scientific_overlap', {})
+            if 'overlaps' in overlap:
+                overlap['overlaps'] = dict(reference=archive.snapshot(overlap['overlaps']),pointer='')
+            if 'chronology' in reduced:
+                reduced['chronology'] = dict(reference=original,pointer='/packet/chronology')
     reduced = _offload(reduced, original, omissions, '/packet')
     roles = authority.get('roles', {})
     if not roles:
         roles = dict(selected_incumbent=packet.get('selected'), latest_attempt=packet.get('latest'),
             latest_completed_evaluation=None, source_baseline=None)
     repeat_count = len(bound.get('replications', []))
+    canonical_reference = archive.snapshot(dict(facts=bound['facts']))
     reduced['working_context'] = dict(version=VERSION, purpose=purpose,
         scientific_question=authority.get('question'), unchanged_acceptance=authority.get('acceptance'),
         roles=roles, chronology=authority.get('chronology', packet.get('chronology')),
         case_id=authority.get('case_id', packet.get('case_id')),
         observations_scope='Observed bound facts; frozen_pre_experiment_background is historical.',
-        recorded_replications=bound.get('replications', []),
+        recorded_replications=(reduced.get('bound_evidence',reduced).get('replications', [])
+            if purpose=='research_decision' else bound.get('replications', [])),
         repeatability_scope=('Matching recorded repeats retained; they do not establish broad variability.' if repeat_count
             else 'No explicit matching repeat in this supplied scope; other scopes are not ruled out.'),
         hypotheses=authority.get('hypotheses', []), contradictions=authority.get('contradictions', []),
@@ -381,6 +486,9 @@ def assemble_context(purpose, packet, *, archive, authority=None):
         remaining_budget=authority.get('remaining_budget', packet.get('capabilities', {}).get('remaining')),
         stop=authority.get('stop', packet.get('stop')),
         sources=dict(reference=original, pointer='/packet', verified_retrievable=True),
+        fact_archive=dict(reference=canonical_reference, pointer='/facts',
+            archived_count=len(bound['facts']), inline_count=len(fact_ids),
+            scope='Complete request-scoped canonical archive; archive retention is not model visibility.'),
         detail_access='Read only original pointers using EvidenceArchive.retrieve or already advertised evidence.read/diagnosis.inspect_evidence. No hidden model tools; if required input cannot fit, preparation fails.',
         retrieval_permission_scope=archive.scope)
     if purpose=='final_report' and authority.get('prefetched_report_only'):
@@ -393,9 +501,11 @@ def assemble_context(purpose, packet, *, archive, authority=None):
     if purpose=='research_decision' and 'history' in packet:
         reduced['working_context']['chronology']=dict(view_pointer='/chronology',authority='Store reservation/completion events')
         reduced['working_context']['unchanged_acceptance']=dict(view_pointer='/acceptance' if 'acceptance' in reduced else '/scope')
-    canonical_reference = archive.snapshot(dict(facts=bound['facts']))
     manifest = archive.manifest()
     audit = dict(version=VERSION, purpose=purpose, selected_fact_ids=fact_ids,
+        fact_selection=dict(policy='Current roles/question/case, feedback and active comparisons; exact hypothesis/support/counterexample selectors; core decision metrics and relevant repeat partners. Unscoped legacy/report inputs require complete prefetch.',
+            archived_fact_count=len(bound['facts']), inline_fact_count=len(fact_ids),
+            offloaded_fact_count=len(bound['facts'])-len(fact_ids), explicitly_retrieved_fact_ids=[]),
         source_manifest=manifest, source_reference=original, omissions=omissions,
         canonical_fact_reference=canonical_reference,
         scientific_thresholds_changed=False, facts_renderer='evidence_bound_reporting@3.0.0',
@@ -410,8 +520,10 @@ def retrieve_fact(assembly, fact_id, *, archive, expected=None):
     fact=facts[fact_id]
     if any(fact.get(k)!=v for k,v in (expected or {}).items()):
         raise ValueError('CROSS_EXECUTION_METRIC_BINDING')
-    return archive.retrieve(assembly['audit']['canonical_fact_reference'],
+    result = archive.retrieve(assembly['audit']['canonical_fact_reference'],
         pointer='/facts/'+pointer_part(fact_id),limit=100,byte_limit=4096,binding=fact)
+    assembly['audit']['fact_selection']['explicitly_retrieved_fact_ids'].append(fact_id)
+    return result
 
 
 def request_facts(request):
@@ -1004,7 +1116,12 @@ def assemble_working_context(purpose, state, *, archive):
     packet = state['packet']
     if purpose == 'final_report' and 'history' in packet:
         _, packet = _research(packet, state['authority'], archive)
-    result = assemble_context(purpose, packet, archive=archive, authority=state['authority'])
+    authority = deepcopy(state['authority'])
+    round_claim = lambda key: re.fullmatch(r'round\d+-interpretation-\d+',key) is not None
+    latest_claim_revision=max((rows[-1]['sequence'] for key,rows in state['claims'].items() if rows and round_claim(key)),default=0)
+    authority['required_evidence'] = [rows[-1]['claim'] for key,rows in state['claims'].items()
+        if rows and (not round_claim(key) or rows[-1]['sequence']==latest_claim_revision)]
+    result = assemble_context(purpose, packet, archive=archive, authority=authority)
     if state.get('current_execution'):
         live=state['current_execution'];view=result['view']['working_context']
         view.update(current_execution=deepcopy(live),legal_actions=deepcopy(live['legal_actions']),remaining_budget=deepcopy(live['remaining_budget']))
@@ -1030,8 +1147,6 @@ def assemble_working_context(purpose, state, *, archive):
         budget_accounting=state['budget_accounting'],
         experiment_permissions=dict(reference=state_reference, pointer='/experiment_permissions'),
         authority_scope='Derived read-only state; does not authorize execution or override host grants')
-    round_claim = lambda key: re.fullmatch(r'round\d+-interpretation-\d+',key) is not None
-    latest_claim_revision=max((rows[-1]['sequence'] for key,rows in state['claims'].items() if rows and round_claim(key)),default=0)
     result['view']['working_context']['hypothesis_revisions']={key:dict(
         current={k:deepcopy(v) for k,v in rows[-1]['claim'].items()
             if k not in ('supporting_evidence','counterexamples','evidence_aliases')},revision=rows[-1]['sequence'],
@@ -1039,10 +1154,10 @@ def assemble_working_context(purpose, state, *, archive):
         counterexample_count=len(rows[-1]['claim'].get('counterexamples',[])),
         supporting_and_contradicting_sources=rows[-1]['evidence_source'],
         previous_revisions=dict(reference=state_reference,pointer='/claims/'+pointer_part(key)),
-        evidence_scope='Original revision retains exact selectors; all current canonical observations/counterexamples remain in the fact table.',
+        evidence_scope='Current supporting/counterexample facts are selected inline; the complete canonical archive retains older observations and exact selectors.',
         causal_truth_verified=False) for key,rows in state['claims'].items()
             if rows and (not round_claim(key) or rows[-1]['sequence']==latest_claim_revision)}
-    result['view']['working_context']['hypothesis_display_policy']='Current named hypotheses and latest round interpretations are displayed; earlier round interpretations and all supporting/counterexample selectors remain in recovery.claim_history. The complete canonical evidence table is unchanged.'
+    result['view']['working_context']['hypothesis_display_policy']='Current named hypotheses and latest round interpretations select required evidence; earlier interpretations remain in recovery.claim_history. The complete canonical archive is unchanged.'
     result['audit']['source_manifest'] = archive.manifest()
     return result
 

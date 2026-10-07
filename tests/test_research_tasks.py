@@ -18,13 +18,16 @@ class ResearchTasksTests(unittest.TestCase):
             source_execution_id='fresh',metrics=[dict(name='position_error',value=.005,units='m')],
             constraints=[dict(name='task_bound',satisfied=True,observed=.005,limit=.01,units='m')])
         self.profile = dict(complete=True,execution_id='fresh',solver_error_count=0,
+            evaluation=dict(artifact_id='b'*64,media_type='application/json'), simulation=self.ev['source'],
             force_bound_violation_n=0., real_time_demonstrated=False,deadline_misses=35,
             sampled_settling=dict(available=True,passed=True,window_s=.05,position_limit_m=.01,
                 speed_limit_m_s=.02,max_error_m=.005,max_speed_m_s=.01))
 
     def acceptance(self, profile=None, ev=None):
         return assemble_acceptance(self.cfg, self.ev if ev is None else ev,
-                                   self.profile if profile is None else profile)
+                                   self.profile if profile is None else profile,
+                                   evaluation_reference=self.profile['evaluation'],
+                                   profile_reference=dict(artifact_id='c'*64,media_type='application/json'))
 
     def test_terminal_success_does_not_replace_hold_and_timing_is_diagnostic(self):
         good = self.acceptance()
@@ -120,12 +123,15 @@ class ResearchTasksTests(unittest.TestCase):
         result=BackendResult(solver_status='completed',backend_id='backend.family_mujoco',model_id='fixture',signals=signals,
             data=Payload(contract='platform.empty',data={}),limitations=[],initial_state=Payload(contract='platform.empty',data={}),seed=17)
         evaluation=registry().get('evaluate.tracking',kind='evaluator').resolve()(inp.task,result,EvidenceRef(artifact_id='a'*64),registry(),'interface')
-        profile=dict(complete=True,solver_error_count=0,force_bound_violation_n=0.)
-        accepted=assemble_acceptance(tracking,evaluation,profile)
+        profile=dict(complete=True,execution_id='tracking-fixture',solver_error_count=0,force_bound_violation_n=0.)
+        accepted=assemble_acceptance(tracking,evaluation,profile,
+            evaluation_reference=dict(artifact_id='b'*64,media_type='application/json'),
+            profile_reference=dict(artifact_id='c'*64,media_type='application/json'))
         self.assertTrue(accepted['accepted'])
         self.assertEqual(accepted['protocol_id'],'offline_tracking_v1')
         self.assertEqual(self.acceptance()['protocol_id'],'offline_reach_hold_v1')
         self.assertNotIn('holding_speed',accepted['components'])
+        self.assertEqual(compare_acceptance(deepcopy(accepted),accepted)['relation'],'equivalent')
         tracking['policy']['controller']['version']='7.0.0'
         support=task_adapter(tracking).check_compatibility()
         self.assertEqual(support['technical_compatibility']['status'],'unsupported')

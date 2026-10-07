@@ -52,6 +52,7 @@ class Mainline2Tests(TestCase):
             lambda g:g[0]['records'][0]['receipt'].update(execution_id='foreign'),
             lambda g:g[0]['records'][0]['acceptance'].update(status='incomplete',accepted=None),
             lambda g:g[0]['records'][0]['acceptance'].update(task_identity='different-task'),
+            lambda g:g[0]['records'][0]['profile_summary'].update(evaluation=g[0]['records'][0]['profile']),
         ):
             copied=deepcopy(self.groups);mutate(copied)
             preserved,comparison=self.compare(copied)
@@ -78,12 +79,57 @@ class Mainline2Tests(TestCase):
         a,b=aggregates(True)
         self.assertEqual([a['accepted'],b['accepted']],[0,0])
         self.assertEqual(compare_acceptance(b,a)['relation'],'unavailable')
-        # Passing an old producer receipt without a cache wrapper still remains
-        # reuse when explicitly declared; it cannot satisfy a fresh slot.
+        # An old producer receipt remains reuse when explicitly declared.
         for row in rows:row['receipt'].update(cache_hit=False,charged={'backend_solves':1})
         a,b=aggregates(True)
         self.assertFalse(a['entries'][0]['fresh_execution'])
         self.assertEqual(compare_acceptance(b,a)['relation'],'unavailable')
+
+    def test_protocol_components_outcomes_and_required_sources(self):
+        before = digest(self.groups)
+        for kind, reason in (
+            ('component', 'PROTOCOL_REQUIRED_COMPONENT_MISSING_OR_UNKNOWN'),
+            ('outcome', 'ACCEPTANCE_COMPONENT_OUTCOME_INCONSISTENT'),
+            ('sources', 'PROTOCOL_REQUIRED_SOURCE_MISSING:evaluation'),
+        ):
+            copied = deepcopy(self.groups)
+            for group in copied:
+                row = group['records'][0]
+                if kind=='component': row['acceptance']['components'].pop('holding_speed')
+                elif kind=='outcome': row['acceptance'].update(status='valid_failure',accepted=False)
+                else:
+                    for record in group['records']:
+                        record.pop('evaluation'); record.pop('profile')
+                        record['acceptance']['sources'] = {}
+            preserved, comparison = self.compare(copied)
+            self.assertEqual(comparison['relation'], 'unavailable')
+            self.assertIn(reason, [i['reason'] for i in comparison['unresolved']])
+            self.assertTrue(preserved[1]['entries'][0]['acceptance']['components']['task_evaluator']['passed'])
+        self.assertEqual(digest(self.groups), before)
+        positive, comparison = self.compare()
+        self.assertEqual([g['accepted'] for g in positive], [6,7])
+        self.assertEqual(comparison['relation'], 'improved')
+        self.assertFalse(any(g['all_scheduled_accepted'] for g in positive))
+
+    def test_null_shortfall_keeps_voluntary_stop_legal(self):
+        from tools.batch_budget import operational_view
+        from examples.platform_fixtures import project,reference_input
+        from tools.platform_host import Host
+        with patch('tools.platform_store.ROOT',self.root):
+            store = Store(self.root/'stop'); store.create(project())
+            host = Host(store.root,'offline-stop'); host.create(reference_input(host.run_id))
+            view = operational_view(store,host.run_id,requirement={'wall_s':2590},as_of_unix=1)
+        self.assertIsNone(view['plan_shortfall'])
+        aggregate = self.compare()[0][1]
+        for operational in (view, {}, {'plan_shortfall':{}}):
+            stop = stop_interpretation(aggregate, 'voluntary_stop', operational=operational,
+                assertions=[dict(field='plan_shortfall',resource='wall_s',value=0)])
+            self.assertTrue(stop['legal'])
+            self.assertIsNone(stop['checked_assertions'][0]['observed'])
+            self.assertEqual(stop['checked_assertions'][0]['support'], 'not_assessed')
+            self.assertEqual(stop['explanation_support'], 'not_assessed')
+            self.assertFalse(stop['success_claim_supported'])
+            self.assertEqual(stop['optimality'], 'not_assessed')
 
     def test_legal_stop_keeps_unsupported_explanation_separate(self):
         aggregate=self.compare()[0][1]

@@ -114,6 +114,79 @@ def _number(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
+def _protocol_requirements(result):
+    """Required meanings come from the supported protocol, never submitted keys."""
+    common = {'evaluation_validity', 'execution_complete', 'task_evaluator',
+              'solver_errors', 'force_bounds'}
+    protocol, family = result.get('protocol_id'), result.get('task_family')
+    if (protocol, family) == ('offline_reach_hold_v1', 'task.reach'):
+        return common | {'holding_coverage', 'holding_position', 'holding_speed',
+                         'evaluator:task_bound'}
+    if (protocol, family) == ('offline_tracking_v1', 'task.tracking'):
+        limits = result.get('evaluator_tension_channels')
+        if not limits:
+            return None
+        return common | {'tracking_sampling', 'evaluator:sampled_tracking_bound'} | {
+            'evaluator:tension_bound_' + channel for channel in limits}
+    return None
+
+
+def _outcome_issue(result):
+    required = _protocol_requirements(result)
+    if required is None:
+        return 'TASK_PROTOCOL_REQUIREMENTS_UNAVAILABLE'
+    components = result.get('components') or {}
+    if required - components.keys() or any(type(c.get('passed')) is not bool for c in components.values()):
+        return 'PROTOCOL_REQUIRED_COMPONENT_MISSING_OR_UNKNOWN'
+    # Invalidity and absent coverage are not ordinary physical failures.
+    coverage = 'holding_coverage' if result['task_family']=='task.reach' else 'tracking_sampling'
+    if any(components[n]['passed'] is not True for n in ('evaluation_validity', 'execution_complete', coverage)):
+        return 'PROTOCOL_VALIDITY_OR_COVERAGE_UNRESOLVED'
+    passed = all(c['passed'] for c in components.values())
+    if (result.get('status') != ('accepted' if passed else 'valid_failure') or
+            result.get('accepted') is not passed):
+        return 'ACCEPTANCE_COMPONENT_OUTCOME_INCONSISTENT'
+    return None
+
+
+def _source_issue(result, evidence=None):
+    """Check presence before equality; reach profile links stay reach-specific."""
+    sources = result.get('sources') or {}
+    evidence = evidence if evidence is not None else result.get('evidence_binding') or {}
+    for kind in ('evaluation', 'profile'):
+        ref = sources.get(kind)
+        if not isinstance(ref, dict) or not ref.get('artifact_id'):
+            return 'PROTOCOL_REQUIRED_SOURCE_MISSING:' + kind
+        if evidence.get(kind) is None:
+            return 'PROTOCOL_REQUIRED_SOURCE_MISSING:' + kind + '_evidence'
+        if ref != evidence[kind]:
+            return 'ACCEPTANCE_SOURCE_BINDING_MISMATCH'
+    execution = result.get('execution_id')
+    if not execution or not evidence.get('simulation'):
+        return 'PROTOCOL_REQUIRED_SOURCE_MISSING:execution'
+    binding = evidence.get('profile_binding') or {}
+    if binding.get('execution_id') is not None and binding['execution_id'] != execution:
+        return 'ACCEPTANCE_SOURCE_BINDING_MISMATCH'
+    evaluation_binding = evidence.get('evaluation_binding') or {}
+    if (evaluation_binding.get('source_execution_id') not in (None,execution) or
+            evaluation_binding.get('original_execution_id') not in (None,execution) or
+            evaluation_binding.get('source') not in (None,evidence['simulation'])):
+        return 'ACCEPTANCE_SOURCE_BINDING_MISMATCH'
+    if result['protocol_id']=='offline_reach_hold_v1':
+        for kind in ('evaluation', 'simulation', 'execution_id'):
+            if not binding.get(kind):
+                return 'PROTOCOL_REQUIRED_SOURCE_MISSING:profile_' + kind
+        if (binding['evaluation'] != sources['evaluation'] or binding['simulation'] != evidence['simulation'] or
+                binding['execution_id'] != execution):
+            return 'ACCEPTANCE_SOURCE_BINDING_MISMATCH'
+    for kind, tool in (('evaluation', 'evaluation.run'), ('profile', 'control.profile_report')):
+        receipts = [r for r in evidence.get('receipts', []) if r.get('tool_id')==tool]
+        if receipts and (len(receipts)!=1 or receipts[0].get('output')!=sources[kind] or
+                         receipts[0].get('execution_status')!='completed'):
+            return 'ACCEPTANCE_SOURCE_BINDING_MISMATCH'
+    return None
+
+
 def assemble_acceptance(configuration, evaluation, profile, *, evaluation_reference=None,
                         profile_reference=None, motion=None, protocol_id=None):
     """Compose sealed evaluator and profile, preserving missing and failed components.
@@ -212,6 +285,12 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
         components=components, metrics=metrics, missing=missing, issues=issues,
         execution_id=report.get('execution_id'),
         sources=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference)),
+        evidence_binding=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference),
+            simulation=(ev or {}).get('source'),
+            evaluation_binding={k:(ev or {}).get(k) for k in ('source','source_execution_id','original_execution_id')},
+            profile_binding={k:report[k] for k in ('evaluation','simulation','execution_id') if k in report}),
+        evaluator_tension_channels=(sorted(task['evaluator']['parameters']['data']['tension_limits_n'])
+            if task['family']=='task.tracking' else None),
         timing=dict(**task['timing'], real_time_required=False, real_time_demonstrated=report.get('real_time_demonstrated'),
             deadline_misses=report.get('deadline_misses'), mean_update_s=report.get('mean_update_s'), simulation_wall_s=report.get('simulation_wall_s')),
         continuous_time_guarantee=False)
@@ -262,7 +341,7 @@ def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=N
         binding_matches = bool(result and execution == result.get('execution_id'))
         source_issues=[]
         for kind in ('evaluation','profile'):
-            expected=(result or {}).get('sources',{}).get(kind)
+            expected=((result or {}).get('sources') or {}).get(kind)
             if record.get(kind) and record[kind]!=expected:source_issues.append(kind)
         declaration=next((s for s in (schedule or []) if slot==slot_key(s)), {})
         fresh_required=declaration.get('fresh_required', policy.get('require_fresh_repetitions', True))
@@ -281,6 +360,12 @@ def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=N
             reuse_permitted=reuse,
             evidence_eligible=evidence_eligible, receipt=receipt,
             source_binding_issues=source_issues,
+            source_evidence=dict(evaluation=record.get('evaluation'), profile=record.get('profile'),
+                simulation=receipt.get('output'), receipts=record.get('receipts', []),
+                evaluation_binding=(record.get('evaluation_data') or
+                    (result or {}).get('evidence_binding', {}).get('evaluation_binding') or {}),
+                profile_binding={k:record.get('profile_summary', {}).get(k)
+                    for k in ('evaluation','simulation','execution_id')}),
             counted_accepted=count, acceptance=result,
             status=('not_new_repetition' if receipt and not fresh else
                     'acceptance_identity_mismatch' if result and result.get('execution_id') and not binding_matches else
@@ -342,8 +427,9 @@ def comparison_prerequisites(candidate, incumbent):
                 reason='OUTCOME_NOT_INTERPRETABLE'
             elif result.get('task_family')!=group['task_family'] or result.get('protocol_id')!=group['protocol_id']:
                 reason='TASK_PROTOCOL_MISMATCH'
-            elif not result.get('components') or any(c.get('passed') is None for c in result['components'].values()):
-                reason='OUTCOME_COMPONENTS_INCOMPLETE'
+            elif _outcome_issue(result):reason=_outcome_issue(result)
+            elif _source_issue(result, entry.get('source_evidence')):
+                reason=_source_issue(result, entry.get('source_evidence'))
             elif any(not _number(result['metrics'].get(n)) for n in group.get('metrics',{})):
                 reason='METRIC_MISSING_OR_UNINTERPRETABLE'
             if reason:issues.append(dict(role=role,slot=list(slot),reason=reason))
@@ -379,6 +465,10 @@ def compare_acceptance(candidate, incumbent, tolerance=1e-9):
             return dict(relation='unavailable',reason='TASK_ACCEPTANCE_IDENTITY_MISMATCH')
         if candidate['accepted'] is None or incumbent['accepted'] is None:
             return dict(relation='unavailable',reason='Missing, invalid or incomplete acceptance is not a physical failure')
+        for result in (candidate, incumbent):
+            issue = _outcome_issue(result) or _source_issue(result)
+            if issue:
+                return dict(relation='unavailable',reason=issue)
         left,right = int(candidate['accepted']),int(incumbent['accepted'])
     if left != right:
         names=(('terminal_error_m','holding_max_error_m','holding_max_speed_m_s')
@@ -410,8 +500,9 @@ def stop_interpretation(result, reason, *, budget_exhausted=False, remaining_wor
     checked=[]
     for assertion in assertions:
         resource=assertion.get('resource');field=assertion.get('field')
-        observed=(operational or {}).get(field,{}).get(resource) if field in (
+        values=(operational or {}).get(field) if field in (
             'executable_capacity','plan_shortfall','actual_shortfall') else None
+        observed=values.get(resource) if isinstance(values,dict) else None
         checked.append(dict(assertion=assertion,observed=observed,
             support='not_assessed' if observed is None else 'supported' if observed==assertion.get('value') else 'unsupported'))
     explanation=('unsupported' if any(r['support']=='unsupported' for r in checked) else
