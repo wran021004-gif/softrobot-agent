@@ -16,7 +16,7 @@ from tools.platform_store import plain,zero
 from tools.research_spec import load_spec
 from tools.fixed_research import evaluate_candidate,schedule,select_candidate,can_reserve
 from tools.research_tasks import aggregate_acceptance,compare_acceptance
-from tools.candidate_parameters import parameter_value
+from tools.candidate_parameters import parameter_value,project_planning_configuration
 
 CONFIG_PATH=ROOT/'configs/research/native_campaign_v2.json'
 FILES=(*pilot.FILES,'examples/research_campaign_v2.py','configs/research/native_campaign_v2.json',
@@ -155,7 +155,10 @@ def refresh_prelaunch(directory=None):
 
 
 def search_rows(w):
-    spec=load_spec();source=spec['starting_configuration']['effective']
+    spec=load_spec()
+    # Archived incumbent selectors predate the per-component pool. Project the
+    # current planning grant without changing its sealed physical configuration.
+    source=project_planning_configuration(spec['starting_configuration']['effective'],spec['execution_template']['policy'])
     rows=[]
     for r in w.records:
         if r['source_store']!=str(w.directory) or r.get('phase')=='verification':continue

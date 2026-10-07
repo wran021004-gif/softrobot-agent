@@ -115,3 +115,54 @@ class ConditionalBudgetTests(TestCase):
         self.assertEqual(actual['wall_s'],32800.)
         self.assertEqual(actual['tool_calls'],170)
         self.assertEqual(actual['model_calls'],22)
+
+
+class ObservedLiveBoundaryTests(TestCase):
+    """Replay actual saved request/receipt data without paid operations."""
+    evidence=campaign.ROOT/'evidence/research_native_development_v3_20261007'
+
+    def test_fitted_post_feedback_request_keeps_current_authority_inline(self):
+        from uuid import uuid4
+        import shutil
+        from types import SimpleNamespace
+        from tools.context_assembly import EvidenceArchive,fit_request
+        from tools.current_research_authority import check_payload
+        from tools.state_io import read
+        payload=read(self.evidence/'failed_post_feedback_request_original.json')
+        cap=json.loads(payload['messages'][1]['content'])['role_context']['research_packet']['capabilities']
+        stamp=cap['authority_snapshot']
+        snapshot=read(self.evidence/'failed_current_authority_snapshot.json')
+        role=dict(refresh_current_authority=True,authority_snapshot=stamp)
+        fake=SimpleNamespace(run_id=stamp['session_id'],store=SimpleNamespace(
+            session=lambda _:dict(state=dict(role_context=role)),artifact=lambda _:snapshot,
+            config=lambda:dict(project_id=stamp['campaign_id'])))
+        config=read(self.evidence/'freeze.json')['provider_configuration']
+        root=campaign.ROOT/'runs'/('fitting-replay-'+uuid4().hex)
+        root.mkdir()
+        try:
+            archive=EvidenceArchive(root,scope=dict(context_id=stamp['session_id'],role='design',binding=None))
+            fitted,audit=fit_request(payload,config,'research_decision',archive=archive)
+            self.assertGreater(len(audit['fitting_steps']),1)
+            check_payload(fake,fitted)
+            emitted=json.loads(fitted['messages'][1]['content'])['role_context']['research_packet']['capabilities']
+            self.assertEqual(emitted['legal'],cap['legal'])
+            self.assertEqual(emitted['remaining'],cap['remaining'])
+        finally:
+            if not root.resolve().is_relative_to((campaign.ROOT/'runs').resolve()):
+                raise ValueError('TEST_CLEANUP_OUTSIDE_WORKSPACE')
+            shutil.rmtree(root)
+
+    def test_actual_completed_control_rows_use_projected_archived_source(self):
+        from pathlib import Path
+        from types import SimpleNamespace
+        from tools.state_io import read
+        from examples.research_campaign_v2 import search_rows
+        state=read(self.evidence/'scheduler_state.json')
+        record=next(r for r in state['records'] if r['execution_id']=='871e8b83c5d14f9ba813fb65dcb0cc29')
+        fake=SimpleNamespace(directory=Path(record['source_store']),records=state['records'],
+            store=SimpleNamespace(artifact=lambda ref:read(self.evidence/'store/artifacts'/f"{ref['artifact_id']}.json")))
+        rows=search_rows(fake)
+        self.assertEqual(len(rows),2)
+        self.assertEqual([r['changes'] for r in rows],[{'control/recipe/terminal_tip_speed_weight':.1},
+            {'control/recipe/terminal_tip_speed_weight':.025}])
+        self.assertEqual([r['acceptance']['accepted'] for r in rows],[True,False])

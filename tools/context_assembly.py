@@ -434,6 +434,11 @@ def fit_request(wire, config, purpose, *, archive):
             out={}
             for key,child in value.items():
                 p=path+'/'+pointer_part(key)
+                # Current execution authority is compared with its immutable
+                # snapshot at the wire boundary. Keep its menu and budgets
+                # inline; duplicate-detail pointers are for archived evidence.
+                if key=='capabilities' and isinstance(child,dict) and child.get('authority_snapshot'):
+                    out[key]=deepcopy(child);continue
                 # Remove only redundant representations, never an execution's
                 # metric, alias, identity or failure. First occurrence stays.
                 if stage==0 and isinstance(child,(dict,list)) and key in {

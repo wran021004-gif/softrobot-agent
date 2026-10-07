@@ -115,6 +115,11 @@ def live(directory=None):
     adapter=EvidenceDrivenAdapter();payload_for(w.host,adapter)
     load_credential(Path.home()/'.codex/.env')
     start_clock(w);w.status='running';pilot.persist(w)
+    continue_trajectory(w)
+
+
+def continue_trajectory(w):
+    """Shared continuation; callers never recreate the grant or live clock."""
     try:
         while w.status=='running':
             if time.time()>=w.freeze['live_clock']['deadline_unix']:
@@ -136,8 +141,62 @@ def live(directory=None):
             conditional_verification=read(w.directory/'conditional_verification_gate.json') if (w.directory/'conditional_verification_gate.json').exists() else None))
 
 
+def recover_live(directory=None):
+    """Only the two observed settled engineering defects, without replay."""
+    from examples.gvs_nmpc_route_experiment import load_credential
+    config=read(CONFIG);w=pilot.restore((directory or ROOT/'runs'/config['campaign_id']).resolve())
+    failure=read(w.directory/'failure.json')
+    if (w.status!='failed' or w.sealed_cases or w.repairs or
+        failure['message']!='REQUEST_CURRENT_AUTHORITY_MENU_OR_BUDGET_MISMATCH' or
+        not w.freeze.get('live_clock') or (w.directory/'conditional_verification_gate.json').exists()):
+        raise ValueError('ONLY_OBSERVED_UNSEALED_ENGINEERING_BOUNDARY_RECOVERY')
+    with w.store.connect(True) as db:
+        if any(r['status'] not in ('completed','failed') or not r['receipt'] for r in db.execute('SELECT status,receipt FROM calls')):
+            raise ValueError('UNSETTLED_OPERATION_RECOVERY_FORBIDDEN')
+    rows=previous.search_rows(w)
+    if len(rows)!=2 or w.store.remaining()['used']['backend_solves']!=2:
+        raise ValueError('RECOVERY_REQUIRES_TWO_COMPLETED_BACKENDS_NO_REPLAY')
+    old=deepcopy(w.freeze);clock=deepcopy(old['live_clock'])
+    atomic_json(w.directory/'pre_repair_freeze.json',old)
+    atomic_json(w.directory/'pre_repair_scheduler_state.json',read(w.directory/'scheduler_state.json'))
+    boundary=dict(version='successor_observed_repair@3.1.0',failures=[failure,dict(
+        message='CONSTRAINED_PARAMETER_MISSING: design/near_section_scale',stage='Failed delivery search_rows')],
+        remedies=['Current authority remains inline through shared request fitting',
+            'Archived source uses existing physics-preserving planning projection for selector reads'],
+        old_implementation=old['implementation'],new_implementation=seal(),
+        live_clock=clock,budget_reset=False,backend_attempts_before=2,backend_replayed=0,
+        science_changed=False,material_repairs_consumed=2,
+        reporting_stop_scope='Prior mandatory final-report STOP was offered only STOP and never executed as a research seal; no voluntary scientific STOP is reopened.')
+    started=read(w.directory/'repair1_started.json')['started_unix']
+    reservation,_=w.store.reserve(w.host.run_id,'observed-live-boundary-repairs',digest(boundary),'engineering',
+        {**zero(),'tool_calls':2,'wall_s':1800.})
+    w.repairs=2;w.freeze['implementation']=seal();w.freeze['final_reporting']=False
+    from tools.diagnostic_workflow import save
+    summary={k:deepcopy(v) for k,v in boundary.items() if k not in ('old_implementation','new_implementation')}
+    summary.update(old_implementation={k:old['implementation'][k] for k in ('commit','stable_controller')},
+        new_implementation={k:w.freeze['implementation'][k] for k in ('commit','stable_controller')},
+        full_boundary=save(w.store,boundary))
+    w.freeze['repair_boundary']=summary;w.freeze['material_live_repairs']=2
+    w.status='running';w.stop_reason=None
+    pilot.configure(w)
+    adapter=EvidenceDrivenAdapter();payload=payload_for(w.host,adapter)
+    pilot.adopt_current_working(w)
+    load_credential(Path.home()/'.codex/.env')
+    actual=time.time()-started
+    receipt=w.store.complete(reservation,dict(request_id=reservation['request_id'],execution_id=reservation['execution_id'],
+        caller='engineering',tool_id='engineering.successor_observed_boundaries',tool_version='3.1.0',
+        execution_status='completed',charged=zero()),boundary,actual)
+    boundary['receipt']=receipt
+    atomic_json(w.directory/'observed_live_repair_boundary.json',boundary)
+    atomic_json(w.directory/'repaired_post_feedback_request.json',dict(payload=payload,audit=adapter.context_assembly_audit))
+    pilot.persist(w)
+    if w.freeze['live_clock']!=clock:raise ValueError('RECOVERY_CHANGED_LIVE_CLOCK')
+    continue_trajectory(w)
+
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live']);parser.add_argument('--output',type=Path)
+    parser=argparse.ArgumentParser();parser.add_argument('mode',choices=['prepare','live','recover-live']);parser.add_argument('--output',type=Path)
     args=parser.parse_args()
     if args.mode=='prepare':prepare(args.output)
-    else:live(args.output)
+    elif args.mode=='live':live(args.output)
+    else:recover_live(args.output)
