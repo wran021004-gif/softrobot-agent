@@ -1,0 +1,968 @@
+{
+  "version": "native_matched_verification@2.0.0",
+  "schedule": [
+    {
+      "case_id": "nominal",
+      "repetition": 1,
+      "seed": 17
+    },
+    {
+      "case_id": "nominal",
+      "repetition": 2,
+      "seed": 18
+    },
+    {
+      "case_id": "near_z_plus",
+      "repetition": 1,
+      "seed": 17
+    },
+    {
+      "case_id": "near_z_plus",
+      "repetition": 2,
+      "seed": 18
+    },
+    {
+      "case_id": "near_z_minus",
+      "repetition": 1,
+      "seed": 17
+    },
+    {
+      "case_id": "near_z_minus",
+      "repetition": 2,
+      "seed": 18
+    },
+    {
+      "case_id": "far_y_plus",
+      "repetition": 1,
+      "seed": 17
+    },
+    {
+      "case_id": "far_y_plus",
+      "repetition": 2,
+      "seed": 18
+    },
+    {
+      "case_id": "far_y_minus",
+      "repetition": 1,
+      "seed": 17
+    },
+    {
+      "case_id": "far_y_minus",
+      "repetition": 2,
+      "seed": 18
+    }
+  ],
+  "selected_candidate": {
+    "candidate_id": "batch-396bdbbae02626d3-0",
+    "configuration": {
+      "artifact_id": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+      "media_type": "application/json"
+    },
+    "changes": {
+      "control/recipe/terminal_tip_speed_weight": 0.1
+    }
+  },
+  "source_search": [
+    {
+      "candidate_id": "batch-396bdbbae02626d3-0",
+      "configuration": {
+        "artifact_id": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "control/recipe/terminal_tip_speed_weight": 0.1
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0032997971664596422
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0033674546591454186
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.01025399247985248
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "871e8b83c5d14f9ba813fb65dcb0cc29",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.0033674546591454186,
+          "holding_max_speed_m_s": 0.01025399247985248,
+          "terminal_error_m": 0.0032997971664596422
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "1b587a3a3bbcea44429515affe1360ae767d091717581638e184783149de99ac",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "b4bb9a28d6df7ef9b1b2aef8bb4f05ec9b26bb39adcf9d0bd3468714ea3b9a30",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 8.622879228572128,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 305.4060000000027,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 305.4060000000027,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "871e8b83c5d14f9ba813fb65dcb0cc29",
+        "execution_status": "completed",
+        "original_execution_id": "871e8b83c5d14f9ba813fb65dcb0cc29",
+        "output": {
+          "artifact_id": "d4d0b75e01b6351faf66d328ad1413959b32cfcee2437d2ff861c3cd87e596ed",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "candidate_id": "batch-396bdbbae02626d3-1",
+      "configuration": {
+        "artifact_id": "26c9ed9c22ab66dfa5e7fa8276ae0cc60a13a53af50af9cc17def945949ff944",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "control/recipe/terminal_tip_speed_weight": 0.025
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0028638642071417758
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0028638642071417758
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.02116571913454289
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "ed8e838859714c17930b16ba7a46e8e1",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.0028638642071417758,
+          "holding_max_speed_m_s": 0.02116571913454289,
+          "terminal_error_m": 0.0028638642071417758
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "b695ed9abbdfc7972d79825b2e4ac13a71e328fe9514147cf1bb8d95c52650e1",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "17a193e2a742ecaf6bffb0714a30036d5acabe1657a98fe381c909b94330281e",
+            "media_type": "application/json"
+          }
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 7.577412962855721,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 267.125,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 267.125,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "ed8e838859714c17930b16ba7a46e8e1",
+        "execution_status": "completed",
+        "original_execution_id": "ed8e838859714c17930b16ba7a46e8e1",
+        "output": {
+          "artifact_id": "555ebb52247e85396a20751bc9bfd4a1e8633f2eb85a7c2a7160f297f24cd607",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "candidate_id": "batch-acf51de37cc32112-0",
+      "configuration": {
+        "artifact_id": "342158761934905515d6323a934450916fe91400b2d611ea2ed8d1f4cf52469e",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "design/near_section_scale": 1.0
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.003195002241686136
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.003322594723389333
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.013737449416257283
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "054cb6d5151e47b397e5f8003ff9a12a",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.003322594723389333,
+          "holding_max_speed_m_s": 0.013737449416257283,
+          "terminal_error_m": 0.003195002241686136
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "8245e196e43b55e5339ed19b9ae2aa483b3ad0204d3764deee61f2422ee42239",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "244012e3ea5fb76c518eaef28dbe84abc648979708cf192047d51d08d9adaba6",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 7.231787028571957,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 256.7030000000086,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 256.7030000000086,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "054cb6d5151e47b397e5f8003ff9a12a",
+        "execution_status": "completed",
+        "original_execution_id": "054cb6d5151e47b397e5f8003ff9a12a",
+        "output": {
+          "artifact_id": "94675e7c4a6a77fbc909851e2f2bf2f15560ab23bdc14715c158151371e7a3db",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "candidate_id": "batch-acf51de37cc32112-1",
+      "configuration": {
+        "artifact_id": "43b0b5cf0f9a6b9248f8d51f0ee80d50275bb1fbc62554e76827514614b38dd9",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "design/near_section_scale": 1.05
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0027390086467412606
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.002739008646741261
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.054580793692926934
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "dfb3b3986afb4981bf5c0c0c06e61acb",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.002739008646741261,
+          "holding_max_speed_m_s": 0.054580793692926934,
+          "terminal_error_m": 0.0027390086467412606
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "06b553eb15e86c5a5e821e74fd13edc3390534714c4234ceafbe617375daa9fd",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "99112cc3ad44f6fc446f5313ed85ba85d31e52e3e8131bde9ca2f9bc2829881d",
+            "media_type": "application/json"
+          }
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 10.101247971427593,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 356.9219999999914,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 356.9219999999914,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "dfb3b3986afb4981bf5c0c0c06e61acb",
+        "execution_status": "completed",
+        "original_execution_id": "dfb3b3986afb4981bf5c0c0c06e61acb",
+        "output": {
+          "artifact_id": "bc35649f5cc08e583482aa8398c496c6871501def84812115224922477ddd633",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "candidate_id": "batch-d86d193aa1860270-0",
+      "configuration": {
+        "artifact_id": "83b01a8d274c2ee335432dbe0396388862de91e6a47e001ce8d2d41d3ad47b9d",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "design/far_section_scale": 1.0
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0028146985060221873
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0030562651971689147
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.013737300830741445
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "7afd015b1c724120a9598c616a7b31ee",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.0030562651971689147,
+          "holding_max_speed_m_s": 0.013737300830741445,
+          "terminal_error_m": 0.0028146985060221873
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "77d6dad67ae8a56fe92837b39780acf55ded63f68bb8f0dcbcf5b73b3d393f41",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "e2d1f95aa4565aa5faa87aa44d8b6166d8eeb2da26caec1ec8a9f3d4333dc2db",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 11.204572105717046,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 395.5940000000119,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 395.5940000000119,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "7afd015b1c724120a9598c616a7b31ee",
+        "execution_status": "completed",
+        "original_execution_id": "7afd015b1c724120a9598c616a7b31ee",
+        "output": {
+          "artifact_id": "cc09be4638b1f67c18015a51b7d5c666720e0c8cc3a8ab832b70f3bead990ed9",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "candidate_id": "batch-d86d193aa1860270-1",
+      "configuration": {
+        "artifact_id": "0d0143b73799de751f495a6e873a7f03a99c945c67e782b765344469109af7b6",
+        "media_type": "application/json"
+      },
+      "changes": {
+        "design/far_section_scale": 1.05
+      },
+      "case_id": "nominal",
+      "seed": 17,
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.002719001068396446
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.002838475393161377
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.016521988699640333
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "execution_id": "37b1deba58ad4f29afca2fb36b99588b",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.002838475393161377,
+          "holding_max_speed_m_s": 0.016521988699640333,
+          "terminal_error_m": 0.002719001068396446
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "5212094dbafc62914135c3cb7bdee4cbb6e48300435390f57d51751b6d510fb7",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "eda6e15ffbc5961eaecc89fbb369c81e2cb794569e21103ef6a86f3e5177484d",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 8.680877448570183,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 307.375,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 307.375,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "37b1deba58ad4f29afca2fb36b99588b",
+        "execution_status": "completed",
+        "original_execution_id": "37b1deba58ad4f29afca2fb36b99588b",
+        "output": {
+          "artifact_id": "5d43214c836ccb1d82d565106903021e109e6feba0334282c2d73e4b45ab2490",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "role": "unchanged_incumbent",
+      "changes": {}
+    },
+    {
+      "role": "selected_candidate",
+      "changes": {
+        "control/recipe/terminal_tip_speed_weight": 0.1
+      }
+    }
+  ],
+  "no_candidate_reason": null
+}

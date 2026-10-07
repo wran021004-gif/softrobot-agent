@@ -1,0 +1,2434 @@
+{
+  "version": "frozen_matched_selection_review@1.0.0",
+  "complete": true,
+  "independent_checks_passed": true,
+  "improvement_supported": true,
+  "selected_configuration": {
+    "candidate_id": "batch-396bdbbae02626d3-0",
+    "configuration": {
+      "artifact_id": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+      "media_type": "application/json"
+    },
+    "changes": {
+      "control/recipe/terminal_tip_speed_weight": 0.1
+    }
+  },
+  "outcome": "promote_frozen_candidate",
+  "comparison": {
+    "relation": "improved",
+    "basis": "primary_joint_acceptance",
+    "componentwise": {
+      "terminal_error_m": {
+        "candidate": 0.00401791580527543,
+        "incumbent": 0.0031794922216638703,
+        "change": 0.0008384235836115597
+      },
+      "holding_max_error_m": {
+        "candidate": 0.004070644033629745,
+        "incumbent": 0.0033040679451552747,
+        "change": 0.0007665760884744701
+      },
+      "holding_max_speed_m_s": {
+        "candidate": 0.06484873299977026,
+        "incumbent": 0.07026211095497123,
+        "change": -0.005413377955200971
+      }
+    }
+  },
+  "aggregates": [
+    {
+      "contract": "research.task_aggregation",
+      "version": "1.0.0",
+      "accepted": 6,
+      "scheduled": 10,
+      "task_family": "task.reach",
+      "protocol_id": "offline_reach_hold_v1",
+      "schedule_identity": "0a28f94aefe0a0840ea7007129e2ed0db6224ce994a15e31db53623ed453ad5d",
+      "recorded": 10,
+      "unrecorded": 0,
+      "joint_acceptance_fraction": 0.6,
+      "all_scheduled_accepted": false,
+      "entries": [
+        {
+          "case_id": "nominal",
+          "seed": 17,
+          "repetition": 1,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.002697828858325615,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0027300544346297905,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.012750255515948416,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.002697828858325615,
+              "holding_max_error_m": 0.0027300544346297905,
+              "holding_max_speed_m_s": 0.012750255515948416
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "a8ba333d53a843ecabf97255fd57b4eb",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "cef93515114f2c6ceede000fb61a9b3693ed90e297448bf8fbc18ffc282c0d84",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "465b936c5e072d14c290e643e1eb45035e6062dd38510eb0e6282a0fd0e891f2",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 8.482592171428093,
+              "simulation_wall_s": 300.60900000002584
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        },
+        {
+          "case_id": "nominal",
+          "seed": 18,
+          "repetition": 2,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "d970e52bdb6f5451f28c4403b1de8bfea18213570c450577d4f3a4357c0650b0",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.002697828858325615,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0027300544346297905,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.012750255515948416,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.002697828858325615,
+              "holding_max_error_m": 0.0027300544346297905,
+              "holding_max_speed_m_s": 0.012750255515948416
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "118534127d8b47fe97f0dfd81df16240",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "7e3fd35277368e6a5beb518951de51a4de9e096428fc548ffae3fd371f0aa118",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "f6382271e8100cd338e69cfc4df0e1e86c1bb3be1894ae1ea83a3736a2c0583a",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 8.745273379998148,
+              "simulation_wall_s": 308.125
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        },
+        {
+          "case_id": "near_z_plus",
+          "seed": 17,
+          "repetition": 1,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "0e947b2e82a33653de5b098a57dfe510e82bb13a37f3d656af8b18503d587acf",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0028383501599537585,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0029564922279630814,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.019548749715701006,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0028383501599537585,
+              "holding_max_error_m": 0.0029564922279630814,
+              "holding_max_speed_m_s": 0.019548749715701006
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "e5ee7daea8f04b8b83cbb6b3cfcd49e2",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "c3bacb5aacfd43fe4db7af3d010593044ce2c2d4f483264e08c6c7be6b996602",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "c18399b9ddbe1d0ec736e68aa5e1f3cc97dea7b30a09e57604756dda48ddd588",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 8.727019537141313,
+              "simulation_wall_s": 307.64100000000326
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        },
+        {
+          "case_id": "near_z_plus",
+          "seed": 18,
+          "repetition": 2,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "c5c0458a4e6e0c985bcda78cbc99f6a7a14bf50cdf88079ab6f1229a065b120c",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0028383501599537585,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0029564922279630814,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.019548749715701006,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0028383501599537585,
+              "holding_max_error_m": 0.0029564922279630814,
+              "holding_max_speed_m_s": 0.019548749715701006
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "1be618cfbb1d494baa9110dfacc37e14",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "83c7a93e0aa275f476a98847b7ce855acfaaf1cbaf7433c3ad1c51c28902ba0b",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "87f38c148c2335020274468dacd86ec9e1f86d57586c3350834e92e758c65996",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 8.709890345708533,
+              "simulation_wall_s": 307.06200000000536
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        },
+        {
+          "case_id": "near_z_minus",
+          "seed": 17,
+          "repetition": 1,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": false,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "243b6ab057280f8591f87b3931282982c42f455fff30dd57444a9ec67c0a7f3b",
+            "status": "valid_failure",
+            "accepted": false,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.002743395889830424,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.002743395889830424,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.024273830642161133,
+                "passed": false,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.002743395889830424,
+              "holding_max_error_m": 0.002743395889830424,
+              "holding_max_speed_m_s": 0.024273830642161133
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "fbda14b7509a45b29aabd5469c5e5537",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "69ba3a3b82a00110e404b372a1d2abf1a9463d4a87f9053cfd4dee4c1aff0ff5",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "69bc5e82bf7c77124aebbd266c0bc9e7fcbef6a18c2782d43b4dcab3e55d740f",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 9.029525682854832,
+              "simulation_wall_s": 318.3280000000086
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "valid_failure"
+        },
+        {
+          "case_id": "near_z_minus",
+          "seed": 18,
+          "repetition": 2,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "9689917d4827e3dc5d4bc6a310c46a07c41b461de6d9d3153a2822ae6c1fd886",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0031794922216638703,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0033040679451552747,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.016634864724980932,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0031794922216638703,
+              "holding_max_error_m": 0.0033040679451552747,
+              "holding_max_speed_m_s": 0.016634864724980932
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "e68dd27ee57b40d9a9399d7ebfa03a44",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "c4a84f688531563752dccc03100903bee9b7a01adf125dbe8aaee028880ec0a9",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "35646809087e175498cc9f1664a9e0fc99c92ac9d2272981a0c2c41d96c76252",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 7.927247994285842,
+              "simulation_wall_s": 279.8280000000086
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        },
+        {
+          "case_id": "far_y_plus",
+          "seed": 17,
+          "repetition": 1,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": false,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "c857892a322862ea039bc4278fb770a009b2eda331feae83b3fa99e19e082b39",
+            "status": "valid_failure",
+            "accepted": false,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0029839364313111556,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0029839364313111556,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.07026211095497123,
+                "passed": false,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0029839364313111556,
+              "holding_max_error_m": 0.0029839364313111556,
+              "holding_max_speed_m_s": 0.07026211095497123
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "177ef7e88d1c491c96bfa1e48c920ef4",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "5dfcb93862afc6f5b82868872e7d93d493be5f184c379bf26ff6341abdab7ce6",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "21f69738f553a4ebf8c7c2b2ff13eea84835df7f7ea4b317b3ae29b2176b46ff",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 8.826621288570044,
+              "simulation_wall_s": 311.31299999999464
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "valid_failure"
+        },
+        {
+          "case_id": "far_y_plus",
+          "seed": 18,
+          "repetition": 2,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": false,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "761cfaf2024e461b2481bef9dd4666ce2cc3b78be9e5855c23e3c1e9b181948b",
+            "status": "valid_failure",
+            "accepted": false,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0029839364313111556,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0029839364313111556,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.07026211095497123,
+                "passed": false,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0029839364313111556,
+              "holding_max_error_m": 0.0029839364313111556,
+              "holding_max_speed_m_s": 0.07026211095497123
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "586d6a767b294364a613ab7817603b04",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "5d02edfcf3cfd8cf591056eced06e539346d1490a79c4e797d91849a3b8f6786",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "a5df33cf6ee1099f08968df1ad6c71c0309b85175d04e21346e71908829da5c8",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 8.812313145711752,
+              "simulation_wall_s": 310.84399999998277
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "valid_failure"
+        },
+        {
+          "case_id": "far_y_minus",
+          "seed": 17,
+          "repetition": 1,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": false,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "40a48368091c091cba6baf41601e72f27e46d74b308dd4578adee989903bb841",
+            "status": "valid_failure",
+            "accepted": false,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.002761940934842203,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0030513772619583882,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.0260479265298389,
+                "passed": false,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.002761940934842203,
+              "holding_max_error_m": 0.0030513772619583882,
+              "holding_max_speed_m_s": 0.0260479265298389
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "828adfe73e75435cb8a54bb295f9e14d",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "9c09b31ac1d3abc46451c5068fbc5e9107d9a1a4fd0dc9cb0a58121036c4179f",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "bee5e2d01b072250f61f4f37af00d1400743480d5448fe43fabac8c05437d81e",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 9.54648879142977,
+              "simulation_wall_s": 336.65600000001723
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "valid_failure"
+        },
+        {
+          "case_id": "far_y_minus",
+          "seed": 18,
+          "repetition": 2,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "4c95b20480cdc11922c2bf288035dacd915b6a1cb065a37c23651f0b6e4f9341",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0028464738362067176,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0028947705173711018,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.013284942907977937,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0028464738362067176,
+              "holding_max_error_m": 0.0028947705173711018,
+              "holding_max_speed_m_s": 0.013284942907977937
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "54c6a4032c4f418d830717b0fba2717d",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "f52e3e3e3135026322e23ed9fa0f8924fb4f0fe8888cd24365aead69b1f2c4c7",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "0a3c3d8d2f5d041934b782c4688ae1bf548eeb6d9c42d9e1904d1279e50b7cfd",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 8.627729774283944,
+              "simulation_wall_s": 304.4679999999935
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        }
+      ],
+      "interpretation": "Deterministic frozen-case observed fraction; not a population success probability",
+      "metrics": {
+        "terminal_error_m": 0.0031794922216638703,
+        "holding_max_error_m": 0.0033040679451552747,
+        "holding_max_speed_m_s": 0.07026211095497123
+      }
+    },
+    {
+      "contract": "research.task_aggregation",
+      "version": "1.0.0",
+      "accepted": 7,
+      "scheduled": 10,
+      "task_family": "task.reach",
+      "protocol_id": "offline_reach_hold_v1",
+      "schedule_identity": "0a28f94aefe0a0840ea7007129e2ed0db6224ce994a15e31db53623ed453ad5d",
+      "recorded": 10,
+      "unrecorded": 0,
+      "joint_acceptance_fraction": 0.7,
+      "all_scheduled_accepted": false,
+      "entries": [
+        {
+          "case_id": "nominal",
+          "seed": 17,
+          "repetition": 1,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0032997971664596422,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0033674546591454186,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.01025399247985248,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0032997971664596422,
+              "holding_max_error_m": 0.0033674546591454186,
+              "holding_max_speed_m_s": 0.01025399247985248
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "2623a040375546b89530ed55e444f13c",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "b55ea58defe9c5d167bb656ec163907715e1fb5b6a63808bd5f07ab8c2a2febe",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "8f45598a46b02696ce645d9ad64cffe20d402737200fe8d1e71050086e76155e",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 8.82095311713804,
+              "simulation_wall_s": 310.84399999998277
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        },
+        {
+          "case_id": "nominal",
+          "seed": 18,
+          "repetition": 2,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "d970e52bdb6f5451f28c4403b1de8bfea18213570c450577d4f3a4357c0650b0",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0032997971664596422,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0033674546591454186,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.01025399247985248,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0032997971664596422,
+              "holding_max_error_m": 0.0033674546591454186,
+              "holding_max_speed_m_s": 0.01025399247985248
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "e98334dc96964a048452928d7ab92bb0",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "d717d5bfecd54362186f7418118be104e3a770bfb25b727875945bc8d066ca01",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "0cfcc3d38ff0a32fb7c615aad55cc7e61fdae7b07feaf76f97c3424b9b784a85",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 8.78461673714337,
+              "simulation_wall_s": 309.6570000000065
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        },
+        {
+          "case_id": "near_z_plus",
+          "seed": 17,
+          "repetition": 1,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "0e947b2e82a33653de5b098a57dfe510e82bb13a37f3d656af8b18503d587acf",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0025225524078900537,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0025457501608359026,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.01922376786453428,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0025225524078900537,
+              "holding_max_error_m": 0.0025457501608359026,
+              "holding_max_speed_m_s": 0.01922376786453428
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "e2a38569098640feab782b173581c086",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "95b24c6890805b5e2b3abccc391f79db8e7e82c5a6c31e59916035b4cd1ba04d",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "5fad5765029b5e3732f1e334b16ee4cf468a302a4a14014d4e135a9edf3dd37b",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 11.403061302856909,
+              "simulation_wall_s": 401.2969999999914
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        },
+        {
+          "case_id": "near_z_plus",
+          "seed": 18,
+          "repetition": 2,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "c5c0458a4e6e0c985bcda78cbc99f6a7a14bf50cdf88079ab6f1229a065b120c",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0025225524078900537,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0025457501608359026,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.01922376786453428,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0025225524078900537,
+              "holding_max_error_m": 0.0025457501608359026,
+              "holding_max_speed_m_s": 0.01922376786453428
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "a60bbfa75337478e83f7bf1c9a977221",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "74c83e4d7655ef76d268b41b30c31a8f68adb63225c8083a96587dda18ac584f",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "f6331fb99780cad3e39998920355e49396f6383a5b160456add159c41626cb4a",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 11.465353320000162,
+              "simulation_wall_s": 403.5309999999881
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        },
+        {
+          "case_id": "near_z_minus",
+          "seed": 17,
+          "repetition": 1,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "243b6ab057280f8591f87b3931282982c42f455fff30dd57444a9ec67c0a7f3b",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.002937493443634504,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0030136443462828733,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.014599664852840795,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.002937493443634504,
+              "holding_max_error_m": 0.0030136443462828733,
+              "holding_max_speed_m_s": 0.014599664852840795
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "17f0d1d5128f4be285ce6368b9e6bf11",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "91c379d01f1a237f317af5d83cb1298232140cb4507c60ea376366fd86860ea7",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "0766528079601a02a160d023ca4a19c6167924ef456714ae4228fa6bc419e18c",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 9.19133401999882,
+              "simulation_wall_s": 324.06200000000536
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        },
+        {
+          "case_id": "near_z_minus",
+          "seed": 18,
+          "repetition": 2,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "9689917d4827e3dc5d4bc6a310c46a07c41b461de6d9d3153a2822ae6c1fd886",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.002948104020573772,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0030253485628585434,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.014588996018466789,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.002948104020573772,
+              "holding_max_error_m": 0.0030253485628585434,
+              "holding_max_speed_m_s": 0.014588996018466789
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "bab3110c8979491e90cd8714314b839b",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "dfdb3177140cf478447f4b8bed10e3f8395029fe1de2f747e9a9efdc4e2e2d3d",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "27a9d97ca9fbb3187c6458b23c31b48c348461cd290a8b00fbe19700463688e3",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 9.256625105715024,
+              "simulation_wall_s": 326.35899999999674
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        },
+        {
+          "case_id": "far_y_plus",
+          "seed": 17,
+          "repetition": 1,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": false,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "c857892a322862ea039bc4278fb770a009b2eda331feae83b3fa99e19e082b39",
+            "status": "valid_failure",
+            "accepted": false,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0032438660223442495,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.003947016377062428,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.06484873299977026,
+                "passed": false,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0032438660223442495,
+              "holding_max_error_m": 0.003947016377062428,
+              "holding_max_speed_m_s": 0.06484873299977026
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "7aaa27160a4541edbf6a52710dc84a48",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "a2ffb795c5543fef6af31674ada79fc3c8349949b5d74945c792db19410d33ba",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "e825d50983ad6c43935ec78bdce6127d1864e729c062c53f284e07b8137bc94a",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 11.749951131427329,
+              "simulation_wall_s": 413.625
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "valid_failure"
+        },
+        {
+          "case_id": "far_y_plus",
+          "seed": 18,
+          "repetition": 2,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": false,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "761cfaf2024e461b2481bef9dd4666ce2cc3b78be9e5855c23e3c1e9b181948b",
+            "status": "valid_failure",
+            "accepted": false,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0027993808162264737,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.003364818171716504,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.02131807816723444,
+                "passed": false,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0027993808162264737,
+              "holding_max_error_m": 0.003364818171716504,
+              "holding_max_speed_m_s": 0.02131807816723444
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "9ac52657e13f4fbd873d017bfc5f7c49",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "e7db40245d1d16c1df043662ab3642fba17731ae14c501b9c6eada528e9c1460",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "18f5cd27ad14d03c4a44282b15828614636243a95a3362375a47b9c4b2e377d5",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 14.490832028570418,
+              "simulation_wall_s": 509.61000000001513
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "valid_failure"
+        },
+        {
+          "case_id": "far_y_minus",
+          "seed": 17,
+          "repetition": 1,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": false,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "40a48368091c091cba6baf41601e72f27e46d74b308dd4578adee989903bb841",
+            "status": "valid_failure",
+            "accepted": false,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.0028152891453997113,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.0034204075297828603,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.02523989283931193,
+                "passed": false,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.0028152891453997113,
+              "holding_max_error_m": 0.0034204075297828603,
+              "holding_max_speed_m_s": 0.02523989283931193
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "282b6b209c374388aac5544448ecbfa0",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "e1a42e31df065b96736bc2e11df157b1c5ac7924c1f6f37769cc388899d56559",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "3adbb54d07ce060fdadfe55cde0fe3667ec5026b32bb3d2b0f1315971791a6be",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 11.925998005715831,
+              "simulation_wall_s": 419.93700000000536
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "valid_failure"
+        },
+        {
+          "case_id": "far_y_minus",
+          "seed": 18,
+          "repetition": 2,
+          "fresh_execution": true,
+          "acceptance_execution_matches": true,
+          "counted_accepted": true,
+          "acceptance": {
+            "contract": "research.task_acceptance",
+            "version": "1.0.0",
+            "protocol_id": "offline_reach_hold_v1",
+            "task_family": "task.reach",
+            "task_identity": "4c95b20480cdc11922c2bf288035dacd915b6a1cb065a37c23651f0b6e4f9341",
+            "status": "accepted",
+            "accepted": true,
+            "components": {
+              "evaluation_validity": {
+                "value": "valid",
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "execution_complete": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "task_evaluator": {
+                "value": true,
+                "passed": true,
+                "unit": null,
+                "limit": null,
+                "reason": null
+              },
+              "evaluator:task_bound": {
+                "value": 0.00401791580527543,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "solver_errors": {
+                "value": 0,
+                "passed": true,
+                "unit": "count",
+                "limit": 0,
+                "reason": null
+              },
+              "force_bounds": {
+                "value": 0.0,
+                "passed": true,
+                "unit": "N",
+                "limit": 1e-08,
+                "reason": null
+              },
+              "holding_coverage": {
+                "value": true,
+                "passed": true,
+                "unit": "inclusive uniform samples",
+                "limit": 6,
+                "reason": null
+              },
+              "holding_position": {
+                "value": 0.004070644033629745,
+                "passed": true,
+                "unit": "m",
+                "limit": 0.01,
+                "reason": null
+              },
+              "holding_speed": {
+                "value": 0.011594959018536587,
+                "passed": true,
+                "unit": "m/s",
+                "limit": 0.02,
+                "reason": null
+              }
+            },
+            "metrics": {
+              "terminal_error_m": 0.00401791580527543,
+              "holding_max_error_m": 0.004070644033629745,
+              "holding_max_speed_m_s": 0.011594959018536587
+            },
+            "missing": [],
+            "issues": [],
+            "execution_id": "4e11bb964fff44f3bd64b246b59e4cb9",
+            "sources": {
+              "evaluation": {
+                "artifact_id": "6d298c554ffb5f3ae34eadc0b1855b4f3084ab4af242e42da678b7536c2b0e8d",
+                "media_type": "application/json"
+              },
+              "profile": {
+                "artifact_id": "53c22cd47abcc05cf9ae3481ed1dfe5be07c7bbec45d60259b7f0517561609bf",
+                "media_type": "application/json"
+              }
+            },
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005,
+              "real_time_required": false,
+              "real_time_demonstrated": false,
+              "deadline_misses": 35,
+              "mean_update_s": 13.777194542856886,
+              "simulation_wall_s": 485.18799999999464
+            },
+            "continuous_time_guarantee": false
+          },
+          "status": "accepted"
+        }
+      ],
+      "interpretation": "Deterministic frozen-case observed fraction; not a population success probability",
+      "metrics": {
+        "terminal_error_m": 0.00401791580527543,
+        "holding_max_error_m": 0.004070644033629745,
+        "holding_max_speed_m_s": 0.06484873299977026
+      }
+    }
+  ],
+  "independent_review": "independent_results_review.json",
+  "model_selected_at_research_stop": {
+    "candidate_id": "batch-ebbeadbdaca10732-0",
+    "configuration": {
+      "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+      "media_type": "application/json"
+    },
+    "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+    "owner_run_id": "batch-ebbeadbdaca10732-0"
+  },
+  "final_model_report": null,
+  "scope": "Post-verification frozen-rule delivery; original sealed research STOP and its prior selected identity remain unchanged. No research reopening, tuning, candidate replacement or retries."
+}

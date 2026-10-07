@@ -1,0 +1,115 @@
+test_actual_post_far_feedback_and_reversible_fact_join (tests.test_structural_request_continuation.StructuralRequestContinuationTests.test_actual_post_far_feedback_and_reversible_fact_join) ... ERROR
+test_twenty_final_slots_real_feedback_and_next_report_request (tests.test_structural_request_continuation.StructuralRequestContinuationTests.test_twenty_final_slots_real_feedback_and_next_report_request) ... ERROR
+
+======================================================================
+ERROR: test_actual_post_far_feedback_and_reversible_fact_join (tests.test_structural_request_continuation.StructuralRequestContinuationTests.test_actual_post_far_feedback_and_reversible_fact_join)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\tests\test_structural_request_continuation.py", line 86, in test_actual_post_far_feedback_and_reversible_fact_join
+    payload,audit=self.request()
+                  ^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tests\test_structural_request_continuation.py", line 37, in request
+    adapter=EvidenceDrivenAdapter();payload=payload_for(self.w.host,adapter)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\platform_models.py", line 418, in payload_for
+    payload = adapter.encode(model_input, config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\diagnostic_reference_adapter.py", line 251, in encode
+    payload,self.context_assembly_audit=assemble_working_request(
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 908, in assemble_working_request
+    wire,fitting=fit_request(wire,config,purpose,archive=archive)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 595, in fit_request
+    context=join_tables(context)
+            ^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in join_tables
+    return {k:join_tables(v) for k,v in value.items()}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in <dictcomp>
+    return {k:join_tables(v) for k,v in value.items()}
+              ^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in join_tables
+    return {k:join_tables(v) for k,v in value.items()}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in <dictcomp>
+    return {k:join_tables(v) for k,v in value.items()}
+              ^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in join_tables
+    return {k:join_tables(v) for k,v in value.items()}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in <dictcomp>
+    return {k:join_tables(v) for k,v in value.items()}
+              ^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 583, in join_tables
+    page=archive.retrieve(metric_sources['reference'],limit=100,byte_limit=65536)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 136, in retrieve
+    args = ReadEvidence(reference=reference, pointer=pointer, offset=offset, limit=limit, byte_limit=byte_limit)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\site-packages\pydantic\main.py", line 263, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for ReadEvidence
+byte_limit
+  Input should be less than or equal to 8192 [type=less_than_equal, input_value=65536, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.13/v/less_than_equal
+
+======================================================================
+ERROR: test_twenty_final_slots_real_feedback_and_next_report_request (tests.test_structural_request_continuation.StructuralRequestContinuationTests.test_twenty_final_slots_real_feedback_and_next_report_request)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\tests\test_structural_request_continuation.py", line 162, in test_twenty_final_slots_real_feedback_and_next_report_request
+    payload,audit=self.request();content=self.check_all_inline_facts(payload)
+                  ^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tests\test_structural_request_continuation.py", line 37, in request
+    adapter=EvidenceDrivenAdapter();payload=payload_for(self.w.host,adapter)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\platform_models.py", line 418, in payload_for
+    payload = adapter.encode(model_input, config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\diagnostic_reference_adapter.py", line 251, in encode
+    payload,self.context_assembly_audit=assemble_working_request(
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 908, in assemble_working_request
+    wire,fitting=fit_request(wire,config,purpose,archive=archive)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 595, in fit_request
+    context=join_tables(context)
+            ^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in join_tables
+    return {k:join_tables(v) for k,v in value.items()}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in <dictcomp>
+    return {k:join_tables(v) for k,v in value.items()}
+              ^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in join_tables
+    return {k:join_tables(v) for k,v in value.items()}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in <dictcomp>
+    return {k:join_tables(v) for k,v in value.items()}
+              ^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in join_tables
+    return {k:join_tables(v) for k,v in value.items()}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 594, in <dictcomp>
+    return {k:join_tables(v) for k,v in value.items()}
+              ^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 583, in join_tables
+    page=archive.retrieve(metric_sources['reference'],limit=100,byte_limit=65536)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 136, in retrieve
+    args = ReadEvidence(reference=reference, pointer=pointer, offset=offset, limit=limit, byte_limit=byte_limit)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\site-packages\pydantic\main.py", line 263, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for ReadEvidence
+byte_limit
+  Input should be less than or equal to 8192 [type=less_than_equal, input_value=65536, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.13/v/less_than_equal
+
+----------------------------------------------------------------------
+Ran 2 tests in 86.514s
+
+FAILED (errors=2)

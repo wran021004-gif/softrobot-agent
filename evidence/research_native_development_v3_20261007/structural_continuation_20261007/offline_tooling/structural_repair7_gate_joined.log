@@ -1,0 +1,31 @@
+test_actual_post_far_feedback_and_reversible_fact_join (tests.test_structural_request_continuation.StructuralRequestContinuationTests.test_actual_post_far_feedback_and_reversible_fact_join) ... ok
+test_twenty_final_slots_real_feedback_and_next_report_request (tests.test_structural_request_continuation.StructuralRequestContinuationTests.test_twenty_final_slots_real_feedback_and_next_report_request) ... ERROR
+
+======================================================================
+ERROR: test_twenty_final_slots_real_feedback_and_next_report_request (tests.test_structural_request_continuation.StructuralRequestContinuationTests.test_twenty_final_slots_real_feedback_and_next_report_request)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\tests\test_structural_request_continuation.py", line 131, in test_twenty_final_slots_real_feedback_and_next_report_request
+    payload,audit=self.request();content=self.check_all_inline_facts(payload)
+                  ^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tests\test_structural_request_continuation.py", line 37, in request
+    adapter=EvidenceDrivenAdapter();payload=payload_for(self.w.host,adapter)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\platform_models.py", line 418, in payload_for
+    payload = adapter.encode(model_input, config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\diagnostic_reference_adapter.py", line 251, in encode
+    payload,self.context_assembly_audit=assemble_working_request(
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 786, in assemble_working_request
+    wire,fitting=fit_request(wire,config,purpose,archive=archive)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 521, in fit_request
+    raise ValueError('CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET: '+str(path)+'; '+json.dumps(report(),sort_keys=True))
+ValueError: CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET: D:\softrobot-agent\runs\structural-fixture-3ac327c895a649aa9d64c8dae5134dc7\context_assembly\audits\1887e72f6b0009f883d33e1e3eec0554f6b559124c708ef8a8613d42f2681c9c.json; {"correction_budget": 90, "packet/acceptance": 3140, "packet/bound_evidence": 75913, "packet/capabilities": 686, "packet/case": 853, "packet/case_id": 9, "packet/chronology": 14070, "packet/corrections": 30, "packet/current_batch_source": 276, "packet/current_feedback": 14692, "packet/decision_recovery": 4, "packet/engineering_coverage": 31, "packet/execution_version_boundary": 574, "packet/history": 23042, "packet/history_coverage": 1389, "packet/incumbent": 70, "packet/performed_batch_evidence": 23090, "packet/predecessor_decision": 117, "packet/primary": 70, "packet/scientific_overlap": 985, "packet/scope": 855, "packet/sealed_cases": 2, "packet/study": 19888, "packet/verification": 16339, "packet/working_context": 15137, "recovery_status": 972, "role_context": 219864, "role_context/instructions": 8037, "role_context/phase": 10, "role_context/research_packet": 211723, "role_context/role": 8, "role_context/unaccepted_draft": 4, "tool_schemas": 11807}
+
+----------------------------------------------------------------------
+Ran 2 tests in 82.183s
+
+FAILED (errors=1)
+POST_FAR_REQUEST {'characters': 149133, 'utf8_bytes': 149133, 'estimated_input_tokens': 157325, 'actual_input_tokens': None, 'method': 'Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.', 'input_budget_tokens': 160000, 'configured_context_limit_tokens': 1000000, 'response_reserve_tokens': 65536, 'interaction_reserve_tokens': 8192, 'passed': True}

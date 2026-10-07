@@ -1,0 +1,53 @@
+test_actual_post_far_feedback_and_reversible_fact_join (tests.test_structural_request_continuation.StructuralRequestContinuationTests.test_actual_post_far_feedback_and_reversible_fact_join) ... ERROR
+test_twenty_final_slots_real_feedback_and_next_report_request (tests.test_structural_request_continuation.StructuralRequestContinuationTests.test_twenty_final_slots_real_feedback_and_next_report_request) ... ERROR
+
+======================================================================
+ERROR: test_actual_post_far_feedback_and_reversible_fact_join (tests.test_structural_request_continuation.StructuralRequestContinuationTests.test_actual_post_far_feedback_and_reversible_fact_join)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\tests\test_structural_request_continuation.py", line 60, in test_actual_post_far_feedback_and_reversible_fact_join
+    payload,audit=self.request()
+                  ^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tests\test_structural_request_continuation.py", line 37, in request
+    adapter=EvidenceDrivenAdapter();payload=payload_for(self.w.host,adapter)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\platform_models.py", line 418, in payload_for
+    payload = adapter.encode(model_input, config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\diagnostic_reference_adapter.py", line 251, in encode
+    payload,self.context_assembly_audit=assemble_working_request(
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 766, in assemble_working_request
+    wire,fitting=fit_request(wire,config,purpose,archive=archive)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 501, in fit_request
+    raise ValueError('CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET: '+str(path)+'; '+json.dumps(report(),sort_keys=True))
+ValueError: CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET: D:\softrobot-agent\runs\structural-fixture-fd04126ddecd4ea6aa74906c6e360cf8\context_assembly\audits\037147c96abe487b91d30fc005973ee6f85f8f74612a6148367c69be79434f7f.json; {"correction_budget": 90, "packet/acceptance": 3140, "packet/bound_evidence": 45728, "packet/capabilities": 3469, "packet/case": 853, "packet/case_id": 9, "packet/chronology": 4520, "packet/corrections": 30, "packet/current_batch_source": 276, "packet/current_feedback": 8002, "packet/decision_recovery": 4, "packet/engineering_coverage": 31, "packet/execution_version_boundary": 574, "packet/history": 10756, "packet/history_coverage": 1389, "packet/incumbent": 70, "packet/performed_batch_evidence": 15246, "packet/predecessor_decision": 117, "packet/primary": 70, "packet/scientific_overlap": 142, "packet/scope": 855, "packet/sealed_cases": 2, "packet/study": 19888, "packet/working_context": 15023, "recovery_status": 972, "role_context": 138508, "role_context/instructions": 7767, "role_context/phase": 10, "role_context/research_packet": 130637, "role_context/role": 8, "role_context/unaccepted_draft": 4, "tool_schemas": 11858}
+
+======================================================================
+ERROR: test_twenty_final_slots_real_feedback_and_next_report_request (tests.test_structural_request_continuation.StructuralRequestContinuationTests.test_twenty_final_slots_real_feedback_and_next_report_request)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\tests\test_structural_request_continuation.py", line 131, in test_twenty_final_slots_real_feedback_and_next_report_request
+    payload,audit=self.request();content=self.check_all_inline_facts(payload)
+                  ^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tests\test_structural_request_continuation.py", line 37, in request
+    adapter=EvidenceDrivenAdapter();payload=payload_for(self.w.host,adapter)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\platform_models.py", line 418, in payload_for
+    payload = adapter.encode(model_input, config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\diagnostic_reference_adapter.py", line 251, in encode
+    payload,self.context_assembly_audit=assemble_working_request(
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 766, in assemble_working_request
+    wire,fitting=fit_request(wire,config,purpose,archive=archive)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\tools\context_assembly.py", line 501, in fit_request
+    raise ValueError('CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET: '+str(path)+'; '+json.dumps(report(),sort_keys=True))
+ValueError: CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET: D:\softrobot-agent\runs\structural-fixture-006859673db34822a7b8943c6ace1baa\context_assembly\audits\86b41be1547f440e8ac9394f2fdea8be943fe25ee5af285d716a6b8ad1ca900a.json; {"correction_budget": 90, "packet/acceptance": 3140, "packet/bound_evidence": 90466, "packet/capabilities": 686, "packet/case": 853, "packet/case_id": 9, "packet/chronology": 14070, "packet/corrections": 30, "packet/current_batch_source": 276, "packet/current_feedback": 76568, "packet/decision_recovery": 4, "packet/engineering_coverage": 31, "packet/execution_version_boundary": 574, "packet/history": 23042, "packet/history_coverage": 1389, "packet/incumbent": 70, "packet/performed_batch_evidence": 23090, "packet/predecessor_decision": 117, "packet/primary": 70, "packet/scientific_overlap": 985, "packet/scope": 855, "packet/sealed_cases": 2, "packet/study": 19888, "packet/verification": 16339, "packet/working_context": 15137, "recovery_status": 972, "role_context": 296293, "role_context/instructions": 8037, "role_context/phase": 10, "role_context/research_packet": 288152, "role_context/role": 8, "role_context/unaccepted_draft": 4, "tool_schemas": 11807}
+
+----------------------------------------------------------------------
+Ran 2 tests in 80.776s
+
+FAILED (errors=2)
