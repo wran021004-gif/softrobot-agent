@@ -2,6 +2,8 @@
 
 Engineering delivery, 2026-10-07, on `feat/gvs-dynamics`. New provider/model requests and scientific executions in this round: **zero**. Mainline 1/2 historical results, STOP, later promotion, task definitions and dependency seals remain historical evidence. Full empirical acceptance of Mainline 3 is pending.
 
+The sections describing the 2026-10-07 delivery below retain that earlier record. The bounded **2026-10-08 investigation closeout** supersedes its one-response investigation and future interface budget descriptions; it does not turn the earlier private-dispatch checks into public concurrency verification.
+
 ## Public scope
 
 | Entry | Implemented scope |
@@ -33,7 +35,7 @@ Candidate facts include actual changed routing coordinates. Routing changes rebu
 | Later gaps | Natural curvature needs preload-consistent initialization; payload properties need consistent mass/COM/inertia mapping; further section/material properties need coupled physical declarations and controller preparation. |
 | Absent physics | Shear, axial stretch, torsion, tendon friction, rope elasticity, motor dynamics and self-collision remain omitted by the serial bending model. |
 
-## Investigations and recovery
+## Investigations and recovery: 2026-10-07 delivery record
 
 Every node binds its question, source/query scope, read-only tools, return contract, one-model-call budget, timeout and stopping conditions. A child must be explicitly proposed by its coordinator and remain within root, parent and per-node permissions/budgets. Investigators cannot delegate. The grant sets total count, concurrency and cumulative resources; SQLite `BEGIN IMMEDIATE` checks scope/count and reserves through the common ledger atomically. Reservations and settlement are counted once; coordination creates no quota.
 
@@ -43,7 +45,7 @@ States distinguish pending, running, unconfirmed, confirmed failed and completed
 
 The future interface scenario has two distinct saved-evidence questions (reach/settling and complete-update timing), then bounded principal synthesis with independent original-source inspection. Direct and coordinator-mediated modes are engineered interface tests, not physics acceptance or causal studies.
 
-## Offline verification and evidence
+## Offline verification and evidence: 2026-10-07 delivery record
 
 Compact evidence: [offline_verification.json](../evidence/research_mainline3_v1_20261007/offline_verification.json). Checks used isolated stores and authority anchors; no real activity grant or archive was changed. Provider transport, backend solves, optimization, equilibrium fitting and integration were blocked in the new suite.
 
@@ -57,12 +59,38 @@ Actual engineering construction established 48 backend coordinates, 12 reduced c
 
 There is no remaining identified implementation blocker for the delivered engineering scope. Changed-radius closed-loop outcomes, actual scientific mathematical preparation and live provider diagnostic handoffs remain unvalidated. The earlier scheduler fixture limitation remains a verification limitation. Empirical acceptance and real-time feasibility are not claimed.
 
+## Bounded investigation closeout: 2026-10-08
+
+The three investigation gaps are addressed through the existing public tools. `research.investigate` now performs a short submission and returns a durable investigation ID with `status=pending`. A completed outer submission receipt establishes acceptance of the submission, not completion of its report. `research.investigation_status` collects the bounded report, with pending, running, unconfirmed, failed, incomplete and completed outcomes. Existing synchronous tools and `.platform_call.lock` retain their behavior; provider waits occur in investigation threads outside that host lock. No additional worker process, delegation depth, scheduler framework or scientific execution privilege is created.
+
+Submission atomically checks the frozen activity/parent grant, proposed children, source/tool narrowing, depth/count/concurrency ceilings and per-node/shared capacity, then reserves the node's complete allowance through `Store.reserve`. Each node owns an OS file lock across preparation, provider turns and settlement. Status observes that ownership across Host instances, rather than inferring failure from the returned outer call or relying on a process-local set. Sealed results and validated saved responses reconcile before unresolved work is classified. Completed work is collected without another attempt; abandoned or uncertain work remains unconfirmed with its reservation retained and no automatic retry. The owning application must remain alive for in-process investigations; process exit releases ownership, enabling conservative recovery rather than transparent resumption.
+
+An investigator may request an additional original evidence page through an advertised native `evidence.read` after optional prefetch. The existing native encoder/decoder, `bounded_evidence_page`, archive/context assembly, transport preparation and final complete-request guard are reused. All prefetch and query operations, including rejected operations within available quota, consume the node's evidence budget; each provider attempt is durably recorded and counted once inside the common reservation. Queries recheck current root/parent/activity authority. Exact reference, pointer, offset/page, content and content identity are saved as investigator read records. These never count as principal inspection. Exhaustion returns an incomplete bounded report without forcing another request. Output has a configurable ceiling up to 16 KiB, and elapsed time includes preparation; provider timeouts narrow to the remaining node deadline. Accumulated exchanges, native schemas, tool results and output reservation all count at every outgoing boundary. Offset pages retain original document pointers, and overviews cannot support factual claims.
+
+Principal source reads use `research.investigation_read` and persist distinct inspection IDs and public execution/request receipts before synthesis. Both prepared organizations collect two distinct completed reports, supply these original source pages and inspection records to the principal, then require two explicit structured decisions from its bounded report. The runner submits these through `research.investigation_disposition`; it never infers acceptance from synthesis prose. Only successful formal dispositions make the scenario complete. Investigators/coordinators cannot call principal inspection/disposition operations or return principal decisions.
+
+Acceptance requires the exact completed report reference and explicit `adopted_claims`. Every claim has supporting facts tied to that report, inspected original scope fields and a support explanation. References/media, original pointer values, supplied source identities and applicability fields are checked; persisted links identify the corresponding principal inspections and original source identities. An empty acceptance or unrelated citation list is insufficient. Deferred/rejected decisions may have no supporting reads when evidence is insufficient, with that limitation explicitly recorded and no independent-verification label. Counterevidence, report unknowns and principal remaining unknowns are retained. Claim statements, support explanations, report interpretation and rationale are recorded as semantically **unassessed**. No LLM judge or automated proof of arbitrary scientific reasoning is introduced.
+
+Focused evidence: [offline_verification.json](../evidence/research_mainline3_closeout_20261008/offline_verification.json). Seven focused cases use an injected deterministic `DeepSeekAdapter._transport` emitting native function calls. The production Host, dispatcher, native decoder, scoped evidence reader, request guard, shared ledger and disposition validator run normally. The checks cover an additional page absent from prefetch; out-of-scope reads, quota exhaustion and accumulated-request overflow; two public submissions entering transport before either release, concurrency rejection and sibling shared-balance rejection; active work observed from a new Host, completed collection without redispatch, saved-response reconciliation and retained uncertain reservations; linked principal acceptance, unsupported/unread/unrelated acceptance rejection, mismatched values/identities/report/scope, role restrictions and insufficient-evidence defer; both full prepared organizations; and offset-page visibility. Synchronization for concurrency uses explicit events, not timing thresholds. Synthetic provider attempts are charged only in isolated fixture stores. **Real provider requests, connectivity probes, simulations, scientific computations/solves and training runs remain zero.**
+
+Verification establishes these software paths with synthetic transport and saved evidence. Live provider handoffs, changed-radius closed-loop behavior, scientific preparation, dominant causes, improved model reasoning and full empirical acceptance remain pending separate authorization. Historical dependency seals and the older scheduler fixture coverage limitation are preserved.
+
+Final focused commands in the installed `softagent` environment:
+
+```powershell
+python -m tests.test_research_investigation_closeout
+python -m unittest tests.test_research_mainline3.Mainline3EngineeringTests.test_coordinator_child_narrowing_bounded_returns_and_atomic_siblings tests.test_research_mainline3.Mainline3EngineeringTests.test_unconfirmed_recovery_no_redispatch_and_confirmed_failure -v
+```
+
+Results: seven public-path cases and two existing investigation/recovery cases passed. The preparation-only command below also completed, and `git diff --check` passed. Canonical report, disposition and original-source bodies are retained by artifact identity in the compact evidence bundle, so its saved references remain inspectable after isolated test stores are removed. No broad historical regression campaign was run.
+
 ## Future commands and proposed budgets
 
 Preparation only (authorized in this round):
 
 ```powershell
 conda run -n softagent python -m tools.research_mainline3 --prepare runs/mainline3_v1_prepared_20261007/future_request.json
+conda run -n softagent python -m tools.research_mainline3 --prepare runs/mainline3_v1_closeout_prepared_20261008/future_request.json
 ```
 
 The following commands require **separate operator-issued ProjectConfig grant files**, unique grant IDs and new output directories. The grant files do not exist as active authorization in this delivery. The runner freezes a new session and never reopens archived work.
@@ -76,9 +104,11 @@ conda run -n softagent python -m tools.research_mainline3 --execute-grant grants
 | Separate proposal | Provider calls | Mathematical computations | Backend attempts | Tool calls / wall ceiling | Correction allowance |
 | --- | ---: | --- | ---: | --- | --- |
 | One joint near +1% / far -1% radius case | 0 | One existing candidate-local preparation/linearization (including its bounded working-point attempts), one metrics call, one endpoint call | 1 | 7 / 4,000 s | 0 automatic retries; any corrective execution needs its own grant |
-| Direct questions + principal synthesis | 3 | 0 | 0 | 8 / 900 s; node timeout <=180 s, concurrency <=2 | 0 retries |
-| Coordinator + two questions + principal synthesis | 4 | 0 | 0 | 10 / 1,200 s; node timeout <=180 s, concurrency <=2 | 0 retries |
+| Direct questions + principal synthesis + formal dispositions | Up to 9 (3/node) | 0 | 0 | 512 / 900 s; 8 evidence operations/node including prefetch, timeout <=180 s, concurrency <=2 | 0 retries |
+| Coordinator + two questions + principal synthesis + formal dispositions | Up to 12 (3/node) | 0 | 0 | 512 / 1,200 s; 8 evidence operations/node including prefetch, timeout <=180 s, concurrency <=2 | 0 retries |
 
 All proposed grants have zero worker-process calls. The mathematical allocation is a count of public operations plus their existing bounded internal working-point attempts, not a claim that each tool performs only one numerical solve. These small shared cases cover multiple connections; they are not an exhaustive combination campaign.
+
+The interface proposals supersede the earlier three-/four-request estimates. `--prepare` saves both proposals without activating a Store/grant or issuing a provider request. Their public grants include submission, status collection, independent principal reads and disposition; child query permissions remain scoped in the separate investigation grant. The tool ceiling includes node evidence reservations, up to 100 status checks/node, eight principal inspections and two dispositions. Principal synthesis uses six optional prefetch operations, leaving two for follow-up queries. Public interface operations reserve 5 s with a 30 s returned-operation limit rather than reserving the whole campaign wall ceiling; provider waits are separately reserved by the node. Execute commands still require new operator-issued ProjectConfig files, unique grants and output directories.
 
 Before publication the entire `origin/feat/gvs-dynamics..HEAD` range must be inspected. Unrelated unpublished commits would block pushing; they must remain intact. Publication status and delivered commit are reported separately after that check.

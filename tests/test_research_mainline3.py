@@ -174,7 +174,7 @@ class Mainline3EngineeringTests(TestCase):
         with self.assertRaisesRegex(ValueError,'TASK_ENVELOPE'):
             construct_candidate(tracking,{'design/far_routing_radius_scale':1.01})
 
-    def isolated_host(self,model_ceiling=5):
+    def isolated_host(self,model_ceiling=5,session_budget=None,operation_allowances=None):
         from tools.platform_host import Host
         folder=ROOT/'runs'/('mainline3-offline-'+uuid4().hex)
         folder.mkdir()
@@ -188,8 +188,8 @@ class Mainline3EngineeringTests(TestCase):
         cfg['policy']['allowed_tools']=['research.capabilities','research.prepare_candidate','research.investigate',
             'research.investigation_status','research.investigation_disposition','research.investigation_read','evidence.read']
         cfg['policy']['tool_bindings']={t:'1.0.0' for t in cfg['policy']['allowed_tools']}
-        cfg['policy']['budget']={**zero(),'tool_calls':30,'model_calls':8,'wall_s':1200.}
-        cfg['policy']['operation_allowances']={};cfg['policy']['timeout_s']=30.
+        cfg['policy']['budget']=session_budget or {**zero(),'tool_calls':30,'model_calls':8,'wall_s':1200.}
+        cfg['policy']['operation_allowances']=operation_allowances or {};cfg['policy']['timeout_s']=30.
         store=Store(folder/'store')
         self.blockers.enter_context(patch('tools.platform_store.ROOT',folder))
         store.create(dict(project_id='offline-'+uuid4().hex,grant_id='fixture-'+uuid4().hex,
@@ -201,15 +201,15 @@ class Mainline3EngineeringTests(TestCase):
             ref=plain(store.put(db,historical['execution']['factual_result']))
             state=store.session(host.run_id,db)['state'];state['role_context']=dict(investigation_grant=dict(
                 max_count=5,max_concurrency=2,allowed_tools=['evidence.read'],evidence=[ref],
-                per_node_budget={**zero(),'model_calls':1,'wall_s':60.},
-                total_budget={**zero(),'model_calls':model_ceiling,'wall_s':300.}))
+                per_node_budget={**zero(),'model_calls':1,'tool_calls':1,'wall_s':60.},
+                total_budget={**zero(),'model_calls':model_ceiling,'tool_calls':5,'wall_s':300.}))
             store.update_state(db,host.run_id,state)
         return host,ref
 
     def order(self,key,ref,**extra):
         return dict(investigation_id=key,question='Read saved terminal position error; distinguish acceptance and execution validity',
             evidence=[ref],queries=[dict(reference=ref,pointer='/terminal_error_m',byte_limit=2048,limit=8)],
-            allowed_tools=['evidence.read'],budget={**zero(),'model_calls':1,'wall_s':60.},
+            allowed_tools=['evidence.read'],budget={**zero(),'model_calls':1,'tool_calls':1,'wall_s':60.},
             timeout_s=30.,stop_conditions=['Return one bounded report','No new scientific computation'],**extra)
 
     def report(self,ref,children=()):
@@ -277,7 +277,10 @@ class Mainline3EngineeringTests(TestCase):
         self.assertEqual(dispatcher.dispatch(order,transport=lambda p:self.fail('duplicate dispatch')).status,'completed')
         fact=plain(self.report(ref).facts[0])
         with self.assertRaisesRegex(ValueError,'PRINCIPAL_MUST_INSPECT'):
-            dispatcher.disposition(dict(investigation_id='direct',disposition='accept',evidence_used=[fact],reason='Saved fact supported'))
+            dispatcher.disposition(dict(investigation_id='direct',report=plain(report.result),disposition='accept',
+                adopted_claims=[dict(statement='Retain saved observation',supporting_facts=[fact],
+                    scope=[dict(statement='Saved scope',reference=ref,pointer='/result_type',value='free_reach')],
+                    support_explanation='This original observation supports the bounded saved report')],reason='Saved fact supported'))
         receipt=invoke(host,'research.investigation_read',dict(reference=ref,pointer='/terminal_error_m'),request_id='principal-read')
         self.assertEqual(receipt['execution_status'],'completed',receipt.get('error'))
         self.assertEqual(dispatcher.disposition(dict(investigation_id='direct',disposition='defer',

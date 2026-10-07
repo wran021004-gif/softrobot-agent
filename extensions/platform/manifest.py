@@ -79,10 +79,10 @@ for name,schema,output,binding in (
     ('research.investigation_disposition',PrincipalDisposition,InvestigationResult,'disposition'),
     ('research.investigation_read',ReadEvidence,EvidencePage,'read_source')):
     EXTENSIONS.append(Extension(name,'tool','1.0.0',schema,output,
-        'tools.research_investigations:'+binding,'Bounded scoped evidence investigations; suggestions do not authorize computation',
-        sources=('tools/research_investigations.py','tools/platform_workers.py','tools/platform_store.py','tools/context_assembly.py'),
+        'tools.research_investigations:'+binding,('Accept a durable bounded investigation submission; collect completion through research.investigation_status. Native evidence queries consume node limits; no scientific execution.' if binding=='dispatch' else 'Collect bounded reports, inspect original evidence, or record explicit principal claims and disposition. Source checks do not prove semantic correctness.'),
+        sources=('tools/research_investigations.py','tools/platform_workers.py','tools/platform_store.py','tools/context_assembly.py','tools/platform_tools.py','tools/platform_models.py','schemas/platform_operations.py'),
         capabilities=dict(category='diagnostics',role='public_tool',
-            **(dict(delegated_execution=True,preflight='tools.research_investigations:dispatch_preflight',model_calls=1) if binding=='dispatch' else {}))))
+            **(dict(delegated_execution=True,preflight='tools.research_investigations:dispatch_preflight',interactive_evidence=True,submission_only=True) if binding=='dispatch' else {}))))
 
 from schemas import platform_handoff as handoff
 EXTENSIONS.append(Extension('research.decide','tool','1.0.0',handoff.ResearchDecision,handoff.HandoffResult,
