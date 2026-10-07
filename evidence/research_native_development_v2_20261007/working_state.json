@@ -1,6 +1,6 @@
 {
   "reference": {
-    "artifact_id": "6c34a4191effafd6d1dee45d001d4e800c83e1c06b8fd048093f3927aa210fe0",
+    "artifact_id": "8322eb2d2081f3e75995c14b0ba2bba1a8d42dae96fa4e8f53ccfde455bc80e6",
     "media_type": "application/json"
   },
   "state": {
@@ -194,153 +194,29 @@
       "replication_pairs": [],
       "new_execution_ids": [],
       "legal_actions": {
-        "control_search": {
-          "paths": [
-            "control/recipe/terminal_tip_speed_weight",
-            "control/recipe/holding_tip_speed_weight"
-          ],
-          "minimum_batch": {
-            "backend_solves": 1,
-            "worker_calls": 0,
-            "model_calls": 5,
-            "tool_calls": 9,
-            "wall_s": 1595.0
-          },
-          "methods": [
-            "search.family_coordinate@1.0.0",
-            "search.family_explicit@1.0.0"
-          ],
-          "domains": {
-            "control/recipe/terminal_tip_speed_weight": [
-              0.025,
-              0.1
-            ],
-            "control/recipe/holding_tip_speed_weight": [
-              0.025,
-              0.1
-            ]
-          },
-          "mixed_semantics": "structure_search permits a joint structural/control subset; each ask/tell point constructs all selected values together, followed by one unchanged v7 closed-loop execution. No inner search or extra control budget.",
-          "method_semantics": {
-            "search.family_coordinate@1.0.0": "Numerically generated continuous coordinate proposals; categorical paths unavailable.",
-            "search.family_explicit@1.0.0": "Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated."
-          },
-          "frozen_cases": [
-            "nominal",
-            "near_z_plus",
-            "near_z_minus",
-            "far_y_plus",
-            "far_y_minus"
-          ],
-          "seeds": [
-            17,
-            18
-          ],
-          "execution_authorized": true,
-          "proposal_only": false
-        },
-        "structure_search": {
-          "paths": [
-            "components/near/length_m",
-            "design/near_section_scale",
-            "design/near_material_scenario",
-            "components/far/length_m",
-            "design/far_section_scale",
-            "design/far_material_scenario",
-            "control/recipe/terminal_tip_speed_weight",
-            "control/recipe/holding_tip_speed_weight"
-          ],
-          "minimum_batch": {
-            "backend_solves": 1,
-            "worker_calls": 0,
-            "model_calls": 5,
-            "tool_calls": 9,
-            "wall_s": 1595.0
-          },
-          "methods": [
-            "search.family_coordinate@1.0.0",
-            "search.family_explicit@1.0.0"
-          ],
-          "domains": {
-            "components/near/length_m": [
-              0.15,
-              0.17
-            ],
-            "design/near_section_scale": [
-              0.95,
-              1.05
-            ],
-            "design/near_material_scenario": [
-              "baseline",
-              "compliant",
-              "stiff"
-            ],
-            "components/far/length_m": [
-              0.11,
-              0.13
-            ],
-            "design/far_section_scale": [
-              0.95,
-              1.05
-            ],
-            "design/far_material_scenario": [
-              "baseline",
-              "compliant",
-              "stiff"
-            ],
-            "control/recipe/terminal_tip_speed_weight": [
-              0.025,
-              0.1
-            ],
-            "control/recipe/holding_tip_speed_weight": [
-              0.025,
-              0.1
-            ]
-          },
-          "mixed_semantics": "structure_search permits a joint structural/control subset; each ask/tell point constructs all selected values together, followed by one unchanged v7 closed-loop execution. No inner search or extra control budget.",
-          "method_semantics": {
-            "search.family_coordinate@1.0.0": "Numerically generated continuous coordinate proposals; categorical paths unavailable.",
-            "search.family_explicit@1.0.0": "Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated."
-          },
-          "frozen_cases": [
-            "nominal",
-            "near_z_plus",
-            "near_z_minus",
-            "far_y_plus",
-            "far_y_minus"
-          ],
-          "seeds": [
-            17,
-            18
-          ],
-          "execution_authorized": true,
-          "proposal_only": false
-        },
-        "diagnosis": {
-          "operations": [
-            "retained prediction/plans/motion query"
-          ],
-          "max_wall_s": 180,
-          "numerical_gap": "Local controller comparisons require separately bound adoption and saved-horizon prerequisites; no such grant installed in this scheduling context."
-        },
         "stop": {
-          "reason": "Voluntary delivery is always legal"
+          "reason": "Final interpretation only; research STOP remains sealed",
+          "execution_authorized": false
         }
       },
       "remaining_budget": {
         "backend_solves": 8,
-        "model_calls": 24,
-        "tool_calls": 127,
-        "wall_s": 12716.654967069626,
+        "model_calls": 19,
+        "tool_calls": 122,
+        "wall_s": 0,
         "worker_calls": 0
       },
       "stop": {
-        "status": "prepared",
-        "reason": null,
+        "status": "failed",
+        "reason": "RESEARCH_DECISION_INCOMPLETE: MODEL_PROTOCOL_CORRECTION_CONSECUTIVE_LIMIT: CAPABILITY_GAP: Complete execution and delivery reservation unavailable: {'backend_solves': 0, 'worker_calls': 0, 'model_calls': 0, 'tool_calls': 0, 'wall_s': 1595.0}",
         "sealed_cases": []
       },
       "unresolved": [
-        "Dominant physical cause and broad repeatability remain unresolved."
+        "The unchanged incumbent's joint reach-and-hold acceptance under the near_z_plus and the other frozen perturbations is unmeasured.",
+        "The dominant physical mechanism of the changed near-section-scale candidate's holding-speed failure is unidentified; sealed M5 negative forecasts carry no screening authority.",
+        "Whether any control weight change lowers perturbed holding speed without worsening holding position error (a trade-off, not overall improvement) is untested.",
+        "Seed-level repeatability of the retained incumbent at nominal is not established (no explicit matching repeat in supplied scope), and no variance or trajectory-identity claim is made.",
+        "Whether a future reservable slot would even allow a decisive perturbed-incumbent reference remains a scheduling uncertainty, not a scientific result."
       ],
       "change_evidence": [
         "voluntary model STOP",
@@ -357,17 +233,17 @@
           "worker_calls": 0
         },
         "used": {
-          "tool_calls": 3,
-          "model_calls": 0,
+          "tool_calls": 8,
+          "model_calls": 5,
           "backend_solves": 0,
           "worker_calls": 0,
-          "wall_s": 8.562999999994645
+          "wall_s": 428.09269616888196
         },
         "remaining": {
           "backend_solves": 28,
-          "model_calls": 24,
-          "tool_calls": 197,
-          "wall_s": 35991.437000000005,
+          "model_calls": 19,
+          "tool_calls": 192,
+          "wall_s": 35571.90730383112,
           "worker_calls": 0
         },
         "occupied": {}
@@ -429,13 +305,68 @@
           "verdict": "supports sampled association only",
           "scope": "Both selected points fail sampled holding speed versus retained incumbent; monotonicity and causal attribution remain unverified, as the model also acknowledges."
         }
+      ],
+      "hypotheses": [
+        {
+          "contradicting_evidence": [],
+          "scope": "Nominal case, seed 17, this campaign store; sampled acceptance over the final 0.05 s window.",
+          "statement": "The retained incumbent execution (91c3ba1b01d6499fb26df8f95409401b) is a complete valid closed-loop evaluation that is jointly accepted, with terminal_error_m 0.002697828858325615, holding_max_error_m 0.0027300544346297905 and holding_max_speed_m_s 0.012750255515948416, all inside the frozen 0.01 m / 0.01 m / 0.02 m/s limits.",
+          "supporting_evidence": [
+            "F14",
+            "F123",
+            "F11",
+            "F24",
+            "F116",
+            "F118",
+            "F98",
+            "F18",
+            "F16",
+            "F21",
+            "F33",
+            "F71",
+            "F76",
+            "F131"
+          ],
+          "uncertainty": "Single seed with no variance estimate; sampled acceptance is not a continuous-time guarantee and no real-time, hardware or superiority claim follows."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "near_z_plus, seed 17, changed near-section-scale structure versus retained nominal incumbent.",
+          "statement": "The only perturbed datum in scope is a changed near-section-scale candidate at near_z_plus that is a valid_failure: holding speed 0.06758272073425946 m/s exceeds the 0.02 limit while terminal error 0.0028029393033160714 m and holding position 0.004094678029888374 m stay within limits. Because the structural edit and the initial-state perturbation are confounded in one execution, this datum does not establish the unchanged incumbent's behavior under that perturbation.",
+          "supporting_evidence": [
+            "F3",
+            "F51",
+            "F45",
+            "F4",
+            "F128",
+            "F54",
+            "F70",
+            "F65",
+            "F93",
+            "F121",
+            "F60",
+            "F104",
+            "F109",
+            "F68"
+          ],
+          "uncertainty": "One execution; structural and perturbation effects are confounded; the dominant physical cause is unidentified and no causal attribution is made."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "This recovery/scheduling context only.",
+          "statement": "No new candidate execution can be completed or credited in this context, so the frozen case question cannot be advanced by further control or structure search; the attempt to reserve complete execution and delivery failed with a capability gap, the business consecutive-failure count exceeds its limit with zero remaining repairs, and the protocol correction allowance is exhausted.",
+          "supporting_evidence": [
+            "F64"
+          ],
+          "uncertainty": "This rests on the reported recovery-state feedback rather than a recorded F fact; a missing reservation slot is a scheduling fact, not physical evidence about the robot, and supports no claim about the system."
+        }
       ]
     },
     "budget": {
       "backend_solves": 8,
-      "model_calls": 24,
-      "tool_calls": 127,
-      "wall_s": 12716.654967069626,
+      "model_calls": 19,
+      "tool_calls": 122,
+      "wall_s": 0,
       "worker_calls": 0
     },
     "budget_accounting": {
@@ -447,17 +378,17 @@
         "worker_calls": 0
       },
       "used": {
-        "tool_calls": 3,
-        "model_calls": 0,
+        "tool_calls": 8,
+        "model_calls": 5,
         "backend_solves": 0,
         "worker_calls": 0,
-        "wall_s": 8.562999999994645
+        "wall_s": 428.09269616888196
       },
       "remaining": {
         "backend_solves": 28,
-        "model_calls": 24,
-        "tool_calls": 197,
-        "wall_s": 35991.437000000005,
+        "model_calls": 19,
+        "tool_calls": 192,
+        "wall_s": 35571.90730383112,
         "worker_calls": 0
       },
       "occupied": {}
@@ -466,149 +397,1013 @@
     "candidate_configuration": null,
     "capabilities": {
       "legal": {
-        "control_search": {
-          "paths": [
-            "control/recipe/terminal_tip_speed_weight",
-            "control/recipe/holding_tip_speed_weight"
-          ],
-          "minimum_batch": {
-            "backend_solves": 1,
-            "worker_calls": 0,
-            "model_calls": 5,
-            "tool_calls": 9,
-            "wall_s": 1595.0
-          },
-          "methods": [
-            "search.family_coordinate@1.0.0",
-            "search.family_explicit@1.0.0"
-          ],
-          "domains": {
-            "control/recipe/terminal_tip_speed_weight": [
-              0.025,
-              0.1
-            ],
-            "control/recipe/holding_tip_speed_weight": [
-              0.025,
-              0.1
-            ]
-          },
-          "mixed_semantics": "structure_search permits a joint structural/control subset; each ask/tell point constructs all selected values together, followed by one unchanged v7 closed-loop execution. No inner search or extra control budget.",
-          "method_semantics": {
-            "search.family_coordinate@1.0.0": "Numerically generated continuous coordinate proposals; categorical paths unavailable.",
-            "search.family_explicit@1.0.0": "Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated."
-          },
-          "frozen_cases": [
-            "nominal",
-            "near_z_plus",
-            "near_z_minus",
-            "far_y_plus",
-            "far_y_minus"
-          ],
-          "seeds": [
-            17,
-            18
-          ],
-          "execution_authorized": true,
-          "proposal_only": false
-        },
-        "structure_search": {
-          "paths": [
-            "components/near/length_m",
-            "design/near_section_scale",
-            "design/near_material_scenario",
-            "components/far/length_m",
-            "design/far_section_scale",
-            "design/far_material_scenario",
-            "control/recipe/terminal_tip_speed_weight",
-            "control/recipe/holding_tip_speed_weight"
-          ],
-          "minimum_batch": {
-            "backend_solves": 1,
-            "worker_calls": 0,
-            "model_calls": 5,
-            "tool_calls": 9,
-            "wall_s": 1595.0
-          },
-          "methods": [
-            "search.family_coordinate@1.0.0",
-            "search.family_explicit@1.0.0"
-          ],
-          "domains": {
-            "components/near/length_m": [
-              0.15,
-              0.17
-            ],
-            "design/near_section_scale": [
-              0.95,
-              1.05
-            ],
-            "design/near_material_scenario": [
-              "baseline",
-              "compliant",
-              "stiff"
-            ],
-            "components/far/length_m": [
-              0.11,
-              0.13
-            ],
-            "design/far_section_scale": [
-              0.95,
-              1.05
-            ],
-            "design/far_material_scenario": [
-              "baseline",
-              "compliant",
-              "stiff"
-            ],
-            "control/recipe/terminal_tip_speed_weight": [
-              0.025,
-              0.1
-            ],
-            "control/recipe/holding_tip_speed_weight": [
-              0.025,
-              0.1
-            ]
-          },
-          "mixed_semantics": "structure_search permits a joint structural/control subset; each ask/tell point constructs all selected values together, followed by one unchanged v7 closed-loop execution. No inner search or extra control budget.",
-          "method_semantics": {
-            "search.family_coordinate@1.0.0": "Numerically generated continuous coordinate proposals; categorical paths unavailable.",
-            "search.family_explicit@1.0.0": "Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated."
-          },
-          "frozen_cases": [
-            "nominal",
-            "near_z_plus",
-            "near_z_minus",
-            "far_y_plus",
-            "far_y_minus"
-          ],
-          "seeds": [
-            17,
-            18
-          ],
-          "execution_authorized": true,
-          "proposal_only": false
-        },
-        "diagnosis": {
-          "operations": [
-            "retained prediction/plans/motion query"
-          ],
-          "max_wall_s": 180,
-          "numerical_gap": "Local controller comparisons require separately bound adoption and saved-horizon prerequisites; no such grant installed in this scheduling context."
-        },
         "stop": {
-          "reason": "Voluntary delivery is always legal"
+          "reason": "Final interpretation only; research STOP remains sealed",
+          "execution_authorized": false
         }
       },
-      "unavailable": {},
+      "unavailable": {
+        "control_search": "Research trajectory closed; final interpretation cannot dispatch work",
+        "structure_search": "Research trajectory closed; final interpretation cannot dispatch work",
+        "diagnosis": "Research trajectory closed; final interpretation cannot dispatch work"
+      },
       "remaining": {
         "backend_solves": 8,
-        "model_calls": 24,
-        "tool_calls": 127,
-        "wall_s": 12716.654967069626,
+        "model_calls": 19,
+        "tool_calls": 122,
+        "wall_s": 0,
         "worker_calls": 0
       }
     },
-    "claims": {},
+    "claims": {
+      "round0-interpretation-0": [
+        {
+          "causal_truth_verified": false,
+          "claim": {
+            "claim_id": "round0-interpretation-0",
+            "counterexamples": [],
+            "evidence_aliases": {
+              "contradiction": [],
+              "support": [
+                "F14",
+                "F123",
+                "F11",
+                "F24",
+                "F116",
+                "F118",
+                "F98",
+                "F18",
+                "F16",
+                "F21",
+                "F33",
+                "F71",
+                "F76",
+                "F131"
+              ]
+            },
+            "scope": "Nominal case, seed 17, this campaign store; sampled acceptance over the final 0.05 s window.",
+            "statement": "The retained incumbent execution (91c3ba1b01d6499fb26df8f95409401b) is a complete valid closed-loop evaluation that is jointly accepted, with terminal_error_m 0.002697828858325615, holding_max_error_m 0.0027300544346297905 and holding_max_speed_m_s 0.012750255515948416, all inside the frozen 0.01 m / 0.01 m / 0.02 m/s limits.",
+            "supporting_evidence": [
+              {
+                "pointer": "/incumbent/acceptance/status",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": "accepted"
+              },
+              {
+                "pointer": "/incumbent/acceptance/accepted",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/evaluation_validity/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/metrics/terminal_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.002697828858325615
+              },
+              {
+                "pointer": "/incumbent/acceptance/metrics/holding_max_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.0027300544346297905
+              },
+              {
+                "pointer": "/incumbent/acceptance/metrics/holding_max_speed_m_s",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.012750255515948416
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/holding_position/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/holding_speed/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/evaluator:task_bound/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/force_bounds/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/holding_coverage/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/execution_complete/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/task_evaluator/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/solver_errors/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              }
+            ],
+            "uncertainty": "Single seed with no variance estimate; sampled acceptance is not a continuous-time guarantee and no real-time, hardware or superiority claim follows."
+          },
+          "evidence_source": {
+            "artifact_id": "153e1820f52f10b76503c5d5fd447be2932c89e450440a308274c20895d515cf",
+            "media_type": "application/json"
+          },
+          "sequence": 8
+        },
+        {
+          "sequence": 9,
+          "claim": {
+            "claim_id": "round0-interpretation-0",
+            "statement": "The retained incumbent execution (91c3ba1b01d6499fb26df8f95409401b) is a complete valid closed-loop evaluation that is jointly accepted, with terminal_error_m 0.002697828858325615, holding_max_error_m 0.0027300544346297905 and holding_max_speed_m_s 0.012750255515948416, all inside the frozen 0.01 m / 0.01 m / 0.02 m/s limits.",
+            "supporting_evidence": [
+              {
+                "pointer": "/incumbent/acceptance/status",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": "accepted"
+              },
+              {
+                "pointer": "/incumbent/acceptance/accepted",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/evaluation_validity/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/metrics/terminal_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.002697828858325615
+              },
+              {
+                "pointer": "/incumbent/acceptance/metrics/holding_max_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.0027300544346297905
+              },
+              {
+                "pointer": "/incumbent/acceptance/metrics/holding_max_speed_m_s",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.012750255515948416
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/holding_position/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/holding_speed/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/evaluator:task_bound/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/force_bounds/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/holding_coverage/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/execution_complete/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/task_evaluator/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/solver_errors/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              }
+            ],
+            "counterexamples": [],
+            "evidence_aliases": {
+              "support": [
+                "F14",
+                "F123",
+                "F11",
+                "F24",
+                "F116",
+                "F118",
+                "F98",
+                "F18",
+                "F16",
+                "F21",
+                "F33",
+                "F71",
+                "F76",
+                "F131"
+              ],
+              "contradiction": []
+            },
+            "scope": "Nominal case, seed 17, this campaign store; sampled acceptance over the final 0.05 s window.",
+            "uncertainty": "Single seed with no variance estimate; sampled acceptance is not a continuous-time guarantee and no real-time, hardware or superiority claim follows."
+          },
+          "evidence_source": {
+            "artifact_id": "153e1820f52f10b76503c5d5fd447be2932c89e450440a308274c20895d515cf",
+            "media_type": "application/json"
+          },
+          "causal_truth_verified": false
+        },
+        {
+          "sequence": 10,
+          "claim": {
+            "claim_id": "round0-interpretation-0",
+            "statement": "The retained incumbent execution (91c3ba1b01d6499fb26df8f95409401b) is a complete valid closed-loop evaluation that is jointly accepted, with terminal_error_m 0.002697828858325615, holding_max_error_m 0.0027300544346297905 and holding_max_speed_m_s 0.012750255515948416, all inside the frozen 0.01 m / 0.01 m / 0.02 m/s limits.",
+            "supporting_evidence": [
+              {
+                "pointer": "/incumbent/acceptance/status",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": "accepted"
+              },
+              {
+                "pointer": "/incumbent/acceptance/accepted",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/evaluation_validity/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/metrics/terminal_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.002697828858325615
+              },
+              {
+                "pointer": "/incumbent/acceptance/metrics/holding_max_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.0027300544346297905
+              },
+              {
+                "pointer": "/incumbent/acceptance/metrics/holding_max_speed_m_s",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.012750255515948416
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/holding_position/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/holding_speed/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/evaluator:task_bound/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/force_bounds/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/holding_coverage/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/execution_complete/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/task_evaluator/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/incumbent/acceptance/components/solver_errors/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              }
+            ],
+            "counterexamples": [],
+            "evidence_aliases": {
+              "support": [
+                "F14",
+                "F123",
+                "F11",
+                "F24",
+                "F116",
+                "F118",
+                "F98",
+                "F18",
+                "F16",
+                "F21",
+                "F33",
+                "F71",
+                "F76",
+                "F131"
+              ],
+              "contradiction": []
+            },
+            "scope": "Nominal case, seed 17, this campaign store; sampled acceptance over the final 0.05 s window.",
+            "uncertainty": "Single seed with no variance estimate; sampled acceptance is not a continuous-time guarantee and no real-time, hardware or superiority claim follows."
+          },
+          "evidence_source": {
+            "artifact_id": "153e1820f52f10b76503c5d5fd447be2932c89e450440a308274c20895d515cf",
+            "media_type": "application/json"
+          },
+          "causal_truth_verified": false
+        }
+      ],
+      "round0-interpretation-1": [
+        {
+          "causal_truth_verified": false,
+          "claim": {
+            "claim_id": "round0-interpretation-1",
+            "counterexamples": [],
+            "evidence_aliases": {
+              "contradiction": [],
+              "support": [
+                "F3",
+                "F51",
+                "F45",
+                "F4",
+                "F128",
+                "F54",
+                "F70",
+                "F65",
+                "F93",
+                "F121",
+                "F60",
+                "F104",
+                "F109",
+                "F68"
+              ]
+            },
+            "scope": "near_z_plus, seed 17, changed near-section-scale structure versus retained nominal incumbent.",
+            "statement": "The only perturbed datum in scope is a changed near-section-scale candidate at near_z_plus that is a valid_failure: holding speed 0.06758272073425946 m/s exceeds the 0.02 limit while terminal error 0.0028029393033160714 m and holding position 0.004094678029888374 m stay within limits. Because the structural edit and the initial-state perturbation are confounded in one execution, this datum does not establish the unchanged incumbent's behavior under that perturbation.",
+            "supporting_evidence": [
+              {
+                "pointer": "/subsequent_event/acceptance/status",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": "valid_failure"
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/accepted",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": false
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/holding_speed/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": false
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/metrics/holding_max_speed_m_s",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.06758272073425946
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/metrics/holding_max_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.004094678029888374
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/metrics/terminal_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.0028029393033160714
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/evaluation_validity/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/evaluator:task_bound/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/execution_complete/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/solver_errors/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/holding_coverage/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/holding_position/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/force_bounds/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/task_evaluator/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              }
+            ],
+            "uncertainty": "One execution; structural and perturbation effects are confounded; the dominant physical cause is unidentified and no causal attribution is made."
+          },
+          "evidence_source": {
+            "artifact_id": "1028bb9ae0ba7ce59d89694be8dffd7b297c24ad405842a1bb6036bcca735054",
+            "media_type": "application/json"
+          },
+          "sequence": 8
+        },
+        {
+          "sequence": 9,
+          "claim": {
+            "claim_id": "round0-interpretation-1",
+            "statement": "The only perturbed datum in scope is a changed near-section-scale candidate at near_z_plus that is a valid_failure: holding speed 0.06758272073425946 m/s exceeds the 0.02 limit while terminal error 0.0028029393033160714 m and holding position 0.004094678029888374 m stay within limits. Because the structural edit and the initial-state perturbation are confounded in one execution, this datum does not establish the unchanged incumbent's behavior under that perturbation.",
+            "supporting_evidence": [
+              {
+                "pointer": "/subsequent_event/acceptance/status",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": "valid_failure"
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/accepted",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": false
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/holding_speed/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": false
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/metrics/holding_max_speed_m_s",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.06758272073425946
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/metrics/holding_max_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.004094678029888374
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/metrics/terminal_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.0028029393033160714
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/evaluation_validity/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/evaluator:task_bound/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/execution_complete/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/solver_errors/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/holding_coverage/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/holding_position/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/force_bounds/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/task_evaluator/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              }
+            ],
+            "counterexamples": [],
+            "evidence_aliases": {
+              "support": [
+                "F3",
+                "F51",
+                "F45",
+                "F4",
+                "F128",
+                "F54",
+                "F70",
+                "F65",
+                "F93",
+                "F121",
+                "F60",
+                "F104",
+                "F109",
+                "F68"
+              ],
+              "contradiction": []
+            },
+            "scope": "near_z_plus, seed 17, changed near-section-scale structure versus retained nominal incumbent.",
+            "uncertainty": "One execution; structural and perturbation effects are confounded; the dominant physical cause is unidentified and no causal attribution is made."
+          },
+          "evidence_source": {
+            "artifact_id": "1028bb9ae0ba7ce59d89694be8dffd7b297c24ad405842a1bb6036bcca735054",
+            "media_type": "application/json"
+          },
+          "causal_truth_verified": false
+        },
+        {
+          "sequence": 10,
+          "claim": {
+            "claim_id": "round0-interpretation-1",
+            "statement": "The only perturbed datum in scope is a changed near-section-scale candidate at near_z_plus that is a valid_failure: holding speed 0.06758272073425946 m/s exceeds the 0.02 limit while terminal error 0.0028029393033160714 m and holding position 0.004094678029888374 m stay within limits. Because the structural edit and the initial-state perturbation are confounded in one execution, this datum does not establish the unchanged incumbent's behavior under that perturbation.",
+            "supporting_evidence": [
+              {
+                "pointer": "/subsequent_event/acceptance/status",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": "valid_failure"
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/accepted",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": false
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/holding_speed/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": false
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/metrics/holding_max_speed_m_s",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.06758272073425946
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/metrics/holding_max_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.004094678029888374
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/metrics/terminal_error_m",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": 0.0028029393033160714
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/evaluation_validity/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/evaluator:task_bound/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/execution_complete/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/solver_errors/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/holding_coverage/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/holding_position/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/force_bounds/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              },
+              {
+                "pointer": "/subsequent_event/acceptance/components/task_evaluator/passed",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": true
+              }
+            ],
+            "counterexamples": [],
+            "evidence_aliases": {
+              "support": [
+                "F3",
+                "F51",
+                "F45",
+                "F4",
+                "F128",
+                "F54",
+                "F70",
+                "F65",
+                "F93",
+                "F121",
+                "F60",
+                "F104",
+                "F109",
+                "F68"
+              ],
+              "contradiction": []
+            },
+            "scope": "near_z_plus, seed 17, changed near-section-scale structure versus retained nominal incumbent.",
+            "uncertainty": "One execution; structural and perturbation effects are confounded; the dominant physical cause is unidentified and no causal attribution is made."
+          },
+          "evidence_source": {
+            "artifact_id": "1028bb9ae0ba7ce59d89694be8dffd7b297c24ad405842a1bb6036bcca735054",
+            "media_type": "application/json"
+          },
+          "causal_truth_verified": false
+        }
+      ],
+      "round0-interpretation-2": [
+        {
+          "causal_truth_verified": false,
+          "claim": {
+            "claim_id": "round0-interpretation-2",
+            "counterexamples": [],
+            "evidence_aliases": {
+              "contradiction": [],
+              "support": [
+                "F64"
+              ]
+            },
+            "scope": "This recovery/scheduling context only.",
+            "statement": "No new candidate execution can be completed or credited in this context, so the frozen case question cannot be advanced by further control or structure search; the attempt to reserve complete execution and delivery failed with a capability gap, the business consecutive-failure count exceeds its limit with zero remaining repairs, and the protocol correction allowance is exhausted.",
+            "supporting_evidence": [
+              {
+                "pointer": "/status",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": "prepared"
+              }
+            ],
+            "uncertainty": "This rests on the reported recovery-state feedback rather than a recorded F fact; a missing reservation slot is a scheduling fact, not physical evidence about the robot, and supports no claim about the system."
+          },
+          "evidence_source": {
+            "artifact_id": "6716fbd42d23ccd97a2232b5ba5287692c382ec0a093707031f05817dca2d442",
+            "media_type": "application/json"
+          },
+          "sequence": 8
+        },
+        {
+          "sequence": 9,
+          "claim": {
+            "claim_id": "round0-interpretation-2",
+            "statement": "No new candidate execution can be completed or credited in this context, so the frozen case question cannot be advanced by further control or structure search; the attempt to reserve complete execution and delivery failed with a capability gap, the business consecutive-failure count exceeds its limit with zero remaining repairs, and the protocol correction allowance is exhausted.",
+            "supporting_evidence": [
+              {
+                "pointer": "/status",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": "prepared"
+              }
+            ],
+            "counterexamples": [],
+            "evidence_aliases": {
+              "support": [
+                "F64"
+              ],
+              "contradiction": []
+            },
+            "scope": "This recovery/scheduling context only.",
+            "uncertainty": "This rests on the reported recovery-state feedback rather than a recorded F fact; a missing reservation slot is a scheduling fact, not physical evidence about the robot, and supports no claim about the system."
+          },
+          "evidence_source": {
+            "artifact_id": "6716fbd42d23ccd97a2232b5ba5287692c382ec0a093707031f05817dca2d442",
+            "media_type": "application/json"
+          },
+          "causal_truth_verified": false
+        },
+        {
+          "sequence": 10,
+          "claim": {
+            "claim_id": "round0-interpretation-2",
+            "statement": "No new candidate execution can be completed or credited in this context, so the frozen case question cannot be advanced by further control or structure search; the attempt to reserve complete execution and delivery failed with a capability gap, the business consecutive-failure count exceeds its limit with zero remaining repairs, and the protocol correction allowance is exhausted.",
+            "supporting_evidence": [
+              {
+                "pointer": "/status",
+                "reference": {
+                  "artifact_id": "bd192eb588e09bdde89408a52d3fa40a6c6b596997b05d17aba69376469a9564",
+                  "media_type": "application/json"
+                },
+                "value": "prepared"
+              }
+            ],
+            "counterexamples": [],
+            "evidence_aliases": {
+              "support": [
+                "F64"
+              ],
+              "contradiction": []
+            },
+            "scope": "This recovery/scheduling context only.",
+            "uncertainty": "This rests on the reported recovery-state feedback rather than a recorded F fact; a missing reservation slot is a scheduling fact, not physical evidence about the robot, and supports no claim about the system."
+          },
+          "evidence_source": {
+            "artifact_id": "6716fbd42d23ccd97a2232b5ba5287692c382ec0a093707031f05817dca2d442",
+            "media_type": "application/json"
+          },
+          "causal_truth_verified": false
+        }
+      ]
+    },
     "current_facts": {
       "f_493945ea9cf3f51b44c3": {
         "execution_id": "110dc2c9c1d642dcb018664a65c62c30",
@@ -2566,9 +3361,86 @@
         }
       },
       {
+        "canonical_facts": {
+          "artifact_id": "923574990ef9e1030618514bffc3d51a03e74cb72f967e76f22b48fa85521188",
+          "media_type": "application/json"
+        },
         "revision": 3,
         "source": {
           "artifact_id": "01aaa0636096a9afdd3f662b273345a2622e4c9a3ebdcea2572e47ba7396e434",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "canonical_facts": {
+          "artifact_id": "923574990ef9e1030618514bffc3d51a03e74cb72f967e76f22b48fa85521188",
+          "media_type": "application/json"
+        },
+        "revision": 4,
+        "source": {
+          "artifact_id": "43d12dce96630cde4deabf01244c65ff2b3747c1764d3d02af384f73301bf054",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "canonical_facts": {
+          "artifact_id": "923574990ef9e1030618514bffc3d51a03e74cb72f967e76f22b48fa85521188",
+          "media_type": "application/json"
+        },
+        "revision": 5,
+        "source": {
+          "artifact_id": "30a18fff256786a882866fc80989f61e63e530a9aebd46b7db7710768017f4a3",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "canonical_facts": {
+          "artifact_id": "923574990ef9e1030618514bffc3d51a03e74cb72f967e76f22b48fa85521188",
+          "media_type": "application/json"
+        },
+        "revision": 6,
+        "source": {
+          "artifact_id": "d84afcac34dcc9bffe16fc5dc42316934522a055ae99733e6f9f295e27e9f090",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "canonical_facts": {
+          "artifact_id": "923574990ef9e1030618514bffc3d51a03e74cb72f967e76f22b48fa85521188",
+          "media_type": "application/json"
+        },
+        "revision": 7,
+        "source": {
+          "artifact_id": "d84afcac34dcc9bffe16fc5dc42316934522a055ae99733e6f9f295e27e9f090",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "canonical_facts": {
+          "artifact_id": "923574990ef9e1030618514bffc3d51a03e74cb72f967e76f22b48fa85521188",
+          "media_type": "application/json"
+        },
+        "revision": 8,
+        "source": {
+          "artifact_id": "d64df5c23d42cbfaddccd705f42cee25ced41569e25a5977fd92975d71fdff59",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "revision": 9,
+        "source": {
+          "artifact_id": "7739d01fa59013521f42a6911f7f6f3d5af811ea76b09b2739c2b1deaee2b41d",
+          "media_type": "application/json"
+        },
+        "canonical_facts": {
+          "artifact_id": "923574990ef9e1030618514bffc3d51a03e74cb72f967e76f22b48fa85521188",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "revision": 10,
+        "source": {
+          "artifact_id": "b07130a11b6fa014eed3dbc76b7d078ea893eb2b08b84c6ad136dc8c6bb7191d",
           "media_type": "application/json"
         },
         "canonical_facts": {
@@ -7349,7 +8221,7 @@
       },
       "current_batch_source": null,
       "predecessor_decision": {
-        "artifact_id": "73d51b89a7dcd84639eeac83bdab0d586990b97dc8826592610f66ccf39f5a7a",
+        "artifact_id": "0e7a028437ecb568dd24968f3c453592cf6ae2465538bd702852f9f1cc3777d3",
         "media_type": "application/json"
       },
       "current_feedback": {
@@ -8158,145 +9030,21 @@
       },
       "capabilities": {
         "legal": {
-          "control_search": {
-            "paths": [
-              "control/recipe/terminal_tip_speed_weight",
-              "control/recipe/holding_tip_speed_weight"
-            ],
-            "minimum_batch": {
-              "backend_solves": 1,
-              "worker_calls": 0,
-              "model_calls": 5,
-              "tool_calls": 9,
-              "wall_s": 1595.0
-            },
-            "methods": [
-              "search.family_coordinate@1.0.0",
-              "search.family_explicit@1.0.0"
-            ],
-            "domains": {
-              "control/recipe/terminal_tip_speed_weight": [
-                0.025,
-                0.1
-              ],
-              "control/recipe/holding_tip_speed_weight": [
-                0.025,
-                0.1
-              ]
-            },
-            "mixed_semantics": "structure_search permits a joint structural/control subset; each ask/tell point constructs all selected values together, followed by one unchanged v7 closed-loop execution. No inner search or extra control budget.",
-            "method_semantics": {
-              "search.family_coordinate@1.0.0": "Numerically generated continuous coordinate proposals; categorical paths unavailable.",
-              "search.family_explicit@1.0.0": "Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated."
-            },
-            "frozen_cases": [
-              "nominal",
-              "near_z_plus",
-              "near_z_minus",
-              "far_y_plus",
-              "far_y_minus"
-            ],
-            "seeds": [
-              17,
-              18
-            ],
-            "execution_authorized": true,
-            "proposal_only": false
-          },
-          "structure_search": {
-            "paths": [
-              "components/near/length_m",
-              "design/near_section_scale",
-              "design/near_material_scenario",
-              "components/far/length_m",
-              "design/far_section_scale",
-              "design/far_material_scenario",
-              "control/recipe/terminal_tip_speed_weight",
-              "control/recipe/holding_tip_speed_weight"
-            ],
-            "minimum_batch": {
-              "backend_solves": 1,
-              "worker_calls": 0,
-              "model_calls": 5,
-              "tool_calls": 9,
-              "wall_s": 1595.0
-            },
-            "methods": [
-              "search.family_coordinate@1.0.0",
-              "search.family_explicit@1.0.0"
-            ],
-            "domains": {
-              "components/near/length_m": [
-                0.15,
-                0.17
-              ],
-              "design/near_section_scale": [
-                0.95,
-                1.05
-              ],
-              "design/near_material_scenario": [
-                "baseline",
-                "compliant",
-                "stiff"
-              ],
-              "components/far/length_m": [
-                0.11,
-                0.13
-              ],
-              "design/far_section_scale": [
-                0.95,
-                1.05
-              ],
-              "design/far_material_scenario": [
-                "baseline",
-                "compliant",
-                "stiff"
-              ],
-              "control/recipe/terminal_tip_speed_weight": [
-                0.025,
-                0.1
-              ],
-              "control/recipe/holding_tip_speed_weight": [
-                0.025,
-                0.1
-              ]
-            },
-            "mixed_semantics": "structure_search permits a joint structural/control subset; each ask/tell point constructs all selected values together, followed by one unchanged v7 closed-loop execution. No inner search or extra control budget.",
-            "method_semantics": {
-              "search.family_coordinate@1.0.0": "Numerically generated continuous coordinate proposals; categorical paths unavailable.",
-              "search.family_explicit@1.0.0": "Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated."
-            },
-            "frozen_cases": [
-              "nominal",
-              "near_z_plus",
-              "near_z_minus",
-              "far_y_plus",
-              "far_y_minus"
-            ],
-            "seeds": [
-              17,
-              18
-            ],
-            "execution_authorized": true,
-            "proposal_only": false
-          },
-          "diagnosis": {
-            "operations": [
-              "retained prediction/plans/motion query"
-            ],
-            "max_wall_s": 180,
-            "numerical_gap": "Local controller comparisons require separately bound adoption and saved-horizon prerequisites; no such grant installed in this scheduling context."
-          },
           "stop": {
-            "reason": "Voluntary delivery is always legal"
+            "reason": "Final interpretation only; research STOP remains sealed",
+            "execution_authorized": false
           }
         },
-        "unavailable": {},
+        "unavailable": {
+          "control_search": "Research trajectory closed; final interpretation cannot dispatch work",
+          "structure_search": "Research trajectory closed; final interpretation cannot dispatch work",
+          "diagnosis": "Research trajectory closed; final interpretation cannot dispatch work"
+        },
         "remaining": {
           "backend_solves": 8,
-          "model_calls": 24,
-          "tool_calls": 127,
-          "wall_s": 12716.654967069626,
+          "model_calls": 19,
+          "tool_calls": 122,
+          "wall_s": 0,
           "worker_calls": 0
         }
       },
@@ -9422,7 +10170,7 @@
       },
       "performed_batch_evidence": [],
       "corrections": {
-        "total": 0,
+        "total": 2,
         "consecutive": 0
       },
       "execution_version_boundary": null,
@@ -9551,8 +10299,8 @@
       },
       "decision_recovery": null
     },
-    "revision": 3,
+    "revision": 10,
     "version": "research_working_state@1.0.0"
   },
-  "source_manifest": "runs/research_native_development_v2_20261007/context_assembly/manifests/03adf251400750278241d58145377f49427a8c5b0feec113d8664837a01494ad.json"
+  "source_manifest": "runs/research_native_development_v2_20261007/context_assembly/manifests/f555c590289de1a888b355679489923a23c8d5ce5984dc17a473222130fa6682.json"
 }

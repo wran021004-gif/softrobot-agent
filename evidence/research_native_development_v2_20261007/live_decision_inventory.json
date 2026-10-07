@@ -1,0 +1,1025 @@
+{
+  "rows": [
+    {
+      "request_id": "model-0",
+      "response": {
+        "artifact_id": "853e06333f77a5c3bbe4554259f4d005649f2b8fbbed0420ae135fa41aaf10e5",
+        "media_type": "application/json"
+      },
+      "usage": {
+        "completion_tokens": 15091,
+        "completion_tokens_details": {
+          "reasoning_tokens": 12062
+        },
+        "prompt_cache_hit_tokens": 2048,
+        "prompt_cache_miss_tokens": 34359,
+        "prompt_tokens": 36407,
+        "prompt_tokens_details": {
+          "cached_tokens": 2048
+        },
+        "total_tokens": 51498
+      },
+      "submitted_decision": {
+        "action": "control_search",
+        "evidence": [
+          "F123",
+          "F14",
+          "F11",
+          "F24",
+          "F116",
+          "F118",
+          "F3",
+          "F51",
+          "F45",
+          "F4",
+          "F128",
+          "F54",
+          "F70"
+        ],
+        "reasoning": "The one current direct datum on the frozen perturbation is a changed near-section-scale candidate at near_z_plus (F3 valid_failure, F51 accepted=false, F45 holding-speed fail at F4=0.06758272073425946 m/s vs 0.02 limit). That failure is confounded: it belongs to a changed structure plus the perturbation, so it does not establish the unchanged incumbent's perturbed behavior, which the frozen question explicitly names as the gap. The retained incumbent is accepted only at nominal (F123 true, F14 accepted) with F24=0.002697828858325615 m, F116=0.0027300544346297905 m, F118=0.012750255515948416 m/s. Local affine/nominal-only evidence cannot guarantee nonlinear reach, braking or perturbation robustness, and sealed M5 negative forecasts have no screening authority, so a small measured control batch is the cheapest decisive step. I therefore propose one immutable 2-point explicit control batch at near_z_plus seed 17: (1) the unchanged incumbent weights (0.05, 0.05) as a perturbed reference — the first execution of that configuration at this case, a reference not a novelty and not by itself a robustness claim; (2) a higher holding tip-speed weight (0.09, 0.1), the one recorded nominal point that passed (148a2a290daa440f9b966f4d5cee4b5f) while showing lower holding speed (0.010201160469407439 m/s) but higher holding position error (0.003370231014572803 m) — i.e., an expected trade-off, not overall improvement. Explicit points are enumerated, never interpolated, and are not an optimization; no monotonicity of the weight-to-speed map is assumed (nominal holding weights 0.06/0.075/0.1 exceeded 0.02 m/s while 0.05 and 0.09 passed). I also decline to claim the incumbent holds the globally best speed margin (0.010201160469407439 and 0.01273567785134029 are lower). Cost: 2 new backend attempts (limit 2), 1 case, 1 seed; no inner adaptation search.",
+        "observations": [
+          {
+            "evidence": "F123",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "evidence": "F14",
+            "operation": "recorded",
+            "value": "accepted"
+          },
+          {
+            "evidence": "F24",
+            "operation": "recorded",
+            "value": 0.002697828858325615
+          },
+          {
+            "evidence": "F116",
+            "operation": "recorded",
+            "value": 0.0027300544346297905
+          },
+          {
+            "evidence": "F118",
+            "operation": "recorded",
+            "value": 0.012750255515948416
+          },
+          {
+            "evidence": "F3",
+            "operation": "recorded",
+            "value": "valid_failure"
+          },
+          {
+            "evidence": "F51",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "evidence": "F45",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "evidence": "F4",
+            "operation": "recorded",
+            "value": 0.06758272073425946
+          },
+          {
+            "evidence": "F128",
+            "operation": "recorded",
+            "value": 0.004094678029888374
+          },
+          {
+            "evidence": "F54",
+            "operation": "recorded",
+            "value": 0.0028029393033160714
+          },
+          {
+            "evidence": "F4",
+            "comparison_evidence": "F118",
+            "operation": "difference",
+            "value": 0.05483246521831105
+          }
+        ],
+        "interpretations": [
+          {
+            "statement": "The near_z_plus holding-speed failure (0.06758272073425946 m/s vs 0.02 limit) belongs to a changed near-section-scale configuration, not to the unchanged incumbent; it therefore does not establish that the unchanged incumbent fails under the same frozen perturbation.",
+            "scope": "This campaign, case near_z_plus, seed 17, changed-structure candidate vs retained nominal incumbent.",
+            "supporting_evidence": [
+              "F3",
+              "F51",
+              "F45",
+              "F4",
+              "F70"
+            ],
+            "contradicting_evidence": [],
+            "uncertainty": "One changed-configuration execution; structural edit and initial-state perturbation are confounded, and the unchanged incumbent's perturbed behavior is unmeasured (F128/F54 belong to the changed candidate)."
+          },
+          {
+            "statement": "Across recorded nominal executions the holding tip-speed weight is not monotonically related to holding maximum speed (0.06, 0.075 and 0.1 nominal points exceeded the 0.02 m/s limit, while 0.05 and 0.09 passed), so no monotone control direction may be assumed for the perturbation.",
+            "scope": "Nominal, seed 17, completed evaluations in this campaign.",
+            "supporting_evidence": [
+              "F118"
+            ],
+            "contradicting_evidence": [],
+            "uncertainty": "The non-monotone points are historical nominal f_* facts outside the current F alias set; sample size 1 per point, no variance estimate, and no causal attribution."
+          },
+          {
+            "statement": "A measured reference of the unchanged incumbent at the frozen perturbation is a prerequisite before any design or control change can be credited with improving perturbed joint acceptance.",
+            "scope": "Campaign decision logic only.",
+            "supporting_evidence": [
+              "F123",
+              "F3"
+            ],
+            "contradicting_evidence": [],
+            "uncertainty": "A single seed cannot separate case-specific from generic perturbation effects, and a passing reference would still not prove broad robustness."
+          }
+        ],
+        "unresolved_uncertainties": [
+          "Unchanged incumbent joint acceptance at near_z_plus (and the other four frozen cases) is unmeasured.",
+          "Dominant physical mechanism of the changed-candidate holding-speed failure is unidentified.",
+          "Whether any holding/terminal weight change lowers perturbed holding speed without worsening holding position error (trade-off) is unknown.",
+          "Seed-level repeatability of the incumbent at nominal is not established (no explicit matching repeat in scope)."
+        ],
+        "plan": {
+          "contract": "platform.search_batch_plan",
+          "version": "1.0.0",
+          "hypothesis": "At the frozen near_z_plus initial-angle/rate perturbation (seed 17) the unchanged incumbent control weights (holding 0.05, terminal 0.05) remain jointly reach-and-hold accepted, whereas raising the holding tip-speed weight to 0.09 with terminal weight 0.1 lowers holding maximum speed relative to the perturbed reference without restoring joint acceptance by a design edit; control-weight adaptation is the affordable direction for perturbation robustness.",
+          "evidence": [
+            "F123",
+            "F14",
+            "F11",
+            "F24",
+            "F116",
+            "F118",
+            "F3",
+            "F51",
+            "F45",
+            "F4",
+            "F128",
+            "F54",
+            "F70"
+          ],
+          "weakening_observations": [
+            "F118 incumbent holding_max_speed 0.012750255515948416 m/s is not the lowest observed (0.010201160469407439 m/s at holding/terminal 0.09/0.1 and 0.01273567785134029 m/s at holding 0.0), so no global best-margin claim and no guaranteed speed gain is made.",
+            "The proposed 0.09/0.1 point already showed a trade-off at nominal (holding 0.003370231014572803 m vs incumbent 0.0027300544346297905 m with terminal error 0.0033130137577230853 m vs 0.002697828858325615 m): lower speed with worse position error.",
+            "Nominal holding-weight 0.1 (110dc2c9c1d642dcb018664a65c62c30, 0.022128674933740447 m/s), 0.06 (312ef97407b34ff28905e883a947f475, 0.023994623331658485 m/s) and 0.075 (e3876a1d289f41f08d46c96202f1da0c, 0.023285947509969908 m/s) all failed, contradicting a monotone weight-versus-speed expectation.",
+            "Candidate 0 repeats the known incumbent weights; it is a first-time reference at this case, not scientific novelty, and cannot alone establish robustness.",
+            "The near_z_plus holding-speed failure of the changed-section candidate (F4) cannot be used to screen out either control point."
+          ],
+          "variables": {
+            "control/recipe/holding_tip_speed_weight": {
+              "kind": "continuous",
+              "bounds": [
+                0.025,
+                0.1
+              ]
+            },
+            "control/recipe/terminal_tip_speed_weight": {
+              "kind": "continuous",
+              "bounds": [
+                0.025,
+                0.1
+              ]
+            }
+          },
+          "fixed_conditions": [
+            "robot",
+            "task",
+            "acceptance",
+            "controller_implementation",
+            "other_numerical_settings"
+          ],
+          "fixed_controller": "controller.gvs_nmpc@7.0.0",
+          "objectives": [
+            "joint_reach_holding_acceptance",
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "constraints": [
+            "frozen_acceptance",
+            "force_bounds",
+            "finite_valid_execution"
+          ],
+          "method": "search.family_explicit@1.0.0",
+          "max_candidates": 2,
+          "candidates": [
+            {
+              "control/recipe/holding_tip_speed_weight": 0.05,
+              "control/recipe/terminal_tip_speed_weight": 0.05
+            },
+            {
+              "control/recipe/holding_tip_speed_weight": 0.09,
+              "control/recipe/terminal_tip_speed_weight": 0.1
+            }
+          ],
+          "step": null,
+          "case_id": "near_z_plus",
+          "seed": 17,
+          "source_candidate": {
+            "candidate_id": "batch-ebbeadbdaca10732-0",
+            "configuration": {
+              "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+              "media_type": "application/json"
+            },
+            "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+            "owner_run_id": "batch-ebbeadbdaca10732-0"
+          },
+          "predecessor_decision": {
+            "artifact_id": "73d51b89a7dcd84639eeac83bdab0d586990b97dc8826592610f66ccf39f5a7a",
+            "media_type": "application/json"
+          },
+          "replication_reason": null,
+          "max_backend_attempts": 2,
+          "target_changed_configurations": 2,
+          "failure_policy": "stop_on_material_failure",
+          "planned_budget": {
+            "backend_solves": 2,
+            "model_calls": 5,
+            "tool_calls": 13,
+            "worker_calls": 0,
+            "wall_s": 2590.0
+          },
+          "fidelity_limits": [
+            "Sampled acceptance is not a continuous-time guarantee and no real-time claim is made.",
+            "Single case and single seed; case-specific effects cannot be separated from generic perturbation effects.",
+            "Explicit enumerated points are not an optimization and carry no optimality or interpolation guarantee; the weight-to-speed map is treated as unknown/non-monotone.",
+            "Case-only re-scoring; historical labels are unchanged."
+          ],
+          "verification": [
+            "candidate.apply",
+            "simulation.run",
+            "evaluation.run",
+            "control.profile_report",
+            "bound_comparison",
+            "diagnostic_revision"
+          ],
+          "stopping_conditions": [
+            "Both candidates reach complete profiled evaluation and bound_comparison, then stop.",
+            "material/unknown execution failure.",
+            "insufficient complete reservation.",
+            "cumulative request/correction ceiling.",
+            "voluntary model STOP."
+          ],
+          "scientific_promise": "uncertain",
+          "rationale": "Goal: separate the frozen perturbation from the confounded changed-structure failure by measuring the unchanged incumbent as a perturbed reference and one affordable control probe. Method: search.family_explicit@1.0.0 with two exact enumerated points and null step, so each point rebuilds all selected values and runs one unchanged stable-v7 closed loop; no inner adaptation search. Assumptions and limits: no continuity, monotonicity or interpolation of the (holding weight, terminal weight) to (holding speed, holding position error) map is assumed; a passing reference does not prove broad robustness; a lower holding speed with higher position error is a trade-off, not overall improvement; the incumbent is not claimed to have the best speed margin. Allocation: 2 backend attempts (limit 2), case near_z_plus, seed 17, both points sharing the batch. Expected information: (a) whether the unchanged incumbent is jointly accepted at the frozen perturbation, (b) whether a higher holding weight changes perturbed holding speed jointly with the three physical metrics. Exit: complete profile of both points, with per-point acceptance and physical metrics reported separately."
+        },
+        "diagnosis": null,
+        "selected_candidate": null,
+        "stop_reason": null
+      }
+    },
+    {
+      "request_id": "model-2",
+      "response": {
+        "artifact_id": "c4ce4327dd023ac3e227c1b8f989828f0ef0550221c261aeeafc69b175c12134",
+        "media_type": "application/json"
+      },
+      "usage": {
+        "completion_tokens": 11394,
+        "completion_tokens_details": {
+          "reasoning_tokens": 8391
+        },
+        "prompt_cache_hit_tokens": 4096,
+        "prompt_cache_miss_tokens": 35382,
+        "prompt_tokens": 39478,
+        "prompt_tokens_details": {
+          "cached_tokens": 4096
+        },
+        "total_tokens": 50872
+      },
+      "submitted_decision": {
+        "action": "control_search",
+        "evidence": [
+          "F123",
+          "F14",
+          "F11",
+          "F24",
+          "F116",
+          "F118",
+          "F3",
+          "F51",
+          "F45",
+          "F4",
+          "F128",
+          "F54",
+          "F70"
+        ],
+        "reasoning": "Retained incumbent (F123 true, F14 accepted at nominal) has F24=0.002697828858325615 m, F116=0.0027300544346297905 m, F118=0.012750255515948416 m/s and passes all components (F11 validity, F98 position, F18 speed, F76 task, F71 execution, F131 solver). The only current datum at a frozen perturbation is a changed near-section-scale candidate at near_z_plus: F3=valid_failure, F51 accepted=false, F45 holding-speed fail with F4=0.06758272073425946 m/s vs 0.02 limit, while its position/terminal remain good (F128=0.004094678029888374 m, F54=0.0028029393033160714 m). That event confounds structure edit with the perturbation, so it does not establish the unchanged incumbent's perturbed behavior - the explicit gap in the frozen question. Local affine/nominal evidence cannot guarantee nonlinear reach, braking or perturbation robustness, and sealed M5 negative forecasts carry no screening authority. Hence the cheapest decisive step is a small control-only batch at near_z_plus, seed 17: one measured reference of the unchanged incumbent weights (0.05,0.05) and one control probe (holding 0.09, terminal 0.1), the single recorded nominal point that passed while showing lower holding speed but higher holding position error. No monotonicity of the weight-to-speed map is assumed: nominal holding weights 0.06/0.075/0.1 exceeded 0.02 m/s while 0.05 and 0.09 passed. Explicit enumerated points are not an optimization and carry no interpolation guarantee. I do not claim the incumbent holds the globally best speed margin (0.010201160469407439 and 0.01273567785134029 are lower).",
+        "observations": [
+          {
+            "evidence": "F123",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "evidence": "F14",
+            "operation": "recorded",
+            "value": "accepted"
+          },
+          {
+            "evidence": "F11",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "evidence": "F24",
+            "operation": "recorded",
+            "value": 0.002697828858325615
+          },
+          {
+            "evidence": "F116",
+            "operation": "recorded",
+            "value": 0.0027300544346297905
+          },
+          {
+            "evidence": "F118",
+            "operation": "recorded",
+            "value": 0.012750255515948416
+          },
+          {
+            "evidence": "F3",
+            "operation": "recorded",
+            "value": "valid_failure"
+          },
+          {
+            "evidence": "F51",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "evidence": "F45",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "evidence": "F4",
+            "operation": "recorded",
+            "value": 0.06758272073425946
+          },
+          {
+            "evidence": "F128",
+            "operation": "recorded",
+            "value": 0.004094678029888374
+          },
+          {
+            "evidence": "F54",
+            "operation": "recorded",
+            "value": 0.0028029393033160714
+          },
+          {
+            "evidence": "F70",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "evidence": "F4",
+            "comparison_evidence": "F118",
+            "operation": "difference",
+            "value": 0.05483246521831105
+          }
+        ],
+        "interpretations": [
+          {
+            "statement": "The near_z_plus holding-speed failure (0.06758272073425946 m/s vs 0.02 limit) belongs to a changed near-section-scale configuration, not to the unchanged incumbent; it therefore does not establish that the unchanged incumbent fails under the same frozen perturbation.",
+            "supporting_evidence": [
+              "F3",
+              "F51",
+              "F45",
+              "F4",
+              "F70"
+            ],
+            "contradicting_evidence": [],
+            "scope": "This campaign, case near_z_plus, seed 17, changed-structure candidate vs retained nominal incumbent.",
+            "uncertainty": "One changed-configuration execution; structural edit and initial-state perturbation are confounded, and the unchanged incumbent's perturbed behavior is unmeasured (F128/F54 belong to the changed candidate)."
+          },
+          {
+            "statement": "Across recorded nominal executions the holding tip-speed weight is not monotonically related to holding maximum speed (holding weights 0.06/0.075/0.1 failed >0.02 m/s while 0.05 and 0.09 passed), so no monotone control direction may be assumed for the perturbation.",
+            "supporting_evidence": [
+              "F118"
+            ],
+            "contradicting_evidence": [],
+            "scope": "Nominal, seed 17, completed evaluations in this campaign.",
+            "uncertainty": "The non-monotone points are historical nominal facts outside the current F alias set; sample size 1 per point, no variance estimate, no causal attribution."
+          },
+          {
+            "statement": "A measured reference of the unchanged incumbent at the frozen perturbation is a prerequisite before any design or control change can be credited with improving perturbed joint acceptance.",
+            "supporting_evidence": [
+              "F123",
+              "F3"
+            ],
+            "contradicting_evidence": [],
+            "scope": "Campaign decision logic only.",
+            "uncertainty": "A single seed cannot separate case-specific from generic perturbation effects, and a passing reference would still not prove broad robustness."
+          }
+        ],
+        "unresolved_uncertainties": [
+          "Unchanged incumbent joint acceptance at near_z_plus (and the other four frozen cases) is unmeasured.",
+          "Dominant physical mechanism of the changed-candidate holding-speed failure is unidentified.",
+          "Whether any holding/terminal weight change lowers perturbed holding speed without worsening holding position error (trade-off) is unknown.",
+          "Seed-level repeatability of the incumbent at nominal is not established (no explicit matching repeat in scope)."
+        ],
+        "selected_candidate": null,
+        "stop_reason": null,
+        "plan": {
+          "contract": "platform.search_batch_plan",
+          "version": "1.0.0",
+          "source_candidate": {
+            "candidate_id": "batch-ebbeadbdaca10732-0",
+            "configuration": {
+              "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+              "media_type": "application/json"
+            },
+            "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+            "owner_run_id": "batch-ebbeadbdaca10732-0"
+          },
+          "predecessor_decision": {
+            "artifact_id": "73d51b89a7dcd84639eeac83bdab0d586990b97dc8826592610f66ccf39f5a7a",
+            "media_type": "application/json"
+          },
+          "case_id": "near_z_plus",
+          "seed": 17,
+          "hypothesis": "At the frozen near_z_plus initial-angle/rate perturbation (seed 17) the unchanged incumbent control weights (holding 0.05, terminal 0.05) remain jointly reach-and-hold accepted, whereas raising the holding tip-speed weight to 0.09 with terminal weight 0.1 changes perturbed holding maximum speed without restoring joint acceptance by control adaptation alone; control-weight adaptation is the affordable direction for perturbation robustness while structural edits are confounded.",
+          "evidence": [
+            "F123",
+            "F14",
+            "F11",
+            "F24",
+            "F116",
+            "F118",
+            "F3",
+            "F51",
+            "F45",
+            "F4",
+            "F128",
+            "F54",
+            "F70"
+          ],
+          "weakening_observations": [
+            "F118 incumbent holding_max_speed 0.012750255515948416 m/s is not the lowest observed (0.010201160469407439 m/s at holding/terminal 0.09/0.1; 0.01273567785134029 m/s at holding 0.0), so no global best-margin claim and no guaranteed speed gain is made.",
+            "The proposed 0.09/0.1 point showed a nominal trade-off (holding 0.003370231014572803 m and terminal 0.0033130137577230853 m) worse than the incumbent's 0.0027300544346297905 m / 0.002697828858325615 m: lower speed with worse position error.",
+            "Nominal holding weights 0.1 (0.022128674933740447 m/s), 0.06 (0.023994623331658485 m/s) and 0.075 (0.023285947509969908 m/s) all failed, contradicting a monotone weight-versus-speed expectation.",
+            "Point 1 repeats known incumbent weights; it is a first-time reference at this case, not scientific novelty, and cannot alone establish robustness.",
+            "The near_z_plus holding-speed failure of the changed-section candidate (F4) cannot be used to screen out either control point."
+          ],
+          "variables": {
+            "control/recipe/holding_tip_speed_weight": {
+              "kind": "continuous",
+              "bounds": [
+                0.025,
+                0.1
+              ]
+            },
+            "control/recipe/terminal_tip_speed_weight": {
+              "kind": "continuous",
+              "bounds": [
+                0.025,
+                0.1
+              ]
+            }
+          },
+          "fixed_conditions": [
+            "robot",
+            "task",
+            "acceptance",
+            "controller_implementation",
+            "other_numerical_settings"
+          ],
+          "fixed_controller": "controller.gvs_nmpc@7.0.0",
+          "objectives": [
+            "joint_reach_holding_acceptance",
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "constraints": [
+            "frozen_acceptance",
+            "force_bounds",
+            "finite_valid_execution"
+          ],
+          "method": "search.family_explicit@1.0.0",
+          "step": null,
+          "candidates": [
+            {
+              "control/recipe/holding_tip_speed_weight": 0.05,
+              "control/recipe/terminal_tip_speed_weight": 0.05
+            },
+            {
+              "control/recipe/holding_tip_speed_weight": 0.09,
+              "control/recipe/terminal_tip_speed_weight": 0.1
+            }
+          ],
+          "max_candidates": 2,
+          "max_backend_attempts": 2,
+          "target_changed_configurations": 2,
+          "failure_policy": "stop_on_material_failure",
+          "replication_reason": "Point 1 re-executes the known incumbent control weights at the previously unmeasured near_z_plus frozen perturbation to obtain an unchanged-incumbent perturbed reference; it is not claimed as novelty and supplies the baseline needed to attribute any change.",
+          "planned_budget": {
+            "backend_solves": 2,
+            "model_calls": 10,
+            "tool_calls": 13,
+            "wall_s": 2590.0,
+            "worker_calls": 0
+          },
+          "fidelity_limits": [
+            "Sampled acceptance is not a continuous-time guarantee and no real-time claim is made.",
+            "Single case and single seed; case-specific effects cannot be separated from generic perturbation effects.",
+            "Explicit enumerated points are not an optimization and carry no optimality or interpolation guarantee; the weight-to-speed map is treated as unknown/non-monotone.",
+            "Case-only re-scoring; historical labels and sealed results are unchanged."
+          ],
+          "verification": [
+            "candidate.apply",
+            "simulation.run",
+            "evaluation.run",
+            "control.profile_report",
+            "bound_comparison",
+            "diagnostic_revision"
+          ],
+          "stopping_conditions": [
+            "Both candidates reach complete profiled evaluation and bound_comparison, then stop.",
+            "material/unknown execution failure.",
+            "insufficient complete reservation.",
+            "cumulative request/correction ceiling.",
+            "voluntary model STOP."
+          ],
+          "scientific_promise": "uncertain",
+          "rationale": "Goal: separate the frozen perturbation from the confounded changed-structure failure by measuring the unchanged incumbent as a perturbed reference and one affordable control probe. Method: search.family_explicit@1.0.0 with two exact enumerated points and null step; each point rebuilds all selected values (physical changes would rebuild models/workspace/warm states, but this batch is control-only) and runs one unchanged stable-v7 closed loop - no inner adaptation search, no extra control budget. Assumptions/limits: no continuity, monotonicity or interpolation of the (holding,terminal) weight to (holding speed, holding position) map is assumed; a passing reference does not prove broad robustness; a lower holding speed with higher position error is a trade-off, not overall improvement; the incumbent is not claimed to have the best speed margin. Allocation: 2 new backend attempts (limit 2), 1 case, 1 seed, both points in one immutable batch; planned budget covers 2 new candidates at 995 s/4 operations each plus protected interpretation (600 s/4 operations). Expected information: (a) whether the unchanged incumbent is jointly accepted at this frozen perturbation, (b) whether the higher holding weight changes perturbed holding speed jointly with the three physical metrics. Exit: complete profile of both points with per-point acceptance and the three physical metrics reported separately."
+        }
+      }
+    },
+    {
+      "request_id": "model-3",
+      "response": {
+        "artifact_id": "e3b830617250118d8b3a1626cc20e613f6d4c62d13688ff9ba4a1e745527ccf3",
+        "media_type": "application/json"
+      },
+      "usage": {
+        "completion_tokens": 11486,
+        "completion_tokens_details": {
+          "reasoning_tokens": 8454
+        },
+        "prompt_cache_hit_tokens": 3456,
+        "prompt_cache_miss_tokens": 36009,
+        "prompt_tokens": 39465,
+        "prompt_tokens_details": {
+          "cached_tokens": 3456
+        },
+        "total_tokens": 50951
+      },
+      "submitted_decision": {
+        "action": "control_search",
+        "evidence": [
+          "F123",
+          "F14",
+          "F11",
+          "F24",
+          "F116",
+          "F118",
+          "F3",
+          "F51",
+          "F45",
+          "F4",
+          "F128",
+          "F54",
+          "F70"
+        ],
+        "reasoning": "Retained incumbent execution 91c3ba1b01d6499fb26df8f95409401b (F14=accepted, F123=true) has F24=0.002697828858325615 m, F116=0.0027300544346297905 m, F118=0.012750255515948416 m/s and passes validity (F11), holding position (F98), holding speed (F18), task (F76), execution (F71) and solver (F131). The only perturbed-campaign datum is the changed near-section-scale candidate at near_z_plus: F3=valid_failure, F51 accepted=false, F45 holding-speed fail with F4=0.06758272073425946 m/s vs the 0.02 limit, while its position/terminal stay good (F128, F54). That single event confounds a structural edit with the frozen perturbation, so it does not establish the unchanged incumbent's perturbed behavior - exactly the gap named in the frozen question. Local affine/nominal evidence cannot guarantee nonlinear reach, braking or perturbation robustness, and sealed M5 negative forecasts carry no screening authority. Hence the cheapest decisive step is a control-only explicit batch at near_z_plus, seed 17: one first-time perturbed reference of the unchanged incumbent weights (0.05, 0.05) and one affordable control probe (holding 0.09, terminal 0.1). No monotonicity of the weight-to-speed map is assumed, because at nominal holding weights 0.06/0.075/0.1 exceeded 0.02 m/s while 0.05 and 0.09 passed. Explicit enumerated points are not an optimization and carry no interpolation or optimality guarantee. I do not claim the incumbent holds the globally best speed margin (lower observed speeds exist at holding 0.09/terminal 0.1 and at holding 0.0).",
+        "observations": [
+          {
+            "evidence": "F123",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "evidence": "F14",
+            "operation": "recorded",
+            "value": "accepted"
+          },
+          {
+            "evidence": "F11",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "evidence": "F24",
+            "operation": "recorded",
+            "value": 0.002697828858325615
+          },
+          {
+            "evidence": "F116",
+            "operation": "recorded",
+            "value": 0.0027300544346297905
+          },
+          {
+            "evidence": "F118",
+            "operation": "recorded",
+            "value": 0.012750255515948416
+          },
+          {
+            "evidence": "F3",
+            "operation": "recorded",
+            "value": "valid_failure"
+          },
+          {
+            "evidence": "F51",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "evidence": "F45",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "evidence": "F4",
+            "operation": "recorded",
+            "value": 0.06758272073425946
+          },
+          {
+            "evidence": "F128",
+            "operation": "recorded",
+            "value": 0.004094678029888374
+          },
+          {
+            "evidence": "F54",
+            "operation": "recorded",
+            "value": 0.0028029393033160714
+          },
+          {
+            "evidence": "F70",
+            "operation": "recorded",
+            "value": true
+          }
+        ],
+        "interpretations": [
+          {
+            "statement": "The near_z_plus holding-speed failure (F4=0.06758272073425946 m/s vs the 0.02 limit, F45 fail, F51 not accepted, F3 valid_failure) belongs to a changed near-section-scale configuration, not to the unchanged incumbent; it therefore does not establish that the unchanged incumbent fails under the same frozen perturbation.",
+            "scope": "This campaign, case near_z_plus, seed 17, changed-structure candidate versus retained nominal incumbent.",
+            "uncertainty": "One changed-configuration execution; the structural edit and the initial-state perturbation are confounded, and the unchanged incumbent's perturbed behavior is unmeasured (F128/F54 belong to the changed candidate).",
+            "supporting_evidence": [
+              "F3",
+              "F51",
+              "F45",
+              "F4",
+              "F70"
+            ],
+            "contradicting_evidence": []
+          },
+          {
+            "statement": "Across recorded nominal executions, holding tip-speed weight is not monotonically related to holding maximum speed (holding weights 0.06/0.075/0.1 failed above 0.02 m/s while 0.05 and 0.09 passed), so no monotone control direction may be assumed for the perturbation.",
+            "scope": "Nominal, seed 17, completed evaluations in this campaign history.",
+            "uncertainty": "Those non-monotone points are historical nominal facts outside the current F alias set; sample size 1 per point, no variance estimate and no causal attribution.",
+            "supporting_evidence": [
+              "F118"
+            ],
+            "contradicting_evidence": []
+          },
+          {
+            "statement": "A measured reference of the unchanged incumbent at the frozen perturbation is a prerequisite before any design or control change can be credited with improving perturbed joint acceptance.",
+            "scope": "Campaign decision logic only.",
+            "uncertainty": "A single seed cannot separate case-specific from generic perturbation effects, and a passing reference would still not prove broad robustness.",
+            "supporting_evidence": [
+              "F123",
+              "F3"
+            ],
+            "contradicting_evidence": []
+          }
+        ],
+        "unresolved_uncertainties": [
+          "Unchanged incumbent joint acceptance at near_z_plus (and the other four frozen cases) is unmeasured.",
+          "Dominant physical mechanism of the changed-candidate holding-speed failure is unidentified.",
+          "Whether any holding/terminal weight change lowers perturbed holding speed without worsening holding position error (a trade-off, not overall improvement) is unknown.",
+          "Seed-level repeatability of the incumbent at nominal is not established (no explicit matching repeat in scope)."
+        ],
+        "plan": {
+          "contract": "platform.search_batch_plan",
+          "version": "1.0.0",
+          "case_id": "near_z_plus",
+          "seed": 17,
+          "source_candidate": {
+            "candidate_id": "batch-ebbeadbdaca10732-0",
+            "configuration": {
+              "artifact_id": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+              "media_type": "application/json"
+            },
+            "execution_id": "91c3ba1b01d6499fb26df8f95409401b",
+            "owner_run_id": "batch-ebbeadbdaca10732-0"
+          },
+          "predecessor_decision": {
+            "artifact_id": "73d51b89a7dcd84639eeac83bdab0d586990b97dc8826592610f66ccf39f5a7a",
+            "media_type": "application/json"
+          },
+          "hypothesis": "At the frozen near_z_plus initial-angle/rate perturbation (seed 17), re-executing the unchanged incumbent control weights (holding 0.05, terminal 0.05) produces a complete valid closed-loop evaluation whose joint reach-and-hold acceptance and the three physical metrics can be compared componentwise with one control probe (holding 0.09, terminal 0.1); no monotonicity, continuity or interpolation of the weight-to-(holding speed, holding position) map is assumed.",
+          "evidence": [
+            "F123",
+            "F14",
+            "F11",
+            "F24",
+            "F116",
+            "F118",
+            "F3",
+            "F51",
+            "F45",
+            "F4",
+            "F128",
+            "F54",
+            "F70"
+          ],
+          "weakening_observations": [
+            "F118 incumbent holding_max_speed 0.012750255515948416 m/s is not the lowest observed (0.010201160469407439 m/s at holding/terminal 0.09/0.1; 0.01273567785134029 m/s at holding 0.0), so no global best-margin claim and no guaranteed speed gain is made.",
+            "The proposed 0.09/0.1 point showed a nominal trade-off (holding 0.003370231014572803 m, terminal 0.0033130137577230853 m) worse than the incumbent's 0.0027300544346297905 m / 0.002697828858325615 m: lower speed with worse position error.",
+            "Nominal holding weights 0.1 (0.022128674933740447 m/s), 0.06 (0.023994623331658485 m/s) and 0.075 (0.023285947509969908 m/s) all failed, contradicting a monotone weight-versus-speed expectation.",
+            "Point 1 repeats known incumbent weights at a new case; it is a first-time perturbed reference, not scientific novelty, and cannot alone establish robustness.",
+            "The near_z_plus holding-speed failure of the changed-section candidate (F4) cannot be used to screen out either control point."
+          ],
+          "variables": {
+            "control/recipe/holding_tip_speed_weight": {
+              "bounds": [
+                0.025,
+                0.1
+              ],
+              "kind": "continuous"
+            },
+            "control/recipe/terminal_tip_speed_weight": {
+              "bounds": [
+                0.025,
+                0.1
+              ],
+              "kind": "continuous"
+            }
+          },
+          "fixed_conditions": [
+            "robot",
+            "task",
+            "acceptance",
+            "controller_implementation",
+            "other_numerical_settings"
+          ],
+          "fixed_controller": "controller.gvs_nmpc@7.0.0",
+          "objectives": [
+            "joint_reach_holding_acceptance",
+            "terminal_error_m",
+            "holding_max_error_m",
+            "holding_max_speed_m_s"
+          ],
+          "constraints": [
+            "frozen_acceptance",
+            "force_bounds",
+            "finite_valid_execution"
+          ],
+          "method": "search.family_explicit@1.0.0",
+          "step": null,
+          "candidates": [
+            {
+              "control/recipe/holding_tip_speed_weight": 0.05,
+              "control/recipe/terminal_tip_speed_weight": 0.05
+            },
+            {
+              "control/recipe/holding_tip_speed_weight": 0.09,
+              "control/recipe/terminal_tip_speed_weight": 0.1
+            }
+          ],
+          "max_candidates": 2,
+          "max_backend_attempts": 2,
+          "target_changed_configurations": 2,
+          "failure_policy": "stop_on_material_failure",
+          "replication_reason": "Point 1 re-executes the known incumbent control weights at the previously unmeasured near_z_plus frozen perturbation to obtain an unchanged-incumbent perturbed reference; it is claimed as a reference, not as novelty, and no strict result reuse is eligible for an unmeasured case.",
+          "planned_budget": {
+            "backend_solves": 2,
+            "model_calls": 10,
+            "tool_calls": 13,
+            "worker_calls": 0,
+            "wall_s": 2590.0
+          },
+          "fidelity_limits": [
+            "Sampled acceptance is not a continuous-time guarantee and no real-time claim is made.",
+            "Single case and single seed; case-specific effects cannot be separated from generic perturbation effects.",
+            "Explicit enumerated points are not an optimization and carry no optimality or interpolation guarantee; the weight-to-speed map is treated as unknown/non-monotone.",
+            "Case-only re-scoring; historical labels and sealed results are unchanged.",
+            "The near_z_plus changed-section failure is confounded and supplies no screening authority."
+          ],
+          "verification": [
+            "candidate.apply",
+            "simulation.run",
+            "evaluation.run",
+            "control.profile_report",
+            "bound_comparison",
+            "diagnostic_revision"
+          ],
+          "stopping_conditions": [
+            "Both candidates reach complete profiled evaluation and bound_comparison, then stop.",
+            "material/unknown execution failure.",
+            "insufficient complete reservation.",
+            "cumulative request/correction ceiling.",
+            "voluntary model STOP."
+          ],
+          "scientific_promise": "uncertain",
+          "rationale": "Goal: separate the frozen perturbation from the confounded changed-structure failure by measuring the unchanged incumbent as a perturbed reference and adding one affordable control probe. Method: search.family_explicit@1.0.0 with two exact enumerated points and null step; each point rebuilds all selected values together (this batch is control-only, so no model/workspace/warm-state rebuild) and runs one unchanged stable-v7 closed loop - no inner adaptation search and no extra control budget. Assumptions and limits: no continuity, monotonicity or interpolation of the (holding, terminal) weight to (holding speed, holding position) map is assumed; a passing reference does not prove broad robustness; a lower holding speed with higher position error is a trade-off, not overall improvement; the incumbent is not claimed to hold the globally best speed margin; local affine evidence cannot guarantee nonlinear reach, braking or perturbation robustness. Allocation: 2 new backend attempts (limit 2), one case, one seed, both points in one immutable batch with a fixed sequence unaffected by feedback. Expected information: (a) whether the unchanged incumbent is jointly accepted at this frozen perturbation, and (b) whether the higher holding weight changes perturbed holding speed jointly with the three physical metrics. Exit: complete profile of both points with per-point joint acceptance and the three physical metrics reported separately."
+        }
+      }
+    },
+    {
+      "request_id": "model-4",
+      "response": {
+        "artifact_id": "50b567237532d3760cccd4f7605584432c22fdaaf6722d652c097ffcfabee121",
+        "media_type": "application/json"
+      },
+      "usage": {
+        "completion_tokens": 7646,
+        "completion_tokens_details": {
+          "reasoning_tokens": 5811
+        },
+        "prompt_cache_hit_tokens": 3456,
+        "prompt_cache_miss_tokens": 35829,
+        "prompt_tokens": 39285,
+        "prompt_tokens_details": {
+          "cached_tokens": 3456
+        },
+        "total_tokens": 46931
+      },
+      "submitted_decision": {
+        "action": "stop",
+        "evidence": [
+          "F14",
+          "F123",
+          "F11",
+          "F24",
+          "F116",
+          "F118",
+          "F98",
+          "F18",
+          "F16",
+          "F21",
+          "F33",
+          "F71",
+          "F76",
+          "F131",
+          "F3",
+          "F51",
+          "F45",
+          "F4",
+          "F128",
+          "F54",
+          "F70",
+          "F65",
+          "F93",
+          "F121",
+          "F60",
+          "F104",
+          "F109",
+          "F68",
+          "F64"
+        ],
+        "reasoning": "Voluntary STOP is chosen because (a) the retained incumbent is the only complete, jointly accepted configuration in scope, (b) the single perturbed datum is a confounded changed-structure failure that cannot represent the unchanged incumbent, and (c) no new execution can be reserved or credited here. Actual feedback effect: the last attempted execution batch was rejected with CAPABILITY_GAP (complete execution/delivery reservation unavailable), the business consecutive-failure count is 3 against limit 2 with zero remaining repairs, and the protocol correction channel has zero consecutive allowance left. That feedback changes my choice: further control/structure batches would repeat the same failing reservation request, so submitting another search batch would not be feedback-linked science and risks consuming the terminal budget. Supported retained diagnosis is only a bounded read and, per M5, retained prediction evidence has no screening authority, so it cannot decide the case; new saved-state numerical computation is unavailable without satisfied binding/adoption prerequisites. Retaining the incumbent and bounding conclusions is the only action that is both legal and defensible; STOP is always legal and supplies the final bounded interpretation. I do NOT claim the incumbent has the globally best speed margin, do NOT claim global optimality, causal proof, broad robustness, hardware safety or real-time behavior, and I do NOT treat the M5 negative forecasts as screening evidence. Speed reduction with increased position error would be a trade-off, not overall improvement.",
+        "observations": [
+          {
+            "evidence": "F14",
+            "operation": "recorded",
+            "value": "accepted"
+          },
+          {
+            "evidence": "F123",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "evidence": "F11",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "evidence": "F24",
+            "operation": "recorded",
+            "value": 0.002697828858325615
+          },
+          {
+            "evidence": "F116",
+            "operation": "recorded",
+            "value": 0.0027300544346297905
+          },
+          {
+            "evidence": "F118",
+            "operation": "recorded",
+            "value": 0.012750255515948416
+          },
+          {
+            "evidence": "F3",
+            "operation": "recorded",
+            "value": "valid_failure"
+          },
+          {
+            "evidence": "F51",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "evidence": "F45",
+            "operation": "recorded",
+            "value": false
+          },
+          {
+            "evidence": "F4",
+            "operation": "recorded",
+            "value": 0.06758272073425946
+          },
+          {
+            "evidence": "F128",
+            "operation": "recorded",
+            "value": 0.004094678029888374
+          },
+          {
+            "evidence": "F54",
+            "operation": "recorded",
+            "value": 0.0028029393033160714
+          },
+          {
+            "evidence": "F4",
+            "operation": "greater_than",
+            "comparison_evidence": "F118",
+            "value": true
+          },
+          {
+            "evidence": "F128",
+            "operation": "greater_than",
+            "comparison_evidence": "F116",
+            "value": true
+          },
+          {
+            "evidence": "F70",
+            "operation": "recorded",
+            "value": true
+          },
+          {
+            "evidence": "F64",
+            "operation": "recorded",
+            "value": "prepared"
+          }
+        ],
+        "interpretations": [
+          {
+            "statement": "The retained incumbent execution (91c3ba1b01d6499fb26df8f95409401b) is a complete valid closed-loop evaluation that is jointly accepted, with terminal_error_m 0.002697828858325615, holding_max_error_m 0.0027300544346297905 and holding_max_speed_m_s 0.012750255515948416, all inside the frozen 0.01 m / 0.01 m / 0.02 m/s limits.",
+            "supporting_evidence": [
+              "F14",
+              "F123",
+              "F11",
+              "F24",
+              "F116",
+              "F118",
+              "F98",
+              "F18",
+              "F16",
+              "F21",
+              "F33",
+              "F71",
+              "F76",
+              "F131"
+            ],
+            "contradicting_evidence": [],
+            "scope": "Nominal case, seed 17, this campaign store; sampled acceptance over the final 0.05 s window.",
+            "uncertainty": "Single seed with no variance estimate; sampled acceptance is not a continuous-time guarantee and no real-time, hardware or superiority claim follows."
+          },
+          {
+            "statement": "The only perturbed datum in scope is a changed near-section-scale candidate at near_z_plus that is a valid_failure: holding speed 0.06758272073425946 m/s exceeds the 0.02 limit while terminal error 0.0028029393033160714 m and holding position 0.004094678029888374 m stay within limits. Because the structural edit and the initial-state perturbation are confounded in one execution, this datum does not establish the unchanged incumbent's behavior under that perturbation.",
+            "supporting_evidence": [
+              "F3",
+              "F51",
+              "F45",
+              "F4",
+              "F128",
+              "F54",
+              "F70",
+              "F65",
+              "F93",
+              "F121",
+              "F60",
+              "F104",
+              "F109",
+              "F68"
+            ],
+            "contradicting_evidence": [],
+            "scope": "near_z_plus, seed 17, changed near-section-scale structure versus retained nominal incumbent.",
+            "uncertainty": "One execution; structural and perturbation effects are confounded; the dominant physical cause is unidentified and no causal attribution is made."
+          },
+          {
+            "statement": "No new candidate execution can be completed or credited in this context, so the frozen case question cannot be advanced by further control or structure search; the attempt to reserve complete execution and delivery failed with a capability gap, the business consecutive-failure count exceeds its limit with zero remaining repairs, and the protocol correction allowance is exhausted.",
+            "supporting_evidence": [
+              "F64"
+            ],
+            "contradicting_evidence": [],
+            "scope": "This recovery/scheduling context only.",
+            "uncertainty": "This rests on the reported recovery-state feedback rather than a recorded F fact; a missing reservation slot is a scheduling fact, not physical evidence about the robot, and supports no claim about the system."
+          }
+        ],
+        "unresolved_uncertainties": [
+          "The unchanged incumbent's joint reach-and-hold acceptance under the near_z_plus and the other frozen perturbations is unmeasured.",
+          "The dominant physical mechanism of the changed near-section-scale candidate's holding-speed failure is unidentified; sealed M5 negative forecasts carry no screening authority.",
+          "Whether any control weight change lowers perturbed holding speed without worsening holding position error (a trade-off, not overall improvement) is untested.",
+          "Seed-level repeatability of the retained incumbent at nominal is not established (no explicit matching repeat in supplied scope), and no variance or trajectory-identity claim is made.",
+          "Whether a future reservable slot would even allow a decisive perturbed-incumbent reference remains a scheduling uncertainty, not a scientific result."
+        ],
+        "stop_reason": "Voluntary STOP on delivered evidence: the retained incumbent is the only complete jointly accepted configuration in scope; the single perturbed event is a confounded changed-structure valid_failure that cannot represent the unchanged incumbent; and no further complete execution/delivery reservation is available, with business repair allowance and protocol correction allowance exhausted. Further search batches would repeat the failing reservation request and could not be feedback-linked science, so the research is closed with a bounded interpretation and the incumbent retained."
+      }
+    }
+  ],
+  "distinction": "model0/model2/model3 are rejected submissions, not accepted scientific plans; model4 is final interpretation STOP after sealed host failure. No backend run."
+}

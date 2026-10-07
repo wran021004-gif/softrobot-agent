@@ -1,17 +1,24 @@
 # Current development status - Milestones 4 and 5, 2026-10-07
 
 A separately authorized [native development v2 campaign](research_native_development_v2.md)
-now connects deterministic full-request budget fitting, corrected bounded history,
-authoritative current permissions and the existing five frozen initial-state cases
-to native research. Its new cumulative 28/24/200/36000 grant protects twenty final
-verification backend slots before search. Focused offline checks and the repaired
-seed18 real receipt-host construction pass. The same-project prelaunch migration
-preserves the original freeze and consumed budget. Automatic approval rejected
-DeepSeek execution and GitHub push before launch; direct chat authorization is
-pending. Actual use is two preparation/engineering operations, 5.125 charged
-seconds, zero providers/backends/standalone numerical/worker calls. No live model
-decision, physical adaptation or matched verification occurred. Earlier STOPs,
-answers, costs and protected formal/M5 allocations are unchanged.
+is now sealed after a negative live scheduling result. Direct chat authorization
+and exact-payload review resolved platform approval; checkpoint 463355c was
+normally pushed and read back from the specified branch. Five provider requests
+(one failed transport and one bounded retry) produced three rejected explicit
+near_z_plus control proposals and one accepted final-report STOP. Search could
+not fit the elapsed deadline plus protected twenty-slot verification reserve.
+No backend, fresh physical adaptation or matched verification ran. A stale
+prelaunch-session authority bug advertised old search capacity; its original
+failure and requests remain sealed. Current-session facts/permissions are now
+separate from archive scope, with affected offline checks passing; the trajectory
+was not restarted. Final use is 5 requests / 8 workflow operations / 428.093
+charged seconds, zero backends, standalone numerical calls or workers. Known
+successful-response token subtotal is 200252; failed-request usage and monetary
+billing are unknown. The independent review corrects the model's false
+"only accepted configuration" claim: three supplied historical executions passed.
+Eight-variable/five-case construction and shared fitting have offline evidence;
+new mathematical search, physical feedback and improvement remain unexercised.
+Earlier STOPs, answers, costs and protected formal/M5 allocations are unchanged.
 
 The [linked decision-only recovery](research_native_pilot.md#linked-decision-recovery-delivered)
 has completed without new simulations. Historical coverage now includes seven

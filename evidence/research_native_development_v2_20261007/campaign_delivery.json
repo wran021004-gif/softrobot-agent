@@ -1,0 +1,205 @@
+{
+  "status": "failed",
+  "stop_reason": "RESEARCH_DECISION_INCOMPLETE: MODEL_PROTOCOL_CORRECTION_CONSECUTIVE_LIMIT: CAPABILITY_GAP: Complete execution and delivery reservation unavailable: {'backend_solves': 0, 'worker_calls': 0, 'model_calls': 0, 'tool_calls': 0, 'wall_s': 1595.0}",
+  "usage": {
+    "limit": {
+      "backend_solves": 28,
+      "model_calls": 24,
+      "tool_calls": 200,
+      "wall_s": 36000.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 7,
+      "model_calls": 5,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 271.7529999999824
+    },
+    "remaining": {
+      "backend_solves": 28,
+      "model_calls": 19,
+      "tool_calls": 193,
+      "wall_s": 35728.24700000002,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "search": [],
+  "verification": null,
+  "decisions": [
+    {
+      "index": 0,
+      "action": "stop",
+      "decision": {
+        "artifact_id": "0e7a028437ecb568dd24968f3c453592cf6ae2465538bd702852f9f1cc3777d3",
+        "media_type": "application/json"
+      },
+      "mathematical_support": null,
+      "interpretations": [
+        {
+          "contradicting_evidence": [],
+          "scope": "Nominal case, seed 17, this campaign store; sampled acceptance over the final 0.05 s window.",
+          "statement": "The retained incumbent execution (91c3ba1b01d6499fb26df8f95409401b) is a complete valid closed-loop evaluation that is jointly accepted, with terminal_error_m 0.002697828858325615, holding_max_error_m 0.0027300544346297905 and holding_max_speed_m_s 0.012750255515948416, all inside the frozen 0.01 m / 0.01 m / 0.02 m/s limits.",
+          "supporting_evidence": [
+            "F14",
+            "F123",
+            "F11",
+            "F24",
+            "F116",
+            "F118",
+            "F98",
+            "F18",
+            "F16",
+            "F21",
+            "F33",
+            "F71",
+            "F76",
+            "F131"
+          ],
+          "uncertainty": "Single seed with no variance estimate; sampled acceptance is not a continuous-time guarantee and no real-time, hardware or superiority claim follows."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "near_z_plus, seed 17, changed near-section-scale structure versus retained nominal incumbent.",
+          "statement": "The only perturbed datum in scope is a changed near-section-scale candidate at near_z_plus that is a valid_failure: holding speed 0.06758272073425946 m/s exceeds the 0.02 limit while terminal error 0.0028029393033160714 m and holding position 0.004094678029888374 m stay within limits. Because the structural edit and the initial-state perturbation are confounded in one execution, this datum does not establish the unchanged incumbent's behavior under that perturbation.",
+          "supporting_evidence": [
+            "F3",
+            "F51",
+            "F45",
+            "F4",
+            "F128",
+            "F54",
+            "F70",
+            "F65",
+            "F93",
+            "F121",
+            "F60",
+            "F104",
+            "F109",
+            "F68"
+          ],
+          "uncertainty": "One execution; structural and perturbation effects are confounded; the dominant physical cause is unidentified and no causal attribution is made."
+        },
+        {
+          "contradicting_evidence": [],
+          "scope": "This recovery/scheduling context only.",
+          "statement": "No new candidate execution can be completed or credited in this context, so the frozen case question cannot be advanced by further control or structure search; the attempt to reserve complete execution and delivery failed with a capability gap, the business consecutive-failure count exceeds its limit with zero remaining repairs, and the protocol correction allowance is exhausted.",
+          "supporting_evidence": [
+            "F64"
+          ],
+          "uncertainty": "This rests on the reported recovery-state feedback rather than a recorded F fact; a missing reservation slot is a scheduling fact, not physical evidence about the robot, and supports no claim about the system."
+        }
+      ]
+    }
+  ],
+  "standalone_numerical_operations": 0,
+  "workers": 0,
+  "subagents": 0,
+  "implementation": {
+    "commit": "70602142d1276397d81a92528e4d445b0132b597",
+    "files": {
+      "examples/research_model_v1.py": "fab2ad7e1713cf14df9a0b82aefd2eaf773151a8bbbb5f878a9b091ef673132e",
+      "examples/milestone4_autonomous.py": "764462cb45bb72b5f5f506f2dad38a1d46de8a9e67a3c8ece1143070c8057a44",
+      "configs/research/native_pilot_v1.json": "b096d68d9f85bd53cd686ce8e697f992e45ae5696533600e15c851c86b6ab375",
+      "tools/research_scheduler.py": "57ed31e4360056263ab6d4dd188d287b145363686d91d76ba90ec5affc6bab64",
+      "tools/platform_search.py": "32a9e44ae76cae62c2394699631b77434566abb7d4c0c56f62cefcc023d24c9d",
+      "tools/live_batch_execution.py": "9c59f58453ea876ca7be00c724737d55b9d4ce30a83a6cffc3b4d5e3bb3fad8e",
+      "tools/context_assembly.py": "2bb9ce822d0e0985e488bc42c603f2cf38231915545582646037a1e74149aff5",
+      "tools/diagnostic_reference_adapter.py": "3970455301f493a50656fae905161fcce645743ad270c879a5e3e0b85a0c72cf",
+      "examples/research_campaign_v2.py": "d36fb589a3ceb39055f2dd0e2134ee88e34212d9897bb648a436d5833a4f575e",
+      "configs/research/native_campaign_v2.json": "abcf6ebc59b8870366d607db15345b48b04e65c8e921b8e6e2611bc304033bc3",
+      "schemas/platform_handoff.py": "0cf890ec8dcadb94d05e1781cf20d6b0ec5de048a92ba50ebe941b6f722916f7",
+      "tools/batch_budget.py": "e9829d980cb4316738359692569196cbaaba8e432700efff07e5890d6b52aad5",
+      "tools/research_spec.py": "df3e03575a54a4c67c5dc4b6a42625eda6940cfe980d1ca8874dd67a06c9b153",
+      "tools/study_history.py": "4697e64b4643e73ab675688e477299dcfe742002d36be89d49b819f4aeb15b70",
+      "tools/candidate_parameters.py": "2c08bfdd5c15dc752b2ea6e5b85833584ba6d069e0c13fa98c097f04df3a7b61",
+      "tools/research_tasks.py": "c728710c80d97c48e53c31422a1f0aece54093e686b0d512c8f7cba0654101c9",
+      "tools/fixed_research.py": "27207dc82c489ce3f90669fd252530628fef7a65d3b543c56869ddfd2bc5891f",
+      "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43",
+      "tools/verification_evidence.py": "c9461fcdd882a1c1e0301fe0babff4fef2db76a7d36a311f3a5c9b4ecab8963f"
+    },
+    "stable_controller": {
+      "extensions/tendon_family/gvs_nmpc.py": "e3d6c33acf8fe6ab326de84634c0a4edf11ffe67ade1b9b72d9527787aae4e5a",
+      "extensions/tendon_family/gvs_trajectory.py": "160b47df2f0958929527d4871c61a66e3c69d766b7406144c97cb197ad65292b",
+      "extensions/tendon_family/gvs_profile.py": "42c4fbb3a86b252e48d575aeff1431546bb09e29883c457954d70097a5a1fc43"
+    }
+  },
+  "historical_answers_unchanged": true,
+  "formal_groups_not_launched": true,
+  "provider_usage": [
+    {
+      "request_id": "model-0",
+      "usage": {
+        "completion_tokens": 15091,
+        "completion_tokens_details": {
+          "reasoning_tokens": 12062
+        },
+        "prompt_cache_hit_tokens": 2048,
+        "prompt_cache_miss_tokens": 34359,
+        "prompt_tokens": 36407,
+        "prompt_tokens_details": {
+          "cached_tokens": 2048
+        },
+        "total_tokens": 51498
+      }
+    },
+    {
+      "request_id": "model-2",
+      "usage": {
+        "completion_tokens": 11394,
+        "completion_tokens_details": {
+          "reasoning_tokens": 8391
+        },
+        "prompt_cache_hit_tokens": 4096,
+        "prompt_cache_miss_tokens": 35382,
+        "prompt_tokens": 39478,
+        "prompt_tokens_details": {
+          "cached_tokens": 4096
+        },
+        "total_tokens": 50872
+      }
+    },
+    {
+      "request_id": "model-3",
+      "usage": {
+        "completion_tokens": 11486,
+        "completion_tokens_details": {
+          "reasoning_tokens": 8454
+        },
+        "prompt_cache_hit_tokens": 3456,
+        "prompt_cache_miss_tokens": 36009,
+        "prompt_tokens": 39465,
+        "prompt_tokens_details": {
+          "cached_tokens": 3456
+        },
+        "total_tokens": 50951
+      }
+    },
+    {
+      "request_id": "model-4",
+      "usage": {
+        "completion_tokens": 7646,
+        "completion_tokens_details": {
+          "reasoning_tokens": 5811
+        },
+        "prompt_cache_hit_tokens": 3456,
+        "prompt_cache_miss_tokens": 35829,
+        "prompt_tokens": 39285,
+        "prompt_tokens_details": {
+          "cached_tokens": 3456
+        },
+        "total_tokens": 46931
+      }
+    }
+  ],
+  "known_token_subtotal": {
+    "prompt_tokens": 154635,
+    "completion_tokens": 45617,
+    "total_tokens": 200252
+  },
+  "usage_limitations": [
+    "Failed requests without supplied usage remain unknown; monetary billing unknown.",
+    "Embedded controller updates are backend work; zero standalone numerical experiments does not mean zero numerical computation."
+  ]
+}
