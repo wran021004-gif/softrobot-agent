@@ -1,0 +1,134 @@
+{
+  "questions": [
+    {
+      "investigation_id": "reach-question",
+      "parent_id": null,
+      "role": "investigator",
+      "question": "For the historical Stage336 proposal-build execution 494deb38d6374deb8f741e96f2430826, explain which reach and sampled holding/settling judgments the available evidence supports and which remain unknown. The small initial page is not the whole authorized source. Choose relevant further evidence yourself if needed, within budget; report exact sourced facts, counterevidence and limits. Do not attribute this old result to the later promoted candidate or diagnose a dominant cause.",
+      "evidence": [
+        {
+          "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+          "media_type": "application/json"
+        }
+      ],
+      "queries": [
+        {
+          "reference": {
+            "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+            "media_type": "application/json"
+          },
+          "pointer": "/terminal_error_m",
+          "offset": 0,
+          "limit": 20,
+          "byte_limit": 4096
+        }
+      ],
+      "allowed_tools": [
+        "evidence.read"
+      ],
+      "budget": {
+        "tool_calls": 8,
+        "model_calls": 6,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 180.0
+      },
+      "timeout_s": 180.0,
+      "stop_conditions": [
+        "Bounded evidence turns then one report",
+        "Historical Stage336 evidence only; no scientific computation",
+        "No transport retries, protocol corrections, delegation or new authority"
+      ],
+      "output_bytes": 16384
+    },
+    {
+      "investigation_id": "timing-question",
+      "parent_id": null,
+      "role": "investigator",
+      "question": "For the same historical Stage336 proposal-build execution 494deb38d6374deb8f741e96f2430826, explain what recorded computation time and control period support, and the limits of timing interpretations. The small initial page is not the whole authorized source. Choose relevant further evidence yourself if needed, within budget; report exact sourced facts, counterevidence and unknowns. Do not infer real robot performance or a causal bottleneck.",
+      "evidence": [
+        {
+          "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+          "media_type": "application/json"
+        }
+      ],
+      "queries": [
+        {
+          "reference": {
+            "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+            "media_type": "application/json"
+          },
+          "pointer": "/deadline_misses",
+          "offset": 0,
+          "limit": 20,
+          "byte_limit": 4096
+        }
+      ],
+      "allowed_tools": [
+        "evidence.read"
+      ],
+      "budget": {
+        "tool_calls": 8,
+        "model_calls": 6,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 180.0
+      },
+      "timeout_s": 180.0,
+      "stop_conditions": [
+        "Bounded evidence turns then one report",
+        "Historical Stage336 evidence only; no scientific computation",
+        "No transport retries, protocol corrections, delegation or new authority"
+      ],
+      "output_bytes": 16384
+    }
+  ],
+  "principal_inspections": [
+    {
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "pointer": "/sampled_settling",
+      "limit": 100,
+      "byte_limit": 8192
+    },
+    {
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "pointer": "/mean_complete_update_s",
+      "limit": 100,
+      "byte_limit": 8192
+    },
+    {
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "pointer": "/control_period_s",
+      "limit": 100,
+      "byte_limit": 8192
+    },
+    {
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "pointer": "/execution_id",
+      "limit": 100,
+      "byte_limit": 8192
+    }
+  ],
+  "principal_report_pointer": "",
+  "principal_budget": {
+    "tool_calls": 4,
+    "model_calls": 6,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 180.0
+  },
+  "principal_accounting": "Four public independent key-source inspections plus at most four node evidence operations: combined principal ceiling eight.",
+  "source_case": "Stage336 saved proposal-build only; later promoted configuration is not execution evidence"
+}

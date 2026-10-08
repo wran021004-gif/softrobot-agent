@@ -1,0 +1,87 @@
+{
+  "project": {
+    "project_id": "mainline3-direct-099aa2d0a9d8",
+    "grant_id": "mainline3-direct-099aa2d0a9d8",
+    "budget": {
+      "tool_calls": 512,
+      "model_calls": 18,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 2400.0
+    },
+    "authorization_source": "User 2026-10-08 bounded real direct investigations only; evidence/research_direct_validation_20261008"
+  },
+  "proposal": {
+    "tool_bindings": {
+      "research.investigate": "1.0.0",
+      "research.investigation_status": "1.0.0",
+      "research.investigation_read": "1.0.0",
+      "research.investigation_disposition": "1.0.0"
+    },
+    "node_budget": {
+      "tool_calls": 8,
+      "model_calls": 6,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 180.0
+    },
+    "total_node_budget": {
+      "tool_calls": 24,
+      "model_calls": 18,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 540.0
+    },
+    "project_budget": {
+      "tool_calls": 512,
+      "model_calls": 18,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 2400.0
+    },
+    "operation_allowances": {
+      "research.investigate": {
+        "reserve_s": 5.0,
+        "timeout_s": 30.0
+      },
+      "research.investigation_status": {
+        "reserve_s": 5.0,
+        "timeout_s": 30.0
+      },
+      "research.investigation_read": {
+        "reserve_s": 5.0,
+        "timeout_s": 30.0
+      },
+      "research.investigation_disposition": {
+        "reserve_s": 5.0,
+        "timeout_s": 30.0
+      }
+    },
+    "node_count": 3,
+    "concurrency": 2,
+    "node_timeout_s": 180.0,
+    "output_bytes": 16384,
+    "provider_retries": 0,
+    "discovery_accounting": "Up to five query/response turns then report per node; catalog pages, original reads and returned reports share eight evidence operations. Larger directories require a separately budgeted narrowed scope, not silent truncation.",
+    "status": "proposal_only_separate_operator_grant_required"
+  },
+  "permitted_roles": [
+    "investigator",
+    "investigator",
+    "principal"
+  ],
+  "forbidden": [
+    "coordinator",
+    "children",
+    "science",
+    "workers",
+    "Version 2",
+    "retries",
+    "protocol corrections",
+    "polishing"
+  ],
+  "data_scope": "Non-secret Stage336 saved facts, source directory, question/tool context, checked reports and principal inspections",
+  "recipient": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "repair_ceiling": 1
+}
