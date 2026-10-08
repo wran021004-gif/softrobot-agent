@@ -1,0 +1,370 @@
+{
+  "version": "v1_stop_delivery_audit@1.0.0",
+  "generated_at": "2026-10-08T15:59:29.670274+08:00",
+  "activity_id": "mainline3-v1-e7e730716bab",
+  "bundle_identity": "39e11b97c40d5db8ad6ffd7d50c9ad690d2e9494c5397f8d8014ad279225cfa4",
+  "gate_identity": "6d054e1670e443f386686fe6adadb0c561a3a4f356a9f2fa9e49b9b94b73a3f5",
+  "conclusion": "Stopped with evidence; V1 live acceptance incomplete; V2 entry blocked",
+  "stop_reason": "Principal native investigation_return has invalid outer wrapper; two paid protocol corrections exhausted",
+  "direct": {
+    "status": "stopped_failed_gate",
+    "gates": {
+      "actual_provider_interaction": "pass",
+      "investigator_selected_followup": "pass",
+      "source_scope_and_provenance": "pass",
+      "completed_reports": "pass",
+      "formal_principal_dispositions": "fail",
+      "independently_inspected_acceptance": "fail",
+      "lifecycle_and_accounting": "pass",
+      "bounded_authority": "pass",
+      "approved_request_settings": "pass",
+      "material_correctness": "unverified"
+    },
+    "ledger": {
+      "limit": {
+        "backend_solves": 0,
+        "model_calls": 18,
+        "tool_calls": 512,
+        "wall_s": 4800.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 26,
+        "model_calls": 13,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 196.2830000000249
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 5,
+        "tool_calls": 486,
+        "wall_s": 4603.716999999975,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "provider_attempts": 13,
+    "received_responses": 13,
+    "tokens": {
+      "prompt_tokens": 115169,
+      "completion_tokens": 40240,
+      "total_tokens": 155409
+    },
+    "token_source": "Returned provider usage; not byte estimates",
+    "billing_cost": "unknown",
+    "paid_protocol_corrections": 2,
+    "implementation_repairs_used": 1,
+    "nodes": {
+      "principal-synthesis": {
+        "status": "failed",
+        "usage": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 2,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "report": null,
+        "original_started_unix": 1791445549.0233612,
+        "recorded_elapsed_s": 58.905999999988126,
+        "total_node_wall_s": null
+      },
+      "reach-question": {
+        "status": "completed",
+        "usage": {
+          "backend_solves": 0,
+          "model_calls": 6,
+          "tool_calls": 5,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "report": {
+          "artifact_id": "83a7c6d7daf53191cdae94add80da47df813e34f066619d01635c48103eea8f1",
+          "media_type": "application/json"
+        },
+        "original_started_unix": 1791445013.6207666,
+        "recorded_elapsed_s": 66.5,
+        "total_node_wall_s": 530.8389887809753
+      },
+      "timing-question": {
+        "status": "completed",
+        "usage": {
+          "backend_solves": 0,
+          "model_calls": 6,
+          "tool_calls": 5,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "report": {
+          "artifact_id": "714d62810b34966ad07259793c10d96c7676f35ffee2ea5b6352adb513f6fbff",
+          "media_type": "application/json"
+        },
+        "original_started_unix": 1791445015.6223252,
+        "recorded_elapsed_s": 59.0,
+        "total_node_wall_s": null
+      }
+    },
+    "formal_dispositions": 0,
+    "failed_principal_response": {
+      "artifact_id": "f996f943ae91032d1e71d6ec307ba08044bd2ea267664598eb05e6fc329de240",
+      "media_type": "application/json"
+    },
+    "failed_principal_argument_keys": [
+      "arguments",
+      "reason",
+      "tool_version"
+    ],
+    "invalid_return_executed": false,
+    "protocol_repair_available": false,
+    "transport_retries": 0
+  },
+  "dependent_phases": {
+    "coordinated": {
+      "status": "unexecuted_failed_direct_prerequisite",
+      "limit": {
+        "tool_calls": 512,
+        "model_calls": 24,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 6400.0
+      },
+      "used": {
+        "tool_calls": 0,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 0
+      },
+      "remaining": {
+        "tool_calls": 512,
+        "model_calls": 24,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 6400.0
+      }
+    },
+    "fixed": {
+      "status": "unexecuted_failed_direct_prerequisite",
+      "limit": {
+        "tool_calls": 7,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 4000.0
+      },
+      "used": {
+        "tool_calls": 0,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 0
+      },
+      "remaining": {
+        "tool_calls": 7,
+        "model_calls": 0,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 4000.0
+      }
+    }
+  },
+  "capacity": {
+    "all_final_requests_passed": true,
+    "maximum_wire_utf8_bytes": 56011,
+    "maximum_estimated_input_tokens": 64203,
+    "maximum_provider_prompt_tokens": 15469,
+    "generation_tokens": 32768,
+    "report_bytes": 65536,
+    "input_budget_tokens": 160000,
+    "estimator": "Conservative UTF-8 byte upper estimate plus framing, distinct from provider tokens",
+    "report_sizes": {
+      "reach-question": 12882,
+      "timing-question": 8365
+    }
+  },
+  "clocks": {
+    "application_initial_wall_s": 63.453000000008615,
+    "application_repair_continuation_wall_s": 86.59399999998277,
+    "application_wall_sum_s": 150.04699999999139,
+    "ledger_cumulative_wall_s": 196.2830000000249,
+    "provider_roundtrips_sum_s": 174.0640070438385,
+    "provider_roundtrips_union_s": 134.98206210136414,
+    "actual_two_investigator_provider_overlap_s": 39.081944942474365,
+    "initial_engineering_preparation_including_tests_and_wait_s": 1394.4639120101929,
+    "repair_authorization_to_refreeze_s": 25.456173181533813,
+    "historical_engineering_snapshot": {
+      "timestamp": "2026-10-08T07:34:30.703897+00:00",
+      "engineering_start": "2026-10-08T07:07:42+00:00",
+      "engineering_preparation_elapsed_s": 1608.703897,
+      "engineering_elapsed_includes_tests_and_review_wait": true,
+      "known_test_runner_elapsed_s": 289.754,
+      "known_test_runs": 8,
+      "model_provider_attempts": 0,
+      "backend_attempts": 0,
+      "live_project_tool_operations": 0,
+      "paid_protocol_corrections": 0,
+      "implementation_repairs_after_freeze": 0,
+      "synthetic_test_model_attempts": "Offline fixture ledger only; not external provider attempts",
+      "old_history_unchanged": true,
+      "frozen_code_and_source_checks": "pass",
+      "live_stage_status": {
+        "direct": "unexecuted_external_approval_required",
+        "coordinated": "unexecuted_external_approval_required",
+        "fixed": "unexecuted_external_approval_required"
+      },
+      "phase_budget_remaining": {
+        "direct": {
+          "tool_calls": 512,
+          "model_calls": 18,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 4800.0
+        },
+        "coordinated": {
+          "tool_calls": 512,
+          "model_calls": 24,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 6400.0
+        },
+        "fixed": {
+          "tool_calls": 7,
+          "model_calls": 0,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 4000.0
+        }
+      },
+      "automatic_review_rejections": 1,
+      "user_approval_pending": true,
+      "publication_status": "local_engineering_commit_only; no push"
+    },
+    "known_offline_test_runner_wall_s": 295.884,
+    "elapsed_from_engineering_start_to_delivery_snapshot_s": 3107.6702740192413,
+    "nonapplication_elapsed_including_review_repair_delivery_and_wait_s": 2957.62327401925,
+    "qualification": "Inclusive elapsed contains approval and review waits; no exact active engineering CPU cost or monetary bill is available."
+  },
+  "provider_intervals": [
+    {
+      "request_id": "investigation-timing-question",
+      "run_id": "mainline3-direct",
+      "start": "2026-10-08T07:36:58.252754+00:00",
+      "end": "2026-10-08T07:37:01.181194+00:00",
+      "elapsed_s": 2.9284400939941406,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-reach-question",
+      "run_id": "mainline3-direct",
+      "start": "2026-10-08T07:36:56.878182+00:00",
+      "end": "2026-10-08T07:37:01.531944+00:00",
+      "elapsed_s": 4.653762102127075,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-reach-question",
+      "run_id": "mainline3-direct",
+      "start": "2026-10-08T07:37:02.059320+00:00",
+      "end": "2026-10-08T07:37:05.039003+00:00",
+      "elapsed_s": 2.9796829223632812,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-timing-question",
+      "run_id": "mainline3-direct",
+      "start": "2026-10-08T07:37:01.398477+00:00",
+      "end": "2026-10-08T07:37:07.236778+00:00",
+      "elapsed_s": 5.838300943374634,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-reach-question",
+      "run_id": "mainline3-direct",
+      "start": "2026-10-08T07:37:05.238205+00:00",
+      "end": "2026-10-08T07:37:08.018262+00:00",
+      "elapsed_s": 2.780056953430176,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-timing-question",
+      "run_id": "mainline3-direct",
+      "start": "2026-10-08T07:37:07.448778+00:00",
+      "end": "2026-10-08T07:37:11.923798+00:00",
+      "elapsed_s": 4.475020170211792,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-reach-question",
+      "run_id": "mainline3-direct",
+      "start": "2026-10-08T07:37:08.561281+00:00",
+      "end": "2026-10-08T07:37:19.933359+00:00",
+      "elapsed_s": 11.372077941894531,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-timing-question",
+      "run_id": "mainline3-direct",
+      "start": "2026-10-08T07:37:12.117599+00:00",
+      "end": "2026-10-08T07:37:25.957584+00:00",
+      "elapsed_s": 13.839984893798828,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-reach-question",
+      "run_id": "mainline3-direct",
+      "start": "2026-10-08T07:37:20.169378+00:00",
+      "end": "2026-10-08T07:37:39.654424+00:00",
+      "elapsed_s": 19.485045909881592,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-timing-question",
+      "run_id": "mainline3-direct",
+      "start": "2026-10-08T07:37:26.148609+00:00",
+      "end": "2026-10-08T07:37:43.602967+00:00",
+      "elapsed_s": 17.454358100891113,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-timing-question",
+      "run_id": "mainline3-direct",
+      "start": "2026-10-08T07:37:43.808975+00:00",
+      "end": "2026-10-08T07:37:54.648843+00:00",
+      "elapsed_s": 10.839868068695068,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-reach-question",
+      "run_id": "mainline3-direct-repair1",
+      "start": "2026-10-08T07:45:24.160062+00:00",
+      "end": "2026-10-08T07:45:44.356604+00:00",
+      "elapsed_s": 20.196542024612427,
+      "finish_reason": "tool_calls"
+    },
+    {
+      "request_id": "investigation-principal-synthesis",
+      "run_id": "mainline3-direct-repair1",
+      "start": "2026-10-08T07:45:50.827861+00:00",
+      "end": "2026-10-08T07:46:48.048728+00:00",
+      "elapsed_s": 57.22086691856384,
+      "finish_reason": "tool_calls"
+    }
+  ],
+  "closure": {
+    "all_submitted_threads_collected": true,
+    "unresolved_new_reservations": [],
+    "old_history_and_unknown_escrow_unchanged": true,
+    "frozen_code_dependencies_and_sources_unchanged": true,
+    "automatic_review_rejections": 1,
+    "later_chat_confirmation_received": true,
+    "scientific_or_acceptance_changes": false,
+    "manual_model_report_substitution": false,
+    "additional_semantic_review_model_calls": 0
+  },
+  "publication": {
+    "target": "https://github.com/wran021004-gif/softrobot-agent.git",
+    "branch": "feat/gvs-dynamics",
+    "method": "normal push only; final remote SHA verified separately after commit"
+  }
+}

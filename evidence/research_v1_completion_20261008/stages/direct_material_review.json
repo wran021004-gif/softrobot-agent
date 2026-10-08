@@ -1,0 +1,31 @@
+{
+  "bundle_identity": "39e11b97c40d5db8ad6ffd7d50c9ad690d2e9494c5397f8d8014ad279225cfa4",
+  "reports": [
+    "714d62810b34966ad07259793c10d96c7676f35ffee2ea5b6352adb513f6fbff",
+    "83a7c6d7daf53191cdae94add80da47df813e34f066619d01635c48103eea8f1"
+  ],
+  "reviewer": "Codex offline material review; no additional provider call",
+  "material_correctness": "fail",
+  "exact_binding": "两份最终调查者报告的来源值、类型、执行身份、授权范围和可见页面通过程序核对；原始响应未截断。此结论不等于报告解释全部正确。",
+  "supported_material": [
+    "Stage336 单一历史执行记录完整有效，task_accepted=false，sampled_settling.passed=false，real_time_demonstrated=false；这些都是本来源明确给出的字段。",
+    "终点误差、保持窗口最大误差及速度、更新计数和计时数值均保留原值；自主追加读取进入后续真实请求并出现在报告事实中。",
+    "两份报告拒绝据此诊断主要原因、推广到真实机器人或归因于后来的晋升候选；这项适用范围限制合理。"
+  ],
+  "interpretive_issues": [
+    "时间报告把 measured_computation_s 和 mean_complete_update_s 的单位称为未声明。字段后缀支持秒单位；具体计时器及区间定义未提供，应分别说明，不能把两者合为单位未知。",
+    "到达报告关于独立 reach 判据未知的限定只适用于这一有限事实文档；不能抹去文档已明确记录的 task_accepted=false，也不能改写原官方任务失败。",
+    "到达报告说窗口最大误差等于终点误差因而没有独立信息，表述过强。聚合最大值仍约束该采样窗口，缺少的是窗口内部轨迹和连续时间保证。",
+    "报告把完整有效和未收敛称为内部张力；这些分别衡量执行完整性与优化收敛，本身并不矛盾。"
+  ],
+  "principal_assessment": {
+    "raw_response": "f996f943ae91032d1e71d6ec307ba08044bd2ea267664598eb05e6fc329de240",
+    "finish_reason": "tool_calls",
+    "failure": "原生 investigation_return 参数使用 arguments/reason/tool_version 外层；工具 schema 直接要求 InvestigationReturn。公共解析器拒绝额外字段及缺失 interpretation。",
+    "formal_dispositions": 0,
+    "manual_unwrap_or_report_rewrite": false,
+    "paid_corrections_used": 2,
+    "paid_corrections_remaining": 0
+  },
+  "scope": "本审查独立记录解释质量，不改写原模型报告，不替代主模型正式处置。门禁仍失败，协调与固定半径阶段未运行。"
+}
