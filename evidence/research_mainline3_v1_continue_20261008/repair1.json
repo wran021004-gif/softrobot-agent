@@ -1,0 +1,26 @@
+{
+  "repair": 1,
+  "defects": [
+    "Multi-call rejection feedback omitted required tool replies, causing documented HTTP 400",
+    "Complete safe reception admission failure was incorrectly treated as unconfirmed transport; local settlement now uses the actual durable reception and original usage",
+    "Reception flags carried across turns; reset per request. Future omitted-body usage captured before body admission."
+  ],
+  "affected_paths": [
+    "tools/research_investigations.py",
+    "tools/model_transports/deepseek.py",
+    "tools/disposition_facts.py",
+    "tools/research_v1_continue.py",
+    "tools/research_v1_continue_gate.py"
+  ],
+  "code_revision": "83e2a5e90938b10e3b0943037c16fe37adb7503f",
+  "checks": "repair1_checks.log",
+  "original_manifest_identity": "cde5b8ad33e2cfdabd89e81818da2ae5cfca3ba5dc7f057ebad25a172b381e1a",
+  "unchanged_model_allowances": true,
+  "unchanged_deadline": true,
+  "original_stopped_run_preserved": true,
+  "historical_lost_response_untouched": true,
+  "paid_recovery_branches": [
+    "Repair and continue the safely archived reach conversation with all tool replies",
+    "Explicit replacement timing submission after confirmed admission failure; omitted body is unrecoverable, not successfully recovered"
+  ]
+}

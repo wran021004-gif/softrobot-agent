@@ -623,7 +623,7 @@
     }
   },
   "frozen_at": "2026-10-08T14:06:51.217697+00:00",
-  "implementation_repairs_used": 2,
+  "implementation_repairs_used": 1,
   "implementation_repair_ceiling": 4,
   "same_defect_repair_ceiling": 2,
   "conditional_length_recovery": {
@@ -1598,35 +1598,6 @@
         "Repair and continue the safely archived reach conversation with all tool replies",
         "Explicit replacement timing submission after confirmed admission failure; omitted body is unrecoverable, not successfully recovered"
       ]
-    },
-    {
-      "repair": 2,
-      "defect": "Credential-admission false positive for version JSON embedded in provider prose",
-      "affected_paths": [
-        "tools/model_transports/deepseek.py",
-        "tools/research_investigations.py",
-        "tests/test_research_v1_continue.py"
-      ],
-      "code_revision": "cd5825124f3b82f76a7e31a216ada0b1e7656662",
-      "checks": "repair2_offline_checks.log",
-      "checks_passed": 3,
-      "live_requests": 0,
-      "live_validation": false,
-      "same_admission_defect_cycles_used": 2,
-      "same_defect_ceiling": 2,
-      "total_post_freeze_repairs": 2,
-      "total_ceiling": 4,
-      "unknown_original_body_cause": "No omitted body was retained; the reproducible offline counterexample does not identify their precise contents or cause.",
-      "new_behavior": "Quoted JSON delimiters excluded from Basic-Auth matching; actual auth/credential checks retained. Future safe omission code saved independently.",
-      "unchanged_scientific_scope": true,
-      "unchanged_grants": true,
-      "unchanged_deadline": true
     }
-  ],
-  "offline_delivery_code_revision": "cd5825124f3b82f76a7e31a216ada0b1e7656662",
-  "offline_delivery_code_identity": {
-    "tools/model_transports/deepseek.py": "a424d75294f4a50ef5ca0c1d9495ffd1574f20bd2c644fa7116dbee6cc815b53",
-    "tools/research_investigations.py": "c2d72c0ff9eb906c36c5f6e0dd8764ec78a536cc2e858bf1199e250ab8d53d1d",
-    "tests/test_research_v1_continue.py": "c6f6569591028c1e76a264345ec8f1fefce21a850884b3e4504749dc14959f3e"
-  }
+  ]
 }

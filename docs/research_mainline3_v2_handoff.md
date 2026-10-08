@@ -1,4 +1,45 @@
-# 主线三版本二条件性交接草案
+# 主线三版本二接口交接（条件性，未验证新拓扑）
+
+当前活动 `mainline3-v1-continue-edd8c668acb1` 保持 A 的既有接受范围，B 在 14 次请求后因非主模型恢复额度 3/3 耗尽而失败，C 未执行。**V1 尚未整体完成；本文件交付可审阅的接口准备，不宣布 V2 已可执行或允许新增实验。** [当前完成记录](research_mainline3_v1_completion.md)与[新活动账目](../evidence/research_mainline3_v1_continue_20261008/delivery_facts.json)保留执行身份和未知费用。旧计时正文不可恢复仍保持不确定；恢复它不是将来新授权的必备前提。缺失的是 B 新报告、综合、正式处置及材料审查，以及 C 固定案例。
+
+本轮只修正了 V1 调查持久化／历史／容量接口，没有修改 V2 公共拓扑入口或启动拓扑研究。未来先通过原 B/C 门禁，之后另行冻结有限拓扑案例、任务、初态、资源比较和预算。有效但物理失败的 C 可完成接口验证，不能以调参追求成功。
+
+## 现有代码与需补齐的边界
+
+以下路径都指向现有实现。集合可表示与单独构建不等于公共 NMPC 兼容，也不等于实际闭环验证。V1 `candidate.family@1.2.0` 与 `controller.gvs_nmpc@9.0.0` 只覆盖固定近／远段结构和已声明变量。
+
+| 接口／现有位置 | 已有表示或实现 | V2 所需小范围实现与验证 |
+| --- | --- | --- |
+| [contracts.py](../extensions/tendon_family/contracts.py)：`Design`、`Segment`、`Tendon`、`Actuator`、`Transmission`、`Discretization` | 组件、绳、执行器集合及命名连接；绳起点、导引、终点；离散网格 | 冻结少量具名模板，显式组件／绳／执行器 ID、顺序、传动与限值；不以任意 JSON 编辑冒充受支持公共设计。 |
+| [candidate.py](../extensions/tendon_family/candidate.py)：`build`、`apply`；[design_decisions.py](../extensions/tendon_family/design_decisions.py)；[parameter_capabilities.py](../extensions/tendon_family/parameter_capabilities.py) | 模板结构和离散选择先编译；当前公共语义变量仍是近／远段 | 增加有限模板的版本化选择声明、授权和可发现兼容域；保留源相对修改及候选事实；旧版本继续拒绝新增拓扑。 |
+| [compiler.py](../extensions/tendon_family/compiler.py)：`resolve`；[routing_radius.py](../extensions/tendon_family/routing_radius.py)：`locations` | 拓扑生成 parts、DOFs、entity_map；每根绳合法通路；传动矩阵为绳数 × 执行器数 | 对新增／删除组件检查引用、导引孔、绳直径、间隔、跨段路由；保留物理所在段归属，远绳过近段孔仍归近段，共享孔仅修改一次。固定点／刚性附件的祖先归属随新拓扑核对。 |
+| `compiler.resolve`；[gvs.py](../extensions/tendon_family/gvs.py)、[gvs_casadi.py](../extensions/tendon_family/gvs_casadi.py) | 当前规则要求每根绳唯一传动并被驱动；约化输入依实际绳顺序 | 显式区分绳张力与执行器命令空间。布局改变须检查传动比／符号、共驱映射、执行器限值如何约束各绳和输入雅可比；不假定新执行器布局仍是六个独立理想张力。 |
+| [gvs_structure.py](../extensions/tendon_family/gvs_structure.py)、[gvs_basis.py](../extensions/tendon_family/gvs_basis.py)：`resolve_basis` | 基函数／节点由组件与附件结构生成；保留结构 ID 与分段积分 | 新段数／网格重建约化维度、坐标顺序与结构节点；不复用旧 12 维约化／48 维后端向量的数值位置。保持局部单位、弯曲轴和积分约定。 |
+| [scene.py](../extensions/tendon_family/scene.py)：`assemble`；`contracts.Initial` | 命名 `qpos_rad`／`qvel_rad_s` 映射编译 DOFs，未知关节拒绝，未指定零 | 新版本显式语义初态映射，见下节；零默认不能隐式替代总远段弯曲条件。记录新旧状态身份、映射误差及初始化规则。 |
+| [gvs_profile.py](../extensions/tendon_family/gvs_profile.py)：`checked_reach`、`reach_numerical`、`candidate_numerical` | 当前固定拓扑兼容；小命名初态；历史张力仅数值猜测，当前测量状态重新生成 | 新拓扑要独立版本化兼容检查、输入／力界顺序、初态约束、数值猜测与不可兼容原因。历史状态、平衡、计划与评价不能重绑定；维度不匹配的张力猜测也不可照搬。 |
+| [gvs_nmpc.py](../extensions/tendon_family/gvs_nmpc.py)：`workspace_key`、`resolve_gvs_nmpc_control` | 基于任务、机器人、参数构建控制工作区和动力学图 | 重建 shooting 状态／输入维度、权重尺度、限值、约束和图；新布局不通过只改一个缓存键获得支持。既有 V7 停止配方与 V8 实验行为继续分开。 |
+| [gvs_projection.py](../extensions/tendon_family/gvs_projection.py)：`description`、`project`、`discretize`；[backends.py](../extensions/tendon_family/backends.py)、[mjcf.py](../extensions/tendon_family/mjcf.py) | 两主轴铰链／单元，按实际长度积分基函数与曲率投影；后端物理模型生成 | 新段／网格重建 qpos/qvel 映射、cell lengths、惯量与控制 entity_map；核对投影／反投影残差、单位、轴、绳导数和实际 MuJoCo 模型。构建成功不等于完成动力学运行。 |
+| [research_execution.py](../tools/research_execution.py)：`prepare_candidate_tool`、`linearize_configuration` | 候选原始所有权、完整 content identity、分析协议与工作点绑定 | 新配置必须贯穿编译、数学工作点、控制器、执行和评价；旧线性化／指标／端点结果不得贴到新拓扑。新的科学计算必须单独授权。 |
+| [research_tasks.py](../tools/research_tasks.py)：`task_adapter`、`assemble_acceptance`；[research_joint_evaluation.py](../tools/research_joint_evaluation.py)：`evaluate` | 到达与跟踪分别适配；评价绑定任务、配置、执行 ID 与报告 | 冻结世界坐标目标、mount、重力、时间网格、初态、seed 与阈值；新尺寸导致可达域变化须显式比较。物理失败、工程无效、缺材料分开；不得反套新判据到历史结果。 |
+| [platform_host.py](../tools/platform_host.py)、[platform_registry.py](../tools/platform_registry.py)、[platform_store.py](../tools/platform_store.py) | 输入／依赖内容身份、版本封存、缓存与原执行来源 | 结构、路由、绳／执行器顺序、离散、初态、任务或控制器变更均核对缓存失效；版本升级显式新快照，旧记录保持原身份。读取旧评价不是新执行。 |
+
+## 初态映射的具体要求
+
+以语义总弯曲为约束，例如 `theta_far = integral kappa_far(s) ds`（离散后为 far 段各单元主轴角之和），不能把旧状态数组复制到新长度或新维度。首先保留 world mount、局部弯曲轴与符号，声明远段弯曲方向／总角及对应语义速度；按新长度、结构节点和基函数分配曲率，再通过新投影得到后端命名关节状态。速度同样由新映射导出，不用索引拷贝。
+
+新增段初始曲率和速度、删除段后弯曲如何保留必须预先明确；不能用事后调节初态优化结果。记录每段积分、末端姿态和投影残差，并检查当前兼容入口的小关节条件（当前 reach envelope 的角度绝对值不超过 0.05 rad、角速度不超过 0.5 rad/s）。若新语义初态不能在原限制中表示，需新的显式版本和任务初始化声明，不能放宽历史阈值。本任务未实现该映射算法。
+
+## 后续有限案例与比较约束
+
+先冻结四个具名槽位：基线 `T0`；仅改变有限绳数／布局的 `T1`；仅改变段数的 `T2`；一个必要的代表组合 `T3`。每个槽位提交完整组件／绳／执行器清单和实际数目、路由及网格，检查支持后才定最终身份；本文件不虚构尚未审查的具体数目，也不授权全部笛卡尔组合或通用优化器。不能把“可由 schema 表示”当作进入有限比较清单的证明。
+
+每个案例的资源表至少记录总长、各段截面／材料、质量／惯量、绳数、执行器数、每路张力限值、传动／力臂与总驱动能力。执行器共驱时不能简单把各绳上限相加宣称总能力；理想张力模型与真实电机能力分开。任务目标、重力、mount、初态语义与运行时间相同的比较须注明改变尺寸后的可达性；资源变化与控制改进不能混称。
+
+验证分三层：离线具名模板编译／路由／维度／初始化／投影／缓存与来源检查；生产公共发现→准备→分析绑定→执行请求的无科学替代检查；最后在另行授权的有限预算下执行真实数学准备和闭环评价。每一步保留构建、数值准备、控制器构建、完整有效执行与物理验收的独立状态，不以一次 isolated construction 跳过其余步骤。
+
+仍未实现的工程缺口：有限拓扑公共选择与版本域、新输入／执行器限值映射、语义初态映射、拓扑控制兼容、后端投影跨维度验证、任务适配与资源公平比较、新身份缓存／评价全链检查及真实有限案例。缺少 shear、stretch、torsion、摩擦与电机动力学的原模型限制继续显式保留。V1 最后持久化修复仅有离线验证，B/C 的缺失也仍是交接限制。
+
+## 前一交接草案（历史记录，不是当前前提）
 
 2026-10-08 新活动 `mainline3-v1-finish-dcf23687722e` 的阶段 A 正式处置与独立审查通过。阶段 B 已开展新的协调者和两名调查者执行，但到达调查耗尽冻结分配的 8 次请求、计时调查第 8 次响应保存失败且原请求未确认，未形成两份有效报告。阶段 C 未启动。**版本一尚未整体完成，本文件不是版本二开工许可。** 当前事实与账目见[版本一交付](research_mainline3_v1_completion.md)。
 
