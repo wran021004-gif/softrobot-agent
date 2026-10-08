@@ -115,7 +115,9 @@ def expand(dispatcher, selected, catalog_ref, *, path='disposition'):
     selected=SelectedDisposition.model_validate(selected)
     if plain(selected.catalog)!=plain(catalog_ref): raise BindingError(path+'/catalog',selected.catalog,'unknown or stale catalog')
     body=dispatcher.store.artifact(catalog_ref)
-    if body['version']!=selected.catalog_version or body['activity_run_id']!=dispatcher.run_id:
+    authorized_runs={dispatcher.run_id,*[n.get('catalog_origin_run_id') for n in dispatcher.store.session(dispatcher.run_id)['state'].get('investigations',{}).values()
+        if n.get('fact_catalog')==plain(catalog_ref)]}
+    if body['version']!=selected.catalog_version or body['activity_run_id'] not in authorized_runs:
         raise BindingError(path+'/catalog',selected.catalog,'catalog version or activity mismatch')
     target=dict(investigation_id=selected.investigation_id,report=plain(selected.report))
     if target not in body['targets'] or dispatcher._reports().get(selected.investigation_id,{}).get('result')!=plain(selected.report):
@@ -154,8 +156,14 @@ def expand(dispatcher, selected, catalog_ref, *, path='disposition'):
         for area,role in [('supporting_facts','report_support'),('additional_support','additional_support'),('scope','scope')]:
             claim[area]=[resolve(s,prefix+f'/{area}/{j}',role) for j,s in enumerate(getattr(c,area))]
         value['adopted_claims'].append(claim)
-    value['selection_provenance']=dict(catalog=plain(catalog_ref),catalog_version=body['version'],expansion_path=path,model_selection=plain(selected),links=links)
+    provenance=dict(catalog=plain(catalog_ref),catalog_version=body['version'],expansion_path=path,model_selection=plain(selected),links=links)
+    with dispatcher.store.transaction() as db:provenance_ref=plain(dispatcher.store.put(db,provenance))
+    value['selection_provenance']=dict(reference=provenance_ref)
     return PrincipalDisposition.model_validate(value)
+
+
+def provenance_body(dispatcher,value):
+    return dispatcher.store.artifact(value['reference']) if set(value)=={'reference'} else value
 
 
 def diagnose(bundle):

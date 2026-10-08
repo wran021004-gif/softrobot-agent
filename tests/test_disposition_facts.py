@@ -3,7 +3,7 @@ from copy import deepcopy
 import json
 from unittest import TestCase
 from tests import test_research_v1_capacity as fixtures
-from tools.disposition_facts import catalog,expand,project,BindingError
+from tools.disposition_facts import catalog,expand,project,BindingError,provenance_body
 from tools.research_investigations import InvestigationReturn,SourceFact
 from tools.platform_store import plain,encode
 from tools.research_execution import invoke
@@ -47,7 +47,7 @@ class SelectableTests(TestCase):
         self.setup_report();s=self.selection();a=expand(self.dispatch,s,self.cat)
         self.assertEqual(encode(plain(a)),encode(plain(expand(self.dispatch,s,self.cat))))
         self.assertEqual(a.adopted_claims[0].supporting_facts[0].value,self.source['scalar'])
-        self.assertEqual(a.selection_provenance['model_selection']['adopted_claims'][0]['supporting_facts'][0]['handle'],self.handle)
+        self.assertEqual(provenance_body(self.dispatch,a.selection_provenance)['model_selection']['adopted_claims'][0]['supporting_facts'][0]['handle'],self.handle)
         record=self.dispatch.disposition(a,validate_only=True)
         self.assertTrue(record['inspection_links']);self.assertEqual(record['semantic_correctness'],'unassessed; structural/source validation does not prove scientific interpretation')
         for field,value in [('value',0),('value',str(self.source['scalar'])),('source_identity',dict(execution_id='wrong'))]:
@@ -73,7 +73,7 @@ class SelectableTests(TestCase):
         with self.assertRaisesRegex(BindingError,'impersonate'):expand(self.dispatch,s,self.cat)
         s=self.selection();s['adopted_claims'][0]['additional_support']=[dict(handle=self.additional)]
         a=expand(self.dispatch,s,self.cat);record=self.dispatch.disposition(a,validate_only=True)
-        self.assertEqual(a.selection_provenance['links'][1]['origin'],'principal_additional')
+        self.assertEqual(provenance_body(self.dispatch,a.selection_provenance)['links'][1]['origin'],'principal_additional')
         for kind in ('accept','defer','reject'):
             a=expand(self.dispatch,self.selection(kind),self.cat)
             self.assertEqual(self.dispatch.disposition(a,validate_only=True)['decision']['disposition'],kind)

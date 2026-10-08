@@ -941,7 +941,8 @@ class InvestigationDispatcher:
         inspection_links=[]
         provenance=args.selection_provenance
         if provenance:
-            from tools.disposition_facts import expand
+            from tools.disposition_facts import expand,provenance_body
+            provenance=provenance_body(self,provenance)
             expected=expand(self,provenance['model_selection'],provenance['catalog'],path=provenance['expansion_path'])
             if encode(plain(expected))!=encode(plain(args)):raise ValueError('DISPOSITION_EXPANSION_CHANGED')
             report_reads=[r for n in state.get('investigations',{}).values() if n['order']['role']=='principal' for r in n.get('reads',[])]
