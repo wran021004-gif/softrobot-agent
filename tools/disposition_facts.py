@@ -72,7 +72,7 @@ def report_binding(dispatcher,target):
         original_execution_id=node.get('original_execution_id'),
         order_identity=digest(node['order']) if node.get('order') else None,execution_id=None)
     if node.get('order'):
-        call=dispatcher.store.lookup(node.get('request_run_id',dispatcher.run_id),'investigation-'+target['investigation_id'])
+        call=dispatcher.store.lookup(node.get('request_run_id',dispatcher.run_id),node.get('active_request_id','investigation-'+target['investigation_id']))
         binding['execution_id']=call['execution_id'] if call else None
     return binding
 

@@ -144,7 +144,7 @@ def host_for(mode,create=False):
         cfg['policy'].update(route=None,budget=p['project_budget'],allowed_tools=list(p['tool_bindings']),tool_bindings=p['tool_bindings'],operation_allowances=p['operation_allowances'],timeout_s=p['project_budget']['wall_s'])
         host=Host(root,cfg['run_id']);host.create(cfg);host.resume()
         atomic_json(OUT/(mode+'_launch.json'),dict(timestamp=now(),started_unix=time.time(),code_commit=m['code_commit'],manifest_identity=digest(m)))
-    else:host=Host(root,'mainline3-'+mode)
+    else:host=Host(root,p.get('active_run_id','mainline3-'+mode))
     return host,m,p
 
 def bind_sources(host,m,p):
@@ -201,18 +201,21 @@ def root_order(p,key,role,question,evidence,queries):
             'Exact source values and original source identities; explicit uncertainty.','Protect frozen report delivery capacity; evidence insufficiency is a valid report.']))
 
 def stage_b(host,m,p,transport=None):
-    sources=bind_sources(host,m,p)
+    session=host.store.session(host.run_id)
+    sources=m['historical_parent']['order']['evidence'] if 'coordinator-plan' in session['state'].get('historical_investigations',{}) else bind_sources(host,m,p)
     children=p['authorized_children']
     if transport is None:
         from examples.gvs_nmpc_route_experiment import load_credential
         load_credential(Path.home()/'.codex/.env')
-    for child in children:submit(host,child)
+    for child in children:
+        if child['investigation_id'] not in host.store.session(host.run_id)['state'].get('investigations',{}):submit(host,child)
     reports=[collect(host,c['investigation_id']) for c in children]
     targets=[dict(investigation_id=c['investigation_id'],report=r) for c,r in zip(children,reports)]
     queries=[dict(reference=r,pointer='',limit=100,byte_limit=65536) for r in reports]
     synthesis=root_order(p,'coordinator-summary','coordinator',
         'Actually synthesize both new investigator reports, including counterevidence and unknowns. Return a concise sourced investigation_return. Distinguish official historical reach and sampled settling from timing and integrity. Do not delegate, dispose, infer a dominant cause, or conduct new science. Facts may cite exact inspected report fields; scientific conclusions remain your own.',[*sources,*reports],queries)
-    submit(host,synthesis);combined=collect(host,'coordinator-summary')
+    if 'coordinator-summary' not in host.store.session(host.run_id)['state'].get('investigations',{}):submit(host,synthesis)
+    combined=collect(host,'coordinator-summary')
     # These prefetches are role-attributable operations inside the principal node reservation.
     original_queries=[dict(reference=sources[0],pointer='',offset=i,limit=15,byte_limit=4096) for i in (0,15,30)]
     original_queries.append(dict(reference=sources[1],pointer='/limitations',limit=100,byte_limit=4096))
@@ -220,11 +223,12 @@ def stage_b(host,m,p,transport=None):
         'Read the two complete new investigator reports, actual coordinator synthesis, and necessary original evidence now present in your prefetched pages. Submit exactly one formal accept/defer/reject disposition per declared report through investigation_return. Select catalog handles for report-linked support, explicit additional_support and per-source scope. Independently evaluate material claims and explicit unknowns. Official historical failure remains recorded; limited recomputation does not erase it. One-step predictions do not establish reach, settling, causality or real-robot feasibility. Adopt only supported portions, or defer/reject with precise reasons. No desired scientific conclusion is mandated.',
         [*sources,*reports,combined],[*queries,dict(reference=combined,pointer='',limit=100,byte_limit=65536),*original_queries])
     principal['disposition_ids']=[t['investigation_id'] for t in targets]
-    submit(host,principal);report=collect(host,'principal-coordinated-v2')
+    if 'principal-coordinated-v2' not in host.store.session(host.run_id)['state'].get('investigations',{}):submit(host,principal)
+    report=collect(host,'principal-coordinated-v2')
     result=dict(status='material_audit_pending',report=report,targets=targets,coordinator_synthesis=combined,coordinator_plan=m['historical_parent']['result'],
         receipts=[],reused_planning=True,new_planning_requests=0,code_commit=m['code_commit'])
     atomic_json(OUT/'coordinated_result.json',result)
-    export(OUT,'coordinated')
+    export(OUT,'coordinated',run_id=host.run_id)
     return result
 
 def close_b():
@@ -242,7 +246,7 @@ def close_b():
         atomic_json(OUT/'coordinated_result.json',result)
     result.update(status='formal_dispositions_recorded',material_review=audit);atomic_json(OUT/'coordinated_result.json',result)
     stop(host,'NEW B GRANT COMPLETE; no historical node reopened')
-    export(OUT,'coordinated')
+    export(OUT,'coordinated',run_id=host.run_id)
     from tools.research_v1_continue_gate import generate_b
     gate=generate_b();atomic_json(OUT/'coordinated_gate.json',gate)
     if not gate['passed']:raise ValueError('B_GATE_FAILED')
@@ -269,11 +273,122 @@ def execute_c():
         stop(host,'FIXED C TERMINAL; physical failure never authorizes tuning or improved-result rerun')
         export(OUT,'fixed')
 
+def bind_repair():
+    """One explicit version migration in the original grant; no STOP revival."""
+    m=read(OUT/'validation_manifest.json');p=m['phases']['coordinated'];old_run=p.get('active_run_id','mainline3-coordinated')
+    store=Store(ROOT/p['output']);old=store.session(old_run)
+    if old['status']!='stopped' or m['implementation_repairs_used']>=4:raise ValueError('BOUNDED_STOPPED_REPAIR_REQUIRED')
+    saved=read(OUT/'coordinated_bundle.json');atomic_json(OUT/'coordinated_bundle_before_repair1.json',saved)
+    # Full reception and original cumulative usage, not body reconstruction, establish
+    # that this NEW request ended in a local admission failure. Supplier billing stays unknown.
+    timing=old['state']['investigations']['timing-integrity-limits']
+    row=store.lookup(old_run,'investigation-timing-integrity-limits')
+    failure=store.artifact(timing['failure_record'])
+    reception=[e for e in store.events(old_run) if e['kind']=='investigation_reception' and e.get('request_id')==row['request_id']
+        and store.artifact(e['outputs'][0]).get('complete_body_received') is True]
+    omitted=[e for e in reception if store.artifact(e['outputs'][0]).get('omission_reason')=='sensitive_response_text; original body not retained']
+    if not omitted or failure['progress']['transport_callable_invocations']!=timing['usage']['model_calls'] or failure['progress']['response_body_received'] is not True:
+        raise ValueError('ORIGINAL_REQUEST_UNCONFIRMED_NO_RETRANSMISSION')
+    d=InvestigationDispatcher(Host(store.root,old_run))
+    if not row['receipt']:
+        receipt=store.complete(row,d._receipt(row,'failed','CONFIRMED_FULL_RECEPTION_BODY_OMITTED; contents and supplier usage unknown'),
+            elapsed=failure['elapsed_s'],actual_cost=timing['usage'],kind='investigation')
+        with store.transaction() as db:
+            ref=store.put(db,dict(original_request=row['request_id'],original_execution=row['execution_id'],original_failure=timing['failure_record'],
+                reception_event=omitted[-1]['event_id'],known_complete_reception=True,body_unavailable=True,provider_charge_unknown=True,receipt=receipt,
+                determination='Confirmed local admission failure; actual local requests/reads/time settle. No body recovered and no zero-cost claim.'))
+            store.event(db,old_run,'investigation_request_reconciliation','confirmed_local_failure',request=row['request_id'],execution=row['execution_id'],outputs=[ref])
+        atomic_json(OUT/'new_timing_reconciliation.json',store.artifact(ref))
+    if any(c['status'] in ('running','unknown') for c in saved['calls'] if c['request_id']!='investigation-timing-integrity-limits'):
+        raise ValueError('OTHER_UNCONFIRMED_REQUEST_NO_REPAIR_DISPATCH')
+    new_run='mainline3-coordinated-repair1'
+    cfg=deepcopy(old['snapshot']['input']);cfg['run_id']=new_run
+    host=Host(store.root,new_run);host.create(cfg);host.resume()
+    state=deepcopy(old['state'])
+    state['original_stopped_run']=old_run
+    state['repair_binding']=dict(kind='explicit_code_revision_original_grant',original_run=old_run,original_project=store.config()['project_id'],
+        counters_and_original_node_deadlines_preserved=True,new_node_or_grant_capacity=0)
+    with store.transaction() as db:store.update_state(db,new_run,state)
+    previous=deepcopy(m);atomic_json(OUT/'validation_manifest_before_repair1.json',previous)
+    affected=['tools/research_investigations.py','tools/model_transports/deepseek.py','tools/disposition_facts.py','tools/research_v1_continue.py','tools/research_v1_continue_gate.py']
+    revision=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+    for path in affected:m['code_identity'][path]=sha(ROOT/path)
+    m.update(code_commit=revision,implementation_repairs_used=1)
+    m['phases']['coordinated']['active_run_id']=new_run
+    record=dict(repair=1,defects=['Multi-call rejection feedback omitted required tool replies, causing documented HTTP 400',
+        'Complete safe reception admission failure was incorrectly treated as unconfirmed transport; local settlement now uses the actual durable reception and original usage',
+        'Reception flags carried across turns; reset per request. Future omitted-body usage captured before body admission.'],
+        affected_paths=affected,code_revision=revision,checks='repair1_checks.log',original_manifest_identity=digest(previous),
+        unchanged_model_allowances=True,unchanged_deadline=True,original_stopped_run_preserved=True,historical_lost_response_untouched=True,
+        paid_recovery_branches=['Repair and continue the safely archived reach conversation with all tool replies',
+            'Explicit replacement timing submission after confirmed admission failure; omitted body is unrecoverable, not successfully recovered'])
+    m.setdefault('repairs',[]).append(record);atomic_json(OUT/'repair1.json',record);atomic_json(OUT/'validation_manifest.json',m)
+    repair_start=1791468491.0  # First live blocker inspection, 14:08:11 UTC.
+    elapsed=max(0,time.time()-repair_start)
+    cost={**zero(),'wall_s':elapsed}
+    r,fresh=store.reserve(new_run,'engineering-repair1',digest(record),'coding-agent-repair',cost,kind='engineering_repair')
+    if fresh:store.complete(r,dict(request_id=r['request_id'],execution_id=r['execution_id'],tool_id='engineering.repair',tool_version='1.0.0',execution_status='completed',caller='coding-agent-repair',charged=zero(),cache_hit=False),record,elapsed=elapsed,actual_cost=cost,kind='engineering_repair')
+    atomic_json(OUT/'repair1_accounting.json',dict(repair_wall_s=elapsed,project_ledger=store.remaining(),coding_operations='Bounded patch, source/receipt inspection, affected offline checks, ordinary commit and version binding; shell operations are engineering, not fabricated public source reads.'))
+
+def continue_repair():
+    host,m,p=host_for('coordinated');store=host.store;d=InvestigationDispatcher(host)
+    from examples.gvs_nmpc_route_experiment import load_credential
+    load_credential(Path.home()/'.codex/.env')
+    for key in ('reach-holding-interpretation','timing-integrity-limits'):
+        node=store.session(host.run_id)['state']['investigations'][key]
+        if node['status']=='completed':continue
+        original_run=store.session(host.run_id)['state']['original_stopped_run']
+        original=store.lookup(original_run,'investigation-'+key)
+        if not original['receipt'] or json.loads(original['receipt'])['execution_status']!='failed':raise ValueError('CONFIRMED_ORIGINAL_FAILURE_REQUIRED')
+        order=InvestigationOrder.model_validate(node['order'])
+        remaining_s=order.timeout_s-(time.time()-node['started_unix'])
+        if remaining_s<=0:raise ValueError('ORIGINAL_NODE_DEADLINE_EXPIRED')
+        reservation={k:v-node['usage'][k] for k,v in plain(order.budget).items()};reservation['wall_s']=remaining_s
+        request='investigation-'+key+'-repair1'
+        # This explicitly paid recovery is separate from genuine model corrections.
+        with store.transaction() as db:
+            state=store.session(host.run_id,db)['state'];g=state['role_context']['investigation_grant'];used=state.get('investigation_protocol_corrections_used',0);other=state.get('investigation_corrections_by_role',{}).get('other',0)
+            if used>=g['protocol_correction_limit'] or other>=3:raise ValueError('PAID_RECOVERY_ALLOWANCE_EXHAUSTED')
+            state['investigation_protocol_corrections_used']=used+1;state.setdefault('investigation_corrections_by_role',{})['other']=other+1
+            state['investigations'][key].setdefault('request_history',[]).append(dict(run_id=original_run,request_id=original['request_id'],execution_id=original['execution_id'],usage=deepcopy(node['usage'])))
+            state['investigations'][key].update(request_run_id=host.run_id,active_request_id=request,status='pending')
+            store.update_state(db,host.run_id,state);store.event(db,host.run_id,'investigation_paid_recovery','authorized',request=request,outputs=[store.put(db,dict(branch='program_history_repair' if key.startswith('reach') else 'new_replacement_after_body_omission',logical_node=key,original_receipt=json.loads(original['receipt']),cumulative_node_usage=node['usage'],same_node_deadline=node['started_unix']+order.timeout_s))])
+        row,fresh=store.reserve(host.run_id,request,digest(dict(original_execution=original['execution_id'],repair=1)),'investigation-dispatcher',reservation,kind='investigation')
+        if not fresh:raise ValueError('NO_REPAIR_REQUEST_REDISPATCH')
+        if key.startswith('reach'):
+            events=[e for e in store.events(original_run) if e['kind']=='investigation_provider_attempt' and e.get('request_id')==original['request_id']]
+            payload=store.artifact(events[-1]['outputs'][0])['payload']
+            # Fix the actual rejected wire locally; retain every assistant reasoning field.
+            fixed=[]
+            for message in payload['messages']:
+                fixed.append(message)
+                if message.get('role')=='assistant' and len(message.get('tool_calls',[]))>1:
+                    fixed.extend(dict(role='tool',tool_call_id=c['id'],content=encode(dict(error='EXACTLY_ONE_NATIVE_TOOL_CALL_REQUIRED',executed=False,requirement='Submit exactly one native call next.'))) for c in message['tool_calls'])
+            payload['messages']=fixed;context=None
+            payload['messages'].append(dict(role='user',content='Report source_identity may be empty. If provided, copy only fields actually present at the original source root; nested candidate_id/owner_run_id are not root identities. Exact scoped values, conclusions and unknowns remain your responsibility.'))
+        else:
+            payload=None;context=dict(kind='explicit_new_replacement_submission_same_authorized_node',
+                prior_confirmed_reads=node['reads'],prior_response_body='Received in full but omitted by mandatory secret admission; unrecoverable. No content or judgment inferred.',
+                scientific_instruction='Continue the original question using the safe evidence actually supplied here. Submit your strongest supported report with explicit missing evidence; no desired conclusion.',
+                source_identity_rule='Use source_identity={} unless copying actual source-root fields. Never promote nested candidate_id or owner_run_id to source-root identity.',
+                historical_uncertainty='The older activity eighth response remains separately unrecoverable and reserved.')
+        from tools.workbench import owner
+        def run(order=order,row=row,payload=payload,context=context):
+            with owner(host.folder,'.investigation-'+order.investigation_id+'.lock'):
+                d._execute(order,row,resume_payload=payload,correction_context=context,reuse_saved_reads=True)
+        threading.Thread(target=run,name='investigation-'+key,daemon=True).start()
+    try:stage_b(host,m,p,transport=True)
+    except Exception:
+        for t in [t for t in threading.enumerate() if t.name.startswith('investigation-')]:t.join(2405)
+        export(OUT,'coordinated',run_id=host.run_id);raise
+
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('action',choices=['start','freeze','execute-b','close-b','check']);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('action',choices=['start','freeze','execute-b','close-b','check','bind-repair','continue-repair']);args=parser.parse_args()
     if args.action=='start':start()
     elif args.action=='freeze':freeze()
     elif args.action=='check':check()
+    elif args.action=='bind-repair':bind_repair()
+    elif args.action=='continue-repair':continue_repair()
     elif args.action=='close-b':close_b()
     else:
         host,m,p=host_for('coordinated',create=True)

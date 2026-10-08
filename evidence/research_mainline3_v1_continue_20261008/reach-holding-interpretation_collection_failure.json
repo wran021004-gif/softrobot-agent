@@ -1,0 +1,113 @@
+{
+  "result": {
+    "disposition_record": null,
+    "failure_record": {
+      "artifact_id": "8ed27104190604750b63bef7741122d2cc55b32b1be84a9c8df41ef3edb9db4a",
+      "media_type": "application/json"
+    },
+    "investigation_id": "reach-holding-interpretation",
+    "progress": {
+      "actual_usage_known": false,
+      "body_persisted": true,
+      "code_commit": "5f6240b685044e2e50322acd9e97ac624bc1d5a4",
+      "code_worktree_dirty": true,
+      "dependency_identity": "6ec167cf90c0022e6b6ce8b7385e49790c3c16b5714142c1408b9c5fdad6deb0",
+      "elapsed_s": 14.48399999999674,
+      "grant_id": "mainline3-v1-continue-edd8c668acb1-coordinated",
+      "http_status": 400,
+      "project_id": "mainline3-v1-continue-edd8c668acb1-coordinated",
+      "provider_request_id": null,
+      "received_responses": 1,
+      "report_saved": false,
+      "response_body_received": true,
+      "response_decoded": true,
+      "response_received": true,
+      "response_saved": false,
+      "saved_responses": 1,
+      "settlement_completed": true,
+      "stage": "settlement",
+      "transport_attempted": true,
+      "transport_callable_invocations": 2,
+      "turn": 1,
+      "valid_report": false
+    },
+    "reason": "INVESTIGATION_FAILED_AT_TRANSPORT: DEEPSEEK_HTTP_400",
+    "result": null,
+    "status": "failed"
+  },
+  "failure": {
+    "billing_known": false,
+    "cause_exception_type": "HTTPError",
+    "details": {
+      "category": "http",
+      "error_routing": {
+        "action": "reconcile_original_receipt_keep_unknown_reservation",
+        "automatic_transport_retry": false,
+        "category": "transport_or_unknown",
+        "cost_owner": "Actual requests remain charged to original stage and node; no refunds. Local repair is engineering time.",
+        "paid_correction_eligible": false,
+        "version": "research.error_routing@1.0.0"
+      },
+      "exception_type": "HTTPError",
+      "http_status": 400,
+      "local_error_code": null,
+      "os_error_number": null,
+      "protocol_error": null,
+      "provider_request_id": null,
+      "reason_message": "Bad Request",
+      "reason_type": "str",
+      "response_body_received": true,
+      "response_received": true,
+      "server_error": {
+        "fields": {
+          "code": "invalid_request_error",
+          "message": "An assistant message with 'tool_calls' must be followed by tool messages responding to each 'tool_call_id'. (insufficient tool messages following tool_calls message) (request_id: 2076069c-303c-40ab-b49f-c9b3cb3bca2f)",
+          "param": null,
+          "type": "invalid_request_error"
+        },
+        "omission_reasons": [],
+        "raw_body_saved": false
+      },
+      "transport_attempted": true,
+      "transport_stage": "transport",
+      "windows_error_number": null
+    },
+    "elapsed_s": 14.48399999999674,
+    "exception_type": "RuntimeError",
+    "execution_id": "e1b056964fa245939cfc22c43728c99f",
+    "investigation_id": "reach-holding-interpretation",
+    "measured_operation_elapsed_s": 14.48399999999674,
+    "persistence_failed": false,
+    "progress": {
+      "actual_usage_known": false,
+      "body_persisted": true,
+      "code_commit": "5f6240b685044e2e50322acd9e97ac624bc1d5a4",
+      "code_worktree_dirty": true,
+      "dependency_identity": "6ec167cf90c0022e6b6ce8b7385e49790c3c16b5714142c1408b9c5fdad6deb0",
+      "elapsed_s": 14.48399999999674,
+      "grant_id": "mainline3-v1-continue-edd8c668acb1-coordinated",
+      "http_status": 400,
+      "project_id": "mainline3-v1-continue-edd8c668acb1-coordinated",
+      "provider_request_id": null,
+      "received_responses": 1,
+      "report_saved": false,
+      "response_body_received": true,
+      "response_decoded": true,
+      "response_received": true,
+      "response_saved": false,
+      "saved_responses": 1,
+      "settlement_completed": false,
+      "stage": "transport",
+      "transport_attempted": true,
+      "transport_callable_invocations": 2,
+      "turn": 1,
+      "valid_report": false
+    },
+    "request_id": "investigation-reach-holding-interpretation",
+    "resolution": "confirmed_local_failure",
+    "retry_authorized": false,
+    "run_id": "mainline3-coordinated",
+    "timestamp": "2026-10-08T14:07:20.789834+00:00",
+    "version": "investigation_failure@1.0.0"
+  }
+}

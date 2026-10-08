@@ -106,6 +106,43 @@ class ContinuationTests(TestCase):
         state=self.host.store.session(self.host.run_id)['state'];self.assertEqual(state['recovery_probes_used'],1)
         self.assertEqual(state['investigation_protocol_corrections_used'],1)
 
+    def test_multi_call_rejection_answers_every_native_id_with_reasoning(self):
+        sends=[]
+        def transport(wire):
+            sends.append(deepcopy(wire))
+            if len(sends)==1:
+                answer=fixture.native({});message=answer['choices'][0]['message'];message['reasoning_content']='Preserve original multi-call reasoning'
+                call=message['tool_calls'][0];call['function']=dict(name='evidence_read',arguments=json.dumps(dict(reference=self.ref,pointer='/scalar')))
+                extra=deepcopy(call);extra['id']='second-native-id';message['tool_calls'].append(extra);return answer
+            last_assistant=next(i for i in reversed(range(len(wire['messages']))) if wire['messages'][i]['role']=='assistant')
+            self.assertEqual(wire['messages'][last_assistant]['reasoning_content'],'Preserve original multi-call reasoning')
+            self.assertEqual({m['tool_call_id'] for m in wire['messages'][last_assistant+1:] if m['role']=='tool'}, {'call','second-native-id'})
+            return fixture.native(dict(interpretation='Complete focused offline report'))
+        with patch.object(InvestigationDispatcher,'_native_v2',return_value=True),patch.object(InvestigationDispatcher,'_selectable',return_value=True):
+            result=self.dispatch.dispatch(plain(self.order),transport=transport)
+        self.assertEqual(result.status,'completed');self.assertEqual(len(sends),2)
+
+    def test_omitted_body_preserves_usage_and_complete_reception(self):
+        from types import SimpleNamespace
+        from tests.test_research_failure_recovery import native,SECRET
+        d=self.dispatch;order,row,_=d._reserve(plain(self.order));progress=d._initial_progress()
+        body=native();body['choices'][0]['message']['content']='Bearer '+SECRET
+        cfg={'base_url':'https://api.deepseek.com','timeout_s':1,'_response_observer':lambda metadata,text,omission:d._receive(order,row,progress,metadata,text,omission)}
+        with patch('tools.model_transports.deepseek.build_opener',return_value=SimpleNamespace(open=lambda *a,**kw:FakeResponse(json.dumps(body).encode()))):
+            with self.assertRaisesRegex(RuntimeError,'PROCESSING_FAILED'):request_completion(cfg,{},'isolated-fixture-key')
+        events=self.host.store.events(self.host.run_id);receptions=[self.host.store.artifact(e['outputs'][0]) for e in events if e['kind']=='investigation_reception']
+        self.assertEqual(receptions[-1]['provider_usage'],body['usage']);self.assertTrue(receptions[-1]['complete_body_received'])
+        self.assertEqual(receptions[-1]['omission_reason'],'sensitive_response_text; original body not retained')
+        self.assertFalse(self.host.store.session(self.host.run_id)['state']['investigations']['investigator'].get('original_body_refs'))
+
+    def test_native_version_citation_is_safe_but_nested_credentials_remain_denied(self):
+        raw=fixture.native(dict(interpretation='Exact saved version',facts=[dict(statement='Version',reference=self.ref,pointer='/scalar',value='evaluate.reach@1.0.0')]))
+        # A minified JSON field followed by a version @ is not URL authentication.
+        raw['choices'][0]['message']['tool_calls'][0]['function']['arguments']=json.dumps(dict(interpretation='Version',value='evaluate.reach@1.0.0'),separators=(',',':'))
+        InvestigationDispatcher._check_response_body(raw)
+        unsafe=deepcopy(raw);unsafe['choices'][0]['message']['tool_calls'][0]['function']['arguments']=json.dumps(dict(interpretation='Version',nested=dict(api_key='private-value')))
+        with self.assertRaisesRegex(ValueError,'SECRET_FIELD'):InvestigationDispatcher._check_response_body(unsafe)
+
     def test_public_import_new_b_synthesis_disposition_and_automatic_c_gate(self):
         from tools import research_v1_continue as activity
         from tools import research_v1_continue_gate as gate

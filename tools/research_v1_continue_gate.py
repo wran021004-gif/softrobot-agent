@@ -21,7 +21,7 @@ def generate_b():
         key=target['investigation_id'];node=nodes[key];reads=node['reads'];proof=[]
         report=arts[node['result']['artifact_id']]
         for e in attempts:
-            if e.get('request_id')!='investigation-'+key:continue
+            if not e.get('request_id','').startswith('investigation-'+key):continue
             wire=arts[e['outputs'][0]['artifact_id']]['payload']
             for message in wire['messages']:
                 if message.get('role')!='tool':continue

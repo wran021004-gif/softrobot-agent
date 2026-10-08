@@ -190,8 +190,23 @@ def request_completion(config, payload, key):
         if body is not None:
             try:text=body.decode('utf-8',errors='strict')
             except UnicodeError:omission='body_not_utf8; original bytes not retained'
-            if text is not None and sanitize_provider_text(text,key,None)!=text:
-                text=None;omission='sensitive_response_text; original body not retained'
+            if text is not None:
+                try:
+                    usage=json.loads(text).get('usage',{})
+                    if isinstance(usage,dict):
+                        state['provider_usage']={k:usage[k] for k in ('prompt_tokens','completion_tokens','total_tokens','prompt_cache_hit_tokens','prompt_cache_miss_tokens') if type(usage.get(k)) is int and usage[k]>=0}
+                except (ValueError,AttributeError):pass
+            if text is not None:
+                try:
+                    if key and key in text:raise ValueError('response contains actual credential')
+                    parsed=json.loads(text)
+                    from tools.research_investigations import InvestigationDispatcher
+                    InvestigationDispatcher._check_response_body(parsed)
+                except json.JSONDecodeError:
+                    if sanitize_provider_text(text,key,None)!=text:
+                        text=None;omission='sensitive_response_text; original body not retained'
+                except ValueError:
+                    text=None;omission='sensitive_response_text; original body not retained'
         observer(dict(state),text,omission)
         if omission and omission.startswith('sensitive_response_text'):
             raise ValueError('INVESTIGATION_RESPONSE_SECRET_TEXT')

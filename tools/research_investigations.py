@@ -439,7 +439,7 @@ class InvestigationDispatcher:
         uncertain=(progress['valid_report'] or progress['stage'] in (
             'response_evidence_save','report_evidence_save','settlement','recovery',
             'response_evidence_read','report_evidence_read')
-            or details['transport_stage']=='response_read'
+            or (details['transport_stage']=='response_read' and progress.get('response_body_received') is not True)
             or (progress['transport_attempted'] and progress['response_received'] is not True))
         record['resolution']='unconfirmed' if uncertain else 'confirmed_local_failure'
         try:
@@ -523,13 +523,14 @@ class InvestigationDispatcher:
             elif isinstance(value,list):
                 for v in value:check(v)
             elif isinstance(value,str):
-                if sanitize_provider_text(value,'',None)!=value:
-                    raise ValueError('INVESTIGATION_RESPONSE_SECRET_TEXT')
                 # Native arguments are encoded JSON strings, not transparent dicts.
                 if value.lstrip().startswith(('{','[')):
                     try:nested=json.loads(value)
-                    except ValueError:return
-                    _no_secrets(nested);check(nested)
+                    except ValueError:pass
+                    else:
+                        _no_secrets(nested);check(nested);return
+                if sanitize_provider_text(value,'',None)!=value:
+                    raise ValueError('INVESTIGATION_RESPONSE_SECRET_TEXT')
         check(returned)
 
     @staticmethod
@@ -555,7 +556,7 @@ class InvestigationDispatcher:
         if text is not None:
             try:parsed=json.loads(text)
             except ValueError:pass
-        usage=self._reported_usage(parsed)
+        usage=self._reported_usage(parsed) or metadata.get('provider_usage')
         record=dict(version='investigation_reception@1.0.0',turn=progress.get('turn'),
             transport_attempted=metadata.get('transport_attempted',True),response_received=metadata.get('response_received',True),
             complete_body_received=metadata.get('response_body_received'),http_status=metadata.get('http_status'),
@@ -586,7 +587,7 @@ class InvestigationDispatcher:
             node.setdefault('original_body_refs',[]).append(plain(body));progress['body_persisted']=True
             node['progress']=dict(progress);self.store.update_state(db,self.run_id,state)
 
-    def _execute(self,order,row,*,transport=None,reuse_saved_reads=False,correction_context=None):
+    def _execute(self,order,row,*,transport=None,reuse_saved_reads=False,correction_context=None,resume_payload=None):
         started=time.monotonic()
         baseline=deepcopy(self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'])
         request_id=row['request_id']
@@ -596,6 +597,11 @@ class InvestigationDispatcher:
             if not self.host.compatibility()['compatible']:raise ValueError('INVESTIGATION_DEPENDENCIES_CHANGED')
             self._state(order.investigation_id,status='running')
             order,payload,reads,measurement=self.prepare(order,executing=True,reuse_saved_reads=reuse_saved_reads)
+            if resume_payload is not None:
+                payload=deepcopy(resume_payload)
+                from tools.context_assembly import check_outgoing_request
+                from tools.platform_models import effective_config
+                measurement=check_outgoing_request(payload,effective_config(self.host),'research_decision')
             if correction_context is not None:
                 # Explicit new correction user turn, not an altered provider
                 # tool-call history. Original responses stay immutable.
@@ -691,7 +697,7 @@ class InvestigationDispatcher:
             with self.store.transaction() as db:
                 self.store.event(db,self.run_id,'investigation_provider_attempt','started',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,dict(turn=turn,payload=payload,measurement=measurement))])
             progress.update(stage='transport',transport_attempted=None,response_received=None,response_body_received=None,
-                response_saved=False,http_status=None,provider_request_id=None,actual_usage_known=False)
+                body_persisted=False,response_decoded=False,response_saved=False,http_status=None,provider_request_id=None,actual_usage_known=False)
             self._checkpoint(order,row,progress,'started',started)
             progress['transport_attempted']=True
             progress['transport_callable_invocations']+=1
@@ -884,6 +890,11 @@ class InvestigationDispatcher:
             return feedback
 
     def _append_correction(self,payload,assistant,call_id,feedback):
+        calls=assistant.get('tool_calls',[])
+        if len(calls)>1:
+            payload['messages'].append(assistant)
+            payload['messages'].extend(dict(role='tool',tool_call_id=c['id'],content=encode(feedback)) for c in calls)
+            return
         if call_id is None:
             payload['messages'].extend([assistant,dict(role='user',content=encode(feedback))]);return
         payload['messages'].extend([assistant,dict(role='tool',tool_call_id=call_id,content=encode(feedback))]);return
