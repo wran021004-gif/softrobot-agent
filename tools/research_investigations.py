@@ -482,7 +482,7 @@ class InvestigationDispatcher:
         return {k:usage[k] for k in ('prompt_tokens','completion_tokens','total_tokens')
             if type(usage.get(k)) is int and usage[k]>=0}
 
-    def _execute(self,order,row,*,transport=None,reuse_saved_reads=False):
+    def _execute(self,order,row,*,transport=None,reuse_saved_reads=False,correction_context=None):
         started=time.monotonic()
         baseline=deepcopy(self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'])
         request_id=row['request_id']
@@ -492,6 +492,12 @@ class InvestigationDispatcher:
             if not self.host.compatibility()['compatible']:raise ValueError('INVESTIGATION_DEPENDENCIES_CHANGED')
             self._state(order.investigation_id,status='running')
             order,payload,reads,measurement=self.prepare(order,executing=True,reuse_saved_reads=reuse_saved_reads)
+            if correction_context is not None:
+                # Explicit new correction user turn, not an altered provider
+                # tool-call history. Original responses stay immutable.
+                payload['messages'].append(dict(role='user',content=encode(correction_context)))
+                from tools.context_assembly import check_outgoing_request
+                measurement=check_outgoing_request(payload,effective_config(self.host),'research_decision')
             self._state(order.investigation_id,measurement=measurement)
             with self.store.transaction() as db:
                 self.store.event(db,self.run_id,'investigation_request','prepared',request=request_id,
