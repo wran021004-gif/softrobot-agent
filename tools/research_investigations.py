@@ -742,6 +742,9 @@ class InvestigationDispatcher:
             group_used=state.get('investigation_corrections_by_role',{}).get(group,0)
             group_limit=grant.get('protocol_correction_role_limits',{}).get(group,grant.get('protocol_correction_limit',0))
             if used>=grant.get('protocol_correction_limit',0) or node.get('protocol_corrections_used',int(node.get('protocol_correction_used',False)))>=grant.get('protocol_correction_per_node',1) or group_used>=group_limit:return None
+            failure_key=getattr(exc,'issue',{}).get('failure_key',str(exc).split(':',1)[0])
+            counts=node.setdefault('protocol_corrections_by_failure_key',{})
+            if counts.get(failure_key,0)>=grant.get('protocol_correction_per_decision',grant.get('protocol_correction_per_node',1)):return None
             if node['usage']['model_calls']>=order.budget.model_calls:return None
             issues=([dict(path=list(e['loc']),type=e['type'],message=e['msg']) for e in exc.errors(include_input=False,include_url=False)]
                 if isinstance(exc,ValidationError) else [getattr(exc,'issue',dict(code=str(exc)))])
@@ -751,6 +754,7 @@ class InvestigationDispatcher:
                 feedback['requirement']='Resubmit the complete advertised investigation_return. Principal dispositions select catalog handles; supporting_facts use report handles, additional_support uses explicitly principal supplemental handles, scope declares applicability separately. Projection is extraction only. Each issue identifies the failed decision position and legal structure; choose conclusions yourself. No disposition was executed. Current report/evidence and original permissions, counters and deadline remain in force; complete prior responses are archived.'
             node['protocol_correction_used']=True
             node['protocol_corrections_used']=node.get('protocol_corrections_used',0)+1
+            counts[failure_key]=counts.get(failure_key,0)+1
             state.setdefault('investigation_corrections_by_role',{})[group]=group_used+1
             state['investigation_protocol_corrections_used']=used+1
             self.store.update_state(db,self.run_id,state)
@@ -805,6 +809,16 @@ class InvestigationDispatcher:
         if order.role=='principal':
             reads=[*reads,*self.store.session(self.run_id)['state'].get('principal_investigation_reads',[])]
         if len(json.dumps(plain(report),ensure_ascii=False).encode('utf8'))>order.output_bytes:raise ValueError('INVESTIGATION_RETURN_TOO_LARGE')
+        if order.role=='principal' and order.disposition_ids is not None:
+            supplied=[d.investigation_id for d in report.dispositions];expected=order.disposition_ids
+            if sorted(supplied)!=sorted(expected):
+                from tools.disposition_facts import BindingError
+                missing=sorted(set(expected)-set(supplied))
+                issue=BindingError('/dispositions',supplied,'missing, duplicate or foreign formal disposition target',
+                    dict(expected=expected,missing=missing,structure='Exactly one formal accept/defer/reject disposition per declared report; choose decisions yourself.'))
+                targets={k:n['result']['artifact_id'] for k,n in self._reports().items() if k in missing and n.get('result')}
+                issue.issue['failure_key']='report:'+','.join(sorted(targets.values())) if targets else 'formal_target_cardinality'
+                raise issue
         ids={r.artifact_id for r in order.evidence}
         for fact in (*report.facts,*report.counterevidence):
             if fact.reference.artifact_id not in ids:raise ValueError('RETURN_SOURCE_OUT_OF_SCOPE')
@@ -1019,10 +1033,12 @@ class InvestigationDispatcher:
                     cat=self.store.artifact(provenance['catalog'])
                     available=[dict(handle=e['handle'],name=e['name'],reference=e['fact']['reference'],pointer=e['fact']['pointer'],value=e['fact']['value'])
                         for e in cat['entries'] if e['fact']['reference']['artifact_id'] in missing and e['fact']['pointer'] in ('/execution_id','/result_type','/coordinate_frame')]
-                raise BindingError((provenance['expansion_path'] if provenance else '')+f'/adopted_claims/{index}/scope',selected,
+                issue=BindingError((provenance['expansion_path'] if provenance else '')+f'/adopted_claims/{index}/scope',selected,
                     'supporting evidence source has no explicitly selected applicability scope',
                     dict(missing_source_artifacts=sorted(missing),available_scope_handles=available,
                          structure='Each original source used in supporting_facts/additional_support must have its own exact selected scope. Choose scope, narrower support, defer or reject yourself.'))
+                issue.issue['failure_key']='report:'+plain(result.result)['artifact_id']
+                raise issue
             # Different original sources are allowed; each attribution was checked
             # against its own immutable source. Prose is never judged by an LLM.
         limitations=list(args.remaining_unknowns)

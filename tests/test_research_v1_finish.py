@@ -25,6 +25,8 @@ class MemoryArchive:
     def transaction(self):yield None
     def put(self,db,value):
         ref=dict(artifact_id=digest(value),media_type='application/json');self.artifacts[ref['artifact_id']]=plain(value);return ref
+    def update_state(self,db,run_id,state):self.bundle['state']=state
+    def event(self,*args,**kwargs):pass
 
 
 class FinishTests(TestCase):
@@ -118,11 +120,29 @@ class FinishTests(TestCase):
         d._grant=lambda *a:(dict(state=b['state']),b['state']['role_context']['investigation_grant'])
         d._principal_authority=lambda:None
         d.recover=lambda key:InvestigationResult(investigation_id=key,status='completed',result=b['state']['historical_investigations'][key]['result'])
-        raw=next(archive.artifact(e['outputs'][0]) for e in reversed(b['events']) if e['kind']=='investigation_provider_response' and any(c['function']['name']=='investigation_return' for c in archive.artifact(e['outputs'][0])['choices'][0]['message'].get('tool_calls',[])))
+        failure=next(e for e in b['events'] if e['kind']=='investigation_protocol_correction' and any(i.get('code')=='ADOPTED_CLAIM_SCOPE_SOURCE_MISMATCH' for i in archive.artifact(e['outputs'][0])['issues']))
+        event=next(e for e in reversed(b['events']) if e['kind']=='investigation_provider_response' and e['sequence']<failure['sequence'])
+        raw=archive.artifact(event['outputs'][0])
         selected=contract(selectable=True).parse('investigation_return',raw['choices'][0]['message']['tool_calls'][0]['function']['arguments'])
         node=b['state']['investigations']['principal-historical-v2']
-        expanded=expand(d,selected.dispositions[0],node['fact_catalog'],path='/dispositions/0')
+        expanded=expand(d,selected.dispositions[0],plain(selected.dispositions[0].catalog),path='/dispositions/0')
         with self.assertRaises(BindingError) as caught:d.disposition(expanded,validate_only=True)
         self.assertIn('/adopted_claims/',caught.exception.issue['path'])
         self.assertTrue(caught.exception.issue['path'].endswith('/scope'))
         self.assertTrue(caught.exception.issue['legal']['available_scope_handles'])
+
+    def test_corrections_preserve_phase_cap_and_per_unresolved_report_cap(self):
+        from types import SimpleNamespace
+        state=dict(investigations={'same-logical-node':dict(usage=dict(model_calls=0))})
+        archive=MemoryArchive(dict(state=state,artifacts={}))
+        d=object.__new__(InvestigationDispatcher);d.store=archive;d.run_id='offline-counter';d._selectable=lambda:True
+        grant=dict(protocol_correction_limit=4,protocol_correction_role_limits=dict(principal=4,other=0),protocol_correction_per_node=4,protocol_correction_per_decision=3)
+        d._grant=lambda *a:(dict(state=archive.bundle['state']),grant)
+        o=SimpleNamespace(investigation_id='same-logical-node',role='principal',budget=SimpleNamespace(model_calls=12))
+        def issue(key):
+            e=ValueError('DISPOSITION_FACT_BINDING: fixture');e.issue=dict(failure_key='report:'+key,path='/dispositions',reason='offline counterexample');return e
+        for _ in range(3):self.assertIsNotNone(d._protocol_feedback(o,issue('immutable-a')))
+        self.assertIsNone(d._protocol_feedback(o,issue('immutable-a')))
+        self.assertIsNotNone(d._protocol_feedback(o,issue('immutable-b')))
+        self.assertEqual(archive.bundle['state']['investigation_protocol_corrections_used'],4)
+        self.assertIsNone(d._protocol_feedback(o,issue('immutable-b')))

@@ -132,7 +132,7 @@ def grant_evidence(host, stage):
         ig=dict(max_count=stage['node_count'],max_concurrency=2,allowed_tools=['evidence.read'],evidence=scope,
             include_completed_reports=True,per_node_budget=stage['node_budget'],total_budget=stage['total_node_budget'],output_bytes=65536,
             deadline_unix=min(read(OUT/'activity_start.json')['execution_cutoff_unix'],time.time()+stage['project_budget']['wall_s']),
-            protocol_correction_limit=stage['protocol_correction_limit'],protocol_correction_role_limits=stage['protocol_correction_role_limits'],protocol_correction_per_node=3,
+            protocol_correction_limit=stage['protocol_correction_limit'],protocol_correction_role_limits=stage['protocol_correction_role_limits'],protocol_correction_per_node=stage['protocol_correction_limit'],protocol_correction_per_decision=3,
             inspected_supplemental_catalog=True)
         state=host.store.session(host.run_id,db)['state'];state.update(role_context=dict(role='principal',investigation_grant=ig),investigation_grant_identity=digest(ig))
         host.store.update_state(db,host.run_id,state)
@@ -214,9 +214,10 @@ def finish_principal(host,key,report,targets):
     # Review and any correction occur in this process with the original clock.
     for iteration in range(4):
         current=host.store.artifact(report)
-        atomic_json(OUT/(key+f'_pending_review_{iteration}.json'),dict(report=report,body=current,targets=targets,
+        suffix=report['artifact_id'][:12]
+        atomic_json(OUT/(key+f'_pending_review_{iteration}_{suffix}.json'),dict(report=report,body=current,targets=targets,
             node=host.store.session(host.run_id)['state']['investigations'][key],no_provider_judge=True))
-        review_path=OUT/(key+f'_review_{iteration}.json')
+        review_path=OUT/(key+f'_review_{iteration}_{suffix}.json')
         while not review_path.exists():
             node=host.store.session(host.run_id)['state']['investigations'][key]
             if time.time()-node['started_unix']>=node['order']['timeout_s'] or time.time()>=read(OUT/'activity_start.json')['execution_cutoff_unix']:raise ValueError('ORIGINAL_REVIEW_NODE_DEADLINE')
@@ -236,7 +237,7 @@ def finish_principal(host,key,report,targets):
     return dict(status='formal_dispositions_recorded',report=report,receipts=rows,material_review=review,targets=targets)
 
 
-def recover_received(mode, *, local_followup=False):
+def recover_received(mode, *, local_followup=False, protocol_incomplete=False):
     """Explicit confirmed-output correction, same logical node/clock/project.
 
     The old stopped session remains stopped. No transport retry, replacement
@@ -247,11 +248,13 @@ def recover_received(mode, *, local_followup=False):
     old=store.session(parent);state=deepcopy(old['state'])
     key='principal-historical-v2' if mode=='reuse' else 'principal-coordinated-v2'
     node=state['investigations'][key]
-    if old['status']!='stopped' or node['status']!='failed' or store.remaining()['occupied']:raise ValueError('CONFIRMED_STOPPED_DRAINED_FAILURE_REQUIRED')
+    if old['status']!='stopped' or node['status'] not in (('completed','failed') if protocol_incomplete else ('failed',)) or store.remaining()['occupied']:raise ValueError('CONFIRMED_STOPPED_DRAINED_FAILURE_REQUIRED')
     if node['progress']['received_responses']!=node['progress']['transport_callable_invocations']:raise ValueError('UNKNOWN_RESULT_NO_RETRY')
     last=node['provider_response_refs'][-1];raw=store.artifact(last)
     calls=raw['choices'][0]['message'].get('tool_calls',[])
-    if local_followup:
+    if protocol_incomplete:
+        if raw['choices'][0]['finish_reason']!='tool_calls' or len(calls)!=1 or calls[0]['function']['name']!='investigation_return':raise ValueError('CONFIRMED_FORMAL_RETURN_REQUIRED')
+    elif local_followup:
         if raw['choices'][0]['finish_reason']!='tool_calls' or len(calls)!=1 or calls[0]['function']['name']!='evidence_read':raise ValueError('CONFIRMED_READ_FOLLOWUP_REQUIRED')
         latest=node['reads'][-1];query=json.loads(calls[0]['function']['arguments'])
         if latest['reference']!=query['reference'] or latest['pointer']!=query.get('pointer',''):raise ValueError('READ_RESULT_BINDING_REQUIRED')
@@ -267,6 +270,18 @@ def recover_received(mode, *, local_followup=False):
     host=Host(store.root,run_id);host.create(cfg,parent_run_id=parent);host.resume()
     state.pop('stop_reason',None);state['received_capacity_recoveries']=number;state['current_recovery_run_id']=run_id
     node.update(status='running',request_run_id=run_id,catalog_origin_run_id=parent)
+    if protocol_incomplete:
+        ig=state['role_context']['investigation_grant']
+        ig['protocol_correction_per_node']=stage['protocol_correction_limit'];ig['protocol_correction_per_decision']=3
+        state['investigation_grant_identity']=digest(ig)
+        # Three already-paid, immutable feedback records retain their counts.
+        # This is an attribution addition, not a reset or refund.
+        if not node.get('protocol_corrections_by_failure_key') and mode=='reuse' and node.get('protocol_corrections_used')==3:
+            node['protocol_corrections_by_failure_key']={
+                'EXACTLY_ONE_NATIVE_TOOL_CALL_REQUIRED':1,
+                'RETURN_GENERATION_CAPACITY_AFTER_LOCAL_INSPECTION':1,
+                'report:83a7c6d7daf53191cdae94add80da47df813e34f066619d01635c48103eea8f1':1}
+            if sum(node['protocol_corrections_by_failure_key'].values())!=node['protocol_corrections_used']:raise ValueError('NO_CORRECTION_COUNT_MIGRATION_OR_REFUND')
     with store.transaction() as db:store.update_state(db,run_id,state)
     d=InvestigationDispatcher(host);o=InvestigationOrder.model_validate(node['order'])
     exc=ValueError('RETURN_GENERATION_CAPACITY_AFTER_LOCAL_INSPECTION')
@@ -275,7 +290,13 @@ def recover_received(mode, *, local_followup=False):
         query=dict(reference=last,pointer='/choices/0/message/reasoning_content',offset=0,limit=3000,byte_limit=4096),
         inspection='Exact input passed existing guard; archived response and formal output were inspected locally first. This new request genuinely needs protocol output and spends a paid correction.')
     feedback=None
-    if local_followup:
+    if protocol_incomplete:
+        try:
+            saved=d._decode(raw);d._validate_return(o,saved,node['reads'])
+        except ValueError as original_issue:
+            feedback=d._protocol_feedback(o,original_issue)
+        if feedback is None:raise ValueError('NO_INCOMPLETE_TARGET_CORRECTION_AVAILABLE')
+    elif local_followup:
         previous_return=next(store.artifact(r) for r in reversed(node['provider_response_refs']) if any(c['function']['name']=='investigation_return' for c in store.artifact(r)['choices'][0]['message'].get('tool_calls',[])))
         try:
             saved=d._decode(previous_return);d._validate_return(o,saved,node['reads'])
@@ -288,7 +309,7 @@ def recover_received(mode, *, local_followup=False):
         stop(host,'CORRECTION_BUDGET_EXHAUSTED; original sessions and clock unchanged')
         raise ValueError('CORRECTION_BUDGET_EXHAUSTED')
     budget={k:max(0,plain(o.budget)[k]-node['usage'][k]) for k in zero()};budget['wall_s']=remaining
-    request='investigation-'+key+('-local-' if local_followup else '-received-')+str(number)
+    request='investigation-'+key+('-protocol-' if protocol_incomplete else '-local-' if local_followup else '-received-')+str(number)
     row,fresh=store.reserve(run_id,request,digest(dict(original_response=last,original_node=key,correction=number)),'investigation-dispatcher',budget,kind='investigation')
     if not fresh:raise ValueError('NO_RECEIVED_CORRECTION_REPLAY')
     d._state(key,status='pending',active_request_id=request)
@@ -312,7 +333,7 @@ def recover_received(mode, *, local_followup=False):
     atomic_json(OUT/(mode+f'_received_recovery{number}.json'),dict(timestamp=now(),same_project=store.config()['project_id'],original_run=parent,new_run=run_id,
         original_node=key,original_started_unix=node['started_unix'],remaining_original_elapsed_s=remaining,original_response=last,
         known_paid_usage=raw.get('usage'),same_node_usage_before=node['usage'],old_stop_preserved=True,new_paid_correction=not local_followup,automatic_retry=False,
-        local_capacity_followup=local_followup,unchanged_read_history_count=len(node['reads'])))
+        local_capacity_followup=local_followup,protocol_incomplete=protocol_incomplete,unchanged_read_history_count=len(node['reads'])))
     began=time.monotonic()
     try:
         from examples.gvs_nmpc_route_experiment import load_credential
@@ -428,11 +449,12 @@ def execute(mode):
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('action',choices=['start','freeze','execute','recover-received','recover-local-followup']);p.add_argument('--mode',choices=['reuse','coordinated','fixed'],default='reuse');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('action',choices=['start','freeze','execute','recover-received','recover-local-followup','recover-incomplete-protocol']);p.add_argument('--mode',choices=['reuse','coordinated','fixed'],default='reuse');a=p.parse_args()
     if a.action=='start':start()
     elif a.action=='freeze':freeze()
     elif a.action=='recover-received':recover_received(a.mode)
     elif a.action=='recover-local-followup':recover_received(a.mode,local_followup=True)
+    elif a.action=='recover-incomplete-protocol':recover_received(a.mode,protocol_incomplete=True)
     else:execute(a.mode)
 
 
