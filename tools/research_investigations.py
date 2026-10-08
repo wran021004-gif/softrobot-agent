@@ -347,7 +347,7 @@ class InvestigationDispatcher:
         self._consume(order,'tool_calls')
         if 'evidence.read' not in order.allowed_tools:raise ValueError('INVESTIGATION_READ_NOT_GRANTED')
         node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
-        is_directory=plain(query.reference) in [node.get('directory'),node.get('fact_catalog')]
+        is_directory=plain(query.reference) in [node.get('directory'),node.get('fact_catalog'),*node.get('provider_response_refs',[])]
         if not is_directory and plain(query.reference) not in [plain(r) for r in order.evidence]:raise ValueError('QUERY_SOURCE_OUT_OF_SCOPE')
         from tools.platform_tools import bounded_evidence_page
         completed_report=order.role=='principal' and any(n.get('status')=='completed' and n.get('result')==plain(query.reference)
@@ -611,7 +611,11 @@ class InvestigationDispatcher:
             returned=plain(raw) if isinstance(raw,InvestigationReturn) else getattr(raw,'raw',raw)
             self._check_response_body(returned)  # Check body and native arguments before original evidence saving.
             with self.store.transaction() as db:
-                self.store.event(db,self.run_id,'investigation_provider_response','returned',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,returned)])
+                response_ref=self.store.put(db,returned)
+                self.store.event(db,self.run_id,'investigation_provider_response','returned',request=row['request_id'],execution=row['execution_id'],outputs=[response_ref])
+                state=self.store.session(self.run_id,db)['state']
+                state['investigations'][order.investigation_id].setdefault('provider_response_refs',[]).append(plain(response_ref))
+                self.store.update_state(db,self.run_id,state)
                 self.store.event(db,self.run_id,'investigation_token_accounting','recorded',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,dict(turn=turn,
                     byte_estimate=measurement,provider_usage=self._reported_usage(returned),
                     provider_usage_source='Returned provider usage only; byte estimates are not actual token counts.'))])
@@ -668,8 +672,19 @@ class InvestigationDispatcher:
                     self.store.event(db,self.run_id,'investigator_read','rejected',request=row['request_id'],outputs=[self.store.put(db,dict(decision=decision,result=response))])
             assistant=dict(role='assistant',content=message.get('content'),tool_calls=calls)
             if 'reasoning_content' in message:assistant['reasoning_content']=message['reasoning_content']
-            payload['messages'].extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],content=encode(response))])
+            if self._selectable():
+                self._append_evidence_turn(payload,calls,response,order)
+            else:payload['messages'].extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],content=encode(response))])
             turn+=1
+
+    def _append_evidence_turn(self,payload,calls,response,order):
+        packet=json.loads(payload['messages'][1]['content'])
+        packet.setdefault('confirmed_followup_evidence',[]).append(dict(native_calls=calls,result=response))
+        refs=self.store.session(self.run_id)['state']['investigations'][order.investigation_id].get('provider_response_refs',[])
+        packet['prior_response_archive']=dict(references=refs,
+            presentation='New explicit evidence user turn after a confirmed received native read and its public result. Complete prior provider responses including all thinking are immutable in Store and queryable with evidence_read; prior reasoning and repeated acknowledgements are archive-only, not omitted evidence or adopted conclusions. All original reports, counterevidence, unknowns, every confirmed read/result, decisions, errors and current permissions/budgets remain visible.',
+            query=dict(reference=refs[-1],pointer='/choices/0/message/reasoning_content',offset=0,limit=3000,byte_limit=4096) if refs else None)
+        payload['messages']=[payload['messages'][0],dict(role='user',content=encode(packet))]
 
     def _protocol_feedback(self,order,exc):
         """A received, unexecuted invalid return; never transport/length retry.

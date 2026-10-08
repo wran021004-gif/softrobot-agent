@@ -99,6 +99,11 @@ def generate(bundle, review=None):
                     for send in later:
                         payload=artifacts[send['outputs'][0]['artifact_id']].get('payload',{})
                         for message in payload.get('messages',[]):
+                            if message.get('role')=='user':
+                                try:packet=json.loads(message.get('content',''))
+                                except (ValueError,TypeError):continue
+                                if any(item.get('native_calls')==native and item.get('result')==record['page'] for item in packet.get('confirmed_followup_evidence',[])):
+                                    delivered.append(send['sequence'])
                             if message.get('role')!='tool' or not native or message.get('tool_call_id')!=native[0].get('id'):continue
                             try:body=json.loads(message.get('content',''))
                             except (ValueError,TypeError):continue

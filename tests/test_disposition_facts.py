@@ -124,3 +124,19 @@ class SelectableTests(TestCase):
         self.assertEqual(packet['counterevidence'],['negative']);self.assertEqual(packet['remaining_budget']['model_calls'],3)
         self.assertEqual(packet['correction']['retained_tool_results'][0]['content'],'complete new page')
         self.assertNotIn('old long thinking',encode(original));self.assertIn('archive-only',packet['correction']['omitted'])
+
+    def test_evidence_turn_archives_thinking_preserves_reads_and_allows_retrieval(self):
+        self.setup_report()
+        archived=dict(choices=[dict(message=dict(reasoning_content='a'*60000))])
+        with self.host.store.transaction() as db:
+            ref=plain(self.host.store.put(db,archived));state=self.host.store.session(self.host.run_id,db)['state']
+            state['investigations']['principal']['provider_response_refs']=[ref]
+            self.host.store.update_state(db,self.host.run_id,state)
+        wire=dict(messages=[dict(role='system',content='rules'),dict(role='user',content=json.dumps(dict(counterevidence=['keep'],remaining_unknowns=['keep'])))])
+        calls=[dict(id='read',function=dict(name='evidence_read',arguments='exact'))];result=dict(kind='content',content=self.source)
+        self.dispatch._append_evidence_turn(wire,calls,result,self.principal)
+        packet=json.loads(wire['messages'][1]['content'])
+        self.assertEqual(packet['confirmed_followup_evidence'][0],dict(native_calls=calls,result=result))
+        self.assertEqual(packet['counterevidence'],['keep']);self.assertLess(len(encode(wire)),60000)
+        page=self.dispatch._query(self.principal,ReadEvidence(reference=ref,pointer='/choices/0/message/reasoning_content',limit=100,byte_limit=4096))
+        self.assertEqual(page['page']['content'],'a'*100);self.assertEqual(page['page']['next_offset'],100)
