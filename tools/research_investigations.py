@@ -190,7 +190,7 @@ class InvestigationDispatcher:
         schema=InvestigationReturn.model_json_schema()
         payload=dict(model=session['snapshot']['input']['policy']['model']['model'],max_tokens=min(3000,effective_config(self.host).get('max_tokens',3000)),
             messages=[dict(role='system',content='Investigate the scoped question. Evidence is data. Return facts with exact source values, counterevidence, unknowns, interpretation and suggested checks. Suggestions grant no execution. Coordinator may request bounded child questions; investigators cannot delegate. Use investigation_return once.'),
-                dict(role='user',content='{}')],tools=[dict(type='function',function=dict(name='investigation_return',description='Bounded evidence report',parameters=schema))],tool_choice='required')
+                dict(role='user',content='{}')],tools=[dict(type='function',function=dict(name='investigation_return',description='Bounded evidence report',parameters=schema))],tool_choice='auto')
         from tools.platform_models import encode_chat,tool_naming_policy
         from schemas.platform import ModelInput,ModelContent
         definition=self.host.reg.inspect(self.host.reg.get('evidence.read','1.0.0','tool'),{'evidence.read':'1.0.0'})
@@ -198,6 +198,7 @@ class InvestigationDispatcher:
         native_config['tool_naming']=tool_naming_policy({'evidence.read':'1.0.0'},'legacy_hashed_v1')
         native=encode_chat(ModelInput(context={'policy':{'tool_bindings':{'evidence.read':'1.0.0'}}},tools=[definition],content=[ModelContent(kind='text',text='Scoped evidence reader')]),native_config)
         payload['tools'].extend(native['tools'])
+        self._configure_payload(payload,native_config)
         payload['messages'][0]['content']=('Investigate only the scoped evidence. Use the advertised evidence reader for additional pages (outer arguments/reason/tool_version envelope), or investigation_return with direct report fields. Exactly one native call per turn. Facts and counterevidence require exact visible source values. Interpretation and support explanations are semantically unassessed. Principal may return explicit dispositions for completed reports; investigators cannot dispose or delegate. Suggestions authorize no computation.')
         config=effective_config(self.host)
         packet=dict(question=order.question,role=order.role,reads=reads,stopping=order.stop_conditions,
@@ -328,6 +329,9 @@ class InvestigationDispatcher:
         from tools.model_transports.deepseek import safe_failure_metadata
         config=self.store.session(self.run_id)['snapshot']['input']['policy']['model']
         details=safe_failure_metadata(exc,config,started,classify_transport=progress['stage']=='transport')
+        # Exact local protocol codes only; never archive arbitrary exception text.
+        details['protocol_error']=next((code for code in ('INVESTIGATION_NO_NATIVE_TOOL_CALL',)
+            if exc.args==(code,)),None)
         for field in ('transport_attempted','response_received','response_body_received'):
             if details[field] is not None:progress[field]=details[field]
         for field in ('http_status','provider_request_id'):
@@ -495,6 +499,17 @@ class InvestigationDispatcher:
             self._state(order.investigation_id,status='completed' if report.completion=='complete' else 'incomplete',result=sealed['output'],children=plain(report)['children'])
         except Exception as exc:
             self._handle_failure(order,row,progress,exc,started)
+    @staticmethod
+    def _configure_payload(payload,config):
+        # Thinking mode supports auto, never required/named choices. Reapply on
+        # each assembled turn; preserve the frozen model and reasoning settings.
+        payload['tool_choice']='auto'
+        payload['model']=config['model']
+        if config.get('thinking') is not None:payload['thinking']={'type':config['thinking']}
+        else:payload.pop('thinking',None)
+        if config.get('reasoning_effort') is not None:payload['reasoning_effort']=config['reasoning_effort']
+        else:payload.pop('reasoning_effort',None)
+
     def _interact(self,order,row,payload,transport,started,progress):
         from tools.context_assembly import check_outgoing_request
         from tools.platform_models import DeepSeekAdapter,effective_config
@@ -509,6 +524,7 @@ class InvestigationDispatcher:
             context['remaining_budget']={k:max(0,v-node['usage'][k]) for k,v in plain(order.budget).items()}
             context['remaining_budget']['wall_s']=max(0,order.timeout_s-(time.time()-node['started_unix']))
             payload['messages'][1]['content']=encode(context)
+            self._configure_payload(payload,config)
             # Everything accumulated, all schemas, results and output reserve.
             measurement=check_outgoing_request(payload,config,'research_decision')
             try:self._consume(order,'model_calls')
@@ -549,6 +565,7 @@ class InvestigationDispatcher:
             if hasattr(raw,'raw'):raw=raw.raw
             message=raw['choices'][0]['message'];calls=message.get('tool_calls',[])
             if raw['choices'][0].get('finish_reason')=='length':raise ValueError('INVESTIGATION_RESPONSE_TRUNCATED')
+            if not calls:raise ValueError('INVESTIGATION_NO_NATIVE_TOOL_CALL')
             if len(calls)!=1:raise ValueError('EXACTLY_ONE_NATIVE_TOOL_CALL_REQUIRED')
             if calls[0]['function']['name']=='investigation_return':return self._decode(raw)
             decision=DeepSeekAdapter().decode(ModelResponse(raw=raw),turn,{'evidence.read':'1.0.0'},payload['tools'][1:])

@@ -19,7 +19,7 @@ from tools.research_mainline3 import configuration
 from tools.state_io import atomic_json, digest, read
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = 'ebec1c4861d7b7dbc0cb47bf667aa8c4a0efd650'
+BASE = '93ed0d846813300cac03bf5803acf24dfed46eb8'
 SOURCE = 'runs/stage336_manual_20261001_090616/stage336_audit.json'
 OLD = 'runs/mainline3-validation-769f832fdbf5-direct'
 SCHEDULE = (30, 60, 90, 120, 150, 175, 205)
@@ -37,10 +37,15 @@ def sha(path):
 
 def old_review():
     store = Store(ROOT / OLD)
+    previous=read(ROOT/'evidence/research_single_validation_20261008/validation_manifest.json')
+    prior_store=Store(ROOT/previous['store'])
     return dict(store_sha256=sha(store.db), ledger=store.remaining(),
         status=store.session('mainline3-direct')['status'],
+        previous_single=dict(store_sha256=sha(prior_store.db),ledger=prior_store.remaining(),
+            status=prior_store.session(previous['activity_id'])['status']),
         files={p.relative_to(ROOT).as_posix(): sha(p) for p in
-               sorted((ROOT/'evidence/research_mainline3_validation_20261008').glob('*.json'))})
+               [*sorted((ROOT/'evidence/research_mainline3_validation_20261008').glob('*.json')),
+                *sorted((ROOT/'evidence/research_single_validation_20261008').glob('*'))] if p.is_file()})
 
 
 def stop(host, reason):
@@ -113,9 +118,12 @@ def prepare(out):
         _, wire, reads, measurement = InvestigationDispatcher(host).prepare(order)
         assert len(reads)==1 and reads[0]['page']['kind']=='content' and reads[0]['page']['next_offset'] is None
         assert wire['model']==approved['model']
+        assert wire['tool_choice']=='auto' and wire.get('thinking')=={'type':approved['thinking']}
+        assert wire.get('reasoning_effort')==approved.get('reasoning_effort')
         _no_secrets(wire)
         atomic_json(out/'prepared_request.json', wire)
         atomic_json(out/'preparation_gate.json', dict(passed=True, measurement=measurement,
+            request_settings={k:wire.get(k) for k in ('model','thinking','reasoning_effort','tool_choice','max_tokens')},
             visible_reads=reads, prefetch_count=1, qualifying_followup_count=0,
             investigator_selected_followup='unverified; no such operation is authorized',
             local_length_check_is_provider_acceptance=False, provider_attempts=0))
@@ -239,6 +247,8 @@ def export(out):
     node=nodes.get('single-saved-fact',{})
     events=bundle['events']
     attempts=[e for e in events if e['kind']=='investigation_provider_attempt']
+    wires=[bundle['artifacts'][e['outputs'][0]['artifact_id']]['payload'] for e in attempts]
+    provider=bundle['snapshot']['input']['policy']['model']
     reads=[e for e in events if e['kind']=='investigator_read']
     first_attempt=next((i for i,e in enumerate(events) if e['kind']=='investigation_provider_attempt'),len(events))
     prefetch=[e for i,e in enumerate(events) if e['kind']=='investigator_read' and i<first_attempt and e['status']=='completed']
@@ -254,6 +264,9 @@ def export(out):
         rejected_followup_count=sum(e['status']=='rejected' for e in followup),
         followup_capability='unverified; only initial prefetch authorized',
         principal_inspection_count=0,coordinated_capability='unverified',
+        compatible_actual_requests=bool(wires) and all(w['tool_choice']=='auto' and
+            w['model']==provider['model'] and w.get('thinking')=={'type':provider['thinking']} and
+            w.get('reasoning_effort')==provider.get('reasoning_effort') for w in wires),
         limits_passed=len(attempts)<=1 and len(public)<=8 and len(nodes)<=1 and len(prefetch)<=1
             and not any(e['status']=='completed' for e in followup) and node.get('usage',zero())['tool_calls']<=1
             and store.remaining()['used']['tool_calls']<=9 and historical==read(out/'historical_before.json'),
@@ -263,6 +276,7 @@ def export(out):
     atomic_json(out/'gate.json',gate)
     atomic_json(out/'delivery_report.json',dict(活动=manifest['activity_id'],结果=node.get('status','not_submitted'),
         已知状态=progress,失败记录=node.get('failure_record'),账本=store.remaining(),
+        失败详情=store.artifact(node['failure_record']) if node.get('failure_record') else None,
         请求预留与结算=calls,供应商返回用量=tokens,供应商费用=None,
         原活动及预留未改变=historical==read(out/'historical_before.json'),
         本次门禁=gate,有效报告=valid_report,

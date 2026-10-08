@@ -59,6 +59,69 @@ def response_identifiers(headers):
     return None
 
 
+ERROR_BODY_LIMIT=8192
+ERROR_FIELDS=('code','type','param','message')
+ERROR_OMISSIONS={'missing','too_large','invalid_encoding','invalid_json','invalid_shape',
+    'sensitive','request_echo','unexpected_fields','invalid_field','message_over_limit','read_failed'}
+
+
+def safe_server_error(body,key='',payload=None):
+    """Allowlisted structured error only. Never retain raw or redacted bodies."""
+    empty={k:None for k in ERROR_FIELDS}
+    def omit(reason):return dict(fields=empty,omission_reasons=[reason],raw_body_saved=False)
+    if body is None:return omit('missing')
+    if isinstance(body,bytes):
+        if len(body)>ERROR_BODY_LIMIT:return omit('too_large')
+        try:body=body.decode('utf-8')
+        except UnicodeError:return omit('invalid_encoding')
+    if isinstance(body,str):
+        try:size=len(body.encode('utf-8'))
+        except UnicodeError:return omit('invalid_encoding')
+        if size>ERROR_BODY_LIMIT:return omit('too_large')
+        try:body=json.loads(body)
+        except (ValueError,RecursionError):return omit('invalid_json')
+    if not isinstance(body,dict):return omit('invalid_shape')
+    from tools.context_assembly import _no_secrets
+    try:_no_secrets(body)
+    except (ValueError,RecursionError):return omit('sensitive')
+    if key and key in json.dumps(body,ensure_ascii=False):return omit('sensitive')
+    error=body.get('error',body)
+    if not isinstance(error,dict):return omit('invalid_shape')
+    if set(body)-({'error'} if 'error' in body else set(ERROR_FIELDS)) or set(error)-set(ERROR_FIELDS):
+        return omit('unexpected_fields')  # Includes nested request/header echoes.
+    fields=dict(empty);reasons=[]
+    for name in ERROR_FIELDS:
+        value=error.get(name)
+        if value is None:continue
+        if name=='code' and type(value) is int:
+            if abs(value)<=2**31:fields[name]=value
+            else:reasons.append('invalid_field')
+            continue
+        if not isinstance(value,str):reasons.append('invalid_field');continue
+        if sanitize_provider_text(value,key,None)!=value:
+            reasons.append('sensitive');continue
+        if name!='message':
+            if re.fullmatch(r'[A-Za-z0-9_.:/\[\]-]{1,128}',value):fields[name]=value
+            else:reasons.append('invalid_field')
+            continue
+        if len(value)>512:reasons.append('message_over_limit');continue
+        # Messages containing structured/text request echoes are not diagnostics.
+        echoed=any(c in value for c in '{}\r\n')
+        def inspect(v):
+            if isinstance(v,dict):return any(inspect(x) for x in v.values())
+            if isinstance(v,list):return any(inspect(x) for x in v)
+            if isinstance(v,str):
+                if len(v)>=16 and v in value:return True
+                if v.lstrip().startswith(('{','[')):
+                    try:return inspect(json.loads(v))
+                    except (ValueError,RecursionError):return False
+            return False
+        if echoed or (payload and inspect(payload.get('messages',[]))):
+            reasons.append('request_echo');continue
+        fields[name]=value
+    return dict(fields=fields,omission_reasons=sorted(set(reasons)),raw_body_saved=False)
+
+
 def safe_failure_metadata(exc, config, started, *, classify_transport=False):
     """Reuse the transport classifier, filtering exception attributes by allowlist.
 
@@ -91,6 +154,15 @@ def safe_failure_metadata(exc, config, started, *, classify_transport=False):
         safe[field] = state.get(field) if type(state.get(field)) is bool else None
     safe['transport_stage'] = state.get('stage') if state.get('stage') in (
         'request_preparation', 'transport', 'response_read', 'response_parse') else None
+    server=supplied.get('server_error')
+    if isinstance(server,dict):
+        filtered=safe_server_error(server.get('fields'))
+        reasons=server.get('omission_reasons')
+        reasons=reasons if isinstance(reasons,list) else []
+        filtered['omission_reasons']=sorted(set(filtered['omission_reasons']) | {
+            r for r in reasons if isinstance(r,str) and r in ERROR_OMISSIONS})
+        safe['server_error']=filtered
+    else:safe['server_error']=safe_server_error(None)
     return safe
 
 
@@ -128,11 +200,13 @@ def request_completion(config, payload, key):
         state.update(response_received=True, http_status=exc.code,
                      provider_request_id=response_identifiers(exc.headers))
         try:
-            body=sanitize_provider_text(exc.read().decode('utf-8',errors='replace'), key)
-            state['response_body_received']=True
-        except Exception:body=None  # HTTP reception is known even when body reading fails.
+            body=exc.read(ERROR_BODY_LIMIT+1)
+            state['response_body_received']=True if len(body)<=ERROR_BODY_LIMIT else None
+            server=safe_server_error(body,key,payload)
+        except Exception:
+            server=dict(fields={k:None for k in ERROR_FIELDS},omission_reasons=['read_failed'],raw_body_saved=False)
         error=RuntimeError(f'DEEPSEEK_HTTP_{exc.code}')
-        error.provider_response=dict(status_code=exc.code,body=body,
+        error.provider_response=dict(status_code=exc.code,body=None,server_error=server,
             failure_details=failure_details(exc, config, started, key))
         error.transport_state=state
         raise error from exc
