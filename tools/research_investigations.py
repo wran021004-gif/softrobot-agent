@@ -650,9 +650,11 @@ class InvestigationDispatcher:
             self._checkpoint(order,row,progress,'started',started)
             if not self.host.compatibility()['compatible']:raise ValueError('INVESTIGATION_DEPENDENCIES_CHANGED')
             self._state(order.investigation_id,status='running')
+            retained_node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
             order,payload,reads,measurement=self.prepare(order,executing=True,reuse_saved_reads=reuse_saved_reads)
             if resume_payload is not None:
                 payload=deepcopy(resume_payload)
+                self._bind_resume_catalog(order,payload,retained_node)
                 from tools.context_assembly import check_outgoing_request
                 from tools.platform_models import effective_config
                 measurement=check_outgoing_request(payload,effective_config(self.host),'research_decision')
@@ -698,6 +700,26 @@ class InvestigationDispatcher:
             self._state(order.investigation_id,status='completed' if report.completion=='complete' else 'incomplete',result=sealed['output'],children=plain(report)['children'])
         except Exception as exc:
             self._handle_failure(order,row,progress,exc,started,baseline=baseline)
+
+    def _bind_resume_catalog(self,order,payload,retained_node):
+        """Keep the immutable authority actually supplied before local restoration."""
+        if order.role!='principal' or not self._selectable():return
+        saved=json.loads(payload['messages'][1]['content'])['fact_catalog']['reference']
+        if saved!=retained_node.get('fact_catalog'):
+            raise ValueError('RESUME_CATALOG_NOT_PREVIOUSLY_BOUND')
+        current=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['fact_catalog']
+        previous_body=self.store.artifact(saved);current_body=self.store.artifact(current)
+        allowed_origins={self.run_id,retained_node.get('catalog_origin_run_id')}
+        if previous_body['activity_run_id'] not in allowed_origins:
+            raise ValueError('RESUME_CATALOG_ACTIVITY_MISMATCH')
+        # An explicit code migration may change the run identity. Report owners,
+        # inspections, handles, exact values and rules must remain identical.
+        previous_content={k:v for k,v in previous_body.items() if k!='activity_run_id'}
+        current_content={k:v for k,v in current_body.items() if k!='activity_run_id'}
+        if encode(previous_content)!=encode(current_content):
+            raise ValueError('RESUME_CATALOG_CONTENT_OR_BINDING_CHANGED')
+        self._state(order.investigation_id,fact_catalog=saved,
+            catalog_origin_run_id=previous_body['activity_run_id'])
     @staticmethod
     def _configure_payload(payload,config):
         # Thinking mode supports auto, never required/named choices. Reapply on

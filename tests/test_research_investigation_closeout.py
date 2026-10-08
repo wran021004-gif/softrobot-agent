@@ -246,6 +246,37 @@ class InvestigationCloseoutTests(TestCase):
         self.assertIn('PRINCIPAL_ONLY',denied['error'])
         self.capture('principal_disposition',host,[*inspected,receipt,deferred],unsupported_accept=empty,unread_accept=unread,role_denied=denied)
 
+    def test_resume_catalog_retains_sent_authority_and_rejects_changed_bindings(self):
+        from tools.research_investigations import InvestigationDispatcher,InvestigationOrder
+        host,ref=self.host();dispatcher=InvestigationDispatcher(host)
+        order=self.order('restored-principal',ref);order['role']='principal'
+        order=InvestigationOrder.model_validate(order)
+        original=dict(kind='disposition_fact_catalog',version='1.0.0',activity_run_id='explicit-prior-code-run',
+            targets=[dict(investigation_id='child',report=ref)],entries=[dict(handle='immutable-handle',value=False)],rules='Original exact binding')
+        regenerated=dict(original,activity_run_id=host.run_id)
+        with host.store.transaction() as db:
+            sent=plain(host.store.put(db,original));current=plain(host.store.put(db,regenerated))
+            state=host.store.session(host.run_id,db)['state']
+            state.setdefault('investigations',{})[order.investigation_id]=dict(order=plain(order),fact_catalog=current)
+            host.store.update_state(db,host.run_id,state)
+        retained=dict(fact_catalog=sent,catalog_origin_run_id=original['activity_run_id'])
+        payload=dict(messages=[dict(role='system',content='Original'),dict(role='user',content=json.dumps(dict(fact_catalog=dict(reference=sent))))])
+        unchanged=deepcopy(payload)
+        with patch.object(dispatcher,'_selectable',return_value=True):
+            dispatcher._bind_resume_catalog(order,payload,retained)
+            self.assertEqual(host.store.session(host.run_id)['state']['investigations'][order.investigation_id]['fact_catalog'],sent)
+            self.assertEqual(payload,unchanged)
+            with self.assertRaisesRegex(ValueError,'NOT_PREVIOUSLY_BOUND'):
+                dispatcher._bind_resume_catalog(order,payload,dict(fact_catalog=current))
+            with self.assertRaisesRegex(ValueError,'ACTIVITY_MISMATCH'):
+                dispatcher._bind_resume_catalog(order,payload,dict(fact_catalog=sent))
+            with host.store.transaction() as db:
+                altered=plain(host.store.put(db,dict(regenerated,entries=[dict(handle='immutable-handle',value=True)])))
+            dispatcher._state(order.investigation_id,fact_catalog=altered)
+            with self.assertRaisesRegex(ValueError,'CONTENT_OR_BINDING_CHANGED'):
+                dispatcher._bind_resume_catalog(order,payload,retained)
+        self.assertEqual(host.store.remaining()['used']['model_calls'],0)
+
     def test_integrated_direct_and_coordinated_public_scenarios(self):
         from tools.research_mainline3 import live_interface_scenario,interface_proposal
         # The runner's full proposed budgets include public collection and reads.
