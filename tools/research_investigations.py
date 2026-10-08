@@ -826,10 +826,19 @@ class InvestigationDispatcher:
                 issue.issue['failure_key']='report:'+','.join(sorted(targets.values())) if targets else 'formal_target_cardinality'
                 raise issue
         ids={r.artifact_id for r in order.evidence}
-        for fact in (*report.facts,*report.counterevidence):
-            if fact.reference.artifact_id not in ids:raise ValueError('RETURN_SOURCE_OUT_OF_SCOPE')
-            self._validate_fact(fact,'RETURN')
-            if not any(self._visible(fact,read) for read in reads):raise ValueError('RETURN_FACT_NOT_IN_INSPECTED_PAGE')
+        for group,facts in (('facts',report.facts),('counterevidence',report.counterevidence)):
+            for index,fact in enumerate(facts):
+                try:
+                    if fact.reference.artifact_id not in ids:raise ValueError('RETURN_SOURCE_OUT_OF_SCOPE')
+                    self._validate_fact(fact,'RETURN')
+                    if not any(self._visible(fact,read) for read in reads):raise ValueError('RETURN_FACT_NOT_IN_INSPECTED_PAGE')
+                except ValueError as exc:
+                    issue=getattr(exc,'issue',dict(code=str(exc).split(':',1)[0],path='',reference=plain(fact.reference),pointer=fact.pointer))
+                    issue['path']=f'/{group}/{index}'+issue['path']
+                    issue['failure_key']='source:'+fact.reference.artifact_id+':'+issue['path']
+                    issue.setdefault('legal',dict(query=dict(reference=plain(fact.reference),pointer=fact.pointer),requirement='Read the exact original scoped field; select supported evidence or retain uncertainty.'))
+                    exc.issue=issue
+                    raise
         if report.children and (order.role!='coordinator' or order.parent_id):raise ValueError('INVESTIGATOR_CANNOT_DELEGATE')
         if any(c.parent_id!=order.investigation_id for c in report.children):raise ValueError('CHILD_PARENT_BINDING_MISMATCH')
         for child in report.children:
@@ -850,10 +859,22 @@ class InvestigationDispatcher:
         try:original=pointer(source,fact.pointer)
         except (KeyError,IndexError,TypeError,ValueError):
             raise ValueError(label+'_INVALID_SINGLE_JSON_POINTER: '+fact.pointer) from None
-        if encode(original)!=encode(fact.value):raise ValueError(label+'_SOURCE_VALUE_MISMATCH: '+fact.pointer)
+        if encode(original)!=encode(fact.value):
+            exc=ValueError(label+'_SOURCE_VALUE_MISMATCH: '+fact.pointer)
+            exc.issue=dict(code=label+'_SOURCE_VALUE_MISMATCH',path='/value',reference=plain(fact.reference),pointer=fact.pointer,
+                supplied_value=plain(fact.value),supplied_type=type(fact.value).__name__,original_value=original,original_type=type(original).__name__)
+            raise exc
         identity_keys={'candidate_id','owner_run_id','run_id','execution_id','source_execution_id','configuration','scientific_configuration_identity','coordinate_frame','result_type'}
-        if any(k not in identity_keys or k not in source or encode(source[k])!=encode(v) for k,v in fact.source_identity.items()):
-            raise ValueError(label+'_SOURCE_IDENTITY_MISMATCH')
+        source_root=source if isinstance(source,dict) else {}
+        invalid={k:dict(supplied=v,allowed_identity_key=k in identity_keys,exists_at_source_root=k in source_root,
+            original=source_root.get(k),original_type=type(source_root[k]).__name__ if k in source_root else None)
+            for k,v in fact.source_identity.items() if k not in identity_keys or k not in source_root or encode(source_root[k])!=encode(v)}
+        if invalid:
+            exc=ValueError(label+'_SOURCE_IDENTITY_MISMATCH')
+            exc.issue=dict(code=label+'_SOURCE_IDENTITY_MISMATCH',path='/source_identity',reference=plain(fact.reference),pointer=fact.pointer,
+                invalid_fields=invalid,legal=dict(root_identity_fields={k:source_root[k] for k in sorted(identity_keys&source_root.keys())},
+                    query=dict(reference=plain(fact.reference),pointer=''),requirement='source_identity binds exact root fields only; nested values need their own source pointer. No alias or inference.'))
+            raise exc
 
     def _visible(self,fact,read):
         """Original pointers remain correct for offset pages; overviews are no facts."""

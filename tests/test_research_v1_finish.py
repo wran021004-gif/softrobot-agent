@@ -163,3 +163,16 @@ class FinishTests(TestCase):
         self.assertNotIn('private body',encode(archive.artifact(ref)))
         routed=classify(ValueError('MODEL_NODE_INCOMPLETE'))
         self.assertEqual(routed['category'],'bounded_stop');self.assertFalse(routed['paid_correction_eligible'])
+
+    def test_saved_coordinated_return_locates_invalid_identity_without_rewriting(self):
+        from tools.research_investigations import InvestigationOrder,InvestigationReturn
+        b=read(ROOT/'evidence/research_mainline3_v1_finish_20261008/coordinated_bundle.json')
+        archive=MemoryArchive(b);d=object.__new__(InvestigationDispatcher);d.store=archive;d.run_id='offline-real-replay'
+        n=b['state']['investigations']['timing-integrity-limits'];raw=archive.artifact(n['provider_response_refs'][-1])
+        args=json.loads(raw['choices'][0]['message']['tool_calls'][0]['function']['arguments']);before=digest(args)
+        with self.assertRaisesRegex(ValueError,'RETURN_SOURCE_IDENTITY_MISMATCH') as caught:
+            d._validate_return(InvestigationOrder.model_validate(n['order']),InvestigationReturn.model_validate(args),n['reads'])
+        issue=caught.exception.issue
+        self.assertEqual(issue['path'],'/facts/0/source_identity');self.assertIn('candidate_id',issue['invalid_fields'])
+        self.assertFalse(issue['invalid_fields']['candidate_id']['exists_at_source_root'])
+        self.assertIn('execution_id',issue['legal']['root_identity_fields']);self.assertEqual(digest(args),before)
