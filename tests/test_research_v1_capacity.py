@@ -137,14 +137,19 @@ class CapacityBindingTests(TestCase):
                 return native(dict(interpretation='Offline defer fixture',dispositions=[dict(investigation_id=t['investigation_id'],report=t['report'],disposition='defer',reason='Fixture semantics unassessed') for t in packet['disposition_targets']]))
             tools=[m for m in payload['messages'] if m['role']=='tool']
             if not tools:
+                arguments=dict(reference=ref,pointer='/sampled_settling')
+                # Exercise the actual advertised contract in both legacy and
+                # business-field fixtures; never ask production to unwrap v2.
+                if 'arguments' in payload['tools'][1]['function']['parameters'].get('properties',{}):
+                    arguments=dict(arguments=arguments,reason='Fixture model chooses original observation',tool_version='1.0.0')
                 answer=native({});answer['choices'][0]['message']['tool_calls'][0]['function']=dict(name=payload['tools'][1]['function']['name'],
-                    arguments=json.dumps(dict(arguments=dict(reference=ref,pointer='/sampled_settling'),reason='Fixture model chooses original observation',tool_version='1.0.0')))
+                    arguments=json.dumps(arguments))
                 return answer
             page=json.loads(tools[-1]['content'])
             return native(dict(facts=[dict(statement='Original sampled limit result',reference=ref,pointer='/sampled_settling/passed',value=page['content']['passed'])],interpretation='Fixture only'))
         errors=[];handler=InvestigationDispatcher._handle_failure
-        def capture(dispatcher,order,row,progress,exc,started):
-            errors.append(str(exc));return handler(dispatcher,order,row,progress,exc,started)
+        def capture(dispatcher,order,row,progress,exc,started,**kwargs):
+            errors.append(str(exc));return handler(dispatcher,order,row,progress,exc,started,**kwargs)
         with patch('tools.platform_models.DeepSeekAdapter._transport',new=transport),patch.object(InvestigationDispatcher,'_handle_failure',new=capture):
             result=live_interface_scenario(self.host,mode,plan=plan)
         failures={k:dict(status=n['status'],progress=n.get('progress'),

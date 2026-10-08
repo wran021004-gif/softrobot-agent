@@ -393,7 +393,13 @@ class InvestigationDispatcher:
         details=safe_failure_metadata(exc,config,started,classify_transport=progress['stage']=='transport')
         from tools.research_error_routing import classify
         details['error_routing']=classify(exc,stage=progress['stage'])
-        # Exact local protocol codes only; never archive arbitrary exception text.
+        # Exact public codes only; never archive arbitrary exception text or a
+        # rejected provider body. Saving failure must remain distinguishable
+        # from the body's admission check without weakening that check.
+        details['local_error_code']=next((code for code in (
+            'INVESTIGATION_RESPONSE_SECRET_TEXT','CONTEXT_SECRET_FIELD',
+            'INVESTIGATION_RESPONSE_TRUNCATED','INVESTIGATION_RETURN_TOO_LARGE')
+            if exc.args==(code,)),None)
         details['protocol_error']=next((code for code in ('INVESTIGATION_NO_NATIVE_TOOL_CALL',)
             if exc.args==(code,)),None)
         for field in ('transport_attempted','response_received','response_body_received'):

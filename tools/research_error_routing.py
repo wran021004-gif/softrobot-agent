@@ -4,7 +4,9 @@ from pydantic import ValidationError
 
 def classify(exc, *, stage=None):
     code = str(exc).split(':', 1)[0]
-    if stage in ('program_expansion', 'report_evidence_save', 'settlement'):
+    if code.startswith(('MODEL_NODE_INCOMPLETE','INVESTIGATION_MODEL_CALLS_BUDGET_EXHAUSTED','INVESTIGATION_ELAPSED_LIMIT')):
+        category, action = 'bounded_stop', 'save_cumulative_limits_and_stop_dependent_stages'
+    elif stage in ('program_expansion', 'report_evidence_save', 'settlement'):
         category, action = 'program_construction', 'local_repair_and_saved_raw_return_revalidation'
     elif stage == 'transport':
         category, action = 'transport_or_unknown', 'reconcile_original_receipt_keep_unknown_reservation'

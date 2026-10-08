@@ -146,3 +146,20 @@ class FinishTests(TestCase):
         self.assertIsNotNone(d._protocol_feedback(o,issue('immutable-b')))
         self.assertEqual(archive.bundle['state']['investigation_protocol_corrections_used'],4)
         self.assertIsNone(d._protocol_feedback(o,issue('immutable-b')))
+
+    def test_response_admission_failure_saves_only_exact_public_code(self):
+        from types import SimpleNamespace
+        import time
+        archive=MemoryArchive(dict(state=dict(investigations={'offline-node':{}}),artifacts={}))
+        archive.session=lambda *a,**k:dict(state=archive.bundle['state'],snapshot=dict(input=dict(policy=dict(model={}))))
+        d=object.__new__(InvestigationDispatcher);d.store=archive;d.run_id='offline-admission'
+        progress=dict(stage='response_evidence_save',valid_report=False,transport_attempted=True,response_received=True)
+        row=dict(request_id='unchanged-request',execution_id='unchanged-execution')
+        ref,uncertain=d._failure(SimpleNamespace(investigation_id='offline-node'),row,progress,ValueError('INVESTIGATION_RESPONSE_SECRET_TEXT'),time.monotonic())
+        self.assertTrue(uncertain)
+        self.assertEqual(archive.artifact(ref)['details']['local_error_code'],'INVESTIGATION_RESPONSE_SECRET_TEXT')
+        ref,_=d._failure(SimpleNamespace(investigation_id='offline-node'),row,progress,ValueError('private body must never be copied'),time.monotonic())
+        self.assertIsNone(archive.artifact(ref)['details']['local_error_code'])
+        self.assertNotIn('private body',encode(archive.artifact(ref)))
+        routed=classify(ValueError('MODEL_NODE_INCOMPLETE'))
+        self.assertEqual(routed['category'],'bounded_stop');self.assertFalse(routed['paid_correction_eligible'])
