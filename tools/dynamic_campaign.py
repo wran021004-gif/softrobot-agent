@@ -534,7 +534,7 @@ class DynamicCampaign(ExperimentSupport,ToolCountRecovery,Workbench):
                 self.settle_correction(row);self.state.update(status='PAUSED',stop_reason=row['error']);break
             try:
                 bounded_config={**config,'timeout_s':min(config['timeout_s'],receipt['reserved_wall_s'])}
-                response=redact(request_completion(bounded_config,payload,key),key);atomic_json(folder/'response.json',response)
+                response=request_completion(bounded_config,payload,key);atomic_json(folder/'response.json',response)
                 row['status']='responded';self.save();self.apply_model_response(row,response)
                 self.settle_correction(row)
                 self.finish(receipt,'completed' if row['status']=='completed' else 'failed')

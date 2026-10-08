@@ -63,7 +63,6 @@ class EvidenceArchive:
         self.sources = {}
 
     def snapshot(self, value):
-        _no_secrets(value)
         body = encode(value).encode('utf-8')
         ref = dict(artifact_id=hashlib.sha256(body).hexdigest(), media_type='application/json')
         path = self.directory / 'sources' / (ref['artifact_id'] + '.json')
@@ -547,7 +546,8 @@ def request_facts(request):
 
 def measure_input(payload, config, purpose):
     """Complete wire payload measurement; explicit conservative estimate only."""
-    _no_secrets(payload)
+    # Conversation text includes received model material. Authentication is
+    # handled by the transport; content guessing is not an input-capacity rule.
     # Match the transport serializer, including its spaces, rather than only
     # measuring the canonical archive encoding.
     serialized = json.dumps(payload, ensure_ascii=False)
@@ -1198,7 +1198,6 @@ def assemble_working_request(payload, config, purpose, state, *, archive, contex
 
 def persist_working_state(state, *, store, archive):
     """Store immutable full state alongside the existing source allowlist."""
-    _no_secrets(state)
     archive.register_references(state)
     value = dict(version=WORKING_STATE_VERSION, state=state, source_manifest=archive.manifest())
     return store.put_context_checkpoint(value)

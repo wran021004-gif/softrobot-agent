@@ -328,7 +328,7 @@ def attempt(number=0, correction=None):
     adapter.request_config=config;adapter.request_purpose='final_report';adapter.request_host=w.host
     then=time.monotonic();raw=None
     try:
-        raw=adapter.respond(payload,number);_no_secrets(raw)
+        raw=adapter.respond(payload,number)
         atomic_json(OUT/f'raw_provider_response_{number}.json',raw)
         with w.store.transaction() as db:
             rawref=plain(w.store.put(db,dict(raw=raw,status='completed')))

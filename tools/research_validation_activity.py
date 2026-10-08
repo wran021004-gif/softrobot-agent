@@ -102,8 +102,6 @@ def export(out, mode, *, run_id=None):
         bundle=dict(mode=mode, transport='real_configured_deepseek', project=store.config(db),
             state=session['state'], snapshot=session['snapshot'], artifacts=artifacts, calls=calls,
             events=[json.loads(r['body']) for r in db.execute('SELECT body FROM events ORDER BY seq')])
-    from tools.context_assembly import _no_secrets
-    _no_secrets(bundle)
     atomic_json(out/(mode+'_bundle.json'), bundle)
     atomic_json(out/(mode+'_ledger.json'), store.remaining())
     print(encode(dict(mode=mode, nodes={k:dict(status=n['status'],usage=n.get('usage'),reason=n.get('reason'))

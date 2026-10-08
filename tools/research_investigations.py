@@ -209,6 +209,19 @@ class InvestigationDispatcher:
         from schemas.platform_operations import ReadEvidence
         from tools.platform_tools import bounded_evidence_page
         reads=[]
+        # Imported query results are supplied as evidence, never new public reads.
+        for imported in grant.get('imported_query_results',{}).get(order.investigation_id,[]):
+            if imported['reference'] not in [plain(r) for r in order.evidence]:raise ValueError('QUERY_SOURCE_OUT_OF_SCOPE')
+            query=ReadEvidence.model_validate(imported['query'])
+            actual=plain(bounded_evidence_page(self.store.artifact(query.reference),query))
+            if actual!=imported['page']:raise ValueError('IMPORTED_QUERY_RESULT_IDENTITY_MISMATCH')
+            retained=dict(imported,inspection_origin='imported_query_result_supplied_to_current_model',new_public_operation=False)
+            reads.append(retained)
+            if executing:
+                with self.store.transaction() as db:
+                    state=self.store.session(self.run_id,db)['state'];node=state['investigations'][order.investigation_id]
+                    if retained not in node['reads']:node['reads'].append(retained)
+                    self.store.update_state(db,self.run_id,state)
         queries=order.queries  # Empty means no prefetch, not forced whole-source access.
         if any(q.reference.artifact_id not in {r.artifact_id for r in order.evidence} for q in queries):
             raise ValueError('QUERY_SOURCE_OUT_OF_SCOPE')
@@ -362,6 +375,69 @@ class InvestigationDispatcher:
             node['usage'][resource]+=1
             self.store.update_state(db,self.run_id,state)
 
+    def _provider_start(self,order,row,payload,measurement,turn):
+        """One invocation, one purpose and one node/common charge; no refunds."""
+        with self.store.transaction() as db:
+            _,grant=self._scope(order,db)
+            state=self.store.session(self.run_id,db)['state'];node=state['investigations'][order.investigation_id]
+            if time.time()-node['started_unix']>=order.timeout_s:raise ValueError('INVESTIGATION_ELAPSED_LIMIT')
+            if node['usage']['model_calls']>=order.budget.model_calls:raise ValueError('INVESTIGATION_MODEL_CALLS_BUDGET_EXHAUSTED')
+            allocation=grant.get('delivery_allocations',{}).get(order.investigation_id,{})
+            purpose=node.get('next_request_purpose','ordinary')
+            reason=node.get('next_request_reason','Planned evidence interaction or first formal submission')
+            used=node.setdefault('requests_by_purpose',dict(ordinary=0,model_correction=0,engineering_recovery=0))
+            limits=allocation.get('request_purposes')
+            if limits and used[purpose]>=limits[purpose]:raise ValueError('INVESTIGATION_'+purpose.upper()+'_ALLOWANCE_EXHAUSTED')
+            common=sum(n['usage']['model_calls'] for n in state['investigations'].values())
+            if common>=grant['total_budget']['model_calls']:raise ValueError('INVESTIGATION_COMMON_MODEL_BUDGET_EXHAUSTED')
+            used[purpose]+=1;node['usage']['model_calls']+=1
+            node.pop('next_request_purpose',None);node.pop('next_request_reason',None)
+            record=dict(turn=turn,purpose=purpose,triggering_reason=reason,payload=payload,measurement=measurement,
+                invocation=node['usage']['model_calls'],code_commit=self.store.session(self.run_id,db)['snapshot']['project_commit'])
+            node.setdefault('provider_requests',[]).append(dict(turn=turn,purpose=purpose,triggering_reason=reason,outcome='started'))
+            self.store.update_state(db,self.run_id,state)
+            self.store.event(db,self.run_id,'investigation_provider_attempt','started',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,record)])
+
+    def _provider_outcome(self,order,outcome,failure=None):
+        with self.store.transaction() as db:
+            state=self.store.session(self.run_id,db)['state'];node=state['investigations'][order.investigation_id]
+            node['provider_requests'][-1].update(outcome=outcome,failure_cause=failure)
+            self.store.update_state(db,self.run_id,state)
+
+    def engineering_recovery(self,key,reason,*,transport=None,resume_payload=None):
+        """Explicit confirmed new-activity failure recovery; same node and grant.
+
+        Saved-response revalidation is attempted first and costs no requests.
+        Unknown sending or billing state never authorizes retransmission here.
+        """
+        result=self.recover(key)
+        if result.status=='completed':return result
+        node=self.store.session(self.run_id)['state']['investigations'][key]
+        old=self.store.lookup(self.run_id,node.get('active_request_id','investigation-'+key))
+        if not old['receipt'] or json.loads(old['receipt'])['execution_status']!='failed':raise ValueError('CONFIRMED_NEW_ACTIVITY_FAILURE_REQUIRED')
+        failure=self.store.artifact(node['failure_record'])
+        routing=failure['details']['error_routing']['category']
+        if routing not in ('program_construction','received_local_failure','transport_or_unknown'):raise ValueError('GENUINE_ENGINEERING_FAILURE_REQUIRED')
+        order=InvestigationOrder.model_validate(node['order']);_,grant=self._scope(order)
+        limits=grant['delivery_allocations'][key]['request_purposes']
+        if node.get('requests_by_purpose',{}).get('engineering_recovery',0)>=limits['engineering_recovery']:raise ValueError('ENGINEERING_RECOVERY_ALLOWANCE_EXHAUSTED')
+        remaining_s=order.timeout_s-(time.time()-node['started_unix'])
+        if remaining_s<=0:raise ValueError('INVESTIGATION_ELAPSED_LIMIT')
+        request=old['request_id']+'-engineering-'+str(node.get('requests_by_purpose',{}).get('engineering_recovery',0)+1)
+        reservation={k:v-node['usage'][k] for k,v in plain(order.budget).items()};reservation['wall_s']=remaining_s
+        with self.store.transaction() as db:
+            state=self.store.session(self.run_id,db)['state'];n=state['investigations'][key]
+            n.update(next_request_purpose='engineering_recovery',next_request_reason=reason,active_request_id=request,status='pending')
+            self.store.update_state(db,self.run_id,state)
+            self.store.event(db,self.run_id,'investigation_paid_recovery','authorized',request=request,outputs=[self.store.put(db,dict(reason=reason,original_failure=node['failure_record'],same_node_deadline=node['started_unix']+order.timeout_s))])
+        row,fresh=self.store.reserve(self.run_id,request,digest(dict(original_execution=old['execution_id'],reason=reason)),'investigation-dispatcher',reservation,kind='investigation')
+        if not fresh:raise ValueError('NO_RECOVERY_REDISPATCH')
+        from tools.workbench import owner
+        with owner(self.host.folder,'.investigation-'+key+'.lock'):
+            self._execute(order,row,transport=transport,reuse_saved_reads=True,resume_payload=resume_payload,
+                correction_context=dict(engineering_recovery=reason,scope='Same current authorization, original counters and deadline. Submit supported findings and explicit unknowns.'))
+        return self.recover(key)
+
     def _query(self,order,query):
         # Recheck root/parent/activity authority on every operation. Rejected reads
         # consume an evidence operation too, within the common node reservation.
@@ -412,9 +488,7 @@ class InvestigationDispatcher:
         details=safe_failure_metadata(exc,config,started,classify_transport=progress['stage']=='transport')
         from tools.research_error_routing import classify
         details['error_routing']=classify(exc,stage=progress['stage'])
-        # Exact public codes only; never archive arbitrary exception text or a
-        # rejected provider body. Saving failure must remain distinguishable
-        # from the body's admission check without weakening that check.
+        # Business failures reference the already persisted original response.
         details['local_error_code']=next((code for code in (
             'INVESTIGATION_RESPONSE_SECRET_TEXT','CONTEXT_SECRET_FIELD',
             'INVESTIGATION_RESPONSE_TRUNCATED','INVESTIGATION_RETURN_TOO_LARGE')
@@ -439,6 +513,7 @@ class InvestigationDispatcher:
         uncertain=(progress['valid_report'] or progress['stage'] in (
             'response_evidence_save','report_evidence_save','settlement','recovery',
             'response_evidence_read','report_evidence_read')
+            or (progress.get('response_saved') and details['error_routing']['category']=='program_construction')
             or (details['transport_stage']=='response_read' and progress.get('response_body_received') is not True)
             or (progress['transport_attempted'] and progress['response_received'] is not True))
         record['resolution']='unconfirmed' if uncertain else 'confirmed_local_failure'
@@ -513,27 +588,6 @@ class InvestigationDispatcher:
             code_commit=snapshot['project_commit'],code_worktree_dirty=snapshot['worktree_dirty'],dependency_identity=digest(snapshot['dependencies']))
 
     @staticmethod
-    def _check_response_body(returned):
-        from tools.context_assembly import _no_secrets
-        from tools.model_transports.deepseek import sanitize_provider_text
-        _no_secrets(returned)
-        def check(value):
-            if isinstance(value,dict):
-                for v in value.values():check(v)
-            elif isinstance(value,list):
-                for v in value:check(v)
-            elif isinstance(value,str):
-                # Native arguments are encoded JSON strings, not transparent dicts.
-                if value.lstrip().startswith(('{','[')):
-                    try:nested=json.loads(value)
-                    except ValueError:pass
-                    else:
-                        _no_secrets(nested);check(nested);return
-                if sanitize_provider_text(value,'',None)!=value:
-                    raise ValueError('INVESTIGATION_RESPONSE_SECRET_TEXT')
-        check(returned)
-
-    @staticmethod
     def _query_error_code(exc):
         # Preserve known service codes without copying Pydantic inputs or exception text.
         code=str(exc).split(':',1)[0]
@@ -553,7 +607,7 @@ class InvestigationDispatcher:
     def _receive(self,order,row,progress,metadata,text=None,omission=None):
         """Safe reception receipt first, original UTF-8 representation second."""
         parsed=None
-        if text is not None:
+        if isinstance(text,str):
             try:parsed=json.loads(text)
             except ValueError:pass
         usage=self._reported_usage(parsed) or metadata.get('provider_usage')
@@ -571,17 +625,16 @@ class InvestigationDispatcher:
             node.setdefault('reception_refs',[]).append(plain(ref));node['progress']=dict(progress)
             self.store.update_state(db,self.run_id,state)
         if text is None:return
-        try:self._check_response_body(parsed if parsed is not None else dict(body=text))
-        except ValueError:
-            with self.store.transaction() as db:
-                rejected=dict(record,omission_reason='mandatory_secret_check; complete body not retained')
-                self.store.event(db,self.run_id,'investigation_reception','body_omitted',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,rejected)])
-            raise
         progress['stage']='response_evidence_save'
         with self.store.transaction() as db:
-            body=self.store.put(db,dict(representation='complete_original_utf8_text',utf8_text=text,
-                original_utf8_sha256=__import__('hashlib').sha256(text.encode('utf-8')).hexdigest()))
-            saved=dict(record,body_persisted=True,representation='complete_original_utf8_text',body=plain(body))
+            if isinstance(text,bytes):
+                representation='complete_original_bytes_base64'
+                original=dict(representation=representation,base64_bytes=__import__('base64').b64encode(text).decode('ascii'),original_sha256=__import__('hashlib').sha256(text).hexdigest())
+            else:
+                representation='complete_original_utf8_text'
+                original=dict(representation=representation,utf8_text=text,original_utf8_sha256=__import__('hashlib').sha256(text.encode('utf-8')).hexdigest())
+            body=self.store.put(db,original)
+            saved=dict(record,body_persisted=True,representation=representation,body=plain(body))
             self.store.event(db,self.run_id,'investigation_reception','body_persisted',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,saved)])
             state=self.store.session(self.run_id,db)['state'];node=state['investigations'][order.investigation_id]
             node.setdefault('original_body_refs',[]).append(plain(body));progress['body_persisted']=True
@@ -669,7 +722,11 @@ class InvestigationDispatcher:
             _,grant=self._grant()
             allocation=grant.get('delivery_allocations',{}).get(order.investigation_id)
             if allocation:
-                report_phase=node['usage']['model_calls']>=allocation['exploration_requests']
+                purposes=allocation.get('request_purposes')
+                ordinary=node.get('requests_by_purpose',{}).get('ordinary',0)
+                report_phase=(node.get('submission_phase')=='report_delivery' or
+                    (ordinary>=purposes['ordinary']-1 or order.budget.model_calls-node['usage']['model_calls']<=allocation['protected_delivery_requests'])
+                    if purposes else node['usage']['model_calls']>=allocation['exploration_requests'])
                 phase='report_delivery' if report_phase else 'exploration'
                 self._state(order.investigation_id,submission_phase=phase)
                 if report_phase:
@@ -677,10 +734,10 @@ class InvestigationDispatcher:
                 context['workbench']=dict(phase=phase,resolved_questions=[dict(pointer=r['pointer'],reference=r['reference'],page_kind=r['page']['kind']) for r in node['reads']],
                     unresolved_questions=[order.question,'Model must declare unresolved questions and missing evidence explicitly in its report.'],
                     material_in_current_request='Initial reads, confirmed_followup_evidence, and complete native assistant/tool history',
-                    exploration_requests_remaining=max(0,allocation['exploration_requests']-node['usage']['model_calls']),
+                    exploration_requests_remaining=max(0,(purposes['ordinary']-1-ordinary) if purposes else allocation['exploration_requests']-node['usage']['model_calls']),
                     report_requests_remaining=min(allocation['protected_delivery_requests'],order.budget.model_calls-node['usage']['model_calls']),
                     correction_opportunities_remaining=min(grant.get('protocol_correction_limit',0)-self.store.session(self.run_id)['state'].get('investigation_protocol_corrections_used',0),
-                        grant.get('protocol_correction_role_limits',{}).get('principal' if order.role=='principal' else 'other',0)-self.store.session(self.run_id)['state'].get('investigation_corrections_by_role',{}).get('principal' if order.role=='principal' else 'other',0)),
+                        purposes['model_correction']-node.get('requests_by_purpose',{}).get('model_correction',0) if purposes else grant.get('protocol_correction_role_limits',{}).get('principal' if order.role=='principal' else 'other',0)-self.store.session(self.run_id)['state'].get('investigation_corrections_by_role',{}).get('principal' if order.role=='principal' else 'other',0)),
                     instruction='Submit the strongest supported investigation_return with explicit unknowns now.' if report_phase else 'Read only necessary scoped evidence; a supported incomplete-evidence report is acceptable.')
             context['remaining_budget']={k:max(0,v-node['usage'][k]) for k,v in plain(order.budget).items()}
             context['remaining_budget']['wall_s']=max(0,order.timeout_s-(time.time()-node['started_unix']))
@@ -690,18 +747,17 @@ class InvestigationDispatcher:
                 payload.update({k:node['provider_setting_override'][k] for k in ('reasoning_effort','max_tokens')})
             # Everything accumulated, all schemas, results and output reserve.
             measurement=check_outgoing_request(payload,config,'research_decision')
-            try:self._consume(order,'model_calls')
-            except ValueError as exc:
-                if 'BUDGET_EXHAUSTED' not in str(exc) and 'ELAPSED_LIMIT' not in str(exc):raise
-                return InvestigationReturn(completion='incomplete',interpretation='Insufficient bounded interaction',unknowns=[str(exc)])
-            with self.store.transaction() as db:
-                self.store.event(db,self.run_id,'investigation_provider_attempt','started',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,dict(turn=turn,payload=payload,measurement=measurement))])
             progress.update(stage='transport',transport_attempted=None,response_received=None,response_body_received=None,
                 body_persisted=False,response_decoded=False,response_saved=False,http_status=None,provider_request_id=None,actual_usage_known=False)
             self._checkpoint(order,row,progress,'started',started)
+            self._provider_start(order,row,payload,measurement,turn)
             progress['transport_attempted']=True
             progress['transport_callable_invocations']+=1
-            raw=transport(deepcopy(payload))  # Preserve original exception and transport metadata.
+            try:raw=transport(deepcopy(payload))
+            except Exception as exc:
+                self._provider_outcome(order,'failed',type(exc).__name__)
+                raise
+            self._provider_outcome(order,'received')
             progress.update(stage='response_evidence_save',response_received=True,response_body_received=True)
             metadata=getattr(raw,'transport_metadata',{})
             from tools.model_transports.deepseek import response_identifiers
@@ -716,7 +772,8 @@ class InvestigationDispatcher:
             with self.store.transaction() as db:
                 self.store.event(db,self.run_id,'investigation_token_accounting','received',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,dict(turn=turn,
                     byte_estimate=measurement,provider_usage=self._reported_usage(returned),provider_usage_source='Provider-reported; independent of body persistence.'))])
-            self._check_response_body(returned)  # Check body and native arguments before original evidence saving.
+            if not progress['body_persisted']:
+                self._receive(order,row,progress,dict(transport_attempted=True,response_received=True,response_body_received=True),encode(returned))
             with self.store.transaction() as db:
                 response_ref=self.store.put(db,returned)
                 self.store.event(db,self.run_id,'investigation_provider_response','returned',request=row['request_id'],execution=row['execution_id'],outputs=[response_ref])
@@ -800,6 +857,7 @@ class InvestigationDispatcher:
             if self._selectable():
                 self._append_evidence_turn(payload,calls,response,order,assistant=assistant)
             else:payload['messages'].extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],content=encode(response))])
+            self._state(order.investigation_id,consecutive_model_corrections=0)
             turn+=1
 
     @staticmethod
@@ -868,7 +926,12 @@ class InvestigationDispatcher:
             group='principal' if order.role=='principal' else 'other'
             group_used=state.get('investigation_corrections_by_role',{}).get(group,0)
             group_limit=grant.get('protocol_correction_role_limits',{}).get(group,grant.get('protocol_correction_limit',0))
-            if used>=grant.get('protocol_correction_limit',0) or node.get('protocol_corrections_used',int(node.get('protocol_correction_used',False)))>=grant.get('protocol_correction_per_node',1) or group_used>=group_limit:return None
+            allocation=grant.get('delivery_allocations',{}).get(order.investigation_id,{})
+            purposes=allocation.get('request_purposes')
+            if purposes:
+                if node.get('requests_by_purpose',{}).get('model_correction',0)>=purposes['model_correction']:return None
+                if node.get('consecutive_model_corrections',0)>=2:return None
+            elif used>=grant.get('protocol_correction_limit',0) or node.get('protocol_corrections_used',int(node.get('protocol_correction_used',False)))>=grant.get('protocol_correction_per_node',1) or group_used>=group_limit:return None
             failure_key=getattr(exc,'issue',{}).get('failure_key',str(exc).split(':',1)[0])
             counts=node.setdefault('protocol_corrections_by_failure_key',{})
             if counts.get(failure_key,0)>=grant.get('protocol_correction_per_decision',grant.get('protocol_correction_per_node',1)):return None
@@ -880,6 +943,9 @@ class InvestigationDispatcher:
             if self._selectable():
                 feedback['requirement']='Resubmit the complete advertised investigation_return. Principal dispositions select catalog handles; supporting_facts use report handles, additional_support uses explicitly principal supplemental handles, scope declares applicability separately. Projection is extraction only. Each issue identifies the failed decision position and legal structure; choose conclusions yourself. No disposition was executed. Current report/evidence and original permissions, counters and deadline remain in force; complete prior responses are archived.'
             node['protocol_correction_used']=True
+            node['next_request_purpose']='model_correction'
+            node['next_request_reason']=str(exc).split(':',1)[0]
+            node['consecutive_model_corrections']=node.get('consecutive_model_corrections',0)+1
             node['protocol_corrections_used']=node.get('protocol_corrections_used',0)+1
             counts[failure_key]=counts.get(failure_key,0)+1
             state.setdefault('investigation_corrections_by_role',{})[group]=group_used+1
@@ -893,7 +959,7 @@ class InvestigationDispatcher:
         calls=assistant.get('tool_calls',[])
         if len(calls)>1:
             payload['messages'].append(assistant)
-            payload['messages'].extend(dict(role='tool',tool_call_id=c['id'],content=encode(feedback)) for c in calls)
+            payload['messages'].extend(dict(role='tool',tool_call_id=c['id'],content=encode(dict(feedback,executed=False))) for c in calls)
             return
         if call_id is None:
             payload['messages'].extend([assistant,dict(role='user',content=encode(feedback))]);return
@@ -1089,8 +1155,8 @@ class InvestigationDispatcher:
                     if receptions and (not originals or receptions[-1]['sequence']>originals[-1]['sequence']):
                         reception=self.store.artifact(receptions[-1]['outputs'][0])
                         original=self.store.artifact(reception['body'])
-                        raw=json.loads(original['utf8_text'])
-                        self._check_response_body(raw)
+                        encoded=original.get('utf8_text') if original['representation']=='complete_original_utf8_text' else __import__('base64').b64decode(original['base64_bytes']).decode('utf-8')
+                        raw=json.loads(encoded)
                         with self.store.transaction() as db:
                             ref=self.store.put(db,raw)
                             self.store.event(db,self.run_id,'investigation_provider_response','locally_recovered',request=row['request_id'],execution=row['execution_id'],inputs=[reception['body']],outputs=[ref])
@@ -1098,7 +1164,6 @@ class InvestigationDispatcher:
                     if originals:
                         progress['stage']='response_evidence_read'
                         raw=self.store.artifact(originals[-1]['outputs'][0])
-                        self._check_response_body(raw)
                         calls=raw.get('choices',[{}])[0].get('message',{}).get('tool_calls',[]) if isinstance(raw,dict) else []
                         if len(calls)==1 and calls[0].get('function',{}).get('name')=='investigation_return':
                             progress.update(stage='report_validation',response_received=True,response_saved=True)

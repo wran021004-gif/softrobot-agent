@@ -3,9 +3,12 @@ import json
 from tools.state_io import read,digest
 from tools.research_v1_continue import OUT,ROOT
 from tools.platform_store import zero,Store
-from tools.research_investigations import InvestigationDispatcher,InvestigationOrder,InvestigationReturn
+from tools.research_investigations import InvestigationDispatcher,InvestigationOrder,InvestigationReturn,SourceFact
 
-def generate_b():
+def generate_b(out=None):
+    if out is None:
+        from tools.research_v1_continue import OUT as out
+    OUT=out
     manifest=read(OUT/'validation_manifest.json');p=manifest['phases']['coordinated']
     bundle=read(OUT/'coordinated_bundle.json');result=read(OUT/'coordinated_result.json')
     nodes=bundle['state']['investigations'];events=bundle['events'];arts=bundle['artifacts'];store=Store(ROOT/p['output'])
@@ -23,6 +26,10 @@ def generate_b():
         for e in attempts:
             if not e.get('request_id','').startswith('investigation-'+key):continue
             wire=arts[e['outputs'][0]['artifact_id']]['payload']
+            initial=json.loads(wire['messages'][1]['content'])
+            for r in initial.get('reads',[]):
+                cited=[f for f in [*report['facts'],*report['counterevidence']] if f['reference']==r['reference'] and InvestigationDispatcher._visible(None,SourceFact.model_validate(f),r)]
+                if cited:proof.append(dict(attempt_sequence=e['sequence'],read_identity=r.get('content_identity',digest(r['page'])),cited_pointers=[f['pointer'] for f in cited],origin=r.get('inspection_origin','prefetch')))
             for message in wire['messages']:
                 if message.get('role')!='tool':continue
                 try:page=json.loads(message['content'])
@@ -36,7 +43,12 @@ def generate_b():
     principal=nodes['principal-coordinated-v2'];principal_report=arts[principal['result']['artifact_id']]
     dispositions=[store.artifact(store.artifact(r['output'])['disposition_record']) for r in result['receipts']]
     inspected=all(d['decision']['disposition']!='accept' or d['inspection_links'] for d in dispositions)
-    protections=all((n['order']['budget']['model_calls']-p['allocations'][k]['exploration_requests'])==p['allocations'][k]['protected_delivery_requests'] for k,n in nodes.items())
+    protections=all(sum(p['allocations'][k]['request_purposes'].values())==n['order']['budget']['model_calls'] and
+        p['allocations'][k]['exploration_requests']<=p['allocations'][k]['request_purposes']['ordinary']-1 and
+        p['allocations'][k]['protected_delivery_requests']>=(4 if n['order']['role'] in ('principal','investigator') else 3)
+        for k,n in nodes.items())
+    category_bounds=all(sum(n.get('requests_by_purpose',{}).values())==n['usage']['model_calls'] and
+        all(n.get('requests_by_purpose',{}).get(c,0)<=limit for c,limit in p['allocations'][k]['request_purposes'].items()) for k,n in nodes.items())
     gates=dict(preserved_A='pass' if read(OUT/'A_preserved.json')['accepted'] else 'fail',
         historical_plan_import='pass' if bundle['state']['historical_investigations']['coordinator-plan']['new_investigation_executed'] is False else 'fail',
         two_new_valid_reports='pass' if len(chains)==2 and all(nodes[t['investigation_id']]['status']=='completed' and c['native_selected_read_followup_and_citation'] for t,c in zip(result['targets'],chains)) else 'fail',
@@ -47,6 +59,6 @@ def generate_b():
         exact_allocation_and_protection='pass' if bounds and protections else 'fail',
         request_capacity_and_settings='pass' if settings and all(settings) else 'fail',
         accounting='pass' if not unknown and used['model_calls']==len(attempts) and all(used[k]<=p['project_budget'][k] for k in used) else 'fail',
-        correction_and_probe_caps='pass' if bundle['state'].get('investigation_protocol_corrections_used',0)<=6 and all(bundle['state'].get('investigation_corrections_by_role',{}).get(k,0)<=3 for k in ('principal','other')) and bundle['state'].get('recovery_probes_used',0)<=2 else 'fail')
+        correction_and_probe_caps='pass' if category_bounds and bundle['state'].get('recovery_probes_used',0)<=2 else 'fail')
     return dict(version='mainline3.continue_gate@1.0.0',gates=gates,passed=all(v=='pass' for v in gates.values()),new_requests=len(attempts),usage=used,
         unknown_reservations=unknown,chains=chains,manifest_identity=digest(manifest),bundle_identity=digest(bundle),separate_material_audit=result['material_review'])

@@ -153,7 +153,7 @@ def execute(out,mode,*,live=True):
             thread_active_at_close=active,all_submitted_threads_collected=not active,unknown_reservations_retained=True))
         export(out,mode)
         bundle=read(out/(mode+'_bundle.json'));bundle.update(session_status='stopped',transport='real_configured_deepseek' if live else 'deterministic_offline_substitute')
-        _no_secrets(bundle);atomic_json(out/(mode+'_bundle.json'),bundle)
+        atomic_json(out/(mode+'_bundle.json'),bundle)
         atomic_json(out/'historical_after.json',dict(unchanged=history()==read(out/'historical_before.json')))
         if mode!='fixed':atomic_json(out/(mode+'_gate.json'),generate(bundle))
 

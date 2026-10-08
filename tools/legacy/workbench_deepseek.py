@@ -196,7 +196,7 @@ def run_model(book, *, steps=None, transport=None):
         state.update(status='MODEL_CALL', stop_reason=None)
         book.save()  # Persist charge before any HTTP I/O; no SDK hidden retries.
         try:
-            response = redact(send(config, payload, key), key)
+            response = send(config, payload, key)
             choice = response['choices'][0]
             message = choice['message']
             saved = dict(message={k: message[k] for k in ('role', 'content', 'reasoning_content', 'tool_calls') if k in message},

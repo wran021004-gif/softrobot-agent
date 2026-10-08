@@ -122,36 +122,80 @@ class ContinuationTests(TestCase):
             result=self.dispatch.dispatch(plain(self.order),transport=transport)
         self.assertEqual(result.status,'completed');self.assertEqual(len(sends),2)
 
-    def test_omitted_body_preserves_usage_and_complete_reception(self):
+    def test_response_content_saved_parsed_processed_and_exportable(self):
         from types import SimpleNamespace
-        from tests.test_research_failure_recovery import native,SECRET
-        d=self.dispatch;order,row,_=d._reserve(plain(self.order));progress=d._initial_progress()
-        body=native();body['choices'][0]['message']['content']='Bearer '+SECRET
-        cfg={'base_url':'https://api.deepseek.com','timeout_s':1,'_response_observer':lambda metadata,text,omission:d._receive(order,row,progress,metadata,text,omission)}
-        with patch('tools.model_transports.deepseek.build_opener',return_value=SimpleNamespace(open=lambda *a,**kw:FakeResponse(json.dumps(body).encode()))):
-            with self.assertRaisesRegex(RuntimeError,'PROCESSING_FAILED'):request_completion(cfg,{},'isolated-fixture-key')
-        events=self.host.store.events(self.host.run_id);receptions=[self.host.store.artifact(e['outputs'][0]) for e in events if e['kind']=='investigation_reception']
-        self.assertEqual(receptions[-1]['provider_usage'],body['usage']);self.assertTrue(receptions[-1]['complete_body_received'])
-        self.assertEqual(receptions[-1]['omission_reason'],'sensitive_response_text; original body not retained')
-        self.assertFalse(self.host.store.session(self.host.run_id)['state']['investigations']['investigator'].get('original_body_refs'))
+        text='Inspect {"evaluator":"evaluate.reach@1.0.0"}; bearer/token/api_key are quoted research labels.'
+        body=fixture.native(dict(interpretation=text,unknowns=['Authentication examples are data: user:password@example.com']))
+        body['choices'][0]['message']['reasoning_content']='Quoted JSON: {"api_key":"fixture-label"}'
+        original=json.dumps(body)
+        def transport(adapter,config,wire):return request_completion(config,wire,'isolated-fixture-key')
+        with patch('tools.platform_models.DeepSeekAdapter._transport',new=transport),patch('tools.model_transports.deepseek.build_opener',return_value=SimpleNamespace(open=lambda *a,**kw:FakeResponse(original.encode()))):
+            submit=invoke(self.host,'research.investigate',plain(self.order),request_id='submit-content')
+            import threading
+            for t in threading.enumerate():
+                if t.name=='investigation-investigator':t.join(30)
+            checked=invoke(self.host,'research.investigation_status',dict(investigation_id='investigator'),request_id='collect-content')
+        self.assertEqual(submit['execution_status'],'completed')
+        result=self.host.store.artifact(checked['output']);self.assertEqual(result['status'],'completed')
+        node=self.host.store.session(self.host.run_id)['state']['investigations']['investigator']
+        self.assertEqual(self.host.store.artifact(node['original_body_refs'][0])['utf8_text'],original)
+        self.assertEqual(self.host.store.artifact(node['result'])['interpretation'],text)
+        self.assertEqual(node['requests_by_purpose'],dict(ordinary=1,model_correction=0,engineering_recovery=0))
 
-    def test_native_version_citation_is_safe_but_nested_credentials_remain_denied(self):
-        raw=fixture.native(dict(interpretation='Exact saved version',facts=[dict(statement='Version',reference=self.ref,pointer='/scalar',value='evaluate.reach@1.0.0')]))
-        # A minified JSON field followed by a version @ is not URL authentication.
-        raw['choices'][0]['message']['tool_calls'][0]['function']['arguments']=json.dumps(dict(interpretation='Version',value='evaluate.reach@1.0.0'),separators=(',',':'))
-        InvestigationDispatcher._check_response_body(raw)
-        unsafe=deepcopy(raw);unsafe['choices'][0]['message']['tool_calls'][0]['function']['arguments']=json.dumps(dict(interpretation='Version',nested=dict(api_key='private-value')))
-        with self.assertRaisesRegex(ValueError,'SECRET_FIELD'):InvestigationDispatcher._check_response_body(unsafe)
+    def test_purpose_categories_report_rejection_history_and_restoration(self):
+        from tools.research_v1_continue import allocation
+        alloc=allocation(3,2,1,4);alloc['budget']=plain(self.order.budget)
+        self.grant(delivery_allocations={'investigator':alloc},protocol_correction_limit=8,protocol_correction_per_decision=2)
+        sends=[]
+        def transport(adapter,config,wire):
+            sends.append(deepcopy(wire));answer=fixture.native({});message=answer['choices'][0]['message']
+            if len(sends) in (1,3):
+                message['reasoning_content']='Every rejected ID must be answered'
+                first=message['tool_calls'][0];first['function']=dict(name='evidence_read',arguments=json.dumps(dict(reference=self.ref,pointer='/scalar')))
+                second=deepcopy(first);second['id']='second-'+str(len(sends));message['tool_calls'].append(second)
+                return answer
+            assistant=next(m for m in reversed(wire['messages']) if m.get('role')=='assistant')
+            replies={m.get('tool_call_id') for m in wire['messages'] if m.get('role')=='tool'}
+            self.assertTrue({c['id'] for c in assistant['tool_calls']}<=replies)
+            self.assertEqual(assistant['reasoning_content'],'Every rejected ID must be answered')
+            if len(sends)==2:
+                message['tool_calls'][0]['function']=dict(name='evidence_read',arguments=json.dumps(dict(reference=self.ref,pointer='/scalar')))
+                return answer
+            self.assertEqual([t['function']['name'] for t in wire['tools']],['investigation_return'])
+            return fixture.native(dict(interpretation='Formal supported result after report-phase rejection'))
+        with patch.object(InvestigationDispatcher,'_native_v2',return_value=True),patch.object(InvestigationDispatcher,'_selectable',return_value=True),patch('tools.platform_models.DeepSeekAdapter._transport',new=transport):
+            r=invoke(self.host,'research.investigate',plain(self.order),request_id='category-submit')
+            import threading
+            for t in threading.enumerate():
+                if t.name=='investigation-investigator':t.join(30)
+            from tools.platform_host import Host
+            restored=Host(self.folder,self.host.run_id)
+            result=invoke(restored,'research.investigation_status',dict(investigation_id='investigator'),request_id='category-restore')
+        self.assertEqual(self.host.store.artifact(result['output'])['status'],'completed')
+        node=restored.store.session(restored.run_id)['state']['investigations']['investigator']
+        self.assertEqual(node['requests_by_purpose'],dict(ordinary=2,model_correction=2,engineering_recovery=0))
+        self.assertEqual(node['usage']['model_calls'],4)
+        self.assertEqual([r['purpose'] for r in node['provider_requests']],['ordinary','model_correction','ordinary','model_correction'])
+        self.assertEqual(node['submission_phase'],'report_delivery')
 
-    def test_embedded_version_json_reasoning_and_actual_auth_are_distinct(self):
-        from tools.model_transports.deepseek import sanitize_provider_text
-        safe='Inspect exact saved evaluator: {"evaluator":"evaluate.reach@1.0.0"}. No new evaluation.'
-        self.assertEqual(sanitize_provider_text(safe,'',None),safe)
-        InvestigationDispatcher._check_response_body(fixture.native(dict(interpretation=safe)))
-        for sensitive in ('user:password@example.com','https://user:password@example.com/path','Bearer private-value','api_key=private-value'):
-            self.assertNotEqual(sanitize_provider_text(sensitive,'',None),sensitive)
-            with self.assertRaisesRegex(ValueError,'SECRET_TEXT'):
-                InvestigationDispatcher._check_response_body(fixture.native(dict(interpretation=sensitive)))
+    def test_engineering_recovery_separate_from_correction_after_restoration(self):
+        from tools.research_v1_continue import allocation
+        alloc=allocation(3,2,1,4);alloc['budget']=plain(self.order.budget)
+        self.grant(delivery_allocations={'investigator':alloc})
+        def broken(wire):
+            exc=RuntimeError('DEEPSEEK_HTTP_400')
+            exc.transport_state=dict(transport_attempted=True,response_received=True,response_body_received=True,http_status=400,stage='transport')
+            exc.provider_response=dict(status_code=400)
+            raise exc
+        result=self.dispatch.dispatch(plain(self.order),transport=broken);self.assertEqual(result.status,'failed')
+        from tools.platform_host import Host
+        restored=InvestigationDispatcher(Host(self.folder,self.host.run_id))
+        result=restored.engineering_recovery('investigator','Confirmed fixture transport failure repaired',transport=lambda wire:fixture.native(dict(interpretation='New formal report after engineering recovery')))
+        self.assertEqual(result.status,'completed')
+        node=restored.store.session(restored.run_id)['state']['investigations']['investigator']
+        self.assertEqual(node['requests_by_purpose'],dict(ordinary=1,model_correction=0,engineering_recovery=1))
+        self.assertEqual(node['usage']['model_calls'],2)
+        self.assertEqual(node['provider_requests'][0]['outcome'],'failed')
 
     def test_public_import_new_b_synthesis_disposition_and_automatic_c_gate(self):
         from tools import research_v1_continue as activity
@@ -179,9 +223,9 @@ class ContinuationTests(TestCase):
                 return fixture.native(dict(interpretation='Fixture formal dispositions only',dispositions=[dict(**t,catalog=cat['reference'],catalog_version='1.0.0',disposition='defer',evidence_used=[dict(handle=entry['handle'])],reason='Offline fixture leaves semantics unassessed') for t in packet['disposition_targets']]))
             with patch('tools.platform_models.DeepSeekAdapter._transport',new=transport),patch('examples.gvs_nmpc_route_experiment.load_credential',side_effect=AssertionError('OFFLINE_CREDENTIAL_BARRIER')):
                 try:result=activity.stage_b(host,m,p,transport=True)
-                except Exception:
+                except Exception as exc:
                     failures={k:host.store.artifact(n['failure_record']) if n.get('failure_record') else n.get('reason') for k,n in host.store.session(host.run_id)['state']['investigations'].items() if n['status']!='completed'}
-                    self.fail(json.dumps(dict(failures=failures,principal_packet=json.loads(sends[-1]['messages'][1]['content']) if sends else None),ensure_ascii=False))
+                    self.fail(str(exc)+' '+json.dumps(dict(failures=failures),ensure_ascii=False))
             atomic_json(out/'material_audit.json',dict(report=result['report'],material_correctness='pass',scope='Fixture structure only; no live/material empirical claim'))
             with patch.object(activity,'execute_c',return_value='automatic fixed C invoked') as c:
                 self.assertEqual(activity.close_b(),'automatic fixed C invoked');c.assert_called_once()

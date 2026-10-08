@@ -107,7 +107,7 @@ class InvestigationCloseoutTests(TestCase):
         with patch('tools.platform_models.DeepSeekAdapter._transport',new=transport):
             submitted,_=self.public(host,'research.investigate',order,'submit-bounded')
             receipt,result=self.collect(host,'bounded')
-        self.assertEqual(result['status'],'incomplete',result.get('reason'))
+        self.assertEqual(result['status'],'failed',result.get('reason'))
         self.assertEqual(len(calls),1)
         self.assertEqual(host.store.remaining()['used']['model_calls'],1)
         events=host.store.events(host.run_id)

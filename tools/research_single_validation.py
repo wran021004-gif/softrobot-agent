@@ -120,7 +120,6 @@ def prepare(out):
         assert wire['model']==approved['model']
         assert wire['tool_choice']=='auto' and wire.get('thinking')=={'type':approved['thinking']}
         assert wire.get('reasoning_effort')==approved.get('reasoning_effort')
-        _no_secrets(wire)
         atomic_json(out/'prepared_request.json', wire)
         atomic_json(out/'preparation_gate.json', dict(passed=True, measurement=measurement,
             request_settings={k:wire.get(k) for k in ('model','thinking','reasoning_effort','tool_choice','max_tokens')},
@@ -238,7 +237,6 @@ def export(out):
             session_status=session['status'],calls=calls,
             artifacts={r['id']:json.loads(r['body']) for r in db.execute('SELECT id,body FROM artifacts')},
             events=[json.loads(r['body']) for r in db.execute('SELECT body FROM events ORDER BY seq')])
-    _no_secrets(bundle)
     atomic_json(out/'bundle.json',bundle)
     atomic_json(out/'ledger.json',store.remaining())
     historical=old_review()

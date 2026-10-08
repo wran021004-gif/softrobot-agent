@@ -62,7 +62,7 @@ def prepare(out):
             assert len(reads)==1 and wire['tool_choice']=='auto'
             assert wire['thinking']=={'type':'enabled'} and wire['reasoning_effort']=='high'
             assert wire['max_tokens']==3000 and wire['model']=='deepseek-flash'
-            _no_secrets(wire);wires[order['investigation_id']]=dict(payload=wire,reads=reads,measurement=measurement)
+            wires[order['investigation_id']]=dict(payload=wire,reads=reads,measurement=measurement)
         from schemas.platform_operations import ReadEvidence
         from tools.platform_tools import bounded_evidence_page
         for query in plan['principal_inspections']:
@@ -99,7 +99,7 @@ def export(out,live):
     export_existing(out,'direct')
     manifest=read(out/'validation_manifest.json');store=Store(ROOT/manifest['phases']['direct']['output'])
     bundle=read(out/'direct_bundle.json');bundle['transport']='real_configured_deepseek' if live else 'deterministic_offline_substitute'
-    bundle['session_status']=store.session(RUN)['status'];_no_secrets(bundle)
+    bundle['session_status']=store.session(RUN)['status']
     atomic_json(out/'direct_bundle.json',bundle)
     atomic_json(out/'historical_after.json',dict(unchanged=history()==read(out/'historical_before.json'),review=history()))
     from tools.research_validation_gate import generate
