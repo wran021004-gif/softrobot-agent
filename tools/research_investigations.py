@@ -497,6 +497,7 @@ class InvestigationDispatcher:
                 # tool-call history. Original responses stay immutable.
                 payload['messages'].append(dict(role='user',content=encode(correction_context)))
                 from tools.context_assembly import check_outgoing_request
+                from tools.platform_models import effective_config
                 measurement=check_outgoing_request(payload,effective_config(self.host),'research_decision')
             self._state(order.investigation_id,measurement=measurement)
             with self.store.transaction() as db:
