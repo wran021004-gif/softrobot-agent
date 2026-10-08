@@ -1,0 +1,236 @@
+{
+  "activity_id": "mainline3-validation-769f832fdbf5",
+  "date": "2026-10-08",
+  "branch": "feat/gvs-dynamics",
+  "code_commit": "03457bbabeab46665ec4ff80c27c7c20710276fe",
+  "relevant_files_sha256": {
+    "docs/research_mainline3_v1_capabilities.md": "e3bf6662fb84b786bc737625c1cf50a7cf56863b9720b6b277efb706ac3d2880",
+    "evidence/research_evidence_discovery_20261008/delivery_report.json": "9bcaeba79251e4a8e7b30fa6e5e2b4a696f0629e159d7b03101bf0e397161985",
+    "evidence/research_evidence_discovery_20261008/future_interface_proposals.json": "9c3084a398bfe87ab95eb871403f6027fabc44951dfdc14c185eb7490ce92a46",
+    "tools/research_mainline3.py": "d3f641cd0e354e101ff5c21423e6cb570c9a8ac19d43ec075d8a73cae4a4e3b0",
+    "tools/research_investigations.py": "43685e5bbeb58cd165917fb830780635e3e54027564323f73fbf2d0772b1b2d8",
+    "tools/platform_models.py": "50dd0d169d809d3cc469f6c5dea6adac93a8e88793651071f18e307454c60c65",
+    "tools/model_transports/deepseek.py": "f230704bf488a2670092e7e6a08d323adc8339e661ae6f451fc31c7d2fc115da",
+    "tools/platform_store.py": "448963a5c91abd4798d1c6124d915b538c236a88b73c53a7cd6f7eeff8053fde",
+    "configs/deepseek.yaml": "77daae8f464ce48fc297fccfdc1dc4244cf7ce288054bf7b57d14139daad42b6",
+    "tools/research_validation_activity.py": "43a2fe2ad5602d131de9b4b494379bf602116cf1ddebc9b96df01d225cb1dca6",
+    "tools/research_validation_gate.py": "aa2471acdb13ba2edf3889d53e5e2ccdaa5da114228b937b880004080750f6fe",
+    "evidence/research_native_development_v3_20261007/store/artifacts/3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b.json": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b"
+  },
+  "configuration_identity": "836a3f3e8971669c1f1c1e763162cb1448c81625ca1a857792ca2d5ab909c3fa",
+  "dependencies": {
+    "mujoco": "3.13.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "casadi": "3.7.2",
+    "pydantic": "2.13.5"
+  },
+  "provider": {
+    "adapter": "deepseek",
+    "adapter_version": "6.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 400000,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-03"
+    },
+    "length_recovery": {
+      "enabled": true,
+      "max_tokens": 131072,
+      "timeout_s": 900.0
+    },
+    "max_no_progress": 3,
+    "max_repairs": 2,
+    "max_tokens": 65536,
+    "max_turns": 24,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 2,
+      "max_total": 4
+    },
+    "readonly_batch_limit": 3,
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0,
+    "tool_naming": {
+      "mapping_identity": "ae769b2a4822b5f771cf13adb207ddaacbf36b90d1fe8232fa562f3638014a68",
+      "scheme": "readable_v1"
+    }
+  },
+  "provider_identity": "546ad3cbb6bea58663a7905d34a4a4e136e9aaa0547232e60b36591cfdbb98c1",
+  "transport": "Existing DeepSeekAdapter/request_completion; redirects refused; no automatic provider retries",
+  "phases": {
+    "direct": {
+      "tool_bindings": {
+        "research.investigate": "1.0.0",
+        "research.investigation_status": "1.0.0",
+        "research.investigation_read": "1.0.0",
+        "research.investigation_disposition": "1.0.0"
+      },
+      "node_budget": {
+        "tool_calls": 8,
+        "model_calls": 6,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 180.0
+      },
+      "total_node_budget": {
+        "tool_calls": 24,
+        "model_calls": 18,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 540.0
+      },
+      "project_budget": {
+        "tool_calls": 512,
+        "model_calls": 18,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 2400.0
+      },
+      "operation_allowances": {
+        "research.investigate": {
+          "reserve_s": 5.0,
+          "timeout_s": 30.0
+        },
+        "research.investigation_status": {
+          "reserve_s": 5.0,
+          "timeout_s": 30.0
+        },
+        "research.investigation_read": {
+          "reserve_s": 5.0,
+          "timeout_s": 30.0
+        },
+        "research.investigation_disposition": {
+          "reserve_s": 5.0,
+          "timeout_s": 30.0
+        }
+      },
+      "node_count": 3,
+      "concurrency": 2,
+      "node_timeout_s": 180.0,
+      "output_bytes": 16384,
+      "provider_retries": 0,
+      "discovery_accounting": "Up to five query/response turns then report per node; catalog pages, original reads and returned reports share eight evidence operations. Larger directories require a separately budgeted narrowed scope, not silent truncation.",
+      "status": "proposal_only_separate_operator_grant_required",
+      "grant_identity": "f6ffcb41254a81475713cf5b403b0a115436de84077b7e58dd49a535c1376b0e",
+      "activated": false,
+      "output": "runs/mainline3-validation-769f832fdbf5-direct"
+    },
+    "coordinated": {
+      "tool_bindings": {
+        "research.investigate": "1.0.0",
+        "research.investigation_status": "1.0.0",
+        "research.investigation_read": "1.0.0",
+        "research.investigation_disposition": "1.0.0"
+      },
+      "node_budget": {
+        "tool_calls": 8,
+        "model_calls": 6,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 180.0
+      },
+      "total_node_budget": {
+        "tool_calls": 32,
+        "model_calls": 24,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 720.0
+      },
+      "project_budget": {
+        "tool_calls": 512,
+        "model_calls": 24,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 3200.0
+      },
+      "operation_allowances": {
+        "research.investigate": {
+          "reserve_s": 5.0,
+          "timeout_s": 30.0
+        },
+        "research.investigation_status": {
+          "reserve_s": 5.0,
+          "timeout_s": 30.0
+        },
+        "research.investigation_read": {
+          "reserve_s": 5.0,
+          "timeout_s": 30.0
+        },
+        "research.investigation_disposition": {
+          "reserve_s": 5.0,
+          "timeout_s": 30.0
+        }
+      },
+      "node_count": 4,
+      "concurrency": 2,
+      "node_timeout_s": 180.0,
+      "output_bytes": 16384,
+      "provider_retries": 0,
+      "discovery_accounting": "Up to five query/response turns then report per node; catalog pages, original reads and returned reports share eight evidence operations. Larger directories require a separately budgeted narrowed scope, not silent truncation.",
+      "status": "proposal_only_separate_operator_grant_required",
+      "grant_identity": "a44903dbf3ea0be56a9b7eb8bf23f5fdcba3a4518b784a5b4e91cfed60de41e0",
+      "activated": false,
+      "output": "runs/mainline3-validation-769f832fdbf5-coordinated"
+    },
+    "fixed": {
+      "project_budget": {
+        "model_calls": 0,
+        "tool_calls": 7,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 4000.0
+      },
+      "scientific_operations": [
+        "linearize_configuration",
+        "control_metrics",
+        "bounded_endpoint"
+      ],
+      "grant_identity": "5ccb6d916812145f2246057e18bc8005c371b23ebd87358156bc320cd5c4c8ec",
+      "activated": false,
+      "output": "runs/mainline3-validation-769f832fdbf5-fixed"
+    }
+  },
+  "launch_gates": {
+    "direct": "Frozen inputs, matching recipient and saved prelaunch record",
+    "coordinated": "All deterministic direct gates pass including investigator-selected novel original evidence read and material correctness review",
+    "fixed": "All coordinated gates pass under separate allocation"
+  },
+  "investigation_scope": "Stage336 execution.factual_result; derived directory metadata and completed bounded reports; independent principal reads",
+  "fixed_source": "evidence/research_native_development_v3_20261007/store/artifacts/3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b.json",
+  "fixed_changes": {
+    "design/near_routing_radius_scale": 1.01,
+    "design/far_routing_radius_scale": 0.99
+  },
+  "source_permissions": "Saved research evidence only, no external arbitrary file reads",
+  "stopping_rules": [
+    "Missing gate stops dependent phases",
+    "No retries or another backend attempt",
+    "Unconfirmed request retains original reservation",
+    "No unused budget transfer",
+    "No Version 2 development"
+  ],
+  "repair_ceiling": 1,
+  "repairs_used": 0,
+  "backend_attempt_ceiling": 1,
+  "model_attempt_ceiling": 42,
+  "accounting": "Export original calls, events, artifacts and state from read-only SQLite. Provider reported tokens separate from byte estimates and unknown billing. Public math counts separate from internal attempts.",
+  "checks": "Existing offline checks reused; only configuration/version/source identity checks run; no scientific calculation or broad discovery tests",
+  "remote_before": "73e53b439eb1f0213a060d144cdf6e75bd5b585a",
+  "focused_gate_checks": {
+    "command": "python -m unittest tests.test_research_validation_gate.SavedGateTests -v",
+    "tests": 3,
+    "failures": 0,
+    "scientific_operations": 0
+  }
+}

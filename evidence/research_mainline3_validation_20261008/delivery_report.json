@@ -1,0 +1,193 @@
+{
+  "date": "2026-10-08",
+  "mainline": "3",
+  "version": "1",
+  "activity_id": "mainline3-validation-769f832fdbf5",
+  "starting_code": "03457bbabeab46665ec4ff80c27c7c20710276fe",
+  "validation_status": "stopped_at_failed_direct_prerequisite",
+  "phases": {
+    "direct": {
+      "executed": true,
+      "grant_activated": true,
+      "activity_now_stopped": true,
+      "runner_status": "unconfirmed",
+      "gate_passed": false,
+      "gate": "direct_gate.json",
+      "reports": 0,
+      "principal_inspections": 0,
+      "formal_dispositions": 0,
+      "initial_prefetch_reads": 2,
+      "investigator_selected_followup_reads": 0,
+      "followup_capability": "unverified",
+      "interpretation": "A successful command exit collected unconfirmed outcomes; it did not pass the declared gates."
+    },
+    "coordinated": {
+      "executed": false,
+      "grant_activated": false,
+      "reason": "Direct prerequisite failed; separate grant was not activated."
+    },
+    "fixed": {
+      "executed": false,
+      "grant_activated": false,
+      "reason": "Dependent investigation gates not passed; separate grant was not activated.",
+      "mathematical_preparation": "unexecuted",
+      "terminal_reach": "unexecuted",
+      "holding_position": "unexecuted",
+      "holding_speed": "unexecuted",
+      "backend_attempts": 0,
+      "solver_errors": null,
+      "input_bound_compliance": null,
+      "timing_diagnostics": null
+    }
+  },
+  "actual_recorded_operations": {
+    "provider_attempts": 2,
+    "provider_responses": 0,
+    "public_tool_operations": 4,
+    "public_tool_ids": [
+      "research.investigate",
+      "research.investigate",
+      "research.investigation_status",
+      "research.investigation_status"
+    ],
+    "node_evidence_operations": 2,
+    "initial_prefetch_operations": 2,
+    "investigator_followup_operations": 0,
+    "principal_inspections": 0,
+    "scientific_public_operations": 0,
+    "internal_working_point_attempts": 0,
+    "numerical_solves": 0,
+    "backend_attempts": 0,
+    "worker_calls": 0,
+    "automatic_provider_retries": 0
+  },
+  "accounting": {
+    "ledger_charged_including_unresolved_allowances": {
+      "tool_calls": 20,
+      "model_calls": 12,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 363.7979999999807
+    },
+    "settled_cost_only": {
+      "tool_calls": 4,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 3.797999999980675
+    },
+    "unresolved_reservations": [
+      {
+        "request_id": "investigation-reach-question",
+        "status": "unknown",
+        "reserved": {
+          "backend_solves": 0,
+          "model_calls": 6,
+          "tool_calls": 8,
+          "wall_s": 180.0,
+          "worker_calls": 0
+        }
+      },
+      {
+        "request_id": "investigation-timing-question",
+        "status": "unknown",
+        "reserved": {
+          "backend_solves": 0,
+          "model_calls": 6,
+          "tool_calls": 8,
+          "wall_s": 180.0,
+          "worker_calls": 0
+        }
+      }
+    ],
+    "direct_remaining": {
+      "backend_solves": 0,
+      "model_calls": 6,
+      "tool_calls": 492,
+      "wall_s": 2036.2020000000193,
+      "worker_calls": 0
+    },
+    "recorded_execution_event_span_s": 9.760619,
+    "unknown_provider_elapsed_s": null,
+    "provider_reported_tokens": null,
+    "outgoing_request_estimates": [
+      {
+        "request_id": "investigation-reach-question",
+        "artifact": {
+          "artifact_id": "b3707add5eaefa3437591c93d40251f931ade43fab8c13f185ad8b4c7c2f49f8",
+          "media_type": "application/json"
+        },
+        "measurement": {
+          "actual_input_tokens": null,
+          "characters": 17133,
+          "configured_context_limit_tokens": 1000000,
+          "estimated_input_tokens": 25325,
+          "input_budget_tokens": 160000,
+          "interaction_reserve_tokens": 8192,
+          "method": "Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.",
+          "passed": true,
+          "response_reserve_tokens": 3000,
+          "utf8_bytes": 17133
+        }
+      },
+      {
+        "request_id": "investigation-timing-question",
+        "artifact": {
+          "artifact_id": "f409c3682b4085f4e9dc865501f6c910b3aa5b3e283cd01add9d4460c9978669",
+          "media_type": "application/json"
+        },
+        "measurement": {
+          "actual_input_tokens": null,
+          "characters": 17127,
+          "configured_context_limit_tokens": 1000000,
+          "estimated_input_tokens": 25319,
+          "input_budget_tokens": 160000,
+          "interaction_reserve_tokens": 8192,
+          "method": "Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.",
+          "passed": true,
+          "response_reserve_tokens": 3000,
+          "utf8_bytes": 17127
+        }
+      }
+    ],
+    "token_estimates_source": "direct_bundle.json investigation_provider_attempt measurement; estimates are not reported usage",
+    "billing_cost": "unknown",
+    "explanation": "Two unconfirmed nodes each retain six model calls, eight evidence operations and 180 seconds. These conservative ledger charges are not actual confirmed usage. Actual provider attempts are two; provider response and token usage are unconfirmed."
+  },
+  "recipient": {
+    "endpoint": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "configuration_identity": "546ad3cbb6bea58663a7905d34a4a4e136e9aaa0547232e60b36591cfdbb98c1",
+    "preserved": true,
+    "body_scope": "Only saved Stage336 factual_result, derived scoped metadata, native schemas and bounded investigation context",
+    "credentials": "Existing loader used only for transport authentication; absent from archived request bodies and artifacts."
+  },
+  "repairs": {
+    "ceiling": 1,
+    "used": 0,
+    "remaining": 1,
+    "completed_work_repeated": false
+  },
+  "limitations": [
+    "Real provider interaction was attempted but no response was saved; receipt, billing and underlying transport failure remain unconfirmed.",
+    "Existing dispatcher converts any transport exception to an unconfirmed state without saving the sanitized transport exception or provider request identifier. The exact failure cause cannot be reconstructed from retained program records.",
+    "No completed real-model report exists for factual or interpretive review.",
+    "No qualifying investigator-selected follow-up read occurred; capability is unverified.",
+    "Coordinator child proposals, dispatch, overlap, principal disposition and changed-radius scientific/physical outcomes remain unvalidated.",
+    "Historical Stage336 failure remains prior evidence only; no new robot result is claimed.",
+    "Unknown requests retain escrow; no retries, manual success reports, budget resets or phase transfers occurred."
+  ],
+  "delivery_evidence": [
+    "validation_manifest.json",
+    "frozen_configuration.json",
+    "authorization.json",
+    "saved_prelaunch_gate.json",
+    "direct_bundle.json",
+    "direct_runner_result.json",
+    "direct_gate.json",
+    "direct_ledger.json",
+    "direct_stopped_session.json",
+    "version2_handoff.json"
+  ],
+  "publication": "Authorized normal push to origin/feat/gvs-dynamics; commit and remote verification reported separately."
+}
