@@ -17,7 +17,7 @@
 | timing-question，判断 3 引用范围 | `/evaluation` | object：evaluation 的完整 artifact_id/media_type 见清单 | 无 |
 | timing-question，判断 3 引用范围 | `/report` | object：原执行、owner、reference、request_id 完整值见清单 | 无 |
 
-共同原始来源为 `6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51`。到达报告 `714d62810b34966ad07259793c10d96c7676f35ffee2ea5b6352adb513f6fbff`；计时报告 `83a7c6d7daf53191cdae94add80da47df813e34f066619d01635c48103eea8f1`。完整值及来源链以 JSON 清单为准。
+共同原始来源为 `6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51`。到达报告 `83a7c6d7daf53191cdae94add80da47df813e34f066619d01635c48103eea8f1`；计时报告 `714d62810b34966ad07259793c10d96c7676f35ffee2ea5b6352adb513f6fbff`。此对应关系已按公共历史交接与模型原生决定复核，完整值及来源链以 JSON 清单为准。
 
 ## 接口和离线证据
 
@@ -80,3 +80,5 @@ thinking=enabled、reasoning_effort=high、tool_choice=auto、max_tokens=32768 �
 旧 Stage336 的 0.06672099201814737 m、task_accepted=false、settling=false、输入越界 0.0 N、求解器错误 0，继续是旧失败，不是本轮固定半径结果。本轮没有新终点、保持、张力或闭环成本。
 
 [版本二交接](research_mainline3_v2_handoff.md)保持入口阻塞，本轮未开发绳数、布局或段数，未证明性能改善、实时部署或组织效率收益。待推送区间从 `05acf1d` 审查，限本任务代码、测试、文档和非秘密证据；只普通推送授权仓库及分支。最终远端 SHA、推送回执和工作区状态在本地 `runs/mainline3-v1-facts-5b50c31fc0f0-publication/publication_result.json` 及聊天交付核对。
+
+自动续行的逐项[完成审计](../evidence/research_disposition_facts_20261008/stages/completion_audit.json)继续判定目标未完成：第一阶段科学门禁失败，第二、三阶段真实链路缺失，最后上下文增补只有离线覆盖。续行仅修正报告哈希对应关系及机器审查中文编码，保留旧文字版本，没有追加模型调用、重开旧节点或修改其决定。
