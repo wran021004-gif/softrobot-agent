@@ -281,7 +281,8 @@ class InvestigationDispatcher:
                 and (order.disposition_ids is None or k in order.disposition_ids)]
             if order.disposition_ids is not None and set(order.disposition_ids)!={t['investigation_id'] for t in packet['disposition_targets']}:
                 raise ValueError('DISPOSITION_EXPLICIT_TARGET_SCOPE_MISMATCH')
-            packet['historical_handoffs']=session['state'].get('historical_investigations',{})
+            packet['historical_handoffs']=self._handoff_view(session['state'].get('historical_investigations',{}))
+            packet['historical_handoff_presentation']='Provenance metadata only; complete imported bindings remain immutable in the Host state and original report artifacts. They are historical work, not new reports or current authorization.'
             if self._selectable():
                 from tools.disposition_facts import catalog
                 targets=packet['disposition_targets']
@@ -869,6 +870,15 @@ class InvestigationDispatcher:
         # Source bodies are already in initial/native pages and selectable fields.
         return [{k:deepcopy(v) for k,v in r.items() if k in ('reference','pointer','inspection_id','request_id','execution_id','inspection_origin','content_identity')}
             for r in records]
+
+    @staticmethod
+    def _handoff_view(nodes):
+        # Original orders, read archives and delegation budgets are already
+        # bound by the Host. Principal report inputs need their provenance,
+        # not another copy of that entire historical execution state.
+        fields=('kind','result','source_run_id','source_project_id','source_node',
+            'source_database_sha256','historical_validation','new_investigation_executed')
+        return {key:{k:deepcopy(v) for k,v in node.items() if k in fields} for key,node in nodes.items()}
 
     def _append_evidence_turn(self,payload,calls,response,order,assistant=None):
         packet=json.loads(payload['messages'][1]['content'])
