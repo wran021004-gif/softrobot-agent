@@ -22,7 +22,7 @@ def sanitize_provider_text(value, key, limit=8192):
     value = re.sub(r'(?i)bearer\s+[^\s"\'<>]+', 'Bearer [REDACTED]', value)
     value = re.sub(r'(?i)((?:cookie|set-cookie|x-api-key)\s*[:=]\s*)[^\r\n]+', r'\1[REDACTED]', value)
     value = re.sub(r'(?i)(?<![a-z0-9+.-])([a-z][a-z0-9+.-]*://)[^/\s@]+@', r'\1[REDACTED]@', value)
-    value = re.sub(r'(?<![\w])[^:\s/@]+:[^@\s/]+@', '[REDACTED]@', value)
+    value = re.sub(r'''(?<![\w])[^:\s/@"']+:[^@\s/"']+@''', '[REDACTED]@', value)
     value = re.sub(r'(?i)((?:api[_-]?key|access_token|password|token)["\']?\s*[:=]\s*["\']?)[^\s"\'&,}]+', r'\1[REDACTED]', value)
     return value if limit is None else value[:limit]
 
@@ -198,14 +198,15 @@ def request_completion(config, payload, key):
                 except (ValueError,AttributeError):pass
             if text is not None:
                 try:
-                    if key and key in text:raise ValueError('response contains actual credential')
+                    if key and key in text:raise ValueError('ACTUAL_CREDENTIAL_TEXT')
                     parsed=json.loads(text)
                     from tools.research_investigations import InvestigationDispatcher
                     InvestigationDispatcher._check_response_body(parsed)
                 except json.JSONDecodeError:
                     if sanitize_provider_text(text,key,None)!=text:
                         text=None;omission='sensitive_response_text; original body not retained'
-                except ValueError:
+                except ValueError as admission:
+                    state['body_admission_code']=str(admission) if str(admission) in ('ACTUAL_CREDENTIAL_TEXT','INVESTIGATION_RESPONSE_SECRET_TEXT','CONTEXT_SECRET_FIELD') else 'RESPONSE_ADMISSION_FAILED'
                     text=None;omission='sensitive_response_text; original body not retained'
         observer(dict(state),text,omission)
         if omission and omission.startswith('sensitive_response_text'):

@@ -561,7 +561,7 @@ class InvestigationDispatcher:
             transport_attempted=metadata.get('transport_attempted',True),response_received=metadata.get('response_received',True),
             complete_body_received=metadata.get('response_body_received'),http_status=metadata.get('http_status'),
             provider_request_id=metadata.get('provider_request_id'),provider_usage=usage,
-            body_persisted=False,representation=None,omission_reason=omission)
+            body_persisted=False,representation=None,omission_reason=omission,body_admission_code=metadata.get('body_admission_code'))
         progress.update(response_received=record['response_received'],response_body_received=record['complete_body_received'],
             http_status=record['http_status'],provider_request_id=record['provider_request_id'],actual_usage_known=usage is not None)
         with self.store.transaction() as db:

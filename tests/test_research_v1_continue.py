@@ -143,6 +143,16 @@ class ContinuationTests(TestCase):
         unsafe=deepcopy(raw);unsafe['choices'][0]['message']['tool_calls'][0]['function']['arguments']=json.dumps(dict(interpretation='Version',nested=dict(api_key='private-value')))
         with self.assertRaisesRegex(ValueError,'SECRET_FIELD'):InvestigationDispatcher._check_response_body(unsafe)
 
+    def test_embedded_version_json_reasoning_and_actual_auth_are_distinct(self):
+        from tools.model_transports.deepseek import sanitize_provider_text
+        safe='Inspect exact saved evaluator: {"evaluator":"evaluate.reach@1.0.0"}. No new evaluation.'
+        self.assertEqual(sanitize_provider_text(safe,'',None),safe)
+        InvestigationDispatcher._check_response_body(fixture.native(dict(interpretation=safe)))
+        for sensitive in ('user:password@example.com','https://user:password@example.com/path','Bearer private-value','api_key=private-value'):
+            self.assertNotEqual(sanitize_provider_text(sensitive,'',None),sensitive)
+            with self.assertRaisesRegex(ValueError,'SECRET_TEXT'):
+                InvestigationDispatcher._check_response_body(fixture.native(dict(interpretation=sensitive)))
+
     def test_public_import_new_b_synthesis_disposition_and_automatic_c_gate(self):
         from tools import research_v1_continue as activity
         from tools import research_v1_continue_gate as gate
