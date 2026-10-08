@@ -172,7 +172,7 @@ class InvestigationDispatcher:
         with self.store.transaction() as db:ref=plain(self.store.put(db,directory))
         return ref,entries
 
-    def prepare(self, value, *, executing=False):
+    def prepare(self, value, *, executing=False, reuse_saved_reads=False):
         from tools.context_assembly import EvidenceArchive, assemble_request, check_outgoing_request
         from tools.platform_models import effective_config
         order=InvestigationOrder.model_validate(value);session,grant=self._scope(order)
@@ -191,7 +191,12 @@ class InvestigationDispatcher:
         for query in queries:
             ref=query.reference
             archive.register(plain(ref))
-            if executing:
+            if reuse_saved_reads:
+                retained=session['state']['investigations'][order.investigation_id]['reads']
+                matching=[r for r in retained if r.get('query')==plain(query)]
+                if not matching:raise ValueError('RETURN_RETAINED_PREFETCH_BINDING_MISMATCH')
+                read=matching[-1]
+            elif executing:
                 read=self._query(order,query)
             else:
                 page=plain(bounded_evidence_page(self.store.artifact(ref),query))
@@ -399,7 +404,7 @@ class InvestigationDispatcher:
         except Exception:
             pass  # Storage and stderr can both fail. No guarantee of a persisted record.
 
-    def _handle_failure(self,order,row,progress,exc,started):
+    def _handle_failure(self,order,row,progress,exc,started,baseline=None):
         ref=None
         try:
             ref,uncertain=self._failure(order,row,progress,exc,started)
@@ -410,7 +415,7 @@ class InvestigationDispatcher:
             else:
                 progress['stage']='settlement'
                 self.store.complete(row,self._receipt(row,'failed',reason),elapsed=time.monotonic()-started,
-                    actual_cost=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'])
+                    actual_cost={k:v-(baseline or zero())[k] for k,v in self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'].items()})
                 progress['settlement_completed']=True
                 self._state(order.investigation_id,status='failed',reason=reason,progress=dict(progress))
         except Exception as persistence_exc:
@@ -477,15 +482,16 @@ class InvestigationDispatcher:
         return {k:usage[k] for k in ('prompt_tokens','completion_tokens','total_tokens')
             if type(usage.get(k)) is int and usage[k]>=0}
 
-    def _execute(self,order,row,*,transport=None):
+    def _execute(self,order,row,*,transport=None,reuse_saved_reads=False):
         started=time.monotonic()
+        baseline=deepcopy(self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'])
         request_id=row['request_id']
         progress=self._initial_progress()
         try:
             self._checkpoint(order,row,progress,'started',started)
             if not self.host.compatibility()['compatible']:raise ValueError('INVESTIGATION_DEPENDENCIES_CHANGED')
             self._state(order.investigation_id,status='running')
-            order,payload,reads,measurement=self.prepare(order,executing=True)
+            order,payload,reads,measurement=self.prepare(order,executing=True,reuse_saved_reads=reuse_saved_reads)
             self._state(order.investigation_id,measurement=measurement)
             with self.store.transaction() as db:
                 self.store.event(db,self.run_id,'investigation_request','prepared',request=request_id,
@@ -513,12 +519,12 @@ class InvestigationDispatcher:
             self._checkpoint(order,row,progress,'started',started)
             receipt=self._receipt(row,'completed')
             sealed=self.store.complete(row,receipt,plain(report),elapsed=time.monotonic()-started,
-                actual_cost=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'])
+                actual_cost={k:v-baseline[k] for k,v in self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'].items()})
             progress['settlement_completed']=True
             self._checkpoint(order,row,progress,'completed',started)
             self._state(order.investigation_id,status='completed' if report.completion=='complete' else 'incomplete',result=sealed['output'],children=plain(report)['children'])
         except Exception as exc:
-            self._handle_failure(order,row,progress,exc,started)
+            self._handle_failure(order,row,progress,exc,started,baseline=baseline)
     @staticmethod
     def _configure_payload(payload,config):
         # Thinking mode supports auto, never required/named choices. Reapply on

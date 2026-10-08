@@ -12,6 +12,7 @@ from tools.platform_host import Host
 from tools.research_execution import invoke
 from tools.research_investigations import InvestigationOrder
 from tools.research_mainline3 import configuration, SOURCE, fixed_pipeline, live_interface_scenario, direct_validation_plan
+from tools.research_mainline3 import import_historical_provenance
 from tools.research_v1_delivery import model_configuration, FIXED_TOOLS
 from tools.research_single_validation import sha, stop
 from tools.research_validation_activity import export
@@ -105,6 +106,7 @@ def reuse(host,out):
     original=read(OLD/'direct_bundle.json');old_manifest=read(OLD/'validation_manifest.json')
     old_store=Store(ROOT/old_manifest['phases']['direct']['output'])
     source_value=read(ROOT/'runs/stage336_manual_20261001_090616/stage336_audit.json')['execution']['factual_result']
+    import_historical_provenance(host.store,source_value)
     descriptors=[];reports=[]
     # Import immutable originals into this Store, not as model observations.
     with host.store.transaction() as db:
@@ -149,6 +151,57 @@ def reuse(host,out):
         if decision['report']!=expected[decision['investigation_id']]:raise ValueError('MODEL_REPORT_BINDING_MISMATCH')
         rows.append(invoke(host,'research.investigation_disposition',decision,request_id='dispose-'+decision['investigation_id']))
     return dict(status='formal_dispositions_recorded' if all(r['execution_status']=='completed' for r in rows) else 'failed',receipts=rows)
+
+
+def continue_preparation_repair(out):
+    """Same logical node, clock, permissions, old reads and project charges."""
+    from tools.research_investigations import InvestigationDispatcher
+    m,cfg=check(out);stage=m['phases']['reuse'];store=Store(ROOT/stage['output'])
+    if (out/'repair2_launch.json').exists():raise ValueError('NO_REPEATED_CONTINUATION')
+    old=store.session('mainline3-reuse');key='principal-historical-disposition';node=old['state']['investigations'][key]
+    if old['status']!='stopped' or node['status']!='failed' or node['usage']['model_calls'] or node['progress']['transport_callable_invocations']:raise ValueError('PREPARATION_ONLY_FAILURE_REQUIRED')
+    if store.remaining()['occupied']:raise ValueError('INFLIGHT_OPERATIONS_MUST_BE_RECONCILED')
+    remaining=node['order']['timeout_s']-(time.time()-node['started_unix'])
+    if remaining<=0:raise ValueError('ORIGINAL_LOGICAL_NODE_DEADLINE_EXPIRED')
+    run_id='mainline3-reuse-repair2';cfg['run_id']=run_id
+    cfg['policy'].update(route=None,budget=stage['project_budget'],allowed_tools=list(stage['tool_bindings']),tool_bindings=stage['tool_bindings'],
+        timeout_s=stage['project_budget']['wall_s'],operation_allowances=stage['operation_allowances'])
+    host=Host(store.root,run_id);host.create(cfg,parent_run_id='mainline3-reuse');host.resume()
+    with store.transaction() as db:
+        state=deepcopy(old['state']);state.pop('stop_reason',None)
+        state['investigations'][key].update(status='pending',request_run_id=run_id,continuation_of=node['failure_record'])
+        store.update_state(db,run_id,state)
+    import_historical_provenance(store,read(ROOT/'runs/stage336_manual_20261001_090616/stage336_audit.json')['execution']['factual_result'])
+    reserve={k:node['order']['budget'][k]-node['usage'][k] for k in zero()};reserve['wall_s']=remaining
+    row,fresh=store.reserve(run_id,'investigation-'+key,digest(dict(original_execution=node['failure_record'],repair=2)),
+        'investigation-dispatcher',reserve,kind='investigation')
+    if not fresh:raise ValueError('NO_REDISPATCH')
+    atomic_json(out/'repair2_launch.json',dict(timestamp=now(),same_project=store.config()['project_id'],
+        original_run_id='mainline3-reuse',run_id=run_id,remaining_original_clock_s=remaining,original_node_started_unix=node['started_unix'],
+        logical_usage_before=node['usage'],reserve=reserve,reuse_original_prefetch=True,original_charges_preserved=True))
+    started=time.monotonic()
+    try:
+        from examples.gvs_nmpc_route_experiment import load_credential
+        load_credential(Path.home()/'.codex/.env')
+        dispatcher=InvestigationDispatcher(host)
+        dispatcher._execute(InvestigationOrder.model_validate(node['order']),row,reuse_saved_reads=True)
+        result=invoke(host,'research.investigation_status',dict(investigation_id=key),request_id='collect-recovered-principal')
+        returned=store.artifact(result['output'])
+        if returned['status']!='completed':atomic_json(out/'reuse_result.json',returned);return
+        decisions=store.artifact(returned['result'])['dispositions']
+        expected={k:n['result'] for k,n in old['state']['historical_investigations'].items()}
+        if len(decisions)!=2 or {d['investigation_id'] for d in decisions}!=set(expected):raise ValueError('TWO_MODEL_DISPOSITIONS_REQUIRED')
+        rows=[]
+        for d in decisions:
+            if d['report']!=expected[d['investigation_id']]:raise ValueError('MODEL_REPORT_BINDING_MISMATCH')
+            rows.append(invoke(host,'research.investigation_disposition',d,request_id='dispose-'+d['investigation_id']))
+        atomic_json(out/'reuse_result.json',dict(status='formal_dispositions_recorded' if all(r['execution_status']=='completed' for r in rows) else 'failed',receipts=rows))
+    finally:
+        stop(host,'REPAIRED_PREPARATION_CONTINUATION_TERMINAL; original clock and project usage preserved')
+        export(out,'reuse',run_id=run_id);b=read(out/'reuse_bundle.json');b['session_status']='stopped';atomic_json(out/'reuse_bundle.json',b)
+        prior=read(out/'reuse_lifecycle.json')
+        atomic_json(out/'reuse_repair2_lifecycle.json',dict(timestamp=now(),application_wall_s=time.monotonic()-started,all_submitted_nodes_drained=True))
+        atomic_json(out/'historical_after.json',dict(unchanged=history()==read(out/'historical_before.json')))
 
 
 def execute(out,mode):
@@ -214,9 +267,10 @@ def execute(out,mode):
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('action',choices=['prepare','execute']);parser.add_argument('directory',type=Path)
+    parser=argparse.ArgumentParser();parser.add_argument('action',choices=['prepare','execute','continue-preparation-repair']);parser.add_argument('directory',type=Path)
     parser.add_argument('--mode',choices=['reuse','coordinated','fixed'],default='reuse');args=parser.parse_args()
     if args.action=='prepare':prepare(args.directory.resolve())
+    elif args.action=='continue-preparation-repair':continue_preparation_repair(args.directory.resolve())
     else:execute(args.directory.resolve(),args.mode)
 
 
