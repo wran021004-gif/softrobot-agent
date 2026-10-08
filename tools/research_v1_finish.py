@@ -236,7 +236,7 @@ def finish_principal(host,key,report,targets):
     return dict(status='formal_dispositions_recorded',report=report,receipts=rows,material_review=review,targets=targets)
 
 
-def recover_received(mode):
+def recover_received(mode, *, local_followup=False):
     """Explicit confirmed-output correction, same logical node/clock/project.
 
     The old stopped session remains stopped. No transport retry, replacement
@@ -250,7 +250,12 @@ def recover_received(mode):
     if old['status']!='stopped' or node['status']!='failed' or store.remaining()['occupied']:raise ValueError('CONFIRMED_STOPPED_DRAINED_FAILURE_REQUIRED')
     if node['progress']['received_responses']!=node['progress']['transport_callable_invocations']:raise ValueError('UNKNOWN_RESULT_NO_RETRY')
     last=node['provider_response_refs'][-1];raw=store.artifact(last)
-    if raw['choices'][0]['finish_reason']!='length':raise ValueError('EXPLICIT_GENERATION_CAPACITY_RECOVERY_ONLY')
+    calls=raw['choices'][0]['message'].get('tool_calls',[])
+    if local_followup:
+        if raw['choices'][0]['finish_reason']!='tool_calls' or len(calls)!=1 or calls[0]['function']['name']!='evidence_read':raise ValueError('CONFIRMED_READ_FOLLOWUP_REQUIRED')
+        latest=node['reads'][-1];query=json.loads(calls[0]['function']['arguments'])
+        if latest['reference']!=query['reference'] or latest['pointer']!=query.get('pointer',''):raise ValueError('READ_RESULT_BINDING_REQUIRED')
+    elif raw['choices'][0]['finish_reason']!='length':raise ValueError('EXPLICIT_GENERATION_CAPACITY_RECOVERY_ONLY')
     remaining=node['order']['timeout_s']-(time.time()-node['started_unix'])
     if remaining<=0:raise ValueError('ORIGINAL_NODE_EXPIRED')
     number=state.get('received_capacity_recoveries',0)+1;run_id='mainline3-'+mode+'-received-recovery'+str(number)
@@ -269,23 +274,45 @@ def recover_received(mode):
         legal='Same advertised investigation_return; a small supported adopted subset, concrete defer, or reject is valid. No required scientific verdict.',
         query=dict(reference=last,pointer='/choices/0/message/reasoning_content',offset=0,limit=3000,byte_limit=4096),
         inspection='Exact input passed existing guard; archived response and formal output were inspected locally first. This new request genuinely needs protocol output and spends a paid correction.')
-    feedback=d._protocol_feedback(o,exc)
+    feedback=None
+    if local_followup:
+        previous_return=next(store.artifact(r) for r in reversed(node['provider_response_refs']) if any(c['function']['name']=='investigation_return' for c in store.artifact(r)['choices'][0]['message'].get('tool_calls',[])))
+        try:
+            saved=d._decode(previous_return);d._validate_return(o,saved,node['reads'])
+        except ValueError as original_issue:
+            feedback=dict(error='SAME_EXISTING_CORRECTION_PRECISE_LOCAL_DIAGNOSTIC',issues=[getattr(original_issue,'issue',dict(code=str(original_issue).split(':',1)[0]))],
+                requirement='This local diagnosis clarifies the already scheduled correction; no new correction quota is spent. Use the fresh catalog reference and choose your own supported scope/decision.')
+        if feedback is None:raise ValueError('SAVED_FORMAL_RETURN_ALREADY_VALID_USE_LOCAL_REVALIDATION')
+    else:feedback=d._protocol_feedback(o,exc)
     if feedback is None:
         stop(host,'CORRECTION_BUDGET_EXHAUSTED; original sessions and clock unchanged')
         raise ValueError('CORRECTION_BUDGET_EXHAUSTED')
     budget={k:max(0,plain(o.budget)[k]-node['usage'][k]) for k in zero()};budget['wall_s']=remaining
-    request='investigation-'+key+'-received-'+str(number)
+    request='investigation-'+key+('-local-' if local_followup else '-received-')+str(number)
     row,fresh=store.reserve(run_id,request,digest(dict(original_response=last,original_node=key,correction=number)),'investigation-dispatcher',budget,kind='investigation')
     if not fresh:raise ValueError('NO_RECEIVED_CORRECTION_REPLAY')
     d._state(key,status='pending',active_request_id=request)
-    context=dict(kind='explicit_known_output_capacity_correction',feedback=feedback,previous_response=last,
+    # Equal pages are presented once, while every receipt and original record
+    # remains immutable and explicitly retrievable. Never deduplicate decisions.
+    distinct=[];seen={}
+    for observed in node['reads']:
+        identity=digest(dict(reference=observed['reference'],pointer=observed['pointer'],page=observed['page']))
+        if identity not in seen:seen[identity]=len(distinct);distinct.append(observed)
+    context=dict(kind='explicit_confirmed_read_after_local_capacity_repair' if local_followup else 'explicit_known_output_capacity_correction',feedback=feedback,previous_response=last,
         received_assistant_content=raw['choices'][0]['message'].get('content'),received_native_calls=raw['choices'][0]['message'].get('tool_calls',[]),
-        retained_followup_evidence=node['reads'],original_deadline_unix=node['started_unix']+o.timeout_s,
+        retained_followup_evidence=distinct,all_read_record_count=len(node['reads']),duplicate_read_record_indices=[dict(index=i,page_identity=digest(dict(reference=r['reference'],pointer=r['pointer'],page=r['page']))) for i,r in enumerate(node['reads'])],
+        original_deadline_unix=node['started_unix']+o.timeout_s,
         instruction='Finish a concise useful formal disposition now; there is no need to reanalyze every old report claim or maximize adoption. Choose supported portions or give concrete defer/reject reasons independently. Thinking high and max_tokens 32768 remain unchanged.',
         archived='Complete previous requests/responses including thinking remain immutable and queryable. No counterevidence, old result, permissions, cumulative quota or deadline was removed.')
+    if local_followup:
+        context['current_unexecuted_decision']=previous_return['choices'][0]['message']['tool_calls']
+        context['query_feedback']=dict(native_calls=calls,result_page_identity=digest(dict(reference=latest['reference'],pointer=latest['pointer'],page=latest['page'])),
+            complete_result_at='retained_followup_evidence; locate the matching reference and pointer. Identical returned pages are presented once; every original read remains recorded.')
+        context['archive_access']=dict(reference=last,pointer='/choices/0/message/reasoning_content',offset=0,limit=3000,byte_limit=4096)
     atomic_json(OUT/(mode+f'_received_recovery{number}.json'),dict(timestamp=now(),same_project=store.config()['project_id'],original_run=parent,new_run=run_id,
         original_node=key,original_started_unix=node['started_unix'],remaining_original_elapsed_s=remaining,original_response=last,
-        known_paid_usage=raw.get('usage'),same_node_usage_before=node['usage'],old_stop_preserved=True,new_paid_correction=True,automatic_retry=False))
+        known_paid_usage=raw.get('usage'),same_node_usage_before=node['usage'],old_stop_preserved=True,new_paid_correction=not local_followup,automatic_retry=False,
+        local_capacity_followup=local_followup,unchanged_read_history_count=len(node['reads'])))
     began=time.monotonic()
     try:
         from examples.gvs_nmpc_route_experiment import load_credential
@@ -401,10 +428,11 @@ def execute(mode):
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('action',choices=['start','freeze','execute','recover-received']);p.add_argument('--mode',choices=['reuse','coordinated','fixed'],default='reuse');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('action',choices=['start','freeze','execute','recover-received','recover-local-followup']);p.add_argument('--mode',choices=['reuse','coordinated','fixed'],default='reuse');a=p.parse_args()
     if a.action=='start':start()
     elif a.action=='freeze':freeze()
     elif a.action=='recover-received':recover_received(a.mode)
+    elif a.action=='recover-local-followup':recover_received(a.mode,local_followup=True)
     else:execute(a.mode)
 
 

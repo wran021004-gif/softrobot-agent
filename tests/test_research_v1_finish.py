@@ -106,3 +106,23 @@ class FinishTests(TestCase):
         profile=deepcopy(s.artifact(f['report']['reference']));profile['detail']['configuration']=f['simulation']
         def bad(ref):return profile if plain(ref)==f['report']['reference'] else s.artifact(ref)
         with self.assertRaisesRegex(ValueError,'CONFIGURATION_BINDING'):evaluate(SimpleNamespace(artifact=bad),args)
+
+    def test_new_saved_scope_error_locates_claim_and_available_handles(self):
+        from tools.disposition_facts import BindingError
+        from tools.research_investigations import InvestigationResult
+        path=ROOT/'evidence/research_mainline3_v1_finish_20261008/reuse_bundle.json'
+        if not path.exists():self.skipTest('New real answer not yet available')
+        b=read(path);archive=MemoryArchive(b);d=object.__new__(InvestigationDispatcher)
+        d.store=archive;d.run_id='mainline3-reuse-received-recovery1'
+        d._reports=lambda:{**b['state']['historical_investigations'],**b['state']['investigations']}
+        d._grant=lambda *a:(dict(state=b['state']),b['state']['role_context']['investigation_grant'])
+        d._principal_authority=lambda:None
+        d.recover=lambda key:InvestigationResult(investigation_id=key,status='completed',result=b['state']['historical_investigations'][key]['result'])
+        raw=next(archive.artifact(e['outputs'][0]) for e in reversed(b['events']) if e['kind']=='investigation_provider_response' and any(c['function']['name']=='investigation_return' for c in archive.artifact(e['outputs'][0])['choices'][0]['message'].get('tool_calls',[])))
+        selected=contract(selectable=True).parse('investigation_return',raw['choices'][0]['message']['tool_calls'][0]['function']['arguments'])
+        node=b['state']['investigations']['principal-historical-v2']
+        expanded=expand(d,selected.dispositions[0],node['fact_catalog'],path='/dispositions/0')
+        with self.assertRaises(BindingError) as caught:d.disposition(expanded,validate_only=True)
+        self.assertIn('/adopted_claims/',caught.exception.issue['path'])
+        self.assertTrue(caught.exception.issue['path'].endswith('/scope'))
+        self.assertTrue(caught.exception.issue['legal']['available_scope_handles'])

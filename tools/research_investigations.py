@@ -1010,8 +1010,19 @@ class InvestigationDispatcher:
                         from tools.disposition_facts import BindingError
                         raise BindingError(f'/adopted_claims/{index}/supporting_facts/{fi}',plain(f),'not an exact report fact or validated projection',dict(use='select report handle or label as principal additional_support'))
             if claim.additional_support and not provenance:raise ValueError('DISPOSITION_ADDITIONAL_SUPPORT_REQUIRES_SELECTION_PROVENANCE')
-            if {f.reference.artifact_id for f in (*claim.supporting_facts,*claim.additional_support)}-{f.reference.artifact_id for f in claim.scope}:
-                raise ValueError('ADOPTED_CLAIM_SCOPE_SOURCE_MISMATCH')
+            missing={f.reference.artifact_id for f in (*claim.supporting_facts,*claim.additional_support)}-{f.reference.artifact_id for f in claim.scope}
+            if missing:
+                from tools.disposition_facts import BindingError
+                selected=provenance['model_selection']['adopted_claims'][index]['scope'] if provenance else plain(claim.scope)
+                available=[]
+                if provenance:
+                    cat=self.store.artifact(provenance['catalog'])
+                    available=[dict(handle=e['handle'],name=e['name'],reference=e['fact']['reference'],pointer=e['fact']['pointer'],value=e['fact']['value'])
+                        for e in cat['entries'] if e['fact']['reference']['artifact_id'] in missing and e['fact']['pointer'] in ('/execution_id','/result_type','/coordinate_frame')]
+                raise BindingError((provenance['expansion_path'] if provenance else '')+f'/adopted_claims/{index}/scope',selected,
+                    'supporting evidence source has no explicitly selected applicability scope',
+                    dict(missing_source_artifacts=sorted(missing),available_scope_handles=available,
+                         structure='Each original source used in supporting_facts/additional_support must have its own exact selected scope. Choose scope, narrower support, defer or reject yourself.'))
             # Different original sources are allowed; each attribution was checked
             # against its own immutable source. Prose is never judged by an LLM.
         limitations=list(args.remaining_unknowns)
