@@ -87,11 +87,11 @@ def prepare(out, authorization):
     print(encode(dict(activity_id=identity, output=str(out), provider_identity=manifest['provider_identity'])))
 
 
-def export(out, mode):
+def export(out, mode, *, run_id=None):
     manifest=read(out/'validation_manifest.json')
     store=Store(ROOT/manifest['phases'][mode]['output'])
     with store.connect(True) as db:
-        session=store.session('mainline3-'+mode, db)
+        session=store.session(run_id or 'mainline3-'+mode, db)
         artifacts={r['id']:json.loads(r['body']) for r in db.execute('SELECT id,body FROM artifacts')}
         calls=[]
         for r in db.execute('SELECT * FROM calls ORDER BY rowid'):

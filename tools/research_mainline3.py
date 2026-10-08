@@ -228,7 +228,10 @@ def live_interface_scenario(host,mode,*,plan=None):
             raise ValueError('ENGINEERED_SCENARIO_REQUIRES_TWO_DISTINCT_QUESTIONS')
     submissions=[]
     for index,question in enumerate(questions):
-        receipt=invoke(host,'research.investigate',question,request_id='question-'+str(index));rows.append(receipt);submissions.append(receipt)
+        if plan and plan.get('collect_existing'):
+            receipt=invoke(host,'research.investigation_status',dict(investigation_id=question['investigation_id']),request_id='retained-question-'+str(index))
+        else:receipt=invoke(host,'research.investigate',question,request_id='question-'+str(index))
+        rows.append(receipt);submissions.append(receipt)
     reports=[]
     failed=[]
     for receipt in submissions:

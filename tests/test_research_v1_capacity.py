@@ -56,6 +56,8 @@ class CapacityBindingTests(TestCase):
         self.dispatch._validate_fact(fact,'RETURN')
         for pointer,value,identity in [('/scalar',self.source,{}),('/scalar',0.0026978288583256148,{}),('/flag',0,{}),('/scalar',self.source['scalar'],dict(execution_id='wrong'))]:
             with self.assertRaises(ValueError):self.dispatch._validate_fact(fact.model_copy(update=dict(pointer=pointer,value=value,source_identity=identity)),'RETURN')
+        with self.assertRaisesRegex(ValueError,'INVALID_SINGLE_JSON_POINTER'):
+            self.dispatch._validate_fact(fact.model_copy(update=dict(pointer='/scalar, /flag')),'RETURN')
         _,_,reads,_=self.dispatch.prepare(self.order)
         self.assertTrue(self.dispatch._visible(fact,reads[0]))
         self.assertFalse(self.dispatch._visible(fact,dict(reads[0],page=dict(reads[0]['page'],kind='overview'))))

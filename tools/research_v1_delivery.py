@@ -164,15 +164,109 @@ def review(out,mode,review_file):
     gate=generate(bundle,assessment);atomic_json(out/(mode+'_gate.json'),gate)
     print(encode(dict(mode=mode,passed=gate['passed'],gates=gate['gates'])))
 
+def continue_report_repair(out,*,live=True):
+    """One bounded continuation on the SAME project and original node clock.
+
+    Original receipts stay sealed. A child session explicitly migrates code
+    dependencies; its supplemental reservation charges only the remaining
+    allowance, while logical-node usage and public inspection limits persist.
+    """
+    from tools.research_investigations import InvestigationDispatcher,InvestigationOrder
+    from tools.platform_models import DeepSeekAdapter,effective_config
+    manifest,cfg=check_freeze(out);stage=manifest['phases']['direct'];root=ROOT/stage['output']
+    if (out/'repair1_launch.json').exists():raise ValueError('NO_REPEATED_REPAIR_CONTINUATION')
+    previous=read(out/'direct_bundle_before_repair1.json');key='reach-question'
+    node=previous['state']['investigations'][key]
+    assert node['status']=='failed' and node['usage']['model_calls']==5
+    assert previous['state']['investigations']['timing-question']['status']=='completed'
+    assert not read(out/'direct_lifecycle.json')['thread_active_at_close']
+    remaining=node['order']['timeout_s']-(time.time()-node['started_unix'])
+    if remaining<=20:raise ValueError('ORIGINAL_NODE_DEADLINE_CANNOT_FUND_CORRECTION')
+    store=Store(root);run_id='mainline3-direct-repair1'
+    cfg['run_id']=run_id;cfg['policy'].update(route=None,budget=stage['project_budget'],allowed_tools=list(stage['tool_bindings']),
+        tool_bindings=stage['tool_bindings'],timeout_s=stage['project_budget']['wall_s'],operation_allowances=stage['operation_allowances'])
+    host=Host(root,run_id);host.create(cfg,parent_run_id='mainline3-direct');host.resume()
+    with store.transaction() as db:
+        state=deepcopy(previous['state'])
+        for k,n in state['investigations'].items():n['request_run_id']='mainline3-direct'
+        state['investigations'][key]['request_run_id']=run_id
+        store.update_state(db,run_id,state)
+    dispatcher=InvestigationDispatcher(host);order=InvestigationOrder.model_validate(node['order'])
+    original_events=[e for e in previous['events'] if e.get('request_id')=='investigation-'+key]
+    response_event=[e for e in original_events if e['kind']=='investigation_provider_response'][-1]
+    raw=previous['artifacts'][response_event['outputs'][0]['artifact_id']]
+    if raw['choices'][0]['finish_reason']=='length':raise ValueError('TRUNCATION_CORRECTION_NOT_AUTHORIZED')
+    report=dispatcher._decode(raw)
+    try:dispatcher._validate_return(order,report,node['reads'])
+    except ValueError as exc:feedback=dispatcher._protocol_feedback(order,exc)
+    else:raise ValueError('REPAIR_REQUIRES_INVALID_UNEXECUTED_REPORT')
+    if feedback is None:raise ValueError('NO_ORIGINAL_PROTOCOL_CORRECTION_ALLOWANCE')
+    wire=deepcopy(previous['artifacts'][[e for e in original_events if e['kind']=='investigation_provider_attempt'][-1]['outputs'][0]['artifact_id']]['payload'])
+    message=raw['choices'][0]['message'];calls=message['tool_calls']
+    assistant=dict(role='assistant',content=message.get('content'),tool_calls=calls)
+    if 'reasoning_content' in message:assistant['reasoning_content']=message['reasoning_content']
+    wire['messages'].extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],content=encode(feedback))])
+    reserve={**zero(),'model_calls':1,'tool_calls':order.budget.tool_calls-node['usage']['tool_calls'],'wall_s':remaining}
+    row,fresh=store.reserve(run_id,'investigation-'+key,digest(dict(original_execution=node['progress'],repair='single pointer feedback')),
+        'investigation-dispatcher',reserve,kind='investigation')
+    if not fresh:raise ValueError('NO_REDISPATCH_OF_REPAIR')
+    atomic_json(out/'repair1_launch.json',dict(timestamp=now(),same_project=store.config()['project_id'],parent_run_id='mainline3-direct',run_id=run_id,
+        original_node_started_unix=node['started_unix'],remaining_original_node_s=remaining,reserve=reserve,
+        original_charges_preserved=True,only_remaining_attempt=True))
+    started=time.monotonic();baseline=deepcopy(node['usage']);progress=dispatcher._initial_progress()
+    try:
+        if live:
+            from examples.gvs_nmpc_route_experiment import load_credential
+            load_credential(Path.home()/'.codex/.env')
+        adapter=DeepSeekAdapter();adapter.request_host=host
+        def transport(payload):
+            adapter.request_config=effective_config(host)
+            adapter.request_config['timeout_s']=max(.001,order.timeout_s-(time.time()-node['started_unix']))
+            return adapter.respond(payload,0)
+        dispatcher._state(key,status='running',continuation_of=node.get('failure_record'))
+        report=dispatcher._interact(order,row,wire,transport,started,progress)
+        dispatcher._validate_return(order,report,node['reads'])
+        usage=store.session(run_id)['state']['investigations'][key]['usage']
+        delta={k:usage[k]-baseline[k] for k in usage}
+        sealed=store.complete(row,dispatcher._receipt(row,'completed'),plain(report),elapsed=time.monotonic()-started,actual_cost=delta)
+        dispatcher._state(key,status='completed' if report.completion=='complete' else 'incomplete',result=sealed['output'],
+            progress=dict(progress,elapsed_s=node['progress']['elapsed_s']+time.monotonic()-started,total_node_wall_s=time.time()-node['started_unix'],settlement_completed=True))
+        if report.completion!='complete':raise ValueError('CORRECTION_INCOMPLETE')
+        # Collect both reports through the SAME public status/inspection/
+        # principal/disposition path; do not re-dispatch the completed nodes.
+        from tools.research_mainline3 import live_interface_scenario,direct_validation_plan
+        ref=store.session(run_id)['state']['role_context']['investigation_grant']['evidence'][0]
+        plan=direct_validation_plan(ref,expanded=True);plan['collect_existing']=True
+        result=live_interface_scenario(host,'direct',plan=plan)
+        atomic_json(out/'direct_result.json',result)
+    except Exception as exc:
+        current=store.lookup(run_id,row['request_id'])
+        if not current['receipt']:
+            usage=store.session(run_id)['state']['investigations'][key]['usage']
+            # Existing failure accounting charges the continuation delta once.
+            dispatcher._state(key,usage={k:usage[k]-baseline[k] for k in usage})
+            dispatcher._handle_failure(order,row,progress,exc,started)
+            dispatcher._state(key,usage=usage)
+        atomic_json(out/'repair1_failure.json',dict(timestamp=now(),exception_type=type(exc).__name__,no_retry=True))
+        raise
+    finally:
+        stop(host,'V1_REPAIR_CONTINUATION_TERMINAL_NO_BUDGET_RESET')
+        export(out,'direct',run_id=run_id)
+        bundle=read(out/'direct_bundle.json');bundle['session_status']='stopped';atomic_json(out/'direct_bundle.json',bundle)
+        atomic_json(out/'direct_gate.json',generate(bundle))
+        atomic_json(out/'direct_repair_lifecycle.json',dict(timestamp=now(),application_wall_s=time.monotonic()-started,
+            all_submitted_threads_collected=not any(t.name.startswith('investigation-') for t in threading.enumerate())))
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action',choices=['prepare','execute','review'])
+    parser.add_argument('action',choices=['prepare','execute','review','continue-report-repair'])
     parser.add_argument('directory',type=Path);parser.add_argument('--mode',choices=['direct','coordinated','fixed'],default='direct')
     parser.add_argument('--authorization',type=Path);parser.add_argument('--review-file',type=Path)
     args=parser.parse_args();out=args.directory.resolve()
     if not out.is_relative_to(ROOT/'evidence'):raise ValueError('TASK_EVIDENCE_DIRECTORY_REQUIRED')
     if args.action=='prepare':prepare(out,args.authorization)
     elif args.action=='execute':execute(out,args.mode)
-    else:review(out,args.mode,args.review_file)
+    elif args.action=='review':review(out,args.mode,args.review_file)
+    else:continue_report_repair(out)
 
 if __name__=='__main__':main()

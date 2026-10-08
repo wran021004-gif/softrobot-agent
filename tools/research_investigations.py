@@ -620,7 +620,7 @@ class InvestigationDispatcher:
             issues=([dict(path=list(e['loc']),type=e['type'],message=e['msg']) for e in exc.errors(include_input=False,include_url=False)]
                 if isinstance(exc,ValidationError) else [dict(code=str(exc))])
             feedback=dict(error='INVALID_UNEXECUTED_REPORT',issues=issues,
-                requirement='Resubmit a complete native investigation_return with corrected fields. Values must exactly match the original JSON pointer and type; scalar pointers require scalar values, never enclosing objects or rounded replacements. Preserve exact source and applicability. No invalid call executed. This paid correction uses the same request/time limits; no further correction of this report is allowed.')
+                requirement='Resubmit a complete native investigation_return with corrected fields. Each fact must have exactly ONE valid JSON Pointer, not a comma-separated list or comparison expression. Split or omit compound facts within the schema limits. Scalar pointers require the exact scalar, never enclosing objects or rounded replacements. Directory metadata cannot support scientific facts; cite only authorized original sources. source_identity keys must match actual root source fields. No invalid call executed. This paid correction uses the same request/time limits; no further correction of this report is allowed.')
             node['protocol_correction_used']=True
             state['investigation_protocol_corrections_used']=used+1
             self.store.update_state(db,self.run_id,state)
@@ -662,7 +662,10 @@ class InvestigationDispatcher:
         from tools.platform_handoff import pointer
         from tools.platform_store import encode
         source=self.store.artifact(fact.reference)
-        if encode(pointer(source,fact.pointer))!=encode(fact.value):raise ValueError(label+'_SOURCE_VALUE_MISMATCH: '+fact.pointer)
+        try:original=pointer(source,fact.pointer)
+        except (KeyError,IndexError,TypeError,ValueError):
+            raise ValueError(label+'_INVALID_SINGLE_JSON_POINTER: '+fact.pointer) from None
+        if encode(original)!=encode(fact.value):raise ValueError(label+'_SOURCE_VALUE_MISMATCH: '+fact.pointer)
         identity_keys={'candidate_id','owner_run_id','run_id','execution_id','source_execution_id','configuration','scientific_configuration_identity','coordinate_frame','result_type'}
         if any(k not in identity_keys or k not in source or encode(source[k])!=encode(v) for k,v in fact.source_identity.items()):
             raise ValueError(label+'_SOURCE_IDENTITY_MISMATCH')
@@ -697,7 +700,9 @@ class InvestigationDispatcher:
 
     def recover(self,key):
         self._grant()  # Recovery collects evidence; it never revives an expired activity.
-        row=self.store.lookup(self.run_id,'investigation-'+key)
+        node=self.store.session(self.run_id)['state'].get('investigations',{}).get(key,{})
+        request_run=node.get('request_run_id',self.run_id)
+        row=self.store.lookup(request_run,'investigation-'+key)
         if not row:raise ValueError('INVESTIGATION_NOT_FOUND')
         if row['receipt']:return self._recover_unowned(key,row)
         from tools.workbench import owner
@@ -707,7 +712,7 @@ class InvestigationDispatcher:
             node=self.store.session(self.run_id)['state']['investigations'][key]
             return InvestigationResult(investigation_id=key,status=node['status'] if node['status'] in ('pending','running') else 'running',
                 failure_record=node.get('failure_record'),progress=node.get('progress'))
-        try:return self._recover_unowned(key,self.store.lookup(self.run_id,row['request_id']))
+        try:return self._recover_unowned(key,self.store.lookup(request_run,row['request_id']))
         finally:ownership.__exit__(None,None,None)
 
     def _recover_unowned(self,key,row):
