@@ -1,0 +1,35 @@
+{
+  "bundle_identity": "474fac3cc4e658a9c1a3e7b884d05db24188734beba744a419176454a9bb7c2d",
+  "reports": [
+    "714d62810b34966ad07259793c10d96c7676f35ffee2ea5b6352adb513f6fbff",
+    "83a7c6d7daf53191cdae94add80da47df813e34f066619d01635c48103eea8f1"
+  ],
+  "reviewer": "Codex source/material review; no extra provider or model judge request",
+  "material_correctness": "fail",
+  "supported_material": [
+    "Both official public dispositions are structurally valid and independently inspected, with exact selected facts, supplemental origin and reversible provenance.",
+    "Terminal position/error/speed, sampled settling failure, official task_accepted=false, no force violation/solver errors and recorded deadline counters are supported for the historical Stage336 execution.",
+    "The timing decision separates seconds-named units from undefined timer/denominator semantics and declines causal and real-robot generalization.",
+    "The reach decision does not adopt the original window-maximum/no-information claim or label execution completeness and optimization nonconvergence as contradictory."
+  ],
+  "blocking_issues": [
+    {
+      "investigation_id": "reach-question",
+      "decision_path": "/dispositions/0/adopted_claims/3",
+      "statement": "The inspected record contains no independent reach criterion, tolerance or reach-verdict field, so reach success is unknown from this record rather than measured-failed; its one-step prediction agreement (aligned_count 35, maximum_tip_difference_m 0.006041094970688899 m) is scoped by the record itself to accepted first-step matches with 'no future-plan replay comparison' and cannot be read as trajectory-level tracking.",
+      "selected_support_pointers": [
+        "/one_step_prediction_summary",
+        "/one_step_prediction_summary/scope"
+      ],
+      "source_fields": {
+        "/result_type": "free_reach",
+        "/task_accepted": false,
+        "/evaluation_validity": "valid"
+      },
+      "explanation_zh": "???????????????????????????????????????????????????????????????? free_reach ????? task_accepted=false ?????????????????????????????????????????????????????????????????????????"
+    }
+  ],
+  "no_manual_decision_change": true,
+  "semantic_gate_does_not_revoke_or_rewrite_public_records": true,
+  "action": "Stop dependent stages; paid principal corrections exhausted; do not relax gate or borrow future-stage budget."
+}

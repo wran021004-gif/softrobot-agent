@@ -1,0 +1,81 @@
+{
+  "version": "historical_disposition_review@1.0.0",
+  "input_identity": "474fac3cc4e658a9c1a3e7b884d05db24188734beba744a419176454a9bb7c2d",
+  "review_identity": "9fe25e823aed8d4b8b314791073894f234fb226b3901db7a2c40e62a8e8e89ac",
+  "passed": false,
+  "gates": {
+    "historical_explicit_handoff": "pass",
+    "actual_provider_interaction": "pass",
+    "actual_read_and_exact_binding": "pass",
+    "reversible_model_selection": "pass",
+    "formal_principal_dispositions": "pass",
+    "bounded_lifecycle_accounting": "pass",
+    "material_correctness": "fail"
+  },
+  "dependent_phase": "unexecuted_failed_prerequisite",
+  "selection_reverse_check": [
+    {
+      "investigation_id": "reach-question",
+      "model_response": {
+        "artifact_id": "85762c243ff0526de3328825f99f9b9ffbd8eb6edc3e385d72a9a20857cdc8b7",
+        "media_type": "application/json"
+      },
+      "disposition_record": {
+        "artifact_id": "a89e9e3bc147e49c01ef1f4d949d5bc39f52b26bddb31cfcdd469e9e91a9bc40",
+        "media_type": "application/json"
+      },
+      "selection_provenance": {
+        "reference": {
+          "artifact_id": "646e9ff132bacd8eaea2930e5a8e3ff601e33fd80bf5d02a4cdec55f822fb556",
+          "media_type": "application/json"
+        }
+      },
+      "model_decision_preserved": true,
+      "model_selected_claims": 4,
+      "report": {
+        "artifact_id": "83a7c6d7daf53191cdae94add80da47df813e34f066619d01635c48103eea8f1",
+        "media_type": "application/json"
+      },
+      "original_execution_id": "1d4c06f7db2e4276a28c2dbba1a02572",
+      "new_investigator_execution": false
+    },
+    {
+      "investigation_id": "timing-question",
+      "model_response": {
+        "artifact_id": "85762c243ff0526de3328825f99f9b9ffbd8eb6edc3e385d72a9a20857cdc8b7",
+        "media_type": "application/json"
+      },
+      "disposition_record": {
+        "artifact_id": "469444b6ca611d45891533d1985ea1f0d42ea73cd5063b8e3f2272e75edfb13b",
+        "media_type": "application/json"
+      },
+      "selection_provenance": {
+        "reference": {
+          "artifact_id": "18b02f7fe78f662a78df5b44d57c9408bafbefcfcde6ccda569c41265ed44082",
+          "media_type": "application/json"
+        }
+      },
+      "model_decision_preserved": true,
+      "model_selected_claims": 4,
+      "report": {
+        "artifact_id": "714d62810b34966ad07259793c10d96c7676f35ffee2ea5b6352adb513f6fbff",
+        "media_type": "application/json"
+      },
+      "original_execution_id": "08bd466fe7e444f8974abb1382dc1564",
+      "new_investigator_execution": false
+    }
+  ],
+  "accounting": {
+    "provider_attempts": 4,
+    "provider_responses": 4,
+    "charged": {
+      "tool_calls": 12,
+      "model_calls": 4,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 227.81399999998393
+    },
+    "unresolved_reservations": []
+  },
+  "scope": "Reused historical reports plus new principal model decisions; no new investigators or science. Structural gate passes; material gate fails."
+}
