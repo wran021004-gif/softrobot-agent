@@ -77,7 +77,7 @@ def report_binding(dispatcher,target):
     return binding
 
 
-def catalog(dispatcher, targets, source_refs):
+def catalog(dispatcher, targets, source_refs, *, source_reads=None):
     entries = []
     for target in targets:
         report = dispatcher.store.artifact(target['report'])
@@ -95,10 +95,22 @@ def catalog(dispatcher, targets, source_refs):
     for ref in source_refs:
         source = dispatcher.store.artifact(ref)
         if not isinstance(source,dict) or source.get('kind') in ('human_engineering_review','disposition_fact_catalog'): continue
-        for key, value in source.items():
+        fields=[('/'+key.replace('~','~0').replace('/','~1'),value,key) for key,value in source.items()]
+        if source_reads is not None:
+            fields=[]
+            for observed in source_reads:
+                if observed['reference']!=plain(ref) or observed['page']['kind']!='content':continue
+                prefix=observed['pointer'];content=observed['page']['content']
+                if isinstance(content,dict):
+                    fields.extend((prefix+'/'+k.replace('~','~0').replace('/','~1'),v,prefix+'/'+k) for k,v in content.items())
+                elif not observed['page'].get('offset',0) and observed['page'].get('next_offset') is None:
+                    fields.append((prefix,content,prefix))
+            fields=list({pointer:(pointer,value,name) for pointer,value,name in fields}.values())
+        for pointer, value, key in fields:
+            if encode(project(source,pointer))!=encode(value):raise ValueError('DISPOSITION_CATALOG_INSPECTED_VALUE_MISMATCH')
             entries.append(dict(origin='principal_additional', report_binding=None, report_item_pointer=None,
                 fact=dict(statement='Original source field '+key, reference=plain(ref),
-                    pointer='/'+key.replace('~','~0').replace('/','~1'), value=deepcopy(value), source_identity=source_identity(source)),
+                    pointer=pointer, value=deepcopy(value), source_identity=source_identity(source)),
                 name=key, purpose='Principal supplemental evidence or applicability scope; independent public inspection required.'))
     for entry in entries:
         entry['value_type'] = type(entry['fact']['value']).__name__

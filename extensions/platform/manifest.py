@@ -12,6 +12,11 @@ class Empty(Contract):
 
 
 CONTRACTS = [('platform.empty', '1.0.0', Empty)]
+from tools.research_joint_evaluation import JointEvaluation, JointResult
+EXTENSION_JOINT = Extension('research.task_acceptance','tool','1.0.0',JointEvaluation,JointResult,
+    'tools.research_joint_evaluation:evaluate','Compose sealed reach, holding, integrity and constraints with exact task/evaluation/profile bindings',
+    sources=('tools/research_joint_evaluation.py','tools/research_tasks.py'),
+    capabilities=dict(category='evaluation',role='public_tool',preflight='tools.research_joint_evaluation:preflight'))
 from tools.investigation_contract import NativeInvestigationParameters, SelectableFactParameters
 CONTRACTS += [('platform.' + name, '1.0.0', schema) for name, schema in [
     ('mathematical_model', math_contracts.MathematicalModel),
@@ -35,6 +40,7 @@ CONTRACTS += [('platform.' + name, '1.0.0', schema) for name, schema in [
     ('diagnostic_report', diagnostic_contracts.DiagnosticReport),
 ]]
 EXTENSIONS = [
+    EXTENSION_JOINT,
     Extension('deepseek', 'model_adapter', '8.0.0', SelectableFactParameters, ModelResponse,
         'tools.investigation_contract:BusinessFieldsAdapter', 'Selectable immutable facts for principal investigation dispositions',
         sources=('tools/investigation_contract.py','tools/disposition_facts.py','tools/research_investigations.py','tools/platform_models.py','tools/model_transports/deepseek.py'),

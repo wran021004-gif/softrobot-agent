@@ -23,9 +23,10 @@ class InvestigationOrder(Contract):
     question: str = Field(min_length=1,max_length=2000)
     evidence: list[EvidenceRef] = Field(min_length=1,max_length=256,description='Finite authorized source scope; metadata is paged, never all bodies prefetched.')
     queries: list[ReadEvidence] = Field(default_factory=list,max_length=12)
+    disposition_ids: list[str] | None = Field(default=None,max_length=3,description='Explicit principal report targets; other completed reports may be synthesis context only.')
     allowed_tools: list[Literal['evidence.read']] = Field(default_factory=lambda:['evidence.read'],min_length=1,max_length=1)
     budget: Budget
-    timeout_s: float = Field(gt=0,le=900)
+    timeout_s: float = Field(gt=0,le=3600)
     stop_conditions: list[str] = Field(min_length=1,max_length=6)
     output_bytes: int = Field(default=16384,ge=1024,le=65536)
 
@@ -246,13 +247,16 @@ class InvestigationDispatcher:
             ids={r.artifact_id for r in order.evidence}
             packet['disposition_targets']=[dict(investigation_id=k,report=n['result'])
                 for k,n in self._reports().items()
-                if n.get('status')=='completed' and n.get('result',{}).get('artifact_id') in ids]
+                if n.get('status')=='completed' and n.get('result',{}).get('artifact_id') in ids
+                and (order.disposition_ids is None or k in order.disposition_ids)]
+            if order.disposition_ids is not None and set(order.disposition_ids)!={t['investigation_id'] for t in packet['disposition_targets']}:
+                raise ValueError('DISPOSITION_EXPLICIT_TARGET_SCOPE_MISMATCH')
             packet['historical_handoffs']=session['state'].get('historical_investigations',{})
             if self._selectable():
                 from tools.disposition_facts import catalog
                 targets=packet['disposition_targets']
                 originals=[plain(r) for r in order.evidence if plain(r) not in [t['report'] for t in targets]]
-                catalog_ref,body=catalog(self,targets,originals)
+                catalog_ref,body=catalog(self,targets,originals,source_reads=session['state'].get('principal_investigation_reads',[]) if grant.get('inspected_supplemental_catalog') else None)
                 archive.register(catalog_ref)
                 # Exact readable values and all available handles, without
                 # repeating the full identity chain on every entry. Full body
@@ -359,8 +363,14 @@ class InvestigationDispatcher:
         with self.store.transaction() as db:
             state=self.store.session(self.run_id,db)['state'];state['investigations'][order.investigation_id]['reads'].append(read)
             ref=self.store.put(db,read)
-            row=self.store.lookup(self.run_id,'investigation-'+order.investigation_id,db)
+            node=state['investigations'][order.investigation_id]
+            row=self.store.lookup(self.run_id,node.get('active_request_id','investigation-'+order.investigation_id),db)
             self.store.event(db,self.run_id,'investigator_read','completed',request=row['request_id'],execution=row['execution_id'],outputs=[ref])
+            if order.role=='principal' and self._selectable() and not is_directory and not completed_report:
+                inspection=dict(read,inspection_id=digest(dict(node=order.investigation_id,read=read)),request_id=row['request_id'],execution_id=row['execution_id'],
+                    inspection_origin='principal_node_evidence_read')
+                state.setdefault('principal_investigation_reads',[]).append(inspection)
+                self.store.event(db,self.run_id,'principal_inspection','completed',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,inspection)])
             self.store.update_state(db,self.run_id,state)
         return read
 
@@ -381,6 +391,8 @@ class InvestigationDispatcher:
         from tools.model_transports.deepseek import safe_failure_metadata
         config=self.store.session(self.run_id)['snapshot']['input']['policy']['model']
         details=safe_failure_metadata(exc,config,started,classify_transport=progress['stage']=='transport')
+        from tools.research_error_routing import classify
+        details['error_routing']=classify(exc,stage=progress['stage'])
         # Exact local protocol codes only; never archive arbitrary exception text.
         details['protocol_error']=next((code for code in ('INVESTIGATION_NO_NATIVE_TOOL_CALL',)
             if exc.args==(code,)),None)
@@ -629,8 +641,13 @@ class InvestigationDispatcher:
             if hasattr(raw,'raw'):raw=raw.raw
             message=raw['choices'][0]['message'];calls=message.get('tool_calls',[])
             if raw['choices'][0].get('finish_reason')=='length':raise ValueError('INVESTIGATION_RESPONSE_TRUNCATED')
-            if not calls:raise ValueError('INVESTIGATION_NO_NATIVE_TOOL_CALL')
-            if len(calls)!=1:raise ValueError('EXACTLY_ONE_NATIVE_TOOL_CALL_REQUIRED')
+            if not calls or len(calls)!=1:
+                exc=ValueError('INVESTIGATION_NO_NATIVE_TOOL_CALL' if not calls else 'EXACTLY_ONE_NATIVE_TOOL_CALL_REQUIRED')
+                feedback=self._protocol_feedback(order,exc) if self._selectable() else None
+                if feedback is None:raise exc
+                self._append_correction(payload,dict(role='assistant',content=message.get('content'),tool_calls=calls),None,feedback)
+                turn+=1
+                continue
             if calls[0]['function']['name']=='investigation_return':
                 try:
                     report=self._decode(raw)
@@ -682,6 +699,20 @@ class InvestigationDispatcher:
         retained=[m for m in payload['messages'][2:] if m.get('role')=='user']
         if retained:packet.setdefault('retained_explicit_context_turns',[]).extend(retained)
         packet.setdefault('confirmed_followup_evidence',[]).append(dict(native_calls=calls,result=response))
+        _,grant=self._grant()
+        if order.role=='principal' and grant.get('inspected_supplemental_catalog'):
+            from tools.disposition_facts import catalog
+            targets=packet['disposition_targets'];report_refs=[t['report'] for t in targets]
+            originals=[plain(r) for r in order.evidence if plain(r) not in report_refs]
+            records=self.store.session(self.run_id)['state'].get('principal_investigation_reads',[])
+            ref,body=catalog(self,targets,originals,source_reads=records)
+            view=dict(kind=body['kind'],version=body['version'],targets=body['targets'],rules=body['rules'],entries=[
+                dict(handle=e['handle'],origin=e['origin'],name=e['name'],investigation_id=e['report_binding']['investigation_id'] if e['report_binding'] else None,
+                    report_item_pointer=e['report_item_pointer'],reference=e['fact']['reference'],pointer=e['fact']['pointer'],value_type=e['value_type'],value=e['fact']['value']) for e in body['entries']])
+            packet['fact_catalog']=dict(reference=ref,content=view,complete_details_query=dict(reference=ref,pointer='/entries/0',limit=100,byte_limit=65536),
+                presentation='Only actually inspected supplemental fields are selectable; all report facts retained. Remaining authorized sources stay queryable via directory. Full catalog provenance is immutable and retrievable.')
+            packet['principal_inspection_records']=records
+            self._state(order.investigation_id,fact_catalog=ref)
         refs=self.store.session(self.run_id)['state']['investigations'][order.investigation_id].get('provider_response_refs',[])
         packet['prior_response_archive']=dict(references=refs,
             presentation='New explicit evidence user turn after a confirmed received native read and its public result. Complete prior provider responses including all thinking are immutable in Store and queryable with evidence_read; prior reasoning and repeated acknowledgements are archive-only, not omitted evidence or adopted conclusions. All original reports, counterevidence, unknowns, every confirmed read/result, decisions, errors and current permissions/budgets remain visible.',
@@ -695,7 +726,14 @@ class InvestigationDispatcher:
         a continuous invalid return per node, with a campaign-wide carried limit.
         """
         from pydantic import ValidationError
-        allowed=('RETURN_','CHILD_','INVESTIGATOR_','ONLY_','PRINCIPAL_','ACCEPT_','ADOPTED_','DISPOSITION_','INVESTIGATION_RETURN_TOO_LARGE')
+        from tools.research_error_routing import classify
+        routing=classify(exc)
+        if not routing['paid_correction_eligible']:
+            with self.store.transaction() as db:
+                self.store.event(db,self.run_id,'investigation_local_error_route','local_only',request='investigation-'+order.investigation_id,
+                    outputs=[self.store.put(db,routing)])
+            return None
+        allowed=('RETURN_','CHILD_','INVESTIGATOR_','ONLY_','PRINCIPAL_','ACCEPT_','ADOPTED_','DISPOSITION_','MATERIAL_','INVESTIGATION_NO_NATIVE_','EXACTLY_ONE_NATIVE_')
         if not isinstance(exc,ValidationError) and not str(exc).startswith(allowed):return None
         with self.store.transaction() as db:
             session,grant=self._grant(db);state=session['state'];node=state['investigations'][order.investigation_id]
@@ -707,7 +745,7 @@ class InvestigationDispatcher:
             if node['usage']['model_calls']>=order.budget.model_calls:return None
             issues=([dict(path=list(e['loc']),type=e['type'],message=e['msg']) for e in exc.errors(include_input=False,include_url=False)]
                 if isinstance(exc,ValidationError) else [getattr(exc,'issue',dict(code=str(exc)))])
-            feedback=dict(error='INVALID_UNEXECUTED_REPORT',issues=issues,
+            feedback=dict(error='INVALID_UNEXECUTED_REPORT',issues=issues,error_routing=routing,
                 requirement='Resubmit a complete native investigation_return with corrected fields. Each fact must have exactly ONE valid JSON Pointer, not a comma-separated list or comparison expression. Split or omit compound facts within the schema limits. Scalar pointers require the exact scalar, never enclosing objects or rounded replacements. Directory metadata cannot support scientific facts; cite only authorized original sources. source_identity keys must match actual root source fields. No invalid call executed. This paid correction uses the same request/time limits; no further correction of this report is allowed.')
             if self._selectable():
                 feedback['requirement']='Resubmit the complete advertised investigation_return. Principal dispositions select catalog handles; supporting_facts use report handles, additional_support uses explicitly principal supplemental handles, scope declares applicability separately. Projection is extraction only. Each issue identifies the failed decision position and legal structure; choose conclusions yourself. No disposition was executed. Current report/evidence and original permissions, counters and deadline remain in force; complete prior responses are archived.'
@@ -832,7 +870,7 @@ class InvestigationDispatcher:
             return InvestigationResult(investigation_id=key,status='completed',result=historical['result'])
         node=self.store.session(self.run_id)['state'].get('investigations',{}).get(key,{})
         request_run=node.get('request_run_id',self.run_id)
-        row=self.store.lookup(request_run,'investigation-'+key)
+        row=self.store.lookup(request_run,node.get('active_request_id','investigation-'+key))
         if not row:raise ValueError('INVESTIGATION_NOT_FOUND')
         if row['receipt']:return self._recover_unowned(key,row)
         from tools.workbench import owner

@@ -38,7 +38,7 @@ def visible(pointer, value, page_read):
         return False
 
 
-def generate(bundle, review=None):
+def generate(bundle, review=None, *, limits=None):
     events = sorted(bundle['events'], key=lambda e: e['sequence'])
     artifacts = bundle['artifacts']
     state = bundle['state']
@@ -52,7 +52,7 @@ def generate(bundle, review=None):
     read_closures = []
     for key, node in sorted(nodes.items()):
         request = 'investigation-' + key
-        own = [e for e in events if e.get('request_id') == request]
+        own = [e for e in events if e.get('request_id') == request or e.get('request_id','').startswith(request+'-material-')]
         starts = [e for e in own if e['kind'] == 'investigation_provider_attempt']
         first = min((e['sequence'] for e in starts), default=float('inf'))
         prefetch, followup, metadata, unmatched = [], [], [], []
@@ -171,11 +171,13 @@ def generate(bundle, review=None):
     accounting &= bundle.get('session_status')=='stopped'
     modern=bundle.get('snapshot',{}).get('input',{}).get('policy',{}).get('model',{}).get('parameters',{}).get('investigation_contract') in ('business_fields_v2','selectable_facts_v3')
     model_cap,evidence_cap,time_cap=(8,12,900) if modern else (6,8,600)
+    if limits:
+        model_cap,evidence_cap,time_cap=limits['node_models'],limits['node_evidence'],limits['node_elapsed_s']
     bounds=all(r['provider_attempts']<=model_cap and r.get('usage',{}).get('tool_calls',0)<=evidence_cap for r in rows)
     principal=[r for r in rows if r['role']=='principal']
-    bounds &= all(r.get('usage',{}).get('tool_calls',0)+sum(e['kind']=='principal_inspection' for e in events)<=evidence_cap for r in principal)
+    bounds &= all(r.get('usage',{}).get('tool_calls',0)+sum(e['kind']=='principal_inspection' and artifacts[e['outputs'][0]['artifact_id']].get('inspection_origin')!='principal_node_evidence_read' for e in events)<=evidence_cap for r in principal)
     coordinated=bundle['mode']=='coordinated'
-    bounds &= len(nodes)<=(4 if coordinated else 3) and not charged['backend_solves'] and not charged['worker_calls'] and attempts<=((32 if coordinated else 8) if modern else (24 if coordinated else 18))
+    bounds &= len(nodes)<=(limits['node_count'] if limits else (4 if coordinated else 3)) and not charged['backend_solves'] and not charged['worker_calls'] and attempts<=(limits['phase_models'] if limits else ((32 if coordinated else 8) if modern else (24 if coordinated else 18)))
     bounds &= all(n['order'].get('timeout_s',180)<=time_cap and (n.get('progress',{}).get('elapsed_s') or 0)<=n['order'].get('timeout_s',180)+5 for n in nodes.values())
     model=bundle.get('snapshot',{}).get('input',{}).get('policy',{}).get('model',{})
     requests=[artifacts[e['outputs'][0]['artifact_id']].get('payload',{}) for e in events if e['kind']=='investigation_provider_attempt']

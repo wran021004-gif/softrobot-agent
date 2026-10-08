@@ -1,0 +1,24 @@
+"""Error routing before any paid correction; no transport replay or quota refund."""
+from pydantic import ValidationError
+
+
+def classify(exc, *, stage=None):
+    code = str(exc).split(':', 1)[0]
+    if stage in ('program_expansion', 'report_evidence_save', 'settlement'):
+        category, action = 'program_construction', 'local_repair_and_saved_raw_return_revalidation'
+    elif stage == 'transport':
+        category, action = 'transport_or_unknown', 'reconcile_original_receipt_keep_unknown_reservation'
+    elif code.startswith('CONTEXT_SOURCE_NOT_RETRIEVABLE'):
+        category, action = 'program_construction', 'import_exact_authorized_archive_reference_locally'
+    elif code.startswith(('CONTEXT_', 'INPUT_', 'REQUEST_', 'INVESTIGATION_RETURN_TOO_LARGE', 'INVESTIGATION_RESPONSE_TRUNCATED')):
+        category, action = 'capacity', 'inspect_exact_wire_or_saved_model_return_locally'
+    elif isinstance(exc, ValidationError) or code.startswith(('RETURN_', 'CHILD_', 'INVESTIGATOR_', 'ONLY_', 'PRINCIPAL_', 'ACCEPT_', 'ADOPTED_', 'DISPOSITION_FACT_BINDING', 'INVESTIGATION_NO_NATIVE_', 'EXACTLY_ONE_NATIVE_')):
+        category, action = 'model_protocol', 'precise_feedback_with_same_node_limits'
+    elif code.startswith('MATERIAL_'):
+        category, action = 'evidence_or_reasoning', 'independent_review_then_bounded_model_correction'
+    else:
+        category, action = 'program_construction', 'local_repair_and_saved_raw_return_revalidation'
+    return dict(version='research.error_routing@1.0.0', category=category, action=action,
+                paid_correction_eligible=category in ('model_protocol', 'evidence_or_reasoning'),
+                cost_owner='Actual requests remain charged to original stage and node; no refunds. Local repair is engineering time.',
+                automatic_transport_retry=False)
