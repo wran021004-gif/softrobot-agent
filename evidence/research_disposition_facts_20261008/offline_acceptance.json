@@ -1,0 +1,35 @@
+{
+  "structural_only": true,
+  "scientific_review_not_replaced": true,
+  "targeted_tests": {
+    "log": "offline_verified.log",
+    "run": 14,
+    "result": "OK",
+    "compact_request_regression": "offline_compact.log",
+    "compact_regression_result": "OK"
+  },
+  "exact_historical_request_preflight": "preflight_compact/offline_request_checks.json",
+  "paid_provider_requests": 0,
+  "full_request_measurements": [
+    {
+      "characters": 95384,
+      "utf8_bytes": 98340,
+      "estimated_input_tokens": 106532,
+      "actual_input_tokens": null,
+      "method": "Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.",
+      "input_budget_tokens": 160000,
+      "configured_context_limit_tokens": 1000000,
+      "response_reserve_tokens": 32768,
+      "interaction_reserve_tokens": 8192,
+      "passed": true
+    }
+  ],
+  "original_history_unchanged": true,
+  "prefreeze_failures_preserved": [
+    "offline_selectable.log",
+    "offline_final.log"
+  ],
+  "initial_unlogged_check": "Initial mixed test command also hit existing FROZEN_RESEARCH_SPECIFICATION_CHANGED in unrelated recovery fixture; not fixed or counted as scientific execution.",
+  "prefreeze_fixes": "Fixture typed EvidenceRef/ReadEvidence and consistent program expansion_path; no activity or paid request started.",
+  "scope": "Deterministic restore; explicit projection; strict values/types/report/version/execution; supplemental origin; accept/defer/reject; detailed feedback; same wire parser/public execution; complete request capacity and detail retrieval."
+}

@@ -15,6 +15,10 @@ class NativeInvestigationParameters(Contract):
     investigation_contract: Literal['business_fields_v2'] = VERSION
 
 
+class SelectableFactParameters(Contract):
+    investigation_contract: Literal['selectable_facts_v3'] = 'selectable_facts_v3'
+
+
 class NativeContract:
     def __init__(self, definitions):
         # name -> (canonical ID, version, authoritative Pydantic schema)
@@ -41,11 +45,17 @@ class NativeContract:
             reason='Native investigation business decision under frozen v2 contract.'))
 
 
-def contract():
+def contract(*,selectable=False):
     from schemas.platform_operations import ReadEvidence
     from tools.research_investigations import InvestigationReturn
+    if selectable:
+        from tools.disposition_facts import SelectedDisposition
+        from pydantic import Field
+        class SelectableReturn(InvestigationReturn):
+            dispositions: list[SelectedDisposition] = Field(default_factory=list,max_length=3)
+        InvestigationReturn=SelectableReturn
     return NativeContract(dict(
-        investigation_return=('investigation_return', '2.0.0', InvestigationReturn),
+        investigation_return=('investigation_return', '3.0.0' if selectable else '2.0.0', InvestigationReturn),
         evidence_read=('evidence.read', '1.0.0', ReadEvidence)))
 
 

@@ -73,7 +73,7 @@ def generate(bundle, review=None):
                 try:
                     decoded = json.loads(native[0]['function']['arguments'])
                     contract=bundle.get('snapshot',{}).get('input',{}).get('policy',{}).get('model',{}).get('parameters',{}).get('investigation_contract')
-                    arguments = decoded if contract=='business_fields_v2' else decoded['arguments']
+                    arguments = decoded if contract in ('business_fields_v2','selectable_facts_v3') else decoded['arguments']
                     query = record['query']
                     matched = (arguments.get('reference') == query['reference']
                                and arguments.get('pointer', '') == query['pointer']
@@ -164,7 +164,7 @@ def generate(bundle, review=None):
     accounting &= all(n.get('usage', {}).get('model_calls', 0) == r['provider_attempts']
                       for n, r in zip((nodes[r['investigation_id']] for r in rows), rows))
     accounting &= bundle.get('session_status')=='stopped'
-    modern=bundle.get('snapshot',{}).get('input',{}).get('policy',{}).get('model',{}).get('parameters',{}).get('investigation_contract')=='business_fields_v2'
+    modern=bundle.get('snapshot',{}).get('input',{}).get('policy',{}).get('model',{}).get('parameters',{}).get('investigation_contract') in ('business_fields_v2','selectable_facts_v3')
     model_cap,evidence_cap,time_cap=(8,12,900) if modern else (6,8,600)
     bounds=all(r['provider_attempts']<=model_cap and r.get('usage',{}).get('tool_calls',0)<=evidence_cap for r in rows)
     principal=[r for r in rows if r['role']=='principal']

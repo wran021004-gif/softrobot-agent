@@ -41,6 +41,7 @@ class SourceFact(Contract):
 class AdoptedClaim(Contract):
     statement: str = Field(min_length=1,max_length=1000)
     supporting_facts: list[SourceFact] = Field(min_length=1,max_length=12)
+    additional_support: list[SourceFact] = Field(default_factory=list,max_length=12,description='Explicit principal supplemental evidence; not report facts.')
     scope: list[SourceFact] = Field(min_length=1,max_length=8,description='Exact inspected source fields declaring applicability, e.g. result_type, execution_id, or prediction scope.')
     support_explanation: str = Field(min_length=1,max_length=2000,description='Principal explanation linking these facts to this claim; semantic correctness remains unassessed.')
 
@@ -54,6 +55,7 @@ class PrincipalDisposition(Contract):
     semantic_claims_unassessed: list[str] = Field(default_factory=list,max_length=12)
     remaining_unknowns: list[str] = Field(default_factory=list,max_length=12)
     reason: str = Field(min_length=1,max_length=2000)
+    selection_provenance: dict | None = None
 
 
 class InvestigationReturn(Contract):
@@ -136,7 +138,14 @@ class InvestigationDispatcher:
 
     def _native_v2(self):
         from tools.investigation_contract import VERSION
-        return self.store.session(self.run_id)['snapshot']['input']['policy']['model'].get('parameters',{}).get('investigation_contract') == VERSION
+        return self.store.session(self.run_id)['snapshot']['input']['policy']['model'].get('parameters',{}).get('investigation_contract') in (VERSION,'selectable_facts_v3')
+
+    def _selectable(self):
+        return self.store.session(self.run_id)['snapshot']['input']['policy']['model'].get('parameters',{}).get('investigation_contract')=='selectable_facts_v3'
+
+    def _contract(self):
+        from tools.investigation_contract import contract
+        return contract(selectable=self._selectable())
 
     def _directory(self,order):
         """A derived Store artifact, not another archive or an access grant.
@@ -215,8 +224,7 @@ class InvestigationDispatcher:
         native=encode_chat(ModelInput(context={'policy':{'tool_bindings':{'evidence.read':'1.0.0'}}},tools=[definition],content=[ModelContent(kind='text',text='Scoped evidence reader')]),native_config)
         payload['tools'].extend(native['tools'])
         if self._native_v2():
-            from tools.investigation_contract import contract
-            payload['tools']=contract().tools()
+            payload['tools']=self._contract().tools()
         self._configure_payload(payload,native_config)
         payload['messages'][0]['content']=('Investigate only the scoped evidence. Use the advertised evidence reader for additional pages (outer arguments/reason/tool_version envelope), or investigation_return with direct report fields. Exactly one native call per turn. Facts and counterevidence require exact visible source values. Interpretation and support explanations are semantically unassessed. Principal may return explicit dispositions for completed reports; investigators cannot dispose or delegate. Suggestions authorize no computation.')
         if self._native_v2():
@@ -240,6 +248,25 @@ class InvestigationDispatcher:
                 for k,n in self._reports().items()
                 if n.get('status')=='completed' and n.get('result',{}).get('artifact_id') in ids]
             packet['historical_handoffs']=session['state'].get('historical_investigations',{})
+            if self._selectable():
+                from tools.disposition_facts import catalog
+                targets=packet['disposition_targets']
+                originals=[plain(r) for r in order.evidence if plain(r) not in [t['report'] for t in targets]]
+                catalog_ref,body=catalog(self,targets,originals)
+                archive.register(catalog_ref)
+                # Exact readable values and all available handles, without
+                # repeating the full identity chain on every entry. Full body
+                # stays immutable and callable through the same reader.
+                view=dict(kind=body['kind'],version=body['version'],targets=body['targets'],rules=body['rules'],entries=[
+                    dict(handle=e['handle'],origin=e['origin'],name=e['name'],
+                        investigation_id=e['report_binding']['investigation_id'] if e['report_binding'] else None,
+                        report_item_pointer=e['report_item_pointer'],reference=e['fact']['reference'],pointer=e['fact']['pointer'],
+                        value_type=e['value_type'],value=e['fact']['value']) for e in body['entries']])
+                packet['fact_catalog']=dict(reference=catalog_ref,content=view,
+                    presentation='All handles, names, origins, source paths, exact values and types are shown. Repeated source identities, full report bindings and purpose details are in the immutable complete catalog; retrieve /entries/<index> with evidence_read. No report facts, counterevidence or unknowns were dropped.',
+                    complete_details_query=dict(reference=catalog_ref,pointer='/entries/0',limit=100,byte_limit=65536))
+                if executing:self._state(order.investigation_id,fact_catalog=catalog_ref)
+                payload['messages'][0]['content']+=' Principal dispositions use catalog handles and optional extraction-only relative projections. supporting_facts must come from that report; additional_support explicitly marks principal supplemental facts. scope is separate. Choose claims, dispositions and explanations yourself; valid handles do not prove reasoning. No need to repeat raw values, identities or inspection declarations. All report bodies, counterevidence and unknowns remain available. Source and report inspections are checked independently.'
         wire,audit=assemble_request(payload,config,'research_decision',packet,archive=archive,
             authority=dict(question=order.question,legal_actions={'submit_return':{}}))
         measurement=check_outgoing_request(wire,config,'research_decision')
@@ -320,7 +347,7 @@ class InvestigationDispatcher:
         self._consume(order,'tool_calls')
         if 'evidence.read' not in order.allowed_tools:raise ValueError('INVESTIGATION_READ_NOT_GRANTED')
         node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
-        is_directory=plain(query.reference)==node.get('directory')
+        is_directory=plain(query.reference) in [node.get('directory'),node.get('fact_catalog')]
         if not is_directory and plain(query.reference) not in [plain(r) for r in order.evidence]:raise ValueError('QUERY_SOURCE_OUT_OF_SCOPE')
         from tools.platform_tools import bounded_evidence_page
         completed_report=order.role=='principal' and any(n.get('status')=='completed' and n.get('result')==plain(query.reference)
@@ -611,19 +638,19 @@ class InvestigationDispatcher:
                     if feedback is None:raise
                     assistant=dict(role='assistant',content=message.get('content'),tool_calls=calls)
                     if 'reasoning_content' in message:assistant['reasoning_content']=message['reasoning_content']
-                    payload['messages'].extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],content=encode(feedback))])
+                    self._append_correction(payload,assistant,calls[0]['id'],feedback)
                     turn+=1
                     continue
             if self._native_v2():
                 from tools.investigation_contract import contract
                 try:
-                    decision=contract().request(calls[0]['function']['name'],calls[0]['function']['arguments'],turn)
+                    decision=self._contract().request(calls[0]['function']['name'],calls[0]['function']['arguments'],turn)
                 except ValueError as exc:
                     feedback=self._protocol_feedback(order,exc)
                     if feedback is None:raise
                     assistant=dict(role='assistant',content=message.get('content'),tool_calls=calls)
                     if 'reasoning_content' in message:assistant['reasoning_content']=message['reasoning_content']
-                    payload['messages'].extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],content=encode(feedback))])
+                    self._append_correction(payload,assistant,calls[0]['id'],feedback)
                     turn+=1
                     continue
             else:
@@ -662,9 +689,11 @@ class InvestigationDispatcher:
             if used>=grant.get('protocol_correction_limit',0) or node.get('protocol_corrections_used',int(node.get('protocol_correction_used',False)))>=grant.get('protocol_correction_per_node',1) or group_used>=group_limit:return None
             if node['usage']['model_calls']>=order.budget.model_calls:return None
             issues=([dict(path=list(e['loc']),type=e['type'],message=e['msg']) for e in exc.errors(include_input=False,include_url=False)]
-                if isinstance(exc,ValidationError) else [dict(code=str(exc))])
+                if isinstance(exc,ValidationError) else [getattr(exc,'issue',dict(code=str(exc)))])
             feedback=dict(error='INVALID_UNEXECUTED_REPORT',issues=issues,
                 requirement='Resubmit a complete native investigation_return with corrected fields. Each fact must have exactly ONE valid JSON Pointer, not a comma-separated list or comparison expression. Split or omit compound facts within the schema limits. Scalar pointers require the exact scalar, never enclosing objects or rounded replacements. Directory metadata cannot support scientific facts; cite only authorized original sources. source_identity keys must match actual root source fields. No invalid call executed. This paid correction uses the same request/time limits; no further correction of this report is allowed.')
+            if self._selectable():
+                feedback['requirement']='Resubmit the complete advertised investigation_return. Principal dispositions select catalog handles; supporting_facts use report handles, additional_support uses explicitly principal supplemental handles, scope declares applicability separately. Projection is extraction only. Each issue identifies the failed decision position and legal structure; choose conclusions yourself. No disposition was executed. Current report/evidence and original permissions, counters and deadline remain in force; complete prior responses are archived.'
             node['protocol_correction_used']=True
             node['protocol_corrections_used']=node.get('protocol_corrections_used',0)+1
             state.setdefault('investigation_corrections_by_role',{})[group]=group_used+1
@@ -674,6 +703,19 @@ class InvestigationDispatcher:
                 outputs=[self.store.put(db,feedback)])
             return feedback
 
+    def _append_correction(self,payload,assistant,call_id,feedback):
+        if not self._selectable():
+            payload['messages'].extend([assistant,dict(role='tool',tool_call_id=call_id,content=encode(feedback))]);return
+        # Complete provider history is already saved; all original pages and
+        # counterevidence stay in the current packet. Follow-up pages are kept.
+        retained=[m for m in payload['messages'][2:] if m.get('role')=='tool']
+        calls=assistant['tool_calls']
+        packet=json.loads(payload['messages'][1]['content'])
+        packet['correction']=dict(received_native_calls=calls,feedback=feedback,
+            retained_tool_results=retained,
+            omitted='Prior reasoning and repeated assistant acknowledgements are archive-only; full original responses and requests are queryable in Store investigation_provider_response/attempt events. Original reports, unknowns, counterevidence, inspected pages and budgets remain in this packet.')
+        payload['messages']=[payload['messages'][0],dict(role='user',content=encode(packet))]
+
     def _decode(self, raw):
         if isinstance(raw,InvestigationReturn):return raw  # Explicit offline fixture boundary.
         if hasattr(raw,'raw'):raw=raw.raw
@@ -681,8 +723,23 @@ class InvestigationDispatcher:
         calls=raw['choices'][0]['message']['tool_calls']
         if len(calls)!=1 or calls[0]['function']['name']!='investigation_return':raise ValueError('BOUNDED_RETURN_REQUIRED')
         if self._native_v2():
-            from tools.investigation_contract import contract
-            return contract().parse('investigation_return',calls[0]['function']['arguments'])
+            report=self._contract().parse('investigation_return',calls[0]['function']['arguments'])
+            if self._selectable():
+                from tools.disposition_facts import expand
+                # Selection carries its own immutable catalog reference. The
+                # independently saved principal node binding is the authority.
+                state=self.store.session(self.run_id)['state']
+                nodes=[n for n in state.get('investigations',{}).values() if n.get('status')=='running' and n['order']['role']=='principal']
+                if report.dispositions and len(nodes)!=1:raise ValueError('DISPOSITION_PRINCIPAL_NODE_BINDING_REQUIRED')
+                value=plain(report)
+                value['dispositions']=[plain(expand(self,d,nodes[0]['fact_catalog'],path=f'/dispositions/{i}')) for i,d in enumerate(report.dispositions)]
+                expanded=InvestigationReturn.model_validate(value)
+                with self.store.transaction() as db:
+                    self.store.event(db,self.run_id,'principal_selection_expansion','expanded',
+                        request='investigation-'+nodes[0]['order']['investigation_id'] if nodes else None,
+                        outputs=[self.store.put(db,dict(model_selection=plain(report),expanded=plain(expanded)))])
+                return expanded
+            return report
         return InvestigationReturn.model_validate_json(calls[0]['function']['arguments'])
 
     def _validate_return(self,order,report,reads):
@@ -867,19 +924,33 @@ class InvestigationDispatcher:
         report=self.store.artifact(result.result)
         if args.disposition!='accept' and args.adopted_claims:raise ValueError('ONLY_ACCEPT_ADOPTS_CLAIMS')
         inspection_links=[]
-        facts=[*args.evidence_used,*[f for c in args.adopted_claims for f in (*c.supporting_facts,*c.scope)]]
+        provenance=args.selection_provenance
+        if provenance:
+            from tools.disposition_facts import expand
+            expected=expand(self,provenance['model_selection'],provenance['catalog'],path=provenance['expansion_path'])
+            if encode(plain(expected))!=encode(plain(args)):raise ValueError('DISPOSITION_EXPANSION_CHANGED')
+            report_reads=[r for n in state.get('investigations',{}).values() if n['order']['role']=='principal' for r in n.get('reads',[])]
+            report_reads+=reads
+            if not any(self._visible(SourceFact(statement='Complete bound report',reference=result.result,pointer='',value=report),r) for r in report_reads):
+                raise ValueError('PRINCIPAL_MUST_INSPECT_COMPLETE_REPORT')
+        facts=[*args.evidence_used,*[f for c in args.adopted_claims for f in (*c.supporting_facts,*c.additional_support,*c.scope)]]
         for fact in facts:
             if fact.reference.artifact_id not in self._sources(*self._grant()):raise ValueError('PRINCIPAL_SOURCE_OUT_OF_SCOPE')
             self._validate_fact(fact,'PRINCIPAL')
             matching=[r for r in reads if self._visible(fact,r)]
             if not matching:raise ValueError('PRINCIPAL_MUST_INSPECT_SOURCE')
             inspection_links.append(dict(fact=plain(fact),inspection_ids=[r['inspection_id'] for r in matching]))
-        from tools.platform_store import encode
         def key(f):return encode({k:plain(f)[k] for k in ('reference','pointer','value')})
         returned={key(f) for f in (*report['facts'],*report['counterevidence'])}
-        for claim in args.adopted_claims:
-            if any(key(f) not in returned for f in claim.supporting_facts):raise ValueError('ADOPTED_FACT_NOT_LINKED_TO_REPORT')
-            if {f.reference.artifact_id for f in claim.supporting_facts}-{f.reference.artifact_id for f in claim.scope}:
+        for index,claim in enumerate(args.adopted_claims):
+            for fi,f in enumerate(claim.supporting_facts):
+                if key(f) not in returned:
+                    linked=provenance and any(link['role']=='report_support' and link['expanded_fact']==plain(f) for link in provenance['links'])
+                    if not linked:
+                        from tools.disposition_facts import BindingError
+                        raise BindingError(f'/adopted_claims/{index}/supporting_facts/{fi}',plain(f),'not an exact report fact or validated projection',dict(use='select report handle or label as principal additional_support'))
+            if claim.additional_support and not provenance:raise ValueError('DISPOSITION_ADDITIONAL_SUPPORT_REQUIRES_SELECTION_PROVENANCE')
+            if {f.reference.artifact_id for f in (*claim.supporting_facts,*claim.additional_support)}-{f.reference.artifact_id for f in claim.scope}:
                 raise ValueError('ADOPTED_CLAIM_SCOPE_SOURCE_MISMATCH')
             # Different original sources are allowed; each attribution was checked
             # against its own immutable source. Prose is never judged by an LLM.

@@ -1,0 +1,72 @@
+{
+  "investigation_id": "principal-historical-disposition",
+  "parent_id": null,
+  "role": "principal",
+  "question": "Independently review the two complete historical investigator reports and the original public inspection. Return exactly one structured disposition for reach-question and timing-question, each bound to its report. Evaluate factual and interpretive support separately; accept only specifically supported portions with adopted_claims, exact supporting report facts and inspected scope fields, or defer/reject with concrete rationale. Review the supplied independent engineering objections and their provenance without assuming agreement. Distinguish seconds units from clock definition, sampled window maximum from internal trajectory, execution completeness from optimization convergence, and missing independent reach criteria from the recorded official task_accepted=false. Historical scope is only Stage336 proposal-build execution 494deb38d6374deb8f741e96f2430826; this is new disposition verification of reused historical reports, no new investigator execution or scientific computation.",
+  "evidence": [
+    {
+      "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "54bbe345f43e7d5af2311733f871ec1987f17bb0c374264793c47bc6d1ef81f1",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "83a7c6d7daf53191cdae94add80da47df813e34f066619d01635c48103eea8f1",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "714d62810b34966ad07259793c10d96c7676f35ffee2ea5b6352adb513f6fbff",
+      "media_type": "application/json"
+    }
+  ],
+  "queries": [
+    {
+      "reference": {
+        "artifact_id": "83a7c6d7daf53191cdae94add80da47df813e34f066619d01635c48103eea8f1",
+        "media_type": "application/json"
+      },
+      "pointer": "",
+      "offset": 0,
+      "limit": 100,
+      "byte_limit": 65536
+    },
+    {
+      "reference": {
+        "artifact_id": "714d62810b34966ad07259793c10d96c7676f35ffee2ea5b6352adb513f6fbff",
+        "media_type": "application/json"
+      },
+      "pointer": "",
+      "offset": 0,
+      "limit": 100,
+      "byte_limit": 65536
+    },
+    {
+      "reference": {
+        "artifact_id": "54bbe345f43e7d5af2311733f871ec1987f17bb0c374264793c47bc6d1ef81f1",
+        "media_type": "application/json"
+      },
+      "pointer": "",
+      "offset": 0,
+      "limit": 100,
+      "byte_limit": 8192
+    }
+  ],
+  "allowed_tools": [
+    "evidence.read"
+  ],
+  "budget": {
+    "tool_calls": 11,
+    "model_calls": 8,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 900.0
+  },
+  "timeout_s": 900.0,
+  "stop_conditions": [
+    "At most eight model attempts and two paid unexecuted protocol corrections",
+    "Exact original source scope; no delegation, science or automatic transport retries"
+  ],
+  "output_bytes": 65536
+}

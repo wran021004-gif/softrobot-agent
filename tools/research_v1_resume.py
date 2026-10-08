@@ -34,13 +34,13 @@ def history():
         files={p.relative_to(ROOT).as_posix():sha(p) for p in (OLD.parent).rglob('*') if p.is_file()}))
 
 
-def prepare(out):
+def prepare(out,*,authorization=None,selectable=False):
     if out.exists():raise ValueError('NEW_AUTHORIZATION_DIRECTORY_REQUIRED')
     cfg=model_configuration(configuration())
-    cfg['policy']['model']['parameters']['investigation_contract']='business_fields_v2'
-    cfg['policy']['model']['adapter_version']='7.0.0'
+    cfg['policy']['model']['parameters']['investigation_contract']='selectable_facts_v3' if selectable else 'business_fields_v2'
+    cfg['policy']['model']['adapter_version']='8.0.0' if selectable else '7.0.0'
     cfg['policy']['model']['timeout_s']=900.
-    identity='mainline3-v1-resume-'+uuid4().hex[:12]
+    identity=('mainline3-v1-facts-' if selectable else 'mainline3-v1-resume-')+uuid4().hex[:12]
     node={**zero(),'model_calls':8,'tool_calls':12,'wall_s':900.}
     bindings={key:'1.0.0' for key in ('research.investigate','research.investigation_status','research.investigation_read','research.investigation_disposition')}
     phases={}
@@ -60,7 +60,8 @@ def prepare(out):
         maximum_attempts=dict(linearization=2,metrics=2,endpoint=2,backend=2),
         retry_condition='Only incomplete/invalid engineering failure after targeted repair; valid physical failure is terminal.')
     out.mkdir(parents=True)
-    atomic_json(out/'authorization.json',dict(text=AUTH.read_text(encoding='utf-8-sig'),sha256=sha(AUTH),
+    auth=authorization or AUTH
+    atomic_json(out/'authorization.json',dict(text=auth.read_text(encoding='utf-8-sig'),sha256=sha(auth),
         recipient='https://api.deepseek.com',model='deepseek-flash',new_authorization=True))
     atomic_json(out/'frozen_configuration.json',cfg)
     for mode,phase in phases.items():
@@ -69,7 +70,7 @@ def prepare(out):
         atomic_json(out/(mode+'_grant.json'),grant)
         phase.update(output='runs/'+identity+'-'+mode,grant_identity=digest(grant))
     paths=subprocess.check_output(['git','ls-files','tools','schemas','extensions','configs'],cwd=ROOT,text=True).splitlines()
-    paths += ['tools/research_v1_resume.py','tools/investigation_contract.py','tools/investigation_handoff.py',SOURCE.relative_to(ROOT).as_posix()]
+    paths += ['tools/research_v1_resume.py','tools/investigation_contract.py','tools/investigation_handoff.py','tools/disposition_facts.py',SOURCE.relative_to(ROOT).as_posix()]
     manifest=dict(activity_id=identity,created_at=now(),branch='feat/gvs-dynamics',
         code_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         code_identity={p:sha(ROOT/p) for p in sorted(set(paths)) if (ROOT/p).is_file()},
@@ -80,6 +81,12 @@ def prepare(out):
         historical_campaign='mainline3-v1-e7e730716bab',historical_reports_are_new_nodes=False,
         stopping='Only real stage gates permit dependent work; all submitted nodes drained; no Version 2.')
     atomic_json(out/'historical_before.json',history())
+    if selectable:
+        previous=ROOT/'evidence/research_v1_resume_20261008/stages'
+        prior=read(previous/'validation_manifest.json');prior_store=Store(ROOT/prior['phases']['reuse']['output'])
+        atomic_json(out/'previous_resume_before.json',dict(db_sha256=sha(prior_store.db),ledger=prior_store.remaining(),
+            files={p.relative_to(ROOT).as_posix():sha(p) for p in previous.rglob('*') if p.is_file()},
+            sessions={key:prior_store.session(key)['status'] for key in ('mainline3-reuse','mainline3-reuse-repair2','mainline3-reuse-repair3')}))
     atomic_json(out/'validation_manifest.json',manifest)
     print(encode(dict(prepared=identity,model_requests=0)),flush=True)
 
@@ -88,6 +95,11 @@ def check(out):
     m=read(out/'validation_manifest.json');cfg=read(out/'frozen_configuration.json')
     if digest(cfg)!=m['configuration_identity'] or any(sha(ROOT/p)!=v for p,v in m['code_identity'].items()):raise ValueError('FROZEN_CODE_OR_CONFIGURATION_CHANGED')
     if history()!=read(out/'historical_before.json'):raise ValueError('OLD_SEALED_HISTORY_CHANGED')
+    if (out/'previous_resume_before.json').exists():
+        old=read(out/'previous_resume_before.json')
+        previous=read(ROOT/'evidence/research_v1_resume_20261008/stages/validation_manifest.json')
+        prior_store=Store(ROOT/previous['phases']['reuse']['output'])
+        if sha(prior_store.db)!=old['db_sha256'] or any(sha(ROOT/p)!=v for p,v in old['files'].items()):raise ValueError('PREVIOUS_RESUME_CHANGED')
     return m,cfg
 
 
@@ -280,12 +292,16 @@ def execute(out,mode):
         export(out,mode);bundle=read(out/(mode+'_bundle.json'));bundle['session_status']='stopped';atomic_json(out/(mode+'_bundle.json'),bundle)
         atomic_json(out/'historical_after.json',dict(unchanged=history()==read(out/'historical_before.json')))
         if mode=='coordinated':atomic_json(out/'coordinated_gate.json',generate(bundle))
+        if (out/'previous_resume_before.json').exists():
+            previous=read(out/'previous_resume_before.json')
+            atomic_json(out/'previous_resume_after.json',dict(unchanged=all(sha(ROOT/p)==v for p,v in previous['files'].items())))
 
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('action',choices=['prepare','execute','continue-preparation-repair','continue-correction-repair']);parser.add_argument('directory',type=Path)
-    parser.add_argument('--mode',choices=['reuse','coordinated','fixed'],default='reuse');args=parser.parse_args()
-    if args.action=='prepare':prepare(args.directory.resolve())
+    parser.add_argument('--mode',choices=['reuse','coordinated','fixed'],default='reuse')
+    parser.add_argument('--authorization',type=Path);parser.add_argument('--selectable-facts',action='store_true');args=parser.parse_args()
+    if args.action=='prepare':prepare(args.directory.resolve(),authorization=args.authorization,selectable=args.selectable_facts)
     elif args.action=='continue-preparation-repair':continue_preparation_repair(args.directory.resolve())
     elif args.action=='continue-correction-repair':continue_preparation_repair(args.directory.resolve(),correction=True)
     else:execute(args.directory.resolve(),args.mode)
