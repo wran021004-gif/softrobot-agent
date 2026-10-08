@@ -181,7 +181,7 @@ def live_interface_scenario(host,mode,*,plan=None):
         grant['output_bytes']=proposal['output_bytes']
         # Preserve the wrapper's frozen deadline and role authority, if present.
         old=state.get('role_context',{}).get('investigation_grant',{})
-        for field in ('deadline_unix','protocol_correction_limit'):
+        for field in ('deadline_unix','protocol_correction_limit','protocol_correction_role_limits','protocol_correction_per_node'):
             if field in old:grant[field]=old[field]
         state['role_context']=dict(role='principal',investigation_grant=grant)
         from tools.state_io import digest

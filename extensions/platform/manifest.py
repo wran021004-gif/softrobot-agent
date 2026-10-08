@@ -73,6 +73,11 @@ EXTENSIONS.append(Extension('research.capabilities','tool','1.0.0',CatalogReques
     capabilities=dict(category='research',role='public_tool')))
 from tools.research_investigations import (InvestigationOrder,InvestigationResult,InvestigationStatus,PrincipalDisposition)
 from schemas.platform_operations import ReadEvidence,EvidencePage
+from tools.investigation_handoff import HistoricalHandoff
+EXTENSIONS.append(Extension('research.investigation_handoff','tool','1.0.0',HistoricalHandoff,InvestigationResult,
+    'tools.investigation_handoff:bind','Explicit stopped historical report reuse, preserving original execution and validation; never executes an investigator.',
+    sources=('tools/investigation_handoff.py','tools/investigation_contract.py','tools/research_investigations.py'),
+    capabilities=dict(category='diagnostics',role='public_tool')))
 for name,schema,output,binding in (
     ('research.investigate',InvestigationOrder,InvestigationResult,'dispatch'),
     ('research.investigation_status',InvestigationStatus,InvestigationResult,'status'),
@@ -80,7 +85,7 @@ for name,schema,output,binding in (
     ('research.investigation_read',ReadEvidence,EvidencePage,'read_source')):
     EXTENSIONS.append(Extension(name,'tool','1.0.0',schema,output,
         'tools.research_investigations:'+binding,('Accept a durable bounded investigation submission; the actual model request includes a source metadata directory with original references, purpose, versions and paged evidence.read discovery. Collect through research.investigation_status. Discovery and body reads share node limits and separately checked permissions; no scientific execution.' if binding=='dispatch' else 'Collect bounded reports, inspect scoped evidence/directory pages, or record explicit principal claims and disposition. Current activity/deadline authority is checked; source checks do not prove semantic correctness.'),
-        sources=('tools/research_investigations.py','tools/platform_workers.py','tools/platform_store.py','tools/context_assembly.py','tools/platform_tools.py','tools/platform_models.py','schemas/platform_operations.py'),
+        sources=('tools/research_investigations.py','tools/investigation_contract.py','tools/platform_workers.py','tools/platform_store.py','tools/context_assembly.py','tools/platform_tools.py','tools/platform_models.py','schemas/platform_operations.py'),
         capabilities=dict(category='diagnostics',role='public_tool',
             **(dict(delegated_execution=True,preflight='tools.research_investigations:dispatch_preflight',interactive_evidence=True,submission_only=True) if binding=='dispatch' else {}))))
 

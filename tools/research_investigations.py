@@ -25,7 +25,7 @@ class InvestigationOrder(Contract):
     queries: list[ReadEvidence] = Field(default_factory=list,max_length=12)
     allowed_tools: list[Literal['evidence.read']] = Field(default_factory=lambda:['evidence.read'],min_length=1,max_length=1)
     budget: Budget
-    timeout_s: float = Field(gt=0,le=600)
+    timeout_s: float = Field(gt=0,le=900)
     stop_conditions: list[str] = Field(min_length=1,max_length=6)
     output_bytes: int = Field(default=16384,ge=1024,le=65536)
 
@@ -127,7 +127,16 @@ class InvestigationDispatcher:
         if grant.get('include_completed_reports'):
             evidence.update(n['result']['artifact_id'] for n in session['state'].get('investigations',{}).values()
                 if n.get('status')=='completed' and n.get('result'))
+            evidence.update(n['result']['artifact_id'] for n in session['state'].get('historical_investigations',{}).values())
         return evidence
+
+    def _reports(self):
+        state=self.store.session(self.run_id)['state']
+        return {**state.get('historical_investigations',{}), **state.get('investigations',{})}
+
+    def _native_v2(self):
+        from tools.investigation_contract import VERSION
+        return self.store.session(self.run_id)['snapshot']['input']['policy']['model'].get('parameters',{}).get('investigation_contract') == VERSION
 
     def _directory(self,order):
         """A derived Store artifact, not another archive or an access grant.
@@ -200,8 +209,13 @@ class InvestigationDispatcher:
         native_config['tool_naming']=tool_naming_policy({'evidence.read':'1.0.0'},'legacy_hashed_v1')
         native=encode_chat(ModelInput(context={'policy':{'tool_bindings':{'evidence.read':'1.0.0'}}},tools=[definition],content=[ModelContent(kind='text',text='Scoped evidence reader')]),native_config)
         payload['tools'].extend(native['tools'])
+        if self._native_v2():
+            from tools.investigation_contract import contract
+            payload['tools']=contract().tools()
         self._configure_payload(payload,native_config)
         payload['messages'][0]['content']=('Investigate only the scoped evidence. Use the advertised evidence reader for additional pages (outer arguments/reason/tool_version envelope), or investigation_return with direct report fields. Exactly one native call per turn. Facts and counterevidence require exact visible source values. Interpretation and support explanations are semantically unassessed. Principal may return explicit dispositions for completed reports; investigators cannot dispose or delegate. Suggestions authorize no computation.')
+        if self._native_v2():
+            payload['messages'][0]['content']=('Investigate only the scoped evidence. All advertised functions accept their business fields directly, with no arguments/reason/tool_version wrapper. Exactly one native call per turn. Read additional pages with evidence_read; finish with investigation_return. Facts and counterevidence require exact visible source values, one JSON Pointer each, and original source identity. Principal must evaluate support independently and may accept supported portions, defer or reject; suggestions authorize no computation.')
         config=effective_config(self.host)
         packet=dict(question=order.question,role=order.role,reads=reads,stopping=order.stop_conditions,
             allowed_tools=order.allowed_tools,remaining_budget=plain(order.budget),organization_limits=dict(
@@ -218,8 +232,9 @@ class InvestigationDispatcher:
             packet['principal_inspection_records']=session['state'].get('principal_investigation_reads',[])
             ids={r.artifact_id for r in order.evidence}
             packet['disposition_targets']=[dict(investigation_id=k,report=n['result'])
-                for k,n in session['state'].get('investigations',{}).items()
+                for k,n in self._reports().items()
                 if n.get('status')=='completed' and n.get('result',{}).get('artifact_id') in ids]
+            packet['historical_handoffs']=session['state'].get('historical_investigations',{})
         wire,audit=assemble_request(payload,config,'research_decision',packet,archive=archive,
             authority=dict(question=order.question,legal_actions={'submit_return':{}}))
         measurement=check_outgoing_request(wire,config,'research_decision')
@@ -304,7 +319,7 @@ class InvestigationDispatcher:
         if not is_directory and plain(query.reference) not in [plain(r) for r in order.evidence]:raise ValueError('QUERY_SOURCE_OUT_OF_SCOPE')
         from tools.platform_tools import bounded_evidence_page
         completed_report=order.role=='principal' and any(n.get('status')=='completed' and n.get('result')==plain(query.reference)
-            for n in self.store.session(self.run_id)['state']['investigations'].values())
+            for n in self._reports().values())
         envelope_bytes=order.output_bytes+2048 if completed_report else 6000
         try:page=plain(bounded_evidence_page(self.store.artifact(query.reference),query,envelope_bytes=envelope_bytes))
         except (ValueError,UnicodeError) as exc:raise ValueError('EVIDENCE_UNAVAILABLE: '+str(exc)) from None
@@ -586,7 +601,20 @@ class InvestigationDispatcher:
                     payload['messages'].extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],content=encode(feedback))])
                     turn+=1
                     continue
-            decision=DeepSeekAdapter().decode(ModelResponse(raw=raw),turn,{'evidence.read':'1.0.0'},payload['tools'][1:])
+            if self._native_v2():
+                from tools.investigation_contract import contract
+                try:
+                    decision=contract().request(calls[0]['function']['name'],calls[0]['function']['arguments'],turn)
+                except ValueError as exc:
+                    feedback=self._protocol_feedback(order,exc)
+                    if feedback is None:raise
+                    assistant=dict(role='assistant',content=message.get('content'),tool_calls=calls)
+                    if 'reasoning_content' in message:assistant['reasoning_content']=message['reasoning_content']
+                    payload['messages'].extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],content=encode(feedback))])
+                    turn+=1
+                    continue
+            else:
+                decision=DeepSeekAdapter().decode(ModelResponse(raw=raw),turn,{'evidence.read':'1.0.0'},payload['tools'][1:])
             try:
                 try:query=ReadEvidence.model_validate(decision['arguments'])
                 except ValueError:
@@ -615,13 +643,18 @@ class InvestigationDispatcher:
         with self.store.transaction() as db:
             session,grant=self._grant(db);state=session['state'];node=state['investigations'][order.investigation_id]
             used=state.get('investigation_protocol_corrections_used',0)
-            if used>=grant.get('protocol_correction_limit',0) or node.get('protocol_correction_used'):return None
+            group='principal' if order.role=='principal' else 'other'
+            group_used=state.get('investigation_corrections_by_role',{}).get(group,0)
+            group_limit=grant.get('protocol_correction_role_limits',{}).get(group,grant.get('protocol_correction_limit',0))
+            if used>=grant.get('protocol_correction_limit',0) or node.get('protocol_corrections_used',int(node.get('protocol_correction_used',False)))>=grant.get('protocol_correction_per_node',1) or group_used>=group_limit:return None
             if node['usage']['model_calls']>=order.budget.model_calls:return None
             issues=([dict(path=list(e['loc']),type=e['type'],message=e['msg']) for e in exc.errors(include_input=False,include_url=False)]
                 if isinstance(exc,ValidationError) else [dict(code=str(exc))])
             feedback=dict(error='INVALID_UNEXECUTED_REPORT',issues=issues,
                 requirement='Resubmit a complete native investigation_return with corrected fields. Each fact must have exactly ONE valid JSON Pointer, not a comma-separated list or comparison expression. Split or omit compound facts within the schema limits. Scalar pointers require the exact scalar, never enclosing objects or rounded replacements. Directory metadata cannot support scientific facts; cite only authorized original sources. source_identity keys must match actual root source fields. No invalid call executed. This paid correction uses the same request/time limits; no further correction of this report is allowed.')
             node['protocol_correction_used']=True
+            node['protocol_corrections_used']=node.get('protocol_corrections_used',0)+1
+            state.setdefault('investigation_corrections_by_role',{})[group]=group_used+1
             state['investigation_protocol_corrections_used']=used+1
             self.store.update_state(db,self.run_id,state)
             self.store.event(db,self.run_id,'investigation_protocol_correction','scheduled',request='investigation-'+order.investigation_id,
@@ -634,6 +667,9 @@ class InvestigationDispatcher:
         if raw['choices'][0].get('finish_reason')=='length':raise ValueError('INVESTIGATION_RESPONSE_TRUNCATED')
         calls=raw['choices'][0]['message']['tool_calls']
         if len(calls)!=1 or calls[0]['function']['name']!='investigation_return':raise ValueError('BOUNDED_RETURN_REQUIRED')
+        if self._native_v2():
+            from tools.investigation_contract import contract
+            return contract().parse('investigation_return',calls[0]['function']['arguments'])
         return InvestigationReturn.model_validate_json(calls[0]['function']['arguments'])
 
     def _validate_return(self,order,report,reads):
@@ -700,6 +736,9 @@ class InvestigationDispatcher:
 
     def recover(self,key):
         self._grant()  # Recovery collects evidence; it never revives an expired activity.
+        historical=self.store.session(self.run_id)['state'].get('historical_investigations',{}).get(key)
+        if historical:
+            return InvestigationResult(investigation_id=key,status='completed',result=historical['result'])
         node=self.store.session(self.run_id)['state'].get('investigations',{}).get(key,{})
         request_run=node.get('request_run_id',self.run_id)
         row=self.store.lookup(request_run,'investigation-'+key)
@@ -845,8 +884,9 @@ class InvestigationDispatcher:
         if validate_only:return record
         with self.store.transaction() as db:
             ref=self.store.put(db,record);state=self.store.session(self.run_id,db)['state']
-            state['investigations'][args.investigation_id]['principal_disposition']=record
-            state['investigations'][args.investigation_id]['disposition_record']=plain(ref)
+            collection='historical_investigations' if args.investigation_id in state.get('historical_investigations',{}) else 'investigations'
+            state[collection][args.investigation_id]['principal_disposition']=record
+            state[collection][args.investigation_id]['disposition_record']=plain(ref)
             self.store.update_state(db,self.run_id,state)
             self.store.event(db,self.run_id,'principal_disposition','recorded',inputs=[result.result],outputs=[ref])
         return result.model_copy(update={'disposition_record':ref})

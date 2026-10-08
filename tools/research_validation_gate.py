@@ -71,7 +71,9 @@ def generate(bundle, review=None):
             matched = False
             if len(native) == 1 and native[0]['function']['name'] != 'investigation_return':
                 try:
-                    arguments = json.loads(native[0]['function']['arguments'])['arguments']
+                    decoded = json.loads(native[0]['function']['arguments'])
+                    contract=bundle.get('snapshot',{}).get('input',{}).get('policy',{}).get('model',{}).get('parameters',{}).get('investigation_contract')
+                    arguments = decoded if contract=='business_fields_v2' else decoded['arguments']
                     query = record['query']
                     matched = (arguments.get('reference') == query['reference']
                                and arguments.get('pointer', '') == query['pointer']
@@ -162,12 +164,14 @@ def generate(bundle, review=None):
     accounting &= all(n.get('usage', {}).get('model_calls', 0) == r['provider_attempts']
                       for n, r in zip((nodes[r['investigation_id']] for r in rows), rows))
     accounting &= bundle.get('session_status')=='stopped'
-    bounds=all(r['provider_attempts']<=6 and r.get('usage',{}).get('tool_calls',0)<=8 for r in rows)
+    modern=bundle.get('snapshot',{}).get('input',{}).get('policy',{}).get('model',{}).get('parameters',{}).get('investigation_contract')=='business_fields_v2'
+    model_cap,evidence_cap,time_cap=(8,12,900) if modern else (6,8,600)
+    bounds=all(r['provider_attempts']<=model_cap and r.get('usage',{}).get('tool_calls',0)<=evidence_cap for r in rows)
     principal=[r for r in rows if r['role']=='principal']
-    bounds &= all(r.get('usage',{}).get('tool_calls',0)+sum(e['kind']=='principal_inspection' for e in events)<=8 for r in principal)
+    bounds &= all(r.get('usage',{}).get('tool_calls',0)+sum(e['kind']=='principal_inspection' for e in events)<=evidence_cap for r in principal)
     coordinated=bundle['mode']=='coordinated'
-    bounds &= len(nodes)<=(4 if coordinated else 3) and not charged['backend_solves'] and not charged['worker_calls'] and attempts<=(24 if coordinated else 18)
-    bounds &= all(n['order'].get('timeout_s',180)<=600 and (n.get('progress',{}).get('elapsed_s') or 0)<=n['order'].get('timeout_s',180)+5 for n in nodes.values())
+    bounds &= len(nodes)<=(4 if coordinated else 3) and not charged['backend_solves'] and not charged['worker_calls'] and attempts<=((32 if coordinated else 8) if modern else (24 if coordinated else 18))
+    bounds &= all(n['order'].get('timeout_s',180)<=time_cap and (n.get('progress',{}).get('elapsed_s') or 0)<=n['order'].get('timeout_s',180)+5 for n in nodes.values())
     model=bundle.get('snapshot',{}).get('input',{}).get('policy',{}).get('model',{})
     requests=[artifacts[e['outputs'][0]['artifact_id']].get('payload',{}) for e in events if e['kind']=='investigation_provider_attempt']
     compatible=bool(model and requests) and all(p.get('model')==model.get('model')=='deepseek-flash'
