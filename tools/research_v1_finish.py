@@ -207,6 +207,10 @@ def principal(host,stage,key,targets,raw,view,extra=None,models=None,ops=None):
     value['disposition_ids']=[t['investigation_id'] for t in targets]
     atomic_json(OUT/(key+'_order.json'),value)
     report=collect(host,invoke(host,'research.investigate',value,request_id=key))
+    return finish_principal(host,key,report,targets)
+
+
+def finish_principal(host,key,report,targets):
     # Review and any correction occur in this process with the original clock.
     for iteration in range(4):
         current=host.store.artifact(report)
@@ -230,6 +234,71 @@ def principal(host,stage,key,targets,raw,view,extra=None,models=None,ops=None):
         r=invoke(host,'research.investigation_disposition',d,request_id='dispose-'+d['investigation_id']);rows.append(r)
         if r['execution_status']!='completed':raise ValueError('PUBLIC_DISPOSITION_FAILED')
     return dict(status='formal_dispositions_recorded',report=report,receipts=rows,material_review=review,targets=targets)
+
+
+def recover_received(mode):
+    """Explicit confirmed-output correction, same logical node/clock/project.
+
+    The old stopped session remains stopped. No transport retry, replacement
+    node, cost refund, scientific change or quota migration is permitted.
+    """
+    m,cfg=check();stage=m['phases'][mode];store=Store(ROOT/stage['output'])
+    bundle=read(OUT/(mode+'_bundle.json'));parent=bundle['state'].get('current_recovery_run_id','mainline3-'+mode)
+    old=store.session(parent);state=deepcopy(old['state'])
+    key='principal-historical-v2' if mode=='reuse' else 'principal-coordinated-v2'
+    node=state['investigations'][key]
+    if old['status']!='stopped' or node['status']!='failed' or store.remaining()['occupied']:raise ValueError('CONFIRMED_STOPPED_DRAINED_FAILURE_REQUIRED')
+    if node['progress']['received_responses']!=node['progress']['transport_callable_invocations']:raise ValueError('UNKNOWN_RESULT_NO_RETRY')
+    last=node['provider_response_refs'][-1];raw=store.artifact(last)
+    if raw['choices'][0]['finish_reason']!='length':raise ValueError('EXPLICIT_GENERATION_CAPACITY_RECOVERY_ONLY')
+    remaining=node['order']['timeout_s']-(time.time()-node['started_unix'])
+    if remaining<=0:raise ValueError('ORIGINAL_NODE_EXPIRED')
+    number=state.get('received_capacity_recoveries',0)+1;run_id='mainline3-'+mode+'-received-recovery'+str(number)
+    if (OUT/(mode+f'_received_recovery{number}.json')).exists():raise ValueError('NO_RECOVERY_REPLAY')
+    atomic_json(OUT/(mode+f'_bundle_before_received_recovery{number}.json'),bundle)
+    cfg['run_id']=run_id
+    cfg['policy'].update(route=None,budget=stage['project_budget'],allowed_tools=list(stage['tool_bindings']),tool_bindings=stage['tool_bindings'],
+        operation_allowances=stage['operation_allowances'],timeout_s=stage['project_budget']['wall_s'])
+    host=Host(store.root,run_id);host.create(cfg,parent_run_id=parent);host.resume()
+    state.pop('stop_reason',None);state['received_capacity_recoveries']=number;state['current_recovery_run_id']=run_id
+    node.update(status='running',request_run_id=run_id,catalog_origin_run_id=parent)
+    with store.transaction() as db:store.update_state(db,run_id,state)
+    d=InvestigationDispatcher(host);o=InvestigationOrder.model_validate(node['order'])
+    exc=ValueError('RETURN_GENERATION_CAPACITY_AFTER_LOCAL_INSPECTION')
+    exc.issue=dict(path='/choices/0',reason='Confirmed finish_reason=length; all 32768 completion tokens were reasoning; no native formal decision exists to expand or revalidate.',
+        legal='Same advertised investigation_return; a small supported adopted subset, concrete defer, or reject is valid. No required scientific verdict.',
+        query=dict(reference=last,pointer='/choices/0/message/reasoning_content',offset=0,limit=3000,byte_limit=4096),
+        inspection='Exact input passed existing guard; archived response and formal output were inspected locally first. This new request genuinely needs protocol output and spends a paid correction.')
+    feedback=d._protocol_feedback(o,exc)
+    if feedback is None:
+        stop(host,'CORRECTION_BUDGET_EXHAUSTED; original sessions and clock unchanged')
+        raise ValueError('CORRECTION_BUDGET_EXHAUSTED')
+    budget={k:max(0,plain(o.budget)[k]-node['usage'][k]) for k in zero()};budget['wall_s']=remaining
+    request='investigation-'+key+'-received-'+str(number)
+    row,fresh=store.reserve(run_id,request,digest(dict(original_response=last,original_node=key,correction=number)),'investigation-dispatcher',budget,kind='investigation')
+    if not fresh:raise ValueError('NO_RECEIVED_CORRECTION_REPLAY')
+    d._state(key,status='pending',active_request_id=request)
+    context=dict(kind='explicit_known_output_capacity_correction',feedback=feedback,previous_response=last,
+        received_assistant_content=raw['choices'][0]['message'].get('content'),received_native_calls=raw['choices'][0]['message'].get('tool_calls',[]),
+        retained_followup_evidence=node['reads'],original_deadline_unix=node['started_unix']+o.timeout_s,
+        instruction='Finish a concise useful formal disposition now; there is no need to reanalyze every old report claim or maximize adoption. Choose supported portions or give concrete defer/reject reasons independently. Thinking high and max_tokens 32768 remain unchanged.',
+        archived='Complete previous requests/responses including thinking remain immutable and queryable. No counterevidence, old result, permissions, cumulative quota or deadline was removed.')
+    atomic_json(OUT/(mode+f'_received_recovery{number}.json'),dict(timestamp=now(),same_project=store.config()['project_id'],original_run=parent,new_run=run_id,
+        original_node=key,original_started_unix=node['started_unix'],remaining_original_elapsed_s=remaining,original_response=last,
+        known_paid_usage=raw.get('usage'),same_node_usage_before=node['usage'],old_stop_preserved=True,new_paid_correction=True,automatic_retry=False))
+    began=time.monotonic()
+    try:
+        from examples.gvs_nmpc_route_experiment import load_credential
+        load_credential(Path.home()/'.codex/.env')
+        d._execute(o,row,reuse_saved_reads=True,correction_context=context)
+        current=store.session(run_id)['state']['investigations'][key]
+        if current['status']!='completed':raise ValueError('CONFIRMED_CORRECTION_'+current['status'].upper())
+        targets=[dict(investigation_id=k,report=n['result']) for k,n in state.get('historical_investigations',{}).items()] if mode=='reuse' else read(OUT/'coordinated_plan_targets.json')
+        result=finish_principal(host,key,current['result'],targets);atomic_json(OUT/(mode+'_result.json'),result)
+    finally:
+        stop(host,'RECEIVED_CAPACITY_CORRECTION_TERMINAL; original node and budgets cumulative')
+        atomic_json(OUT/(mode+f'_recovery{number}_lifecycle.json'),dict(application_wall_s=time.monotonic()-began,ended_at=now(),unknown_reservations=store.remaining()['occupied']))
+        export(OUT,mode,run_id=run_id);new=read(OUT/(mode+'_bundle.json'));new['session_status']='stopped';atomic_json(OUT/(mode+'_bundle.json'),new)
 
 
 def correct_material(host,key,review):
@@ -280,6 +349,7 @@ def stage_b(host,p):
     combined=collect(host,invoke(host,'research.investigate',synthesis,request_id='coordinator-summary'))
     inspect(host,[raw,view])
     targets=[dict(investigation_id=c['investigation_id'],report=r) for c,r in zip(children,reports)]
+    atomic_json(OUT/'coordinated_plan_targets.json',targets)
     result=principal(host,p,'principal-coordinated-v2',targets,raw,view,extra=[combined],models=10,ops=14)
     result.update(coordinator_plan=ref,coordinator_synthesis=combined,new_investigators=targets)
     return result
@@ -331,9 +401,10 @@ def execute(mode):
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('action',choices=['start','freeze','execute']);p.add_argument('--mode',choices=['reuse','coordinated','fixed'],default='reuse');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('action',choices=['start','freeze','execute','recover-received']);p.add_argument('--mode',choices=['reuse','coordinated','fixed'],default='reuse');a=p.parse_args()
     if a.action=='start':start()
     elif a.action=='freeze':freeze()
+    elif a.action=='recover-received':recover_received(a.mode)
     else:execute(a.mode)
 
 

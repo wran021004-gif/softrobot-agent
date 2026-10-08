@@ -52,7 +52,7 @@ def generate(bundle, review=None, *, limits=None):
     read_closures = []
     for key, node in sorted(nodes.items()):
         request = 'investigation-' + key
-        own = [e for e in events if e.get('request_id') == request or e.get('request_id','').startswith(request+'-material-')]
+        own = [e for e in events if e.get('request_id') == request or e.get('request_id','').startswith((request+'-material-',request+'-received-'))]
         starts = [e for e in own if e['kind'] == 'investigation_provider_attempt']
         first = min((e['sequence'] for e in starts), default=float('inf'))
         prefetch, followup, metadata, unmatched = [], [], [], []
