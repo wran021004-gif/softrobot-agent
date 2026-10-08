@@ -108,7 +108,27 @@ def main():
     atomic_json(host.folder/'mainline3_result.json',output)
 
 
-def live_interface_scenario(host,mode):
+def direct_validation_plan(source):
+    """Frozen direct questions; no prescribed investigator follow-up path."""
+    from tools.research_investigations import InvestigationOrder
+    proposal=interface_proposal('direct')
+    def order(key,question,pointer):
+        return plain(InvestigationOrder(investigation_id=key,question=question,role='investigator',
+            evidence=[source],queries=[dict(reference=source,pointer=pointer)],
+            budget=proposal['node_budget'],timeout_s=180.,stop_conditions=[
+                'Bounded evidence turns then one report','Historical Stage336 evidence only; no scientific computation',
+                'No transport retries, protocol corrections, delegation or new authority']))
+    return dict(questions=[
+        order('reach-question','For the historical Stage336 proposal-build execution 494deb38d6374deb8f741e96f2430826, explain which reach and sampled holding/settling judgments the available evidence supports and which remain unknown. The small initial page is not the whole authorized source. Choose relevant further evidence yourself if needed, within budget; report exact sourced facts, counterevidence and limits. Do not attribute this old result to the later promoted candidate or diagnose a dominant cause.', '/terminal_error_m'),
+        order('timing-question','For the same historical Stage336 proposal-build execution 494deb38d6374deb8f741e96f2430826, explain what recorded computation time and control period support, and the limits of timing interpretations. The small initial page is not the whole authorized source. Choose relevant further evidence yourself if needed, within budget; report exact sourced facts, counterevidence and unknowns. Do not infer real robot performance or a causal bottleneck.', '/deadline_misses')],
+        principal_inspections=[dict(reference=source,pointer=p,limit=100,byte_limit=8192) for p in (
+            '/sampled_settling','/mean_complete_update_s','/control_period_s','/execution_id')],
+        principal_report_pointer='',principal_budget={**proposal['node_budget'],'tool_calls':4},
+        principal_accounting='Four public independent key-source inspections plus at most four node evidence operations: combined principal ceiling eight.',
+        source_case='Stage336 saved proposal-build only; later promoted configuration is not execution evidence')
+
+
+def live_interface_scenario(host,mode,*,plan=None):
     """Future engineered interface test; not a physics experiment or acceptance claim."""
     from tools.research_investigations import InvestigationOrder
     from tools.platform_store import zero
@@ -118,9 +138,15 @@ def live_interface_scenario(host,mode):
         source=plain(host.store.put(db,audit['execution']['factual_result']))
         state=host.store.session(host.run_id,db)['state']
         count=proposal['node_count']
-        state['role_context']=dict(investigation_grant=dict(max_count=count,max_concurrency=2,
+        grant=dict(max_count=count,max_concurrency=2,
             allowed_tools=['evidence.read'],evidence=[source],include_completed_reports=True,
-            per_node_budget=proposal['node_budget'],total_budget=proposal['total_node_budget']))
+            per_node_budget=proposal['node_budget'],total_budget=proposal['total_node_budget'])
+        # Preserve the wrapper's frozen deadline and role authority, if present.
+        old=state.get('role_context',{}).get('investigation_grant',{})
+        if 'deadline_unix' in old:grant['deadline_unix']=old['deadline_unix']
+        state['role_context']=dict(role='principal',investigation_grant=grant)
+        from tools.state_io import digest
+        state['investigation_grant_identity']=digest(grant)
         host.store.update_state(db,host.run_id,state)
     def order(key,question,queries,role='investigator',evidence=None):
         return plain(InvestigationOrder(investigation_id=key,question=question,role=role,
@@ -134,17 +160,22 @@ def live_interface_scenario(host,mode):
     def collect(receipt):
         result=returned(receipt)
         if result['status'] not in ('pending','running'):return result
-        deadline=time.monotonic()+180.
-        for attempt in range(100):
+        import threading
+        node=host.store.session(host.run_id)['state']['investigations'][result['investigation_id']]
+        deadline=time.monotonic()+max(0,180.-(time.time()-node['started_unix']))+10.
+        for attempt in range(16):
+            thread=next((t for t in threading.enumerate() if t.name=='investigation-'+result['investigation_id']),None)
+            wait=max(0,min(15.,deadline-time.monotonic()))
+            if thread is not None:thread.join(wait)
+            elif wait:time.sleep(wait)
             checked=invoke(host,'research.investigation_status',dict(investigation_id=result['investigation_id']),
                 request_id='collect-'+result['investigation_id']+'-'+str(attempt))
             rows.append(checked);result=returned(checked)
             if result['status'] not in ('pending','running'):return result
             if time.monotonic()>=deadline:break
-            time.sleep(1.8)
         return dict(status='incomplete',reason='Collection limit reached; original reservation retained, no redispatch')
     if mode=='direct':
-        questions=[order('reach-question','Explain saved reach/settling results and unknowns',
+        questions=plan['questions'] if plan else [order('reach-question','Explain saved reach/settling results and unknowns',
             [dict(reference=source,pointer='/terminal_error_m')]),
             order('timing-question','Explain saved complete-update accounting and its limits',
             [dict(reference=source,pointer='/deadline_misses')])]
@@ -167,13 +198,18 @@ def live_interface_scenario(host,mode):
     # Public principal reads happen before its decision; exact receipts and pages
     # are passed into its independently assembled input, separately from child reads.
     source_pointers=('/terminal_error_m','/deadline_misses','/sampled_settling','/task_accepted','/mean_complete_update_s','/control_period_s','/execution_id','/result_type')
-    for index,p in enumerate(source_pointers):
-        receipt=invoke(host,'research.investigation_read',dict(reference=source,pointer=p),request_id='principal-inspect-'+str(index));rows.append(receipt)
+    inspections=plan['principal_inspections'] if plan else [dict(reference=source,pointer=p) for p in source_pointers]
+    for index,query in enumerate(inspections):
+        receipt=invoke(host,'research.investigation_read',query,request_id='principal-inspect-'+str(index));rows.append(receipt)
         if receipt['execution_status']!='completed':return dict(engineered_interface_test=True,status=receipt['execution_status'],receipts=rows)
-    queries=[dict(reference=ref,pointer='/facts') for ref in reports]
-    queries.extend(dict(reference=source,pointer=p) for p in source_pointers[:4])
+    queries=[dict(reference=ref,pointer=plan['principal_report_pointer'] if plan else '/facts',
+        **(dict(limit=100,byte_limit=8192) if plan else {})) for ref in reports]
+    if not plan:queries.extend(dict(reference=source,pointer=p) for p in source_pointers[:4])
     synthesis=order('principal-synthesis','Synthesize the two distinct completed evidence questions. Public principal inspection records and original pages are supplied independently of child reads. Return exactly one explicit structured disposition for each of these investigation IDs: '+', '.join(q['investigation_id'] for q in questions)+'. Bind each report reference. Accept only with adopted_claims, specific supporting report facts, exact inspected scope fields, and support_explanation; semantic reasoning remains unassessed. Defer/reject may have no inspections when evidence is insufficient; state remaining_unknowns. Do not replace decisions with informal prose. No new computation is authorized.',
         queries,role='principal',evidence=[source,*reports])
+    if plan:
+        synthesis['budget']=plan['principal_budget']
+        synthesis['question']+=' Historical applicability is Stage336 proposal-build execution 494deb38d6374deb8f741e96f2430826 only, not the later promoted candidate. Only facts and scope covered by principal_inspection_records qualify for formal adoption; other node reads support analysis but do not substitute independent public inspection. Limit adopted claims accordingly or defer/reject uninspected conclusions. Check factual and interpretive support separately; do not force acceptance. No children or protocol correction requests are authorized.'
     rows.append(invoke(host,'research.investigate',synthesis,request_id='synthesis'))
     result=collect(rows[-1])
     if result['status']!='completed':return dict(engineered_interface_test=True,status=result['status'],receipts=rows)

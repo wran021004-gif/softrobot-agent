@@ -49,6 +49,7 @@ def generate(bundle, review=None):
             errors.append('ARTIFACT_IDENTITY_MISMATCH:' + key)
     rows = []
     qualifying = []
+    read_closures = []
     for key, node in sorted(nodes.items()):
         request = 'investigation-' + key
         own = [e for e in events if e.get('request_id') == request]
@@ -90,15 +91,46 @@ def generate(bundle, review=None):
             else:
                 followup.append(entry)
                 if node['order']['role'] == 'investigator' and entry['absent_from_initial_prefetch']:
-                    qualifying.append(dict(investigation_id=key, sequence=event['sequence'],
+                    # A requested/read page alone is not a completed model loop.
+                    later=[e for e in starts if e['sequence']>event['sequence']]
+                    delivered=[]
+                    for send in later:
+                        payload=artifacts[send['outputs'][0]['artifact_id']].get('payload',{})
+                        for message in payload.get('messages',[]):
+                            if message.get('role')!='tool' or not native or message.get('tool_call_id')!=native[0].get('id'):continue
+                            try:body=json.loads(message.get('content',''))
+                            except (ValueError,TypeError):continue
+                            if body==record['page']:delivered.append(send['sequence'])
+                    report=artifacts.get((node.get('result') or {}).get('artifact_id'),{})
+                    used=[f for f in (*report.get('facts',[]),*report.get('counterevidence',[]))
+                        if f['reference']==record['reference'] and visible(f['pointer'],f['value'],record)
+                        and not any(p['read']['reference']==f['reference'] and visible(f['pointer'],f['value'],p['read']) for p in prefetch)]
+                    closure=dict(investigation_id=key, sequence=event['sequence'],
                         reference=record['reference'], pointer=record['pointer'],
-                        native_response_sequence=entry['native_response_sequence']))
+                        native_response_sequence=entry['native_response_sequence'],
+                        delivered_in_attempt_sequences=delivered,report_uses_novel_facts=used,
+                        closed=bool(delivered and used and node['status']=='completed'))
+                    read_closures.append(closure)
+                    if closure['closed']:qualifying.append(closure)
         rows.append(dict(investigation_id=key, role=node['order']['role'], status=node['status'],
             report=node.get('result'), initial_prefetch=prefetch,
             investigator_selected_original_reads=followup, selected_directory_reads=metadata,
             unmatched_reads=unmatched, provider_attempts=len(starts),
             provider_responses=sum(e['kind'] == 'investigation_provider_response' for e in own),
             usage=node.get('usage'), disposition=node.get('disposition_record')))
+        report=artifacts.get((node.get('result') or {}).get('artifact_id'),{})
+        observed=[x['read'] for x in (*prefetch,*followup)]
+        if node['order']['role']=='principal':observed+=state.get('principal_investigation_reads',[])
+        for fact in (*report.get('facts',[]),*report.get('counterevidence',[])):
+            ref=fact['reference'];original=artifacts.get(ref['artifact_id'])
+            scoped=ref in node['order']['evidence']
+            seen=any(r['reference']==ref and visible(fact['pointer'],fact['value'],r) for r in observed)
+            from tools.platform_handoff import pointer as resolve
+            try:correct=encode(resolve(original,fact['pointer']))==encode(fact['value'])
+            except (KeyError,IndexError,TypeError,ValueError):correct=False
+            identity=fact.get('source_identity',{})
+            correct &= all(isinstance(original,dict) and original.get(k)==v for k,v in identity.items())
+            if not (scoped and seen and correct):errors.append('REPORT_SOURCE_VALUE_SCOPE_OR_VISIBILITY:' + key)
         if unmatched:
             errors.append('UNMATCHED_POST_SEND_READ:' + key)
     investigators = [n for n in nodes.values() if n['order']['role'] == 'investigator']
@@ -120,8 +152,8 @@ def generate(bundle, review=None):
     charged = zero()
     unresolved = []
     for call in bundle['calls']:
-        for k, v in call['charged'].items():
-            charged[k] += v
+        if call.get('charged'):
+            for k, v in call['charged'].items():charged[k] += v
         if call['status'] in ('running', 'unknown'):
             unresolved.append(dict(request_id=call['request_id'], status=call['status'], reserved=call['reserved']))
     budget = bundle['project']['budget']
@@ -129,6 +161,17 @@ def generate(bundle, review=None):
     accounting &= all(charged[k] <= budget[k] for k in budget)
     accounting &= all(n.get('usage', {}).get('model_calls', 0) == r['provider_attempts']
                       for n, r in zip((nodes[r['investigation_id']] for r in rows), rows))
+    accounting &= bundle.get('session_status')=='stopped'
+    bounds=all(r['provider_attempts']<=6 and r.get('usage',{}).get('tool_calls',0)<=8 for r in rows)
+    principal=[r for r in rows if r['role']=='principal']
+    bounds &= all(r.get('usage',{}).get('tool_calls',0)+sum(e['kind']=='principal_inspection' for e in events)<=8 for r in principal)
+    bounds &= len(nodes)<=3 and not charged['backend_solves'] and not charged['worker_calls'] and attempts<=18
+    model=bundle.get('snapshot',{}).get('input',{}).get('policy',{}).get('model',{})
+    requests=[artifacts[e['outputs'][0]['artifact_id']].get('payload',{}) for e in events if e['kind']=='investigation_provider_attempt']
+    compatible=bool(model and requests) and all(p.get('model')==model.get('model')=='deepseek-flash'
+        and p.get('thinking')=={'type':'enabled'} and p.get('reasoning_effort')=='high'
+        and p.get('tool_choice')=='auto' and p.get('max_tokens')==3000 for p in requests)
+    acceptance_count=sum(d['record']['decision']['disposition']=='accept' for d in dispositions)
     expected_reports = sorted(n['result']['artifact_id'] for n in investigators if n.get('result'))
     material = bool(review and review.get('bundle_identity') == digest(bundle)
                     and sorted(review.get('reports', [])) == expected_reports
@@ -140,12 +183,16 @@ def generate(bundle, review=None):
         formal_principal_dispositions='pass' if completed and len(dispositions) == 2 else 'fail',
         independently_inspected_acceptance='pass' if inspected and len(dispositions) == 2 else 'fail',
         lifecycle_and_accounting='pass' if accounting else 'fail',
+        bounded_authority='pass' if bounds else 'fail',
+        approved_request_settings='pass' if compatible and model.get('base_url')=='https://api.deepseek.com' else 'unverified',
         material_correctness='pass' if material else 'unverified')
     return dict(version='mainline3_saved_gate@1.0.0', input_identity=digest(bundle),
         review_identity=digest(review) if review else None, mode=bundle['mode'],
         gates=gates, passed=all(v == 'pass' for v in gates.values()),
         dependent_phase='permitted' if all(v == 'pass' for v in gates.values()) else 'unexecuted_failed_prerequisite',
         qualifying_followup_reads=qualifying, nodes=rows,
+        novel_original_read_closures=read_closures,
+        acceptance_coverage='covered' if acceptance_count else 'unverified; no accepted report',
         principal_inspections=state.get('principal_investigation_reads', []), dispositions=dispositions,
         accounting=dict(provider_attempts=attempts, provider_responses=responses,
             charged=charged, budget=budget, unresolved_reservations=unresolved,
